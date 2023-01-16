@@ -2869,9 +2869,18 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int staffLineWidth = m_options->m_staffLineWidth.GetValue() * unit;
         const int startX = x1 - staffLineWidth;
-        const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD))
-            ? x2 + endingMeasure->CalculateRightBarLineWidth(m_doc, staffSize) - lineWidth / 2 - staffLineWidth
-            : x2;
+
+        const int rightBarLineWidth = endingMeasure->CalculateRightBarLineWidth(m_doc, staffSize);
+        int endX = x2;
+        if (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD)) {
+            // Right align the ending in the last measure of the system
+            endX += rightBarLineWidth - lineWidth / 2 - staffLineWidth;
+        }
+        else {
+            // Ensure that successive endings do not overlap horizontally
+            endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
+        }
+
         dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
         Point p[4];
         p[0] = { ToDeviceContextX(startX), ToDeviceContextY(y1) };
