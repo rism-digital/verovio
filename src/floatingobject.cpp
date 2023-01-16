@@ -384,15 +384,6 @@ int FloatingPositioner::GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox,
             return 2 * unit;
         }
     }
-
-    if (bbox->Is(FLOATING_POSITIONER)) {
-        const FloatingPositioner *positioner = vrv_cast<const FloatingPositioner *>(bbox);
-        // Endings are allowed to slightly overlap
-        if (this->GetObject()->Is(ENDING) && positioner->GetObject()->Is(ENDING)) {
-            return -2 * unit;
-        }
-    }
-
     return 0;
 }
 
