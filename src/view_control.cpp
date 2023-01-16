@@ -2888,19 +2888,31 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         const int staffLineWidth = m_options->m_staffLineWidth.GetValue() * unit;
         const int startX = x1 - staffLineWidth;
-        const int endX = (measure == system->FindDescendantByType(MEASURE, 1, BACKWARD))
-            ? x2 + endingMeasure->CalculateRightBarLineWidth(m_doc, staffSize) - lineWidth / 2 - staffLineWidth
-            : x2;
+
+        const int rightBarLineWidth = endingMeasure->CalculateRightBarLineWidth(m_doc, staffSize);
+        int endX = x2;
+        if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)
+            || (endingMeasure == system->FindDescendantByType(MEASURE, 1, BACKWARD))) {
+            // Right align the ending in the last measure of the system
+            endX += rightBarLineWidth - lineWidth / 2 - staffLineWidth;
+        }
+        else if (endingMeasure->GetDrawingRightBarLine() != BARRENDITION_invis) {
+            // Ensure that successive endings do not overlap horizontally
+            endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
+        }
+
         dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
         Point p[4];
         p[0] = { ToDeviceContextX(startX), ToDeviceContextY(y1) };
         p[1] = { ToDeviceContextX(startX), ToDeviceContextY(y2) };
         p[2] = { ToDeviceContextX(endX), ToDeviceContextY(y2) };
         p[3] = { ToDeviceContextX(endX), ToDeviceContextY(y1) };
-        if ((spanningType == SPANNING_END) || (ending->GetLstartsym() == LINESTARTENDSYMBOL_none)) {
+        if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)
+            || (ending->GetLstartsym() == LINESTARTENDSYMBOL_none)) {
             p[0] = p[1];
         }
-        if ((spanningType == SPANNING_START) || (ending->GetLendsym() == LINESTARTENDSYMBOL_none)) {
+        if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)
+            || (ending->GetLendsym() == LINESTARTENDSYMBOL_none)) {
             p[3] = p[2];
         }
         dc->DrawPolyline(4, p);

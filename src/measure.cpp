@@ -285,7 +285,7 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
+int Measure::CalculateRightBarLineWidth(const Doc *doc, int staffSize) const
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
@@ -298,7 +298,8 @@ int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
     int width = 0;
     switch (barline->GetForm()) {
         case BARRENDITION_dbl:
-        case BARRENDITION_dbldashed: {
+        case BARRENDITION_dbldashed:
+        case BARRENDITION_dbldotted: {
             width = barLineSeparation + barLineWidth;
             break;
         }

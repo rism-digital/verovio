@@ -184,38 +184,20 @@ void BBoxDeviceContext::DrawEllipse(int x, int y, int width, int height)
 
 void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, double start, double end)
 {
-    int penWidth = m_penStack.top().GetWidth();
-    if (penWidth % 2) {
-        penWidth += 1;
-    }
+    const std::pair<int, int> overlap = this->GetPenWidthOverlap();
+
     // needs to be fixed - for now uses the entire rectangle
-    this->UpdateBB(x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
+    this->UpdateBB(x - overlap.first, y - overlap.second, x + width + overlap.second, y + height + overlap.first);
 }
 
 void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    if (x1 > x2) {
-        int tmp = x1;
-        x1 = x2;
-        x2 = tmp;
-    }
-    if (y1 > y2) {
-        int tmp = y1;
-        y1 = y2;
-        y2 = tmp;
-    }
+    if (x1 > x2) std::swap(x1, x2);
+    if (y1 > y2) std::swap(y1, y2);
 
-    int penWidth = m_penStack.top().GetWidth();
-    int p1 = penWidth / 2;
-    int p2 = p1;
-    // how odd line width is handled might depend on the implementation of the device context.
-    // however, we expect the actually width to be shifted on the left/top
-    // e.g., with 7, 4 on the left and 3 on the right
-    if (penWidth % 2) {
-        p1++;
-    }
+    const std::pair<int, int> overlap = this->GetPenWidthOverlap();
 
-    this->UpdateBB(x1 - p1, y1 - p1, x2 + p2, y2 + p2);
+    this->UpdateBB(x1 - overlap.first, y1 - overlap.second, x2 + overlap.second, y2 + overlap.first);
 }
 
 void BBoxDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOffset)
@@ -235,12 +217,15 @@ void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOff
     int y2 = y1;
 
     for (int i = 0; i < n; i++) {
-        if (points[i].x + xOffset < x1) x1 = points[i].x + xOffset;
-        if (points[i].x + xOffset > x2) x2 = points[i].x + xOffset;
-        if (points[i].y + yOffset < y1) y1 = points[i].y + yOffset;
-        if (points[i].y + yOffset > y2) y2 = points[i].y + yOffset;
+        x1 = std::min(x1, points[i].x + xOffset);
+        x2 = std::max(x2, points[i].x + xOffset);
+        y1 = std::min(y1, points[i].y + yOffset);
+        y2 = std::max(y2, points[i].y + yOffset);
     }
-    this->UpdateBB(x1, y1, x2, y2);
+
+    const std::pair<int, int> overlap = this->GetPenWidthOverlap();
+
+    this->UpdateBB(x1 - overlap.first, y1 - overlap.second, x2 + overlap.second, y2 + overlap.first);
 }
 
 void BBoxDeviceContext::DrawRectangle(int x, int y, int width, int height)
@@ -259,13 +244,10 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         width = -width;
         x -= width;
     }
-    int penWidth = m_penStack.top().GetWidth();
 
-    if (penWidth % 2) {
-        penWidth += 1;
-    }
+    const std::pair<int, int> overlap = this->GetPenWidthOverlap();
 
-    this->UpdateBB(x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
+    this->UpdateBB(x - overlap.first, y - overlap.second, x + width + overlap.second, y + height + overlap.first);
 }
 
 void BBoxDeviceContext::DrawPlaceholder(int x, int y)
@@ -456,6 +438,20 @@ void BBoxDeviceContext::ResetGraphicRotation()
     m_rotationAngle = 0.0;
     m_rotationOrigin.x = 0;
     m_rotationOrigin.y = 0;
+}
+
+std::pair<int, int> BBoxDeviceContext::GetPenWidthOverlap() const
+{
+    const int penWidth = m_penStack.top().GetWidth();
+    int p1 = penWidth / 2;
+    int p2 = p1;
+
+    // How odd line width is handled might depend on the implementation of the device context.
+    // However, we expect the actual width to be shifted on the left/top
+    // e.g., with 7, 4 on the left and 3 on the right.
+    if (penWidth % 2) ++p1;
+
+    return { p1, p2 };
 }
 
 } // namespace vrv

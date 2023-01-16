@@ -849,15 +849,12 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizontally (and, in case of extender
             // elements - vertically)
-            LayerElement *element = dynamic_cast<LayerElement *>(*i);
-            const bool additionalMargin
-                = ((*iter)->GetObject()->Is(DYNAM) && element && element->GetFirstAncestor(BEAM));
-            const int margin = additionalMargin ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize) : 0;
-            i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
+            i = std::find_if(i, end, [iter, drawingUnit](BoundingBox *elem) {
                 if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
                     return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
                         || (*iter)->VerticalContentOverlap(elem);
                 }
+                const int margin = (*iter)->GetAdmissibleHorizOverlapMargin(elem, drawingUnit);
                 return (*iter)->HorizontalContentOverlap(elem, margin);
             });
             if (i != end) {
