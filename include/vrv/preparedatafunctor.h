@@ -1073,7 +1073,10 @@ public:
 protected:
     //
 private:
-    //
+    // Helper to get the element list for the beamSpan - elements are acquired from all layerElements
+    // that are located in between start and end of the beamSpan
+    ArrayOfObjects GetBeamSpanElementList(BeamSpan *beamSpan, Layer *layer, const Staff *staff) const;
+
 public:
     //
 private:

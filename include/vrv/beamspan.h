@@ -85,6 +85,14 @@ public:
     const BeamSpanSegment *GetSegmentForSystem(const System *system) const;
     ///@}
 
+    /**
+     * Getter and setter for the beamed elements
+     */
+    ///@{
+    const ArrayOfObjects &GetBeamedElements() const { return m_beamedElements; }
+    void SetBeamedElements(const ArrayOfObjects &beamedElements) { m_beamedElements = beamedElements; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
