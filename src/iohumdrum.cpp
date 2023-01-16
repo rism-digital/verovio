@@ -976,8 +976,8 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 //      *below   == place scale degree below staff (default)
 //      *bold    == scale degree displayed in bold
 //      *Xbold   == stop displaying scale degrees in bold
-//      *circle  == add a circle around the scale degrees
-//      *Xcircle == don't add a circle (default)
+//      *circ    == add a circle around the scale degrees
+//      *Xcirc   == don't add a circle (default)
 //      *hat     == add a hat above the scale degrees
 //      *Xhat    == don't add a hat (default)
 //      *solf    == display in moveable do
@@ -1130,11 +1130,11 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             boxQ = false;
             boxline = 0;
         }
-        else if (*current == "*circle") {
+        else if (*current == "*circ") {
             circleQ = true;
             circleline = current->getLineIndex();
         }
-        else if (*current == "*Xcircle") {
+        else if (*current == "*Xcirc") {
             circleQ = false;
             circleline = 0;
         }
