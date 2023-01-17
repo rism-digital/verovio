@@ -731,40 +731,59 @@ void View::DrawOctave(
         const int lineWidth = octave->GetLineWidth(m_doc, m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // adjust is to avoid the figure to touch the line
-        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + lineWidth;
         if (altSymbols) x1 += extend.m_width / 2;
-        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-        int lineShift = (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
 
-        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        const int gap = lineWidth * 4;
+
+        dc->SetPen(m_currentColour, lineWidth, AxSHORT_DASH, 0, gap, AxCAP_SQUARE);
         dc->SetBrush(m_currentColour, AxSOLID);
-        int dotShift = 0;
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                dc->SetPen(m_currentColour, lineWidth, AxSOLID);
+                dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE);
                 dc->SetBrush(m_currentColour, AxSOLID);
             }
             else if (octave->GetLform() == LINEFORM_dotted) {
-                dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
+                if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+                    // round to nearest multiple
+                    const int diff = (x2 - x1) % (gap + 1);
+                    x2 += (gap - diff < diff) ? gap - diff : -diff;
+                }
+                dc->SetPen(m_currentColour, lineWidth * 3 / 2, AxDOT, 0, gap, AxCAP_ROUND);
                 dc->SetBrush(m_currentColour, AxSOLID);
-                dotShift = lineShift;
             }
         }
 
+        // adjust vertical ends
+        y1 -= lineWidth / 2;
+        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+
         if (x1 > x2) {
             // make sure we have a minimal extender line
-            x2 = x1 + extend.m_height / 4;
+            x2 = x1 + lineWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1 + lineShift), ToDeviceContextX(x2),
-            ToDeviceContextY(y1 + lineShift));
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
         octave->SetDrawingExtenderX(x1, x2);
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none) {
-            x2 += lineWidth / 2;
-            // draw the ending vertical line if not the end of the system
             if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
-                dc->DrawLine(
-                    ToDeviceContextX(x2), ToDeviceContextY(y1 + dotShift), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                if (octave->GetLform() == LINEFORM_dotted) {
+                    // make sure we have at least two dots for the dotted hook
+                    dc->SetPen(m_currentColour, lineWidth * 3 / 2, AxDOT, 0, std::min(gap, extend.m_height - lineWidth),
+                        AxCAP_ROUND);
+                    dc->DrawLine(
+                        ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                }
+                else {
+                    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
+                    // Right hook
+                    Point hookRight[3];
+                    hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
+                    hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
+                    hookRight[2] = { ToDeviceContextX(x2 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+                        ToDeviceContextY(y1) };
+                    dc->DrawPolyline(3, hookRight);
+                }
             }
         }
     }
@@ -1142,7 +1161,10 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        x1 = f->GetContentRight();
+        Text *text = vrv_cast<Text *>(f->GetFirst(TEXT));
+        if (text) {
+            x1 = text->GetContentRight();
+        }
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
