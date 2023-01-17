@@ -602,6 +602,7 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
             else {
                 dynamStr += xmlDynamPart.name();
             }
+            if (xmlDynamPart != node.last_child()) dynamStr += " ";
         }
         return dynamStr;
     }
@@ -3242,6 +3243,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             else {
                 dynamStr += xmlDynamPart.name();
             }
+            if (xmlDynamPart != xmlDynam.last_child()) dynamStr += " ";
         }
         Text *text = new Text();
         text->SetText(UTF8to32(dynamStr));
