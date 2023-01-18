@@ -477,7 +477,7 @@ void View::DrawBracketSpan(
             Point hookLeft[3];
             hookLeft[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - unit * 2) };
             hookLeft[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
-            hookLeft[2] = { ToDeviceContextX(x1 + lineWidth / 2 + unit), ToDeviceContextY(y) };
+            hookLeft[2] = { ToDeviceContextX(x1 + unit), ToDeviceContextY(y) };
             dc->DrawPolyline(3, hookLeft);
         }
     }
@@ -490,7 +490,7 @@ void View::DrawBracketSpan(
             Point hookRight[3];
             hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y - unit * 2) };
             hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
-            hookRight[2] = { ToDeviceContextX(x2 - lineWidth / 2 - unit), ToDeviceContextY(y) };
+            hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y) };
             dc->DrawPolyline(3, hookRight);
         }
     }
@@ -706,13 +706,13 @@ void View::DrawOctave(
     dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        const int lineWidth = octave->GetLineWidth(m_doc, m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int lineWidth = octave->GetLineWidth(m_doc, unit);
+        const int gap = lineWidth * 4;
 
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + lineWidth;
         if (altSymbols) x1 += extend.m_width / 2;
-
-        const int gap = lineWidth * 4;
 
         dc->SetPen(m_currentColour, lineWidth, AxSHORT_DASH, 0, gap, AxCAP_SQUARE);
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -733,8 +733,8 @@ void View::DrawOctave(
         }
 
         // adjust vertical ends
-        y1 -= lineWidth / 2;
-        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        y1 += (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
+        y2 = (disPlace == STAFFREL_basic_above) ? y1 - unit * 2 : y1 + unit * 2;
 
         if (x1 > x2) {
             // make sure we have a minimal extender line
@@ -747,8 +747,8 @@ void View::DrawOctave(
             if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
                 if (octave->GetLform() == LINEFORM_dotted) {
                     // make sure we have at least two dots for the dotted hook
-                    dc->SetPen(m_currentColour, lineWidth * 3 / 2, AxDOT, 0, std::min(gap, extend.m_height - lineWidth),
-                        AxCAP_ROUND);
+                    dc->SetPen(
+                        m_currentColour, lineWidth * 3 / 2, AxDOT, 0, std::min(gap, unit * 2 - lineWidth), AxCAP_ROUND);
                     dc->DrawLine(
                         ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
                 }
@@ -758,8 +758,7 @@ void View::DrawOctave(
                     Point hookRight[3];
                     hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
                     hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
-                    hookRight[2] = { ToDeviceContextX(x2 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-                        ToDeviceContextY(y1) };
+                    hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y1) };
                     dc->DrawPolyline(3, hookRight);
                 }
             }
