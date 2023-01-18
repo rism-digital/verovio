@@ -500,10 +500,12 @@ void View::DrawBracketSpan(
             dc->SetPen(m_currentColour, lineWidth, AxLONG_DASH, 0, 0, AxCAP_SQUARE);
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
-            dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
             // Adjust start and end
-            x1 += unit * 2;
-            x2 -= unit + lineWidth;
+            dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
+            x1 += unit + lineWidth * 2;
+            x2 -= unit + lineWidth * 2;
+            const int diff = (x2 - x1) % (lineWidth * 3 + 1);
+            x1 += diff / 2;
         }
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
     }
