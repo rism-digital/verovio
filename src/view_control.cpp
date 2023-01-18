@@ -460,29 +460,7 @@ void View::DrawBracketSpan(
     }
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-
-    if (bracketSpan->HasLwidth()) {
-        if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
-            if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
-                lineWidth *= LINEWIDTHTERM_factor_narrow;
-            }
-            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
-                lineWidth *= LINEWIDTHTERM_factor_medium;
-            }
-            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
-                lineWidth *= LINEWIDTHTERM_factor_wide;
-            }
-        }
-        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
-            if (bracketSpan->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetPx();
-            }
-            else {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetVu() * unit;
-            }
-        }
-    }
+    const int lineWidth = bracketSpan->GetLineWidth(m_doc, unit);
 
     x1 += lineWidth / 2;
     x2 -= lineWidth / 2;
