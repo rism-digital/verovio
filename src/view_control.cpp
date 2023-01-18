@@ -450,34 +450,7 @@ void View::DrawBracketSpan(
         return;
     }
 
-    int y = bracketSpan->GetDrawingY();
-
-    int startRadius = 0;
-    if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
-        startRadius = bracketSpan->GetStart()->GetDrawingRadius(m_doc);
-    }
-
-    int endRadius = 0;
-    if (!bracketSpan->GetEnd()->Is(TIMESTAMP_ATTR)) {
-        endRadius = bracketSpan->GetEnd()->GetDrawingRadius(m_doc);
-    }
-
-    // The both correspond to the current system, which means no system break in-between (simple case)
-    if (spanningType == SPANNING_START_END) {
-        x1 -= startRadius;
-        x2 += endRadius;
-    }
-    // Only the first parent is the same, this means that the syl is "open" at the end of the system
-    else if (spanningType == SPANNING_START) {
-        x1 -= startRadius;
-    }
-    // We are in the system of the last note - draw the connector from the beginning of the system
-    else if (spanningType == SPANNING_END) {
-        x2 += endRadius;
-    }
-    else {
-        // nothing to adjust
-    }
+    const int y = bracketSpan->GetDrawingY();
 
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
@@ -486,78 +459,59 @@ void View::DrawBracketSpan(
         dc->StartGraphic(bracketSpan, "", bracketSpan->GetID(), SPANNING);
     }
 
-    int bracketSize = 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int lineWidth = bracketSpan->GetLineWidth(m_doc, unit);
 
-    if (bracketSpan->HasLwidth()) {
-        if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_lineWidthTerm) {
-            if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_narrow) {
-                lineWidth *= LINEWIDTHTERM_factor_narrow;
-            }
-            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_medium) {
-                lineWidth *= LINEWIDTHTERM_factor_medium;
-            }
-            else if (bracketSpan->GetLwidth().GetLineWithTerm() == LINEWIDTHTERM_wide) {
-                lineWidth *= LINEWIDTHTERM_factor_wide;
-            }
-        }
-        else if (bracketSpan->GetLwidth().GetType() == LINEWIDTHTYPE_measurementunsigned) {
-            if (bracketSpan->GetLwidth().GetMeasurementunsigned().GetType() == MEASUREMENTTYPE_px) {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetPx();
-            }
-            else {
-                lineWidth = bracketSpan->GetLwidth().GetMeasurementunsigned().GetVu()
-                    * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-        }
-    }
+    x1 += lineWidth / 2;
+    x2 -= lineWidth / 2;
 
-    // Opening bracket
+    dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        // Do not draw the horizontal line if the lines is dashed or solid as a full line will be drawn below
-        // (Do draw the horizontal line for dotted lines as it looks better)
-        if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
-            this->DrawFilledRectangle(dc, x1, y, x1 + bracketSize, y + lineWidth);
+        if (!bracketSpan->GetStart()->Is(TIMESTAMP_ATTR)) {
+            x1 -= bracketSpan->GetStart()->GetDrawingRadius(m_doc);
         }
-        this->DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y - bracketSize);
+        if (bracketSpan->GetLstartsym() != LINESTARTENDSYMBOL_none) {
+            // Left hook
+            Point hookLeft[3];
+            hookLeft[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - unit * 2) };
+            hookLeft[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
+            hookLeft[2] = { ToDeviceContextX(x1 + unit), ToDeviceContextY(y) };
+            dc->DrawPolyline(3, hookLeft);
+        }
     }
-    // Closing bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        // Ditto
-        if ((bracketSpan->GetLform() != LINEFORM_dashed) && (bracketSpan->GetLform() != LINEFORM_solid)) {
-            this->DrawFilledRectangle(dc, x2 - bracketSize, y, x2, y + lineWidth);
+        if (!bracketSpan->GetEnd()->Is(TIMESTAMP_ATTR)) {
+            x2 += bracketSpan->GetEnd()->GetDrawingRadius(m_doc);
         }
-        this->DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y - bracketSize);
+        if (bracketSpan->GetLendsym() != LINESTARTENDSYMBOL_none) {
+            // Right hook
+            Point hookRight[3];
+            hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y - unit * 2) };
+            hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
+            hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y) };
+            dc->DrawPolyline(3, hookRight);
+        }
     }
     // We have a @lform - draw a full line
     if (bracketSpan->HasLform()) {
-        if (bracketSpan->GetLform() == LINEFORM_solid) {
-            this->DrawFilledRectangle(dc, x1, y, x2, y - lineWidth);
-        }
-        else if (bracketSpan->GetLform() == LINEFORM_dashed) {
-            dc->SetPen(m_currentColour, lineWidth, AxSOLID, bracketSize);
-            dc->SetBrush(m_currentColour, AxSOLID);
-            int yDotted = y + lineWidth / 2;
-            dc->DrawLine(
-                ToDeviceContextX(x1), ToDeviceContextY(yDotted), ToDeviceContextX(x2), ToDeviceContextY(yDotted));
-            dc->ResetPen();
-            dc->ResetBrush();
+        if (bracketSpan->GetLform() == LINEFORM_dashed) {
+            dc->SetPen(m_currentColour, lineWidth, AxLONG_DASH, 0, 0, AxCAP_SQUARE);
         }
         else if (bracketSpan->GetLform() == LINEFORM_dotted) {
+            // Adjust start and end
             dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
-            dc->SetBrush(m_currentColour, AxSOLID);
-            // Adjust the start and end because the horizontal line of the was drawn in that case
-            int x1Dotted
-                = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) ? x1 + bracketSize : x1;
-            int x2Dotted
-                = ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) ? x2 - bracketSize : x2;
-            int yDotted = y + lineWidth / 2;
-            dc->DrawLine(ToDeviceContextX(x1Dotted + 1.5 * lineWidth), ToDeviceContextY(yDotted),
-                ToDeviceContextX(x2Dotted), ToDeviceContextY(yDotted));
-            dc->ResetPen();
-            dc->ResetBrush();
+            x1 += unit + lineWidth * 2;
+            x2 -= unit + lineWidth * 2;
+            const int diff = (x2 - x1) % (lineWidth * 3 + 1);
+            x1 += diff / 2;
         }
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
     }
+
+    dc->ResetPen();
+    dc->ResetBrush();
 
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);
@@ -754,43 +708,61 @@ void View::DrawOctave(
     dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        const int lineWidth = octave->GetLineWidth(m_doc, m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int lineWidth = octave->GetLineWidth(m_doc, unit);
+        const int gap = lineWidth * 4;
 
         // adjust is to avoid the figure to touch the line
-        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + lineWidth;
         if (altSymbols) x1 += extend.m_width / 2;
-        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-        int lineShift = (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
 
-        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        dc->SetPen(m_currentColour, lineWidth, AxSHORT_DASH, 0, gap, AxCAP_SQUARE);
         dc->SetBrush(m_currentColour, AxSOLID);
-        int dotShift = 0;
         if (octave->HasLform()) {
             if (octave->GetLform() == LINEFORM_solid) {
-                dc->SetPen(m_currentColour, lineWidth, AxSOLID);
+                dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE);
                 dc->SetBrush(m_currentColour, AxSOLID);
             }
             else if (octave->GetLform() == LINEFORM_dotted) {
-                dc->SetPen(m_currentColour, lineWidth, AxDOT, 0, 0, AxCAP_ROUND);
+                if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+                    // round to nearest multiple
+                    const int diff = (x2 - x1) % (gap + 1);
+                    x2 += (gap - diff < diff) ? gap - diff : -diff;
+                }
+                dc->SetPen(m_currentColour, lineWidth * 3 / 2, AxDOT, 0, gap, AxCAP_ROUND);
                 dc->SetBrush(m_currentColour, AxSOLID);
-                dotShift = lineShift;
             }
         }
 
+        // adjust vertical ends
+        y1 += (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
+        y2 = (disPlace == STAFFREL_basic_above) ? y1 - unit * 2 : y1 + unit * 2;
+
         if (x1 > x2) {
             // make sure we have a minimal extender line
-            x2 = x1 + extend.m_height / 4;
+            x2 = x1 + lineWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1 + lineShift), ToDeviceContextX(x2),
-            ToDeviceContextY(y1 + lineShift));
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
         octave->SetDrawingExtenderX(x1, x2);
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none) {
-            x2 += lineWidth / 2;
-            // draw the ending vertical line if not the end of the system
             if (spanningType == SPANNING_END || spanningType == SPANNING_START_END) {
-                dc->DrawLine(
-                    ToDeviceContextX(x2), ToDeviceContextY(y1 + dotShift), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                if (octave->GetLform() == LINEFORM_dotted) {
+                    // make sure we have at least two dots for the dotted hook
+                    dc->SetPen(
+                        m_currentColour, lineWidth * 3 / 2, AxDOT, 0, std::min(gap, unit * 2 - lineWidth), AxCAP_ROUND);
+                    dc->DrawLine(
+                        ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                }
+                else {
+                    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
+                    // Right hook
+                    Point hookRight[3];
+                    hookRight[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
+                    hookRight[1] = { ToDeviceContextX(x2), ToDeviceContextY(y1) };
+                    hookRight[2] = { ToDeviceContextX(x2 - unit), ToDeviceContextY(y1) };
+                    dc->DrawPolyline(3, hookRight);
+                }
             }
         }
     }
@@ -1161,7 +1133,6 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     if (!f->GetStart() || !f->GetEnd()) return;
 
     const int y = this->GetFYRel(f, staff);
-    TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
@@ -1169,7 +1140,10 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
-        x1 = f->GetContentRight();
+        Text *text = vrv_cast<Text *>(f->GetFirst(TEXT));
+        if (text) {
+            x1 = text->GetContentRight();
+        }
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
@@ -2907,7 +2881,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
         }
 
-        dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_ARCS);
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_MITER);
         Point p[4];
         p[0] = { ToDeviceContextX(startX), ToDeviceContextY(y1) };
         p[1] = { ToDeviceContextX(startX), ToDeviceContextY(y2) };
