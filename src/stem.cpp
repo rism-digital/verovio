@@ -388,7 +388,7 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
-    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < 8)) {
+    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < STEMMODIFIER_MAX)) {
         stemMod = this->GetDrawingStemMod();
     }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
@@ -416,7 +416,7 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
         }
         case STEMMODIFIER_sprech:
         case STEMMODIFIER_z: {
-            height += (noteLoc % 2) ? 3 * unit : 2 * unit;
+            height += 2 * unit;
             if (stemMod == STEMMODIFIER_sprech) height -= sign * glyphHalfHeight;
             break;
         }
