@@ -714,4 +714,14 @@ int Tuplet::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Tuplet::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetVerticalAlignment(functorParams);
+
+    this->ResetInnerSlurs();
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
