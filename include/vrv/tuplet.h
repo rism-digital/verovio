@@ -16,7 +16,6 @@
 namespace vrv {
 
 class Note;
-class Slur;
 class TupletBracket;
 
 //----------------------------------------------------------------------------
@@ -81,8 +80,8 @@ public:
      * @name Getter and setter for the inner slurs.
      */
     ///@{
-    const std::set<const Slur *> &GetInnerSlurs() const { return m_innerSlurs; }
-    void AddInnerSlur(const Slur *slur) { m_innerSlurs.insert(slur); }
+    const std::set<const FloatingCurvePositioner *> &GetInnerSlurs() const { return m_innerSlurs; }
+    void AddInnerSlur(const FloatingCurvePositioner *slur) { m_innerSlurs.insert(slur); }
     void ResetInnerSlurs() { m_innerSlurs.clear(); }
     ///@}
 
@@ -187,7 +186,7 @@ private:
     /** The beam with which the num aligns (in any) set in Tuplet::AdjustTupletsX */
     Beam *m_numAlignedBeam;
     /** The slurs avoided by the tuplet, set during drawing */
-    std::set<const Slur *> m_innerSlurs;
+    std::set<const FloatingCurvePositioner *> m_innerSlurs;
 };
 
 } // namespace vrv

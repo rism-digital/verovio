@@ -26,6 +26,7 @@
 #include "note.h"
 #include "staff.h"
 #include "system.h"
+#include "tuplet.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -337,11 +338,22 @@ void Slur::AddSpannedElements(
     for (auto element : spanned.elements) {
         const int xLeft = element->GetSelfLeft();
         const int xRight = element->GetSelfRight();
-        if (((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax))) {
+
+        const bool isContained = (xLeft > xMin) && (xRight < xMax);
+        const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
+
+        const Tuplet *tuplet = vrv_cast<const Tuplet *>(element->GetFirstAncestor(TUPLET));
+        const bool isHorizontalTupletBracket = tuplet && !tuplet->GetBracketAlignedBeam();
+
+        if (isContained || (isOverlapping && !isHorizontalTupletBracket)) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
             spannedElement->m_isBelow = this->IsElementBelow(element, startStaff, endStaff);
             curve->AddSpannedElement(spannedElement);
+        }
+        else if (!isOverlapping || (isOverlapping && isHorizontalTupletBracket)) {
+            // Exceptional case where the slur actually modifies a spanned element
+            const_cast<Tuplet *>(tuplet)->AddInnerSlur(curve);
         }
 
         if (!curve->IsCrossStaff() && element->m_crossStaff) {
