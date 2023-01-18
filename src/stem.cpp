@@ -207,7 +207,7 @@ int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) cons
     const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
     int val = std::abs(m_stemModRelY);
     if ((stemMod == STEMMODIFIER_sprech) && (this->GetDrawingStemDir() == STEMDIRECTION_down)) {
-        val -= 0.5 * glyphHeight;
+        val -= glyphHeight / 2;
     }
     const int diff = std::abs(actualLength - val) - 0.5 * glyphHeight;
     const int halfUnit = 0.5 * unit;
