@@ -698,6 +698,10 @@ int Tuplet::AdjustTupletWithSlurs(FunctorParams *functorParams)
     }
     TupletNum *tupletNum = vrv_cast<TupletNum *>(this->GetFirst(TUPLET_NUM));
 
+    const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    const int margin = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    const int sign = (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
+
     const int xLeft = this->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft();
     const int xRight = this->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight();
     const int yLeft = tupletBracket->GetDrawingYLeft();
@@ -706,8 +710,8 @@ int Tuplet::AdjustTupletWithSlurs(FunctorParams *functorParams)
     int tupletShift = 0;
 
     for (auto curve : m_innerSlurs) {
-        const int shift = tupletBracket->Intersects(curve, CONTENT, 0);
-        if (shift != 0) {
+        const int shift = tupletBracket->Intersects(curve, CONTENT, margin) * sign;
+        if (shift > 0) {
             // The shift is calculated from the entire bounding box of the tuplet bracket.
             // If the bracket is angled and the slur is short, then this might be too coarse.
             // We reduce the shift by the height of the subbox that cannot be hit.
@@ -731,7 +735,6 @@ int Tuplet::AdjustTupletWithSlurs(FunctorParams *functorParams)
 
     // Apply the tuplet shift from slurs
     if (tupletShift) {
-        const int sign = (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
         tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + sign * tupletShift);
         if (tupletNum) tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + sign * tupletShift);
     }
