@@ -683,7 +683,7 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
                     = layerElement ? (layerElement->GetOriginalLayerN() != this->GetEnd()->GetOriginalLayerN()) : true;
             }
             // Ignore tuplet elements
-            if (layerElement->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
+            if (layerElement && layerElement->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
                 spannedElement->m_discarded = true;
             }
         }
