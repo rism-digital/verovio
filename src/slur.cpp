@@ -667,10 +667,11 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
             = (spannedElement->m_boundingBox->GetSelfLeft() + spannedElement->m_boundingBox->GetSelfRight()) / 2.0;
         const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
 
-        // Ignore obstacles in a different layer which completely lie on the other side of the slur near the endpoints
+        // Check if obstacles completely lie on the other side of the slur
         const int elementHeight
             = std::abs(spannedElement->m_boundingBox->GetSelfTop() - spannedElement->m_boundingBox->GetSelfBottom());
         if (intersection > elementHeight + 4 * margin) {
+            // Ignore elements in a different layer near the endpoints
             const LayerElement *layerElement = dynamic_cast<const LayerElement *>(spannedElement->m_boundingBox);
             if (distanceRatio < 0.05) {
                 spannedElement->m_discarded = layerElement
@@ -680,6 +681,10 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
             else if (distanceRatio > 0.95) {
                 spannedElement->m_discarded
                     = layerElement ? (layerElement->GetOriginalLayerN() != this->GetEnd()->GetOriginalLayerN()) : true;
+            }
+            // Ignore tuplet elements
+            if (layerElement->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
+                spannedElement->m_discarded = true;
             }
         }
     }
