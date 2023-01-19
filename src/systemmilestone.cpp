@@ -161,6 +161,13 @@ FunctorCode SystemMilestoneInterface::InterfacePrepareMilestones(PrepareMileston
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode SystemMilestoneInterface::InterfaceResetData(ResetDataFunctor &functor)
+{
+    m_drawingMeasure = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int SystemMilestoneInterface::InterfaceResetData(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;

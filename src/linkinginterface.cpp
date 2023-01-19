@@ -134,6 +134,15 @@ FunctorCode LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode LinkingInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
+{
+    m_next = NULL;
+    m_nextID = "";
+    m_sameas = NULL;
+    m_sameasID = "";
+    return FUNCTOR_CONTINUE;
+}
+
 int LinkingInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_next = NULL;

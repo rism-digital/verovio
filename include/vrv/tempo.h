@@ -69,10 +69,12 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * @name Get the X drawing position
+     * @name Getter and setter for the X drawing position
      */
     ///@{
     int GetDrawingXRelativeToStaff(int staffN) const;
+    void ResetDrawingXRelative() { m_drawingXRels.clear(); }
+    ///@}
 
     /**
      * See FloatingObject::IsExtenderElement

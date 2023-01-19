@@ -21,6 +21,7 @@ class PrepareStaffCurrentTimeSpanningFunctor;
 class PrepareTimePointingFunctor;
 class PrepareTimeSpanningFunctor;
 class PrepareTimestampsFunctor;
+class ResetDataFunctor;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -106,6 +107,7 @@ public:
     ///@{
     FunctorCode InterfacePrepareTimePointing(PrepareTimePointingFunctor &functor, Object *object);
     virtual FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object);
+    virtual FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
 
     /**
@@ -220,6 +222,7 @@ public:
     FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object) override;
     FunctorCode InterfacePrepareStaffCurrentTimeSpanning(
         PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object) override;
     ///@}
 
     /**

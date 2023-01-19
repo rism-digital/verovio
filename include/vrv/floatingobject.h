@@ -37,6 +37,7 @@ public:
     FloatingObject(ClassId classId, const std::string &classIdStr);
     virtual ~FloatingObject();
     void Reset() override;
+    void ResetDrawing();
     ///@}
 
     void UpdateContentBBoxX(int x1, int x2) override;

@@ -18,6 +18,7 @@ class Measure;
 class Object;
 class PrepareLinkingFunctor;
 class PrepareStaffCurrentTimeSpanningFunctor;
+class ResetDataFunctor;
 
 //----------------------------------------------------------------------------
 // LinkingInterface
@@ -87,6 +88,7 @@ public:
     FunctorCode InterfacePrepareLinking(PrepareLinkingFunctor &functor, Object *object);
     FunctorCode InterfacePrepareStaffCurrentTimeSpanning(
         PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
 
     /**

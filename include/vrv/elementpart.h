@@ -46,6 +46,7 @@ public:
 
     const MapOfDotLocs &GetMapOfDotLocs() const { return m_dotLocsByStaff; }
     void SetMapOfDotLocs(const MapOfDotLocs &dotLocs) { m_dotLocsByStaff = dotLocs; };
+    void ResetMapOfDotLocs() { m_dotLocsByStaff.clear(); }
 
     void IsAdjusted(bool isAdjusted) { m_isAdjusted = isAdjusted; }
     bool IsAdjusted() const { return m_isAdjusted; }

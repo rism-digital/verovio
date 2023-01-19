@@ -67,9 +67,6 @@ FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
 FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
 {
     this->Reset();
-
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
 }
 
 FloatingObject::~FloatingObject() {}
@@ -78,7 +75,15 @@ void FloatingObject::Reset()
 {
     Object::Reset();
 
+    this->ResetDrawing();
+
     m_drawingGrpId = 0;
+}
+
+void FloatingObject::ResetDrawing()
+{
+    m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
 }
 
 void FloatingObject::UpdateContentBBoxX(int x1, int x2)

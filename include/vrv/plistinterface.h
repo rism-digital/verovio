@@ -15,6 +15,7 @@ namespace vrv {
 
 class Object;
 class PreparePlistFunctor;
+class ResetDataFunctor;
 class FunctorParams;
 
 //----------------------------------------------------------------------------
@@ -73,6 +74,7 @@ public:
      */
     ///@{
     FunctorCode InterfacePreparePlist(PreparePlistFunctor &functor, Object *object);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
 
     /**

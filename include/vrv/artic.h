@@ -70,7 +70,13 @@ public:
 
     void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
+    /**
+     * Getter and setter for the drawing place
+     */
+    ///@{
     data_STAFFREL GetDrawingPlace() const { return m_drawingPlace; }
+    void SetDrawingPlace(data_STAFFREL drawingPlace) { m_drawingPlace = drawingPlace; }
+    ///@}
 
     /**
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL

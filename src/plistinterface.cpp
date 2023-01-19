@@ -114,6 +114,14 @@ FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, 
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PlistInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
+{
+    m_ids.clear();
+    m_references.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_ids.clear();

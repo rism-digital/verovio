@@ -372,6 +372,13 @@ FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunc
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode TimePointInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
+{
+    m_start = NULL;
+    m_startID = "";
+    return FUNCTOR_CONTINUE;
+}
+
 int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_start = NULL;
@@ -427,6 +434,14 @@ FunctorCode TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(
         functor.InsertTimeSpanningElement(object);
     }
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TimeSpanningInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
+{
+    m_end = NULL;
+    m_endID = "";
+    // Special case where we have interface inheritance
+    return TimePointInterface::InterfaceResetData(functor, object);
 }
 
 int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)

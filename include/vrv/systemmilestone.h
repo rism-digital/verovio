@@ -16,6 +16,7 @@ namespace vrv {
 class Measure;
 class Object;
 class PrepareMilestonesFunctor;
+class ResetDataFunctor;
 
 //----------------------------------------------------------------------------
 // SystemMilestoneEnd
@@ -143,6 +144,7 @@ public:
      */
     ///@{
     FunctorCode InterfacePrepareMilestones(PrepareMilestonesFunctor &functor);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
     ///@}
 
     /**
