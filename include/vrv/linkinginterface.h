@@ -13,7 +13,6 @@
 
 namespace vrv {
 
-class FunctorParams;
 class Measure;
 class Object;
 class PrepareLinkingFunctor;
@@ -90,11 +89,6 @@ public:
         PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**

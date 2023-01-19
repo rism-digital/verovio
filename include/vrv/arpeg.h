@@ -125,11 +125,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CacheHorizontalLayout
      */
     int CacheHorizontalLayout(FunctorParams *functorParams) override;

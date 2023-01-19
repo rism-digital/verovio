@@ -868,25 +868,6 @@ int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingObject::ResetData(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    else if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    m_drawingGrpId = 0;
-    return FUNCTOR_CONTINUE;
-}
-
 int FloatingObject::UnCastOff(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;

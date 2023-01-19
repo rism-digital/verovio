@@ -461,15 +461,4 @@ int Stem::CalculateStemModAdjustment(const Doc *doc, const Staff *staff, int fla
     return this->AdjustSlashes(doc, staff, flagOffset);
 }
 
-int Stem::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingStemDir = STEMDIRECTION_NONE;
-    m_drawingStemLen = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

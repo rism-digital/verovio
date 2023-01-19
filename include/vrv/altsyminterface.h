@@ -14,7 +14,6 @@
 
 namespace vrv {
 
-class FunctorParams;
 class PrepareAltSymFunctor;
 class ResetDataFunctor;
 class SymbolDef;
@@ -70,11 +69,6 @@ public:
     FunctorCode InterfacePrepareAltSym(PrepareAltSymFunctor &functor, Object *object);
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**

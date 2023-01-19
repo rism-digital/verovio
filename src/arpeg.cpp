@@ -260,16 +260,6 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Arpeg::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    PlistInterface *interface = this->GetPlistInterface();
-    assert(interface);
-    return interface->InterfaceResetData(functorParams, this);
-}
-
 int Arpeg::CacheHorizontalLayout(FunctorParams *functorParams)
 {
     CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);

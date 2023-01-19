@@ -2245,19 +2245,4 @@ int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Beam::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    BeamDrawingInterface::Reset();
-
-    m_beamSegment.Reset();
-    m_stemSameas = NULL;
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

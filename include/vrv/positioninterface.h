@@ -72,11 +72,6 @@ public:
     /**
      * See Object::ResetData
      */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::ResetData
-     */
     virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
 
 private:

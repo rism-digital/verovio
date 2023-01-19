@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
+#include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -138,8 +139,8 @@ Object::Object(const Object &object) : BoundingBox(object)
 void Object::CloneReset()
 {
     this->Modify();
-    FunctorParams voidParams;
-    this->ResetData(&voidParams);
+    ResetDataFunctor resetData;
+    this->Process(resetData, 0);
 }
 
 Object &Object::operator=(const Object &object)

@@ -117,15 +117,6 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Ending::ResetData(FunctorParams *functorParams)
-{
-    FloatingObject::ResetData(functorParams);
-
-    this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Ending::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);

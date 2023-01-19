@@ -289,11 +289,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * @name See Object::GenerateMIDI
      */
     ///@{

@@ -14,7 +14,6 @@
 namespace vrv {
 
 class Object;
-class FunctorParams;
 class LayerElement;
 class Measure;
 class PrepareStaffCurrentTimeSpanningFunctor;
@@ -109,11 +108,6 @@ public:
     virtual FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object);
     virtual FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -224,11 +218,6 @@ public:
         PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object) override;
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int InterfaceResetData(FunctorParams *functorParams, Object *object) override;
 
 private:
     //

@@ -230,11 +230,6 @@ public:
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::JustifyYAdjustCrossStaff
      */
     int JustifyYAdjustCrossStaff(FunctorParams *functorParams) override;

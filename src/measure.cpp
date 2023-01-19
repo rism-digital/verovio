@@ -1207,13 +1207,6 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::ResetData(FunctorParams *functorParams)
-{
-    m_timestampAligner.Reset();
-    m_drawingEnding = NULL;
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);

@@ -145,16 +145,6 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Tempo::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_drawingXRels.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
     InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);

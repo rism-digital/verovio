@@ -473,13 +473,6 @@ int Staff::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Staff::ResetData(FunctorParams *functorParams)
-{
-    m_timeSpanningElements.clear();
-    ClearLedgerLines();
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::InitOnsetOffset(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);

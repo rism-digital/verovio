@@ -2329,21 +2329,6 @@ int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::ResetData(FunctorParams *functorParams)
-{
-    m_isInBeamspan = false;
-    m_drawingCueSize = false;
-    m_crossStaff = NULL;
-    m_crossLayer = NULL;
-
-    // Pass it to the pseudo functor of the interface
-    LinkingInterface *interface = this->GetLinkingInterface();
-    assert(interface);
-    interface->InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::CalcSlurDirection(FunctorParams *)
 {
     return FUNCTOR_SIBLINGS;

@@ -132,11 +132,6 @@ public:
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;

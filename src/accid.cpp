@@ -303,15 +303,6 @@ FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitAccidEnd(this);
 }
 
-int Accid::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);

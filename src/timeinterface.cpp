@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "functorparams.h"
 #include "harm.h"
 #include "layerelement.h"
 #include "measure.h"
@@ -379,13 +378,6 @@ FunctorCode TimePointInterface::InterfaceResetData(ResetDataFunctor &functor, Ob
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
-{
-    m_start = NULL;
-    m_startID = "";
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object)
 {
     if (!this->HasStartid() && !this->HasEndid()) {
@@ -442,14 +434,6 @@ FunctorCode TimeSpanningInterface::InterfaceResetData(ResetDataFunctor &functor,
     m_endID = "";
     // Special case where we have interface inheritance
     return TimePointInterface::InterfaceResetData(functor, object);
-}
-
-int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
-{
-    m_end = NULL;
-    m_endID = "";
-    // Special case where we have interface inheritance
-    return TimePointInterface::InterfaceResetData(functorParams, object);
 }
 
 } // namespace vrv

@@ -67,11 +67,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffSystems
      */
     int CastOffSystems(FunctorParams *functorParams) override;

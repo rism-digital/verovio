@@ -176,17 +176,6 @@ int Syl::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Syl::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_nextWordSyl = NULL;
-
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceResetData(functorParams, this);
-}
-
 bool Syl::CreateDefaultZone(Doc *doc)
 {
     const int offsetUly = 100;

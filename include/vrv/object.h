@@ -1086,18 +1086,6 @@ public:
     ///@}
 
     /**
-     * @name Functors for preparing the data.
-     */
-    ///@{
-
-    /**
-     * Reset the drawing values before calling PrepareData after changes.
-     */
-    virtual int ResetData(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for justification.
      */
     ///@{

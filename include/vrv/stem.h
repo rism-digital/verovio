@@ -105,11 +105,6 @@ public:
      */
     int CalcStem(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
 private:
     /**
      * Addjusts flag placement and stem length if they are crossing notehead or ledger lines

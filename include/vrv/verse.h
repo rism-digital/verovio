@@ -90,11 +90,6 @@ public:
      */
     int GenerateMIDI(FunctorParams *) override;
 
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
 private:
     //
 public:

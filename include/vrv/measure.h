@@ -424,11 +424,6 @@ public:
     int CastOffToSelection(FunctorParams *) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;

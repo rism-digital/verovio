@@ -1985,17 +1985,6 @@ FunctorCode Slur::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSlurEnd(this);
 }
 
-int Slur::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_drawingCurveDir = SlurCurveDirection::None;
-    // m_isCrossStaff = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Slur::CalcSlurDirection(FunctorParams *functorParams)
 {
     CalcSlurDirectionParams *params = vrv_params_cast<CalcSlurDirectionParams *>(functorParams);

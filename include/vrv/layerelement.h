@@ -421,11 +421,6 @@ public:
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcSlurDirection
      */
     int CalcSlurDirection(FunctorParams *functorParams) override;

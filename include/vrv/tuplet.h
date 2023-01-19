@@ -117,11 +117,6 @@ public:
      */
     int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note elements.

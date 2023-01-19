@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"
 #include "preparedatafunctor.h"
@@ -115,14 +114,6 @@ FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, 
 }
 
 FunctorCode PlistInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
-{
-    m_ids.clear();
-    m_references.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_ids.clear();
     m_references.clear();

@@ -47,6 +47,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "preparedatafunctor.h"
+#include "resetfunctor.h"
 #include "runningelement.h"
 #include "score.h"
 #include "setscoredeffunctor.h"
@@ -503,8 +504,8 @@ void Doc::PrepareData()
 {
     /************ Reset and initialization ************/
     if (m_dataPreparationDone) {
-        Functor resetData(&Object::ResetData);
-        this->Process(&resetData, NULL);
+        ResetDataFunctor resetData;
+        this->Process(resetData);
     }
     PrepareDataInitializationFunctor prepareDataInitialization(this);
     this->Process(prepareDataInitialization);

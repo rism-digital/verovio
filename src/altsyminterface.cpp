@@ -13,7 +13,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
 #include "preparedatafunctor.h"
 #include "symboldef.h"
 #include "symboltable.h"
@@ -78,13 +77,6 @@ FunctorCode AltSymInterface::InterfacePrepareAltSym(PrepareAltSymFunctor &functo
 }
 
 FunctorCode AltSymInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
-{
-    m_symbolDef = NULL;
-    m_symbolDefID = "";
-    return FUNCTOR_CONTINUE;
-}
-
-int AltSymInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
 {
     m_symbolDef = NULL;
     m_symbolDefID = "";

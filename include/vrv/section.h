@@ -72,11 +72,6 @@ public:
     int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AlignMeasures
      */
     int AlignMeasures(FunctorParams *functorParams) override;

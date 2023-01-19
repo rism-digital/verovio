@@ -296,17 +296,6 @@ FunctorCode Dots::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDotsEnd(this);
 }
 
-int Dots::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_dotLocsByStaff.clear();
-    m_isAdjusted = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
@@ -334,16 +323,6 @@ FunctorCode Flag::AcceptEnd(MutableFunctor &functor)
 FunctorCode Flag::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitFlagEnd(this);
-}
-
-int Flag::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingNbFlags = 0;
-
-    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode TupletBracket::Accept(MutableFunctor &functor)

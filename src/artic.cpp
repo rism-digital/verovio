@@ -549,16 +549,6 @@ int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Artic::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingPlace = STAFFREL_NONE;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Artic::CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const
 {
     int shift = parent->GetDrawingRadius(doc);

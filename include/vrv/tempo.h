@@ -101,11 +101,6 @@ public:
     int AdjustTempo(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;

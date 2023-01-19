@@ -100,11 +100,6 @@ public:
      */
     int GenerateMIDI(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
     /** Create a default zone for a syl based on syllable. */
     bool CreateDefaultZone(Doc *doc);
 

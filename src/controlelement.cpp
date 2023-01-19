@@ -169,24 +169,4 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ControlElement::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    FloatingObject::ResetData(functorParams);
-
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = this->GetAltSymInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

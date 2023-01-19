@@ -81,13 +81,4 @@ FunctorCode F::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitFEnd(this);
 }
 
-int F::ResetData(FunctorParams *functorParams)
-{
-    TextElement::ResetData(functorParams);
-
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfaceResetData(functorParams, this);
-}
-
 } // namespace vrv

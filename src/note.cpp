@@ -1145,20 +1145,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Note::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    m_drawingLoc = 0;
-    m_flippedNotehead = false;
-    m_stemSameas = NULL;
-    m_stemSameasRole = SAMEAS_NONE;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);

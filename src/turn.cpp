@@ -118,14 +118,4 @@ FunctorCode Turn::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTurnEnd(this);
 }
 
-int Turn::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_drawingEndElement = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

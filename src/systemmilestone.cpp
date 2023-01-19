@@ -102,15 +102,6 @@ FunctorCode SystemMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemMilestoneEnd(this);
 }
 
-int SystemMilestoneEnd::ResetData(FunctorParams *functorParams)
-{
-    FloatingObject::ResetData(functorParams);
-
-    this->SetMeasure(NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int SystemMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
@@ -162,13 +153,6 @@ FunctorCode SystemMilestoneInterface::InterfacePrepareMilestones(PrepareMileston
 }
 
 FunctorCode SystemMilestoneInterface::InterfaceResetData(ResetDataFunctor &functor)
-{
-    m_drawingMeasure = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int SystemMilestoneInterface::InterfaceResetData(FunctorParams *functorParams)
 {
     m_drawingMeasure = NULL;
 

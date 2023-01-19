@@ -851,16 +851,6 @@ int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::JustifyYAdjustCrossStaff(FunctorParams *functorParams)
 {
     JustifyYAdjustCrossStaffParams *params = vrv_params_cast<JustifyYAdjustCrossStaffParams *>(functorParams);

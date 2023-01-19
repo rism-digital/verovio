@@ -71,18 +71,6 @@ FunctorCode Dot::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDotEnd(this);
 }
 
-int Dot::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    m_drawingPreviousElement = NULL;
-    m_drawingNextElement = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Dot::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);

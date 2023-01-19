@@ -646,20 +646,6 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Tuplet::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-
-    m_drawingLeft = NULL;
-    m_drawingRight = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Tuplet::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too

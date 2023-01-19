@@ -238,16 +238,4 @@ FunctorCode Hairpin::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitHairpinEnd(this);
 }
 
-int Hairpin::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_leftLink = NULL;
-    m_rightLink = NULL;
-    m_drawingLength = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

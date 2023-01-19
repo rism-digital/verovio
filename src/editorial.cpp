@@ -191,15 +191,6 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int EditorialElement::ResetData(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);

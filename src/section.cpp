@@ -127,17 +127,6 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Section::ResetData(FunctorParams *functorParams)
-{
-    FloatingObject::ResetData(functorParams);
-
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Section::AlignMeasures(FunctorParams *functorParams)
 {
     AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);

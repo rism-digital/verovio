@@ -82,11 +82,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetHorizontalAlignment
      */
     int ResetHorizontalAlignment(FunctorParams *functorParams) override;
@@ -155,11 +150,6 @@ public:
     int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //

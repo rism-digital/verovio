@@ -107,15 +107,6 @@ FunctorCode Custos::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitCustosEnd(this);
 }
 
-int Custos::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Custos::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);

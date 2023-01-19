@@ -802,13 +802,6 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ResetData(FunctorParams *functorParams)
-{
-    m_crossStaffFromBelow = false;
-    m_crossStaffFromAbove = false;
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

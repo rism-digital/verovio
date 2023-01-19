@@ -16,7 +16,6 @@ namespace vrv {
 class Object;
 class PreparePlistFunctor;
 class ResetDataFunctor;
-class FunctorParams;
 
 //----------------------------------------------------------------------------
 // PlistInterface
@@ -76,11 +75,6 @@ public:
     FunctorCode InterfacePreparePlist(PreparePlistFunctor &functor, Object *object);
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
 
 protected:
     /**

@@ -66,11 +66,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffSystems
      */
     int CastOffSystems(FunctorParams *functorParams) override;
@@ -146,12 +141,6 @@ public:
     FunctorCode InterfacePrepareMilestones(PrepareMilestonesFunctor &functor);
     FunctorCode InterfaceResetData(ResetDataFunctor &functor);
     ///@}
-
-    /**
-     * Reset the drawing values before calling PrepareData after changes.
-     * Called from Ending::ResetData and EditorialElement::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams);
 
 protected:
     //
