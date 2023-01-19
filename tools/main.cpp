@@ -445,7 +445,8 @@ int main(int argc, char **argv)
         && (outformat != "midi") && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum")
         && (outformat != "pae")) {
         std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'humdrum' or 'pae'." << std::endl;
+                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'timemap', 'humdrum' or 'pae'."
+                  << std::endl;
         exit(1);
     }
 
