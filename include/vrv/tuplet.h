@@ -117,6 +117,11 @@ public:
     int AdjustTupletsY(FunctorParams *functorParams) override;
 
     /**
+     * See Object::AdjustTupletWithSlurs
+     */
+    int AdjustTupletWithSlurs(FunctorParams *functorParams) override;
+
+    /**
      * See Object::ResetHorizontalAlignment
      */
     int ResetHorizontalAlignment(FunctorParams *functorParams) override;

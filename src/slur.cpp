@@ -342,7 +342,7 @@ void Slur::AddSpannedElements(
         const bool isContained = (xLeft > xMin) && (xRight < xMax);
         const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
 
-        const Tuplet *tuplet = vrv_cast<const Tuplet *>(element->GetFirstAncestor(TUPLET));
+        const Tuplet *tuplet = vrv_cast<const Tuplet *>(element->GetFirstAncestor(TUPLET, 1));
         const bool isHorizontalTupletBracket = tuplet && !tuplet->GetBracketAlignedBeam();
 
         if (isContained || (isOverlapping && !isHorizontalTupletBracket)) {
@@ -351,9 +351,11 @@ void Slur::AddSpannedElements(
             spannedElement->m_isBelow = this->IsElementBelow(element, startStaff, endStaff);
             curve->AddSpannedElement(spannedElement);
         }
-        else if (!isOverlapping || (isOverlapping && isHorizontalTupletBracket)) {
-            // Exceptional case where the slur actually modifies a spanned element
-            const_cast<Tuplet *>(tuplet)->AddInnerSlur(curve);
+        else if (tuplet) {
+            if (!isOverlapping || (isOverlapping && isHorizontalTupletBracket)) {
+                // Exceptional case where the slur actually modifies a spanned element
+                const_cast<Tuplet *>(tuplet)->AddInnerSlur(curve);
+            }
         }
 
         if (!curve->IsCrossStaff() && element->m_crossStaff) {
