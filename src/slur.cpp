@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -338,30 +339,23 @@ void Slur::AddSpannedElements(
     for (auto element : spanned.elements) {
         const int xLeft = element->GetSelfLeft();
         const int xRight = element->GetSelfRight();
-
-        const bool isContained = (xLeft > xMin) && (xRight < xMax);
         const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
 
-        const Tuplet *tuplet = vrv_cast<const Tuplet *>(element->GetFirstAncestor(TUPLET, 1));
-        const bool isHorizontalTupletBracket = tuplet && !tuplet->GetBracketAlignedBeam();
-
-        if (isContained || (isOverlapping && !isHorizontalTupletBracket)) {
+        if (isOverlapping || element->Is(TUPLET_BRACKET)) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
             spannedElement->m_isBelow = this->IsElementBelow(element, startStaff, endStaff);
             curve->AddSpannedElement(spannedElement);
-        }
-        else if (tuplet) {
-            if (!isOverlapping || (isOverlapping && isHorizontalTupletBracket)) {
-                // Exceptional case where the slur actually modifies a spanned element
-                const_cast<Tuplet *>(tuplet)->AddInnerSlur(curve);
-            }
         }
 
         if (!curve->IsCrossStaff() && element->m_crossStaff) {
             curve->SetCrossStaff(element->m_crossStaff);
         }
     }
+
+    // Some tuplet elements are discarded immediately, if they should be rendered outside the slur
+    // => Flexible layout priority
+    this->DiscardTupletElements(curve, xMin, xMax);
 
     // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them.
     // This might be refined later, since using the entire bounding box of a tie for collision avoidance with slurs is
@@ -399,6 +393,42 @@ void Slur::AddSpannedElements(
                 spannedElement->m_boundingBox = positioner;
                 spannedElement->m_isBelow = this->IsElementBelow(positioner, startStaff, endStaff);
                 curve->AddSpannedElement(spannedElement);
+            }
+        }
+    }
+}
+
+void Slur::DiscardTupletElements(FloatingCurvePositioner *curve, int xMin, int xMax)
+{
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    for (auto spannedElement : *spannedElements) {
+        if (spannedElement->m_boundingBox->Is(TUPLET_BRACKET)) {
+            const TupletBracket *tupletBracket = vrv_cast<const TupletBracket *>(spannedElement->m_boundingBox);
+            assert(tupletBracket->GetParent()->Is(TUPLET));
+            const Tuplet *tuplet = vrv_cast<const Tuplet *>(tupletBracket->GetParent());
+
+            const int xLeft = tupletBracket->GetSelfLeft();
+            const int xRight = tupletBracket->GetSelfRight();
+            const bool isContained = (xLeft > xMin) && (xRight < xMax);
+            const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
+
+            // Slurs avoid inner tuplets and overlapping tuplets which are beam aligned
+            if (isContained) continue;
+            if (isOverlapping && tuplet->GetBracketAlignedBeam()) continue;
+
+            // Discard the tuplet bracket and register the slur for tuplet adjustment
+            spannedElement->m_discarded = true;
+            // Exceptional case where the slur actually modifies a spanned element
+            const_cast<Tuplet *>(tuplet)->AddInnerSlur(curve);
+
+            // Discard any associated tuplet number as well
+            const TupletNum *tupletNum = tupletBracket->GetAlignedNum();
+            if (tupletNum) {
+                auto elementIter = std::find_if(spannedElements->begin(), spannedElements->end(),
+                    [tupletNum](CurveSpannedElement *element) { return (element->m_boundingBox == tupletNum); });
+                if (elementIter != spannedElements->end()) {
+                    (*elementIter)->m_discarded = true;
+                }
             }
         }
     }
