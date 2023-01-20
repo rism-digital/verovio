@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 15 01:00:35 PST 2023
+// Last Modified: Thu Jan 19 21:53:43 PST 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6613,8 +6613,10 @@ class Tool_deg : public HumTool {
 				int             getSubtokenCount         (void) const;
 
 				// output options:
-				static void     setShowTies  (bool state) { m_showTiesQ = state;  }
-				static void     setShowZeros (bool state) { m_showZerosQ = state; }
+				static void     setShowTies    (bool state) { m_showTiesQ = state;  }
+				static void     setShowZeros   (bool state) { m_showZerosQ = state; }
+				static void     setShowOctaves (bool state) { m_octaveQ = state; }
+				static void     setForcedKey   (const string& key) { m_forcedKey = key; }
 
 			protected:  // ScaleDegree class
 				std::string     generateDegDataToken     (void) const;
@@ -6638,7 +6640,7 @@ class Tool_deg : public HumTool {
 				// m_unpitched: true if unpitched (because in a percussion part)
 				bool m_unpitched = false;
 
-			   // m_mode: the mode of the current key	(0 = none, 1 = major, 2 = minor)
+				// m_mode: the mode of the current key	(0 = none, 1 = major, 2 = minor)
 				//
 				// modal keys:
 				// 3 = dorian (such as *c:dor)
@@ -6694,6 +6696,8 @@ class Tool_deg : public HumTool {
 				// ScaleDegree rendering options:
 				static bool m_showTiesQ;
 				static bool m_showZerosQ;
+				static bool m_octaveQ;
+				static std::string m_forcedKey;
 		};
 
 
@@ -6715,16 +6719,36 @@ class Tool_deg : public HumTool {
 		void            processFile              (HumdrumFile& infile);
 		void            initialize               (void);
 
+		bool            setupSpineInfo           (HumdrumFile& infile);
 		void            prepareDegSpine          (vector<vector<ScaleDegree>>& degspine, HTp kernstart, HumdrumFile& infil);
 		void            printDegScore            (HumdrumFile& infile);
 		void            printDegScoreInterleavedWithInputScore(HumdrumFile& infile);
-		std::string     createOutputHumdrumLine  (HumdrumFile& infile, std::vector<int>& insertTracks, int lineIndex);
-      std::string     prepareMergerLine        (const std::string& input, std::vector<int>& tracks, std::vector<string>& tokens, bool inputMerger, bool outputMerger);
+		std::string     createOutputHumdrumLine  (HumdrumFile& infile, int lineIndex);
+      std::string     prepareMergerLine        (std::vector<std::vector<std::string>>& merge);
 		void            calculateManipulatorOutputForSpine(std::vector<std::string>& lineout, std::vector<std::string>& linein);
 		std::string     createRecipInterpretation(const std::string& starttok, int refLine);
 		std::string     createDegInterpretation  (const string& degtok, int refLine, bool addPreSpine);
 		std::string     printDegInterpretation   (const string& interp, HumdrumFile& infile, int lineIndex);
+		void            getModeAndTonic          (string& mode, int& b40tonic, const string& token);
+
+		bool            isDegAboveLine           (HumdrumFile& infile, int lineIndex);
 		bool            isDegArrowLine           (HumdrumFile& infile, int lineIndex);
+		bool            isDegBoxLine             (HumdrumFile& infile, int lineIndex);
+		bool            isDegCircleLine          (HumdrumFile& infile, int lineIndex);
+		bool            isDegColorLine           (HumdrumFile& infile, int lineIndex);
+		bool            isDegHatLine             (HumdrumFile& infile, int lineIndex);
+		bool            isDegSolfegeLine         (HumdrumFile& infile, int lineIndex);
+		bool            isKeyDesignationLine     (HumdrumFile& infile, int lineIndex);
+
+		void            checkAboveStatus         (string& value, bool arrowStatus);
+		void            checkArrowStatus         (string& value, bool arrowStatus);
+		void            checkBoxStatus           (string& value, bool arrowStatus);
+		void            checkCircleStatus        (string& value, bool arrowStatus);
+		void            checkColorStatus         (string& value, bool arrowStatus);
+		void            checkHatStatus           (string& value, bool arrowStatus);
+		void            checkSolfegeStatus       (string& value, bool arrowStatus);
+
+		void            checkKeyDesignationStatus(string& value, int keyDesignationStatus);
 
 	private: // Tool_deg class
 
@@ -6739,7 +6763,33 @@ class Tool_deg : public HumTool {
 		//    handled by Tool_deg::ScaleDegree class).
 		std::vector<std::vector<std::vector<ScaleDegree>>> m_degSpines;
 
+		// m_kernSpines: list of all **kern spines found in file.
+		std::vector<HTp> m_kernSpines;
+
+		// m_selectedKernSpines: list of only the **kern spines that will be analyzed.
+		std::vector<HTp> m_selectedKernSpines;
+
+		// m_degInsertTrack: the track number in the input file that an
+		//	output **deg spine should be inserted before.  A track of -1 means
+		// append the **deg spine after the last input spine.
+		std::vector<int> m_degInsertTrack;
+
+		// m_insertTracks: matches to m_degSpines first dimension.
+		// It gives the track number for spines before which the corresponding
+		// m_degSpine[x] spine should be inserted.  A -1 value at the last
+		// position in m_insertTracks means append the **deg spine at the 
+		// end of the line.
+		std::vector<int> m_insertTracks;
+
+		bool m_aboveQ          = false;   // used with --above option
 		bool m_arrowQ          = false;   // used with --arrow option
+		bool m_boxQ            = false;   // used with --box option
+		bool m_circleQ         = false;   // used with --circle option
+		bool m_hatQ            = false;   // used with --hat option
+		bool m_colorQ          = false;   // used with --color option
+		std::string  m_color;             // used with --color option
+		bool m_solfegeQ        = false;   // used with --solfege option
+
 		bool m_degOnlyQ        = false;   // used with -I option
 		bool m_recipQ          = false;   // used with -r option
 		bool m_kernQ           = false;   // used with --kern option
@@ -6757,14 +6807,28 @@ class Tool_deg : public HumTool {
 		class InterleavedPrintVariables {
 			public:
 				bool foundData;
-				bool foundArrowLine;
 				bool hasDegSpines;
+				bool foundAboveLine;
+				bool foundArrowLine;
+				bool foundBoxLine;
+				bool foundCircleLine;
+				bool foundColorLine;
+				bool foundHatLine;
+				bool foundKeyDesignationLine;
+				bool foundSolfegeLine;
 
 				InterleavedPrintVariables(void) { clear(); }
 				void clear(void) {
-					foundData      = false;
-					foundArrowLine = false;
-					hasDegSpines   = true;
+					foundData       = false;
+					hasDegSpines    = true;
+					foundAboveLine  = false;
+					foundArrowLine  = false;
+					foundBoxLine    = false;
+					foundCircleLine = false;
+					foundColorLine  = false;
+					foundHatLine    = false;
+					foundKeyDesignationLine = false;
+					foundSolfegeLine = false;
 				}
 		};
 		InterleavedPrintVariables m_ipv;

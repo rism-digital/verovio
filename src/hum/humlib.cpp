@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 15 01:00:35 PST 2023
+// Last Modified: Thu Jan 19 21:53:43 PST 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -68920,6 +68920,8 @@ void Tool_compositeold::addVerseLabels2(HumdrumFile& infile, HTp spinestart) {
 
 bool Tool_deg::ScaleDegree::m_showTiesQ  = false;
 bool Tool_deg::ScaleDegree::m_showZerosQ = false;
+bool Tool_deg::ScaleDegree::m_octaveQ = false;
+string Tool_deg::ScaleDegree::m_forcedKey = "";
 
 
 
@@ -68929,19 +68931,23 @@ bool Tool_deg::ScaleDegree::m_showZerosQ = false;
 //
 
 Tool_deg::Tool_deg(void) {
+	define("above=b", "Display scale degrees above analyzed staff");
 	define("arr|arrow|arrows=b", "Display scale degree alterations as arrows");
-   define("b|boxes|box=b", "Display scale degrees in boxes");
-   define("color=s", "Display color for scale degrees");
-   define("c|circles|circle=b", "Display scale degrees in circles");
+	define("b|boxes|box=b", "Display scale degrees in boxes");
+	define("color=s", "Display color for scale degrees");
+	define("c|circ|circles|circle=b", "Display scale degrees in circles");
+	define("hat|caret|circumflex=b", "Display hats on scale degrees");
+	define("solf|solfege=b", "Display (relative) solfege syllables instead of scale degree numbers");
 	define("I|no-input=b", "Do not interleave **deg data with input score in output");
 	define("kern=b", "Prefix composite rhythm **kern spine with -I option");
 	define("k|kern-tracks=s", "Process only the specified kern spines");
-	define("kd|dk|key-default|default-key=s", "Default key if none specified in data");
-	define("kf|fk|key-force|force-key=s", "Use the given key for analysing deg data (ignore modulations)");
+	define("kd|dk|key-default|default-key=s", "Default (initial) key if none specified in data");
+	define("kf|fk|key-force|force-key|forced-key|key-forced=s", "Use the given key for analysing deg data (ignore modulations)");
+	define("o|octave|octaves|degree=b", "Encode octave information int **degree spines");
 	define("r|recip=b", "Prefix output data with **recip spine with -I option");
 	define("t|ties=b", "Include scale degrees for tied notes");
 	define("s|spine-tracks|spine|spines|track|tracks=s", "Process only the specified spines");
-	define("0|z|zero|zeros=b", "Show rests as scale degree 0");
+	define("0|O|z|zero|zeros=b", "Show rests as scale degree 0");
 }
 
 
@@ -68998,7 +69004,18 @@ bool Tool_deg::run(HumdrumFile& infile) {
 //
 
 void Tool_deg::initialize(void) {
+	m_aboveQ   = getBoolean("above");
 	m_arrowQ   = getBoolean("arrow");
+	m_boxQ     = getBoolean("box");
+	m_circleQ  = getBoolean("circle");
+	m_colorQ   = getBoolean("color");
+	m_hatQ     = getBoolean("hat");
+	m_solfegeQ = getBoolean("solfege");
+
+	if (m_colorQ) {
+		m_color = getString("color");
+	}
+
 	m_degOnlyQ = getBoolean("no-input");
 	m_kernQ    = getBoolean("kern");
 	m_recipQ   = getBoolean("recip");
@@ -69006,11 +69023,39 @@ void Tool_deg::initialize(void) {
 		m_recipQ = true;
 	}
 	m_degTiesQ = getBoolean("ties");
+	Tool_deg::ScaleDegree::setShowOctaves(getBoolean("octave"));
 
 	if (getBoolean("spine-tracks")) {
 		m_spineTracks = getString("spine-tracks");
 	} else if (getBoolean("kern-tracks")) {
 		m_kernTracks = getString("kern-tracks");
+	}
+
+	if (getBoolean("default-key")) {
+		m_defaultKey = getString("default-key");
+		if (!m_defaultKey.empty()) {
+			if (m_defaultKey[0] != '*') {
+				m_defaultKey = "*" + m_defaultKey;
+			}
+			if (m_defaultKey.find(":") == string::npos) {
+				m_defaultKey += ":";
+			}
+		}
+	}
+
+	if (getBoolean("forced-key")) {
+		m_defaultKey.clear(); // override --default-key option
+
+		m_forcedKey = getString("forced-key");
+		if (!m_forcedKey.empty()) {
+			if (m_forcedKey[0] != '*') {
+				m_forcedKey = "*" + m_forcedKey;
+			}
+			if (m_forcedKey.find(":") == string::npos) {
+				m_forcedKey += ":";
+			}
+			Tool_deg::ScaleDegree::setForcedKey(m_forcedKey);
+		}
 	}
 
 	Tool_deg::ScaleDegree::setShowTies(m_degTiesQ);
@@ -69025,52 +69070,16 @@ void Tool_deg::initialize(void) {
 //
 
 void Tool_deg::processFile(HumdrumFile& infile) {
-	vector<HTp> kernstarts;
-	infile.getKernSpineStartList(kernstarts);
-
-	// Calculate which input spines to process based on -s or -k option:
-	int maxTrack = infile.getMaxTrack();
-	m_processTrack.resize(maxTrack + 1); // +1 is needed since track=0 is not used
-	// By default, process all tracks:
-	fill(m_processTrack.begin(), m_processTrack.end(), true);
-	// Otherwise, select which **kern track, or spine tracks to process selectively:
-	if (!m_kernTracks.empty()) {
-		vector<int> ktracks = Convert::extractIntegerList(m_kernTracks, maxTrack);
-
-		fill(m_processTrack.begin(), m_processTrack.end(), false);
-		for (int i=0; i<(int)ktracks.size(); i++) {
-			int index = ktracks[i] - 1;
-			if ((index < 0) || (index >= (int)kernstarts.size())) {
-				continue;
-			}
-			int track = kernstarts.at(ktracks[i] - 1)->getTrack();
-			m_processTrack.at(track) = true;
-		}
-	} else if (!m_spineTracks.empty()) {
-		infile.makeBooleanTrackList(m_processTrack, m_spineTracks);
-	}
-
-	// Count how many **kern spines to process, doing nothing if none are selected/available:
-	m_degSpines.clear();
-	vector<HTp> newKernStarts;
-	for (int i=0; i<(int)kernstarts.size(); i++) {
-		int track = kernstarts[i]->getTrack();
-		if (m_processTrack.at(track)) {
-			newKernStarts.push_back(kernstarts[i]);
-		}
-	}
-	int kernCount = (int)newKernStarts.size();
-	if (kernCount == 0) {
+	bool status = setupSpineInfo(infile);
+	if (!status) {
 		return;
 	}
 
 	// Create storage space for scale degree analyses:
+	int kernCount = (int)m_selectedKernSpines.size();
 	m_degSpines.resize(kernCount);
 	for (int i=0; i<kernCount; i++) {
-		int track = newKernStarts.at(i)->getTrack();
-		if (m_processTrack.at(track)) {
-			prepareDegSpine(m_degSpines.at(i), newKernStarts.at(i), infile);
-		}
+		prepareDegSpine(m_degSpines.at(i), m_selectedKernSpines.at(i), infile);
 	}
 
 	// Analyze the scale degrees in the score (for selected spines)
@@ -69079,6 +69088,93 @@ void Tool_deg::processFile(HumdrumFile& infile) {
 	} else {
 		printDegScoreInterleavedWithInputScore(infile);
 	}
+}
+
+
+//////////////////////////////
+//
+// Tool_deg::setupSpineInfo --
+//
+
+bool Tool_deg::setupSpineInfo(HumdrumFile& infile) {
+	infile.getKernSpineStartList(m_kernSpines);
+
+	if (m_kernSpines.empty()) {
+		return false;
+	}
+
+	// Create a list of only the spine starts that are selected with the -s or -k option.
+	// -s spines that are not **kern spines will be ignored, and spine numbers outside
+	// of the range of **kern spines in the file will be ignored (such as spine 5 in a
+	// file containing four **kern spines).
+	m_selectedKernSpines.clear();
+
+	if (!m_kernTracks.empty()) {
+		vector<int> tracks = Convert::extractIntegerList(m_kernTracks, (int)m_kernSpines.size());
+		// don't allow out-of-sequence values for the tracks list:
+		sort(tracks.begin(),tracks.end());
+		tracks.erase(unique(tracks.begin(), tracks.end()), tracks.end());
+		if (tracks.empty()) {
+			return false;
+		}
+		for (int i=0; i<(int)tracks.size(); i++) {
+			int index = tracks.at(i) - 1;
+			if ((index < 0) || (index > (int)m_kernSpines.size() - 1)) {
+				continue;
+			}
+			m_selectedKernSpines.push_back(m_kernSpines.at(index));
+		}
+	} else if (!m_spineTracks.empty()) {
+		int maxTrack = infile.getMaxTrack();
+		vector<int> tracks = Convert::extractIntegerList(m_spineTracks, maxTrack);
+		sort(tracks.begin(),tracks.end());
+		tracks.erase(unique(tracks.begin(), tracks.end()), tracks.end());
+		if (tracks.empty()) {
+			return false;
+		}
+		for (int i=0; i<(int)tracks.size(); i++) {
+			int track = tracks.at(i);
+			if ((track < 1) || (track > maxTrack)) {
+				continue;
+			}
+			for (int j=0; j<(int)m_kernSpines.size(); j++) {
+				int ktrack = m_kernSpines.at(j)->getTrack();
+				if (ktrack == track) {
+					m_selectedKernSpines.push_back(m_kernSpines.at(j));
+				}
+			}
+		}
+	} else {
+		// analyzing all **kern tracks
+		m_selectedKernSpines = m_kernSpines;
+	}
+
+	if (m_selectedKernSpines.empty()) {
+		return false;
+	}
+
+
+	// Finally, store the insertion track for added **deg analysis spines,
+	// which is the track number of the next **kern spine (not the next
+	// selected **kern spine).  A track of -1 means append the last **deg
+	// spine to the end of data lines.
+	m_degInsertTrack.resize(m_selectedKernSpines.size());
+	for (int i=0; i<(int)m_selectedKernSpines.size(); i++) {
+		HTp target = m_selectedKernSpines.at(i);
+		for (int j=0; j<(int)m_kernSpines.size(); j++) {
+			if (m_kernSpines.at(j) != target) {
+				continue;
+			}
+			if (j < (int)m_kernSpines.size() - 1) {
+				m_degInsertTrack.at(i) = m_kernSpines.at(j+1)->getTrack();
+
+			} else {
+				m_degInsertTrack.at(i) = -1;
+			}
+		}
+	}
+
+	return true;
 }
 
 
@@ -69094,55 +69190,13 @@ void Tool_deg::printDegScoreInterleavedWithInputScore(HumdrumFile& infile) {
 		return;
 	}
 
-	// Store the list of kern tracks that will have
-	// **deg spines attached to them:
-	vector<HTp> newKernStarts;
-	for (int i=0; i<(int)kernStarts.size(); i++) {
-		int track = kernStarts[i]->getTrack();
-		if (m_processTrack.at(track)) {
-			newKernStarts.push_back(kernStarts[i]);
-		}
-	}
-
-	if (newKernStarts.empty()) {
-		// strange: nothing to print?
-		return;
-	}
-
 	m_ipv.clear();
-
-	// Calculate the location that **deg analyses should
-	// be inserted.  This is the track number of the 
-	// next **kern spine after the **deg analysis's **kern spine,
-	// or -1 if the **deg analysis is placed after the last **kern
-	// spine.
-	vector<int> insertTracks((int)newKernStarts.size() - 1);
-
-	for (int i=0; i<(int)newKernStarts.size() - 1; i++) {
-		for (int j=0; j<(int)kernStarts.size(); j++) {
-			if (kernStarts.at(j) == newKernStarts.at(i)) {
-				insertTracks.at(i) = kernStarts.at(j+1)->getTrack();
-				break;
-			}
-		}
-	}
-	// Deal with the location of the last **deg spine:
-	if (kernStarts.back() == newKernStarts.back()) {
-		insertTracks.push_back(-1);
-	} else {
-		for (int j=0; j<(int)kernStarts.size(); j++) {
-			if (kernStarts.at(j) == newKernStarts.back()) {
-				insertTracks.push_back(kernStarts.at(j+1)->getTrack());
-				break;
-			}
-		}
-	}
 
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].hasSpines()) {
 			m_humdrum_text << infile[i] << endl;
 		} else {
-			m_humdrum_text << createOutputHumdrumLine(infile, insertTracks, i) << endl;
+			m_humdrum_text << createOutputHumdrumLine(infile, i) << endl;
 		}
 	}
 }
@@ -69157,116 +69211,462 @@ void Tool_deg::printDegScoreInterleavedWithInputScore(HumdrumFile& infile) {
 //    **mens.
 //
 
-string Tool_deg::createOutputHumdrumLine(HumdrumFile& infile, vector<int>& insertTracks, int lineIndex) {
-	int inputFieldCount = infile[lineIndex].getFieldCount();
-	int currentDegIndex = 0;
-	string output;
+string Tool_deg::createOutputHumdrumLine(HumdrumFile& infile, int lineIndex) {
 
-	// tracks: this is for handling *v mergers gracefully for the inserted **deg data.
-	vector<int> tracks;
-	vector<string> tokens;
-	bool hasMerger = false;
-	bool hasDegMerger = false;
-	int degNegativeTrack = -1;
-	bool arrowStatus = false;
+	// Styling interpretation tracking variables:
+	bool aboveStatus          = false;
+	bool arrowStatus          = false;
+	bool boxStatus            = false;
+	bool circleStatus         = false;
+	bool colorStatus          = false;
+	bool hatStatus            = false;
+	bool keyDesignationStatus = false;
+	bool solfegeStatus        = false;
 
-	// Keep track of an existing arrow styling line and if m_arrowQ is true, then
-	// insert the arrow styling for new **deg spines here rather than just
-	// before the first data line.
-	if (m_arrowQ && !m_ipv.foundArrowLine && !m_ipv.foundData) {
-		arrowStatus = isDegArrowLine(infile, lineIndex);
+	// Keep track of an existing styling line and if such a line is found,
+	// then insert a styling interpretation for the new **deg spines here
+	// rather than just before the first data line.
+	if (!m_ipv.foundData) {
+		if (!m_defaultKey.empty() && !keyDesignationStatus && !m_ipv.foundKeyDesignationLine) {
+			keyDesignationStatus = isKeyDesignationLine(infile, lineIndex);
+		}
+		if (!m_forcedKey.empty() && !keyDesignationStatus && !m_ipv.foundKeyDesignationLine) {
+			keyDesignationStatus = isKeyDesignationLine(infile, lineIndex);
+		}
+		if (m_aboveQ && !m_ipv.foundAboveLine) {
+			aboveStatus = isDegAboveLine(infile, lineIndex);
+		}
+		if (m_arrowQ && !m_ipv.foundArrowLine) {
+			arrowStatus = isDegArrowLine(infile, lineIndex);
+		}
+		if (m_boxQ && !m_ipv.foundBoxLine) {
+			boxStatus = isDegBoxLine(infile, lineIndex);
+		}
+		if (m_circleQ && !m_ipv.foundCircleLine) {
+			circleStatus = isDegCircleLine(infile, lineIndex);
+		}
+		if (m_colorQ && !m_ipv.foundColorLine) {
+			colorStatus = isDegColorLine(infile, lineIndex);
+		}
+		if (m_hatQ && !m_ipv.foundHatLine) {
+			hatStatus = isDegHatLine(infile, lineIndex);
+		}
+		if (m_solfegeQ && !m_ipv.foundSolfegeLine) {
+			solfegeStatus = isDegSolfegeLine(infile, lineIndex);
+		}
 	}
 
-	for (int i=0; i<inputFieldCount; i++) {
+	// spineData: The output Humdrum data line stored in a 2D vector.
+	// The first index for the primary track/spine, and the second is for
+	// the subtracks for each track/spine.  This data will be checked
+	// for adjacemtn mergers happening between two different tracks
+	// (which for backwards compatibility with the Humdrum Toolkit, is not
+	// allowed).
+	vector<vector<string>> spineData;
+
+	// Interleave the **deg spines into the input line.  The **deg spines
+	// are stored just before the matching index of the spine in m_degSpines
+	// in the vector m_degInsertTrack.  If the track in m_degInsertTrack
+	// is -1 (only possible in the last position of m_degInsertTrack), then
+	// that will be handled append at the end of the line (outside of the
+	// following loop).
+
+	int  curDegIndex  = 0;
+	bool hasDegMerger = false;
+	int  track        = -1000;
+	int  lasttrack    = -1000;
+
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
 		HTp token = infile.token(lineIndex, i);
-		int track = token->getTrack();
-		int dtrack;
-		if (currentDegIndex < (int)insertTracks.size()) {
-			dtrack = insertTracks.at(currentDegIndex);
-		} else {
-			dtrack = -1;
-		}
-		if (dtrack == track) {
-			// insert the current **deg spine
-			int spineSize = (int)m_degSpines.at(currentDegIndex).at(lineIndex).size();
-			for (int k=0; k<spineSize; k++) {
-				string value = m_degSpines[currentDegIndex][lineIndex][k].getDegToken();
+		lasttrack = track;
+		track = token->getTrack();
 
-				if (arrowStatus && m_arrowQ && (!m_ipv.foundArrowLine) && (!m_ipv.foundData)) {
-					if (value == "*") {
-						value = "*arr";
-					}
-				}
-
-				output += "\t";
-				output += value;
-				tracks.push_back(degNegativeTrack);
-				tokens.push_back(value);
+		if ((curDegIndex < (int)m_degSpines.size()) && (track == m_degInsertTrack.at(curDegIndex))) {
+			// insert the next **deg spine into spineData
+			spineData.resize(spineData.size() + 1);
+			for (int j=0; j<(int)m_degSpines.at(curDegIndex).at(lineIndex).size(); j++) {
+				string value = m_degSpines.at(curDegIndex).at(lineIndex).at(j).getDegToken();
+				checkKeyDesignationStatus(value, keyDesignationStatus);
+				checkAboveStatus(value, aboveStatus);
+				checkArrowStatus(value, arrowStatus);
+				checkBoxStatus(value, boxStatus);
+				checkCircleStatus(value, circleStatus);
+				checkColorStatus(value, colorStatus);
+				checkHatStatus(value, hatStatus);
+				checkSolfegeStatus(value, hatStatus);
+				spineData.back().push_back(value);
 				if (value == "*v") {
 					hasDegMerger = true;
 				}
 			}
-			degNegativeTrack--;
-			currentDegIndex++;
+			curDegIndex++;
 		}
-		if (i > 0) {
-			output += "\t";
+
+		if (track != lasttrack) {
+			spineData.resize(spineData.size() + 1);
 		}
-		output += *token;
-		if (*token == "*v") {
-			hasMerger = true;
-		}
-		tracks.push_back(track);
-		tokens.push_back(*token);
+
+		spineData.back().push_back(*token);
 	}
 
-	// Output the last **deg spine at the end of the line:
-	if ((!insertTracks.empty()) && (insertTracks.back() == -1)) {
-		int kcount = (int)m_degSpines.back().at(lineIndex).size();
-		for (int k=0; k<kcount; k++) {
-			output += "\t";
-			string value = m_degSpines.back().at(lineIndex).at(k).getDegToken();
-	
-			if (arrowStatus && m_arrowQ && (!m_ipv.foundArrowLine) && (!m_ipv.foundData)) {
-				if (value == "*") {
-					value = "*arr";
-				}
-			}
-	
+	// Add the last **deg spine if necessary:
+	if (!m_degInsertTrack.empty() && m_degInsertTrack.back() == -1) {
+		spineData.resize(spineData.size() + 1);
+		for (int i=0; i<(int)m_degSpines.back().at(lineIndex).size(); i++) {
+			string value = m_degSpines.back().at(lineIndex).at(i).getDegToken();
+			checkKeyDesignationStatus(value, keyDesignationStatus);
+			checkAboveStatus(value, aboveStatus);
+			checkArrowStatus(value, arrowStatus);
+			checkBoxStatus(value, boxStatus);
+			checkCircleStatus(value, circleStatus);
+			checkColorStatus(value, colorStatus);
+			checkHatStatus(value, hatStatus);
+			checkSolfegeStatus(value, hatStatus);
+			spineData.back().push_back(value);
 			if (value == "*v") {
 				hasDegMerger = true;
 			}
-			output += value;
-			tracks.push_back(degNegativeTrack);
-			tokens.push_back(value);
 		}
+		curDegIndex++;
 	}
 
+	// Keep track of cases where the styling interpretations can be
+	// stored in the header (to avoid creating a new line in the
+	// output score just before the data to store such interpretations).
+	if (keyDesignationStatus) {
+		m_ipv.foundKeyDesignationLine = true;
+	}
+	if (aboveStatus) {
+		m_ipv.foundAboveLine = true;
+	}
 	if (arrowStatus) {
 		m_ipv.foundArrowLine = true;
 	}
+	if (boxStatus) {
+		m_ipv.foundBoxLine = true;
+	}
+	if (circleStatus) {
+		m_ipv.foundCircleLine = true;
+	}
+	if (colorStatus) {
+		m_ipv.foundColorLine = true;
+	}
+	if (hatStatus) {
+		m_ipv.foundHatLine = true;
+	}
+	if (solfegeStatus) {
+		m_ipv.foundSolfegeLine = true;
+	}
 
-	if ((!m_ipv.foundData) && infile[lineIndex].isData() && !m_ipv.foundArrowLine) {
+
+	// if styling interpretation lines were not found before the data,
+	// add them just before the data (or change to also before first
+	// barline and before first spine manipulator other than exclusive
+	// interpretations.
+	vector<string> extraLines;
+	if (!m_ipv.foundData && infile[lineIndex].isData()) {
 		m_ipv.foundData = true;
-		if (m_arrowQ && !m_ipv.foundArrowLine) {
-			string line = printDegInterpretation("*arr", infile, lineIndex);
-			if (!line.empty()) {
-				output = line + "\n" + output;
+
+		if (!m_ipv.foundHatLine) {
+			if (m_hatQ && !m_ipv.foundHatLine) {
+				string line = printDegInterpretation("*hat", infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
 			}
 		}
+
+		if (!m_ipv.foundColorLine) {
+			if (m_colorQ && !m_ipv.foundColorLine) {
+				string interp = "*color:";
+				interp += m_color;
+				string line = printDegInterpretation(interp, infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundBoxLine) {
+			if (m_boxQ && !m_ipv.foundBoxLine) {
+				string line = printDegInterpretation("*box", infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundCircleLine) {
+			if (m_circleQ && !m_ipv.foundCircleLine) {
+				string line = printDegInterpretation("*circ", infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundArrowLine) {
+			if (m_arrowQ && !m_ipv.foundArrowLine) {
+				string line = printDegInterpretation("*arr", infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundAboveLine) {
+			if (m_aboveQ && !m_ipv.foundAboveLine) {
+				string line = printDegInterpretation("*above", infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundSolfegeLine) {
+			if (m_solfegeQ && !m_ipv.foundSolfegeLine) {
+				string line = printDegInterpretation("*solf", infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundKeyDesignationLine) {
+			if (!m_defaultKey.empty() && !m_ipv.foundKeyDesignationLine) {
+				string line = printDegInterpretation(m_defaultKey, infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
+		if (!m_ipv.foundKeyDesignationLine) {
+			if (!m_forcedKey.empty() && !m_ipv.foundKeyDesignationLine) {
+				string line = printDegInterpretation(m_forcedKey, infile, lineIndex);
+				if (!line.empty()) {
+					extraLines.push_back(line);
+				}
+			}
+		}
+
 	}
 
 	if (!hasDegMerger) {
-		return output;
+		string output;
+		for (int i=0; i<(int)spineData.size(); i++) {
+			for (int j=0; j<(int)spineData[i].size(); j++) {
+				output += spineData[i][j];
+				output += "\t";
+			}
+		}
+		if (!output.empty()) {
+			output.resize(output.size() - 1);
+		}
+		if (extraLines.empty()) {
+			return output;
+		} else {
+			extraLines.push_back(output);
+			string newoutput;
+			for (int i=0; i<(int)extraLines.size(); i++) {
+				newoutput += extraLines[i];
+				if (i < (int)extraLines.size() - 1) {
+					newoutput += "\n";
+				}
+			}
+			return newoutput;
+		}
 	}
 
 	// The output contains some spine mergers, so be careful and
 	// place any adjacent mergers onto separate lines.
-
-	output = prepareMergerLine(output, tracks, tokens, hasMerger, hasDegMerger);
-
+	string output = prepareMergerLine(spineData);
 	return output;
 }
+
+
+
+//////////////////////////////
+//
+// Tool_deg::checkKeyDesignationStatus --
+//
+
+void Tool_deg::checkKeyDesignationStatus(string& value, int keyDesignationStatus) {
+	if (keyDesignationStatus && (!m_ipv.foundKeyDesignationLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			if (!m_defaultKey.empty()) {
+				value = m_defaultKey;
+			} else if (!m_forcedKey.empty()) {
+				value = m_forcedKey;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::checkAboveStatus -- Add *above interpretation to spine if needed.
+//
+
+void Tool_deg::checkAboveStatus(string& value, bool aboveStatus) {
+	if (aboveStatus && m_aboveQ && (!m_ipv.foundAboveLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*above";
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::checkArrowStatus -- Add *arr interpretation to spine if needed.
+//
+
+void Tool_deg::checkArrowStatus(string& value, bool arrowStatus) {
+	if (arrowStatus && m_arrowQ && (!m_ipv.foundArrowLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*arr";
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::checkBoxStatus -- Add *box interpretation to spine if needed.
+//
+
+void Tool_deg::checkBoxStatus(string& value, bool boxStatus) {
+	if (boxStatus && m_boxQ && (!m_ipv.foundBoxLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*box";
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::checkCircleStatus -- Add *circ interpretation to spine if needed.
+//
+
+void Tool_deg::checkCircleStatus(string& value, bool circleStatus) {
+	if (circleStatus && m_circleQ && (!m_ipv.foundCircleLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*circ";
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_deg::checkColorStatus -- Add *color interpretation to spine if needed.
+//
+
+void Tool_deg::checkColorStatus(string& value, bool colorStatus) {
+	if (colorStatus && m_colorQ && (!m_ipv.foundColorLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*color:";
+			value += m_color;
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_deg::checkHatStatus -- Add *hat interpretation to spine if needed.
+//
+
+void Tool_deg::checkHatStatus(string& value, bool hatStatus) {
+	if (hatStatus && m_hatQ && (!m_ipv.foundHatLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*hat";
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::checkSolfegeStatus -- Add *solfege interpretation to spine if needed.
+//
+
+void Tool_deg::checkSolfegeStatus(string& value, bool hatStatus) {
+	if (hatStatus && m_solfegeQ && (!m_ipv.foundSolfegeLine) && (!m_ipv.foundData)) {
+		if (value == "*") {
+			value = "*solf";
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::isKeyDesignationLine -- Returns true if any spine on the line
+//    looks like a key designation (such as *G#:loc).
+//
+
+bool Tool_deg::isKeyDesignationLine(HumdrumFile& infile, int lineIndex) {
+	if (!infile[lineIndex].hasSpines()) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	}
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (token->isKeyDesignation()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::isDegAboveLine -- Return true if **deg spines only
+//     include *above, *below, interpretations and "*" (but not all "*").
+//
+
+bool Tool_deg::isDegAboveLine(HumdrumFile& infile, int lineIndex) {
+	// If there are no **deg spines, then don't bother searching for them.
+	if (!m_ipv.hasDegSpines) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	} if (infile[lineIndex].isManipulator()) {
+		return false;
+	}
+
+	int degCount = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (!(token->isDataType("**deg") || token->isDataType("**degree"))) {
+			continue;
+		}
+		degCount++;
+		if (*token == "*above")  { return true; }
+		if (*token == "*below") { return true; }
+	}
+	if (degCount == 0) {
+		m_ipv.hasDegSpines = false;
+	}
+
+	return false;
+}
+
 
 
 //////////////////////////////
@@ -69290,7 +69690,7 @@ bool Tool_deg::isDegArrowLine(HumdrumFile& infile, int lineIndex) {
 	int degCount = 0;
 	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
 		HTp token = infile.token(lineIndex, i);
-		if (!token->isDataType("**deg")) {
+		if (!(token->isDataType("**deg") || token->isDataType("**degree"))) {
 			continue;
 		}
 		degCount++;
@@ -69310,39 +69710,215 @@ bool Tool_deg::isDegArrowLine(HumdrumFile& infile, int lineIndex) {
 
 //////////////////////////////
 //
+// Tool_deg::isDegBoxLine -- Return true if **deg spines includes
+//     any *box, or *Xbox, interpretations and "*" (but not all "*").
+//
+
+bool Tool_deg::isDegBoxLine(HumdrumFile& infile, int lineIndex) {
+	// If there are no **deg spines, then don't bother searching for them.
+	if (!m_ipv.hasDegSpines) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	} if (infile[lineIndex].isManipulator()) {
+		return false;
+	}
+
+	int degCount = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (!(token->isDataType("**deg") || token->isDataType("**degree"))) {
+			continue;
+		}
+		degCount++;
+		if (*token == "*box")  { return true; }
+		if (*token == "*Xbox") { return true; }
+	}
+	if (degCount == 0) {
+		m_ipv.hasDegSpines = false;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::isDegCircleLine -- Return true if **deg spines includes
+//     any *circ, or *Xcirc, interpretations and "*" (but not all "*").
+//
+
+bool Tool_deg::isDegCircleLine(HumdrumFile& infile, int lineIndex) {
+	// If there are no **deg spines, then don't bother searching for them.
+	if (!m_ipv.hasDegSpines) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	} if (infile[lineIndex].isManipulator()) {
+		return false;
+	}
+
+	int degCount = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (!(token->isDataType("**deg") || token->isDataType("**degree"))) {
+			continue;
+		}
+		degCount++;
+		if (*token == "*circ")  { return true; }
+		if (*token == "*Xcirc") { return true; }
+	}
+	if (degCount == 0) {
+		m_ipv.hasDegSpines = false;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::isDegColorLine -- Return true if **deg spines only
+//     include *color interpretations and "*" (but not all "*").
+//
+
+bool Tool_deg::isDegColorLine(HumdrumFile& infile, int lineIndex) {
+	// If there are no **deg spines, then don't bother searching for them.
+	if (!m_ipv.hasDegSpines) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	} if (infile[lineIndex].isManipulator()) {
+		return false;
+	}
+
+	int degCount = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (!(token->isDataType("**deg") || token->isDataType("**degree"))) {
+			continue;
+		}
+		degCount++;
+		if (token->compare(0, 7, "*color:") == 0)  { return true; }
+	}
+	if (degCount == 0) {
+		m_ipv.hasDegSpines = false;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::isDegHatLine -- Return true if **deg spines includes
+//     any *hat, or *Xhat, interpretations and "*" (but not all "*").
+//
+
+bool Tool_deg::isDegHatLine(HumdrumFile& infile, int lineIndex) {
+	// If there are no **deg spines, then don't bother searching for them.
+	if (!m_ipv.hasDegSpines) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	} if (infile[lineIndex].isManipulator()) {
+		return false;
+	}
+
+	int degCount = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (!(token->isDataType("**deg") || token->isDataType("**degree"))) {
+			continue;
+		}
+		degCount++;
+		if (*token == "*hat")  { return true; }
+		if (*token == "*Xhat") { return true; }
+	}
+	if (degCount == 0) {
+		m_ipv.hasDegSpines = false;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_deg::isDegSolfegeLine -- Return true if **deg spines includes
+//     any *solf, or *Xsolf, interpretations and "*" (but not all "*").
+//
+
+bool Tool_deg::isDegSolfegeLine(HumdrumFile& infile, int lineIndex) {
+	// If there are no **deg spines, then don't bother searching for them.
+	if (!m_ipv.hasDegSpines) {
+		return false;
+	}
+	if (!infile[lineIndex].isInterpretation()) {
+		return false;
+	} if (infile[lineIndex].isManipulator()) {
+		return false;
+	}
+
+	int degCount = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		if (!token->isDataType("**deg")) {
+			continue;
+		}
+		degCount++;
+		if (*token == "*solf")  { return true; }
+		if (*token == "*Xsolf") { return true; }
+	}
+	if (degCount == 0) {
+		m_ipv.hasDegSpines = false;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_deg::printDegInterpretation --
 //
 
 string Tool_deg::printDegInterpretation(const string& interp, HumdrumFile& infile, int lineIndex) {
 	string output;
-	int degIndex = 0;
-	int kernCount = 0;
-	for (int j=0; j<infile[lineIndex].getFieldCount(); j++) {
-		HTp token = infile.token(lineIndex, j);
-		if (!token->isKern()) {
-			output += "*\t";
-		} else {
-			kernCount++;
-			if (kernCount == 1) {
-				output += "*\t";
-			} else {
-				// print **deg interps
-				int kcount = m_degSpines.at(degIndex).at(lineIndex).size();
-				for (int k=0; k<kcount; k++) {
-					output += interp;
-					output += "\t";
-				}
-				degIndex++;
-				output += "*\t";
+
+	int curDegIndex = 0;
+	for (int i=0; i<infile[lineIndex].getFieldCount(); i++) {
+		HTp token = infile.token(lineIndex, i);
+		int track = token->getTrack();
+
+		if ((curDegIndex < (int)m_degSpines.size()) && (track == m_degInsertTrack.at(curDegIndex))) {
+			// insert the next **deg spine into spineData
+			for (int j=0; j<(int)m_degSpines.at(curDegIndex).at(lineIndex).size(); j++) {
+				output += interp;
+				output += "\t";
 			}
+			curDegIndex++;
 		}
+		output += "*";
+		output += "\t";
 	}
 
-	// print the last **deg spine:
-	int kcount = m_degSpines.back().at(lineIndex).size();
-	for (int k=0; k<kcount; k++) {
-		output += interp;
-		output += "\t";
+	// Add the last **deg spine if necessary:
+	if (!m_degInsertTrack.empty() && m_degInsertTrack.back() == -1) {
+		for (int i=0; i<(int)m_degSpines.back().at(lineIndex).size(); i++) {
+			output += interp;
+			output += "\t";
+		}
+		curDegIndex++;
 	}
 	if (!output.empty()) {
 		output.resize(output.size() - 1);
@@ -69357,26 +69933,9 @@ string Tool_deg::printDegInterpretation(const string& interp, HumdrumFile& infil
 // Tool_deg::prepareMergerLine --
 //
 
-string Tool_deg::prepareMergerLine(const string& input, vector<int>& tracks, vector<string>& tokens, bool inputMerger, bool outputMerger) {
-	if (!outputMerger) {
-		return input;
-	}
+string Tool_deg::prepareMergerLine(vector<vector<string>>& merge) {
 
-	// group tokens by track
-	vector<vector<string>> merge(1);
-	vector<vector<int>> tks(1);
-	merge[0].push_back(tokens[0]);
-	tks[0].push_back(tracks[0]);
-	for (int i=1; i<(int)tokens.size(); i++) {
-		if (tracks[i-1] != tracks[i]) {
-			merge.resize(merge.size() + 1);
-			tks.resize(tks.size() + 1);
-		}
-		merge.back().push_back(tokens[i]);
-		tks.back().push_back(tracks[i]);
-	}
-
-	// calculate result of spine manipulations
+	// Calculate result of spine manipulations:
 	vector<vector<string>> after(merge.size());
 	for (int i=0; i<(int)merge.size(); i++) {
 		calculateManipulatorOutputForSpine(after.at(i), merge.at(i));
@@ -69485,7 +70044,7 @@ string Tool_deg::prepareMergerLine(const string& input, vector<int>& tracks, vec
 
 //////////////////////////////
 //
-// Tool_deg::calculateManipulatorOutput -- Deal with *^ *v *- *+ manipulators
+// Tool_deg::calculateManipulatorOutputForSpine -- Deal with *^ *v *- *+ manipulators
 //
 
 void Tool_deg::calculateManipulatorOutputForSpine(vector<string>& lineout,
@@ -69532,12 +70091,20 @@ void Tool_deg::printDegScore(HumdrumFile& infile) {
 	// Variables to keep track of printing interpretations in **recip spine
 	HumNum printTimeSignature = -1;
 	HumNum printMetricSignature = -1;
+	bool foundData  = false;
 	bool printClef  = false;
-	bool printColor = false;
+	bool printRecipColor = false;
 	bool printStria = false;
 	bool printStem  = false;
-	bool foundData  = false;
-	bool printArrow = !m_arrowQ;
+
+	// input styling options
+	bool printAbove  = !m_aboveQ;
+	bool printArrow  = !m_arrowQ;
+	bool printBox    = !m_boxQ;
+	bool printCircle = !m_circleQ;
+	bool printColor  = !m_colorQ;
+	bool printHat    = !m_hatQ;
+	bool printSolfege = !m_solfegeQ;
 
 	int lineCount = (int)m_degSpines[0].size();
 	int spineCount = (int)m_degSpines.size();
@@ -69566,10 +70133,10 @@ void Tool_deg::printDegScore(HumdrumFile& infile) {
 					m_humdrum_text << line << endl;
 					printStria = true;
 				}
-				if (!printColor) {
+				if (!printRecipColor) {
 					string line = createRecipInterpretation("*color:#fff0", i);
 					m_humdrum_text << line << endl;
-					printColor = true;
+					printRecipColor = true;
 				}
 				if (!printStem) {
 					string line = createRecipInterpretation("*Xstem", i);
@@ -69579,11 +70146,50 @@ void Tool_deg::printDegScore(HumdrumFile& infile) {
 
 			}
 
+			if (!printAbove) {
+				string line = createDegInterpretation("*above", i, m_recipQ);
+				m_humdrum_text << line << endl;
+				printAbove = true;
+			}
+
 			if (!printArrow) {
 				string line = createDegInterpretation("*arr", i, m_recipQ);
 				m_humdrum_text << line << endl;
 				printArrow = true;
 			}
+
+			if (!printBox) {
+				string line = createDegInterpretation("*box", i, m_recipQ);
+				m_humdrum_text << line << endl;
+				printBox = true;
+			}
+
+			if (!printCircle) {
+				string line = createDegInterpretation("*circ", i, m_recipQ);
+				m_humdrum_text << line << endl;
+				printCircle = true;
+			}
+
+			if (!printColor) {
+				string interp = "*color:";
+				interp += m_color;
+				string line = createDegInterpretation(interp, i, m_recipQ);
+				m_humdrum_text << line << endl;
+				printColor = true;
+			}
+
+			if (!printHat) {
+				string line = createDegInterpretation("*hat", i, m_recipQ);
+				m_humdrum_text << line << endl;
+				printHat = true;
+			}
+
+			if (!printSolfege) {
+				string line = createDegInterpretation("*solf", i, m_recipQ);
+				m_humdrum_text << line << endl;
+				printSolfege = true;
+			}
+
 		}
 
 		for (int j=0; j<spineCount; j++) {
@@ -69757,14 +70363,18 @@ void Tool_deg::prepareDegSpine(vector<vector<ScaleDegree>>& degspine, HTp kernst
 	string mode = "unknown";
 	int b40tonic = -1;
 
+	if (!m_defaultKey.empty()) {
+		getModeAndTonic(mode, b40tonic, m_defaultKey);
+	} else if (!m_forcedKey.empty()) {
+		getModeAndTonic(mode, b40tonic, m_forcedKey);
+	}
+
 	int lineCount = infile.getLineCount();
 
 	degspine.resize(lineCount);
 	int track = kernstart->getTrack();
 	HTp current = kernstart;
-	HumRegex hre;
 
-	int middleC = Convert::kernToBase40("c");
 	bool isUnpitched = false;
 
 	while (current) {
@@ -69776,25 +70386,8 @@ void Tool_deg::prepareDegSpine(vector<vector<ScaleDegree>>& degspine, HTp kernst
 			continue;
 		}
 		if (current->isKeyDesignation()) {
-			if (hre.search(current, "\\*([A-Ga-g][-#]*):(.*)")) {
-				string key = hre.getMatch(1);
-				string kmode = hre.getMatch(2);
-				b40tonic = Convert::kernToBase40(key);
-				if (b40tonic < middleC - 2) {
-					mode = "major";
-				} else {
-					mode = "minor";
-				}
-				if (!kmode.empty()) {
-					if      (kmode == "dor") { mode = "dor"; }
-					else if (kmode == "phr") { mode = "phr"; }
-					else if (kmode == "lyd") { mode = "lyd"; }
-					else if (kmode == "mix") { mode = "mix"; }
-					else if (kmode == "aeo") { mode = "aeo"; }
-					else if (kmode == "loc") { mode = "loc"; }
-					else if (kmode == "ion") { mode = "ion"; }
-				}
-			}
+			getModeAndTonic(mode, b40tonic, *current);
+
 		}
 		if (current->isClef()) {
 			if (*current == "*clefX") {
@@ -69830,6 +70423,41 @@ void Tool_deg::prepareDegSpine(vector<vector<ScaleDegree>>& degspine, HTp kernst
 
 	// process melodic contours, etc.
 
+}
+
+
+//////////////////////////////
+//
+// Tool_deg::getModeAndTonic -- Convert key designation interpretation into a mode
+//     string and a base-40 tonic pitch (162 = middle C)
+//
+
+void Tool_deg::getModeAndTonic(string& mode, int& b40tonic, const string& token) {
+	string newtoken = token;
+	if (!m_forcedKey.empty()) {
+		newtoken = m_forcedKey;
+	}
+	HumRegex hre;
+	if (hre.search(newtoken, "^\\*?([A-Ga-g][-#]*):?(.*)$")) {
+		string key = hre.getMatch(1);
+		string kmode = hre.getMatch(2);
+		b40tonic = Convert::kernToBase40(key);
+		int middleC = 162; // Convert::kernToBase40("c");
+		if (b40tonic < middleC - 2) {
+			mode = "major";
+		} else {
+			mode = "minor";
+		}
+		if (!kmode.empty()) {
+			if      (kmode == "dor") { mode = "dor"; }
+			else if (kmode == "phr") { mode = "phr"; }
+			else if (kmode == "lyd") { mode = "lyd"; }
+			else if (kmode == "mix") { mode = "mix"; }
+			else if (kmode == "aeo") { mode = "aeo"; }
+			else if (kmode == "loc") { mode = "loc"; }
+			else if (kmode == "ion") { mode = "ion"; }
+		}
+	}
 }
 
 
@@ -70085,7 +70713,7 @@ HTp Tool_deg::ScaleDegree::getLinkedKernToken(void) const {
 //////////////////////////////
 //
 // Tool_deg::ScaleDegree:getDegToken -- Convert the ScaleDegre
-//     to a **deg token string.
+//     to a **deg token string (or **degree token if including an octave).
 //
 
 string Tool_deg::ScaleDegree::getDegToken(void) const {
@@ -70099,12 +70727,20 @@ string Tool_deg::ScaleDegree::getDegToken(void) const {
 	}
 
 	if (isExclusiveInterpretation()) {
-		return "**deg";
+		if (m_octaveQ) {
+			return "**degree";
+		} else {
+			return "**deg";
+		}
 	} else if (isManipulator()) {
 		return getManipulator();
 	} else if (isInterpretation()) {
 		if (isKeyDesignation()) {
-			return *token;
+			if (m_forcedKey.empty()) {
+				return *token;
+			} else{
+				return "*";
+			}
 		} else {
 			return "*";
 		}
@@ -70197,7 +70833,7 @@ string Tool_deg::ScaleDegree::generateDegDataToken(void) const {
 
 //////////////////////////////
 //
-// Tool_deg::ScaleDegree::createDegDataSubToken -- Convert the ScaleDegree
+// Tool_deg::ScaleDegree::generateDegDataSubtoken -- Convert the ScaleDegree
 //		subtoken (chord note) into **deg data.
 //
 
@@ -70242,6 +70878,12 @@ string Tool_deg::ScaleDegree::generateDegDataSubtoken(int index) const {
 		for (int i=0; i<m_alters.at(index); i++) {
 			output += "+";
 		}
+	}
+
+	// Add octave information if requested:
+	if (m_octaveQ && (degree != 0)) {
+		output += "/";
+		output += to_string(m_octaves.at(index));
 	}
 
 	return output;
