@@ -8892,6 +8892,12 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     std::u32string output;
 
     bool solfegeQ = token->getValueInt("auto", "solf");
+    int accidQ = !token->getValueInt("auto", "nodegacc");
+    int arrowQ = token->getValueInt("auto", "arrow");
+
+    if (!arrowQ) {
+        output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
+    }
 
     hum::HumRegex hre;
     if (hre.search(firstnote, "(\\d+)")) {
@@ -8922,11 +8928,26 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
         }
     }
 
-    int accidQ = !token->getValueInt("auto", "nodegacc");
+    if (arrowQ) {
+        output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
+    }
+
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addSemitoneAdjustmentsToDeg --
+//
+
+std::u32string HumdrumInput::addSemitoneAdjustmentsToDeg(
+    hum::HTp token, int arrowQ, int accidQ, int solfegeQ, int sharps, int flats)
+{
+
+    std::u32string output;
 
     // Add semitone adjustments
     if (accidQ && !solfegeQ) {
-        int arrowQ = token->getValueInt("auto", "arrow");
         if (sharps > 0) {
             if (sharps == 1) {
                 if (arrowQ) {
@@ -8986,7 +9007,6 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
             }
         }
     }
-
     return output;
 }
 

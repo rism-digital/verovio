@@ -808,6 +808,8 @@ protected:
     std::u32string getMoveableDoName(hum::HTp token, int degree, int semitones);
     void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
     void setFontStyleForHarm(Harm *harm, const std::string &style);
+    std::u32string addSemitoneAdjustmentsToDeg(
+        hum::HTp token, int arrowQ, int accidQ, int solfegeQ, int sharps, int flats);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
