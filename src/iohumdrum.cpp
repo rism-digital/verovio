@@ -988,6 +988,8 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
 {
     bool aboveQ = false;
     bool arrowQ = false;
+    bool revarrQ = false;
+    bool revaccQ = false;
     bool boldQ = false;
     bool boxQ = false;
     bool circleQ = false;
@@ -1020,7 +1022,19 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
                 // display scale degrees above the staff
                 current->setValue("auto", "above", 1);
             }
-            if (arrowQ) {
+            if (revarrQ) {
+                arrowQ = true;
+                revaccQ = false;
+                arrowQ = true;
+                current->setValue("auto", "arrR", 1);
+            }
+            if (revaccQ) {
+                arrowQ = false;
+                revarrQ = false;
+                revaccQ = true;
+                current->setValue("auto", "accR", 1);
+            }
+            if (arrowQ || revarrQ) {
                 // display chromatic alterations as up/down arrows,
                 // but only inform tokens that contain an alteration
                 if ((current->find('+') != std::string::npos) || (current->find('-') != std::string::npos)
@@ -1107,11 +1121,21 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         else if (*current == "*Xacc") {
             degaccQ = false;
         }
+        else if (*current == "*accR") {
+            arrowQ = false;
+            revaccQ = true;
+            revarrQ = false;
+        }
         else if (*current == "*arr") {
             arrowQ = true;
         }
         else if (*current == "*Xarr") {
             arrowQ = false;
+        }
+        else if (*current == "*arrR") {
+            arrowQ = true;
+            revaccQ = false;
+            revarrQ = true;
         }
         else if (*current == "*below") {
             aboveQ = false;
@@ -8894,8 +8918,13 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
     bool solfegeQ = token->getValueInt("auto", "solf");
     int accidQ = !token->getValueInt("auto", "nodegacc");
     int arrowQ = token->getValueInt("auto", "arrow");
+    int revaccQ = token->getValueInt("auto", "accR");
+    int revarrQ = token->getValueInt("auto", "arrR");
 
-    if (!arrowQ) {
+    if (arrowQ && revarrQ && !revaccQ) {
+        output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
+    }
+    else if (!arrowQ && !revaccQ) {
         output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
     }
 
@@ -8928,7 +8957,10 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
         }
     }
 
-    if (arrowQ) {
+    if (arrowQ && !revaccQ && !revarrQ) {
+        output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
+    }
+    else if (!arrowQ && revaccQ) {
         output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
     }
 
