@@ -52,10 +52,12 @@ void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
         DurationInterface *interface = object->GetDurationInterface();
         assert(interface);
 
-        double realTimeStart = params->m_realTimeOffsetMilliseconds + interface->GetRealTimeOnsetMilliseconds();
+        double realTimeStart
+            = (int)(params->m_realTimeOffsetMilliseconds + interface->GetRealTimeOnsetMilliseconds() + .5);
         double scoreTimeStart = params->m_scoreTimeOffset + interface->GetScoreTimeOnset();
 
-        double realTimeEnd = params->m_realTimeOffsetMilliseconds + interface->GetRealTimeOffsetMilliseconds();
+        double realTimeEnd
+            = (int)(params->m_realTimeOffsetMilliseconds + interface->GetRealTimeOffsetMilliseconds() + .5);
         double scoreTimeEnd = params->m_scoreTimeOffset + interface->GetScoreTimeOffset();
 
         bool isRest = (object->Is(REST));
@@ -100,7 +102,7 @@ void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
 
         // Deal with repeated music later, for now get the last times.
         double scoreTimeStart = params->m_scoreTimeOffset;
-        double realTimeStart = params->m_realTimeOffsetMilliseconds;
+        double realTimeStart = (int)(params->m_realTimeOffsetMilliseconds + .5);
 
         if (m_map.count(realTimeStart) == 0) {
             m_map[realTimeStart] = emptyEntry;
