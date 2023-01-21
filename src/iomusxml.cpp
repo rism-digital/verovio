@@ -3520,7 +3520,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     }
 
     // tuplet end
-    pugi::xpath_node tupletEnd = notations.node().select_node("tuplet[@type='stop']");
+    pugi::xpath_node tupletEnd = node.select_node("notations/tuplet[@type='stop']");
     if (tupletEnd) {
         RemoveLastFromStack(TUPLET, layer);
     }
