@@ -5104,6 +5104,11 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         else if (part->compare(0, 6, "*oclef") == 0) {
             if (hre.search(part, 6, "\\d")) {
                 m_oclef.emplace_back(staffnumber, part);
+                if (part->isMensLike()) {
+                    // Override *clef with *oclef if displaying **mens:
+                    clef = *part;
+                    cleftok = part;
+                }
             }
         }
         else if (part->compare(0, 5, "*part") == 0) {
@@ -10812,31 +10817,32 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     hum::HTp lastnote = NULL;
     for (int i = 0; i < (int)layerdata.size(); ++i) {
-        if (layerdata[i]->isData()) {
-            lastnote = layerdata[i];
+        hum::HTp token = layerdata[i];
+        if (token->isData()) {
+            lastnote = token;
         }
         if (prespace.at(i) > 0) {
             addSpace(elements, pointers, prespace.at(i), "straddle");
         }
-        if (layerdata[i]->isData() && layerdata[i]->isNull()) {
+        if (token->isData() && token->isNull()) {
             // print any global text directions attached to the null token
             // and then skip to next token.
-            processDirections(layerdata[i], staffindex);
+            processDirections(token, staffindex);
             continue;
         }
-        if (layerdata[i]->isInterpretation()) {
-            processInterpretationStuff(layerdata[i], staffindex);
-            if (*layerdata[i] == "*join") {
+        if (token->isInterpretation()) {
+            processInterpretationStuff(token, staffindex);
+            if (*token == "*join") {
                 m_join = true;
                 continue;
             }
-            if (*layerdata[i] == "*Xjoin") {
+            if (*token == "*Xjoin") {
                 m_join = false;
                 continue;
             }
-            if ((staffindex == 0) && (layerdata[i]->compare(0, 8, "*tscale:") == 0)) {
+            if ((staffindex == 0) && (token->compare(0, 8, "*tscale:") == 0)) {
                 hum::HumRegex hree;
-                if (hree.search(layerdata[i], "^\\*tscale:(\\d+)/(\\d+)$")) {
+                if (hree.search(token, "^\\*tscale:(\\d+)/(\\d+)$")) {
                     int valuetop = hree.getMatchInt(1);
                     int valuebot = hree.getMatchInt(2);
                     if ((valuetop > 0) && (valuebot > 0)) {
@@ -10845,22 +10851,22 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         m_localTempoScaling *= value;
                         Tempo *tempo = new Tempo();
                         tempo->SetMidiBpm(m_midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
-                        setLocationId(tempo, layerdata[i]);
+                        setLocationId(tempo, token);
                         int staffindex = 0;
-                        hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
                         tempo->SetTstamp(tstamp.getFloat());
                         addChildMeasureOrSection(tempo);
                     }
                 }
-                else if (hree.search(layerdata[i], "^\\*tscale:(\\d+)$")) {
+                else if (hree.search(token, "^\\*tscale:(\\d+)$")) {
                     hum::HumNum value = hree.getMatchInt(1);
                     if (value > 0) {
                         m_localTempoScaling *= value;
                         Tempo *tempo = new Tempo();
                         tempo->SetMidiBpm(m_midibpm * m_globalTempoScaling * m_localTempoScaling.getFloat());
-                        setLocationId(tempo, layerdata[i]);
+                        setLocationId(tempo, token);
                         int staffindex = 0;
-                        hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                        hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
                         tempo->SetTstamp(tstamp.getFloat());
                         addChildMeasureOrSection(tempo);
                     }
@@ -10868,19 +10874,19 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
 
             if (ss[staffindex].verse) {
-                checkForVerseLabels(layerdata[i]);
+                checkForVerseLabels(token);
             }
             if (!m_mens) {
-                handleOttavaMark(layerdata[i], note);
-                handleLigature(layerdata[i]);
-                handleColoration(layerdata[i]);
-                handleTempoChange(layerdata[i]);
-                handlePedalMark(layerdata[i]);
-                handleStaffStateVariables(layerdata[i]);
-                handleStaffDynamStateVariables(layerdata[i]);
+                handleOttavaMark(token, note);
+                handleLigature(token);
+                handleColoration(token);
+                handleTempoChange(token);
+                handlePedalMark(token);
+                handleStaffStateVariables(token);
+                handleStaffDynamStateVariables(token);
             }
             handleCustos(elements, pointers, layerdata, i);
-            if (*layerdata[i] == "*rep") {
+            if (*token == "*rep") {
                 int oldi = i;
                 i = insertRepetitionElement(elements, pointers, layerdata, i);
 
@@ -10893,9 +10899,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     processDirections(layerdata[j], staffindex);
                 }
             }
-            if (hre.search(layerdata[i], "^\\*color:(.*)")) {
-                int ctrack = layerdata[i]->getTrack();
-                int strack = layerdata[i]->getSubtrack();
+            if (hre.search(token, "^\\*color:(.*)")) {
+                int ctrack = token->getTrack();
+                int strack = token->getSubtrack();
                 m_spine_color[ctrack][strack] = hre.getMatch(1);
                 if (strack == 1) {
                     m_spine_color[ctrack][0] = m_spine_color[ctrack][1];
@@ -10908,39 +10914,43 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
 
             bool forceClefChange = false;
-            if (layerdata[i]->isClef() || (*layerdata[i] == "*")) {
-                if (layerdata[i]->getValueBool("auto", "clefChange")) {
-                    forceClefChange = true;
+            if (token->isClef() || (*token == "*")) {
+                if (!(token->isMensLike() && token->getDurationFromStart() == 0)) {
+                    if (token->getValueBool("auto", "clefChange")) {
+                        forceClefChange = true;
+                    }
                 }
             }
 
-            if (layerdata[i]->isMensLike()) {
-                if (layerdata[i]->isClef()) {
-                    if (ss.at(m_currentstaff - 1).last_clef != *layerdata[i]) {
-                        Clef *clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
-                        setLocationId(clef, layerdata[i]);
+            if (token->isMensLike()) {
+                if (token->isClef()) {
+                    if (ss.at(m_currentstaff - 1).last_clef != *token) {
+                        if (forceClefChange) {
+                            Clef *clef = insertClefElement(elements, pointers, token, lastnote);
+                            setLocationId(clef, token);
+                        }
                     }
                 }
                 if (m_mens) {
-                    if (layerdata[i]->isMensurationSymbol()) {
+                    if (token->isMensurationSymbol()) {
                         // add mensuration change to layer.
-                        setMensurationSymbol(m_layer, *layerdata[i], staffindex, layerdata[i]);
+                        setMensurationSymbol(m_layer, *token, staffindex, token);
                     }
                 }
-                else if (layerdata[i]->isMensurationSymbol() && (layerdata[i]->getDurationFromStart() > 0)) {
+                else if (token->isMensurationSymbol() && (token->getDurationFromStart() > 0)) {
                     // add mensuration change to layer.
-                    setMensurationSymbol(m_layer, *layerdata[i], staffindex, layerdata[i]);
+                    setMensurationSymbol(m_layer, *token, staffindex, token);
                 }
             }
-            else if (forceClefChange || (layerdata[i]->getDurationFromStart() != 0)) {
-                if (layerdata[i]->isClef()) {
-                    int subtrack = layerdata[i]->getSubtrack();
+            else if (forceClefChange || (token->getDurationFromStart() != 0)) {
+                if (token->isClef()) {
+                    int subtrack = token->getSubtrack();
                     if (subtrack) {
                         subtrack--;
                     }
 
-                    hum::HumNum durFromStart = layerdata[i]->getDurationFromStart();
-                    hum::HumNum durFromBarline = layerdata[i]->getDurationFromBarline();
+                    hum::HumNum durFromStart = token->getDurationFromStart();
+                    hum::HumNum durFromBarline = token->getDurationFromBarline();
 
                     Clef *clef = NULL;
                     if ((durFromStart > 0) && (durFromBarline == 0)) {
@@ -10949,14 +10959,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     else {
                         // Store in the layer as a cautionary staff.
-                        clef = insertClefElement(elements, pointers, layerdata[i], lastnote);
+                        clef = insertClefElement(elements, pointers, token, lastnote);
                     }
 
                     if (clef) {
-                        if (layerdata[i]->find("yy") != std::string::npos) {
+                        if (token->find("yy") != std::string::npos) {
                             clef->SetVisible(BOOLEAN_false);
                         }
-                        setLocationId(clef, layerdata[i]);
+                        setLocationId(clef, token);
                         int diff = layerindex - subtrack;
                         if (diff > 0) {
                             std::string letter;
@@ -10989,20 +10999,20 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         }
                     }
                 }
-                else if (layerdata[i]->isNull()) {
-                    if ((i > 0) && (layerdata[i]->getLineIndex() == layerdata[i - 1]->getLineIndex())) {
+                else if (token->isNull()) {
+                    if ((i > 0) && (token->getLineIndex() == layerdata[i - 1]->getLineIndex())) {
                         // do nothing: duplicate layer clefs are handled elsewhere
                     }
                     else {
                         // duplicate clef changes in secondary layers
-                        int xtrack = layerdata[i]->getTrack();
-                        hum::HTp tok = layerdata[i]->getPreviousFieldToken();
+                        int xtrack = token->getTrack();
+                        hum::HTp tok = token->getPreviousFieldToken();
                         while (tok) {
                             int ttrack = tok->getTrack();
                             if (ttrack == xtrack) {
                                 if (tok->isClef()) {
                                     Clef *clef = insertClefElement(elements, pointers, tok, lastnote);
-                                    setLocationId(clef, layerdata[i]);
+                                    setLocationId(clef, token);
                                     // Uncomment when clef->SetSameas() is available:
                                     // std::string sameas = "#clef-L";
                                     // sameas += to_string(tok->getLineNumber());
@@ -11017,53 +11027,52 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
             }
-            if (layerdata[i]->isTimeSignature()) {
+            if (token->isTimeSignature()) {
                 // Now done at the measure level.  This location might
                 // be good for time signatures which change in the
                 // middle of measures.
                 // insertMeterSigElement(elements, pointers, layerdata, i);
-                processDirections(layerdata[i], staffindex);
+                processDirections(token, staffindex);
             }
-            if ((*layerdata[i] == "*bar") || (layerdata[i]->compare(0, 5, "*bar:") == 0)) {
+            if ((*token == "*bar") || (token->compare(0, 5, "*bar:") == 0)) {
                 BarLine *barline = new BarLine;
-                setLocationId(barline, layerdata[i]);
+                setLocationId(barline, token);
                 appendElement(elements, pointers, barline);
             }
-            if (m_join && ((*layerdata[i] == "*a2") || (layerdata[i]->compare(0, 4, "*a2:") == 0))
-                && (layerdata[i]->getSubtrack() == 1)) {
+            if (m_join && ((*token == "*a2") || (token->compare(0, 4, "*a2:") == 0)) && (token->getSubtrack() == 1)) {
                 // Add "a 2" text
                 Dir *dir = new Dir;
                 addTextElement(dir, "a 2");
                 setStaff(dir, m_currentstaff);
-                setLocationId(dir, layerdata[i]); // adjust with new element class
-                hum::HumNum tstamp = getMeasureTstamp(layerdata[i], staffindex);
+                setLocationId(dir, token); // adjust with new element class
+                hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
                 dir->SetTstamp(tstamp.getFloat());
                 addChildBackMeasureOrSection(dir);
                 setPlaceRelStaff(dir, "above");
             }
         }
-        if (layerdata[i]->isBarline() && (!layerdata[i]->allSameBarlineStyle())) {
+        if (token->isBarline() && (!token->allSameBarlineStyle())) {
             // display a barline local to the staff
             if (i == 0) {
                 // don't print a barline at the start of a measure (always?)
             }
             else {
-                addBarLineElement(layerdata[i], elements, pointers);
+                addBarLineElement(token, elements, pointers);
             }
         }
-        if (!layerdata[i]->isData()) {
+        if (!token->isData()) {
             continue;
         }
 
-        if (layerdata[i]->isMensLike()) {
-            convertMensuralToken(elements, pointers, layerdata[i], staffindex);
+        if (token->isMensLike()) {
+            convertMensuralToken(elements, pointers, token, staffindex);
             continue;
         }
 
         handleGroupStarts(tgs, elements, pointers, layerdata, i);
 
-        if (layerdata[i]->getValueBool("auto", "tremoloBeam")) {
-            if (layerdata[i]->find("L") == std::string::npos) {
+        if (token->getValueBool("auto", "tremoloBeam")) {
+            if (token->find("L") == std::string::npos) {
                 // ignore the ending note of a beamed group
                 // of tremolos (a previous note in the tremolo
                 // replaces display of this note).
@@ -11072,52 +11081,52 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
         }
 
-        if (layerdata[i]->getValueInt("auto", "suppress")) {
+        if (token->getValueInt("auto", "suppress")) {
             // This element is not supposed to be printed,
             // probably due to being in a tremolo.
 
             // But first check for dynamics and text, which
             // should not be suppressed:
-            processDynamics(layerdata[i], staffindex);
-            processDirections(layerdata[i], staffindex);
+            processDynamics(token, staffindex);
+            processDirections(token, staffindex);
             continue;
         }
 
         // conversion of **kern data to MEI:
-        if (layerdata[i]->isChord()) {
-            int chordnotecount = getChordNoteCount(layerdata[i]);
+        if (token->isChord()) {
+            int chordnotecount = getChordNoteCount(token);
             if (chordnotecount < 1) {
                 // invalid chord, so put a space in its place.
                 if (m_signifiers.irest_color.empty() && m_signifiers.space_color.empty()) {
                     Space *irest = new Space();
                     if (m_doc->GetOptions()->m_humType.GetValue()) {
-                        embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                        embedQstampInClass(irest, token, *token);
                     }
-                    setLocationId(irest, layerdata[i]);
+                    setLocationId(irest, token);
                     appendElement(elements, pointers, irest);
-                    convertRhythm(irest, layerdata[i]);
+                    convertRhythm(irest, token);
                 }
                 else {
                     // force invisible rest to be displayed
                     Rest *rest = new Rest();
-                    setLocationId(rest, layerdata[i]);
+                    setLocationId(rest, token);
                     appendElement(elements, pointers, rest);
-                    convertRest(rest, layerdata[i], -1, staffindex);
-                    int line = layerdata[i]->getLineIndex();
-                    int field = layerdata[i]->getFieldIndex();
-                    colorRest(rest, *layerdata[i], line, field);
-                    verticalRest(rest, *layerdata[i]);
+                    convertRest(rest, token, -1, staffindex);
+                    int line = token->getLineIndex();
+                    int field = token->getFieldIndex();
+                    colorRest(rest, *token, line, field);
+                    verticalRest(rest, *token);
                 }
             }
             else {
                 Chord *chord = new Chord();
-                setLocationId(chord, layerdata[i]);
+                setLocationId(chord, token);
 
-                if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
+                if (m_hasTremolo && token->getValueBool("auto", "tremolo")) {
                     BTrem *btrem = new BTrem();
                     setBeamLocationId(btrem, tgs, layerdata, i);
-                    // int slashes = layerdata[i]->getValueInt("auto", "slashes"); // MEI 3 method
-                    int twodur = -(int)log2(hum::Convert::recipToDuration(layerdata[i]).getFloat());
+                    // int slashes = token->getValueInt("auto", "slashes"); // MEI 3 method
+                    int twodur = -(int)log2(hum::Convert::recipToDuration(token).getFloat());
                     switch (twodur) {
                         case 1: btrem->SetUnitdur(DURATION_8); break;
                         case 2: btrem->SetUnitdur(DURATION_16); break;
@@ -11128,12 +11137,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     appendElement(btrem, chord);
                     appendElement(elements, pointers, btrem);
                 }
-                else if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo2")) {
+                else if (m_hasTremolo && token->getValueBool("auto", "tremolo2")) {
                     FTrem *ftrem = new FTrem();
                     setBeamLocationId(ftrem, tgs, layerdata, i);
-                    int beams = layerdata[i]->getValueInt("auto", "beams");
+                    int beams = token->getValueInt("auto", "beams");
                     ftrem->SetBeams(beams);
-                    int unit = layerdata[i]->getValueInt("auto", "unit");
+                    int unit = token->getValueInt("auto", "unit");
                     switch (unit) {
                         case 8: ftrem->SetUnitdur(DURATION_8); break;
                         case 16: ftrem->SetUnitdur(DURATION_16); break;
@@ -11163,10 +11172,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                             appendElement(ftrem, note2);
                             convertNote(note2, second, 0, staffindex);
                         }
-                        addSlur(ftrem, layerdata[i], second);
+                        addSlur(ftrem, token, second);
                     }
                     appendElement(elements, pointers, ftrem);
-                    addExplicitStemDirection(ftrem, layerdata[i]);
+                    addExplicitStemDirection(ftrem, token);
                 }
                 else {
                     appendElement(elements, pointers, chord);
@@ -11174,28 +11183,28 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
                 elements.push_back("chord");
                 pointers.push_back((void *)chord);
-                processChordSignifiers(chord, layerdata[i], staffindex);
-                convertChord(chord, layerdata[i], staffindex);
-                checkForFingeredHarmonic(chord, layerdata[i]);
+                processChordSignifiers(chord, token, staffindex);
+                convertChord(chord, token, staffindex);
+                checkForFingeredHarmonic(chord, token);
                 popElementStack(elements, pointers);
                 // maybe an extra pop here for tremolos?
-                processSlurs(layerdata[i]);
-                processPhrases(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                assignAutomaticStem(chord, layerdata[i], staffindex);
-                addArticulations(chord, layerdata[i]);
-                addOrnaments(chord, layerdata[i]);
-                addArpeggio(chord, layerdata[i]);
-                processDirections(layerdata[i], staffindex);
+                processSlurs(token);
+                processPhrases(token);
+                processDynamics(token, staffindex);
+                assignAutomaticStem(chord, token, staffindex);
+                addArticulations(chord, token);
+                addOrnaments(chord, token);
+                addArpeggio(chord, token);
+                processDirections(token, staffindex);
             }
         }
-        else if (layerdata[i]->isRest()) {
-            if ((layerdata[i]->find("yy") != std::string::npos) && m_signifiers.irest_color.empty()
+        else if (token->isRest()) {
+            if ((token->find("yy") != std::string::npos) && m_signifiers.irest_color.empty()
                 && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
                 if ((i < (int)layerdata.size() - 1) && layerdata[i + 1]->isClef()) {
-                    hum::HumNum dur = layerdata[i]->getDuration();
-                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
+                    hum::HumNum dur = token->getDuration();
+                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - token->getDurationFromStart();
                     hum::HumNum remainingDur = dur - ndur;
 
                     if ((ndur < dur) && isExpressibleDuration(ndur) && isExpressibleDuration(remainingDur)) {
@@ -11204,56 +11213,56 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // split the space into two pieces, this is the firsthalf.
                         Space *irest = new Space();
                         if (m_doc->GetOptions()->m_humType.GetValue()) {
-                            embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                            embedQstampInClass(irest, token, *token);
                         }
-                        setLocationId(irest, layerdata[i]);
+                        setLocationId(irest, token);
                         appendElement(elements, pointers, irest);
-                        // convertRhythm(irest, layerdata[i]);
+                        // convertRhythm(irest, token);
                         setRhythmFromDuration(irest, ndur);
-                        processSlurs(layerdata[i]);
-                        processPhrases(layerdata[i]);
-                        processDynamics(layerdata[i], staffindex);
-                        processDirections(layerdata[i], staffindex);
+                        processSlurs(token);
+                        processPhrases(token);
+                        processDynamics(token, staffindex);
+                        processDirections(token, staffindex);
                         // Store rest here to complete the split after the clef change.
-                        restSplitToken = layerdata[i];
+                        restSplitToken = token;
                         remainingSplitDur = remainingDur;
                     }
                     else {
                         // normal space
                         Space *irest = new Space();
                         if (m_doc->GetOptions()->m_humType.GetValue()) {
-                            embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                            embedQstampInClass(irest, token, *token);
                         }
-                        setLocationId(irest, layerdata[i]);
+                        setLocationId(irest, token);
                         appendElement(elements, pointers, irest);
-                        convertRhythm(irest, layerdata[i]);
-                        processSlurs(layerdata[i]);
-                        processPhrases(layerdata[i]);
-                        processDynamics(layerdata[i], staffindex);
-                        processDirections(layerdata[i], staffindex);
+                        convertRhythm(irest, token);
+                        processSlurs(token);
+                        processPhrases(token);
+                        processDynamics(token, staffindex);
+                        processDirections(token, staffindex);
                     }
                 }
                 else {
                     Space *irest = new Space();
                     if (m_doc->GetOptions()->m_humType.GetValue()) {
-                        embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                        embedQstampInClass(irest, token, *token);
                     }
-                    setLocationId(irest, layerdata[i]);
+                    setLocationId(irest, token);
                     appendElement(elements, pointers, irest);
-                    convertRhythm(irest, layerdata[i]);
-                    processSlurs(layerdata[i]);
-                    processPhrases(layerdata[i]);
-                    processDynamics(layerdata[i], staffindex);
-                    processDirections(layerdata[i], staffindex);
+                    convertRhythm(irest, token);
+                    processSlurs(token);
+                    processPhrases(token);
+                    processDynamics(token, staffindex);
+                    processDirections(token, staffindex);
                 }
             }
             else {
-                int line = layerdata[i]->getLineIndex();
-                int field = layerdata[i]->getFieldIndex();
+                int line = token->getLineIndex();
+                int field = token->getFieldIndex();
 
                 if ((i < (int)layerdata.size() - 1) && layerdata[i + 1]->isClef()) {
-                    hum::HumNum dur = layerdata[i]->getDuration();
-                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
+                    hum::HumNum dur = token->getDuration();
+                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - token->getDurationFromStart();
                     hum::HumNum remainingDur = dur - ndur;
 
                     if ((ndur < dur) && isExpressibleDuration(ndur) && isExpressibleDuration(remainingDur)) {
@@ -11267,72 +11276,72 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         // the second rest should be.
                         Rest *rest1 = new Rest();
                         if (m_doc->GetOptions()->m_humType.GetValue()) {
-                            embedQstampInClass(rest1, layerdata[i], *layerdata[i]);
+                            embedQstampInClass(rest1, token, *token);
                         }
-                        setLocationId(rest1, layerdata[i]);
+                        setLocationId(rest1, token);
                         appendElement(elements, pointers, rest1);
-                        // convertRhythm(irest, layerdata[i]);
+                        // convertRhythm(irest, token);
                         setVisualAndGesturalRhythmFromDuration(rest1, dur, ndur);
-                        processSlurs(layerdata[i]);
-                        processPhrases(layerdata[i]);
-                        processDynamics(layerdata[i], staffindex);
-                        processDirections(layerdata[i], staffindex);
+                        processSlurs(token);
+                        processPhrases(token);
+                        processDynamics(token, staffindex);
+                        processDirections(token, staffindex);
                         // Store rest here to complete the split after the clef change.
-                        restSplitToken = layerdata[i];
+                        restSplitToken = token;
                         remainingSplitDur = remainingDur;
                     }
                     else {
-                        hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
+                        hum::HumNum restDur = hum::Convert::recipToDuration(token);
                         if ((restDur == duration) && (restDur == timesigdurs[startline])) {
                             // whole-measure rest with something else also in
                             // measure (such as grace notes).
                             MRest *mrest = new MRest();
-                            setLocationId(mrest, layerdata[i]);
+                            setLocationId(mrest, token);
                             appendElement(elements, pointers, mrest);
-                            // colorRest(mrest, *layerdata[i], line, field);
-                            verticalRest(mrest, *layerdata[i]);
+                            // colorRest(mrest, *token, line, field);
+                            verticalRest(mrest, *token);
                         }
                         else {
                             Rest *rest = new Rest();
-                            setLocationId(rest, layerdata[i]);
+                            setLocationId(rest, token);
                             appendElement(elements, pointers, rest);
-                            convertRest(rest, layerdata[i], -1, staffindex);
-                            colorRest(rest, *layerdata[i], line, field);
-                            verticalRest(rest, *layerdata[i]);
+                            convertRest(rest, token, -1, staffindex);
+                            colorRest(rest, *token, line, field);
+                            verticalRest(rest, *token);
                         }
-                        processSlurs(layerdata[i]);
-                        processPhrases(layerdata[i]);
-                        processDynamics(layerdata[i], staffindex);
-                        processDirections(layerdata[i], staffindex);
+                        processSlurs(token);
+                        processPhrases(token);
+                        processDynamics(token, staffindex);
+                        processDirections(token, staffindex);
                     }
                 }
                 else {
-                    hum::HumNum restDur = hum::Convert::recipToDuration(layerdata[i]);
+                    hum::HumNum restDur = hum::Convert::recipToDuration(token);
                     if ((restDur == duration) && (restDur == timesigdurs[startline])) {
                         // whole-measure rest with something else also in
                         // measure (such as grace notes).
                         MRest *mrest = new MRest();
-                        setLocationId(mrest, layerdata[i]);
+                        setLocationId(mrest, token);
                         appendElement(elements, pointers, mrest);
-                        // colorRest(mrest, *layerdata[i], line, field);
-                        verticalRest(mrest, *layerdata[i]);
+                        // colorRest(mrest, *token, line, field);
+                        verticalRest(mrest, *token);
                     }
                     else {
                         Rest *rest = new Rest();
-                        setLocationId(rest, layerdata[i]);
+                        setLocationId(rest, token);
                         appendElement(elements, pointers, rest);
-                        convertRest(rest, layerdata[i], -1, staffindex);
-                        colorRest(rest, *layerdata[i], line, field);
-                        verticalRest(rest, *layerdata[i]);
+                        convertRest(rest, token, -1, staffindex);
+                        colorRest(rest, *token, line, field);
+                        verticalRest(rest, *token);
                     }
-                    processSlurs(layerdata[i]);
-                    processPhrases(layerdata[i]);
-                    processDynamics(layerdata[i], staffindex);
-                    processDirections(layerdata[i], staffindex);
+                    processSlurs(token);
+                    processPhrases(token);
+                    processDynamics(token, staffindex);
+                    processDirections(token, staffindex);
                 }
             }
         }
-        else if (!layerdata[i]->isNote()) {
+        else if (!token->isNote()) {
 
             // this is probably a **recip value without note or rest information
             // so print it as a space (invisible rest).
@@ -11340,42 +11349,42 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 // This should be invisible but someone wants it visible
                 // and colored.
                 Rest *rest = new Rest();
-                setLocationId(rest, layerdata[i]);
+                setLocationId(rest, token);
                 appendElement(elements, pointers, rest);
-                convertRest(rest, layerdata[i], -1, staffindex);
-                processSlurs(layerdata[i]);
-                processPhrases(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                processDirections(layerdata[i], staffindex);
-                int line = layerdata[i]->getLineIndex();
-                int field = layerdata[i]->getFieldIndex();
-                colorRest(rest, *layerdata[i], line, field);
+                convertRest(rest, token, -1, staffindex);
+                processSlurs(token);
+                processPhrases(token);
+                processDynamics(token, staffindex);
+                processDirections(token, staffindex);
+                int line = token->getLineIndex();
+                int field = token->getFieldIndex();
+                colorRest(rest, *token, line, field);
             }
             else {
                 Space *irest = new Space();
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                    embedQstampInClass(irest, token, *token);
                 }
-                setLocationId(irest, layerdata[i]);
+                setLocationId(irest, token);
                 appendElement(elements, pointers, irest);
-                convertRhythm(irest, layerdata[i]);
-                processSlurs(layerdata[i]);
-                processPhrases(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                processDirections(layerdata[i], staffindex);
+                convertRhythm(irest, token);
+                processSlurs(token);
+                processPhrases(token);
+                processDynamics(token, staffindex);
+                processDirections(token, staffindex);
             }
         }
         else {
             // should be a note
             note = new Note();
-            setStemLength(note, layerdata[i]);
-            setLocationId(note, layerdata[i]);
+            setStemLength(note, token);
+            setLocationId(note, token);
 
-            if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo")) {
+            if (m_hasTremolo && token->getValueBool("auto", "tremolo")) {
                 BTrem *btrem = new BTrem();
                 setBeamLocationId(btrem, tgs, layerdata, i);
-                // int slashes = layerdata[i]->getValueInt("auto", "slashes"); // MEI 3 method
-                int twodur = -(int)log2(hum::Convert::recipToDuration(layerdata[i]).getFloat());
+                // int slashes = token->getValueInt("auto", "slashes"); // MEI 3 method
+                int twodur = -(int)log2(hum::Convert::recipToDuration(token).getFloat());
                 switch (twodur) {
                     case 1: btrem->SetUnitdur(DURATION_8); break;
                     case 2: btrem->SetUnitdur(DURATION_16); break;
@@ -11386,12 +11395,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(btrem, note);
                 appendElement(elements, pointers, btrem);
             }
-            else if (m_hasTremolo && layerdata[i]->getValueBool("auto", "tremolo2")) {
+            else if (m_hasTremolo && token->getValueBool("auto", "tremolo2")) {
                 FTrem *ftrem = new FTrem();
                 setBeamLocationId(ftrem, tgs, layerdata, i);
-                int beams = layerdata[i]->getValueInt("auto", "beams");
+                int beams = token->getValueInt("auto", "beams");
                 ftrem->SetBeams(beams);
-                int unit = layerdata[i]->getValueInt("auto", "unit");
+                int unit = token->getValueInt("auto", "unit");
                 switch (unit) {
                     case 8: ftrem->SetUnitdur(DURATION_8); break;
                     case 16: ftrem->SetUnitdur(DURATION_16); break;
@@ -11407,7 +11416,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
                 appendElement(ftrem, note);
-                addArticulations(note, layerdata[i]);
+                addArticulations(note, token);
                 if (second) {
                     // ignoring slurs, ties, ornaments, articulations
                     if (second->isChord()) {
@@ -11423,36 +11432,36 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         convertNote(note2, second, 0, staffindex);
                         addArticulations(note2, second);
                     }
-                    addSlur(ftrem, layerdata[i], second);
+                    addSlur(ftrem, token, second);
                 }
                 appendElement(elements, pointers, ftrem);
-                addExplicitStemDirection(ftrem, layerdata[i]);
+                addExplicitStemDirection(ftrem, token);
             }
             else {
                 appendElement(elements, pointers, note);
             }
 
-            convertNote(note, layerdata[i], 0, staffindex);
-            processSlurs(layerdata[i]);
-            processPhrases(layerdata[i]);
-            processDynamics(layerdata[i], staffindex);
-            assignAutomaticStem(note, layerdata[i], staffindex);
-            if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != std::string::npos) {
+            convertNote(note, token, 0, staffindex);
+            processSlurs(token);
+            processPhrases(token);
+            processDynamics(token, staffindex);
+            assignAutomaticStem(note, token, staffindex);
+            if (m_signifiers.nostem && token->find(m_signifiers.nostem) != std::string::npos) {
                 note->SetStemVisible(BOOLEAN_false);
             }
-            if (m_signifiers.hairpinAccent && layerdata[i]->find(m_signifiers.hairpinAccent) != std::string::npos) {
-                addHairpinAccent(layerdata[i]);
+            if (m_signifiers.hairpinAccent && token->find(m_signifiers.hairpinAccent) != std::string::npos) {
+                addHairpinAccent(token);
             }
-            if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != std::string::npos) {
+            if (m_signifiers.cuesize && token->find(m_signifiers.cuesize) != std::string::npos) {
                 note->SetCue(BOOLEAN_true);
             }
             else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
                 note->SetCue(BOOLEAN_true);
             }
-            addArticulations(note, layerdata[i]);
-            addOrnaments(note, layerdata[i]);
-            addArpeggio(note, layerdata[i]);
-            processDirections(layerdata[i], staffindex);
+            addArticulations(note, token);
+            addOrnaments(note, token);
+            addArpeggio(note, token);
+            processDirections(token, staffindex);
         }
 
         handleGroupEnds(tgs.at(i), elements, pointers);
@@ -11495,13 +11504,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     // starting barline that should be checked for a repeat start:
     if (!layerdata.empty() && (layerdata[0]->compare(0, 2, "**") == 0)) {
         for (int i = 0; i < (int)layerdata.size(); ++i) {
-            if (layerdata[i]->isData()) {
+            hum::HTp token = layerdata[i];
+            if (token->isData()) {
                 break;
             }
-            if (!layerdata[i]->isBarline()) {
+            if (!token->isBarline()) {
                 continue;
             }
-            if ((layerdata[i]->find("|:") != std::string::npos) || (layerdata[i]->find("!:") != std::string::npos)) {
+            if ((token->find("|:") != std::string::npos) || (token->find("!:") != std::string::npos)) {
                 if (m_measure) {
                     m_measure->SetLeft(BARRENDITION_rptstart);
                 }
