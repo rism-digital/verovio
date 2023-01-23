@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
@@ -86,5 +87,25 @@ char32_t Trill::GetTrillGlyph() const
 //----------------------------------------------------------------------------
 // Trill functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Trill::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTrill(this);
+}
+
+FunctorCode Trill::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTrill(this);
+}
+
+FunctorCode Trill::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTrillEnd(this);
+}
+
+FunctorCode Trill::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTrillEnd(this);
+}
 
 } // namespace vrv

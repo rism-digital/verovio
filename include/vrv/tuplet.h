@@ -103,11 +103,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustTupletsX
      */
     int AdjustTupletsX(FunctorParams *functorParams) override;
@@ -121,11 +116,6 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
 protected:
     /**

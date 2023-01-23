@@ -833,90 +833,6 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
-
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        this->AddChild(currentStem);
-    }
-    currentStem->AttGraced::operator=(*this);
-    currentStem->FillAttributes(*this);
-
-    int duration = this->GetNoteOrChordDur(this);
-    if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
-        currentStem->IsVirtual(true);
-    }
-
-    if ((duration > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    this->SetDrawingStem(currentStem);
-
-    // Calculate chord clusters
-    this->CalculateClusters();
-
-    // Also set the drawing stem object (or NULL) to all child notes
-    const ListOfObjects &childList = this->GetList(this);
-    for (ListOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        assert((*it)->Is(NOTE));
-        Note *note = vrv_cast<Note *>(*it);
-        assert(note);
-        note->SetDrawingStem(currentStem);
-    }
-
-    /************ dots ***********/
-
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if (this->GetDots() > 0) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareLyrics(FunctorParams *functorParams)
-{
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
-    params->m_lastNoteOrChord = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
@@ -931,28 +847,6 @@ int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 
     params->m_currentScoreTime += incrementScoreTime;
     params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareDataInitialization(FunctorParams *)
-{
-    if (this->HasEmptyList(this)) {
-        LogWarning("Chord '%s' has no child note - a default note is added", this->GetID().c_str());
-        Note *rescueNote = new Note();
-        this->AddChild(rescueNote);
-    }
-    this->Modify();
 
     return FUNCTOR_CONTINUE;
 }

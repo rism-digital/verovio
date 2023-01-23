@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "staff.h"
@@ -86,6 +87,26 @@ int Tempo::GetDrawingXRelativeToStaff(int staffN) const
     return this->GetStart()->GetDrawingX() + m_relativeX;
 }
 
+FunctorCode Tempo::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTempo(this);
+}
+
+FunctorCode Tempo::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTempo(this);
+}
+
+FunctorCode Tempo::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTempoEnd(this);
+}
+
+FunctorCode Tempo::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTempoEnd(this);
+}
+
 int Tempo::AdjustTempo(FunctorParams *functorParams)
 {
     AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
@@ -120,16 +141,6 @@ int Tempo::AdjustTempo(FunctorParams *functorParams)
             m_drawingXRels[staffN] = left - start;
         }
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Tempo::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_drawingXRels.clear();
 
     return FUNCTOR_CONTINUE;
 }

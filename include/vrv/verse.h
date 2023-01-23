@@ -41,11 +41,12 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * @name Getter for the labelAbbr
+     * @name Getter and setter for the labelAbbr
      */
     ///@{
     LabelAbbr *GetDrawingLabelAbbr() { return m_drawingLabelAbbr; }
     const LabelAbbr *GetDrawingLabelAbbr() const { return m_drawingLabelAbbr; }
+    void SetDrawingLabelAbbr(LabelAbbr *labelAbbr) { m_drawingLabelAbbr = labelAbbr; }
     ///@}
 
     /**
@@ -88,11 +89,6 @@ public:
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //

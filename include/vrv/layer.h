@@ -282,21 +282,11 @@ public:
     int InitProcessingLists(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{
     int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * @name See Object::GenerateMIDI

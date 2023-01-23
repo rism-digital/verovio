@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "layerelement.h"
 #include "vrv.h"
 
@@ -58,5 +59,25 @@ bool Lv::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, i
 //----------------------------------------------------------------------------
 // Lv functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Lv::Accept(MutableFunctor &functor)
+{
+    return functor.VisitLv(this);
+}
+
+FunctorCode Lv::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitLv(this);
+}
+
+FunctorCode Lv::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitLvEnd(this);
+}
+
+FunctorCode Lv::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLvEnd(this);
+}
 
 } // namespace vrv

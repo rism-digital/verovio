@@ -85,9 +85,27 @@ public:
     const BeamSpanSegment *GetSegmentForSystem(const System *system) const;
     ///@}
 
+    /**
+     * Getter and setter for the beamed elements
+     */
+    ///@{
+    const ArrayOfObjects &GetBeamedElements() const { return m_beamedElements; }
+    void SetBeamedElements(const ArrayOfObjects &beamedElements) { m_beamedElements = beamedElements; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -100,11 +118,6 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareBeamSpanElements
-     */
-    int PrepareBeamSpanElements(FunctorParams *) override;
-
-    /**
      * See Object::CalcSpanningBeamSpans
      */
     int CalcSpanningBeamSpans(FunctorParams *) override;
@@ -112,10 +125,6 @@ public:
 private:
     // Helper for breaking one big spanning beamSpan into smaller beamSpans
     bool AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
-
-    // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
-    // in between start and end of the beamSpan
-    ArrayOfObjects GetBeamSpanElementList(Layer *layer, const Staff *staff);
 
 public:
     //

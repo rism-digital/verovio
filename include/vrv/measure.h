@@ -424,44 +424,6 @@ public:
     int CastOffToSelection(FunctorParams *) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanningEnd
-     */
-    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareCrossStaff
-     */
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::PrepareFloatingGrps
-     */
-    ///@{
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-    int PrepareFloatingGrpsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::PrepareTimePointingEnd
-     */
-    int PrepareTimePointingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanningEnd
-     */
-    int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareMilestones
-     */
-    int PrepareMilestones(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;
@@ -488,11 +450,6 @@ public:
      * See Object::InitOnsetOffset
      */
     int InitOnsetOffset(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
@@ -567,9 +524,8 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareMilestones and passed to the System drawing
-     * list
-     * in DrawMeasure
+     * A pointer to the ending to which the measure belongs. Set by PrepareMilestonesFunctor
+     * and passed to the System drawing list in DrawMeasure
      */
     Ending *m_drawingEnding;
 

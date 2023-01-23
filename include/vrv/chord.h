@@ -172,6 +172,11 @@ public:
      */
     std::list<const Note *> GetAdjacentNotesList(const Staff *staff, int loc) const;
 
+    /**
+     * Recalculate the m_clusters vector
+     */
+    void CalculateClusters();
+
     //----------//
     // Functors //
     //----------//
@@ -220,29 +225,9 @@ public:
     int CalcChordNoteHeads(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffsetEnd
      */
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
 
     /**
      * See Object::JustifyYAdjustCrossStaff
@@ -277,11 +262,6 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
-
-    /**
-     * Recalculate the m_clusters vector
-     */
-    void CalculateClusters();
 
     /**
      * Filter the flat list and keep only Note elements.

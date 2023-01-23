@@ -15,24 +15,45 @@ namespace vrv {
 class Accid;
 class Alignment;
 class AlignmentReference;
+class AnchoredText;
+class Arpeg;
 class Artic;
 class BarLine;
 class Beam;
+class BeamSpan;
 class BeatRpt;
+class BracketSpan;
+class Breath;
 class BTrem;
+class Caesura;
 class Chord;
 class Clef;
+class ControlElement;
 class Course;
 class Custos;
+class Dir;
 class Dot;
 class Dots;
 class Doc;
+class Dynam;
+class EditorialElement;
+class Ending;
+class Expansion;
+class F;
+class Fb;
+class Fermata;
+class Fing;
+class Fig;
 class Flag;
+class FloatingObject;
 class FTrem;
+class Gliss;
 class GraceAligner;
 class GraceGrp;
 class GrpSym;
+class Hairpin;
 class HalfmRpt;
+class Harm;
 class HorizontalAligner;
 class InstrDef;
 class KeyAccid;
@@ -42,13 +63,17 @@ class LabelAbbr;
 class Layer;
 class LayerDef;
 class LayerElement;
+class Lb;
 class Ligature;
+class Lv;
 class Mdiv;
 class Measure;
 class MeasureAligner;
 class Mensur;
 class MeterSig;
 class MeterSigGrp;
+class Mordent;
+class MNum;
 class MRest;
 class MRpt;
 class MRpt2;
@@ -58,37 +83,62 @@ class MultiRpt;
 class Nc;
 class Neume;
 class Note;
+class Num;
 class Object;
+class Octave;
+class Ornam;
 class Page;
 class PageElement;
 class PageMilestoneEnd;
 class Pages;
 class Pb;
+class Pedal;
+class PgFoot;
+class PgFoot2;
+class PgHead;
+class PgHead2;
+class Phrase;
+class PitchInflection;
 class Plica;
 class Proport;
+class Reh;
+class Rend;
 class Rest;
+class RunningElement;
 class Sb;
 class Score;
 class ScoreDef;
 class ScoreDefElement;
+class Section;
+class Slur;
 class Space;
 class Staff;
 class StaffAlignment;
 class StaffDef;
 class StaffGrp;
 class Stem;
+class Svg;
 class Syl;
 class Syllable;
+class Symbol;
 class System;
 class SystemAligner;
+class SystemElement;
+class SystemMilestoneEnd;
 class TabDurSym;
 class TabGrp;
+class Tempo;
+class Text;
+class TextElement;
+class Tie;
 class TimestampAligner;
 class TimestampAttr;
+class Trill;
 class Tuning;
 class Tuplet;
 class TupletBracket;
 class TupletNum;
+class Turn;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -123,7 +173,6 @@ public:
      * @name Visit container elements
      */
     ///@{
-    // TODO: Add system elements later
     virtual FunctorCode VisitCourse(Course *course);
     virtual FunctorCode VisitCourseEnd(Course *course);
     virtual FunctorCode VisitGrpSym(GrpSym *grpSym);
@@ -144,10 +193,10 @@ public:
     virtual FunctorCode VisitPageEnd(Page *page);
     virtual FunctorCode VisitPages(Pages *pages);
     virtual FunctorCode VisitPagesEnd(Pages *pages);
-    // virtual FunctorCode VisitPb(Pb *pb);
-    // virtual FunctorCode VisitPbEnd(Pb *pb);
-    // virtual FunctorCode VisitSb(Sb *sb);
-    // virtual FunctorCode VisitSbEnd(Sb *sb);
+    virtual FunctorCode VisitPb(Pb *pb);
+    virtual FunctorCode VisitPbEnd(Pb *pb);
+    virtual FunctorCode VisitSb(Sb *sb);
+    virtual FunctorCode VisitSbEnd(Sb *sb);
     virtual FunctorCode VisitScoreDef(ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefElement(ScoreDefElement *scoreDefElement);
@@ -165,6 +214,47 @@ public:
     ///@}
 
     /**
+     * @name Visit editorial elements
+     * Limited to EditorialElement for now, can be extended later
+     */
+    ///@{
+    virtual FunctorCode VisitEditorialElement(EditorialElement *editorialElement);
+    virtual FunctorCode VisitEditorialElementEnd(EditorialElement *editorialElement);
+    ///@}
+
+    /**
+     * @name Visit running elements
+     */
+    ///@{
+    virtual FunctorCode VisitRunningElement(RunningElement *runningElement);
+    virtual FunctorCode VisitRunningElementEnd(RunningElement *runningElement);
+    virtual FunctorCode VisitPgFoot(PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFootEnd(PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFoot2(PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgFoot2End(PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgHead(PgHead *pgHead);
+    virtual FunctorCode VisitPgHeadEnd(PgHead *pgHead);
+    virtual FunctorCode VisitPgHead2(PgHead2 *pgHead2);
+    virtual FunctorCode VisitPgHead2End(PgHead2 *pgHead2);
+    ///@}
+
+    /**
+     * @name Visit system elements
+     */
+    ///@{
+    virtual FunctorCode VisitEnding(Ending *ending);
+    virtual FunctorCode VisitEndingEnd(Ending *ending);
+    virtual FunctorCode VisitExpansion(Expansion *expansion);
+    virtual FunctorCode VisitExpansionEnd(Expansion *expansion);
+    virtual FunctorCode VisitSection(Section *section);
+    virtual FunctorCode VisitSectionEnd(Section *section);
+    virtual FunctorCode VisitSystemElement(SystemElement *systemElement);
+    virtual FunctorCode VisitSystemElementEnd(SystemElement *systemElement);
+    virtual FunctorCode VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd);
+    virtual FunctorCode VisitSystemMilestoneEnd(SystemMilestoneEnd *systemMilestoneEnd);
+    ///@}
+
+    /**
      * @name Visit page elements
      */
     ///@{
@@ -176,6 +266,66 @@ public:
     virtual FunctorCode VisitPageMilestoneEnd(PageMilestoneEnd *pageMilestoneEnd);
     virtual FunctorCode VisitScore(Score *score);
     virtual FunctorCode VisitScoreEnd(Score *score);
+    ///@}
+
+    /**
+     * @name Visit control elements
+     */
+    ///@{
+    virtual FunctorCode VisitAnchoredText(AnchoredText *anchoredText);
+    virtual FunctorCode VisitAnchoredTextEnd(AnchoredText *anchoredText);
+    virtual FunctorCode VisitArpeg(Arpeg *arpeg);
+    virtual FunctorCode VisitArpegEnd(Arpeg *arpeg);
+    virtual FunctorCode VisitBeamSpan(BeamSpan *beamSpan);
+    virtual FunctorCode VisitBeamSpanEnd(BeamSpan *beamSpan);
+    virtual FunctorCode VisitBracketSpan(BracketSpan *bracketSpan);
+    virtual FunctorCode VisitBracketSpanEnd(BracketSpan *bracketSpan);
+    virtual FunctorCode VisitBreath(Breath *breath);
+    virtual FunctorCode VisitBreathEnd(Breath *breath);
+    virtual FunctorCode VisitCaesura(Caesura *caesura);
+    virtual FunctorCode VisitCaesuraEnd(Caesura *caesura);
+    virtual FunctorCode VisitControlElement(ControlElement *controlElement);
+    virtual FunctorCode VisitControlElementEnd(ControlElement *controlElement);
+    virtual FunctorCode VisitDir(Dir *dir);
+    virtual FunctorCode VisitDirEnd(Dir *dir);
+    virtual FunctorCode VisitDynam(Dynam *dynam);
+    virtual FunctorCode VisitDynamEnd(Dynam *dynam);
+    virtual FunctorCode VisitFermata(Fermata *fermata);
+    virtual FunctorCode VisitFermataEnd(Fermata *fermata);
+    virtual FunctorCode VisitFing(Fing *fing);
+    virtual FunctorCode VisitFingEnd(Fing *fing);
+    virtual FunctorCode VisitGliss(Gliss *gliss);
+    virtual FunctorCode VisitGlissEnd(Gliss *gliss);
+    virtual FunctorCode VisitHairpin(Hairpin *hairpin);
+    virtual FunctorCode VisitHairpinEnd(Hairpin *hairpin);
+    virtual FunctorCode VisitHarm(Harm *harm);
+    virtual FunctorCode VisitHarmEnd(Harm *harm);
+    virtual FunctorCode VisitLv(Lv *lv);
+    virtual FunctorCode VisitLvEnd(Lv *lv);
+    virtual FunctorCode VisitMordent(Mordent *mordent);
+    virtual FunctorCode VisitMordentEnd(Mordent *mordent);
+    virtual FunctorCode VisitOctave(Octave *octave);
+    virtual FunctorCode VisitOctaveEnd(Octave *octave);
+    virtual FunctorCode VisitOrnam(Ornam *ornam);
+    virtual FunctorCode VisitOrnamEnd(Ornam *ornam);
+    virtual FunctorCode VisitPedal(Pedal *pedal);
+    virtual FunctorCode VisitPedalEnd(Pedal *pedal);
+    virtual FunctorCode VisitPhrase(Phrase *phrase);
+    virtual FunctorCode VisitPhraseEnd(Phrase *phrase);
+    virtual FunctorCode VisitPitchInflection(PitchInflection *pitchInflection);
+    virtual FunctorCode VisitPitchInflectionEnd(PitchInflection *pitchInflection);
+    virtual FunctorCode VisitReh(Reh *reh);
+    virtual FunctorCode VisitRehEnd(Reh *reh);
+    virtual FunctorCode VisitSlur(Slur *slur);
+    virtual FunctorCode VisitSlurEnd(Slur *slur);
+    virtual FunctorCode VisitTempo(Tempo *tempo);
+    virtual FunctorCode VisitTempoEnd(Tempo *tempo);
+    virtual FunctorCode VisitTie(Tie *tie);
+    virtual FunctorCode VisitTieEnd(Tie *tie);
+    virtual FunctorCode VisitTrill(Trill *trill);
+    virtual FunctorCode VisitTrillEnd(Trill *trill);
+    virtual FunctorCode VisitTurn(Turn *turn);
+    virtual FunctorCode VisitTurnEnd(Turn *turn);
     ///@}
 
     /**
@@ -275,6 +425,34 @@ public:
     ///@}
 
     /**
+     * @name Visit text elements
+     */
+    ///@{
+    virtual FunctorCode VisitF(F *f);
+    virtual FunctorCode VisitFEnd(F *f);
+    virtual FunctorCode VisitFb(Fb *fb);
+    virtual FunctorCode VisitFbEnd(Fb *fb);
+    virtual FunctorCode VisitFig(Fig *fig);
+    virtual FunctorCode VisitFigEnd(Fig *fig);
+    virtual FunctorCode VisitLb(Lb *lb);
+    virtual FunctorCode VisitLbEnd(Lb *lb);
+    virtual FunctorCode VisitMNum(MNum *mNum);
+    virtual FunctorCode VisitMNumEnd(MNum *mNum);
+    virtual FunctorCode VisitNum(Num *num);
+    virtual FunctorCode VisitNumEnd(Num *num);
+    virtual FunctorCode VisitRend(Rend *rend);
+    virtual FunctorCode VisitRendEnd(Rend *rend);
+    virtual FunctorCode VisitSvg(Svg *svg);
+    virtual FunctorCode VisitSvgEnd(Svg *svg);
+    virtual FunctorCode VisitSymbol(Symbol *symbol);
+    virtual FunctorCode VisitSymbolEnd(Symbol *symbol);
+    virtual FunctorCode VisitText(Text *text);
+    virtual FunctorCode VisitTextEnd(Text *text);
+    virtual FunctorCode VisitTextElement(TextElement *textElement);
+    virtual FunctorCode VisitTextElementEnd(TextElement *textElement);
+    ///@}
+
+    /**
      * @name Visit horizontal aligners
      */
     ///@{
@@ -302,11 +480,20 @@ public:
     virtual FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment);
     ///@}
 
+    /**
+     * @name Visit floating objects
+     */
+    ///@{
+    virtual FunctorCode VisitFloatingObject(FloatingObject *floatingObject);
+    virtual FunctorCode VisitFloatingObjectEnd(FloatingObject *floatingObject);
+    ///@}
+
 private:
     //
 public:
     //
 private:
+    //
 };
 
 //----------------------------------------------------------------------------
@@ -341,7 +528,6 @@ public:
      * @name Visit container elements
      */
     ///@{
-    // TODO: Add system elements later
     virtual FunctorCode VisitCourse(const Course *course);
     virtual FunctorCode VisitCourseEnd(const Course *course);
     virtual FunctorCode VisitGrpSym(const GrpSym *grpSym);
@@ -362,10 +548,10 @@ public:
     virtual FunctorCode VisitPageEnd(const Page *page);
     virtual FunctorCode VisitPages(const Pages *pages);
     virtual FunctorCode VisitPagesEnd(const Pages *pages);
-    // virtual FunctorCode VisitPb(const Pb *pb);
-    // virtual FunctorCode VisitPbEnd(const Pb *pb);
-    // virtual FunctorCode VisitSb(const Sb *sb);
-    // virtual FunctorCode VisitSbEnd(const Sb *sb);
+    virtual FunctorCode VisitPb(const Pb *pb);
+    virtual FunctorCode VisitPbEnd(const Pb *pb);
+    virtual FunctorCode VisitSb(const Sb *sb);
+    virtual FunctorCode VisitSbEnd(const Sb *sb);
     virtual FunctorCode VisitScoreDef(const ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefEnd(const ScoreDef *scoreDef);
     virtual FunctorCode VisitScoreDefElement(const ScoreDefElement *scoreDefElement);
@@ -383,6 +569,47 @@ public:
     ///@}
 
     /**
+     * @name Visit editorial elements
+     * Limited to EditorialElement for now, can be extended later
+     */
+    ///@{
+    virtual FunctorCode VisitEditorialElement(const EditorialElement *editorialElement);
+    virtual FunctorCode VisitEditorialElementEnd(const EditorialElement *editorialElement);
+    ///@}
+
+    /**
+     * @name Visit running elements
+     */
+    ///@{
+    virtual FunctorCode VisitRunningElement(const RunningElement *runningElement);
+    virtual FunctorCode VisitRunningElementEnd(const RunningElement *runningElement);
+    virtual FunctorCode VisitPgFoot(const PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFootEnd(const PgFoot *pgFoot);
+    virtual FunctorCode VisitPgFoot2(const PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgFoot2End(const PgFoot2 *pgFoot2);
+    virtual FunctorCode VisitPgHead(const PgHead *pgHead);
+    virtual FunctorCode VisitPgHeadEnd(const PgHead *pgHead);
+    virtual FunctorCode VisitPgHead2(const PgHead2 *pgHead2);
+    virtual FunctorCode VisitPgHead2End(const PgHead2 *pgHead2);
+    ///@}
+
+    /**
+     * @name Visit system elements
+     */
+    ///@{
+    virtual FunctorCode VisitEnding(const Ending *ending);
+    virtual FunctorCode VisitEndingEnd(const Ending *ending);
+    virtual FunctorCode VisitExpansion(const Expansion *expansion);
+    virtual FunctorCode VisitExpansionEnd(const Expansion *expansion);
+    virtual FunctorCode VisitSection(const Section *section);
+    virtual FunctorCode VisitSectionEnd(const Section *section);
+    virtual FunctorCode VisitSystemElement(const SystemElement *systemElement);
+    virtual FunctorCode VisitSystemElementEnd(const SystemElement *systemElement);
+    virtual FunctorCode VisitSystemMilestone(const SystemMilestoneEnd *systemMilestoneEnd);
+    virtual FunctorCode VisitSystemMilestoneEnd(const SystemMilestoneEnd *systemMilestoneEnd);
+    ///@}
+
+    /**
      * @name Visit page elements
      */
     ///@{
@@ -394,6 +621,66 @@ public:
     virtual FunctorCode VisitPageMilestoneEnd(const PageMilestoneEnd *pageMilestoneEnd);
     virtual FunctorCode VisitScore(const Score *score);
     virtual FunctorCode VisitScoreEnd(const Score *score);
+    ///@}
+
+    /**
+     * @name Visit control elements
+     */
+    ///@{
+    virtual FunctorCode VisitAnchoredText(const AnchoredText *anchoredText);
+    virtual FunctorCode VisitAnchoredTextEnd(const AnchoredText *anchoredText);
+    virtual FunctorCode VisitArpeg(const Arpeg *arpeg);
+    virtual FunctorCode VisitArpegEnd(const Arpeg *arpeg);
+    virtual FunctorCode VisitBeamSpan(const BeamSpan *beamSpan);
+    virtual FunctorCode VisitBeamSpanEnd(const BeamSpan *beamSpan);
+    virtual FunctorCode VisitBracketSpan(const BracketSpan *bracketSpan);
+    virtual FunctorCode VisitBracketSpanEnd(const BracketSpan *bracketSpan);
+    virtual FunctorCode VisitBreath(const Breath *breath);
+    virtual FunctorCode VisitBreathEnd(const Breath *breath);
+    virtual FunctorCode VisitCaesura(const Caesura *caesura);
+    virtual FunctorCode VisitCaesuraEnd(const Caesura *caesura);
+    virtual FunctorCode VisitControlElement(const ControlElement *controlElement);
+    virtual FunctorCode VisitControlElementEnd(const ControlElement *controlElement);
+    virtual FunctorCode VisitDir(const Dir *dir);
+    virtual FunctorCode VisitDirEnd(const Dir *dir);
+    virtual FunctorCode VisitDynam(const Dynam *dynam);
+    virtual FunctorCode VisitDynamEnd(const Dynam *dynam);
+    virtual FunctorCode VisitFermata(const Fermata *fermata);
+    virtual FunctorCode VisitFermataEnd(const Fermata *fermata);
+    virtual FunctorCode VisitFing(const Fing *fing);
+    virtual FunctorCode VisitFingEnd(const Fing *fing);
+    virtual FunctorCode VisitGliss(const Gliss *gliss);
+    virtual FunctorCode VisitGlissEnd(const Gliss *gliss);
+    virtual FunctorCode VisitHairpin(const Hairpin *hairpin);
+    virtual FunctorCode VisitHairpinEnd(const Hairpin *hairpin);
+    virtual FunctorCode VisitHarm(const Harm *harm);
+    virtual FunctorCode VisitHarmEnd(const Harm *harm);
+    virtual FunctorCode VisitLv(const Lv *lv);
+    virtual FunctorCode VisitLvEnd(const Lv *lv);
+    virtual FunctorCode VisitMordent(const Mordent *mordent);
+    virtual FunctorCode VisitMordentEnd(const Mordent *mordent);
+    virtual FunctorCode VisitOctave(const Octave *octave);
+    virtual FunctorCode VisitOctaveEnd(const Octave *octave);
+    virtual FunctorCode VisitOrnam(const Ornam *ornam);
+    virtual FunctorCode VisitOrnamEnd(const Ornam *ornam);
+    virtual FunctorCode VisitPedal(const Pedal *pedal);
+    virtual FunctorCode VisitPedalEnd(const Pedal *pedal);
+    virtual FunctorCode VisitPhrase(const Phrase *phrase);
+    virtual FunctorCode VisitPhraseEnd(const Phrase *phrase);
+    virtual FunctorCode VisitPitchInflection(const PitchInflection *pitchInflection);
+    virtual FunctorCode VisitPitchInflectionEnd(const PitchInflection *pitchInflection);
+    virtual FunctorCode VisitReh(const Reh *reh);
+    virtual FunctorCode VisitRehEnd(const Reh *reh);
+    virtual FunctorCode VisitSlur(const Slur *slur);
+    virtual FunctorCode VisitSlurEnd(const Slur *slur);
+    virtual FunctorCode VisitTempo(const Tempo *tempo);
+    virtual FunctorCode VisitTempoEnd(const Tempo *tempo);
+    virtual FunctorCode VisitTie(const Tie *tie);
+    virtual FunctorCode VisitTieEnd(const Tie *tie);
+    virtual FunctorCode VisitTrill(const Trill *trill);
+    virtual FunctorCode VisitTrillEnd(const Trill *trill);
+    virtual FunctorCode VisitTurn(const Turn *turn);
+    virtual FunctorCode VisitTurnEnd(const Turn *turn);
     ///@}
 
     /**
@@ -493,6 +780,34 @@ public:
     ///@}
 
     /**
+     * @name Visit text elements
+     */
+    ///@{
+    virtual FunctorCode VisitF(const F *f);
+    virtual FunctorCode VisitFEnd(const F *f);
+    virtual FunctorCode VisitFb(const Fb *fb);
+    virtual FunctorCode VisitFbEnd(const Fb *fb);
+    virtual FunctorCode VisitFig(const Fig *fig);
+    virtual FunctorCode VisitFigEnd(const Fig *fig);
+    virtual FunctorCode VisitLb(const Lb *lb);
+    virtual FunctorCode VisitLbEnd(const Lb *lb);
+    virtual FunctorCode VisitMNum(const MNum *mNum);
+    virtual FunctorCode VisitMNumEnd(const MNum *mNum);
+    virtual FunctorCode VisitNum(const Num *num);
+    virtual FunctorCode VisitNumEnd(const Num *num);
+    virtual FunctorCode VisitRend(const Rend *rend);
+    virtual FunctorCode VisitRendEnd(const Rend *rend);
+    virtual FunctorCode VisitSvg(const Svg *svg);
+    virtual FunctorCode VisitSvgEnd(const Svg *svg);
+    virtual FunctorCode VisitSymbol(const Symbol *symbol);
+    virtual FunctorCode VisitSymbolEnd(const Symbol *symbol);
+    virtual FunctorCode VisitText(const Text *text);
+    virtual FunctorCode VisitTextEnd(const Text *text);
+    virtual FunctorCode VisitTextElement(const TextElement *textElement);
+    virtual FunctorCode VisitTextElementEnd(const TextElement *textElement);
+    ///@}
+
+    /**
      * @name Visit horizontal aligners
      */
     ///@{
@@ -520,11 +835,20 @@ public:
     virtual FunctorCode VisitStaffAlignmentEnd(const StaffAlignment *staffAlignment);
     ///@}
 
+    /**
+     * @name Visit floating objects
+     */
+    ///@{
+    virtual FunctorCode VisitFloatingObject(const FloatingObject *floatingObject);
+    virtual FunctorCode VisitFloatingObjectEnd(const FloatingObject *floatingObject);
+    ///@}
+
 private:
     //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

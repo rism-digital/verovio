@@ -220,24 +220,9 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitOnsetOffset

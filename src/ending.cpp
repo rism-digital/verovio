@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -75,6 +76,26 @@ bool Ending::IsSupportedChild(Object *child)
 // Ending functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Ending::Accept(MutableFunctor &functor)
+{
+    return functor.VisitEnding(this);
+}
+
+FunctorCode Ending::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitEnding(this);
+}
+
+FunctorCode Ending::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitEndingEnd(this);
+}
+
+FunctorCode Ending::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitEndingEnd(this);
+}
+
 int Ending::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
@@ -92,30 +113,6 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
     assert(params);
 
     ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Ending::PrepareMilestones(FunctorParams *functorParams)
-{
-    PrepareMilestonesParams *params = vrv_params_cast<PrepareMilestonesParams *>(functorParams);
-    assert(params);
-
-    // Endings should always have an SystemMilestoneEnd
-    assert(this->IsSystemMilestone());
-
-    this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-
-    params->m_currentEnding = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Ending::ResetData(FunctorParams *functorParams)
-{
-    FloatingObject::ResetData(functorParams);
-
-    this->SystemMilestoneInterface::InterfaceResetData(functorParams);
 
     return FUNCTOR_CONTINUE;
 }
@@ -147,25 +144,6 @@ int Ending::CastOffEncoding(FunctorParams *functorParams)
     MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_previousEnding) {
-        // We need to group the previous and this ending - the previous one should have a grpId
-        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
-            LogDebug("Something went wrong with the grouping of the endings");
-        }
-        this->SetDrawingGrpId(params->m_previousEnding->GetDrawingGrpId());
-        // Also set the previous ending to NULL to the grpId is _not_ incremented at the next measure
-        // We need this because three or more endings might have to be grouped together
-        params->m_previousEnding = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

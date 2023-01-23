@@ -92,11 +92,6 @@ public:
     ///@}
 
     /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcStem
      */
     int CalcStem(FunctorParams *functorParams) override;

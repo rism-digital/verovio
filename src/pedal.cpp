@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layerelement.h"
@@ -108,6 +109,26 @@ data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
 // Pedal functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Pedal::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPedal(this);
+}
+
+FunctorCode Pedal::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPedal(this);
+}
+
+FunctorCode Pedal::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPedalEnd(this);
+}
+
+FunctorCode Pedal::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPedalEnd(this);
+}
+
 int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -133,27 +154,6 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
             params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq) + 0.1, params->m_midiChannel);
             break;
         default: return FUNCTOR_CONTINUE;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    if (!this->HasDir()) return FUNCTOR_CONTINUE;
-
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
-    assert(system);
-    data_PEDALSTYLE form = this->GetPedalForm(params->m_doc, system);
-    if (form == PEDALSTYLE_line || form == PEDALSTYLE_pedline) {
-        params->m_pedalLines.push_back(this);
     }
 
     return FUNCTOR_CONTINUE;

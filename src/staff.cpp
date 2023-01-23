@@ -466,66 +466,11 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
-    while (iter != params->m_timeSpanningElements.end()) {
-        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
-        assert(interface);
-        Measure *currentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        assert(currentMeasure);
-        // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
-        // notation
-        if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
-            m_timeSpanningElements.push_back(*iter);
-        }
-        ++iter;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::CastOffEncoding(FunctorParams *functorParams)
 {
     // Staff alignments must be reset, otherwise they would dangle whenever they belong to a deleted system
     m_staffAlignment = NULL;
     return FUNCTOR_SIBLINGS;
-}
-
-int Staff::ResetData(FunctorParams *functorParams)
-{
-    m_timeSpanningElements.clear();
-    ClearLedgerLines();
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::PrepareRpt(FunctorParams *functorParams)
-{
-    PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
-    assert(params);
-
-    // If multiNumber is set, we already know that nothing needs to be done
-    // Futhermore, if @multi.number is false, the functor should have stopped (see below)
-    if (params->m_multiNumber != BOOLEAN_NONE) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // This is happening only for the first staff element of the staff @n
-    if (StaffDef *staffDef = params->m_doc->GetCurrentScoreDef()->GetStaffDef(this->GetN())) {
-        const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
-            || ((staffDef->GetMultiNumber() != BOOLEAN_true)
-                && (params->m_doc->GetCurrentScoreDef()->GetMultiNumber() == BOOLEAN_false));
-        if (hideNumber) {
-            // Set it just in case, but stopping the functor should do it for this staff @n
-            params->m_multiNumber = BOOLEAN_false;
-            return FUNCTOR_STOP;
-        }
-    }
-    params->m_multiNumber = BOOLEAN_true;
-    return FUNCTOR_CONTINUE;
 }
 
 int Staff::InitOnsetOffset(FunctorParams *functorParams)

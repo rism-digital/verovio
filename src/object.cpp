@@ -40,6 +40,7 @@
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
+#include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -138,8 +139,8 @@ Object::Object(const Object &object) : BoundingBox(object)
 void Object::CloneReset()
 {
     this->Modify();
-    FunctorParams voidParams;
-    this->ResetData(&voidParams);
+    ResetDataFunctor resetData;
+    this->Process(resetData, 0);
 }
 
 Object &Object::operator=(const Object &object)
@@ -1788,128 +1789,6 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
         this->MoveItselfTo(params->m_targetLayer);
         // Do not precess children because we move the full sub-tree
         return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::PrepareFacsimile(FunctorParams *functorParams)
-{
-    PrepareFacsimileParams *params = vrv_params_cast<PrepareFacsimileParams *>(functorParams);
-    assert(params);
-
-    if (this->HasInterface(INTERFACE_FACSIMILE)) {
-        FacsimileInterface *interface = this->GetFacsimileInterface();
-        assert(interface);
-        if (interface->HasFacs()) {
-            std::string facsID = (interface->GetFacs().compare(0, 1, "#") == 0 ? interface->GetFacs().substr(1)
-                                                                               : interface->GetFacs());
-            Zone *zone = params->m_facsimile->FindZoneByID(facsID);
-            if (zone != NULL) {
-                interface->AttachZone(zone);
-            }
-        }
-        // Zoneless syl
-        else if (this->Is(SYL)) {
-            params->m_zonelessSyls.push_back(this);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::PrepareAltSym(FunctorParams *functorParams)
-{
-    PrepareAltSymParams *params = vrv_params_cast<PrepareAltSymParams *>(functorParams);
-    assert(params);
-
-    if (this->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(this);
-        assert(score);
-        params->m_symbolTable = vrv_cast<SymbolTable *>(score->GetScoreDef()->FindDescendantByType(SYMBOLTABLE));
-    }
-
-    if (this->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = this->GetAltSymInterface();
-        assert(interface);
-        interface->InterfacePrepareAltSym(functorParams, this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::PrepareLinking(FunctorParams *functorParams)
-{
-    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
-    assert(params);
-
-    if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        interface->InterfacePrepareLinking(functorParams, this);
-    }
-
-    if (this->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(this);
-        assert(note);
-        PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
-        assert(params);
-        note->ResolveStemSameas(params);
-    }
-
-    // @next
-    std::string id = this->GetID();
-    auto r1 = params->m_nextIDPairs.equal_range(id);
-    if (r1.first != params->m_nextIDPairs.end()) {
-        for (auto i = r1.first; i != r1.second; ++i) {
-            i->second->SetNextLink(this);
-        }
-        params->m_nextIDPairs.erase(r1.first, r1.second);
-    }
-
-    // @sameas
-    auto r2 = params->m_sameasIDPairs.equal_range(id);
-    if (r2.first != params->m_sameasIDPairs.end()) {
-        for (auto j = r2.first; j != r2.second; ++j) {
-            j->second->SetSameasLink(this);
-            // Issue a warning if classes of object and sameas do not match
-            Object *owner = dynamic_cast<Object *>(j->second);
-            if (owner && (owner->GetClassId() != this->GetClassId())) {
-                LogWarning("%s with @xml:id %s has @sameas to an element of class %s.", owner->GetClassName().c_str(),
-                    owner->GetID().c_str(), this->GetClassName().c_str());
-            }
-        }
-        params->m_sameasIDPairs.erase(r2.first, r2.second);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::PreparePlist(FunctorParams *functorParams)
-{
-    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
-    if (params->m_fillList && this->HasInterface(INTERFACE_PLIST)) {
-        PlistInterface *interface = this->GetPlistInterface();
-        assert(interface);
-        return interface->InterfacePreparePlist(functorParams, this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::PrepareProcessPlist(FunctorParams *functorParams)
-{
-    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-
-    std::string id = this->GetID();
-    auto i = std::find_if(params->m_interfaceIDTuples.begin(), params->m_interfaceIDTuples.end(),
-        [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
-    if (i != params->m_interfaceIDTuples.end()) {
-        std::get<2>(*i) = this;
     }
 
     return FUNCTOR_CONTINUE;

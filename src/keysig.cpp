@@ -384,14 +384,6 @@ FunctorCode KeySig::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitKeySigEnd(this);
 }
 
-int KeySig::PrepareDataInitialization(FunctorParams *)
-{
-    // Clear and regenerate attribute children
-    this->GenerateKeyAccidAttribChildren();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int KeySig::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

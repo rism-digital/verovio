@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "resources.h"
 #include "vrv.h"
 
@@ -67,6 +68,26 @@ char32_t Symbol::GetSymbolGlyph() const
     }
 
     return 0;
+}
+
+FunctorCode Symbol::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSymbol(this);
+}
+
+FunctorCode Symbol::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSymbol(this);
+}
+
+FunctorCode Symbol::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSymbolEnd(this);
+}
+
+FunctorCode Symbol::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSymbolEnd(this);
 }
 
 } // namespace vrv

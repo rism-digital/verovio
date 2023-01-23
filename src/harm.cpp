@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "f.h"
 #include "fb.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "system.h"
@@ -154,30 +155,24 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 // Harm functor methods
 //----------------------------------------------------------------------------
 
-int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
+FunctorCode Harm::Accept(MutableFunctor &functor)
 {
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
+    return functor.VisitHarm(this);
+}
 
-    std::string n = this->GetN();
-    // If there is no @n on harm we use the first @staff value as negative
-    // This will not work if @staff has more than one staff id, but this is probably not going to be used
-    if (n == "" && this->HasStaff()) {
-        n = StringFormat("%d", this->GetStaff().at(0) * -1);
-    }
+FunctorCode Harm::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitHarm(this);
+}
 
-    for (auto &kv : params->m_harms) {
-        if (kv.first == n) {
-            this->SetDrawingGrpId(kv.second->GetDrawingGrpId());
-            return FUNCTOR_CONTINUE;
-        }
-    }
+FunctorCode Harm::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHarmEnd(this);
+}
 
-    // first harm@n, create a new group
-    this->SetDrawingGrpObject(this);
-    params->m_harms.insert({ n, this });
-
-    return FUNCTOR_CONTINUE;
+FunctorCode Harm::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHarmEnd(this);
 }
 
 int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)

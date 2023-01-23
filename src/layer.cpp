@@ -788,18 +788,6 @@ int Layer::InitProcessingLists(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::PrepareRpt(FunctorParams *functorParams)
-{
-    PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
-    assert(params);
-
-    // If we have encountered a mRpt before and there is none is this layer, reset it to NULL
-    if (params->m_currentMRpt && !this->FindDescendantByType(MRPT)) {
-        params->m_currentMRpt = NULL;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::InitOnsetOffset(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
@@ -811,13 +799,6 @@ int Layer::InitOnsetOffset(FunctorParams *functorParams)
     params->m_currentMensur = this->GetCurrentMensur();
     params->m_currentMeterSig = this->GetCurrentMeterSig();
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::ResetData(FunctorParams *functorParams)
-{
-    m_crossStaffFromBelow = false;
-    m_crossStaffFromAbove = false;
     return FUNCTOR_CONTINUE;
 }
 

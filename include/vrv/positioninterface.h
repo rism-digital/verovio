@@ -15,6 +15,7 @@ namespace vrv {
 class FunctorParams;
 class Layer;
 class LayerElement;
+class ResetDataFunctor;
 
 //----------------------------------------------------------------------------
 // PositionInterface
@@ -60,9 +61,13 @@ public:
     //-----------------//
 
     /**
-     * See Object::ResetData
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    ///@}
 
     /**
      * See Object::ResetData

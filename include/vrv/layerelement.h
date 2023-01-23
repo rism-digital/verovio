@@ -119,8 +119,6 @@ public:
     ///@{
     /** Return true if the element is a grace note */
     bool IsGraceNote() const;
-    /** Return true if the element is has to be rederred as cue sized */
-    bool GetDrawingCueSize() const;
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
@@ -135,6 +133,14 @@ public:
     Beam *GetAncestorBeam();
     const Beam *GetAncestorBeam() const;
     bool IsInBeam() const;
+    ///@}
+
+    /**
+     * @name Setter and getter for the drawingCueSize flag
+     */
+    ///@{
+    void SetDrawingCueSize(bool drawingCueSize) { m_drawingCueSize = drawingCueSize; }
+    bool GetDrawingCueSize() const { return m_drawingCueSize; }
     ///@}
 
     /**
@@ -379,39 +385,6 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareCueSize
-     */
-    int PrepareCueSize(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareCrossStaff
-     */
-    ///@{
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-    int PrepareCrossStaffEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::PreparePointersByLayer
-     */
-    int PreparePointersByLayer(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDelayedTurns
-     */
-    int PrepareDelayedTurns(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimePointing
-     */
-    int PrepareTimePointing(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    int PrepareTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcAlignmentPitchPos
      */
     int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
@@ -448,19 +421,9 @@ public:
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcSlurDirection
      */
     int CalcSlurDirection(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
 
     /**
      * See Object::CacheHorizontalLayout
@@ -528,7 +491,7 @@ public:
     int m_xAbs;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
-     * See Object::PrepareCrossStaff
+     * See PrepareCrossStaffFunctor
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;
@@ -564,7 +527,7 @@ protected:
     int m_cachedXRel;
 
     /**
-     * The cached drawing cue size set by PrepareCueSize
+     * The cached drawing cue size set by PrepareCueSizeFunctor
      */
     bool m_drawingCueSize;
 

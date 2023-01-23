@@ -15,6 +15,7 @@
 
 #include "barline.h"
 #include "comparison.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -100,57 +101,6 @@ const BeamSpanSegment *BeamSpan::GetSegmentForSystem(const System *system) const
     return NULL;
 }
 
-ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, const Staff *staff)
-{
-    // find all elements between startId and endId of the beamSpan
-    ClassIdsComparison classIds({ NOTE, CHORD });
-    ListOfObjects objects;
-    layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, 1);
-
-    if (objects.empty()) return {};
-
-    ArrayOfObjects beamSpanElements(objects.begin(), objects.end());
-    // If last element is not equal to the end, there is high chance that this beamSpan is cross-measure.
-    // Look for the same N-staff N-layer in next measure and try finding end there
-    Measure *startMeasure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
-    Measure *endMeasure = vrv_cast<Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
-    Measure *nextMeasure = NULL;
-    while ((beamSpanElements.back() != this->GetEnd()) && (startMeasure != endMeasure)) {
-        Object *parent = startMeasure->GetParent();
-
-        nextMeasure = vrv_cast<Measure *>(parent->GetNext(startMeasure, MEASURE));
-        if (!nextMeasure) break;
-
-        AttNIntegerComparison snc(STAFF, staff->GetN());
-        Staff *nextStaff = vrv_cast<Staff *>(nextMeasure->FindDescendantByComparison(&snc));
-        if (!nextStaff) break;
-
-        AttNIntegerComparison lnc(LAYER, layer->GetN());
-        Layer *nextStaffLayer = vrv_cast<Layer *>(nextStaff->FindDescendantByComparison(&lnc));
-        if (!nextStaffLayer) break;
-
-        // find all elements between startId and endId of the beamSpan
-        ClassIdsComparison classIds({ NOTE, CHORD });
-        ListOfObjects nextLayerObjects;
-        // pass NULL as starting element to add all elements until end is reached
-        if (endMeasure == nextMeasure) {
-            nextStaffLayer->FindAllDescendantsBetween(&nextLayerObjects, &classIds, NULL, this->GetEnd(), true, 1);
-            // Handle only next measure for the time being
-            if (nextLayerObjects.back() == this->GetEnd()) {
-                beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
-            }
-        }
-        else {
-            nextStaffLayer->FindAllDescendantsByComparison(&nextLayerObjects, &classIds);
-            beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
-        }
-
-        startMeasure = nextMeasure;
-    }
-
-    return beamSpanElements;
-}
-
 bool BeamSpan::AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment)
 {
     Layer *layer = vrv_cast<Layer *>((*elements.at(index).first)->GetFirstAncestor(LAYER));
@@ -203,6 +153,26 @@ bool BeamSpan::AddSpanningSegment(const Doc *doc, const SpanIndexVector &element
 // Functors //
 //----------//
 
+FunctorCode BeamSpan::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBeamSpan(this);
+}
+
+FunctorCode BeamSpan::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeamSpan(this);
+}
+
+FunctorCode BeamSpan::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeamSpanEnd(this);
+}
+
+FunctorCode BeamSpan::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeamSpanEnd(this);
+}
+
 int BeamSpan::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     this->ClearBeamSegments();
@@ -232,41 +202,6 @@ int BeamSpan::CalcStem(FunctorParams *functorParams)
     ArrayOfBeamElementCoords coord(m_beamElementCoords.begin(), m_beamElementCoords.end());
     m_beamSegments.at(0)->InitCoordRefs(&coord);
     m_beamSegments.at(0)->CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());
-
-    return FUNCTOR_CONTINUE;
-}
-
-int BeamSpan::PrepareBeamSpanElements(FunctorParams *functorParams)
-{
-    if (!m_beamedElements.empty() || !this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
-
-    Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
-    if (!layer || !staff) return FUNCTOR_SIBLINGS;
-
-    m_beamedElements = this->HasPlist() ? this->GetRefs() : this->GetBeamSpanElementList(layer, staff);
-
-    if (m_beamedElements.empty()) return FUNCTOR_SIBLINGS;
-
-    // set current beamSpan as referencedElement for all beamed elements (for the sake of figuring if corresponding
-    // element is in beamSpan)
-    for (const auto element : m_beamedElements) {
-        LayerElement *layerElem = vrv_cast<LayerElement *>(element);
-        if (!layerElem) continue;
-
-        Measure *measure = vrv_cast<Measure *>(layerElem->GetFirstAncestor(MEASURE));
-        if (!measure) continue;
-        layerElem->SetIsInBeamSpan(true);
-
-        Staff *elementStaff = vrv_cast<Staff *>(layerElem->GetFirstAncestor(STAFF));
-        if (!elementStaff) continue;
-        if (elementStaff->GetN() != staff->GetN()) {
-            Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
-            if (!elementStaff || !elementLayer) continue;
-            layerElem->m_crossStaff = elementStaff;
-            layerElem->m_crossLayer = elementLayer;
-        }
-    }
 
     return FUNCTOR_CONTINUE;
 }

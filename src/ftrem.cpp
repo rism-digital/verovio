@@ -251,18 +251,6 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FTrem::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_beamSegment.Reset();
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
 int FTrem::GenerateMIDI(FunctorParams *functorParams)
 {
     // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

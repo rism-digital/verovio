@@ -283,14 +283,4 @@ int Verse::GenerateMIDI(FunctorParams *)
     return FUNCTOR_CONTINUE;
 }
 
-int Verse::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingLabelAbbr = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

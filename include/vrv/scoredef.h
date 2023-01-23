@@ -318,11 +318,6 @@ public:
     int JustifyX(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Transpose
      */
     ///@{

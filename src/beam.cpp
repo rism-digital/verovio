@@ -1826,7 +1826,8 @@ BeamElementCoord::~BeamElementCoord() {}
 data_STEMDIRECTION BeamElementCoord::GetStemDir() const
 {
     // m_stem is not necessary set, so we need to look at the Note / Chord original value
-    // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
+    // Example: IsInBeam called in PrepareLayerElementPartsFunctor::VisitNote when reaching
+    // the first note of the beam
     if (m_stem) {
         return m_stem->GetDir();
     }
@@ -2240,21 +2241,6 @@ int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
 
     m_beamSegment.m_stemSameasRole = SAMEAS_NONE;
     m_beamSegment.m_stemSameasReverseRole = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    BeamDrawingInterface::Reset();
-
-    m_beamSegment.Reset();
-    m_stemSameas = NULL;
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
 
     return FUNCTOR_CONTINUE;
 }

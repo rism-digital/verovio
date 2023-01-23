@@ -345,16 +345,4 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Ligature::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingShapes.clear();
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
