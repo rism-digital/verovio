@@ -1121,6 +1121,11 @@ public:
     virtual int AdjustTupletNumOverlap(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the Y position of tuplets by inner slurs
+     */
+    virtual int AdjustTupletWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }

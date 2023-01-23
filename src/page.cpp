@@ -542,6 +542,11 @@ void Page::LayOutVertically()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Adjust the position of tuplets by slurs
+    FunctorDocParams adjustTupletWithSlursParams(doc);
+    Functor adjustTupletWithSlurs(&Object::AdjustTupletWithSlurs);
+    this->Process(&adjustTupletWithSlurs, &adjustTupletWithSlursParams);
+
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     CalcBBoxOverflowsParams calcBBoxOverflowsParams(doc);
     Functor calcBBoxOverflows(&Object::CalcBBoxOverflows);

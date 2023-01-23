@@ -142,7 +142,7 @@ void Tuplet::AddChild(Object *child)
 
 void Tuplet::AdjustTupletBracketY(const Doc *doc, const Staff *staff)
 {
-    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
+    TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(this->GetFirst(TUPLET_BRACKET));
     if (!tupletBracket || (this->GetBracketVisible() == BOOLEAN_false)) return;
 
     // if bracket is used for beam elements - process that part separately
@@ -266,7 +266,7 @@ void Tuplet::AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, Tuplet
 
 void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
 {
-    TupletNum *tupletNum = dynamic_cast<TupletNum *>(FindDescendantByType(TUPLET_NUM));
+    TupletNum *tupletNum = vrv_cast<TupletNum *>(this->GetFirst(TUPLET_NUM));
     if (!tupletNum || (this->GetNumVisible() == BOOLEAN_false)) return;
 
     // The num is within a bracket
@@ -512,14 +512,14 @@ void Tuplet::GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *d
 
 int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET, 1));
-    TupletNum *currentNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM, 1));
+    TupletBracket *currentBracket = vrv_cast<TupletBracket *>(this->GetFirst(TUPLET_BRACKET));
+    TupletNum *currentNum = vrv_cast<TupletNum *>(this->GetFirst(TUPLET_NUM));
 
     bool beamed = false;
     // Are we contained in a beam?
     if (this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
         // is only the tuplet beamed? (will not work with nested tuplets)
-        Beam *currentBeam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+        Beam *currentBeam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
         if (currentBeam->GetChildCount() == 1) {
             beamed = true;
         }
@@ -566,9 +566,8 @@ int Tuplet::PrepareLayerElementParts(FunctorParams *functorParams)
     /*********** Get the left and right element ***********/
 
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
-    m_drawingLeft = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&comparison));
-    m_drawingRight
-        = dynamic_cast<LayerElement *>(this->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
+    m_drawingLeft = vrv_cast<LayerElement *>(this->FindDescendantByComparison(&comparison));
+    m_drawingRight = vrv_cast<LayerElement *>(this->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD));
 
     return FUNCTOR_CONTINUE;
 }
@@ -596,12 +595,12 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     assert(m_drawingBracketPos != STAFFREL_basic_NONE);
 
     // Carefull: this will not work if the tuplet has editorial markup (one child) and then notes + one beam
-    Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    Beam *beamParent = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     // Are we contained in a beam?
     if (beamParent) {
         m_bracketAlignedBeam = beamParent;
     }
-    Beam *beamChild = dynamic_cast<Beam *>(this->FindDescendantByType(BEAM));
+    Beam *beamChild = vrv_cast<Beam *>(this->FindDescendantByType(BEAM));
     // Do we contain a beam?
     if (beamChild) {
         if ((this->GetChildCount(NOTE) == 0) && (this->GetChildCount(CHORD) == 0) && (this->GetChildCount(BEAM) == 1)) {
@@ -636,13 +635,13 @@ int Tuplet::AdjustTupletsX(FunctorParams *functorParams)
     int xRelRight;
     this->GetDrawingLeftRightXRel(xRelLeft, xRelRight, params->m_doc);
 
-    TupletBracket *tupletBracket = dynamic_cast<TupletBracket *>(this->FindDescendantByType(TUPLET_BRACKET));
+    TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(this->GetFirst(TUPLET_BRACKET));
     if (tupletBracket && (this->GetBracketVisible() != BOOLEAN_false)) {
         tupletBracket->SetDrawingXRelLeft(xRelLeft);
         tupletBracket->SetDrawingXRelRight(xRelRight);
     }
 
-    TupletNum *tupletNum = dynamic_cast<TupletNum *>(this->FindDescendantByType(TUPLET_NUM));
+    TupletNum *tupletNum = vrv_cast<TupletNum *>(this->GetFirst(TUPLET_NUM));
     if (tupletNum && (this->GetNumVisible() != BOOLEAN_false)) {
         // We have a bracket and the num is not on its opposite side
         if (tupletBracket && (m_drawingNumPos == m_drawingBracketPos)) {
@@ -688,6 +687,61 @@ int Tuplet::AdjustTupletsY(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Tuplet::AdjustTupletWithSlurs(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(this->GetFirst(TUPLET_BRACKET));
+    if (!tupletBracket || m_innerSlurs.empty()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    TupletNum *tupletNum = vrv_cast<TupletNum *>(this->GetFirst(TUPLET_NUM));
+
+    const Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    const int margin = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    const int sign = (m_drawingBracketPos == STAFFREL_basic_above) ? 1 : -1;
+
+    const int xLeft = this->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft();
+    const int xRight = this->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight();
+    const int yLeft = tupletBracket->GetDrawingYLeft();
+    const int yRight = tupletBracket->GetDrawingYRight();
+    const double tupletSlope = double(yRight - yLeft) / double(xRight - xLeft);
+    int tupletShift = 0;
+
+    for (auto curve : m_innerSlurs) {
+        const int shift = tupletBracket->Intersects(curve, CONTENT, margin) * sign;
+        if (shift > 0) {
+            // The shift is calculated from the entire bounding box of the tuplet bracket.
+            // If the bracket is angled and the slur is short, then this might be too coarse.
+            // We reduce the shift by the height of the subbox that cannot be hit.
+            Point points[4];
+            curve->GetPoints(points);
+            const int curveXLeft = std::max(points[0].x, xLeft);
+            const int curveXRight = std::min(points[3].x, xRight);
+            const int curveYLeft = tupletSlope * (curveXLeft - xLeft) + yLeft;
+            const int curveYRight = tupletSlope * (curveXRight - xLeft) + yLeft;
+
+            int reduction = 0;
+            if (m_drawingBracketPos == STAFFREL_basic_above) {
+                reduction = std::min(curveYLeft, curveYRight) - std::min(yLeft, yRight);
+            }
+            else {
+                reduction = std::max(yLeft, yRight) - std::max(curveYLeft, curveYRight);
+            }
+            tupletShift = std::max(shift - reduction, tupletShift);
+        }
+    }
+
+    // Apply the tuplet shift from slurs
+    if (tupletShift) {
+        tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + sign * tupletShift);
+        if (tupletNum) tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + sign * tupletShift);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Tuplet::ResetData(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -710,6 +764,16 @@ int Tuplet::ResetHorizontalAlignment(FunctorParams *functorParams)
     m_drawingBracketPos = STAFFREL_basic_NONE;
     m_bracketAlignedBeam = NULL;
     m_numAlignedBeam = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Tuplet::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetVerticalAlignment(functorParams);
+
+    this->ResetInnerSlurs();
 
     return FUNCTOR_CONTINUE;
 }
