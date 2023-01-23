@@ -22688,6 +22688,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         appendElement(note, accid);
         setLocationId(accid, token, subtoken);
 
+        if (editorialQ) {
+            accid->SetFunc(accidLog_FUNC_edit);
+        }
+
         std::string color = token->getLayoutParameter("ACC", "color", subtoken);
         if (!color.empty()) {
             accid->SetColor(color);
@@ -22704,22 +22708,69 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
         else {
-            switch (accidCount) {
-                case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
-                case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
-                case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
-                case 0:
-                    if (tstring.find("n") != std::string::npos) {
+
+            if (editorialQ) {
+
+                accid->SetGlyphAuth("smufl");
+                switch (accidCount) {
+                    case +3:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_xs);
+                        accid->SetGlyphName("accidentalTripleSharp");
+                        break;
+                    case +2:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_x);
+                        accid->SetGlyphName("accidentalDoubleSharp");
+                        break;
+                    case +1:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                        accid->SetGlyphName("accidentalSharp");
+                        break;
+                    case 0:
                         accid->SetAccid(ACCIDENTAL_WRITTEN_n);
-                    }
-                    break;
-                case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
-                case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
-                case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
-                default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
+                        accid->SetGlyphName("accidentalNatural");
+                        break;
+                    case -1:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                        accid->SetGlyphName("accidentalFlat");
+                        break;
+                    case -2:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+                        accid->SetGlyphName("accidentalDoubleFlat");
+                        break;
+                    case -3:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
+                        accid->SetGlyphName("accidentalTripleFlat");
+                        break;
+                }
             }
-            if (accidlevel != 0) {
-                accid->SetFunc(accidLog_FUNC_edit);
+            else {
+
+                switch (accidCount) {
+                    case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
+                    case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+                    case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                    case 0:
+                        // mensural music does not have a natural sign
+                        // and accidentals are relative
+                        switch (diatonic % 7) {
+                            case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // C# -> Cn
+                            case 1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // D# -> Dn
+                            case 2: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // E- -> En
+                            case 3: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // F# -> Fn
+                            case 4: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // G# -> Gn
+                            case 5: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // A- -> An
+                            case 6: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // B- -> Bn
+                        }
+                        break;
+                    case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                    case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                    case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                    default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
+                }
+
+                if (accidlevel != 0) {
+                    accid->SetFunc(accidLog_FUNC_edit);
+                }
             }
         }
     }
