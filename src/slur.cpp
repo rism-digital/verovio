@@ -412,9 +412,14 @@ void Slur::DiscardTupletElements(FloatingCurvePositioner *curve, int xMin, int x
             const bool isContained = (xLeft > xMin) && (xRight < xMax);
             const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
 
-            // Slurs avoid inner tuplets and overlapping tuplets which are beam aligned
+            // Slurs avoid inner tuplets
             if (isContained) continue;
-            if (isOverlapping && tuplet->GetBracketAlignedBeam()) continue;
+
+            // Slurs avoid overlapping tuplets which are beam aligned or not significantly longer
+            if (isOverlapping) {
+                if (tuplet->GetBracketAlignedBeam()) continue;
+                if (xRight - xLeft < 2 * (xMax - xMin)) continue;
+            }
 
             // Discard the tuplet bracket and register the slur for tuplet adjustment
             spannedElement->m_discarded = true;
@@ -682,8 +687,8 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
                 spannedElement->m_discarded
                     = layerElement ? (layerElement->GetOriginalLayerN() != this->GetEnd()->GetOriginalLayerN()) : true;
             }
-            // Ignore tuplet elements
-            if (layerElement && layerElement->Is({ TUPLET_BRACKET, TUPLET_NUM })) {
+            // Ignore tuplet numbers
+            if (layerElement && layerElement->Is(TUPLET_NUM)) {
                 spannedElement->m_discarded = true;
             }
         }
