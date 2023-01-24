@@ -255,6 +255,15 @@ public:
     ///@}
 
     /**
+     * @name Get and set the drawing extender width.
+     * Should be nonzero only if the extender line is not included in the bounding box.
+     */
+    ///@{
+    int GetDrawingExtenderWidth() const { return m_drawingExtenderWidth; }
+    void SetDrawingExtenderWidth(int extenderWidth) { m_drawingExtenderWidth = extenderWidth; }
+    ///@}
+
+    /**
      * Return the horizontal margin for overlap with another element
      * This can be negative, if elements are allowed to slightly overlap
      */
@@ -299,6 +308,11 @@ protected:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingYRel;
+
+    /**
+     * The horizontal width of the extender line whenever it is not included in the bounding box.
+     */
+    int m_drawingExtenderWidth;
 
     /**
      * A pointer to the FloatingObject it represents.

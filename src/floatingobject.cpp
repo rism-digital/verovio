@@ -321,6 +321,8 @@ void FloatingPositioner::ResetPositioner()
 
     m_drawingYRel = 0;
     m_drawingXRel = 0;
+
+    m_drawingExtenderWidth = 0;
 }
 
 int FloatingPositioner::GetDrawingX() const
