@@ -4490,8 +4490,8 @@ std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)
         { "double-sharp", "𝄪" }, //
         { "flat-flat", "𝄫" }, //
         { "sharp-sharp", "♯♯" }, //
-        { "backslash", "\u20E5" }, //
-        { "slash", "\u0338" }, //
+        { "backslash", "\xE2\x83\xA5" }, // utf-8 byte encoding for non-spacing backslash U+20E5
+        { "slash", "\xCC\xB8" }, // utf-8 byte encoding for non-spacing slash U+0338
         { "cross", "+" } //
     };
 
