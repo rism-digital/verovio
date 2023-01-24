@@ -2171,27 +2171,30 @@ void MusicXmlInput::ReadMusicXmlDirection(
     for (pugi::xpath_node_set::const_iterator wedge = wedges.begin(); wedge != wedges.end(); ++wedge) {
         short int hairpinNumber = wedge->node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
+        bool matchedWedge = false;
         if (HasAttributeWithValue(wedge->node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
-            std::vector<std::pair<Hairpin *, musicxml::OpenSpanner>>::reverse_iterator riter;
-            for (riter = m_hairpinStack.rbegin(); riter != m_hairpinStack.rend(); ++riter) {
-                if (riter->second.m_dirN == hairpinNumber) {
-                    const int measureDifference = m_measureCounts.at(measure) - riter->second.m_lastMeasureCount;
+            std::vector<std::pair<Hairpin *, musicxml::OpenSpanner>>::iterator iter;
+            for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
+                if (iter->second.m_dirN == hairpinNumber) {
+                    const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     if (measureDifference >= 0) {
-                        riter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp - 0.5));
+                        iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                     }
                     if (wedge->node().attribute("spread")) {
                         data_MEASUREMENTSIGNED opening;
                         opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
-                        riter->first->SetOpening(opening);
+                        iter->first->SetOpening(opening);
                     }
-                    m_hairpinStack.erase(std::next(riter).base());
-                    return;
+                    matchedWedge = true;
+                    m_hairpinStack.erase(iter);
+                    break;
                 }
             }
-            // ...or push on hairpin stop stack, if not matched.
-            m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenSpanner>(
-                0, timeStamp, musicxml::OpenSpanner(hairpinNumber, m_measureCounts.at(measure))));
+            if (!matchedWedge) {
+                m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenSpanner>(
+                    0, timeStamp, musicxml::OpenSpanner(hairpinNumber, m_measureCounts.at(measure))));
+            }
         }
         else {
             Hairpin *hairpin = new Hairpin();
@@ -2232,18 +2235,20 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // match new hairpin to existing hairpin stop
             for (auto iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
                 const int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
-                if (std::get<2>(*iter).m_dirN == hairpinNumber) {
+                if ((std::get<2>(*iter).m_dirN == hairpinNumber) && (measureDifference == 0)) {
                     if (measureDifference >= 0) {
                         hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
                         m_controlElements.push_back({ measureNum, hairpin });
                     }
+                    matchedWedge = true;
                     m_hairpinStopStack.erase(iter);
-                    return;
+                    break;
                 }
             }
-            // ...or push to open hairpin stack.
-            m_controlElements.push_back({ measureNum, hairpin });
-            m_hairpinStack.push_back({ hairpin, openHairpin });
+            if (!matchedWedge) {
+                m_controlElements.push_back({ measureNum, hairpin });
+                m_hairpinStack.push_back({ hairpin, openHairpin });
+            }
         }
     }
 
