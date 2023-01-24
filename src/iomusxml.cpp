@@ -1564,11 +1564,9 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
         }
         m_bracketStack.clear();
     }
-    if (!m_hairpinStack.empty() || !m_hairpinStopStack.empty()) {
-        LogWarning(
-            "MusicXML import: There are %d hairpins left open", m_hairpinStack.size() + m_hairpinStopStack.size());
+    if (!m_hairpinStack.empty()) {
+        LogWarning("MusicXML import: There are %d hairpins left open", m_hairpinStack.size());
         m_hairpinStack.clear();
-        m_hairpinStopStack.clear();
     }
 
     return false;
@@ -1691,9 +1689,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ++iter;
         }
     }
-    if (!m_tieStopStack.empty()) { // clear m_tieStopStack after each measure
-        m_tieStopStack.clear();
-    }
+
+    // clear stop stacks after each measure
+    m_hairpinStopStack.clear();
+    m_tieStopStack.clear();
 
     for (auto staff : measure->GetChildren()) {
         if (!staff->Is(STAFF)) {
