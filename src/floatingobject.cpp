@@ -378,10 +378,28 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
     }
 }
 
+bool FloatingPositioner::HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const
+{
+    int bboxExtenderWidth = 0;
+    const FloatingPositioner *bboxPositioner = dynamic_cast<const FloatingPositioner *>(bbox);
+    if (bboxPositioner) {
+        bboxExtenderWidth = bboxPositioner->GetDrawingExtenderWidth();
+    }
+
+    const int margin = this->GetAdmissibleHorizOverlapMargin(bbox, unit);
+
+    if (!this->HasContentBB() || !bbox->HasContentBB()) return false;
+    if (this->GetContentRight() + m_drawingExtenderWidth <= bbox->GetContentLeft() - margin) return false;
+    if (this->GetContentLeft() >= bbox->GetContentRight() + bboxExtenderWidth + margin) return false;
+
+    return true;
+}
+
 int FloatingPositioner::GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const
 {
     const LayerElement *element = dynamic_cast<const LayerElement *>(bbox);
     if (element) {
+        if (this->GetObject()->IsExtenderElement()) return 8 * unit;
         if ((this->GetObject()->Is(DYNAM)) && element->GetFirstAncestor(BEAM)) {
             return 2 * unit;
         }

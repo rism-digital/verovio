@@ -264,6 +264,11 @@ public:
     ///@}
 
     /**
+     * Check for horizontal overlap with special consideration for extender lines
+     */
+    bool HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const;
+
+    /**
      * Return the horizontal margin for overlap with another element
      * This can be negative, if elements are allowed to slightly overlap
      */
