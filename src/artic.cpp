@@ -296,6 +296,7 @@ bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
         case SMUFL_E614_stringsHarmonic: return true;
         case SMUFL_E630_pluckedSnapPizzicatoBelow: return true;
         case SMUFL_E633_pluckedLeftHandPizzicato: return true;
+        case SMUFL_E638_pluckedDamp:return true;
         default: return false;
     }
 }
