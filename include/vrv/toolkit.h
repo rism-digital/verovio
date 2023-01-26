@@ -107,7 +107,7 @@ public:
      * Reset the seed used to generate MEI \@xml:id attribute values
      *
      * Passing 0 will seed the \@xml:id generator with a random (time-based) seed value.
-     * This method will have no effect if the --xml-id-checksum option is set.
+     * This method will have no effect if the xmlIdChecksum option is set.
      *
      * @param seed The seed value for generating the \@xml:id values (0 for a time-based random seed)
      */
