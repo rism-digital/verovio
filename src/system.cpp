@@ -959,9 +959,6 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
     Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
 
-    params->m_classId = GLISS;
-    m_systemAligner.Process(params->m_functor, params);
-
     params->m_classId = LV;
     m_systemAligner.Process(params->m_functor, params);
 
