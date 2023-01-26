@@ -747,8 +747,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     assert(staff);
     int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
-    int i;
-    for (i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
+    for (int i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = vrv_cast<Alignment *>(params->m_measureAligner->GetChild(i));
         assert(alignment);
         if (alignment->HasGraceAligner(graceAlignerId)) {

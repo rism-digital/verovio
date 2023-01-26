@@ -238,14 +238,13 @@ bool BoundingBox::VerticalSelfOverlap(const BoundingBox *other, int margin) cons
 int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, const Doc *doc, int margin, int vMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
     anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB1rect, doc->GetResources());
     anchor2 = other->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB2rect, doc->GetResources());
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectLeftOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
         }
     }
@@ -256,14 +255,13 @@ int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, const Doc *doc,
 int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, const Doc *doc, int margin, int vMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
     anchor1 = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB1rect, doc->GetResources());
     anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB2rect, doc->GetResources());
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectRightOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
         }
     }
@@ -274,14 +272,13 @@ int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, const Doc *doc
 int BoundingBox::VerticalTopOverlap(const BoundingBox *other, const Doc *doc, int margin, int hMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
     anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB1rect, doc->GetResources());
     anchor2 = other->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB2rect, doc->GetResources());
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectTopOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
         }
     }
@@ -292,14 +289,13 @@ int BoundingBox::VerticalTopOverlap(const BoundingBox *other, const Doc *doc, in
 int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, const Doc *doc, int margin, int hMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
     anchor1 = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB1rect, doc->GetResources());
     anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB2rect, doc->GetResources());
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectBottomOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
         }
     }
@@ -1038,8 +1034,7 @@ void BoundingBox::ApproximateBezierBoundingBox(
     todx = dx - cx;
     tody = dy - cy;
     double step = 1.0 / BEZIER_APPROXIMATION;
-    int i;
-    for (i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); ++i) {
+    for (int i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); ++i) {
         double d = i * step;
         px = ax + d * tobx;
         py = ay + d * toby;

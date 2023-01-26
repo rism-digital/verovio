@@ -855,7 +855,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         const double tuneHz = this->GetTuneHz();
         // Add tuning for all keys from 0 to 127
         std::vector<std::pair<int, double>> tuneFrequencies;
-        for (int i = 0; i < 127; i++) {
+        for (int i = 0; i < 127; ++i) {
             double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
             tuneFrequencies.push_back(std::make_pair(i, freq));
         }

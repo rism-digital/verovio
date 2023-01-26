@@ -1083,8 +1083,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         else if (json.has<jsonxx::Array>(iter->first)) {
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
             std::vector<std::string> strValues;
-            int i;
-            for (i = 0; i < (int)values.size(); ++i) {
+            for (int i = 0; i < (int)values.size(); ++i) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
                 // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }

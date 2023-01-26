@@ -860,7 +860,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             if (i != end) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
-                i++;
+                ++i;
             }
         }
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
@@ -928,7 +928,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
                     diffY = y;
                     adjusted = true;
                 }
-                i++;
+                ++i;
             }
         }
         if (!adjusted) {

@@ -6868,7 +6868,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
-        i++;
+        ++i;
     }
     return success;
 }
@@ -7824,8 +7824,7 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     int startIdx = startChild->GetIdx();
     int endIdx = endChild->GetIdx();
     // LogDebug("%d %d %s!", startIdx, endIdx, start->GetID().c_str());
-    int i;
-    for (i = endIdx; i >= startIdx; i--) {
+    for (int i = endIdx; i >= startIdx; --i) {
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
         if (element) tuplet->AddChild(element);
     }
