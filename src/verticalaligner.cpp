@@ -852,6 +852,9 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             }
         }
 
+        // Vertically align extender elements across systems
+        (*iter)->AlignExtenders();
+
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
         if (place == STAFFREL_above) {

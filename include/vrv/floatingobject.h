@@ -82,10 +82,10 @@ public:
 
     /**
      * @name Get and set maximum drawing yRel that is persistent for the floating object across all its floating
-     * positioners, which allows for persisten vertical positioning for some elements
+     * positioners, which allows for persistent vertical positioning for some elements
      */
     ///@{
-    void SetMaxDrawingYRel(int maxDrawingYRel);
+    void SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place);
     int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
     ///@}
 
@@ -279,6 +279,14 @@ public:
      */
     void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
 
+    /**
+     * Align extender elements across systems
+     */
+    void AlignExtenders();
+
+    /**
+     * Calculate the vertical space below the element and above the bounding box
+     */
     int GetSpaceBelow(
         const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
 
