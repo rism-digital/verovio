@@ -54,6 +54,7 @@ void vrvToolkit_resetOptions(void *tkPtr);
 void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed);
 bool vrvToolkit_select(void *tkPtr, const char *selection);
 bool vrvToolkit_setOptions(void *tkPtr, const char *options);
+void vrvToolkit_skipLayoutOnLoad(void *tkPtr, bool skip);
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data);
 
 #ifdef __cplusplus

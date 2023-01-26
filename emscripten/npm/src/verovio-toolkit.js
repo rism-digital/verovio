@@ -84,15 +84,15 @@ export class VerovioToolkit {
 
     getOptions(defaultValues) {
         if (defaultValues === true) {
-            console.warn( "This function (with 'true' parameter) is deprecated. Use getDefaultOptions() instead." );
-            return JSON.parse(this.proxy.getDefaultOptions(this.ptr));    
+            console.warn("This function (with 'true' parameter) is deprecated. Use getDefaultOptions() instead.");
+            return JSON.parse(this.proxy.getDefaultOptions(this.ptr));
         }
         else if (defaultValues === false) {
-            console.warn( "This function (with 'false' parameter) is deprecated. Use getOptions() instead." );
-            return JSON.parse(this.proxy.getOptions(this.ptr));    
+            console.warn("This function (with 'false' parameter) is deprecated. Use getOptions() instead.");
+            return JSON.parse(this.proxy.getOptions(this.ptr));
         }
         else {
-            return JSON.parse(this.proxy.getOptions(this.ptr));  
+            return JSON.parse(this.proxy.getOptions(this.ptr));
         }
     }
 
@@ -180,6 +180,10 @@ export class VerovioToolkit {
 
     setOptions(options) {
         return this.proxy.setOptions(this.ptr, JSON.stringify(options));
+    }
+
+    skipLayoutOnLoad(skip) {
+        return this.proxy.skipLayoutOnLoad(this.ptr, skip);
     }
 
     validatePAE(data) {

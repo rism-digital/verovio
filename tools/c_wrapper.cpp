@@ -294,6 +294,12 @@ bool vrvToolkit_setOptions(void *tkPtr, const char *options)
     return tk->SetOptions(options);
 }
 
+void vrvToolkit_skipLayoutOnLoad(void *tkPtr, const bool skip)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SkipLayoutOnLoad(skip);
+}
+
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

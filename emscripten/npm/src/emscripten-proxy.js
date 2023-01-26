@@ -18,7 +18,7 @@ function getToolkitFunction(VerovioModule, method) {
     // void destructor(Toolkit *ic)
     mapping.destructor = VerovioModule.cwrap("vrvToolkit_destructor", null, ["number"]);
 
-    // bool edit(Toolkit *ic, const char *editorAction) 
+    // bool edit(Toolkit *ic, const char *editorAction)
     mapping.edit = VerovioModule.cwrap("vrvToolkit_edit", "number", ["number", "string"]);
 
     // char *editInfo(Toolkit *ic)
@@ -117,14 +117,17 @@ function getToolkitFunction(VerovioModule, method) {
     // void resetOptions(Toolkit *ic)
     mapping.resetOptions = VerovioModule.cwrap("vrvToolkit_resetOptions", null, ["number"]);
 
-    // void resetXmlIdSeed(Toolkit *ic, int seed) 
+    // void resetXmlIdSeed(Toolkit *ic, int seed)
     mapping.resetXmlIdSeed = VerovioModule.cwrap("vrvToolkit_resetXmlIdSeed", null, ["number", "number"]);
 
-    // bool select(Toolkit *ic, const char *options) 
+    // bool select(Toolkit *ic, const char *options)
     mapping.select = VerovioModule.cwrap("vrvToolkit_select", "number", ["number", "string"]);
 
-    // void setOptions(Toolkit *ic, const char *options) 
+    // void setOptions(Toolkit *ic, const char *options)
     mapping.setOptions = VerovioModule.cwrap("vrvToolkit_setOptions", null, ["number", "string"]);
+
+    // void skipLayoutOnLoad(Toolkit *ic, int skip)
+    mapping.skipLayoutOnLoad = VerovioModule.cwrap("vrvToolkit_skipLayoutOnLoad", "string", ["number", "number"]);
 
     // char *validatePAE(Toolkit *ic, const char *options)
     mapping.validatePAE = VerovioModule.cwrap("vrvToolkit_validatePAE", "string", ["number", "string"]);

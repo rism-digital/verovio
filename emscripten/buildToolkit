@@ -223,6 +223,7 @@ $exports .= "'_vrvToolkit_resetOptions',";
 $exports .= "'_vrvToolkit_resetXmlIdSeed',";
 $exports .= "'_vrvToolkit_select',";
 $exports .= "'_vrvToolkit_setOptions',";
+$exports .= "'_vrvToolkit_skipLayoutOnLoad',";
 $exports .= "'_vrvToolkit_validatePAE',";
 $exports .= "'_malloc',";
 $exports .= "'_free'";
