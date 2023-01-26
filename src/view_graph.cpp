@@ -55,8 +55,8 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
 void View::DrawVerticalSegmentedLine(
     DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {
-    int i, start, end;
-    for (i = 0; i < line.GetSegmentCount(); i++) {
+    int start, end;
+    for (int i = 0; i < line.GetSegmentCount(); ++i) {
         std::tie(start, end) = line.GetStartEnd(i);
         this->DrawVerticalLine(dc, start, end, x1, width, dashLength, gapLength);
     }
@@ -65,8 +65,8 @@ void View::DrawVerticalSegmentedLine(
 void View::DrawHorizontalSegmentedLine(
     DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {
-    int i, start, end;
-    for (i = 0; i < line.GetSegmentCount(); i++) {
+    int start, end;
+    for (int i = 0; i < line.GetSegmentCount(); ++i) {
         std::tie(start, end) = line.GetStartEnd(i);
         this->DrawHorizontalLine(dc, start, end, y1, width, dashLength, gapLength);
     }

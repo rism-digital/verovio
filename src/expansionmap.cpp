@@ -82,7 +82,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetID());
                 this->GetIDList(clonedObject, clonedIds);
-                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
+                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); ++i) {
                     this->AddExpandedIDToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 

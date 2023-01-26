@@ -860,7 +860,7 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             if (i != end) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
-                i++;
+                ++i;
             }
         }
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
@@ -928,7 +928,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
                     diffY = y;
                     adjusted = true;
                 }
-                i++;
+                ++i;
             }
         }
         if (!adjusted) {
@@ -1057,10 +1057,10 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 
     // Detection of inner slurs
     std::map<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners> innerCurveMap;
-    for (size_t i = 0; i < positioners.size(); ++i) {
+    for (int i = 0; i < (int)positioners.size(); ++i) {
         Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
         ArrayOfFloatingCurvePositioners innerCurves;
-        for (size_t j = 0; j < positioners.size(); ++j) {
+        for (int j = 0; j < (int)positioners.size(); ++j) {
             if (i == j) continue;
             Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
             // Check if second slur is inner slur of first

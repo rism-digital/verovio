@@ -141,8 +141,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     int lastDur, currentDur;
 
     m_beamElementCoords.reserve(childList.size());
-    int i;
-    for (i = 0; i < (int)childList.size(); ++i) {
+    for (int i = 0; i < (int)childList.size(); ++i) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
@@ -407,8 +406,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
     std::vector<int> items;
     items.reserve(m_beamElementCoords.size());
 
-    int i;
-    for (i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoords.at(i);
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
@@ -424,18 +422,17 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
 
     // Find all possible dividers for the sequence (without 1 and its size)
     std::vector<int> dividers;
-    for (i = 2; i <= itemCount / 2; ++i) {
+    for (int i = 2; i <= itemCount / 2; ++i) {
         if (itemCount % i == 0) dividers.push_back(i);
     }
 
     // Correlate a sub-array for each divider until a sequence is found (if any)
-    for (i = 0; i < (int)dividers.size(); ++i) {
+    for (int i = 0; i < (int)dividers.size(); ++i) {
         int divider = dividers.at(i);
-        int j;
         bool pattern = true;
         std::vector<int>::iterator iter = items.begin();
         std::vector<int> v1 = std::vector<int>(iter, iter + divider);
-        for (j = 1; j < (itemCount / divider); ++j) {
+        for (int j = 1; j < (itemCount / divider); ++j) {
             std::vector<int> v2 = std::vector<int>(iter + j * divider, iter + (j + 1) * divider);
             if (v1 != v2) {
                 pattern = false;

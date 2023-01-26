@@ -573,15 +573,13 @@ void BeamSegment::CalcBeamInit(
     assert(doc);
     assert(beamInterface);
 
-    int i;
-
     int elementCount = (int)m_beamElementCoordRefs.size();
     assert(elementCount > 0);
 
     /******************************************************************/
     // initialization
 
-    for (i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_x = coord->m_element->GetDrawingX();
     }
@@ -630,7 +628,7 @@ void BeamSegment::CalcBeamInit(
     };
 
     // elementCount holds the last one
-    for (i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = 0;
 

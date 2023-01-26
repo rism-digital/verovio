@@ -55,11 +55,10 @@ Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType t
 
 const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const
 {
-    int i;
     idx = -1; // the index if we reach the end.
     const Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
-    for (i = 0; i < this->GetAlignmentCount(); ++i) {
+    for (int i = 0; i < this->GetAlignmentCount(); ++i) {
         alignment = vrv_cast<const Alignment *>(this->GetChild(i));
         assert(alignment);
 
@@ -164,10 +163,9 @@ void MeasureAligner::SetMaxTime(double time)
     int idx = m_rightBarLineAlignment->GetIdx();
     assert(idx != -1);
 
-    int i;
     Alignment *alignment = NULL;
     // Increase the time position for all alignment from the right barline
-    for (i = idx; i < this->GetAlignmentCount(); ++i) {
+    for (int i = idx; i < this->GetAlignmentCount(); ++i) {
         alignment = vrv_cast<Alignment *>(this->GetChild(i));
         assert(alignment);
         // Change it only if higher than before
@@ -353,9 +351,8 @@ void GraceAligner::StackGraceElement(LayerElement *element)
 
 void GraceAligner::AlignStack()
 {
-    int i;
     double time = 0.0;
-    for (i = (int)m_graceStack.size(); i > 0; i--) {
+    for (int i = (int)m_graceStack.size(); i > 0; --i) {
         LayerElement *element = vrv_cast<LayerElement *>(m_graceStack.at(i - 1));
         assert(element);
         // get the duration of the event
@@ -435,7 +432,7 @@ void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
         // We space with a notehead (non grace size) which seems to be a reasonable default spacing with margin
         // Ideally we should look at the duration in that alignment and also the maximum staff scaling for this aligner
         alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
-        i++;
+        ++i;
     }
 }
 
@@ -883,7 +880,6 @@ bool TimestampAligner::IsSupportedChild(Object *child)
 
 TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 {
-    int i;
     int idx = -1; // the index if we reach the end.
     // We need to adjust the position since timestamp 0 to 1.0 are before 0 musical time
     time = time - 1.0;
@@ -892,7 +888,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // First try to see if we already have something at the time position
-    for (i = 0; i < this->GetChildCount(); ++i) {
+    for (int i = 0; i < this->GetChildCount(); ++i) {
         timestampAttr = vrv_cast<TimestampAttr *>(children.at(i));
         assert(timestampAttr);
 
@@ -1500,11 +1496,10 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     }
 
     int count = (int)m_accidSpace.size();
-    int i, j;
 
     std::vector<Accid *> adjustedAccids;
     // Align the octaves
-    for (i = 0; i < count - 1; ++i) {
+    for (int i = 0; i < count - 1; ++i) {
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
             this->AdjustAccidWithAccidSpace(
@@ -1526,7 +1521,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
-    for (i = 0, j = count - 1; i < middle; i++, j--) {
+    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip octaves
         if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);

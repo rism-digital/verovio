@@ -300,7 +300,7 @@ int main(int argc, char **argv)
         long_options[i].has_arg = (optBool) ? no_argument : required_argument;
         long_options[i].flag = 0;
         long_options[i].val = 0;
-        i++;
+        ++i;
     }
 
     // Concatenate the base options

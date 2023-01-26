@@ -802,7 +802,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
 
         if (incipit[i] == ' ') {
             // just skip
-            i++;
+            ++i;
         }
 
         // octaves
@@ -966,7 +966,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
             }
         }
 
-        i++;
+        ++i;
     }
 
     // we need to add the last measure if it has no barLine at the end
@@ -1056,7 +1056,7 @@ int PAEInput::getOctave(const char *incipit, char *octave, int index)
         *octave = BASE_OCT;
         while ((i + 1 < length) && (incipit[i + 1] == '\'')) {
             (*octave)++;
-            i++;
+            ++i;
         }
     }
     else if (incipit[i] == ',') {
@@ -1064,7 +1064,7 @@ int PAEInput::getOctave(const char *incipit, char *octave, int index)
         *octave = BASE_OCT - 1;
         while ((i + 1 < length) && (incipit[i + 1] == ',')) {
             (*octave)--;
-            i++;
+            ++i;
         }
     }
 
@@ -1120,7 +1120,7 @@ int PAEInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
     *dot = 0;
     while ((i + 1 < length) && (incipit[i + 1] == '.')) {
         (*dot)++;
-        i++;
+        ++i;
     }
     if ((*dot == 1) && (incipit[i] == 7)) {
         // neumatic notation
@@ -1156,7 +1156,7 @@ int PAEInput::getDurations(const char *incipit, pae::Measure *measure, int index
         measure->dots.push_back(dot);
         // j++;
         if ((i + 1 < length) && isdigit(incipit[i + 1])) {
-            i++;
+            ++i;
         }
         else {
             break;
@@ -1183,14 +1183,14 @@ int PAEInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accide
         *accident = ACCIDENTAL_WRITTEN_s;
         if ((i + 1 < length) && (incipit[i + 1] == 'x')) {
             *accident = ACCIDENTAL_WRITTEN_x;
-            i++;
+            ++i;
         }
     }
     else if (incipit[i] == 'b') {
         *accident = ACCIDENTAL_WRITTEN_f;
         if ((i + 1 < length) && (incipit[i + 1] == 'b')) {
             *accident = ACCIDENTAL_WRITTEN_ff;
-            i++;
+            ++i;
         }
     }
     return i - index;
@@ -1321,7 +1321,7 @@ int PAEInput::getGraceNote(const char *incipit, pae::Note *note, int index)
     else if (incipit[i] == 'q') {
         note->appoggiatura = 1;
         if ((i + 1 < length) && (incipit[i + 1] == 'q')) {
-            i++;
+            ++i;
             int r = i;
             while ((r < length) && (incipit[r] != 'r')) {
                 if ((incipit[r] - 'A' >= 0) && (incipit[r] - 'A' < 7)) {
@@ -1376,12 +1376,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     }
 
     // find the end of time signature
-    i++; // the time signature length is at least 1
+    ++i; // the time signature length is a least 1
     while (i < length) {
         if (!isdigit(incipit[i]) && (incipit[i] != '/') && (incipit[i] != '.')) {
             break;
         }
-        i++;
+        ++i;
     }
 
     // use a substring for the time signature
@@ -1495,7 +1495,7 @@ int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         if (incipit[index] == '+') {
             m_is_mensural = true;
         }
-        i++;
+        ++i;
         index++;
     }
 
@@ -1624,7 +1624,7 @@ int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
     else { //
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
-            i++;
+            ++i;
             for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
                 // With abbreviation, repeat clefs but do not copy keySig, meterSig and mensur
@@ -1695,7 +1695,7 @@ int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             if (alt_nr < 7) {
                 enclosedAccids.at(alt_nr) = enclosed;
             }
-            i++;
+            ++i;
         }
     }
 
@@ -1887,7 +1887,7 @@ void PAEInput::convertMeasure(pae::Measure *measure)
 
     m_nested_objects.clear();
 
-    for (unsigned int i = 0; i < measure->notes.size(); ++i) {
+    for (int i = 0; i < (int)measure->notes.size(); ++i) {
         pae::Note *note = &measure->notes.at(i);
         parseNote(note);
     }
@@ -2189,8 +2189,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     strcpy(value, &input[index]);
 
     // Truncate string to first space
-    size_t i;
-    for (i = strlen(value) - 2; i > 0; i--) {
+    for (int i = strlen(value) - 2; i > 0; --i) {
         if (isspace(value[i])) {
             value[i] = EMPTY;
             continue;
@@ -2864,7 +2863,7 @@ bool PAEInput::Import(const std::string &input)
         if (c == pae::CONTAINER_END) continue;
         // Otherwise go ahead
         this->AddToken(c, i);
-        i++;
+        ++i;
     }
 
     // Add a token marking the end - special use of the CONTAINER_END with no object

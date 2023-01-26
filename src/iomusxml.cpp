@@ -722,7 +722,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                     [](const auto pair) { return pair.first == MetronomeElements::SEPARATOR; });
                 const short int dotCount = (short int)std::count_if(
                     iter, separator, [](const auto pair) { return pair.first == MetronomeElements::BEAT_UNIT_DOT; });
-                for (short int i = 0; i < dotCount; i++) {
+                for (short int i = 0; i < dotCount; ++i) {
                     verovioText += U"\xE1E7"; // SMUFL augmentation dot
                 }
                 // set @mmUnit and @mmDots attributes only based on the first beat-unit in the sequence
@@ -748,7 +748,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
             case MetronomeElements::PER_MINUTE: {
                 // Use the first floating-point number on the line to set @mm:
                 std::string matches("0123456789");
-                std::size_t offset = iter->second.find_first_of(matches);
+                int offset = (int)iter->second.find_first_of(matches);
                 if (offset < iter->second.length()) {
                     const double mmval = std::stod(iter->second.substr(offset));
                     tempo->SetMm(mmval);
@@ -1547,7 +1547,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
                 }
             }
         }
-        i++;
+        ++i;
     }
 
     // clean up part specific stacks
@@ -1589,8 +1589,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         measure->AddChild(mNum);
     }
 
-    int i = 0;
-    for (i = 0; i < nbStaves; i++) {
+    for (int i = 0; i < nbStaves; ++i) {
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);

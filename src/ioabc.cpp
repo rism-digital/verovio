@@ -1117,11 +1117,11 @@ void ABCInput::parseLyrics()
 
     // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
     // for several notes if syllable needs to be held
-    for (size_t i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
-        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
+    for (int i = 0, j = 0; (i < (int)m_lineNoteArray.size()) && (j < (int)syllables.size()); ++j) {
+        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < (int)m_lineNoteArray.size())) {
             ++i;
         }
-        if (i >= m_lineNoteArray.size()) break;
+        if (i >= (int)m_lineNoteArray.size()) break;
         Verse *verse = NULL;
         verse = vrv_cast<Verse *>(m_lineNoteArray.at(i)->GetChild(0, VERSE));
         if (!verse) {

@@ -439,8 +439,7 @@ bool OptionArray::SetValue(const std::string &value)
 std::string OptionArray::GetStrValue() const
 {
     std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)m_values.size(); ++i) {
+    for (int i = 0; i < (int)m_values.size(); ++i) {
         if (i != 0) {
             ss << ", ";
         }
@@ -452,8 +451,7 @@ std::string OptionArray::GetStrValue() const
 std::string OptionArray::GetDefaultStrValue() const
 {
     std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)m_defaultValues.size(); ++i) {
+    for (int i = 0; i < (int)m_defaultValues.size(); ++i) {
         if (i != 0) {
             ss << ", ";
         }
@@ -568,8 +566,7 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 {
     std::vector<std::string> strValues = this->GetStrValues(withoutDefault);
     std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)strValues.size(); ++i) {
+    for (int i = 0; i < (int)strValues.size(); ++i) {
         if (i != 0) {
             ss << ", ";
         }

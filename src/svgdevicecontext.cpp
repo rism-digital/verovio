@@ -1011,7 +1011,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
     }
 
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); ++i) {
+    for (int i = 0; i < (int)text.length(); ++i) {
         char32_t c = text.at(i);
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {

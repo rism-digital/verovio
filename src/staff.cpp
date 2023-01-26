@@ -253,8 +253,7 @@ void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int r
     assert(left < right);
 
     if ((int)lines.size() < count) lines.resize(count);
-    int i = 0;
-    for (i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i) {
         lines.at(i).AddDash(left, right, extension);
     }
 }

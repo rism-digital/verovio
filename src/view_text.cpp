@@ -76,7 +76,7 @@ void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawi
     std::u32string convertedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
     if (dc->GetFont()->GetSmuflFont()) {
-        for (int i = 0; i < (int)str.size(); i++) {
+        for (int i = 0; i < (int)str.size(); ++i) {
             convertedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
         }
     }
@@ -154,8 +154,8 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
     int toDcX = ToDeviceContextX(params.m_x);
     int toDcY = ToDeviceContextY(params.m_y);
 
-    std::size_t prevPos = 0, pos;
-    while ((pos = str.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
+    int prevPos = 0, pos;
+    while ((pos = (int)str.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
             std::u32string substr = str.substr(prevPos, pos - prevPos);
@@ -166,7 +166,7 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
         }
 
         // if it is the same or we still have space, it is the accidental
-        if (pos == prevPos || pos < str.length()) {
+        if (pos == prevPos || pos < (int)str.length()) {
             // Then the accidental
             std::u32string accid = str.substr(pos, 1);
             std::u32string smuflAccid;

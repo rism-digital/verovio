@@ -216,7 +216,7 @@ void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOff
     int y1 = points[0].y + yOffset;
     int y2 = y1;
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i) {
         x1 = std::min(x1, points[i].x + xOffset);
         x2 = std::max(x2, points[i].x + xOffset);
         y1 = std::min(y1, points[i].y + yOffset);
@@ -362,7 +362,7 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
     char32_t smuflGlyph = 0;
     if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
 
-    for (unsigned int i = 0; i < text.length(); i++) {
+    for (int i = 0; i < (int)text.length(); ++i) {
         char32_t c = text.at(i);
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
@@ -425,9 +425,8 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, char32_t glyph)
         if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());
     }
 
-    int i;
     // Stretch the content BB of the other objects
-    for (i = 0; i < (int)m_objects.size(); i++) {
+    for (int i = 0; i < (int)m_objects.size(); ++i) {
         if (!m_isDeactivatedX) (m_objects.at(i))->UpdateContentBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
         if (!m_isDeactivatedY) (m_objects.at(i))->UpdateContentBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
     }

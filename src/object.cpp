@@ -120,8 +120,7 @@ Object::Object(const Object &object) : BoundingBox(object)
         return;
     }
 
-    int i;
-    for (i = 0; i < (int)object.m_children.size(); ++i) {
+    for (int i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
         Object *clone = current->Clone();
         if (clone) {
@@ -167,8 +166,7 @@ Object &Object::operator=(const Object &object)
         if (link) link->AddBackLink(&object);
 
         if (object.CopyChildren()) {
-            int i;
-            for (i = 0; i < (int)object.m_children.size(); ++i) {
+            for (int i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
                 if (clone) {
@@ -288,8 +286,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
         assert("Object must be of the same type");
     }
 
-    int i;
-    for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
+    for (int i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
         if (idx != -1) {
             this->InsertChild(child, idx);
