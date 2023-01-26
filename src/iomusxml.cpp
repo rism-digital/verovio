@@ -1564,11 +1564,9 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
         }
         m_bracketStack.clear();
     }
-    if (!m_hairpinStack.empty() || !m_hairpinStopStack.empty()) {
-        LogWarning(
-            "MusicXML import: There are %d hairpins left open", m_hairpinStack.size() + m_hairpinStopStack.size());
+    if (!m_hairpinStack.empty()) {
+        LogWarning("MusicXML import: There are %d hairpins left open", m_hairpinStack.size());
         m_hairpinStack.clear();
-        m_hairpinStopStack.clear();
     }
 
     return false;
@@ -1691,9 +1689,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
             ++iter;
         }
     }
-    if (!m_tieStopStack.empty()) { // clear m_tieStopStack after each measure
-        m_tieStopStack.clear();
-    }
+
+    // clear stop stacks after each measure
+    m_hairpinStopStack.clear();
+    m_tieStopStack.clear();
 
     for (auto staff : measure->GetChildren()) {
         if (!staff->Is(STAFF)) {
@@ -2172,27 +2171,30 @@ void MusicXmlInput::ReadMusicXmlDirection(
     for (pugi::xpath_node_set::const_iterator wedge = wedges.begin(); wedge != wedges.end(); ++wedge) {
         short int hairpinNumber = wedge->node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
+        bool matchedWedge = false;
         if (HasAttributeWithValue(wedge->node(), "type", "stop")) {
             // match wedge type=stop to open hairpin
-            std::vector<std::pair<Hairpin *, musicxml::OpenSpanner>>::reverse_iterator riter;
-            for (riter = m_hairpinStack.rbegin(); riter != m_hairpinStack.rend(); ++riter) {
-                if (riter->second.m_dirN == hairpinNumber) {
-                    const int measureDifference = m_measureCounts.at(measure) - riter->second.m_lastMeasureCount;
+            std::vector<std::pair<Hairpin *, musicxml::OpenSpanner>>::iterator iter;
+            for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); ++iter) {
+                if (iter->second.m_dirN == hairpinNumber) {
+                    const int measureDifference = m_measureCounts.at(measure) - iter->second.m_lastMeasureCount;
                     if (measureDifference >= 0) {
-                        riter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp - 0.5));
+                        iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                     }
                     if (wedge->node().attribute("spread")) {
                         data_MEASUREMENTSIGNED opening;
                         opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
-                        riter->first->SetOpening(opening);
+                        iter->first->SetOpening(opening);
                     }
-                    m_hairpinStack.erase(std::next(riter).base());
-                    return;
+                    matchedWedge = true;
+                    m_hairpinStack.erase(iter);
+                    break;
                 }
             }
-            // ...or push on hairpin stop stack, if not matched.
-            m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenSpanner>(
-                0, timeStamp, musicxml::OpenSpanner(hairpinNumber, m_measureCounts.at(measure))));
+            if (!matchedWedge) {
+                m_hairpinStopStack.push_back(std::tuple<int, double, musicxml::OpenSpanner>(
+                    0, timeStamp, musicxml::OpenSpanner(hairpinNumber, m_measureCounts.at(measure))));
+            }
         }
         else {
             Hairpin *hairpin = new Hairpin();
@@ -2233,18 +2235,20 @@ void MusicXmlInput::ReadMusicXmlDirection(
             // match new hairpin to existing hairpin stop
             for (auto iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
                 const int measureDifference = std::get<2>(*iter).m_lastMeasureCount - m_measureCounts.at(measure);
-                if (std::get<2>(*iter).m_dirN == hairpinNumber) {
+                if ((std::get<2>(*iter).m_dirN == hairpinNumber) && (measureDifference == 0)) {
                     if (measureDifference >= 0) {
                         hairpin->SetTstamp2(std::pair<int, double>(measureDifference, std::get<1>(*iter)));
                         m_controlElements.push_back({ measureNum, hairpin });
                     }
+                    matchedWedge = true;
                     m_hairpinStopStack.erase(iter);
-                    return;
+                    break;
                 }
             }
-            // ...or push to open hairpin stack.
-            m_controlElements.push_back({ measureNum, hairpin });
-            m_hairpinStack.push_back({ hairpin, openHairpin });
+            if (!matchedWedge) {
+                m_controlElements.push_back({ measureNum, hairpin });
+                m_hairpinStack.push_back({ hairpin, openHairpin });
+            }
         }
     }
 
@@ -3629,7 +3633,7 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     pugi::xpath_node currentMeasure = node.select_node("ancestor::measure");
 
     pugi::xml_node beamEnd = node.select_node("./following-sibling::note[beam[@number='1' and text()='end']]").node();
-    pugi::xml_node tupletEnd = node.select_node("./following-sibling::note[notations[tuplet[@type='stop']]]").node();
+    pugi::xml_node tupletEnd = node.select_node("./following-sibling::note[notations/tuplet[@type='stop']]").node();
 
     const auto measureNodeChildren = currentMeasure.node().children();
     std::vector<pugi::xml_node> currentMeasureNodes(measureNodeChildren.begin(), measureNodeChildren.end());
@@ -3655,7 +3659,7 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
     else if (beamStart) {
         // find whether there is a tuplet that starts during the span of the beam
         pugi::xpath_node nextTupletStart
-            = node.select_node("./following-sibling::note[notations[tuplet[@type='start']]]").node();
+            = node.select_node("./following-sibling::note[notations/tuplet[@type='start']]").node();
 
         // find start and end of the beam
         const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
