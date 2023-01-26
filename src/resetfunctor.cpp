@@ -403,4 +403,105 @@ FunctorCode ResetDataFunctor::VisitVerse(Verse *verse)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ResetHorizontalAlignmentFunctor
+//----------------------------------------------------------------------------
+
+ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() {}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitAccid(Accid *accid)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitArpeg(Arpeg *arpeg)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitBeam(Beam *beam)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitBeamSpan(BeamSpan *beamSpan)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitCustos(Custos *custos)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitDot(Dot *dot)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitDots(Dots *dots)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitLayer(Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitMRest(MRest *mRest)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitNote(Note *note)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitRest(Rest *rest)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitTuplet(Tuplet *tuplet)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletBracket(TupletBracket *tupletBracket)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
