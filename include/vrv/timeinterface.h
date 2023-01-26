@@ -194,7 +194,7 @@ public:
 
     /**
      * Check if the end points are temporally ordered
-     * @Return true if end temporally occurs after start
+     * @return true if end temporally occurs after start
      */
     ///@{
     bool IsOrdered() const;
