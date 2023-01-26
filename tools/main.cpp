@@ -468,9 +468,9 @@ int main(int argc, char **argv)
         outfile = removeExtension(outfile);
     }
 
-    // Skip the layout for MIDI and timemap output
+    // Skip the layout for MIDI and timemap output by setting --breaks to none
     if ((outformat == "midi") || (outformat == "timemap")) {
-        toolkit.SkipLayoutOnLoad(true);
+        toolkit.SetOptions("{'breaks': 'none'}");
     }
 
     // Load the std input or load the file
