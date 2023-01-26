@@ -612,6 +612,13 @@ public:
      */
     void RedoPagePitchPosLayout();
 
+    /**
+     * Skip the layout on load to speed up MIDI or timemap output.
+     *
+     * @param skip True for skipping the layout process
+     */
+    void SkipLayoutOnLoad(bool skip);
+
     ///@}
 
     //------------------------------------------------//
@@ -624,13 +631,6 @@ public:
      * @internal They are marked with \@ingroup nodoc
      */
     ///@{
-
-    /**
-     * Skip the layout on load to speed up MIDI or timemap output.
-     *
-     * @ingroup nodoc
-     */
-    void SkipLayoutOnLoad(bool value);
 
     /**
      * Render the page to the deviceContext.
