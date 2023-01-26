@@ -120,7 +120,7 @@ Object::Object(const Object &object) : BoundingBox(object)
         return;
     }
 
-    for (size_t i = 0; i < (int)object.m_children.size(); ++i) {
+    for (int i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
         Object *clone = current->Clone();
         if (clone) {
@@ -166,7 +166,7 @@ Object &Object::operator=(const Object &object)
         if (link) link->AddBackLink(&object);
 
         if (object.CopyChildren()) {
-            for (size_t i = 0; i < object.m_children.size(); ++i) {
+            for (int i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
                 Object *clone = current->Clone();
                 if (clone) {

@@ -533,7 +533,7 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const size_t unmatchedElements = std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
+    const int unmatchedElements = (int)std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
         prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
         [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
             return (entry.first->HasStartid() && entry.first->HasEndid());

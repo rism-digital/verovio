@@ -713,7 +713,7 @@ bool Transposer::GetKeyTonic(const std::string &keyTonic, TransPitch &tonic)
     int pitch = 0;
     int accid = 0;
     int state = 0;
-    for (size_t i = 0; i < keyTonic.size(); ++i) {
+    for (int i = 0; i < (int)keyTonic.size(); ++i) {
         switch (state) {
             case 0:
                 switch (keyTonic[i]) {

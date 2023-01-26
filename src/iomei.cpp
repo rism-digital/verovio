@@ -3225,7 +3225,7 @@ std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
     std::u32string buffer;
     // approximate that we won't have a 1.1 longer string (for optimization)
     buffer.reserve(data.size() * 1.1);
-    for (size_t pos = 0; pos != data.size(); ++pos) {
+    for (int pos = 0; pos != data.size(); ++pos) {
         if (data[pos] == '&') {
             buffer.append(U"&amp;");
         }
@@ -7900,9 +7900,9 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
         std::string name = elem.name();
         std::string value = elem.value();
 
-        size_t pos = value.find_first_not_of(' ');
+        int pos = (int)value.find_first_not_of(' ');
         if (pos != std::string::npos) value = value.substr(pos);
-        pos = value.find_last_not_of(' ');
+        pos = (int)value.find_last_not_of(' ');
         if (pos != std::string::npos) value = value.substr(0, pos + 1);
 
         elem.set_value(value.c_str());

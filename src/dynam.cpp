@@ -249,10 +249,10 @@ std::u32string Dynam::GetSymbolStr(const std::u32string &str, const bool singleG
     // Otherwise replace it letter by letter
     dynam = str;
     std::u32string from, to;
-    for (size_t i = 0; i < DYNAM_CHARS; ++i) {
+    for (int i = 0; i < DYNAM_CHARS; ++i) {
         from = dynamChars[i];
         to = dynamSmufl[i];
-        for (size_t pos = 0; (pos = dynam.find(from, pos)) != std::string::npos; pos += to.size())
+        for (int pos = 0; (pos = (int)dynam.find(from, pos)) != std::string::npos; pos += to.size())
             dynam.replace(pos, from.size(), to);
     }
     return dynam;

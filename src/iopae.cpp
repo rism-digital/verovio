@@ -1887,7 +1887,7 @@ void PAEInput::convertMeasure(pae::Measure *measure)
 
     m_nested_objects.clear();
 
-    for (size_t i = 0; i < measure->notes.size(); ++i) {
+    for (int i = 0; i < (int)measure->notes.size(); ++i) {
         pae::Note *note = &measure->notes.at(i);
         parseNote(note);
     }
@@ -2189,7 +2189,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     strcpy(value, &input[index]);
 
     // Truncate string to first space
-    for (size_t i = strlen(value) - 2; i > 0; --i) {
+    for (int i = strlen(value) - 2; i > 0; --i) {
         if (isspace(value[i])) {
             value[i] = EMPTY;
             continue;

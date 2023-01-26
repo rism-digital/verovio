@@ -259,7 +259,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;
         return UNKNOWN;
     }
-    size_t searchLimit = 600;
+    const int searchLimit = 600;
     std::string initial = data.substr(0, searchLimit);
     if (data[0] == '<') {
         // <mei> == root node for standard organization of MEI data
@@ -1790,7 +1790,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     this->ClearHumdrumBuffer();
-    size_t size = strlen(data) + 1;
+    int size = (int)strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong

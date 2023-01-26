@@ -352,7 +352,7 @@ void GraceAligner::StackGraceElement(LayerElement *element)
 void GraceAligner::AlignStack()
 {
     double time = 0.0;
-    for (size_t i = m_graceStack.size(); i > 0; --i) {
+    for (int i = (int)m_graceStack.size(); i > 0; --i) {
         LayerElement *element = vrv_cast<LayerElement *>(m_graceStack.at(i - 1));
         assert(element);
         // get the duration of the event

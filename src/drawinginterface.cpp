@@ -141,7 +141,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     int lastDur, currentDur;
 
     m_beamElementCoords.reserve(childList.size());
-    for (size_t i = 0; i < childList.size(); ++i) {
+    for (int i = 0; i < (int)childList.size(); ++i) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
@@ -287,14 +287,14 @@ bool BeamDrawingInterface::IsHorizontal() const
     items.reserve(m_beamElementCoords.size());
     directions.reserve(m_beamElementCoords.size());
 
-    for (size_t i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoords.at(i);
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
         items.push_back(coord->m_closestNote->GetDrawingY());
         directions.push_back(coord->m_beamRelativePlace);
     }
-    size_t itemCount = items.size();
+    int itemCount = (int)items.size();
 
     if (itemCount < 2) return true;
 
@@ -312,7 +312,7 @@ bool BeamDrawingInterface::IsHorizontal() const
     const bool lastStep = (last != items.at(items.size() - 2));
     if ((items.size() > 2) && (firstStep || lastStep)) {
         // Detect concave shapes
-        for (size_t i = 1; i < itemCount - 1; ++i) {
+        for (int i = 1; i < itemCount - 1; ++i) {
             if (m_drawingPlace == BEAMPLACE_above) {
                 if ((items.at(i) >= first) && (items.at(i) >= last)) return true;
             }
@@ -365,7 +365,7 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
     data_STEMDIRECTION outsidePitchDirection = GetNoteDirection(items.front(), items.back());
     std::map<data_STEMDIRECTION, int> beamDirections{ { STEMDIRECTION_NONE, 0 }, { STEMDIRECTION_up, 0 },
         { STEMDIRECTION_down, 0 } };
-    for (size_t i = 0; i < items.size(); ++i) {
+    for (int i = 0; i < (int)items.size(); ++i) {
         if (directions[i] == BEAMPLACE_above) {
             if (previousTop == VRV_UNSET) {
                 previousTop = items[i];
@@ -406,14 +406,14 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
     std::vector<int> items;
     items.reserve(m_beamElementCoords.size());
 
-    for (size_t i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoords.at(i);
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
         // Could this be an overflow with 32 bits?
         items.push_back(coord->m_closestNote->GetDrawingY() * DUR_MAX + coord->m_dur);
     }
-    size_t itemCount = items.size();
+    int itemCount = (int)items.size();
 
     // No pattern with at least 4 elements or if all elements are the same
     if ((itemCount < 4) || (std::equal(items.begin() + 1, items.end(), items.begin()))) {
@@ -427,7 +427,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
     }
 
     // Correlate a sub-array for each divider until a sequence is found (if any)
-    for (size_t i = 0; i < dividers.size(); ++i) {
+    for (int i = 0; i < (int)dividers.size(); ++i) {
         int divider = dividers.at(i);
         bool pattern = true;
         std::vector<int>::iterator iter = items.begin();
