@@ -3015,6 +3015,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
     interface->WriteMidiTempo(element);
+    interface->WriteMmTempo(element);
     interface->WriteMultinumMeasures(element);
     interface->WritePianoPedals(element);
 }
@@ -7133,6 +7134,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
     interface->ReadMidiTempo(element);
+    interface->ReadMmTempo(element);
     interface->ReadMultinumMeasures(element);
     interface->ReadPianoPedals(element);
     return true;

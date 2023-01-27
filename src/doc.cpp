@@ -289,6 +289,21 @@ void Doc::CalculateTimemap()
     if (this->GetCurrentScoreDef()->HasMidiBpm()) {
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
     }
+    else if (this->GetCurrentScoreDef()->HasMm()) {
+        double mm = this->GetCurrentScoreDef()->GetMm();
+        double mmUnit = 4;
+        if (this->GetCurrentScoreDef()->HasMmUnit() && (this->GetCurrentScoreDef()->GetMmUnit() > DURATION_breve)) {
+            mmUnit = pow(2, (int)this->GetCurrentScoreDef()->GetMmUnit() - 2);
+        }
+        if (this->GetCurrentScoreDef()->HasMmDots()) {
+            double dotsUnit = 0.0;
+            for (int d = 0; d < this->GetCurrentScoreDef()->GetMmDots(); d++) {
+                dotsUnit += mmUnit / 4.0 / pow(2, d);
+            }
+            mmUnit -= dotsUnit;
+        }
+        if (mmUnit > 0) tempo = mm * 4.0 / mmUnit;
+    }
 
     // We first calculate the maximum duration of each measure
     InitMaxMeasureDurationParams initMaxMeasureDurationParams;
