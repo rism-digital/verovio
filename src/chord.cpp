@@ -445,8 +445,8 @@ bool Chord::IsVisible() const
     // if the chord doesn't have it, see if all the children are invisible
     const ListOfConstObjects &notes = this->GetList(this);
 
-    for (const Object *iter : notes) {
-        const Note *note = vrv_cast<const Note *>(iter);
+    for (const Object *object : notes) {
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
@@ -515,8 +515,8 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
     int actualElementsInUnison = 0;
 
     // process each note of the chord separately, storing locations in the set
-    for (Object *iter : notes) {
-        Note *note = vrv_cast<Note *>(iter);
+    for (Object *object : notes) {
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
         auto [overlap, isInUnison] = note->CalcElementHorizontalOverlap(
             doc, otherElements, areDotsAdjusted, true, isLowerPosition, expectedElementsInUnison > 0);

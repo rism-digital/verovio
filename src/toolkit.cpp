@@ -1564,21 +1564,21 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
 
     // Fill the JSON object
-    for (Object *item : notesOrRests) {
-        if (item->Is(NOTE)) {
-            noteArray << item->GetID();
-            Note *note = vrv_cast<Note *>(item);
+    for (Object *object : notesOrRests) {
+        if (object->Is(NOTE)) {
+            noteArray << object->GetID();
+            Note *note = vrv_cast<Note *>(object);
             assert(note);
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (item->Is(REST)) {
-            restArray << item->GetID();
+        else if (object->Is(REST)) {
+            restArray << object->GetID();
         }
     }
     chords.unique();
-    for (Object *item : chords) {
-        chordArray << item->GetID();
+    for (Object *object : chords) {
+        chordArray << object->GetID();
     }
 
     o << "notes" << noteArray;

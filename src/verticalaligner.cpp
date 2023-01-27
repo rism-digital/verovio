@@ -177,10 +177,10 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
     m_spacingTypes.clear();
 
     const ListOfConstObjects &childList = scoreDef->GetList(scoreDef);
-    for (const Object *iter : childList) {
+    for (const Object *object : childList) {
         // It should be staffDef only, but double check.
-        if (!iter->Is(STAFFDEF)) continue;
-        const StaffDef *staffDef = vrv_cast<const StaffDef *>(iter);
+        if (!object->Is(STAFFDEF)) continue;
+        const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
         assert(staffDef);
 
         m_spacingTypes[staffDef->GetN()] = CalculateSpacingAbove(staffDef);

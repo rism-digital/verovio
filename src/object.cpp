@@ -1222,9 +1222,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         a->FindAllDescendantsByComparison(&children, &comp);
-        for (Object *it : children) {
-            if (it->Is(SYL)) continue;
-            FacsimileInterface *temp = it->GetFacsimileInterface();
+        for (Object *object : children) {
+            if (object->Is(SYL)) continue;
+            FacsimileInterface *temp = object->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
@@ -1236,9 +1236,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         b->FindAllDescendantsByComparison(&children, &comp);
-        for (Object *it : children) {
-            if (it->Is(SYL)) continue;
-            FacsimileInterface *temp = it->GetFacsimileInterface();
+        for (Object *object : children) {
+            if (object->Is(SYL)) continue;
+            FacsimileInterface *temp = object->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;

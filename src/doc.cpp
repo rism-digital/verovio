@@ -838,8 +838,8 @@ void Doc::PrepareData()
         this->Process(&prepareFacsimile, &prepareFacsimileParams);
 
         // Add default syl zone if one is not present.
-        for (Object *it : prepareFacsimileParams.m_zonelessSyls) {
-            Syl *syl = vrv_cast<Syl *>(it);
+        for (Object *object : prepareFacsimileParams.m_zonelessSyls) {
+            Syl *syl = vrv_cast<Syl *>(object);
             assert(syl);
             syl->CreateDefaultZone(this);
         }
