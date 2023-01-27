@@ -289,8 +289,8 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
             Note *lastNote = ligature->GetLastNote();
             int x2 = lastNote->GetContentRight();
             // Look for the highest note position in the ligature
-            for (auto &iter : notes) {
-                Note *note = vrv_cast<Note *>(iter);
+            for (Object *object : notes) {
+                Note *note = vrv_cast<Note *>(object);
                 assert(note);
                 y = std::max(y, note->GetContentTop());
             }

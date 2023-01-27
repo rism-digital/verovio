@@ -180,10 +180,8 @@ LogLevel StrToLogLevel(const std::string &level)
 
 bool LogBufferContains(const std::string &s)
 {
-    std::vector<std::string>::iterator iter = logBuffer.begin();
-    while (iter != logBuffer.end()) {
-        if ((*iter) == s) return true;
-        ++iter;
+    for (const std::string &logStr : logBuffer) {
+        if (logStr == s) return true;
     }
     return false;
 }

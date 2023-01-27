@@ -171,9 +171,9 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (auto it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
+        for (const Glyph *smuflGlyph : m_smuflGlyphs) {
             // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source((*it)->GetPath());
+            std::ifstream source(smuflGlyph->GetPath());
             sourceDoc.load(source);
 
             // copy all the nodes inside into the master document
@@ -1011,8 +1011,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
     }
 
     // print chars one by one
-    for (int i = 0; i < (int)text.length(); ++i) {
-        char32_t c = text.at(i);
+    for (char32_t c : text) {
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;

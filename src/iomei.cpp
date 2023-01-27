@@ -3225,31 +3225,31 @@ std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
     std::u32string buffer;
     // approximate that we won't have a 1.1 longer string (for optimization)
     buffer.reserve(data.size() * 1.1);
-    for (int pos = 0; pos != data.size(); ++pos) {
-        if (data[pos] == '&') {
+    for (const char32_t &c : data) {
+        if (c == '&') {
             buffer.append(U"&amp;");
         }
-        else if (data[pos] == '\"') {
+        else if (c == '\"') {
             buffer.append(U"&quot;");
         }
-        else if (data[pos] == '\'') {
+        else if (c == '\'') {
             buffer.append(U"&apos;");
         }
-        else if (data[pos] == '<') {
+        else if (c == '<') {
             buffer.append(U"&lt;");
         }
-        else if (data[pos] == '>') {
+        else if (c == '>') {
             buffer.append(U"&gt;");
         }
         // Unicode private area for SMuFL characters (and unicode music symbols)
-        else if (data[pos] > 0xE000) {
+        else if (c > 0xE000) {
             std::ostringstream ss;
-            ss << std::hex << (int)data[pos];
+            ss << std::hex << (int)c;
             std::u32string smuflCode = UTF8to32(ss.str());
             buffer.append(U"&#x").append(smuflCode).append(U";");
         }
         else {
-            buffer.append(&data[pos], 1);
+            buffer.append(&c, 1);
         }
     }
     return buffer;
@@ -7900,9 +7900,9 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
         std::string name = elem.name();
         std::string value = elem.value();
 
-        int pos = (int)value.find_first_not_of(' ');
+        size_t pos = value.find_first_not_of(' ');
         if (pos != std::string::npos) value = value.substr(pos);
-        pos = (int)value.find_last_not_of(' ');
+        pos = value.find_last_not_of(' ');
         if (pos != std::string::npos) value = value.substr(0, pos + 1);
 
         elem.set_value(value.c_str());

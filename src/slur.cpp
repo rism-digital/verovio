@@ -336,7 +336,7 @@ void Slur::AddSpannedElements(
     }
 
     curve->ClearSpannedElements();
-    for (auto element : spanned.elements) {
+    for (const LayerElement *element : spanned.elements) {
         const int xLeft = element->GetSelfLeft();
         const int xRight = element->GetSelfRight();
         const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
@@ -401,7 +401,7 @@ void Slur::AddSpannedElements(
 void Slur::DiscardTupletElements(FloatingCurvePositioner *curve, int xMin, int xMax)
 {
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
         if (spannedElement->m_boundingBox->Is(TUPLET_BRACKET)) {
             const TupletBracket *tupletBracket = vrv_cast<const TupletBracket *>(spannedElement->m_boundingBox);
             assert(tupletBracket->GetParent()->Is(TUPLET));
@@ -452,7 +452,7 @@ void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         ListOfObjects artics = start->FindAllDescendantsByType(ARTIC);
         // Then the @n of each first staffDef
-        for (auto &object : artics) {
+        for (Object *object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             if (artic->IsOutsideArtic()) {
@@ -469,7 +469,7 @@ void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         ListOfObjects artics = end->FindAllDescendantsByType(ARTIC);
         // Then the @n of each first staffDef
-        for (auto &object : artics) {
+        for (Object *object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             if (artic->IsOutsideArtic()) {
@@ -659,7 +659,7 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -702,7 +702,7 @@ NearEndCollision Slur::DetectCollisionsNearEnd(
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return nearEndCollision;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
         if (spannedElement->m_discarded) {
             continue;
         }
@@ -750,7 +750,7 @@ std::pair<int, int> Slur::CalcEndPointShift(
     const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -920,7 +920,7 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
     double leftSlopeMax = std::abs(BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.c1));
     double rightSlopeMax = std::abs(BoundingBox::CalcSlope(bezierCurve.p2, bezierCurve.c2));
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -992,7 +992,7 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;

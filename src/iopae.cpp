@@ -2449,7 +2449,7 @@ void PAEInput::ClearTokenObjects()
 {
     // Before we clear the pae list of tokens, we need to delete all token objects.
     // Normally, they should be none because they are passed to the doc.
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (!token.m_object || token.IsContainerEnd()) continue;
         LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
         delete token.m_object;
@@ -2539,7 +2539,7 @@ void PAEInput::LogDebugTokens(bool vertical)
 {
     // For long incipits or to see full class name
     if (vertical) {
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c1 = (token.m_char) ? token.m_char : ' ';
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
             std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
@@ -2549,7 +2549,7 @@ void PAEInput::LogDebugTokens(bool vertical)
     }
     else {
         std::string row;
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c = (token.m_inputChar) ? token.m_inputChar : ' ';
             row.push_back(c);
         }
@@ -2557,20 +2557,20 @@ void PAEInput::LogDebugTokens(bool vertical)
         LogDebug(row.c_str());
         if (m_hasErrors) {
             row.clear();
-            for (auto &token : m_pae) {
+            for (pae::Token &token : m_pae) {
                 char c = (token.m_isError) ? '^' : ' ';
                 row.push_back(c);
             }
             LogDebug(row.c_str());
         }
         row.clear();
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
             row.push_back(className.at(0));
         }
         LogDebug(row.c_str());
         row.clear();
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c = (token.m_char) ? token.m_char : ' ';
             row.push_back(c);
         }
@@ -2622,7 +2622,7 @@ void PAEInput::AddToken(char c, int &position)
 
 void PAEInput::PrepareInsertion(int position, std::list<pae::Token> &insertion)
 {
-    for (auto &token : insertion) {
+    for (pae::Token &token : insertion) {
         token.m_position = position;
         if (token.m_object) {
             token.m_object = token.m_object->Clone();
@@ -2986,7 +2986,7 @@ bool PAEInput::Parse()
     // The current meterSig, used to calculate the tstamp2 for open ties
     MeterSig *currentMeterSig = &m_meterSig;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // Double check that we don't have more than the layer on the layerStack
@@ -3124,7 +3124,7 @@ bool PAEInput::ConvertKeySig()
     pae::Token *keySigToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::KEYSIG_START) {
@@ -3162,7 +3162,7 @@ bool PAEInput::ConvertClef()
     pae::Token *clefToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::CLEF_START) {
@@ -3200,7 +3200,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
     pae::Token *meterSigOrMensurToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::METERSIG_START) {
@@ -3249,7 +3249,7 @@ bool PAEInput::ConvertMeasure()
     // measureCount is currently ignored by the Measure constructor
     int measureCount = 1;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // This is the first (default) measure added to the tokens ::Import
@@ -3444,7 +3444,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
     pae::Token *mRestOrMultiRestToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '=') {
@@ -3485,7 +3485,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
 
 bool PAEInput::ConvertPitch()
 {
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::NOTENAME)) {
@@ -3515,7 +3515,7 @@ bool PAEInput::ConvertOctave()
     int oct = 4;
     char readingOct = 0;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::OCTAVEUP) {
@@ -3560,7 +3560,7 @@ bool PAEInput::ConvertTrill()
 {
     Object *note = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // Keep a pointer and simply continue
@@ -3600,7 +3600,7 @@ bool PAEInput::ConvertFermata()
     pae::Token *fermataToken = NULL;
     Object *fermataTarget = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '(') {
@@ -3663,7 +3663,7 @@ bool PAEInput::ConvertAccidental()
 {
     data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::ACCIDENTAL_INTERNAL)) {
@@ -3702,7 +3702,7 @@ bool PAEInput::ConvertAccidental()
 
 bool PAEInput::ConvertRest()
 {
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '-') {
@@ -3897,7 +3897,7 @@ bool PAEInput::ConvertGraceGrp()
     // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
     pae::Token *graceGrpToken = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == 'q') {
@@ -3973,7 +3973,7 @@ bool PAEInput::ConvertGrace()
     pae::Token *graceToken = NULL;
     bool isAcciaccatura = false;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::GRACE)) {
@@ -4222,7 +4222,7 @@ bool PAEInput::ConvertTie()
     // A pointer to the token be able to reset it to '+' in mensural notation
     pae::Token *tieToken = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.Is(NOTE)) {
@@ -4398,7 +4398,7 @@ bool PAEInput::ConvertAccidGes()
     Note *lastNote = NULL;
     std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.Is(KEYSIG)) {
@@ -4483,7 +4483,7 @@ bool PAEInput::CheckHierarchy()
     while (!isValid && checkCount < 5) {
         checkCount++;
         isValid = true;
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             if (token.IsVoid()) continue;
 
             if (!token.m_object) continue;
@@ -4601,7 +4601,7 @@ bool PAEInput::CheckContentPostBuild()
 void PAEInput::RemoveContainerToken(Object *object)
 {
     bool deleted = false;
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid() || !token.m_object) continue;
 
         if (token.m_object == object) {
@@ -4637,7 +4637,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     enclosedAccids.resize(7);
     bool cancel = false;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
-    for (auto c : paeStr) {
+    for (char c : paeStr) {
         switch (c) {
             case 'b':
                 altNumber = 0;

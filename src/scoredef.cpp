@@ -474,9 +474,9 @@ void ScoreDef::ResetFromDrawingValues()
     const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : childList) {
-        if (!item->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(item);
+    for (Object *object : childList) {
+        if (!object->Is(STAFFDEF)) continue;
+        staffDef = vrv_cast<StaffDef *>(object);
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
@@ -533,8 +533,8 @@ const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
     ListOfConstObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
-    for (auto &item : staffGrps) {
-        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(item);
+    for (const Object *object : staffGrps) {
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(object);
         assert(staffGrp);
         if (staffGrp->GetN() == n) return staffGrp;
     }

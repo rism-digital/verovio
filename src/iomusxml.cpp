@@ -748,7 +748,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
             case MetronomeElements::PER_MINUTE: {
                 // Use the first floating-point number on the line to set @mm:
                 std::string matches("0123456789");
-                int offset = (int)iter->second.find_first_of(matches);
+                std::size_t offset = iter->second.find_first_of(matches);
                 if (offset < iter->second.length()) {
                     const double mmval = std::stod(iter->second.substr(offset));
                     tempo->SetMm(mmval);

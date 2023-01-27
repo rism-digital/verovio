@@ -352,7 +352,8 @@ public:
     bool IsSet() const override;
 
 private:
-    //
+    std::string GetStr(const std::vector<std::string> &values) const;
+
 public:
     //
 private:

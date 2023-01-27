@@ -417,7 +417,7 @@ void View::DrawSymbolDef(DeviceContext *dc, Object *parent, SymbolDef *symbolDef
     // to be properly propagated in the device context
     symbolDef->SetTemporaryParent(parent);
 
-    for (auto current : symbolDef->GetChildren()) {
+    for (Object *current : symbolDef->GetChildren()) {
         if (current->Is(GRAPHIC)) {
             Graphic *graphic = vrv_cast<Graphic *>(current);
             assert(graphic);

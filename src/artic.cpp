@@ -143,7 +143,7 @@ void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
     ClassIdComparison matchType(ARTIC);
     ListOfObjects children;
     parentNoteOrChord->FindAllDescendantsBetween(&children, &matchType, first, last);
-    for (auto &child : children) {
+    for (Object *child : children) {
         if (child == this) continue;
         Artic *artic = vrv_cast<Artic *>(child);
         assert(artic);

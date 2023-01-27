@@ -40,10 +40,10 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 {
     assert(prevSect);
     // find all siblings of expansion element to know what in MEI file
-    const vrv::ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
+    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
-    for (auto o : expansionSiblings) {
-        if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetID());
+    for (Object *object : expansionSiblings) {
+        if (object->Is({ SECTION, ENDING, LEM, RDG })) reductionList.push_back(object->GetID());
     }
 
     for (std::string s : expansionList) {

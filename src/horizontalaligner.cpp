@@ -205,7 +205,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         int startX = start->GetXRel();
         int endX = end->GetXRel();
         // We use a reverse iterator
-        for (auto child : this->GetChildren()) {
+        for (Object *child : this->GetChildren()) {
             Alignment *current = vrv_cast<Alignment *>(child);
             assert(current);
             // Nothing to do once we passed the start alignment
@@ -590,7 +590,7 @@ void Alignment::GetLeftRight(
     minLeft = -VRV_UNSET;
     maxRight = VRV_UNSET;
 
-    for (auto staffN : staffNs) {
+    for (int staffN : staffNs) {
         int staffMinLeft, staffMaxRight;
         this->GetLeftRight(staffN, staffMinLeft, staffMaxRight);
         if (staffMinLeft < minLeft) minLeft = staffMinLeft;
@@ -645,7 +645,7 @@ const AlignmentReference *Alignment::GetReferenceWithElement(const LayerElement 
 {
     const AlignmentReference *reference = NULL;
 
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         reference = dynamic_cast<const AlignmentReference *>(child);
         if (reference->GetN() == staffN) {
             return reference;
@@ -662,9 +662,9 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
     int max = VRV_UNSET, min = VRV_UNSET;
     // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
     // values for the Alignment
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         const AlignmentReference *reference = dynamic_cast<const AlignmentReference *>(child);
-        for (auto element : reference->GetChildren()) {
+        for (const Object *element : reference->GetChildren()) {
             const int top = element->GetSelfTop();
             if ((VRV_UNSET == max) || (top > max)) {
                 max = top;
@@ -783,7 +783,7 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     const ArrayOfObjects &children = this->GetChildren();
 
     // bottom one
-    for (auto child : children) {
+    for (Object *child : children) {
         // if accidental has unison overlap, ignore elements on other layers for overlap
         if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
             continue;
@@ -888,8 +888,9 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // First try to see if we already have something at the time position
-    for (int i = 0; i < this->GetChildCount(); ++i) {
-        timestampAttr = vrv_cast<TimestampAttr *>(children.at(i));
+    int i = 0;
+    for (Object *child : children) {
+        timestampAttr = vrv_cast<TimestampAttr *>(child);
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
@@ -901,6 +902,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
             idx = i;
             break;
         }
+        ++i;
     }
     // nothing found
     timestampAttr = new TimestampAttr();

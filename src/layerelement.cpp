@@ -479,7 +479,7 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticTy
     this->FindAllDescendantsByComparison(&artics, &isArtic, UNLIMITED_DEPTH, BACKWARD);
 
     const Artic *artic = NULL;
-    for (auto &child : artics) {
+    for (const Object *child : artics) {
         artic = vrv_cast<const Artic *>(child);
         assert(artic);
         if (artic->GetDrawingPlace() == place) break;
@@ -763,7 +763,7 @@ double LayerElement::GetContentAlignmentDuration(
 
     double duration = 0.0;
 
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         // Skip everything that does not have a duration interface and notes in chords
         if (!child->HasInterface(INTERFACE_DURATION) || (child->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH) != NULL)) {
             continue;
@@ -787,10 +787,10 @@ bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry) co
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     this->FindAllDescendantsByComparison(&childrenWithFacsimileInterface, &ic);
     bool result = false;
-    for (auto it = childrenWithFacsimileInterface.begin(); it != childrenWithFacsimileInterface.end(); ++it) {
-        const FacsimileInterface *fi = (*it)->GetFacsimileInterface();
+    for (const Object *object : childrenWithFacsimileInterface) {
+        const FacsimileInterface *fi = object->GetFacsimileInterface();
         assert(fi);
-        if (!(*it)->Is(SYL) && fi->HasFacs()) {
+        if (!object->Is(SYL) && fi->HasFacs()) {
             const Zone *zone = fi->GetZone();
             assert(zone);
             *ulx = std::min(*ulx, zone->GetUlx());
@@ -947,7 +947,7 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     if (!parentLayer) return 0;
     // Check whether there are elements on other layer in the duration of the current beam. If there are none - stop
     // here, there's nothing to be done
-    auto collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    ListOfObjects collidingElementsList = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
     if (collidingElementsList.empty()) return 0;
 
     Staff *staff = this->GetAncestorStaff();
@@ -955,7 +955,7 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     int leftMargin = 0;
     int rightMargin = 0;
     std::vector<int> elementOverlaps;
-    for (auto object : collidingElementsList) {
+    for (Object *object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
         if (!this->HorizontalContentOverlap(object)) continue;
         if (direction > 0) {
@@ -2332,7 +2332,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
         this->FindAllDescendantsByComparison(&durations, &hasInterface);
         Staff *crossStaff = NULL;
         Layer *crossLayer = NULL;
-        for (auto object : durations) {
+        for (Object *object : durations) {
             LayerElement *durElement = vrv_cast<LayerElement *>(object);
             assert(durElement);
             // The duration element is not cross-staff, of the cross-staff is not that same staff (very rare)

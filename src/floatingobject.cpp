@@ -608,7 +608,7 @@ bool FloatingCurvePositioner::HasCachedX12() const
 
 void FloatingCurvePositioner::ClearSpannedElements()
 {
-    for (auto &spannedElement : m_spannedElements) {
+    for (CurveSpannedElement *spannedElement : m_spannedElements) {
         delete spannedElement;
     }
     m_spannedElements.clear();

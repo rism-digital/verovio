@@ -108,8 +108,7 @@ char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 
 bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
 {
-    for (int i = 0; i < (int)text.length(); ++i) {
-        char32_t c = text.at(i);
+    for (char32_t c : text) {
         const Glyph *glyph = this->GetGlyph(c);
         if (glyph && glyph->GetFallback()) return true;
     }

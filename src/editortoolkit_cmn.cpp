@@ -483,7 +483,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         chord->AddChild(note);
 
         ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
-        for (auto &artic : artics) {
+        for (Object *artic : artics) {
             artic->MoveItselfTo(chord);
         }
         currentNote->ClearRelinquishedChildren();
@@ -536,7 +536,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             parent->ReplaceChild(chord, otherNote);
 
             ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
-            for (auto &artic : artics) {
+            for (Object *artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }
             m_chainedId = chord->GetID();

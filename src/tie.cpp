@@ -85,7 +85,7 @@ bool Tie::AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *cu
 
     int overlap = 0;
     bool discard = false;
-    for (auto object : objects) {
+    for (const Object *object : objects) {
         overlap = curve->CalcAdjustment(object, discard);
     }
     if (!overlap) return false;
@@ -515,7 +515,7 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
 
     int adjust = 0;
     int dotsPosition = 0;
-    for (auto object : objects) {
+    for (const Object *object : objects) {
         if (!object->HasSelfBB()) continue;
         // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
         // outer ties, so there should be no issue of inner tie moving up and colliding with other elements
