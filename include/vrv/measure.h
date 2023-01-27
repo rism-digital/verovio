@@ -236,6 +236,15 @@ public:
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
     ///@}
 
+    /**
+     * @name Setter and getter for the flag indicating if there is an AlignmentReference
+     * with multiple layers
+     */
+    ///@{
+    bool HasAlignmentRefWithMultipleLayers() const { return m_hasAlignmentRefWithMultipleLayers; }
+    void HasAlignmentRefWithMultipleLayers(bool hasRef) { m_hasAlignmentRefWithMultipleLayers = hasRef; }
+    ///@}
+
     /*
      * Return the first staff of each staffGrp according to the scoreDef
      */

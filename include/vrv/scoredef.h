@@ -229,8 +229,14 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    /**
+     * @name Set and get the drawing label width.
+     */
+    ///@{
     int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
+    void ResetDrawingLabelsWidth() { m_drawingLabelsWidth = 0; }
+    ///@}
 
     /**
      * @name Getters for running elements

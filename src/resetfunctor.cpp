@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "arpeg.h"
+#include "beamspan.h"
 #include "custos.h"
 #include "dot.h"
 #include "editorial.h"
@@ -27,6 +28,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
+#include "system.h"
 #include "tempo.h"
 #include "tuplet.h"
 #include "turn.h"
@@ -411,96 +413,214 @@ ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() {}
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitAccid(Accid *accid)
 {
+    this->VisitLayerElement(accid);
+    accid->PositionInterface::InterfaceResetHorizontalAlignment(*this, accid);
+
+    accid->SetDrawingOctave(false);
+    accid->SetDrawingOctaveAccid(NULL);
+    accid->SetDrawingUnisonAccid(NULL);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitArpeg(Arpeg *arpeg)
 {
-    return FUNCTOR_CONTINUE;
+    arpeg->SetDrawingXRel(0);
+
+    return this->VisitControlElement(arpeg);
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitBeam(Beam *beam)
 {
+    this->VisitLayerElement(beam);
+
+    beam->m_beamSegment.m_stemSameasRole = SAMEAS_NONE;
+    beam->m_beamSegment.m_stemSameasReverseRole = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 {
-    return FUNCTOR_CONTINUE;
+    beamSpan->ClearBeamSegments();
+    beamSpan->InitBeamSegments();
+
+    return this->VisitControlElement(beamSpan);
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitCustos(Custos *custos)
 {
+    this->VisitLayerElement(custos);
+    custos->PositionInterface::InterfaceResetHorizontalAlignment(*this, custos);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitDot(Dot *dot)
 {
+    this->VisitLayerElement(dot);
+    dot->PositionInterface::InterfaceResetHorizontalAlignment(*this, dot);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitDots(Dots *dots)
 {
+    this->VisitLayerElement(dots);
+
+    dots->ResetMapOfDotLocs();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    floatingObject->SetCurrentFloatingPositioner(NULL);
+    floatingObject->ResetMaxDrawingYRel();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitLayer(Layer *layer)
 {
+    if (layer->GetStaffDefClef()) {
+        this->VisitClef(layer->GetStaffDefClef());
+    }
+    if (layer->GetStaffDefKeySig()) {
+        this->VisitKeySig(layer->GetStaffDefKeySig());
+    }
+    if (layer->GetStaffDefMensur()) {
+        this->VisitMensur(layer->GetStaffDefMensur());
+    }
+    if (layer->GetStaffDefMeterSig()) {
+        this->VisitMeterSig(layer->GetStaffDefMeterSig());
+    }
+    if (layer->GetStaffDefMeterSigGrp()) {
+        layer->GetStaffDefMeterSigGrp()->Process(*this);
+    }
+
+    if (layer->GetCautionStaffDefClef()) {
+        this->VisitClef(layer->GetCautionStaffDefClef());
+    }
+    if (layer->GetCautionStaffDefKeySig()) {
+        this->VisitKeySig(layer->GetCautionStaffDefKeySig());
+    }
+    if (layer->GetCautionStaffDefMensur()) {
+        this->VisitMensur(layer->GetCautionStaffDefMensur());
+    }
+    if (layer->GetCautionStaffDefMeterSig()) {
+        this->VisitMeterSig(layer->GetCautionStaffDefMeterSig());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    layerElement->SetDrawingXRel(0);
+    // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
+    // See Object::CalcAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
+    layerElement->SetDrawingYRel(0);
+
+    layerElement->ResetAlignment();
+    layerElement->ResetGraceAlignment();
+    layerElement->SetAlignmentLayerN(VRV_UNSET);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitMeasure(Measure *measure)
 {
+    measure->SetDrawingXRel(0);
+    if (measure->m_measureAligner.GetLeftAlignment()) {
+        measure->m_measureAligner.GetLeftAlignment()->SetXRel(0);
+    }
+    if (measure->m_measureAligner.GetRightAlignment()) {
+        measure->m_measureAligner.GetRightAlignment()->SetXRel(0);
+    }
+
+    measure->m_timestampAligner.Process(*this);
+
+    measure->HasAlignmentRefWithMultipleLayers(false);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitMRest(MRest *mRest)
 {
+    this->VisitLayerElement(mRest);
+    mRest->PositionInterface::InterfaceResetHorizontalAlignment(*this, mRest);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitNote(Note *note)
 {
+    this->VisitLayerElement(note);
+    note->PositionInterface::InterfaceResetHorizontalAlignment(*this, note);
+
+    note->SetDrawingLoc(0);
+    note->SetFlippedNotehead(false);
+    // Re-mark the role as unsed if we have a shared stem
+    if (note->HasStemSameasNote()) note->SetStemSameasRole(SAMEAS_UNSET);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitRest(Rest *rest)
 {
+    this->VisitLayerElement(rest);
+    rest->PositionInterface::InterfaceResetHorizontalAlignment(*this, rest);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
+    scoreDef->ResetDrawingLabelsWidth();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitSystem(System *system)
 {
+    system->SetDrawingXRel(0);
+    system->ResetDrawingAbbrLabelsWidth();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitTuplet(Tuplet *tuplet)
 {
+    // Call parent one too
+    this->VisitLayerElement(tuplet);
+
+    tuplet->SetDrawingBracketPos(STAFFREL_basic_NONE);
+    tuplet->SetBracketAlignedBeam(NULL);
+    tuplet->SetNumAlignedBeam(NULL);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletBracket(TupletBracket *tupletBracket)
 {
+    // Call parent one too
+    this->VisitLayerElement(tupletBracket);
+
+    tupletBracket->SetDrawingXRelLeft(0);
+    tupletBracket->SetDrawingXRelRight(0);
+    tupletBracket->SetAlignedNum(NULL);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum)
 {
+    // Call parent one too
+    this->VisitLayerElement(tupletNum);
+
+    tupletNum->SetAlignedBracket(NULL);
+
     return FUNCTOR_CONTINUE;
 }
 

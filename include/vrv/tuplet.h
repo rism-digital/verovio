@@ -63,17 +63,21 @@ public:
     const LayerElement *GetDrawingRight() const { return m_drawingRight; }
     void SetDrawingRight(LayerElement *drawingRight) { m_drawingRight = drawingRight; }
     data_STAFFREL_basic GetDrawingBracketPos() const { return m_drawingBracketPos; }
+    void SetDrawingBracketPos(data_STAFFREL_basic bracketPos) { m_drawingBracketPos = bracketPos; }
     data_STAFFREL_basic GetDrawingNumPos() const { return m_drawingNumPos; }
+    void SetDrawingNumPos(data_STAFFREL_basic numPos) { m_drawingNumPos = numPos; }
     ///@}
 
     /**
-     * @name Getter for the beam with which the bracket and / or the num is aligned.
+     * @name Setter and getter for the beam with which the bracket and / or the num is aligned.
      */
     ///@{
     Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
     const Beam *GetBracketAlignedBeam() const { return m_bracketAlignedBeam; }
+    void SetBracketAlignedBeam(Beam *alignedBeam) { m_bracketAlignedBeam = alignedBeam; }
     Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
     const Beam *GetNumAlignedBeam() const { return m_numAlignedBeam; }
+    void SetNumAlignedBeam(Beam *alignedBeam) { m_numAlignedBeam = alignedBeam; }
     ///@}
 
     /**

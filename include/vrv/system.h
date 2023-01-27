@@ -79,6 +79,7 @@ public:
     void SetDrawingLabelsWidth(int width);
     int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
+    void ResetDrawingAbbrLabelsWidth() { m_drawingAbbrLabelsWidth = 0; }
     ///@}
 
     /**

@@ -17,6 +17,7 @@ class FunctorParams;
 class Layer;
 class LayerElement;
 class ResetDataFunctor;
+class ResetHorizontalAlignmentFunctor;
 
 //----------------------------------------------------------------------------
 // PositionInterface
@@ -68,6 +69,7 @@ public:
      */
     ///@{
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    FunctorCode InterfaceResetHorizontalAlignment(ResetHorizontalAlignmentFunctor &functor, Object *object);
     ///@}
 
     /**

@@ -204,11 +204,12 @@ public:
     int GetDrawingRadius(const Doc *doc, bool isInLigature = false) const;
 
     /**
-     * Alignment getter
+     * Alignment setter and getter
      */
     ///@{
     Alignment *GetAlignment() { return m_alignment; }
     const Alignment *GetAlignment() const { return m_alignment; }
+    void ResetAlignment() { m_alignment = NULL; }
     ///@}
 
     /**
@@ -247,6 +248,7 @@ public:
     ///@{
     Alignment *GetGraceAlignment();
     const Alignment *GetGraceAlignment() const;
+    void ResetGraceAlignment() { m_graceAlignment = NULL; }
     void SetGraceAlignment(Alignment *graceAlignment);
     bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
     ///@}

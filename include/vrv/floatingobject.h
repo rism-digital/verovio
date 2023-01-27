@@ -86,6 +86,7 @@ public:
      * positioners, which allows for persistent vertical positioning for some elements
      */
     ///@{
+    void ResetMaxDrawingYRel() { m_maxDrawingYRel = VRV_UNSET; }
     void SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place);
     int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
     ///@}
