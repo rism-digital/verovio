@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+* Improved interaction between slurs and tuplets (@eNote-GmbH)
+* Fixes in the MusicXML importer (@eNote-GmbH)
 
 ## [3.14.0] - 2022-12-23
 * Support for user defined symbols in `symbolTable/symbolDef` with `svg` or `graphic`
