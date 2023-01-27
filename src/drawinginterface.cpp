@@ -111,9 +111,8 @@ int BeamDrawingInterface::GetTotalBeamWidth() const
 
 void BeamDrawingInterface::ClearCoords()
 {
-    ArrayOfBeamElementCoords::iterator iter;
-    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
-        delete *iter;
+    for (BeamElementCoord *coord : m_beamElementCoords) {
+        delete coord;
     }
     m_beamElementCoords.clear();
 }

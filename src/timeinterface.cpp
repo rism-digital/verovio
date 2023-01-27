@@ -96,9 +96,8 @@ bool TimePointInterface::IsOnStaff(int n) const
 {
     if (this->HasStaff()) {
         std::vector<int> staffList = this->GetStaff();
-        std::vector<int>::iterator iter;
-        for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
-            if (*iter == n) return true;
+        for (int staffN : staffList) {
+            if (staffN == n) return true;
         }
         return false;
     }
@@ -115,7 +114,6 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
     assert(object);
 
     std::vector<Staff *> staves;
-    std::vector<int>::iterator iter;
     std::vector<int> staffList;
 
     // For <f> within <harm> without @staff we try to get the @staff from the <harm> ancestor
@@ -151,8 +149,8 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
         staffList.push_back(1);
     }
 
-    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
-        AttNIntegerComparison comparison(STAFF, *iter);
+    for (int staffN : staffList) {
+        AttNIntegerComparison comparison(STAFF, staffN);
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());

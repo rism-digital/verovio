@@ -428,9 +428,8 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
 {
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-        if (((*iter).first == attribute) && ((*iter).second == value)) return true;
+    for (auto &attributePair : attributes) {
+        if ((attributePair.first == attribute) && (attributePair.second == value)) return true;
     }
     return false;
 }

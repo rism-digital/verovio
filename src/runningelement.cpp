@@ -221,12 +221,11 @@ bool RunningElement::AdjustDrawingScaling(int width)
         // For each column
         for (int j = 0; j < 3; ++j) {
             ArrayOfTextElements *textElements = &m_cells[i * 3 + j];
-            ArrayOfTextElements::iterator iter;
             int columnWidth = 0;
             // For each object
-            for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
-                if ((*iter)->HasContentBB()) {
-                    int iterWidth = (*iter)->GetContentX2() - (*iter)->GetContentX1();
+            for (TextElement *element : *textElements) {
+                if (element->HasContentBB()) {
+                    int iterWidth = element->GetContentX2() - element->GetContentX1();
                     columnWidth = std::max(columnWidth, iterWidth);
                 }
             }
@@ -242,20 +241,18 @@ bool RunningElement::AdjustDrawingScaling(int width)
 
 bool RunningElement::AdjustRunningElementYPos()
 {
-    ArrayOfTextElements::iterator iter;
-
     // First adjust the content of each cell
     for (int i = 0; i < 9; ++i) {
         int cumulatedYRel = 0;
         ArrayOfTextElements *textElements = &m_cells[i];
         // For each object
-        for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
-            if (!(*iter)->HasContentBB()) {
+        for (TextElement *element : *textElements) {
+            if (element->HasContentBB()) {
                 continue;
             }
-            int yShift = (*iter)->GetContentY2();
-            (*iter)->SetDrawingYRel(cumulatedYRel - yShift);
-            cumulatedYRel += ((*iter)->GetContentY1() - (*iter)->GetContentY2());
+            int yShift = element->GetContentY2();
+            element->SetDrawingYRel(cumulatedYRel - yShift);
+            cumulatedYRel += (element->GetContentY1() - element->GetContentY2());
         }
     }
 
@@ -277,13 +274,12 @@ bool RunningElement::AdjustRunningElementYPos()
             }
 
             ArrayOfTextElements *textElements = &m_cells[cell];
-            ArrayOfTextElements::iterator iter;
             // For each object - adjust the yRel according to the rowYRel and the colYshift
-            for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
-                if (!(*iter)->HasContentBB()) {
+            for (TextElement *element : *textElements) {
+                if (!element->HasContentBB()) {
                     continue;
                 }
-                (*iter)->SetDrawingYRel((*iter)->GetDrawingYRel() + rowYRel - colYShift);
+                element->SetDrawingYRel(element->GetDrawingYRel() + rowYRel - colYShift);
             }
         }
         rowYRel -= currentRowHeigt;

@@ -107,10 +107,9 @@ void Artic::SplitMultival(Object *parent)
     if (articList.empty()) return;
 
     int idx = this->GetIdx() + 1;
-    std::vector<data_ARTICULATION>::iterator iter;
-    for (iter = articList.begin() + 1; iter != articList.end(); ++iter) {
+    for (data_ARTICULATION articVal : articList) {
         Artic *artic = new Artic();
-        artic->SetArtic({ *iter });
+        artic->SetArtic({ articVal });
         artic->AttColor::operator=(*this);
         artic->AttEnclosingChars::operator=(*this);
         artic->AttExtSym::operator=(*this);

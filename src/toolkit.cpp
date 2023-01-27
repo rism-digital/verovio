@@ -949,10 +949,9 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         }
         else if (optArray) {
             std::vector<std::string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
-            std::vector<std::string>::iterator strIter;
             jsonxx::Array values;
-            for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-                values << (*strIter);
+            for (const std::string &strValue : strValues) {
+                values << strValue;
             }
             o << iter->first << values;
         }
@@ -1215,9 +1214,8 @@ std::string Toolkit::EditInfo()
 std::string Toolkit::GetLog()
 {
     std::string str;
-    std::vector<std::string>::iterator iter;
-    for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
-        str += (*iter);
+    for (const std::string &logStr : logBuffer) {
+        str += logStr;
     }
     return str;
 }

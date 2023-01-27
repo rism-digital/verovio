@@ -234,66 +234,65 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     assert(system);
 
     ArrayOfObjects *drawingList = system->GetDrawingList();
-    ArrayOfObjects::iterator iter;
 
-    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        if ((*iter)->Is(classId) && (classId == BEAMSPAN)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+    for (Object *object : *drawingList) {
+        if (object->Is(classId) && (classId == BEAMSPAN)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == BRACKETSPAN)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == BRACKETSPAN)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == DIR)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == DIR)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == DYNAM)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == DYNAM)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == FIGURE)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == FIGURE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == GLISS)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == GLISS)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == HAIRPIN)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == LV)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == LV)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == PHRASE)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == PHRASE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == OCTAVE)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == OCTAVE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == ORNAM)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == ORNAM)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == PEDAL)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == PEDAL)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == PITCHINFLECTION)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == PITCHINFLECTION)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == SYL)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == SYL)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == TEMPO)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == TEMPO)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == TIE)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == TIE)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == TRILL)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == TRILL)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == SLUR)) {
-            this->DrawTimeSpanningElement(dc, *iter, system);
+        if (object->Is(classId) && (classId == SLUR)) {
+            this->DrawTimeSpanningElement(dc, object, system);
         }
-        if ((*iter)->Is(classId) && (classId == ENDING)) {
+        if (object->Is(classId) && (classId == ENDING)) {
             // cast to Ending check in DrawEnding
-            this->DrawEnding(dc, dynamic_cast<Ending *>(*iter), system);
+            this->DrawEnding(dc, dynamic_cast<Ending *>(object), system);
         }
     }
 }
@@ -1523,14 +1522,13 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
     assert(measure);
 
     ArrayOfObjects *drawingList = layer->GetDrawingList();
-    ArrayOfObjects::iterator iter;
 
-    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        if ((*iter)->Is(classId) && (classId == TUPLET_BRACKET)) {
-            this->DrawTupletBracket(dc, dynamic_cast<LayerElement *>(*iter), layer, staff, measure);
+    for (Object *object : *drawingList) {
+        if (object->Is(classId) && (classId == TUPLET_BRACKET)) {
+            this->DrawTupletBracket(dc, dynamic_cast<LayerElement *>(object), layer, staff, measure);
         }
-        if ((*iter)->Is(classId) && (classId == TUPLET_NUM)) {
-            this->DrawTupletNum(dc, dynamic_cast<LayerElement *>(*iter), layer, staff, measure);
+        if (object->Is(classId) && (classId == TUPLET_NUM)) {
+            this->DrawTupletNum(dc, dynamic_cast<LayerElement *>(object), layer, staff, measure);
         }
     }
 }
