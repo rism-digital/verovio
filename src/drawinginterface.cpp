@@ -379,7 +379,7 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
                 ++beamDirections[GetNoteDirection(previousBottom, items.at(i))];
             }
         }
-        i++;
+        ++i;
     }
     // if direction of beam outside pitches corresponds to majority of the note directions within the beam, beam
     // can be drawn in that direction. Otherwise horizontal beam should be used
