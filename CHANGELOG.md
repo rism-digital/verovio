@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Improved rendering of brackets (@eNote-GmbH)
 * Improved interaction between slurs and tuplets (@eNote-GmbH)
 * Fixes in the MusicXML importer (@eNote-GmbH)
 
