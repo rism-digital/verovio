@@ -308,12 +308,12 @@ bool BeamDrawingInterface::IsHorizontal() const
     const bool lastStep = (last != items.at(items.size() - 2));
     if ((items.size() > 2) && (firstStep || lastStep)) {
         // Detect concave shapes
-        for (int item : items) {
+        for (int i = 1; i < itemCount - 1; ++i) {
             if (m_drawingPlace == BEAMPLACE_above) {
-                if (item >= first && item >= last) return true;
+                if ((items.at(i) >= first) && (items.at(i) >= last)) return true;
             }
             else if (m_drawingPlace == BEAMPLACE_below) {
-                if (item <= first && item <= last) return true;
+                if ((items.at(i) <= first) && (items.at(i) <= last)) return true;
             }
         }
         std::vector<int> pitches;

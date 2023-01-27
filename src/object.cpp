@@ -284,7 +284,8 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
         assert("Object must be of the same type");
     }
 
-    for (Object *child : sourceParent->m_children) {
+    for (int i = 0; i < (int)sourceParent->m_children.size(); ++i) {
+        Object *child = sourceParent->Relinquish(i);
         if (idx != -1) {
             this->InsertChild(child, idx);
             idx++;
