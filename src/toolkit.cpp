@@ -79,8 +79,6 @@ Toolkit::Toolkit(bool initFont)
 
     m_options = m_doc.GetOptions();
 
-    m_skipLayoutOnLoad = false;
-
     m_editorToolkit = NULL;
 
 #ifndef NO_RUNTIME
@@ -746,7 +744,7 @@ bool Toolkit::LoadData(const std::string &data)
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
 
-    if (!m_skipLayoutOnLoad && (breaks != BREAKS_none)) {
+    if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
@@ -796,11 +794,6 @@ bool Toolkit::LoadData(const std::string &data)
 #endif
 
     return true;
-}
-
-void Toolkit::SkipLayoutOnLoad(bool value)
-{
-    m_skipLayoutOnLoad = value;
 }
 
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
