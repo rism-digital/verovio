@@ -888,8 +888,9 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // First try to see if we already have something at the time position
-    for (int i = 0; i < this->GetChildCount(); ++i) {
-        timestampAttr = vrv_cast<TimestampAttr *>(children.at(i));
+    int i = 0;
+    for (Object *child : children) {
+        timestampAttr = vrv_cast<TimestampAttr *>(child);
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
@@ -901,6 +902,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
             idx = i;
             break;
         }
+        ++i;
     }
     // nothing found
     timestampAttr = new TimestampAttr();

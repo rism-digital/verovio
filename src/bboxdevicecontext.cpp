@@ -362,8 +362,7 @@ void BBoxDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, 
     char32_t smuflGlyph = 0;
     if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
 
-    for (int i = 0; i < (int)text.length(); ++i) {
-        char32_t c = text.at(i);
+    for (char32_t c : text) {
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
@@ -426,9 +425,9 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, char32_t glyph)
     }
 
     // Stretch the content BB of the other objects
-    for (int i = 0; i < (int)m_objects.size(); ++i) {
-        if (!m_isDeactivatedX) (m_objects.at(i))->UpdateContentBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
-        if (!m_isDeactivatedY) (m_objects.at(i))->UpdateContentBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
+    for (Object *object : m_objects) {
+        if (!m_isDeactivatedX) object->UpdateContentBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
+        if (!m_isDeactivatedY) object->UpdateContentBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
     }
 }
 
