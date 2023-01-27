@@ -146,7 +146,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     // For better clarify, we loop withing the Ligature::CalcLigatureNotePos instead of
     // implementing Note::CalcLigatureNotePos.
 
-    for (auto &iter : notes) {
+    for (Object *iter : notes) {
 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);
@@ -290,7 +290,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     previousNote = NULL;
     n1 = 0;
 
-    for (auto &iter : notes) {
+    for (Object *iter : notes) {
 
         Note *note = vrv_cast<Note *>(iter);
         assert(note);

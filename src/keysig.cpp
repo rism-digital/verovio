@@ -196,7 +196,7 @@ void KeySig::FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const
 
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (!childList.empty()) {
-        for (auto &child : childList) {
+        for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
             for (int oct = 0; oct < 10; ++oct) {
@@ -252,7 +252,7 @@ data_KEYSIGNATURE KeySig::ConvertToSig() const
         data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_NONE;
         bool isCommon = true;
         int pos = 0;
-        for (auto &child : childList) {
+        for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
             data_ACCIDENTAL_WRITTEN curType = keyAccid->GetAccid();

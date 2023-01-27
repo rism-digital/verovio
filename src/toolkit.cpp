@@ -418,7 +418,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 
     std::string filename;
     // Look for the meta file in the zip
-    for (auto &member : file.infolist()) {
+    for (miniz_cpp::zip_info &member : file.infolist()) {
         if (member.filename == "META-INF/container.xml") {
             std::string container = file.read(member.filename);
             // Find the file name with an xpath query
@@ -988,7 +988,7 @@ std::string Toolkit::GetAvailableOptions() const
     grps << "0-base" << m_options->GetBaseOptGrp();
 
     const std::vector<OptionGrp *> *optionGrps = m_options->GetGrps();
-    for (auto const &optionGrp : *optionGrps) {
+    for (OptionGrp *optionGrp : *optionGrps) {
 
         jsonxx::Object grp;
         grp << "name" << optionGrp->GetLabel();
@@ -997,7 +997,7 @@ std::string Toolkit::GetAvailableOptions() const
 
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
-        for (auto const &option : *options) {
+        for (Option *option : *options) {
             // Reading json from file is not supported in toolkit
             const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
             if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
@@ -1566,7 +1566,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
 
     // Fill the JSON object
-    for (auto const item : notesOrRests) {
+    for (Object *item : notesOrRests) {
         if (item->Is(NOTE)) {
             noteArray << item->GetID();
             Note *note = vrv_cast<Note *>(item);
@@ -1579,7 +1579,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
         }
     }
     chords.unique();
-    for (auto const item : chords) {
+    for (Object *item : chords) {
         chordArray << item->GetID();
     }
 

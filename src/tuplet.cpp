@@ -160,7 +160,7 @@ void Tuplet::AdjustTupletBracketY(const Doc *doc, const Staff *staff)
     this->FindAllDescendantsByComparison(&descendants, &comparison);
 
     const int yReference = staff->GetDrawingY();
-    for (auto &descendant : descendants) {
+    for (Object *descendant : descendants) {
         if (!descendant->HasSelfBB()) continue;
         if (vrv_cast<LayerElement *>(descendant)->m_crossStaff) continue;
         if (m_drawingBracketPos == STAFFREL_basic_above) {
@@ -189,7 +189,7 @@ void Tuplet::AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, Tuplet
     ListOfObjects artics = this->FindAllDescendantsByType(ARTIC);
 
     int articPadding = 0;
-    for (auto &artic : artics) {
+    for (Object *artic : artics) {
         if (!artic->HasSelfBB()) continue;
         if (m_drawingBracketPos == STAFFREL_basic_above) {
             // Left point when slope is going up and right when going down
@@ -216,7 +216,7 @@ void Tuplet::AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, Tuplet
     int restAdjust = 0;
     const int bracketRel = bracket->GetDrawingYRel() - articPadding + bracketVerticalMargin;
     const int bracketPosition = (bracket->GetSelfTop() + bracket->GetSelfBottom() + bracketRel) / 2;
-    for (auto &descendant : descendants) {
+    for (Object *descendant : descendants) {
         if (descendant->GetFirstAncestor(BEAM) || !descendant->HasSelfBB()) continue;
         if (m_drawingBracketPos == STAFFREL_basic_above) {
             if (bracketPosition < descendant->GetSelfTop()) {
@@ -361,7 +361,7 @@ void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
     Staff *crossStaff = NULL;
     Layer *crossLayer = NULL;
     int crossStaffCount = 0;
-    for (auto object : descendants) {
+    for (Object *object : descendants) {
         LayerElement *durElement = vrv_cast<LayerElement *>(object);
         assert(durElement);
         if (crossStaff && durElement->m_crossStaff && (durElement->m_crossStaff != crossStaff)) {

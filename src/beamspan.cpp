@@ -76,7 +76,7 @@ void BeamSpan::InitBeamSegments()
 
 void BeamSpan::ClearBeamSegments()
 {
-    for (auto segment : m_beamSegments) {
+    for (BeamSpanSegment *segment : m_beamSegments) {
         delete segment;
     }
     m_beamSegments.clear();
@@ -91,7 +91,7 @@ const BeamSpanSegment *BeamSpan::GetSegmentForSystem(const System *system) const
 {
     assert(system);
 
-    for (auto segment : m_beamSegments) {
+    for (BeamSpanSegment *segment : m_beamSegments) {
         // make sure to process only segments for current system
         const Measure *segmentSystem = segment->GetMeasure();
         if (segmentSystem && vrv_cast<const System *>(segmentSystem->GetFirstAncestor(SYSTEM)) == system)

@@ -120,7 +120,7 @@ bool StaffDef::HasLayerDefWithLabel() const
     ListOfConstObjects layerDefs = this->FindAllDescendantsByType(LAYERDEF);
 
     // Then the @n of each first staffDef
-    for (auto &item : layerDefs) {
+    for (const Object *item : layerDefs) {
         if (item->FindDescendantByType(LABEL)) return true;
     }
     return false;

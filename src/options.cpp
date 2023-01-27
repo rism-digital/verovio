@@ -1912,7 +1912,7 @@ jsonxx::Object Options::GetBaseOptGrp()
     grpBase << "name" << m_baseOptions.GetLabel();
 
     const std::vector<Option *> *options = this->GetBaseOptions();
-    for (auto const &option : *options) {
+    for (Option *option : *options) {
         baseOpts << option->GetKey() << option->ToJson();
     }
 

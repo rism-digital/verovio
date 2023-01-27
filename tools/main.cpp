@@ -207,7 +207,7 @@ void display_usage(const vrv::Options *options, const std::string &category)
         std::cout << "Options (marked as * are repeatable)" << std::endl;
         if ((it->first == vrv::OptionsCategory::Base) || (it->first == vrv::OptionsCategory::Full)) {
             const std::vector<vrv::Option *> *baseOptions = options->GetBaseOptions();
-            for (auto const &option : *baseOptions) {
+            for (vrv::Option *option : *baseOptions) {
                 display_option(option);
             }
         }
@@ -218,7 +218,7 @@ void display_usage(const vrv::Options *options, const std::string &category)
                 std::cout << std::endl << group->GetLabel() << std::endl;
                 const std::vector<vrv::Option *> *options = group->GetOptions();
 
-                for (auto const &option : *options) {
+                for (vrv::Option *option : *options) {
                     display_option(option);
                 }
             }

@@ -185,7 +185,7 @@ bool Doc::GenerateDocumentScoreDef()
 
     this->GetCurrentScoreDef()->Reset();
     StaffGrp *staffGrp = new StaffGrp();
-    for (auto &object : staves) {
+    for (Object *object : staves) {
         Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
@@ -248,7 +248,7 @@ bool Doc::GenerateMeasureNumbers()
     ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
 
     // run through all measures and generate missing mNum from attribute
-    for (auto &object : measures) {
+    for (Object *object : measures) {
         Measure *measure = dynamic_cast<Measure *>(object);
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
@@ -825,8 +825,8 @@ void Doc::PrepareData()
 
     /************ Add default syl for syllables (if applicable) ************/
     ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
-    for (auto it = syllables.begin(); it != syllables.end(); ++it) {
-        Syllable *syllable = dynamic_cast<Syllable *>(*it);
+    for (Object *object : syllables) {
+        Syllable *syllable = dynamic_cast<Syllable *>(object);
         syllable->MarkupAddSyl();
     }
 
@@ -838,7 +838,7 @@ void Doc::PrepareData()
         this->Process(&prepareFacsimile, &prepareFacsimileParams);
 
         // Add default syl zone if one is not present.
-        for (auto &it : prepareFacsimileParams.m_zonelessSyls) {
+        for (Object *it : prepareFacsimileParams.m_zonelessSyls) {
             Syl *syl = vrv_cast<Syl *>(it);
             assert(syl);
             syl->CreateDefaultZone(this);
@@ -990,7 +990,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->SetDrawingPage(0);
 
     bool optimize = false;
-    for (auto const score : scores) {
+    for (Score *score : scores) {
         if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             optimize = true;
             break;
@@ -1013,7 +1013,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDataPage();
 
-    for (auto const score : scores) {
+    for (Score *score : scores) {
         score->CalcRunningElementHeight(this);
     }
 
@@ -1102,7 +1102,7 @@ void Doc::CastOffEncodingDoc()
     this->ScoreDefSetCurrentDoc(true);
 
     // Optimize the doc if one of the score requires optimization
-    for (auto const score : this->GetScores()) {
+    for (Score *score : this->GetScores()) {
         if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             this->ScoreDefOptimizeDoc();
             break;

@@ -854,7 +854,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
 {
     ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     int i = 0;
-    for (auto &object : objects) {
+    for (Object *object : objects) {
         if (child == object) return i;
         ++i;
     }
@@ -1222,9 +1222,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         a->FindAllDescendantsByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
+        for (Object *it : children) {
+            if (it->Is(SYL)) continue;
+            FacsimileInterface *temp = it->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
@@ -1236,9 +1236,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         b->FindAllDescendantsByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
+        for (Object *it : children) {
+            if (it->Is(SYL)) continue;
+            FacsimileInterface *temp = it->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
@@ -1609,7 +1609,7 @@ ClassId ObjectFactory::GetClassId(std::string name)
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
-    for (auto str : classStrings) {
+    for (const std::string &str : classStrings) {
         if (s_classIdsRegistry.count(str) > 0) {
             classIds.push_back(s_classIdsRegistry.at(str));
         }
@@ -1796,7 +1796,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = this->GetPlistInterface();
         assert(interface);
-        for (auto &object : interface->GetRefs()) {
+        for (Object *object : interface->GetRefs()) {
             params->m_elements->push_back(object);
         }
     }

@@ -91,7 +91,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     dc->StartPage();
 
-    for (auto child : m_currentPage->GetChildren()) {
+    for (Object *child : m_currentPage->GetChildren()) {
         if (child->IsPageElement()) {
             // cast to PageElement check in DrawSystemEditorial element
             this->DrawPageElement(dc, dynamic_cast<PageElement *>(child));
@@ -588,7 +588,7 @@ void View::DrawLabels(
         std::vector<std::u32string> lines;
         labelAbbr->GetTextLines(labelAbbr, lines);
         int maxLength = 0;
-        for (auto const &line : lines) {
+        for (std::u32string &line : lines) {
             dc->GetTextExtent(line, &extend, true);
             maxLength = (extend.m_width > maxLength) ? extend.m_width : maxLength;
         }
@@ -1260,7 +1260,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     this->DrawStaffDefCautionary(dc, staff, measure);
 
-    for (auto &spanningElement : staff->m_timeSpanningElements) {
+    for (Object *spanningElement : staff->m_timeSpanningElements) {
         system->AddToDrawingListIfNecessary(spanningElement);
     }
 
@@ -1315,7 +1315,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
                 fullLine.UpdateContentBBoxX(x1, x2);
                 int margin = m_doc->GetDrawingUnit(100) / 2;
                 ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
-                for (auto &note : notes) {
+                for (Object *note : notes) {
                     if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
                         line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
                     }
@@ -1610,7 +1610,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     assert(parent);
     assert(system);
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
             this->DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
@@ -1650,7 +1650,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(system);
 
     ListOfObjects objects = parent->FindAllDescendantsByType(BEAMSPAN, false);
-    for (auto element : objects) {
+    for (Object *element : objects) {
         BeamSpan *beamSpan = vrv_cast<BeamSpan *>(element);
         BeamSpanSegment *segment = beamSpan->GetSegmentForSystem(system);
         if (segment) {
@@ -1658,7 +1658,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
         }
     }
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             this->DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
@@ -1685,7 +1685,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
     assert(staff);
     assert(measure);
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->Is(LAYER)) {
             // cast to Layer check in DrawLayer
             this->DrawLayer(dc, dynamic_cast<Layer *>(current), staff, measure);
@@ -1708,7 +1708,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->IsLayerElement()) {
             this->DrawLayerElement(dc, dynamic_cast<LayerElement *>(current), layer, staff, measure);
         }
@@ -1738,7 +1738,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
         }
     }
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->IsTextElement()) {
             this->DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
@@ -1757,7 +1757,7 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
     assert(dc);
     assert(parent);
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->IsTextElement()) {
             this->DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
@@ -1776,7 +1776,7 @@ void View::DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingPar
     assert(dc);
     assert(parent);
 
-    for (auto current : parent->GetChildren()) {
+    for (Object *current : parent->GetChildren()) {
         if (current->Is(FIG)) {
             this->DrawFig(dc, dynamic_cast<Fig *>(current), params);
         }

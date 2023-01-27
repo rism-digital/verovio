@@ -231,7 +231,7 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
     // Now we can look for chords and note
     ClassIdsComparison matchType({ CHORD, NOTE });
     ListOfConstObjects children;
-    for (auto &measure : measures) {
+    for (const Object *measure : measures) {
         const Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
         const Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
         measure->FindAllDescendantsBetween(&children, &matchType, curStart, curEnd, false);
@@ -244,10 +244,10 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    for (auto &child : children) {
-        const Layer *layer = vrv_cast<const Layer *>((child)->GetFirstAncestor(LAYER));
+    for (const Object *child : children) {
+        const Layer *layer = vrv_cast<const Layer *>(child->GetFirstAncestor(LAYER));
         assert(layer);
-        const Staff *staff = vrv_cast<const Staff *>((child)->GetFirstAncestor(STAFF));
+        const Staff *staff = vrv_cast<const Staff *>(child->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measures, the children list will include notes and chords
