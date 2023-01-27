@@ -438,26 +438,12 @@ bool OptionArray::SetValue(const std::string &value)
 
 std::string OptionArray::GetStrValue() const
 {
-    std::stringstream ss;
-    for (int i = 0; i < (int)m_values.size(); ++i) {
-        if (i != 0) {
-            ss << ", ";
-        }
-        ss << "\"" << m_values.at(i) << "\"";
-    }
-    return ss.str();
+    return this->GetStr(m_values);
 }
 
 std::string OptionArray::GetDefaultStrValue() const
 {
-    std::stringstream ss;
-    for (int i = 0; i < (int)m_defaultValues.size(); ++i) {
-        if (i != 0) {
-            ss << ", ";
-        }
-        ss << "\"" << m_defaultValues.at(i) << "\"";
-    }
-    return ss.str();
+    return this->GetStr(m_defaultValues);
 }
 
 bool OptionArray::SetValue(std::vector<std::string> const &values)
@@ -476,6 +462,20 @@ void OptionArray::Reset()
 bool OptionArray::IsSet() const
 {
     return !m_values.empty();
+}
+
+std::string OptionArray::GetStr(const std::vector<std::string> &values) const
+{
+    std::stringstream ss;
+    int i = 0;
+    for (std::string const &value : values) {
+        if (i != 0) {
+            ss << ", ";
+        }
+        ss << "\"" << value << "\"";
+        ++i;
+    }
+    return ss.str();
 }
 
 //----------------------------------------------------------------------------
