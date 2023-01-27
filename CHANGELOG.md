@@ -3,6 +3,7 @@
 ## [unreleased]
 * Improved rendering of brackets (@eNote-GmbH)
 * Improved interaction between slurs and tuplets (@eNote-GmbH)
+* Fix in MIDI tempo calculation with `@mm.dots` (@wergo)
 * Fixes in the MusicXML importer (@eNote-GmbH)
 
 ## [3.14.0] - 2022-12-23
