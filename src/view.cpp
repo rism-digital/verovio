@@ -168,7 +168,7 @@ std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
     stream << number;
     std::u32string str = UTF8to32(stream.str());
 
-    for (char32_t c : str) {
+    for (char32_t &c : str) {
         c += offset - 48;
     }
     return str;
