@@ -13,7 +13,6 @@
 
 namespace vrv {
 
-class FunctorParams;
 class Layer;
 class LayerElement;
 class ResetDataFunctor;
@@ -71,11 +70,6 @@ public:
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
     FunctorCode InterfaceResetHorizontalAlignment(ResetHorizontalAlignmentFunctor &functor, Object *object);
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
 
 private:
     //

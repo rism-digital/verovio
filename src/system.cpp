@@ -509,14 +509,6 @@ FunctorCode System::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemEnd(this);
 }
 
-int System::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingXRel(0);
-    m_drawingAbbrLabelsWidth = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     this->SetDrawingYRel(0);

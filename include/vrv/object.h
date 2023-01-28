@@ -776,11 +776,6 @@ public:
     ///@{
 
     /**
-     * Reset the horizontal alignment environment for various types for object.
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Align horizontally the content of a page.
      * For each LayerElement, instanciate its Alignment.
      * It creates it if no other note or event occurs at its position.

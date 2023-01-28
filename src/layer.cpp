@@ -651,41 +651,6 @@ int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    if (this->GetStaffDefClef()) {
-        this->GetStaffDefClef()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetStaffDefKeySig()) {
-        this->GetStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetStaffDefMensur()) {
-        this->GetStaffDefMensur()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetStaffDefMeterSig()) {
-        this->GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetStaffDefMeterSigGrp()) {
-        Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-        this->GetStaffDefMeterSigGrp()->Process(&resetHorizontalAlignment, NULL);
-    }
-
-    if (this->GetCautionStaffDefClef()) {
-        this->GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetCautionStaffDefKeySig()) {
-        this->GetCautionStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetCautionStaffDefMensur()) {
-        this->GetCautionStaffDefMensur()->ResetHorizontalAlignment(functorParams);
-    }
-    if (this->GetCautionStaffDefMeterSig()) {
-        this->GetCautionStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::AlignHorizontally(FunctorParams *functorParams)
 {
     AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);

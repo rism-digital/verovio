@@ -816,24 +816,6 @@ int Measure::SaveEnd(FunctorParams *functorParams)
     return (this->IsMeasuredMusic()) ? Object::SaveEnd(functorParams) : FUNCTOR_CONTINUE;
 }
 
-int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingXRel(0);
-    if (m_measureAligner.GetLeftAlignment()) {
-        m_measureAligner.GetLeftAlignment()->SetXRel(0);
-    }
-    if (m_measureAligner.GetRightAlignment()) {
-        m_measureAligner.GetRightAlignment()->SetXRel(0);
-    }
-
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
-
-    m_hasAlignmentRefWithMultipleLayers = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);

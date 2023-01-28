@@ -296,15 +296,6 @@ FunctorCode Dots::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDotsEnd(this);
 }
 
-int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_dotLocsByStaff.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode Flag::Accept(MutableFunctor &functor)
 {
     return functor.VisitFlag(this);
@@ -345,18 +336,6 @@ FunctorCode TupletBracket::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTupletBracketEnd(this);
 }
 
-int TupletBracket::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_drawingXRelLeft = 0;
-    m_drawingXRelRight = 0;
-    m_alignedNum = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -386,16 +365,6 @@ FunctorCode TupletNum::AcceptEnd(MutableFunctor &functor)
 FunctorCode TupletNum::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTupletNumEnd(this);
-}
-
-int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_alignedBracket = NULL;
-
-    return FUNCTOR_CONTINUE;
 }
 
 int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)

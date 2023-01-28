@@ -113,11 +113,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustArpeg
      */
     ///@{

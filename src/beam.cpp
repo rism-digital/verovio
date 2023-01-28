@@ -2242,14 +2242,4 @@ int Beam::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_beamSegment.m_stemSameasRole = SAMEAS_NONE;
-    m_beamSegment.m_stemSameasReverseRole = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

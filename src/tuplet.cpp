@@ -701,18 +701,6 @@ int Tuplet::AdjustTupletWithSlurs(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Tuplet::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_drawingBracketPos = STAFFREL_basic_NONE;
-    m_bracketAlignedBeam = NULL;
-    m_numAlignedBeam = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Tuplet::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Call parent one too

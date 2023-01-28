@@ -763,13 +763,6 @@ FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreDefEnd(this);
 }
 
-int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    m_drawingLabelsWidth = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);

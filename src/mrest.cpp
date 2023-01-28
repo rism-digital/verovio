@@ -91,14 +91,6 @@ int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const
 {
     if (!layer) return defaultLocation;

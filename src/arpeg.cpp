@@ -204,13 +204,6 @@ FunctorCode Arpeg::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitArpegEnd(this);
 }
 
-int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    m_drawingXRel = 0;
-
-    return ControlElement::ResetHorizontalAlignment(functorParams);
-}
-
 int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 {
     AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);

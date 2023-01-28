@@ -1165,20 +1165,6 @@ FunctorCode LayerElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitLayerElementEnd(this);
 }
 
-int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingXRel(0);
-    // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
-    // See Object::CalcAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
-    this->SetDrawingYRel(0);
-
-    m_alignment = NULL;
-    m_graceAlignment = NULL;
-    m_alignmentLayerN = VRV_UNSET;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in CalcAlignmentPitchPos

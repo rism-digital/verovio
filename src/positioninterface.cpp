@@ -90,11 +90,4 @@ FunctorCode PositionInterface::InterfaceResetHorizontalAlignment(
     return FUNCTOR_CONTINUE;
 }
 
-int PositionInterface::InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object)
-{
-    m_drawingLoc = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

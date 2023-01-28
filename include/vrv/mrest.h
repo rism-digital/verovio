@@ -75,11 +75,6 @@ public:
      */
     int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
 private:
     //
 public:

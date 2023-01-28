@@ -27,6 +27,7 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "system.h"
@@ -197,8 +198,8 @@ void Page::LayOutTranscription(bool force)
     assert(this == doc->GetDrawingPage());
 
     // Reset the horizontal alignment
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    this->Process(&resetHorizontalAlignment, NULL);
+    ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
+    this->Process(resetHorizontalAlignment);
 
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
@@ -263,8 +264,8 @@ void Page::ResetAligners()
     assert(this == doc->GetDrawingPage());
 
     // Reset the horizontal alignment
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    this->Process(&resetHorizontalAlignment, NULL);
+    ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
+    this->Process(resetHorizontalAlignment);
 
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);

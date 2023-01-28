@@ -1143,19 +1143,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    m_drawingLoc = 0;
-    m_flippedNotehead = false;
-    // Re-mark the role as unsed if we have a shared stem
-    if (this->HasStemSameasNote()) m_stemSameasRole = SAMEAS_UNSET;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Note::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
