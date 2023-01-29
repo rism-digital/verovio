@@ -1402,6 +1402,12 @@
 		E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198328CD31AD00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
+		E7908E9F298582090004C1F9 /* alignfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7908E9E298582090004C1F9 /* alignfunctor.h */; };
+		E7908EA0298582090004C1F9 /* alignfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7908E9E298582090004C1F9 /* alignfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7908EA22985829F0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
+		E7908EA32985829F0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
+		E7908EA4298582DE0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
+		E7908EA5298582DF0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
 		E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
 		E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
 		E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
@@ -1932,6 +1938,8 @@
 		E765675B28BC019F00BC6490 /* functor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functor.h; path = include/vrv/functor.h; sourceTree = "<group>"; };
 		E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdotsfunctor.h; path = include/vrv/calcdotsfunctor.h; sourceTree = "<group>"; };
 		E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcdotsfunctor.cpp; path = src/calcdotsfunctor.cpp; sourceTree = "<group>"; };
+		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
+		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
 		E79ADDC326BD1AE900527E4B /* runtimeclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = runtimeclock.h; path = include/vrv/runtimeclock.h; sourceTree = "<group>"; };
 		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
@@ -2680,6 +2688,8 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
+				E7908EA12985829F0004C1F9 /* alignfunctor.cpp */,
+				E7908E9E298582090004C1F9 /* alignfunctor.h */,
 				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
 				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
@@ -2739,6 +2749,7 @@
 				BD6E5C41290007CE0039B0F1 /* graphic.h in Headers */,
 				4DB3D89A1F7C326800B5FC2B /* fb.h in Headers */,
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
+				E7908E9F298582090004C1F9 /* alignfunctor.h in Headers */,
 				4DB3D8C71F83D0FD00B5FC2B /* breath.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
@@ -2977,6 +2988,7 @@
 				BB4C4B9022A932DF001F6AF0 /* text.h in Headers */,
 				BB4C4B4822A932D7001F6AF0 /* chord.h in Headers */,
 				4DACC97F2990F29A00B55913 /* atts_figtable.h in Headers */,
+				E7908EA0298582090004C1F9 /* alignfunctor.h in Headers */,
 				BB4C4B9822A932E5001F6AF0 /* durationinterface.h in Headers */,
 				BB4C4BB722A932F6001F6AF0 /* jsonxx.h in Headers */,
 				BB4C4B1622A932C8001F6AF0 /* systemelement.h in Headers */,
@@ -3466,6 +3478,7 @@
 				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
 				4D27E13827F582BB00D64FBD /* docselection.cpp in Sources */,
 				E74A806328BC911D005274E7 /* findfunctor.cpp in Sources */,
+				E7908EA4298582DE0004C1F9 /* alignfunctor.cpp in Sources */,
 				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
 				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
@@ -3694,6 +3707,7 @@
 				403BEFF0206C00B500D022D5 /* multirpt.cpp in Sources */,
 				4D766EFA20ACAD63006875D8 /* syllable.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
+				E7908EA5298582DF0004C1F9 /* alignfunctor.cpp in Sources */,
 				4D766EFB20ACAD63006875D8 /* nc.cpp in Sources */,
 				4DEC4DAE21C81F0600D1D273 /* sic.cpp in Sources */,
 				40C2E41F2052A6E00003625F /* pb.cpp in Sources */,
@@ -3951,6 +3965,7 @@
 				8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */,
 				4DB3D8ED1F83D18C00B5FC2B /* space.cpp in Sources */,
 				4D27E13927F582BB00D64FBD /* docselection.cpp in Sources */,
+				E7908EA22985829F0004C1F9 /* alignfunctor.cpp in Sources */,
 				E74A806128BC9111005274E7 /* findfunctor.cpp in Sources */,
 				8F3DD35218854B2E0051330C /* rest.cpp in Sources */,
 				4DEC4D9421C81E0B00D1D273 /* del.cpp in Sources */,
@@ -4186,6 +4201,7 @@
 				BB4C4ADD22A932BC001F6AF0 /* add.cpp in Sources */,
 				BB4C4B1122A932C8001F6AF0 /* expansion.cpp in Sources */,
 				4D27E13A27F582BB00D64FBD /* docselection.cpp in Sources */,
+				E7908EA32985829F0004C1F9 /* alignfunctor.cpp in Sources */,
 				E74A806228BC9111005274E7 /* findfunctor.cpp in Sources */,
 				BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */,
 				BB4C4B5122A932D7001F6AF0 /* ftrem.cpp in Sources */,
