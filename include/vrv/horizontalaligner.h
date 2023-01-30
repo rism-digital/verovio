@@ -282,7 +282,7 @@ private:
     int m_xRel;
     /**
      * Stores the time at which the alignment occur.
-     * It is set by Object::AlignHorizontally.
+     * It is set by the AlignHorizontallyFunctor.
      */
     double m_time;
     /**

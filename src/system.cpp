@@ -531,17 +531,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignHorizontally(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    // since we are starting a new system its first scoreDef will need to be a SYSTEM_SCOREDEF
-    params->m_isFirstMeasure = true;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);

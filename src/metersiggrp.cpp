@@ -192,9 +192,4 @@ FunctorCode MeterSigGrp::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeterSigGrpEnd(this);
 }
 
-int MeterSigGrp::AlignHorizontally(FunctorParams *)
-{
-    return this->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
@@ -208,10 +209,8 @@ void Page::LayOutTranscription(bool force)
     // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
-    Functor alignHorizontally(&Object::AlignHorizontally);
-    Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
-    this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
+    AlignHorizontallyFunctor alignHorizontally(doc);
+    this->Process(alignHorizontally);
 
     // Align the content of the page using system aligners
     // After this:
@@ -274,10 +273,8 @@ void Page::ResetAligners()
     // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
-    Functor alignHorizontally(&Object::AlignHorizontally);
-    Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
-    this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
+    AlignHorizontallyFunctor alignHorizontally(doc);
+    this->Process(alignHorizontally);
 
     // Align the content of the page using system aligners
     // After this:

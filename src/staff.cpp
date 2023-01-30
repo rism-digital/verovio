@@ -399,25 +399,6 @@ int Staff::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::AlignHorizontally(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    assert(m_drawingStaffDef);
-
-    if (m_drawingStaffDef->HasNotationtype()) {
-        params->m_notationType = m_drawingStaffDef->GetNotationtype();
-    }
-    else {
-        params->m_notationType = NOTATIONTYPE_cmn;
-    }
-    Measure *parentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-    if (parentMeasure) m_drawingStaffDef->AlternateCurrentMeterSig(parentMeasure);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);

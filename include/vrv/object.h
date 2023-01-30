@@ -776,19 +776,6 @@ public:
     ///@{
 
     /**
-     * Align horizontally the content of a page.
-     * For each LayerElement, instanciate its Alignment.
-     * It creates it if no other note or event occurs at its position.
-     * At the end, for each Layer, align the grace note stacked in GraceAlignment.
-     */
-    virtual int AlignHorizontally(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AlignHorizontally
-     */
-    virtual int AlignHorizontallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * At the end, store the width of the system in the MeasureAligner for justification.
      */

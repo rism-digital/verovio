@@ -748,50 +748,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AlignHorizontallyParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the measureAligner
- * member 1: the time
- * member 2: the current Mensur
- * member 3: the current MeterSig
- * member 4: the current notation type
- * member 5: the functor for passing it to the TimeStampAligner
- * member 6: a flag indicating whereas we are processing the caution scoreDef
- * member 7: a flag indicating is we are in the first measure (for the scoreDef role)
- * member 8: a flag indicating if we had mutliple layer alignment reference in the measure
- * member 9: the doc
- **/
-
-class AlignHorizontallyParams : public FunctorParams {
-public:
-    AlignHorizontallyParams(Functor *functor, Doc *doc)
-    {
-        m_measureAligner = NULL;
-        m_time = 0.0;
-        m_currentMensur = NULL;
-        m_currentMeterSig = NULL;
-        m_notationType = NOTATIONTYPE_cmn;
-        m_functor = functor;
-        m_scoreDefRole = SCOREDEF_NONE;
-        m_isFirstMeasure = false;
-        m_hasMultipleLayer = false;
-        m_doc = doc;
-    }
-    MeasureAligner *m_measureAligner;
-    double m_time;
-    Mensur *m_currentMensur;
-    MeterSig *m_currentMeterSig;
-    data_NOTATIONTYPE m_notationType;
-    Functor *m_functor;
-    ElementScoreDefRole m_scoreDefRole;
-    bool m_isFirstMeasure;
-    bool m_hasMultipleLayer;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AlignMeasuresParams
 //----------------------------------------------------------------------------
 

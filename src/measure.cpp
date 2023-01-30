@@ -827,47 +827,6 @@ int Measure::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AlignHorizontally(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    // clear the content of the measureAligner
-    m_measureAligner.Reset();
-
-    // point to it
-    params->m_measureAligner = &m_measureAligner;
-    params->m_hasMultipleLayer = false;
-
-    if (m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment())) params->m_hasMultipleLayer = true;
-    if (m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment())) params->m_hasMultipleLayer = true;
-
-    assert(params->m_measureAligner);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    int meterUnit = (params->m_currentMeterSig) ? params->m_currentMeterSig->GetUnit() : 4;
-    m_measureAligner.SetInitialTstamp(meterUnit);
-
-    // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
-    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work
-    // in MEI anyway.
-    m_timestampAligner.Process(params->m_functor, params);
-
-    // Next scoreDef will be INTERMEDIATE_SCOREDEF (See Layer::AlignHorizontally)
-    params->m_isFirstMeasure = false;
-
-    if (params->m_hasMultipleLayer) m_hasAlignmentRefWithMultipleLayers = true;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
