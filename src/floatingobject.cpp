@@ -519,7 +519,7 @@ void FloatingPositioner::CalcDrawingYRel(
     }
 }
 
-void FloatingPositioner::AlignExtenders()
+void FloatingPositioner::AdjustExtenders()
 {
     const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
     if (!isExtender) return;

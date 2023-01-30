@@ -282,7 +282,7 @@ public:
     /**
      * Align extender elements across systems
      */
-    void AlignExtenders();
+    void AdjustExtenders();
 
     /**
      * Calculate the vertical space below the element and above the bounding box
