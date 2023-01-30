@@ -13,7 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "atttypes.h"
-#include "vrvdef.h"
+#include "attdef.h"
 
 namespace vrv {
 

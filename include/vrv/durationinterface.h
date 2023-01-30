@@ -12,6 +12,7 @@
 #include "atts_gestural.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "interface.h"
 
 namespace vrv {
 

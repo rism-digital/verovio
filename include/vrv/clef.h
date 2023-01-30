@@ -11,6 +11,7 @@
 #include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

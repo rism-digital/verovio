@@ -14,6 +14,7 @@
 #include "atts_midi.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {

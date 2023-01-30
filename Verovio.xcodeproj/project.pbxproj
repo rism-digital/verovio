@@ -688,6 +688,8 @@
 		4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */; };
 		4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
+		4DE0B9A12988070C00D4C939 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0B9A02988070C00D4C939 /* interface.h */; };
+		4DE0B9A22988070C00D4C939 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0B9A02988070C00D4C939 /* interface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE644F41EDBEA01002FBE6C /* breath.cpp */; };
 		4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE96E3821C4370E00CB85BE /* bracketspan.h */; };
 		4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
@@ -1633,6 +1635,7 @@
 		4DDBBB591C7AE45900054AFF /* dynam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynam.cpp; path = src/dynam.cpp; sourceTree = "<group>"; };
 		4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hairpin.cpp; path = src/hairpin.cpp; sourceTree = "<group>"; };
 		4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_text.cpp; path = src/view_text.cpp; sourceTree = "<group>"; };
+		4DE0B9A02988070C00D4C939 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interface.h; path = include/vrv/interface.h; sourceTree = "<group>"; };
 		4DE644F31EDBE9F8002FBE6C /* breath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = breath.h; path = include/vrv/breath.h; sourceTree = "<group>"; };
 		4DE644F41EDBEA01002FBE6C /* breath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = breath.cpp; path = src/breath.cpp; sourceTree = "<group>"; };
 		4DE96E3821C4370E00CB85BE /* bracketspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bracketspan.h; path = include/vrv/bracketspan.h; sourceTree = "<group>"; };
@@ -2306,6 +2309,7 @@
 				4DF440791D3D085600152B7E /* functorparams.h */,
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
+				4DE0B9A02988070C00D4C939 /* interface.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				4DA80D951A6ACF5D0089802D /* options.cpp */,
@@ -2609,6 +2613,7 @@
 				4DB3D8BA1F83D0CA00B5FC2B /* systemmilestone.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
 				40C2E4202052A6E90003625F /* sb.h in Headers */,
+				4DE0B9A12988070C00D4C939 /* interface.h in Headers */,
 				4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */,
 				4DB3D8DB1F83D13F00B5FC2B /* turn.h in Headers */,
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
@@ -2955,6 +2960,7 @@
 				BB4C4B6E22A932D7001F6AF0 /* note.h in Headers */,
 				BB4C4BA422A932E5001F6AF0 /* textdirinterface.h in Headers */,
 				BB4C4A8E22A9328F001F6AF0 /* attalternates.h in Headers */,
+				4DE0B9A22988070C00D4C939 /* interface.h in Headers */,
 				4DC3B9EB239E2B23007F185E /* transposition.h in Headers */,
 				BB4C4BC122A932FC001F6AF0 /* MidiMessage.h in Headers */,
 				BB4C4B9222A932DF001F6AF0 /* textelement.h in Headers */,

@@ -14,7 +14,6 @@
 
 #include "attalternates.h"
 #include "attconverter.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
@@ -37,6 +36,7 @@ public:
     virtual ~Att();
     ///@}
 
+#ifndef ATT_NO_STATIC
     /**
      * @name static method for blind attribute modification
      * The implementation is implemented by LibMEI in each module corresponding file
@@ -105,7 +105,8 @@ public:
     static bool IsMensuralType(data_NOTATIONTYPE notationType);
     static bool IsNeumeType(data_NOTATIONTYPE notationType);
     static bool IsTabType(data_NOTATIONTYPE notationType);
-
+#endif
+    
 public:
     /** Dummy string converter */
     std::string StrToStr(std::string str) const;
@@ -240,58 +241,6 @@ public:
     std::string PlacementToStr(data_PLACEMENT data) const;
     data_PLACEMENT StrToPlacement(const std::string &value, bool logWarning = true) const;
     ///@}
-};
-
-//----------------------------------------------------------------------------
-// Interface
-//----------------------------------------------------------------------------
-
-/**
- * This is a base class for regrouping MEI att classes.
- * It is not an abstract class but it should not be instanciated directly.
- * The inherited classes should override the InterfaceId method for returning
- * their own InterfaceId.
- */
-
-class Interface {
-
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    Interface(){};
-    virtual ~Interface(){};
-    ///@}
-
-    /**
-     * Method for registering an MEI att classes in the interface.
-     */
-    void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); }
-
-    /**
-     * Method for obtaining a pointer to the attribute class vector of the interface
-     */
-    std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; }
-
-    /**
-     * Virtual reset method.
-     * Needs to be overridden in child classes.
-     */
-    virtual void Reset() {}
-
-    /**
-     * Virtual method returning the InterfaceId of the interface.
-     * Needs to be overridden in child classes.
-     */
-    virtual InterfaceId IsInterface() const { return INTERFACE; }
-
-private:
-    /**
-     * A vector for storing all the MEI att classes grouped in the interface
-     */
-    std::vector<AttClassId> m_interfaceAttClasses;
 };
 
 } // namespace vrv
