@@ -210,6 +210,7 @@ public:
     Alignment *GetAlignment() { return m_alignment; }
     const Alignment *GetAlignment() const { return m_alignment; }
     void ResetAlignment() { m_alignment = NULL; }
+    void SetAlignment(Alignment *alignment) { m_alignment = alignment; }
     ///@}
 
     /**
