@@ -76,6 +76,57 @@ private:
     bool m_hasMultipleLayer;
 };
 
+//----------------------------------------------------------------------------
+// AlignMeasuresFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class aligns the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
+ * At the end, store the width of the system in the MeasureAligner for justification.
+ */
+class AlignMeasuresFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AlignMeasuresFunctor(Doc *doc);
+    virtual ~AlignMeasuresFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitSection(Section *section) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemEnd(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The cumulated shift
+    int m_shift;
+    // The cumulated justifiable width
+    int m_justifiableWidth;
+    // Shift next measure due to section restart?
+    bool m_applySectionRestartShift;
+    // Store castoff system widths if true
+    bool m_storeCastOffSystemWidths;
+};
+
 } // namespace vrv
 
 #endif // __VRV_ALIGNFUNCTOR_H__

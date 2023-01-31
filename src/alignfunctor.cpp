@@ -395,4 +395,41 @@ FunctorCode AlignHorizontallyFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// AlignMeasuresFunctor
+//----------------------------------------------------------------------------
+
+AlignMeasuresFunctor::AlignMeasuresFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_shift = 0;
+    m_justifiableWidth = 0;
+    m_applySectionRestartShift = false;
+    m_storeCastOffSystemWidths = false;
+}
+
+FunctorCode AlignMeasuresFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignMeasuresFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignMeasuresFunctor::VisitSection(Section *section)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignMeasuresFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignMeasuresFunctor::VisitSystemEnd(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
