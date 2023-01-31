@@ -33,6 +33,7 @@
 #include "staffgrp.h"
 #include "symboltable.h"
 #include "system.h"
+#include "tempo.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -810,6 +811,21 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
         if (this->FindDescendantByComparison(&comparison)) {
             params->m_applySectionRestartShift = false;
         }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
+{
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasMidiBpm()) {
+        params->m_currentTempo = this->GetMidiBpm();
+    }
+    else if (this->HasMm()) {
+        params->m_currentTempo = Tempo::CalcTempo(this);
     }
 
     return FUNCTOR_CONTINUE;
