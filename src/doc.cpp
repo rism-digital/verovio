@@ -332,6 +332,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     if (this->GetCurrentScoreDef()->HasMidiBpm()) {
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
     }
+    else if (this->GetCurrentScoreDef()->HasMm()) {
+        tempo = Tempo::CalcTempo(this->GetCurrentScoreDef());
+    }
     midiFile->addTempo(0, 0, tempo);
 
     // Capture information for MIDI generation, i.e. from control elements
