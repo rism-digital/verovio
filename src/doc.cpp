@@ -291,8 +291,7 @@ void Doc::CalculateTimemap()
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
     }
     else if (this->GetCurrentScoreDef()->HasMm()) {
-        double t = Tempo::CalcTempo(this->GetCurrentScoreDef());
-        if (t > 0) tempo = t;
+        tempo = Tempo::CalcTempo(this->GetCurrentScoreDef());
     }
 
     // We first calculate the maximum duration of each measure

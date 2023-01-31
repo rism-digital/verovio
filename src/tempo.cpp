@@ -143,8 +143,7 @@ int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
         params->m_currentTempo = this->GetMidiBpm();
     }
     else if (this->HasMm()) {
-        double tempo = Tempo::CalcTempo(this);
-        if (tempo > 0) params->m_currentTempo = tempo;
+        params->m_currentTempo = Tempo::CalcTempo(this);
     }
 
     return FUNCTOR_CONTINUE;
@@ -152,7 +151,7 @@ int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
 
 double Tempo::CalcTempo(const AttMmTempo *attMmTempo)
 {
-    double tempo = 0.0;
+    double tempo = MIDI_TEMPO;
 
     double mm = attMmTempo->GetMm();
     double mmUnit = 4;
