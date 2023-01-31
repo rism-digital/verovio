@@ -14,7 +14,9 @@
 #include "layer.h"
 #include "ligature.h"
 #include "rest.h"
+#include "section.h"
 #include "staff.h"
+#include "system.h"
 #include "tabgrp.h"
 
 //----------------------------------------------------------------------------
@@ -409,26 +411,62 @@ AlignMeasuresFunctor::AlignMeasuresFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignMeasuresFunctor::VisitMeasure(Measure *measure)
 {
-    return FUNCTOR_CONTINUE;
+    if (m_applySectionRestartShift) {
+        m_shift += measure->GetSectionRestartShift(m_doc);
+        m_applySectionRestartShift = false;
+    }
+
+    measure->SetDrawingXRel(m_shift);
+
+    m_shift += measure->GetWidth();
+    m_justifiableWidth += measure->GetRightBarLineXRel() - measure->GetLeftBarLineXRel();
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AlignMeasuresFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
+    m_shift += scoreDef->GetDrawingLabelsWidth();
+
+    if (m_applySectionRestartShift) {
+        ClassIdsComparison comparison({ LABEL, LABELABBR });
+        if (scoreDef->FindDescendantByComparison(&comparison)) {
+            m_applySectionRestartShift = false;
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignMeasuresFunctor::VisitSection(Section *section)
 {
+    if (section->GetRestart() == BOOLEAN_true) {
+        m_applySectionRestartShift = true;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignMeasuresFunctor::VisitSystem(System *system)
 {
+    system->SetDrawingXRel(system->m_systemLeftMar + system->GetDrawingLabelsWidth());
+    m_shift = 0;
+    m_justifiableWidth = 0;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignMeasuresFunctor::VisitSystemEnd(System *system)
 {
+    if (m_storeCastOffSystemWidths) {
+        system->m_castOffTotalWidth = m_shift + system->GetDrawingLabelsWidth();
+        system->m_castOffJustifiableWidth = m_justifiableWidth;
+    }
+    else {
+        system->m_drawingTotalWidth = m_shift + system->GetDrawingLabelsWidth();
+        system->m_drawingJustifiableWidth = m_justifiableWidth;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
