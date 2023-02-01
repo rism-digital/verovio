@@ -776,17 +776,6 @@ public:
     ///@{
 
     /**
-     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * At the end, store the width of the system in the MeasureAligner for justification.
-     */
-    virtual int AlignMeasures(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AlignMeasures
-     */
-    virtual int AlignMeasuresEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calc the position of the Alignment.
      * Looks at the time difference from the previous Alignment.
      */

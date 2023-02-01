@@ -463,10 +463,8 @@ void Page::LayOutHorizontally()
     this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
 
     // Adjust measure X position
-    AlignMeasuresParams alignMeasuresParams(doc);
-    Functor alignMeasures(&Object::AlignMeasures);
-    Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
-    this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+    AlignMeasuresFunctor alignMeasures(doc);
+    this->Process(alignMeasures);
 }
 
 void Page::LayOutHorizontallyWithCache(bool restore)

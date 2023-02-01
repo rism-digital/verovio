@@ -242,14 +242,6 @@ public:
     int AlignSystems(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::AlignMeasures
-     */
-    ///@{
-    int AlignMeasures(FunctorParams *functorParams) override;
-    int AlignMeasuresEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::JustifyX
      */
     int JustifyX(FunctorParams *functorParams) override;

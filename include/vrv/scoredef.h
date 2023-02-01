@@ -304,11 +304,6 @@ public:
     int CastOffToSelection(FunctorParams *) override;
 
     /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;

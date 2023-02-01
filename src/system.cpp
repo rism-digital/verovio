@@ -745,35 +745,6 @@ int System::AdjustYPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    this->SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
-    params->m_shift = 0;
-    params->m_justifiableWidth = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AlignMeasuresEnd(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    if (params->m_storeCastOffSystemWidths) {
-        m_castOffTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-        m_castOffJustifiableWidth = params->m_justifiableWidth;
-    }
-    else {
-        m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-        m_drawingJustifiableWidth = params->m_justifiableWidth;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);

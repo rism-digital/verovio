@@ -100,6 +100,11 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Set if castoff system widths should be stored
+     */
+    void StoreCastOffSystemWidths(bool storeWidths) { m_storeCastOffSystemWidths = storeWidths; }
+
+    /*
      * Functor interface
      */
     ///@{

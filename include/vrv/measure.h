@@ -397,11 +397,6 @@ public:
     int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
-
-    /**
      * See Object::JustifyX
      */
     int JustifyX(FunctorParams *functorParams) override;

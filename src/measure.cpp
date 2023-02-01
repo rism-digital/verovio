@@ -1126,24 +1126,6 @@ int Measure::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    if (params->m_applySectionRestartShift) {
-        params->m_shift += this->GetSectionRestartShift(params->m_doc);
-        params->m_applySectionRestartShift = false;
-    }
-
-    this->SetDrawingXRel(params->m_shift);
-
-    params->m_shift += this->GetWidth();
-    params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Measure::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
