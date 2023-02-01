@@ -19,17 +19,24 @@ LOCAL_SRC_FILES := \
 	$(ROOT_PATH)/libmei/atts_cmn.cpp \
 	$(ROOT_PATH)/libmei/atts_cmnornaments.cpp \
 	$(ROOT_PATH)/libmei/atts_critapp.cpp \
-	$(ROOT_PATH)/libmei/atts_gestural.cpp \
+	$(ROOT_PATH)/libmei/atts_edittrans.cpp \
 	$(ROOT_PATH)/libmei/atts_externalsymbols.cpp \
 	$(ROOT_PATH)/libmei/atts_facsimile.cpp \
+	$(ROOT_PATH)/libmei/atts_figtable.cpp \
+	$(ROOT_PATH)/libmei/atts_fingering.cpp \
 	$(ROOT_PATH)/libmei/atts_frettab.cpp \
+	$(ROOT_PATH)/libmei/atts_gestural.cpp \
+	$(ROOT_PATH)/libmei/atts_harmony.cpp \
+	$(ROOT_PATH)/libmei/atts_header.cpp \
 	$(ROOT_PATH)/libmei/atts_mei.cpp \
 	$(ROOT_PATH)/libmei/atts_mensural.cpp \
 	$(ROOT_PATH)/libmei/atts_midi.cpp \
 	$(ROOT_PATH)/libmei/atts_neumes.cpp \
 	$(ROOT_PATH)/libmei/atts_pagebased.cpp \
+	$(ROOT_PATH)/libmei/atts_performance.cpp \
 	$(ROOT_PATH)/libmei/atts_shared.cpp \
-	$(ROOT_PATH)/libmei/atts_visual.cpp
+	$(ROOT_PATH)/libmei/atts_usersymbols.cpp \
+	$(ROOT_PATH)/libmei/atts_visual.cpp \
 	
 LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include \
