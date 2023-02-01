@@ -2688,16 +2688,11 @@
 		E765675628BBF9CD00BC6490 /* functors */ = {
 			isa = PBXGroup;
 			children = (
+				E786CD09298AA3BC009BAC58 /* horizontal-layout */,
+				E786CD0A298AA3D8009BAC58 /* vertical-layout */,
+				E786CD0B298AA450009BAC58 /* search */,
 				E7908EA12985829F0004C1F9 /* alignfunctor.cpp */,
 				E7908E9E298582090004C1F9 /* alignfunctor.h */,
-				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
-				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
-				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
-				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
-				E74A806028BC9111005274E7 /* findfunctor.cpp */,
-				E74A806528BC97D5005274E7 /* findfunctor.h */,
-				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
-				E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
@@ -2709,6 +2704,35 @@
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 			);
 			name = functors;
+			sourceTree = "<group>";
+		};
+		E786CD09298AA3BC009BAC58 /* horizontal-layout */ = {
+			isa = PBXGroup;
+			children = (
+				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
+				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
+			);
+			name = "horizontal-layout";
+			sourceTree = "<group>";
+		};
+		E786CD0A298AA3D8009BAC58 /* vertical-layout */ = {
+			isa = PBXGroup;
+			children = (
+				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
+				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
+			);
+			name = "vertical-layout";
+			sourceTree = "<group>";
+		};
+		E786CD0B298AA450009BAC58 /* search */ = {
+			isa = PBXGroup;
+			children = (
+				E74A806028BC9111005274E7 /* findfunctor.cpp */,
+				E74A806528BC97D5005274E7 /* findfunctor.h */,
+				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
+				E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */,
+			);
+			name = search;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
