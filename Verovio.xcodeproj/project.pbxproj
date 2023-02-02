@@ -1402,6 +1402,12 @@
 		E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198328CD31AD00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
+		E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; };
+		E790165A298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
+		E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
+		E7901661298BCB2C008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
+		E7901662298BCB2D008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
 		E7908E9F298582090004C1F9 /* alignfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7908E9E298582090004C1F9 /* alignfunctor.h */; };
 		E7908EA0298582090004C1F9 /* alignfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7908E9E298582090004C1F9 /* alignfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7908EA22985829F0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
@@ -1938,6 +1944,8 @@
 		E765675B28BC019F00BC6490 /* functor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functor.h; path = include/vrv/functor.h; sourceTree = "<group>"; };
 		E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdotsfunctor.h; path = include/vrv/calcdotsfunctor.h; sourceTree = "<group>"; };
 		E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcdotsfunctor.cpp; path = src/calcdotsfunctor.cpp; sourceTree = "<group>"; };
+		E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentxposfunctor.h; path = include/vrv/calcalignmentxposfunctor.h; sourceTree = "<group>"; };
+		E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentxposfunctor.cpp; path = src/calcalignmentxposfunctor.cpp; sourceTree = "<group>"; };
 		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
 		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
 		E79ADDC326BD1AE900527E4B /* runtimeclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = runtimeclock.h; path = include/vrv/runtimeclock.h; sourceTree = "<group>"; };
@@ -2709,6 +2717,8 @@
 		E786CD09298AA3BC009BAC58 /* horizontal-layout */ = {
 			isa = PBXGroup;
 			children = (
+				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
+				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
 			);
@@ -2946,6 +2956,7 @@
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
 				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
 				4DB3D8B41F83D08700B5FC2B /* devicecontextbase.h in Headers */,
+				E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BDEF9ECC26725248008A3A47 /* caesura.h in Headers */,
 				4DEC4DD921C8295700D1D273 /* rdg.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
@@ -3024,6 +3035,7 @@
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
 				4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */,
 				4DF092A32497706600239195 /* phrase.h in Headers */,
+				E790165A298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BB4C4B9622A932E5001F6AF0 /* drawinginterface.h in Headers */,
 				BB4C4B4022A932D7001F6AF0 /* barline.h in Headers */,
 				BB4C4B9E22A932E5001F6AF0 /* plistinterface.h in Headers */,
@@ -3398,6 +3410,7 @@
 			files = (
 				4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */,
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
+				E7901661298BCB2C008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */,
 				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
@@ -3869,6 +3882,7 @@
 				BD2E4D95287587FD00B04350 /* stem.cpp in Sources */,
 				E77C198328CD31AD00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
+				E7901662298BCB2D008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				4DEC4DB221C826E000D1D273 /* supplied.cpp in Sources */,
 				4D20740A22A4FDFA00E0765F /* course.cpp in Sources */,
 				4DA0EAC322BB779400A7EBEB /* surface.cpp in Sources */,
@@ -3883,6 +3897,7 @@
 			files = (
 				4DEF8A6621B7AAF90093A76B /* f.cpp in Sources */,
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
+				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
 				4D766F0220ACAD6E006875D8 /* nc.cpp in Sources */,
 				4DEC4D9821C81E3B00D1D273 /* expan.cpp in Sources */,
@@ -4126,6 +4141,7 @@
 			files = (
 				BB4C4AF522A932BC001F6AF0 /* ref.cpp in Sources */,
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
+				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
 				BB4C4B2F22A932CF001F6AF0 /* pedal.cpp in Sources */,
 				4D2E759222BC2B80004C51F0 /* tuning.cpp in Sources */,
