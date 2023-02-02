@@ -18,6 +18,7 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
@@ -1413,6 +1414,45 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
+
+    // Link dynamics and hairpins at the end of the measure to make sure that the order of elements in MEI does not
+    // dictate their linkage. With this, linking dynamics to hairpin is prioritized and hairpins are linked only after
+    // all dynamics were processed.
+
+    for (auto &dynam : params->m_dynams) {
+        for (auto &hairpin : params->m_hairpins) {
+            if ((hairpin->GetEnd() == dynam->GetStart()) && (hairpin->GetStaff() == dynam->GetStaff())) {
+                if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+            }
+        }
+    }
+
+    for (auto &hairpin : params->m_hairpins) {
+        for (auto &dynam : params->m_dynams) {
+            if ((dynam->GetStart() == hairpin->GetStart()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(dynam);
+            }
+            else if ((dynam->GetStart() == hairpin->GetEnd()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+            }
+        }
+
+        for (auto &hairpin2 : params->m_hairpins) {
+            if (hairpin == hairpin2) continue;
+            if ((hairpin2->GetEnd() == hairpin->GetStart()) && (hairpin2->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetLeftLink() && !hairpin2->GetRightLink()) {
+                    hairpin->SetLeftLink(hairpin2);
+                    hairpin2->SetRightLink(hairpin);
+                }
+            }
+            if ((hairpin2->GetStart() == hairpin->GetEnd()) && (hairpin2->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin2->GetLeftLink() && !hairpin->GetRightLink()) {
+                    hairpin2->SetLeftLink(hairpin);
+                    hairpin->SetRightLink(hairpin2);
+                }
+            }
+        }
+    }
 
     params->m_dynams.clear();
 

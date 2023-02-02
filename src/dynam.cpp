@@ -276,12 +276,6 @@ int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
 
     params->m_dynams.push_back(this);
 
-    for (auto &hairpin : params->m_hairpins) {
-        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
-        }
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
