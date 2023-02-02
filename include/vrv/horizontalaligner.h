@@ -134,6 +134,11 @@ public:
     void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {}) const;
 
     /**
+     * Return all GraceAligners for the Alignment.
+     */
+    const MapOfIntGraceAligners &GetGraceAligners() { return m_graceAligners; }
+
+    /**
      * Returns the GraceAligner for the Alignment.
      * Create it if necessary.
      */
