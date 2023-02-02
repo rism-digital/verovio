@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -129,7 +125,19 @@ bool AttNoteGesTab::HasTabFret() const
 
 /* include <atttab.fret> */
 
-bool Att::SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_COURSELOG)) {
         AttCourseLog *att = dynamic_cast<AttCourseLog *>(element);
@@ -155,7 +163,7 @@ bool Att::SetFrettab(Object *element, const std::string &attrType, const std::st
     return false;
 }
 
-void Att::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_COURSELOG)) {
         const AttCourseLog *att = dynamic_cast<const AttCourseLog *>(element);

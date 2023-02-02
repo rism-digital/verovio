@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -70,7 +66,19 @@ bool AttFacsimile::HasFacs() const
 
 /* include <attfacs> */
 
-bool Att::SetFacsimile(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetFacsimile(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_FACSIMILE)) {
         AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);
@@ -84,7 +92,7 @@ bool Att::SetFacsimile(Object *element, const std::string &attrType, const std::
     return false;
 }
 
-void Att::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FACSIMILE)) {
         const AttFacsimile *att = dynamic_cast<const AttFacsimile *>(element);

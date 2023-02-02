@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -202,7 +198,19 @@ bool AttLineLog::HasFunc() const
 
 /* include <attfunc> */
 
-bool Att::SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
         AttAltSym *att = dynamic_cast<AttAltSym *>(element);
@@ -240,7 +248,7 @@ bool Att::SetUsersymbols(Object *element, const std::string &attrType, const std
     return false;
 }
 
-void Att::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
         const AttAltSym *att = dynamic_cast<const AttAltSym *>(element);

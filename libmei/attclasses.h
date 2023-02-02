@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+
 namespace vrv {
 
 enum AttClassId {
@@ -88,11 +89,8 @@ enum AttClassId {
     ATT_TIMESTAMPGES,
     ATT_TIMESTAMP2GES,
     ATT_HARMLOG,
-    ATT_ADLIBITUM,
     ATT_BIFOLIUMSURFACES,
     ATT_FOLIUMSURFACES,
-    ATT_PERFRES,
-    ATT_PERFRESBASIC,
     ATT_RECORDTYPE,
     ATT_REGULARMETHOD,
     ATT_DURATIONQUALITY,

@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -70,7 +66,19 @@ bool AttCrit::HasCause() const
 
 /* include <attcause> */
 
-bool Att::SetCritapp(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetCritapp(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_CRIT)) {
         AttCrit *att = dynamic_cast<AttCrit *>(element);
@@ -84,7 +92,7 @@ bool Att::SetCritapp(Object *element, const std::string &attrType, const std::st
     return false;
 }
 
-void Att::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_CRIT)) {
         const AttCrit *att = dynamic_cast<const AttCrit *>(element);

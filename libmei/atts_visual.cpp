@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -2404,7 +2400,19 @@ bool AttTupletVis::HasNumFormat() const
 
 /* include <attnum.format> */
 
-bool Att::SetVisual(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetVisual(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ANNOTVIS)) {
         AttAnnotVis *att = dynamic_cast<AttAnnotVis *>(element);
@@ -2906,7 +2914,7 @@ bool Att::SetVisual(Object *element, const std::string &attrType, const std::str
     return false;
 }
 
-void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ANNOTVIS)) {
         const AttAnnotVis *att = dynamic_cast<const AttAnnotVis *>(element);

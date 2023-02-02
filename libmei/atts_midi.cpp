@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -557,7 +553,19 @@ bool AttTimeBase::HasPpq() const
 
 /* include <attppq> */
 
-bool Att::SetMidi(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetMidi(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_CHANNELIZED)) {
         AttChannelized *att = dynamic_cast<AttChannelized *>(element);
@@ -671,7 +679,7 @@ bool Att::SetMidi(Object *element, const std::string &attrType, const std::strin
     return false;
 }
 
-void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_CHANNELIZED)) {
         const AttChannelized *att = dynamic_cast<const AttChannelized *>(element);

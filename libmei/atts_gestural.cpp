@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -764,7 +760,19 @@ bool AttTimestamp2Ges::HasTstamp2Real() const
 
 /* include <atttstamp2.real> */
 
-bool Att::SetGestural(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetGestural(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ACCIDENTALGES)) {
         AttAccidentalGes *att = dynamic_cast<AttAccidentalGes *>(element);
@@ -922,7 +930,7 @@ bool Att::SetGestural(Object *element, const std::string &attrType, const std::s
     return false;
 }
 
-void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ACCIDENTALGES)) {
         const AttAccidentalGes *att = dynamic_cast<const AttAccidentalGes *>(element);

@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -115,7 +111,19 @@ bool AttMargins::HasRightmar() const
 
 /* include <attrightmar> */
 
-bool Att::SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_MARGINS)) {
         AttMargins *att = dynamic_cast<AttMargins *>(element);
@@ -141,7 +149,7 @@ bool Att::SetPagebased(Object *element, const std::string &attrType, const std::
     return false;
 }
 
-void Att::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_MARGINS)) {
         const AttMargins *att = dynamic_cast<const AttMargins *>(element);

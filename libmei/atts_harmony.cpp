@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -70,7 +66,19 @@ bool AttHarmLog::HasChordref() const
 
 /* include <attchordref> */
 
-bool Att::SetHarmony(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetHarmony(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_HARMLOG)) {
         AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);
@@ -84,7 +92,7 @@ bool Att::SetHarmony(Object *element, const std::string &attrType, const std::st
     return false;
 }
 
-void Att::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_HARMLOG)) {
         const AttHarmLog *att = dynamic_cast<const AttHarmLog *>(element);

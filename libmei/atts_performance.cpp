@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -70,7 +66,19 @@ bool AttAlignment::HasWhen() const
 
 /* include <attwhen> */
 
-bool Att::SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ALIGNMENT)) {
         AttAlignment *att = dynamic_cast<AttAlignment *>(element);
@@ -84,7 +92,7 @@ bool Att::SetPerformance(Object *element, const std::string &attrType, const std
     return false;
 }
 
-void Att::GetPerformance(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetPerformance(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALIGNMENT)) {
         const AttAlignment *att = dynamic_cast<const AttAlignment *>(element);

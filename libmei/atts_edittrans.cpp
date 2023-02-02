@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -114,7 +110,19 @@ bool AttReasonIdent::HasReason() const
 
 /* include <attreason> */
 
-bool Att::SetEdittrans(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetEdittrans(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_AGENTIDENT)) {
         AttAgentIdent *att = dynamic_cast<AttAgentIdent *>(element);
@@ -136,7 +144,7 @@ bool Att::SetEdittrans(Object *element, const std::string &attrType, const std::
     return false;
 }
 
-void Att::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_AGENTIDENT)) {
         const AttAgentIdent *att = dynamic_cast<const AttAgentIdent *>(element);

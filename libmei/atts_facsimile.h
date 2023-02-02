@@ -56,8 +56,8 @@ public:
 
 private:
     /**
-     * Points to one or more images, portions of an image, or surfaces which correspond
-     * to the current element.
+     * Permits the current element to reference a facsimile surface or image zone which
+     * corresponds to it.
      **/
     std::string m_facs;
 

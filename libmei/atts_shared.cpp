@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -8029,7 +8025,19 @@ bool AttXy2::HasY2() const
 
 /* include <atty2> */
 
-bool Att::SetShared(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetShared(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ACCIDLOG)) {
         AttAccidLog *att = dynamic_cast<AttAccidLog *>(element);
@@ -9639,7 +9647,7 @@ bool Att::SetShared(Object *element, const std::string &attrType, const std::str
     return false;
 }
 
-void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ACCIDLOG)) {
         const AttAccidLog *att = dynamic_cast<const AttAccidLog *>(element);

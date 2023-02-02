@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -452,7 +448,19 @@ bool AttSolfa::HasPsolfa() const
 
 /* include <attpsolfa> */
 
-bool Att::SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_HARMANL)) {
         AttHarmAnl *att = dynamic_cast<AttHarmAnl *>(element);
@@ -538,7 +546,7 @@ bool Att::SetAnalytical(Object *element, const std::string &attrType, const std:
     return false;
 }
 
-void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_HARMANL)) {
         const AttHarmAnl *att = dynamic_cast<const AttHarmAnl *>(element);

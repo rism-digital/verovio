@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -234,7 +230,19 @@ bool AttNcForm::HasTilt() const
 
 /* include <atttilt> */
 
-bool Att::SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_NCLOG)) {
         AttNcLog *att = dynamic_cast<AttNcLog *>(element);
@@ -288,7 +296,7 @@ bool Att::SetNeumes(Object *element, const std::string &attrType, const std::str
     return false;
 }
 
-void Att::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_NCLOG)) {
         const AttNcLog *att = dynamic_cast<const AttNcLog *>(element);

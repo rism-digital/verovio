@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -115,7 +111,19 @@ bool AttExtSym::HasGlyphUri() const
 
 /* include <attglyph.uri> */
 
-bool Att::SetExternalsymbols(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetExternalsymbols(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_EXTSYM)) {
         AttExtSym *att = dynamic_cast<AttExtSym *>(element);
@@ -141,7 +149,7 @@ bool Att::SetExternalsymbols(Object *element, const std::string &attrType, const
     return false;
 }
 
-void Att::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_EXTSYM)) {
         const AttExtSym *att = dynamic_cast<const AttExtSym *>(element);

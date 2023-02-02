@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -70,7 +66,19 @@ bool AttFingGrpLog::HasForm() const
 
 /* include <attform> */
 
-bool Att::SetFingering(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetFingering(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_FINGGRPLOG)) {
         AttFingGrpLog *att = dynamic_cast<AttFingGrpLog *>(element);
@@ -84,7 +92,7 @@ bool Att::SetFingering(Object *element, const std::string &attrType, const std::
     return false;
 }
 
-void Att::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FINGGRPLOG)) {
         const AttFingGrpLog *att = dynamic_cast<const AttFingGrpLog *>(element);

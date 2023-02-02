@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -365,7 +361,19 @@ bool AttStemsMensural::HasStemForm() const
 
 /* include <attstem.form> */
 
-bool Att::SetMensural(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetMensural(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_DURATIONQUALITY)) {
         AttDurationQuality *att = dynamic_cast<AttDurationQuality *>(element);
@@ -439,7 +447,7 @@ bool Att::SetMensural(Object *element, const std::string &attrType, const std::s
     return false;
 }
 
-void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_DURATIONQUALITY)) {
         const AttDurationQuality *att = dynamic_cast<const AttDurationQuality *>(element);

@@ -15,8 +15,11 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
 #include "vrv.h"
+
+#ifndef DEFINITION_FACTOR
+#define DEFINITION_FACTOR 1
+#endif
 
 namespace vrv {
 
@@ -914,6 +917,7 @@ data_STAFFREL_basic Att::StaffrelToStaffrelBasic(data_STAFFREL staffrel)
     return staffrelBasic;
 }
 
+#ifndef MEI_BASIC
 bool Att::IsMensuralType(data_NOTATIONTYPE notationType)
 {
     return (notationType == NOTATIONTYPE_mensural || notationType == NOTATIONTYPE_mensural_white
@@ -931,5 +935,6 @@ bool Att::IsTabType(data_NOTATIONTYPE notationType)
     // Next version of MEI will have other tab types
     return (notationType == NOTATIONTYPE_tab);
 }
+#endif
 
 } // namespace vrv

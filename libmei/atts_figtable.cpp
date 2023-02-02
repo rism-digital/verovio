@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -85,7 +81,19 @@ bool AttTabular::HasRowspan() const
 
 /* include <attrowspan> */
 
-bool Att::SetFigtable(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetFigtable(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
         AttTabular *att = dynamic_cast<AttTabular *>(element);
@@ -103,7 +111,7 @@ bool Att::SetFigtable(Object *element, const std::string &attrType, const std::s
     return false;
 }
 
-void Att::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
         const AttTabular *att = dynamic_cast<const AttTabular *>(element);

@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -1645,7 +1641,19 @@ bool AttTremMeasured::HasUnitdur() const
 
 /* include <attunitdur> */
 
-bool Att::SetCmn(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_ARPEGLOG)) {
         AttArpegLog *att = dynamic_cast<AttArpegLog *>(element);
@@ -1967,7 +1975,7 @@ bool Att::SetCmn(Object *element, const std::string &attrType, const std::string
     return false;
 }
 
-void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ARPEGLOG)) {
         const AttArpegLog *att = dynamic_cast<const AttArpegLog *>(element);

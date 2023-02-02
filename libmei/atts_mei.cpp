@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -85,7 +81,19 @@ bool AttNotationType::HasNotationsubtype() const
 
 /* include <attnotationsubtype> */
 
-bool Att::SetMei(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetMei(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
         AttNotationType *att = dynamic_cast<AttNotationType *>(element);
@@ -103,7 +111,7 @@ bool Att::SetMei(Object *element, const std::string &attrType, const std::string
     return false;
 }
 
-void Att::GetMei(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetMei(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
         const AttNotationType *att = dynamic_cast<const AttNotationType *>(element);

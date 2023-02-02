@@ -20,10 +20,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "object.h"
-
-/* #include_block */
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -247,7 +243,19 @@ bool AttTurnLog::HasForm() const
 
 /* include <attform> */
 
-bool Att::SetCmnornaments(Object *element, const std::string &attrType, const std::string &attrValue)
+} // namespace vrv
+
+//----------------------------------------------------------------------------
+// Module setter and getter
+//----------------------------------------------------------------------------
+
+#include "object.h"
+
+//----------------------------------------------------------------------------
+
+namespace vrv {
+
+bool AttModule::SetCmnornaments(Object *element, const std::string &attrType, const std::string &attrValue)
 {
     if (element->HasAttClass(ATT_MORDENTLOG)) {
         AttMordentLog *att = dynamic_cast<AttMordentLog *>(element);
@@ -297,7 +305,7 @@ bool Att::SetCmnornaments(Object *element, const std::string &attrType, const st
     return false;
 }
 
-void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
+void AttModule::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_MORDENTLOG)) {
         const AttMordentLog *att = dynamic_cast<const AttMordentLog *>(element);
