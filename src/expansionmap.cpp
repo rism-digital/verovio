@@ -263,4 +263,16 @@ void ExpansionMap::GeneratePredictableIDs(Object *source, Object *target)
     }
 }
 
+void ExpansionMap::ToJson(std::string &output)
+{
+    jsonxx::Object expansionmap;
+    for (auto &[id, ids] : m_map) {
+        jsonxx::Array expandedIds;
+        for (auto i : ids) expandedIds << i;
+        expansionmap << id << expandedIds;
+        ;
+    }
+    output = expansionmap.json();
+}
+
 } // namespace vrv

@@ -483,6 +483,15 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     return true;
 }
 
+bool Doc::ExportExpansionMap(std::string &output)
+{
+    if (m_expansionMap.HasExpansionMap()) {
+        m_expansionMap.ToJson(output);
+        return true;
+    }
+    return false;
+}
+
 bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
     if (!Doc::HasTimemap()) {
@@ -1473,12 +1482,6 @@ void Doc::ExpandExpansions()
     // std::cout << "[expand] original expansion xml:id=\"" << originalExpansion->GetID().c_str()
     //          << "\" plist={";
     // for (std::string s : existingList) std::cout << s.c_str() << ((s != existingList.back()) ? " " : "}.\n");
-
-    // for (auto const &strVect : m_doc->m_expansionMap.m_map) { // DEBUG: display expansionMap on console
-    //     std::cout << strVect.first << ": <";
-    //     for (auto const &string : strVect.second)
-    //        std::cout << string << ((string != strVect.second.back()) ? ", " : ">.\n");
-    // }
 }
 
 bool Doc::HasPage(int pageIdx) const
