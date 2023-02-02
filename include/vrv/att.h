@@ -36,16 +36,16 @@ public:
 
     static data_ACCIDENTAL_WRITTEN AccidentalGesturalToWritten(data_ACCIDENTAL_GESTURAL accid);
     static data_ACCIDENTAL_GESTURAL AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTEN accid);
-    
+
     static data_STAFFREL StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic);
     static data_STAFFREL_basic StaffrelToStaffrelBasic(data_STAFFREL staffrel);
-    
+
 #ifndef MEI_BASIC
     static bool IsMensuralType(data_NOTATIONTYPE notationType);
     static bool IsNeumeType(data_NOTATIONTYPE notationType);
     static bool IsTabType(data_NOTATIONTYPE notationType);
 #endif
-    
+
 public:
     /** Dummy string converter */
     std::string StrToStr(std::string str) const;
@@ -182,7 +182,6 @@ public:
     ///@}
 };
 
-
 #ifndef LIBMEI_ELEMENTS
 
 class Object;
@@ -203,7 +202,7 @@ public:
     AttModule();
     virtual ~AttModule();
     ///@}
-    
+
     /**
      * @name static method for blind attribute modification
      * The implementation is implemented by LibMEI in each module corresponding file
@@ -235,7 +234,7 @@ public:
     static bool SetShared(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
     static bool SetVisual(Object *element, const std::string &attrType, const std::string &attrValue);
-    
+
     /**
      * Idem for getting attributes as strings
      */

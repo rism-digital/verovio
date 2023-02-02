@@ -12,8 +12,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "atttypes.h"
 #include "attdef.h"
+#include "atttypes.h"
 
 namespace vrv {
 
