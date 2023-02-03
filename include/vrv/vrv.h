@@ -40,7 +40,7 @@ void LogInfo(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
 
 /**
- * Member and functions specific to loging that uses a vector of string to buffer the logs.
+ * Member and functions specific to logging that uses a vector of string to buffer the logs.
  */
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
