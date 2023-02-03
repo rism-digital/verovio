@@ -313,10 +313,10 @@ private:
     ///@}
 
     /*
-     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     * @name Helper method to check whether an ending measure is already present in m_endingStack.
      */
     ///@{
-    bool NotInEndingStack(std::string const &measureN);
+    bool NotInEndingStack(const Measure *measure) const;
     ///@}
 
     /*
@@ -507,6 +507,9 @@ private:
     std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
     std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
+    /* Current ending info for start/stop */
+    std::optional<musicxml::EndingInfo> m_currentEndingStart;
+    std::optional<musicxml::EndingInfo> m_currentEndingStop;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>> m_endingStack;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
