@@ -8,10 +8,10 @@
 #ifndef __VRV_H__
 #define __VRV_H__
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
 #include <map>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
 #include <unordered_map>
 #include <vector>

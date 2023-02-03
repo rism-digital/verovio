@@ -16,8 +16,6 @@
 #include <iostream>
 #include <locale>
 #include <sstream>
-#include <stdarg.h>
-#include <stdio.h>
 #include <vector>
 
 #ifndef _WIN32
