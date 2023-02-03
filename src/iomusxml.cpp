@@ -340,42 +340,72 @@ void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *lay
     }
 }
 
-void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
+bool MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
 {
     assert(section);
     assert(i >= 0);
 
+    Measure *contentMeasure = NULL;
+
     // we just need to add a measure
     if (section->GetChildCount(MEASURE) <= i - GetMrestMeasuresCountBeforeIndex(i)) {
         section->AddChild(measure);
+        contentMeasure = measure;
     }
     // otherwise copy the content to the corresponding existing measure
     else {
+        Measure *existingMeasure = NULL;
+        // Search by measure number first
+        ListOfObjects matchingMeasures;
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-        Measure *existingMeasure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
+        section->FindAllDescendantsByComparison(&matchingMeasures, &comparisonMeasure, 1);
+        // For now take the first match
+        if (!matchingMeasures.empty()) {
+            existingMeasure = vrv_cast<Measure *>(matchingMeasures.front());
+        }
+        // Prefer any measure with matching index (measure numbers might be non-unique)
+        for (Object *object : matchingMeasures) {
+            Measure *matchingMeasure = vrv_cast<Measure *>(object);
+            if (m_measureCounts.at(matchingMeasure) == i) {
+                existingMeasure = matchingMeasure;
+                break;
+            }
+        }
         if (existingMeasure) {
             for (auto current : measure->GetChildren()) {
                 if (!current->Is(STAFF)) {
                     continue;
                 }
-                Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
-                assert(staff);
-                existingMeasure->AddChild(staff);
+                current->MoveItselfTo(existingMeasure);
             }
+            measure->ClearRelinquishedChildren();
         }
         else {
             LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
-            delete measure;
         }
+        contentMeasure = existingMeasure;
     }
 
-    // add this measure to `m_endingStack` if within an ending
-    if (!m_endingStack.empty()) {
-        if (m_endingStack.back().second.m_endingType == "start"
-            && m_endingStack.back().first.back()->GetID() != measure->GetID()) {
-            m_endingStack.back().first.push_back(measure);
+    // Handle endings
+    if (contentMeasure && NotInEndingStack(contentMeasure)) {
+        if (m_currentEndingStart) {
+            // Create a new ending
+            std::vector<Measure *> measures;
+            m_endingStack.push_back({ measures, *m_currentEndingStart });
+        }
+        if (!m_endingStack.empty() && (m_endingStack.back().second.m_endingType == "start")) {
+            // Append the current measure
+            m_endingStack.back().first.push_back(contentMeasure);
+        }
+        if (m_currentEndingStop && !m_endingStack.empty()) {
+            // Stop the last ending
+            m_endingStack.back().second.m_endingType = m_currentEndingStop->m_endingType;
         }
     }
+    m_currentEndingStart.reset();
+    m_currentEndingStop.reset();
+
+    return (contentMeasure == measure);
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
@@ -1527,7 +1557,11 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
             m_measureCounts[measure] = i;
             ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset, i);
             // Add the measure to the system - if already there from a previous part we'll just merge the content
-            AddMeasure(section, measure, i);
+            if (!AddMeasure(section, measure, i)) {
+                // If content was transferred to existing measure, clean up
+                m_measureCounts.erase(measure);
+                delete measure;
+            }
         }
         else {
             // Handle barline parsing for the multirests (where barline would be defined in last measure of the mRest)
@@ -1854,11 +1888,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             // check for corresponding stop points
             std::string xpath = StringFormat("following::ending[@number='%s'][@type != 'start']", endingNumber.c_str());
             pugi::xpath_node endingEnd = node.select_node(xpath.c_str());
-            if (endingEnd && (m_endingStack.empty() || NotInEndingStack(measure->GetN()))) {
-                musicxml::EndingInfo endingInfo(endingNumber, endingType, endingText);
-                std::vector<Measure *> measureList;
-                measureList.push_back(measure);
-                m_endingStack.push_back({ measureList, endingInfo });
+            if (endingEnd) {
+                m_currentEndingStart = musicxml::EndingInfo(endingNumber, endingType, endingText);
             }
         }
         else if (endingType == "stop" || endingType == "discontinue") {
@@ -1866,10 +1897,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
                 LogWarning("MusicXML import: Dangling ending tag skipped");
             }
             else {
-                m_endingStack.back().second.m_endingType = endingType;
-                if (NotInEndingStack(measure->GetN())) {
-                    m_endingStack.back().first.push_back(measure);
-                }
+                m_currentEndingStop = musicxml::EndingInfo(endingNumber, endingType, endingText);
             }
         }
     }
@@ -4506,11 +4534,11 @@ std::string MusicXmlInput::ConvertFigureGlyph(const std::string &value)
     return std::string();
 }
 
-bool MusicXmlInput::NotInEndingStack(const std::string &measureN)
+bool MusicXmlInput::NotInEndingStack(const Measure *measure) const
 {
-    for (auto &endingItem : m_endingStack) {
-        for (auto &measure : endingItem.first) {
-            if (measure->GetN() == measureN) return false;
+    for (const auto &endingItem : m_endingStack) {
+        for (Measure *endingMeasure : endingItem.first) {
+            if (endingMeasure->GetID() == measure->GetID()) return false;
         }
     }
     return true;
