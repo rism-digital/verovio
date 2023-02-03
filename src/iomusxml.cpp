@@ -340,7 +340,7 @@ void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *lay
     }
 }
 
-void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
+bool MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
 {
     assert(section);
     assert(i >= 0);
@@ -376,14 +376,12 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
                 if (!current->Is(STAFF)) {
                     continue;
                 }
-                Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
-                assert(staff);
-                existingMeasure->AddChild(staff);
+                current->MoveItselfTo(existingMeasure);
             }
+            measure->ClearRelinquishedChildren();
         }
         else {
             LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
-            delete measure;
         }
         contentMeasure = existingMeasure;
     }
@@ -406,6 +404,8 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     }
     m_currentEndingStart.reset();
     m_currentEndingStop.reset();
+
+    return (contentMeasure == measure);
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
@@ -1557,7 +1557,11 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
             m_measureCounts[measure] = i;
             ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset, i);
             // Add the measure to the system - if already there from a previous part we'll just merge the content
-            AddMeasure(section, measure, i);
+            if (!AddMeasure(section, measure, i)) {
+                // If content was transferred to existing measure, clean up
+                m_measureCounts.erase(measure);
+                delete measure;
+            }
         }
         else {
             // Handle barline parsing for the multirests (where barline would be defined in last measure of the mRest)
