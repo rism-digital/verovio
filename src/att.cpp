@@ -64,7 +64,7 @@ int Att::StrToInt(const std::string &value) const
 
 data_VU Att::StrToVU(const std::string &value, bool logWarning) const
 {
-    std::regex test("[0-9]*(\\.[0-9]+)?(vu)?");
+    std::regex test("[+-]?[0-9]*(\\.[0-9]+)?(vu)?");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
         return VRV_UNSET;
