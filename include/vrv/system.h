@@ -190,11 +190,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcAlignmentXPos
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
      * @name See Object::AdjustXOverflow
      */
     ///@{

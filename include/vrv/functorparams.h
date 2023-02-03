@@ -868,46 +868,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcAlignmentXPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the previous time position
- * member 1: the previous x rel position
- * member 2: duration of the longest note
- * member 3: the estimated justification ratio of the system
- * member 4: the last alignment that was not timestamp-only
- * member 5: the list of timestamp-only alignment that needs to be adjusted
- * member 6: the MeasureAligner
- * member 7: the Doc
- * member 8: the functor to be redirected to Aligner
- **/
-
-class CalcAlignmentXPosParams : public FunctorParams {
-public:
-    CalcAlignmentXPosParams(Doc *doc, Functor *functor)
-    {
-        m_previousTime = 0.0;
-        m_previousXRel = 0;
-        m_longestActualDur = 0;
-        m_estimatedJustificationRatio = 1.0;
-        m_lastNonTimestamp = NULL;
-        m_measureAligner = NULL;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    double m_previousTime;
-    int m_previousXRel;
-    int m_longestActualDur;
-    double m_estimatedJustificationRatio;
-    Alignment *m_lastNonTimestamp;
-    std::list<Alignment *> m_timestamps;
-    MeasureAligner *m_measureAligner;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // CalcArticParams
 //----------------------------------------------------------------------------
 

@@ -554,19 +554,6 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    const double ratio = this->EstimateJustificationRatio(params->m_doc);
-    if ((!this->IsLastOfMdiv() && !this->IsLastOfSelection()) || (ratio < params->m_estimatedJustificationRatio)) {
-        params->m_estimatedJustificationRatio = ratio;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::AdjustXOverflow(FunctorParams *functorParams)
 {
     AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);

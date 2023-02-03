@@ -226,12 +226,6 @@ public:
     ///@}
 
     /**
-     * Calc the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
@@ -280,7 +274,7 @@ public:
 private:
     /**
      * Stores the position relative to the measure.
-     * This is instanciated by the Object::CalcAlignmentXPos functor.
+     * This is instanciated by the CalcAlignmentXPosFunctor.
      * It takes into account a non-linear according to the time interval with
      * the previous Alignement
      */
@@ -597,13 +591,6 @@ public:
     ///@}
 
     /**
-     * Set the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
-     * For each MeasureAlignment, we need to reset the previous time position.
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
@@ -696,7 +683,7 @@ public:
 
     /**
      * Set an linear defaut position for each grace note
-     * This is called from the CalcAlignmentXPos Functor.
+     * This is called from the CalcAlignmentXPosFunctor.
      */
     void SetGraceAlignmentXPos(const Doc *doc);
 

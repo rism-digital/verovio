@@ -36,6 +36,14 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Getter and setter for the longest note duration
+     */
+    ///@{
+    int GetLongestActualDur() const { return m_longestActualDur; }
+    void SetLongestActualDur(int dur) { m_longestActualDur = dur; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

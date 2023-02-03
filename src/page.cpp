@@ -15,6 +15,7 @@
 
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
+#include "calcalignmentxposfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
 #include "comparison.h"
@@ -302,10 +303,9 @@ void Page::ResetAligners()
             }
         }
 
-        Functor setAlignmentX(&Object::CalcAlignmentXPos);
-        CalcAlignmentXPosParams calcAlignmentXPosParams(doc, &setAlignmentX);
-        calcAlignmentXPosParams.m_longestActualDur = longestActualDur;
-        this->Process(&setAlignmentX, &calcAlignmentXPosParams);
+        CalcAlignmentXPosFunctor calcAlignmentXPos(doc);
+        calcAlignmentXPos.SetLongestActualDur(longestActualDur);
+        this->Process(calcAlignmentXPos);
     }
 
     // Set the pitch / pos alignment

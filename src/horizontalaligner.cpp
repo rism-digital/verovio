@@ -1041,21 +1041,6 @@ FunctorCode TimestampAligner::AcceptEnd(ConstFunctor &functor) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeasureAligner::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    // We start a new MeasureAligner
-    // Reset the previous time position and x_rel to 0;
-    params->m_previousTime = 0.0;
-    params->m_previousXRel = params->m_doc->GetDrawingUnit(100);
-    params->m_lastNonTimestamp = m_leftBarLineAlignment;
-    params->m_measureAligner = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
@@ -1403,73 +1388,6 @@ int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
 
     params->m_elements.clear();
     params->m_dots.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    // Do not set an x pos for anything before the barline (including it)
-    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-
-    int intervalXRel = 0;
-    double intervalTime = (m_time - params->m_previousTime);
-
-    if (m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        intervalTime = 0.0;
-    }
-
-    // Do not move aligner that are only time-stamps at this stage but add it to the pending list
-    if (this->HasTimestampOnly()) {
-        params->m_timestamps.push_back(this);
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (intervalTime > 0.0) {
-        intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-            params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
-            params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
-        // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
-    }
-
-    MapOfIntGraceAligners::const_iterator iter;
-    for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
-        iter->second->SetGraceAlignmentXPos(params->m_doc);
-    }
-
-    this->SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR * params->m_estimatedJustificationRatio);
-    params->m_previousTime = m_time;
-    params->m_previousXRel = m_xRel;
-
-    // This is an alignment which is not timestamp only. If we have a list of pendings timetamp
-    // alignments, then we now need to move them appropriately
-    if (!params->m_timestamps.empty() && params->m_lastNonTimestamp) {
-        int startXRel = params->m_lastNonTimestamp->GetXRel();
-        double startTime = params->m_lastNonTimestamp->GetTime();
-        double endTime = this->GetTime();
-        // We have timestamp alignments between the left barline and the first beat. We need
-        // to use the MeasureAligner::m_initialTstampDur to calculate the time (percentage) position
-        if (params->m_lastNonTimestamp->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
-            startTime = params->m_measureAligner->GetInitialTstampDur();
-        }
-        // The duration since the last alignment and the current one
-        double duration = endTime - startTime;
-        int space = m_xRel - params->m_lastNonTimestamp->GetXRel();
-        // For each timestamp alignment, move them proportionally to the space we currently have
-        for (auto &alignment : params->m_timestamps) {
-            // Avoid division by zero (nothing to move with the alignment anyway
-            if (duration == 0.0) break;
-            double percent = (alignment->GetTime() - startTime) / duration;
-            alignment->SetXRel(startXRel + space * percent);
-        }
-        params->m_timestamps.clear();
-    }
-
-    // Do not use clef change and grancenote alignment as reference since these are not aligned at this stage
-    if (!this->IsOfType({ ALIGNMENT_CLEF, ALIGNMENT_GRACENOTE })) params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }

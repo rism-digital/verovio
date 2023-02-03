@@ -776,12 +776,6 @@ public:
     ///@{
 
     /**
-     * Calc the position of the Alignment.
-     * Looks at the time difference from the previous Alignment.
-     */
-    virtual int CalcAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calc the drawing position (m_drawingX and m_drawingY) values for objects
      */
     virtual int CalcAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
