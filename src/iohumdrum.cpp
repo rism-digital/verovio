@@ -21930,10 +21930,11 @@ bool HumdrumInput::hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::Hum
     }
     int datacount = 0;
     for (int i = 0; i < (int)layerdata.size(); ++i) {
-        if (!layerdata[i]->isData()) {
+        hum::HTp token = layerdata[i];
+        if (!token->isData()) {
             continue;
         }
-        if (layerdata[i]->isNull()) {
+        if (token->isNull()) {
             continue;
         }
         // deal with grace notes in same measure as mrest?
@@ -21941,13 +21942,16 @@ bool HumdrumInput::hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::Hum
         if (datacount > 1) {
             return false;
         }
-        if (!layerdata[i]->isRest()) {
+        if (!token->isRest()) {
+            return false;
+        }
+        if (token->getDurationFromBarline() > 0) {
             return false;
         }
         // Don't convert full-measure rests into spaces since
         // due to cases such as 5/4 measure rests.  Use @visible="false"
         // instead.
-        // if (layerdata[i]->find("yy") != std::string::npos) {
+        // if (token->find("yy") != std::string::npos) {
         //    // treat invisible full-measure rest as a space later.
         //    return false;
         //}
