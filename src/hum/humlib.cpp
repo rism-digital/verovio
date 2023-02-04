@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jan 21 08:59:56 PST 2023
+// Last Modified: Thu Jan 26 22:41:11 PST 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -78031,21 +78031,21 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 //
 
 Tool_fb::Tool_fb(void) {
-	define("c|compound=b",          "output reasonable figured bass numbers within octave");
-	define("a|accidentals=b",       "display accidentals in figured bass output");
-	define("b|base|base-track=i:1", "number of the base kern track (compare with -k)");
-	define("i|intervallsatz=b",     "display intervals under their voice and not under the lowest staff");
-	define("o|sort|order=b",        "sort figured bass numbers by interval size and not by voice index");
-	define("l|lowest=b",            "use lowest note as base note; -b flag will be ignored");
-	define("n|normalize=b",         "remove octave and doubled intervals; adds: --compound --sort");
-	define("r|abbr=b",              "use abbreviated figures; adds: --normalize --compound --sort");
-	define("t|ties=b",              "hide repeated numbers for sustained notes when base does not change");
-	define("f|figuredbass=b",       "shortcut for -c -a -o -n -r -3");
-	define("3|hide-three=b",        "hide number 3 if it has an accidental (e.g.: #3 => #)");
-	define("m|negative=b",          "show negative numbers");
-	define("above=b",               "place figured bass numbers above staff (**fba)");
-	define("frequency|recip=s:",    "frequency to display the numbers (set a **recip value, e.g. 2, 4, 8, 4.)");
-	define("k|kern-tracks=s",       "Process only the specified kern spines");
+	define("c|compound=b",               "Output reasonable figured bass numbers within octave");
+	define("a|accidentals|accid|acc=b",  "Display accidentals in front of the numbers");
+	define("b|base|base-track=i:1",      "Number of the base kern track (compare with -k)");
+	define("i|intervallsatz=b",          "Display numbers under their voice instead of under the base staff");
+	define("o|sort|order=b",             "Sort figured bass numbers by size");
+	define("l|lowest=b",                 "Use lowest note as base note");
+	define("n|normalize=b",              "Remove number 8 and doubled numbers; adds -co");
+	define("r|reduce|abbreviate|abbr=b", "Use abbreviated figures; adds -nco");
+	define("t|ties=b",                   "Hide numbers without attack or changing base (needs -i)");
+	define("f|figuredbass=b",            "Shortcut for -acorn3");
+	define("3|hide-three=b",             "Hide number 3 if it has an accidental");
+	define("m|negative=b",               "Show negative numbers");
+	define("above=b",                    "Show numbers above the staff (**fba)");
+	define("rate=s:",                    "Rate to display the numbers (use a **recip value, e.g. 4, 4.)");
+	define("k|kern-tracks=s",            "Process only the specified kern spines");
 	define("s|spine-tracks|spine|spines|track|tracks=s", "Process only the specified spines");
 }
 
@@ -78106,13 +78106,13 @@ void Tool_fb::initialize(void) {
 	m_sortQ          = getBoolean("sort");
 	m_lowestQ        = getBoolean("lowest");
 	m_normalizeQ     = getBoolean("normalize");
-	m_abbrQ          = getBoolean("abbr");
+	m_reduceQ        = getBoolean("reduce");
 	m_attackQ        = getBoolean("ties");
 	m_figuredbassQ   = getBoolean("figuredbass");
 	m_hideThreeQ     = getBoolean("hide-three");
 	m_showNegativeQ  = getBoolean("negative");
 	m_aboveQ         = getBoolean("above");
-	m_recipQ         = getString("frequency");
+	m_rateQ          = getString("rate");
 
 	if (getBoolean("spine-tracks")) {
 		m_spineTracks = getString("spine-tracks");
@@ -78125,14 +78125,14 @@ void Tool_fb::initialize(void) {
 		m_sortQ = true;
 	}
 
-	if (m_abbrQ) {
+	if (m_reduceQ) {
 		m_normalizeQ = true;
 		m_compoundQ = true;
 		m_sortQ = true;
 	}
 
 	if (m_figuredbassQ) {
-		m_abbrQ = true;
+		m_reduceQ = true;
 		m_normalizeQ = true;
 		m_compoundQ = true;
 		m_sortQ = true;
@@ -78236,8 +78236,8 @@ void Tool_fb::processFile(HumdrumFile& infile) {
 
 		string keySignature = getKeySignature(infile, baseCell->getLineIndex());
 
-		// Hide numbers if they do not match rhythmic position of --recip
-		if (!m_recipQ.empty()) {
+		// Hide numbers if they do not match rhythmic position of --rate
+		if (!m_rateQ.empty()) {
 			// Get time signatures
 			vector<pair<int, HumNum>> timeSigs;
 			infile.getTimeSigs(timeSigs, baseCell->getToken()->getTrack());
@@ -78380,9 +78380,9 @@ void Tool_fb::processFile(HumdrumFile& infile) {
 //
 
 bool Tool_fb::hideNumbersForTokenLine(HTp token, pair<int, HumNum> timeSig) {
-	// Get note duration from --recip option
-	HumNum recip = Convert::recipToDuration(m_recipQ);
-	if (recip.toFloat() != 0) {
+	// Get note duration from --rate option
+	HumNum rateDuration = Convert::recipToDuration(m_rateQ);
+	if (rateDuration.toFloat() != 0) {
 		float timeSigBarDuration = timeSig.first * Convert::recipToDuration(to_string(timeSig.second.getInteger())).toFloat();
 		float durationFromBarline = token->getDurationFromBarline().toFloat();
 		// Handle upbeats
@@ -78391,8 +78391,8 @@ bool Tool_fb::hideNumbersForTokenLine(HTp token, pair<int, HumNum> timeSig) {
 			// the bar duration of the time signature
 			durationFromBarline = timeSigBarDuration - token->getDurationToBarline().toFloat();
 		}
-		// Checks if rhythmic position is divisible by recip duration 
-		return fmod(durationFromBarline, recip.toFloat()) != 0;
+		// Checks if rhythmic position is divisible by rateDuration
+		return fmod(durationFromBarline, rateDuration.toFloat()) != 0;
 	}
 	return false;
 }
@@ -78634,7 +78634,7 @@ string Tool_fb::formatFiguredBassNumbers(const vector<FiguredBassNumber*>& numbe
 		});
 	}
 
-	if (m_abbrQ) {
+	if (m_reduceQ) {
 		// Overwrite formattedNumbers with abbreviated numbers
 		formattedNumbers = getAbbreviatedNumbers(formattedNumbers);
 	}
@@ -85811,11 +85811,11 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 	hre.replaceDestructive(data, "X", "000");
 	hre.replaceDestructive(data, "L", "00");
 	hre.replaceDestructive(data, "S", "0");
-	hre.replaceDestructive(data, "s", "1");
+	hre.replaceDestructive(data, "u", "16");
 	hre.replaceDestructive(data, "M", "2");
 	hre.replaceDestructive(data, "m", "4");
 	hre.replaceDestructive(data, "U", "8");
-	hre.replaceDestructive(data, "u", "16");
+	hre.replaceDestructive(data, "s", "1");
 	hre.replaceDestructive(data, ":", "\\.");
 	if (perfect) {
 		hre.replaceDestructive(data, "$1p", "([XLSsMmUu]+)");
