@@ -182,8 +182,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
-    for (auto it = params.begin(); it != params.end(); it++) {
-        this->DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+    for (drawingParams &param : params) {
+        this->DrawSmuflCode(dc, noteX + param.xOffset * noteWidth, yValue + param.yOffset * noteHeight, param.fontNo,
             staff->m_drawingStaffSize, false, true);
     }
 

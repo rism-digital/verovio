@@ -241,6 +241,8 @@ private:
     // Determine whether a layer element should lie above or below the slur
     bool IsElementBelow(const LayerElement *element, const Staff *startStaff, const Staff *endStaff) const;
     bool IsElementBelow(const FloatingPositioner *positioner, const Staff *startStaff, const Staff *endStaff) const;
+    // Discard tuplets that don't have to be considered for slur adjustment
+    void DiscardTupletElements(FloatingCurvePositioner *curve, int xMin, int xMax);
     ///@}
 
     /**

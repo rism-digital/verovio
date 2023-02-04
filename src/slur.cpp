@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "comparison.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "layer.h"
@@ -26,6 +27,7 @@
 #include "note.h"
 #include "staff.h"
 #include "system.h"
+#include "tuplet.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -334,10 +336,12 @@ void Slur::AddSpannedElements(
     }
 
     curve->ClearSpannedElements();
-    for (auto element : spanned.elements) {
+    for (const LayerElement *element : spanned.elements) {
         const int xLeft = element->GetSelfLeft();
         const int xRight = element->GetSelfRight();
-        if (((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax))) {
+        const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
+
+        if (isOverlapping || element->Is(TUPLET_BRACKET)) {
             CurveSpannedElement *spannedElement = new CurveSpannedElement();
             spannedElement->m_boundingBox = element;
             spannedElement->m_isBelow = this->IsElementBelow(element, startStaff, endStaff);
@@ -348,6 +352,10 @@ void Slur::AddSpannedElements(
             curve->SetCrossStaff(element->m_crossStaff);
         }
     }
+
+    // Some tuplet elements are discarded immediately, if they should be rendered outside the slur
+    // => Flexible layout priority
+    this->DiscardTupletElements(curve, xMin, xMax);
 
     // Ties can be broken across systems, so we have to look for all floating curve positioners that represent them.
     // This might be refined later, since using the entire bounding box of a tie for collision avoidance with slurs is
@@ -390,6 +398,47 @@ void Slur::AddSpannedElements(
     }
 }
 
+void Slur::DiscardTupletElements(FloatingCurvePositioner *curve, int xMin, int xMax)
+{
+    const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
+        if (spannedElement->m_boundingBox->Is(TUPLET_BRACKET)) {
+            const TupletBracket *tupletBracket = vrv_cast<const TupletBracket *>(spannedElement->m_boundingBox);
+            assert(tupletBracket->GetParent()->Is(TUPLET));
+            const Tuplet *tuplet = vrv_cast<const Tuplet *>(tupletBracket->GetParent());
+
+            const int xLeft = tupletBracket->GetSelfLeft();
+            const int xRight = tupletBracket->GetSelfRight();
+            const bool isContained = (xLeft > xMin) && (xRight < xMax);
+            const bool isOverlapping = ((xLeft > xMin) && (xLeft < xMax)) || ((xRight > xMin) && (xRight < xMax));
+
+            // Slurs avoid inner tuplets
+            if (isContained) continue;
+
+            // Slurs avoid overlapping tuplets which are beam aligned or not significantly longer
+            if (isOverlapping) {
+                if (tuplet->GetBracketAlignedBeam()) continue;
+                if (xRight - xLeft < 2 * (xMax - xMin)) continue;
+            }
+
+            // Discard the tuplet bracket and register the slur for tuplet adjustment
+            spannedElement->m_discarded = true;
+            // Exceptional case where the slur actually modifies a spanned element
+            const_cast<Tuplet *>(tuplet)->AddInnerSlur(curve);
+
+            // Discard any associated tuplet number as well
+            const TupletNum *tupletNum = tupletBracket->GetAlignedNum();
+            if (tupletNum) {
+                auto elementIter = std::find_if(spannedElements->begin(), spannedElements->end(),
+                    [tupletNum](CurveSpannedElement *element) { return (element->m_boundingBox == tupletNum); });
+                if (elementIter != spannedElements->end()) {
+                    (*elementIter)->m_discarded = true;
+                }
+            }
+        }
+    }
+}
+
 void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
 {
     LayerElement *start = this->GetStart();
@@ -403,7 +452,7 @@ void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         ListOfObjects artics = start->FindAllDescendantsByType(ARTIC);
         // Then the @n of each first staffDef
-        for (auto &object : artics) {
+        for (Object *object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             if (artic->IsOutsideArtic()) {
@@ -420,7 +469,7 @@ void Slur::AddPositionerToArticulations(FloatingCurvePositioner *curve)
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         ListOfObjects artics = end->FindAllDescendantsByType(ARTIC);
         // Then the @n of each first staffDef
-        for (auto &object : artics) {
+        for (Object *object : artics) {
             Artic *artic = vrv_cast<Artic *>(object);
             assert(artic);
             if (artic->IsOutsideArtic()) {
@@ -610,7 +659,7 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -623,10 +672,11 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
             = (spannedElement->m_boundingBox->GetSelfLeft() + spannedElement->m_boundingBox->GetSelfRight()) / 2.0;
         const float distanceRatio = float(xMiddle - bezierCurve.p1.x) / float(dist);
 
-        // Ignore obstacles in a different layer which completely lie on the other side of the slur near the endpoints
+        // Check if obstacles completely lie on the other side of the slur
         const int elementHeight
             = std::abs(spannedElement->m_boundingBox->GetSelfTop() - spannedElement->m_boundingBox->GetSelfBottom());
         if (intersection > elementHeight + 4 * margin) {
+            // Ignore elements in a different layer near the endpoints
             const LayerElement *layerElement = dynamic_cast<const LayerElement *>(spannedElement->m_boundingBox);
             if (distanceRatio < 0.05) {
                 spannedElement->m_discarded = layerElement
@@ -636,6 +686,10 @@ void Slur::FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCur
             else if (distanceRatio > 0.95) {
                 spannedElement->m_discarded
                     = layerElement ? (layerElement->GetOriginalLayerN() != this->GetEnd()->GetOriginalLayerN()) : true;
+            }
+            // Ignore tuplet numbers
+            if (layerElement && layerElement->Is(TUPLET_NUM)) {
+                spannedElement->m_discarded = true;
             }
         }
     }
@@ -648,7 +702,7 @@ NearEndCollision Slur::DetectCollisionsNearEnd(
     if (bezierCurve.p1.x >= bezierCurve.p2.x) return nearEndCollision;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
         if (spannedElement->m_discarded) {
             continue;
         }
@@ -696,7 +750,7 @@ std::pair<int, int> Slur::CalcEndPointShift(
     const int dist = bezierCurve.p2.x - bezierCurve.p1.x;
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -866,7 +920,7 @@ std::tuple<bool, int, int> Slur::CalcControlPointOffset(
     double leftSlopeMax = std::abs(BoundingBox::CalcSlope(bezierCurve.p1, bezierCurve.c1));
     double rightSlopeMax = std::abs(BoundingBox::CalcSlope(bezierCurve.p2, bezierCurve.c2));
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -938,7 +992,7 @@ ControlPointAdjustment Slur::CalcControlPointVerticalShift(
 
     const ArrayOfCurveSpannedElements *spannedElements = curve->GetSpannedElements();
 
-    for (auto spannedElement : *spannedElements) {
+    for (CurveSpannedElement *spannedElement : *spannedElements) {
 
         if (spannedElement->m_discarded) {
             continue;
@@ -1322,17 +1376,21 @@ float Slur::GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature
     if (fabs(slurAngle) > maxAngle) {
         int side = (p2.x - p1.x) * tan(maxAngle);
         if (p2.y > p1.y) {
-            if (curveDir == curvature_CURVEDIR_above)
+            if (curveDir == curvature_CURVEDIR_above) {
                 p1.y = p2.y - side;
-            else
+            }
+            else {
                 p2.y = p1.y + side;
+            }
             slurAngle = maxAngle;
         }
         else {
-            if (curveDir == curvature_CURVEDIR_above)
+            if (curveDir == curvature_CURVEDIR_above) {
                 p2.y = p1.y - side;
-            else
+            }
+            else {
                 p1.y = p2.y + side;
+            }
             slurAngle = -maxAngle;
         }
     }
@@ -1527,10 +1585,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
                 else {
                     // Primary endpoint on the side, move it right
                     x1 += unit * 2;
-                    if (startChord)
-                        y1 = yChordMax + unit * 3;
-                    else
-                        y1 = start->GetDrawingY() + unit * 3;
+                    y1 = (startChord) ? (yChordMax + unit * 3) : (start->GetDrawingY() + unit * 3);
                 }
             }
         }

@@ -85,7 +85,7 @@ bool Tie::AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *cu
 
     int overlap = 0;
     bool discard = false;
-    for (auto object : objects) {
+    for (const Object *object : objects) {
         overlap = curve->CalcAdjustment(object, discard);
     }
     if (!overlap) return false;
@@ -220,13 +220,13 @@ bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, 
 
     // shortTie correction cannot be applied for chords
     const bool isShortTie = !startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit);
-    const bool isSameDirection = !(note1 && note2) || (note1->GetStemDir() == note2->GetStemDir());
+    const bool isGraceToNoteTie = (note1 && note2) && note1->IsGraceNote() && !note2->IsGraceNote();
 
     const int ySign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
 
     startPoint.y += ySign * drawingUnit / 2;
     endPoint.y += ySign * drawingUnit / 2;
-    if (isShortTie && isSameDirection) {
+    if (isShortTie && !isGraceToNoteTie) {
         startPoint.y += ySign * drawingUnit;
         endPoint.y += ySign * drawingUnit;
     }
@@ -515,7 +515,7 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
 
     int adjust = 0;
     int dotsPosition = 0;
-    for (auto object : objects) {
+    for (const Object *object : objects) {
         if (!object->HasSelfBB()) continue;
         // if we have possible overlap with dots, we need to move tie up/down to avoid it. This happens only for the
         // outer ties, so there should be no issue of inner tie moving up and colliding with other elements
@@ -558,8 +558,9 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
             else if (oppositeOverlap) {
                 intersection = (oppositeOverlap / step) * step * 0.5;
             }
-            else
+            else {
                 continue;
+            }
 
             if (std::abs(intersection) > std::abs(adjust)) adjust = intersection;
         }

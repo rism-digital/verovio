@@ -121,7 +121,7 @@ int StaffGrp::GetMaxStaffSize() const
     int max = 0;
 
     const StaffDef *staffDef = NULL;
-    for (auto &child : childList) {
+    for (const Object *child : childList) {
         staffDef = vrv_cast<const StaffDef *>(child);
         assert(staffDef);
         if (staffDef->HasScale() && staffDef->GetScale() >= max) {

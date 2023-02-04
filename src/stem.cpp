@@ -188,7 +188,7 @@ int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) cons
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
-    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < 8)) {
+    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < STEMMODIFIER_MAX)) {
         stemMod = this->GetDrawingStemMod();
     }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return 0;
@@ -205,7 +205,13 @@ int Stem::AdjustSlashes(const Doc *doc, const Staff *staff, int flagOffset) cons
 
     const int glyphHeight = doc->GetGlyphHeight(code, staffSize, false);
     const int actualLength = std::abs(this->GetDrawingStemLen()) - lenAdjust / unit * unit;
-    const int diff = actualLength - std::abs(m_stemModRelY) - 0.5 * glyphHeight;
+    int diff = 0;
+    if ((stemMod == STEMMODIFIER_sprech) && (this->GetDrawingStemDir() == STEMDIRECTION_down)) {
+        diff = std::abs(actualLength - std::abs(m_stemModRelY));
+    }
+    else {
+        diff = actualLength - std::abs(m_stemModRelY) - 0.5 * glyphHeight;
+    }
     const int halfUnit = 0.5 * unit;
 
     int adjust = 0;
@@ -388,7 +394,7 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
     if (bTrem) {
         stemMod = bTrem->GetDrawingStemMod();
     }
-    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < 8)) {
+    else if (this->HasDrawingStemMod() && (this->GetDrawingStemMod() < STEMMODIFIER_MAX)) {
         stemMod = this->GetDrawingStemMod();
     }
     if ((stemMod == STEMMODIFIER_NONE) || (stemMod == STEMMODIFIER_none)) return;
@@ -402,11 +408,11 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
     const int noteLoc = note->GetDrawingLoc();
     int height = 2 * unit;
     switch (stemMod) {
-        case STEMMODIFIER_1slash:
-        case STEMMODIFIER_2slash:
-        case STEMMODIFIER_3slash:
-        case STEMMODIFIER_4slash:
-        case STEMMODIFIER_5slash:
+        case STEMMODIFIER_1slash: [[fallthrough]];
+        case STEMMODIFIER_2slash: [[fallthrough]];
+        case STEMMODIFIER_3slash: [[fallthrough]];
+        case STEMMODIFIER_4slash: [[fallthrough]];
+        case STEMMODIFIER_5slash: [[fallthrough]];
         case STEMMODIFIER_6slash: {
             if (noteLoc % 2 == 0) height += unit;
             height += glyphHalfHeight;
@@ -414,9 +420,9 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
                 height += doc->GetGlyphHeight(SMUFL_E220_tremolo1, staff->m_drawingStaffSize, false) / 2;
             break;
         }
-        case STEMMODIFIER_sprech:
+        case STEMMODIFIER_sprech: [[fallthrough]];
         case STEMMODIFIER_z: {
-            height += (noteLoc % 2) ? 3 * unit : 2 * unit;
+            height += unit;
             if (stemMod == STEMMODIFIER_sprech) height -= sign * glyphHalfHeight;
             break;
         }

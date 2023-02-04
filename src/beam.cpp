@@ -152,7 +152,7 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
     assert(beamInterface);
 
     const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
         if (!el->Is({ CHORD, NOTE })) continue;
@@ -259,7 +259,7 @@ void BeamSegment::CalcSetStemValuesTab(const Staff *staff, const Doc *doc, const
 
     int y1, y2;
 
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         // All notes and chords get their stem value stored
         LayerElement *el = coord->m_element;
         if (el->Is(TABGRP)) {
@@ -403,7 +403,7 @@ bool BeamSegment::NeedToResetPosition(Staff *staff, const Doc *doc, BeamDrawingI
     // Calculate midpoint for the beam with mixed placement
     int min = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
     int max = m_beamElementCoordRefs.at(0)->m_element->GetDrawingY();
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         max = std::max(max, coord->m_element->GetDrawingY());
         min = std::min(min, coord->m_element->GetDrawingY());
     }
@@ -512,7 +512,7 @@ void BeamSegment::AdjustBeamToLedgerLines(
     const int staffHeight = doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     const int doubleUnit = doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     const int staffMargin = isHorizontal ? doubleUnit / 2 : 0;
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
             const int topPosition = coord->m_yBeam + beamInterface->GetTotalBeamWidth();
             if (topPosition > staffTop - staffMargin) {
@@ -541,7 +541,7 @@ void BeamSegment::AdjustBeamToTremolos(const Doc *doc, const Staff *staff, const
     // iterate over all coords and find maximum required adjustment for stems and beam; additional beams should be taken
     // into account to make sure that correct value is calculated
     int maxAdjustment = 0;
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         // Get the interface for the chord or note
         StemmedDrawingInterface *stemmedInterface = coord->GetStemHolderInterface();
         if (!stemmedInterface) continue;
@@ -554,7 +554,7 @@ void BeamSegment::AdjustBeamToTremolos(const Doc *doc, const Staff *staff, const
     // exit in case no adjustment is required
     if (maxAdjustment == 0) return;
     // otherwise apply adjustment to all stems within beam and all beam positions
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         coord->m_yBeam -= maxAdjustment;
 
         // Get the interface for the chord or note
@@ -573,15 +573,13 @@ void BeamSegment::CalcBeamInit(
     assert(doc);
     assert(beamInterface);
 
-    int i;
-
     int elementCount = (int)m_beamElementCoordRefs.size();
     assert(elementCount > 0);
 
     /******************************************************************/
     // initialization
 
-    for (i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_x = coord->m_element->GetDrawingX();
     }
@@ -630,7 +628,7 @@ void BeamSegment::CalcBeamInit(
     };
 
     // elementCount holds the last one
-    for (i = 0; i < elementCount; ++i) {
+    for (int i = 0; i < elementCount; ++i) {
         BeamElementCoord *coord = m_beamElementCoordRefs.at(i);
         coord->m_yBeam = 0;
 
@@ -916,7 +914,7 @@ void BeamSegment::CalcBeamPosition(
     const Doc *doc, const Staff *staff, BeamDrawingInterface *beamInterface, bool isHorizontal)
 {
     // Set drawing stem positions
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
             coord->SetDrawingStemDir(STEMDIRECTION_up, staff, doc, this, beamInterface);
         }
@@ -996,7 +994,7 @@ void BeamSegment::CalcAdjustSlope(const Staff *staff, const Doc *doc, BeamDrawin
     refLen -= unit;
 
     bool lengthen = false;
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         if (coord->m_stem && coord->m_closestNote) {
             const int len = abs(coord->m_yBeam - coord->m_closestNote->GetDrawingY());
             if (len < refLen) {
@@ -1187,7 +1185,7 @@ void BeamSegment::CalcBeamPlaceTab(
     }
 
     if (beamInterface->m_drawingPlace == BEAMPLACE_below && staff->IsTabWithStemsOutside()) {
-        for (auto coord : m_beamElementCoordRefs) {
+        for (BeamElementCoord *coord : m_beamElementCoordRefs) {
             if (!coord->m_element || !coord->m_element->Is(TABGRP)) continue;
             TabGrp *tabGrp = vrv_cast<TabGrp *>(coord->m_element);
             assert(tabGrp);
@@ -1201,7 +1199,7 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
 {
     const auto [noteLoc, noteDur] = this->CalcStemDefiningNote(staff, place);
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
                                                                       : STEMDIRECTION_up;
@@ -1220,7 +1218,7 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
         }
     }
     // make adjustments for the grace notes length
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         if (coord->m_element) {
             if (coord->m_element->IsGraceNote()) {
                 m_uniformStemLength *= 0.75;
@@ -1241,7 +1239,7 @@ int BeamSegment::CalcMixedBeamCenterY(int step, int unit) const
 
     int highestBelowBeam = VRV_UNSET;
     int lowestAboveBeam = VRV_UNSET;
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         const int normalizedY = coord->m_yBeam - targetSlope * (coord->m_x - m_firstNoteOrChord->m_x);
         // Note that for elements below the beam the beamRelativePlace is above and vice versa
         if (coord->m_beamRelativePlace == BEAMPLACE_above) {
@@ -1274,7 +1272,7 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_B
     int relevantDuration = DUR_4;
     int relevantLoc = VRV_UNSET;
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
             : (coord->m_beamRelativePlace == BEAMPLACE_below)         ? STEMDIRECTION_down
                                                                       : STEMDIRECTION_up;
@@ -1342,7 +1340,7 @@ void BeamSegment::CalcHorizontalBeam(const Doc *doc, const Staff *staff, const B
         int maxLength = (beamInterface->m_drawingPlace == BEAMPLACE_above) ? VRV_UNSET : -VRV_UNSET;
 
         // Find the longest stem length
-        for (auto coord : m_beamElementCoordRefs) {
+        for (BeamElementCoord *coord : m_beamElementCoordRefs) {
             if (!coord->m_stem) continue;
 
             if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
@@ -1387,7 +1385,7 @@ void BeamSegment::CalcMixedBeamPlace(const Staff *staff)
         }
     }
 
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         if (it != m_beamElementCoordRefs.end()) {
             if (!coord->m_element->m_crossStaff) {
                 coord->m_beamRelativePlace = beamPlaceBelow ? BEAMPLACE_below : BEAMPLACE_above;
@@ -1456,7 +1454,7 @@ void BeamSegment::CalcSetValues()
     int startingX = m_beamElementCoordRefs.at(0)->m_x;
     int startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
 
-    for (auto coord : m_beamElementCoordRefs) {
+    for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         coord->m_yBeam = startingY + m_beamSlope * (coord->m_x - startingX);
     }
 }
@@ -2029,7 +2027,7 @@ void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterfac
 
     // Adjust existing artic
     ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);
-    for (auto object : artics) {
+    for (Object *object : artics) {
         Artic *artic = vrv_cast<Artic *>(object);
         if (((artic->GetDrawingPlace() == STAFFREL_above) && (stem->GetDrawingStemDir() == STEMDIRECTION_up))
             || ((artic->GetDrawingPlace() == STAFFREL_below) && (stem->GetDrawingStemDir() == STEMDIRECTION_down))) {

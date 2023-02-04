@@ -219,10 +219,12 @@ void Chord::FilterList(ListOfConstObjects &childList) const
     ListOfConstObjects::iterator iter = childList.begin();
 
     while (iter != childList.end()) {
-        if ((*iter)->Is(NOTE))
+        if ((*iter)->Is(NOTE)) {
             ++iter;
-        else
+        }
+        else {
             iter = childList.erase(iter);
+        }
     }
 
     childList.sort(DiatonicSort());
@@ -443,8 +445,8 @@ bool Chord::IsVisible() const
     // if the chord doesn't have it, see if all the children are invisible
     const ListOfConstObjects &notes = this->GetList(this);
 
-    for (auto &iter : notes) {
-        const Note *note = vrv_cast<const Note *>(iter);
+    for (const Object *object : notes) {
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
@@ -488,7 +490,7 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
     int margin = 0;
     // get positions of other elements
     std::set<int> otherElementLocations;
-    for (auto element : otherElements) {
+    for (LayerElement *element : otherElements) {
         if (element->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(element);
             assert(note);
@@ -513,8 +515,8 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
     int actualElementsInUnison = 0;
 
     // process each note of the chord separately, storing locations in the set
-    for (auto iter : notes) {
-        Note *note = vrv_cast<Note *>(iter);
+    for (Object *object : notes) {
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
         auto [overlap, isInUnison] = note->CalcElementHorizontalOverlap(
             doc, otherElements, areDotsAdjusted, true, isLowerPosition, expectedElementsInUnison > 0);
@@ -748,10 +750,13 @@ int Chord::CalcStem(FunctorParams *functorParams)
     this->SetDrawingStemDir(stemDir);
 
     // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up) stem->SetDrawingYRel(yMin - this->GetDrawingY());
+    if (stemDir == STEMDIRECTION_up) {
+        stem->SetDrawingYRel(yMin - this->GetDrawingY());
+    }
     // And to the top note when down
-    else
+    else {
         stem->SetDrawingYRel(yMax - this->GetDrawingY());
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -804,10 +809,12 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
     MapOfNoteLocs noteLocs = this->CalcNoteLocations([](const Note *note) { return !note->HasDots(); });
     MapOfDotLocs dotLocs;
     for (const auto &mapEntry : noteLocs) {
-        if (useReverseOrder)
+        if (useReverseOrder) {
             dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.rbegin(), mapEntry.second.rend(), true);
-        else
+        }
+        else {
             dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
+        }
     }
     return dotLocs;
 }

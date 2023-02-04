@@ -96,46 +96,54 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
         return;
     }
 
-    data_STAFFREL_basic position = tuplet->GetDrawingBracketPos();
-    const int lineWidth
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tupletBracketThickness.GetValue();
-
     dc->ResumeGraphic(tupletBracket, tupletBracket->GetID());
 
-    const int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft();
-    const int xRight = tuplet->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight();
-    const int yLeft = tupletBracket->GetDrawingYLeft() - lineWidth / 2;
-    const int yRight = tupletBracket->GetDrawingYRight() - lineWidth / 2;
-    int bracketHeight;
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int lineWidth
+        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tupletBracketThickness.GetValue();
+    const int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft() + lineWidth / 2;
+    const int xRight = tuplet->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight() - lineWidth / 2;
+    const int yLeft = tupletBracket->GetDrawingYLeft();
+    const int yRight = tupletBracket->GetDrawingYRight();
+    int bracketHeight = (tuplet->GetDrawingBracketPos() == STAFFREL_basic_above) ? -1 : 1;
+
+    dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
 
     // Draw a bracket with a gap
     if (tupletBracket->GetAlignedNum() && tupletBracket->GetAlignedNum()->HasSelfBB()) {
-        const int xNumLeft
-            = tupletBracket->GetAlignedNum()->GetSelfLeft() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-        const int xNumRight
-            = tupletBracket->GetAlignedNum()->GetSelfRight() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        const int xNumLeft = tupletBracket->GetAlignedNum()->GetSelfLeft() - unit / 2;
+        const int xNumRight = tupletBracket->GetAlignedNum()->GetSelfRight() + unit / 2;
         const double slope = (double)(yRight - yLeft) / (double)(xRight - xLeft);
         const int yNumLeft = yLeft + slope * (xNumLeft - xLeft);
-        this->DrawObliquePolygon(dc, xLeft, yLeft, xNumLeft, yNumLeft, lineWidth);
         const int yNumRight = yRight - slope * (xRight - xNumRight);
-        this->DrawObliquePolygon(dc, xNumRight, yNumRight, xRight, yRight, lineWidth);
         bracketHeight
-            = abs(tupletBracket->GetAlignedNum()->GetSelfTop() - tupletBracket->GetAlignedNum()->GetSelfBottom()) / 2;
+            *= abs(tupletBracket->GetAlignedNum()->GetSelfTop() - tupletBracket->GetAlignedNum()->GetSelfBottom()) / 2;
+
+        Point bracketLeft[3];
+        bracketLeft[0] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft + bracketHeight) };
+        bracketLeft[1] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft) };
+        bracketLeft[2] = { ToDeviceContextX(xNumLeft), ToDeviceContextY(yNumLeft) };
+        Point bracketRight[3];
+        bracketRight[0] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight + bracketHeight) };
+        bracketRight[1] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight) };
+        bracketRight[2] = { ToDeviceContextX(xNumRight), ToDeviceContextY(yNumRight) };
+
+        dc->DrawPolyline(3, bracketLeft);
+        dc->DrawPolyline(3, bracketRight);
     }
     else {
-        this->DrawObliquePolygon(dc, xLeft, yLeft, xRight, yRight, lineWidth);
-        // HARDCODED
-        bracketHeight = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6 / 5;
+        bracketHeight *= unit + lineWidth;
+
+        Point bracket[4];
+        bracket[0] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft + bracketHeight) };
+        bracket[1] = { ToDeviceContextX(xLeft), ToDeviceContextY(yLeft) };
+        bracket[2] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight) };
+        bracket[3] = { ToDeviceContextX(xRight), ToDeviceContextY(yRight + bracketHeight) };
+
+        dc->DrawPolyline(4, bracket);
     }
 
-    if (position == STAFFREL_basic_above) {
-        bracketHeight *= -1;
-    }
-
-    this->DrawFilledRectangle(
-        dc, xLeft, yLeft + lineWidth / 2, xLeft + lineWidth, yLeft + bracketHeight + lineWidth / 2);
-    this->DrawFilledRectangle(
-        dc, xRight, yRight + lineWidth / 2, xRight - lineWidth, yRight + bracketHeight + lineWidth / 2);
+    dc->ResetPen();
 
     dc->EndResumedGraphic(tupletBracket, this);
 

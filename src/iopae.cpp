@@ -742,10 +742,12 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_clef)) {
         Clef *c = new Clef;
         getClefInfo(c_clef, c); // do we need to put a default clef?
-        if (!staffDefClef)
+        if (!staffDefClef) {
             staffDefClef = c;
-        else
+        }
+        else {
             current_measure.clef = c;
+        }
     }
 
     if (strlen(c_keysig)) {
@@ -800,7 +802,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
 
         if (incipit[i] == ' ') {
             // just skip
-            i++;
+            ++i;
         }
 
         // octaves
@@ -822,10 +824,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         // beaming starts
         else if (incipit[i] == '{') {
             // current_note.beam = 1;
-            if (current_note.tuplet_note > 0)
-                current_note.beam = BEAM_TUPLET;
-            else
-                current_note.beam = BEAM_INITIAL;
+            current_note.beam = (current_note.tuplet_note > 0) ? BEAM_TUPLET : BEAM_INITIAL;
             in_beam++;
         }
 
@@ -967,7 +966,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
             }
         }
 
-        i++;
+        ++i;
     }
 
     // we need to add the last measure if it has no barLine at the end
@@ -1057,7 +1056,7 @@ int PAEInput::getOctave(const char *incipit, char *octave, int index)
         *octave = BASE_OCT;
         while ((i + 1 < length) && (incipit[i + 1] == '\'')) {
             (*octave)++;
-            i++;
+            ++i;
         }
     }
     else if (incipit[i] == ',') {
@@ -1065,7 +1064,7 @@ int PAEInput::getOctave(const char *incipit, char *octave, int index)
         *octave = BASE_OCT - 1;
         while ((i + 1 < length) && (incipit[i + 1] == ',')) {
             (*octave)--;
-            i++;
+            ++i;
         }
     }
 
@@ -1121,7 +1120,7 @@ int PAEInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
     *dot = 0;
     while ((i + 1 < length) && (incipit[i + 1] == '.')) {
         (*dot)++;
-        i++;
+        ++i;
     }
     if ((*dot == 1) && (incipit[i] == 7)) {
         // neumatic notation
@@ -1157,7 +1156,7 @@ int PAEInput::getDurations(const char *incipit, pae::Measure *measure, int index
         measure->dots.push_back(dot);
         // j++;
         if ((i + 1 < length) && isdigit(incipit[i + 1])) {
-            i++;
+            ++i;
         }
         else {
             break;
@@ -1184,14 +1183,14 @@ int PAEInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accide
         *accident = ACCIDENTAL_WRITTEN_s;
         if ((i + 1 < length) && (incipit[i + 1] == 'x')) {
             *accident = ACCIDENTAL_WRITTEN_x;
-            i++;
+            ++i;
         }
     }
     else if (incipit[i] == 'b') {
         *accident = ACCIDENTAL_WRITTEN_f;
         if ((i + 1 < length) && (incipit[i + 1] == 'b')) {
             *accident = ACCIDENTAL_WRITTEN_ff;
-            i++;
+            ++i;
         }
     }
     return i - index;
@@ -1322,7 +1321,7 @@ int PAEInput::getGraceNote(const char *incipit, pae::Note *note, int index)
     else if (incipit[i] == 'q') {
         note->appoggiatura = 1;
         if ((i + 1 < length) && (incipit[i + 1] == 'q')) {
-            i++;
+            ++i;
             int r = i;
             while ((r < length) && (incipit[r] != 'r')) {
                 if ((incipit[r] - 'A' >= 0) && (incipit[r] - 'A' < 7)) {
@@ -1377,12 +1376,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     }
 
     // find the end of time signature
-    i++; // the time signature length is a least 1
+    ++i; // the time signature length is a least 1
     while (i < length) {
         if (!isdigit(incipit[i]) && (incipit[i] != '/') && (incipit[i] != '.')) {
             break;
         }
-        i++;
+        ++i;
     }
 
     // use a substring for the time signature
@@ -1496,7 +1495,7 @@ int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         if (incipit[index] == '+') {
             m_is_mensural = true;
         }
-        i++;
+        ++i;
         index++;
     }
 
@@ -1625,7 +1624,7 @@ int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
     else { //
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
-            i++;
+            ++i;
             for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
                 // With abbreviation, repeat clefs but do not copy keySig, meterSig and mensur
@@ -1696,7 +1695,7 @@ int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             if (alt_nr < 7) {
                 enclosedAccids.at(alt_nr) = enclosed;
             }
-            i++;
+            ++i;
         }
     }
 
@@ -1888,7 +1887,7 @@ void PAEInput::convertMeasure(pae::Measure *measure)
 
     m_nested_objects.clear();
 
-    for (unsigned int i = 0; i < measure->notes.size(); ++i) {
+    for (int i = 0; i < (int)measure->notes.size(); ++i) {
         pae::Note *note = &measure->notes.at(i);
         parseNote(note);
     }
@@ -2190,8 +2189,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     strcpy(value, &input[index]);
 
     // Truncate string to first space
-    size_t i;
-    for (i = strlen(value) - 2; i > 0; i--) {
+    for (int i = strlen(value) - 2; i > 0; --i) {
         if (isspace(value[i])) {
             value[i] = EMPTY;
             continue;
@@ -2451,7 +2449,7 @@ void PAEInput::ClearTokenObjects()
 {
     // Before we clear the pae list of tokens, we need to delete all token objects.
     // Normally, they should be none because they are passed to the doc.
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (!token.m_object || token.IsContainerEnd()) continue;
         LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
         delete token.m_object;
@@ -2541,7 +2539,7 @@ void PAEInput::LogDebugTokens(bool vertical)
 {
     // For long incipits or to see full class name
     if (vertical) {
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c1 = (token.m_char) ? token.m_char : ' ';
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
             std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
@@ -2551,7 +2549,7 @@ void PAEInput::LogDebugTokens(bool vertical)
     }
     else {
         std::string row;
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c = (token.m_inputChar) ? token.m_inputChar : ' ';
             row.push_back(c);
         }
@@ -2559,20 +2557,20 @@ void PAEInput::LogDebugTokens(bool vertical)
         LogDebug(row.c_str());
         if (m_hasErrors) {
             row.clear();
-            for (auto &token : m_pae) {
+            for (pae::Token &token : m_pae) {
                 char c = (token.m_isError) ? '^' : ' ';
                 row.push_back(c);
             }
             LogDebug(row.c_str());
         }
         row.clear();
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
             row.push_back(className.at(0));
         }
         LogDebug(row.c_str());
         row.clear();
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c = (token.m_char) ? token.m_char : ' ';
             row.push_back(c);
         }
@@ -2624,7 +2622,7 @@ void PAEInput::AddToken(char c, int &position)
 
 void PAEInput::PrepareInsertion(int position, std::list<pae::Token> &insertion)
 {
-    for (auto &token : insertion) {
+    for (pae::Token &token : insertion) {
         token.m_position = position;
         if (token.m_object) {
             token.m_object = token.m_object->Clone();
@@ -2865,7 +2863,7 @@ bool PAEInput::Import(const std::string &input)
         if (c == pae::CONTAINER_END) continue;
         // Otherwise go ahead
         this->AddToken(c, i);
-        i++;
+        ++i;
     }
 
     // Add a token marking the end - special use of the CONTAINER_END with no object
@@ -2988,7 +2986,7 @@ bool PAEInput::Parse()
     // The current meterSig, used to calculate the tstamp2 for open ties
     MeterSig *currentMeterSig = &m_meterSig;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // Double check that we don't have more than the layer on the layerStack
@@ -3126,7 +3124,7 @@ bool PAEInput::ConvertKeySig()
     pae::Token *keySigToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::KEYSIG_START) {
@@ -3164,7 +3162,7 @@ bool PAEInput::ConvertClef()
     pae::Token *clefToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::CLEF_START) {
@@ -3202,7 +3200,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
     pae::Token *meterSigOrMensurToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::METERSIG_START) {
@@ -3251,7 +3249,7 @@ bool PAEInput::ConvertMeasure()
     // measureCount is currently ignored by the Measure constructor
     int measureCount = 1;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // This is the first (default) measure added to the tokens ::Import
@@ -3446,7 +3444,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
     pae::Token *mRestOrMultiRestToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '=') {
@@ -3487,7 +3485,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
 
 bool PAEInput::ConvertPitch()
 {
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::NOTENAME)) {
@@ -3517,7 +3515,7 @@ bool PAEInput::ConvertOctave()
     int oct = 4;
     char readingOct = 0;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::OCTAVEUP) {
@@ -3562,7 +3560,7 @@ bool PAEInput::ConvertTrill()
 {
     Object *note = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // Keep a pointer and simply continue
@@ -3602,7 +3600,7 @@ bool PAEInput::ConvertFermata()
     pae::Token *fermataToken = NULL;
     Object *fermataTarget = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '(') {
@@ -3665,7 +3663,7 @@ bool PAEInput::ConvertAccidental()
 {
     data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::ACCIDENTAL_INTERNAL)) {
@@ -3704,7 +3702,7 @@ bool PAEInput::ConvertAccidental()
 
 bool PAEInput::ConvertRest()
 {
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '-') {
@@ -3899,7 +3897,7 @@ bool PAEInput::ConvertGraceGrp()
     // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
     pae::Token *graceGrpToken = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == 'q') {
@@ -3975,7 +3973,7 @@ bool PAEInput::ConvertGrace()
     pae::Token *graceToken = NULL;
     bool isAcciaccatura = false;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::GRACE)) {
@@ -4224,7 +4222,7 @@ bool PAEInput::ConvertTie()
     // A pointer to the token be able to reset it to '+' in mensural notation
     pae::Token *tieToken = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.Is(NOTE)) {
@@ -4400,7 +4398,7 @@ bool PAEInput::ConvertAccidGes()
     Note *lastNote = NULL;
     std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.Is(KEYSIG)) {
@@ -4485,7 +4483,7 @@ bool PAEInput::CheckHierarchy()
     while (!isValid && checkCount < 5) {
         checkCount++;
         isValid = true;
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             if (token.IsVoid()) continue;
 
             if (!token.m_object) continue;
@@ -4603,7 +4601,7 @@ bool PAEInput::CheckContentPostBuild()
 void PAEInput::RemoveContainerToken(Object *object)
 {
     bool deleted = false;
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid() || !token.m_object) continue;
 
         if (token.m_object == object) {
@@ -4639,7 +4637,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     enclosedAccids.resize(7);
     bool cancel = false;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
-    for (auto c : paeStr) {
+    for (char c : paeStr) {
         switch (c) {
             case 'b':
                 altNumber = 0;

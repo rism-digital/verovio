@@ -217,8 +217,10 @@ elseif (BUILD_AS_PYTHON)
     set(PYTHON_VERSION "3" CACHE STRING "Python Version to use")
     find_package(Python EXACT ${PYTHON_VERSION} MODULE REQUIRED)
 
-    if(PYTHON_VERSION VERSION_GREATER_EQUAL 3)
-      list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
+    if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
+        list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
+    else()
+        list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
 
     set_source_files_properties(../bindings/python/verovio.i PROPERTIES CPLUSPLUS ON)

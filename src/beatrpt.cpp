@@ -88,7 +88,7 @@ int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
     // filter last beat and copy all notes
     smf::MidiEvent event;
     int eventcount = params->m_midiFile->getEventCount(params->m_midiTrack);
-    for (int i = 0; i < eventcount; i++) {
+    for (int i = 0; i < eventcount; ++i) {
         event = params->m_midiFile->getEvent(params->m_midiTrack, i);
         if (event.tick > starttime * tpq)
             break;

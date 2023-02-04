@@ -40,10 +40,10 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 {
     assert(prevSect);
     // find all siblings of expansion element to know what in MEI file
-    const vrv::ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
+    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
-    for (auto o : expansionSiblings) {
-        if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetID());
+    for (Object *object : expansionSiblings) {
+        if (object->Is({ SECTION, ENDING, LEM, RDG })) reductionList.push_back(object->GetID());
     }
 
     for (std::string s : expansionList) {
@@ -55,10 +55,12 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
         if (currSect->Is(EXPANSION)) { // if reference is itself an expansion, resolve it recursively
             // remove parent from reductionList, if expansion
             for (auto it = begin(reductionList); it != end(reductionList);) {
-                if ((*it).compare(currSect->GetParent()->GetID()) == 0)
+                if ((*it).compare(currSect->GetParent()->GetID()) == 0) {
                     it = reductionList.erase(it);
-                else
+                }
+                else {
                     ++it;
+                }
             }
             Expansion *currExpansion = vrv_cast<Expansion *>(currSect);
             assert(currExpansion);
@@ -80,7 +82,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetID());
                 this->GetIDList(clonedObject, clonedIds);
-                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
+                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); ++i) {
                     this->AddExpandedIDToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 
@@ -98,10 +100,12 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 
             // remove s from reductionList
             for (auto it = begin(reductionList); it != end(reductionList);) {
-                if ((*it).compare(s) == 0)
+                if ((*it).compare(s) == 0) {
                     it = reductionList.erase(it);
-                else
+                }
+                else {
                     ++it;
+                }
             }
         }
     }

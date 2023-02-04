@@ -542,6 +542,11 @@ void Page::LayOutVertically()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Adjust the position of tuplets by slurs
+    FunctorDocParams adjustTupletWithSlursParams(doc);
+    Functor adjustTupletWithSlurs(&Object::AdjustTupletWithSlurs);
+    this->Process(&adjustTupletWithSlurs, &adjustTupletWithSlursParams);
+
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     CalcBBoxOverflowsParams calcBBoxOverflowsParams(doc);
     Functor calcBBoxOverflows(&Object::CalcBBoxOverflows);
@@ -759,7 +764,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         const System *system = dynamic_cast<const System *>(child);
         if (system) {
             // we include the left margin and the right margin

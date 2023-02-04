@@ -120,9 +120,7 @@ Object::Object(const Object &object) : BoundingBox(object)
         return;
     }
 
-    int i;
-    for (i = 0; i < (int)object.m_children.size(); ++i) {
-        Object *current = object.m_children.at(i);
+    for (Object *current : object.m_children) {
         Object *clone = current->Clone();
         if (clone) {
             LinkingInterface *link = clone->GetLinkingInterface();
@@ -167,9 +165,7 @@ Object &Object::operator=(const Object &object)
         if (link) link->AddBackLink(&object);
 
         if (object.CopyChildren()) {
-            int i;
-            for (i = 0; i < (int)object.m_children.size(); ++i) {
-                Object *current = object.m_children.at(i);
+            for (Object *current : object.m_children) {
                 Object *clone = current->Clone();
                 if (clone) {
                     LinkingInterface *link = clone->GetLinkingInterface();
@@ -288,16 +284,14 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
         assert("Object must be of the same type");
     }
 
-    int i;
-    for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
+    for (int i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
-        child->SetParent(this);
         if (idx != -1) {
             this->InsertChild(child, idx);
             idx++;
         }
         else {
-            m_children.push_back(child);
+            AddChild(child);
         }
     }
 }
@@ -320,7 +314,6 @@ void Object::InsertBefore(Object *child, Object *newChild)
     assert(this->GetChildIndex(newChild) == -1);
 
     int idx = this->GetChildIndex(child);
-    newChild->SetParent(this);
     this->InsertChild(newChild, idx);
 
     this->Modify();
@@ -332,7 +325,6 @@ void Object::InsertAfter(Object *child, Object *newChild)
     assert(this->GetChildIndex(newChild) == -1);
 
     int idx = this->GetChildIndex(child);
-    newChild->SetParent(this);
     this->InsertChild(newChild, idx + 1);
 
     this->Modify();
@@ -437,9 +429,8 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
 {
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-        if (((*iter).first == attribute) && ((*iter).second == value)) return true;
+    for (auto &attributePair : attributes) {
+        if ((attributePair.first == attribute) && (attributePair.second == value)) return true;
     }
     return false;
 }
@@ -524,8 +515,9 @@ int Object::GetIdx() const
 
 void Object::InsertChild(Object *element, int idx)
 {
-    // With this method we require the parent to be set before
-    assert(element->GetParent() == this);
+    // With this method we require the parent to be NULL
+    assert(!element->GetParent());
+    element->SetParent(this);
 
     if (idx >= (int)m_children.size()) {
         m_children.push_back(element);
@@ -580,8 +572,9 @@ void Object::ClearRelinquishedChildren()
         if ((*iter)->GetParent() != this) {
             iter = m_children.erase(iter);
         }
-        else
+        else {
             ++iter;
+        }
     }
 }
 
@@ -861,7 +854,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
 {
     ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     int i = 0;
-    for (auto &object : objects) {
+    for (Object *object : objects) {
         if (child == object) return i;
         ++i;
     }
@@ -1229,9 +1222,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         a->FindAllDescendantsByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
+        for (Object *object : children) {
+            if (object->Is(SYL)) continue;
+            FacsimileInterface *temp = object->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
@@ -1243,9 +1236,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         b->FindAllDescendantsByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
+        for (Object *object : children) {
+            if (object->Is(SYL)) continue;
+            FacsimileInterface *temp = object->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
@@ -1616,7 +1609,7 @@ ClassId ObjectFactory::GetClassId(std::string name)
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
-    for (auto str : classStrings) {
+    for (const std::string &str : classStrings) {
         if (s_classIdsRegistry.count(str) > 0) {
             classIds.push_back(s_classIdsRegistry.at(str));
         }
@@ -1803,7 +1796,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = this->GetPlistInterface();
         assert(interface);
-        for (auto &object : interface->GetRefs()) {
+        for (Object *object : interface->GetRefs()) {
             params->m_elements->push_back(object);
         }
     }

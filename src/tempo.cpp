@@ -144,12 +144,16 @@ int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
     }
     else if (this->HasMm()) {
         double mm = this->GetMm();
-        int mmUnit = 4;
+        double mmUnit = 4;
         if (this->HasMmUnit() && (this->GetMmUnit() > DURATION_breve)) {
             mmUnit = pow(2, (int)this->GetMmUnit() - 2);
         }
         if (this->HasMmDots()) {
-            mmUnit = 2 * mmUnit - (mmUnit / pow(2, this->GetMmDots()));
+            double dotsUnit = 0.0;
+            for (int d = 0; d < this->GetMmDots(); d++) {
+                dotsUnit += mmUnit / 4.0 / pow(2, d);
+            }
+            mmUnit -= dotsUnit;
         }
         if (mmUnit > 0) params->m_currentTempo = mm * 4.0 / mmUnit;
     }

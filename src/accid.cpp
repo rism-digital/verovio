@@ -171,10 +171,9 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
-            std::vector<Accid *>::iterator iter;
             // Recursively adjust all accidental that are on the left because enough space was previously available
-            for (iter = leftAccids.begin(); iter != leftAccids.end(); ++iter) {
-                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset, adjustedAccids);
+            for (Accid *accid : leftAccids) {
+                this->AdjustX(accid, doc, staffSize, leftAccidsSubset, adjustedAccids);
             }
         }
     }

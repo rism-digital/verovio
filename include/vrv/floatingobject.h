@@ -99,6 +99,15 @@ public:
      */
     virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
 
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary (relative to the object position)
+     * and a flag indicating whether refined layout was used.
+     */
+    virtual std::pair<int, bool> GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+
     //----------//
     // Functors //
     //----------//
@@ -232,11 +241,6 @@ public:
      */
     char GetSpanningType() const { return m_spanningType; }
 
-    bool CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox);
-
-    int GetSpaceBelow(
-        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox) const;
-
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     /**
@@ -249,6 +253,35 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
     ///@}
+
+    /**
+     * Return the horizontal margin for overlap with another element
+     * This can be negative, if elements are allowed to slightly overlap
+     */
+    int GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const;
+
+    /**
+     * Update the Y drawing relative position based on collision detection with the overlapping bounding box
+     */
+    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+
+    int GetSpaceBelow(
+        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     */
+    ///@{
+    std::pair<int, bool> GetVerticalContentBoundaryRel(
+        const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+    int GetVerticalContentBoundary(const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+    ///@}
+
+    /**
+     * Version of Boundary::VerticalContentOverlap which takes refined boundaries into account
+     */
+    bool HasVerticalContentOverlap(const Doc *doc, const BoundingBox *horizOverlappingBBox, int margin) const;
 
 private:
     Object *m_objectX;

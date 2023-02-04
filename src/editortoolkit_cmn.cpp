@@ -202,7 +202,7 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 {
     bool status = true;
     m_chainedId = "";
-    for (int i = 0; i < (int)actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); ++i) {
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
         m_editInfo.import("uuid", m_chainedId);
     }
@@ -483,7 +483,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         chord->AddChild(note);
 
         ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
-        for (auto &artic : artics) {
+        for (Object *artic : artics) {
             artic->MoveItselfTo(chord);
         }
         currentNote->ClearRelinquishedChildren();
@@ -536,7 +536,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             parent->ReplaceChild(chord, otherNote);
 
             ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
-            for (auto &artic : artics) {
+            for (Object *artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }
             m_chainedId = chord->GetID();

@@ -18,6 +18,7 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
@@ -285,7 +286,7 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
+int Measure::CalculateRightBarLineWidth(const Doc *doc, int staffSize) const
 {
     const BarLine *barline = this->GetRightBarLine();
     if (!barline) return 0;
@@ -298,7 +299,8 @@ int Measure::CalculateRightBarLineWidth(Doc *doc, int staffSize)
     int width = 0;
     switch (barline->GetForm()) {
         case BARRENDITION_dbl:
-        case BARRENDITION_dbldashed: {
+        case BARRENDITION_dbldashed:
+        case BARRENDITION_dbldotted: {
             width = barLineSeparation + barLineWidth;
             break;
         }
@@ -408,14 +410,14 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
-    for (auto &staffGrp : staffGrps) {
+    for (Object *staffGrp : staffGrps) {
         StaffDef *staffDef = vrv_cast<StaffDef *>((staffGrp)->FindDescendantByType(STAFFDEF));
         if (staffDef && (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) staffList.insert(staffDef->GetN());
     }
 
     // Get the corresponding staves in the measure
-    for (auto iter = staffList.begin(); iter != staffList.end(); ++iter) {
-        AttNIntegerComparison matchN(STAFF, *iter);
+    for (int staffN : staffList) {
+        AttNIntegerComparison matchN(STAFF, staffN);
         Staff *staff = vrv_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
@@ -436,7 +438,7 @@ const Staff *Measure::GetTopVisibleStaff() const
 {
     const Staff *staff = NULL;
     ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
-    for (auto &child : staves) {
+    for (const Object *child : staves) {
         staff = vrv_cast<const Staff *>(child);
         assert(staff);
         if (staff->DrawingIsVisible()) {
@@ -792,18 +794,12 @@ int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Measure::Save(FunctorParams *functorParams)
 {
-    if (this->IsMeasuredMusic())
-        return Object::Save(functorParams);
-    else
-        return FUNCTOR_CONTINUE;
+    return (this->IsMeasuredMusic()) ? Object::Save(functorParams) : FUNCTOR_CONTINUE;
 }
 
 int Measure::SaveEnd(FunctorParams *functorParams)
 {
-    if (this->IsMeasuredMusic())
-        return Object::SaveEnd(functorParams);
-    else
-        return FUNCTOR_CONTINUE;
+    return (this->IsMeasuredMusic()) ? Object::SaveEnd(functorParams) : FUNCTOR_CONTINUE;
 }
 
 int Measure::ScoreDefUnsetCurrent(FunctorParams *functorParams)
@@ -1418,6 +1414,45 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
 {
     PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
     assert(params);
+
+    // Link dynamics and hairpins at the end of the measure to make sure that the order of elements in MEI does not
+    // dictate their linkage. With this, linking dynamics to hairpin is prioritized and hairpins are linked only after
+    // all dynamics were processed.
+
+    for (auto &dynam : params->m_dynams) {
+        for (auto &hairpin : params->m_hairpins) {
+            if ((hairpin->GetEnd() == dynam->GetStart()) && (hairpin->GetStaff() == dynam->GetStaff())) {
+                if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+            }
+        }
+    }
+
+    for (auto &hairpin : params->m_hairpins) {
+        for (auto &dynam : params->m_dynams) {
+            if ((dynam->GetStart() == hairpin->GetStart()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(dynam);
+            }
+            else if ((dynam->GetStart() == hairpin->GetEnd()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+            }
+        }
+
+        for (auto &hairpin2 : params->m_hairpins) {
+            if (hairpin == hairpin2) continue;
+            if ((hairpin2->GetEnd() == hairpin->GetStart()) && (hairpin2->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetLeftLink() && !hairpin2->GetRightLink()) {
+                    hairpin->SetLeftLink(hairpin2);
+                    hairpin2->SetRightLink(hairpin);
+                }
+            }
+            if ((hairpin2->GetStart() == hairpin->GetEnd()) && (hairpin2->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin2->GetLeftLink() && !hairpin->GetRightLink()) {
+                    hairpin2->SetLeftLink(hairpin);
+                    hairpin->SetRightLink(hairpin2);
+                }
+            }
+        }
+    }
 
     params->m_dynams.clear();
 

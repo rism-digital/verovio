@@ -130,7 +130,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
                 = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
             m_intervalsDiatonic << intervalDiatonicStr;
             jsonxx::Array intervalsIds;
-            for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
+            for (Note *previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
             intervalsIds << note->GetID();
             m_intervalsIds << jsonxx::Value(intervalsIds);
         }
