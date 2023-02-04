@@ -64,7 +64,7 @@ bool AttAnnotVis::HasPlace() const
     return (m_place.HasValue());
 }
 
-/* include <attplace> */
+
 
 //----------------------------------------------------------------------------
 // AttArpegVis
@@ -198,7 +198,7 @@ bool AttArpegVis::HasLineWidth() const
     return (m_lineWidth.HasValue());
 }
 
-/* include <attline.width> */
+
 
 //----------------------------------------------------------------------------
 // AttBarLineVis
@@ -272,7 +272,7 @@ bool AttBarLineVis::HasPlace() const
     return (m_place != VRV_UNSET);
 }
 
-/* include <attplace> */
+
 
 //----------------------------------------------------------------------------
 // AttBeamingVis
@@ -346,7 +346,7 @@ bool AttBeamingVis::HasBeamSlope() const
     return (m_beamSlope != 0.0);
 }
 
-/* include <attbeam.slope> */
+
 
 //----------------------------------------------------------------------------
 // AttBeatRptVis
@@ -390,7 +390,7 @@ bool AttBeatRptVis::HasSlash() const
     return (m_slash != BEATRPT_REND_NONE);
 }
 
-/* include <attslash> */
+
 
 //----------------------------------------------------------------------------
 // AttChordVis
@@ -434,7 +434,7 @@ bool AttChordVis::HasCluster() const
     return (m_cluster != CLUSTER_NONE);
 }
 
-/* include <attcluster> */
+
 
 //----------------------------------------------------------------------------
 // AttCleffingVis
@@ -493,7 +493,7 @@ bool AttCleffingVis::HasClefVisible() const
     return (m_clefVisible != BOOLEAN_NONE);
 }
 
-/* include <attclef.visible> */
+
 
 //----------------------------------------------------------------------------
 // AttEpisemaVis
@@ -552,7 +552,7 @@ bool AttEpisemaVis::HasPlace() const
     return (m_place != data_EVENTREL());
 }
 
-/* include <attplace> */
+
 
 //----------------------------------------------------------------------------
 // AttFTremVis
@@ -626,7 +626,7 @@ bool AttFTremVis::HasFloatGap() const
     return (m_floatGap != data_MEASUREMENTUNSIGNED());
 }
 
-/* include <attfloat.gap> */
+
 
 //----------------------------------------------------------------------------
 // AttFermataVis
@@ -685,7 +685,7 @@ bool AttFermataVis::HasShape() const
     return (m_shape != fermataVis_SHAPE_NONE);
 }
 
-/* include <attshape> */
+
 
 //----------------------------------------------------------------------------
 // AttFingGrpVis
@@ -729,7 +729,7 @@ bool AttFingGrpVis::HasOrient() const
     return (m_orient != fingGrpVis_ORIENT_NONE);
 }
 
-/* include <attorient> */
+
 
 //----------------------------------------------------------------------------
 // AttHairpinVis
@@ -818,7 +818,7 @@ bool AttHairpinVis::HasAngleOptimize() const
     return (m_angleOptimize != BOOLEAN_NONE);
 }
 
-/* include <attangle.optimize> */
+
 
 //----------------------------------------------------------------------------
 // AttHarmVis
@@ -862,7 +862,7 @@ bool AttHarmVis::HasRendgrid() const
     return (m_rendgrid != harmVis_RENDGRID_NONE);
 }
 
-/* include <attrendgrid> */
+
 
 //----------------------------------------------------------------------------
 // AttHispanTickVis
@@ -921,7 +921,7 @@ bool AttHispanTickVis::HasTilt() const
     return (m_tilt != data_COMPASSDIRECTION());
 }
 
-/* include <atttilt> */
+
 
 //----------------------------------------------------------------------------
 // AttKeySigVis
@@ -965,7 +965,7 @@ bool AttKeySigVis::HasSigShowchange() const
     return (m_sigShowchange != BOOLEAN_NONE);
 }
 
-/* include <attsig.showchange> */
+
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultVis
@@ -1024,7 +1024,7 @@ bool AttKeySigDefaultVis::HasKeysigShowchange() const
     return (m_keysigShowchange != BOOLEAN_NONE);
 }
 
-/* include <attkeysig.showchange> */
+
 
 //----------------------------------------------------------------------------
 // AttLigatureVis
@@ -1068,7 +1068,7 @@ bool AttLigatureVis::HasForm() const
     return (m_form != LIGATUREFORM_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttLineVis
@@ -1187,7 +1187,7 @@ bool AttLineVis::HasStartsymSize() const
     return (m_startsymSize != VRV_UNSET);
 }
 
-/* include <attstartsym.size> */
+
 
 //----------------------------------------------------------------------------
 // AttLiquescentVis
@@ -1246,7 +1246,7 @@ bool AttLiquescentVis::HasLooped() const
     return (m_looped != BOOLEAN_NONE);
 }
 
-/* include <attlooped> */
+
 
 //----------------------------------------------------------------------------
 // AttMensurVis
@@ -1335,7 +1335,7 @@ bool AttMensurVis::HasSign() const
     return (m_sign != MENSURATIONSIGN_NONE);
 }
 
-/* include <attsign> */
+
 
 //----------------------------------------------------------------------------
 // AttMensuralVis
@@ -1484,7 +1484,7 @@ bool AttMensuralVis::HasMensurSlash() const
     return (m_mensurSlash != VRV_UNSET);
 }
 
-/* include <attmensur.slash> */
+
 
 //----------------------------------------------------------------------------
 // AttMeterSigVis
@@ -1528,7 +1528,7 @@ bool AttMeterSigVis::HasForm() const
     return (m_form != METERFORM_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultVis
@@ -1587,7 +1587,7 @@ bool AttMeterSigDefaultVis::HasMeterShowchange() const
     return (m_meterShowchange != BOOLEAN_NONE);
 }
 
-/* include <attmeter.showchange> */
+
 
 //----------------------------------------------------------------------------
 // AttMultiRestVis
@@ -1631,7 +1631,7 @@ bool AttMultiRestVis::HasBlock() const
     return (m_block != BOOLEAN_NONE);
 }
 
-/* include <attblock> */
+
 
 //----------------------------------------------------------------------------
 // AttPbVis
@@ -1675,7 +1675,7 @@ bool AttPbVis::HasFolium() const
     return (m_folium != pbVis_FOLIUM_NONE);
 }
 
-/* include <attfolium> */
+
 
 //----------------------------------------------------------------------------
 // AttPedalVis
@@ -1719,7 +1719,7 @@ bool AttPedalVis::HasForm() const
     return (m_form != PEDALSTYLE_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttPlicaVis
@@ -1778,7 +1778,7 @@ bool AttPlicaVis::HasLen() const
     return (m_len != data_MEASUREMENTUNSIGNED());
 }
 
-/* include <attlen> */
+
 
 //----------------------------------------------------------------------------
 // AttQuilismaVis
@@ -1822,7 +1822,7 @@ bool AttQuilismaVis::HasWaves() const
     return (m_waves != VRV_UNSET);
 }
 
-/* include <attwaves> */
+
 
 //----------------------------------------------------------------------------
 // AttSbVis
@@ -1866,7 +1866,7 @@ bool AttSbVis::HasForm() const
     return (m_form != sbVis_FORM_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttScoreDefVis
@@ -1910,7 +1910,7 @@ bool AttScoreDefVis::HasVuHeight() const
     return (m_vuHeight != "");
 }
 
-/* include <attvu.height> */
+
 
 //----------------------------------------------------------------------------
 // AttSectionVis
@@ -1954,7 +1954,7 @@ bool AttSectionVis::HasRestart() const
     return (m_restart != BOOLEAN_NONE);
 }
 
-/* include <attrestart> */
+
 
 //----------------------------------------------------------------------------
 // AttSignifLetVis
@@ -1998,7 +1998,7 @@ bool AttSignifLetVis::HasPlace() const
     return (m_place != data_EVENTREL());
 }
 
-/* include <attplace> */
+
 
 //----------------------------------------------------------------------------
 // AttSpaceVis
@@ -2042,7 +2042,7 @@ bool AttSpaceVis::HasCompressable() const
     return (m_compressable != BOOLEAN_NONE);
 }
 
-/* include <attcompressable> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffDefVis
@@ -2146,7 +2146,7 @@ bool AttStaffDefVis::HasSpacing() const
     return (m_spacing != data_MEASUREMENTSIGNED());
 }
 
-/* include <attspacing> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffGrpVis
@@ -2190,7 +2190,7 @@ bool AttStaffGrpVis::HasBarThru() const
     return (m_barThru != BOOLEAN_NONE);
 }
 
-/* include <attbar.thru> */
+
 
 //----------------------------------------------------------------------------
 // AttStemVis
@@ -2309,7 +2309,7 @@ bool AttStemVis::HasFlagForm() const
     return (m_flagForm != FLAGFORM_mensural_NONE);
 }
 
-/* include <attflag.form> */
+
 
 //----------------------------------------------------------------------------
 // AttTupletVis
@@ -2398,9 +2398,7 @@ bool AttTupletVis::HasNumFormat() const
     return (m_numFormat != tupletVis_NUMFORMAT_NONE);
 }
 
-/* include <attnum.format> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -3327,4 +3325,4 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

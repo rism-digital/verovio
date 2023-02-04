@@ -64,7 +64,7 @@ bool AttAltSym::HasAltsym() const
     return (m_altsym != "");
 }
 
-/* include <attaltsym> */
+
 
 //----------------------------------------------------------------------------
 // AttAnchoredTextLog
@@ -108,7 +108,7 @@ bool AttAnchoredTextLog::HasFunc() const
     return (m_func != "");
 }
 
-/* include <attfunc> */
+
 
 //----------------------------------------------------------------------------
 // AttCurveLog
@@ -152,7 +152,7 @@ bool AttCurveLog::HasFunc() const
     return (m_func != "");
 }
 
-/* include <attfunc> */
+
 
 //----------------------------------------------------------------------------
 // AttLineLog
@@ -196,9 +196,7 @@ bool AttLineLog::HasFunc() const
     return (m_func != "");
 }
 
-/* include <attfunc> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -280,4 +278,4 @@ void AttModule::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes
     }
 }
 
-} // namespace vrv
+} // namespace

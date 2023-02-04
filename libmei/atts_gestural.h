@@ -58,7 +58,6 @@ private:
     /** Records the performed pitch inflection. **/
     data_ACCIDENTAL_GESTURAL m_accidGes;
 
-    /* include <attaccid.ges> */
 };
 
 //----------------------------------------------------------------------------
@@ -94,7 +93,6 @@ private:
     /** Records performed articulation that differs from the written value. **/
     data_ARTICULATION_List m_articGes;
 
-    /* include <attartic.ges> */
 };
 
 //----------------------------------------------------------------------------
@@ -134,7 +132,6 @@ private:
      **/
     double m_amount;
 
-    /* include <attamount> */
 };
 
 //----------------------------------------------------------------------------
@@ -206,7 +203,6 @@ private:
     /** Duration as an optionally dotted Humdrum **recip value. **/
     std::string m_durRecip;
 
-    /* include <attdur.recip> */
 };
 
 //----------------------------------------------------------------------------
@@ -245,7 +241,6 @@ private:
      **/
     data_BOOLEAN m_attacca;
 
-    /* include <attattacca> */
 };
 
 //----------------------------------------------------------------------------
@@ -293,7 +288,6 @@ private:
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
     int m_pnum;
 
-    /* include <attpnum> */
 };
 
 //----------------------------------------------------------------------------
@@ -347,7 +341,6 @@ private:
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
     int m_pnum;
 
-    /* include <attpnum> */
 };
 
 //----------------------------------------------------------------------------
@@ -389,7 +382,6 @@ private:
     /** Records the sounding accidental associated with a lower neighboring note. **/
     data_ACCIDENTAL_GESTURAL m_accidlowerGes;
 
-    /* include <attaccidlower.ges> */
 };
 
 //----------------------------------------------------------------------------
@@ -428,7 +420,6 @@ private:
      **/
     data_BOOLEAN m_attacca;
 
-    /* include <attattacca> */
 };
 
 //----------------------------------------------------------------------------
@@ -470,7 +461,6 @@ private:
     /** The above-to-below axis. **/
     double m_elevation;
 
-    /* include <attelevation> */
 };
 
 //----------------------------------------------------------------------------
@@ -515,7 +505,6 @@ private:
     /** Records the onset time in terms of ISO time. **/
     std::string m_tstampReal;
 
-    /* include <atttstamp.real> */
 };
 
 //----------------------------------------------------------------------------
@@ -560,9 +549,8 @@ private:
     /** Records the ending point of an event in terms of ISO time. **/
     std::string m_tstamp2Real;
 
-    /* include <atttstamp2.real> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_GESTURAL_H__

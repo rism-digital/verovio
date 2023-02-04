@@ -64,7 +64,7 @@ bool AttDurationQuality::HasDurQuality() const
     return (m_durQuality != DURQUALITY_mensural_NONE);
 }
 
-/* include <attdur.quality> */
+
 
 //----------------------------------------------------------------------------
 // AttMensuralLog
@@ -123,7 +123,7 @@ bool AttMensuralLog::HasProportNumbase() const
     return (m_proportNumbase != VRV_UNSET);
 }
 
-/* include <attproport.numbase> */
+
 
 //----------------------------------------------------------------------------
 // AttMensuralShared
@@ -227,7 +227,7 @@ bool AttMensuralShared::HasDivisio() const
     return (m_divisio != DIVISIO_NONE);
 }
 
-/* include <attdivisio> */
+
 
 //----------------------------------------------------------------------------
 // AttNoteVisMensural
@@ -271,7 +271,7 @@ bool AttNoteVisMensural::HasLig() const
     return (m_lig != LIGATUREFORM_NONE);
 }
 
-/* include <attlig> */
+
 
 //----------------------------------------------------------------------------
 // AttRestVisMensural
@@ -315,7 +315,7 @@ bool AttRestVisMensural::HasSpaces() const
     return (m_spaces != VRV_UNSET);
 }
 
-/* include <attspaces> */
+
 
 //----------------------------------------------------------------------------
 // AttStemsMensural
@@ -359,9 +359,7 @@ bool AttStemsMensural::HasStemForm() const
     return (m_stemForm != STEMFORM_mensural_NONE);
 }
 
-/* include <attstem.form> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -508,4 +506,4 @@ void AttModule::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

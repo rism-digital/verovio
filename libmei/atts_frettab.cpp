@@ -64,7 +64,7 @@ bool AttCourseLog::HasTuningStandard() const
     return (m_tuningStandard != COURSETUNING_NONE);
 }
 
-/* include <atttuning.standard> */
+
 
 //----------------------------------------------------------------------------
 // AttNoteGesTab
@@ -123,9 +123,7 @@ bool AttNoteGesTab::HasTabFret() const
     return (m_tabFret != -1);
 }
 
-/* include <atttab.fret> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -184,4 +182,4 @@ void AttModule::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

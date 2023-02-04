@@ -61,7 +61,6 @@ private:
      **/
     std::string m_agent;
 
-    /* include <attagent> */
 };
 
 //----------------------------------------------------------------------------
@@ -101,9 +100,8 @@ private:
      **/
     std::string m_reason;
 
-    /* include <attreason> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_EDITTRANS_H__

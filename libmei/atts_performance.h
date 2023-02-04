@@ -61,9 +61,8 @@ private:
      **/
     std::string m_when;
 
-    /* include <attwhen> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_PERFORMANCE_H__

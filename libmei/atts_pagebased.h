@@ -76,9 +76,8 @@ private:
     /** Indicates the amount of whitespace at the right side of a page. **/
     data_MEASUREMENTUNSIGNED m_rightmar;
 
-    /* include <attrightmar> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_PAGEBASED_H__

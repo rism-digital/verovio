@@ -79,9 +79,7 @@ bool AttTabular::HasRowspan() const
     return (m_rowspan != VRV_UNSET);
 }
 
-/* include <attrowspan> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -125,4 +123,4 @@ void AttModule::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

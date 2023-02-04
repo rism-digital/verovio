@@ -79,9 +79,7 @@ bool AttNotationType::HasNotationsubtype() const
     return (m_notationsubtype != "");
 }
 
-/* include <attnotationsubtype> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -125,4 +123,4 @@ void AttModule::GetMei(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

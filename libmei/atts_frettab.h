@@ -58,7 +58,6 @@ private:
     /** Indicates a tuning standard for the course. **/
     data_COURSETUNING m_tuningStandard;
 
-    /* include <atttuning.standard> */
 };
 
 //----------------------------------------------------------------------------
@@ -100,9 +99,8 @@ private:
     /** Records which course is to be played. **/
     int m_tabFret;
 
-    /* include <atttab.fret> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_FRETTAB_H__

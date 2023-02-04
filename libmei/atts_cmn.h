@@ -58,7 +58,6 @@ private:
     /** Describes the direction in which an arpeggio is to be performed. **/
     arpegLog_ORDER m_order;
 
-    /* include <attorder> */
 };
 
 //----------------------------------------------------------------------------
@@ -94,7 +93,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     bTremLog_FORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -130,7 +128,6 @@ private:
     /** Indicates that this event is "under a beam". **/
     std::string m_beam;
 
-    /* include <attbeam> */
 };
 
 //----------------------------------------------------------------------------
@@ -184,7 +181,6 @@ private:
     /** Records the slope of the beam. **/
     double m_slope;
 
-    /* include <attslope> */
 };
 
 //----------------------------------------------------------------------------
@@ -225,7 +221,6 @@ private:
      **/
     int m_breaksec;
 
-    /* include <attbreaksec> */
 };
 
 //----------------------------------------------------------------------------
@@ -265,7 +260,6 @@ private:
      **/
     data_NEIGHBORINGLAYER m_beamWith;
 
-    /* include <attbeam.with> */
 };
 
 //----------------------------------------------------------------------------
@@ -313,7 +307,6 @@ private:
      **/
     data_BOOLEAN m_beamRests;
 
-    /* include <attbeam.rests> */
 };
 
 //----------------------------------------------------------------------------
@@ -352,7 +345,6 @@ private:
      **/
     double m_beatdef;
 
-    /* include <attbeatdef> */
 };
 
 //----------------------------------------------------------------------------
@@ -388,7 +380,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -424,7 +415,6 @@ private:
     /** "Cut-out" style. **/
     cutout_CUTOUT m_cutout;
 
-    /* include <attcutout> */
 };
 
 //----------------------------------------------------------------------------
@@ -465,7 +455,6 @@ private:
      **/
     data_BOOLEAN m_expand;
 
-    /* include <attexpand> */
 };
 
 //----------------------------------------------------------------------------
@@ -501,7 +490,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     fTremLog_FORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -541,7 +529,6 @@ private:
      **/
     data_GLISSANDO m_gliss;
 
-    /* include <attgliss> */
 };
 
 //----------------------------------------------------------------------------
@@ -581,7 +568,6 @@ private:
      **/
     graceGrpLog_ATTACH m_attach;
 
-    /* include <attattach> */
 };
 
 //----------------------------------------------------------------------------
@@ -626,7 +612,6 @@ private:
     /** Records the amount of time to be "stolen" from a non-grace note/chord. **/
     data_PERCENT m_graceTime;
 
-    /* include <attgrace.time> */
 };
 
 //----------------------------------------------------------------------------
@@ -672,7 +657,6 @@ private:
      **/
     data_BOOLEAN m_niente;
 
-    /* include <attniente> */
 };
 
 //----------------------------------------------------------------------------
@@ -744,7 +728,6 @@ private:
     /** Indicates the pedal setting for the harp’s B strings. **/
     harpPedalLog_B m_b;
 
-    /* include <attb> */
 };
 
 //----------------------------------------------------------------------------
@@ -783,7 +766,6 @@ private:
      **/
     data_BOOLEAN m_lv;
 
-    /* include <attlv> */
 };
 
 //----------------------------------------------------------------------------
@@ -829,7 +811,6 @@ private:
     /** Indicates the function of the right bar line and is structurally important. **/
     data_BARRENDITION m_right;
 
-    /* include <attright> */
 };
 
 //----------------------------------------------------------------------------
@@ -865,7 +846,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     meterSigGrpLog_FUNC m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -907,7 +887,6 @@ private:
     /** Determines if the tuplet number is visible. **/
     data_BOOLEAN m_numVisible;
 
-    /* include <attnum.visible> */
 };
 
 //----------------------------------------------------------------------------
@@ -943,7 +922,6 @@ private:
     /** Records a number or count accompanying a notational feature. **/
     int m_num;
 
-    /* include <attnum> */
 };
 
 //----------------------------------------------------------------------------
@@ -985,7 +963,6 @@ private:
      **/
     octaveLog_COLL m_coll;
 
-    /* include <attcoll> */
 };
 
 //----------------------------------------------------------------------------
@@ -1027,7 +1004,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -1063,7 +1039,6 @@ private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
     data_PEDALSTYLE m_pedalStyle;
 
-    /* include <attpedal.style> */
 };
 
 //----------------------------------------------------------------------------
@@ -1099,7 +1074,6 @@ private:
     /** Describes the enclosing shape for rehearsal marks. **/
     rehearsal_REHENCLOSE m_rehEnclose;
 
-    /* include <attreh.enclose> */
 };
 
 //----------------------------------------------------------------------------
@@ -1135,7 +1109,6 @@ private:
     /** Determines whether to display guitar chord grids. **/
     data_BOOLEAN m_gridShow;
 
-    /* include <attgrid.show> */
 };
 
 //----------------------------------------------------------------------------
@@ -1179,7 +1152,6 @@ private:
     /** --- **/
     data_LINEWIDTH m_slurLwidth;
 
-    /* include <attslur.lwidth> */
 };
 
 //----------------------------------------------------------------------------
@@ -1219,7 +1191,6 @@ private:
      **/
     data_NEIGHBORINGLAYER m_stemWith;
 
-    /* include <attstem.with> */
 };
 
 //----------------------------------------------------------------------------
@@ -1263,7 +1234,6 @@ private:
     /** --- **/
     data_LINEWIDTH m_tieLwidth;
 
-    /* include <atttie.lwidth> */
 };
 
 //----------------------------------------------------------------------------
@@ -1299,9 +1269,8 @@ private:
     /** The performed duration of an individual note in a measured tremolo. **/
     data_DURATION m_unitdur;
 
-    /* include <attunitdur> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_CMN_H__

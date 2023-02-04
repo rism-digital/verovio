@@ -64,9 +64,7 @@ bool AttFingGrpLog::HasForm() const
     return (m_form != fingGrpLog_FORM_NONE);
 }
 
-/* include <attform> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -103,4 +101,4 @@ void AttModule::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

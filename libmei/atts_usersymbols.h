@@ -62,7 +62,6 @@ private:
      **/
     std::string m_altsym;
 
-    /* include <attaltsym> */
 };
 
 //----------------------------------------------------------------------------
@@ -98,7 +97,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -134,7 +132,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -170,9 +167,8 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
 
-    /* include <attfunc> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_USERSYMBOLS_H__

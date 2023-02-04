@@ -64,7 +64,7 @@ bool AttAgentIdent::HasAgent() const
     return (m_agent != "");
 }
 
-/* include <attagent> */
+
 
 //----------------------------------------------------------------------------
 // AttReasonIdent
@@ -108,9 +108,7 @@ bool AttReasonIdent::HasReason() const
     return (m_reason != "");
 }
 
-/* include <attreason> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -162,4 +160,4 @@ void AttModule::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

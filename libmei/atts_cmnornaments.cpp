@@ -79,7 +79,7 @@ bool AttMordentLog::HasLong() const
     return (m_long != BOOLEAN_NONE);
 }
 
-/* include <attlong> */
+
 
 //----------------------------------------------------------------------------
 // AttOrnamPresent
@@ -123,7 +123,7 @@ bool AttOrnamPresent::HasOrnam() const
     return (m_ornam != "");
 }
 
-/* include <attornam> */
+
 
 //----------------------------------------------------------------------------
 // AttOrnamentAccid
@@ -182,7 +182,7 @@ bool AttOrnamentAccid::HasAccidlower() const
     return (m_accidlower != ACCIDENTAL_WRITTEN_NONE);
 }
 
-/* include <attaccidlower> */
+
 
 //----------------------------------------------------------------------------
 // AttTurnLog
@@ -241,9 +241,7 @@ bool AttTurnLog::HasForm() const
     return (m_form != turnLog_FORM_NONE);
 }
 
-/* include <attform> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -346,4 +344,4 @@ void AttModule::GetCmnornaments(const Object *element, ArrayOfStrAttr *attribute
     }
 }
 
-} // namespace vrv
+} // namespace

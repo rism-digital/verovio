@@ -67,7 +67,6 @@ private:
      **/
     data_BOOLEAN m_long;
 
-    /* include <attlong> */
 };
 
 //----------------------------------------------------------------------------
@@ -107,7 +106,6 @@ private:
      **/
     std::string m_ornam;
 
-    /* include <attornam> */
 };
 
 //----------------------------------------------------------------------------
@@ -149,7 +147,6 @@ private:
     /** Records the written accidental associated with a lower neighboring note. **/
     data_ACCIDENTAL_WRITTEN m_accidlower;
 
-    /* include <attaccidlower> */
 };
 
 //----------------------------------------------------------------------------
@@ -191,9 +188,8 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     turnLog_FORM m_form;
 
-    /* include <attform> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_CMNORNAMENTS_H__

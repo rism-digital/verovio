@@ -109,9 +109,7 @@ bool AttExtSym::HasGlyphUri() const
     return (m_glyphUri != "");
 }
 
-/* include <attglyph.uri> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -169,4 +167,4 @@ void AttModule::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attrib
     }
 }
 
-} // namespace vrv
+} // namespace

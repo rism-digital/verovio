@@ -64,9 +64,7 @@ bool AttAlignment::HasWhen() const
     return (m_when != "");
 }
 
-/* include <attwhen> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -103,4 +101,4 @@ void AttModule::GetPerformance(const Object *element, ArrayOfStrAttr *attributes
     }
 }
 
-} // namespace vrv
+} // namespace

@@ -58,9 +58,8 @@ private:
     /** Contains a reference to a chordDef element elsewhere in the document. **/
     std::string m_chordref;
 
-    /* include <attchordref> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_HARMONY_H__

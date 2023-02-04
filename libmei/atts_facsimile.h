@@ -61,9 +61,8 @@ private:
      **/
     std::string m_facs;
 
-    /* include <attfacs> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_FACSIMILE_H__

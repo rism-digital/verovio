@@ -109,7 +109,7 @@ bool AttChannelized::HasMidiTrack() const
     return (m_midiTrack != VRV_UNSET);
 }
 
-/* include <attmidi.track> */
+
 
 //----------------------------------------------------------------------------
 // AttInstrumentIdent
@@ -153,7 +153,7 @@ bool AttInstrumentIdent::HasInstr() const
     return (m_instr != "");
 }
 
-/* include <attinstr> */
+
 
 //----------------------------------------------------------------------------
 // AttMidiInstrument
@@ -272,7 +272,7 @@ bool AttMidiInstrument::HasMidiVolume() const
     return (m_midiVolume != -1.0);
 }
 
-/* include <attmidi.volume> */
+
 
 //----------------------------------------------------------------------------
 // AttMidiNumber
@@ -316,7 +316,7 @@ bool AttMidiNumber::HasNum() const
     return (m_num != -1);
 }
 
-/* include <attnum> */
+
 
 //----------------------------------------------------------------------------
 // AttMidiTempo
@@ -375,7 +375,7 @@ bool AttMidiTempo::HasMidiMspb() const
     return (m_midiMspb != -1);
 }
 
-/* include <attmidi.mspb> */
+
 
 //----------------------------------------------------------------------------
 // AttMidiValue
@@ -419,7 +419,7 @@ bool AttMidiValue::HasVal() const
     return (m_val != -1);
 }
 
-/* include <attval> */
+
 
 //----------------------------------------------------------------------------
 // AttMidiValue2
@@ -463,7 +463,7 @@ bool AttMidiValue2::HasVal2() const
     return (m_val2 != -1);
 }
 
-/* include <attval2> */
+
 
 //----------------------------------------------------------------------------
 // AttMidiVelocity
@@ -507,7 +507,7 @@ bool AttMidiVelocity::HasVel() const
     return (m_vel != -1);
 }
 
-/* include <attvel> */
+
 
 //----------------------------------------------------------------------------
 // AttTimeBase
@@ -551,9 +551,7 @@ bool AttTimeBase::HasPpq() const
     return (m_ppq != VRV_UNSET);
 }
 
-/* include <attppq> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -773,4 +771,4 @@ void AttModule::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

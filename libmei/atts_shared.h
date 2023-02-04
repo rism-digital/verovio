@@ -58,7 +58,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     accidLog_FUNC m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -94,7 +93,6 @@ private:
     /** Captures a written accidental. **/
     data_ACCIDENTAL_WRITTEN m_accid;
 
-    /* include <attaccid> */
 };
 
 //----------------------------------------------------------------------------
@@ -136,7 +134,6 @@ private:
      **/
     data_ARTICULATION_List m_artic;
 
-    /* include <attartic> */
 };
 
 //----------------------------------------------------------------------------
@@ -172,7 +169,6 @@ private:
     /** Indicates the next section or movement to be performed. **/
     std::string m_target;
 
-    /* include <atttarget> */
 };
 
 //----------------------------------------------------------------------------
@@ -208,7 +204,6 @@ private:
     /** The intended audience. **/
     audience_AUDIENCE m_audience;
 
-    /* include <attaudience> */
 };
 
 //----------------------------------------------------------------------------
@@ -244,7 +239,6 @@ private:
     /** Records the number of augmentation dots required by a written dotted duration. **/
     int m_dots;
 
-    /* include <attdots> */
 };
 
 //----------------------------------------------------------------------------
@@ -294,7 +288,6 @@ private:
      **/
     std::string m_authUri;
 
-    /* include <attauth.uri> */
 };
 
 //----------------------------------------------------------------------------
@@ -330,7 +323,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_BARRENDITION m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -385,7 +377,6 @@ private:
      **/
     int m_barPlace;
 
-    /* include <attbar.place> */
 };
 
 //----------------------------------------------------------------------------
@@ -421,7 +412,6 @@ private:
     /** --- **/
     std::string m_base;
 
-    /* include <attbase> */
 };
 
 //----------------------------------------------------------------------------
@@ -460,7 +450,6 @@ private:
      **/
     std::string m_analog;
 
-    /* include <attanalog> */
 };
 
 //----------------------------------------------------------------------------
@@ -499,7 +488,6 @@ private:
      **/
     std::string m_calendar;
 
-    /* include <attcalendar> */
 };
 
 //----------------------------------------------------------------------------
@@ -539,7 +527,6 @@ private:
      **/
     std::string m_codedval;
 
-    /* include <attcodedval> */
 };
 
 //----------------------------------------------------------------------------
@@ -578,7 +565,6 @@ private:
      **/
     std::string m_class;
 
-    /* include <attclass> */
 };
 
 //----------------------------------------------------------------------------
@@ -617,7 +603,6 @@ private:
      **/
     data_BOOLEAN m_cautionary;
 
-    /* include <attcautionary> */
 };
 
 //----------------------------------------------------------------------------
@@ -653,7 +638,6 @@ private:
     /** Describes a clef’s shape. **/
     data_CLEFSHAPE m_shape;
 
-    /* include <attshape> */
 };
 
 //----------------------------------------------------------------------------
@@ -711,7 +695,6 @@ private:
     /** Records the direction of octave displacement to be applied to the clef. **/
     data_STAFFREL_basic m_clefDisPlace;
 
-    /* include <attclef.dis.place> */
 };
 
 //----------------------------------------------------------------------------
@@ -750,7 +733,6 @@ private:
      **/
     std::string m_color;
 
-    /* include <attcolor> */
 };
 
 //----------------------------------------------------------------------------
@@ -793,7 +775,6 @@ private:
      **/
     data_BOOLEAN m_colored;
 
-    /* include <attcolored> */
 };
 
 //----------------------------------------------------------------------------
@@ -829,7 +810,6 @@ private:
     /** Gives coordinates for the left side of a feature. **/
     double m_coordX1;
 
-    /* include <attcoord.x1> */
 };
 
 //----------------------------------------------------------------------------
@@ -865,7 +845,6 @@ private:
     /** Gives coordinates for the right side of a feature. **/
     double m_coordX2;
 
-    /* include <attcoord.x2> */
 };
 
 //----------------------------------------------------------------------------
@@ -901,7 +880,6 @@ private:
     /** Gives y coordinates for the top left of a feature. **/
     double m_coordY1;
 
-    /* include <attcoord.y1> */
 };
 
 //----------------------------------------------------------------------------
@@ -966,7 +944,6 @@ private:
      **/
     double m_rotate;
 
-    /* include <attrotate> */
 };
 
 //----------------------------------------------------------------------------
@@ -1002,7 +979,6 @@ private:
     /** --- **/
     data_BOOLEAN m_cue;
 
-    /* include <attcue> */
 };
 
 //----------------------------------------------------------------------------
@@ -1062,7 +1038,6 @@ private:
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     curvature_CURVEDIR m_curvedir;
 
-    /* include <attcurvedir> */
 };
 
 //----------------------------------------------------------------------------
@@ -1106,7 +1081,6 @@ private:
     /** Width of a curved line. **/
     data_LINEWIDTH m_lwidth;
 
-    /* include <attlwidth> */
 };
 
 //----------------------------------------------------------------------------
@@ -1142,7 +1116,6 @@ private:
     /** Indicates the next section or movement to be performed. **/
     std::string m_target;
 
-    /* include <atttarget> */
 };
 
 //----------------------------------------------------------------------------
@@ -1178,7 +1151,6 @@ private:
     /** Used to link metadata elements to one or more data-containing elements. **/
     std::string m_data;
 
-    /* include <attdata> */
 };
 
 //----------------------------------------------------------------------------
@@ -1238,7 +1210,6 @@ private:
     /** Contains the starting point of a date range in standard ISO form. **/
     std::string m_startdate;
 
-    /* include <attstartdate> */
 };
 
 //----------------------------------------------------------------------------
@@ -1301,7 +1272,6 @@ private:
     /** Records the default distance from the staff for tempo marks. **/
     data_MEASUREMENTSIGNED m_tempoDist;
 
-    /* include <atttempo.dist> */
 };
 
 //----------------------------------------------------------------------------
@@ -1337,7 +1307,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     dotLog_FORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -1376,7 +1345,6 @@ private:
      **/
     data_DURATION m_dur;
 
-    /* include <attdur> */
 };
 
 //----------------------------------------------------------------------------
@@ -1434,7 +1402,6 @@ private:
      **/
     int m_numbaseDefault;
 
-    /* include <attnumbase.default> */
 };
 
 //----------------------------------------------------------------------------
@@ -1473,7 +1440,6 @@ private:
      **/
     data_DURATION m_dur;
 
-    /* include <attdur> */
 };
 
 //----------------------------------------------------------------------------
@@ -1518,7 +1484,6 @@ private:
      **/
     int m_numbase;
 
-    /* include <attnumbase> */
 };
 
 //----------------------------------------------------------------------------
@@ -1559,7 +1524,6 @@ private:
      **/
     data_ENCLOSURE m_enclose;
 
-    /* include <attenclose> */
 };
 
 //----------------------------------------------------------------------------
@@ -1595,7 +1559,6 @@ private:
     /** Describes where ending marks should be displayed. **/
     endings_ENDINGREND m_endingRend;
 
-    /* include <attending.rend> */
 };
 
 //----------------------------------------------------------------------------
@@ -1640,7 +1603,6 @@ private:
      **/
     std::string m_evidence;
 
-    /* include <attevidence> */
 };
 
 //----------------------------------------------------------------------------
@@ -1676,7 +1638,6 @@ private:
     /** Indicates the presence of an extension symbol, typically a line. **/
     data_BOOLEAN m_extender;
 
-    /* include <attextender> */
 };
 
 //----------------------------------------------------------------------------
@@ -1716,7 +1677,6 @@ private:
      **/
     std::string m_extent;
 
-    /* include <attextent> */
 };
 
 //----------------------------------------------------------------------------
@@ -1756,7 +1716,6 @@ private:
      **/
     data_STAFFREL_basic m_fermata;
 
-    /* include <attfermata> */
 };
 
 //----------------------------------------------------------------------------
@@ -1795,7 +1754,6 @@ private:
      **/
     int m_nonfiling;
 
-    /* include <attnonfiling> */
 };
 
 //----------------------------------------------------------------------------
@@ -1831,7 +1789,6 @@ private:
     /** Indicates the nesting level of staff grouping symbols. **/
     int m_level;
 
-    /* include <attlevel> */
 };
 
 //----------------------------------------------------------------------------
@@ -1870,7 +1827,6 @@ private:
      **/
     std::string m_hand;
 
-    /* include <atthand> */
 };
 
 //----------------------------------------------------------------------------
@@ -1906,7 +1862,6 @@ private:
     /** Measurement of the vertical dimension of an entity. **/
     data_MEASUREMENTUNSIGNED m_height;
 
-    /* include <attheight> */
 };
 
 //----------------------------------------------------------------------------
@@ -1942,7 +1897,6 @@ private:
     /** Records horizontal alignment. **/
     data_HORIZONTALALIGNMENT m_halign;
 
-    /* include <atthalign> */
 };
 
 //----------------------------------------------------------------------------
@@ -1982,7 +1936,6 @@ private:
      **/
     std::string m_mimetype;
 
-    /* include <attmimetype> */
 };
 
 //----------------------------------------------------------------------------
@@ -2025,7 +1978,6 @@ private:
      **/
     std::string m_join;
 
-    /* include <attjoin> */
 };
 
 //----------------------------------------------------------------------------
@@ -2061,7 +2013,6 @@ private:
     /** Written key signature. **/
     data_KEYSIGNATURE m_sig;
 
-    /* include <attsig> */
 };
 
 //----------------------------------------------------------------------------
@@ -2097,7 +2048,6 @@ private:
     /** Written key signature. **/
     data_KEYSIGNATURE m_keySig;
 
-    /* include <attkey.sig> */
 };
 
 //----------------------------------------------------------------------------
@@ -2137,7 +2087,6 @@ private:
      **/
     std::string m_label;
 
-    /* include <attlabel> */
 };
 
 //----------------------------------------------------------------------------
@@ -2179,7 +2128,6 @@ private:
     /** Specifies the transliteration technique used. **/
     std::string m_translit;
 
-    /* include <atttranslit> */
 };
 
 //----------------------------------------------------------------------------
@@ -2215,7 +2163,6 @@ private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
 
-    /* include <attdef> */
 };
 
 //----------------------------------------------------------------------------
@@ -2251,7 +2198,6 @@ private:
     /** Identifies the layer to which a feature applies. **/
     int m_layer;
 
-    /* include <attlayer> */
 };
 
 //----------------------------------------------------------------------------
@@ -2291,7 +2237,6 @@ private:
      **/
     char m_line;
 
-    /* include <attline> */
 };
 
 //----------------------------------------------------------------------------
@@ -2345,7 +2290,6 @@ private:
     /** Holds the relative size of the line-start symbol. **/
     int m_lstartsymSize;
 
-    /* include <attlstartsym.size> */
 };
 
 //----------------------------------------------------------------------------
@@ -2401,7 +2345,6 @@ private:
     /** Width of a curved line. **/
     data_LINEWIDTH m_lwidth;
 
-    /* include <attlwidth> */
 };
 
 //----------------------------------------------------------------------------
@@ -2491,7 +2434,6 @@ private:
     /** Points to elements that are synchronous with the current element. **/
     std::string m_synch;
 
-    /* include <attsynch> */
 };
 
 //----------------------------------------------------------------------------
@@ -2559,7 +2501,6 @@ private:
     /** Sets the default font weight value for lyrics. **/
     data_FONTWEIGHT m_lyricWeight;
 
-    /* include <attlyric.weight> */
 };
 
 //----------------------------------------------------------------------------
@@ -2595,7 +2536,6 @@ private:
     /** Indicates whether measure numbers should be displayed. **/
     data_BOOLEAN m_mnumVisible;
 
-    /* include <attmnum.visible> */
 };
 
 //----------------------------------------------------------------------------
@@ -2631,7 +2571,6 @@ private:
     /** Indicates the unit of measurement. **/
     std::string m_unit;
 
-    /* include <attunit> */
 };
 
 //----------------------------------------------------------------------------
@@ -2692,7 +2631,6 @@ private:
      **/
     data_BETYPE m_betype;
 
-    /* include <attbetype> */
 };
 
 //----------------------------------------------------------------------------
@@ -2728,7 +2666,6 @@ private:
     /** Describes the writing medium. **/
     std::string m_medium;
 
-    /* include <attmedium> */
 };
 
 //----------------------------------------------------------------------------
@@ -2764,7 +2701,6 @@ private:
     /** Specifies a generic MEI version label. **/
     meiVersion_MEIVERSION m_meiversion;
 
-    /* include <attmeiversion> */
 };
 
 //----------------------------------------------------------------------------
@@ -2804,7 +2740,6 @@ private:
      **/
     std::string m_decls;
 
-    /* include <attdecls> */
 };
 
 //----------------------------------------------------------------------------
@@ -2843,7 +2778,6 @@ private:
      **/
     meterConformance_METCON m_metcon;
 
-    /* include <attmetcon> */
 };
 
 //----------------------------------------------------------------------------
@@ -2894,7 +2828,6 @@ private:
      **/
     data_BOOLEAN m_control;
 
-    /* include <attcontrol> */
 };
 
 //----------------------------------------------------------------------------
@@ -2945,7 +2878,6 @@ private:
     /** Indicates the unit of measurement. **/
     int m_unit;
 
-    /* include <attunit> */
 };
 
 //----------------------------------------------------------------------------
@@ -3004,7 +2936,6 @@ private:
      **/
     data_METERSIGN m_meterSym;
 
-    /* include <attmeter.sym> */
 };
 
 //----------------------------------------------------------------------------
@@ -3058,7 +2989,6 @@ private:
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
     int m_mmDots;
 
-    /* include <attmm.dots> */
 };
 
 //----------------------------------------------------------------------------
@@ -3097,7 +3027,6 @@ private:
      **/
     data_BOOLEAN m_multiNumber;
 
-    /* include <attmulti.number> */
 };
 
 //----------------------------------------------------------------------------
@@ -3137,7 +3066,6 @@ private:
      **/
     int m_n;
 
-    /* include <attn> */
 };
 
 //----------------------------------------------------------------------------
@@ -3177,7 +3105,6 @@ private:
      **/
     std::string m_n;
 
-    /* include <attn> */
 };
 
 //----------------------------------------------------------------------------
@@ -3225,7 +3152,6 @@ private:
      **/
     std::string m_role;
 
-    /* include <attrole> */
 };
 
 //----------------------------------------------------------------------------
@@ -3269,7 +3195,6 @@ private:
     /** Sets the default music font size. **/
     data_FONTSIZE m_musicSize;
 
-    /* include <attmusic.size> */
 };
 
 //----------------------------------------------------------------------------
@@ -3367,7 +3292,6 @@ private:
      **/
     data_BOOLEAN m_headVisible;
 
-    /* include <atthead.visible> */
 };
 
 //----------------------------------------------------------------------------
@@ -3403,7 +3327,6 @@ private:
     /** Captures written octave information. **/
     data_OCTAVE m_oct;
 
-    /* include <attoct> */
 };
 
 //----------------------------------------------------------------------------
@@ -3443,7 +3366,6 @@ private:
      **/
     data_OCTAVE m_octDefault;
 
-    /* include <attoct.default> */
 };
 
 //----------------------------------------------------------------------------
@@ -3485,7 +3407,6 @@ private:
     /** Records the direction of octave displacement. **/
     data_STAFFREL_basic m_disPlace;
 
-    /* include <attdis.place> */
 };
 
 //----------------------------------------------------------------------------
@@ -3525,7 +3446,6 @@ private:
      **/
     data_BOOLEAN m_ontheline;
 
-    /* include <attontheline> */
 };
 
 //----------------------------------------------------------------------------
@@ -3564,7 +3484,6 @@ private:
      **/
     data_BOOLEAN m_optimize;
 
-    /* include <attoptimize> */
 };
 
 //----------------------------------------------------------------------------
@@ -3600,7 +3519,6 @@ private:
     /** Identifies the layer on which referenced notation occurs. **/
     std::string m_originLayer;
 
-    /* include <attorigin.layer> */
 };
 
 //----------------------------------------------------------------------------
@@ -3639,7 +3557,6 @@ private:
      **/
     std::string m_originStaff;
 
-    /* include <attorigin.staff> */
 };
 
 //----------------------------------------------------------------------------
@@ -3681,7 +3598,6 @@ private:
     /** Indicates the final element in a sequence of events. **/
     std::string m_originEndid;
 
-    /* include <attorigin.endid> */
 };
 
 //----------------------------------------------------------------------------
@@ -3730,7 +3646,6 @@ private:
      **/
     data_MEASUREBEAT m_originTstamp2;
 
-    /* include <attorigin.tstamp2> */
 };
 
 //----------------------------------------------------------------------------
@@ -3814,7 +3729,6 @@ private:
     /** Indicates how the page should be scaled when rendered. **/
     std::string m_pageScale;
 
-    /* include <attpage.scale> */
 };
 
 //----------------------------------------------------------------------------
@@ -3862,7 +3776,6 @@ private:
      **/
     std::string m_partstaff;
 
-    /* include <attpartstaff> */
 };
 
 //----------------------------------------------------------------------------
@@ -3898,7 +3811,6 @@ private:
     /** Contains a written pitch name. **/
     data_PITCHNAME m_pname;
 
-    /* include <attpname> */
 };
 
 //----------------------------------------------------------------------------
@@ -3937,7 +3849,6 @@ private:
      **/
     data_BOOLEAN m_onstaff;
 
-    /* include <attonstaff> */
 };
 
 //----------------------------------------------------------------------------
@@ -3973,7 +3884,6 @@ private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_STAFFREL m_place;
 
-    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -4009,7 +3919,6 @@ private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_STAFFREL m_place;
 
-    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -4051,7 +3960,6 @@ private:
      **/
     xsdAnyURI_List m_plist;
 
-    /* include <attplist> */
 };
 
 //----------------------------------------------------------------------------
@@ -4117,7 +4025,6 @@ private:
      **/
     std::string m_targettype;
 
-    /* include <atttargettype> */
 };
 
 //----------------------------------------------------------------------------
@@ -4156,7 +4063,6 @@ private:
      **/
     double m_quantity;
 
-    /* include <attquantity> */
 };
 
 //----------------------------------------------------------------------------
@@ -4226,7 +4132,6 @@ private:
      **/
     double m_confidence;
 
-    /* include <attconfidence> */
 };
 
 //----------------------------------------------------------------------------
@@ -4266,7 +4171,6 @@ private:
      **/
     std::string m_resp;
 
-    /* include <attresp> */
 };
 
 //----------------------------------------------------------------------------
@@ -4293,8 +4197,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(data_DURATIONRESTS dur_) { m_dur = dur_; }
-    data_DURATIONRESTS GetDur() const { return m_dur; }
+    void SetDur(data_DURATION dur_) { m_dur = dur_; }
+    data_DURATION GetDur() const { return m_dur; }
     bool HasDur() const;
     ///@}
 
@@ -4303,9 +4207,8 @@ private:
      * When a duration cannot be represented as a single power-of-two value, multiple
      * space-separated values that add up to the total duration may be used.
      **/
-    data_DURATIONRESTS m_dur;
+    data_DURATION m_dur;
 
-    /* include <attdur> */
 };
 
 //----------------------------------------------------------------------------
@@ -4341,7 +4244,6 @@ private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
     data_PERCENT m_scale;
 
-    /* include <attscale> */
 };
 
 //----------------------------------------------------------------------------
@@ -4380,7 +4282,6 @@ private:
      **/
     int m_seq;
 
-    /* include <attseq> */
 };
 
 //----------------------------------------------------------------------------
@@ -4416,7 +4317,6 @@ private:
     /** Indicates presence of slash through the beam. **/
     char m_slash;
 
-    /* include <attslash> */
 };
 
 //----------------------------------------------------------------------------
@@ -4456,7 +4356,6 @@ private:
      **/
     std::string m_slur;
 
-    /* include <attslur> */
 };
 
 //----------------------------------------------------------------------------
@@ -4497,7 +4396,6 @@ private:
      **/
     std::string m_source;
 
-    /* include <attsource> */
 };
 
 //----------------------------------------------------------------------------
@@ -4560,7 +4458,6 @@ private:
      **/
     data_MEASUREMENTSIGNED m_spacingSystem;
 
-    /* include <attspacing.system> */
 };
 
 //----------------------------------------------------------------------------
@@ -4596,7 +4493,6 @@ private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
 
-    /* include <attdef> */
 };
 
 //----------------------------------------------------------------------------
@@ -4632,7 +4528,6 @@ private:
     /** Indicates the number of staff lines. **/
     int m_lines;
 
-    /* include <attlines> */
 };
 
 //----------------------------------------------------------------------------
@@ -4668,7 +4563,6 @@ private:
     /** Specifies the symbol used to group a set of staves. **/
     staffGroupingSym_SYMBOL m_symbol;
 
-    /* include <attsymbol> */
 };
 
 //----------------------------------------------------------------------------
@@ -4708,7 +4602,6 @@ private:
      **/
     xsdPositiveInteger_List m_staff;
 
-    /* include <attstaff> */
 };
 
 //----------------------------------------------------------------------------
@@ -4762,7 +4655,6 @@ private:
     /** Describes vertical order of items printed between staves, from top to bottom. **/
     data_STAFFITEM m_betweenorder;
 
-    /* include <attbetweenorder> */
 };
 
 //----------------------------------------------------------------------------
@@ -4798,7 +4690,6 @@ private:
     /** Holds the staff location of the feature. **/
     int m_loc;
 
-    /* include <attloc> */
 };
 
 //----------------------------------------------------------------------------
@@ -4840,7 +4731,6 @@ private:
     /** Records staff location in terms of written octave. **/
     data_OCTAVE m_oloc;
 
-    /* include <attoloc> */
 };
 
 //----------------------------------------------------------------------------
@@ -4879,7 +4769,6 @@ private:
      **/
     std::string m_endid;
 
-    /* include <attendid> */
 };
 
 //----------------------------------------------------------------------------
@@ -4918,7 +4807,6 @@ private:
      **/
     std::string m_startid;
 
-    /* include <attstartid> */
 };
 
 //----------------------------------------------------------------------------
@@ -5003,7 +4891,6 @@ private:
     /** Records the output y coordinate of the stem’s attachment point. **/
     double m_stemY;
 
-    /* include <attstem.y> */
 };
 
 //----------------------------------------------------------------------------
@@ -5048,7 +4935,6 @@ private:
     /** Records the position of a syllable within a word. **/
     sylLog_WORDPOS m_wordpos;
 
-    /* include <attwordpos> */
 };
 
 //----------------------------------------------------------------------------
@@ -5084,7 +4970,6 @@ private:
     /** Holds an associated sung text syllable. **/
     std::string m_syl;
 
-    /* include <attsyl> */
 };
 
 //----------------------------------------------------------------------------
@@ -5151,7 +5036,6 @@ private:
      **/
     data_MEASUREMENTUNSIGNED m_systemTopmar;
 
-    /* include <attsystem.topmar> */
 };
 
 //----------------------------------------------------------------------------
@@ -5190,7 +5074,6 @@ private:
      **/
     targetEval_EVALUATE m_evaluate;
 
-    /* include <attevaluate> */
 };
 
 //----------------------------------------------------------------------------
@@ -5226,7 +5109,6 @@ private:
     /** Describes the function of the bracketed event sequence. **/
     tempoLog_FUNC m_func;
 
-    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -5268,7 +5150,6 @@ private:
     /** Captures the appearance of the element’s contents using MEI-defined descriptors. **/
     data_TEXTRENDITION m_rend;
 
-    /* include <attrend> */
 };
 
 //----------------------------------------------------------------------------
@@ -5345,7 +5226,6 @@ private:
      **/
     data_FONTWEIGHT m_textWeight;
 
-    /* include <atttext.weight> */
 };
 
 //----------------------------------------------------------------------------
@@ -5385,7 +5265,6 @@ private:
      **/
     data_TIE m_tie;
 
-    /* include <atttie> */
 };
 
 //----------------------------------------------------------------------------
@@ -5424,7 +5303,6 @@ private:
      **/
     double m_tstamp;
 
-    /* include <atttstamp> */
 };
 
 //----------------------------------------------------------------------------
@@ -5463,7 +5341,6 @@ private:
      **/
     data_MEASUREBEAT m_tstamp2;
 
-    /* include <atttstamp2> */
 };
 
 //----------------------------------------------------------------------------
@@ -5511,7 +5388,6 @@ private:
      **/
     int m_transSemi;
 
-    /* include <atttrans.semi> */
 };
 
 //----------------------------------------------------------------------------
@@ -5562,7 +5438,6 @@ private:
     /** Provides an indication of the tuning system, just, for example. **/
     data_TEMPERAMENT m_tuneTemper;
 
-    /* include <atttune.temper> */
 };
 
 //----------------------------------------------------------------------------
@@ -5602,7 +5477,6 @@ private:
      **/
     std::string m_tuplet;
 
-    /* include <atttuplet> */
 };
 
 //----------------------------------------------------------------------------
@@ -5641,7 +5515,6 @@ private:
      **/
     std::string m_type;
 
-    /* include <atttype> */
 };
 
 //----------------------------------------------------------------------------
@@ -5722,7 +5595,6 @@ private:
     /** Indicates line height in analogy to the CSS line-height property. **/
     std::string m_lineheight;
 
-    /* include <attlineheight> */
 };
 
 //----------------------------------------------------------------------------
@@ -5758,7 +5630,6 @@ private:
     /** Records vertical alignment. **/
     data_VERTICALALIGNMENT m_valign;
 
-    /* include <attvalign> */
 };
 
 //----------------------------------------------------------------------------
@@ -5794,7 +5665,6 @@ private:
     /** Provides a label for members of a vertically aligned group. **/
     int m_vgrp;
 
-    /* include <attvgrp> */
 };
 
 //----------------------------------------------------------------------------
@@ -5833,7 +5703,6 @@ private:
      **/
     data_BOOLEAN m_visible;
 
-    /* include <attvisible> */
 };
 
 //----------------------------------------------------------------------------
@@ -5873,7 +5742,6 @@ private:
      **/
     data_MEASUREMENTSIGNED m_ho;
 
-    /* include <attho> */
 };
 
 //----------------------------------------------------------------------------
@@ -5912,7 +5780,6 @@ private:
      **/
     double m_to;
 
-    /* include <attto> */
 };
 
 //----------------------------------------------------------------------------
@@ -5952,7 +5819,6 @@ private:
      **/
     data_MEASUREMENTSIGNED m_vo;
 
-    /* include <attvo> */
 };
 
 //----------------------------------------------------------------------------
@@ -6000,7 +5866,6 @@ private:
      **/
     data_MEASUREMENTSIGNED m_endho;
 
-    /* include <attendho> */
 };
 
 //----------------------------------------------------------------------------
@@ -6048,7 +5913,6 @@ private:
      **/
     double m_endto;
 
-    /* include <attendto> */
 };
 
 //----------------------------------------------------------------------------
@@ -6096,7 +5960,6 @@ private:
      **/
     data_MEASUREMENTSIGNED m_endvo;
 
-    /* include <attendvo> */
 };
 
 //----------------------------------------------------------------------------
@@ -6132,7 +5995,6 @@ private:
     /** Specifies the symbol used to group lyrics. **/
     voltaGroupingSym_VOLTASYM m_voltasym;
 
-    /* include <attvoltasym> */
 };
 
 //----------------------------------------------------------------------------
@@ -6168,7 +6030,6 @@ private:
     /** --- **/
     std::string m_space;
 
-    /* include <attspace> */
 };
 
 //----------------------------------------------------------------------------
@@ -6204,7 +6065,6 @@ private:
     /** Measurement of the horizontal dimension of an entity. **/
     data_MEASUREMENTUNSIGNED m_width;
 
-    /* include <attwidth> */
 };
 
 //----------------------------------------------------------------------------
@@ -6254,7 +6114,6 @@ private:
      **/
     double m_y;
 
-    /* include <atty> */
 };
 
 //----------------------------------------------------------------------------
@@ -6296,9 +6155,8 @@ private:
     /** Encodes the optional 2nd y coordinate. **/
     double m_y2;
 
-    /* include <atty2> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_SHARED_H__

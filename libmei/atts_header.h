@@ -88,7 +88,6 @@ private:
      **/
     std::string m_outerVerso;
 
-    /* include <attouter.verso> */
 };
 
 //----------------------------------------------------------------------------
@@ -130,7 +129,6 @@ private:
     /** A reference to a surface element positioned on the verso side of the sheet. **/
     std::string m_verso;
 
-    /* include <attverso> */
 };
 
 //----------------------------------------------------------------------------
@@ -166,7 +164,6 @@ private:
     /** --- **/
     recordType_RECORDTYPE m_recordtype;
 
-    /* include <attrecordtype> */
 };
 
 //----------------------------------------------------------------------------
@@ -202,9 +199,8 @@ private:
     /** Indicates the method employed to mark corrections and normalizations. **/
     regularMethod_METHOD m_method;
 
-    /* include <attmethod> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_HEADER_H__

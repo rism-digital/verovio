@@ -564,28 +564,6 @@ enum data_DIVISIO {
 };
 
 /**
- * MEI data.DURATIONRESTS
- */
-enum data_DURATIONRESTS {
-    DURATIONRESTS_NONE = 0,
-    DURATIONRESTS_long,
-    DURATIONRESTS_breve,
-    DURATIONRESTS_1,
-    DURATIONRESTS_2,
-    DURATIONRESTS_4,
-    DURATIONRESTS_8,
-    DURATIONRESTS_16,
-    DURATIONRESTS_32,
-    DURATIONRESTS_64,
-    DURATIONRESTS_128,
-    DURATIONRESTS_256,
-    DURATIONRESTS_512,
-    DURATIONRESTS_1024,
-    DURATIONRESTS_2048,
-    DURATIONRESTS_MAX
-};
-
-/**
  * MEI data.DURATIONRESTS.mensural
  */
 enum data_DURATIONRESTS_mensural {
@@ -2521,6 +2499,6 @@ enum whitespace_XMLSPACE {
     whitespace_XMLSPACE_MAX
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATT_TYPES_H__

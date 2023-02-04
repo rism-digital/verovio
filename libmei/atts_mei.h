@@ -70,9 +70,8 @@ private:
      **/
     std::string m_notationsubtype;
 
-    /* include <attnotationsubtype> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_MEI_H__

@@ -62,7 +62,6 @@ private:
      **/
     data_DURQUALITY_mensural m_durQuality;
 
-    /* include <attdur.quality> */
 };
 
 //----------------------------------------------------------------------------
@@ -112,7 +111,6 @@ private:
      **/
     int m_proportNumbase;
 
-    /* include <attproport.numbase> */
 };
 
 //----------------------------------------------------------------------------
@@ -172,7 +170,6 @@ private:
     /** Describes the divisions of the breve in use in 14th-century Italy. **/
     data_DIVISIO m_divisio;
 
-    /* include <attdivisio> */
 };
 
 //----------------------------------------------------------------------------
@@ -208,7 +205,6 @@ private:
     /** Indicates this element’s participation in a ligature. **/
     data_LIGATUREFORM m_lig;
 
-    /* include <attlig> */
 };
 
 //----------------------------------------------------------------------------
@@ -244,7 +240,6 @@ private:
     /** States how many spaces are covered by the rest. **/
     int m_spaces;
 
-    /* include <attspaces> */
 };
 
 //----------------------------------------------------------------------------
@@ -280,9 +275,8 @@ private:
     /** Records the form of the stem. **/
     data_STEMFORM_mensural m_stemForm;
 
-    /* include <attstem.form> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_MENSURAL_H__

@@ -85,9 +85,8 @@ private:
      **/
     std::string m_glyphUri;
 
-    /* include <attglyph.uri> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_EXTERNALSYMBOLS_H__

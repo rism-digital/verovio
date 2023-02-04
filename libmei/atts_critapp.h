@@ -61,9 +61,8 @@ private:
      **/
     std::string m_cause;
 
-    /* include <attcause> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_CRITAPP_H__

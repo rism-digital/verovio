@@ -109,7 +109,7 @@ bool AttBifoliumSurfaces::HasOuterVerso() const
     return (m_outerVerso != "");
 }
 
-/* include <attouter.verso> */
+
 
 //----------------------------------------------------------------------------
 // AttFoliumSurfaces
@@ -168,7 +168,7 @@ bool AttFoliumSurfaces::HasVerso() const
     return (m_verso != "");
 }
 
-/* include <attverso> */
+
 
 //----------------------------------------------------------------------------
 // AttRecordType
@@ -212,7 +212,7 @@ bool AttRecordType::HasRecordtype() const
     return (m_recordtype != recordType_RECORDTYPE_NONE);
 }
 
-/* include <attrecordtype> */
+
 
 //----------------------------------------------------------------------------
 // AttRegularMethod
@@ -256,9 +256,7 @@ bool AttRegularMethod::HasMethod() const
     return (m_method != regularMethod_METHOD_NONE);
 }
 
-/* include <attmethod> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -368,4 +366,4 @@ void AttModule::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

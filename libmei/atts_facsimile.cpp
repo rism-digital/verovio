@@ -64,9 +64,7 @@ bool AttFacsimile::HasFacs() const
     return (m_facs != "");
 }
 
-/* include <attfacs> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -103,4 +101,4 @@ void AttModule::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

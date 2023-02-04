@@ -64,9 +64,7 @@ bool AttHarmLog::HasChordref() const
     return (m_chordref != "");
 }
 
-/* include <attchordref> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -103,4 +101,4 @@ void AttModule::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

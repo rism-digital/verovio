@@ -98,9 +98,6 @@ public:
     std::string DivisioToStr(data_DIVISIO data) const;
     data_DIVISIO StrToDivisio(const std::string &value, bool logWarning = true) const;
 
-    std::string DurationrestsToStr(data_DURATIONRESTS data) const;
-    data_DURATIONRESTS StrToDurationrests(const std::string &value, bool logWarning = true) const;
-
     std::string DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const;
     data_DURATIONRESTS_mensural StrToDurationrestsMensural(const std::string &value, bool logWarning = true) const;
 
@@ -480,6 +477,6 @@ public:
     whitespace_XMLSPACE StrToWhitespaceXmlspace(const std::string &value, bool logWarning = true) const;
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATT_CONVERTER_H__

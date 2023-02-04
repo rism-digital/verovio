@@ -76,7 +76,6 @@ private:
     /** Sets the MIDI track. **/
     int m_midiTrack;
 
-    /* include <attmidi.track> */
 };
 
 //----------------------------------------------------------------------------
@@ -115,7 +114,6 @@ private:
      **/
     std::string m_instr;
 
-    /* include <attinstr> */
 };
 
 //----------------------------------------------------------------------------
@@ -190,7 +188,6 @@ private:
     /** Sets the instrument’s volume. **/
     data_PERCENT m_midiVolume;
 
-    /* include <attmidi.volume> */
 };
 
 //----------------------------------------------------------------------------
@@ -226,7 +223,6 @@ private:
     /** Records a number or count accompanying a notational feature. **/
     data_MIDIVALUE m_num;
 
-    /* include <attnum> */
 };
 
 //----------------------------------------------------------------------------
@@ -277,7 +273,6 @@ private:
      **/
     data_MIDIMSPB m_midiMspb;
 
-    /* include <attmidi.mspb> */
 };
 
 //----------------------------------------------------------------------------
@@ -313,7 +308,6 @@ private:
     /** MIDI number. **/
     data_MIDIVALUE m_val;
 
-    /* include <attval> */
 };
 
 //----------------------------------------------------------------------------
@@ -349,7 +343,6 @@ private:
     /** MIDI number. **/
     data_MIDIVALUE m_val2;
 
-    /* include <attval2> */
 };
 
 //----------------------------------------------------------------------------
@@ -385,7 +378,6 @@ private:
     /** MIDI Note-on/off velocity. **/
     data_MIDIVALUE m_vel;
 
-    /* include <attvel> */
 };
 
 //----------------------------------------------------------------------------
@@ -425,9 +417,8 @@ private:
      **/
     int m_ppq;
 
-    /* include <attppq> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_MIDI_H__

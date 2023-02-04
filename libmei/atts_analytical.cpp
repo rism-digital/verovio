@@ -64,7 +64,7 @@ bool AttHarmAnl::HasForm() const
     return (m_form != harmAnl_FORM_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttHarmonicFunction
@@ -108,7 +108,7 @@ bool AttHarmonicFunction::HasDeg() const
     return (m_deg != "");
 }
 
-/* include <attdeg> */
+
 
 //----------------------------------------------------------------------------
 // AttIntervalHarmonic
@@ -152,7 +152,7 @@ bool AttIntervalHarmonic::HasInth() const
     return (m_inth != "");
 }
 
-/* include <attinth> */
+
 
 //----------------------------------------------------------------------------
 // AttIntervalMelodic
@@ -196,7 +196,7 @@ bool AttIntervalMelodic::HasIntm() const
     return (m_intm != "");
 }
 
-/* include <attintm> */
+
 
 //----------------------------------------------------------------------------
 // AttKeySigAnl
@@ -240,7 +240,7 @@ bool AttKeySigAnl::HasMode() const
     return (m_mode != MODE_NONE);
 }
 
-/* include <attmode> */
+
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
@@ -314,7 +314,7 @@ bool AttKeySigDefaultAnl::HasKeyPname() const
     return (m_keyPname != PITCHNAME_NONE);
 }
 
-/* include <attkey.pname> */
+
 
 //----------------------------------------------------------------------------
 // AttMelodicFunction
@@ -358,7 +358,7 @@ bool AttMelodicFunction::HasMfunc() const
     return (m_mfunc != MELODICFUNCTION_NONE);
 }
 
-/* include <attmfunc> */
+
 
 //----------------------------------------------------------------------------
 // AttPitchClass
@@ -402,7 +402,7 @@ bool AttPitchClass::HasPclass() const
     return (m_pclass != VRV_UNSET);
 }
 
-/* include <attpclass> */
+
 
 //----------------------------------------------------------------------------
 // AttSolfa
@@ -446,9 +446,7 @@ bool AttSolfa::HasPsolfa() const
     return (m_psolfa != "");
 }
 
-/* include <attpsolfa> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -619,4 +617,4 @@ void AttModule::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

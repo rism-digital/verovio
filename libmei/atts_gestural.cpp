@@ -64,7 +64,7 @@ bool AttAccidentalGes::HasAccidGes() const
     return (m_accidGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-/* include <attaccid.ges> */
+
 
 //----------------------------------------------------------------------------
 // AttArticulationGes
@@ -108,7 +108,7 @@ bool AttArticulationGes::HasArticGes() const
     return (m_articGes != std::vector<data_ARTICULATION>());
 }
 
-/* include <attartic.ges> */
+
 
 //----------------------------------------------------------------------------
 // AttBendGes
@@ -152,7 +152,7 @@ bool AttBendGes::HasAmount() const
     return (m_amount != 0.0);
 }
 
-/* include <attamount> */
+
 
 //----------------------------------------------------------------------------
 // AttDurationGes
@@ -271,7 +271,7 @@ bool AttDurationGes::HasDurRecip() const
     return (m_durRecip != "");
 }
 
-/* include <attdur.recip> */
+
 
 //----------------------------------------------------------------------------
 // AttMdivGes
@@ -315,7 +315,7 @@ bool AttMdivGes::HasAttacca() const
     return (m_attacca != BOOLEAN_NONE);
 }
 
-/* include <attattacca> */
+
 
 //----------------------------------------------------------------------------
 // AttNcGes
@@ -389,7 +389,7 @@ bool AttNcGes::HasPnum() const
     return (m_pnum != VRV_UNSET);
 }
 
-/* include <attpnum> */
+
 
 //----------------------------------------------------------------------------
 // AttNoteGes
@@ -478,7 +478,7 @@ bool AttNoteGes::HasPnum() const
     return (m_pnum != VRV_UNSET);
 }
 
-/* include <attpnum> */
+
 
 //----------------------------------------------------------------------------
 // AttOrnamentAccidGes
@@ -537,7 +537,7 @@ bool AttOrnamentAccidGes::HasAccidlowerGes() const
     return (m_accidlowerGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-/* include <attaccidlower.ges> */
+
 
 //----------------------------------------------------------------------------
 // AttSectionGes
@@ -581,7 +581,7 @@ bool AttSectionGes::HasAttacca() const
     return (m_attacca != BOOLEAN_NONE);
 }
 
-/* include <attattacca> */
+
 
 //----------------------------------------------------------------------------
 // AttSoundLocation
@@ -640,7 +640,7 @@ bool AttSoundLocation::HasElevation() const
     return (m_elevation != 0.0);
 }
 
-/* include <attelevation> */
+
 
 //----------------------------------------------------------------------------
 // AttTimestampGes
@@ -699,7 +699,7 @@ bool AttTimestampGes::HasTstampReal() const
     return (m_tstampReal != "");
 }
 
-/* include <atttstamp.real> */
+
 
 //----------------------------------------------------------------------------
 // AttTimestamp2Ges
@@ -758,9 +758,7 @@ bool AttTimestamp2Ges::HasTstamp2Real() const
     return (m_tstamp2Real != "");
 }
 
-/* include <atttstamp2.real> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -1060,4 +1058,4 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

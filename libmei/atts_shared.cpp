@@ -64,7 +64,7 @@ bool AttAccidLog::HasFunc() const
     return (m_func != accidLog_FUNC_NONE);
 }
 
-/* include <attfunc> */
+
 
 //----------------------------------------------------------------------------
 // AttAccidental
@@ -108,7 +108,7 @@ bool AttAccidental::HasAccid() const
     return (m_accid != ACCIDENTAL_WRITTEN_NONE);
 }
 
-/* include <attaccid> */
+
 
 //----------------------------------------------------------------------------
 // AttArticulation
@@ -152,7 +152,7 @@ bool AttArticulation::HasArtic() const
     return (m_artic != std::vector<data_ARTICULATION>());
 }
 
-/* include <attartic> */
+
 
 //----------------------------------------------------------------------------
 // AttAttaccaLog
@@ -196,7 +196,7 @@ bool AttAttaccaLog::HasTarget() const
     return (m_target != "");
 }
 
-/* include <atttarget> */
+
 
 //----------------------------------------------------------------------------
 // AttAudience
@@ -240,7 +240,7 @@ bool AttAudience::HasAudience() const
     return (m_audience != audience_AUDIENCE_NONE);
 }
 
-/* include <attaudience> */
+
 
 //----------------------------------------------------------------------------
 // AttAugmentDots
@@ -284,7 +284,7 @@ bool AttAugmentDots::HasDots() const
     return (m_dots != VRV_UNSET);
 }
 
-/* include <attdots> */
+
 
 //----------------------------------------------------------------------------
 // AttAuthorized
@@ -343,7 +343,7 @@ bool AttAuthorized::HasAuthUri() const
     return (m_authUri != "");
 }
 
-/* include <attauth.uri> */
+
 
 //----------------------------------------------------------------------------
 // AttBarLineLog
@@ -387,7 +387,7 @@ bool AttBarLineLog::HasForm() const
     return (m_form != BARRENDITION_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttBarring
@@ -461,7 +461,7 @@ bool AttBarring::HasBarPlace() const
     return (m_barPlace != VRV_UNSET);
 }
 
-/* include <attbar.place> */
+
 
 //----------------------------------------------------------------------------
 // AttBasic
@@ -505,7 +505,7 @@ bool AttBasic::HasBase() const
     return (m_base != "");
 }
 
-/* include <attbase> */
+
 
 //----------------------------------------------------------------------------
 // AttBibl
@@ -549,7 +549,7 @@ bool AttBibl::HasAnalog() const
     return (m_analog != "");
 }
 
-/* include <attanalog> */
+
 
 //----------------------------------------------------------------------------
 // AttCalendared
@@ -593,7 +593,7 @@ bool AttCalendared::HasCalendar() const
     return (m_calendar != "");
 }
 
-/* include <attcalendar> */
+
 
 //----------------------------------------------------------------------------
 // AttCanonical
@@ -637,7 +637,7 @@ bool AttCanonical::HasCodedval() const
     return (m_codedval != "");
 }
 
-/* include <attcodedval> */
+
 
 //----------------------------------------------------------------------------
 // AttClassed
@@ -681,7 +681,7 @@ bool AttClassed::HasClass() const
     return (m_class != "");
 }
 
-/* include <attclass> */
+
 
 //----------------------------------------------------------------------------
 // AttClefLog
@@ -725,7 +725,7 @@ bool AttClefLog::HasCautionary() const
     return (m_cautionary != BOOLEAN_NONE);
 }
 
-/* include <attcautionary> */
+
 
 //----------------------------------------------------------------------------
 // AttClefShape
@@ -769,7 +769,7 @@ bool AttClefShape::HasShape() const
     return (m_shape != CLEFSHAPE_NONE);
 }
 
-/* include <attshape> */
+
 
 //----------------------------------------------------------------------------
 // AttCleffingLog
@@ -858,7 +858,7 @@ bool AttCleffingLog::HasClefDisPlace() const
     return (m_clefDisPlace != STAFFREL_basic_NONE);
 }
 
-/* include <attclef.dis.place> */
+
 
 //----------------------------------------------------------------------------
 // AttColor
@@ -902,7 +902,7 @@ bool AttColor::HasColor() const
     return (m_color != "");
 }
 
-/* include <attcolor> */
+
 
 //----------------------------------------------------------------------------
 // AttColoration
@@ -946,7 +946,7 @@ bool AttColoration::HasColored() const
     return (m_colored != BOOLEAN_NONE);
 }
 
-/* include <attcolored> */
+
 
 //----------------------------------------------------------------------------
 // AttCoordX1
@@ -990,7 +990,7 @@ bool AttCoordX1::HasCoordX1() const
     return (m_coordX1 != 0.0);
 }
 
-/* include <attcoord.x1> */
+
 
 //----------------------------------------------------------------------------
 // AttCoordX2
@@ -1034,7 +1034,7 @@ bool AttCoordX2::HasCoordX2() const
     return (m_coordX2 != 0.0);
 }
 
-/* include <attcoord.x2> */
+
 
 //----------------------------------------------------------------------------
 // AttCoordY1
@@ -1078,7 +1078,7 @@ bool AttCoordY1::HasCoordY1() const
     return (m_coordY1 != 0.0);
 }
 
-/* include <attcoord.y1> */
+
 
 //----------------------------------------------------------------------------
 // AttCoordinated
@@ -1182,7 +1182,7 @@ bool AttCoordinated::HasRotate() const
     return (m_rotate != 0.0);
 }
 
-/* include <attrotate> */
+
 
 //----------------------------------------------------------------------------
 // AttCue
@@ -1226,7 +1226,7 @@ bool AttCue::HasCue() const
     return (m_cue != BOOLEAN_NONE);
 }
 
-/* include <attcue> */
+
 
 //----------------------------------------------------------------------------
 // AttCurvature
@@ -1300,7 +1300,7 @@ bool AttCurvature::HasCurvedir() const
     return (m_curvedir != curvature_CURVEDIR_NONE);
 }
 
-/* include <attcurvedir> */
+
 
 //----------------------------------------------------------------------------
 // AttCurveRend
@@ -1359,7 +1359,7 @@ bool AttCurveRend::HasLwidth() const
     return (m_lwidth.HasValue());
 }
 
-/* include <attlwidth> */
+
 
 //----------------------------------------------------------------------------
 // AttCustosLog
@@ -1403,7 +1403,7 @@ bool AttCustosLog::HasTarget() const
     return (m_target != "");
 }
 
-/* include <atttarget> */
+
 
 //----------------------------------------------------------------------------
 // AttDataPointing
@@ -1447,7 +1447,7 @@ bool AttDataPointing::HasData() const
     return (m_data != "");
 }
 
-/* include <attdata> */
+
 
 //----------------------------------------------------------------------------
 // AttDatable
@@ -1551,7 +1551,7 @@ bool AttDatable::HasStartdate() const
     return (m_startdate != "");
 }
 
-/* include <attstartdate> */
+
 
 //----------------------------------------------------------------------------
 // AttDistances
@@ -1655,7 +1655,7 @@ bool AttDistances::HasTempoDist() const
     return (m_tempoDist != data_MEASUREMENTSIGNED());
 }
 
-/* include <atttempo.dist> */
+
 
 //----------------------------------------------------------------------------
 // AttDotLog
@@ -1699,7 +1699,7 @@ bool AttDotLog::HasForm() const
     return (m_form != dotLog_FORM_NONE);
 }
 
-/* include <attform> */
+
 
 //----------------------------------------------------------------------------
 // AttDurationAdditive
@@ -1743,7 +1743,7 @@ bool AttDurationAdditive::HasDur() const
     return (m_dur != DURATION_NONE);
 }
 
-/* include <attdur> */
+
 
 //----------------------------------------------------------------------------
 // AttDurationDefault
@@ -1817,7 +1817,7 @@ bool AttDurationDefault::HasNumbaseDefault() const
     return (m_numbaseDefault != VRV_UNSET);
 }
 
-/* include <attnumbase.default> */
+
 
 //----------------------------------------------------------------------------
 // AttDurationLog
@@ -1861,7 +1861,7 @@ bool AttDurationLog::HasDur() const
     return (m_dur != DURATION_NONE);
 }
 
-/* include <attdur> */
+
 
 //----------------------------------------------------------------------------
 // AttDurationRatio
@@ -1920,7 +1920,7 @@ bool AttDurationRatio::HasNumbase() const
     return (m_numbase != VRV_UNSET);
 }
 
-/* include <attnumbase> */
+
 
 //----------------------------------------------------------------------------
 // AttEnclosingChars
@@ -1964,7 +1964,7 @@ bool AttEnclosingChars::HasEnclose() const
     return (m_enclose != ENCLOSURE_NONE);
 }
 
-/* include <attenclose> */
+
 
 //----------------------------------------------------------------------------
 // AttEndings
@@ -2008,7 +2008,7 @@ bool AttEndings::HasEndingRend() const
     return (m_endingRend != endings_ENDINGREND_NONE);
 }
 
-/* include <attending.rend> */
+
 
 //----------------------------------------------------------------------------
 // AttEvidence
@@ -2067,7 +2067,7 @@ bool AttEvidence::HasEvidence() const
     return (m_evidence != "");
 }
 
-/* include <attevidence> */
+
 
 //----------------------------------------------------------------------------
 // AttExtender
@@ -2111,7 +2111,7 @@ bool AttExtender::HasExtender() const
     return (m_extender != BOOLEAN_NONE);
 }
 
-/* include <attextender> */
+
 
 //----------------------------------------------------------------------------
 // AttExtent
@@ -2155,7 +2155,7 @@ bool AttExtent::HasExtent() const
     return (m_extent != "");
 }
 
-/* include <attextent> */
+
 
 //----------------------------------------------------------------------------
 // AttFermataPresent
@@ -2199,7 +2199,7 @@ bool AttFermataPresent::HasFermata() const
     return (m_fermata != STAFFREL_basic_NONE);
 }
 
-/* include <attfermata> */
+
 
 //----------------------------------------------------------------------------
 // AttFiling
@@ -2243,7 +2243,7 @@ bool AttFiling::HasNonfiling() const
     return (m_nonfiling != VRV_UNSET);
 }
 
-/* include <attnonfiling> */
+
 
 //----------------------------------------------------------------------------
 // AttGrpSymLog
@@ -2287,7 +2287,7 @@ bool AttGrpSymLog::HasLevel() const
     return (m_level != VRV_UNSET);
 }
 
-/* include <attlevel> */
+
 
 //----------------------------------------------------------------------------
 // AttHandIdent
@@ -2331,7 +2331,7 @@ bool AttHandIdent::HasHand() const
     return (m_hand != "");
 }
 
-/* include <atthand> */
+
 
 //----------------------------------------------------------------------------
 // AttHeight
@@ -2375,7 +2375,7 @@ bool AttHeight::HasHeight() const
     return (m_height != data_MEASUREMENTUNSIGNED());
 }
 
-/* include <attheight> */
+
 
 //----------------------------------------------------------------------------
 // AttHorizontalAlign
@@ -2419,7 +2419,7 @@ bool AttHorizontalAlign::HasHalign() const
     return (m_halign != HORIZONTALALIGNMENT_NONE);
 }
 
-/* include <atthalign> */
+
 
 //----------------------------------------------------------------------------
 // AttInternetMedia
@@ -2463,7 +2463,7 @@ bool AttInternetMedia::HasMimetype() const
     return (m_mimetype != "");
 }
 
-/* include <attmimetype> */
+
 
 //----------------------------------------------------------------------------
 // AttJoined
@@ -2507,7 +2507,7 @@ bool AttJoined::HasJoin() const
     return (m_join != "");
 }
 
-/* include <attjoin> */
+
 
 //----------------------------------------------------------------------------
 // AttKeySigLog
@@ -2551,7 +2551,7 @@ bool AttKeySigLog::HasSig() const
     return (m_sig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
-/* include <attsig> */
+
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultLog
@@ -2595,7 +2595,7 @@ bool AttKeySigDefaultLog::HasKeySig() const
     return (m_keySig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
-/* include <attkey.sig> */
+
 
 //----------------------------------------------------------------------------
 // AttLabelled
@@ -2639,7 +2639,7 @@ bool AttLabelled::HasLabel() const
     return (m_label != "");
 }
 
-/* include <attlabel> */
+
 
 //----------------------------------------------------------------------------
 // AttLang
@@ -2698,7 +2698,7 @@ bool AttLang::HasTranslit() const
     return (m_translit != "");
 }
 
-/* include <atttranslit> */
+
 
 //----------------------------------------------------------------------------
 // AttLayerLog
@@ -2742,7 +2742,7 @@ bool AttLayerLog::HasDef() const
     return (m_def != "");
 }
 
-/* include <attdef> */
+
 
 //----------------------------------------------------------------------------
 // AttLayerIdent
@@ -2786,7 +2786,7 @@ bool AttLayerIdent::HasLayer() const
     return (m_layer != VRV_UNSET);
 }
 
-/* include <attlayer> */
+
 
 //----------------------------------------------------------------------------
 // AttLineLoc
@@ -2830,7 +2830,7 @@ bool AttLineLoc::HasLine() const
     return (m_line != 0);
 }
 
-/* include <attline> */
+
 
 //----------------------------------------------------------------------------
 // AttLineRend
@@ -2919,7 +2919,7 @@ bool AttLineRend::HasLstartsymSize() const
     return (m_lstartsymSize != VRV_UNSET);
 }
 
-/* include <attlstartsym.size> */
+
 
 //----------------------------------------------------------------------------
 // AttLineRendBase
@@ -2993,7 +2993,7 @@ bool AttLineRendBase::HasLwidth() const
     return (m_lwidth.HasValue());
 }
 
-/* include <attlwidth> */
+
 
 //----------------------------------------------------------------------------
 // AttLinking
@@ -3142,7 +3142,7 @@ bool AttLinking::HasSynch() const
     return (m_synch != "");
 }
 
-/* include <attsynch> */
+
 
 //----------------------------------------------------------------------------
 // AttLyricStyle
@@ -3261,7 +3261,7 @@ bool AttLyricStyle::HasLyricWeight() const
     return (m_lyricWeight != FONTWEIGHT_NONE);
 }
 
-/* include <attlyric.weight> */
+
 
 //----------------------------------------------------------------------------
 // AttMeasureNumbers
@@ -3305,7 +3305,7 @@ bool AttMeasureNumbers::HasMnumVisible() const
     return (m_mnumVisible != BOOLEAN_NONE);
 }
 
-/* include <attmnum.visible> */
+
 
 //----------------------------------------------------------------------------
 // AttMeasurement
@@ -3349,7 +3349,7 @@ bool AttMeasurement::HasUnit() const
     return (m_unit != "");
 }
 
-/* include <attunit> */
+
 
 //----------------------------------------------------------------------------
 // AttMediaBounds
@@ -3423,7 +3423,7 @@ bool AttMediaBounds::HasBetype() const
     return (m_betype != BETYPE_NONE);
 }
 
-/* include <attbetype> */
+
 
 //----------------------------------------------------------------------------
 // AttMedium
@@ -3467,7 +3467,7 @@ bool AttMedium::HasMedium() const
     return (m_medium != "");
 }
 
-/* include <attmedium> */
+
 
 //----------------------------------------------------------------------------
 // AttMeiVersion
@@ -3511,7 +3511,7 @@ bool AttMeiVersion::HasMeiversion() const
     return (m_meiversion != meiVersion_MEIVERSION_NONE);
 }
 
-/* include <attmeiversion> */
+
 
 //----------------------------------------------------------------------------
 // AttMetadataPointing
@@ -3555,7 +3555,7 @@ bool AttMetadataPointing::HasDecls() const
     return (m_decls != "");
 }
 
-/* include <attdecls> */
+
 
 //----------------------------------------------------------------------------
 // AttMeterConformance
@@ -3599,7 +3599,7 @@ bool AttMeterConformance::HasMetcon() const
     return (m_metcon != meterConformance_METCON_NONE);
 }
 
-/* include <attmetcon> */
+
 
 //----------------------------------------------------------------------------
 // AttMeterConformanceBar
@@ -3658,7 +3658,7 @@ bool AttMeterConformanceBar::HasControl() const
     return (m_control != BOOLEAN_NONE);
 }
 
-/* include <attcontrol> */
+
 
 //----------------------------------------------------------------------------
 // AttMeterSigLog
@@ -3732,7 +3732,7 @@ bool AttMeterSigLog::HasUnit() const
     return (m_unit != VRV_UNSET);
 }
 
-/* include <attunit> */
+
 
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultLog
@@ -3806,7 +3806,7 @@ bool AttMeterSigDefaultLog::HasMeterSym() const
     return (m_meterSym != METERSIGN_NONE);
 }
 
-/* include <attmeter.sym> */
+
 
 //----------------------------------------------------------------------------
 // AttMmTempo
@@ -3880,7 +3880,7 @@ bool AttMmTempo::HasMmDots() const
     return (m_mmDots != VRV_UNSET);
 }
 
-/* include <attmm.dots> */
+
 
 //----------------------------------------------------------------------------
 // AttMultinumMeasures
@@ -3924,7 +3924,7 @@ bool AttMultinumMeasures::HasMultiNumber() const
     return (m_multiNumber != BOOLEAN_NONE);
 }
 
-/* include <attmulti.number> */
+
 
 //----------------------------------------------------------------------------
 // AttNInteger
@@ -3968,7 +3968,7 @@ bool AttNInteger::HasN() const
     return (m_n != VRV_UNSET);
 }
 
-/* include <attn> */
+
 
 //----------------------------------------------------------------------------
 // AttNNumberLike
@@ -4012,7 +4012,7 @@ bool AttNNumberLike::HasN() const
     return (m_n != "");
 }
 
-/* include <attn> */
+
 
 //----------------------------------------------------------------------------
 // AttName
@@ -4071,7 +4071,7 @@ bool AttName::HasRole() const
     return (m_role != "");
 }
 
-/* include <attrole> */
+
 
 //----------------------------------------------------------------------------
 // AttNotationStyle
@@ -4130,7 +4130,7 @@ bool AttNotationStyle::HasMusicSize() const
     return (m_musicSize.HasValue());
 }
 
-/* include <attmusic.size> */
+
 
 //----------------------------------------------------------------------------
 // AttNoteHeads
@@ -4294,7 +4294,7 @@ bool AttNoteHeads::HasHeadVisible() const
     return (m_headVisible != BOOLEAN_NONE);
 }
 
-/* include <atthead.visible> */
+
 
 //----------------------------------------------------------------------------
 // AttOctave
@@ -4338,7 +4338,7 @@ bool AttOctave::HasOct() const
     return (m_oct != -127);
 }
 
-/* include <attoct> */
+
 
 //----------------------------------------------------------------------------
 // AttOctaveDefault
@@ -4382,7 +4382,7 @@ bool AttOctaveDefault::HasOctDefault() const
     return (m_octDefault != -127);
 }
 
-/* include <attoct.default> */
+
 
 //----------------------------------------------------------------------------
 // AttOctaveDisplacement
@@ -4441,7 +4441,7 @@ bool AttOctaveDisplacement::HasDisPlace() const
     return (m_disPlace != STAFFREL_basic_NONE);
 }
 
-/* include <attdis.place> */
+
 
 //----------------------------------------------------------------------------
 // AttOneLineStaff
@@ -4485,7 +4485,7 @@ bool AttOneLineStaff::HasOntheline() const
     return (m_ontheline != BOOLEAN_NONE);
 }
 
-/* include <attontheline> */
+
 
 //----------------------------------------------------------------------------
 // AttOptimization
@@ -4529,7 +4529,7 @@ bool AttOptimization::HasOptimize() const
     return (m_optimize != BOOLEAN_NONE);
 }
 
-/* include <attoptimize> */
+
 
 //----------------------------------------------------------------------------
 // AttOriginLayerIdent
@@ -4573,7 +4573,7 @@ bool AttOriginLayerIdent::HasOriginLayer() const
     return (m_originLayer != "");
 }
 
-/* include <attorigin.layer> */
+
 
 //----------------------------------------------------------------------------
 // AttOriginStaffIdent
@@ -4617,7 +4617,7 @@ bool AttOriginStaffIdent::HasOriginStaff() const
     return (m_originStaff != "");
 }
 
-/* include <attorigin.staff> */
+
 
 //----------------------------------------------------------------------------
 // AttOriginStartEndId
@@ -4676,7 +4676,7 @@ bool AttOriginStartEndId::HasOriginEndid() const
     return (m_originEndid != "");
 }
 
-/* include <attorigin.endid> */
+
 
 //----------------------------------------------------------------------------
 // AttOriginTimestampLog
@@ -4735,7 +4735,7 @@ bool AttOriginTimestampLog::HasOriginTstamp2() const
     return (m_originTstamp2 != std::make_pair(-1, -1.0));
 }
 
-/* include <attorigin.tstamp2> */
+
 
 //----------------------------------------------------------------------------
 // AttPages
@@ -4884,7 +4884,7 @@ bool AttPages::HasPageScale() const
     return (m_pageScale != "");
 }
 
-/* include <attpage.scale> */
+
 
 //----------------------------------------------------------------------------
 // AttPartIdent
@@ -4943,7 +4943,7 @@ bool AttPartIdent::HasPartstaff() const
     return (m_partstaff != "");
 }
 
-/* include <attpartstaff> */
+
 
 //----------------------------------------------------------------------------
 // AttPitch
@@ -4987,7 +4987,7 @@ bool AttPitch::HasPname() const
     return (m_pname != PITCHNAME_NONE);
 }
 
-/* include <attpname> */
+
 
 //----------------------------------------------------------------------------
 // AttPlacementOnStaff
@@ -5031,7 +5031,7 @@ bool AttPlacementOnStaff::HasOnstaff() const
     return (m_onstaff != BOOLEAN_NONE);
 }
 
-/* include <attonstaff> */
+
 
 //----------------------------------------------------------------------------
 // AttPlacementRelEvent
@@ -5075,7 +5075,7 @@ bool AttPlacementRelEvent::HasPlace() const
     return (m_place != data_STAFFREL());
 }
 
-/* include <attplace> */
+
 
 //----------------------------------------------------------------------------
 // AttPlacementRelStaff
@@ -5119,7 +5119,7 @@ bool AttPlacementRelStaff::HasPlace() const
     return (m_place != data_STAFFREL());
 }
 
-/* include <attplace> */
+
 
 //----------------------------------------------------------------------------
 // AttPlist
@@ -5163,7 +5163,7 @@ bool AttPlist::HasPlist() const
     return (m_plist != std::vector<std::string>());
 }
 
-/* include <attplist> */
+
 
 //----------------------------------------------------------------------------
 // AttPointing
@@ -5267,7 +5267,7 @@ bool AttPointing::HasTargettype() const
     return (m_targettype != "");
 }
 
-/* include <atttargettype> */
+
 
 //----------------------------------------------------------------------------
 // AttQuantity
@@ -5311,7 +5311,7 @@ bool AttQuantity::HasQuantity() const
     return (m_quantity != 0.0);
 }
 
-/* include <attquantity> */
+
 
 //----------------------------------------------------------------------------
 // AttRanging
@@ -5415,7 +5415,7 @@ bool AttRanging::HasConfidence() const
     return (m_confidence != 0.0);
 }
 
-/* include <attconfidence> */
+
 
 //----------------------------------------------------------------------------
 // AttResponsibility
@@ -5459,7 +5459,7 @@ bool AttResponsibility::HasResp() const
     return (m_resp != "");
 }
 
-/* include <attresp> */
+
 
 //----------------------------------------------------------------------------
 // AttRestdurationLog
@@ -5474,14 +5474,14 @@ AttRestdurationLog::~AttRestdurationLog() {}
 
 void AttRestdurationLog::ResetRestdurationLog()
 {
-    m_dur = DURATIONRESTS_NONE;
+    m_dur = DURATION_NONE;
 }
 
 bool AttRestdurationLog::ReadRestdurationLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("dur")) {
-        this->SetDur(StrToDurationrests(element.attribute("dur").value()));
+        this->SetDur(StrToDuration(element.attribute("dur").value()));
         element.remove_attribute("dur");
         hasAttribute = true;
     }
@@ -5492,7 +5492,7 @@ bool AttRestdurationLog::WriteRestdurationLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDur()) {
-        element.append_attribute("dur") = DurationrestsToStr(this->GetDur()).c_str();
+        element.append_attribute("dur") = DurationToStr(this->GetDur()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5500,10 +5500,10 @@ bool AttRestdurationLog::WriteRestdurationLog(pugi::xml_node element)
 
 bool AttRestdurationLog::HasDur() const
 {
-    return (m_dur != DURATIONRESTS_NONE);
+    return (m_dur != DURATION_NONE);
 }
 
-/* include <attdur> */
+
 
 //----------------------------------------------------------------------------
 // AttScalable
@@ -5547,7 +5547,7 @@ bool AttScalable::HasScale() const
     return (m_scale != -1.0);
 }
 
-/* include <attscale> */
+
 
 //----------------------------------------------------------------------------
 // AttSequence
@@ -5591,7 +5591,7 @@ bool AttSequence::HasSeq() const
     return (m_seq != VRV_UNSET);
 }
 
-/* include <attseq> */
+
 
 //----------------------------------------------------------------------------
 // AttSlashCount
@@ -5635,7 +5635,7 @@ bool AttSlashCount::HasSlash() const
     return (m_slash != 0);
 }
 
-/* include <attslash> */
+
 
 //----------------------------------------------------------------------------
 // AttSlurPresent
@@ -5679,7 +5679,7 @@ bool AttSlurPresent::HasSlur() const
     return (m_slur != "");
 }
 
-/* include <attslur> */
+
 
 //----------------------------------------------------------------------------
 // AttSource
@@ -5723,7 +5723,7 @@ bool AttSource::HasSource() const
     return (m_source != "");
 }
 
-/* include <attsource> */
+
 
 //----------------------------------------------------------------------------
 // AttSpacing
@@ -5812,7 +5812,7 @@ bool AttSpacing::HasSpacingSystem() const
     return (m_spacingSystem != data_MEASUREMENTSIGNED());
 }
 
-/* include <attspacing.system> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffLog
@@ -5856,7 +5856,7 @@ bool AttStaffLog::HasDef() const
     return (m_def != "");
 }
 
-/* include <attdef> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffDefLog
@@ -5900,7 +5900,7 @@ bool AttStaffDefLog::HasLines() const
     return (m_lines != VRV_UNSET);
 }
 
-/* include <attlines> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffGroupingSym
@@ -5944,7 +5944,7 @@ bool AttStaffGroupingSym::HasSymbol() const
     return (m_symbol != staffGroupingSym_SYMBOL_NONE);
 }
 
-/* include <attsymbol> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffIdent
@@ -5988,7 +5988,7 @@ bool AttStaffIdent::HasStaff() const
     return (m_staff != std::vector<int>());
 }
 
-/* include <attstaff> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffItems
@@ -6062,7 +6062,7 @@ bool AttStaffItems::HasBetweenorder() const
     return (m_betweenorder != data_STAFFITEM());
 }
 
-/* include <attbetweenorder> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffLoc
@@ -6106,7 +6106,7 @@ bool AttStaffLoc::HasLoc() const
     return (m_loc != VRV_UNSET);
 }
 
-/* include <attloc> */
+
 
 //----------------------------------------------------------------------------
 // AttStaffLocPitched
@@ -6165,7 +6165,7 @@ bool AttStaffLocPitched::HasOloc() const
     return (m_oloc != -127);
 }
 
-/* include <attoloc> */
+
 
 //----------------------------------------------------------------------------
 // AttStartEndId
@@ -6209,7 +6209,7 @@ bool AttStartEndId::HasEndid() const
     return (m_endid != "");
 }
 
-/* include <attendid> */
+
 
 //----------------------------------------------------------------------------
 // AttStartId
@@ -6253,7 +6253,7 @@ bool AttStartId::HasStartid() const
     return (m_startid != "");
 }
 
-/* include <attstartid> */
+
 
 //----------------------------------------------------------------------------
 // AttStems
@@ -6402,7 +6402,7 @@ bool AttStems::HasStemY() const
     return (m_stemY != 0.0);
 }
 
-/* include <attstem.y> */
+
 
 //----------------------------------------------------------------------------
 // AttSylLog
@@ -6461,7 +6461,7 @@ bool AttSylLog::HasWordpos() const
     return (m_wordpos != sylLog_WORDPOS_NONE);
 }
 
-/* include <attwordpos> */
+
 
 //----------------------------------------------------------------------------
 // AttSylText
@@ -6505,7 +6505,7 @@ bool AttSylText::HasSyl() const
     return (m_syl != "");
 }
 
-/* include <attsyl> */
+
 
 //----------------------------------------------------------------------------
 // AttSystems
@@ -6594,7 +6594,7 @@ bool AttSystems::HasSystemTopmar() const
     return (m_systemTopmar != data_MEASUREMENTUNSIGNED());
 }
 
-/* include <attsystem.topmar> */
+
 
 //----------------------------------------------------------------------------
 // AttTargetEval
@@ -6638,7 +6638,7 @@ bool AttTargetEval::HasEvaluate() const
     return (m_evaluate != targetEval_EVALUATE_NONE);
 }
 
-/* include <attevaluate> */
+
 
 //----------------------------------------------------------------------------
 // AttTempoLog
@@ -6682,7 +6682,7 @@ bool AttTempoLog::HasFunc() const
     return (m_func != tempoLog_FUNC_NONE);
 }
 
-/* include <attfunc> */
+
 
 //----------------------------------------------------------------------------
 // AttTextRendition
@@ -6741,7 +6741,7 @@ bool AttTextRendition::HasRend() const
     return (m_rend != TEXTRENDITION_NONE);
 }
 
-/* include <attrend> */
+
 
 //----------------------------------------------------------------------------
 // AttTextStyle
@@ -6845,7 +6845,7 @@ bool AttTextStyle::HasTextWeight() const
     return (m_textWeight != FONTWEIGHT_NONE);
 }
 
-/* include <atttext.weight> */
+
 
 //----------------------------------------------------------------------------
 // AttTiePresent
@@ -6889,7 +6889,7 @@ bool AttTiePresent::HasTie() const
     return (m_tie != TIE_NONE);
 }
 
-/* include <atttie> */
+
 
 //----------------------------------------------------------------------------
 // AttTimestampLog
@@ -6933,7 +6933,7 @@ bool AttTimestampLog::HasTstamp() const
     return (m_tstamp != -1.0);
 }
 
-/* include <atttstamp> */
+
 
 //----------------------------------------------------------------------------
 // AttTimestamp2Log
@@ -6977,7 +6977,7 @@ bool AttTimestamp2Log::HasTstamp2() const
     return (m_tstamp2 != std::make_pair(-1, -1.0));
 }
 
-/* include <atttstamp2> */
+
 
 //----------------------------------------------------------------------------
 // AttTransposition
@@ -7036,7 +7036,7 @@ bool AttTransposition::HasTransSemi() const
     return (m_transSemi != VRV_UNSET);
 }
 
-/* include <atttrans.semi> */
+
 
 //----------------------------------------------------------------------------
 // AttTuning
@@ -7110,7 +7110,7 @@ bool AttTuning::HasTuneTemper() const
     return (m_tuneTemper != TEMPERAMENT_NONE);
 }
 
-/* include <atttune.temper> */
+
 
 //----------------------------------------------------------------------------
 // AttTupletPresent
@@ -7154,7 +7154,7 @@ bool AttTupletPresent::HasTuplet() const
     return (m_tuplet != "");
 }
 
-/* include <atttuplet> */
+
 
 //----------------------------------------------------------------------------
 // AttTyped
@@ -7198,7 +7198,7 @@ bool AttTyped::HasType() const
     return (m_type != "");
 }
 
-/* include <atttype> */
+
 
 //----------------------------------------------------------------------------
 // AttTypography
@@ -7332,7 +7332,7 @@ bool AttTypography::HasLineheight() const
     return (m_lineheight != "");
 }
 
-/* include <attlineheight> */
+
 
 //----------------------------------------------------------------------------
 // AttVerticalAlign
@@ -7376,7 +7376,7 @@ bool AttVerticalAlign::HasValign() const
     return (m_valign != VERTICALALIGNMENT_NONE);
 }
 
-/* include <attvalign> */
+
 
 //----------------------------------------------------------------------------
 // AttVerticalGroup
@@ -7420,7 +7420,7 @@ bool AttVerticalGroup::HasVgrp() const
     return (m_vgrp != VRV_UNSET);
 }
 
-/* include <attvgrp> */
+
 
 //----------------------------------------------------------------------------
 // AttVisibility
@@ -7464,7 +7464,7 @@ bool AttVisibility::HasVisible() const
     return (m_visible != BOOLEAN_NONE);
 }
 
-/* include <attvisible> */
+
 
 //----------------------------------------------------------------------------
 // AttVisualOffsetHo
@@ -7508,7 +7508,7 @@ bool AttVisualOffsetHo::HasHo() const
     return (m_ho != data_MEASUREMENTSIGNED());
 }
 
-/* include <attho> */
+
 
 //----------------------------------------------------------------------------
 // AttVisualOffsetTo
@@ -7552,7 +7552,7 @@ bool AttVisualOffsetTo::HasTo() const
     return (m_to != 0.0);
 }
 
-/* include <attto> */
+
 
 //----------------------------------------------------------------------------
 // AttVisualOffsetVo
@@ -7596,7 +7596,7 @@ bool AttVisualOffsetVo::HasVo() const
     return (m_vo != data_MEASUREMENTSIGNED());
 }
 
-/* include <attvo> */
+
 
 //----------------------------------------------------------------------------
 // AttVisualOffset2Ho
@@ -7655,7 +7655,7 @@ bool AttVisualOffset2Ho::HasEndho() const
     return (m_endho != data_MEASUREMENTSIGNED());
 }
 
-/* include <attendho> */
+
 
 //----------------------------------------------------------------------------
 // AttVisualOffset2To
@@ -7714,7 +7714,7 @@ bool AttVisualOffset2To::HasEndto() const
     return (m_endto != 0.0);
 }
 
-/* include <attendto> */
+
 
 //----------------------------------------------------------------------------
 // AttVisualOffset2Vo
@@ -7773,7 +7773,7 @@ bool AttVisualOffset2Vo::HasEndvo() const
     return (m_endvo != data_MEASUREMENTSIGNED());
 }
 
-/* include <attendvo> */
+
 
 //----------------------------------------------------------------------------
 // AttVoltaGroupingSym
@@ -7817,7 +7817,7 @@ bool AttVoltaGroupingSym::HasVoltasym() const
     return (m_voltasym != voltaGroupingSym_VOLTASYM_NONE);
 }
 
-/* include <attvoltasym> */
+
 
 //----------------------------------------------------------------------------
 // AttWhitespace
@@ -7861,7 +7861,7 @@ bool AttWhitespace::HasSpace() const
     return (m_space != "");
 }
 
-/* include <attspace> */
+
 
 //----------------------------------------------------------------------------
 // AttWidth
@@ -7905,7 +7905,7 @@ bool AttWidth::HasWidth() const
     return (m_width != data_MEASUREMENTUNSIGNED());
 }
 
-/* include <attwidth> */
+
 
 //----------------------------------------------------------------------------
 // AttXy
@@ -7964,7 +7964,7 @@ bool AttXy::HasY() const
     return (m_y != 0.0);
 }
 
-/* include <atty> */
+
 
 //----------------------------------------------------------------------------
 // AttXy2
@@ -8023,9 +8023,7 @@ bool AttXy2::HasY2() const
     return (m_y2 != 0.0);
 }
 
-/* include <atty2> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -9135,7 +9133,7 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         AttRestdurationLog *att = dynamic_cast<AttRestdurationLog *>(element);
         assert(att);
         if (attrType == "dur") {
-            att->SetDur(att->StrToDurationrests(attrValue));
+            att->SetDur(att->StrToDuration(attrValue));
             return true;
         }
     }
@@ -10568,7 +10566,7 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttRestdurationLog *att = dynamic_cast<const AttRestdurationLog *>(element);
         assert(att);
         if (att->HasDur()) {
-            attributes->push_back({ "dur", att->DurationrestsToStr(att->GetDur()) });
+            attributes->push_back({ "dur", att->DurationToStr(att->GetDur()) });
         }
     }
     if (element->HasAttClass(ATT_SCALABLE)) {
@@ -10996,4 +10994,4 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

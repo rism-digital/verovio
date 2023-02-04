@@ -58,7 +58,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     harmAnl_FORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -100,7 +99,6 @@ private:
      **/
     std::string m_deg;
 
-    /* include <attdeg> */
 };
 
 //----------------------------------------------------------------------------
@@ -136,7 +134,6 @@ private:
     /** Encodes the harmonic interval between pitches occurring at the same time. **/
     std::string m_inth;
 
-    /* include <attinth> */
 };
 
 //----------------------------------------------------------------------------
@@ -177,7 +174,6 @@ private:
      **/
     std::string m_intm;
 
-    /* include <attintm> */
 };
 
 //----------------------------------------------------------------------------
@@ -213,7 +209,6 @@ private:
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_mode;
 
-    /* include <attmode> */
 };
 
 //----------------------------------------------------------------------------
@@ -264,7 +259,6 @@ private:
     /** Holds the pitch name of the tonic key, e.g., c for the key of C. **/
     data_PITCHNAME m_keyPname;
 
-    /* include <attkey.pname> */
 };
 
 //----------------------------------------------------------------------------
@@ -300,7 +294,6 @@ private:
     /** Describes melodic function using Humdrum **embel syntax. **/
     data_MELODICFUNCTION m_mfunc;
 
-    /* include <attmfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -336,7 +329,6 @@ private:
     /** Holds pitch class information. **/
     int m_pclass;
 
-    /* include <attpclass> */
 };
 
 //----------------------------------------------------------------------------
@@ -375,9 +367,8 @@ private:
      **/
     std::string m_psolfa;
 
-    /* include <attpsolfa> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_ANALYTICAL_H__

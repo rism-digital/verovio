@@ -109,9 +109,7 @@ bool AttMargins::HasRightmar() const
     return (m_rightmar != data_MEASUREMENTUNSIGNED());
 }
 
-/* include <attrightmar> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -169,4 +167,4 @@ void AttModule::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

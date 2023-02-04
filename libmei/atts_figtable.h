@@ -64,9 +64,8 @@ private:
     /** The number of rows spanned by this cell. **/
     int m_rowspan;
 
-    /* include <attrowspan> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_FIGTABLE_H__

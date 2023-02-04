@@ -58,9 +58,8 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     fingGrpLog_FORM m_form;
 
-    /* include <attform> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_FINGERING_H__

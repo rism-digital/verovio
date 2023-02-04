@@ -1185,53 +1185,6 @@ data_DIVISIO AttConverter::StrToDivisio(const std::string &value, bool logWarnin
     return DIVISIO_NONE;
 }
 
-std::string AttConverter::DurationrestsToStr(data_DURATIONRESTS data) const
-{
-    std::string value;
-    switch (data) {
-        case DURATIONRESTS_long: value = "long"; break;
-        case DURATIONRESTS_breve: value = "breve"; break;
-        case DURATIONRESTS_1: value = "1"; break;
-        case DURATIONRESTS_2: value = "2"; break;
-        case DURATIONRESTS_4: value = "4"; break;
-        case DURATIONRESTS_8: value = "8"; break;
-        case DURATIONRESTS_16: value = "16"; break;
-        case DURATIONRESTS_32: value = "32"; break;
-        case DURATIONRESTS_64: value = "64"; break;
-        case DURATIONRESTS_128: value = "128"; break;
-        case DURATIONRESTS_256: value = "256"; break;
-        case DURATIONRESTS_512: value = "512"; break;
-        case DURATIONRESTS_1024: value = "1024"; break;
-        case DURATIONRESTS_2048: value = "2048"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.DURATIONRESTS", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_DURATIONRESTS AttConverter::StrToDurationrests(const std::string &value, bool logWarning) const
-{
-    if (value == "long") return DURATIONRESTS_long;
-    if (value == "breve") return DURATIONRESTS_breve;
-    if (value == "1") return DURATIONRESTS_1;
-    if (value == "2") return DURATIONRESTS_2;
-    if (value == "4") return DURATIONRESTS_4;
-    if (value == "8") return DURATIONRESTS_8;
-    if (value == "16") return DURATIONRESTS_16;
-    if (value == "32") return DURATIONRESTS_32;
-    if (value == "64") return DURATIONRESTS_64;
-    if (value == "128") return DURATIONRESTS_128;
-    if (value == "256") return DURATIONRESTS_256;
-    if (value == "512") return DURATIONRESTS_512;
-    if (value == "1024") return DURATIONRESTS_1024;
-    if (value == "2048") return DURATIONRESTS_2048;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for data.DURATIONRESTS", value.c_str());
-    return DURATIONRESTS_NONE;
-}
-
 std::string AttConverter::DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const
 {
     std::string value;
@@ -5482,4 +5435,4 @@ whitespace_XMLSPACE AttConverter::StrToWhitespaceXmlspace(const std::string &val
     return whitespace_XMLSPACE_NONE;
 }
 
-} // namespace vrv
+} // namespace

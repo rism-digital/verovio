@@ -64,9 +64,7 @@ bool AttCrit::HasCause() const
     return (m_cause != "");
 }
 
-/* include <attcause> */
-
-} // namespace vrv
+} // namespace
 
 //----------------------------------------------------------------------------
 // Module setter and getter
@@ -103,4 +101,4 @@ void AttModule::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace vrv
+} // namespace

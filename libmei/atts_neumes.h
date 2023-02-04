@@ -64,7 +64,6 @@ private:
     /** Contains a written pitch name. **/
     std::string m_pname;
 
-    /* include <attpname> */
 };
 
 //----------------------------------------------------------------------------
@@ -148,9 +147,8 @@ private:
     /** Direction of the pen stroke. **/
     data_COMPASSDIRECTION m_tilt;
 
-    /* include <atttilt> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_NEUMES_H__

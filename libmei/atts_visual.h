@@ -60,7 +60,6 @@ private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_PLACEMENT m_place;
 
-    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -134,7 +133,6 @@ private:
     /** Width of the line. **/
     data_LINEWIDTH m_lineWidth;
 
-    /* include <attline.width> */
 };
 
 //----------------------------------------------------------------------------
@@ -186,7 +184,6 @@ private:
     /** Records the placement of the beam relative to the events it affects. **/
     int m_place;
 
-    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -234,7 +231,6 @@ private:
     /** Captures beam slope. **/
     double m_beamSlope;
 
-    /* include <attbeam.slope> */
 };
 
 //----------------------------------------------------------------------------
@@ -270,7 +266,6 @@ private:
     /** Indicates presence of slash through the beam. **/
     data_BEATRPT_REND m_slash;
 
-    /* include <attslash> */
 };
 
 //----------------------------------------------------------------------------
@@ -311,7 +306,6 @@ private:
      **/
     data_CLUSTER m_cluster;
 
-    /* include <attcluster> */
 };
 
 //----------------------------------------------------------------------------
@@ -353,7 +347,6 @@ private:
     /** Determines whether the clef is to be displayed. **/
     data_BOOLEAN m_clefVisible;
 
-    /* include <attclef.visible> */
 };
 
 //----------------------------------------------------------------------------
@@ -395,7 +388,6 @@ private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_EVENTREL m_place;
 
-    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -443,7 +435,6 @@ private:
     /** Records the amount of separation between floating beams and stems. **/
     data_MEASUREMENTUNSIGNED m_floatGap;
 
-    /* include <attfloat.gap> */
 };
 
 //----------------------------------------------------------------------------
@@ -485,7 +476,6 @@ private:
     /** Describes a clef’s shape. **/
     fermataVis_SHAPE m_shape;
 
-    /* include <attshape> */
 };
 
 //----------------------------------------------------------------------------
@@ -521,7 +511,6 @@ private:
     /** Describes the rotation or reflection of the base symbol. **/
     fingGrpVis_ORIENT m_orient;
 
-    /* include <attorient> */
 };
 
 //----------------------------------------------------------------------------
@@ -589,7 +578,6 @@ private:
      **/
     data_BOOLEAN m_angleOptimize;
 
-    /* include <attangle.optimize> */
 };
 
 //----------------------------------------------------------------------------
@@ -625,7 +613,6 @@ private:
     /** Describes how the harmonic indication should be rendered. **/
     harmVis_RENDGRID m_rendgrid;
 
-    /* include <attrendgrid> */
 };
 
 //----------------------------------------------------------------------------
@@ -667,7 +654,6 @@ private:
     /** Direction of the pen stroke. **/
     data_COMPASSDIRECTION m_tilt;
 
-    /* include <atttilt> */
 };
 
 //----------------------------------------------------------------------------
@@ -703,7 +689,6 @@ private:
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
     data_BOOLEAN m_sigShowchange;
 
-    /* include <attsig.showchange> */
 };
 
 //----------------------------------------------------------------------------
@@ -745,7 +730,6 @@ private:
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
     data_BOOLEAN m_keysigShowchange;
 
-    /* include <attkeysig.showchange> */
 };
 
 //----------------------------------------------------------------------------
@@ -781,7 +765,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_LIGATUREFORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -849,7 +832,6 @@ private:
     /** Holds the relative size of the line-start symbol. **/
     int m_startsymSize;
 
-    /* include <attstartsym.size> */
 };
 
 //----------------------------------------------------------------------------
@@ -891,7 +873,6 @@ private:
     /** Indicates whether curve is closed. **/
     data_BOOLEAN m_looped;
 
-    /* include <attlooped> */
 };
 
 //----------------------------------------------------------------------------
@@ -945,7 +926,6 @@ private:
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
     data_MENSURATIONSIGN m_sign;
 
-    /* include <attsign> */
 };
 
 //----------------------------------------------------------------------------
@@ -1031,7 +1011,6 @@ private:
      **/
     int m_mensurSlash;
 
-    /* include <attmensur.slash> */
 };
 
 //----------------------------------------------------------------------------
@@ -1067,7 +1046,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_METERFORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -1112,7 +1090,6 @@ private:
      **/
     data_BOOLEAN m_meterShowchange;
 
-    /* include <attmeter.showchange> */
 };
 
 //----------------------------------------------------------------------------
@@ -1152,7 +1129,6 @@ private:
      **/
     data_BOOLEAN m_block;
 
-    /* include <attblock> */
 };
 
 //----------------------------------------------------------------------------
@@ -1191,7 +1167,6 @@ private:
      **/
     pbVis_FOLIUM m_folium;
 
-    /* include <attfolium> */
 };
 
 //----------------------------------------------------------------------------
@@ -1227,7 +1202,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_PEDALSTYLE m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -1273,7 +1247,6 @@ private:
      **/
     data_MEASUREMENTUNSIGNED m_len;
 
-    /* include <attlen> */
 };
 
 //----------------------------------------------------------------------------
@@ -1309,7 +1282,6 @@ private:
     /** Number of "crests" of a wavy line. **/
     int m_waves;
 
-    /* include <attwaves> */
 };
 
 //----------------------------------------------------------------------------
@@ -1345,7 +1317,6 @@ private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     sbVis_FORM m_form;
 
-    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -1385,7 +1356,6 @@ private:
      **/
     std::string m_vuHeight;
 
-    /* include <attvu.height> */
 };
 
 //----------------------------------------------------------------------------
@@ -1421,7 +1391,6 @@ private:
     /** Indicates that staves begin again with this section. **/
     data_BOOLEAN m_restart;
 
-    /* include <attrestart> */
 };
 
 //----------------------------------------------------------------------------
@@ -1457,7 +1426,6 @@ private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_EVENTREL m_place;
 
-    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -1496,7 +1464,6 @@ private:
      **/
     data_BOOLEAN m_compressable;
 
-    /* include <attcompressable> */
 };
 
 //----------------------------------------------------------------------------
@@ -1561,7 +1528,6 @@ private:
      **/
     data_MEASUREMENTSIGNED m_spacing;
 
-    /* include <attspacing> */
 };
 
 //----------------------------------------------------------------------------
@@ -1600,7 +1566,6 @@ private:
      **/
     data_BOOLEAN m_barThru;
 
-    /* include <attbar.thru> */
 };
 
 //----------------------------------------------------------------------------
@@ -1676,7 +1641,6 @@ private:
      **/
     data_FLAGFORM_mensural m_flagForm;
 
-    /* include <attflag.form> */
 };
 
 //----------------------------------------------------------------------------
@@ -1733,9 +1697,8 @@ private:
     /** Controls how the num:numbase ratio is to be displayed. **/
     tupletVis_NUMFORMAT m_numFormat;
 
-    /* include <attnum.format> */
 };
 
-} // namespace vrv
+} // namespace
 
 #endif // __VRV_ATTS_VISUAL_H__
