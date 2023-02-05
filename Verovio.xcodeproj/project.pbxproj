@@ -1414,6 +1414,12 @@
 		E7908EA32985829F0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
 		E7908EA4298582DE0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
 		E7908EA5298582DF0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
+		E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
+		E797C461298EC2E600CAD67E /* calcalignmentpitchposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */; };
+		E797C462298EC2E700CAD67E /* calcalignmentpitchposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E797C463298EC30600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
+		E797C464298EC30700CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
+		E797C465298EC30800CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
 		E79ADDC426BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
 		E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */ = {isa = PBXBuildFile; fileRef = E79ADDC326BD1AE900527E4B /* runtimeclock.h */; };
 		E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79ADDC626BD645B00527E4B /* runtimeclock.cpp */; };
@@ -1948,6 +1954,8 @@
 		E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentxposfunctor.cpp; path = src/calcalignmentxposfunctor.cpp; sourceTree = "<group>"; };
 		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
 		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
+		E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentpitchposfunctor.h; path = include/vrv/calcalignmentpitchposfunctor.h; sourceTree = "<group>"; };
+		E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentpitchposfunctor.cpp; path = src/calcalignmentpitchposfunctor.cpp; sourceTree = "<group>"; };
 		E79ADDC326BD1AE900527E4B /* runtimeclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = runtimeclock.h; path = include/vrv/runtimeclock.h; sourceTree = "<group>"; };
 		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
@@ -2719,6 +2727,8 @@
 			children = (
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
+				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
+				E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
 			);
@@ -2943,6 +2953,7 @@
 				4DB3D89B1F7C326A00B5FC2B /* lb.h in Headers */,
 				4D22C41C18890E9900D0831F /* mrest.h in Headers */,
 				4DB3D8FF1F83D20800B5FC2B /* options.h in Headers */,
+				E797C461298EC2E600CAD67E /* calcalignmentpitchposfunctor.h in Headers */,
 				4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */,
 				4D20740822A4FDE800E0765F /* course.h in Headers */,
 				4DEC4D5A21C800A000D1D273 /* abbr.h in Headers */,
@@ -3058,6 +3069,7 @@
 				BB4C4B8E22A932DF001F6AF0 /* svg.h in Headers */,
 				BB4C4B3822A932CF001F6AF0 /* trill.h in Headers */,
 				BB4C4B6422A932D7001F6AF0 /* mrpt2.h in Headers */,
+				E797C462298EC2E700CAD67E /* calcalignmentpitchposfunctor.h in Headers */,
 				BB4C4B5222A932D7001F6AF0 /* ftrem.h in Headers */,
 				4D88AD0B289673F50006D7DA /* symbol.h in Headers */,
 				4D2E759022BC2B71004C51F0 /* course.h in Headers */,
@@ -3547,6 +3559,7 @@
 				4DACC9E32990F29A00B55913 /* atts_midi.cpp in Sources */,
 				4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */,
 				4D20741322A708C600E0765F /* view_tab.cpp in Sources */,
+				E797C463298EC30600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				406916E12383379B009E6B04 /* mspace.cpp in Sources */,
 				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
 				4D6413792035F58200BB630E /* pages.cpp in Sources */,
@@ -3757,6 +3770,7 @@
 				4DC12A841F741110000440E9 /* pgfoot2.cpp in Sources */,
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
 				4DD7C10227A5650600B9C017 /* timemap.cpp in Sources */,
+				E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
 				BDEF9EC726725234008A3A47 /* caesura.cpp in Sources */,
@@ -4036,6 +4050,7 @@
 				8F3DD33418854B250051330C /* scoredef.cpp in Sources */,
 				8F3DD33618854B250051330C /* staff.cpp in Sources */,
 				4DB3D8C61F83D0FA00B5FC2B /* breath.cpp in Sources */,
+				E797C464298EC30700CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				4DB3D8CF1F83D11600B5FC2B /* mordent.cpp in Sources */,
 				406916E02383379A009E6B04 /* mspace.cpp in Sources */,
 				4DB3D8D71F83D13600B5FC2B /* trill.cpp in Sources */,
@@ -4273,6 +4288,7 @@
 				BB4C4A9F22A9328F001F6AF0 /* toolkit.cpp in Sources */,
 				4DACC9A92990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9FB2990F29A00B55913 /* atts_figtable.cpp in Sources */,
+				E797C465298EC30800CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				406916E22383379C009E6B04 /* mspace.cpp in Sources */,
 				4DACC9E52990F29A00B55913 /* atts_midi.cpp in Sources */,
 				BB4C4AE922A932BC001F6AF0 /* del.cpp in Sources */,
