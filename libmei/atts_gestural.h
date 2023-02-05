@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_GESTURAL_H__
-#define __VRV_ATTS_GESTURAL_H__
+#ifndef __LIBMEI_ATTS_GESTURAL_H__
+#define __LIBMEI_ATTS_GESTURAL_H__
 
 #include "att.h"
 #include "attdef.h"
@@ -553,4 +553,4 @@ private:
 
 } // namespace
 
-#endif // __VRV_ATTS_GESTURAL_H__
+#endif // __LIBMEI_ATTS_GESTURAL_H__

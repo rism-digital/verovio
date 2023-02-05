@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_MEI_H__
-#define __VRV_ATTS_MEI_H__
+#ifndef __LIBMEI_ATTS_MEI_H__
+#define __LIBMEI_ATTS_MEI_H__
 
 #include "att.h"
 #include "attdef.h"
@@ -74,4 +74,4 @@ private:
 
 } // namespace
 
-#endif // __VRV_ATTS_MEI_H__
+#endif // __LIBMEI_ATTS_MEI_H__

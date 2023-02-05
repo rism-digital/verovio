@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_TYPES_H__
-#define __VRV_ATT_TYPES_H__
+#ifndef __LIBMEI_ATT_TYPES_H__
+#define __LIBMEI_ATT_TYPES_H__
 
 //----------------------------------------------------------------------------
 
@@ -2501,4 +2501,4 @@ enum whitespace_XMLSPACE {
 
 } // namespace
 
-#endif // __VRV_ATT_TYPES_H__
+#endif // __LIBMEI_ATT_TYPES_H__

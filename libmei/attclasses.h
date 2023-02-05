@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_CLASSES_H__
-#define __VRV_ATT_CLASSES_H__
+#ifndef __LIBMEI_ATT_CLASSES_H__
+#define __LIBMEI_ATT_CLASSES_H__
 
 //----------------------------------------------------------------------------
 
@@ -300,4 +300,4 @@ enum AttClassId {
 
 } // namespace
 
-#endif // __VRV_ATT_CLASSES_H__
+#endif // __LIBMEI_ATT_CLASSES_H__

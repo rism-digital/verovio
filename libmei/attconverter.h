@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_CONVERTER_H__
-#define __VRV_ATT_CONVERTER_H__
+#ifndef __LIBMEI_ATT_CONVERTER_H__
+#define __LIBMEI_ATT_CONVERTER_H__
 
 #include <string>
 
@@ -479,4 +479,4 @@ public:
 
 } // namespace
 
-#endif // __VRV_ATT_CONVERTER_H__
+#endif // __LIBMEI_ATT_CONVERTER_H__
