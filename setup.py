@@ -90,7 +90,11 @@ else:
                            '-DNO_PAE_SUPPORT']
 
 verovio_module = Extension('verovio._verovio',
-                           sources=glob('./src/*.cpp') + glob('./src/hum/*.cpp') +
+                           sources=
+                                glob('./src/*.cpp') + 
+                                glob('./src/hum/*.cpp') +
+                                glob('./libmei/dist/*.cpp') +
+                                glob('./libmei/addons/*.cpp') +
                            [
                                './src/crc/crc.cpp',
                                './src/json/jsonxx.cc',
@@ -100,8 +104,6 @@ verovio_module = Extension('verovio._verovio',
                                './src/midi/MidiEventList.cpp',
                                './src/midi/MidiFile.cpp',
                                './src/midi/MidiMessage.cpp',
-                               './libmei/dist/*.cpp',
-                               './libmei/addons/*.cpp',
                                './bindings/python/verovio.i'],
                            swig_opts=['-c++', '-outdir',
                                       './bindings/python', '-doxygen'],
