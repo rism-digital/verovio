@@ -308,7 +308,7 @@ std::string BaseEncodeInt(unsigned int value, unsigned int base)
 bool IsMensuralType(data_NOTATIONTYPE notationType)
 {
     return (notationType == NOTATIONTYPE_mensural || notationType == NOTATIONTYPE_mensural_white
-            || notationType == NOTATIONTYPE_mensural_black);
+        || notationType == NOTATIONTYPE_mensural_black);
 }
 
 bool IsNeumeType(data_NOTATIONTYPE notationType)
