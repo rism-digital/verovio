@@ -1197,7 +1197,7 @@ void BeamSegment::CalcBeamPlaceTab(
 
 void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, bool isHorizontal)
 {
-    const auto [noteLoc, noteDur] = this->CalcStemDefiningNote(staff, place);
+    const auto [noteLoc, noteDur, preferredDur] = this->CalcStemDefiningNote(staff, place);
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         const data_STEMDIRECTION stemDir = (place != BEAMPLACE_mixed) ? globalStemDir
@@ -1212,7 +1212,8 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
         // skip current element if it's longer that minDuration and is not a part of fTrem
         if ((coord->m_dur < noteDur) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
         // adjust stem length if location matches
-        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal);
+        const int dur = (preferredDur != 0) ? preferredDur : coord->m_dur;
+        const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal, dur);
         if (coord->m_closestNote->GetDrawingLoc() == noteLoc) {
             m_uniformStemLength = coordStemLength;
         }
@@ -1265,7 +1266,7 @@ int BeamSegment::CalcMixedBeamCenterY(int step, int unit) const
     return centerY;
 }
 
-std::pair<int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
+std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
 {
     int shortestDuration = DUR_4;
     int shortestLoc = VRV_UNSET;
@@ -1312,6 +1313,7 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_B
         }
     }
 
+    int adjusted_duration = 0;
     // if shortest note location does not offset its duration (shorter notes need more space for additional beams) then
     // give preference to the its location
     if ((shortestDuration - relevantDuration) > (std::abs(relevantLoc - shortestLoc) + 1)) {
@@ -1325,8 +1327,11 @@ std::pair<int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_B
             relevantDuration = shortestDuration;
         }
     }
+    else if ((shortestDuration - relevantDuration) == std::abs(relevantLoc - shortestLoc)) {
+        adjusted_duration = (relevantDuration + shortestDuration) / 2;
+    }
 
-    return { relevantLoc, relevantDuration };
+    return { relevantLoc, relevantDuration, adjusted_duration };
 }
 
 void BeamSegment::CalcHorizontalBeam(const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface)
@@ -1897,7 +1902,8 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
     m_yBeam += m_overlapMargin;
 }
 
-int BeamElementCoord::CalculateStemLength(const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal) const
+int BeamElementCoord::CalculateStemLength(
+    const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, int preferredDur) const
 {
     if (!m_closestNote) return 0;
 
@@ -1919,7 +1925,7 @@ int BeamElementCoord::CalculateStemLength(const Staff *staff, data_STEMDIRECTION
     const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     int stemLen = directionBias;
     // For 8th notes, use the shortened stem (if shortened)
-    if (m_dur == DUR_8) {
+    if (preferredDur == DUR_8) {
         if (stemLenInHalfUnits != standardStemLen) {
             stemLen *= stemLenInHalfUnits;
         }
