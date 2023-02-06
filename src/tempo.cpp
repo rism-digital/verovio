@@ -143,22 +143,32 @@ int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
         params->m_currentTempo = this->GetMidiBpm();
     }
     else if (this->HasMm()) {
-        double mm = this->GetMm();
-        double mmUnit = 4;
-        if (this->HasMmUnit() && (this->GetMmUnit() > DURATION_breve)) {
-            mmUnit = pow(2, (int)this->GetMmUnit() - 2);
-        }
-        if (this->HasMmDots()) {
-            double dotsUnit = 0.0;
-            for (int d = 0; d < this->GetMmDots(); d++) {
-                dotsUnit += mmUnit / 4.0 / pow(2, d);
-            }
-            mmUnit -= dotsUnit;
-        }
-        if (mmUnit > 0) params->m_currentTempo = mm * 4.0 / mmUnit;
+        params->m_currentTempo = Tempo::CalcTempo(this);
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+double Tempo::CalcTempo(const AttMmTempo *attMmTempo)
+{
+    double tempo = MIDI_TEMPO;
+
+    double mm = attMmTempo->GetMm();
+    double mmUnit = 4;
+
+    if (attMmTempo->HasMmUnit() && (attMmTempo->GetMmUnit() > DURATION_breve)) {
+        mmUnit = pow(2, (int)attMmTempo->GetMmUnit() - 2);
+    }
+    if (attMmTempo->HasMmDots()) {
+        double dotsUnit = 0.0;
+        for (int d = 0; d < attMmTempo->GetMmDots(); d++) {
+            dotsUnit += mmUnit / 4.0 / pow(2, d);
+        }
+        mmUnit -= dotsUnit;
+    }
+    if (mmUnit > 0) tempo = mm * 4.0 / mmUnit;
+
+    return tempo;
 }
 
 } // namespace vrv
