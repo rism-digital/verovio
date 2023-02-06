@@ -776,11 +776,6 @@ public:
     ///@{
 
     /**
-     * Calc the drawing position (m_drawingX and m_drawingY) values for objects
-     */
-    virtual int CalcAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the drawing stem positions, including for beams.
      */
     virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }

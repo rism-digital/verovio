@@ -519,7 +519,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitLayerElement(LayerElement *lay
 {
     layerElement->SetDrawingXRel(0);
     // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
-    // See Object::CalcAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
+    // See CalcAlignmentPitchPosFunctor - for this reason we need to reset it here and not in ResetVerticalAlignment
     layerElement->SetDrawingYRel(0);
 
     layerElement->ResetAlignment();

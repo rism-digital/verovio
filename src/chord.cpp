@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "calcalignmentpitchposfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
@@ -606,9 +607,8 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(params->m_doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(params->m_doc);
+    this->Process(calcAlignmentPitchPos);
 
     CalcStemParams calcStemParams(params->m_doc);
     Functor calcStem(&Object::CalcStem);

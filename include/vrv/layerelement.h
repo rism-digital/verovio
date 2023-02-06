@@ -378,11 +378,6 @@ public:
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcAlignmentPitchPos
-     */
-    int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{

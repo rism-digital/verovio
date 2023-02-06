@@ -15,6 +15,7 @@
 
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
+#include "calcalignmentpitchposfunctor.h"
 #include "calcalignmentxposfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
@@ -222,9 +223,8 @@ void Page::LayOutTranscription(bool force)
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignment
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
+    this->Process(calcAlignmentPitchPos);
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);
@@ -309,9 +309,8 @@ void Page::ResetAligners()
     }
 
     // Set the pitch / pos alignment
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
+    this->Process(calcAlignmentPitchPos);
 
     if (IsMensuralType(doc->m_notationType)) {
         FunctorDocParams calcLigatureNotePosParams(doc);
@@ -713,9 +712,8 @@ void Page::LayOutPitchPos()
     assert(this == doc->GetDrawingPage());
 
     // Set the pitch / pos alignment
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
+    this->Process(calcAlignmentPitchPos);
 
     CalcStemParams calcStemParams(doc);
     Functor calcStem(&Object::CalcStem);

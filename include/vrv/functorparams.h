@@ -854,20 +854,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcAlignmentPitchPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer doc
- **/
-
-class CalcAlignmentPitchPosParams : public FunctorParams {
-public:
-    CalcAlignmentPitchPosParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CalcArticParams
 //----------------------------------------------------------------------------
 
