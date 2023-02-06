@@ -826,6 +826,12 @@ bool HumdrumInput::convertHumdrum()
             staffindex++;
             m_mens = true;
         }
+        else if (it->isDataType("**text")) {
+            analyzeTextInterpretation(it);
+        }
+        else if (it->isDataType("**silbe")) {
+            analyzeTextInterpretation(it);
+        }
         else if (it->isDataType("**harm")) {
             analyzeHarmInterpretations(it);
             m_harm = true;
@@ -1224,6 +1230,50 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
         else if (*current == "*Xsolf") {
             solfQ = false;
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeTextInterpretation --  Ignoring spine splits
+//     for now.
+//
+
+void HumdrumInput::analyzeTextInterpretation(hum::HTp starttok)
+{
+    hum::HTp current = starttok;
+    bool elisionQ = true;
+    hum::HumRegex hre;
+    while (current) {
+        if (current->isInterpretation()) {
+            if (*current == "*elision") {
+                elisionQ = true;
+            }
+            else if (*current == "*Xelision") {
+                elisionQ = false;
+            }
+        }
+        if (elisionQ) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (!current->isData()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->isNull()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->find(' ') == std::string::npos) {
+            current = current->getNextToken();
+            continue;
+        }
+
+        std::string text = *current;
+        hre.replaceDestructive(text, "&nbsp;", " ", "g");
+        current->setValue("auto", "text", text);
+        current = current->getNextToken();
     }
 }
 
@@ -23553,16 +23603,23 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
         // int strack = token->getSubtrack();
         if (token->isDataTypeLike("**silbe")) {
             vtoks.push_back(token);
-            std::string value = token->getText();
+            std::string value = token->getValue("auto", "text");
+            if (value.empty()) {
+                value = *token;
+            }
             hre.replaceDestructive(value, "", "\\|", "g");
-            hre.replaceDestructive(value, "&uuml;", "u2", "g");
-            hre.replaceDestructive(value, "&auml;", "a2", "g");
-            hre.replaceDestructive(value, "&ouml;", "o2", "g");
+            hre.replaceDestructive(value, "&#xFC;", "u2", "g"); // u-umlaut
+            hre.replaceDestructive(value, "&#xE4;", "a2", "g"); // a-umlaut
+            hre.replaceDestructive(value, "&#xF6;", "o2", "g"); // o-umlaut
             vtexts.push_back(value);
         }
         else {
             vtoks.push_back(token);
-            vtexts.push_back(*token);
+            std::string value = token->getValue("auto", "text");
+            if (value.empty()) {
+                value = *token;
+            }
+            vtexts.push_back(value);
         }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
