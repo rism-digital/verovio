@@ -147,6 +147,7 @@ if(NO_RUNTIME)
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
+file(GLOB libmei_SRC "../libmei/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
 file(GLOB crc_SRC "../src/crc/*.cpp")
 
@@ -156,28 +157,12 @@ add_custom_target(headers SOURCES ${LibFiles})
 
 set(all_SRC
     ${verovio_SRC}
+    ${libmei_SRC}
     ${hum_SRC}
     ${crc_SRC}
     ${midi_SRC}
     ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp
-    ../libmei/attconverter.cpp
-    ../libmei/atts_analytical.cpp
-    ../libmei/atts_cmn.cpp
-    ../libmei/atts_cmnornaments.cpp
-    ../libmei/atts_critapp.cpp
-    ../libmei/atts_gestural.cpp
-    ../libmei/atts_externalsymbols.cpp
-    ../libmei/atts_facsimile.cpp
-    ../libmei/atts_frettab.cpp
-    ../libmei/atts_mei.cpp
-    ../libmei/atts_mensural.cpp
-    ../libmei/atts_midi.cpp
-    ../libmei/atts_neumes.cpp
-    ../libmei/atts_pagebased.cpp
-    ../libmei/atts_shared.cpp
-    ../libmei/atts_usersymbols.cpp
-    ../libmei/atts_visual.cpp
 )
 
 ##################
