@@ -61,7 +61,7 @@ public:
     /** @name Converters for writing and reading */
     ///@{
     std::string ArticulationListToStr(data_ARTICULATION_List data) const;
-    data_ARTICULATION_List StrToArticulationList(const std::string &value, bool logWarning = true) const;
+    data_ARTICULATION_List StrToArticulationList(const std::string &value, bool = true) const;
 
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
     data_BEATRPT_REND StrToBeatrptRend(const std::string &value, bool logWarning = true) const;
@@ -70,7 +70,7 @@ public:
     data_BULGE StrToBulge(const std::string &value, bool logWarning = true) const;
 
     std::string DurationToStr(data_DURATION data) const;
-    data_DURATION StrToDuration(const std::string &value, bool logWarning = true) const;
+    data_DURATION StrToDuration(const std::string &value, bool = true) const;
 
     std::string FontsizenumericToStr(data_FONTSIZENUMERIC data) const;
     data_FONTSIZENUMERIC StrToFontsizenumeric(const std::string &value, bool logWarning = true) const;
@@ -82,7 +82,7 @@ public:
     data_KEYSIGNATURE StrToKeysignature(const std::string &value, bool logWarning = true) const;
 
     std::string MeasurebeatToStr(data_MEASUREBEAT data) const;
-    data_MEASUREBEAT StrToMeasurebeat(std::string value, bool logWarning = true) const;
+    data_MEASUREBEAT StrToMeasurebeat(std::string value, bool = true) const;
 
     std::string MeasurementsignedToStr(data_MEASUREMENTSIGNED data) const;
     data_MEASUREMENTSIGNED StrToMeasurementsigned(const std::string &value, bool logWarning = true) const;

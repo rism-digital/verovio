@@ -83,7 +83,7 @@ std::string Att::ArticulationListToStr(data_ARTICULATION_List data) const
     return ss.str();
 }
 
-data_ARTICULATION_List Att::StrToArticulationList(const std::string &value, bool logWarning) const
+data_ARTICULATION_List Att::StrToArticulationList(const std::string &value, bool) const
 {
     data_ARTICULATION_List list;
     std::istringstream iss(value);
@@ -193,7 +193,7 @@ std::string Att::DurationToStr(data_DURATION data) const
     return value;
 }
 
-data_DURATION Att::StrToDuration(const std::string &value, bool logWarning) const
+data_DURATION Att::StrToDuration(const std::string &value, bool) const
 {
     if (value == "maxima") return DURATION_maxima;
     if (value == "longa") return DURATION_longa;
@@ -372,7 +372,7 @@ std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
     return StringFormat("%dm+%.4f", data.first, data.second);
 }
 
-data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
+data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool) const
 {
     for (int i = 0; i < (int)value.length(); ++i) {
         if (iswspace(value.at(i))) {
