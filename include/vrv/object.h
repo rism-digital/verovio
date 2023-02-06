@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "attclasses.h"
+#include "attmodule.h"
 #include "boundingbox.h"
 #include "vrvdef.h"
 

@@ -38,7 +38,8 @@ include_directories(
     ../include/pugi
     ../include/zip
     ../include/vrv
-    ../libmei
+    ../libmei/dist
+    ../libmei/addons
 )
 
 if(MSVC)
@@ -147,7 +148,8 @@ if(NO_RUNTIME)
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
-file(GLOB libmei_SRC "../libmei/*.cpp")
+file(GLOB libmei_dist_SRC "../libmei/dist/*.cpp")
+file(GLOB libmei_addons_SRC "../libmei/addons/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
 file(GLOB crc_SRC "../src/crc/*.cpp")
 
@@ -157,7 +159,8 @@ add_custom_target(headers SOURCES ${LibFiles})
 
 set(all_SRC
     ${verovio_SRC}
-    ${libmei_SRC}
+    ${libmei_dist_SRC}
+    ${libmei_addons_SRC}
     ${hum_SRC}
     ${crc_SRC}
     ${midi_SRC}

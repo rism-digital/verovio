@@ -5,8 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_ALTERNATES_H__
-#define __VRV_ATT_ALTERNATES_H__
+#ifndef __LIBMEI_ATT_ALTERNATES_H__
+#define __LIBMEI_ATT_ALTERNATES_H__
 
 #include <string>
 
@@ -413,6 +413,6 @@ protected:
     std::string m_nmtoken;
 };
 
-} // namespace vrv
+} // namespace
 
-#endif
+#endif // __LIBMEI_ATT_ALTERNATES_H__

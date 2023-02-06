@@ -14,12 +14,14 @@ LOCAL_SRC_FILES := \
 	$(MIDI_SRC:$(MIDI_SRC)/%=%) \
 	$(ROOT_PATH)/src/pugi/pugixml.cpp \
 	$(ROOT_PATH)/src/json/jsonxx.cc \
-	$(ROOT_PATH)/libmei/*.cpp
+	$(ROOT_PATH)/libmei/dist/*.cpp \
+	$(ROOT_PATH)/libmei/addons/*.cpp
 	
 LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include \
 	$(ROOT_PATH)/include/vrv \
-	$(ROOT_PATH)/libmei \
+	$(ROOT_PATH)/libmei/dist \
+	$(ROOT_PATH)/libmei/addons \
 	$(ROOT_PATH)/include/utf8 \
 	$(ROOT_PATH)/include/pugi \
 	$(ROOT_PATH)/include/hum \

@@ -15,11 +15,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
-
-#ifndef DEFINITION_FACTOR
-#define DEFINITION_FACTOR 1
-#endif
+#include "libmei.h"
 
 namespace vrv {
 

@@ -5,8 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_DEF_H__
-#define __VRV_ATT_DEF_H__
+#ifndef __LIBMEI_ATT_DEF_H__
+#define __LIBMEI_ATT_DEF_H__
 
 #include <string>
 #include <utility>
@@ -20,8 +20,6 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-
-typedef std::vector<std::pair<std::string, std::string>> ArrayOfStrAttr;
 
 #define VRV_UNSET -0x7FFFFFFF
 
@@ -284,6 +282,6 @@ typedef std::vector<std::string> xsdAnyURI_List;
  */
 typedef std::vector<int> xsdPositiveInteger_List;
 
-} // namespace vrv
+} // namespace
 
-#endif // __VRV_ATT_DEF_H__
+#endif // __LIBMEI_ATT_DEF_H__

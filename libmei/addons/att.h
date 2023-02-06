@@ -5,8 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATT_H__
-#define __VRV_ATT_H__
+#ifndef __LIBMEI_ATT_H__
+#define __LIBMEI_ATT_H__
 
 #include <string>
 
@@ -182,88 +182,6 @@ public:
     ///@}
 };
 
-#ifndef LIBMEI_ELEMENTS
+} // namespace
 
-class Object;
-
-//----------------------------------------------------------------------------
-// AttModule
-//----------------------------------------------------------------------------
-
-/**
- * This is the base class for all MEI att classes.
- * It is not an abstract class but it should not be instanciated directly.
- * The att classes are generated with the libmei parser for Verovio.
- */
-class AttModule : public AttConverter {
-public:
-    /** @name Constructors and destructor */
-    ///@{
-    AttModule();
-    virtual ~AttModule();
-    ///@}
-
-    /**
-     * @name static method for blind attribute modification
-     * The implementation is implemented by LibMEI in each module corresponding file
-     * Use in the toolkit for applying attribute modification to unspecified elements
-     * See Toolkit::Set method
-     * Files to be uncommented according to the inclusion of the corresponding LibMEI files.
-     * When uncommentting a file also uncomment corresponding calls in Object::GetAttributes
-     */
-    ///@{
-    static bool SetAnalytical(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetCmn(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetCmnornaments(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetCritapp(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetEdittrans(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetExternalsymbols(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetFacsimile(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetFigtable(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetFingering(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetFrettab(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetGestural(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetHarmony(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetHeader(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetMei(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetMensural(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetMidi(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetPagebased(Object *element, const std::string &attrType, const std::string &attrValue);
-    // static bool SetPerformance(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetShared(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetUsersymbols(Object *element, const std::string &attrType, const std::string &attrValue);
-    static bool SetVisual(Object *element, const std::string &attrType, const std::string &attrValue);
-
-    /**
-     * Idem for getting attributes as strings
-     */
-    static void GetAnalytical(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetCmn(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetEdittrans(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetFrettab(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetHarmony(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetHeader(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
-    static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
-    ///@}
-};
-#endif // LIBMEI_ELEMENTS
-
-} // namespace vrv
-
-#endif
+#endif // __LIBMEI_ATT_H__
