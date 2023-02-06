@@ -1414,6 +1414,12 @@
 		E7908EA32985829F0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
 		E7908EA4298582DE0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
 		E7908EA5298582DF0004C1F9 /* alignfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7908EA12985829F0004C1F9 /* alignfunctor.cpp */; };
+		E79320642991452100D80975 /* calcstemfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E79320632991450E00D80975 /* calcstemfunctor.h */; };
+		E79320652991452200D80975 /* calcstemfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E79320632991450E00D80975 /* calcstemfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E79320672991453C00D80975 /* calcstemfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79320662991453C00D80975 /* calcstemfunctor.cpp */; };
+		E79320682991454000D80975 /* calcstemfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79320662991453C00D80975 /* calcstemfunctor.cpp */; };
+		E79320692991454000D80975 /* calcstemfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79320662991453C00D80975 /* calcstemfunctor.cpp */; };
+		E793206A2991454100D80975 /* calcstemfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79320662991453C00D80975 /* calcstemfunctor.cpp */; };
 		E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */; };
 		E797C461298EC2E600CAD67E /* calcalignmentpitchposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */; };
 		E797C462298EC2E700CAD67E /* calcalignmentpitchposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1954,6 +1960,8 @@
 		E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentxposfunctor.cpp; path = src/calcalignmentxposfunctor.cpp; sourceTree = "<group>"; };
 		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
 		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
+		E79320632991450E00D80975 /* calcstemfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcstemfunctor.h; path = include/vrv/calcstemfunctor.h; sourceTree = "<group>"; };
+		E79320662991453C00D80975 /* calcstemfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcstemfunctor.cpp; path = src/calcstemfunctor.cpp; sourceTree = "<group>"; };
 		E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentpitchposfunctor.h; path = include/vrv/calcalignmentpitchposfunctor.h; sourceTree = "<group>"; };
 		E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentpitchposfunctor.cpp; path = src/calcalignmentpitchposfunctor.cpp; sourceTree = "<group>"; };
 		E79ADDC326BD1AE900527E4B /* runtimeclock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = runtimeclock.h; path = include/vrv/runtimeclock.h; sourceTree = "<group>"; };
@@ -2731,6 +2739,8 @@
 				E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
+				E79320662991453C00D80975 /* calcstemfunctor.cpp */,
+				E79320632991450E00D80975 /* calcstemfunctor.h */,
 			);
 			name = "horizontal-layout";
 			sourceTree = "<group>";
@@ -2978,6 +2988,7 @@
 				4DEC4DD221C8295700D1D273 /* supplied.h in Headers */,
 				4D3C3F11294B89C9009993E6 /* ornam.h in Headers */,
 				4DD7C0FF27A55CFD00B9C017 /* timemap.h in Headers */,
+				E79320642991452100D80975 /* calcstemfunctor.h in Headers */,
 				4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */,
 				4DACC9F42990F29A00B55913 /* atts_visual.h in Headers */,
 				4DF4407A1D3D085600152B7E /* functorparams.h in Headers */,
@@ -3013,6 +3024,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E79320652991452200D80975 /* calcstemfunctor.h in Headers */,
 				4DA0EAE022BB77AF00A7EBEB /* facsimileinterface.h in Headers */,
 				BB4C4B9C22A932E5001F6AF0 /* pitchinterface.h in Headers */,
 				4DACC9E92990F29A00B55913 /* atts_fingering.h in Headers */,
@@ -3476,6 +3488,7 @@
 				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
+				E79320682991454000D80975 /* calcstemfunctor.cpp in Sources */,
 				4DED4F18294733140073E504 /* altsyminterface.cpp in Sources */,
 				4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */,
 				4D2073F922A3BCE000E0765F /* tabdursym.cpp in Sources */,
@@ -3702,6 +3715,7 @@
 				4DACC9842990F29A00B55913 /* atts_performance.cpp in Sources */,
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
+				E79320672991453C00D80975 /* calcstemfunctor.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
@@ -3967,6 +3981,7 @@
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				4DB3D8D51F83D12B00B5FC2B /* tempo.cpp in Sources */,
 				4DEC4DA021C81E9400D1D273 /* orig.cpp in Sources */,
+				E79320692991454000D80975 /* calcstemfunctor.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
 				4D4C26F01EF7E75E00681770 /* score.cpp in Sources */,
@@ -4209,6 +4224,7 @@
 				BB4C4B2322A932CF001F6AF0 /* dynam.cpp in Sources */,
 				BB4C4B6522A932D7001F6AF0 /* multirest.cpp in Sources */,
 				BB4C4AB322A932A6001F6AF0 /* iohumdrum.cpp in Sources */,
+				E793206A2991454100D80975 /* calcstemfunctor.cpp in Sources */,
 				BB4C4AD722A932B6001F6AF0 /* staff.cpp in Sources */,
 				4DED4F1A294733140073E504 /* altsyminterface.cpp in Sources */,
 				BB4C4B9F22A932E5001F6AF0 /* positioninterface.cpp in Sources */,
