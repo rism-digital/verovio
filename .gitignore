@@ -43,7 +43,6 @@ bindings/python/__pycache__/*
 bindings/python/CMakeCache.txt
 bindings/python/CMakeFiles/
 build
-dist
 verovio.egg-info
 
 # java build
