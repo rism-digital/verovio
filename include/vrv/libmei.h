@@ -9,7 +9,7 @@
 #define __VRV_LIBMEI_H__
 
 /////////////////////////////////////////////////////////////////////////////
-/// File include from the libmei code that need to define:
+/// File include from the libmei code that needs to define:
 // * StringFormat
 // * LogWarning
 // * DEFINITION_FACTOR
