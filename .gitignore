@@ -44,6 +44,7 @@ bindings/python/CMakeCache.txt
 bindings/python/CMakeFiles/
 build
 verovio.egg-info
+/dist
 
 # java build
 bindings/java/verovio_wrap.cxx
