@@ -1952,10 +1952,10 @@ int View::GetFYRel(F *f, Staff *staff)
     y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
 
     FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
-    // There is no other harm, we use the bottom line.
-    if (!positioner) return y;
-
-    y = positioner->GetDrawingY();
+    // If there is no other harm, we use the bottom line.
+    if (positioner) {
+        y = positioner->GetDrawingY();
+    }
 
     Object *fb = f->GetFirstAncestor(FB);
     assert(fb);
