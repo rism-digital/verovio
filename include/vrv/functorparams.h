@@ -1149,10 +1149,12 @@ public:
     {
         m_doc = doc;
         m_diameter = 0;
+        m_alignmentType = 0;
     }
 
     Doc *m_doc;
     int m_diameter;
+    int m_alignmentType;
 };
 
 //----------------------------------------------------------------------------
