@@ -106,6 +106,8 @@ public:
     int CalcStem(FunctorParams *functorParams) override;
 
 private:
+    // TODO: Move to functor helper!!!
+public:
     /**
      * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
      */

@@ -81,6 +81,8 @@ public:
      * Access the beam segments
      */
     ///@{
+    BeamSpanSegment *GetSegment(int index) { return m_beamSegments.at(index); }
+    const BeamSpanSegment *GetSegment(int index) const { return m_beamSegments.at(index); }
     BeamSpanSegment *GetSegmentForSystem(const System *system);
     const BeamSpanSegment *GetSegmentForSystem(const System *system) const;
     ///@}
