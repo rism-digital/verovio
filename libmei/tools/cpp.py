@@ -75,7 +75,7 @@ public:
     void Reset{attGroupNameUpper}();
 
     /** Read the values for the attribute class **/
-    bool Read{attGroupNameUpper}(pugi::xml_node element);
+    bool Read{attGroupNameUpper}(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool Write{attGroupNameUpper}(pugi::xml_node element);
@@ -139,7 +139,7 @@ void Att{attGroupNameUpper}::Reset{attGroupNameUpper}()
     {defaults}
 }}
 
-bool Att{attGroupNameUpper}::Read{attGroupNameUpper}(pugi::xml_node element)
+bool Att{attGroupNameUpper}::Read{attGroupNameUpper}(pugi::xml_node element, bool removeAttr)
 {{
     bool hasAttribute = false;
     {reads}
@@ -160,7 +160,7 @@ ATTCLASS_MEMBERS_DEFAULT_CPP = """m_{attNameLowerJoined} = {attDefault};"""
 
 ATTCLASS_READ_CPP = """if (element.attribute("{attNameLower}")) {{
         this->Set{attNameUpper}({converterRead}(element.attribute("{attNameLower}").value()));
-        element.remove_attribute("{attNameLower}");
+        if (removeAttr) element.remove_attribute("{attNameLower}");
         hasAttribute = true;
     }}"""
 
@@ -211,7 +211,7 @@ class {elementNameUpper} : public Element{attClasses} {{
         virtual ~{elementNameUpper}();
 
 public:
-    bool Read(pugi::xml_node element);
+    bool Read(pugi::xml_node element, bool removeAttr = false);
     bool Write(pugi::xml_node element);
     void Reset();
 }};
@@ -223,13 +223,13 @@ ELEMENTCLASS_CPP = """{elementNameUpper}::{elementNameUpper}() :{attClasses}
 
 {elementNameUpper}::~{elementNameUpper}() {{}}
 
-bool {elementNameUpper}::Read(pugi::xml_node element)
+bool {elementNameUpper}::Read({readParam})
 {{
     bool hasAttribute = false;{elementRead}
     return hasAttribute;
 }}
 
-bool {elementNameUpper}::Write(pugi::xml_node element)
+bool {elementNameUpper}::Write({writeParam})
 {{
     bool hasAttribute = false;{elementWrite}
     return hasAttribute;
@@ -1029,9 +1029,15 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
 
                 att_str = schema.cc(schema.strpatt(attribute))
                 element_att_classes.append(f", Att{att_str}()")
-                element_read.append(f"\n    hasAttribute = (Read{att_str}(element) || hasAttribute);")
+                element_read.append(f"\n    hasAttribute = (Read{att_str}(element, removeAttr) || hasAttribute);")
                 element_write.append(f"\n    hasAttribute = (Write{att_str}(element) || hasAttribute);")
                 element_reset.append(f"\n    Reset{att_str}();")
+
+            readParam = "pugi::xml_node, bool"
+            writeParam = "pugi::xml_node"
+            if len(element_read):
+                readParam = "pugi::xml_node element, bool removeAttr"
+                writeParam = "pugi::xml_node element"
 
             consvars = {
                 'elementNameUpper': schema.cc(element),
@@ -1040,6 +1046,8 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                 'elementRead': "".join(element_read),
                 'elementWrite': "".join(element_write),
                 'elementReset': "".join(element_reset),
+                'readParam': readParam,
+                'writeParam': writeParam
             }
             element_constructor.append(ELEMENTCLASS_CPP.format_map(consvars))
 
