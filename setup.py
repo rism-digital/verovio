@@ -30,7 +30,7 @@ class sdist(_sdist):
 
 
 def get_commit():
-    """Utility function to call tools/get_git_commit.sh on any platform."""
+    """Call tools/get_git_commit.sh on any platform."""
     if os.path.exists('./tools'):
         print('running tools/get_git_commit.sh')
         os.system('bash -c "cd tools; ./get_git_commit.sh"')
@@ -38,14 +38,14 @@ def get_commit():
         print('tools directory is missing')
 
 
-def get_readme():
-    """Utility function to read the README file into the long_description."""
+def get_readme() -> str:
+    """Read the README file into the long_description."""
     with open('README.md', 'r') as fh:
         return fh.read()
 
 
-def get_version():
-    """Utility function to get the version from the header file and the git sha for dev versions."""
+def get_version() -> str:
+    """Get the version from the header file and the git sha for dev versions."""
     version = '0.0.0'
     # If we have a PKG-INFO (e.g., in a sdist) use that
     if os.path.exists('PKG-INFO'):
