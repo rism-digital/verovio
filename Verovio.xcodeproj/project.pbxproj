@@ -1402,6 +1402,12 @@
 		E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198328CD31AD00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
+		E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */; };
+		E788335E2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
+		E78833612994EC7C00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
+		E78833622994EC7D00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
+		E78833632994EC7E00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
 		E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; };
 		E790165A298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
@@ -1957,6 +1963,8 @@
 		E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdotsfunctor.h; path = include/vrv/calcdotsfunctor.h; sourceTree = "<group>"; };
 		E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcdotsfunctor.cpp; path = src/calcdotsfunctor.cpp; sourceTree = "<group>"; };
 		E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentxposfunctor.h; path = include/vrv/calcalignmentxposfunctor.h; sourceTree = "<group>"; };
+		E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcchordnoteheadsfunctor.h; path = include/vrv/calcchordnoteheadsfunctor.h; sourceTree = "<group>"; };
+		E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcchordnoteheadsfunctor.cpp; path = src/calcchordnoteheadsfunctor.cpp; sourceTree = "<group>"; };
 		E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentxposfunctor.cpp; path = src/calcalignmentxposfunctor.cpp; sourceTree = "<group>"; };
 		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
 		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
@@ -2737,6 +2745,8 @@
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
 				E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */,
+				E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */,
+				E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
 				E79320662991453C00D80975 /* calcstemfunctor.cpp */,
@@ -2822,6 +2832,7 @@
 				4DF092A22497706600239195 /* phrase.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
+				E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */,
 				4D79643126C6AA720026288B /* featureextractor.h in Headers */,
 				4DEC4DC221C8291300D1D273 /* add.h in Headers */,
 				403BEFF1206C00D500D022D5 /* mrpt2.h in Headers */,
@@ -3097,6 +3108,7 @@
 				BB4C4B2A22A932CF001F6AF0 /* harm.h in Headers */,
 				4DD7C10027A55CFD00B9C017 /* timemap.h in Headers */,
 				BB4C4AAC22A932A0001F6AF0 /* svgdevicecontext.h in Headers */,
+				E788335E2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */,
 				BB4C4ADE22A932BC001F6AF0 /* add.h in Headers */,
 				BB4C4B4C22A932D7001F6AF0 /* custos.h in Headers */,
 				4DACCA182990F2E600B55913 /* attdef.h in Headers */,
@@ -3486,6 +3498,7 @@
 				E74A806B28BC98B1005274E7 /* functorinterface.cpp in Sources */,
 				4DD7C10127A5650600B9C017 /* timemap.cpp in Sources */,
 				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
+				E78833612994EC7C00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
 				E79320682991454000D80975 /* calcstemfunctor.cpp in Sources */,
@@ -3713,6 +3726,7 @@
 				4DACC9D82990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4DACC9842990F29A00B55913 /* atts_performance.cpp in Sources */,
+				E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
 				E79320672991453C00D80975 /* calcstemfunctor.cpp in Sources */,
@@ -3978,6 +3992,7 @@
 				403BEFF9206C00FF00D022D5 /* beatrpt.cpp in Sources */,
 				E74A806928BC9843005274E7 /* functorinterface.cpp in Sources */,
 				4DD7C0FC27A55CEA00B9C017 /* timemap.cpp in Sources */,
+				E78833622994EC7D00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				4DB3D8D51F83D12B00B5FC2B /* tempo.cpp in Sources */,
 				4DEC4DA021C81E9400D1D273 /* orig.cpp in Sources */,
@@ -4221,6 +4236,7 @@
 				BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */,
 				E74A806A28BC9843005274E7 /* functorinterface.cpp in Sources */,
 				4DD7C0FD27A55CEA00B9C017 /* timemap.cpp in Sources */,
+				E78833632994EC7E00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				BB4C4B2322A932CF001F6AF0 /* dynam.cpp in Sources */,
 				BB4C4B6522A932D7001F6AF0 /* multirest.cpp in Sources */,
 				BB4C4AB322A932A6001F6AF0 /* iohumdrum.cpp in Sources */,
