@@ -1,5 +1,4 @@
 # -- coding: utf-8 --
-import sys
 from re import Pattern
 from typing import Optional
 
@@ -8,6 +7,8 @@ import logging
 import re
 import textwrap
 from pathlib import Path
+
+from schema import MeiSchema
 
 lg = logging.getLogger('schemaparser')
 
@@ -1157,6 +1158,61 @@ def copy_addons(namespace: str, addons_dir: Path, outdir: Path):
         lg.debug("Wrote addon %s", outfile)
 
 
+BASIC_VALID_CPP: str = """
+std::map<std::string, std::vector<std::string>> basic = {{
+{nameAttributeMap}
+}};
+"""
+
+
+def create_basic_validator(configure: dict, outdir: Path):
+    basic_path = Path(configure["basic_odd"])
+    with basic_path.open("r") as basic_schema:
+        bschema = MeiSchema(basic_schema, resolve_elements=True)
+
+    flat_att_groups = {}
+    for mod, attgrp in bschema.attribute_group_structure.items():
+        for attgrpname, attrs in attgrp.items():
+            flat_att_groups[attgrpname] = attrs
+
+    elres: dict = {}
+    for module, elements in bschema.element_structure.items():
+        for elname, elattrs in elements.items():
+            out_list = []
+            for att in elattrs:
+                if isinstance(att, list):
+                    out_list.extend(att)
+                else:
+                    out_list.extend(flat_att_groups.get(att, []))
+            elres[elname] = out_list
+
+    formatted_attr_map: list = []
+    for elname, elattrs in elres.items():
+        attrlist = []
+        for att in elattrs:
+            if "|" in att:
+                # we have a namespaced attribute
+                ns, att = att.split("|")
+                prefix = NS_PREFIX_MAP[ns]
+                attrlist.append(f"{prefix}:{att}")
+            else:
+                attrlist.append(att)
+
+        if attrlist:
+            fmt_attr = "\", \"".join(attrlist)
+            fmt_attr_str = f'{{"{fmt_attr}"}}'
+        else:
+            fmt_attr_str = '{}'
+
+        fmt_attr_map = f'    {{"{elname}", {fmt_attr_str}}},\n'
+        formatted_attr_map.append(fmt_attr_map)
+
+    name_attribute_map = "".join(formatted_attr_map).rstrip()
+    formatted_output = BASIC_VALID_CPP.format(nameAttributeMap=name_attribute_map)
+
+    # TODO: Actually write the output somewhere!
+
+
 def create(schema, configure: dict) -> bool:
     global DATATYPES
     lg.debug("Begin Verovio C++ Output ...")
@@ -1183,6 +1239,9 @@ def create(schema, configure: dict) -> bool:
 
     create_att_classes(ns, schema, outdir)
     create_att_datatypes(ns, schema, outdir)
+
+    if configure["basic_odd"]:
+        create_basic_validator(configure, outdir)
 
     lg.debug("Success!")
     return True
