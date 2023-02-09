@@ -20,6 +20,7 @@
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
+#include "calcspanningbeamspansfunctor.h"
 #include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
@@ -336,9 +337,8 @@ void Page::ResetAligners()
     Functor calcSlurDirection(&Object::CalcSlurDirection);
     this->Process(&calcSlurDirection, &calcSlurDirectionParams);
 
-    FunctorDocParams calcSpanningBeamSpansParams(doc);
-    Functor calcSpanningBeamSpans(&Object::CalcSpanningBeamSpans);
-    this->Process(&calcSpanningBeamSpans, &calcSpanningBeamSpansParams);
+    CalcSpanningBeamSpansFunctor calcSpanningBeamSpans(doc);
+    this->Process(calcSpanningBeamSpans);
 }
 
 void Page::LayOutHorizontally()

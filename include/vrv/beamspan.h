@@ -114,11 +114,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcSpanningBeamSpans
-     */
-    int CalcSpanningBeamSpans(FunctorParams *) override;
-
 private:
     //
 public:

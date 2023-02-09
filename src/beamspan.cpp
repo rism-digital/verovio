@@ -173,48 +173,4 @@ FunctorCode BeamSpan::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitBeamSpanEnd(this);
 }
 
-int BeamSpan::CalcSpanningBeamSpans(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (m_beamedElements.empty() || !this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
-
-    Object *startSystem = this->GetStart()->GetFirstAncestor(SYSTEM);
-    Object *endSystem = this->GetEnd()->GetFirstAncestor(SYSTEM);
-    assert(startSystem && endSystem);
-    if (startSystem == endSystem) return FUNCTOR_CONTINUE;
-
-    // Find layerElements that belong to another system and store then in the vector alongside
-    // the system they belong to. This will allow us to break down beamSpan based on the systems
-    auto iter = m_beamedElements.begin();
-    SpanIndexVector elements;
-    Object *firstSystem = startSystem;
-    while (iter != m_beamedElements.end()) {
-        elements.push_back({ iter, firstSystem });
-        iter = std::find_if(iter, m_beamedElements.end(), [&firstSystem](Object *element) {
-            Object *parentSystem = element->GetFirstAncestor(SYSTEM);
-            if (firstSystem == parentSystem) return false;
-            firstSystem = parentSystem;
-            return true;
-        });
-    }
-    elements.push_back({ m_beamedElements.end(), NULL });
-
-    // Iterator for the elements are based on the initial order of the elements, so skip current system when
-    // found and process it separately in the end
-    Object *currentSystem = this->GetFirstAncestor(SYSTEM);
-    int currentSystemIndex = 0;
-    for (int i = 0; i < (int)elements.size() - 1; ++i) {
-        if (elements.at(i).second == currentSystem) {
-            currentSystemIndex = i;
-            continue;
-        }
-        this->AddSpanningSegment(params->m_doc, elements, i);
-    }
-    this->AddSpanningSegment(params->m_doc, elements, currentSystemIndex, false);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
