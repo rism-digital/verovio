@@ -1034,11 +1034,11 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                 element_write.append(f"\n    hasAttribute = (Write{att_str}(element) || hasAttribute);")
                 element_reset.append(f"\n    Reset{att_str}();")
 
-            readParam = "pugi::xml_node, bool"
-            writeParam = "pugi::xml_node"
-            if len(element_read):
-                readParam = "pugi::xml_node element, bool removeAttr"
-                writeParam = "pugi::xml_node element"
+            read_param = "pugi::xml_node, bool"
+            write_param = "pugi::xml_node"
+            if element_read:
+                read_param = "pugi::xml_node element, bool removeAttr"
+                write_param = "pugi::xml_node element"
 
             consvars = {
                 'elementNameUpper': schema.cc(element),
@@ -1047,8 +1047,8 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                 'elementRead': "".join(element_read),
                 'elementWrite': "".join(element_write),
                 'elementReset': "".join(element_reset),
-                'readParam': readParam,
-                'writeParam': writeParam
+                'readParam': read_param,
+                'writeParam': write_param
             }
             element_constructor.append(ELEMENTCLASS_CPP.format_map(consvars))
 
@@ -1159,8 +1159,24 @@ def copy_addons(namespace: str, addons_dir: Path, outdir: Path):
 
 
 BASIC_VALID_CPP: str = """
-std::map<std::string, std::vector<std::string>> basic = {{
-{nameAttributeMap}
+    inline static std::map<std::string, std::vector<std::string>> map = {{
+        {nameAttributeMap}
+    }};
+"""
+
+MEI_BASIC_H: str = """
+class MEIBasic {{
+public:
+    static bool IsAllowed(const std::string &element, const std::string &attr)
+    {{
+        if (!MEIBasic::map.count(element)) return false;
+        const std::vector<std::string> &attributes = MEIBasic::map.at(element);
+        return (std::find(attributes.begin(), attributes.end(), attr) != attributes.end());
+    }}
+    
+    // clang-format off
+    {basicAttributeMap}
+    // clang-format on
 }};
 """
 
@@ -1204,13 +1220,16 @@ def create_basic_validator(configure: dict, outdir: Path):
         else:
             fmt_attr_str = '{}'
 
-        fmt_attr_map = f'    {{"{elname}", {fmt_attr_str}}},\n'
+        fmt_attr_map = f'        {{"{elname}", {fmt_attr_str}}},\n'
         formatted_attr_map.append(fmt_attr_map)
 
-    name_attribute_map = "".join(formatted_attr_map).rstrip()
+    name_attribute_map = "".join(formatted_attr_map).strip()
     formatted_output = BASIC_VALID_CPP.format(nameAttributeMap=name_attribute_map)
 
     # TODO: Actually write the output somewhere!
+    with Path(outdir, "meibasic.h").open("w") as mei_basic_h:
+        lg.debug("Writing meibasic.h")
+        mei_basic_h.write(MEI_BASIC_H.format(basicAttributeMap=formatted_output))
 
 
 def create(schema, configure: dict) -> bool:
