@@ -1408,6 +1408,12 @@
 		E78833612994EC7C00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
 		E78833622994EC7D00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
 		E78833632994EC7E00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
+		E78833652995007700D44B01 /* calcspanningbeamspansfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */; };
+		E78833662995007800D44B01 /* calcspanningbeamspansfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7883368299500D600D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
+		E7883369299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
+		E788336A299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
+		E788336B299500DD00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
 		E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; };
 		E790165A298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
@@ -1965,6 +1971,8 @@
 		E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentxposfunctor.h; path = include/vrv/calcalignmentxposfunctor.h; sourceTree = "<group>"; };
 		E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcchordnoteheadsfunctor.h; path = include/vrv/calcchordnoteheadsfunctor.h; sourceTree = "<group>"; };
 		E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcchordnoteheadsfunctor.cpp; path = src/calcchordnoteheadsfunctor.cpp; sourceTree = "<group>"; };
+		E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcspanningbeamspansfunctor.h; path = include/vrv/calcspanningbeamspansfunctor.h; sourceTree = "<group>"; };
+		E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcspanningbeamspansfunctor.cpp; path = src/calcspanningbeamspansfunctor.cpp; sourceTree = "<group>"; };
 		E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentxposfunctor.cpp; path = src/calcalignmentxposfunctor.cpp; sourceTree = "<group>"; };
 		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
 		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
@@ -2749,6 +2757,8 @@
 				E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
+				E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */,
+				E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */,
 				E79320662991453C00D80975 /* calcstemfunctor.cpp */,
 				E79320632991450E00D80975 /* calcstemfunctor.h */,
 			);
@@ -2948,6 +2958,7 @@
 				4DEC4DD821C8295700D1D273 /* unclear.h in Headers */,
 				4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */,
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
+				E78833652995007700D44B01 /* calcspanningbeamspansfunctor.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
 				4D766F0820ACAD74006875D8 /* syllable.h in Headers */,
 				4DACC9F22990F29A00B55913 /* atts_frettab.h in Headers */,
@@ -3068,6 +3079,7 @@
 				BB4C4AA522A9328F001F6AF0 /* vrvdef.h in Headers */,
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
 				4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */,
+				E78833662995007800D44B01 /* calcspanningbeamspansfunctor.h in Headers */,
 				4DF092A32497706600239195 /* phrase.h in Headers */,
 				E790165A298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BB4C4B9622A932E5001F6AF0 /* drawinginterface.h in Headers */,
@@ -3652,6 +3664,7 @@
 				4DACC9C92990F29A00B55913 /* attconverter.cpp in Sources */,
 				4D1694471E3A44F300569BF4 /* ligature.cpp in Sources */,
 				4D6122BF1F77E1E000FC90A0 /* rend.cpp in Sources */,
+				E7883369299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,
 				4D1694481E3A44F300569BF4 /* controlelement.cpp in Sources */,
 				4DFB3E8623ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				4DEC4DA321C81EB300D1D273 /* rdg.cpp in Sources */,
@@ -3706,6 +3719,7 @@
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				E79ADDC726BD645B00527E4B /* runtimeclock.cpp in Sources */,
 				40E1CEDE205060E20007C8AF /* labelabbr.cpp in Sources */,
+				E7883368299500D600D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,
 				4D674B46255F40B7008AEF4C /* plica.cpp in Sources */,
 				4DACCA062990F29A00B55913 /* atts_harmony.cpp in Sources */,
 				403B050F244F3E2900EE4F71 /* gliss.cpp in Sources */,
@@ -4143,6 +4157,7 @@
 				4D6DF9F820E1074200C12BBD /* subst.cpp in Sources */,
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4DACC9CA2990F29A00B55913 /* attconverter.cpp in Sources */,
+				E788336A299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,
 				4D1BE7701C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
 				4DFB3E8723ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */,
@@ -4386,6 +4401,7 @@
 				BB4C4B8922A932DF001F6AF0 /* mnum.cpp in Sources */,
 				BB4C4B2722A932CF001F6AF0 /* hairpin.cpp in Sources */,
 				BB4C4B3F22A932D7001F6AF0 /* barline.cpp in Sources */,
+				E788336B299500DD00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,
 				BB4C4AAF22A932A6001F6AF0 /* ioabc.cpp in Sources */,
 				4DFB3E8823ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				4DACC9CB2990F29A00B55913 /* attconverter.cpp in Sources */,
