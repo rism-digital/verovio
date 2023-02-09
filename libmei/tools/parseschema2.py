@@ -21,29 +21,22 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import sys
-
-if sys.version_info < (3, 4):
-    raise Exception("requires python 3.4")
-
-import codecs
 import logging
 import re
 import shutil
+import sys
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import List
+from re import Pattern
 
+import yaml
 from lxml import etree
 
-lg = logging.getLogger('schemaparser')
-f = logging.Formatter(
-    "%(levelname)s %(asctime)s On Line: %(lineno)d %(message)s")
-h = logging.StreamHandler()
-h.setFormatter(f)
+import cpp
 
-lg.setLevel(logging.DEBUG)
-lg.addHandler(h)
+logging.basicConfig(format="[%(asctime)s] [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)")
+log = logging.getLogger('schemaparser')
+
 
 # globals
 TEI_NS = {"tei": "http://www.tei-c.org/ns/1.0"}
@@ -51,16 +44,18 @@ TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0",
               "rng": "http://relaxng.org/ns/structure/1.0"}
 NAMESPACES = {'xml': 'http://www.w3.org/XML/1998/namespace',
               'xlink': 'http://www.w3.org/1999/xlink'}
+WHITESPACE_REGEX: Pattern = re.compile(r"[\s\t]+")
 
 
 class MeiSchema(object):
-    def __init__(self, oddfile):
+    def __init__(self, oddfile, resolve_elements=False):
         parser = etree.XMLParser(resolve_entities=True)
         self.schema = etree.parse(oddfile, parser)
         # self.customization = etree.parse(customization_file)
 
         self.active_modules = []  # the modules active in the resulting output
         self.element_structure = {}  # the element structure.
+
         self.attribute_group_structure = {}  # the attribute group structure
         # inverted, so we can map attgroups to modules
         self.inverse_attribute_group_structure = {}
@@ -68,18 +63,21 @@ class MeiSchema(object):
         self.data_types = {}
         self.data_lists = {}
 
-        self.get_elements()
+        # processing the elements takes a long time, so only do it when needed
+        if resolve_elements:
+            self.get_elements()
+
         self.get_attribute_groups()
         self.get_data_types_and_lists()
         self.invert_attribute_group_structure()
         self.set_active_modules()
-
+        breakpoint()
         # lg.debug(self.data_lists)
 
     def get_elements(self):
         """Retrieves all defined elements from the schema."""
-        elements = [m for m in self.schema.xpath(
-            "//tei:elementSpec", namespaces=TEI_NS)]
+        elements: list[etree.Element] = self.schema.xpath("//tei:elementSpec", namespaces=TEI_NS)
+
         for element in elements:
             modname = element.get("module").split(".")[-1]
 
@@ -89,44 +87,42 @@ class MeiSchema(object):
             element_name = element.get("ident")
             memberships = []
 
-            element_membership = element.xpath(
-                "./tei:classes/tei:memberOf", namespaces=TEI_NS)
+            element_membership = element.xpath("./tei:classes/tei:memberOf", namespaces=TEI_NS)
             for member in element_membership:
                 if member.get("key").split(".")[0] != "att":
                     # skip the models that this element might be a member of
                     continue
+
                 self.__get_membership(member, memberships)
 
-            # memberships.kesort()
             self.element_structure[modname][element_name] = memberships
 
             # need a way to keep self-defined attributes:
             selfattributes = []
-            attdefs = element.xpath(
-                "./tei:attList/tei:attDef", namespaces=TEI_NS)
-            if attdefs:
-                for attdef in attdefs:
-                    if attdef.get("ident") == "id":
-                        continue
-                    attname = self.__process_att(attdef)
-                    selfattributes.append(attname)
+            attdefs: list[etree.Element] = element.xpath("./tei:attList/tei:attDef", namespaces=TEI_NS)
+            if not attdefs:
+                continue
 
-                self.element_structure[modname][element_name].append(
-                    selfattributes)
+            for attdef in attdefs:
+                if attdef.get("ident") == "id":
+                    continue
+                attname = self.__process_att(attdef)
+                selfattributes.append(attname)
+
+            self.element_structure[modname][element_name].append(selfattributes)
 
     def get_attribute_groups(self):
         """Retrieves all defined attribute classes from the schema."""
-        attribute_groups = [m for m in self.schema.xpath(
-            "//tei:classSpec[@type=$at]", at="atts", namespaces=TEI_NS)]
+        attribute_groups: list[etree.Element] = self.schema.xpath(".//tei:classSpec[@type='atts']",
+                                                                  namespaces=TEI_NS)
         for group in attribute_groups:
-            group_name = group.get("ident")
+            group_name: str = group.get("ident")
 
             if group_name == "att.id":
                 continue
 
             group_module = group.get("module").split(".")[-1]
-            attdefs = group.xpath(
-                "./tei:attList/tei:attDef", namespaces=TEI_NS)
+            attdefs = group.xpath("./tei:attList/tei:attDef", namespaces=TEI_NS)
             if not attdefs:
                 continue
 
@@ -138,93 +134,66 @@ class MeiSchema(object):
                 if attdef.get("ident") == "id":
                     continue
                 attname = self.__process_att(attdef)
-                self.attribute_group_structure[group_module][group_name].append(
-                    attname)
+                self.attribute_group_structure[group_module][group_name].append(attname)
 
     def get_data_types_and_lists(self):
+        compound_alternate = self.schema.xpath(".//tei:macroSpec[@type='dt' and .//tei:alternate[@minOccurs='1' and @maxOccurs='1']]",
+                                               namespaces=TEI_RNG_NS)
 
-        compoundalternate = [m for m in self.schema.xpath(
-            "//tei:macroSpec[@type=\"dt\" and .//tei:alternate[@minOccurs=\"1\" and @maxOccurs=\"1\"]]", namespaces=TEI_RNG_NS)]
-        for ct in compoundalternate:
-            #lg.debug("TYPE - {0}".format(ct.get("ident")))
+        for ct in compound_alternate:
             data_type = ct.get("ident")
-            self.data_types[data_type] = []
-            subtypes = [m for m in ct.findall(
-                ".//tei:alternate/tei:macroRef", namespaces=TEI_RNG_NS)]
-            for st in subtypes:
-                #lg.debug("SUBTYPE - {0}".format(st.get("name")))
-                subtype = st.xpath("//tei:macroSpec[@ident=\"{0}\"]//tei:valList/tei:valItem".format(
-                    st.get("key")), namespaces=TEI_RNG_NS)
-                for v in subtype:
-                    # lg.debug("\t{0}".format(v.get("ident")))
-                    type_value = v.get("ident")
-                    self.data_types[data_type].append(type_value)
-            if len(self.data_types[data_type]) == 0:
-                del self.data_types[data_type]
-                #lg.debug("REMOVE {0}".format(data_type))
+            subtypes = ct.findall(".//tei:alternate/tei:macroRef", namespaces=TEI_RNG_NS)
 
-        compoundchoice = [m for m in self.schema.xpath(
-            "//tei:macroSpec[@type=\"dt\" and .//rng:choice]|//tei:dataSpec[.//rng:choice]", namespaces=TEI_RNG_NS)]
-        for ct in compoundchoice:
-            #lg.debug("TYPE - {0}".format(ct.get("ident")))
+            for st in subtypes:
+                subtype = self.schema.xpath(".//tei:macroSpec[@ident=$st_ident]//tei:valList/tei:valItem",
+                                            st_ident=st.get("key"),
+                                            namespaces=TEI_RNG_NS)
+                for v in subtype:
+                    if data_type not in self.data_types:
+                        self.data_types[data_type] = []
+                    self.data_types[data_type].append(v.get("ident"))
+
+        compound_choice = self.schema.xpath(".//tei:macroSpec[@type='dt' and .//rng:choice]|//tei:dataSpec[.//rng:choice]",
+                                            namespaces=TEI_RNG_NS)
+
+        for ct in compound_choice:
             data_type = ct.get("ident")
-            self.data_types[data_type] = []
-            subtypes = [m for m in ct.xpath(
-                ".//rng:choice/rng:ref", namespaces=TEI_RNG_NS)]
-            for st in subtypes:
-                #lg.debug("SUBTYPE - {0}".format(st.get("name")))
-                subtype = st.xpath("//tei:macroSpec[@ident=\"{0}\"]//tei:valList/tei:valItem|//tei:dataSpec[@ident=\"{0}\"]//tei:valList/tei:valItem".format(
-                    st.get("name")), namespaces=TEI_RNG_NS)
-                for v in subtype:
-                    # lg.debug("\t{0}".format(v.get("ident")))
-                    type_value = v.get("ident")
-                    self.data_types[data_type].append(type_value)
-            if len(self.data_types[data_type]) == 0:
-                del self.data_types[data_type]
-                #lg.debug("REMOVE {0}".format(data_type))
+            subtypes = ct.xpath(".//rng:choice/rng:ref", namespaces=TEI_RNG_NS)
 
-        types = [m for m in self.schema.xpath(
-            "//tei:macroSpec[.//tei:valList[@type=\"closed\" or @type=\"semi\"]]|//tei:dataSpec[.//tei:valList[@type=\"closed\" or @type=\"semi\"]]", namespaces=TEI_RNG_NS)]
+            for st in subtypes:
+                subtype = st.xpath("//tei:macroSpec[@ident=$st_ident]//tei:valList/tei:valItem|//tei:dataSpec[@ident=$st_ident]//tei:valList/tei:valItem",
+                                   st_ident=st.get("name"),
+                                   namespaces=TEI_RNG_NS)
+
+                for v in subtype:
+                    if data_type not in self.data_types:
+                        self.data_types[data_type] = []
+                    self.data_types[data_type].append(v.get("ident"))
+
+        types = self.schema.xpath(".//tei:macroSpec[.//tei:valList[@type='closed' or @type='semi']]|//tei:dataSpec[.//tei:valList[@type='closed' or @type='semi']]", namespaces=TEI_RNG_NS)
         for t in types:
-            #lg.debug("TYPE - {0}".format(t.get("ident")))
             data_type = t.get("ident")
-            self.data_types[data_type] = []
-            values = t.findall(".//tei:valList/tei:valItem",
-                               namespaces=TEI_RNG_NS)
+            values = t.findall(".//tei:valList/tei:valItem", namespaces=TEI_RNG_NS)
             for v in values:
-                # lg.debug("\t{0}".format(v.get("ident")))
-                type_value = v.get("ident")
-                self.data_types[data_type].append(type_value)
+                if data_type not in self.data_types:
+                    self.data_types[data_type] = []
+                self.data_types[data_type].append(v.get("ident"))
 
-        vallists = [m for m in self.schema.xpath(
-            "//tei:valList[@type=\"closed\" or @type=\"semi\"]", namespaces=TEI_RNG_NS)]
+        vallists = self.schema.xpath("//tei:valList[@type='closed' or @type='semi']", namespaces=TEI_RNG_NS)
         for vl in vallists:
-            element = vl.xpath("./ancestor::tei:classSpec",
-                               namespaces=TEI_RNG_NS)
-            attName = vl.xpath("./parent::tei:attDef/@ident",
-                               namespaces=TEI_RNG_NS)
-            # if ($current.valList/ancestor::tei:classSpec) then($current.valList/ancestor::tei:classSpec/@ident) else($current.valList/ancestor::tei:elementSpec/@ident
-            if element:
-                #lg.debug("VALLIST - ELEMEMT {0} --- {1}".format(element[0].get("ident"),attName[0]))
-                data_list = "{0}@{1}".format(
-                    element[0].get("ident"), attName[0])
-                self.data_lists[data_list] = []
-                self.data_lists[data_list]
-                values = vl.xpath(".//tei:valItem", namespaces=TEI_RNG_NS)
-                for v in values:
-                    # lg.debug("\t{0}".format(v.get("ident")))
-                    list_value = v.get("ident")
-                    self.data_lists[data_list].append(list_value)
-            # elif attName:
-            #    elName = vl.xpath("./ancestor::tei:elementSpec/@ident", namespaces=TEI_RNG_NS)
-            #    lg.debug("VALLIST {0} --- {1}".format(elName[0],attName[0]))
-            #    data_list = "{0}.{1}".format(elName[0],attName[0])
-            #    self.data_lists[data_list] = []
-            #    values = vl.xpath(".//tei:valItem", namespaces=TEI_RNG_NS)
-            #    for v in values:
-            #        lg.debug("\t{0}".format(v.get("ident")))
-            #        list_value = v.get("ident")
-            #        self.data_lists[data_list].append(list_value)
+            element = vl.xpath("./ancestor::tei:classSpec", namespaces=TEI_RNG_NS)
+            if not element:
+                continue
+
+            att_name = vl.xpath("./parent::tei:attDef/@ident", namespaces=TEI_RNG_NS)
+
+            data_list = f"{element[0].get('ident')}@{att_name[0]}"
+            values = vl.xpath(".//tei:valItem", namespaces=TEI_RNG_NS)
+
+            for v in values:
+                if data_list not in self.data_lists:
+                    self.data_lists[data_list] = []
+                self.data_lists[data_list].append(v.get("ident"))
 
     def invert_attribute_group_structure(self):
         for module, groups in self.attribute_group_structure.items():
@@ -237,39 +206,34 @@ class MeiSchema(object):
 
     def __process_att(self, attdef: etree.Element) -> str:
         """Process attribute definition."""
-        attname = ""
-        attdefident = attdef.get("ident")
-        if "-" in attdefident:
-            f, l = attdefident.split("-")
-            attdefident = f"{f}{l.title()}"
+        attdef_ident = attdef.get("ident")
+        if "-" in attdef_ident:
+            first, last = attdef_ident.split("-")
+            attdef_ident = f"{first}{last.title()}"
 
         if attdef.get("ns"):
-            attname = f"{attdef.get('ns')}|{attdefident}"
-        elif ":" in attdefident:
-            pfx, att = attdefident.split(":")
-            attname = f"{NAMESPACES[pfx]}|{att}"
+            return f"{attdef.get('ns')}|{attdef_ident}"
+        elif ":" in attdef_ident:
+            pfx, att = attdef_ident.split(":")
+            return f"{NAMESPACES[pfx]}|{att}"
         else:
-            attname = f"{attdefident}"
+            return f"{attdef_ident}"
 
-        return attname
-
-    def __get_membership(self, member: etree.Element, resarr: List[str]) -> None:
+    def __get_membership(self, member: etree.Element, resarr: list[str]) -> None:
         """Get attribute groups."""
-        member_attgroup = member.xpath(
-            "//tei:classSpec[@type=$att][@ident=$nm]", att="atts", nm=member.get("key"), namespaces=TEI_NS)
+        member_attgroup = self.schema.xpath(".//tei:classSpec[@type='atts'][@ident=$nm]", nm=member.get("key"), namespaces=TEI_NS)
 
-        if member_attgroup:
-            member_attgroup = member_attgroup[0]
-        else:
-            return
+        if member_attgroup is None:
+            return None
 
-        if member_attgroup.xpath("./tei:attList/tei:attDef", namespaces=TEI_NS):
-            if member_attgroup.get("ident") == "att.id":
-                return
-            resarr.append(member_attgroup.get("ident"))
-        m2s = member_attgroup.xpath(
-            "./tei:classes/tei:memberOf", namespaces=TEI_NS)
+        member_groupel = member_attgroup[0]
+        if member_groupel.get("ident") == "att.id":
+            return None
 
+        if member_groupel.xpath("./tei:attList/tei:attDef", namespaces=TEI_NS):
+            resarr.append(member_groupel.get("ident"))
+
+        m2s = member_groupel.xpath("./tei:classes/tei:memberOf", namespaces=TEI_NS)
         for mship in m2s:
             self.__get_membership(mship, resarr)
 
@@ -279,7 +243,7 @@ class MeiSchema(object):
 
     def strpdot(self, string: str) -> str:
         """Returns a version of the string without any dots."""
-        return "".join([n for n in string.split(".")])
+        return "".join(string.split("."))
 
     def cc(self, att_name: str) -> str:
         """Returns a CamelCasedName version of attribute.case.names."""
@@ -287,61 +251,56 @@ class MeiSchema(object):
 
     def get_att_desc(self, att_name: str) -> str:
         """Returns the documentation string for an attribute by name."""
-        desc = self.schema.find(
-            f"//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
-        if desc is not None:
-            # strip extraneous whitespace
-            return re.sub("[\s\t]+", " ", desc.xpath("string()"))
-        else:
+        desc = self.schema.find(f"//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
+        if desc is None:
             return ""
+
+        return re.sub(WHITESPACE_REGEX, " ", desc.xpath("string()"))
 
     def get_elem_desc(self, elem_name: str) -> str:
         """Returns the documentation string for an element by name."""
-        desc = self.schema.find(
-            f"//tei:elementSpec[@ident='{elem_name}']/tei:desc", namespaces=TEI_NS)
-        if desc is not None:
-            # strip extraneous whitespace
-            return re.sub("[\s\t]+", " ", desc.xpath("string()"))
-        else:
+        desc = self.schema.find(f".//tei:elementSpec[@ident='{elem_name}']/tei:desc", namespaces=TEI_NS)
+        if desc is None:
             return ""
+
+        return re.sub(WHITESPACE_REGEX, " ", desc.xpath("string()"))
+
+
+def main(configure: dict) -> bool:
+    with open(configure["compiled"], "r") as mei_source:
+        resolve_elements = configure["elements"]
+        schema = MeiSchema(mei_source, resolve_elements=resolve_elements)
+
+    output_directory: Path = Path(configure["output_dir"])
+    if output_directory.exists():
+        log.debug("Removing old Verovio C++ output directory")
+        shutil.rmtree(output_directory)
+    output_directory.mkdir(exist_ok=True)
+
+    cpp.create(schema, configure)
+
+    return True
 
 
 if __name__ == "__main__":
     # Custom usage message to show user [compiled] should go before all other flags
-    p = ArgumentParser(
-        usage='%(prog)s [compiled | -sl] [-e] [-h] [-df DEFINE] [-o OUTDIR] [-d]')
-    exclusive_group = p.add_mutually_exclusive_group()
-    # Due to nargs="?", "compiled" will appear as optional and not positional
-    exclusive_group.add_argument(
-        "compiled", help="A compiled ODD file", nargs="?")
-    p.add_argument("-o", "--outdir", default=".", help="output directory")
-    p.add_argument("-d", "--debugging",
-                   help="Run with verbose output", action="store_true")
-    p.add_argument("-e", "--elements",
-                   help="Output element classes", action="store_true")
-    p.add_argument("-ns", "--namespace", default="vrv", help="C++ output namespace")
+    p = ArgumentParser(usage='%(prog)s [compiled | -sl] [-e] [-h] [-df DEFINE] [-o OUTDIR] [-d]')
+
+    p.add_argument("compiled", help="A compiled ODD file", type=Path)
+    p.add_argument("-c", "--config", help="Path to a config file", type=Path)
 
     args = p.parse_args()
 
-    compiled_odd = Path(args.compiled)
+    if not args.config.exists():
+        log.error("Could not find a config file at %s", args.config)
+        sys.exit(1)
 
-    mei_source = codecs.open(compiled_odd, 'r', 'utf-8')
-    # sf = codecs.open(args.source,'r', "utf-8")
-    # cf = codecs.open(args.customization, 'r', "utf-8")
-    outdir = Path(args.outdir)
+    config: dict = yaml.safe_load(open(args.config, "r"))
+    config["compiled"] = args.compiled
 
-    outdir.mkdir(exist_ok=True)
+    if config["debug"]:
+        log.setLevel(logging.DEBUG)
+    else:
+        log.setLevel(logging.WARN)
 
-    schema = MeiSchema(mei_source)
-
-    import generatecode
-    output_directory = Path(outdir, "dist")
-    if output_directory.exists():
-        lg.debug("Removing old Verovio C++ output directory")
-        shutil.rmtree(output_directory)
-    output_directory.mkdir()
-    generatecode.create(args.namespace, schema, output_directory, args.elements)
-
-    mei_source.close()
-
-    sys.exit(0)
+    res: bool = main(config)
