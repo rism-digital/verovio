@@ -1,6 +1,6 @@
 ---
 debug: true
-output_dir: "/tmp/develop/tmpdist"
+output_dir: "../dist"
 addons_dir: "../addons"
 elements: false
 namespace: "vrv"
