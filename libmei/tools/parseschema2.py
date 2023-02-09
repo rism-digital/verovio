@@ -303,3 +303,5 @@ if __name__ == "__main__":
         log.setLevel(logging.WARN)
 
     res: bool = main(config)
+    if not res:
+        sys.exit(1)

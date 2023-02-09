@@ -528,16 +528,16 @@ TEI_RNG_NS = {"tei": "http://www.tei-c.org/ns/1.0",
               "rng": "http://relaxng.org/ns/structure/1.0"}
 
 
-def vrv_member_cc(name):
+def vrv_member_cc(name: str) -> str:
     cc = "".join([n[0].upper() + n[1:] for n in name.split(".")])
     return cc[0].lower() + cc[1:]
 
 
-def vrv_member_cc_upper(name):
+def vrv_member_cc_upper(name: str) -> str:
     return "".join([n[0].upper() + n[1:] for n in name.split(".")])
 
 
-def vrv_converter_cc(name):
+def vrv_converter_cc(name: str) -> str:
     left, right = name.split('_', 1)
     rest = "".join([n[0].upper() + n[1:].lower() for n in right.split("_")])
     if left == "data":
@@ -565,11 +565,11 @@ def vrv_is_excluded_type(datatype: str) -> bool:
     return datatype in DATATYPES["excludes"]
 
 
-def vrv_is_alternate_type(datatype):
+def vrv_is_alternate_type(datatype: str) -> bool:
     return datatype in DATATYPES["alternates"]
 
 
-def vrv_get_att_config_type(module, gp, att) -> Optional[str]:
+def vrv_get_att_config_type(module: str, gp: str, att: str) -> Optional[str]:
     """Get the att type."""
     att_config = vrv_get_att_config(module, gp, att)
     if not att_config or "type" not in att_config:
@@ -577,7 +577,7 @@ def vrv_get_att_config_type(module, gp, att) -> Optional[str]:
     return att_config["type"]
 
 
-def vrv_get_att_config_default(module, gp, att) -> Optional[str]:
+def vrv_get_att_config_default(module: str, gp: str, att: str) -> Optional[str]:
     """Get the att default value."""
     att_config = vrv_get_att_config(module, gp, att)
     # nothing in the module/att
@@ -587,19 +587,19 @@ def vrv_get_att_config_default(module, gp, att) -> Optional[str]:
     return att_config["default"]
 
 
-def vrv_getformattedtype(datatype):
+def vrv_getformattedtype(datatype: str) -> str:
     if datatype in DATATYPES["mapped"]:
         return DATATYPES["mapped"][datatype]
     return datatype.replace(".", "_")
 
 
-def vrv_getformattedvallist(att, vallist):
+def vrv_getformattedvallist(att: str, vallist: str) -> str:
     pfx: str = vrv_member_cc(att.replace("att.", ""))
     sfx: str = vallist.upper().replace(".", "").replace(":", "")
     return f"{pfx}_{sfx}"
 
 
-def vrv_getatttype(schema, module, gp, aname):
+def vrv_getatttype(schema, module: str, gp: str, aname: str) -> str:
     """Returns the attribute type for element name, or string if not detectable."""
     # Look up if there is an override for this type in the current module, and return it
     # Note that we do not honor pseudo-hungarian notation
@@ -637,7 +637,7 @@ def vrv_getatttype(schema, module, gp, aname):
     return "std::string"
 
 
-def vrv_getattdefault(schema, module, gp, aname):
+def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
     """Returns the attribute default value for element name, or string if not detectable."""
     attype = vrv_getatttype(schema, module, gp, aname)
     default = vrv_get_att_config_default(module, gp, aname)
@@ -664,7 +664,7 @@ def vrv_getattdefault(schema, module, gp, aname):
         return default, [f"StrTo{cname}", f"{cname}ToStr"]
 
 
-def create_doctstr(text: str, indent: int = 0):
+def create_doctstr(text: str, indent: int = 0) -> str:
     """
         Format a docstring. Take the first sentence (. followed by a space)
         and use it for the brief. Then put the rest of the text after a blank
@@ -707,7 +707,7 @@ def create_doctstr(text: str, indent: int = 0):
     return docstr
 
 
-def create_att_classes(cpp_ns, schema, outdir):
+def create_att_classes(cpp_ns: str, schema, outdir: Path):
     enums: list = []
 
     for module, atgroup in sorted(schema.attribute_group_structure.items()):
@@ -817,7 +817,7 @@ def create_att_classes(cpp_ns, schema, outdir):
         f_att_classes_h.write(ENUM_GRP_END)
 
 
-def create_att_datatypes(cpp_ns, schema, outdir):
+def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
     # data types
     att_type_data_types: list = []
     att_converter_header_data_types: list = []
@@ -950,7 +950,7 @@ def create_att_datatypes(cpp_ns, schema, outdir):
         f_att_converter_cpp.write(CONVERTER_END_CPP)
 
 
-def create_element_classes(cpp_ns, schema, outdir):
+def create_element_classes(cpp_ns: str, schema, outdir: Path):
     lg.debug("Creating Element Headers")
     ###########################################################################
     # Header
@@ -1056,7 +1056,7 @@ def create_element_classes(cpp_ns, schema, outdir):
             f_element_class_cpp.write(CLASS_FILE_END)
 
 
-def create_att_module(cpp_ns, schema, outdir):
+def create_att_module(cpp_ns: str, schema, outdir: Path):
     lg.debug("Creating AttModule Header and Implementation.")
     header_modules: list = []
     impl_modules: list = []
