@@ -173,31 +173,6 @@ FunctorCode BeamSpan::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitBeamSpanEnd(this);
 }
 
-int BeamSpan::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    if (!this->GetStart() || !this->GetEnd() || m_beamedElements.empty()) return FUNCTOR_CONTINUE;
-
-    Layer *layer = vrv_cast<Layer *>(this->GetStart()->GetFirstAncestor(LAYER));
-    Staff *staff = vrv_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
-    Measure *measure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
-
-    this->InitCoords(m_beamedElements, staff, this->GetPlace());
-
-    m_beamSegments.at(0)->SetMeasure(measure);
-    m_beamSegments.at(0)->SetStaff(staff);
-    m_beamSegments.at(0)->SetLayer(layer);
-    m_beamSegments.at(0)->SetBeginCoord(*m_beamElementCoords.begin());
-    m_beamSegments.at(0)->SetEndCoord(*m_beamElementCoords.rbegin());
-    ArrayOfBeamElementCoords coord(m_beamElementCoords.begin(), m_beamElementCoords.end());
-    m_beamSegments.at(0)->InitCoordRefs(&coord);
-    m_beamSegments.at(0)->CalcBeam(layer, staff, params->m_doc, this, this->GetPlace());
-
-    return FUNCTOR_CONTINUE;
-}
-
 int BeamSpan::CalcSpanningBeamSpans(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);

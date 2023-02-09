@@ -19,6 +19,7 @@
 #include "calcalignmentxposfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
+#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
@@ -226,9 +227,8 @@ void Page::LayOutTranscription(bool force)
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(doc);
+    this->Process(calcStem);
 
     CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
@@ -318,9 +318,8 @@ void Page::ResetAligners()
         this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
     }
 
-    CalcStemParams calcStemParams(doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(doc);
+    this->Process(calcStem);
 
     CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
@@ -715,9 +714,8 @@ void Page::LayOutPitchPos()
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(doc);
+    this->Process(calcStem);
 }
 
 int Page::GetContentHeight() const

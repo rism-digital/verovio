@@ -252,7 +252,7 @@ public:
      * Calculate the stem direction of the pair of notes.
      * The presence of a StemSameasNote() needs to be check before calling it.
      * Encoded stem direction on the calling note is taken into account.
-     * Called from Note::CalcStem
+     * Called from CalcStemFunctor::VisitNote
      */
     data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
 
@@ -307,11 +307,6 @@ public:
      * See Object::CalcArtic
      */
     int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcChordNoteHeads

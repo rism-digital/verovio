@@ -110,11 +110,6 @@ public:
     ///@}
 
     /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcSpanningBeamSpans
      */
     int CalcSpanningBeamSpans(FunctorParams *) override;

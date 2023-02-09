@@ -19,6 +19,7 @@
 
 #include "artic.h"
 #include "calcalignmentpitchposfunctor.h"
+#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
@@ -610,9 +611,8 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(params->m_doc);
     this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(params->m_doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(params->m_doc);
+    this->Process(calcStem);
 
     return FUNCTOR_SIBLINGS;
 }

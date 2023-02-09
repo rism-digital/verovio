@@ -227,11 +227,6 @@ public:
     ///@}
 
     /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustSylSpacing
      */
     int AdjustSylSpacing(FunctorParams *functorParams) override;

@@ -93,11 +93,6 @@ public:
     int AdjustBeamsEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

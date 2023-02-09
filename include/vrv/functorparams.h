@@ -939,50 +939,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcStemParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the additional length for a chord stem (between the top and bottom note)
- * member 1: the vertical center of the staff
- * member 2: the actual duration of the chord / note
- * member 3: the flag for grace notes (stem is not extended)
- * member 4: the flag for stem.sameas notes
- * member 5: the flag indicating that we have no note in tabGrp
- * member 6: the current staff (to avoid additional lookup)
- * member 7: the current layer (ditto)
- * member 8: the chord or note to which the stem belongs
- * member 9: the doc
- **/
-
-class CalcStemParams : public FunctorParams {
-public:
-    CalcStemParams(Doc *doc)
-    {
-        m_chordStemLength = 0;
-        m_verticalCenter = 0;
-        m_dur = DUR_1;
-        m_isGraceNote = false;
-        m_isStemSameasSecondary = false;
-        m_tabGrpWithNoNote = false;
-        m_staff = NULL;
-        m_layer = NULL;
-        m_interface = NULL;
-        m_doc = doc;
-    }
-    int m_chordStemLength;
-    int m_verticalCenter;
-    int m_dur;
-    bool m_isGraceNote;
-    bool m_isStemSameasSecondary;
-    bool m_tabGrpWithNoNote;
-    Staff *m_staff;
-    Layer *m_layer;
-    StemmedDrawingInterface *m_interface;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CalcChordNoteHeadsParams
 //----------------------------------------------------------------------------
 

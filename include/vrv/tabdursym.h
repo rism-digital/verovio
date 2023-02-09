@@ -91,11 +91,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
 protected:
     //
 private:

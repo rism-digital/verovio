@@ -2204,42 +2204,4 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Beam::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    const ListOfObjects &beamChildren = this->GetList(this);
-
-    // Should we assert this at the beginning?
-    if (beamChildren.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (!this->HasCoords()) {
-        this->InitCoords(beamChildren, staff, this->GetPlace());
-        const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
-        this->InitCue(isCue);
-    }
-
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
-
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    data_BEAMPLACE initialPlace = this->GetPlace();
-    if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
-
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
-
-    if (this->HasStemSameasBeam())
-        m_beamSegment.CalcNoteHeadShiftForStemSameas(this->GetStemSameasBeam(), initialPlace);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

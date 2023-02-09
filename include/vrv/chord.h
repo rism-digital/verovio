@@ -215,11 +215,6 @@ public:
     int CalcArtic(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcChordNoteHeads
      */
     int CalcChordNoteHeads(FunctorParams *functorParams) override;

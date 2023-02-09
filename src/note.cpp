@@ -356,7 +356,7 @@ Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
     char32_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
-    // For changing this, change Note::CalcStem and Note::PrepareLayerElementParts
+    // For changing this, change CalcStemFunctor::VisitNote and PrepareLayerElementPartsFunctor::VisitNote
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralNoteheadGlyph();
@@ -967,96 +967,6 @@ int Note::AdjustArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_articAbove.clear();
     params->m_articBelow.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
-    // be processed either
-    if (this->IsInBeam() || this->GetAncestorFTrem()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // We do not need to calc stems for mensural notes
-    // We have no stem with tab because it belongs to tabDurSym in this case
-    if (this->IsMensuralDur() || this->IsTabGrpNote()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    if (this->IsChordTone()) {
-        assert(params->m_interface);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // This now should be NULL and the chord stem length will be 0
-    params->m_interface = NULL;
-    params->m_chordStemLength = 0;
-
-    Stem *stem = this->GetDrawingStem();
-    assert(stem);
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    if (m_crossStaff) {
-        staff = m_crossStaff;
-        layer = m_crossLayer;
-    }
-
-    // Cache the in params to avoid further lookup
-    params->m_staff = staff;
-    params->m_layer = layer;
-    params->m_interface = this;
-    params->m_dur = this->GetActualDur();
-    params->m_isGraceNote = this->IsGraceNote();
-    params->m_isStemSameasSecondary = false;
-
-    const int staffSize = staff->m_drawingStaffSize;
-
-    params->m_verticalCenter
-        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
-
-    /************ Set the direction ************/
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    if (this->HasStemSameasNote()) {
-        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
-    }
-    else if (stem->HasDir()) {
-        stemDir = stem->GetDir();
-    }
-    else if (this->IsGraceNote()) {
-        stemDir = STEMDIRECTION_up;
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    }
-
-    this->SetDrawingStemDir(stemDir);
-
-    // Make sure the relative position of the stem is the same
-    stem->SetDrawingYRel(0);
-
-    // Use the params->m_chordStemLength for the length of the stem beetween the notes
-    // The value of m_stemSameasRole is set by Note::CalcStemDirForSameasNote
-    if (this->HasStemSameasNote() && m_stemSameasRole == SAMEAS_SECONDARY) {
-        params->m_chordStemLength = -std::abs(this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY());
-        params->m_isStemSameasSecondary = true;
-    }
 
     return FUNCTOR_CONTINUE;
 }

@@ -776,11 +776,6 @@ public:
     ///@{
 
     /**
-     * Set the drawing stem positions, including for beams.
-     */
-    virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the note head flipped positions
      */
     virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }

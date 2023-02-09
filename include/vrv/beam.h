@@ -370,11 +370,6 @@ public:
      */
     int AdjustBeamsEnd(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note and Chords elements.
