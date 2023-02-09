@@ -175,6 +175,7 @@ public:
     ///@{
     void SetCluster(ChordCluster *cluster, int position);
     ChordCluster *GetCluster() { return m_cluster; }
+    int GetClusterPosition() const { return m_clusterPosition; }
     ///@}
 
     /**
