@@ -35,9 +35,6 @@ class BeamSpan : public ControlElement,
                  public AttBeamedWith,
                  public AttBeamRend,
                  public AttColor {
-private:
-    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::iterator, Object *>>;
-
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -95,6 +92,14 @@ public:
     void SetBeamedElements(const ArrayOfObjects &beamedElements) { m_beamedElements = beamedElements; }
     ///@}
 
+    /**
+     * Break one big spanning beamSpan into smaller beamSpans
+     */
+    ///@{
+    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::const_iterator, Object *>>;
+    bool AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -115,9 +120,7 @@ public:
     int CalcSpanningBeamSpans(FunctorParams *) override;
 
 private:
-    // Helper for breaking one big spanning beamSpan into smaller beamSpans
-    bool AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
-
+    //
 public:
     //
 private:
