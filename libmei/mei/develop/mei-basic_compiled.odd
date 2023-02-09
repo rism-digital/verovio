@@ -1027,11 +1027,6 @@
     <content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <choice xmlns="http://relaxng.org/ns/structure/1.0"><ref name="data.DURATION.cmn"/><ref name="data.DURATIONRESTS.mensural"/></choice>
     </content>
-  </macroSpec><macroSpec rend="add" ident="data.DURATION.gestural" module="MEI" type="dt">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Performed duration attribute values.</desc>
-    <content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <choice xmlns="http://relaxng.org/ns/structure/1.0"><ref name="data.DURATION.cmn"/><ref name="data.DURATION.mensural"/></choice>
-    </content>
   </macroSpec><macroSpec rend="add" ident="data.EVENTREL" module="MEI" type="dt">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Location of musical material relative to a symbol on a staff instead of the staff.</desc>
     <content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -1367,12 +1362,6 @@
       <choice xmlns="http://relaxng.org/ns/structure/1.0"><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="date"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="gYear"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="gMonth"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="gDay"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="gYearMonth"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="gMonthDay"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="time"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="dateTime"/><rng:data xmlns="http://www.tei-c.org/ns/1.0" type="token">
           <rng:param name="pattern">[0-9.,DHMPRSTWYZ/:+\-]+</rng:param>
         </rng:data></choice>
-    </content>
-  </macroSpec><macroSpec rend="add" ident="data.ISOTIME" module="MEI" type="dt">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">ISO 24-hour time format: HH:MM:SS.ss, <abbr>i.e.</abbr>,
-      [0-9][0-9]:[0-9][0-9]:[0-9][0-9](\.?[0-9]*)?.</desc>
-    <content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <rng:data type="time"/>
     </content>
   </macroSpec><macroSpec rend="add" ident="data.KEYFIFTHS" module="MEI" type="dt">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Indicates the location of the tonic in the circle of fifths.</desc>
@@ -3197,7 +3186,7 @@
       <memberOf key="att.staffIdent"/>
       <memberOf key="att.startId"/>
       <memberOf key="att.timestamp.log"/>
-      <memberOf key="att.timestamp.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.rest.log.cmn" module="MEI.cmn" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes in the CMN repertoire.</desc>
@@ -4510,18 +4499,8 @@
   </classSpec><classSpec rend="add" ident="att.artic.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.articulation.ges"/>
+      
     </classes>
-  </classSpec><classSpec rend="add" ident="att.articulation.ges" module="MEI.gestural" type="atts">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes describing the method of performance.</desc>
-    <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <attDef ident="artic.ges" usage="opt">
-        <desc xml:lang="en">Records performed articulation that differs from the written value.</desc>
-        <datatype maxOccurs="unbounded">
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.ARTICULATION"/>
-        </datatype>
-      </attDef>
-    </attList>
   </classSpec><classSpec rend="add" ident="att.beam.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.beatRpt.ges" module="MEI.gestural" type="atts">
@@ -4529,7 +4508,7 @@
   </classSpec><classSpec rend="add" ident="att.breath.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.timestamp.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.bTrem.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4539,14 +4518,14 @@
   </classSpec><classSpec rend="add" ident="att.caesura.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.chord.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.articulation.ges"/>
-      <memberOf key="att.duration.ges"/>
+      
+      
       
       <memberOf key="att.chord.ges.cmn"/>
     </classes>
@@ -4572,77 +4551,28 @@
         </datatype>
       </attDef>
     </attList>
-  </classSpec><classSpec rend="add" ident="att.duration.ges" module="MEI.gestural" type="atts">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record performed duration that differs from a feature’s written
-      duration.</desc>
-    <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <attDef ident="dur.ges" usage="opt">
-        <desc xml:lang="en">Records performed duration information that differs from the written duration.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.DURATION.gestural"/>
-        </datatype>
-      </attDef>
-      <attDef ident="dots.ges" usage="opt">
-        <desc xml:lang="en">Number of dots required for a gestural duration when different from that of the
-          written duration.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.AUGMENTDOT"/>
-        </datatype>
-      </attDef>
-      <attDef ident="dur.metrical" usage="opt">
-        <desc xml:lang="en">Duration as a count of units provided in the time signature denominator.</desc>
-        <datatype>
-          <rng:data type="decimal">
-            <rng:param name="pattern">\d+(\.\d+)?</rng:param>
-          </rng:data>
-        </datatype>
-      </attDef>
-      <attDef ident="dur.ppq" usage="opt">
-        <desc xml:lang="en">Duration recorded as pulses-per-quarter note, <abbr>e.g.</abbr>, MIDI clicks or MusicXML
-          divisions.</desc>
-        <datatype>
-          <rng:data type="nonNegativeInteger"/>
-        </datatype>
-      </attDef>
-      <attDef ident="dur.real" usage="opt">
-        <desc xml:lang="en">Duration in seconds, <abbr>e.g.</abbr>, <val>1.732</val>.</desc>
-        <datatype>
-          <rng:data type="decimal">
-            <rng:param name="pattern">\d+(\.\d+)?</rng:param>
-          </rng:data>
-        </datatype>
-      </attDef>
-      <attDef ident="dur.recip" usage="opt">
-        <desc xml:lang="en">Duration as an optionally dotted <ref target="https://www.humdrum.org/rep/recip/">Humdrum **recip value</ref>.</desc>
-        <datatype>
-          <rng:data type="token">
-            <rng:param name="pattern">[0-9]+(%[0-9]+)?\.*q?</rng:param>
-          </rng:data>
-        </datatype>
-      </attDef>
-    </attList>
   </classSpec><classSpec rend="add" ident="att.f.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.fermata.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.fing.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.fingGrp.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.fTrem.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4652,8 +4582,8 @@
   </classSpec><classSpec rend="add" ident="att.gliss.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.graceGrp.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4662,15 +4592,15 @@
   </classSpec><classSpec rend="add" ident="att.hairpin.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
       
       
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.harpPedal.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.keyAccid.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4685,7 +4615,7 @@
   </classSpec><classSpec rend="add" ident="att.lv.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.timestamp2.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.lyrics.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4694,7 +4624,7 @@
       time of the measure. In reality, this is usually the same as the onset time of the first event
       in the measure.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.timestamp.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.mNum.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4703,14 +4633,14 @@
   </classSpec><classSpec rend="add" ident="att.mRest.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.mRpt.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
   </classSpec><classSpec rend="add" ident="att.multiRest.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.multiRpt.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4743,14 +4673,14 @@
                 </classSpec><classSpec rend="add" ident="att.octave.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.ornam.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.ornamentAccid.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural accidentals associated with ornaments.</desc>
@@ -4773,13 +4703,13 @@
   </classSpec><classSpec rend="add" ident="att.pedal.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.timestamp2.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.phrase.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.refrain.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4803,13 +4733,13 @@
   </classSpec><classSpec rend="add" ident="att.slur.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.space.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.staff.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -4838,53 +4768,18 @@
   </classSpec><classSpec rend="add" ident="att.tie.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.timestamp2.ges"/>
+      
     </classes>
-  </classSpec><classSpec rend="add" ident="att.timestamp.ges" module="MEI.gestural" type="atts">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record a performed (as opposed to notated) time stamp.</desc>
-    <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <attDef ident="tstamp.ges" usage="opt">
-        <desc xml:lang="en">Encodes the onset time in terms of musical time, <abbr>i.e.</abbr>, beats[.fractional beat part],
-          as expressed in the written time signature.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.BEAT"/>
-        </datatype>
-      </attDef>
-      <attDef ident="tstamp.real" usage="opt">
-        <desc xml:lang="en">Records the onset time in terms of ISO time.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.ISOTIME"/>
-        </datatype>
-      </attDef>
-    </attList>
-  </classSpec><classSpec rend="add" ident="att.timestamp2.ges" module="MEI.gestural" type="atts">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record a performed (as opposed to notated) time stamp for the end of an
-      event.</desc>
-    <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <attDef ident="tstamp2.ges" usage="opt">
-        <desc xml:lang="en">Encodes the ending point of an event, <abbr>i.e.</abbr>, a count of measures plus a beat location
-          in the ending measure.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.MEASUREBEAT"/>
-        </datatype>
-      </attDef>
-      <attDef ident="tstamp2.real" usage="opt">
-        <desc xml:lang="en">Records the ending point of an event in terms of ISO time.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.ISOTIME"/>
-        </datatype>
-      </attDef>
-    </attList>
   </classSpec><classSpec rend="add" ident="att.trill.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
-      <memberOf key="att.timestamp2.ges"/>
+      
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.tuplet.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.duration.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.turn.ges" module="MEI.gestural" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Gestural domain attributes.</desc>
@@ -6322,7 +6217,7 @@
       <memberOf key="att.staffIdent"/>
       
       <memberOf key="att.timestamp.log"/>
-      <memberOf key="att.timestamp.ges"/>
+      
     </classes>
   </classSpec><classSpec rend="add" ident="att.cue" module="MEI.shared" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that describe "cue-ness".</desc>
