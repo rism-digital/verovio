@@ -384,6 +384,8 @@
 		4D94721F20CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
 		4D94722020CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
 		4D94722120CA702C00C780C8 /* linkinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D94721E20CA702C00C780C8 /* linkinginterface.cpp */; };
+		4D94E0E22995411100F49F89 /* meibasic.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D94E0E12995411100F49F89 /* meibasic.h */; };
+		4D94E0E32995411100F49F89 /* meibasic.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D94E0E12995411100F49F89 /* meibasic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D95D4F21D6E042400B2B856 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
 		4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F51D71866200B2B856 /* controlelement.cpp */; };
 		4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F81D718D4A00B2B856 /* systemelement.cpp */; };
@@ -1564,6 +1566,7 @@
 		4D9234F11A586AE100763251 /* comparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = comparison.h; path = include/vrv/comparison.h; sourceTree = "<group>"; };
 		4D94721C20CA701000C780C8 /* linkinginterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linkinginterface.h; path = include/vrv/linkinginterface.h; sourceTree = "<group>"; };
 		4D94721E20CA702C00C780C8 /* linkinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linkinginterface.cpp; path = src/linkinginterface.cpp; sourceTree = "<group>"; };
+		4D94E0E12995411100F49F89 /* meibasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = meibasic.h; path = libmei/dist/meibasic.h; sourceTree = "<group>"; };
 		4D95D4F01D6E041E00B2B856 /* section.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = section.h; path = include/vrv/section.h; sourceTree = "<group>"; };
 		4D95D4F11D6E042400B2B856 /* section.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = section.cpp; path = src/section.cpp; sourceTree = "<group>"; };
 		4D95D4F41D7185DE00B2B856 /* floatingobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = floatingobject.h; path = include/vrv/floatingobject.h; sourceTree = "<group>"; };
@@ -2159,6 +2162,7 @@
 				4DACC9452990F29800B55913 /* atts_visual.cpp */,
 				4DACC96F2990F29A00B55913 /* atts_visual.h */,
 				4DACC9692990F29A00B55913 /* atttypes.h */,
+				4D94E0E12995411100F49F89 /* meibasic.h */,
 			);
 			name = dist;
 			sourceTree = "<group>";
@@ -2825,6 +2829,7 @@
 				40DA9C3720905CEB006BED92 /* ioabc.h in Headers */,
 				4DB3D8CD1F83D11100B5FC2B /* harm.h in Headers */,
 				40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */,
+				4D94E0E22995411100F49F89 /* meibasic.h in Headers */,
 				BD2E4D9B2875882200B04350 /* stem.h in Headers */,
 				4DACC9EA2990F29A00B55913 /* attmodule.h in Headers */,
 				4DACC98E2990F29A00B55913 /* atts_externalsymbols.h in Headers */,
@@ -2966,6 +2971,7 @@
 				40ACDEA724079F6900F82B8C /* reh.h in Headers */,
 				BB4C4B6822A932D7001F6AF0 /* multirpt.h in Headers */,
 				BB4C4B0822A932C3001F6AF0 /* pgfoot2.h in Headers */,
+				4D94E0E32995411100F49F89 /* meibasic.h in Headers */,
 				4DA0EAD822BB77AF00A7EBEB /* editortoolkit_cmn.h in Headers */,
 				4DACCA102990F2E600B55913 /* att.h in Headers */,
 				BB4C4AD822A932B6001F6AF0 /* staff.h in Headers */,

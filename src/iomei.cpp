@@ -78,6 +78,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
+#include "meibasic.h"
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
