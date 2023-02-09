@@ -71,7 +71,6 @@ class MeiSchema(object):
         self.get_data_types_and_lists()
         self.invert_attribute_group_structure()
         self.set_active_modules()
-        breakpoint()
         # lg.debug(self.data_lists)
 
     def get_elements(self):
