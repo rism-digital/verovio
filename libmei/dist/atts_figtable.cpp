@@ -39,17 +39,17 @@ void AttTabular::ResetTabular()
     m_rowspan = MEI_UNSET;
 }
 
-bool AttTabular::ReadTabular(pugi::xml_node element)
+bool AttTabular::ReadTabular(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("colspan")) {
         this->SetColspan(StrToInt(element.attribute("colspan").value()));
-        element.remove_attribute("colspan");
+        if (removeAttr) element.remove_attribute("colspan");
         hasAttribute = true;
     }
     if (element.attribute("rowspan")) {
         this->SetRowspan(StrToInt(element.attribute("rowspan").value()));
-        element.remove_attribute("rowspan");
+        if (removeAttr) element.remove_attribute("rowspan");
         hasAttribute = true;
     }
     return hasAttribute;

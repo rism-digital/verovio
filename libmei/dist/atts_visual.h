@@ -38,7 +38,7 @@ public:
     void ResetAnnotVis();
 
     /** Read the values for the attribute class **/
-    bool ReadAnnotVis(pugi::xml_node element);
+    bool ReadAnnotVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteAnnotVis(pugi::xml_node element);
@@ -75,7 +75,7 @@ public:
     void ResetArpegVis();
 
     /** Read the values for the attribute class **/
-    bool ReadArpegVis(pugi::xml_node element);
+    bool ReadArpegVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteArpegVis(pugi::xml_node element);
@@ -148,7 +148,7 @@ public:
     void ResetBarLineVis();
 
     /** Read the values for the attribute class **/
-    bool ReadBarLineVis(pugi::xml_node element);
+    bool ReadBarLineVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBarLineVis(pugi::xml_node element);
@@ -199,7 +199,7 @@ public:
     void ResetBeamingVis();
 
     /** Read the values for the attribute class **/
-    bool ReadBeamingVis(pugi::xml_node element);
+    bool ReadBeamingVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeamingVis(pugi::xml_node element);
@@ -246,7 +246,7 @@ public:
     void ResetBeatRptVis();
 
     /** Read the values for the attribute class **/
-    bool ReadBeatRptVis(pugi::xml_node element);
+    bool ReadBeatRptVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeatRptVis(pugi::xml_node element);
@@ -281,7 +281,7 @@ public:
     void ResetChordVis();
 
     /** Read the values for the attribute class **/
-    bool ReadChordVis(pugi::xml_node element);
+    bool ReadChordVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteChordVis(pugi::xml_node element);
@@ -321,7 +321,7 @@ public:
     void ResetCleffingVis();
 
     /** Read the values for the attribute class **/
-    bool ReadCleffingVis(pugi::xml_node element);
+    bool ReadCleffingVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteCleffingVis(pugi::xml_node element);
@@ -362,7 +362,7 @@ public:
     void ResetEpisemaVis();
 
     /** Read the values for the attribute class **/
-    bool ReadEpisemaVis(pugi::xml_node element);
+    bool ReadEpisemaVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteEpisemaVis(pugi::xml_node element);
@@ -403,7 +403,7 @@ public:
     void ResetFTremVis();
 
     /** Read the values for the attribute class **/
-    bool ReadFTremVis(pugi::xml_node element);
+    bool ReadFTremVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFTremVis(pugi::xml_node element);
@@ -450,7 +450,7 @@ public:
     void ResetFermataVis();
 
     /** Read the values for the attribute class **/
-    bool ReadFermataVis(pugi::xml_node element);
+    bool ReadFermataVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFermataVis(pugi::xml_node element);
@@ -491,7 +491,7 @@ public:
     void ResetFingGrpVis();
 
     /** Read the values for the attribute class **/
-    bool ReadFingGrpVis(pugi::xml_node element);
+    bool ReadFingGrpVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFingGrpVis(pugi::xml_node element);
@@ -526,7 +526,7 @@ public:
     void ResetHairpinVis();
 
     /** Read the values for the attribute class **/
-    bool ReadHairpinVis(pugi::xml_node element);
+    bool ReadHairpinVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHairpinVis(pugi::xml_node element);
@@ -593,7 +593,7 @@ public:
     void ResetHarmVis();
 
     /** Read the values for the attribute class **/
-    bool ReadHarmVis(pugi::xml_node element);
+    bool ReadHarmVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHarmVis(pugi::xml_node element);
@@ -628,7 +628,7 @@ public:
     void ResetHispanTickVis();
 
     /** Read the values for the attribute class **/
-    bool ReadHispanTickVis(pugi::xml_node element);
+    bool ReadHispanTickVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHispanTickVis(pugi::xml_node element);
@@ -669,7 +669,7 @@ public:
     void ResetKeySigVis();
 
     /** Read the values for the attribute class **/
-    bool ReadKeySigVis(pugi::xml_node element);
+    bool ReadKeySigVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteKeySigVis(pugi::xml_node element);
@@ -704,7 +704,7 @@ public:
     void ResetKeySigDefaultVis();
 
     /** Read the values for the attribute class **/
-    bool ReadKeySigDefaultVis(pugi::xml_node element);
+    bool ReadKeySigDefaultVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteKeySigDefaultVis(pugi::xml_node element);
@@ -745,7 +745,7 @@ public:
     void ResetLigatureVis();
 
     /** Read the values for the attribute class **/
-    bool ReadLigatureVis(pugi::xml_node element);
+    bool ReadLigatureVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteLigatureVis(pugi::xml_node element);
@@ -780,7 +780,7 @@ public:
     void ResetLineVis();
 
     /** Read the values for the attribute class **/
-    bool ReadLineVis(pugi::xml_node element);
+    bool ReadLineVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteLineVis(pugi::xml_node element);
@@ -847,7 +847,7 @@ public:
     void ResetLiquescentVis();
 
     /** Read the values for the attribute class **/
-    bool ReadLiquescentVis(pugi::xml_node element);
+    bool ReadLiquescentVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteLiquescentVis(pugi::xml_node element);
@@ -888,7 +888,7 @@ public:
     void ResetMensurVis();
 
     /** Read the values for the attribute class **/
-    bool ReadMensurVis(pugi::xml_node element);
+    bool ReadMensurVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMensurVis(pugi::xml_node element);
@@ -941,7 +941,7 @@ public:
     void ResetMensuralVis();
 
     /** Read the values for the attribute class **/
-    bool ReadMensuralVis(pugi::xml_node element);
+    bool ReadMensuralVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMensuralVis(pugi::xml_node element);
@@ -1026,7 +1026,7 @@ public:
     void ResetMeterSigVis();
 
     /** Read the values for the attribute class **/
-    bool ReadMeterSigVis(pugi::xml_node element);
+    bool ReadMeterSigVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMeterSigVis(pugi::xml_node element);
@@ -1061,7 +1061,7 @@ public:
     void ResetMeterSigDefaultVis();
 
     /** Read the values for the attribute class **/
-    bool ReadMeterSigDefaultVis(pugi::xml_node element);
+    bool ReadMeterSigDefaultVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMeterSigDefaultVis(pugi::xml_node element);
@@ -1105,7 +1105,7 @@ public:
     void ResetMultiRestVis();
 
     /** Read the values for the attribute class **/
-    bool ReadMultiRestVis(pugi::xml_node element);
+    bool ReadMultiRestVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMultiRestVis(pugi::xml_node element);
@@ -1144,7 +1144,7 @@ public:
     void ResetPbVis();
 
     /** Read the values for the attribute class **/
-    bool ReadPbVis(pugi::xml_node element);
+    bool ReadPbVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WritePbVis(pugi::xml_node element);
@@ -1182,7 +1182,7 @@ public:
     void ResetPedalVis();
 
     /** Read the values for the attribute class **/
-    bool ReadPedalVis(pugi::xml_node element);
+    bool ReadPedalVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WritePedalVis(pugi::xml_node element);
@@ -1217,7 +1217,7 @@ public:
     void ResetPlicaVis();
 
     /** Read the values for the attribute class **/
-    bool ReadPlicaVis(pugi::xml_node element);
+    bool ReadPlicaVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WritePlicaVis(pugi::xml_node element);
@@ -1262,7 +1262,7 @@ public:
     void ResetQuilismaVis();
 
     /** Read the values for the attribute class **/
-    bool ReadQuilismaVis(pugi::xml_node element);
+    bool ReadQuilismaVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteQuilismaVis(pugi::xml_node element);
@@ -1297,7 +1297,7 @@ public:
     void ResetSbVis();
 
     /** Read the values for the attribute class **/
-    bool ReadSbVis(pugi::xml_node element);
+    bool ReadSbVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSbVis(pugi::xml_node element);
@@ -1332,7 +1332,7 @@ public:
     void ResetScoreDefVis();
 
     /** Read the values for the attribute class **/
-    bool ReadScoreDefVis(pugi::xml_node element);
+    bool ReadScoreDefVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteScoreDefVis(pugi::xml_node element);
@@ -1371,7 +1371,7 @@ public:
     void ResetSectionVis();
 
     /** Read the values for the attribute class **/
-    bool ReadSectionVis(pugi::xml_node element);
+    bool ReadSectionVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSectionVis(pugi::xml_node element);
@@ -1406,7 +1406,7 @@ public:
     void ResetSignifLetVis();
 
     /** Read the values for the attribute class **/
-    bool ReadSignifLetVis(pugi::xml_node element);
+    bool ReadSignifLetVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSignifLetVis(pugi::xml_node element);
@@ -1441,7 +1441,7 @@ public:
     void ResetSpaceVis();
 
     /** Read the values for the attribute class **/
-    bool ReadSpaceVis(pugi::xml_node element);
+    bool ReadSpaceVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSpaceVis(pugi::xml_node element);
@@ -1479,7 +1479,7 @@ public:
     void ResetStaffDefVis();
 
     /** Read the values for the attribute class **/
-    bool ReadStaffDefVis(pugi::xml_node element);
+    bool ReadStaffDefVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteStaffDefVis(pugi::xml_node element);
@@ -1543,7 +1543,7 @@ public:
     void ResetStaffGrpVis();
 
     /** Read the values for the attribute class **/
-    bool ReadStaffGrpVis(pugi::xml_node element);
+    bool ReadStaffGrpVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteStaffGrpVis(pugi::xml_node element);
@@ -1581,7 +1581,7 @@ public:
     void ResetStemVis();
 
     /** Read the values for the attribute class **/
-    bool ReadStemVis(pugi::xml_node element);
+    bool ReadStemVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteStemVis(pugi::xml_node element);
@@ -1656,7 +1656,7 @@ public:
     void ResetTupletVis();
 
     /** Read the values for the attribute class **/
-    bool ReadTupletVis(pugi::xml_node element);
+    bool ReadTupletVis(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTupletVis(pugi::xml_node element);

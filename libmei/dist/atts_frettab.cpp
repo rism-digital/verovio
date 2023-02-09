@@ -38,12 +38,12 @@ void AttCourseLog::ResetCourseLog()
     m_tuningStandard = COURSETUNING_NONE;
 }
 
-bool AttCourseLog::ReadCourseLog(pugi::xml_node element)
+bool AttCourseLog::ReadCourseLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("tuning.standard")) {
         this->SetTuningStandard(StrToCoursetuning(element.attribute("tuning.standard").value()));
-        element.remove_attribute("tuning.standard");
+        if (removeAttr) element.remove_attribute("tuning.standard");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -83,17 +83,17 @@ void AttNoteGesTab::ResetNoteGesTab()
     m_tabFret = -1;
 }
 
-bool AttNoteGesTab::ReadNoteGesTab(pugi::xml_node element)
+bool AttNoteGesTab::ReadNoteGesTab(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("tab.course")) {
         this->SetTabCourse(StrToInt(element.attribute("tab.course").value()));
-        element.remove_attribute("tab.course");
+        if (removeAttr) element.remove_attribute("tab.course");
         hasAttribute = true;
     }
     if (element.attribute("tab.fret")) {
         this->SetTabFret(StrToInt(element.attribute("tab.fret").value()));
-        element.remove_attribute("tab.fret");
+        if (removeAttr) element.remove_attribute("tab.fret");
         hasAttribute = true;
     }
     return hasAttribute;

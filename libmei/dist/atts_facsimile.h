@@ -38,7 +38,7 @@ public:
     void ResetFacsimile();
 
     /** Read the values for the attribute class **/
-    bool ReadFacsimile(pugi::xml_node element);
+    bool ReadFacsimile(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFacsimile(pugi::xml_node element);

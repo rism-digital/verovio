@@ -38,7 +38,7 @@ public:
     void ResetAccidentalGes();
 
     /** Read the values for the attribute class **/
-    bool ReadAccidentalGes(pugi::xml_node element);
+    bool ReadAccidentalGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteAccidentalGes(pugi::xml_node element);
@@ -73,7 +73,7 @@ public:
     void ResetArticulationGes();
 
     /** Read the values for the attribute class **/
-    bool ReadArticulationGes(pugi::xml_node element);
+    bool ReadArticulationGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteArticulationGes(pugi::xml_node element);
@@ -108,7 +108,7 @@ public:
     void ResetBendGes();
 
     /** Read the values for the attribute class **/
-    bool ReadBendGes(pugi::xml_node element);
+    bool ReadBendGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBendGes(pugi::xml_node element);
@@ -147,7 +147,7 @@ public:
     void ResetDurationGes();
 
     /** Read the values for the attribute class **/
-    bool ReadDurationGes(pugi::xml_node element);
+    bool ReadDurationGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteDurationGes(pugi::xml_node element);
@@ -218,7 +218,7 @@ public:
     void ResetMdivGes();
 
     /** Read the values for the attribute class **/
-    bool ReadMdivGes(pugi::xml_node element);
+    bool ReadMdivGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMdivGes(pugi::xml_node element);
@@ -256,7 +256,7 @@ public:
     void ResetNcGes();
 
     /** Read the values for the attribute class **/
-    bool ReadNcGes(pugi::xml_node element);
+    bool ReadNcGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNcGes(pugi::xml_node element);
@@ -303,7 +303,7 @@ public:
     void ResetNoteGes();
 
     /** Read the values for the attribute class **/
-    bool ReadNoteGes(pugi::xml_node element);
+    bool ReadNoteGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNoteGes(pugi::xml_node element);
@@ -356,7 +356,7 @@ public:
     void ResetOrnamentAccidGes();
 
     /** Read the values for the attribute class **/
-    bool ReadOrnamentAccidGes(pugi::xml_node element);
+    bool ReadOrnamentAccidGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteOrnamentAccidGes(pugi::xml_node element);
@@ -397,7 +397,7 @@ public:
     void ResetSectionGes();
 
     /** Read the values for the attribute class **/
-    bool ReadSectionGes(pugi::xml_node element);
+    bool ReadSectionGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSectionGes(pugi::xml_node element);
@@ -435,7 +435,7 @@ public:
     void ResetSoundLocation();
 
     /** Read the values for the attribute class **/
-    bool ReadSoundLocation(pugi::xml_node element);
+    bool ReadSoundLocation(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSoundLocation(pugi::xml_node element);
@@ -476,7 +476,7 @@ public:
     void ResetTimestampGes();
 
     /** Read the values for the attribute class **/
-    bool ReadTimestampGes(pugi::xml_node element);
+    bool ReadTimestampGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTimestampGes(pugi::xml_node element);
@@ -520,7 +520,7 @@ public:
     void ResetTimestamp2Ges();
 
     /** Read the values for the attribute class **/
-    bool ReadTimestamp2Ges(pugi::xml_node element);
+    bool ReadTimestamp2Ges(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTimestamp2Ges(pugi::xml_node element);

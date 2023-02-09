@@ -38,7 +38,7 @@ public:
     void ResetMargins();
 
     /** Read the values for the attribute class **/
-    bool ReadMargins(pugi::xml_node element);
+    bool ReadMargins(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMargins(pugi::xml_node element);

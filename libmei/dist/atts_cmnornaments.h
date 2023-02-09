@@ -38,7 +38,7 @@ public:
     void ResetMordentLog();
 
     /** Read the values for the attribute class **/
-    bool ReadMordentLog(pugi::xml_node element);
+    bool ReadMordentLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMordentLog(pugi::xml_node element);
@@ -82,7 +82,7 @@ public:
     void ResetOrnamPresent();
 
     /** Read the values for the attribute class **/
-    bool ReadOrnamPresent(pugi::xml_node element);
+    bool ReadOrnamPresent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteOrnamPresent(pugi::xml_node element);
@@ -121,7 +121,7 @@ public:
     void ResetOrnamentAccid();
 
     /** Read the values for the attribute class **/
-    bool ReadOrnamentAccid(pugi::xml_node element);
+    bool ReadOrnamentAccid(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteOrnamentAccid(pugi::xml_node element);
@@ -162,7 +162,7 @@ public:
     void ResetTurnLog();
 
     /** Read the values for the attribute class **/
-    bool ReadTurnLog(pugi::xml_node element);
+    bool ReadTurnLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTurnLog(pugi::xml_node element);

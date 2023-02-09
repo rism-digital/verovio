@@ -38,7 +38,7 @@ public:
     void ResetAgentIdent();
 
     /** Read the values for the attribute class **/
-    bool ReadAgentIdent(pugi::xml_node element);
+    bool ReadAgentIdent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteAgentIdent(pugi::xml_node element);
@@ -76,7 +76,7 @@ public:
     void ResetReasonIdent();
 
     /** Read the values for the attribute class **/
-    bool ReadReasonIdent(pugi::xml_node element);
+    bool ReadReasonIdent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteReasonIdent(pugi::xml_node element);

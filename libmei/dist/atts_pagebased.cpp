@@ -41,27 +41,27 @@ void AttMargins::ResetMargins()
     m_rightmar = data_MEASUREMENTUNSIGNED();
 }
 
-bool AttMargins::ReadMargins(pugi::xml_node element)
+bool AttMargins::ReadMargins(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("topmar")) {
         this->SetTopmar(StrToMeasurementunsigned(element.attribute("topmar").value()));
-        element.remove_attribute("topmar");
+        if (removeAttr) element.remove_attribute("topmar");
         hasAttribute = true;
     }
     if (element.attribute("botmar")) {
         this->SetBotmar(StrToMeasurementunsigned(element.attribute("botmar").value()));
-        element.remove_attribute("botmar");
+        if (removeAttr) element.remove_attribute("botmar");
         hasAttribute = true;
     }
     if (element.attribute("leftmar")) {
         this->SetLeftmar(StrToMeasurementunsigned(element.attribute("leftmar").value()));
-        element.remove_attribute("leftmar");
+        if (removeAttr) element.remove_attribute("leftmar");
         hasAttribute = true;
     }
     if (element.attribute("rightmar")) {
         this->SetRightmar(StrToMeasurementunsigned(element.attribute("rightmar").value()));
-        element.remove_attribute("rightmar");
+        if (removeAttr) element.remove_attribute("rightmar");
         hasAttribute = true;
     }
     return hasAttribute;

@@ -38,12 +38,12 @@ void AttAccidentalGes::ResetAccidentalGes()
     m_accidGes = ACCIDENTAL_GESTURAL_NONE;
 }
 
-bool AttAccidentalGes::ReadAccidentalGes(pugi::xml_node element)
+bool AttAccidentalGes::ReadAccidentalGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("accid.ges")) {
         this->SetAccidGes(StrToAccidentalGestural(element.attribute("accid.ges").value()));
-        element.remove_attribute("accid.ges");
+        if (removeAttr) element.remove_attribute("accid.ges");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -82,12 +82,12 @@ void AttArticulationGes::ResetArticulationGes()
     m_articGes = std::vector<data_ARTICULATION>();
 }
 
-bool AttArticulationGes::ReadArticulationGes(pugi::xml_node element)
+bool AttArticulationGes::ReadArticulationGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("artic.ges")) {
         this->SetArticGes(StrToArticulationList(element.attribute("artic.ges").value()));
-        element.remove_attribute("artic.ges");
+        if (removeAttr) element.remove_attribute("artic.ges");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -126,12 +126,12 @@ void AttBendGes::ResetBendGes()
     m_amount = 0.0;
 }
 
-bool AttBendGes::ReadBendGes(pugi::xml_node element)
+bool AttBendGes::ReadBendGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("amount")) {
         this->SetAmount(StrToDbl(element.attribute("amount").value()));
-        element.remove_attribute("amount");
+        if (removeAttr) element.remove_attribute("amount");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -175,37 +175,37 @@ void AttDurationGes::ResetDurationGes()
     m_durRecip = "";
 }
 
-bool AttDurationGes::ReadDurationGes(pugi::xml_node element)
+bool AttDurationGes::ReadDurationGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("dur.ges")) {
         this->SetDurGes(StrToDuration(element.attribute("dur.ges").value()));
-        element.remove_attribute("dur.ges");
+        if (removeAttr) element.remove_attribute("dur.ges");
         hasAttribute = true;
     }
     if (element.attribute("dots.ges")) {
         this->SetDotsGes(StrToInt(element.attribute("dots.ges").value()));
-        element.remove_attribute("dots.ges");
+        if (removeAttr) element.remove_attribute("dots.ges");
         hasAttribute = true;
     }
     if (element.attribute("dur.metrical")) {
         this->SetDurMetrical(StrToDbl(element.attribute("dur.metrical").value()));
-        element.remove_attribute("dur.metrical");
+        if (removeAttr) element.remove_attribute("dur.metrical");
         hasAttribute = true;
     }
     if (element.attribute("dur.ppq")) {
         this->SetDurPpq(StrToInt(element.attribute("dur.ppq").value()));
-        element.remove_attribute("dur.ppq");
+        if (removeAttr) element.remove_attribute("dur.ppq");
         hasAttribute = true;
     }
     if (element.attribute("dur.real")) {
         this->SetDurReal(StrToDbl(element.attribute("dur.real").value()));
-        element.remove_attribute("dur.real");
+        if (removeAttr) element.remove_attribute("dur.real");
         hasAttribute = true;
     }
     if (element.attribute("dur.recip")) {
         this->SetDurRecip(StrToStr(element.attribute("dur.recip").value()));
-        element.remove_attribute("dur.recip");
+        if (removeAttr) element.remove_attribute("dur.recip");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -289,12 +289,12 @@ void AttMdivGes::ResetMdivGes()
     m_attacca = BOOLEAN_NONE;
 }
 
-bool AttMdivGes::ReadMdivGes(pugi::xml_node element)
+bool AttMdivGes::ReadMdivGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("attacca")) {
         this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
-        element.remove_attribute("attacca");
+        if (removeAttr) element.remove_attribute("attacca");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -335,22 +335,22 @@ void AttNcGes::ResetNcGes()
     m_pnum = MEI_UNSET;
 }
 
-bool AttNcGes::ReadNcGes(pugi::xml_node element)
+bool AttNcGes::ReadNcGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("oct.ges")) {
         this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
-        element.remove_attribute("oct.ges");
+        if (removeAttr) element.remove_attribute("oct.ges");
         hasAttribute = true;
     }
     if (element.attribute("pname.ges")) {
         this->SetPnameGes(StrToPitchname(element.attribute("pname.ges").value()));
-        element.remove_attribute("pname.ges");
+        if (removeAttr) element.remove_attribute("pname.ges");
         hasAttribute = true;
     }
     if (element.attribute("pnum")) {
         this->SetPnum(StrToInt(element.attribute("pnum").value()));
-        element.remove_attribute("pnum");
+        if (removeAttr) element.remove_attribute("pnum");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -410,27 +410,27 @@ void AttNoteGes::ResetNoteGes()
     m_pnum = MEI_UNSET;
 }
 
-bool AttNoteGes::ReadNoteGes(pugi::xml_node element)
+bool AttNoteGes::ReadNoteGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("extremis")) {
         this->SetExtremis(StrToNoteGesExtremis(element.attribute("extremis").value()));
-        element.remove_attribute("extremis");
+        if (removeAttr) element.remove_attribute("extremis");
         hasAttribute = true;
     }
     if (element.attribute("oct.ges")) {
         this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
-        element.remove_attribute("oct.ges");
+        if (removeAttr) element.remove_attribute("oct.ges");
         hasAttribute = true;
     }
     if (element.attribute("pname.ges")) {
         this->SetPnameGes(StrToPitchname(element.attribute("pname.ges").value()));
-        element.remove_attribute("pname.ges");
+        if (removeAttr) element.remove_attribute("pname.ges");
         hasAttribute = true;
     }
     if (element.attribute("pnum")) {
         this->SetPnum(StrToInt(element.attribute("pnum").value()));
-        element.remove_attribute("pnum");
+        if (removeAttr) element.remove_attribute("pnum");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -497,17 +497,17 @@ void AttOrnamentAccidGes::ResetOrnamentAccidGes()
     m_accidlowerGes = ACCIDENTAL_GESTURAL_NONE;
 }
 
-bool AttOrnamentAccidGes::ReadOrnamentAccidGes(pugi::xml_node element)
+bool AttOrnamentAccidGes::ReadOrnamentAccidGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("accidupper.ges")) {
         this->SetAccidupperGes(StrToAccidentalGestural(element.attribute("accidupper.ges").value()));
-        element.remove_attribute("accidupper.ges");
+        if (removeAttr) element.remove_attribute("accidupper.ges");
         hasAttribute = true;
     }
     if (element.attribute("accidlower.ges")) {
         this->SetAccidlowerGes(StrToAccidentalGestural(element.attribute("accidlower.ges").value()));
-        element.remove_attribute("accidlower.ges");
+        if (removeAttr) element.remove_attribute("accidlower.ges");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -555,12 +555,12 @@ void AttSectionGes::ResetSectionGes()
     m_attacca = BOOLEAN_NONE;
 }
 
-bool AttSectionGes::ReadSectionGes(pugi::xml_node element)
+bool AttSectionGes::ReadSectionGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("attacca")) {
         this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
-        element.remove_attribute("attacca");
+        if (removeAttr) element.remove_attribute("attacca");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -600,17 +600,17 @@ void AttSoundLocation::ResetSoundLocation()
     m_elevation = 0.0;
 }
 
-bool AttSoundLocation::ReadSoundLocation(pugi::xml_node element)
+bool AttSoundLocation::ReadSoundLocation(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("azimuth")) {
         this->SetAzimuth(StrToDbl(element.attribute("azimuth").value()));
-        element.remove_attribute("azimuth");
+        if (removeAttr) element.remove_attribute("azimuth");
         hasAttribute = true;
     }
     if (element.attribute("elevation")) {
         this->SetElevation(StrToDbl(element.attribute("elevation").value()));
-        element.remove_attribute("elevation");
+        if (removeAttr) element.remove_attribute("elevation");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -659,17 +659,17 @@ void AttTimestampGes::ResetTimestampGes()
     m_tstampReal = "";
 }
 
-bool AttTimestampGes::ReadTimestampGes(pugi::xml_node element)
+bool AttTimestampGes::ReadTimestampGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp.ges")) {
         this->SetTstampGes(StrToDbl(element.attribute("tstamp.ges").value()));
-        element.remove_attribute("tstamp.ges");
+        if (removeAttr) element.remove_attribute("tstamp.ges");
         hasAttribute = true;
     }
     if (element.attribute("tstamp.real")) {
         this->SetTstampReal(StrToStr(element.attribute("tstamp.real").value()));
-        element.remove_attribute("tstamp.real");
+        if (removeAttr) element.remove_attribute("tstamp.real");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -718,17 +718,17 @@ void AttTimestamp2Ges::ResetTimestamp2Ges()
     m_tstamp2Real = "";
 }
 
-bool AttTimestamp2Ges::ReadTimestamp2Ges(pugi::xml_node element)
+bool AttTimestamp2Ges::ReadTimestamp2Ges(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp2.ges")) {
         this->SetTstamp2Ges(StrToMeasurebeat(element.attribute("tstamp2.ges").value()));
-        element.remove_attribute("tstamp2.ges");
+        if (removeAttr) element.remove_attribute("tstamp2.ges");
         hasAttribute = true;
     }
     if (element.attribute("tstamp2.real")) {
         this->SetTstamp2Real(StrToStr(element.attribute("tstamp2.real").value()));
-        element.remove_attribute("tstamp2.real");
+        if (removeAttr) element.remove_attribute("tstamp2.real");
         hasAttribute = true;
     }
     return hasAttribute;

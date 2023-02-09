@@ -38,7 +38,7 @@ public:
     void ResetTabular();
 
     /** Read the values for the attribute class **/
-    bool ReadTabular(pugi::xml_node element);
+    bool ReadTabular(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTabular(pugi::xml_node element);

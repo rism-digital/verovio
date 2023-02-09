@@ -38,12 +38,12 @@ void AttCrit::ResetCrit()
     m_cause = "";
 }
 
-bool AttCrit::ReadCrit(pugi::xml_node element)
+bool AttCrit::ReadCrit(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("cause")) {
         this->SetCause(StrToStr(element.attribute("cause").value()));
-        element.remove_attribute("cause");
+        if (removeAttr) element.remove_attribute("cause");
         hasAttribute = true;
     }
     return hasAttribute;

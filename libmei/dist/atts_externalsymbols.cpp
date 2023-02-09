@@ -41,27 +41,27 @@ void AttExtSym::ResetExtSym()
     m_glyphUri = "";
 }
 
-bool AttExtSym::ReadExtSym(pugi::xml_node element)
+bool AttExtSym::ReadExtSym(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("glyph.auth")) {
         this->SetGlyphAuth(StrToStr(element.attribute("glyph.auth").value()));
-        element.remove_attribute("glyph.auth");
+        if (removeAttr) element.remove_attribute("glyph.auth");
         hasAttribute = true;
     }
     if (element.attribute("glyph.name")) {
         this->SetGlyphName(StrToStr(element.attribute("glyph.name").value()));
-        element.remove_attribute("glyph.name");
+        if (removeAttr) element.remove_attribute("glyph.name");
         hasAttribute = true;
     }
     if (element.attribute("glyph.num")) {
         this->SetGlyphNum(StrToHexnum(element.attribute("glyph.num").value()));
-        element.remove_attribute("glyph.num");
+        if (removeAttr) element.remove_attribute("glyph.num");
         hasAttribute = true;
     }
     if (element.attribute("glyph.uri")) {
         this->SetGlyphUri(StrToStr(element.attribute("glyph.uri").value()));
-        element.remove_attribute("glyph.uri");
+        if (removeAttr) element.remove_attribute("glyph.uri");
         hasAttribute = true;
     }
     return hasAttribute;

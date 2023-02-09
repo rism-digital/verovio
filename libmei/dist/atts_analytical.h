@@ -38,7 +38,7 @@ public:
     void ResetHarmAnl();
 
     /** Read the values for the attribute class **/
-    bool ReadHarmAnl(pugi::xml_node element);
+    bool ReadHarmAnl(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHarmAnl(pugi::xml_node element);
@@ -73,7 +73,7 @@ public:
     void ResetHarmonicFunction();
 
     /** Read the values for the attribute class **/
-    bool ReadHarmonicFunction(pugi::xml_node element);
+    bool ReadHarmonicFunction(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHarmonicFunction(pugi::xml_node element);
@@ -114,7 +114,7 @@ public:
     void ResetIntervalHarmonic();
 
     /** Read the values for the attribute class **/
-    bool ReadIntervalHarmonic(pugi::xml_node element);
+    bool ReadIntervalHarmonic(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteIntervalHarmonic(pugi::xml_node element);
@@ -149,7 +149,7 @@ public:
     void ResetIntervalMelodic();
 
     /** Read the values for the attribute class **/
-    bool ReadIntervalMelodic(pugi::xml_node element);
+    bool ReadIntervalMelodic(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteIntervalMelodic(pugi::xml_node element);
@@ -189,7 +189,7 @@ public:
     void ResetKeySigAnl();
 
     /** Read the values for the attribute class **/
-    bool ReadKeySigAnl(pugi::xml_node element);
+    bool ReadKeySigAnl(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteKeySigAnl(pugi::xml_node element);
@@ -224,7 +224,7 @@ public:
     void ResetKeySigDefaultAnl();
 
     /** Read the values for the attribute class **/
-    bool ReadKeySigDefaultAnl(pugi::xml_node element);
+    bool ReadKeySigDefaultAnl(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteKeySigDefaultAnl(pugi::xml_node element);
@@ -274,7 +274,7 @@ public:
     void ResetMelodicFunction();
 
     /** Read the values for the attribute class **/
-    bool ReadMelodicFunction(pugi::xml_node element);
+    bool ReadMelodicFunction(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMelodicFunction(pugi::xml_node element);
@@ -309,7 +309,7 @@ public:
     void ResetPitchClass();
 
     /** Read the values for the attribute class **/
-    bool ReadPitchClass(pugi::xml_node element);
+    bool ReadPitchClass(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WritePitchClass(pugi::xml_node element);
@@ -344,7 +344,7 @@ public:
     void ResetSolfa();
 
     /** Read the values for the attribute class **/
-    bool ReadSolfa(pugi::xml_node element);
+    bool ReadSolfa(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSolfa(pugi::xml_node element);

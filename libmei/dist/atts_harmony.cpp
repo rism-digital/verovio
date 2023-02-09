@@ -38,12 +38,12 @@ void AttHarmLog::ResetHarmLog()
     m_chordref = "";
 }
 
-bool AttHarmLog::ReadHarmLog(pugi::xml_node element)
+bool AttHarmLog::ReadHarmLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("chordref")) {
         this->SetChordref(StrToStr(element.attribute("chordref").value()));
-        element.remove_attribute("chordref");
+        if (removeAttr) element.remove_attribute("chordref");
         hasAttribute = true;
     }
     return hasAttribute;

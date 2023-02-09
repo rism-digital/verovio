@@ -38,12 +38,12 @@ void AttAlignment::ResetAlignment()
     m_when = "";
 }
 
-bool AttAlignment::ReadAlignment(pugi::xml_node element)
+bool AttAlignment::ReadAlignment(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("when")) {
         this->SetWhen(StrToStr(element.attribute("when").value()));
-        element.remove_attribute("when");
+        if (removeAttr) element.remove_attribute("when");
         hasAttribute = true;
     }
     return hasAttribute;

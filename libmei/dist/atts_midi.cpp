@@ -41,27 +41,27 @@ void AttChannelized::ResetChannelized()
     m_midiTrack = MEI_UNSET;
 }
 
-bool AttChannelized::ReadChannelized(pugi::xml_node element)
+bool AttChannelized::ReadChannelized(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("midi.channel")) {
         this->SetMidiChannel(StrToMidichannel(element.attribute("midi.channel").value()));
-        element.remove_attribute("midi.channel");
+        if (removeAttr) element.remove_attribute("midi.channel");
         hasAttribute = true;
     }
     if (element.attribute("midi.duty")) {
         this->SetMidiDuty(StrToPercentLimited(element.attribute("midi.duty").value()));
-        element.remove_attribute("midi.duty");
+        if (removeAttr) element.remove_attribute("midi.duty");
         hasAttribute = true;
     }
     if (element.attribute("midi.port")) {
         this->SetMidiPort(StrToMidivalueName(element.attribute("midi.port").value()));
-        element.remove_attribute("midi.port");
+        if (removeAttr) element.remove_attribute("midi.port");
         hasAttribute = true;
     }
     if (element.attribute("midi.track")) {
         this->SetMidiTrack(StrToInt(element.attribute("midi.track").value()));
-        element.remove_attribute("midi.track");
+        if (removeAttr) element.remove_attribute("midi.track");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -127,12 +127,12 @@ void AttInstrumentIdent::ResetInstrumentIdent()
     m_instr = "";
 }
 
-bool AttInstrumentIdent::ReadInstrumentIdent(pugi::xml_node element)
+bool AttInstrumentIdent::ReadInstrumentIdent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("instr")) {
         this->SetInstr(StrToStr(element.attribute("instr").value()));
-        element.remove_attribute("instr");
+        if (removeAttr) element.remove_attribute("instr");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -176,37 +176,37 @@ void AttMidiInstrument::ResetMidiInstrument()
     m_midiVolume = -1.0;
 }
 
-bool AttMidiInstrument::ReadMidiInstrument(pugi::xml_node element)
+bool AttMidiInstrument::ReadMidiInstrument(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("midi.instrnum")) {
         this->SetMidiInstrnum(StrToMidivalue(element.attribute("midi.instrnum").value()));
-        element.remove_attribute("midi.instrnum");
+        if (removeAttr) element.remove_attribute("midi.instrnum");
         hasAttribute = true;
     }
     if (element.attribute("midi.instrname")) {
         this->SetMidiInstrname(StrToMidinames(element.attribute("midi.instrname").value()));
-        element.remove_attribute("midi.instrname");
+        if (removeAttr) element.remove_attribute("midi.instrname");
         hasAttribute = true;
     }
     if (element.attribute("midi.pan")) {
         this->SetMidiPan(StrToMidivaluePan(element.attribute("midi.pan").value()));
-        element.remove_attribute("midi.pan");
+        if (removeAttr) element.remove_attribute("midi.pan");
         hasAttribute = true;
     }
     if (element.attribute("midi.patchname")) {
         this->SetMidiPatchname(StrToStr(element.attribute("midi.patchname").value()));
-        element.remove_attribute("midi.patchname");
+        if (removeAttr) element.remove_attribute("midi.patchname");
         hasAttribute = true;
     }
     if (element.attribute("midi.patchnum")) {
         this->SetMidiPatchnum(StrToMidivalue(element.attribute("midi.patchnum").value()));
-        element.remove_attribute("midi.patchnum");
+        if (removeAttr) element.remove_attribute("midi.patchnum");
         hasAttribute = true;
     }
     if (element.attribute("midi.volume")) {
         this->SetMidiVolume(StrToPercent(element.attribute("midi.volume").value()));
-        element.remove_attribute("midi.volume");
+        if (removeAttr) element.remove_attribute("midi.volume");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -290,12 +290,12 @@ void AttMidiNumber::ResetMidiNumber()
     m_num = -1;
 }
 
-bool AttMidiNumber::ReadMidiNumber(pugi::xml_node element)
+bool AttMidiNumber::ReadMidiNumber(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToMidivalue(element.attribute("num").value()));
-        element.remove_attribute("num");
+        if (removeAttr) element.remove_attribute("num");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -335,17 +335,17 @@ void AttMidiTempo::ResetMidiTempo()
     m_midiMspb = -1;
 }
 
-bool AttMidiTempo::ReadMidiTempo(pugi::xml_node element)
+bool AttMidiTempo::ReadMidiTempo(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("midi.bpm")) {
         this->SetMidiBpm(StrToDbl(element.attribute("midi.bpm").value()));
-        element.remove_attribute("midi.bpm");
+        if (removeAttr) element.remove_attribute("midi.bpm");
         hasAttribute = true;
     }
     if (element.attribute("midi.mspb")) {
         this->SetMidiMspb(StrToMidimspb(element.attribute("midi.mspb").value()));
-        element.remove_attribute("midi.mspb");
+        if (removeAttr) element.remove_attribute("midi.mspb");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -393,12 +393,12 @@ void AttMidiValue::ResetMidiValue()
     m_val = -1;
 }
 
-bool AttMidiValue::ReadMidiValue(pugi::xml_node element)
+bool AttMidiValue::ReadMidiValue(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("val")) {
         this->SetVal(StrToMidivalue(element.attribute("val").value()));
-        element.remove_attribute("val");
+        if (removeAttr) element.remove_attribute("val");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -437,12 +437,12 @@ void AttMidiValue2::ResetMidiValue2()
     m_val2 = -1;
 }
 
-bool AttMidiValue2::ReadMidiValue2(pugi::xml_node element)
+bool AttMidiValue2::ReadMidiValue2(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("val2")) {
         this->SetVal2(StrToMidivalue(element.attribute("val2").value()));
-        element.remove_attribute("val2");
+        if (removeAttr) element.remove_attribute("val2");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -481,12 +481,12 @@ void AttMidiVelocity::ResetMidiVelocity()
     m_vel = -1;
 }
 
-bool AttMidiVelocity::ReadMidiVelocity(pugi::xml_node element)
+bool AttMidiVelocity::ReadMidiVelocity(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("vel")) {
         this->SetVel(StrToMidivalue(element.attribute("vel").value()));
-        element.remove_attribute("vel");
+        if (removeAttr) element.remove_attribute("vel");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -525,12 +525,12 @@ void AttTimeBase::ResetTimeBase()
     m_ppq = MEI_UNSET;
 }
 
-bool AttTimeBase::ReadTimeBase(pugi::xml_node element)
+bool AttTimeBase::ReadTimeBase(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("ppq")) {
         this->SetPpq(StrToInt(element.attribute("ppq").value()));
-        element.remove_attribute("ppq");
+        if (removeAttr) element.remove_attribute("ppq");
         hasAttribute = true;
     }
     return hasAttribute;

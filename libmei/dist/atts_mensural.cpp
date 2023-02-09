@@ -38,12 +38,12 @@ void AttDurationQuality::ResetDurationQuality()
     m_durQuality = DURQUALITY_mensural_NONE;
 }
 
-bool AttDurationQuality::ReadDurationQuality(pugi::xml_node element)
+bool AttDurationQuality::ReadDurationQuality(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("dur.quality")) {
         this->SetDurQuality(StrToDurqualityMensural(element.attribute("dur.quality").value()));
-        element.remove_attribute("dur.quality");
+        if (removeAttr) element.remove_attribute("dur.quality");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -83,17 +83,17 @@ void AttMensuralLog::ResetMensuralLog()
     m_proportNumbase = MEI_UNSET;
 }
 
-bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element)
+bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("proport.num")) {
         this->SetProportNum(StrToInt(element.attribute("proport.num").value()));
-        element.remove_attribute("proport.num");
+        if (removeAttr) element.remove_attribute("proport.num");
         hasAttribute = true;
     }
     if (element.attribute("proport.numbase")) {
         this->SetProportNumbase(StrToInt(element.attribute("proport.numbase").value()));
-        element.remove_attribute("proport.numbase");
+        if (removeAttr) element.remove_attribute("proport.numbase");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -145,32 +145,32 @@ void AttMensuralShared::ResetMensuralShared()
     m_divisio = DIVISIO_NONE;
 }
 
-bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element)
+bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("modusmaior")) {
         this->SetModusmaior(StrToModusmaior(element.attribute("modusmaior").value()));
-        element.remove_attribute("modusmaior");
+        if (removeAttr) element.remove_attribute("modusmaior");
         hasAttribute = true;
     }
     if (element.attribute("modusminor")) {
         this->SetModusminor(StrToModusminor(element.attribute("modusminor").value()));
-        element.remove_attribute("modusminor");
+        if (removeAttr) element.remove_attribute("modusminor");
         hasAttribute = true;
     }
     if (element.attribute("prolatio")) {
         this->SetProlatio(StrToProlatio(element.attribute("prolatio").value()));
-        element.remove_attribute("prolatio");
+        if (removeAttr) element.remove_attribute("prolatio");
         hasAttribute = true;
     }
     if (element.attribute("tempus")) {
         this->SetTempus(StrToTempus(element.attribute("tempus").value()));
-        element.remove_attribute("tempus");
+        if (removeAttr) element.remove_attribute("tempus");
         hasAttribute = true;
     }
     if (element.attribute("divisio")) {
         this->SetDivisio(StrToDivisio(element.attribute("divisio").value()));
-        element.remove_attribute("divisio");
+        if (removeAttr) element.remove_attribute("divisio");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -245,12 +245,12 @@ void AttNoteVisMensural::ResetNoteVisMensural()
     m_lig = LIGATUREFORM_NONE;
 }
 
-bool AttNoteVisMensural::ReadNoteVisMensural(pugi::xml_node element)
+bool AttNoteVisMensural::ReadNoteVisMensural(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("lig")) {
         this->SetLig(StrToLigatureform(element.attribute("lig").value()));
-        element.remove_attribute("lig");
+        if (removeAttr) element.remove_attribute("lig");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -289,12 +289,12 @@ void AttRestVisMensural::ResetRestVisMensural()
     m_spaces = MEI_UNSET;
 }
 
-bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element)
+bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("spaces")) {
         this->SetSpaces(StrToInt(element.attribute("spaces").value()));
-        element.remove_attribute("spaces");
+        if (removeAttr) element.remove_attribute("spaces");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -333,12 +333,12 @@ void AttStemsMensural::ResetStemsMensural()
     m_stemForm = STEMFORM_mensural_NONE;
 }
 
-bool AttStemsMensural::ReadStemsMensural(pugi::xml_node element)
+bool AttStemsMensural::ReadStemsMensural(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("stem.form")) {
         this->SetStemForm(StrToStemformMensural(element.attribute("stem.form").value()));
-        element.remove_attribute("stem.form");
+        if (removeAttr) element.remove_attribute("stem.form");
         hasAttribute = true;
     }
     return hasAttribute;

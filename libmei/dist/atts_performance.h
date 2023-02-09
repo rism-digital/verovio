@@ -38,7 +38,7 @@ public:
     void ResetAlignment();
 
     /** Read the values for the attribute class **/
-    bool ReadAlignment(pugi::xml_node element);
+    bool ReadAlignment(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteAlignment(pugi::xml_node element);

@@ -38,7 +38,7 @@ public:
     void ResetAltSym();
 
     /** Read the values for the attribute class **/
-    bool ReadAltSym(pugi::xml_node element);
+    bool ReadAltSym(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteAltSym(pugi::xml_node element);
@@ -77,7 +77,7 @@ public:
     void ResetAnchoredTextLog();
 
     /** Read the values for the attribute class **/
-    bool ReadAnchoredTextLog(pugi::xml_node element);
+    bool ReadAnchoredTextLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteAnchoredTextLog(pugi::xml_node element);
@@ -112,7 +112,7 @@ public:
     void ResetCurveLog();
 
     /** Read the values for the attribute class **/
-    bool ReadCurveLog(pugi::xml_node element);
+    bool ReadCurveLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteCurveLog(pugi::xml_node element);
@@ -147,7 +147,7 @@ public:
     void ResetLineLog();
 
     /** Read the values for the attribute class **/
-    bool ReadLineLog(pugi::xml_node element);
+    bool ReadLineLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteLineLog(pugi::xml_node element);

@@ -38,7 +38,7 @@ public:
     void ResetNotationType();
 
     /** Read the values for the attribute class **/
-    bool ReadNotationType(pugi::xml_node element);
+    bool ReadNotationType(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNotationType(pugi::xml_node element);

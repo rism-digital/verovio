@@ -38,7 +38,7 @@ public:
     void ResetCourseLog();
 
     /** Read the values for the attribute class **/
-    bool ReadCourseLog(pugi::xml_node element);
+    bool ReadCourseLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteCourseLog(pugi::xml_node element);
@@ -73,7 +73,7 @@ public:
     void ResetNoteGesTab();
 
     /** Read the values for the attribute class **/
-    bool ReadNoteGesTab(pugi::xml_node element);
+    bool ReadNoteGesTab(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNoteGesTab(pugi::xml_node element);

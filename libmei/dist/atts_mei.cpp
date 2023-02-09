@@ -39,17 +39,17 @@ void AttNotationType::ResetNotationType()
     m_notationsubtype = "";
 }
 
-bool AttNotationType::ReadNotationType(pugi::xml_node element)
+bool AttNotationType::ReadNotationType(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("notationtype")) {
         this->SetNotationtype(StrToNotationtype(element.attribute("notationtype").value()));
-        element.remove_attribute("notationtype");
+        if (removeAttr) element.remove_attribute("notationtype");
         hasAttribute = true;
     }
     if (element.attribute("notationsubtype")) {
         this->SetNotationsubtype(StrToStr(element.attribute("notationsubtype").value()));
-        element.remove_attribute("notationsubtype");
+        if (removeAttr) element.remove_attribute("notationsubtype");
         hasAttribute = true;
     }
     return hasAttribute;

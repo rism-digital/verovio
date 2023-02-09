@@ -38,12 +38,12 @@ void AttFacsimile::ResetFacsimile()
     m_facs = "";
 }
 
-bool AttFacsimile::ReadFacsimile(pugi::xml_node element)
+bool AttFacsimile::ReadFacsimile(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("facs")) {
         this->SetFacs(StrToStr(element.attribute("facs").value()));
-        element.remove_attribute("facs");
+        if (removeAttr) element.remove_attribute("facs");
         hasAttribute = true;
     }
     return hasAttribute;

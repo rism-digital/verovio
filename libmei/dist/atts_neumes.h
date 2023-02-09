@@ -38,7 +38,7 @@ public:
     void ResetNcLog();
 
     /** Read the values for the attribute class **/
-    bool ReadNcLog(pugi::xml_node element);
+    bool ReadNcLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNcLog(pugi::xml_node element);
@@ -79,7 +79,7 @@ public:
     void ResetNcForm();
 
     /** Read the values for the attribute class **/
-    bool ReadNcForm(pugi::xml_node element);
+    bool ReadNcForm(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNcForm(pugi::xml_node element);

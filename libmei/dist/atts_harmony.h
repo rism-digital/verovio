@@ -38,7 +38,7 @@ public:
     void ResetHarmLog();
 
     /** Read the values for the attribute class **/
-    bool ReadHarmLog(pugi::xml_node element);
+    bool ReadHarmLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHarmLog(pugi::xml_node element);

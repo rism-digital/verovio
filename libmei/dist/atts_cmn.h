@@ -38,7 +38,7 @@ public:
     void ResetArpegLog();
 
     /** Read the values for the attribute class **/
-    bool ReadArpegLog(pugi::xml_node element);
+    bool ReadArpegLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteArpegLog(pugi::xml_node element);
@@ -73,7 +73,7 @@ public:
     void ResetBTremLog();
 
     /** Read the values for the attribute class **/
-    bool ReadBTremLog(pugi::xml_node element);
+    bool ReadBTremLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBTremLog(pugi::xml_node element);
@@ -108,7 +108,7 @@ public:
     void ResetBeamPresent();
 
     /** Read the values for the attribute class **/
-    bool ReadBeamPresent(pugi::xml_node element);
+    bool ReadBeamPresent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeamPresent(pugi::xml_node element);
@@ -143,7 +143,7 @@ public:
     void ResetBeamRend();
 
     /** Read the values for the attribute class **/
-    bool ReadBeamRend(pugi::xml_node element);
+    bool ReadBeamRend(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeamRend(pugi::xml_node element);
@@ -196,7 +196,7 @@ public:
     void ResetBeamSecondary();
 
     /** Read the values for the attribute class **/
-    bool ReadBeamSecondary(pugi::xml_node element);
+    bool ReadBeamSecondary(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeamSecondary(pugi::xml_node element);
@@ -236,7 +236,7 @@ public:
     void ResetBeamedWith();
 
     /** Read the values for the attribute class **/
-    bool ReadBeamedWith(pugi::xml_node element);
+    bool ReadBeamedWith(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeamedWith(pugi::xml_node element);
@@ -275,7 +275,7 @@ public:
     void ResetBeamingLog();
 
     /** Read the values for the attribute class **/
-    bool ReadBeamingLog(pugi::xml_node element);
+    bool ReadBeamingLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeamingLog(pugi::xml_node element);
@@ -322,7 +322,7 @@ public:
     void ResetBeatRptLog();
 
     /** Read the values for the attribute class **/
-    bool ReadBeatRptLog(pugi::xml_node element);
+    bool ReadBeatRptLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBeatRptLog(pugi::xml_node element);
@@ -360,7 +360,7 @@ public:
     void ResetBracketSpanLog();
 
     /** Read the values for the attribute class **/
-    bool ReadBracketSpanLog(pugi::xml_node element);
+    bool ReadBracketSpanLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBracketSpanLog(pugi::xml_node element);
@@ -395,7 +395,7 @@ public:
     void ResetCutout();
 
     /** Read the values for the attribute class **/
-    bool ReadCutout(pugi::xml_node element);
+    bool ReadCutout(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteCutout(pugi::xml_node element);
@@ -430,7 +430,7 @@ public:
     void ResetExpandable();
 
     /** Read the values for the attribute class **/
-    bool ReadExpandable(pugi::xml_node element);
+    bool ReadExpandable(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteExpandable(pugi::xml_node element);
@@ -470,7 +470,7 @@ public:
     void ResetFTremLog();
 
     /** Read the values for the attribute class **/
-    bool ReadFTremLog(pugi::xml_node element);
+    bool ReadFTremLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFTremLog(pugi::xml_node element);
@@ -505,7 +505,7 @@ public:
     void ResetGlissPresent();
 
     /** Read the values for the attribute class **/
-    bool ReadGlissPresent(pugi::xml_node element);
+    bool ReadGlissPresent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteGlissPresent(pugi::xml_node element);
@@ -544,7 +544,7 @@ public:
     void ResetGraceGrpLog();
 
     /** Read the values for the attribute class **/
-    bool ReadGraceGrpLog(pugi::xml_node element);
+    bool ReadGraceGrpLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteGraceGrpLog(pugi::xml_node element);
@@ -583,7 +583,7 @@ public:
     void ResetGraced();
 
     /** Read the values for the attribute class **/
-    bool ReadGraced(pugi::xml_node element);
+    bool ReadGraced(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteGraced(pugi::xml_node element);
@@ -627,7 +627,7 @@ public:
     void ResetHairpinLog();
 
     /** Read the values for the attribute class **/
-    bool ReadHairpinLog(pugi::xml_node element);
+    bool ReadHairpinLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHairpinLog(pugi::xml_node element);
@@ -672,7 +672,7 @@ public:
     void ResetHarpPedalLog();
 
     /** Read the values for the attribute class **/
-    bool ReadHarpPedalLog(pugi::xml_node element);
+    bool ReadHarpPedalLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteHarpPedalLog(pugi::xml_node element);
@@ -743,7 +743,7 @@ public:
     void ResetLvPresent();
 
     /** Read the values for the attribute class **/
-    bool ReadLvPresent(pugi::xml_node element);
+    bool ReadLvPresent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteLvPresent(pugi::xml_node element);
@@ -781,7 +781,7 @@ public:
     void ResetMeasureLog();
 
     /** Read the values for the attribute class **/
-    bool ReadMeasureLog(pugi::xml_node element);
+    bool ReadMeasureLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMeasureLog(pugi::xml_node element);
@@ -826,7 +826,7 @@ public:
     void ResetMeterSigGrpLog();
 
     /** Read the values for the attribute class **/
-    bool ReadMeterSigGrpLog(pugi::xml_node element);
+    bool ReadMeterSigGrpLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMeterSigGrpLog(pugi::xml_node element);
@@ -861,7 +861,7 @@ public:
     void ResetNumberPlacement();
 
     /** Read the values for the attribute class **/
-    bool ReadNumberPlacement(pugi::xml_node element);
+    bool ReadNumberPlacement(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNumberPlacement(pugi::xml_node element);
@@ -902,7 +902,7 @@ public:
     void ResetNumbered();
 
     /** Read the values for the attribute class **/
-    bool ReadNumbered(pugi::xml_node element);
+    bool ReadNumbered(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNumbered(pugi::xml_node element);
@@ -937,7 +937,7 @@ public:
     void ResetOctaveLog();
 
     /** Read the values for the attribute class **/
-    bool ReadOctaveLog(pugi::xml_node element);
+    bool ReadOctaveLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteOctaveLog(pugi::xml_node element);
@@ -978,7 +978,7 @@ public:
     void ResetPedalLog();
 
     /** Read the values for the attribute class **/
-    bool ReadPedalLog(pugi::xml_node element);
+    bool ReadPedalLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WritePedalLog(pugi::xml_node element);
@@ -1019,7 +1019,7 @@ public:
     void ResetPianoPedals();
 
     /** Read the values for the attribute class **/
-    bool ReadPianoPedals(pugi::xml_node element);
+    bool ReadPianoPedals(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WritePianoPedals(pugi::xml_node element);
@@ -1054,7 +1054,7 @@ public:
     void ResetRehearsal();
 
     /** Read the values for the attribute class **/
-    bool ReadRehearsal(pugi::xml_node element);
+    bool ReadRehearsal(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteRehearsal(pugi::xml_node element);
@@ -1089,7 +1089,7 @@ public:
     void ResetScoreDefVisCmn();
 
     /** Read the values for the attribute class **/
-    bool ReadScoreDefVisCmn(pugi::xml_node element);
+    bool ReadScoreDefVisCmn(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteScoreDefVisCmn(pugi::xml_node element);
@@ -1124,7 +1124,7 @@ public:
     void ResetSlurRend();
 
     /** Read the values for the attribute class **/
-    bool ReadSlurRend(pugi::xml_node element);
+    bool ReadSlurRend(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteSlurRend(pugi::xml_node element);
@@ -1167,7 +1167,7 @@ public:
     void ResetStemsCmn();
 
     /** Read the values for the attribute class **/
-    bool ReadStemsCmn(pugi::xml_node element);
+    bool ReadStemsCmn(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteStemsCmn(pugi::xml_node element);
@@ -1206,7 +1206,7 @@ public:
     void ResetTieRend();
 
     /** Read the values for the attribute class **/
-    bool ReadTieRend(pugi::xml_node element);
+    bool ReadTieRend(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTieRend(pugi::xml_node element);
@@ -1249,7 +1249,7 @@ public:
     void ResetTremMeasured();
 
     /** Read the values for the attribute class **/
-    bool ReadTremMeasured(pugi::xml_node element);
+    bool ReadTremMeasured(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTremMeasured(pugi::xml_node element);

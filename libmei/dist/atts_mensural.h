@@ -38,7 +38,7 @@ public:
     void ResetDurationQuality();
 
     /** Read the values for the attribute class **/
-    bool ReadDurationQuality(pugi::xml_node element);
+    bool ReadDurationQuality(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteDurationQuality(pugi::xml_node element);
@@ -77,7 +77,7 @@ public:
     void ResetMensuralLog();
 
     /** Read the values for the attribute class **/
-    bool ReadMensuralLog(pugi::xml_node element);
+    bool ReadMensuralLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMensuralLog(pugi::xml_node element);
@@ -126,7 +126,7 @@ public:
     void ResetMensuralShared();
 
     /** Read the values for the attribute class **/
-    bool ReadMensuralShared(pugi::xml_node element);
+    bool ReadMensuralShared(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMensuralShared(pugi::xml_node element);
@@ -185,7 +185,7 @@ public:
     void ResetNoteVisMensural();
 
     /** Read the values for the attribute class **/
-    bool ReadNoteVisMensural(pugi::xml_node element);
+    bool ReadNoteVisMensural(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteNoteVisMensural(pugi::xml_node element);
@@ -220,7 +220,7 @@ public:
     void ResetRestVisMensural();
 
     /** Read the values for the attribute class **/
-    bool ReadRestVisMensural(pugi::xml_node element);
+    bool ReadRestVisMensural(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteRestVisMensural(pugi::xml_node element);
@@ -255,7 +255,7 @@ public:
     void ResetStemsMensural();
 
     /** Read the values for the attribute class **/
-    bool ReadStemsMensural(pugi::xml_node element);
+    bool ReadStemsMensural(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteStemsMensural(pugi::xml_node element);

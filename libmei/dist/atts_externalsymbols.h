@@ -38,7 +38,7 @@ public:
     void ResetExtSym();
 
     /** Read the values for the attribute class **/
-    bool ReadExtSym(pugi::xml_node element);
+    bool ReadExtSym(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteExtSym(pugi::xml_node element);

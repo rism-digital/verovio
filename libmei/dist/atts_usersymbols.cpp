@@ -38,12 +38,12 @@ void AttAltSym::ResetAltSym()
     m_altsym = "";
 }
 
-bool AttAltSym::ReadAltSym(pugi::xml_node element)
+bool AttAltSym::ReadAltSym(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("altsym")) {
         this->SetAltsym(StrToStr(element.attribute("altsym").value()));
-        element.remove_attribute("altsym");
+        if (removeAttr) element.remove_attribute("altsym");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -82,12 +82,12 @@ void AttAnchoredTextLog::ResetAnchoredTextLog()
     m_func = "";
 }
 
-bool AttAnchoredTextLog::ReadAnchoredTextLog(pugi::xml_node element)
+bool AttAnchoredTextLog::ReadAnchoredTextLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
         this->SetFunc(StrToStr(element.attribute("func").value()));
-        element.remove_attribute("func");
+        if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -126,12 +126,12 @@ void AttCurveLog::ResetCurveLog()
     m_func = "";
 }
 
-bool AttCurveLog::ReadCurveLog(pugi::xml_node element)
+bool AttCurveLog::ReadCurveLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
         this->SetFunc(StrToStr(element.attribute("func").value()));
-        element.remove_attribute("func");
+        if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -170,12 +170,12 @@ void AttLineLog::ResetLineLog()
     m_func = "";
 }
 
-bool AttLineLog::ReadLineLog(pugi::xml_node element)
+bool AttLineLog::ReadLineLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
         this->SetFunc(StrToStr(element.attribute("func").value()));
-        element.remove_attribute("func");
+        if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;

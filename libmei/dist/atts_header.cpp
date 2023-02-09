@@ -41,27 +41,27 @@ void AttBifoliumSurfaces::ResetBifoliumSurfaces()
     m_outerVerso = "";
 }
 
-bool AttBifoliumSurfaces::ReadBifoliumSurfaces(pugi::xml_node element)
+bool AttBifoliumSurfaces::ReadBifoliumSurfaces(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("outer.recto")) {
         this->SetOuterRecto(StrToStr(element.attribute("outer.recto").value()));
-        element.remove_attribute("outer.recto");
+        if (removeAttr) element.remove_attribute("outer.recto");
         hasAttribute = true;
     }
     if (element.attribute("inner.verso")) {
         this->SetInnerVerso(StrToStr(element.attribute("inner.verso").value()));
-        element.remove_attribute("inner.verso");
+        if (removeAttr) element.remove_attribute("inner.verso");
         hasAttribute = true;
     }
     if (element.attribute("inner.recto")) {
         this->SetInnerRecto(StrToStr(element.attribute("inner.recto").value()));
-        element.remove_attribute("inner.recto");
+        if (removeAttr) element.remove_attribute("inner.recto");
         hasAttribute = true;
     }
     if (element.attribute("outer.verso")) {
         this->SetOuterVerso(StrToStr(element.attribute("outer.verso").value()));
-        element.remove_attribute("outer.verso");
+        if (removeAttr) element.remove_attribute("outer.verso");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -128,17 +128,17 @@ void AttFoliumSurfaces::ResetFoliumSurfaces()
     m_verso = "";
 }
 
-bool AttFoliumSurfaces::ReadFoliumSurfaces(pugi::xml_node element)
+bool AttFoliumSurfaces::ReadFoliumSurfaces(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("recto")) {
         this->SetRecto(StrToStr(element.attribute("recto").value()));
-        element.remove_attribute("recto");
+        if (removeAttr) element.remove_attribute("recto");
         hasAttribute = true;
     }
     if (element.attribute("verso")) {
         this->SetVerso(StrToStr(element.attribute("verso").value()));
-        element.remove_attribute("verso");
+        if (removeAttr) element.remove_attribute("verso");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -186,12 +186,12 @@ void AttRecordType::ResetRecordType()
     m_recordtype = recordType_RECORDTYPE_NONE;
 }
 
-bool AttRecordType::ReadRecordType(pugi::xml_node element)
+bool AttRecordType::ReadRecordType(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("recordtype")) {
         this->SetRecordtype(StrToRecordTypeRecordtype(element.attribute("recordtype").value()));
-        element.remove_attribute("recordtype");
+        if (removeAttr) element.remove_attribute("recordtype");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -230,12 +230,12 @@ void AttRegularMethod::ResetRegularMethod()
     m_method = regularMethod_METHOD_NONE;
 }
 
-bool AttRegularMethod::ReadRegularMethod(pugi::xml_node element)
+bool AttRegularMethod::ReadRegularMethod(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("method")) {
         this->SetMethod(StrToRegularMethodMethod(element.attribute("method").value()));
-        element.remove_attribute("method");
+        if (removeAttr) element.remove_attribute("method");
         hasAttribute = true;
     }
     return hasAttribute;

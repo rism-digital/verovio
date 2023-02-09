@@ -38,12 +38,12 @@ void AttFingGrpLog::ResetFingGrpLog()
     m_form = fingGrpLog_FORM_NONE;
 }
 
-bool AttFingGrpLog::ReadFingGrpLog(pugi::xml_node element)
+bool AttFingGrpLog::ReadFingGrpLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToFingGrpLogForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;

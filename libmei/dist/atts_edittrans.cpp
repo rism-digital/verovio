@@ -38,12 +38,12 @@ void AttAgentIdent::ResetAgentIdent()
     m_agent = "";
 }
 
-bool AttAgentIdent::ReadAgentIdent(pugi::xml_node element)
+bool AttAgentIdent::ReadAgentIdent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("agent")) {
         this->SetAgent(StrToStr(element.attribute("agent").value()));
-        element.remove_attribute("agent");
+        if (removeAttr) element.remove_attribute("agent");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -82,12 +82,12 @@ void AttReasonIdent::ResetReasonIdent()
     m_reason = "";
 }
 
-bool AttReasonIdent::ReadReasonIdent(pugi::xml_node element)
+bool AttReasonIdent::ReadReasonIdent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("reason")) {
         this->SetReason(StrToStr(element.attribute("reason").value()));
-        element.remove_attribute("reason");
+        if (removeAttr) element.remove_attribute("reason");
         hasAttribute = true;
     }
     return hasAttribute;

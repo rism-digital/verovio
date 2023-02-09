@@ -38,7 +38,7 @@ public:
     void ResetChannelized();
 
     /** Read the values for the attribute class **/
-    bool ReadChannelized(pugi::xml_node element);
+    bool ReadChannelized(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteChannelized(pugi::xml_node element);
@@ -91,7 +91,7 @@ public:
     void ResetInstrumentIdent();
 
     /** Read the values for the attribute class **/
-    bool ReadInstrumentIdent(pugi::xml_node element);
+    bool ReadInstrumentIdent(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteInstrumentIdent(pugi::xml_node element);
@@ -129,7 +129,7 @@ public:
     void ResetMidiInstrument();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiInstrument(pugi::xml_node element);
+    bool ReadMidiInstrument(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMidiInstrument(pugi::xml_node element);
@@ -203,7 +203,7 @@ public:
     void ResetMidiNumber();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiNumber(pugi::xml_node element);
+    bool ReadMidiNumber(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMidiNumber(pugi::xml_node element);
@@ -238,7 +238,7 @@ public:
     void ResetMidiTempo();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiTempo(pugi::xml_node element);
+    bool ReadMidiTempo(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMidiTempo(pugi::xml_node element);
@@ -288,7 +288,7 @@ public:
     void ResetMidiValue();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiValue(pugi::xml_node element);
+    bool ReadMidiValue(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMidiValue(pugi::xml_node element);
@@ -323,7 +323,7 @@ public:
     void ResetMidiValue2();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiValue2(pugi::xml_node element);
+    bool ReadMidiValue2(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMidiValue2(pugi::xml_node element);
@@ -358,7 +358,7 @@ public:
     void ResetMidiVelocity();
 
     /** Read the values for the attribute class **/
-    bool ReadMidiVelocity(pugi::xml_node element);
+    bool ReadMidiVelocity(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteMidiVelocity(pugi::xml_node element);
@@ -393,7 +393,7 @@ public:
     void ResetTimeBase();
 
     /** Read the values for the attribute class **/
-    bool ReadTimeBase(pugi::xml_node element);
+    bool ReadTimeBase(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteTimeBase(pugi::xml_node element);

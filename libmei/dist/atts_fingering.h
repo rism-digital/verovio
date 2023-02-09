@@ -38,7 +38,7 @@ public:
     void ResetFingGrpLog();
 
     /** Read the values for the attribute class **/
-    bool ReadFingGrpLog(pugi::xml_node element);
+    bool ReadFingGrpLog(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFingGrpLog(pugi::xml_node element);

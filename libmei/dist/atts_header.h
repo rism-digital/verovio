@@ -38,7 +38,7 @@ public:
     void ResetBifoliumSurfaces();
 
     /** Read the values for the attribute class **/
-    bool ReadBifoliumSurfaces(pugi::xml_node element);
+    bool ReadBifoliumSurfaces(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteBifoliumSurfaces(pugi::xml_node element);
@@ -103,7 +103,7 @@ public:
     void ResetFoliumSurfaces();
 
     /** Read the values for the attribute class **/
-    bool ReadFoliumSurfaces(pugi::xml_node element);
+    bool ReadFoliumSurfaces(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteFoliumSurfaces(pugi::xml_node element);
@@ -144,7 +144,7 @@ public:
     void ResetRecordType();
 
     /** Read the values for the attribute class **/
-    bool ReadRecordType(pugi::xml_node element);
+    bool ReadRecordType(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteRecordType(pugi::xml_node element);
@@ -179,7 +179,7 @@ public:
     void ResetRegularMethod();
 
     /** Read the values for the attribute class **/
-    bool ReadRegularMethod(pugi::xml_node element);
+    bool ReadRegularMethod(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteRegularMethod(pugi::xml_node element);

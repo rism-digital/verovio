@@ -38,12 +38,12 @@ void AttHarmAnl::ResetHarmAnl()
     m_form = harmAnl_FORM_NONE;
 }
 
-bool AttHarmAnl::ReadHarmAnl(pugi::xml_node element)
+bool AttHarmAnl::ReadHarmAnl(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToHarmAnlForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -82,12 +82,12 @@ void AttHarmonicFunction::ResetHarmonicFunction()
     m_deg = "";
 }
 
-bool AttHarmonicFunction::ReadHarmonicFunction(pugi::xml_node element)
+bool AttHarmonicFunction::ReadHarmonicFunction(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("deg")) {
         this->SetDeg(StrToStr(element.attribute("deg").value()));
-        element.remove_attribute("deg");
+        if (removeAttr) element.remove_attribute("deg");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -126,12 +126,12 @@ void AttIntervalHarmonic::ResetIntervalHarmonic()
     m_inth = "";
 }
 
-bool AttIntervalHarmonic::ReadIntervalHarmonic(pugi::xml_node element)
+bool AttIntervalHarmonic::ReadIntervalHarmonic(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("inth")) {
         this->SetInth(StrToStr(element.attribute("inth").value()));
-        element.remove_attribute("inth");
+        if (removeAttr) element.remove_attribute("inth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -170,12 +170,12 @@ void AttIntervalMelodic::ResetIntervalMelodic()
     m_intm = "";
 }
 
-bool AttIntervalMelodic::ReadIntervalMelodic(pugi::xml_node element)
+bool AttIntervalMelodic::ReadIntervalMelodic(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("intm")) {
         this->SetIntm(StrToStr(element.attribute("intm").value()));
-        element.remove_attribute("intm");
+        if (removeAttr) element.remove_attribute("intm");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -214,12 +214,12 @@ void AttKeySigAnl::ResetKeySigAnl()
     m_mode = MODE_NONE;
 }
 
-bool AttKeySigAnl::ReadKeySigAnl(pugi::xml_node element)
+bool AttKeySigAnl::ReadKeySigAnl(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("mode")) {
         this->SetMode(StrToMode(element.attribute("mode").value()));
-        element.remove_attribute("mode");
+        if (removeAttr) element.remove_attribute("mode");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -260,22 +260,22 @@ void AttKeySigDefaultAnl::ResetKeySigDefaultAnl()
     m_keyPname = PITCHNAME_NONE;
 }
 
-bool AttKeySigDefaultAnl::ReadKeySigDefaultAnl(pugi::xml_node element)
+bool AttKeySigDefaultAnl::ReadKeySigDefaultAnl(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("key.accid")) {
         this->SetKeyAccid(StrToAccidentalGestural(element.attribute("key.accid").value()));
-        element.remove_attribute("key.accid");
+        if (removeAttr) element.remove_attribute("key.accid");
         hasAttribute = true;
     }
     if (element.attribute("key.mode")) {
         this->SetKeyMode(StrToMode(element.attribute("key.mode").value()));
-        element.remove_attribute("key.mode");
+        if (removeAttr) element.remove_attribute("key.mode");
         hasAttribute = true;
     }
     if (element.attribute("key.pname")) {
         this->SetKeyPname(StrToPitchname(element.attribute("key.pname").value()));
-        element.remove_attribute("key.pname");
+        if (removeAttr) element.remove_attribute("key.pname");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -332,12 +332,12 @@ void AttMelodicFunction::ResetMelodicFunction()
     m_mfunc = MELODICFUNCTION_NONE;
 }
 
-bool AttMelodicFunction::ReadMelodicFunction(pugi::xml_node element)
+bool AttMelodicFunction::ReadMelodicFunction(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("mfunc")) {
         this->SetMfunc(StrToMelodicfunction(element.attribute("mfunc").value()));
-        element.remove_attribute("mfunc");
+        if (removeAttr) element.remove_attribute("mfunc");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -376,12 +376,12 @@ void AttPitchClass::ResetPitchClass()
     m_pclass = MEI_UNSET;
 }
 
-bool AttPitchClass::ReadPitchClass(pugi::xml_node element)
+bool AttPitchClass::ReadPitchClass(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("pclass")) {
         this->SetPclass(StrToInt(element.attribute("pclass").value()));
-        element.remove_attribute("pclass");
+        if (removeAttr) element.remove_attribute("pclass");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -420,12 +420,12 @@ void AttSolfa::ResetSolfa()
     m_psolfa = "";
 }
 
-bool AttSolfa::ReadSolfa(pugi::xml_node element)
+bool AttSolfa::ReadSolfa(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("psolfa")) {
         this->SetPsolfa(StrToStr(element.attribute("psolfa").value()));
-        element.remove_attribute("psolfa");
+        if (removeAttr) element.remove_attribute("psolfa");
         hasAttribute = true;
     }
     return hasAttribute;

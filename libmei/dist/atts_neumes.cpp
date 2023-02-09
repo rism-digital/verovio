@@ -39,17 +39,17 @@ void AttNcLog::ResetNcLog()
     m_pname = "";
 }
 
-bool AttNcLog::ReadNcLog(pugi::xml_node element)
+bool AttNcLog::ReadNcLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("oct")) {
         this->SetOct(StrToStr(element.attribute("oct").value()));
-        element.remove_attribute("oct");
+        if (removeAttr) element.remove_attribute("oct");
         hasAttribute = true;
     }
     if (element.attribute("pname")) {
         this->SetPname(StrToStr(element.attribute("pname").value()));
-        element.remove_attribute("pname");
+        if (removeAttr) element.remove_attribute("pname");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -104,47 +104,47 @@ void AttNcForm::ResetNcForm()
     m_tilt = data_COMPASSDIRECTION();
 }
 
-bool AttNcForm::ReadNcForm(pugi::xml_node element)
+bool AttNcForm::ReadNcForm(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("angled")) {
         this->SetAngled(StrToBoolean(element.attribute("angled").value()));
-        element.remove_attribute("angled");
+        if (removeAttr) element.remove_attribute("angled");
         hasAttribute = true;
     }
     if (element.attribute("con")) {
         this->SetCon(StrToNcFormCon(element.attribute("con").value()));
-        element.remove_attribute("con");
+        if (removeAttr) element.remove_attribute("con");
         hasAttribute = true;
     }
     if (element.attribute("curve")) {
         this->SetCurve(StrToNcFormCurve(element.attribute("curve").value()));
-        element.remove_attribute("curve");
+        if (removeAttr) element.remove_attribute("curve");
         hasAttribute = true;
     }
     if (element.attribute("hooked")) {
         this->SetHooked(StrToBoolean(element.attribute("hooked").value()));
-        element.remove_attribute("hooked");
+        if (removeAttr) element.remove_attribute("hooked");
         hasAttribute = true;
     }
     if (element.attribute("ligated")) {
         this->SetLigated(StrToBoolean(element.attribute("ligated").value()));
-        element.remove_attribute("ligated");
+        if (removeAttr) element.remove_attribute("ligated");
         hasAttribute = true;
     }
     if (element.attribute("rellen")) {
         this->SetRellen(StrToNcFormRellen(element.attribute("rellen").value()));
-        element.remove_attribute("rellen");
+        if (removeAttr) element.remove_attribute("rellen");
         hasAttribute = true;
     }
     if (element.attribute("sShape")) {
         this->SetSShape(StrToStr(element.attribute("sShape").value()));
-        element.remove_attribute("sShape");
+        if (removeAttr) element.remove_attribute("sShape");
         hasAttribute = true;
     }
     if (element.attribute("tilt")) {
         this->SetTilt(StrToCompassdirection(element.attribute("tilt").value()));
-        element.remove_attribute("tilt");
+        if (removeAttr) element.remove_attribute("tilt");
         hasAttribute = true;
     }
     return hasAttribute;

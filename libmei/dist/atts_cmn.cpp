@@ -38,12 +38,12 @@ void AttArpegLog::ResetArpegLog()
     m_order = arpegLog_ORDER_NONE;
 }
 
-bool AttArpegLog::ReadArpegLog(pugi::xml_node element)
+bool AttArpegLog::ReadArpegLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("order")) {
         this->SetOrder(StrToArpegLogOrder(element.attribute("order").value()));
-        element.remove_attribute("order");
+        if (removeAttr) element.remove_attribute("order");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -82,12 +82,12 @@ void AttBTremLog::ResetBTremLog()
     m_form = bTremLog_FORM_NONE;
 }
 
-bool AttBTremLog::ReadBTremLog(pugi::xml_node element)
+bool AttBTremLog::ReadBTremLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToBTremLogForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -126,12 +126,12 @@ void AttBeamPresent::ResetBeamPresent()
     m_beam = "";
 }
 
-bool AttBeamPresent::ReadBeamPresent(pugi::xml_node element)
+bool AttBeamPresent::ReadBeamPresent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("beam")) {
         this->SetBeam(StrToStr(element.attribute("beam").value()));
-        element.remove_attribute("beam");
+        if (removeAttr) element.remove_attribute("beam");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -173,27 +173,27 @@ void AttBeamRend::ResetBeamRend()
     m_slope = 0.0;
 }
 
-bool AttBeamRend::ReadBeamRend(pugi::xml_node element)
+bool AttBeamRend::ReadBeamRend(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToBeamRendForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("place")) {
         this->SetPlace(StrToBeamplace(element.attribute("place").value()));
-        element.remove_attribute("place");
+        if (removeAttr) element.remove_attribute("place");
         hasAttribute = true;
     }
     if (element.attribute("slash")) {
         this->SetSlash(StrToBoolean(element.attribute("slash").value()));
-        element.remove_attribute("slash");
+        if (removeAttr) element.remove_attribute("slash");
         hasAttribute = true;
     }
     if (element.attribute("slope")) {
         this->SetSlope(StrToDbl(element.attribute("slope").value()));
-        element.remove_attribute("slope");
+        if (removeAttr) element.remove_attribute("slope");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -259,12 +259,12 @@ void AttBeamSecondary::ResetBeamSecondary()
     m_breaksec = MEI_UNSET;
 }
 
-bool AttBeamSecondary::ReadBeamSecondary(pugi::xml_node element)
+bool AttBeamSecondary::ReadBeamSecondary(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("breaksec")) {
         this->SetBreaksec(StrToInt(element.attribute("breaksec").value()));
-        element.remove_attribute("breaksec");
+        if (removeAttr) element.remove_attribute("breaksec");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -303,12 +303,12 @@ void AttBeamedWith::ResetBeamedWith()
     m_beamWith = NEIGHBORINGLAYER_NONE;
 }
 
-bool AttBeamedWith::ReadBeamedWith(pugi::xml_node element)
+bool AttBeamedWith::ReadBeamedWith(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("beam.with")) {
         this->SetBeamWith(StrToNeighboringlayer(element.attribute("beam.with").value()));
-        element.remove_attribute("beam.with");
+        if (removeAttr) element.remove_attribute("beam.with");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -348,17 +348,17 @@ void AttBeamingLog::ResetBeamingLog()
     m_beamRests = BOOLEAN_NONE;
 }
 
-bool AttBeamingLog::ReadBeamingLog(pugi::xml_node element)
+bool AttBeamingLog::ReadBeamingLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("beam.group")) {
         this->SetBeamGroup(StrToStr(element.attribute("beam.group").value()));
-        element.remove_attribute("beam.group");
+        if (removeAttr) element.remove_attribute("beam.group");
         hasAttribute = true;
     }
     if (element.attribute("beam.rests")) {
         this->SetBeamRests(StrToBoolean(element.attribute("beam.rests").value()));
-        element.remove_attribute("beam.rests");
+        if (removeAttr) element.remove_attribute("beam.rests");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -406,12 +406,12 @@ void AttBeatRptLog::ResetBeatRptLog()
     m_beatdef = 0.0;
 }
 
-bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element)
+bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("beatdef")) {
         this->SetBeatdef(StrToDbl(element.attribute("beatdef").value()));
-        element.remove_attribute("beatdef");
+        if (removeAttr) element.remove_attribute("beatdef");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -450,12 +450,12 @@ void AttBracketSpanLog::ResetBracketSpanLog()
     m_func = "";
 }
 
-bool AttBracketSpanLog::ReadBracketSpanLog(pugi::xml_node element)
+bool AttBracketSpanLog::ReadBracketSpanLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
         this->SetFunc(StrToStr(element.attribute("func").value()));
-        element.remove_attribute("func");
+        if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -494,12 +494,12 @@ void AttCutout::ResetCutout()
     m_cutout = cutout_CUTOUT_NONE;
 }
 
-bool AttCutout::ReadCutout(pugi::xml_node element)
+bool AttCutout::ReadCutout(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("cutout")) {
         this->SetCutout(StrToCutoutCutout(element.attribute("cutout").value()));
-        element.remove_attribute("cutout");
+        if (removeAttr) element.remove_attribute("cutout");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -538,12 +538,12 @@ void AttExpandable::ResetExpandable()
     m_expand = BOOLEAN_NONE;
 }
 
-bool AttExpandable::ReadExpandable(pugi::xml_node element)
+bool AttExpandable::ReadExpandable(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("expand")) {
         this->SetExpand(StrToBoolean(element.attribute("expand").value()));
-        element.remove_attribute("expand");
+        if (removeAttr) element.remove_attribute("expand");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -582,12 +582,12 @@ void AttFTremLog::ResetFTremLog()
     m_form = fTremLog_FORM_NONE;
 }
 
-bool AttFTremLog::ReadFTremLog(pugi::xml_node element)
+bool AttFTremLog::ReadFTremLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToFTremLogForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -626,12 +626,12 @@ void AttGlissPresent::ResetGlissPresent()
     m_gliss = GLISSANDO_NONE;
 }
 
-bool AttGlissPresent::ReadGlissPresent(pugi::xml_node element)
+bool AttGlissPresent::ReadGlissPresent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("gliss")) {
         this->SetGliss(StrToGlissando(element.attribute("gliss").value()));
-        element.remove_attribute("gliss");
+        if (removeAttr) element.remove_attribute("gliss");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -670,12 +670,12 @@ void AttGraceGrpLog::ResetGraceGrpLog()
     m_attach = graceGrpLog_ATTACH_NONE;
 }
 
-bool AttGraceGrpLog::ReadGraceGrpLog(pugi::xml_node element)
+bool AttGraceGrpLog::ReadGraceGrpLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("attach")) {
         this->SetAttach(StrToGraceGrpLogAttach(element.attribute("attach").value()));
-        element.remove_attribute("attach");
+        if (removeAttr) element.remove_attribute("attach");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -715,17 +715,17 @@ void AttGraced::ResetGraced()
     m_graceTime = -1.0;
 }
 
-bool AttGraced::ReadGraced(pugi::xml_node element)
+bool AttGraced::ReadGraced(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("grace")) {
         this->SetGrace(StrToGrace(element.attribute("grace").value()));
-        element.remove_attribute("grace");
+        if (removeAttr) element.remove_attribute("grace");
         hasAttribute = true;
     }
     if (element.attribute("grace.time")) {
         this->SetGraceTime(StrToPercent(element.attribute("grace.time").value()));
-        element.remove_attribute("grace.time");
+        if (removeAttr) element.remove_attribute("grace.time");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -774,17 +774,17 @@ void AttHairpinLog::ResetHairpinLog()
     m_niente = BOOLEAN_NONE;
 }
 
-bool AttHairpinLog::ReadHairpinLog(pugi::xml_node element)
+bool AttHairpinLog::ReadHairpinLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToHairpinLogForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("niente")) {
         this->SetNiente(StrToBoolean(element.attribute("niente").value()));
-        element.remove_attribute("niente");
+        if (removeAttr) element.remove_attribute("niente");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -838,42 +838,42 @@ void AttHarpPedalLog::ResetHarpPedalLog()
     m_b = harpPedalLog_B_NONE;
 }
 
-bool AttHarpPedalLog::ReadHarpPedalLog(pugi::xml_node element)
+bool AttHarpPedalLog::ReadHarpPedalLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("c")) {
         this->SetC(StrToHarpPedalLogC(element.attribute("c").value()));
-        element.remove_attribute("c");
+        if (removeAttr) element.remove_attribute("c");
         hasAttribute = true;
     }
     if (element.attribute("d")) {
         this->SetD(StrToHarpPedalLogD(element.attribute("d").value()));
-        element.remove_attribute("d");
+        if (removeAttr) element.remove_attribute("d");
         hasAttribute = true;
     }
     if (element.attribute("e")) {
         this->SetE(StrToHarpPedalLogE(element.attribute("e").value()));
-        element.remove_attribute("e");
+        if (removeAttr) element.remove_attribute("e");
         hasAttribute = true;
     }
     if (element.attribute("f")) {
         this->SetF(StrToHarpPedalLogF(element.attribute("f").value()));
-        element.remove_attribute("f");
+        if (removeAttr) element.remove_attribute("f");
         hasAttribute = true;
     }
     if (element.attribute("g")) {
         this->SetG(StrToHarpPedalLogG(element.attribute("g").value()));
-        element.remove_attribute("g");
+        if (removeAttr) element.remove_attribute("g");
         hasAttribute = true;
     }
     if (element.attribute("a")) {
         this->SetA(StrToHarpPedalLogA(element.attribute("a").value()));
-        element.remove_attribute("a");
+        if (removeAttr) element.remove_attribute("a");
         hasAttribute = true;
     }
     if (element.attribute("b")) {
         this->SetB(StrToHarpPedalLogB(element.attribute("b").value()));
-        element.remove_attribute("b");
+        if (removeAttr) element.remove_attribute("b");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -966,12 +966,12 @@ void AttLvPresent::ResetLvPresent()
     m_lv = BOOLEAN_NONE;
 }
 
-bool AttLvPresent::ReadLvPresent(pugi::xml_node element)
+bool AttLvPresent::ReadLvPresent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("lv")) {
         this->SetLv(StrToBoolean(element.attribute("lv").value()));
-        element.remove_attribute("lv");
+        if (removeAttr) element.remove_attribute("lv");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1011,17 +1011,17 @@ void AttMeasureLog::ResetMeasureLog()
     m_right = BARRENDITION_NONE;
 }
 
-bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element)
+bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("left")) {
         this->SetLeft(StrToBarrendition(element.attribute("left").value()));
-        element.remove_attribute("left");
+        if (removeAttr) element.remove_attribute("left");
         hasAttribute = true;
     }
     if (element.attribute("right")) {
         this->SetRight(StrToBarrendition(element.attribute("right").value()));
-        element.remove_attribute("right");
+        if (removeAttr) element.remove_attribute("right");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1069,12 +1069,12 @@ void AttMeterSigGrpLog::ResetMeterSigGrpLog()
     m_func = meterSigGrpLog_FUNC_NONE;
 }
 
-bool AttMeterSigGrpLog::ReadMeterSigGrpLog(pugi::xml_node element)
+bool AttMeterSigGrpLog::ReadMeterSigGrpLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("func")) {
         this->SetFunc(StrToMeterSigGrpLogFunc(element.attribute("func").value()));
-        element.remove_attribute("func");
+        if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1114,17 +1114,17 @@ void AttNumberPlacement::ResetNumberPlacement()
     m_numVisible = BOOLEAN_NONE;
 }
 
-bool AttNumberPlacement::ReadNumberPlacement(pugi::xml_node element)
+bool AttNumberPlacement::ReadNumberPlacement(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("num.place")) {
         this->SetNumPlace(StrToStaffrelBasic(element.attribute("num.place").value()));
-        element.remove_attribute("num.place");
+        if (removeAttr) element.remove_attribute("num.place");
         hasAttribute = true;
     }
     if (element.attribute("num.visible")) {
         this->SetNumVisible(StrToBoolean(element.attribute("num.visible").value()));
-        element.remove_attribute("num.visible");
+        if (removeAttr) element.remove_attribute("num.visible");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1172,12 +1172,12 @@ void AttNumbered::ResetNumbered()
     m_num = MEI_UNSET;
 }
 
-bool AttNumbered::ReadNumbered(pugi::xml_node element)
+bool AttNumbered::ReadNumbered(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
-        element.remove_attribute("num");
+        if (removeAttr) element.remove_attribute("num");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1216,12 +1216,12 @@ void AttOctaveLog::ResetOctaveLog()
     m_coll = octaveLog_COLL_NONE;
 }
 
-bool AttOctaveLog::ReadOctaveLog(pugi::xml_node element)
+bool AttOctaveLog::ReadOctaveLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("coll")) {
         this->SetColl(StrToOctaveLogColl(element.attribute("coll").value()));
-        element.remove_attribute("coll");
+        if (removeAttr) element.remove_attribute("coll");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1261,17 +1261,17 @@ void AttPedalLog::ResetPedalLog()
     m_func = "";
 }
 
-bool AttPedalLog::ReadPedalLog(pugi::xml_node element)
+bool AttPedalLog::ReadPedalLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("dir")) {
         this->SetDir(StrToPedalLogDir(element.attribute("dir").value()));
-        element.remove_attribute("dir");
+        if (removeAttr) element.remove_attribute("dir");
         hasAttribute = true;
     }
     if (element.attribute("func")) {
         this->SetFunc(StrToStr(element.attribute("func").value()));
-        element.remove_attribute("func");
+        if (removeAttr) element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1319,12 +1319,12 @@ void AttPianoPedals::ResetPianoPedals()
     m_pedalStyle = PEDALSTYLE_NONE;
 }
 
-bool AttPianoPedals::ReadPianoPedals(pugi::xml_node element)
+bool AttPianoPedals::ReadPianoPedals(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("pedal.style")) {
         this->SetPedalStyle(StrToPedalstyle(element.attribute("pedal.style").value()));
-        element.remove_attribute("pedal.style");
+        if (removeAttr) element.remove_attribute("pedal.style");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1363,12 +1363,12 @@ void AttRehearsal::ResetRehearsal()
     m_rehEnclose = rehearsal_REHENCLOSE_NONE;
 }
 
-bool AttRehearsal::ReadRehearsal(pugi::xml_node element)
+bool AttRehearsal::ReadRehearsal(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("reh.enclose")) {
         this->SetRehEnclose(StrToRehearsalRehenclose(element.attribute("reh.enclose").value()));
-        element.remove_attribute("reh.enclose");
+        if (removeAttr) element.remove_attribute("reh.enclose");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1407,12 +1407,12 @@ void AttScoreDefVisCmn::ResetScoreDefVisCmn()
     m_gridShow = BOOLEAN_NONE;
 }
 
-bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element)
+bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("grid.show")) {
         this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
-        element.remove_attribute("grid.show");
+        if (removeAttr) element.remove_attribute("grid.show");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1452,17 +1452,17 @@ void AttSlurRend::ResetSlurRend()
     m_slurLwidth = data_LINEWIDTH();
 }
 
-bool AttSlurRend::ReadSlurRend(pugi::xml_node element)
+bool AttSlurRend::ReadSlurRend(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("slur.lform")) {
         this->SetSlurLform(StrToLineform(element.attribute("slur.lform").value()));
-        element.remove_attribute("slur.lform");
+        if (removeAttr) element.remove_attribute("slur.lform");
         hasAttribute = true;
     }
     if (element.attribute("slur.lwidth")) {
         this->SetSlurLwidth(StrToLinewidth(element.attribute("slur.lwidth").value()));
-        element.remove_attribute("slur.lwidth");
+        if (removeAttr) element.remove_attribute("slur.lwidth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1510,12 +1510,12 @@ void AttStemsCmn::ResetStemsCmn()
     m_stemWith = NEIGHBORINGLAYER_NONE;
 }
 
-bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element)
+bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("stem.with")) {
         this->SetStemWith(StrToNeighboringlayer(element.attribute("stem.with").value()));
-        element.remove_attribute("stem.with");
+        if (removeAttr) element.remove_attribute("stem.with");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1555,17 +1555,17 @@ void AttTieRend::ResetTieRend()
     m_tieLwidth = data_LINEWIDTH();
 }
 
-bool AttTieRend::ReadTieRend(pugi::xml_node element)
+bool AttTieRend::ReadTieRend(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("tie.lform")) {
         this->SetTieLform(StrToLineform(element.attribute("tie.lform").value()));
-        element.remove_attribute("tie.lform");
+        if (removeAttr) element.remove_attribute("tie.lform");
         hasAttribute = true;
     }
     if (element.attribute("tie.lwidth")) {
         this->SetTieLwidth(StrToLinewidth(element.attribute("tie.lwidth").value()));
-        element.remove_attribute("tie.lwidth");
+        if (removeAttr) element.remove_attribute("tie.lwidth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1613,12 +1613,12 @@ void AttTremMeasured::ResetTremMeasured()
     m_unitdur = DURATION_NONE;
 }
 
-bool AttTremMeasured::ReadTremMeasured(pugi::xml_node element)
+bool AttTremMeasured::ReadTremMeasured(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("unitdur")) {
         this->SetUnitdur(StrToDuration(element.attribute("unitdur").value()));
-        element.remove_attribute("unitdur");
+        if (removeAttr) element.remove_attribute("unitdur");
         hasAttribute = true;
     }
     return hasAttribute;

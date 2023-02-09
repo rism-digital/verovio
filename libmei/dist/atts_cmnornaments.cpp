@@ -39,17 +39,17 @@ void AttMordentLog::ResetMordentLog()
     m_long = BOOLEAN_NONE;
 }
 
-bool AttMordentLog::ReadMordentLog(pugi::xml_node element)
+bool AttMordentLog::ReadMordentLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToMordentLogForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("long")) {
         this->SetLong(StrToBoolean(element.attribute("long").value()));
-        element.remove_attribute("long");
+        if (removeAttr) element.remove_attribute("long");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -97,12 +97,12 @@ void AttOrnamPresent::ResetOrnamPresent()
     m_ornam = "";
 }
 
-bool AttOrnamPresent::ReadOrnamPresent(pugi::xml_node element)
+bool AttOrnamPresent::ReadOrnamPresent(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("ornam")) {
         this->SetOrnam(StrToStr(element.attribute("ornam").value()));
-        element.remove_attribute("ornam");
+        if (removeAttr) element.remove_attribute("ornam");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -142,17 +142,17 @@ void AttOrnamentAccid::ResetOrnamentAccid()
     m_accidlower = ACCIDENTAL_WRITTEN_NONE;
 }
 
-bool AttOrnamentAccid::ReadOrnamentAccid(pugi::xml_node element)
+bool AttOrnamentAccid::ReadOrnamentAccid(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("accidupper")) {
         this->SetAccidupper(StrToAccidentalWritten(element.attribute("accidupper").value()));
-        element.remove_attribute("accidupper");
+        if (removeAttr) element.remove_attribute("accidupper");
         hasAttribute = true;
     }
     if (element.attribute("accidlower")) {
         this->SetAccidlower(StrToAccidentalWritten(element.attribute("accidlower").value()));
-        element.remove_attribute("accidlower");
+        if (removeAttr) element.remove_attribute("accidlower");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -201,17 +201,17 @@ void AttTurnLog::ResetTurnLog()
     m_form = turnLog_FORM_NONE;
 }
 
-bool AttTurnLog::ReadTurnLog(pugi::xml_node element)
+bool AttTurnLog::ReadTurnLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("delayed")) {
         this->SetDelayed(StrToBoolean(element.attribute("delayed").value()));
-        element.remove_attribute("delayed");
+        if (removeAttr) element.remove_attribute("delayed");
         hasAttribute = true;
     }
     if (element.attribute("form")) {
         this->SetForm(StrToTurnLogForm(element.attribute("form").value()));
-        element.remove_attribute("form");
+        if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;

@@ -38,7 +38,7 @@ public:
     void ResetCrit();
 
     /** Read the values for the attribute class **/
-    bool ReadCrit(pugi::xml_node element);
+    bool ReadCrit(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
     bool WriteCrit(pugi::xml_node element);
