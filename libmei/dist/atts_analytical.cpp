@@ -373,7 +373,7 @@ AttPitchClass::~AttPitchClass() {}
 
 void AttPitchClass::ResetPitchClass()
 {
-    m_pclass = VRV_UNSET;
+    m_pclass = MEI_UNSET;
 }
 
 bool AttPitchClass::ReadPitchClass(pugi::xml_node element)
@@ -399,7 +399,7 @@ bool AttPitchClass::WritePitchClass(pugi::xml_node element)
 
 bool AttPitchClass::HasPclass() const
 {
-    return (m_pclass != VRV_UNSET);
+    return (m_pclass != MEI_UNSET);
 }
 
 

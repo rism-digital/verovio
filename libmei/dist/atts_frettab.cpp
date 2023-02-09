@@ -79,7 +79,7 @@ AttNoteGesTab::~AttNoteGesTab() {}
 
 void AttNoteGesTab::ResetNoteGesTab()
 {
-    m_tabCourse = VRV_UNSET;
+    m_tabCourse = MEI_UNSET;
     m_tabFret = -1;
 }
 
@@ -115,7 +115,7 @@ bool AttNoteGesTab::WriteNoteGesTab(pugi::xml_node element)
 
 bool AttNoteGesTab::HasTabCourse() const
 {
-    return (m_tabCourse != VRV_UNSET);
+    return (m_tabCourse != MEI_UNSET);
 }
 
 bool AttNoteGesTab::HasTabFret() const

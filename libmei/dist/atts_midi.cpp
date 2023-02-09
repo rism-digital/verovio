@@ -38,7 +38,7 @@ void AttChannelized::ResetChannelized()
     m_midiChannel = -1;
     m_midiDuty = -1.0;
     m_midiPort = data_MIDIVALUE_NAME();
-    m_midiTrack = VRV_UNSET;
+    m_midiTrack = MEI_UNSET;
 }
 
 bool AttChannelized::ReadChannelized(pugi::xml_node element)
@@ -106,7 +106,7 @@ bool AttChannelized::HasMidiPort() const
 
 bool AttChannelized::HasMidiTrack() const
 {
-    return (m_midiTrack != VRV_UNSET);
+    return (m_midiTrack != MEI_UNSET);
 }
 
 
@@ -522,7 +522,7 @@ AttTimeBase::~AttTimeBase() {}
 
 void AttTimeBase::ResetTimeBase()
 {
-    m_ppq = VRV_UNSET;
+    m_ppq = MEI_UNSET;
 }
 
 bool AttTimeBase::ReadTimeBase(pugi::xml_node element)
@@ -548,7 +548,7 @@ bool AttTimeBase::WriteTimeBase(pugi::xml_node element)
 
 bool AttTimeBase::HasPpq() const
 {
-    return (m_ppq != VRV_UNSET);
+    return (m_ppq != MEI_UNSET);
 }
 
 } // namespace

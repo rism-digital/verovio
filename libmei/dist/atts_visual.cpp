@@ -81,7 +81,7 @@ void AttArpegVis::ResetArpegVis()
 {
     m_arrow = BOOLEAN_NONE;
     m_arrowShape = LINESTARTENDSYMBOL_NONE;
-    m_arrowSize = VRV_UNSET;
+    m_arrowSize = MEI_UNSET;
     m_arrowColor = "";
     m_arrowFillcolor = "";
     m_lineForm = LINEFORM_NONE;
@@ -175,7 +175,7 @@ bool AttArpegVis::HasArrowShape() const
 
 bool AttArpegVis::HasArrowSize() const
 {
-    return (m_arrowSize != VRV_UNSET);
+    return (m_arrowSize != MEI_UNSET);
 }
 
 bool AttArpegVis::HasArrowColor() const
@@ -215,7 +215,7 @@ void AttBarLineVis::ResetBarLineVis()
 {
     m_len = 0.0;
     m_method = BARMETHOD_NONE;
-    m_place = VRV_UNSET;
+    m_place = MEI_UNSET;
 }
 
 bool AttBarLineVis::ReadBarLineVis(pugi::xml_node element)
@@ -269,7 +269,7 @@ bool AttBarLineVis::HasMethod() const
 
 bool AttBarLineVis::HasPlace() const
 {
-    return (m_place != VRV_UNSET);
+    return (m_place != MEI_UNSET);
 }
 
 
@@ -567,8 +567,8 @@ AttFTremVis::~AttFTremVis() {}
 
 void AttFTremVis::ResetFTremVis()
 {
-    m_beams = VRV_UNSET;
-    m_beamsFloat = VRV_UNSET;
+    m_beams = MEI_UNSET;
+    m_beamsFloat = MEI_UNSET;
     m_floatGap = data_MEASUREMENTUNSIGNED();
 }
 
@@ -613,12 +613,12 @@ bool AttFTremVis::WriteFTremVis(pugi::xml_node element)
 
 bool AttFTremVis::HasBeams() const
 {
-    return (m_beams != VRV_UNSET);
+    return (m_beams != MEI_UNSET);
 }
 
 bool AttFTremVis::HasBeamsFloat() const
 {
-    return (m_beamsFloat != VRV_UNSET);
+    return (m_beamsFloat != MEI_UNSET);
 }
 
 bool AttFTremVis::HasFloatGap() const
@@ -1086,9 +1086,9 @@ void AttLineVis::ResetLineVis()
     m_form = LINEFORM_NONE;
     m_width = data_LINEWIDTH();
     m_endsym = LINESTARTENDSYMBOL_NONE;
-    m_endsymSize = VRV_UNSET;
+    m_endsymSize = MEI_UNSET;
     m_startsym = LINESTARTENDSYMBOL_NONE;
-    m_startsymSize = VRV_UNSET;
+    m_startsymSize = MEI_UNSET;
 }
 
 bool AttLineVis::ReadLineVis(pugi::xml_node element)
@@ -1174,7 +1174,7 @@ bool AttLineVis::HasEndsym() const
 
 bool AttLineVis::HasEndsymSize() const
 {
-    return (m_endsymSize != VRV_UNSET);
+    return (m_endsymSize != MEI_UNSET);
 }
 
 bool AttLineVis::HasStartsym() const
@@ -1184,7 +1184,7 @@ bool AttLineVis::HasStartsym() const
 
 bool AttLineVis::HasStartsymSize() const
 {
-    return (m_startsymSize != VRV_UNSET);
+    return (m_startsymSize != MEI_UNSET);
 }
 
 
@@ -1353,11 +1353,11 @@ void AttMensuralVis::ResetMensuralVis()
     m_mensurColor = "";
     m_mensurDot = BOOLEAN_NONE;
     m_mensurForm = mensuralVis_MENSURFORM_NONE;
-    m_mensurLoc = VRV_UNSET;
+    m_mensurLoc = MEI_UNSET;
     m_mensurOrient = ORIENTATION_NONE;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSize = data_FONTSIZE();
-    m_mensurSlash = VRV_UNSET;
+    m_mensurSlash = MEI_UNSET;
 }
 
 bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
@@ -1461,7 +1461,7 @@ bool AttMensuralVis::HasMensurForm() const
 
 bool AttMensuralVis::HasMensurLoc() const
 {
-    return (m_mensurLoc != VRV_UNSET);
+    return (m_mensurLoc != MEI_UNSET);
 }
 
 bool AttMensuralVis::HasMensurOrient() const
@@ -1481,7 +1481,7 @@ bool AttMensuralVis::HasMensurSize() const
 
 bool AttMensuralVis::HasMensurSlash() const
 {
-    return (m_mensurSlash != VRV_UNSET);
+    return (m_mensurSlash != MEI_UNSET);
 }
 
 
@@ -1793,7 +1793,7 @@ AttQuilismaVis::~AttQuilismaVis() {}
 
 void AttQuilismaVis::ResetQuilismaVis()
 {
-    m_waves = VRV_UNSET;
+    m_waves = MEI_UNSET;
 }
 
 bool AttQuilismaVis::ReadQuilismaVis(pugi::xml_node element)
@@ -1819,7 +1819,7 @@ bool AttQuilismaVis::WriteQuilismaVis(pugi::xml_node element)
 
 bool AttQuilismaVis::HasWaves() const
 {
-    return (m_waves != VRV_UNSET);
+    return (m_waves != MEI_UNSET);
 }
 
 

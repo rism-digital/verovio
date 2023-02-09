@@ -152,9 +152,9 @@ defaults:
     data_MEASUREMENTUNSIGNED:
         data_MEASUREMENTUNSIGNED()
     data_MEASUREMENTTYPOGRAPHYSIGNED:
-        VRV_UNSET
+        MEI_UNSET
     data_MEASUREMENTTYPOGRAPHYUNSIGNED:
-        VRV_UNSET
+        MEI_UNSET
     data_METERCOUNT_pair:
         std::pair<std::vector<int>, MeterCountSign>()
     data_MIDICHANNEL:

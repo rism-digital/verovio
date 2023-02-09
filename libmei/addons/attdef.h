@@ -21,7 +21,7 @@
 
 namespace vrv {
 
-#define VRV_UNSET -0x7FFFFFFF
+#define MEI_UNSET -0x7FFFFFFF
 
 /**
  * MEI virtual unit;
@@ -138,7 +138,7 @@ typedef char32_t data_HEXNUM;
 /**
  * MEI data.KEYSIGNATURE
  * default (unset) is -1; ACCIDENTAL_WRITTEN_NONE
- * "mixed" is VRV_UNSET; ACCITENTDAL_WRITTEN_NONE
+ * "mixed" is MEI_UNSET; ACCITENTDAL_WRITTEN_NONE
  */
 typedef std::pair<int, data_ACCIDENTAL_WRITTEN> data_KEYSIGNATURE;
 

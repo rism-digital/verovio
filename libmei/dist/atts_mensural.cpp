@@ -79,8 +79,8 @@ AttMensuralLog::~AttMensuralLog() {}
 
 void AttMensuralLog::ResetMensuralLog()
 {
-    m_proportNum = VRV_UNSET;
-    m_proportNumbase = VRV_UNSET;
+    m_proportNum = MEI_UNSET;
+    m_proportNumbase = MEI_UNSET;
 }
 
 bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element)
@@ -115,12 +115,12 @@ bool AttMensuralLog::WriteMensuralLog(pugi::xml_node element)
 
 bool AttMensuralLog::HasProportNum() const
 {
-    return (m_proportNum != VRV_UNSET);
+    return (m_proportNum != MEI_UNSET);
 }
 
 bool AttMensuralLog::HasProportNumbase() const
 {
-    return (m_proportNumbase != VRV_UNSET);
+    return (m_proportNumbase != MEI_UNSET);
 }
 
 
@@ -286,7 +286,7 @@ AttRestVisMensural::~AttRestVisMensural() {}
 
 void AttRestVisMensural::ResetRestVisMensural()
 {
-    m_spaces = VRV_UNSET;
+    m_spaces = MEI_UNSET;
 }
 
 bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element)
@@ -312,7 +312,7 @@ bool AttRestVisMensural::WriteRestVisMensural(pugi::xml_node element)
 
 bool AttRestVisMensural::HasSpaces() const
 {
-    return (m_spaces != VRV_UNSET);
+    return (m_spaces != MEI_UNSET);
 }
 
 

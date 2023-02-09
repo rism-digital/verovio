@@ -644,7 +644,7 @@ def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
 
     if attype == "int":
         if default is None:
-            default = "VRV_UNSET"
+            default = "MEI_UNSET"
         return default, ["StrToInt", "IntToStr"]
     elif attype == "char":
         if default is None:

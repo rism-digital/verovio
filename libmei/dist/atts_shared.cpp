@@ -255,7 +255,7 @@ AttAugmentDots::~AttAugmentDots() {}
 
 void AttAugmentDots::ResetAugmentDots()
 {
-    m_dots = VRV_UNSET;
+    m_dots = MEI_UNSET;
 }
 
 bool AttAugmentDots::ReadAugmentDots(pugi::xml_node element)
@@ -281,7 +281,7 @@ bool AttAugmentDots::WriteAugmentDots(pugi::xml_node element)
 
 bool AttAugmentDots::HasDots() const
 {
-    return (m_dots != VRV_UNSET);
+    return (m_dots != MEI_UNSET);
 }
 
 
@@ -404,7 +404,7 @@ void AttBarring::ResetBarring()
 {
     m_barLen = 0.0;
     m_barMethod = BARMETHOD_NONE;
-    m_barPlace = VRV_UNSET;
+    m_barPlace = MEI_UNSET;
 }
 
 bool AttBarring::ReadBarring(pugi::xml_node element)
@@ -458,7 +458,7 @@ bool AttBarring::HasBarMethod() const
 
 bool AttBarring::HasBarPlace() const
 {
-    return (m_barPlace != VRV_UNSET);
+    return (m_barPlace != MEI_UNSET);
 }
 
 
@@ -1093,10 +1093,10 @@ AttCoordinated::~AttCoordinated() {}
 
 void AttCoordinated::ResetCoordinated()
 {
-    m_ulx = VRV_UNSET;
-    m_uly = VRV_UNSET;
-    m_lrx = VRV_UNSET;
-    m_lry = VRV_UNSET;
+    m_ulx = MEI_UNSET;
+    m_uly = MEI_UNSET;
+    m_lrx = MEI_UNSET;
+    m_lry = MEI_UNSET;
     m_rotate = 0.0;
 }
 
@@ -1159,22 +1159,22 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
 
 bool AttCoordinated::HasUlx() const
 {
-    return (m_ulx != VRV_UNSET);
+    return (m_ulx != MEI_UNSET);
 }
 
 bool AttCoordinated::HasUly() const
 {
-    return (m_uly != VRV_UNSET);
+    return (m_uly != MEI_UNSET);
 }
 
 bool AttCoordinated::HasLrx() const
 {
-    return (m_lrx != VRV_UNSET);
+    return (m_lrx != MEI_UNSET);
 }
 
 bool AttCoordinated::HasLry() const
 {
-    return (m_lry != VRV_UNSET);
+    return (m_lry != MEI_UNSET);
 }
 
 bool AttCoordinated::HasRotate() const
@@ -1759,8 +1759,8 @@ AttDurationDefault::~AttDurationDefault() {}
 void AttDurationDefault::ResetDurationDefault()
 {
     m_durDefault = DURATION_NONE;
-    m_numDefault = VRV_UNSET;
-    m_numbaseDefault = VRV_UNSET;
+    m_numDefault = MEI_UNSET;
+    m_numbaseDefault = MEI_UNSET;
 }
 
 bool AttDurationDefault::ReadDurationDefault(pugi::xml_node element)
@@ -1809,12 +1809,12 @@ bool AttDurationDefault::HasDurDefault() const
 
 bool AttDurationDefault::HasNumDefault() const
 {
-    return (m_numDefault != VRV_UNSET);
+    return (m_numDefault != MEI_UNSET);
 }
 
 bool AttDurationDefault::HasNumbaseDefault() const
 {
-    return (m_numbaseDefault != VRV_UNSET);
+    return (m_numbaseDefault != MEI_UNSET);
 }
 
 
@@ -1876,8 +1876,8 @@ AttDurationRatio::~AttDurationRatio() {}
 
 void AttDurationRatio::ResetDurationRatio()
 {
-    m_num = VRV_UNSET;
-    m_numbase = VRV_UNSET;
+    m_num = MEI_UNSET;
+    m_numbase = MEI_UNSET;
 }
 
 bool AttDurationRatio::ReadDurationRatio(pugi::xml_node element)
@@ -1912,12 +1912,12 @@ bool AttDurationRatio::WriteDurationRatio(pugi::xml_node element)
 
 bool AttDurationRatio::HasNum() const
 {
-    return (m_num != VRV_UNSET);
+    return (m_num != MEI_UNSET);
 }
 
 bool AttDurationRatio::HasNumbase() const
 {
-    return (m_numbase != VRV_UNSET);
+    return (m_numbase != MEI_UNSET);
 }
 
 
@@ -2214,7 +2214,7 @@ AttFiling::~AttFiling() {}
 
 void AttFiling::ResetFiling()
 {
-    m_nonfiling = VRV_UNSET;
+    m_nonfiling = MEI_UNSET;
 }
 
 bool AttFiling::ReadFiling(pugi::xml_node element)
@@ -2240,7 +2240,7 @@ bool AttFiling::WriteFiling(pugi::xml_node element)
 
 bool AttFiling::HasNonfiling() const
 {
-    return (m_nonfiling != VRV_UNSET);
+    return (m_nonfiling != MEI_UNSET);
 }
 
 
@@ -2258,7 +2258,7 @@ AttGrpSymLog::~AttGrpSymLog() {}
 
 void AttGrpSymLog::ResetGrpSymLog()
 {
-    m_level = VRV_UNSET;
+    m_level = MEI_UNSET;
 }
 
 bool AttGrpSymLog::ReadGrpSymLog(pugi::xml_node element)
@@ -2284,7 +2284,7 @@ bool AttGrpSymLog::WriteGrpSymLog(pugi::xml_node element)
 
 bool AttGrpSymLog::HasLevel() const
 {
-    return (m_level != VRV_UNSET);
+    return (m_level != MEI_UNSET);
 }
 
 
@@ -2757,7 +2757,7 @@ AttLayerIdent::~AttLayerIdent() {}
 
 void AttLayerIdent::ResetLayerIdent()
 {
-    m_layer = VRV_UNSET;
+    m_layer = MEI_UNSET;
 }
 
 bool AttLayerIdent::ReadLayerIdent(pugi::xml_node element)
@@ -2783,7 +2783,7 @@ bool AttLayerIdent::WriteLayerIdent(pugi::xml_node element)
 
 bool AttLayerIdent::HasLayer() const
 {
-    return (m_layer != VRV_UNSET);
+    return (m_layer != MEI_UNSET);
 }
 
 
@@ -2846,9 +2846,9 @@ AttLineRend::~AttLineRend() {}
 void AttLineRend::ResetLineRend()
 {
     m_lendsym = LINESTARTENDSYMBOL_NONE;
-    m_lendsymSize = VRV_UNSET;
+    m_lendsymSize = MEI_UNSET;
     m_lstartsym = LINESTARTENDSYMBOL_NONE;
-    m_lstartsymSize = VRV_UNSET;
+    m_lstartsymSize = MEI_UNSET;
 }
 
 bool AttLineRend::ReadLineRend(pugi::xml_node element)
@@ -2906,7 +2906,7 @@ bool AttLineRend::HasLendsym() const
 
 bool AttLineRend::HasLendsymSize() const
 {
-    return (m_lendsymSize != VRV_UNSET);
+    return (m_lendsymSize != MEI_UNSET);
 }
 
 bool AttLineRend::HasLstartsym() const
@@ -2916,7 +2916,7 @@ bool AttLineRend::HasLstartsym() const
 
 bool AttLineRend::HasLstartsymSize() const
 {
-    return (m_lstartsymSize != VRV_UNSET);
+    return (m_lstartsymSize != MEI_UNSET);
 }
 
 
@@ -2935,7 +2935,7 @@ AttLineRendBase::~AttLineRendBase() {}
 void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
-    m_lsegs = VRV_UNSET;
+    m_lsegs = MEI_UNSET;
     m_lwidth = data_LINEWIDTH();
 }
 
@@ -2985,7 +2985,7 @@ bool AttLineRendBase::HasLform() const
 
 bool AttLineRendBase::HasLsegs() const
 {
-    return (m_lsegs != VRV_UNSET);
+    return (m_lsegs != MEI_UNSET);
 }
 
 bool AttLineRendBase::HasLwidth() const
@@ -3675,7 +3675,7 @@ void AttMeterSigLog::ResetMeterSigLog()
 {
     m_count = std::pair<std::vector<int>, MeterCountSign>();
     m_sym = METERSIGN_NONE;
-    m_unit = VRV_UNSET;
+    m_unit = MEI_UNSET;
 }
 
 bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
@@ -3729,7 +3729,7 @@ bool AttMeterSigLog::HasSym() const
 
 bool AttMeterSigLog::HasUnit() const
 {
-    return (m_unit != VRV_UNSET);
+    return (m_unit != MEI_UNSET);
 }
 
 
@@ -3748,7 +3748,7 @@ AttMeterSigDefaultLog::~AttMeterSigDefaultLog() {}
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
     m_meterCount = std::pair<std::vector<int>, MeterCountSign>();
-    m_meterUnit = VRV_UNSET;
+    m_meterUnit = MEI_UNSET;
     m_meterSym = METERSIGN_NONE;
 }
 
@@ -3798,7 +3798,7 @@ bool AttMeterSigDefaultLog::HasMeterCount() const
 
 bool AttMeterSigDefaultLog::HasMeterUnit() const
 {
-    return (m_meterUnit != VRV_UNSET);
+    return (m_meterUnit != MEI_UNSET);
 }
 
 bool AttMeterSigDefaultLog::HasMeterSym() const
@@ -3823,7 +3823,7 @@ void AttMmTempo::ResetMmTempo()
 {
     m_mm = 0.0;
     m_mmUnit = DURATION_NONE;
-    m_mmDots = VRV_UNSET;
+    m_mmDots = MEI_UNSET;
 }
 
 bool AttMmTempo::ReadMmTempo(pugi::xml_node element)
@@ -3877,7 +3877,7 @@ bool AttMmTempo::HasMmUnit() const
 
 bool AttMmTempo::HasMmDots() const
 {
-    return (m_mmDots != VRV_UNSET);
+    return (m_mmDots != MEI_UNSET);
 }
 
 
@@ -3939,7 +3939,7 @@ AttNInteger::~AttNInteger() {}
 
 void AttNInteger::ResetNInteger()
 {
-    m_n = VRV_UNSET;
+    m_n = MEI_UNSET;
 }
 
 bool AttNInteger::ReadNInteger(pugi::xml_node element)
@@ -3965,7 +3965,7 @@ bool AttNInteger::WriteNInteger(pugi::xml_node element)
 
 bool AttNInteger::HasN() const
 {
-    return (m_n != VRV_UNSET);
+    return (m_n != MEI_UNSET);
 }
 
 
@@ -5562,7 +5562,7 @@ AttSequence::~AttSequence() {}
 
 void AttSequence::ResetSequence()
 {
-    m_seq = VRV_UNSET;
+    m_seq = MEI_UNSET;
 }
 
 bool AttSequence::ReadSequence(pugi::xml_node element)
@@ -5588,7 +5588,7 @@ bool AttSequence::WriteSequence(pugi::xml_node element)
 
 bool AttSequence::HasSeq() const
 {
-    return (m_seq != VRV_UNSET);
+    return (m_seq != MEI_UNSET);
 }
 
 
@@ -5871,7 +5871,7 @@ AttStaffDefLog::~AttStaffDefLog() {}
 
 void AttStaffDefLog::ResetStaffDefLog()
 {
-    m_lines = VRV_UNSET;
+    m_lines = MEI_UNSET;
 }
 
 bool AttStaffDefLog::ReadStaffDefLog(pugi::xml_node element)
@@ -5897,7 +5897,7 @@ bool AttStaffDefLog::WriteStaffDefLog(pugi::xml_node element)
 
 bool AttStaffDefLog::HasLines() const
 {
-    return (m_lines != VRV_UNSET);
+    return (m_lines != MEI_UNSET);
 }
 
 
@@ -6077,7 +6077,7 @@ AttStaffLoc::~AttStaffLoc() {}
 
 void AttStaffLoc::ResetStaffLoc()
 {
-    m_loc = VRV_UNSET;
+    m_loc = MEI_UNSET;
 }
 
 bool AttStaffLoc::ReadStaffLoc(pugi::xml_node element)
@@ -6103,7 +6103,7 @@ bool AttStaffLoc::WriteStaffLoc(pugi::xml_node element)
 
 bool AttStaffLoc::HasLoc() const
 {
-    return (m_loc != VRV_UNSET);
+    return (m_loc != MEI_UNSET);
 }
 
 
@@ -6992,8 +6992,8 @@ AttTransposition::~AttTransposition() {}
 
 void AttTransposition::ResetTransposition()
 {
-    m_transDiat = VRV_UNSET;
-    m_transSemi = VRV_UNSET;
+    m_transDiat = MEI_UNSET;
+    m_transSemi = MEI_UNSET;
 }
 
 bool AttTransposition::ReadTransposition(pugi::xml_node element)
@@ -7028,12 +7028,12 @@ bool AttTransposition::WriteTransposition(pugi::xml_node element)
 
 bool AttTransposition::HasTransDiat() const
 {
-    return (m_transDiat != VRV_UNSET);
+    return (m_transDiat != MEI_UNSET);
 }
 
 bool AttTransposition::HasTransSemi() const
 {
-    return (m_transSemi != VRV_UNSET);
+    return (m_transSemi != MEI_UNSET);
 }
 
 
@@ -7391,7 +7391,7 @@ AttVerticalGroup::~AttVerticalGroup() {}
 
 void AttVerticalGroup::ResetVerticalGroup()
 {
-    m_vgrp = VRV_UNSET;
+    m_vgrp = MEI_UNSET;
 }
 
 bool AttVerticalGroup::ReadVerticalGroup(pugi::xml_node element)
@@ -7417,7 +7417,7 @@ bool AttVerticalGroup::WriteVerticalGroup(pugi::xml_node element)
 
 bool AttVerticalGroup::HasVgrp() const
 {
-    return (m_vgrp != VRV_UNSET);
+    return (m_vgrp != MEI_UNSET);
 }
 
 

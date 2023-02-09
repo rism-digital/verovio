@@ -36,7 +36,7 @@ public:
     void Reset(FontSizeType type)
     {
         m_type = type;
-        m_fontSizeNumeric = VRV_UNSET;
+        m_fontSizeNumeric = MEI_UNSET;
         m_term = FONTSIZETERM_NONE;
         m_percent = 0;
     }
@@ -81,7 +81,7 @@ public:
 
     bool HasValue() const
     {
-        if (m_fontSizeNumeric != VRV_UNSET) return true;
+        if (m_fontSizeNumeric != MEI_UNSET) return true;
         if (m_term != FONTSIZETERM_NONE) return true;
         if (m_percent != 0) return true;
         return false;
@@ -120,8 +120,8 @@ public:
     void Reset(MeasurementType type)
     {
         m_type = type;
-        m_px = VRV_UNSET;
-        m_vu = VRV_UNSET;
+        m_px = MEI_UNSET;
+        m_vu = MEI_UNSET;
     }
 
     MeasurementType GetType() const { return m_type; }
@@ -142,8 +142,8 @@ public:
 
     bool HasValue() const
     {
-        if (m_px != VRV_UNSET) return true;
-        if (m_vu != VRV_UNSET) return true;
+        if (m_px != MEI_UNSET) return true;
+        if (m_vu != MEI_UNSET) return true;
         return false;
     }
 
@@ -297,7 +297,7 @@ public:
     {
         m_type = type;
         m_midivalue = -1;
-        m_percentLimitedSigned = VRV_UNSET;
+        m_percentLimitedSigned = MEI_UNSET;
     }
 
     MidivaluePanType GetType() const { return m_type; }
@@ -319,7 +319,7 @@ public:
     bool HasValue() const
     {
         if (m_midivalue != -1) return true;
-        if (m_percentLimitedSigned != VRV_UNSET) return true;
+        if (m_percentLimitedSigned != MEI_UNSET) return true;
         return false;
     }
 

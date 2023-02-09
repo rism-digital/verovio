@@ -66,7 +66,7 @@ data_VU Att::StrToVU(const std::string &value, bool logWarning) const
     std::regex test("[0-9]*(\\.[0-9]+)?(vu)?");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) LogWarning("Unsupported virtual unit value '%s'", value.c_str());
-        return VRV_UNSET;
+        return MEI_UNSET;
     }
     return atof(value.substr(0, value.find("vu")).c_str());
 }
@@ -320,7 +320,7 @@ data_FONTSIZENUMERIC Att::StrToFontsizenumeric(const std::string &value, bool lo
     std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
     if (!std::regex_match(value, test)) {
         if (logWarning && !value.empty()) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
-        return VRV_UNSET;
+        return MEI_UNSET;
     }
     return atof(value.substr(0, value.find("pt")).c_str());
 }
@@ -329,7 +329,7 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
 {
     std::string value;
 
-    if (data.first == VRV_UNSET) {
+    if (data.first == MEI_UNSET) {
         value = "mixed";
     }
     else if (data.first == 0) {
@@ -354,7 +354,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
     }
 
     if (value == "mixed") {
-        return { VRV_UNSET, ACCIDENTAL_WRITTEN_NONE };
+        return { MEI_UNSET, ACCIDENTAL_WRITTEN_NONE };
     }
     else if (value != "0") {
         alterationNumber = std::stoi(value);
@@ -913,4 +913,4 @@ data_STAFFREL_basic Att::StaffrelToStaffrelBasic(data_STAFFREL staffrel)
     return staffrelBasic;
 }
 
-} // namespace vrv
+} // namespace
