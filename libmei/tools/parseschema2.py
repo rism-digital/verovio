@@ -53,8 +53,7 @@ def main(configure: dict) -> bool:
 
 
 if __name__ == "__main__":
-    # Custom usage message to show user [compiled] should go before all other flags
-    p = ArgumentParser(usage='%(prog)s [compiled | -sl] [-e] [-h] [-df DEFINE] [-o OUTDIR] [-d]')
+    p = ArgumentParser(usage='%(prog)s [-c config path] [compiled odd path]')
 
     p.add_argument("compiled", help="A compiled ODD file", type=Path)
     p.add_argument("-c", "--config", help="Path to a config file", type=Path)
