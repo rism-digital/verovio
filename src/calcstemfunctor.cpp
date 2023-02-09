@@ -154,7 +154,7 @@ FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
         stemDir = layerStemDir;
     }
     else {
-        stemDir = chord->CalcStemDirection(m_verticalCenter);
+        stemDir = this->CalcStemDirection(chord, m_verticalCenter);
     }
 
     chord->SetDrawingStemDir(stemDir);
@@ -472,7 +472,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
         if (flag) flag->SetDrawingYRel(-stem->GetDrawingStemLen());
     }
 
-    if (flag) stem->AdjustFlagPlacement(m_doc, flag, staffSize, m_verticalCenter, m_dur);
+    if (flag) this->AdjustFlagPlacement(m_doc, stem, flag, staffSize, m_verticalCenter, m_dur);
 
     return FUNCTOR_CONTINUE;
 }
@@ -576,6 +576,104 @@ FunctorCode CalcStemFunctor::VisitTabGrp(TabGrp *tabGrp)
     m_tabGrpWithNoNote = !tabGrp->FindDescendantByType(NOTE);
 
     return FUNCTOR_CONTINUE;
+}
+
+data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int verticalCenter) const
+{
+    const ListOfConstObjects &childList = chord->GetList(chord);
+    ListOfConstObjects topNotes, bottomNotes;
+
+    // split notes into two vectors - notes above vertical center and below
+    std::partition_copy(childList.begin(), childList.end(), std::back_inserter(topNotes),
+        std::back_inserter(bottomNotes),
+        [verticalCenter](const Object *note) { return note->GetDrawingY() > verticalCenter; });
+
+    auto bottomIter = bottomNotes.begin();
+    auto topIter = topNotes.rbegin();
+    for (; bottomIter != bottomNotes.end() && topIter != topNotes.rend(); ++bottomIter, ++topIter) {
+        const int bottomY = (*bottomIter)->GetDrawingY();
+        const int topY = (*topIter)->GetDrawingY();
+        const int middlePoint = (topY + bottomY) / 2;
+
+        // if notes are equidistant - proceed to the next pair of notes
+        if (middlePoint == verticalCenter) {
+            continue;
+        }
+        // otherwise return corresponding stem direction
+        else if (middlePoint > verticalCenter) {
+            return STEMDIRECTION_down;
+        }
+        else if (middlePoint < verticalCenter) {
+            return STEMDIRECTION_up;
+        }
+    }
+
+    // if there are still unprocessed notes left on the bottom that are not on the center - stem direction should be up
+    if ((bottomIter != bottomNotes.end()) && ((*bottomIter)->GetDrawingY() != verticalCenter)) {
+        return STEMDIRECTION_up;
+    }
+    // otherwise place it down
+    return STEMDIRECTION_down;
+}
+
+void CalcStemFunctor::AdjustFlagPlacement(
+    const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, int duration) const
+{
+    assert(stem->GetParent());
+    assert(stem->GetParent()->IsLayerElement());
+
+    LayerElement *parent = vrv_cast<LayerElement *>(stem->GetParent());
+    if (!parent) return;
+
+    const data_STEMDIRECTION stemDirection = stem->GetDrawingStemDir();
+    // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
+    char32_t flagGlyph = SMUFL_E242_flag16thUp;
+    if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
+    const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, stem->GetDrawingCueSize());
+
+    // Make sure that flags don't overlap with notehead. Upward flags cannot overlap with noteheads so check
+    // only downward ones
+    const int adjustmentStep = doc->GetDrawingUnit(staffSize);
+    if (stemDirection == STEMDIRECTION_down) {
+        const int noteheadMargin = stem->GetDrawingStemLen() - (glyphHeight + parent->GetDrawingRadius(doc));
+        if ((duration > DURATION_16) && (noteheadMargin < 0)) {
+            int offset = 0;
+            if (noteheadMargin % adjustmentStep < -adjustmentStep / 3 * 2) offset = adjustmentStep / 2;
+            const int heightToAdjust = (noteheadMargin / adjustmentStep) * adjustmentStep - offset;
+            stem->SetDrawingStemLen(stem->GetDrawingStemLen() - heightToAdjust);
+            flag->SetDrawingYRel(-stem->GetDrawingStemLen());
+        }
+    }
+
+    Note *note = NULL;
+    if (parent->Is(NOTE)) {
+        note = vrv_cast<Note *>(parent);
+    }
+    else if (parent->Is(CHORD)) {
+        note = vrv_cast<Chord *>(parent)->GetTopNote();
+    }
+    int ledgerAbove = 0;
+    int ledgerBelow = 0;
+    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
+    if (((stemDirection == STEMDIRECTION_up) && !ledgerBelow)
+        || ((stemDirection == STEMDIRECTION_down) && !ledgerAbove))
+        return;
+
+    // Make sure that flags don't overlap with first (top or bottom) ledger line (effectively avoiding all ledgers)
+    const int directionBias = (stemDirection == STEMDIRECTION_down) ? -1 : 1;
+    const int position = stem->GetDrawingY() - stem->GetDrawingStemLen() - directionBias * glyphHeight;
+    const int ledgerPosition = verticalCenter - 6 * directionBias * adjustmentStep;
+    const int displacementMargin = (position - ledgerPosition) * directionBias;
+
+    if (displacementMargin < 0) {
+        int offset = 0;
+        if ((stemDirection == STEMDIRECTION_down) && (displacementMargin % adjustmentStep > -adjustmentStep / 3)) {
+            offset = adjustmentStep / 2;
+        }
+        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
+        stem->SetDrawingStemLen(stem->GetDrawingStemLen() + heightToAdjust);
+        flag->SetDrawingYRel(-stem->GetDrawingStemLen());
+    }
 }
 
 } // namespace vrv

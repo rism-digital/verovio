@@ -247,14 +247,6 @@ protected:
      */
     MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
 
-    // TODO: Move to functor helper!!!
-public:
-    /**
-     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
-     * the top-/bottommost and moving inward towards the center of the chord
-     */
-    data_STEMDIRECTION CalcStemDirection(int verticalCenter) const;
-
     /**
      * Clear the m_clusters vector and delete all the objects.
      */

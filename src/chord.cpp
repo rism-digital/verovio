@@ -382,44 +382,6 @@ Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter) const
-{
-    const ListOfConstObjects &childList = this->GetList(this);
-    ListOfConstObjects topNotes, bottomNotes;
-
-    // split notes into two vectors - notes above vertical center and below
-    std::partition_copy(childList.begin(), childList.end(), std::back_inserter(topNotes),
-        std::back_inserter(bottomNotes),
-        [verticalCenter](const Object *note) { return note->GetDrawingY() > verticalCenter; });
-
-    auto bottomIter = bottomNotes.begin();
-    auto topIter = topNotes.rbegin();
-    for (; bottomIter != bottomNotes.end() && topIter != topNotes.rend(); ++bottomIter, ++topIter) {
-        const int bottomY = (*bottomIter)->GetDrawingY();
-        const int topY = (*topIter)->GetDrawingY();
-        const int middlePoint = (topY + bottomY) / 2;
-
-        // if notes are equidistant - proceed to the next pair of notes
-        if (middlePoint == verticalCenter) {
-            continue;
-        }
-        // otherwise return corresponding stem direction
-        else if (middlePoint > verticalCenter) {
-            return STEMDIRECTION_down;
-        }
-        else if (middlePoint < verticalCenter) {
-            return STEMDIRECTION_up;
-        }
-    }
-
-    // if there are still unprocessed notes left on the bottom that are not on the center - stem direction should be up
-    if ((bottomIter != bottomNotes.end()) && ((*bottomIter)->GetDrawingY() != verticalCenter)) {
-        return STEMDIRECTION_up;
-    }
-    // otherwise place it down
-    return STEMDIRECTION_down;
-}
-
 int Chord::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);

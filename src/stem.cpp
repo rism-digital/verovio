@@ -114,65 +114,6 @@ int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElem
     }
 }
 
-void Stem::AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration)
-{
-    assert(this->GetParent());
-    assert(this->GetParent()->IsLayerElement());
-
-    LayerElement *parent = vrv_cast<LayerElement *>(this->GetParent());
-    if (!parent) return;
-
-    const data_STEMDIRECTION stemDirection = this->GetDrawingStemDir();
-    // For overlapping purposes we don't care for flags shorter than 16th since they grow in opposite direction
-    char32_t flagGlyph = SMUFL_E242_flag16thUp;
-    if (duration < DURATION_16) flagGlyph = flag->GetFlagGlyph(stemDirection);
-    const int glyphHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
-
-    // Make sure that flags don't overlap with notehead. Upward flags cannot overlap with noteheads so check
-    // only downward ones
-    const int adjustmentStep = doc->GetDrawingUnit(staffSize);
-    if (stemDirection == STEMDIRECTION_down) {
-        const int noteheadMargin = this->GetDrawingStemLen() - (glyphHeight + parent->GetDrawingRadius(doc));
-        if ((duration > DURATION_16) && (noteheadMargin < 0)) {
-            int offset = 0;
-            if (noteheadMargin % adjustmentStep < -adjustmentStep / 3 * 2) offset = adjustmentStep / 2;
-            const int heightToAdjust = (noteheadMargin / adjustmentStep) * adjustmentStep - offset;
-            this->SetDrawingStemLen(this->GetDrawingStemLen() - heightToAdjust);
-            flag->SetDrawingYRel(-this->GetDrawingStemLen());
-        }
-    }
-
-    Note *note = NULL;
-    if (parent->Is(NOTE)) {
-        note = vrv_cast<Note *>(parent);
-    }
-    else if (parent->Is(CHORD)) {
-        note = vrv_cast<Chord *>(parent)->GetTopNote();
-    }
-    int ledgerAbove = 0;
-    int ledgerBelow = 0;
-    if (!note || !note->HasLedgerLines(ledgerAbove, ledgerBelow)) return;
-    if (((stemDirection == STEMDIRECTION_up) && !ledgerBelow)
-        || ((stemDirection == STEMDIRECTION_down) && !ledgerAbove))
-        return;
-
-    // Make sure that flags don't overlap with first (top or bottom) ledger line (effectively avoiding all ledgers)
-    const int directionBias = (stemDirection == STEMDIRECTION_down) ? -1 : 1;
-    const int position = this->GetDrawingY() - this->GetDrawingStemLen() - directionBias * glyphHeight;
-    const int ledgerPosition = verticalCenter - 6 * directionBias * adjustmentStep;
-    const int displacementMargin = (position - ledgerPosition) * directionBias;
-
-    if (displacementMargin < 0) {
-        int offset = 0;
-        if ((stemDirection == STEMDIRECTION_down) && (displacementMargin % adjustmentStep > -adjustmentStep / 3)) {
-            offset = adjustmentStep / 2;
-        }
-        const int heightToAdjust = (displacementMargin / adjustmentStep - 1) * adjustmentStep * directionBias - offset;
-        this->SetDrawingStemLen(this->GetDrawingStemLen() + heightToAdjust);
-        flag->SetDrawingYRel(-this->GetDrawingStemLen());
-    }
-}
-
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

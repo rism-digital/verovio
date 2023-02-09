@@ -52,7 +52,18 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
+     * the top-/bottom most and moving inward towards the center of the chord
+     */
+    data_STEMDIRECTION CalcStemDirection(const Chord *chord, int verticalCenter) const;
+
+    /**
+     * Adjusts the flag placement and stem length if they are crossing notehead or ledger lines
+     */
+    void AdjustFlagPlacement(
+        const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, int duration) const;
+
 public:
     //
 private:
