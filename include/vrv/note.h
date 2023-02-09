@@ -310,11 +310,6 @@ public:
     int CalcArtic(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcChordNoteHeads
-     */
-    int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

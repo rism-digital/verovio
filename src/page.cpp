@@ -17,6 +17,7 @@
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
 #include "calcalignmentxposfunctor.h"
+#include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
 #include "calcstemfunctor.h"
@@ -230,9 +231,8 @@ void Page::LayOutTranscription(bool force)
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
 
-    CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
-    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
-    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+    CalcChordNoteHeadsFunctor calcChordNoteHeads(doc);
+    this->Process(calcChordNoteHeads);
 
     CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
@@ -321,9 +321,8 @@ void Page::ResetAligners()
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
 
-    CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
-    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
-    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+    CalcChordNoteHeadsFunctor calcChordNoteHeads(doc);
+    this->Process(calcChordNoteHeads);
 
     CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
