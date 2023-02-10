@@ -286,6 +286,7 @@ private:
     void UpdateMdivFilter(Object *object);
     bool ProcessScoreBasedFilter(Object *object);
     bool ProcessScoreBasedFilterEnd(Object *object);
+    void PruneAttributes(pugi::xml_node node);
     ///@}
 
     /**
