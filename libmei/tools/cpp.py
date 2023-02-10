@@ -1169,6 +1169,7 @@ class MEIBasic {{
 public:
     static bool IsAllowed(const std::string &element, const std::string &attr)
     {{
+        if (attr == "xml:id") return true;
         if (!MEIBasic::map.count(element)) return false;
         const std::vector<std::string> &attributes = MEIBasic::map.at(element);
         return (std::find(attributes.begin(), attributes.end(), attr) != attributes.end());
