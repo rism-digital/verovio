@@ -264,7 +264,7 @@ bool MEIOutput::Export()
         if (m_doc->GetOptions()->m_outputFormatRaw.GetValue()) {
             output_flags |= pugi::format_raw;
         }
-        
+
         if (this->GetBasic()) {
             this->PruneAttributes(m_mei.child("music"));
         }
@@ -1251,7 +1251,7 @@ void MEIOutput::PruneAttributes(pugi::xml_node node)
     }
     for (const std::string &attribute : unsupported) node.remove_attribute(attribute.c_str());
 
-    for(pugi::xml_node &child: node.children()) {
+    for (pugi::xml_node &child : node.children()) {
         this->PruneAttributes(child);
     }
 }
