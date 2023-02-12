@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.swift_versions = ['3.0', '4.0', '4.1', '4.2', '5.0','5.1']
   s.source_files        = 'src/**/*.{h,cpp,cc}',
                           'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-                          'libmei/{dist,addons}/*.{cpp}'
+                          'libmei/{dist,addons}/*.{h,cpp}'
   s.public_header_files = 'src/**/*.{h}',
                           'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
                           'libmei/{dist,addons}/*.{h}'
