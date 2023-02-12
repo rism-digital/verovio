@@ -47,7 +47,7 @@ public:
     void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); }
 
     /**
-     * Method for obtaining a pointer to the attribute class vector of the interface
+     * Method for obtaining a pointer to the attribute class vector of the interface.
      */
     std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; }
 
@@ -65,7 +65,7 @@ public:
 
 private:
     /**
-     * A vector for storing all the MEI att classes grouped in the interface
+     * A vector for storing all the MEI att classes grouped in the interface.
      */
     std::vector<AttClassId> m_interfaceAttClasses;
 };
