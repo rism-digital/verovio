@@ -55,6 +55,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "tempo.h"
 #include "text.h"
 #include "timemap.h"
 #include "timestamp.h"
@@ -289,6 +290,9 @@ void Doc::CalculateTimemap()
     if (this->GetCurrentScoreDef()->HasMidiBpm()) {
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
     }
+    else if (this->GetCurrentScoreDef()->HasMm()) {
+        tempo = Tempo::CalcTempo(this->GetCurrentScoreDef());
+    }
 
     // We first calculate the maximum duration of each measure
     InitMaxMeasureDurationParams initMaxMeasureDurationParams;
@@ -327,6 +331,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // set MIDI tempo
     if (this->GetCurrentScoreDef()->HasMidiBpm()) {
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
+    }
+    else if (this->GetCurrentScoreDef()->HasMm()) {
+        tempo = Tempo::CalcTempo(this->GetCurrentScoreDef());
     }
     midiFile->addTempo(0, 0, tempo);
 

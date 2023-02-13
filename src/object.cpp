@@ -2383,8 +2383,8 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
             }
             else {
                 above->SetOverflowAbove(overflowAbove);
-                above->AddBBoxAbove(current);
             }
+            above->AddBBoxAbove(current);
         }
     }
 
@@ -2398,8 +2398,8 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
             }
             else {
                 below->SetOverflowBelow(overflowBelow);
-                below->AddBBoxBelow(current);
             }
+            below->AddBBoxBelow(current);
         }
     }
 

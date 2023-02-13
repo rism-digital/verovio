@@ -844,25 +844,17 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             if (params->m_classId == HAIRPIN) continue;
         }
 
-        auto i = overflowBoxes->begin();
-        auto end = overflowBoxes->end();
-        while (i != end) {
-            // find all the overflowing elements from the staff that overlap horizontally (and, in case of extender
-            // elements - vertically)
-            i = std::find_if(i, end, [iter, drawingUnit](BoundingBox *elem) {
-                if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
-                    return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
-                        || (*iter)->VerticalContentOverlap(elem);
-                }
-                const int margin = (*iter)->GetAdmissibleHorizOverlapMargin(elem, drawingUnit);
-                return (*iter)->HorizontalContentOverlap(elem, margin);
-            });
-            if (i != end) {
+        // Find all the overflowing elements from the staff that overlap horizontally
+        for (auto i = overflowBoxes->begin(); i != overflowBoxes->end(); ++i) {
+            if ((*iter)->HasHorizontalOverlapWith(*i, drawingUnit)) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
-                ++i;
             }
         }
+
+        // Vertically align extender elements across systems
+        (*iter)->AdjustExtenders();
+
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
         if (place == STAFFREL_above) {
