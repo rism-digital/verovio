@@ -1376,6 +1376,12 @@
 		E722106728F856C4002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
 		E722106828F85981002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
 		E722106928F85982002CD6E9 /* findlayerelementsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */; };
+		E741ACFF299A3D3400854426 /* calcslurdirectionfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */; };
+		E741AD00299A3D3500854426 /* calcslurdirectionfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E741AD02299A3D5B00854426 /* calcslurdirectionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */; };
+		E741AD03299A3D6300854426 /* calcslurdirectionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */; };
+		E741AD04299A3D6400854426 /* calcslurdirectionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */; };
+		E741AD05299A3D6500854426 /* calcslurdirectionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */; };
 		E74A806128BC9111005274E7 /* findfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findfunctor.cpp */; };
 		E74A806228BC9111005274E7 /* findfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findfunctor.cpp */; };
 		E74A806328BC911D005274E7 /* findfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806028BC9111005274E7 /* findfunctor.cpp */; };
@@ -1959,6 +1965,8 @@
 		E71EF3C52975ED3800D36264 /* resetfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resetfunctor.cpp; path = src/resetfunctor.cpp; sourceTree = "<group>"; };
 		E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findlayerelementsfunctor.h; path = include/vrv/findlayerelementsfunctor.h; sourceTree = "<group>"; };
 		E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findlayerelementsfunctor.cpp; path = src/findlayerelementsfunctor.cpp; sourceTree = "<group>"; };
+		E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcslurdirectionfunctor.h; path = include/vrv/calcslurdirectionfunctor.h; sourceTree = "<group>"; };
+		E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcslurdirectionfunctor.cpp; path = src/calcslurdirectionfunctor.cpp; sourceTree = "<group>"; };
 		E74A806028BC9111005274E7 /* findfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findfunctor.cpp; path = src/findfunctor.cpp; sourceTree = "<group>"; };
 		E74A806528BC97D5005274E7 /* findfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findfunctor.h; path = include/vrv/findfunctor.h; sourceTree = "<group>"; };
 		E74A806828BC9842005274E7 /* functorinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functorinterface.cpp; path = src/functorinterface.cpp; sourceTree = "<group>"; };
@@ -2757,6 +2765,8 @@
 				E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
+				E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */,
+				E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */,
 				E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */,
 				E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */,
 				E79320662991453C00D80975 /* calcstemfunctor.cpp */,
@@ -2869,6 +2879,7 @@
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
 				403B0514244F3E4D00EE4F71 /* gliss.h in Headers */,
+				E741ACFF299A3D3400854426 /* calcslurdirectionfunctor.h in Headers */,
 				4DEF8A6221B7AACC0093A76B /* f.h in Headers */,
 				4DACC9DE2990F29A00B55913 /* atts_performance.h in Headers */,
 				4DB3D8B71F83D0A300B5FC2B /* label.h in Headers */,
@@ -3073,6 +3084,7 @@
 				BB4C4BB722A932F6001F6AF0 /* jsonxx.h in Headers */,
 				BB4C4B1622A932C8001F6AF0 /* systemelement.h in Headers */,
 				BB4C4AC622A932B6001F6AF0 /* measure.h in Headers */,
+				E741AD00299A3D3500854426 /* calcslurdirectionfunctor.h in Headers */,
 				BB4C4B7E22A932D7001F6AF0 /* verse.h in Headers */,
 				BB4C4B0422A932C3001F6AF0 /* runningelement.h in Headers */,
 				BB4C4B1822A932CF001F6AF0 /* controlelement.h in Headers */,
@@ -3503,6 +3515,7 @@
 				4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4D79642226C167100026288B /* pagemilestone.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
+				E741AD03299A3D6300854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */,
 				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
 				4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */,
@@ -3835,6 +3848,7 @@
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				E722106928F85982002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
+				E741AD02299A3D5B00854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				E7C3AEDC295501CA002DE5AB /* preparedatafunctor.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */,
@@ -3999,6 +4013,7 @@
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
 				4D79642326C167100026288B /* pagemilestone.cpp in Sources */,
+				E741AD04299A3D6400854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				4DB3D8F51F83D1D600B5FC2B /* view_control.cpp in Sources */,
 				4D8135202322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4D4FCD141F54570E0009C455 /* staffdef.cpp in Sources */,
@@ -4245,6 +4260,7 @@
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
 				4D79642426C167100026288B /* pagemilestone.cpp in Sources */,
+				E741AD05299A3D6500854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				BB4C4A9322A9328F001F6AF0 /* doc.cpp in Sources */,
 				4D8135212322C41800F59C01 /* keyaccid.cpp in Sources */,
 				BB4C4B9922A932E5001F6AF0 /* linkinginterface.cpp in Sources */,
