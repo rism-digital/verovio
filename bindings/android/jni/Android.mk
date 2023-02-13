@@ -15,7 +15,8 @@ LOCAL_SRC_FILES := \
 	$(ROOT_PATH)/src/pugi/pugixml.cpp \
 	$(ROOT_PATH)/src/json/jsonxx.cc \
 	$(ROOT_PATH)/libmei/dist/*.cpp \
-	$(ROOT_PATH)/libmei/addons/*.cpp
+	$(ROOT_PATH)/libmei/addons/*.cpp \
+	$(ROOT_PATH)/src/crc/crc.cpp
 	
 LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include \
@@ -26,6 +27,8 @@ LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include/pugi \
 	$(ROOT_PATH)/include/hum \
 	$(ROOT_PATH)/include/midi \
-	$(ROOT_PATH)/include/json
+	$(ROOT_PATH)/include/json \
+	$(ROOT_PATH)/include/crc \
+	$(ROOT_PATH)/include/zip
 
 include $(BUILD_SHARED_LIBRARY)
