@@ -23,24 +23,24 @@ namespace vrv {
 
 /**
  * This is the base class for all MEI att classes.
- * It is not an abstract class but it should not be instanciated directly.
+ * It cannot be instanciated outside the Att class hierarchy.
  * The att classes are generated with the libmei parser for Verovio.
  */
-class Att : public AttConverter {
-public:
+class Att : public AttConverterBase {
+protected:
     /** @name Constructors and destructor */
     ///@{
-    Att();
-    virtual ~Att();
+    Att() = default;
+    ~Att() = default;
     ///@}
 
+public:
     static data_ACCIDENTAL_WRITTEN AccidentalGesturalToWritten(data_ACCIDENTAL_GESTURAL accid);
     static data_ACCIDENTAL_GESTURAL AccidentalWrittenToGestural(data_ACCIDENTAL_WRITTEN accid);
 
     static data_STAFFREL StaffrelBasicToStaffrel(data_STAFFREL_basic staffrelBasic);
     static data_STAFFREL_basic StaffrelToStaffrelBasic(data_STAFFREL staffrel);
 
-public:
     /** Dummy string converter */
     std::string StrToStr(std::string str) const;
 
