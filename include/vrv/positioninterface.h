@@ -9,6 +9,7 @@
 #define __VRV_POSITION_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 
 namespace vrv {
 

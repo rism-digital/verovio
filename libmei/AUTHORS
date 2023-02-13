@@ -1,0 +1,18 @@
+LibMEI is developed primarily by Andrew Hankinson and Alastair Porter at the Distributed Digital Music Archives and Libraries lab, McGill University, Montreal, QC, Canada.
+
+There have been a number of other important contributors:
+
+2011 Mahtab Ghamsari-Esfahani: Project setup, Initial author
+2011 Jamie Klassen: Auto-generation from the MEI specs, MEI Updater Utility
+2012 Greg Burlet: Bug fixes, MusicXML to MEI converter, Boost Python superhero
+     Peter Henderson: Travis-CI integration, Windows compatibility
+2015 Ian Karp
+
+Raffaele Viglianti: Helper methods in the Python Bindings
+Laurent Pugin: Advice and consulting
+Zoltan Komives: Bug hunter extraordinaire
+
+This software was developed as part of a doctoral degree in Music Information Retrieval, under the supervision of Ichiro Fujinaga.
+
+Development of LibMEI was made possible with funding from the Social Sciences and Humanities Research Council of Canada
+

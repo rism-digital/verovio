@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 

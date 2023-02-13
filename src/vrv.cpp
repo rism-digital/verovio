@@ -302,6 +302,28 @@ std::string BaseEncodeInt(unsigned int value, unsigned int base)
 }
 
 //----------------------------------------------------------------------------
+// Notation type checks
+//----------------------------------------------------------------------------
+
+bool IsMensuralType(data_NOTATIONTYPE notationType)
+{
+    return (notationType == NOTATIONTYPE_mensural || notationType == NOTATIONTYPE_mensural_white
+        || notationType == NOTATIONTYPE_mensural_black);
+}
+
+bool IsNeumeType(data_NOTATIONTYPE notationType)
+{
+    // Maybe one day we will have other neume types too
+    return (notationType == NOTATIONTYPE_neume);
+}
+
+bool IsTabType(data_NOTATIONTYPE notationType)
+{
+    // Next version of MEI will have other tab types
+    return (notationType == NOTATIONTYPE_tab);
+}
+
+//----------------------------------------------------------------------------
 // Base64 code borrowed
 //----------------------------------------------------------------------------
 

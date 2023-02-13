@@ -17,6 +17,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "libmei.h"
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
@@ -314,7 +315,7 @@ void Page::ResetAligners()
     Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
     this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
 
-    if (Att::IsMensuralType(doc->m_notationType)) {
+    if (IsMensuralType(doc->m_notationType)) {
         FunctorDocParams calcLigatureNotePosParams(doc);
         Functor calcLigatureNotePos(&Object::CalcLigatureNotePos);
         this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);

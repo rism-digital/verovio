@@ -2335,14 +2335,14 @@ void MusicXmlInput::ReadMusicXmlDirection(
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             if (pedalLine) pedal->SetForm(PEDALSTYLE_line);
             if (xmlPedal.attribute("abbreviated")) {
-                pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
-                pedal->SetExternalsymbols(pedal, "glyph.num", "U+E651");
+                AttModule::SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                AttModule::SetExternalsymbols(pedal, "glyph.num", "U+E651");
             }
             if (pedalType == "sostenuto") {
                 pedal->SetFunc("sostenuto");
                 if (xmlPedal.attribute("abbreviated")) {
-                    pedal->SetExternalsymbols(pedal, "glyph.auth", "smufl");
-                    pedal->SetExternalsymbols(pedal, "glyph.num", "U+E65A");
+                    AttModule::SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                    AttModule::SetExternalsymbols(pedal, "glyph.num", "U+E65A");
                 }
             }
             if (staffNode) {
@@ -3382,8 +3382,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
             const std::string smuflCode = GetOrnamentGlyphNumber(mordentFlags);
             if (!smuflCode.empty()) {
-                mordent->SetExternalsymbols(mordent, "glyph.num", smuflCode);
-                mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
+                AttModule::SetExternalsymbols(mordent, "glyph.num", smuflCode);
+                AttModule::SetExternalsymbols(mordent, "glyph.auth", "smufl");
             }
         }
     }
@@ -3402,8 +3402,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         mordent->SetPlace(
             mordent->AttPlacementRelStaff::StrToStaffrel(xmlExtOrnament.node().attribute("placement").as_string()));
         const bool isHaydn = std::string(xmlExtOrnament.node().name()) == "haydn";
-        mordent->SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E587");
-        mordent->SetExternalsymbols(mordent, "glyph.auth", "smufl");
+        AttModule::SetExternalsymbols(mordent, "glyph.num", isHaydn ? "U+E56F" : "U+E587");
+        AttModule::SetExternalsymbols(mordent, "glyph.auth", "smufl");
     }
 
     // trill
@@ -3476,15 +3476,15 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
         if (xmlTurn.node().attribute("slash").as_bool()) {
-            turn->SetExternalsymbols(turn, "glyph.auth", "smufl");
-            turn->SetExternalsymbols(turn, "glyph.num", "U+E569");
+            AttModule::SetExternalsymbols(turn, "glyph.auth", "smufl");
+            AttModule::SetExternalsymbols(turn, "glyph.num", "U+E569");
         }
         if (!std::strncmp(xmlTurn.node().name(), "inverted", 8)) {
             turn->SetForm(turnLog_FORM_lower);
             if (std::string(xmlTurn.node().name()).find("vertical") != std::string::npos) {
                 turn->SetType("vertical");
-                turn->SetExternalsymbols(turn, "glyph.auth", "smufl");
-                turn->SetExternalsymbols(turn, "glyph.num", "U+E56B");
+                AttModule::SetExternalsymbols(turn, "glyph.auth", "smufl");
+                AttModule::SetExternalsymbols(turn, "glyph.num", "U+E56B");
             }
         }
         if (!std::strncmp(xmlTurn.node().name(), "delayed", 7)) {
@@ -3492,8 +3492,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
         if (!std::strncmp(xmlTurn.node().name(), "vertical", 8)) {
             turn->SetType("vertical");
-            turn->SetExternalsymbols(turn, "glyph.auth", "smufl");
-            turn->SetExternalsymbols(turn, "glyph.num", "U+E56A");
+            AttModule::SetExternalsymbols(turn, "glyph.auth", "smufl");
+            AttModule::SetExternalsymbols(turn, "glyph.num", "U+E56A");
         }
     }
 
@@ -4554,12 +4554,12 @@ void MusicXmlInput::SetFermataExternalSymbols(Fermata *fermata, const std::strin
 
     if (const auto result = fermataExtSymbolsBelow.find(shape);
         (fermata->GetForm() == fermataVis_FORM_inv) && (result != fermataExtSymbolsBelow.end())) {
-        fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
-        fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
+        AttModule::SetExternalsymbols(fermata, "glyph.num", result->second);
+        AttModule::SetExternalsymbols(fermata, "glyph.auth", "smufl");
     }
     else if (const auto result = fermataExtSymbolsAbove.find(shape); result != fermataExtSymbolsAbove.end()) {
-        fermata->SetExternalsymbols(fermata, "glyph.num", result->second);
-        fermata->SetExternalsymbols(fermata, "glyph.auth", "smufl");
+        AttModule::SetExternalsymbols(fermata, "glyph.num", result->second);
+        AttModule::SetExternalsymbols(fermata, "glyph.auth", "smufl");
     }
 }
 
