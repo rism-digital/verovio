@@ -90,8 +90,7 @@ public:
 {methods}///@}}
 
 private:
-{members}
-}};
+{members}}};
 """
 
 ATTCLASS_METHODS_H = """    void Set{attNameUpper}({attType} {attNameLowerJoined}_) {{ m_{attNameLowerJoined} = {attNameLowerJoined}_; }}
@@ -426,8 +425,8 @@ class AttModule {{
 public:
     /** @name Constructors and destructor */
     ///@{{
-    AttModule() {{}};
-    virtual ~AttModule() {{}};
+    AttModule(){{}};
+    virtual ~AttModule(){{}};
     ///@}}
 
     /**
