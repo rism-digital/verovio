@@ -1142,7 +1142,8 @@ def copy_addons(namespace: str, addons_dir: Path, outdir: Path):
     # These are the only files to be edited by hand.
     # When the output directory is not ".", they need to be copied
     # When the namespace option is specified, the vrv namespace need to be adjusted when copying
-    NS_REGEX: Pattern = re.compile(r"^namespace vrv {$", re.M)
+    NS_REGEX_BEGIN: Pattern = re.compile(r"^namespace vrv {$", re.M)
+    NS_REGEX_END: Pattern = re.compile(r"^} // namespace vrv$", re.M)
 
     for f in addons_dir.iterdir():
         if not f.is_file():
@@ -1150,7 +1151,8 @@ def copy_addons(namespace: str, addons_dir: Path, outdir: Path):
 
         outfile: Path = Path(outdir, f.name)
         file_contents: str = f.read_text()
-        repl_file_contents: str = re.sub(NS_REGEX, f"namespace {namespace} {{", file_contents)
+        repl_file_contents: str = re.sub(NS_REGEX_BEGIN, f"namespace {namespace} {{", file_contents)
+        repl_file_contents: str = re.sub(NS_REGEX_END, f"}} // namespace {namespace}", repl_file_contents)
         outfile.write_text(repl_file_contents)
         lg.debug("Wrote addon %s", outfile)
 
