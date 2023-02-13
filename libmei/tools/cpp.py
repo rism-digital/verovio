@@ -787,8 +787,8 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
                 "checkers": "".join(checkers),
 
             }
-            header_classes.append(ATTCLASS_H.format_map(clsubstr))
-            impl_classes.append(ATTCLASS_CPP.format_map(clsubstr))
+            header_classes.append(ATTCLASS_H.format_map(clsubstr).strip())
+            impl_classes.append(ATTCLASS_CPP.format_map(clsubstr).strip())
             enums.append(f"    ATT_{schema.cc(schema.strpatt(gp)).upper()},\n")
 
         tplvars = {
@@ -797,8 +797,8 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
             'moduleNameCaps': f"ATTS_{module.upper()}",
             "moduleNameCap": module.capitalize(),
             "moduleNameLower": f"atts_{module.lower()}",
-            'headerElements': "".join(header_classes).strip(),
-            'implElements': "".join(impl_classes).strip(),
+            'headerElements': "\n\n".join(header_classes),
+            'implElements': "\n\n".join(impl_classes),
             'ns': cpp_ns
         }
 
