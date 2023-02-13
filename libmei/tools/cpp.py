@@ -665,7 +665,7 @@ def vrv_getattdefault(schema, module: str, gp: str, aname: str) -> tuple:
         return default, [f"StrTo{cname}", f"{cname}ToStr"]
 
 
-def create_doctstr(text: str, indent: int = 0) -> str:
+def create_docstr(text: str, indent: int = 0) -> str:
     """
         Format a docstring. Take the first sentence (. followed by a space)
         and use it for the brief. Then put the rest of the text after a blank
@@ -739,7 +739,7 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
                     att_lower_name = att
 
                 att_type = vrv_getatttype(schema.schema, module, gp, att)
-                doc_str = create_doctstr(schema.get_att_desc(att), indent=4)
+                doc_str = create_docstr(schema.get_att_desc(att), indent=4)
                 attdefault, converters = vrv_getattdefault(schema.schema, module, gp, att)
 
                 substrings = {
@@ -979,7 +979,7 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                     if mod not in includes:
                         includes.append(mod)
 
-            docstr = create_doctstr(schema.get_elem_desc(element), indent=0)
+            docstr = create_docstr(schema.get_elem_desc(element), indent=0)
             elvars = {
                 "elementNameUpper": schema.cc(element),
                 "attClasses": "".join(element_att_classes),
