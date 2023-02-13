@@ -79,8 +79,6 @@ bool AttNcLog::HasPname() const
     return (m_pname != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttNcForm
 //----------------------------------------------------------------------------
@@ -228,4 +226,4 @@ bool AttNcForm::HasTilt() const
     return (m_tilt != data_COMPASSDIRECTION());
 }
 
-} // namespace
+} // namespace vrv

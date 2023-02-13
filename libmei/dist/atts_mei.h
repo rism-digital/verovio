@@ -69,9 +69,8 @@ private:
      * element, additional to that given by its notationtype attribute.
      **/
     std::string m_notationsubtype;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_MEI_H__

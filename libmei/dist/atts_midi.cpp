@@ -109,8 +109,6 @@ bool AttChannelized::HasMidiTrack() const
     return (m_midiTrack != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttInstrumentIdent
 //----------------------------------------------------------------------------
@@ -152,8 +150,6 @@ bool AttInstrumentIdent::HasInstr() const
 {
     return (m_instr != "");
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMidiInstrument
@@ -272,8 +268,6 @@ bool AttMidiInstrument::HasMidiVolume() const
     return (m_midiVolume != -1.0);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMidiNumber
 //----------------------------------------------------------------------------
@@ -315,8 +309,6 @@ bool AttMidiNumber::HasNum() const
 {
     return (m_num != -1);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMidiTempo
@@ -375,8 +367,6 @@ bool AttMidiTempo::HasMidiMspb() const
     return (m_midiMspb != -1);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMidiValue
 //----------------------------------------------------------------------------
@@ -418,8 +408,6 @@ bool AttMidiValue::HasVal() const
 {
     return (m_val != -1);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMidiValue2
@@ -463,8 +451,6 @@ bool AttMidiValue2::HasVal2() const
     return (m_val2 != -1);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMidiVelocity
 //----------------------------------------------------------------------------
@@ -506,8 +492,6 @@ bool AttMidiVelocity::HasVel() const
 {
     return (m_vel != -1);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttTimeBase
@@ -551,4 +535,4 @@ bool AttTimeBase::HasPpq() const
     return (m_ppq != MEI_UNSET);
 }
 
-} // namespace
+} // namespace vrv

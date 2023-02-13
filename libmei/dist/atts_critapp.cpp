@@ -64,4 +64,4 @@ bool AttCrit::HasCause() const
     return (m_cause != "");
 }
 
-} // namespace
+} // namespace vrv

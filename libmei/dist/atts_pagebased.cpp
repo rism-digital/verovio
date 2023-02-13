@@ -109,4 +109,4 @@ bool AttMargins::HasRightmar() const
     return (m_rightmar != data_MEASUREMENTUNSIGNED());
 }
 
-} // namespace
+} // namespace vrv

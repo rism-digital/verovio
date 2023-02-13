@@ -75,9 +75,8 @@ private:
     data_MEASUREMENTUNSIGNED m_leftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
     data_MEASUREMENTUNSIGNED m_rightmar;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_PAGEBASED_H__

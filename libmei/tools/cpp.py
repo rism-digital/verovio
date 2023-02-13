@@ -50,12 +50,12 @@ namespace {ns} {{
 
 {headerElements}
 
-}} // namespace
+}} // namespace {ns}
 
 #endif // __LIBMEI_{moduleNameCaps}_H__
 """
 
-CLASS_FILE_END = """} // namespace
+CLASS_FILE_END = """}} // namespace {ns}
 """
 
 #
@@ -90,8 +90,7 @@ public:
 {methods}///@}}
 
 private:
-{members}
-}};
+{members}}};
 """
 
 ATTCLASS_METHODS_H = """    void Set{attNameUpper}({attType} {attNameLowerJoined}_) {{ m_{attNameLowerJoined} = {attNameLowerJoined}_; }}
@@ -260,9 +259,9 @@ enum AttClassId {{
 """
 
 ENUM_GRP_END = """    ATT_CLASS_max
-};
+}};
 
-} // namespace
+}} // namespace {ns}
 
 #endif // __LIBMEI_ATT_CLASSES_H__
 """
@@ -282,7 +281,7 @@ namespace {ns} {{
 
 """
 
-TYPE_GRP_END = """} // namespace
+TYPE_GRP_END = """}} // namespace {ns}
 
 #endif // __LIBMEI_ATT_TYPES_H__
 """
@@ -331,9 +330,9 @@ CONVERTER_METHODS_H = """
     {type} StrTo{fname}(const std::string &value, bool logWarning = true) const;
 """
 
-CONVERTER_END_H = """};
+CONVERTER_END_H = """}};
 
-} // namespace
+}} // namespace {ns}
 
 #endif // __LIBMEI_ATT_CONVERTER_H__
 """
@@ -391,7 +390,7 @@ CONVERTER_METHOD2_END_CPP = """
 """
 
 CONVERTER_END_CPP = """
-} // namespace
+}} // namespace {ns}
 """
 
 #
@@ -404,8 +403,8 @@ ATTMODULE_FILE_H = """{license}
 #define __LIBMEI_ATT_MODULE_H__
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace {ns} {{
 
@@ -426,8 +425,8 @@ class AttModule {{
 public:
     /** @name Constructors and destructor */
     ///@{{
-    AttModule() {{}};
-    virtual ~AttModule() {{}};
+    AttModule(){{}};
+    virtual ~AttModule(){{}};
     ///@}}
 
     /**
@@ -438,14 +437,13 @@ public:
 
 SETTERS_GETTERS_H = """    static bool Set{moduleNameCap}(Object *element, const std::string &attrType, const std::string &attrValue);
     static void Get{moduleNameCap}(const Object *element, ArrayOfStrAttr *attributes);
-    
+
 """
 
-ATTMODULE_FILE_END_H = """    ///@}
+ATTMODULE_FILE_END_H = """    ///@}}
+}};
 
-};
-
-} // namespace
+}} // namespace {ns}
 
 #endif // __LIBMEI_ATT_MODULE_H__
 """
@@ -519,8 +517,7 @@ GETTERS_GRP_END_CPP = """    }}
 
 GETTERS_END_CPP = """}}
 
-}} // namespace
-
+}} // namespace {ns}
 """
 
 DATATYPES: dict
@@ -787,8 +784,8 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
                 "checkers": "".join(checkers),
 
             }
-            header_classes.append(ATTCLASS_H.format_map(clsubstr))
-            impl_classes.append(ATTCLASS_CPP.format_map(clsubstr))
+            header_classes.append(ATTCLASS_H.format_map(clsubstr).strip())
+            impl_classes.append(ATTCLASS_CPP.format_map(clsubstr).strip())
             enums.append(f"    ATT_{schema.cc(schema.strpatt(gp)).upper()},\n")
 
         tplvars = {
@@ -797,8 +794,8 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
             'moduleNameCaps': f"ATTS_{module.upper()}",
             "moduleNameCap": module.capitalize(),
             "moduleNameLower": f"atts_{module.lower()}",
-            'headerElements': "".join(header_classes).strip(),
-            'implElements': "".join(impl_classes).strip(),
+            'headerElements': "\n\n".join(header_classes),
+            'implElements': "\n\n".join(impl_classes),
             'ns': cpp_ns
         }
 
@@ -809,13 +806,13 @@ def create_att_classes(cpp_ns: str, schema, outdir: Path):
         with Path(outdir, f"atts_{module.lower()}.cpp").open("w") as f_att_class_cpp:
             lg.debug(f"\tCreating atts_{module.lower()}.cpp")
             f_att_class_cpp.write(ATTCLASS_FILE_CPP.format_map(tplvars))
-            f_att_class_cpp.write(CLASS_FILE_END)
+            f_att_class_cpp.write(CLASS_FILE_END.format(ns=cpp_ns))
 
     with Path(outdir, "attclasses.h").open("w") as f_att_classes_h:
         f_att_classes_h.write(LICENSE)
         f_att_classes_h.write(ENUM_GRP_START.format(ns=cpp_ns))
         f_att_classes_h.write("".join(enums))
-        f_att_classes_h.write(ENUM_GRP_END)
+        f_att_classes_h.write(ENUM_GRP_END.format(ns=cpp_ns))
 
 
 def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
@@ -932,7 +929,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         f_att_types_h.write(TYPE_GRP_START.format(ns=cpp_ns))
         f_att_types_h.write("".join(att_type_data_types))
         f_att_types_h.write("".join(att_type_data_list))
-        f_att_types_h.write(TYPE_GRP_END)
+        f_att_types_h.write(TYPE_GRP_END.format(ns=cpp_ns))
 
     with Path(outdir, "attconverter.h").open("w") as f_att_converter_h:
         lg.debug("\tCreating attconverter.h")
@@ -940,7 +937,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         f_att_converter_h.write(CONVERTER_H.format(ns=cpp_ns))
         f_att_converter_h.write("".join(att_converter_header_data_types))
         f_att_converter_h.write("".join(att_converter_header_data_list))
-        f_att_converter_h.write(CONVERTER_END_H)
+        f_att_converter_h.write(CONVERTER_END_H.format(ns=cpp_ns))
 
     with Path(outdir, "attconverter.cpp").open("w") as f_att_converter_cpp:
         lg.debug("\tCreating attconverter.cpp")
@@ -948,7 +945,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         f_att_converter_cpp.write(CONVERTER_CPP.format(ns=cpp_ns))
         f_att_converter_cpp.write("".join(att_converter_impl_data_types))
         f_att_converter_cpp.write("".join(att_converter_impl_data_list))
-        f_att_converter_cpp.write(CONVERTER_END_CPP)
+        f_att_converter_cpp.write(CONVERTER_END_CPP.format(ns=cpp_ns))
 
 
 def create_element_classes(cpp_ns: str, schema, outdir: Path):
@@ -1132,7 +1129,7 @@ def create_att_module(cpp_ns: str, schema, outdir: Path):
         lic: str = LICENSE.format(authors=AUTHORS)
         f_att_module_h.write(ATTMODULE_FILE_H.format(license=lic, ns=cpp_ns))
         f_att_module_h.write("".join(header_modules))
-        f_att_module_h.write(ATTMODULE_FILE_END_H)
+        f_att_module_h.write(ATTMODULE_FILE_END_H.format(ns=cpp_ns))
 
     with Path(outdir, "attmodule.cpp").open("w") as f_att_module_cpp:
         lg.debug("\tCreated attmodule.cpp")
@@ -1174,7 +1171,7 @@ public:
         const std::vector<std::string> &attributes = MEIBasic::map.at(element);
         return (std::find(attributes.begin(), attributes.end(), attr) != attributes.end());
     }}
-    
+
     // clang-format off
     {basicAttributeMap}
     // clang-format on

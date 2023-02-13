@@ -64,8 +64,6 @@ bool AttAgentIdent::HasAgent() const
     return (m_agent != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttReasonIdent
 //----------------------------------------------------------------------------
@@ -108,4 +106,4 @@ bool AttReasonIdent::HasReason() const
     return (m_reason != "");
 }
 
-} // namespace
+} // namespace vrv

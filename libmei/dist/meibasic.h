@@ -8,7 +8,7 @@ public:
         const std::vector<std::string> &attributes = MEIBasic::map.at(element);
         return (std::find(attributes.begin(), attributes.end(), attr) != attributes.end());
     }
-    
+
     // clang-format off
     
     inline static std::map<std::string, std::vector<std::string>> map = {

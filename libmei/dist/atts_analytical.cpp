@@ -64,8 +64,6 @@ bool AttHarmAnl::HasForm() const
     return (m_form != harmAnl_FORM_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttHarmonicFunction
 //----------------------------------------------------------------------------
@@ -107,8 +105,6 @@ bool AttHarmonicFunction::HasDeg() const
 {
     return (m_deg != "");
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttIntervalHarmonic
@@ -152,8 +148,6 @@ bool AttIntervalHarmonic::HasInth() const
     return (m_inth != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttIntervalMelodic
 //----------------------------------------------------------------------------
@@ -196,8 +190,6 @@ bool AttIntervalMelodic::HasIntm() const
     return (m_intm != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttKeySigAnl
 //----------------------------------------------------------------------------
@@ -239,8 +231,6 @@ bool AttKeySigAnl::HasMode() const
 {
     return (m_mode != MODE_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
@@ -314,8 +304,6 @@ bool AttKeySigDefaultAnl::HasKeyPname() const
     return (m_keyPname != PITCHNAME_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMelodicFunction
 //----------------------------------------------------------------------------
@@ -357,8 +345,6 @@ bool AttMelodicFunction::HasMfunc() const
 {
     return (m_mfunc != MELODICFUNCTION_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttPitchClass
@@ -402,8 +388,6 @@ bool AttPitchClass::HasPclass() const
     return (m_pclass != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttSolfa
 //----------------------------------------------------------------------------
@@ -446,4 +430,4 @@ bool AttSolfa::HasPsolfa() const
     return (m_psolfa != "");
 }
 
-} // namespace
+} // namespace vrv

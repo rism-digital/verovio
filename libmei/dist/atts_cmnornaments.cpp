@@ -79,8 +79,6 @@ bool AttMordentLog::HasLong() const
     return (m_long != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttOrnamPresent
 //----------------------------------------------------------------------------
@@ -122,8 +120,6 @@ bool AttOrnamPresent::HasOrnam() const
 {
     return (m_ornam != "");
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttOrnamentAccid
@@ -182,8 +178,6 @@ bool AttOrnamentAccid::HasAccidlower() const
     return (m_accidlower != ACCIDENTAL_WRITTEN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttTurnLog
 //----------------------------------------------------------------------------
@@ -241,4 +235,4 @@ bool AttTurnLog::HasForm() const
     return (m_form != turnLog_FORM_NONE);
 }
 
-} // namespace
+} // namespace vrv

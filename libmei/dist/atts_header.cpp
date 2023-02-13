@@ -109,8 +109,6 @@ bool AttBifoliumSurfaces::HasOuterVerso() const
     return (m_outerVerso != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttFoliumSurfaces
 //----------------------------------------------------------------------------
@@ -168,8 +166,6 @@ bool AttFoliumSurfaces::HasVerso() const
     return (m_verso != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttRecordType
 //----------------------------------------------------------------------------
@@ -211,8 +207,6 @@ bool AttRecordType::HasRecordtype() const
 {
     return (m_recordtype != recordType_RECORDTYPE_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttRegularMethod
@@ -256,4 +250,4 @@ bool AttRegularMethod::HasMethod() const
     return (m_method != regularMethod_METHOD_NONE);
 }
 
-} // namespace
+} // namespace vrv

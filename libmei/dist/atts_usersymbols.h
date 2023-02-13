@@ -61,7 +61,6 @@ private:
      * document.
      **/
     std::string m_altsym;
-
 };
 
 //----------------------------------------------------------------------------
@@ -96,7 +95,6 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -131,7 +129,6 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -166,9 +163,8 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_USERSYMBOLS_H__

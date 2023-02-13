@@ -60,9 +60,8 @@ private:
      * Its value must be the ID of a when element elsewhere in the document.
      **/
     std::string m_when;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_PERFORMANCE_H__

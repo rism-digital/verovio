@@ -75,7 +75,6 @@ private:
     data_MIDIVALUE_NAME m_midiPort;
     /** Sets the MIDI track. **/
     int m_midiTrack;
-
 };
 
 //----------------------------------------------------------------------------
@@ -113,7 +112,6 @@ private:
      * It must contain the ID of an instrDef element elsewhere in the document.
      **/
     std::string m_instr;
-
 };
 
 //----------------------------------------------------------------------------
@@ -187,7 +185,6 @@ private:
     data_MIDIVALUE m_midiPatchnum;
     /** Sets the instrument’s volume. **/
     data_PERCENT m_midiVolume;
-
 };
 
 //----------------------------------------------------------------------------
@@ -222,7 +219,6 @@ public:
 private:
     /** Records a number or count accompanying a notational feature. **/
     data_MIDIVALUE m_num;
-
 };
 
 //----------------------------------------------------------------------------
@@ -272,7 +268,6 @@ private:
      * each quarter note will last 500,000 microseconds.
      **/
     data_MIDIMSPB m_midiMspb;
-
 };
 
 //----------------------------------------------------------------------------
@@ -307,7 +302,6 @@ public:
 private:
     /** MIDI number. **/
     data_MIDIVALUE m_val;
-
 };
 
 //----------------------------------------------------------------------------
@@ -342,7 +336,6 @@ public:
 private:
     /** MIDI number. **/
     data_MIDIVALUE m_val2;
-
 };
 
 //----------------------------------------------------------------------------
@@ -377,7 +370,6 @@ public:
 private:
     /** MIDI Note-on/off velocity. **/
     data_MIDIVALUE m_vel;
-
 };
 
 //----------------------------------------------------------------------------
@@ -416,9 +408,8 @@ private:
      * Unlike MIDI, MEI permits different values for a score and individual staves.
      **/
     int m_ppq;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_MIDI_H__

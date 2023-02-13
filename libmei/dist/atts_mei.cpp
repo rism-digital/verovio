@@ -79,4 +79,4 @@ bool AttNotationType::HasNotationsubtype() const
     return (m_notationsubtype != "");
 }
 
-} // namespace
+} // namespace vrv

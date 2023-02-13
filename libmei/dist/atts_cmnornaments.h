@@ -66,7 +66,6 @@ private:
      * consisting of 5 notes, is indicated.
      **/
     data_BOOLEAN m_long;
-
 };
 
 //----------------------------------------------------------------------------
@@ -105,7 +104,6 @@ private:
      * that represents an ornament (mordent, trill, or turn) should be employed.
      **/
     std::string m_ornam;
-
 };
 
 //----------------------------------------------------------------------------
@@ -146,7 +144,6 @@ private:
     data_ACCIDENTAL_WRITTEN m_accidupper;
     /** Records the written accidental associated with a lower neighboring note. **/
     data_ACCIDENTAL_WRITTEN m_accidlower;
-
 };
 
 //----------------------------------------------------------------------------
@@ -187,9 +184,8 @@ private:
     data_BOOLEAN m_delayed;
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     turnLog_FORM m_form;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_CMNORNAMENTS_H__

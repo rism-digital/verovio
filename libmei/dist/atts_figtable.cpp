@@ -79,4 +79,4 @@ bool AttTabular::HasRowspan() const
     return (m_rowspan != MEI_UNSET);
 }
 
-} // namespace
+} // namespace vrv

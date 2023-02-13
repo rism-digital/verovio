@@ -57,7 +57,6 @@ public:
 private:
     /** Records the performed pitch inflection. **/
     data_ACCIDENTAL_GESTURAL m_accidGes;
-
 };
 
 //----------------------------------------------------------------------------
@@ -92,7 +91,6 @@ public:
 private:
     /** Records performed articulation that differs from the written value. **/
     data_ARTICULATION_List m_articGes;
-
 };
 
 //----------------------------------------------------------------------------
@@ -131,7 +129,6 @@ private:
      * fraction) along with the bend symbol.
      **/
     double m_amount;
-
 };
 
 //----------------------------------------------------------------------------
@@ -202,7 +199,6 @@ private:
     double m_durReal;
     /** Duration as an optionally dotted Humdrum **recip value. **/
     std::string m_durRecip;
-
 };
 
 //----------------------------------------------------------------------------
@@ -240,7 +236,6 @@ private:
      * immediately following this one.
      **/
     data_BOOLEAN m_attacca;
-
 };
 
 //----------------------------------------------------------------------------
@@ -287,7 +282,6 @@ private:
     data_PITCHNAME m_pnameGes;
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
     int m_pnum;
-
 };
 
 //----------------------------------------------------------------------------
@@ -340,7 +334,6 @@ private:
     data_PITCHNAME m_pnameGes;
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
     int m_pnum;
-
 };
 
 //----------------------------------------------------------------------------
@@ -381,7 +374,6 @@ private:
     data_ACCIDENTAL_GESTURAL m_accidupperGes;
     /** Records the sounding accidental associated with a lower neighboring note. **/
     data_ACCIDENTAL_GESTURAL m_accidlowerGes;
-
 };
 
 //----------------------------------------------------------------------------
@@ -419,7 +411,6 @@ private:
      * immediately following this one.
      **/
     data_BOOLEAN m_attacca;
-
 };
 
 //----------------------------------------------------------------------------
@@ -460,7 +451,6 @@ private:
     double m_azimuth;
     /** The above-to-below axis. **/
     double m_elevation;
-
 };
 
 //----------------------------------------------------------------------------
@@ -504,7 +494,6 @@ private:
     double m_tstampGes;
     /** Records the onset time in terms of ISO time. **/
     std::string m_tstampReal;
-
 };
 
 //----------------------------------------------------------------------------
@@ -548,9 +537,8 @@ private:
     data_MEASUREBEAT m_tstamp2Ges;
     /** Records the ending point of an event in terms of ISO time. **/
     std::string m_tstamp2Real;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_GESTURAL_H__
