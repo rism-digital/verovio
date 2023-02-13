@@ -319,10 +319,14 @@ CONVERTER_H = """
 namespace {ns} {{
 
 //----------------------------------------------------------------------------
-// AttConverter
+// AttConverterBase
 //----------------------------------------------------------------------------
 
-class AttConverter {{
+class AttConverterBase {{
+public:
+    AttConverterBase() = default;
+protected:
+    ~AttConverterBase() = default;
 public:"""
 
 CONVERTER_METHODS_H = """
@@ -331,6 +335,16 @@ CONVERTER_METHODS_H = """
 """
 
 CONVERTER_END_H = """}};
+
+//----------------------------------------------------------------------------
+// AttConverter
+//----------------------------------------------------------------------------
+
+class AttConverter: public AttConverterBase {
+public:
+    AttConverter() = default;
+    virtual ~AttConverter() = default;
+};
 
 }} // namespace {ns}
 
@@ -352,18 +366,18 @@ CONVERTER_CPP = """
 namespace {ns} {{
 
 //----------------------------------------------------------------------------
-// AttConverter
+// AttConverterBase
 //----------------------------------------------------------------------------
 """
 
 CONVERTER_METHOD1_START_CPP = """
-std::string AttConverter::{fname}ToStr({type} data) const
+std::string AttConverterBase::{fname}ToStr({type} data) const
 {{
     std::string value;
     switch (data) {{"""
 
 CONVERTER_METHOD2_START_CPP = """
-{type} AttConverter::StrTo{fname}(const std::string &value, bool logWarning) const
+{type} AttConverterBase::StrTo{fname}(const std::string &value, bool logWarning) const
 {{"""
 
 CONVERTER_METHOD1_CPP = """
