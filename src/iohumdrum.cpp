@@ -24736,29 +24736,33 @@ bool HumdrumInput::isLeftmostSystemArpeggio(hum::HTp token)
 
 void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 {
-    std::vector<bool> chartable(128, false);
-    for (int i = 0; i < (int)token->size(); ++i) {
-        int intch = (unsigned char)token->at(i);
-        if (intch < 0 || intch > 127) {
-            continue;
-        }
-        chartable[intch] = true;
-    }
+    std::vector<string> subtoks = token->getSubtokens();
 
-    if (chartable['T'] || chartable['t']) {
-        addTrill(object, token);
-    }
-    if (chartable[';']) {
-        addFermata(token, object);
-    }
-    if (chartable[',']) {
-        addBreath(token, object);
-    }
-    if (chartable['W'] || chartable['w'] || chartable['M'] || chartable['m']) {
-        addMordent(object, token);
-    }
-    if (chartable['s'] || chartable['S'] || chartable['$']) {
-        addTurn(object, token);
+    for (int t = 0; t < (int)subtoks.size(); t++) {
+        std::vector<bool> chartable(128, false);
+        for (int i = 0; i < (int)subtoks.at(t).size(); ++i) {
+            int intch = (unsigned char)subtoks.at(t).at(i);
+            if (intch < 0 || intch > 127) {
+                continue;
+            }
+            chartable[intch] = true;
+        }
+
+        if (chartable['T'] || chartable['t']) {
+            addTrill(object, token);
+        }
+        if (chartable[';']) {
+            addFermata(token, object);
+        }
+        if (chartable[',']) {
+            addBreath(token, object);
+        }
+        if (chartable['W'] || chartable['w'] || chartable['M'] || chartable['m']) {
+            addMordent(object, token);
+        }
+        if (chartable['s'] || chartable['S'] || chartable['$']) {
+            addTurn(token, subtoks.at(t), subtoks.size() > 1 ? t : -1);
+        }
     }
 
     // addOrnamentMarkers(token);
@@ -24787,12 +24791,12 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 // Deal with cases where the accidental should be hidden but different from sounding accidental.  This
 // can be done when MEI allows @accidlower.ges and @accidupper.ges.
 //
-// Assuming not in chord for now.
+// noteIndex == -1 means the note is not in a chord; otherwise, the noteIndex is the nth note in
+// a chord (from left to right in a token).
 //
 
-void HumdrumInput::addTurn(Object *linked, hum::HTp token)
+void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
 {
-    std::string &tok = *token;
     int turnstart = -1;
     int turnend = -1;
 
@@ -24813,61 +24817,41 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         }
     }
 
+    if (turnstart == turnend) {
+        return;
+    }
     std::string turnstr = tok.substr(turnstart, turnend - turnstart + 1);
 
-    bool delayedQ = turnstr[0] == 's' ? false : true;
+    if (turnstr.empty()) {
+        return;
+    }
 
-    if ((!delayedQ) && turnstr.size() == 1) {
-        // not an invalid turn indication
+    bool delayedQ = turnstr.at(0) == 's' ? false : true;
+    if ((!delayedQ) && (turnstr.size() == 1)) {
+        // not a valid turn indication
         return;
     }
 
     bool invertedQ = false;
-    if (((!delayedQ) && turnstr[1] == '$') || (turnstr[0] == '$')) {
+    if ((turnstr.size() > 1) && (((!delayedQ) && turnstr.at(1) == '$') || (turnstr.at(0) == '$'))) {
         invertedQ = true;
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = getNoteStaff(token, m_currentstaff);
-    int staffindex = staff - 1;
-    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     Turn *turn = new Turn();
     appendElement(m_measure, turn);
     setStaff(turn, staff);
 
-    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    if (linked) {
-        if (delayedQ) {
-            turn->SetDelayed(BOOLEAN_true);
-        }
-        turn->SetStartid("#" + linked->GetID());
-    }
-    else {
-        if (delayedQ) {
-            hum::HumNum duration = token->getDuration();
-            // if (ss[staffindex].meter_bottom == 0) {
-            //    duration /= 2;
-            // } else {
-            duration *= ss[staffindex].meter_bottom;
-            // }
-            duration /= 4;
-            duration /= 2;
-            tstamp += duration;
-
-            turn->SetDelayed(BOOLEAN_true);
-        }
-        turn->SetTstamp(tstamp.getFloat());
+    if (delayedQ) {
+        turn->SetDelayed(BOOLEAN_true);
     }
 
-    if (invertedQ) {
-        turn->SetForm(turnLog_FORM_lower);
-    }
-    else {
-        turn->SetForm(turnLog_FORM_upper);
-    }
+    std::string noteid = getLocationId("note", token, noteIndex);
+    turn->SetStartid("#" + noteid);
 
-    setLocationId(turn, token);
+    turn->SetForm(invertedQ ? turnLog_FORM_lower : turnLog_FORM_lower);
 
     if (m_signifiers.above) {
         if (turnend < (int)token->size() - 1) {
@@ -24884,15 +24868,17 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         }
     }
 
-    int subtok = 0;
+    int subtok = noteIndex;
     int tokindex = subtok;
     if (subtok < 0) {
         tokindex = 0;
     }
 
     // Check for automatic upper and lower accidental on turn:
-    std::string loweraccid = token->getValue("auto", to_string(tokindex), "turnLowerAccidental");
-    std::string upperaccid = token->getValue("auto", to_string(tokindex), "turnUpperAccidental");
+    std::string loweraccid;
+    std::string upperaccid;
+    loweraccid = token->getValue("auto", to_string(tokindex), "turnLowerAccidental");
+    upperaccid = token->getValue("auto", to_string(tokindex), "turnUpperAccidental");
     if (!loweraccid.empty()) {
         if (loweraccid == "1") {
             loweraccid = "#";

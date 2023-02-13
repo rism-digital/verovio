@@ -482,7 +482,7 @@ protected:
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
     void addBreath(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(vrv::Object *linked, hum::HTp token);
-    void addTurn(vrv::Object *linked, hum::HTp token);
+    void addTurn(hum::HTp token, const string &tok, int noteIndex);
     void addMordent(vrv::Object *linked, hum::HTp token);
     void addOrnaments(vrv::Object *object, hum::HTp token);
     void addArpeggio(vrv::Object *object, hum::HTp token);
