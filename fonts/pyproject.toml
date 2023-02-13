@@ -11,7 +11,7 @@ svgpathtools = "^1.5.1"
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.group.dev.dependencies]
-ipython = "^8.5.0"
+ipython = "^8.10.0"
 black = "^22.8.0"
 mypy = "^0.971"
 pylint = "^2.15.3"
