@@ -1059,7 +1059,7 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
         with Path(outdir, f"{module.lower()}.cpp").open("w") as f_element_class_cpp:
             lg.debug(f"\t Creating {module.lower()}.cpp")
             f_element_class_cpp.write(ELEMENTCLASS_FILE_H.format_map(implvars))
-            f_element_class_cpp.write(CLASS_FILE_END)
+            f_element_class_cpp.write(CLASS_FILE_END.format(ns=cpp_ns))
 
 
 def create_att_module(cpp_ns: str, schema, outdir: Path):
