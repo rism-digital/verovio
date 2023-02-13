@@ -2499,6 +2499,6 @@ enum whitespace_XMLSPACE {
     whitespace_XMLSPACE_MAX
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATT_TYPES_H__

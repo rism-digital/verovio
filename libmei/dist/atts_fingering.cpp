@@ -64,4 +64,4 @@ bool AttFingGrpLog::HasForm() const
     return (m_form != fingGrpLog_FORM_NONE);
 }
 
-} // namespace
+} // namespace vrv

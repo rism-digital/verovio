@@ -64,4 +64,4 @@ bool AttHarmLog::HasChordref() const
     return (m_chordref != "");
 }
 
-} // namespace
+} // namespace vrv

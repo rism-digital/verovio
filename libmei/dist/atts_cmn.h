@@ -57,7 +57,6 @@ public:
 private:
     /** Describes the direction in which an arpeggio is to be performed. **/
     arpegLog_ORDER m_order;
-
 };
 
 //----------------------------------------------------------------------------
@@ -92,7 +91,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     bTremLog_FORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -127,7 +125,6 @@ public:
 private:
     /** Indicates that this event is "under a beam". **/
     std::string m_beam;
-
 };
 
 //----------------------------------------------------------------------------
@@ -180,7 +177,6 @@ private:
     data_BOOLEAN m_slash;
     /** Records the slope of the beam. **/
     double m_slope;
-
 };
 
 //----------------------------------------------------------------------------
@@ -220,7 +216,6 @@ private:
      * unbroken.
      **/
     int m_breaksec;
-
 };
 
 //----------------------------------------------------------------------------
@@ -259,7 +254,6 @@ private:
      * below.
      **/
     data_NEIGHBORINGLAYER m_beamWith;
-
 };
 
 //----------------------------------------------------------------------------
@@ -306,7 +300,6 @@ private:
      * quarter note duration.
      **/
     data_BOOLEAN m_beamRests;
-
 };
 
 //----------------------------------------------------------------------------
@@ -344,7 +337,6 @@ private:
      * time signature denominator units.
      **/
     double m_beatdef;
-
 };
 
 //----------------------------------------------------------------------------
@@ -379,7 +371,6 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -414,7 +405,6 @@ public:
 private:
     /** "Cut-out" style. **/
     cutout_CUTOUT m_cutout;
-
 };
 
 //----------------------------------------------------------------------------
@@ -454,7 +444,6 @@ private:
      * symbol.
      **/
     data_BOOLEAN m_expand;
-
 };
 
 //----------------------------------------------------------------------------
@@ -489,7 +478,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     fTremLog_FORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -528,7 +516,6 @@ private:
      * element should be employed instead.
      **/
     data_GLISSANDO m_gliss;
-
 };
 
 //----------------------------------------------------------------------------
@@ -567,7 +554,6 @@ private:
      * The usual name for the latter is "Nachschlag".
      **/
     graceGrpLog_ATTACH m_attach;
-
 };
 
 //----------------------------------------------------------------------------
@@ -611,7 +597,6 @@ private:
     data_GRACE m_grace;
     /** Records the amount of time to be "stolen" from a non-grace note/chord. **/
     data_PERCENT m_graceTime;
-
 };
 
 //----------------------------------------------------------------------------
@@ -656,7 +641,6 @@ private:
      * Gould, p. 108.
      **/
     data_BOOLEAN m_niente;
-
 };
 
 //----------------------------------------------------------------------------
@@ -727,7 +711,6 @@ private:
     harpPedalLog_A m_a;
     /** Indicates the pedal setting for the harp’s B strings. **/
     harpPedalLog_B m_b;
-
 };
 
 //----------------------------------------------------------------------------
@@ -765,7 +748,6 @@ private:
      * (laissez vibrer) sign to this element.
      **/
     data_BOOLEAN m_lv;
-
 };
 
 //----------------------------------------------------------------------------
@@ -810,7 +792,6 @@ private:
     data_BARRENDITION m_left;
     /** Indicates the function of the right bar line and is structurally important. **/
     data_BARRENDITION m_right;
-
 };
 
 //----------------------------------------------------------------------------
@@ -845,7 +826,6 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     meterSigGrpLog_FUNC m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -886,7 +866,6 @@ private:
     data_STAFFREL_basic m_numPlace;
     /** Determines if the tuplet number is visible. **/
     data_BOOLEAN m_numVisible;
-
 };
 
 //----------------------------------------------------------------------------
@@ -921,7 +900,6 @@ public:
 private:
     /** Records a number or count accompanying a notational feature. **/
     int m_num;
-
 };
 
 //----------------------------------------------------------------------------
@@ -962,7 +940,6 @@ private:
      * a short vertical stroke. See Read, p. 47-48.
      **/
     octaveLog_COLL m_coll;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1003,7 +980,6 @@ private:
     pedalLog_DIR m_dir;
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1038,7 +1014,6 @@ public:
 private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
     data_PEDALSTYLE m_pedalStyle;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1073,7 +1048,6 @@ public:
 private:
     /** Describes the enclosing shape for rehearsal marks. **/
     rehearsal_REHENCLOSE m_rehEnclose;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1108,7 +1082,6 @@ public:
 private:
     /** Determines whether to display guitar chord grids. **/
     data_BOOLEAN m_gridShow;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1151,7 +1124,6 @@ private:
     data_LINEFORM m_slurLform;
     /** --- **/
     data_LINEWIDTH m_slurLwidth;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1190,7 +1162,6 @@ private:
      * one below.
      **/
     data_NEIGHBORINGLAYER m_stemWith;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1233,7 +1204,6 @@ private:
     data_LINEFORM m_tieLform;
     /** --- **/
     data_LINEWIDTH m_tieLwidth;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1268,9 +1238,8 @@ public:
 private:
     /** The performed duration of an individual note in a measured tremolo. **/
     data_DURATION m_unitdur;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_CMN_H__

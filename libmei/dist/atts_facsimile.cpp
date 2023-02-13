@@ -64,4 +64,4 @@ bool AttFacsimile::HasFacs() const
     return (m_facs != "");
 }
 
-} // namespace
+} // namespace vrv

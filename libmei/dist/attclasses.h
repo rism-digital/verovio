@@ -297,6 +297,6 @@ enum AttClassId {
     ATT_CLASS_max
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATT_CLASSES_H__

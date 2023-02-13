@@ -64,8 +64,6 @@ bool AttAccidentalGes::HasAccidGes() const
     return (m_accidGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttArticulationGes
 //----------------------------------------------------------------------------
@@ -108,8 +106,6 @@ bool AttArticulationGes::HasArticGes() const
     return (m_articGes != std::vector<data_ARTICULATION>());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBendGes
 //----------------------------------------------------------------------------
@@ -151,8 +147,6 @@ bool AttBendGes::HasAmount() const
 {
     return (m_amount != 0.0);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttDurationGes
@@ -271,8 +265,6 @@ bool AttDurationGes::HasDurRecip() const
     return (m_durRecip != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMdivGes
 //----------------------------------------------------------------------------
@@ -314,8 +306,6 @@ bool AttMdivGes::HasAttacca() const
 {
     return (m_attacca != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttNcGes
@@ -388,8 +378,6 @@ bool AttNcGes::HasPnum() const
 {
     return (m_pnum != MEI_UNSET);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttNoteGes
@@ -478,8 +466,6 @@ bool AttNoteGes::HasPnum() const
     return (m_pnum != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttOrnamentAccidGes
 //----------------------------------------------------------------------------
@@ -537,8 +523,6 @@ bool AttOrnamentAccidGes::HasAccidlowerGes() const
     return (m_accidlowerGes != ACCIDENTAL_GESTURAL_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttSectionGes
 //----------------------------------------------------------------------------
@@ -580,8 +564,6 @@ bool AttSectionGes::HasAttacca() const
 {
     return (m_attacca != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttSoundLocation
@@ -640,8 +622,6 @@ bool AttSoundLocation::HasElevation() const
     return (m_elevation != 0.0);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttTimestampGes
 //----------------------------------------------------------------------------
@@ -698,8 +678,6 @@ bool AttTimestampGes::HasTstampReal() const
 {
     return (m_tstampReal != "");
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttTimestamp2Ges
@@ -758,4 +736,4 @@ bool AttTimestamp2Ges::HasTstamp2Real() const
     return (m_tstamp2Real != "");
 }
 
-} // namespace
+} // namespace vrv

@@ -60,9 +60,8 @@ private:
      * corresponds to it.
      **/
     std::string m_facs;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_FACSIMILE_H__

@@ -109,4 +109,4 @@ bool AttExtSym::HasGlyphUri() const
     return (m_glyphUri != "");
 }
 
-} // namespace
+} // namespace vrv

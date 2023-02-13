@@ -64,4 +64,4 @@ bool AttAlignment::HasWhen() const
     return (m_when != "");
 }
 
-} // namespace
+} // namespace vrv

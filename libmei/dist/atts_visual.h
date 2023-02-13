@@ -59,7 +59,6 @@ public:
 private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_PLACEMENT m_place;
-
 };
 
 //----------------------------------------------------------------------------
@@ -132,7 +131,6 @@ private:
     data_LINEFORM m_lineForm;
     /** Width of the line. **/
     data_LINEWIDTH m_lineWidth;
-
 };
 
 //----------------------------------------------------------------------------
@@ -183,7 +181,6 @@ private:
     data_BARMETHOD m_method;
     /** Records the placement of the beam relative to the events it affects. **/
     int m_place;
-
 };
 
 //----------------------------------------------------------------------------
@@ -230,7 +227,6 @@ private:
     beamingVis_BEAMREND m_beamRend;
     /** Captures beam slope. **/
     double m_beamSlope;
-
 };
 
 //----------------------------------------------------------------------------
@@ -265,7 +261,6 @@ public:
 private:
     /** Indicates presence of slash through the beam. **/
     data_BEATRPT_REND m_slash;
-
 };
 
 //----------------------------------------------------------------------------
@@ -305,7 +300,6 @@ private:
      * boundaries of the cluster note head.
      **/
     data_CLUSTER m_cluster;
-
 };
 
 //----------------------------------------------------------------------------
@@ -346,7 +340,6 @@ private:
     std::string m_clefColor;
     /** Determines whether the clef is to be displayed. **/
     data_BOOLEAN m_clefVisible;
-
 };
 
 //----------------------------------------------------------------------------
@@ -387,7 +380,6 @@ private:
     episemaVis_FORM m_form;
     /** Records the placement of the beam relative to the events it affects. **/
     data_EVENTREL m_place;
-
 };
 
 //----------------------------------------------------------------------------
@@ -434,7 +426,6 @@ private:
     int m_beamsFloat;
     /** Records the amount of separation between floating beams and stems. **/
     data_MEASUREMENTUNSIGNED m_floatGap;
-
 };
 
 //----------------------------------------------------------------------------
@@ -475,7 +466,6 @@ private:
     fermataVis_FORM m_form;
     /** Describes a clef’s shape. **/
     fermataVis_SHAPE m_shape;
-
 };
 
 //----------------------------------------------------------------------------
@@ -510,7 +500,6 @@ public:
 private:
     /** Describes the rotation or reflection of the base symbol. **/
     fingGrpVis_ORIENT m_orient;
-
 };
 
 //----------------------------------------------------------------------------
@@ -577,7 +566,6 @@ private:
      * order to optimize spacing.
      **/
     data_BOOLEAN m_angleOptimize;
-
 };
 
 //----------------------------------------------------------------------------
@@ -612,7 +600,6 @@ public:
 private:
     /** Describes how the harmonic indication should be rendered. **/
     harmVis_RENDGRID m_rendgrid;
-
 };
 
 //----------------------------------------------------------------------------
@@ -653,7 +640,6 @@ private:
     data_EVENTREL m_place;
     /** Direction of the pen stroke. **/
     data_COMPASSDIRECTION m_tilt;
-
 };
 
 //----------------------------------------------------------------------------
@@ -688,7 +674,6 @@ public:
 private:
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
     data_BOOLEAN m_sigShowchange;
-
 };
 
 //----------------------------------------------------------------------------
@@ -729,7 +714,6 @@ private:
     data_BOOLEAN m_keysigShow;
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
     data_BOOLEAN m_keysigShowchange;
-
 };
 
 //----------------------------------------------------------------------------
@@ -764,7 +748,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_LIGATUREFORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -831,7 +814,6 @@ private:
     data_LINESTARTENDSYMBOL m_startsym;
     /** Holds the relative size of the line-start symbol. **/
     int m_startsymSize;
-
 };
 
 //----------------------------------------------------------------------------
@@ -872,7 +854,6 @@ private:
     liquescentVis_CURVE m_curve;
     /** Indicates whether curve is closed. **/
     data_BOOLEAN m_looped;
-
 };
 
 //----------------------------------------------------------------------------
@@ -925,7 +906,6 @@ private:
     data_ORIENTATION m_orient;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
     data_MENSURATIONSIGN m_sign;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1010,7 +990,6 @@ private:
      * For example, one slash is added for what we now call 'alla breve'.
      **/
     int m_mensurSlash;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1045,7 +1024,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_METERFORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1089,7 +1067,6 @@ private:
      * signature changes.
      **/
     data_BOOLEAN m_meterShowchange;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1128,7 +1105,6 @@ private:
      * longa, breve and semibreve rests.
      **/
     data_BOOLEAN m_block;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1166,7 +1142,6 @@ private:
      * the pb element occurs.
      **/
     pbVis_FOLIUM m_folium;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1201,7 +1176,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_PEDALSTYLE m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1246,7 +1220,6 @@ private:
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
     data_MEASUREMENTUNSIGNED m_len;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1281,7 +1254,6 @@ public:
 private:
     /** Number of "crests" of a wavy line. **/
     int m_waves;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1316,7 +1288,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     sbVis_FORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1355,7 +1326,6 @@ private:
      * interline space is measured from the middle of a staff line.
      **/
     std::string m_vuHeight;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1390,7 +1360,6 @@ public:
 private:
     /** Indicates that staves begin again with this section. **/
     data_BOOLEAN m_restart;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1425,7 +1394,6 @@ public:
 private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_EVENTREL m_place;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1463,7 +1431,6 @@ private:
      * discretion of processing software.
      **/
     data_BOOLEAN m_compressable;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1527,7 +1494,6 @@ private:
      * spacing.system attribute indicates the spacing between systems.
      **/
     data_MEASUREMENTSIGNED m_spacing;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1565,7 +1531,6 @@ private:
      * only drawn across the lines of each staff (false).
      **/
     data_BOOLEAN m_barThru;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1640,7 +1605,6 @@ private:
      * data.FLAGFORM.mensural datatype.
      **/
     data_FLAGFORM_mensural m_flagForm;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1696,9 +1660,8 @@ private:
     data_BOOLEAN m_durVisible;
     /** Controls how the num:numbase ratio is to be displayed. **/
     tupletVis_NUMFORMAT m_numFormat;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_VISUAL_H__

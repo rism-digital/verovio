@@ -60,9 +60,8 @@ private:
      * typology of possible origins.
      **/
     std::string m_cause;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_CRITAPP_H__

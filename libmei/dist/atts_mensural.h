@@ -61,7 +61,6 @@ private:
      * major / minor / duplex quality of a note).
      **/
     data_DURQUALITY_mensural m_durQuality;
-
 };
 
 //----------------------------------------------------------------------------
@@ -110,7 +109,6 @@ private:
      * Proport.numbase is for the second value in the ratio.
      **/
     int m_proportNumbase;
-
 };
 
 //----------------------------------------------------------------------------
@@ -169,7 +167,6 @@ private:
     data_TEMPUS m_tempus;
     /** Describes the divisions of the breve in use in 14th-century Italy. **/
     data_DIVISIO m_divisio;
-
 };
 
 //----------------------------------------------------------------------------
@@ -204,7 +201,6 @@ public:
 private:
     /** Indicates this element’s participation in a ligature. **/
     data_LIGATUREFORM m_lig;
-
 };
 
 //----------------------------------------------------------------------------
@@ -239,7 +235,6 @@ public:
 private:
     /** States how many spaces are covered by the rest. **/
     int m_spaces;
-
 };
 
 //----------------------------------------------------------------------------
@@ -274,9 +269,8 @@ public:
 private:
     /** Records the form of the stem. **/
     data_STEMFORM_mensural m_stemForm;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_MENSURAL_H__

@@ -63,9 +63,8 @@ private:
     int m_colspan;
     /** The number of rows spanned by this cell. **/
     int m_rowspan;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_FIGTABLE_H__

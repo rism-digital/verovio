@@ -57,7 +57,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     harmAnl_FORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -98,7 +97,6 @@ private:
      * ^1, or v5+, for example. The amount of chromatic alternation is not indicated.
      **/
     std::string m_deg;
-
 };
 
 //----------------------------------------------------------------------------
@@ -133,7 +131,6 @@ public:
 private:
     /** Encodes the harmonic interval between pitches occurring at the same time. **/
     std::string m_inth;
-
 };
 
 //----------------------------------------------------------------------------
@@ -173,7 +170,6 @@ private:
      * half steps.
      **/
     std::string m_intm;
-
 };
 
 //----------------------------------------------------------------------------
@@ -208,7 +204,6 @@ public:
 private:
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_mode;
-
 };
 
 //----------------------------------------------------------------------------
@@ -258,7 +253,6 @@ private:
     data_MODE m_keyMode;
     /** Holds the pitch name of the tonic key, e.g., c for the key of C. **/
     data_PITCHNAME m_keyPname;
-
 };
 
 //----------------------------------------------------------------------------
@@ -293,7 +287,6 @@ public:
 private:
     /** Describes melodic function using Humdrum **embel syntax. **/
     data_MELODICFUNCTION m_mfunc;
-
 };
 
 //----------------------------------------------------------------------------
@@ -328,7 +321,6 @@ public:
 private:
     /** Holds pitch class information. **/
     int m_pclass;
-
 };
 
 //----------------------------------------------------------------------------
@@ -366,9 +358,8 @@ private:
      * movable Do system.
      **/
     std::string m_psolfa;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_ANALYTICAL_H__

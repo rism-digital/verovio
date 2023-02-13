@@ -57,7 +57,6 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     accidLog_FUNC m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -92,7 +91,6 @@ public:
 private:
     /** Captures a written accidental. **/
     data_ACCIDENTAL_WRITTEN m_accid;
-
 };
 
 //----------------------------------------------------------------------------
@@ -133,7 +131,6 @@ private:
      * encoded using the fing element.
      **/
     data_ARTICULATION_List m_artic;
-
 };
 
 //----------------------------------------------------------------------------
@@ -168,7 +165,6 @@ public:
 private:
     /** Indicates the next section or movement to be performed. **/
     std::string m_target;
-
 };
 
 //----------------------------------------------------------------------------
@@ -203,7 +199,6 @@ public:
 private:
     /** The intended audience. **/
     audience_AUDIENCE m_audience;
-
 };
 
 //----------------------------------------------------------------------------
@@ -238,7 +233,6 @@ public:
 private:
     /** Records the number of augmentation dots required by a written dotted duration. **/
     int m_dots;
-
 };
 
 //----------------------------------------------------------------------------
@@ -287,7 +281,6 @@ private:
      * the value of the codedval attribute.
      **/
     std::string m_authUri;
-
 };
 
 //----------------------------------------------------------------------------
@@ -322,7 +315,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_BARRENDITION m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -376,7 +368,6 @@ private:
      * not equal to 2 times (the number of staff lines - 1).
      **/
     int m_barPlace;
-
 };
 
 //----------------------------------------------------------------------------
@@ -411,7 +402,6 @@ public:
 private:
     /** --- **/
     std::string m_base;
-
 };
 
 //----------------------------------------------------------------------------
@@ -449,7 +439,6 @@ private:
      * system to which this MEI element is comparable.
      **/
     std::string m_analog;
-
 };
 
 //----------------------------------------------------------------------------
@@ -487,7 +476,6 @@ private:
      * Julian, Roman, Mosaic, Revolutionary, Islamic, etc.
      **/
     std::string m_calendar;
-
 };
 
 //----------------------------------------------------------------------------
@@ -526,7 +514,6 @@ private:
      * identified by the auth or auth.uri attributes.
      **/
     std::string m_codedval;
-
 };
 
 //----------------------------------------------------------------------------
@@ -564,7 +551,6 @@ private:
      * entity bearing this attribute.
      **/
     std::string m_class;
-
 };
 
 //----------------------------------------------------------------------------
@@ -602,7 +588,6 @@ private:
      * A "cautionary" clef does not change the following pitches.
      **/
     data_BOOLEAN m_cautionary;
-
 };
 
 //----------------------------------------------------------------------------
@@ -637,7 +622,6 @@ public:
 private:
     /** Describes a clef’s shape. **/
     data_CLEFSHAPE m_shape;
-
 };
 
 //----------------------------------------------------------------------------
@@ -694,7 +678,6 @@ private:
     data_OCTAVE_DIS m_clefDis;
     /** Records the direction of octave displacement to be applied to the clef. **/
     data_STAFFREL_basic m_clefDisPlace;
-
 };
 
 //----------------------------------------------------------------------------
@@ -732,7 +715,6 @@ private:
      * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
      **/
     std::string m_color;
-
 };
 
 //----------------------------------------------------------------------------
@@ -774,7 +756,6 @@ private:
      * filled and vice versa.
      **/
     data_BOOLEAN m_colored;
-
 };
 
 //----------------------------------------------------------------------------
@@ -809,7 +790,6 @@ public:
 private:
     /** Gives coordinates for the left side of a feature. **/
     double m_coordX1;
-
 };
 
 //----------------------------------------------------------------------------
@@ -844,7 +824,6 @@ public:
 private:
     /** Gives coordinates for the right side of a feature. **/
     double m_coordX2;
-
 };
 
 //----------------------------------------------------------------------------
@@ -879,7 +858,6 @@ public:
 private:
     /** Gives y coordinates for the top left of a feature. **/
     double m_coordY1;
-
 };
 
 //----------------------------------------------------------------------------
@@ -943,7 +921,6 @@ private:
      * The orientation is expressed in arc degrees.
      **/
     double m_rotate;
-
 };
 
 //----------------------------------------------------------------------------
@@ -978,7 +955,6 @@ public:
 private:
     /** --- **/
     data_BOOLEAN m_cue;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1037,7 +1013,6 @@ private:
     data_BULGE m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     curvature_CURVEDIR m_curvedir;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1080,7 +1055,6 @@ private:
     data_LINEFORM m_lform;
     /** Width of a curved line. **/
     data_LINEWIDTH m_lwidth;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1115,7 +1089,6 @@ public:
 private:
     /** Indicates the next section or movement to be performed. **/
     std::string m_target;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1150,7 +1123,6 @@ public:
 private:
     /** Used to link metadata elements to one or more data-containing elements. **/
     std::string m_data;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1209,7 +1181,6 @@ private:
     std::string m_notbefore;
     /** Contains the starting point of a date range in standard ISO form. **/
     std::string m_startdate;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1271,7 +1242,6 @@ private:
     data_MEASUREMENTSIGNED m_rehDist;
     /** Records the default distance from the staff for tempo marks. **/
     data_MEASUREMENTSIGNED m_tempoDist;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1306,7 +1276,6 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     dotLog_FORM m_form;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1344,7 +1313,6 @@ private:
      * space-separated values that add up to the total duration may be used.
      **/
     data_DURATION m_dur;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1401,7 +1369,6 @@ private:
      * numbase.default is the second value in the ratio.
      **/
     int m_numbaseDefault;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1439,7 +1406,6 @@ private:
      * space-separated values that add up to the total duration may be used.
      **/
     data_DURATION m_dur;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1483,7 +1449,6 @@ private:
      * num is the first value in the ratio, while numbase is the second.
      **/
     int m_numbase;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1523,7 +1488,6 @@ private:
      * 131, ex. 9-14.
      **/
     data_ENCLOSURE m_enclose;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1558,7 +1522,6 @@ public:
 private:
     /** Describes where ending marks should be displayed. **/
     endings_ENDINGREND m_endingRend;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1602,7 +1565,6 @@ private:
      * the intervention or interpretation.
      **/
     std::string m_evidence;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1637,7 +1599,6 @@ public:
 private:
     /** Indicates the presence of an extension symbol, typically a line. **/
     data_BOOLEAN m_extender;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1676,7 +1637,6 @@ private:
      * measurement unit.
      **/
     std::string m_extent;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1715,7 +1675,6 @@ private:
      * element should be employed instead.
      **/
     data_STAFFREL_basic m_fermata;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1753,7 +1712,6 @@ private:
      * preposition) that should not be used for sorting a title or name.
      **/
     int m_nonfiling;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1788,7 +1746,6 @@ public:
 private:
     /** Indicates the nesting level of staff grouping symbols. **/
     int m_level;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1826,7 +1783,6 @@ private:
      * The value must be the ID of a hand element declared in the header.
      **/
     std::string m_hand;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1861,7 +1817,6 @@ public:
 private:
     /** Measurement of the vertical dimension of an entity. **/
     data_MEASUREMENTUNSIGNED m_height;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1896,7 +1851,6 @@ public:
 private:
     /** Records horizontal alignment. **/
     data_HORIZONTALALIGNMENT m_halign;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1935,7 +1889,6 @@ private:
      * Task Force in RFC 2046.
      **/
     std::string m_mimetype;
-
 };
 
 //----------------------------------------------------------------------------
@@ -1977,7 +1930,6 @@ private:
      * carrying the attribute.
      **/
     std::string m_join;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2012,7 +1964,6 @@ public:
 private:
     /** Written key signature. **/
     data_KEYSIGNATURE m_sig;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2047,7 +1998,6 @@ public:
 private:
     /** Written key signature. **/
     data_KEYSIGNATURE m_keySig;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2086,7 +2036,6 @@ private:
      * Should not be used to record document content.
      **/
     std::string m_label;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2127,7 +2076,6 @@ private:
     std::string m_lang;
     /** Specifies the transliteration technique used. **/
     std::string m_translit;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2162,7 +2110,6 @@ public:
 private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2197,7 +2144,6 @@ public:
 private:
     /** Identifies the layer to which a feature applies. **/
     int m_layer;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2236,7 +2182,6 @@ private:
      * The numbering of lines starts with the lowest line of the staff.
      **/
     char m_line;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2289,7 +2234,6 @@ private:
     data_LINESTARTENDSYMBOL m_lstartsym;
     /** Holds the relative size of the line-start symbol. **/
     int m_lstartsymSize;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2344,7 +2288,6 @@ private:
     int m_lsegs;
     /** Width of a curved line. **/
     data_LINEWIDTH m_lwidth;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2433,7 +2376,6 @@ private:
     std::string m_sameas;
     /** Points to elements that are synchronous with the current element. **/
     std::string m_synch;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2500,7 +2442,6 @@ private:
     data_FONTSTYLE m_lyricStyle;
     /** Sets the default font weight value for lyrics. **/
     data_FONTWEIGHT m_lyricWeight;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2535,7 +2476,6 @@ public:
 private:
     /** Indicates whether measure numbers should be displayed. **/
     data_BOOLEAN m_mnumVisible;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2570,7 +2510,6 @@ public:
 private:
     /** Indicates the unit of measurement. **/
     std::string m_unit;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2630,7 +2569,6 @@ private:
      * with this attribute.
      **/
     data_BETYPE m_betype;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2665,7 +2603,6 @@ public:
 private:
     /** Describes the writing medium. **/
     std::string m_medium;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2700,7 +2637,6 @@ public:
 private:
     /** Specifies a generic MEI version label. **/
     meiVersion_MEIVERSION m_meiversion;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2739,7 +2675,6 @@ private:
      * attribute and its content.
      **/
     std::string m_decls;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2777,7 +2712,6 @@ private:
      * prevailing meter.
      **/
     meterConformance_METCON m_metcon;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2827,7 +2761,6 @@ private:
      * attribute indicates the nature of the right barline but not the left.
      **/
     data_BOOLEAN m_control;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2877,7 +2810,6 @@ private:
     data_METERSIGN m_sym;
     /** Indicates the unit of measurement. **/
     int m_unit;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2935,7 +2867,6 @@ private:
      * is, 'C' for common time or 'C' with a slash for cut time.
      **/
     data_METERSIGN m_meterSym;
-
 };
 
 //----------------------------------------------------------------------------
@@ -2988,7 +2919,6 @@ private:
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
     int m_mmDots;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3026,7 +2956,6 @@ private:
      * rest (mRest) and whole measure repeats (mRpt) in parts should be rendered.
      **/
     data_BOOLEAN m_multiNumber;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3065,7 +2994,6 @@ private:
      * Its value must be a non-negative integer.
      **/
     int m_n;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3104,7 +3032,6 @@ private:
      * Its value must be a non-negative integer.
      **/
     std::string m_n;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3151,7 +3078,6 @@ private:
      * for example, the occupation of a person or the status of a place.
      **/
     std::string m_role;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3194,7 +3120,6 @@ private:
     std::string m_musicName;
     /** Sets the default music font size. **/
     data_FONTSIZE m_musicSize;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3291,7 +3216,6 @@ private:
      * graphically or sounded when it is presented in an aural form.
      **/
     data_BOOLEAN m_headVisible;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3326,7 +3250,6 @@ public:
 private:
     /** Captures written octave information. **/
     data_OCTAVE m_oct;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3365,7 +3288,6 @@ private:
      * in a measure does not have an octave value specified.
      **/
     data_OCTAVE m_octDefault;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3406,7 +3328,6 @@ private:
     data_OCTAVE_DIS m_dis;
     /** Records the direction of octave displacement. **/
     data_STAFFREL_basic m_disPlace;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3445,7 +3366,6 @@ private:
      * stems-up notes above the line and stems-down notes below the line.
      **/
     data_BOOLEAN m_ontheline;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3483,7 +3403,6 @@ private:
      * should be displayed. When the value is 'true', empty staves are displayed.
      **/
     data_BOOLEAN m_optimize;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3518,7 +3437,6 @@ public:
 private:
     /** Identifies the layer on which referenced notation occurs. **/
     std::string m_originLayer;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3556,7 +3474,6 @@ private:
      * Defaults to the same value as the local staff. Mandatory when applicable.
      **/
     std::string m_originStaff;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3597,7 +3514,6 @@ private:
     std::string m_originStartid;
     /** Indicates the final element in a sequence of events. **/
     std::string m_originEndid;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3645,7 +3561,6 @@ private:
      * The values are relative to the measure identified by origin.tstamp.
      **/
     data_MEASUREBEAT m_originTstamp2;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3728,7 +3643,6 @@ private:
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
     std::string m_pageScale;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3775,7 +3689,6 @@ private:
      * Use '%all' when the feature should occur on every staff.
      **/
     std::string m_partstaff;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3810,7 +3723,6 @@ public:
 private:
     /** Contains a written pitch name. **/
     data_PITCHNAME m_pname;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3848,7 +3760,6 @@ private:
      * A value of 'true' means on the staff, and 'false' off the staff.
      **/
     data_BOOLEAN m_onstaff;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3883,7 +3794,6 @@ public:
 private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_STAFFREL m_place;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3918,7 +3828,6 @@ public:
 private:
     /** Records the placement of the beam relative to the events it affects. **/
     data_STAFFREL m_place;
-
 };
 
 //----------------------------------------------------------------------------
@@ -3959,7 +3868,6 @@ private:
      * relationship.
      **/
     xsdAnyURI_List m_plist;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4024,7 +3932,6 @@ private:
      * scheme or typology.
      **/
     std::string m_targettype;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4062,7 +3969,6 @@ private:
      * Can only be interpreted in combination with the unit attribute.
      **/
     double m_quantity;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4131,7 +4037,6 @@ private:
      * observed values that fall within that range.
      **/
     double m_confidence;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4170,7 +4075,6 @@ private:
      * Its value must point to one or more identifiers declared in the document header.
      **/
     std::string m_resp;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4208,7 +4112,6 @@ private:
      * space-separated values that add up to the total duration may be used.
      **/
     data_DURATION m_dur;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4243,7 +4146,6 @@ public:
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
     data_PERCENT m_scale;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4281,7 +4183,6 @@ private:
      * features carrying this attribute are believed to have occurred.
      **/
     int m_seq;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4316,7 +4217,6 @@ public:
 private:
     /** Indicates presence of slash through the beam. **/
     char m_slash;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4355,7 +4255,6 @@ private:
      * should be employed.
      **/
     std::string m_slur;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4395,7 +4294,6 @@ private:
      * located in the document header.
      **/
     std::string m_source;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4457,7 +4355,6 @@ private:
      * space; that is, the minimum and maximum values are equal.
      **/
     data_MEASUREMENTSIGNED m_spacingSystem;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4492,7 +4389,6 @@ public:
 private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4527,7 +4423,6 @@ public:
 private:
     /** Indicates the number of staff lines. **/
     int m_lines;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4562,7 +4457,6 @@ public:
 private:
     /** Specifies the symbol used to group a set of staves. **/
     staffGroupingSym_SYMBOL m_symbol;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4601,7 +4495,6 @@ private:
      * Mandatory when applicable.
      **/
     xsdPositiveInteger_List m_staff;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4654,7 +4547,6 @@ private:
     data_STAFFITEM m_beloworder;
     /** Describes vertical order of items printed between staves, from top to bottom. **/
     data_STAFFITEM m_betweenorder;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4689,7 +4581,6 @@ public:
 private:
     /** Holds the staff location of the feature. **/
     int m_loc;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4730,7 +4621,6 @@ private:
     data_PITCHNAME m_ploc;
     /** Records staff location in terms of written octave. **/
     data_OCTAVE m_oloc;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4768,7 +4658,6 @@ private:
      * applies.
      **/
     std::string m_endid;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4806,7 +4695,6 @@ private:
      * feature applies.
      **/
     std::string m_startid;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4890,7 +4778,6 @@ private:
     double m_stemX;
     /** Records the output y coordinate of the stem’s attachment point. **/
     double m_stemY;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4934,7 +4821,6 @@ private:
     sylLog_CON m_con;
     /** Records the position of a syllable within a word. **/
     sylLog_WORDPOS m_wordpos;
-
 };
 
 //----------------------------------------------------------------------------
@@ -4969,7 +4855,6 @@ public:
 private:
     /** Holds an associated sung text syllable. **/
     std::string m_syl;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5035,7 +4920,6 @@ private:
      * page only.
      **/
     data_MEASUREMENTUNSIGNED m_systemTopmar;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5073,7 +4957,6 @@ private:
      * pointer.
      **/
     targetEval_EVALUATE m_evaluate;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5108,7 +4991,6 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     tempoLog_FUNC m_func;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5149,7 +5031,6 @@ private:
     std::string m_altrend;
     /** Captures the appearance of the element’s contents using MEI-defined descriptors. **/
     data_TEXTRENDITION m_rend;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5225,7 +5106,6 @@ private:
      * this information is not provided on the individual elements.
      **/
     data_FONTWEIGHT m_textWeight;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5264,7 +5144,6 @@ private:
      * should be employed.
      **/
     data_TIE m_tie;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5302,7 +5181,6 @@ private:
      * part], as expressed in the written time signature.
      **/
     double m_tstamp;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5340,7 +5218,6 @@ private:
      * location in the ending measure.
      **/
     data_MEASUREBEAT m_tstamp2;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5387,7 +5264,6 @@ private:
      * necessary to calculate the sounded pitch from the written one.
      **/
     int m_transSemi;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5437,7 +5313,6 @@ private:
     data_PITCHNAME m_tunePname;
     /** Provides an indication of the tuning system, just, for example. **/
     data_TEMPERAMENT m_tuneTemper;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5476,7 +5351,6 @@ private:
      * element should be employed.
      **/
     std::string m_tuplet;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5514,7 +5388,6 @@ private:
      * categories.
      **/
     std::string m_type;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5594,7 +5467,6 @@ private:
     double m_letterspacing;
     /** Indicates line height in analogy to the CSS line-height property. **/
     std::string m_lineheight;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5629,7 +5501,6 @@ public:
 private:
     /** Records vertical alignment. **/
     data_VERTICALALIGNMENT m_valign;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5664,7 +5535,6 @@ public:
 private:
     /** Provides a label for members of a vertically aligned group. **/
     int m_vgrp;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5702,7 +5572,6 @@ private:
      * graphically or sounded when it is presented in an aural form.
      **/
     data_BOOLEAN m_visible;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5741,7 +5610,6 @@ private:
      * distance between adjacent staff lines.
      **/
     data_MEASUREMENTSIGNED m_ho;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5779,7 +5647,6 @@ private:
      * location in terms of musical time; that is, beats.
      **/
     double m_to;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5818,7 +5685,6 @@ private:
      * distance between adjacent staff lines.
      **/
     data_MEASUREMENTSIGNED m_vo;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5865,7 +5731,6 @@ private:
      * point.
      **/
     data_MEASUREMENTSIGNED m_endho;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5912,7 +5777,6 @@ private:
      * point.
      **/
     double m_endto;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5959,7 +5823,6 @@ private:
      * point.
      **/
     data_MEASUREMENTSIGNED m_endvo;
-
 };
 
 //----------------------------------------------------------------------------
@@ -5994,7 +5857,6 @@ public:
 private:
     /** Specifies the symbol used to group lyrics. **/
     voltaGroupingSym_VOLTASYM m_voltasym;
-
 };
 
 //----------------------------------------------------------------------------
@@ -6029,7 +5891,6 @@ public:
 private:
     /** --- **/
     std::string m_space;
-
 };
 
 //----------------------------------------------------------------------------
@@ -6064,7 +5925,6 @@ public:
 private:
     /** Measurement of the horizontal dimension of an entity. **/
     data_MEASUREMENTUNSIGNED m_width;
-
 };
 
 //----------------------------------------------------------------------------
@@ -6113,7 +5973,6 @@ private:
      * use the facs attribute.
      **/
     double m_y;
-
 };
 
 //----------------------------------------------------------------------------
@@ -6154,9 +6013,8 @@ private:
     double m_x2;
     /** Encodes the optional 2nd y coordinate. **/
     double m_y2;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_SHARED_H__

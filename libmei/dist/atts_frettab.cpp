@@ -64,8 +64,6 @@ bool AttCourseLog::HasTuningStandard() const
     return (m_tuningStandard != COURSETUNING_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttNoteGesTab
 //----------------------------------------------------------------------------
@@ -123,4 +121,4 @@ bool AttNoteGesTab::HasTabFret() const
     return (m_tabFret != -1);
 }
 
-} // namespace
+} // namespace vrv

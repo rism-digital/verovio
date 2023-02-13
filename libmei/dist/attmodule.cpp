@@ -62,8 +62,7 @@ void AttModule::GetMei(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_analytical.h"
 
@@ -232,8 +231,7 @@ void AttModule::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_cmn.h"
 
@@ -837,8 +835,7 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_cmnornaments.h"
 
@@ -939,8 +936,7 @@ void AttModule::GetCmnornaments(const Object *element, ArrayOfStrAttr *attribute
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_critapp.h"
 
@@ -975,8 +971,7 @@ void AttModule::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_edittrans.h"
 
@@ -1026,8 +1021,7 @@ void AttModule::GetEdittrans(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_externalsymbols.h"
 
@@ -1083,8 +1077,7 @@ void AttModule::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attrib
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_facsimile.h"
 
@@ -1119,8 +1112,7 @@ void AttModule::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_figtable.h"
 
@@ -1162,8 +1154,7 @@ void AttModule::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_fingering.h"
 
@@ -1198,8 +1189,7 @@ void AttModule::GetFingering(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_frettab.h"
 
@@ -1256,8 +1246,7 @@ void AttModule::GetFrettab(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_gestural.h"
 
@@ -1555,8 +1544,7 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_harmony.h"
 
@@ -1591,8 +1579,7 @@ void AttModule::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_header.h"
 
@@ -1700,8 +1687,7 @@ void AttModule::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_mensural.h"
 
@@ -1846,8 +1832,7 @@ void AttModule::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_midi.h"
 
@@ -2065,8 +2050,7 @@ void AttModule::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_neumes.h"
 
@@ -2172,8 +2156,7 @@ void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_pagebased.h"
 
@@ -2229,8 +2212,7 @@ void AttModule::GetPagebased(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_performance.h"
 
@@ -2265,8 +2247,7 @@ void AttModule::GetPerformance(const Object *element, ArrayOfStrAttr *attributes
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_shared.h"
 
@@ -5235,8 +5216,7 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_usersymbols.h"
 
@@ -5316,8 +5296,7 @@ void AttModule::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes
     }
 }
 
-} // namespace
-
+} // namespace vrv
 
 #include "atts_visual.h"
 
@@ -6242,5 +6221,4 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     }
 }
 
-} // namespace
-
+} // namespace vrv

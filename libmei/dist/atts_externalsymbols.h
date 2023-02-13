@@ -84,9 +84,8 @@ private:
      * glyph.name or glyph.num is taken.
      **/
     std::string m_glyphUri;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_EXTERNALSYMBOLS_H__

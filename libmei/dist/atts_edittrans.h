@@ -60,7 +60,6 @@ private:
      * text.
      **/
     std::string m_agent;
-
 };
 
 //----------------------------------------------------------------------------
@@ -99,9 +98,8 @@ private:
      * (unclear).
      **/
     std::string m_reason;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_EDITTRANS_H__

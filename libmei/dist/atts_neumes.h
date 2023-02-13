@@ -63,7 +63,6 @@ private:
     std::string m_oct;
     /** Contains a written pitch name. **/
     std::string m_pname;
-
 };
 
 //----------------------------------------------------------------------------
@@ -146,9 +145,8 @@ private:
     std::string m_sShape;
     /** Direction of the pen stroke. **/
     data_COMPASSDIRECTION m_tilt;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_NEUMES_H__

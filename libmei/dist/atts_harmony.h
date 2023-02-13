@@ -57,9 +57,8 @@ public:
 private:
     /** Contains a reference to a chordDef element elsewhere in the document. **/
     std::string m_chordref;
-
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATTS_HARMONY_H__

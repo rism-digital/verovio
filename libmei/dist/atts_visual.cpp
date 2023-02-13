@@ -64,8 +64,6 @@ bool AttAnnotVis::HasPlace() const
     return (m_place.HasValue());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttArpegVis
 //----------------------------------------------------------------------------
@@ -198,8 +196,6 @@ bool AttArpegVis::HasLineWidth() const
     return (m_lineWidth.HasValue());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBarLineVis
 //----------------------------------------------------------------------------
@@ -271,8 +267,6 @@ bool AttBarLineVis::HasPlace() const
 {
     return (m_place != MEI_UNSET);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttBeamingVis
@@ -346,8 +340,6 @@ bool AttBeamingVis::HasBeamSlope() const
     return (m_beamSlope != 0.0);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBeatRptVis
 //----------------------------------------------------------------------------
@@ -390,8 +382,6 @@ bool AttBeatRptVis::HasSlash() const
     return (m_slash != BEATRPT_REND_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttChordVis
 //----------------------------------------------------------------------------
@@ -433,8 +423,6 @@ bool AttChordVis::HasCluster() const
 {
     return (m_cluster != CLUSTER_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttCleffingVis
@@ -493,8 +481,6 @@ bool AttCleffingVis::HasClefVisible() const
     return (m_clefVisible != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttEpisemaVis
 //----------------------------------------------------------------------------
@@ -551,8 +537,6 @@ bool AttEpisemaVis::HasPlace() const
 {
     return (m_place != data_EVENTREL());
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttFTremVis
@@ -626,8 +610,6 @@ bool AttFTremVis::HasFloatGap() const
     return (m_floatGap != data_MEASUREMENTUNSIGNED());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttFermataVis
 //----------------------------------------------------------------------------
@@ -685,8 +667,6 @@ bool AttFermataVis::HasShape() const
     return (m_shape != fermataVis_SHAPE_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttFingGrpVis
 //----------------------------------------------------------------------------
@@ -728,8 +708,6 @@ bool AttFingGrpVis::HasOrient() const
 {
     return (m_orient != fingGrpVis_ORIENT_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttHairpinVis
@@ -818,8 +796,6 @@ bool AttHairpinVis::HasAngleOptimize() const
     return (m_angleOptimize != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttHarmVis
 //----------------------------------------------------------------------------
@@ -861,8 +837,6 @@ bool AttHarmVis::HasRendgrid() const
 {
     return (m_rendgrid != harmVis_RENDGRID_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttHispanTickVis
@@ -921,8 +895,6 @@ bool AttHispanTickVis::HasTilt() const
     return (m_tilt != data_COMPASSDIRECTION());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttKeySigVis
 //----------------------------------------------------------------------------
@@ -964,8 +936,6 @@ bool AttKeySigVis::HasSigShowchange() const
 {
     return (m_sigShowchange != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultVis
@@ -1024,8 +994,6 @@ bool AttKeySigDefaultVis::HasKeysigShowchange() const
     return (m_keysigShowchange != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttLigatureVis
 //----------------------------------------------------------------------------
@@ -1067,8 +1035,6 @@ bool AttLigatureVis::HasForm() const
 {
     return (m_form != LIGATUREFORM_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttLineVis
@@ -1187,8 +1153,6 @@ bool AttLineVis::HasStartsymSize() const
     return (m_startsymSize != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttLiquescentVis
 //----------------------------------------------------------------------------
@@ -1245,8 +1209,6 @@ bool AttLiquescentVis::HasLooped() const
 {
     return (m_looped != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMensurVis
@@ -1334,8 +1296,6 @@ bool AttMensurVis::HasSign() const
 {
     return (m_sign != MENSURATIONSIGN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMensuralVis
@@ -1484,8 +1444,6 @@ bool AttMensuralVis::HasMensurSlash() const
     return (m_mensurSlash != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMeterSigVis
 //----------------------------------------------------------------------------
@@ -1527,8 +1485,6 @@ bool AttMeterSigVis::HasForm() const
 {
     return (m_form != METERFORM_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultVis
@@ -1587,8 +1543,6 @@ bool AttMeterSigDefaultVis::HasMeterShowchange() const
     return (m_meterShowchange != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMultiRestVis
 //----------------------------------------------------------------------------
@@ -1630,8 +1584,6 @@ bool AttMultiRestVis::HasBlock() const
 {
     return (m_block != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttPbVis
@@ -1675,8 +1627,6 @@ bool AttPbVis::HasFolium() const
     return (m_folium != pbVis_FOLIUM_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttPedalVis
 //----------------------------------------------------------------------------
@@ -1718,8 +1668,6 @@ bool AttPedalVis::HasForm() const
 {
     return (m_form != PEDALSTYLE_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttPlicaVis
@@ -1778,8 +1726,6 @@ bool AttPlicaVis::HasLen() const
     return (m_len != data_MEASUREMENTUNSIGNED());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttQuilismaVis
 //----------------------------------------------------------------------------
@@ -1821,8 +1767,6 @@ bool AttQuilismaVis::HasWaves() const
 {
     return (m_waves != MEI_UNSET);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttSbVis
@@ -1866,8 +1810,6 @@ bool AttSbVis::HasForm() const
     return (m_form != sbVis_FORM_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttScoreDefVis
 //----------------------------------------------------------------------------
@@ -1909,8 +1851,6 @@ bool AttScoreDefVis::HasVuHeight() const
 {
     return (m_vuHeight != "");
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttSectionVis
@@ -1954,8 +1894,6 @@ bool AttSectionVis::HasRestart() const
     return (m_restart != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttSignifLetVis
 //----------------------------------------------------------------------------
@@ -1998,8 +1936,6 @@ bool AttSignifLetVis::HasPlace() const
     return (m_place != data_EVENTREL());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttSpaceVis
 //----------------------------------------------------------------------------
@@ -2041,8 +1977,6 @@ bool AttSpaceVis::HasCompressable() const
 {
     return (m_compressable != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttStaffDefVis
@@ -2146,8 +2080,6 @@ bool AttStaffDefVis::HasSpacing() const
     return (m_spacing != data_MEASUREMENTSIGNED());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttStaffGrpVis
 //----------------------------------------------------------------------------
@@ -2189,8 +2121,6 @@ bool AttStaffGrpVis::HasBarThru() const
 {
     return (m_barThru != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttStemVis
@@ -2309,8 +2239,6 @@ bool AttStemVis::HasFlagForm() const
     return (m_flagForm != FLAGFORM_mensural_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttTupletVis
 //----------------------------------------------------------------------------
@@ -2398,4 +2326,4 @@ bool AttTupletVis::HasNumFormat() const
     return (m_numFormat != tupletVis_NUMFORMAT_NONE);
 }
 
-} // namespace
+} // namespace vrv

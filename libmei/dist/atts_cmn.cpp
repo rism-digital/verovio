@@ -64,8 +64,6 @@ bool AttArpegLog::HasOrder() const
     return (m_order != arpegLog_ORDER_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBTremLog
 //----------------------------------------------------------------------------
@@ -108,8 +106,6 @@ bool AttBTremLog::HasForm() const
     return (m_form != bTremLog_FORM_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBeamPresent
 //----------------------------------------------------------------------------
@@ -151,8 +147,6 @@ bool AttBeamPresent::HasBeam() const
 {
     return (m_beam != "");
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttBeamRend
@@ -241,8 +235,6 @@ bool AttBeamRend::HasSlope() const
     return (m_slope != 0.0);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBeamSecondary
 //----------------------------------------------------------------------------
@@ -285,8 +277,6 @@ bool AttBeamSecondary::HasBreaksec() const
     return (m_breaksec != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBeamedWith
 //----------------------------------------------------------------------------
@@ -328,8 +318,6 @@ bool AttBeamedWith::HasBeamWith() const
 {
     return (m_beamWith != NEIGHBORINGLAYER_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttBeamingLog
@@ -388,8 +376,6 @@ bool AttBeamingLog::HasBeamRests() const
     return (m_beamRests != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttBeatRptLog
 //----------------------------------------------------------------------------
@@ -431,8 +417,6 @@ bool AttBeatRptLog::HasBeatdef() const
 {
     return (m_beatdef != 0.0);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttBracketSpanLog
@@ -476,8 +460,6 @@ bool AttBracketSpanLog::HasFunc() const
     return (m_func != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttCutout
 //----------------------------------------------------------------------------
@@ -519,8 +501,6 @@ bool AttCutout::HasCutout() const
 {
     return (m_cutout != cutout_CUTOUT_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttExpandable
@@ -564,8 +544,6 @@ bool AttExpandable::HasExpand() const
     return (m_expand != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttFTremLog
 //----------------------------------------------------------------------------
@@ -607,8 +585,6 @@ bool AttFTremLog::HasForm() const
 {
     return (m_form != fTremLog_FORM_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttGlissPresent
@@ -652,8 +628,6 @@ bool AttGlissPresent::HasGliss() const
     return (m_gliss != GLISSANDO_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttGraceGrpLog
 //----------------------------------------------------------------------------
@@ -695,8 +669,6 @@ bool AttGraceGrpLog::HasAttach() const
 {
     return (m_attach != graceGrpLog_ATTACH_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttGraced
@@ -755,8 +727,6 @@ bool AttGraced::HasGraceTime() const
     return (m_graceTime != -1.0);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttHairpinLog
 //----------------------------------------------------------------------------
@@ -813,8 +783,6 @@ bool AttHairpinLog::HasNiente() const
 {
     return (m_niente != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttHarpPedalLog
@@ -948,8 +916,6 @@ bool AttHarpPedalLog::HasB() const
     return (m_b != harpPedalLog_B_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttLvPresent
 //----------------------------------------------------------------------------
@@ -991,8 +957,6 @@ bool AttLvPresent::HasLv() const
 {
     return (m_lv != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttMeasureLog
@@ -1051,8 +1015,6 @@ bool AttMeasureLog::HasRight() const
     return (m_right != BARRENDITION_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttMeterSigGrpLog
 //----------------------------------------------------------------------------
@@ -1094,8 +1056,6 @@ bool AttMeterSigGrpLog::HasFunc() const
 {
     return (m_func != meterSigGrpLog_FUNC_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttNumberPlacement
@@ -1154,8 +1114,6 @@ bool AttNumberPlacement::HasNumVisible() const
     return (m_numVisible != BOOLEAN_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttNumbered
 //----------------------------------------------------------------------------
@@ -1198,8 +1156,6 @@ bool AttNumbered::HasNum() const
     return (m_num != MEI_UNSET);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttOctaveLog
 //----------------------------------------------------------------------------
@@ -1241,8 +1197,6 @@ bool AttOctaveLog::HasColl() const
 {
     return (m_coll != octaveLog_COLL_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttPedalLog
@@ -1301,8 +1255,6 @@ bool AttPedalLog::HasFunc() const
     return (m_func != "");
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttPianoPedals
 //----------------------------------------------------------------------------
@@ -1344,8 +1296,6 @@ bool AttPianoPedals::HasPedalStyle() const
 {
     return (m_pedalStyle != PEDALSTYLE_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttRehearsal
@@ -1389,8 +1339,6 @@ bool AttRehearsal::HasRehEnclose() const
     return (m_rehEnclose != rehearsal_REHENCLOSE_NONE);
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttScoreDefVisCmn
 //----------------------------------------------------------------------------
@@ -1432,8 +1380,6 @@ bool AttScoreDefVisCmn::HasGridShow() const
 {
     return (m_gridShow != BOOLEAN_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttSlurRend
@@ -1492,8 +1438,6 @@ bool AttSlurRend::HasSlurLwidth() const
     return (m_slurLwidth.HasValue());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttStemsCmn
 //----------------------------------------------------------------------------
@@ -1535,8 +1479,6 @@ bool AttStemsCmn::HasStemWith() const
 {
     return (m_stemWith != NEIGHBORINGLAYER_NONE);
 }
-
-
 
 //----------------------------------------------------------------------------
 // AttTieRend
@@ -1595,8 +1537,6 @@ bool AttTieRend::HasTieLwidth() const
     return (m_tieLwidth.HasValue());
 }
 
-
-
 //----------------------------------------------------------------------------
 // AttTremMeasured
 //----------------------------------------------------------------------------
@@ -1639,4 +1579,4 @@ bool AttTremMeasured::HasUnitdur() const
     return (m_unitdur != DURATION_NONE);
 }
 
-} // namespace
+} // namespace vrv
