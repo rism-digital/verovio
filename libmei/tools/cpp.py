@@ -68,10 +68,11 @@ ATTCLASS_H = """
 //----------------------------------------------------------------------------
 
 class Att{attGroupNameUpper} : public Att {{
-public:
+protected:
     Att{attGroupNameUpper}();
-    virtual ~Att{attGroupNameUpper}();
+    ~Att{attGroupNameUpper}() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void Reset{attGroupNameUpper}();
 
@@ -91,6 +92,16 @@ public:
 
 private:
 {members}}};
+
+//----------------------------------------------------------------------------
+// ExtAtt{attGroupNameUpper}
+//----------------------------------------------------------------------------
+
+class ExtAtt{attGroupNameUpper} : public Att{attGroupNameUpper} {{
+public:
+    ExtAtt{attGroupNameUpper}() = default;
+    virtual ~ExtAtt{attGroupNameUpper}() = default;
+}};
 """
 
 ATTCLASS_METHODS_H = """    void Set{attNameUpper}({attType} {attNameLowerJoined}_) {{ m_{attNameLowerJoined} = {attNameLowerJoined}_; }}
@@ -131,8 +142,6 @@ Att{attGroupNameUpper}::Att{attGroupNameUpper}() : Att()
 {{
     Reset{attGroupNameUpper}();
 }}
-
-Att{attGroupNameUpper}::~Att{attGroupNameUpper}() {{}}
 
 void Att{attGroupNameUpper}::Reset{attGroupNameUpper}()
 {{
@@ -323,9 +332,8 @@ namespace {ns} {{
 //----------------------------------------------------------------------------
 
 class AttConverterBase {{
-public:
-    AttConverterBase() = default;
 protected:
+    AttConverterBase() = default;
     ~AttConverterBase() = default;
 public:"""
 
