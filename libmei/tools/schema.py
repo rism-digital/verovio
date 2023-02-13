@@ -44,14 +44,16 @@ class MeiSchema(object):
         # lg.debug(self.data_lists)
 
     def get_elements(self):
-        """Retrieves all defined elements from the schema."""
+        """
+        Retrieve all defined elements from the schema.
+        """
         elements: list[etree.Element] = self.schema.xpath("//tei:elementSpec", namespaces=TEI_NS)
 
         for element in elements:
-            modname = element.get("module").split(".")[-1]
+            mod_name: str = element.get("module").split(".")[-1]
 
-            if modname not in self.element_structure.keys():
-                self.element_structure[modname] = {}
+            if mod_name not in self.element_structure:
+                self.element_structure[mod_name] = {}
 
             element_name = element.get("ident")
             memberships = []
@@ -64,7 +66,7 @@ class MeiSchema(object):
 
                 self.__get_membership(member, memberships)
 
-            self.element_structure[modname][element_name] = memberships
+            self.element_structure[mod_name][element_name] = memberships
 
             # need a way to keep self-defined attributes:
             selfattributes = []
@@ -75,13 +77,15 @@ class MeiSchema(object):
             for attdef in attdefs:
                 if attdef.get("ident") == "id":
                     continue
-                attname = self.__process_att(attdef)
-                selfattributes.append(attname)
+                att_name: str = self.__process_att(attdef)
+                selfattributes.append(att_name)
 
-            self.element_structure[modname][element_name].append(selfattributes)
+            self.element_structure[mod_name][element_name].append(selfattributes)
 
     def get_attribute_groups(self):
-        """Retrieves all defined attribute classes from the schema."""
+        """
+        Retrieve all defined attribute classes from the schema.
+        """
         attribute_groups: list[etree.Element] = self.schema.xpath(".//tei:classSpec[@type='atts']",
                                                                   namespaces=TEI_NS)
         for group in attribute_groups:
@@ -106,6 +110,9 @@ class MeiSchema(object):
                 self.attribute_group_structure[group_module][group_name].append(attname)
 
     def get_data_types_and_lists(self):
+        """
+        Parse data types from the schema.
+        """
         compound_alternate = self.schema.xpath(".//tei:macroSpec[@type='dt' and .//tei:alternate[@minOccurs='1' and @maxOccurs='1']]",
                                                namespaces=TEI_RNG_NS)
 
@@ -174,7 +181,9 @@ class MeiSchema(object):
         self.active_modules.sort()
 
     def __process_att(self, attdef: etree.Element) -> str:
-        """Process attribute definition."""
+        """
+        Process attribute definition.
+        """
         attdef_ident = attdef.get("ident")
         if "-" in attdef_ident:
             first, last = attdef_ident.split("-")
@@ -189,7 +198,9 @@ class MeiSchema(object):
             return f"{attdef_ident}"
 
     def __get_membership(self, member: etree.Element, resarr: list[str]) -> None:
-        """Get attribute groups."""
+        """
+        Get attribute groups.
+        """
         member_attgroup = self.schema.xpath(".//tei:classSpec[@type='atts'][@ident=$nm]", nm=member.get("key"), namespaces=TEI_NS)
 
         if member_attgroup is None:
@@ -207,19 +218,27 @@ class MeiSchema(object):
             self.__get_membership(mship, resarr)
 
     def strpatt(self, string: str) -> str:
-        """Returns a version of the string with any leading att. stripped."""
+        """
+        Return a version of the string with any leading att. stripped.
+        """
         return string.replace("att.", "")
 
     def strpdot(self, string: str) -> str:
-        """Returns a version of the string without any dots."""
+        """
+        Return a version of the string without any dots.
+        """
         return "".join(string.split("."))
 
     def cc(self, att_name: str) -> str:
-        """Returns a CamelCasedName version of attribute.case.names."""
+        """
+        Return a CamelCasedName version of attribute.case.names.
+        """
         return "".join([n[0].upper() + n[1:] for n in att_name.split(".")])
 
     def get_att_desc(self, att_name: str) -> str:
-        """Returns the documentation string for an attribute by name."""
+        """
+        Returns the documentation string for an attribute by name.
+        """
         desc = self.schema.find(f"//tei:attDef[@ident='{att_name}']/tei:desc", namespaces=TEI_NS)
         if desc is None:
             return ""
@@ -227,7 +246,9 @@ class MeiSchema(object):
         return re.sub(WHITESPACE_REGEX, " ", desc.xpath("string()"))
 
     def get_elem_desc(self, elem_name: str) -> str:
-        """Returns the documentation string for an element by name."""
+        """
+        Return the documentation string for an element by name.
+        """
         desc = self.schema.find(f".//tei:elementSpec[@ident='{elem_name}']/tei:desc", namespaces=TEI_NS)
         if desc is None:
             return ""
