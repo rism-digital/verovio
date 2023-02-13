@@ -437,7 +437,7 @@ public:
 
 SETTERS_GETTERS_H = """    static bool Set{moduleNameCap}(Object *element, const std::string &attrType, const std::string &attrValue);
     static void Get{moduleNameCap}(const Object *element, ArrayOfStrAttr *attributes);
-    
+
 """
 
 ATTMODULE_FILE_END_H = """    ///@}}
@@ -1171,7 +1171,7 @@ public:
         const std::vector<std::string> &attributes = MEIBasic::map.at(element);
         return (std::find(attributes.begin(), attributes.end(), attr) != attributes.end());
     }}
-    
+
     // clang-format off
     {basicAttributeMap}
     // clang-format on
