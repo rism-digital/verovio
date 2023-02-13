@@ -25,6 +25,6 @@ public:
     virtual ~Element() {}
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ELEMENT_H__
