@@ -404,8 +404,8 @@ ATTMODULE_FILE_H = """{license}
 #define __LIBMEI_ATT_MODULE_H__
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace {ns} {{
 
