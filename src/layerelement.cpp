@@ -2128,11 +2128,6 @@ int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::CalcSlurDirection(FunctorParams *)
-{
-    return FUNCTOR_SIBLINGS;
-}
-
 int LayerElement::CacheHorizontalLayout(FunctorParams *functorParams)
 {
     CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);

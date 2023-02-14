@@ -776,11 +776,6 @@ public:
     ///@{
 
     /**
-     * Calculate the slur direction
-     */
-    virtual int CalcSlurDirection(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the Arpeg position
      */
     virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }

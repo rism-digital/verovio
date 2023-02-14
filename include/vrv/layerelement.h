@@ -409,11 +409,6 @@ public:
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcSlurDirection
-     */
-    int CalcSlurDirection(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CacheHorizontalLayout
      */
     int CacheHorizontalLayout(FunctorParams *functorParams) override;

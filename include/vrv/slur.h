@@ -221,11 +221,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcSlurDirection
-     */
-    int CalcSlurDirection(FunctorParams *functorParams) override;
-
     // TODO: Move to functor helper
 public:
     /**
@@ -355,7 +350,7 @@ public:
 private:
     /**
      * The drawing curve direction
-     * This is calculated in the CalcSlurDirection functor and contains an additional distinction
+     * This is calculated in the CalcSlurDirectionFunctor and contains an additional distinction
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;
