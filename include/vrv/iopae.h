@@ -558,6 +558,11 @@ private:
     bool Parse();
 
     /**
+     * Parse the metadata in the \@header json object
+     */
+    void ParseHeader(jsonxx::Object &header);
+
+    /**
      * @name Methods that convert pae::Token::m_char to pae::Token::m_objects
      *
      * The order in which they are called is important.

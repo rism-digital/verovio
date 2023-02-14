@@ -2775,7 +2775,16 @@ bool PAEInput::Import(const std::string &input)
     m_hasMeterSig = false;
     m_hasMensur = false;
 
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+
     bool success = true;
+
+    jsonxx::Object header;
+    if (jsonInput.has<jsonxx::Object>("header")) {
+        header = jsonInput.get<jsonxx::Object>("header");
+        ParseHeader(header);
+    }
 
     std::string keySigStr;
     if (jsonInput.has<jsonxx::String>("keysig")) keySigStr = jsonInput.get<jsonxx::String>("keysig");
@@ -2932,8 +2941,6 @@ bool PAEInput::Parse()
         return false;
     }
 
-    m_doc->Reset();
-    m_doc->SetType(Raw);
     // Set the notation type
     if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
@@ -3155,6 +3162,11 @@ bool PAEInput::ConvertKeySig()
     }
 
     return true;
+}
+
+void PAEInput::ParseHeader(jsonxx::Object &header)
+{
+    m_doc->GenerateMEIHeader(false);
 }
 
 bool PAEInput::ConvertClef()
