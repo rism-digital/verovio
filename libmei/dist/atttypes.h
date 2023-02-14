@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * MEI data.ACCIDENTAL.GESTURAL
  */
-enum data_ACCIDENTAL_GESTURAL {
+enum data_ACCIDENTAL_GESTURAL : int8_t {
     ACCIDENTAL_GESTURAL_NONE = 0,
     ACCIDENTAL_GESTURAL_s,
     ACCIDENTAL_GESTURAL_f,
@@ -51,7 +51,7 @@ enum data_ACCIDENTAL_GESTURAL {
 /**
  * MEI data.ACCIDENTAL.GESTURAL.basic
  */
-enum data_ACCIDENTAL_GESTURAL_basic {
+enum data_ACCIDENTAL_GESTURAL_basic : int8_t {
     ACCIDENTAL_GESTURAL_basic_NONE = 0,
     ACCIDENTAL_GESTURAL_basic_s,
     ACCIDENTAL_GESTURAL_basic_f,
@@ -66,7 +66,7 @@ enum data_ACCIDENTAL_GESTURAL_basic {
 /**
  * MEI data.ACCIDENTAL.GESTURAL.extended
  */
-enum data_ACCIDENTAL_GESTURAL_extended {
+enum data_ACCIDENTAL_GESTURAL_extended : int8_t {
     ACCIDENTAL_GESTURAL_extended_NONE = 0,
     ACCIDENTAL_GESTURAL_extended_su,
     ACCIDENTAL_GESTURAL_extended_sd,
@@ -78,7 +78,7 @@ enum data_ACCIDENTAL_GESTURAL_extended {
 /**
  * MEI data.ACCIDENTAL.WRITTEN
  */
-enum data_ACCIDENTAL_WRITTEN {
+enum data_ACCIDENTAL_WRITTEN : int8_t {
     ACCIDENTAL_WRITTEN_NONE = 0,
     ACCIDENTAL_WRITTEN_s,
     ACCIDENTAL_WRITTEN_f,
@@ -118,7 +118,7 @@ enum data_ACCIDENTAL_WRITTEN {
 /**
  * MEI data.ACCIDENTAL.WRITTEN.basic
  */
-enum data_ACCIDENTAL_WRITTEN_basic {
+enum data_ACCIDENTAL_WRITTEN_basic : int8_t {
     ACCIDENTAL_WRITTEN_basic_NONE = 0,
     ACCIDENTAL_WRITTEN_basic_s,
     ACCIDENTAL_WRITTEN_basic_f,
@@ -138,7 +138,7 @@ enum data_ACCIDENTAL_WRITTEN_basic {
 /**
  * MEI data.ACCIDENTAL.WRITTEN.extended
  */
-enum data_ACCIDENTAL_WRITTEN_extended {
+enum data_ACCIDENTAL_WRITTEN_extended : int8_t {
     ACCIDENTAL_WRITTEN_extended_NONE = 0,
     ACCIDENTAL_WRITTEN_extended_su,
     ACCIDENTAL_WRITTEN_extended_sd,
@@ -156,7 +156,7 @@ enum data_ACCIDENTAL_WRITTEN_extended {
 /**
  * MEI data.ACCIDENTAL.aeu
  */
-enum data_ACCIDENTAL_aeu {
+enum data_ACCIDENTAL_aeu : int8_t {
     ACCIDENTAL_aeu_NONE = 0,
     ACCIDENTAL_aeu_bms,
     ACCIDENTAL_aeu_kms,
@@ -172,7 +172,7 @@ enum data_ACCIDENTAL_aeu {
 /**
  * MEI data.ACCIDENTAL.persian
  */
-enum data_ACCIDENTAL_persian {
+enum data_ACCIDENTAL_persian : int8_t {
     ACCIDENTAL_persian_NONE = 0,
     ACCIDENTAL_persian_koron,
     ACCIDENTAL_persian_sori,
@@ -182,7 +182,7 @@ enum data_ACCIDENTAL_persian {
 /**
  * MEI data.ARTICULATION
  */
-enum data_ARTICULATION {
+enum data_ARTICULATION : int8_t {
     ARTICULATION_NONE = 0,
     ARTICULATION_acc,
     ARTICULATION_acc_inv,
@@ -226,7 +226,7 @@ enum data_ARTICULATION {
 /**
  * MEI data.BARMETHOD
  */
-enum data_BARMETHOD {
+enum data_BARMETHOD : int8_t {
     BARMETHOD_NONE = 0,
     BARMETHOD_mensur,
     BARMETHOD_staff,
@@ -237,7 +237,7 @@ enum data_BARMETHOD {
 /**
  * MEI data.BARRENDITION
  */
-enum data_BARRENDITION {
+enum data_BARRENDITION : int8_t {
     BARRENDITION_NONE = 0,
     BARRENDITION_dashed,
     BARRENDITION_dotted,
@@ -260,7 +260,7 @@ enum data_BARRENDITION {
 /**
  * MEI data.BEAMPLACE
  */
-enum data_BEAMPLACE {
+enum data_BEAMPLACE : int8_t {
     BEAMPLACE_NONE = 0,
     BEAMPLACE_above,
     BEAMPLACE_below,
@@ -271,7 +271,7 @@ enum data_BEAMPLACE {
 /**
  * MEI data.BETYPE
  */
-enum data_BETYPE {
+enum data_BETYPE : int8_t {
     BETYPE_NONE = 0,
     BETYPE_byte,
     BETYPE_smil,
@@ -292,7 +292,7 @@ enum data_BETYPE {
 /**
  * MEI data.BOOLEAN
  */
-enum data_BOOLEAN {
+enum data_BOOLEAN : int8_t {
     BOOLEAN_NONE = 0,
     BOOLEAN_true,
     BOOLEAN_false,
@@ -302,7 +302,7 @@ enum data_BOOLEAN {
 /**
  * MEI data.CERTAINTY
  */
-enum data_CERTAINTY {
+enum data_CERTAINTY : int8_t {
     CERTAINTY_NONE = 0,
     CERTAINTY_high,
     CERTAINTY_medium,
@@ -314,7 +314,7 @@ enum data_CERTAINTY {
 /**
  * MEI data.CLEFSHAPE
  */
-enum data_CLEFSHAPE {
+enum data_CLEFSHAPE : int8_t {
     CLEFSHAPE_NONE = 0,
     CLEFSHAPE_G,
     CLEFSHAPE_GG,
@@ -328,7 +328,7 @@ enum data_CLEFSHAPE {
 /**
  * MEI data.CLUSTER
  */
-enum data_CLUSTER {
+enum data_CLUSTER : int8_t {
     CLUSTER_NONE = 0,
     CLUSTER_white,
     CLUSTER_black,
@@ -495,7 +495,7 @@ enum data_COLORNAMES {
 /**
  * MEI data.COMPASSDIRECTION
  */
-enum data_COMPASSDIRECTION {
+enum data_COMPASSDIRECTION : int8_t {
     COMPASSDIRECTION_NONE = 0,
     COMPASSDIRECTION_n,
     COMPASSDIRECTION_e,
@@ -511,7 +511,7 @@ enum data_COMPASSDIRECTION {
 /**
  * MEI data.COMPASSDIRECTION.basic
  */
-enum data_COMPASSDIRECTION_basic {
+enum data_COMPASSDIRECTION_basic : int8_t {
     COMPASSDIRECTION_basic_NONE = 0,
     COMPASSDIRECTION_basic_n,
     COMPASSDIRECTION_basic_e,
@@ -523,7 +523,7 @@ enum data_COMPASSDIRECTION_basic {
 /**
  * MEI data.COMPASSDIRECTION.extended
  */
-enum data_COMPASSDIRECTION_extended {
+enum data_COMPASSDIRECTION_extended : int8_t {
     COMPASSDIRECTION_extended_NONE = 0,
     COMPASSDIRECTION_extended_ne,
     COMPASSDIRECTION_extended_nw,
@@ -535,7 +535,7 @@ enum data_COMPASSDIRECTION_extended {
 /**
  * MEI data.COURSETUNING
  */
-enum data_COURSETUNING {
+enum data_COURSETUNING : int8_t {
     COURSETUNING_NONE = 0,
     COURSETUNING_guitar_standard,
     COURSETUNING_guitar_drop_D,
@@ -551,7 +551,7 @@ enum data_COURSETUNING {
 /**
  * MEI data.DIVISIO
  */
-enum data_DIVISIO {
+enum data_DIVISIO : int8_t {
     DIVISIO_NONE = 0,
     DIVISIO_ternaria,
     DIVISIO_quaternaria,
@@ -566,7 +566,7 @@ enum data_DIVISIO {
 /**
  * MEI data.DURATIONRESTS.mensural
  */
-enum data_DURATIONRESTS_mensural {
+enum data_DURATIONRESTS_mensural : int8_t {
     DURATIONRESTS_mensural_NONE = 0,
     DURATIONRESTS_mensural_2B,
     DURATIONRESTS_mensural_3B,
@@ -584,7 +584,7 @@ enum data_DURATIONRESTS_mensural {
 /**
  * MEI data.DURQUALITY.mensural
  */
-enum data_DURQUALITY_mensural {
+enum data_DURQUALITY_mensural : int8_t {
     DURQUALITY_mensural_NONE = 0,
     DURQUALITY_mensural_perfecta,
     DURQUALITY_mensural_imperfecta,
@@ -598,7 +598,7 @@ enum data_DURQUALITY_mensural {
 /**
  * MEI data.ENCLOSURE
  */
-enum data_ENCLOSURE {
+enum data_ENCLOSURE : int8_t {
     ENCLOSURE_NONE = 0,
     ENCLOSURE_paren,
     ENCLOSURE_brack,
@@ -610,7 +610,7 @@ enum data_ENCLOSURE {
 /**
  * MEI data.EVENTREL
  */
-enum data_EVENTREL {
+enum data_EVENTREL : int8_t {
     EVENTREL_NONE = 0,
     EVENTREL_above,
     EVENTREL_below,
@@ -626,7 +626,7 @@ enum data_EVENTREL {
 /**
  * MEI data.EVENTREL.basic
  */
-enum data_EVENTREL_basic {
+enum data_EVENTREL_basic : int8_t {
     EVENTREL_basic_NONE = 0,
     EVENTREL_basic_above,
     EVENTREL_basic_below,
@@ -638,7 +638,7 @@ enum data_EVENTREL_basic {
 /**
  * MEI data.EVENTREL.extended
  */
-enum data_EVENTREL_extended {
+enum data_EVENTREL_extended : int8_t {
     EVENTREL_extended_NONE = 0,
     EVENTREL_extended_above_left,
     EVENTREL_extended_above_right,
@@ -650,7 +650,7 @@ enum data_EVENTREL_extended {
 /**
  * MEI data.FILL
  */
-enum data_FILL {
+enum data_FILL : int8_t {
     FILL_NONE = 0,
     FILL_void,
     FILL_solid,
@@ -664,7 +664,7 @@ enum data_FILL {
 /**
  * MEI data.FLAGFORM.mensural
  */
-enum data_FLAGFORM_mensural {
+enum data_FLAGFORM_mensural : int8_t {
     FLAGFORM_mensural_NONE = 0,
     FLAGFORM_mensural_straight,
     FLAGFORM_mensural_angled,
@@ -678,7 +678,7 @@ enum data_FLAGFORM_mensural {
 /**
  * MEI data.FLAGPOS.mensural
  */
-enum data_FLAGPOS_mensural {
+enum data_FLAGPOS_mensural : int8_t {
     FLAGPOS_mensural_NONE = 0,
     FLAGPOS_mensural_left,
     FLAGPOS_mensural_right,
@@ -689,7 +689,7 @@ enum data_FLAGPOS_mensural {
 /**
  * MEI data.FONTSIZETERM
  */
-enum data_FONTSIZETERM {
+enum data_FONTSIZETERM : int8_t {
     FONTSIZETERM_NONE = 0,
     FONTSIZETERM_xx_small,
     FONTSIZETERM_x_small,
@@ -706,7 +706,7 @@ enum data_FONTSIZETERM {
 /**
  * MEI data.FONTSTYLE
  */
-enum data_FONTSTYLE {
+enum data_FONTSTYLE : int8_t {
     FONTSTYLE_NONE = 0,
     FONTSTYLE_italic,
     FONTSTYLE_normal,
@@ -717,7 +717,7 @@ enum data_FONTSTYLE {
 /**
  * MEI data.FONTWEIGHT
  */
-enum data_FONTWEIGHT {
+enum data_FONTWEIGHT : int8_t {
     FONTWEIGHT_NONE = 0,
     FONTWEIGHT_bold,
     FONTWEIGHT_normal,
@@ -727,7 +727,7 @@ enum data_FONTWEIGHT {
 /**
  * MEI data.FRBRRELATIONSHIP
  */
-enum data_FRBRRELATIONSHIP {
+enum data_FRBRRELATIONSHIP : int8_t {
     FRBRRELATIONSHIP_NONE = 0,
     FRBRRELATIONSHIP_hasAbridgement,
     FRBRRELATIONSHIP_isAbridgementOf,
@@ -771,7 +771,7 @@ enum data_FRBRRELATIONSHIP {
 /**
  * MEI data.GLISSANDO
  */
-enum data_GLISSANDO {
+enum data_GLISSANDO : int8_t {
     GLISSANDO_NONE = 0,
     GLISSANDO_i,
     GLISSANDO_m,
@@ -782,7 +782,7 @@ enum data_GLISSANDO {
 /**
  * MEI data.GRACE
  */
-enum data_GRACE {
+enum data_GRACE : int8_t {
     GRACE_NONE = 0,
     GRACE_acc,
     GRACE_unacc,
@@ -793,7 +793,7 @@ enum data_GRACE {
 /**
  * MEI data.HEADSHAPE
  */
-enum data_HEADSHAPE {
+enum data_HEADSHAPE : int8_t {
     HEADSHAPE_NONE = 0,
     HEADSHAPE_quarter,
     HEADSHAPE_half,
@@ -817,7 +817,7 @@ enum data_HEADSHAPE {
 /**
  * MEI data.HEADSHAPE.list
  */
-enum data_HEADSHAPE_list {
+enum data_HEADSHAPE_list : int8_t {
     HEADSHAPE_list_NONE = 0,
     HEADSHAPE_list_quarter,
     HEADSHAPE_list_half,
@@ -841,7 +841,7 @@ enum data_HEADSHAPE_list {
 /**
  * MEI data.HORIZONTALALIGNMENT
  */
-enum data_HORIZONTALALIGNMENT {
+enum data_HORIZONTALALIGNMENT : int8_t {
     HORIZONTALALIGNMENT_NONE = 0,
     HORIZONTALALIGNMENT_left,
     HORIZONTALALIGNMENT_right,
@@ -853,7 +853,7 @@ enum data_HORIZONTALALIGNMENT {
 /**
  * MEI data.LAYERSCHEME
  */
-enum data_LAYERSCHEME {
+enum data_LAYERSCHEME : int8_t {
     LAYERSCHEME_NONE = 0,
     LAYERSCHEME_1,
     LAYERSCHEME_2o,
@@ -866,7 +866,7 @@ enum data_LAYERSCHEME {
 /**
  * MEI data.LIGATUREFORM
  */
-enum data_LIGATUREFORM {
+enum data_LIGATUREFORM : int8_t {
     LIGATUREFORM_NONE = 0,
     LIGATUREFORM_recta,
     LIGATUREFORM_obliqua,
@@ -876,7 +876,7 @@ enum data_LIGATUREFORM {
 /**
  * MEI data.LINEFORM
  */
-enum data_LINEFORM {
+enum data_LINEFORM : int8_t {
     LINEFORM_NONE = 0,
     LINEFORM_dashed,
     LINEFORM_dotted,
@@ -888,7 +888,7 @@ enum data_LINEFORM {
 /**
  * MEI data.LINESTARTENDSYMBOL
  */
-enum data_LINESTARTENDSYMBOL {
+enum data_LINESTARTENDSYMBOL : int8_t {
     LINESTARTENDSYMBOL_NONE = 0,
     LINESTARTENDSYMBOL_angledown,
     LINESTARTENDSYMBOL_angleup,
@@ -916,7 +916,7 @@ enum data_LINESTARTENDSYMBOL {
 /**
  * MEI data.LINEWIDTHTERM
  */
-enum data_LINEWIDTHTERM {
+enum data_LINEWIDTHTERM : int8_t {
     LINEWIDTHTERM_NONE = 0,
     LINEWIDTHTERM_narrow,
     LINEWIDTHTERM_medium,
@@ -927,7 +927,7 @@ enum data_LINEWIDTHTERM {
 /**
  * MEI data.MELODICFUNCTION
  */
-enum data_MELODICFUNCTION {
+enum data_MELODICFUNCTION : int8_t {
     MELODICFUNCTION_NONE = 0,
     MELODICFUNCTION_aln,
     MELODICFUNCTION_ant,
@@ -963,7 +963,7 @@ enum data_MELODICFUNCTION {
 /**
  * MEI data.MENSURATIONSIGN
  */
-enum data_MENSURATIONSIGN {
+enum data_MENSURATIONSIGN : int8_t {
     MENSURATIONSIGN_NONE = 0,
     MENSURATIONSIGN_C,
     MENSURATIONSIGN_O,
@@ -986,7 +986,7 @@ enum data_MENSURATIONSIGN {
 /**
  * MEI data.METERFORM
  */
-enum data_METERFORM {
+enum data_METERFORM : int8_t {
     METERFORM_NONE = 0,
     METERFORM_num,
     METERFORM_denomsym,
@@ -999,7 +999,7 @@ enum data_METERFORM {
 /**
  * MEI data.METERSIGN
  */
-enum data_METERSIGN {
+enum data_METERSIGN : int8_t {
     METERSIGN_NONE = 0,
     METERSIGN_common,
     METERSIGN_cut,
@@ -1193,7 +1193,7 @@ enum data_MIDINAMES {
 /**
  * MEI data.MODE
  */
-enum data_MODE {
+enum data_MODE : int8_t {
     MODE_NONE = 0,
     MODE_major,
     MODE_minor,
@@ -1218,7 +1218,7 @@ enum data_MODE {
 /**
  * MEI data.MODE.cmn
  */
-enum data_MODE_cmn {
+enum data_MODE_cmn : int8_t {
     MODE_cmn_NONE = 0,
     MODE_cmn_major,
     MODE_cmn_minor,
@@ -1228,7 +1228,7 @@ enum data_MODE_cmn {
 /**
  * MEI data.MODE.extended
  */
-enum data_MODE_extended {
+enum data_MODE_extended : int8_t {
     MODE_extended_NONE = 0,
     MODE_extended_ionian,
     MODE_extended_hypoionian,
@@ -1242,7 +1242,7 @@ enum data_MODE_extended {
 /**
  * MEI data.MODE.gregorian
  */
-enum data_MODE_gregorian {
+enum data_MODE_gregorian : int8_t {
     MODE_gregorian_NONE = 0,
     MODE_gregorian_dorian,
     MODE_gregorian_hypodorian,
@@ -1259,7 +1259,7 @@ enum data_MODE_gregorian {
 /**
  * MEI data.MODSRELATIONSHIP
  */
-enum data_MODSRELATIONSHIP {
+enum data_MODSRELATIONSHIP : int8_t {
     MODSRELATIONSHIP_NONE = 0,
     MODSRELATIONSHIP_preceding,
     MODSRELATIONSHIP_succeeding,
@@ -1276,7 +1276,7 @@ enum data_MODSRELATIONSHIP {
 /**
  * MEI data.MULTIBREVERESTS.mensural
  */
-enum data_MULTIBREVERESTS_mensural {
+enum data_MULTIBREVERESTS_mensural : int8_t {
     MULTIBREVERESTS_mensural_NONE = 0,
     MULTIBREVERESTS_mensural_2B,
     MULTIBREVERESTS_mensural_3B,
@@ -1286,7 +1286,7 @@ enum data_MULTIBREVERESTS_mensural {
 /**
  * MEI data.NEIGHBORINGLAYER
  */
-enum data_NEIGHBORINGLAYER {
+enum data_NEIGHBORINGLAYER : int8_t {
     NEIGHBORINGLAYER_NONE = 0,
     NEIGHBORINGLAYER_above,
     NEIGHBORINGLAYER_below,
@@ -1296,7 +1296,7 @@ enum data_NEIGHBORINGLAYER {
 /**
  * MEI data.NONSTAFFPLACE
  */
-enum data_NONSTAFFPLACE {
+enum data_NONSTAFFPLACE : int8_t {
     NONSTAFFPLACE_NONE = 0,
     NONSTAFFPLACE_botmar,
     NONSTAFFPLACE_topmar,
@@ -1317,7 +1317,7 @@ enum data_NONSTAFFPLACE {
 /**
  * MEI data.NOTATIONTYPE
  */
-enum data_NOTATIONTYPE {
+enum data_NOTATIONTYPE : int8_t {
     NOTATIONTYPE_NONE = 0,
     NOTATIONTYPE_cmn,
     NOTATIONTYPE_mensural,
@@ -1335,7 +1335,7 @@ enum data_NOTATIONTYPE {
 /**
  * MEI data.NOTEHEADMODIFIER
  */
-enum data_NOTEHEADMODIFIER {
+enum data_NOTEHEADMODIFIER : int8_t {
     NOTEHEADMODIFIER_NONE = 0,
     NOTEHEADMODIFIER_slash,
     NOTEHEADMODIFIER_backslash,
@@ -1353,7 +1353,7 @@ enum data_NOTEHEADMODIFIER {
 /**
  * MEI data.NOTEHEADMODIFIER.list
  */
-enum data_NOTEHEADMODIFIER_list {
+enum data_NOTEHEADMODIFIER_list : int8_t {
     NOTEHEADMODIFIER_list_NONE = 0,
     NOTEHEADMODIFIER_list_slash,
     NOTEHEADMODIFIER_list_backslash,
@@ -1371,7 +1371,7 @@ enum data_NOTEHEADMODIFIER_list {
 /**
  * MEI data.PEDALSTYLE
  */
-enum data_PEDALSTYLE {
+enum data_PEDALSTYLE : int8_t {
     PEDALSTYLE_NONE = 0,
     PEDALSTYLE_line,
     PEDALSTYLE_pedline,
@@ -1383,7 +1383,7 @@ enum data_PEDALSTYLE {
 /**
  * MEI data.PGFUNC
  */
-enum data_PGFUNC {
+enum data_PGFUNC : int8_t {
     PGFUNC_NONE = 0,
     PGFUNC_all,
     PGFUNC_first,
@@ -1396,7 +1396,7 @@ enum data_PGFUNC {
 /**
  * MEI data.RELATIONSHIP
  */
-enum data_RELATIONSHIP {
+enum data_RELATIONSHIP : int8_t {
     RELATIONSHIP_NONE = 0,
     RELATIONSHIP_hasAbridgement,
     RELATIONSHIP_isAbridgementOf,
@@ -1449,7 +1449,7 @@ enum data_RELATIONSHIP {
 /**
  * MEI data.ROTATION
  */
-enum data_ROTATION {
+enum data_ROTATION : int8_t {
     ROTATION_NONE = 0,
     ROTATION_none,
     ROTATION_down,
@@ -1464,7 +1464,7 @@ enum data_ROTATION {
 /**
  * MEI data.ROTATIONDIRECTION
  */
-enum data_ROTATIONDIRECTION {
+enum data_ROTATIONDIRECTION : int8_t {
     ROTATIONDIRECTION_NONE = 0,
     ROTATIONDIRECTION_none,
     ROTATIONDIRECTION_down,
@@ -1479,7 +1479,7 @@ enum data_ROTATIONDIRECTION {
 /**
  * MEI data.STAFFITEM
  */
-enum data_STAFFITEM {
+enum data_STAFFITEM : int8_t {
     STAFFITEM_NONE = 0,
     STAFFITEM_accid,
     STAFFITEM_annot,
@@ -1516,7 +1516,7 @@ enum data_STAFFITEM {
 /**
  * MEI data.STAFFITEM.basic
  */
-enum data_STAFFITEM_basic {
+enum data_STAFFITEM_basic : int8_t {
     STAFFITEM_basic_NONE = 0,
     STAFFITEM_basic_accid,
     STAFFITEM_basic_annot,
@@ -1534,7 +1534,7 @@ enum data_STAFFITEM_basic {
 /**
  * MEI data.STAFFITEM.cmn
  */
-enum data_STAFFITEM_cmn {
+enum data_STAFFITEM_cmn : int8_t {
     STAFFITEM_cmn_NONE = 0,
     STAFFITEM_cmn_beam,
     STAFFITEM_cmn_bend,
@@ -1560,7 +1560,7 @@ enum data_STAFFITEM_cmn {
 /**
  * MEI data.STAFFITEM.mensural
  */
-enum data_STAFFITEM_mensural {
+enum data_STAFFITEM_mensural : int8_t {
     STAFFITEM_mensural_NONE = 0,
     STAFFITEM_mensural_ligature,
     STAFFITEM_mensural_MAX
@@ -1569,7 +1569,7 @@ enum data_STAFFITEM_mensural {
 /**
  * MEI data.STAFFREL
  */
-enum data_STAFFREL {
+enum data_STAFFREL : int8_t {
     STAFFREL_NONE = 0,
     STAFFREL_above,
     STAFFREL_below,
@@ -1581,7 +1581,7 @@ enum data_STAFFREL {
 /**
  * MEI data.STAFFREL.basic
  */
-enum data_STAFFREL_basic {
+enum data_STAFFREL_basic : int8_t {
     STAFFREL_basic_NONE = 0,
     STAFFREL_basic_above,
     STAFFREL_basic_below,
@@ -1591,7 +1591,7 @@ enum data_STAFFREL_basic {
 /**
  * MEI data.STAFFREL.extended
  */
-enum data_STAFFREL_extended {
+enum data_STAFFREL_extended : int8_t {
     STAFFREL_extended_NONE = 0,
     STAFFREL_extended_between,
     STAFFREL_extended_within,
@@ -1601,7 +1601,7 @@ enum data_STAFFREL_extended {
 /**
  * MEI data.STEMDIRECTION
  */
-enum data_STEMDIRECTION {
+enum data_STEMDIRECTION : int8_t {
     STEMDIRECTION_NONE = 0,
     STEMDIRECTION_up,
     STEMDIRECTION_down,
@@ -1617,7 +1617,7 @@ enum data_STEMDIRECTION {
 /**
  * MEI data.STEMDIRECTION.basic
  */
-enum data_STEMDIRECTION_basic {
+enum data_STEMDIRECTION_basic : int8_t {
     STEMDIRECTION_basic_NONE = 0,
     STEMDIRECTION_basic_up,
     STEMDIRECTION_basic_down,
@@ -1627,7 +1627,7 @@ enum data_STEMDIRECTION_basic {
 /**
  * MEI data.STEMDIRECTION.extended
  */
-enum data_STEMDIRECTION_extended {
+enum data_STEMDIRECTION_extended : int8_t {
     STEMDIRECTION_extended_NONE = 0,
     STEMDIRECTION_extended_left,
     STEMDIRECTION_extended_right,
@@ -1641,7 +1641,7 @@ enum data_STEMDIRECTION_extended {
 /**
  * MEI data.STEMFORM.mensural
  */
-enum data_STEMFORM_mensural {
+enum data_STEMFORM_mensural : int8_t {
     STEMFORM_mensural_NONE = 0,
     STEMFORM_mensural_circle,
     STEMFORM_mensural_oblique,
@@ -1653,7 +1653,7 @@ enum data_STEMFORM_mensural {
 /**
  * MEI data.STEMMODIFIER
  */
-enum data_STEMMODIFIER {
+enum data_STEMMODIFIER : int8_t {
     STEMMODIFIER_NONE = 0,
     STEMMODIFIER_none,
     STEMMODIFIER_1slash,
@@ -1670,7 +1670,7 @@ enum data_STEMMODIFIER {
 /**
  * MEI data.STEMPOSITION
  */
-enum data_STEMPOSITION {
+enum data_STEMPOSITION : int8_t {
     STEMPOSITION_NONE = 0,
     STEMPOSITION_left,
     STEMPOSITION_right,
@@ -1681,7 +1681,7 @@ enum data_STEMPOSITION {
 /**
  * MEI data.TEMPERAMENT
  */
-enum data_TEMPERAMENT {
+enum data_TEMPERAMENT : int8_t {
     TEMPERAMENT_NONE = 0,
     TEMPERAMENT_equal,
     TEMPERAMENT_just,
@@ -1693,7 +1693,7 @@ enum data_TEMPERAMENT {
 /**
  * MEI data.TEXTRENDITION
  */
-enum data_TEXTRENDITION {
+enum data_TEXTRENDITION : int8_t {
     TEXTRENDITION_NONE = 0,
     TEXTRENDITION_quote,
     TEXTRENDITION_quotedbl,
@@ -1729,7 +1729,7 @@ enum data_TEXTRENDITION {
 /**
  * MEI data.TEXTRENDITIONLIST
  */
-enum data_TEXTRENDITIONLIST {
+enum data_TEXTRENDITIONLIST : int8_t {
     TEXTRENDITIONLIST_NONE = 0,
     TEXTRENDITIONLIST_quote,
     TEXTRENDITIONLIST_quotedbl,
@@ -1765,7 +1765,7 @@ enum data_TEXTRENDITIONLIST {
 /**
  * MEI data.VERTICALALIGNMENT
  */
-enum data_VERTICALALIGNMENT {
+enum data_VERTICALALIGNMENT : int8_t {
     VERTICALALIGNMENT_NONE = 0,
     VERTICALALIGNMENT_top,
     VERTICALALIGNMENT_middle,
@@ -1777,7 +1777,7 @@ enum data_VERTICALALIGNMENT {
 /**
  * MEI att.accid.log@func
  */
-enum accidLog_FUNC {
+enum accidLog_FUNC : int8_t {
     accidLog_FUNC_NONE = 0,
     accidLog_FUNC_caution,
     accidLog_FUNC_edit,
@@ -1787,7 +1787,7 @@ enum accidLog_FUNC {
 /**
  * MEI att.anchoredText.log@func
  */
-enum anchoredTextLog_FUNC {
+enum anchoredTextLog_FUNC : int8_t {
     anchoredTextLog_FUNC_NONE = 0,
     anchoredTextLog_FUNC_unknown,
     anchoredTextLog_FUNC_MAX
@@ -1796,7 +1796,7 @@ enum anchoredTextLog_FUNC {
 /**
  * MEI att.arpeg.log@order
  */
-enum arpegLog_ORDER {
+enum arpegLog_ORDER : int8_t {
     arpegLog_ORDER_NONE = 0,
     arpegLog_ORDER_up,
     arpegLog_ORDER_down,
@@ -1807,7 +1807,7 @@ enum arpegLog_ORDER {
 /**
  * MEI att.audience@audience
  */
-enum audience_AUDIENCE {
+enum audience_AUDIENCE : int8_t {
     audience_AUDIENCE_NONE = 0,
     audience_AUDIENCE_private,
     audience_AUDIENCE_public,
@@ -1817,7 +1817,7 @@ enum audience_AUDIENCE {
 /**
  * MEI att.bTrem.log@form
  */
-enum bTremLog_FORM {
+enum bTremLog_FORM : int8_t {
     bTremLog_FORM_NONE = 0,
     bTremLog_FORM_meas,
     bTremLog_FORM_unmeas,
@@ -1827,7 +1827,7 @@ enum bTremLog_FORM {
 /**
  * MEI att.beamRend@form
  */
-enum beamRend_FORM {
+enum beamRend_FORM : int8_t {
     beamRend_FORM_NONE = 0,
     beamRend_FORM_acc,
     beamRend_FORM_mixed,
@@ -1839,7 +1839,7 @@ enum beamRend_FORM {
 /**
  * MEI att.beaming.vis@beam.rend
  */
-enum beamingVis_BEAMREND {
+enum beamingVis_BEAMREND : int8_t {
     beamingVis_BEAMREND_NONE = 0,
     beamingVis_BEAMREND_acc,
     beamingVis_BEAMREND_rit,
@@ -1850,7 +1850,7 @@ enum beamingVis_BEAMREND {
 /**
  * MEI att.bracketSpan.log@func
  */
-enum bracketSpanLog_FUNC {
+enum bracketSpanLog_FUNC : int8_t {
     bracketSpanLog_FUNC_NONE = 0,
     bracketSpanLog_FUNC_coloration,
     bracketSpanLog_FUNC_cross_rhythm,
@@ -1861,7 +1861,7 @@ enum bracketSpanLog_FUNC {
 /**
  * MEI att.curvature@curvedir
  */
-enum curvature_CURVEDIR {
+enum curvature_CURVEDIR : int8_t {
     curvature_CURVEDIR_NONE = 0,
     curvature_CURVEDIR_above,
     curvature_CURVEDIR_below,
@@ -1872,7 +1872,7 @@ enum curvature_CURVEDIR {
 /**
  * MEI att.curve.log@func
  */
-enum curveLog_FUNC {
+enum curveLog_FUNC : int8_t {
     curveLog_FUNC_NONE = 0,
     curveLog_FUNC_unknown,
     curveLog_FUNC_MAX
@@ -1881,7 +1881,7 @@ enum curveLog_FUNC {
 /**
  * MEI att.cutout@cutout
  */
-enum cutout_CUTOUT {
+enum cutout_CUTOUT : int8_t {
     cutout_CUTOUT_NONE = 0,
     cutout_CUTOUT_cutout,
     cutout_CUTOUT_MAX
@@ -1890,7 +1890,7 @@ enum cutout_CUTOUT {
 /**
  * MEI att.dot.log@form
  */
-enum dotLog_FORM {
+enum dotLog_FORM : int8_t {
     dotLog_FORM_NONE = 0,
     dotLog_FORM_aug,
     dotLog_FORM_div,
@@ -1900,7 +1900,7 @@ enum dotLog_FORM {
 /**
  * MEI att.endings@ending.rend
  */
-enum endings_ENDINGREND {
+enum endings_ENDINGREND : int8_t {
     endings_ENDINGREND_NONE = 0,
     endings_ENDINGREND_top,
     endings_ENDINGREND_barred,
@@ -1911,7 +1911,7 @@ enum endings_ENDINGREND {
 /**
  * MEI att.episema.vis@form
  */
-enum episemaVis_FORM {
+enum episemaVis_FORM : int8_t {
     episemaVis_FORM_NONE = 0,
     episemaVis_FORM_h,
     episemaVis_FORM_v,
@@ -1921,7 +1921,7 @@ enum episemaVis_FORM {
 /**
  * MEI att.evidence@evidence
  */
-enum evidence_EVIDENCE {
+enum evidence_EVIDENCE : int8_t {
     evidence_EVIDENCE_NONE = 0,
     evidence_EVIDENCE_internal,
     evidence_EVIDENCE_external,
@@ -1932,7 +1932,7 @@ enum evidence_EVIDENCE {
 /**
  * MEI att.extSym@glyph.auth
  */
-enum extSym_GLYPHAUTH {
+enum extSym_GLYPHAUTH : int8_t {
     extSym_GLYPHAUTH_NONE = 0,
     extSym_GLYPHAUTH_smufl,
     extSym_GLYPHAUTH_MAX
@@ -1941,7 +1941,7 @@ enum extSym_GLYPHAUTH {
 /**
  * MEI att.fTrem.log@form
  */
-enum fTremLog_FORM {
+enum fTremLog_FORM : int8_t {
     fTremLog_FORM_NONE = 0,
     fTremLog_FORM_meas,
     fTremLog_FORM_unmeas,
@@ -1951,7 +1951,7 @@ enum fTremLog_FORM {
 /**
  * MEI att.fermata.vis@form
  */
-enum fermataVis_FORM {
+enum fermataVis_FORM : int8_t {
     fermataVis_FORM_NONE = 0,
     fermataVis_FORM_inv,
     fermataVis_FORM_norm,
@@ -1961,7 +1961,7 @@ enum fermataVis_FORM {
 /**
  * MEI att.fermata.vis@shape
  */
-enum fermataVis_SHAPE {
+enum fermataVis_SHAPE : int8_t {
     fermataVis_SHAPE_NONE = 0,
     fermataVis_SHAPE_curved,
     fermataVis_SHAPE_square,
@@ -1972,7 +1972,7 @@ enum fermataVis_SHAPE {
 /**
  * MEI att.fingGrp.log@form
  */
-enum fingGrpLog_FORM {
+enum fingGrpLog_FORM : int8_t {
     fingGrpLog_FORM_NONE = 0,
     fingGrpLog_FORM_alter,
     fingGrpLog_FORM_combi,
@@ -1983,7 +1983,7 @@ enum fingGrpLog_FORM {
 /**
  * MEI att.fingGrp.vis@orient
  */
-enum fingGrpVis_ORIENT {
+enum fingGrpVis_ORIENT : int8_t {
     fingGrpVis_ORIENT_NONE = 0,
     fingGrpVis_ORIENT_horiz,
     fingGrpVis_ORIENT_vert,
@@ -1993,7 +1993,7 @@ enum fingGrpVis_ORIENT {
 /**
  * MEI att.graceGrp.log@attach
  */
-enum graceGrpLog_ATTACH {
+enum graceGrpLog_ATTACH : int8_t {
     graceGrpLog_ATTACH_NONE = 0,
     graceGrpLog_ATTACH_pre,
     graceGrpLog_ATTACH_post,
@@ -2004,7 +2004,7 @@ enum graceGrpLog_ATTACH {
 /**
  * MEI att.hairpin.log@form
  */
-enum hairpinLog_FORM {
+enum hairpinLog_FORM : int8_t {
     hairpinLog_FORM_NONE = 0,
     hairpinLog_FORM_cres,
     hairpinLog_FORM_dim,
@@ -2014,7 +2014,7 @@ enum hairpinLog_FORM {
 /**
  * MEI att.harm.anl@form
  */
-enum harmAnl_FORM {
+enum harmAnl_FORM : int8_t {
     harmAnl_FORM_NONE = 0,
     harmAnl_FORM_explicit,
     harmAnl_FORM_implied,
@@ -2024,7 +2024,7 @@ enum harmAnl_FORM {
 /**
  * MEI att.harm.vis@rendgrid
  */
-enum harmVis_RENDGRID {
+enum harmVis_RENDGRID : int8_t {
     harmVis_RENDGRID_NONE = 0,
     harmVis_RENDGRID_grid,
     harmVis_RENDGRID_gridtext,
@@ -2035,7 +2035,7 @@ enum harmVis_RENDGRID {
 /**
  * MEI att.harpPedal.log@a
  */
-enum harpPedalLog_A {
+enum harpPedalLog_A : int8_t {
     harpPedalLog_A_NONE = 0,
     harpPedalLog_A_f,
     harpPedalLog_A_n,
@@ -2046,7 +2046,7 @@ enum harpPedalLog_A {
 /**
  * MEI att.harpPedal.log@b
  */
-enum harpPedalLog_B {
+enum harpPedalLog_B : int8_t {
     harpPedalLog_B_NONE = 0,
     harpPedalLog_B_f,
     harpPedalLog_B_n,
@@ -2057,7 +2057,7 @@ enum harpPedalLog_B {
 /**
  * MEI att.harpPedal.log@c
  */
-enum harpPedalLog_C {
+enum harpPedalLog_C : int8_t {
     harpPedalLog_C_NONE = 0,
     harpPedalLog_C_f,
     harpPedalLog_C_n,
@@ -2068,7 +2068,7 @@ enum harpPedalLog_C {
 /**
  * MEI att.harpPedal.log@d
  */
-enum harpPedalLog_D {
+enum harpPedalLog_D : int8_t {
     harpPedalLog_D_NONE = 0,
     harpPedalLog_D_f,
     harpPedalLog_D_n,
@@ -2079,7 +2079,7 @@ enum harpPedalLog_D {
 /**
  * MEI att.harpPedal.log@e
  */
-enum harpPedalLog_E {
+enum harpPedalLog_E : int8_t {
     harpPedalLog_E_NONE = 0,
     harpPedalLog_E_f,
     harpPedalLog_E_n,
@@ -2090,7 +2090,7 @@ enum harpPedalLog_E {
 /**
  * MEI att.harpPedal.log@f
  */
-enum harpPedalLog_F {
+enum harpPedalLog_F : int8_t {
     harpPedalLog_F_NONE = 0,
     harpPedalLog_F_f,
     harpPedalLog_F_n,
@@ -2101,7 +2101,7 @@ enum harpPedalLog_F {
 /**
  * MEI att.harpPedal.log@g
  */
-enum harpPedalLog_G {
+enum harpPedalLog_G : int8_t {
     harpPedalLog_G_NONE = 0,
     harpPedalLog_G_f,
     harpPedalLog_G_n,
@@ -2112,7 +2112,7 @@ enum harpPedalLog_G {
 /**
  * MEI att.line.log@func
  */
-enum lineLog_FUNC {
+enum lineLog_FUNC : int8_t {
     lineLog_FUNC_NONE = 0,
     lineLog_FUNC_coloration,
     lineLog_FUNC_ligature,
@@ -2123,7 +2123,7 @@ enum lineLog_FUNC {
 /**
  * MEI att.liquescent.vis@curve
  */
-enum liquescentVis_CURVE {
+enum liquescentVis_CURVE : int8_t {
     liquescentVis_CURVE_NONE = 0,
     liquescentVis_CURVE_a,
     liquescentVis_CURVE_c,
@@ -2133,7 +2133,7 @@ enum liquescentVis_CURVE {
 /**
  * MEI att.measurement@unit
  */
-enum measurement_UNIT {
+enum measurement_UNIT : int8_t {
     measurement_UNIT_NONE = 0,
     measurement_UNIT_byte,
     measurement_UNIT_char,
@@ -2158,7 +2158,7 @@ enum measurement_UNIT {
 /**
  * MEI att.meiVersion@meiversion
  */
-enum meiVersion_MEIVERSION {
+enum meiVersion_MEIVERSION : int8_t {
     meiVersion_MEIVERSION_NONE = 0,
     meiVersion_MEIVERSION_2013,
     meiVersion_MEIVERSION_3_0_0,
@@ -2172,7 +2172,7 @@ enum meiVersion_MEIVERSION {
 /**
  * MEI att.mensur.vis@form
  */
-enum mensurVis_FORM {
+enum mensurVis_FORM : int8_t {
     mensurVis_FORM_NONE = 0,
     mensurVis_FORM_horizontal,
     mensurVis_FORM_vertical,
@@ -2182,7 +2182,7 @@ enum mensurVis_FORM {
 /**
  * MEI att.mensural.vis@mensur.form
  */
-enum mensuralVis_MENSURFORM {
+enum mensuralVis_MENSURFORM : int8_t {
     mensuralVis_MENSURFORM_NONE = 0,
     mensuralVis_MENSURFORM_horizontal,
     mensuralVis_MENSURFORM_vertical,
@@ -2192,7 +2192,7 @@ enum mensuralVis_MENSURFORM {
 /**
  * MEI att.meterConformance@metcon
  */
-enum meterConformance_METCON {
+enum meterConformance_METCON : int8_t {
     meterConformance_METCON_NONE = 0,
     meterConformance_METCON_c,
     meterConformance_METCON_i,
@@ -2203,7 +2203,7 @@ enum meterConformance_METCON {
 /**
  * MEI att.meterSigGrp.log@func
  */
-enum meterSigGrpLog_FUNC {
+enum meterSigGrpLog_FUNC : int8_t {
     meterSigGrpLog_FUNC_NONE = 0,
     meterSigGrpLog_FUNC_alternating,
     meterSigGrpLog_FUNC_interchanging,
@@ -2215,7 +2215,7 @@ enum meterSigGrpLog_FUNC {
 /**
  * MEI att.mordent.log@form
  */
-enum mordentLog_FORM {
+enum mordentLog_FORM : int8_t {
     mordentLog_FORM_NONE = 0,
     mordentLog_FORM_lower,
     mordentLog_FORM_upper,
@@ -2225,7 +2225,7 @@ enum mordentLog_FORM {
 /**
  * MEI att.ncForm@con
  */
-enum ncForm_CON {
+enum ncForm_CON : int8_t {
     ncForm_CON_NONE = 0,
     ncForm_CON_g,
     ncForm_CON_l,
@@ -2236,7 +2236,7 @@ enum ncForm_CON {
 /**
  * MEI att.ncForm@curve
  */
-enum ncForm_CURVE {
+enum ncForm_CURVE : int8_t {
     ncForm_CURVE_NONE = 0,
     ncForm_CURVE_a,
     ncForm_CURVE_c,
@@ -2246,7 +2246,7 @@ enum ncForm_CURVE {
 /**
  * MEI att.ncForm@rellen
  */
-enum ncForm_RELLEN {
+enum ncForm_RELLEN : int8_t {
     ncForm_RELLEN_NONE = 0,
     ncForm_RELLEN_l,
     ncForm_RELLEN_s,
@@ -2256,7 +2256,7 @@ enum ncForm_RELLEN {
 /**
  * MEI att.note.ges@extremis
  */
-enum noteGes_EXTREMIS {
+enum noteGes_EXTREMIS : int8_t {
     noteGes_EXTREMIS_NONE = 0,
     noteGes_EXTREMIS_highest,
     noteGes_EXTREMIS_lowest,
@@ -2266,7 +2266,7 @@ enum noteGes_EXTREMIS {
 /**
  * MEI att.noteHeads@head.auth
  */
-enum noteHeads_HEADAUTH {
+enum noteHeads_HEADAUTH : int8_t {
     noteHeads_HEADAUTH_NONE = 0,
     noteHeads_HEADAUTH_smufl,
     noteHeads_HEADAUTH_MAX
@@ -2275,7 +2275,7 @@ enum noteHeads_HEADAUTH {
 /**
  * MEI att.octave.log@coll
  */
-enum octaveLog_COLL {
+enum octaveLog_COLL : int8_t {
     octaveLog_COLL_NONE = 0,
     octaveLog_COLL_coll,
     octaveLog_COLL_MAX
@@ -2284,7 +2284,7 @@ enum octaveLog_COLL {
 /**
  * MEI att.pb.vis@folium
  */
-enum pbVis_FOLIUM {
+enum pbVis_FOLIUM : int8_t {
     pbVis_FOLIUM_NONE = 0,
     pbVis_FOLIUM_verso,
     pbVis_FOLIUM_recto,
@@ -2294,7 +2294,7 @@ enum pbVis_FOLIUM {
 /**
  * MEI att.pedal.log@dir
  */
-enum pedalLog_DIR {
+enum pedalLog_DIR : int8_t {
     pedalLog_DIR_NONE = 0,
     pedalLog_DIR_down,
     pedalLog_DIR_up,
@@ -2306,7 +2306,7 @@ enum pedalLog_DIR {
 /**
  * MEI att.pedal.log@func
  */
-enum pedalLog_FUNC {
+enum pedalLog_FUNC : int8_t {
     pedalLog_FUNC_NONE = 0,
     pedalLog_FUNC_sustain,
     pedalLog_FUNC_soft,
@@ -2318,7 +2318,7 @@ enum pedalLog_FUNC {
 /**
  * MEI att.pointing@xlink:actuate
  */
-enum pointing_XLINKACTUATE {
+enum pointing_XLINKACTUATE : int8_t {
     pointing_XLINKACTUATE_NONE = 0,
     pointing_XLINKACTUATE_onLoad,
     pointing_XLINKACTUATE_onRequest,
@@ -2330,7 +2330,7 @@ enum pointing_XLINKACTUATE {
 /**
  * MEI att.pointing@xlink:show
  */
-enum pointing_XLINKSHOW {
+enum pointing_XLINKSHOW : int8_t {
     pointing_XLINKSHOW_NONE = 0,
     pointing_XLINKSHOW_new,
     pointing_XLINKSHOW_replace,
@@ -2343,7 +2343,7 @@ enum pointing_XLINKSHOW {
 /**
  * MEI att.recordType@recordtype
  */
-enum recordType_RECORDTYPE {
+enum recordType_RECORDTYPE : int8_t {
     recordType_RECORDTYPE_NONE = 0,
     recordType_RECORDTYPE_a,
     recordType_RECORDTYPE_c,
@@ -2365,7 +2365,7 @@ enum recordType_RECORDTYPE {
 /**
  * MEI att.regularMethod@method
  */
-enum regularMethod_METHOD {
+enum regularMethod_METHOD : int8_t {
     regularMethod_METHOD_NONE = 0,
     regularMethod_METHOD_silent,
     regularMethod_METHOD_tags,
@@ -2375,7 +2375,7 @@ enum regularMethod_METHOD {
 /**
  * MEI att.rehearsal@reh.enclose
  */
-enum rehearsal_REHENCLOSE {
+enum rehearsal_REHENCLOSE : int8_t {
     rehearsal_REHENCLOSE_NONE = 0,
     rehearsal_REHENCLOSE_box,
     rehearsal_REHENCLOSE_circle,
@@ -2386,7 +2386,7 @@ enum rehearsal_REHENCLOSE {
 /**
  * MEI att.sb.vis@form
  */
-enum sbVis_FORM {
+enum sbVis_FORM : int8_t {
     sbVis_FORM_NONE = 0,
     sbVis_FORM_hash,
     sbVis_FORM_MAX
@@ -2395,7 +2395,7 @@ enum sbVis_FORM {
 /**
  * MEI att.staffGroupingSym@symbol
  */
-enum staffGroupingSym_SYMBOL {
+enum staffGroupingSym_SYMBOL : int8_t {
     staffGroupingSym_SYMBOL_NONE = 0,
     staffGroupingSym_SYMBOL_brace,
     staffGroupingSym_SYMBOL_bracket,
@@ -2408,7 +2408,7 @@ enum staffGroupingSym_SYMBOL {
 /**
  * MEI att.syl.log@con
  */
-enum sylLog_CON {
+enum sylLog_CON : int8_t {
     sylLog_CON_NONE = 0,
     sylLog_CON_s,
     sylLog_CON_d,
@@ -2424,7 +2424,7 @@ enum sylLog_CON {
 /**
  * MEI att.syl.log@wordpos
  */
-enum sylLog_WORDPOS {
+enum sylLog_WORDPOS : int8_t {
     sylLog_WORDPOS_NONE = 0,
     sylLog_WORDPOS_i,
     sylLog_WORDPOS_m,
@@ -2436,7 +2436,7 @@ enum sylLog_WORDPOS {
 /**
  * MEI att.targetEval@evaluate
  */
-enum targetEval_EVALUATE {
+enum targetEval_EVALUATE : int8_t {
     targetEval_EVALUATE_NONE = 0,
     targetEval_EVALUATE_all,
     targetEval_EVALUATE_one,
@@ -2447,7 +2447,7 @@ enum targetEval_EVALUATE {
 /**
  * MEI att.tempo.log@func
  */
-enum tempoLog_FUNC {
+enum tempoLog_FUNC : int8_t {
     tempoLog_FUNC_NONE = 0,
     tempoLog_FUNC_continuous,
     tempoLog_FUNC_instantaneous,
@@ -2459,7 +2459,7 @@ enum tempoLog_FUNC {
 /**
  * MEI att.tuplet.vis@num.format
  */
-enum tupletVis_NUMFORMAT {
+enum tupletVis_NUMFORMAT : int8_t {
     tupletVis_NUMFORMAT_NONE = 0,
     tupletVis_NUMFORMAT_count,
     tupletVis_NUMFORMAT_ratio,
@@ -2469,7 +2469,7 @@ enum tupletVis_NUMFORMAT {
 /**
  * MEI att.turn.log@form
  */
-enum turnLog_FORM {
+enum turnLog_FORM : int8_t {
     turnLog_FORM_NONE = 0,
     turnLog_FORM_lower,
     turnLog_FORM_upper,
@@ -2479,7 +2479,7 @@ enum turnLog_FORM {
 /**
  * MEI att.voltaGroupingSym@voltasym
  */
-enum voltaGroupingSym_VOLTASYM {
+enum voltaGroupingSym_VOLTASYM : int8_t {
     voltaGroupingSym_VOLTASYM_NONE = 0,
     voltaGroupingSym_VOLTASYM_brace,
     voltaGroupingSym_VOLTASYM_bracket,
@@ -2492,7 +2492,7 @@ enum voltaGroupingSym_VOLTASYM {
 /**
  * MEI att.whitespace@xml:space
  */
-enum whitespace_XMLSPACE {
+enum whitespace_XMLSPACE : int8_t {
     whitespace_XMLSPACE_NONE = 0,
     whitespace_XMLSPACE_default,
     whitespace_XMLSPACE_preserve,

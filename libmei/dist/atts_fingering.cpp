@@ -31,8 +31,6 @@ AttFingGrpLog::AttFingGrpLog() : Att()
     ResetFingGrpLog();
 }
 
-AttFingGrpLog::~AttFingGrpLog() {}
-
 void AttFingGrpLog::ResetFingGrpLog()
 {
     m_form = fingGrpLog_FORM_NONE;

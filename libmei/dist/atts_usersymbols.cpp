@@ -31,8 +31,6 @@ AttAltSym::AttAltSym() : Att()
     ResetAltSym();
 }
 
-AttAltSym::~AttAltSym() {}
-
 void AttAltSym::ResetAltSym()
 {
     m_altsym = "";
@@ -72,8 +70,6 @@ AttAnchoredTextLog::AttAnchoredTextLog() : Att()
 {
     ResetAnchoredTextLog();
 }
-
-AttAnchoredTextLog::~AttAnchoredTextLog() {}
 
 void AttAnchoredTextLog::ResetAnchoredTextLog()
 {
@@ -115,8 +111,6 @@ AttCurveLog::AttCurveLog() : Att()
     ResetCurveLog();
 }
 
-AttCurveLog::~AttCurveLog() {}
-
 void AttCurveLog::ResetCurveLog()
 {
     m_func = "";
@@ -156,8 +150,6 @@ AttLineLog::AttLineLog() : Att()
 {
     ResetLineLog();
 }
-
-AttLineLog::~AttLineLog() {}
 
 void AttLineLog::ResetLineLog()
 {

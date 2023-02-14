@@ -31,8 +31,6 @@ AttMordentLog::AttMordentLog() : Att()
     ResetMordentLog();
 }
 
-AttMordentLog::~AttMordentLog() {}
-
 void AttMordentLog::ResetMordentLog()
 {
     m_form = mordentLog_FORM_NONE;
@@ -88,8 +86,6 @@ AttOrnamPresent::AttOrnamPresent() : Att()
     ResetOrnamPresent();
 }
 
-AttOrnamPresent::~AttOrnamPresent() {}
-
 void AttOrnamPresent::ResetOrnamPresent()
 {
     m_ornam = "";
@@ -129,8 +125,6 @@ AttOrnamentAccid::AttOrnamentAccid() : Att()
 {
     ResetOrnamentAccid();
 }
-
-AttOrnamentAccid::~AttOrnamentAccid() {}
 
 void AttOrnamentAccid::ResetOrnamentAccid()
 {
@@ -186,8 +180,6 @@ AttTurnLog::AttTurnLog() : Att()
 {
     ResetTurnLog();
 }
-
-AttTurnLog::~AttTurnLog() {}
 
 void AttTurnLog::ResetTurnLog()
 {

@@ -31,8 +31,6 @@ AttAccidentalGes::AttAccidentalGes() : Att()
     ResetAccidentalGes();
 }
 
-AttAccidentalGes::~AttAccidentalGes() {}
-
 void AttAccidentalGes::ResetAccidentalGes()
 {
     m_accidGes = ACCIDENTAL_GESTURAL_NONE;
@@ -72,8 +70,6 @@ AttArticulationGes::AttArticulationGes() : Att()
 {
     ResetArticulationGes();
 }
-
-AttArticulationGes::~AttArticulationGes() {}
 
 void AttArticulationGes::ResetArticulationGes()
 {
@@ -115,8 +111,6 @@ AttBendGes::AttBendGes() : Att()
     ResetBendGes();
 }
 
-AttBendGes::~AttBendGes() {}
-
 void AttBendGes::ResetBendGes()
 {
     m_amount = 0.0;
@@ -156,8 +150,6 @@ AttDurationGes::AttDurationGes() : Att()
 {
     ResetDurationGes();
 }
-
-AttDurationGes::~AttDurationGes() {}
 
 void AttDurationGes::ResetDurationGes()
 {
@@ -274,8 +266,6 @@ AttMdivGes::AttMdivGes() : Att()
     ResetMdivGes();
 }
 
-AttMdivGes::~AttMdivGes() {}
-
 void AttMdivGes::ResetMdivGes()
 {
     m_attacca = BOOLEAN_NONE;
@@ -315,8 +305,6 @@ AttNcGes::AttNcGes() : Att()
 {
     ResetNcGes();
 }
-
-AttNcGes::~AttNcGes() {}
 
 void AttNcGes::ResetNcGes()
 {
@@ -387,8 +375,6 @@ AttNoteGes::AttNoteGes() : Att()
 {
     ResetNoteGes();
 }
-
-AttNoteGes::~AttNoteGes() {}
 
 void AttNoteGes::ResetNoteGes()
 {
@@ -475,8 +461,6 @@ AttOrnamentAccidGes::AttOrnamentAccidGes() : Att()
     ResetOrnamentAccidGes();
 }
 
-AttOrnamentAccidGes::~AttOrnamentAccidGes() {}
-
 void AttOrnamentAccidGes::ResetOrnamentAccidGes()
 {
     m_accidupperGes = ACCIDENTAL_GESTURAL_NONE;
@@ -532,8 +516,6 @@ AttSectionGes::AttSectionGes() : Att()
     ResetSectionGes();
 }
 
-AttSectionGes::~AttSectionGes() {}
-
 void AttSectionGes::ResetSectionGes()
 {
     m_attacca = BOOLEAN_NONE;
@@ -573,8 +555,6 @@ AttSoundLocation::AttSoundLocation() : Att()
 {
     ResetSoundLocation();
 }
-
-AttSoundLocation::~AttSoundLocation() {}
 
 void AttSoundLocation::ResetSoundLocation()
 {
@@ -631,8 +611,6 @@ AttTimestampGes::AttTimestampGes() : Att()
     ResetTimestampGes();
 }
 
-AttTimestampGes::~AttTimestampGes() {}
-
 void AttTimestampGes::ResetTimestampGes()
 {
     m_tstampGes = 0.0;
@@ -687,8 +665,6 @@ AttTimestamp2Ges::AttTimestamp2Ges() : Att()
 {
     ResetTimestamp2Ges();
 }
-
-AttTimestamp2Ges::~AttTimestamp2Ges() {}
 
 void AttTimestamp2Ges::ResetTimestamp2Ges()
 {

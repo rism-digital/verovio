@@ -31,8 +31,6 @@ AttMargins::AttMargins() : Att()
     ResetMargins();
 }
 
-AttMargins::~AttMargins() {}
-
 void AttMargins::ResetMargins()
 {
     m_topmar = data_MEASUREMENTUNSIGNED();

@@ -31,8 +31,6 @@ AttHarmLog::AttHarmLog() : Att()
     ResetHarmLog();
 }
 
-AttHarmLog::~AttHarmLog() {}
-
 void AttHarmLog::ResetHarmLog()
 {
     m_chordref = "";

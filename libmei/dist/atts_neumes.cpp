@@ -31,8 +31,6 @@ AttNcLog::AttNcLog() : Att()
     ResetNcLog();
 }
 
-AttNcLog::~AttNcLog() {}
-
 void AttNcLog::ResetNcLog()
 {
     m_oct = "";
@@ -87,8 +85,6 @@ AttNcForm::AttNcForm() : Att()
 {
     ResetNcForm();
 }
-
-AttNcForm::~AttNcForm() {}
 
 void AttNcForm::ResetNcForm()
 {

@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttDurationQuality : public Att {
-public:
+protected:
     AttDurationQuality();
-    virtual ~AttDurationQuality();
+    ~AttDurationQuality() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDurationQuality();
 
@@ -64,14 +65,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttDurationQuality
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDurationQuality
+ */
+
+class ExtAttDurationQuality : public AttDurationQuality {
+public:
+    ExtAttDurationQuality() = default;
+    virtual ~ExtAttDurationQuality() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMensuralLog
 //----------------------------------------------------------------------------
 
 class AttMensuralLog : public Att {
-public:
+protected:
     AttMensuralLog();
-    virtual ~AttMensuralLog();
+    ~AttMensuralLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMensuralLog();
 
@@ -112,14 +128,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMensuralLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMensuralLog
+ */
+
+class ExtAttMensuralLog : public AttMensuralLog {
+public:
+    ExtAttMensuralLog() = default;
+    virtual ~ExtAttMensuralLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMensuralShared
 //----------------------------------------------------------------------------
 
 class AttMensuralShared : public Att {
-public:
+protected:
     AttMensuralShared();
-    virtual ~AttMensuralShared();
+    ~AttMensuralShared() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMensuralShared();
 
@@ -170,14 +201,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMensuralShared
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMensuralShared
+ */
+
+class ExtAttMensuralShared : public AttMensuralShared {
+public:
+    ExtAttMensuralShared() = default;
+    virtual ~ExtAttMensuralShared() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNoteVisMensural
 //----------------------------------------------------------------------------
 
 class AttNoteVisMensural : public Att {
-public:
+protected:
     AttNoteVisMensural();
-    virtual ~AttNoteVisMensural();
+    ~AttNoteVisMensural() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNoteVisMensural();
 
@@ -204,14 +250,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttNoteVisMensural
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNoteVisMensural
+ */
+
+class ExtAttNoteVisMensural : public AttNoteVisMensural {
+public:
+    ExtAttNoteVisMensural() = default;
+    virtual ~ExtAttNoteVisMensural() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttRestVisMensural
 //----------------------------------------------------------------------------
 
 class AttRestVisMensural : public Att {
-public:
+protected:
     AttRestVisMensural();
-    virtual ~AttRestVisMensural();
+    ~AttRestVisMensural() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetRestVisMensural();
 
@@ -238,14 +299,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttRestVisMensural
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRestVisMensural
+ */
+
+class ExtAttRestVisMensural : public AttRestVisMensural {
+public:
+    ExtAttRestVisMensural() = default;
+    virtual ~ExtAttRestVisMensural() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStemsMensural
 //----------------------------------------------------------------------------
 
 class AttStemsMensural : public Att {
-public:
+protected:
     AttStemsMensural();
-    virtual ~AttStemsMensural();
+    ~AttStemsMensural() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStemsMensural();
 
@@ -269,6 +345,20 @@ public:
 private:
     /** Records the form of the stem. **/
     data_STEMFORM_mensural m_stemForm;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttStemsMensural
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStemsMensural
+ */
+
+class ExtAttStemsMensural : public AttStemsMensural {
+public:
+    ExtAttStemsMensural() = default;
+    virtual ~ExtAttStemsMensural() = default;
 };
 
 } // namespace vrv

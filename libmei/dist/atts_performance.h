@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttAlignment : public Att {
-public:
+protected:
     AttAlignment();
-    virtual ~AttAlignment();
+    ~AttAlignment() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAlignment();
 
@@ -60,6 +61,20 @@ private:
      * Its value must be the ID of a when element elsewhere in the document.
      **/
     std::string m_when;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttAlignment
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAlignment
+ */
+
+class ExtAttAlignment : public AttAlignment {
+public:
+    ExtAttAlignment() = default;
+    virtual ~ExtAttAlignment() = default;
 };
 
 } // namespace vrv

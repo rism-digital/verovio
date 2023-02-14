@@ -31,8 +31,6 @@ AttCourseLog::AttCourseLog() : Att()
     ResetCourseLog();
 }
 
-AttCourseLog::~AttCourseLog() {}
-
 void AttCourseLog::ResetCourseLog()
 {
     m_tuningStandard = COURSETUNING_NONE;
@@ -72,8 +70,6 @@ AttNoteGesTab::AttNoteGesTab() : Att()
 {
     ResetNoteGesTab();
 }
-
-AttNoteGesTab::~AttNoteGesTab() {}
 
 void AttNoteGesTab::ResetNoteGesTab()
 {

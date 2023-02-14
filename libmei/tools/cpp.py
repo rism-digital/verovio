@@ -68,10 +68,11 @@ ATTCLASS_H = """
 //----------------------------------------------------------------------------
 
 class Att{attGroupNameUpper} : public Att {{
-public:
+protected:
     Att{attGroupNameUpper}();
-    virtual ~Att{attGroupNameUpper}();
+    ~Att{attGroupNameUpper}() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void Reset{attGroupNameUpper}();
 
@@ -91,6 +92,20 @@ public:
 
 private:
 {members}}};
+
+//----------------------------------------------------------------------------
+// ExtAtt{attGroupNameUpper}
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of Att{attGroupNameUpper}
+ */
+
+class ExtAtt{attGroupNameUpper} : public Att{attGroupNameUpper} {{
+public:
+    ExtAtt{attGroupNameUpper}() = default;
+    virtual ~ExtAtt{attGroupNameUpper}() = default;
+}};
 """
 
 ATTCLASS_METHODS_H = """    void Set{attNameUpper}({attType} {attNameLowerJoined}_) {{ m_{attNameLowerJoined} = {attNameLowerJoined}_; }}
@@ -131,8 +146,6 @@ Att{attGroupNameUpper}::Att{attGroupNameUpper}() : Att()
 {{
     Reset{attGroupNameUpper}();
 }}
-
-Att{attGroupNameUpper}::~Att{attGroupNameUpper}() {{}}
 
 void Att{attGroupNameUpper}::Reset{attGroupNameUpper}()
 {{
@@ -289,7 +302,7 @@ TYPE_GRP_END = """}} // namespace {ns}
 TYPE_START = """/**
  * MEI {meitype}
  */
-enum {vrvtype} {{
+enum {vrvtype}{enumtype} {{
     {val_prefix}_NONE = 0,"""
 
 TYPE_VALUE = """
@@ -319,10 +332,13 @@ CONVERTER_H = """
 namespace {ns} {{
 
 //----------------------------------------------------------------------------
-// AttConverter
+// AttConverterBase
 //----------------------------------------------------------------------------
 
-class AttConverter {{
+class AttConverterBase {{
+protected:
+    AttConverterBase() = default;
+    ~AttConverterBase() = default;
 public:"""
 
 CONVERTER_METHODS_H = """
@@ -331,6 +347,20 @@ CONVERTER_METHODS_H = """
 """
 
 CONVERTER_END_H = """}};
+
+//----------------------------------------------------------------------------
+// AttConverter
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttConverterBase
+ */
+
+class AttConverter: public AttConverterBase {{
+public:
+    AttConverter() = default;
+    virtual ~AttConverter() = default;
+}};
 
 }} // namespace {ns}
 
@@ -352,18 +382,18 @@ CONVERTER_CPP = """
 namespace {ns} {{
 
 //----------------------------------------------------------------------------
-// AttConverter
+// AttConverterBase
 //----------------------------------------------------------------------------
 """
 
 CONVERTER_METHOD1_START_CPP = """
-std::string AttConverter::{fname}ToStr({type} data) const
+std::string AttConverterBase::{fname}ToStr({type} data) const
 {{
     std::string value;
     switch (data) {{"""
 
 CONVERTER_METHOD2_START_CPP = """
-{type} AttConverter::StrTo{fname}(const std::string &value, bool logWarning) const
+{type} AttConverterBase::StrTo{fname}(const std::string &value, bool logWarning) const
 {{"""
 
 CONVERTER_METHOD1_CPP = """
@@ -836,6 +866,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         type_start_fmt = {
             "meitype": data_type,
             "vrvtype": vrv_getformattedtype(data_type),
+            "enumtype": " : int8_t" if len(values) < 64 else "",
             "val_prefix":  val_prefix
         }
         att_type_data_types.append(TYPE_START.format_map(type_start_fmt))
@@ -891,6 +922,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         type_start_fmt = {
             "meitype": list_type,
             "vrvtype": val_prefix,
+            "enumtype": " : int8_t" if len(values) < 64 else "",
             "val_prefix":  val_prefix
         }
         att_type_data_list.append(TYPE_START.format_map(type_start_fmt))

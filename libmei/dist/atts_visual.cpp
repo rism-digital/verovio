@@ -31,8 +31,6 @@ AttAnnotVis::AttAnnotVis() : Att()
     ResetAnnotVis();
 }
 
-AttAnnotVis::~AttAnnotVis() {}
-
 void AttAnnotVis::ResetAnnotVis()
 {
     m_place = data_PLACEMENT();
@@ -72,8 +70,6 @@ AttArpegVis::AttArpegVis() : Att()
 {
     ResetArpegVis();
 }
-
-AttArpegVis::~AttArpegVis() {}
 
 void AttArpegVis::ResetArpegVis()
 {
@@ -205,8 +201,6 @@ AttBarLineVis::AttBarLineVis() : Att()
     ResetBarLineVis();
 }
 
-AttBarLineVis::~AttBarLineVis() {}
-
 void AttBarLineVis::ResetBarLineVis()
 {
     m_len = 0.0;
@@ -276,8 +270,6 @@ AttBeamingVis::AttBeamingVis() : Att()
 {
     ResetBeamingVis();
 }
-
-AttBeamingVis::~AttBeamingVis() {}
 
 void AttBeamingVis::ResetBeamingVis()
 {
@@ -349,8 +341,6 @@ AttBeatRptVis::AttBeatRptVis() : Att()
     ResetBeatRptVis();
 }
 
-AttBeatRptVis::~AttBeatRptVis() {}
-
 void AttBeatRptVis::ResetBeatRptVis()
 {
     m_slash = BEATRPT_REND_NONE;
@@ -391,8 +381,6 @@ AttChordVis::AttChordVis() : Att()
     ResetChordVis();
 }
 
-AttChordVis::~AttChordVis() {}
-
 void AttChordVis::ResetChordVis()
 {
     m_cluster = CLUSTER_NONE;
@@ -432,8 +420,6 @@ AttCleffingVis::AttCleffingVis() : Att()
 {
     ResetCleffingVis();
 }
-
-AttCleffingVis::~AttCleffingVis() {}
 
 void AttCleffingVis::ResetCleffingVis()
 {
@@ -490,8 +476,6 @@ AttEpisemaVis::AttEpisemaVis() : Att()
     ResetEpisemaVis();
 }
 
-AttEpisemaVis::~AttEpisemaVis() {}
-
 void AttEpisemaVis::ResetEpisemaVis()
 {
     m_form = episemaVis_FORM_NONE;
@@ -546,8 +530,6 @@ AttFTremVis::AttFTremVis() : Att()
 {
     ResetFTremVis();
 }
-
-AttFTremVis::~AttFTremVis() {}
 
 void AttFTremVis::ResetFTremVis()
 {
@@ -619,8 +601,6 @@ AttFermataVis::AttFermataVis() : Att()
     ResetFermataVis();
 }
 
-AttFermataVis::~AttFermataVis() {}
-
 void AttFermataVis::ResetFermataVis()
 {
     m_form = fermataVis_FORM_NONE;
@@ -676,8 +656,6 @@ AttFingGrpVis::AttFingGrpVis() : Att()
     ResetFingGrpVis();
 }
 
-AttFingGrpVis::~AttFingGrpVis() {}
-
 void AttFingGrpVis::ResetFingGrpVis()
 {
     m_orient = fingGrpVis_ORIENT_NONE;
@@ -717,8 +695,6 @@ AttHairpinVis::AttHairpinVis() : Att()
 {
     ResetHairpinVis();
 }
-
-AttHairpinVis::~AttHairpinVis() {}
 
 void AttHairpinVis::ResetHairpinVis()
 {
@@ -805,8 +781,6 @@ AttHarmVis::AttHarmVis() : Att()
     ResetHarmVis();
 }
 
-AttHarmVis::~AttHarmVis() {}
-
 void AttHarmVis::ResetHarmVis()
 {
     m_rendgrid = harmVis_RENDGRID_NONE;
@@ -846,8 +820,6 @@ AttHispanTickVis::AttHispanTickVis() : Att()
 {
     ResetHispanTickVis();
 }
-
-AttHispanTickVis::~AttHispanTickVis() {}
 
 void AttHispanTickVis::ResetHispanTickVis()
 {
@@ -904,8 +876,6 @@ AttKeySigVis::AttKeySigVis() : Att()
     ResetKeySigVis();
 }
 
-AttKeySigVis::~AttKeySigVis() {}
-
 void AttKeySigVis::ResetKeySigVis()
 {
     m_sigShowchange = BOOLEAN_NONE;
@@ -945,8 +915,6 @@ AttKeySigDefaultVis::AttKeySigDefaultVis() : Att()
 {
     ResetKeySigDefaultVis();
 }
-
-AttKeySigDefaultVis::~AttKeySigDefaultVis() {}
 
 void AttKeySigDefaultVis::ResetKeySigDefaultVis()
 {
@@ -1003,8 +971,6 @@ AttLigatureVis::AttLigatureVis() : Att()
     ResetLigatureVis();
 }
 
-AttLigatureVis::~AttLigatureVis() {}
-
 void AttLigatureVis::ResetLigatureVis()
 {
     m_form = LIGATUREFORM_NONE;
@@ -1044,8 +1010,6 @@ AttLineVis::AttLineVis() : Att()
 {
     ResetLineVis();
 }
-
-AttLineVis::~AttLineVis() {}
 
 void AttLineVis::ResetLineVis()
 {
@@ -1162,8 +1126,6 @@ AttLiquescentVis::AttLiquescentVis() : Att()
     ResetLiquescentVis();
 }
 
-AttLiquescentVis::~AttLiquescentVis() {}
-
 void AttLiquescentVis::ResetLiquescentVis()
 {
     m_curve = liquescentVis_CURVE_NONE;
@@ -1218,8 +1180,6 @@ AttMensurVis::AttMensurVis() : Att()
 {
     ResetMensurVis();
 }
-
-AttMensurVis::~AttMensurVis() {}
 
 void AttMensurVis::ResetMensurVis()
 {
@@ -1305,8 +1265,6 @@ AttMensuralVis::AttMensuralVis() : Att()
 {
     ResetMensuralVis();
 }
-
-AttMensuralVis::~AttMensuralVis() {}
 
 void AttMensuralVis::ResetMensuralVis()
 {
@@ -1453,8 +1411,6 @@ AttMeterSigVis::AttMeterSigVis() : Att()
     ResetMeterSigVis();
 }
 
-AttMeterSigVis::~AttMeterSigVis() {}
-
 void AttMeterSigVis::ResetMeterSigVis()
 {
     m_form = METERFORM_NONE;
@@ -1494,8 +1450,6 @@ AttMeterSigDefaultVis::AttMeterSigDefaultVis() : Att()
 {
     ResetMeterSigDefaultVis();
 }
-
-AttMeterSigDefaultVis::~AttMeterSigDefaultVis() {}
 
 void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
 {
@@ -1552,8 +1506,6 @@ AttMultiRestVis::AttMultiRestVis() : Att()
     ResetMultiRestVis();
 }
 
-AttMultiRestVis::~AttMultiRestVis() {}
-
 void AttMultiRestVis::ResetMultiRestVis()
 {
     m_block = BOOLEAN_NONE;
@@ -1593,8 +1545,6 @@ AttPbVis::AttPbVis() : Att()
 {
     ResetPbVis();
 }
-
-AttPbVis::~AttPbVis() {}
 
 void AttPbVis::ResetPbVis()
 {
@@ -1636,8 +1586,6 @@ AttPedalVis::AttPedalVis() : Att()
     ResetPedalVis();
 }
 
-AttPedalVis::~AttPedalVis() {}
-
 void AttPedalVis::ResetPedalVis()
 {
     m_form = PEDALSTYLE_NONE;
@@ -1677,8 +1625,6 @@ AttPlicaVis::AttPlicaVis() : Att()
 {
     ResetPlicaVis();
 }
-
-AttPlicaVis::~AttPlicaVis() {}
 
 void AttPlicaVis::ResetPlicaVis()
 {
@@ -1735,8 +1681,6 @@ AttQuilismaVis::AttQuilismaVis() : Att()
     ResetQuilismaVis();
 }
 
-AttQuilismaVis::~AttQuilismaVis() {}
-
 void AttQuilismaVis::ResetQuilismaVis()
 {
     m_waves = MEI_UNSET;
@@ -1776,8 +1720,6 @@ AttSbVis::AttSbVis() : Att()
 {
     ResetSbVis();
 }
-
-AttSbVis::~AttSbVis() {}
 
 void AttSbVis::ResetSbVis()
 {
@@ -1819,8 +1761,6 @@ AttScoreDefVis::AttScoreDefVis() : Att()
     ResetScoreDefVis();
 }
 
-AttScoreDefVis::~AttScoreDefVis() {}
-
 void AttScoreDefVis::ResetScoreDefVis()
 {
     m_vuHeight = "";
@@ -1860,8 +1800,6 @@ AttSectionVis::AttSectionVis() : Att()
 {
     ResetSectionVis();
 }
-
-AttSectionVis::~AttSectionVis() {}
 
 void AttSectionVis::ResetSectionVis()
 {
@@ -1903,8 +1841,6 @@ AttSignifLetVis::AttSignifLetVis() : Att()
     ResetSignifLetVis();
 }
 
-AttSignifLetVis::~AttSignifLetVis() {}
-
 void AttSignifLetVis::ResetSignifLetVis()
 {
     m_place = data_EVENTREL();
@@ -1945,8 +1881,6 @@ AttSpaceVis::AttSpaceVis() : Att()
     ResetSpaceVis();
 }
 
-AttSpaceVis::~AttSpaceVis() {}
-
 void AttSpaceVis::ResetSpaceVis()
 {
     m_compressable = BOOLEAN_NONE;
@@ -1986,8 +1920,6 @@ AttStaffDefVis::AttStaffDefVis() : Att()
 {
     ResetStaffDefVis();
 }
-
-AttStaffDefVis::~AttStaffDefVis() {}
 
 void AttStaffDefVis::ResetStaffDefVis()
 {
@@ -2089,8 +2021,6 @@ AttStaffGrpVis::AttStaffGrpVis() : Att()
     ResetStaffGrpVis();
 }
 
-AttStaffGrpVis::~AttStaffGrpVis() {}
-
 void AttStaffGrpVis::ResetStaffGrpVis()
 {
     m_barThru = BOOLEAN_NONE;
@@ -2130,8 +2060,6 @@ AttStemVis::AttStemVis() : Att()
 {
     ResetStemVis();
 }
-
-AttStemVis::~AttStemVis() {}
 
 void AttStemVis::ResetStemVis()
 {
@@ -2247,8 +2175,6 @@ AttTupletVis::AttTupletVis() : Att()
 {
     ResetTupletVis();
 }
-
-AttTupletVis::~AttTupletVis() {}
 
 void AttTupletVis::ResetTupletVis()
 {
