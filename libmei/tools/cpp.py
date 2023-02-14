@@ -302,7 +302,7 @@ TYPE_GRP_END = """}} // namespace {ns}
 TYPE_START = """/**
  * MEI {meitype}
  */
-enum {vrvtype} {{
+enum {vrvtype}{enumtype} {{
     {val_prefix}_NONE = 0,"""
 
 TYPE_VALUE = """
@@ -862,6 +862,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         type_start_fmt = {
             "meitype": data_type,
             "vrvtype": vrv_getformattedtype(data_type),
+            "enumtype": " : int8_t" if len(values) < 64 else "",
             "val_prefix":  val_prefix
         }
         att_type_data_types.append(TYPE_START.format_map(type_start_fmt))
@@ -917,6 +918,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
         type_start_fmt = {
             "meitype": list_type,
             "vrvtype": val_prefix,
+            "enumtype": " : int8_t" if len(values) < 64 else "",
             "val_prefix":  val_prefix
         }
         att_type_data_list.append(TYPE_START.format_map(type_start_fmt))
