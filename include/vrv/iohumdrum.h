@@ -811,6 +811,7 @@ protected:
     void setFontStyleForHarm(Harm *harm, const std::string &style);
     std::u32string addSemitoneAdjustmentsToDeg(
         hum::HTp token, int arrowQ, int accidQ, int solfegeQ, int sharps, int flats);
+    int hasParallelNote(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
