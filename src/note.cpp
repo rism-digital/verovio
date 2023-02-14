@@ -1119,7 +1119,8 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     }
 
     // Nothing to do for notes that are not in a cluster and without base diameter for the chord
-    if (!params->m_diameter && !m_cluster) return FUNCTOR_SIBLINGS;
+    if ((!params->m_diameter || params->m_alignmentType != this->GetAlignment()->GetType()) && !m_cluster)
+        return FUNCTOR_SIBLINGS;
 
     /************** notehead direction **************/
 

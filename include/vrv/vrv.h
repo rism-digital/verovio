@@ -129,6 +129,14 @@ void LogElapsedTimeEnd(const char *msg = "unspecified operation");
 bool Check(Object *object);
 
 //----------------------------------------------------------------------------
+// Notation type checks
+//----------------------------------------------------------------------------
+
+bool IsMensuralType(data_NOTATIONTYPE notationType);
+bool IsNeumeType(data_NOTATIONTYPE notationType);
+bool IsTabType(data_NOTATIONTYPE notationType);
+
+//----------------------------------------------------------------------------
 // Base64 code borrowed
 //----------------------------------------------------------------------------
 

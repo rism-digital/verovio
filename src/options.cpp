@@ -17,8 +17,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "att.h"
+#include "attconverter.h"
 #include "vrv.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -604,7 +605,7 @@ void OptionStaffrel::Init(data_STAFFREL defaultValue)
 
 bool OptionStaffrel::SetValue(const std::string &value)
 {
-    Att converter;
+    AttConverter converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
     if (staffrel == STAFFREL_NONE) {
         LogError("Parameter '%s' not valid", value.c_str());
@@ -616,13 +617,13 @@ bool OptionStaffrel::SetValue(const std::string &value)
 
 std::string OptionStaffrel::GetStrValue() const
 {
-    Att converter;
+    AttConverter converter;
     return converter.StaffrelToStr(m_value);
 }
 
 std::string OptionStaffrel::GetDefaultStrValue() const
 {
-    Att converter;
+    AttConverter converter;
     return converter.StaffrelToStr(m_defaultValue);
 }
 

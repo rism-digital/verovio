@@ -365,33 +365,33 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
     if (!element) return false;
 
     bool success = false;
-    if (Att::SetAnalytical(element, attribute, value))
+    if (AttModule::SetAnalytical(element, attribute, value))
         success = true;
-    else if (Att::SetCmn(element, attribute, value))
+    else if (AttModule::SetCmn(element, attribute, value))
         success = true;
-    else if (Att::SetCmnornaments(element, attribute, value))
+    else if (AttModule::SetCmnornaments(element, attribute, value))
         success = true;
-    else if (Att::SetCritapp(element, attribute, value))
+    else if (AttModule::SetCritapp(element, attribute, value))
         success = true;
-    else if (Att::SetExternalsymbols(element, attribute, value))
+    else if (AttModule::SetExternalsymbols(element, attribute, value))
         success = true;
-    else if (Att::SetFacsimile(element, attribute, value))
+    else if (AttModule::SetFacsimile(element, attribute, value))
         success = true;
-    else if (Att::SetGestural(element, attribute, value))
+    else if (AttModule::SetGestural(element, attribute, value))
         success = true;
-    else if (Att::SetMei(element, attribute, value))
+    else if (AttModule::SetMei(element, attribute, value))
         success = true;
-    else if (Att::SetMensural(element, attribute, value))
+    else if (AttModule::SetMensural(element, attribute, value))
         success = true;
-    else if (Att::SetMidi(element, attribute, value))
+    else if (AttModule::SetMidi(element, attribute, value))
         success = true;
-    else if (Att::SetNeumes(element, attribute, value))
+    else if (AttModule::SetNeumes(element, attribute, value))
         success = true;
-    else if (Att::SetPagebased(element, attribute, value))
+    else if (AttModule::SetPagebased(element, attribute, value))
         success = true;
-    else if (Att::SetShared(element, attribute, value))
+    else if (AttModule::SetShared(element, attribute, value))
         success = true;
-    else if (Att::SetVisual(element, attribute, value))
+    else if (AttModule::SetVisual(element, attribute, value))
         success = true;
     if (success) {
         return true;

@@ -90,7 +90,11 @@ else:
                            '-DNO_PAE_SUPPORT']
 
 verovio_module = Extension('verovio._verovio',
-                           sources=glob('./src/*.cpp') + glob('./src/hum/*.cpp') +
+                           sources=
+                                glob('./src/*.cpp') + 
+                                glob('./src/hum/*.cpp') +
+                                glob('./libmei/dist/*.cpp') +
+                                glob('./libmei/addons/*.cpp') +
                            [
                                './src/crc/crc.cpp',
                                './src/json/jsonxx.cc',
@@ -100,23 +104,6 @@ verovio_module = Extension('verovio._verovio',
                                './src/midi/MidiEventList.cpp',
                                './src/midi/MidiFile.cpp',
                                './src/midi/MidiMessage.cpp',
-                               './libmei/attconverter.cpp',
-                               './libmei/atts_analytical.cpp',
-                               './libmei/atts_cmn.cpp',
-                               './libmei/atts_cmnornaments.cpp',
-                               './libmei/atts_critapp.cpp',
-                               './libmei/atts_gestural.cpp',
-                               './libmei/atts_externalsymbols.cpp',
-                               './libmei/atts_facsimile.cpp',
-                               './libmei/atts_frettab.cpp',
-                               './libmei/atts_mei.cpp',
-                               './libmei/atts_mensural.cpp',
-                               './libmei/atts_midi.cpp',
-                               './libmei/atts_neumes.cpp',
-                               './libmei/atts_pagebased.cpp',
-                               './libmei/atts_shared.cpp',
-                               './libmei/atts_usersymbols.cpp',
-                               './libmei/atts_visual.cpp',
                                './bindings/python/verovio.i'],
                            swig_opts=['-c++', '-outdir',
                                       './bindings/python', '-doxygen'],
@@ -128,7 +115,8 @@ verovio_module = Extension('verovio._verovio',
                                          './include/pugi',
                                          './include/win32',
                                          './include/zip',
-                                         './libmei'],
+                                         './libmei/dist',
+                                         './libmei/addons'],
                            extra_compile_args=EXTRA_COMPILE_ARGS
                            )
 

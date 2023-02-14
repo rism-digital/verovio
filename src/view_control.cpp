@@ -1100,6 +1100,8 @@ void View::DrawControlElementConnector(
 
     if (deactivate) {
         dc->DeactivateGraphic();
+        // If the extender line is not included in the bounding box, then store its width
+        element->GetCurrentFloatingPositioner()->SetDrawingExtenderWidth(dist);
     }
 
     for (int i = 0; i < nbDashes; ++i) {

@@ -395,28 +395,28 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     assert(attributes);
     attributes->clear();
 
-    Att::GetAnalytical(this, attributes);
-    Att::GetCmn(this, attributes);
-    Att::GetCmnornaments(this, attributes);
-    Att::GetCritapp(this, attributes);
-    // Att::GetEdittrans(this, attributes);
-    Att::GetExternalsymbols(this, attributes);
-    Att::GetFrettab(this, attributes);
-    Att::GetFacsimile(this, attributes);
-    // Att::GetFigtable(this, attributes);
-    // Att::GetFingering(this, attributes);
-    Att::GetGestural(this, attributes);
-    // Att::GetHarmony(this, attributes);
-    // Att::GetHeader(this, attributes);
-    Att::GetMei(this, attributes);
-    Att::GetMensural(this, attributes);
-    Att::GetMidi(this, attributes);
-    Att::GetNeumes(this, attributes);
-    Att::GetPagebased(this, attributes);
-    // Att::GetPerformance(this, attributes);
-    Att::GetShared(this, attributes);
-    // Att::GetUsersymbols(this, attributes);
-    Att::GetVisual(this, attributes);
+    AttModule::GetAnalytical(this, attributes);
+    AttModule::GetCmn(this, attributes);
+    AttModule::GetCmnornaments(this, attributes);
+    AttModule::GetCritapp(this, attributes);
+    // AttModule::GetEdittrans(this, attributes);
+    AttModule::GetExternalsymbols(this, attributes);
+    AttModule::GetFrettab(this, attributes);
+    AttModule::GetFacsimile(this, attributes);
+    // AttModule::GetFigtable(this, attributes);
+    // AttModule::GetFingering(this, attributes);
+    AttModule::GetGestural(this, attributes);
+    // AttModule::GetHarmony(this, attributes);
+    // AttModule::GetHeader(this, attributes);
+    AttModule::GetMei(this, attributes);
+    AttModule::GetMensural(this, attributes);
+    AttModule::GetMidi(this, attributes);
+    AttModule::GetNeumes(this, attributes);
+    AttModule::GetPagebased(this, attributes);
+    // AttModule::GetPerformance(this, attributes);
+    AttModule::GetShared(this, attributes);
+    // AttModule::GetUsersymbols(this, attributes);
+    AttModule::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
         attributes->push_back({ pair.first, pair.second });
@@ -2383,8 +2383,8 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
             }
             else {
                 above->SetOverflowAbove(overflowAbove);
-                above->AddBBoxAbove(current);
             }
+            above->AddBBoxAbove(current);
         }
     }
 
@@ -2398,8 +2398,8 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
             }
             else {
                 below->SetOverflowBelow(overflowBelow);
-                below->AddBBoxBelow(current);
             }
+            below->AddBBoxBelow(current);
         }
     }
 

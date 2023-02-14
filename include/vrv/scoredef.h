@@ -288,6 +288,11 @@ public:
     int AlignMeasures(FunctorParams *functorParams) override;
 
     /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
+
+    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

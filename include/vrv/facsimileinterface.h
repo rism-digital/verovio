@@ -10,6 +10,7 @@
 
 #include "atts_facsimile.h"
 #include "atts_shared.h"
+#include "interface.h"
 
 namespace vrv {
 class FunctorParams;

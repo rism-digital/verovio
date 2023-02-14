@@ -779,6 +779,7 @@ int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
             params->m_diameter = params->m_doc->GetGlyphWidth(
                 code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
         }
+        params->m_alignmentType = this->GetAlignment()->GetType();
     }
 
     return FUNCTOR_CONTINUE;

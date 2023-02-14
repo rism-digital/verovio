@@ -289,11 +289,9 @@ void SvgDeviceContext::StartGraphic(
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
         if (att->HasFontstyle())
-            m_currentNode.append_attribute("font-style")
-                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+            m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
-            m_currentNode.append_attribute("font-weight")
-                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+            m_currentNode.append_attribute("font-weight") = att->FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -369,11 +367,9 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
         if (att->HasFontstyle())
-            m_currentNode.append_attribute("font-style")
-                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+            m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
-            m_currentNode.append_attribute("font-weight")
-                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+            m_currentNode.append_attribute("font-weight") = att->FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_WHITESPACE)) {
