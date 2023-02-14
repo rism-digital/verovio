@@ -1090,6 +1090,11 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         // For note to note alignment, make sure there is a standard spacing even if they do not overlap
         // vertically
         if (this->Is(NOTE) && element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(this);
+            if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
+                const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
+                margin = std::max(margin, tremWidth / 2);
+            }
             overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
         }
         else if (this->Is(ACCID) && element->Is(NOTE)) {
@@ -1119,6 +1124,11 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
             }
         }
         else {
+            Note *note = vrv_cast<Note *>(this);
+            if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
+                const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
+                margin = std::max(margin, tremWidth / 2);
+            }
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
         }
         // if there is no overlap between elements, make additinal checks for some of the edge cases
@@ -2133,6 +2143,14 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         if (additionalOffset > params->m_currentAlignment.m_offset) {
             params->m_currentAlignment.m_offset = additionalOffset;
             params->m_currentAlignment.m_overlappingBB = this;
+        }
+    }
+    else if (this->Is(NOTE) && (next == ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
+        Note *note = vrv_cast<Note *>(this);
+        if (note->HasStemMod() && (note->GetStemMod() < STEMMODIFIER_MAX) && note->GetStemDir() == STEMDIRECTION_up) {
+            const int adjust = drawingUnit / 2;
+            params->m_cumulatedXShift += adjust;
+            params->m_upcomingMinPos += adjust;
         }
     }
     else {
