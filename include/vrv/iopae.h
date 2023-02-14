@@ -92,8 +92,6 @@ public:
     bool WriteObjectEnd(Object *object) override;
 
 private:
-    bool WriteDoc(Doc *doc);
-
     /**
      * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
      */
