@@ -1084,17 +1084,19 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
         assert(element);
         int margin = (params->m_doc->GetRightMargin(element) + selfLeftMargin) * drawingUnit;
+        if (element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(element);
+            if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
+                const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
+                margin = std::max(margin, drawingUnit / 3 + tremWidth / 2);
+            }
+        }
         bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
         if (!hasOverlap) continue;
 
         // For note to note alignment, make sure there is a standard spacing even if they do not overlap
         // vertically
         if (this->Is(NOTE) && element->Is(NOTE)) {
-            Note *note = vrv_cast<Note *>(this);
-            if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
-                const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
-                margin = std::max(margin, tremWidth / 2);
-            }
             overlap = std::max(overlap, element->GetSelfRight() - this->GetSelfLeft() + margin);
         }
         else if (this->Is(ACCID) && element->Is(NOTE)) {
@@ -1123,14 +1125,7 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
                 overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
             }
         }
-        else {
-            if (this->Is(NOTE)) {
-                Note *note = vrv_cast<Note *>(this);
-                if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
-                    const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
-                    margin = std::max(margin, tremWidth / 2);
-                }
-            }            
+        else {         
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
         }
         // if there is no overlap between elements, make additinal checks for some of the edge cases
@@ -2149,8 +2144,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
     else if (this->Is(NOTE) && (next == ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         Note *note = vrv_cast<Note *>(this);
-        if (note->HasStemMod() && (note->GetStemMod() < STEMMODIFIER_MAX) && note->GetStemDir() == STEMDIRECTION_up) {
-            const int adjust = drawingUnit / 2;
+        if (note->HasStemMod() && (note->GetStemMod() < STEMMODIFIER_MAX) && (note->GetDrawingStemDir() == STEMDIRECTION_up)) {
+            const int adjust = drawingUnit;
             params->m_cumulatedXShift += adjust;
             params->m_upcomingMinPos += adjust;
         }
