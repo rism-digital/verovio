@@ -61,17 +61,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAccidLog
+// InstAccidLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAccidLog
  */
 
-class ExtAttAccidLog : public AttAccidLog {
+class InstAccidLog : public AttAccidLog {
 public:
-    ExtAttAccidLog() = default;
-    virtual ~ExtAttAccidLog() = default;
+    InstAccidLog() = default;
+    virtual ~InstAccidLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -110,17 +110,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAccidental
+// InstAccidental
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAccidental
  */
 
-class ExtAttAccidental : public AttAccidental {
+class InstAccidental : public AttAccidental {
 public:
-    ExtAttAccidental() = default;
-    virtual ~ExtAttAccidental() = default;
+    InstAccidental() = default;
+    virtual ~InstAccidental() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -165,17 +165,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttArticulation
+// InstArticulation
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttArticulation
  */
 
-class ExtAttArticulation : public AttArticulation {
+class InstArticulation : public AttArticulation {
 public:
-    ExtAttArticulation() = default;
-    virtual ~ExtAttArticulation() = default;
+    InstArticulation() = default;
+    virtual ~InstArticulation() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -214,17 +214,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAttaccaLog
+// InstAttaccaLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAttaccaLog
  */
 
-class ExtAttAttaccaLog : public AttAttaccaLog {
+class InstAttaccaLog : public AttAttaccaLog {
 public:
-    ExtAttAttaccaLog() = default;
-    virtual ~ExtAttAttaccaLog() = default;
+    InstAttaccaLog() = default;
+    virtual ~InstAttaccaLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -263,17 +263,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAudience
+// InstAudience
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAudience
  */
 
-class ExtAttAudience : public AttAudience {
+class InstAudience : public AttAudience {
 public:
-    ExtAttAudience() = default;
-    virtual ~ExtAttAudience() = default;
+    InstAudience() = default;
+    virtual ~InstAudience() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -312,17 +312,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAugmentDots
+// InstAugmentDots
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAugmentDots
  */
 
-class ExtAttAugmentDots : public AttAugmentDots {
+class InstAugmentDots : public AttAugmentDots {
 public:
-    ExtAttAugmentDots() = default;
-    virtual ~ExtAttAugmentDots() = default;
+    InstAugmentDots() = default;
+    virtual ~InstAugmentDots() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -375,17 +375,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAuthorized
+// InstAuthorized
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAuthorized
  */
 
-class ExtAttAuthorized : public AttAuthorized {
+class InstAuthorized : public AttAuthorized {
 public:
-    ExtAttAuthorized() = default;
-    virtual ~ExtAttAuthorized() = default;
+    InstAuthorized() = default;
+    virtual ~InstAuthorized() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -424,17 +424,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBarLineLog
+// InstBarLineLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBarLineLog
  */
 
-class ExtAttBarLineLog : public AttBarLineLog {
+class InstBarLineLog : public AttBarLineLog {
 public:
-    ExtAttBarLineLog() = default;
-    virtual ~ExtAttBarLineLog() = default;
+    InstBarLineLog() = default;
+    virtual ~InstBarLineLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -492,17 +492,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBarring
+// InstBarring
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBarring
  */
 
-class ExtAttBarring : public AttBarring {
+class InstBarring : public AttBarring {
 public:
-    ExtAttBarring() = default;
-    virtual ~ExtAttBarring() = default;
+    InstBarring() = default;
+    virtual ~InstBarring() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -541,17 +541,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBasic
+// InstBasic
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBasic
  */
 
-class ExtAttBasic : public AttBasic {
+class InstBasic : public AttBasic {
 public:
-    ExtAttBasic() = default;
-    virtual ~ExtAttBasic() = default;
+    InstBasic() = default;
+    virtual ~InstBasic() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -593,17 +593,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBibl
+// InstBibl
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBibl
  */
 
-class ExtAttBibl : public AttBibl {
+class InstBibl : public AttBibl {
 public:
-    ExtAttBibl() = default;
-    virtual ~ExtAttBibl() = default;
+    InstBibl() = default;
+    virtual ~InstBibl() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -645,17 +645,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCalendared
+// InstCalendared
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCalendared
  */
 
-class ExtAttCalendared : public AttCalendared {
+class InstCalendared : public AttCalendared {
 public:
-    ExtAttCalendared() = default;
-    virtual ~ExtAttCalendared() = default;
+    InstCalendared() = default;
+    virtual ~InstCalendared() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -698,17 +698,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCanonical
+// InstCanonical
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCanonical
  */
 
-class ExtAttCanonical : public AttCanonical {
+class InstCanonical : public AttCanonical {
 public:
-    ExtAttCanonical() = default;
-    virtual ~ExtAttCanonical() = default;
+    InstCanonical() = default;
+    virtual ~InstCanonical() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -750,17 +750,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttClassed
+// InstClassed
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttClassed
  */
 
-class ExtAttClassed : public AttClassed {
+class InstClassed : public AttClassed {
 public:
-    ExtAttClassed() = default;
-    virtual ~ExtAttClassed() = default;
+    InstClassed() = default;
+    virtual ~InstClassed() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -802,17 +802,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttClefLog
+// InstClefLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttClefLog
  */
 
-class ExtAttClefLog : public AttClefLog {
+class InstClefLog : public AttClefLog {
 public:
-    ExtAttClefLog() = default;
-    virtual ~ExtAttClefLog() = default;
+    InstClefLog() = default;
+    virtual ~InstClefLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -851,17 +851,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttClefShape
+// InstClefShape
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttClefShape
  */
 
-class ExtAttClefShape : public AttClefShape {
+class InstClefShape : public AttClefShape {
 public:
-    ExtAttClefShape() = default;
-    virtual ~ExtAttClefShape() = default;
+    InstClefShape() = default;
+    virtual ~InstClefShape() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -922,17 +922,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCleffingLog
+// InstCleffingLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCleffingLog
  */
 
-class ExtAttCleffingLog : public AttCleffingLog {
+class InstCleffingLog : public AttCleffingLog {
 public:
-    ExtAttCleffingLog() = default;
-    virtual ~ExtAttCleffingLog() = default;
+    InstCleffingLog() = default;
+    virtual ~InstCleffingLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -974,17 +974,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttColor
+// InstColor
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttColor
  */
 
-class ExtAttColor : public AttColor {
+class InstColor : public AttColor {
 public:
-    ExtAttColor() = default;
-    virtual ~ExtAttColor() = default;
+    InstColor() = default;
+    virtual ~InstColor() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1030,17 +1030,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttColoration
+// InstColoration
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttColoration
  */
 
-class ExtAttColoration : public AttColoration {
+class InstColoration : public AttColoration {
 public:
-    ExtAttColoration() = default;
-    virtual ~ExtAttColoration() = default;
+    InstColoration() = default;
+    virtual ~InstColoration() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1079,17 +1079,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCoordX1
+// InstCoordX1
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCoordX1
  */
 
-class ExtAttCoordX1 : public AttCoordX1 {
+class InstCoordX1 : public AttCoordX1 {
 public:
-    ExtAttCoordX1() = default;
-    virtual ~ExtAttCoordX1() = default;
+    InstCoordX1() = default;
+    virtual ~InstCoordX1() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1128,17 +1128,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCoordX2
+// InstCoordX2
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCoordX2
  */
 
-class ExtAttCoordX2 : public AttCoordX2 {
+class InstCoordX2 : public AttCoordX2 {
 public:
-    ExtAttCoordX2() = default;
-    virtual ~ExtAttCoordX2() = default;
+    InstCoordX2() = default;
+    virtual ~InstCoordX2() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1177,17 +1177,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCoordY1
+// InstCoordY1
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCoordY1
  */
 
-class ExtAttCoordY1 : public AttCoordY1 {
+class InstCoordY1 : public AttCoordY1 {
 public:
-    ExtAttCoordY1() = default;
-    virtual ~ExtAttCoordY1() = default;
+    InstCoordY1() = default;
+    virtual ~InstCoordY1() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1255,17 +1255,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCoordinated
+// InstCoordinated
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCoordinated
  */
 
-class ExtAttCoordinated : public AttCoordinated {
+class InstCoordinated : public AttCoordinated {
 public:
-    ExtAttCoordinated() = default;
-    virtual ~ExtAttCoordinated() = default;
+    InstCoordinated() = default;
+    virtual ~InstCoordinated() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1304,17 +1304,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCue
+// InstCue
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCue
  */
 
-class ExtAttCue : public AttCue {
+class InstCue : public AttCue {
 public:
-    ExtAttCue() = default;
-    virtual ~ExtAttCue() = default;
+    InstCue() = default;
+    virtual ~InstCue() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1377,17 +1377,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCurvature
+// InstCurvature
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCurvature
  */
 
-class ExtAttCurvature : public AttCurvature {
+class InstCurvature : public AttCurvature {
 public:
-    ExtAttCurvature() = default;
-    virtual ~ExtAttCurvature() = default;
+    InstCurvature() = default;
+    virtual ~InstCurvature() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1434,17 +1434,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCurveRend
+// InstCurveRend
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCurveRend
  */
 
-class ExtAttCurveRend : public AttCurveRend {
+class InstCurveRend : public AttCurveRend {
 public:
-    ExtAttCurveRend() = default;
-    virtual ~ExtAttCurveRend() = default;
+    InstCurveRend() = default;
+    virtual ~InstCurveRend() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1483,17 +1483,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCustosLog
+// InstCustosLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCustosLog
  */
 
-class ExtAttCustosLog : public AttCustosLog {
+class InstCustosLog : public AttCustosLog {
 public:
-    ExtAttCustosLog() = default;
-    virtual ~ExtAttCustosLog() = default;
+    InstCustosLog() = default;
+    virtual ~InstCustosLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1532,17 +1532,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDataPointing
+// InstDataPointing
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDataPointing
  */
 
-class ExtAttDataPointing : public AttDataPointing {
+class InstDataPointing : public AttDataPointing {
 public:
-    ExtAttDataPointing() = default;
-    virtual ~ExtAttDataPointing() = default;
+    InstDataPointing() = default;
+    virtual ~InstDataPointing() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1605,17 +1605,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDatable
+// InstDatable
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDatable
  */
 
-class ExtAttDatable : public AttDatable {
+class InstDatable : public AttDatable {
 public:
-    ExtAttDatable() = default;
-    virtual ~ExtAttDatable() = default;
+    InstDatable() = default;
+    virtual ~InstDatable() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1681,17 +1681,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDistances
+// InstDistances
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDistances
  */
 
-class ExtAttDistances : public AttDistances {
+class InstDistances : public AttDistances {
 public:
-    ExtAttDistances() = default;
-    virtual ~ExtAttDistances() = default;
+    InstDistances() = default;
+    virtual ~InstDistances() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1730,17 +1730,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDotLog
+// InstDotLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDotLog
  */
 
-class ExtAttDotLog : public AttDotLog {
+class InstDotLog : public AttDotLog {
 public:
-    ExtAttDotLog() = default;
-    virtual ~ExtAttDotLog() = default;
+    InstDotLog() = default;
+    virtual ~InstDotLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1782,17 +1782,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDurationAdditive
+// InstDurationAdditive
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDurationAdditive
  */
 
-class ExtAttDurationAdditive : public AttDurationAdditive {
+class InstDurationAdditive : public AttDurationAdditive {
 public:
-    ExtAttDurationAdditive() = default;
-    virtual ~ExtAttDurationAdditive() = default;
+    InstDurationAdditive() = default;
+    virtual ~InstDurationAdditive() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1853,17 +1853,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDurationDefault
+// InstDurationDefault
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDurationDefault
  */
 
-class ExtAttDurationDefault : public AttDurationDefault {
+class InstDurationDefault : public AttDurationDefault {
 public:
-    ExtAttDurationDefault() = default;
-    virtual ~ExtAttDurationDefault() = default;
+    InstDurationDefault() = default;
+    virtual ~InstDurationDefault() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1905,17 +1905,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDurationLog
+// InstDurationLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDurationLog
  */
 
-class ExtAttDurationLog : public AttDurationLog {
+class InstDurationLog : public AttDurationLog {
 public:
-    ExtAttDurationLog() = default;
-    virtual ~ExtAttDurationLog() = default;
+    InstDurationLog() = default;
+    virtual ~InstDurationLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1963,17 +1963,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDurationRatio
+// InstDurationRatio
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDurationRatio
  */
 
-class ExtAttDurationRatio : public AttDurationRatio {
+class InstDurationRatio : public AttDurationRatio {
 public:
-    ExtAttDurationRatio() = default;
-    virtual ~ExtAttDurationRatio() = default;
+    InstDurationRatio() = default;
+    virtual ~InstDurationRatio() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2017,17 +2017,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttEnclosingChars
+// InstEnclosingChars
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttEnclosingChars
  */
 
-class ExtAttEnclosingChars : public AttEnclosingChars {
+class InstEnclosingChars : public AttEnclosingChars {
 public:
-    ExtAttEnclosingChars() = default;
-    virtual ~ExtAttEnclosingChars() = default;
+    InstEnclosingChars() = default;
+    virtual ~InstEnclosingChars() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2066,17 +2066,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttEndings
+// InstEndings
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttEndings
  */
 
-class ExtAttEndings : public AttEndings {
+class InstEndings : public AttEndings {
 public:
-    ExtAttEndings() = default;
-    virtual ~ExtAttEndings() = default;
+    InstEndings() = default;
+    virtual ~InstEndings() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2124,17 +2124,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttEvidence
+// InstEvidence
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttEvidence
  */
 
-class ExtAttEvidence : public AttEvidence {
+class InstEvidence : public AttEvidence {
 public:
-    ExtAttEvidence() = default;
-    virtual ~ExtAttEvidence() = default;
+    InstEvidence() = default;
+    virtual ~InstEvidence() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2173,17 +2173,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttExtender
+// InstExtender
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttExtender
  */
 
-class ExtAttExtender : public AttExtender {
+class InstExtender : public AttExtender {
 public:
-    ExtAttExtender() = default;
-    virtual ~ExtAttExtender() = default;
+    InstExtender() = default;
+    virtual ~InstExtender() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2226,17 +2226,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttExtent
+// InstExtent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttExtent
  */
 
-class ExtAttExtent : public AttExtent {
+class InstExtent : public AttExtent {
 public:
-    ExtAttExtent() = default;
-    virtual ~ExtAttExtent() = default;
+    InstExtent() = default;
+    virtual ~InstExtent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2279,17 +2279,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFermataPresent
+// InstFermataPresent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFermataPresent
  */
 
-class ExtAttFermataPresent : public AttFermataPresent {
+class InstFermataPresent : public AttFermataPresent {
 public:
-    ExtAttFermataPresent() = default;
-    virtual ~ExtAttFermataPresent() = default;
+    InstFermataPresent() = default;
+    virtual ~InstFermataPresent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2331,17 +2331,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFiling
+// InstFiling
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFiling
  */
 
-class ExtAttFiling : public AttFiling {
+class InstFiling : public AttFiling {
 public:
-    ExtAttFiling() = default;
-    virtual ~ExtAttFiling() = default;
+    InstFiling() = default;
+    virtual ~InstFiling() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2380,17 +2380,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttGrpSymLog
+// InstGrpSymLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttGrpSymLog
  */
 
-class ExtAttGrpSymLog : public AttGrpSymLog {
+class InstGrpSymLog : public AttGrpSymLog {
 public:
-    ExtAttGrpSymLog() = default;
-    virtual ~ExtAttGrpSymLog() = default;
+    InstGrpSymLog() = default;
+    virtual ~InstGrpSymLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2432,17 +2432,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHandIdent
+// InstHandIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHandIdent
  */
 
-class ExtAttHandIdent : public AttHandIdent {
+class InstHandIdent : public AttHandIdent {
 public:
-    ExtAttHandIdent() = default;
-    virtual ~ExtAttHandIdent() = default;
+    InstHandIdent() = default;
+    virtual ~InstHandIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2481,17 +2481,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHeight
+// InstHeight
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHeight
  */
 
-class ExtAttHeight : public AttHeight {
+class InstHeight : public AttHeight {
 public:
-    ExtAttHeight() = default;
-    virtual ~ExtAttHeight() = default;
+    InstHeight() = default;
+    virtual ~InstHeight() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2530,17 +2530,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHorizontalAlign
+// InstHorizontalAlign
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHorizontalAlign
  */
 
-class ExtAttHorizontalAlign : public AttHorizontalAlign {
+class InstHorizontalAlign : public AttHorizontalAlign {
 public:
-    ExtAttHorizontalAlign() = default;
-    virtual ~ExtAttHorizontalAlign() = default;
+    InstHorizontalAlign() = default;
+    virtual ~InstHorizontalAlign() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2583,17 +2583,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttInternetMedia
+// InstInternetMedia
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttInternetMedia
  */
 
-class ExtAttInternetMedia : public AttInternetMedia {
+class InstInternetMedia : public AttInternetMedia {
 public:
-    ExtAttInternetMedia() = default;
-    virtual ~ExtAttInternetMedia() = default;
+    InstInternetMedia() = default;
+    virtual ~InstInternetMedia() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2639,17 +2639,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttJoined
+// InstJoined
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttJoined
  */
 
-class ExtAttJoined : public AttJoined {
+class InstJoined : public AttJoined {
 public:
-    ExtAttJoined() = default;
-    virtual ~ExtAttJoined() = default;
+    InstJoined() = default;
+    virtual ~InstJoined() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2688,17 +2688,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttKeySigLog
+// InstKeySigLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttKeySigLog
  */
 
-class ExtAttKeySigLog : public AttKeySigLog {
+class InstKeySigLog : public AttKeySigLog {
 public:
-    ExtAttKeySigLog() = default;
-    virtual ~ExtAttKeySigLog() = default;
+    InstKeySigLog() = default;
+    virtual ~InstKeySigLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2737,17 +2737,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttKeySigDefaultLog
+// InstKeySigDefaultLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttKeySigDefaultLog
  */
 
-class ExtAttKeySigDefaultLog : public AttKeySigDefaultLog {
+class InstKeySigDefaultLog : public AttKeySigDefaultLog {
 public:
-    ExtAttKeySigDefaultLog() = default;
-    virtual ~ExtAttKeySigDefaultLog() = default;
+    InstKeySigDefaultLog() = default;
+    virtual ~InstKeySigDefaultLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2790,17 +2790,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLabelled
+// InstLabelled
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLabelled
  */
 
-class ExtAttLabelled : public AttLabelled {
+class InstLabelled : public AttLabelled {
 public:
-    ExtAttLabelled() = default;
-    virtual ~ExtAttLabelled() = default;
+    InstLabelled() = default;
+    virtual ~InstLabelled() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2845,17 +2845,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLang
+// InstLang
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLang
  */
 
-class ExtAttLang : public AttLang {
+class InstLang : public AttLang {
 public:
-    ExtAttLang() = default;
-    virtual ~ExtAttLang() = default;
+    InstLang() = default;
+    virtual ~InstLang() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2894,17 +2894,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLayerLog
+// InstLayerLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLayerLog
  */
 
-class ExtAttLayerLog : public AttLayerLog {
+class InstLayerLog : public AttLayerLog {
 public:
-    ExtAttLayerLog() = default;
-    virtual ~ExtAttLayerLog() = default;
+    InstLayerLog() = default;
+    virtual ~InstLayerLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2943,17 +2943,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLayerIdent
+// InstLayerIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLayerIdent
  */
 
-class ExtAttLayerIdent : public AttLayerIdent {
+class InstLayerIdent : public AttLayerIdent {
 public:
-    ExtAttLayerIdent() = default;
-    virtual ~ExtAttLayerIdent() = default;
+    InstLayerIdent() = default;
+    virtual ~InstLayerIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2996,17 +2996,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLineLoc
+// InstLineLoc
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLineLoc
  */
 
-class ExtAttLineLoc : public AttLineLoc {
+class InstLineLoc : public AttLineLoc {
 public:
-    ExtAttLineLoc() = default;
-    virtual ~ExtAttLineLoc() = default;
+    InstLineLoc() = default;
+    virtual ~InstLineLoc() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3063,17 +3063,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLineRend
+// InstLineRend
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLineRend
  */
 
-class ExtAttLineRend : public AttLineRend {
+class InstLineRend : public AttLineRend {
 public:
-    ExtAttLineRend() = default;
-    virtual ~ExtAttLineRend() = default;
+    InstLineRend() = default;
+    virtual ~InstLineRend() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3132,17 +3132,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLineRendBase
+// InstLineRendBase
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLineRendBase
  */
 
-class ExtAttLineRendBase : public AttLineRendBase {
+class InstLineRendBase : public AttLineRendBase {
 public:
-    ExtAttLineRendBase() = default;
-    virtual ~ExtAttLineRendBase() = default;
+    InstLineRendBase() = default;
+    virtual ~InstLineRendBase() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3235,17 +3235,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLinking
+// InstLinking
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLinking
  */
 
-class ExtAttLinking : public AttLinking {
+class InstLinking : public AttLinking {
 public:
-    ExtAttLinking() = default;
-    virtual ~ExtAttLinking() = default;
+    InstLinking() = default;
+    virtual ~InstLinking() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3316,17 +3316,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLyricStyle
+// InstLyricStyle
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLyricStyle
  */
 
-class ExtAttLyricStyle : public AttLyricStyle {
+class InstLyricStyle : public AttLyricStyle {
 public:
-    ExtAttLyricStyle() = default;
-    virtual ~ExtAttLyricStyle() = default;
+    InstLyricStyle() = default;
+    virtual ~InstLyricStyle() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3365,17 +3365,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeasureNumbers
+// InstMeasureNumbers
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeasureNumbers
  */
 
-class ExtAttMeasureNumbers : public AttMeasureNumbers {
+class InstMeasureNumbers : public AttMeasureNumbers {
 public:
-    ExtAttMeasureNumbers() = default;
-    virtual ~ExtAttMeasureNumbers() = default;
+    InstMeasureNumbers() = default;
+    virtual ~InstMeasureNumbers() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3414,17 +3414,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeasurement
+// InstMeasurement
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeasurement
  */
 
-class ExtAttMeasurement : public AttMeasurement {
+class InstMeasurement : public AttMeasurement {
 public:
-    ExtAttMeasurement() = default;
-    virtual ~ExtAttMeasurement() = default;
+    InstMeasurement() = default;
+    virtual ~InstMeasurement() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3488,17 +3488,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMediaBounds
+// InstMediaBounds
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMediaBounds
  */
 
-class ExtAttMediaBounds : public AttMediaBounds {
+class InstMediaBounds : public AttMediaBounds {
 public:
-    ExtAttMediaBounds() = default;
-    virtual ~ExtAttMediaBounds() = default;
+    InstMediaBounds() = default;
+    virtual ~InstMediaBounds() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3537,17 +3537,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMedium
+// InstMedium
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMedium
  */
 
-class ExtAttMedium : public AttMedium {
+class InstMedium : public AttMedium {
 public:
-    ExtAttMedium() = default;
-    virtual ~ExtAttMedium() = default;
+    InstMedium() = default;
+    virtual ~InstMedium() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3586,17 +3586,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeiVersion
+// InstMeiVersion
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeiVersion
  */
 
-class ExtAttMeiVersion : public AttMeiVersion {
+class InstMeiVersion : public AttMeiVersion {
 public:
-    ExtAttMeiVersion() = default;
-    virtual ~ExtAttMeiVersion() = default;
+    InstMeiVersion() = default;
+    virtual ~InstMeiVersion() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3639,17 +3639,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMetadataPointing
+// InstMetadataPointing
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMetadataPointing
  */
 
-class ExtAttMetadataPointing : public AttMetadataPointing {
+class InstMetadataPointing : public AttMetadataPointing {
 public:
-    ExtAttMetadataPointing() = default;
-    virtual ~ExtAttMetadataPointing() = default;
+    InstMetadataPointing() = default;
+    virtual ~InstMetadataPointing() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3691,17 +3691,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeterConformance
+// InstMeterConformance
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeterConformance
  */
 
-class ExtAttMeterConformance : public AttMeterConformance {
+class InstMeterConformance : public AttMeterConformance {
 public:
-    ExtAttMeterConformance() = default;
-    virtual ~ExtAttMeterConformance() = default;
+    InstMeterConformance() = default;
+    virtual ~InstMeterConformance() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3755,17 +3755,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeterConformanceBar
+// InstMeterConformanceBar
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeterConformanceBar
  */
 
-class ExtAttMeterConformanceBar : public AttMeterConformanceBar {
+class InstMeterConformanceBar : public AttMeterConformanceBar {
 public:
-    ExtAttMeterConformanceBar() = default;
-    virtual ~ExtAttMeterConformanceBar() = default;
+    InstMeterConformanceBar() = default;
+    virtual ~InstMeterConformanceBar() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3819,17 +3819,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeterSigLog
+// InstMeterSigLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeterSigLog
  */
 
-class ExtAttMeterSigLog : public AttMeterSigLog {
+class InstMeterSigLog : public AttMeterSigLog {
 public:
-    ExtAttMeterSigLog() = default;
-    virtual ~ExtAttMeterSigLog() = default;
+    InstMeterSigLog() = default;
+    virtual ~InstMeterSigLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3891,17 +3891,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeterSigDefaultLog
+// InstMeterSigDefaultLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeterSigDefaultLog
  */
 
-class ExtAttMeterSigDefaultLog : public AttMeterSigDefaultLog {
+class InstMeterSigDefaultLog : public AttMeterSigDefaultLog {
 public:
-    ExtAttMeterSigDefaultLog() = default;
-    virtual ~ExtAttMeterSigDefaultLog() = default;
+    InstMeterSigDefaultLog() = default;
+    virtual ~InstMeterSigDefaultLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -3958,17 +3958,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMmTempo
+// InstMmTempo
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMmTempo
  */
 
-class ExtAttMmTempo : public AttMmTempo {
+class InstMmTempo : public AttMmTempo {
 public:
-    ExtAttMmTempo() = default;
-    virtual ~ExtAttMmTempo() = default;
+    InstMmTempo() = default;
+    virtual ~InstMmTempo() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4010,17 +4010,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMultinumMeasures
+// InstMultinumMeasures
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMultinumMeasures
  */
 
-class ExtAttMultinumMeasures : public AttMultinumMeasures {
+class InstMultinumMeasures : public AttMultinumMeasures {
 public:
-    ExtAttMultinumMeasures() = default;
-    virtual ~ExtAttMultinumMeasures() = default;
+    InstMultinumMeasures() = default;
+    virtual ~InstMultinumMeasures() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4063,17 +4063,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNInteger
+// InstNInteger
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNInteger
  */
 
-class ExtAttNInteger : public AttNInteger {
+class InstNInteger : public AttNInteger {
 public:
-    ExtAttNInteger() = default;
-    virtual ~ExtAttNInteger() = default;
+    InstNInteger() = default;
+    virtual ~InstNInteger() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4116,17 +4116,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNNumberLike
+// InstNNumberLike
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNNumberLike
  */
 
-class ExtAttNNumberLike : public AttNNumberLike {
+class InstNNumberLike : public AttNNumberLike {
 public:
-    ExtAttNNumberLike() = default;
-    virtual ~ExtAttNNumberLike() = default;
+    InstNNumberLike() = default;
+    virtual ~InstNNumberLike() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4177,17 +4177,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttName
+// InstName
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttName
  */
 
-class ExtAttName : public AttName {
+class InstName : public AttName {
 public:
-    ExtAttName() = default;
-    virtual ~ExtAttName() = default;
+    InstName() = default;
+    virtual ~InstName() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4234,17 +4234,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNotationStyle
+// InstNotationStyle
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNotationStyle
  */
 
-class ExtAttNotationStyle : public AttNotationStyle {
+class InstNotationStyle : public AttNotationStyle {
 public:
-    ExtAttNotationStyle() = default;
-    virtual ~ExtAttNotationStyle() = default;
+    InstNotationStyle() = default;
+    virtual ~InstNotationStyle() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4345,17 +4345,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNoteHeads
+// InstNoteHeads
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNoteHeads
  */
 
-class ExtAttNoteHeads : public AttNoteHeads {
+class InstNoteHeads : public AttNoteHeads {
 public:
-    ExtAttNoteHeads() = default;
-    virtual ~ExtAttNoteHeads() = default;
+    InstNoteHeads() = default;
+    virtual ~InstNoteHeads() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4394,17 +4394,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOctave
+// InstOctave
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOctave
  */
 
-class ExtAttOctave : public AttOctave {
+class InstOctave : public AttOctave {
 public:
-    ExtAttOctave() = default;
-    virtual ~ExtAttOctave() = default;
+    InstOctave() = default;
+    virtual ~InstOctave() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4447,17 +4447,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOctaveDefault
+// InstOctaveDefault
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOctaveDefault
  */
 
-class ExtAttOctaveDefault : public AttOctaveDefault {
+class InstOctaveDefault : public AttOctaveDefault {
 public:
-    ExtAttOctaveDefault() = default;
-    virtual ~ExtAttOctaveDefault() = default;
+    InstOctaveDefault() = default;
+    virtual ~InstOctaveDefault() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4502,17 +4502,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOctaveDisplacement
+// InstOctaveDisplacement
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOctaveDisplacement
  */
 
-class ExtAttOctaveDisplacement : public AttOctaveDisplacement {
+class InstOctaveDisplacement : public AttOctaveDisplacement {
 public:
-    ExtAttOctaveDisplacement() = default;
-    virtual ~ExtAttOctaveDisplacement() = default;
+    InstOctaveDisplacement() = default;
+    virtual ~InstOctaveDisplacement() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4555,17 +4555,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOneLineStaff
+// InstOneLineStaff
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOneLineStaff
  */
 
-class ExtAttOneLineStaff : public AttOneLineStaff {
+class InstOneLineStaff : public AttOneLineStaff {
 public:
-    ExtAttOneLineStaff() = default;
-    virtual ~ExtAttOneLineStaff() = default;
+    InstOneLineStaff() = default;
+    virtual ~InstOneLineStaff() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4607,17 +4607,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOptimization
+// InstOptimization
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOptimization
  */
 
-class ExtAttOptimization : public AttOptimization {
+class InstOptimization : public AttOptimization {
 public:
-    ExtAttOptimization() = default;
-    virtual ~ExtAttOptimization() = default;
+    InstOptimization() = default;
+    virtual ~InstOptimization() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4656,17 +4656,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOriginLayerIdent
+// InstOriginLayerIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOriginLayerIdent
  */
 
-class ExtAttOriginLayerIdent : public AttOriginLayerIdent {
+class InstOriginLayerIdent : public AttOriginLayerIdent {
 public:
-    ExtAttOriginLayerIdent() = default;
-    virtual ~ExtAttOriginLayerIdent() = default;
+    InstOriginLayerIdent() = default;
+    virtual ~InstOriginLayerIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4708,17 +4708,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOriginStaffIdent
+// InstOriginStaffIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOriginStaffIdent
  */
 
-class ExtAttOriginStaffIdent : public AttOriginStaffIdent {
+class InstOriginStaffIdent : public AttOriginStaffIdent {
 public:
-    ExtAttOriginStaffIdent() = default;
-    virtual ~ExtAttOriginStaffIdent() = default;
+    InstOriginStaffIdent() = default;
+    virtual ~InstOriginStaffIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4763,17 +4763,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOriginStartEndId
+// InstOriginStartEndId
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOriginStartEndId
  */
 
-class ExtAttOriginStartEndId : public AttOriginStartEndId {
+class InstOriginStartEndId : public AttOriginStartEndId {
 public:
-    ExtAttOriginStartEndId() = default;
-    virtual ~ExtAttOriginStartEndId() = default;
+    InstOriginStartEndId() = default;
+    virtual ~InstOriginStartEndId() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4825,17 +4825,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOriginTimestampLog
+// InstOriginTimestampLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOriginTimestampLog
  */
 
-class ExtAttOriginTimestampLog : public AttOriginTimestampLog {
+class InstOriginTimestampLog : public AttOriginTimestampLog {
 public:
-    ExtAttOriginTimestampLog() = default;
-    virtual ~ExtAttOriginTimestampLog() = default;
+    InstOriginTimestampLog() = default;
+    virtual ~InstOriginTimestampLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4922,17 +4922,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPages
+// InstPages
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPages
  */
 
-class ExtAttPages : public AttPages {
+class InstPages : public AttPages {
 public:
-    ExtAttPages() = default;
-    virtual ~ExtAttPages() = default;
+    InstPages() = default;
+    virtual ~InstPages() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -4983,17 +4983,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPartIdent
+// InstPartIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPartIdent
  */
 
-class ExtAttPartIdent : public AttPartIdent {
+class InstPartIdent : public AttPartIdent {
 public:
-    ExtAttPartIdent() = default;
-    virtual ~ExtAttPartIdent() = default;
+    InstPartIdent() = default;
+    virtual ~InstPartIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5032,17 +5032,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPitch
+// InstPitch
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPitch
  */
 
-class ExtAttPitch : public AttPitch {
+class InstPitch : public AttPitch {
 public:
-    ExtAttPitch() = default;
-    virtual ~ExtAttPitch() = default;
+    InstPitch() = default;
+    virtual ~InstPitch() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5084,17 +5084,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPlacementOnStaff
+// InstPlacementOnStaff
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPlacementOnStaff
  */
 
-class ExtAttPlacementOnStaff : public AttPlacementOnStaff {
+class InstPlacementOnStaff : public AttPlacementOnStaff {
 public:
-    ExtAttPlacementOnStaff() = default;
-    virtual ~ExtAttPlacementOnStaff() = default;
+    InstPlacementOnStaff() = default;
+    virtual ~InstPlacementOnStaff() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5133,17 +5133,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPlacementRelEvent
+// InstPlacementRelEvent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPlacementRelEvent
  */
 
-class ExtAttPlacementRelEvent : public AttPlacementRelEvent {
+class InstPlacementRelEvent : public AttPlacementRelEvent {
 public:
-    ExtAttPlacementRelEvent() = default;
-    virtual ~ExtAttPlacementRelEvent() = default;
+    InstPlacementRelEvent() = default;
+    virtual ~InstPlacementRelEvent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5182,17 +5182,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPlacementRelStaff
+// InstPlacementRelStaff
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPlacementRelStaff
  */
 
-class ExtAttPlacementRelStaff : public AttPlacementRelStaff {
+class InstPlacementRelStaff : public AttPlacementRelStaff {
 public:
-    ExtAttPlacementRelStaff() = default;
-    virtual ~ExtAttPlacementRelStaff() = default;
+    InstPlacementRelStaff() = default;
+    virtual ~InstPlacementRelStaff() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5237,17 +5237,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPlist
+// InstPlist
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPlist
  */
 
-class ExtAttPlist : public AttPlist {
+class InstPlist : public AttPlist {
 public:
-    ExtAttPlist() = default;
-    virtual ~ExtAttPlist() = default;
+    InstPlist() = default;
+    virtual ~InstPlist() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5316,17 +5316,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPointing
+// InstPointing
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPointing
  */
 
-class ExtAttPointing : public AttPointing {
+class InstPointing : public AttPointing {
 public:
-    ExtAttPointing() = default;
-    virtual ~ExtAttPointing() = default;
+    InstPointing() = default;
+    virtual ~InstPointing() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5368,17 +5368,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttQuantity
+// InstQuantity
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttQuantity
  */
 
-class ExtAttQuantity : public AttQuantity {
+class InstQuantity : public AttQuantity {
 public:
-    ExtAttQuantity() = default;
-    virtual ~ExtAttQuantity() = default;
+    InstQuantity() = default;
+    virtual ~InstQuantity() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5451,17 +5451,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttRanging
+// InstRanging
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttRanging
  */
 
-class ExtAttRanging : public AttRanging {
+class InstRanging : public AttRanging {
 public:
-    ExtAttRanging() = default;
-    virtual ~ExtAttRanging() = default;
+    InstRanging() = default;
+    virtual ~InstRanging() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5504,17 +5504,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttResponsibility
+// InstResponsibility
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttResponsibility
  */
 
-class ExtAttResponsibility : public AttResponsibility {
+class InstResponsibility : public AttResponsibility {
 public:
-    ExtAttResponsibility() = default;
-    virtual ~ExtAttResponsibility() = default;
+    InstResponsibility() = default;
+    virtual ~InstResponsibility() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5556,17 +5556,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttRestdurationLog
+// InstRestdurationLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttRestdurationLog
  */
 
-class ExtAttRestdurationLog : public AttRestdurationLog {
+class InstRestdurationLog : public AttRestdurationLog {
 public:
-    ExtAttRestdurationLog() = default;
-    virtual ~ExtAttRestdurationLog() = default;
+    InstRestdurationLog() = default;
+    virtual ~InstRestdurationLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5605,17 +5605,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttScalable
+// InstScalable
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttScalable
  */
 
-class ExtAttScalable : public AttScalable {
+class InstScalable : public AttScalable {
 public:
-    ExtAttScalable() = default;
-    virtual ~ExtAttScalable() = default;
+    InstScalable() = default;
+    virtual ~InstScalable() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5657,17 +5657,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSequence
+// InstSequence
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSequence
  */
 
-class ExtAttSequence : public AttSequence {
+class InstSequence : public AttSequence {
 public:
-    ExtAttSequence() = default;
-    virtual ~ExtAttSequence() = default;
+    InstSequence() = default;
+    virtual ~InstSequence() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5706,17 +5706,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSlashCount
+// InstSlashCount
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSlashCount
  */
 
-class ExtAttSlashCount : public AttSlashCount {
+class InstSlashCount : public AttSlashCount {
 public:
-    ExtAttSlashCount() = default;
-    virtual ~ExtAttSlashCount() = default;
+    InstSlashCount() = default;
+    virtual ~InstSlashCount() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5759,17 +5759,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSlurPresent
+// InstSlurPresent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSlurPresent
  */
 
-class ExtAttSlurPresent : public AttSlurPresent {
+class InstSlurPresent : public AttSlurPresent {
 public:
-    ExtAttSlurPresent() = default;
-    virtual ~ExtAttSlurPresent() = default;
+    InstSlurPresent() = default;
+    virtual ~InstSlurPresent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5813,17 +5813,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSource
+// InstSource
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSource
  */
 
-class ExtAttSource : public AttSource {
+class InstSource : public AttSource {
 public:
-    ExtAttSource() = default;
-    virtual ~ExtAttSource() = default;
+    InstSource() = default;
+    virtual ~InstSource() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5889,17 +5889,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSpacing
+// InstSpacing
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSpacing
  */
 
-class ExtAttSpacing : public AttSpacing {
+class InstSpacing : public AttSpacing {
 public:
-    ExtAttSpacing() = default;
-    virtual ~ExtAttSpacing() = default;
+    InstSpacing() = default;
+    virtual ~InstSpacing() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5938,17 +5938,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffLog
+// InstStaffLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffLog
  */
 
-class ExtAttStaffLog : public AttStaffLog {
+class InstStaffLog : public AttStaffLog {
 public:
-    ExtAttStaffLog() = default;
-    virtual ~ExtAttStaffLog() = default;
+    InstStaffLog() = default;
+    virtual ~InstStaffLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -5987,17 +5987,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffDefLog
+// InstStaffDefLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffDefLog
  */
 
-class ExtAttStaffDefLog : public AttStaffDefLog {
+class InstStaffDefLog : public AttStaffDefLog {
 public:
-    ExtAttStaffDefLog() = default;
-    virtual ~ExtAttStaffDefLog() = default;
+    InstStaffDefLog() = default;
+    virtual ~InstStaffDefLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6036,17 +6036,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffGroupingSym
+// InstStaffGroupingSym
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffGroupingSym
  */
 
-class ExtAttStaffGroupingSym : public AttStaffGroupingSym {
+class InstStaffGroupingSym : public AttStaffGroupingSym {
 public:
-    ExtAttStaffGroupingSym() = default;
-    virtual ~ExtAttStaffGroupingSym() = default;
+    InstStaffGroupingSym() = default;
+    virtual ~InstStaffGroupingSym() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6089,17 +6089,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffIdent
+// InstStaffIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffIdent
  */
 
-class ExtAttStaffIdent : public AttStaffIdent {
+class InstStaffIdent : public AttStaffIdent {
 public:
-    ExtAttStaffIdent() = default;
-    virtual ~ExtAttStaffIdent() = default;
+    InstStaffIdent() = default;
+    virtual ~InstStaffIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6156,17 +6156,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffItems
+// InstStaffItems
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffItems
  */
 
-class ExtAttStaffItems : public AttStaffItems {
+class InstStaffItems : public AttStaffItems {
 public:
-    ExtAttStaffItems() = default;
-    virtual ~ExtAttStaffItems() = default;
+    InstStaffItems() = default;
+    virtual ~InstStaffItems() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6205,17 +6205,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffLoc
+// InstStaffLoc
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffLoc
  */
 
-class ExtAttStaffLoc : public AttStaffLoc {
+class InstStaffLoc : public AttStaffLoc {
 public:
-    ExtAttStaffLoc() = default;
-    virtual ~ExtAttStaffLoc() = default;
+    InstStaffLoc() = default;
+    virtual ~InstStaffLoc() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6260,17 +6260,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffLocPitched
+// InstStaffLocPitched
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffLocPitched
  */
 
-class ExtAttStaffLocPitched : public AttStaffLocPitched {
+class InstStaffLocPitched : public AttStaffLocPitched {
 public:
-    ExtAttStaffLocPitched() = default;
-    virtual ~ExtAttStaffLocPitched() = default;
+    InstStaffLocPitched() = default;
+    virtual ~InstStaffLocPitched() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6312,17 +6312,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStartEndId
+// InstStartEndId
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStartEndId
  */
 
-class ExtAttStartEndId : public AttStartEndId {
+class InstStartEndId : public AttStartEndId {
 public:
-    ExtAttStartEndId() = default;
-    virtual ~ExtAttStartEndId() = default;
+    InstStartEndId() = default;
+    virtual ~InstStartEndId() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6364,17 +6364,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStartId
+// InstStartId
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStartId
  */
 
-class ExtAttStartId : public AttStartId {
+class InstStartId : public AttStartId {
 public:
-    ExtAttStartId() = default;
-    virtual ~ExtAttStartId() = default;
+    InstStartId() = default;
+    virtual ~InstStartId() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6462,17 +6462,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStems
+// InstStems
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStems
  */
 
-class ExtAttStems : public AttStems {
+class InstStems : public AttStems {
 public:
-    ExtAttStems() = default;
-    virtual ~ExtAttStems() = default;
+    InstStems() = default;
+    virtual ~InstStems() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6520,17 +6520,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSylLog
+// InstSylLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSylLog
  */
 
-class ExtAttSylLog : public AttSylLog {
+class InstSylLog : public AttSylLog {
 public:
-    ExtAttSylLog() = default;
-    virtual ~ExtAttSylLog() = default;
+    InstSylLog() = default;
+    virtual ~InstSylLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6569,17 +6569,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSylText
+// InstSylText
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSylText
  */
 
-class ExtAttSylText : public AttSylText {
+class InstSylText : public AttSylText {
 public:
-    ExtAttSylText() = default;
-    virtual ~ExtAttSylText() = default;
+    InstSylText() = default;
+    virtual ~InstSylText() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6649,17 +6649,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSystems
+// InstSystems
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSystems
  */
 
-class ExtAttSystems : public AttSystems {
+class InstSystems : public AttSystems {
 public:
-    ExtAttSystems() = default;
-    virtual ~ExtAttSystems() = default;
+    InstSystems() = default;
+    virtual ~InstSystems() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6701,17 +6701,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTargetEval
+// InstTargetEval
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTargetEval
  */
 
-class ExtAttTargetEval : public AttTargetEval {
+class InstTargetEval : public AttTargetEval {
 public:
-    ExtAttTargetEval() = default;
-    virtual ~ExtAttTargetEval() = default;
+    InstTargetEval() = default;
+    virtual ~InstTargetEval() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6750,17 +6750,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTempoLog
+// InstTempoLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTempoLog
  */
 
-class ExtAttTempoLog : public AttTempoLog {
+class InstTempoLog : public AttTempoLog {
 public:
-    ExtAttTempoLog() = default;
-    virtual ~ExtAttTempoLog() = default;
+    InstTempoLog() = default;
+    virtual ~InstTempoLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6805,17 +6805,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTextRendition
+// InstTextRendition
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTextRendition
  */
 
-class ExtAttTextRendition : public AttTextRendition {
+class InstTextRendition : public AttTextRendition {
 public:
-    ExtAttTextRendition() = default;
-    virtual ~ExtAttTextRendition() = default;
+    InstTextRendition() = default;
+    virtual ~InstTextRendition() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6895,17 +6895,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTextStyle
+// InstTextStyle
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTextStyle
  */
 
-class ExtAttTextStyle : public AttTextStyle {
+class InstTextStyle : public AttTextStyle {
 public:
-    ExtAttTextStyle() = default;
-    virtual ~ExtAttTextStyle() = default;
+    InstTextStyle() = default;
+    virtual ~InstTextStyle() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -6948,17 +6948,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTiePresent
+// InstTiePresent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTiePresent
  */
 
-class ExtAttTiePresent : public AttTiePresent {
+class InstTiePresent : public AttTiePresent {
 public:
-    ExtAttTiePresent() = default;
-    virtual ~ExtAttTiePresent() = default;
+    InstTiePresent() = default;
+    virtual ~InstTiePresent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7000,17 +7000,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTimestampLog
+// InstTimestampLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTimestampLog
  */
 
-class ExtAttTimestampLog : public AttTimestampLog {
+class InstTimestampLog : public AttTimestampLog {
 public:
-    ExtAttTimestampLog() = default;
-    virtual ~ExtAttTimestampLog() = default;
+    InstTimestampLog() = default;
+    virtual ~InstTimestampLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7052,17 +7052,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTimestamp2Log
+// InstTimestamp2Log
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTimestamp2Log
  */
 
-class ExtAttTimestamp2Log : public AttTimestamp2Log {
+class InstTimestamp2Log : public AttTimestamp2Log {
 public:
-    ExtAttTimestamp2Log() = default;
-    virtual ~ExtAttTimestamp2Log() = default;
+    InstTimestamp2Log() = default;
+    virtual ~InstTimestamp2Log() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7113,17 +7113,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTransposition
+// InstTransposition
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTransposition
  */
 
-class ExtAttTransposition : public AttTransposition {
+class InstTransposition : public AttTransposition {
 public:
-    ExtAttTransposition() = default;
-    virtual ~ExtAttTransposition() = default;
+    InstTransposition() = default;
+    virtual ~InstTransposition() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7177,17 +7177,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTuning
+// InstTuning
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTuning
  */
 
-class ExtAttTuning : public AttTuning {
+class InstTuning : public AttTuning {
 public:
-    ExtAttTuning() = default;
-    virtual ~ExtAttTuning() = default;
+    InstTuning() = default;
+    virtual ~InstTuning() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7230,17 +7230,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTupletPresent
+// InstTupletPresent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTupletPresent
  */
 
-class ExtAttTupletPresent : public AttTupletPresent {
+class InstTupletPresent : public AttTupletPresent {
 public:
-    ExtAttTupletPresent() = default;
-    virtual ~ExtAttTupletPresent() = default;
+    InstTupletPresent() = default;
+    virtual ~InstTupletPresent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7282,17 +7282,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTyped
+// InstTyped
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTyped
  */
 
-class ExtAttTyped : public AttTyped {
+class InstTyped : public AttTyped {
 public:
-    ExtAttTyped() = default;
-    virtual ~ExtAttTyped() = default;
+    InstTyped() = default;
+    virtual ~InstTyped() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7376,17 +7376,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTypography
+// InstTypography
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTypography
  */
 
-class ExtAttTypography : public AttTypography {
+class InstTypography : public AttTypography {
 public:
-    ExtAttTypography() = default;
-    virtual ~ExtAttTypography() = default;
+    InstTypography() = default;
+    virtual ~InstTypography() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7425,17 +7425,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVerticalAlign
+// InstVerticalAlign
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVerticalAlign
  */
 
-class ExtAttVerticalAlign : public AttVerticalAlign {
+class InstVerticalAlign : public AttVerticalAlign {
 public:
-    ExtAttVerticalAlign() = default;
-    virtual ~ExtAttVerticalAlign() = default;
+    InstVerticalAlign() = default;
+    virtual ~InstVerticalAlign() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7474,17 +7474,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVerticalGroup
+// InstVerticalGroup
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVerticalGroup
  */
 
-class ExtAttVerticalGroup : public AttVerticalGroup {
+class InstVerticalGroup : public AttVerticalGroup {
 public:
-    ExtAttVerticalGroup() = default;
-    virtual ~ExtAttVerticalGroup() = default;
+    InstVerticalGroup() = default;
+    virtual ~InstVerticalGroup() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7526,17 +7526,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisibility
+// InstVisibility
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisibility
  */
 
-class ExtAttVisibility : public AttVisibility {
+class InstVisibility : public AttVisibility {
 public:
-    ExtAttVisibility() = default;
-    virtual ~ExtAttVisibility() = default;
+    InstVisibility() = default;
+    virtual ~InstVisibility() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7579,17 +7579,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisualOffsetHo
+// InstVisualOffsetHo
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisualOffsetHo
  */
 
-class ExtAttVisualOffsetHo : public AttVisualOffsetHo {
+class InstVisualOffsetHo : public AttVisualOffsetHo {
 public:
-    ExtAttVisualOffsetHo() = default;
-    virtual ~ExtAttVisualOffsetHo() = default;
+    InstVisualOffsetHo() = default;
+    virtual ~InstVisualOffsetHo() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7631,17 +7631,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisualOffsetTo
+// InstVisualOffsetTo
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisualOffsetTo
  */
 
-class ExtAttVisualOffsetTo : public AttVisualOffsetTo {
+class InstVisualOffsetTo : public AttVisualOffsetTo {
 public:
-    ExtAttVisualOffsetTo() = default;
-    virtual ~ExtAttVisualOffsetTo() = default;
+    InstVisualOffsetTo() = default;
+    virtual ~InstVisualOffsetTo() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7684,17 +7684,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisualOffsetVo
+// InstVisualOffsetVo
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisualOffsetVo
  */
 
-class ExtAttVisualOffsetVo : public AttVisualOffsetVo {
+class InstVisualOffsetVo : public AttVisualOffsetVo {
 public:
-    ExtAttVisualOffsetVo() = default;
-    virtual ~ExtAttVisualOffsetVo() = default;
+    InstVisualOffsetVo() = default;
+    virtual ~InstVisualOffsetVo() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7745,17 +7745,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisualOffset2Ho
+// InstVisualOffset2Ho
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisualOffset2Ho
  */
 
-class ExtAttVisualOffset2Ho : public AttVisualOffset2Ho {
+class InstVisualOffset2Ho : public AttVisualOffset2Ho {
 public:
-    ExtAttVisualOffset2Ho() = default;
-    virtual ~ExtAttVisualOffset2Ho() = default;
+    InstVisualOffset2Ho() = default;
+    virtual ~InstVisualOffset2Ho() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7806,17 +7806,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisualOffset2To
+// InstVisualOffset2To
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisualOffset2To
  */
 
-class ExtAttVisualOffset2To : public AttVisualOffset2To {
+class InstVisualOffset2To : public AttVisualOffset2To {
 public:
-    ExtAttVisualOffset2To() = default;
-    virtual ~ExtAttVisualOffset2To() = default;
+    InstVisualOffset2To() = default;
+    virtual ~InstVisualOffset2To() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7867,17 +7867,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVisualOffset2Vo
+// InstVisualOffset2Vo
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVisualOffset2Vo
  */
 
-class ExtAttVisualOffset2Vo : public AttVisualOffset2Vo {
+class InstVisualOffset2Vo : public AttVisualOffset2Vo {
 public:
-    ExtAttVisualOffset2Vo() = default;
-    virtual ~ExtAttVisualOffset2Vo() = default;
+    InstVisualOffset2Vo() = default;
+    virtual ~InstVisualOffset2Vo() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7916,17 +7916,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttVoltaGroupingSym
+// InstVoltaGroupingSym
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttVoltaGroupingSym
  */
 
-class ExtAttVoltaGroupingSym : public AttVoltaGroupingSym {
+class InstVoltaGroupingSym : public AttVoltaGroupingSym {
 public:
-    ExtAttVoltaGroupingSym() = default;
-    virtual ~ExtAttVoltaGroupingSym() = default;
+    InstVoltaGroupingSym() = default;
+    virtual ~InstVoltaGroupingSym() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -7965,17 +7965,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttWhitespace
+// InstWhitespace
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttWhitespace
  */
 
-class ExtAttWhitespace : public AttWhitespace {
+class InstWhitespace : public AttWhitespace {
 public:
-    ExtAttWhitespace() = default;
-    virtual ~ExtAttWhitespace() = default;
+    InstWhitespace() = default;
+    virtual ~InstWhitespace() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -8014,17 +8014,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttWidth
+// InstWidth
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttWidth
  */
 
-class ExtAttWidth : public AttWidth {
+class InstWidth : public AttWidth {
 public:
-    ExtAttWidth() = default;
-    virtual ~ExtAttWidth() = default;
+    InstWidth() = default;
+    virtual ~InstWidth() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -8077,17 +8077,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttXy
+// InstXy
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttXy
  */
 
-class ExtAttXy : public AttXy {
+class InstXy : public AttXy {
 public:
-    ExtAttXy() = default;
-    virtual ~ExtAttXy() = default;
+    InstXy() = default;
+    virtual ~InstXy() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -8132,17 +8132,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttXy2
+// InstXy2
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttXy2
  */
 
-class ExtAttXy2 : public AttXy2 {
+class InstXy2 : public AttXy2 {
 public:
-    ExtAttXy2() = default;
-    virtual ~ExtAttXy2() = default;
+    InstXy2() = default;
+    virtual ~InstXy2() = default;
 };
 
 } // namespace vrv

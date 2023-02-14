@@ -94,17 +94,17 @@ private:
 {members}}};
 
 //----------------------------------------------------------------------------
-// ExtAtt{attGroupNameUpper}
+// Inst{attGroupNameUpper}
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of Att{attGroupNameUpper}
  */
 
-class ExtAtt{attGroupNameUpper} : public Att{attGroupNameUpper} {{
+class Inst{attGroupNameUpper} : public Att{attGroupNameUpper} {{
 public:
-    ExtAtt{attGroupNameUpper}() = default;
-    virtual ~ExtAtt{attGroupNameUpper}() = default;
+    Inst{attGroupNameUpper}() = default;
+    virtual ~Inst{attGroupNameUpper}() = default;
 }};
 """
 

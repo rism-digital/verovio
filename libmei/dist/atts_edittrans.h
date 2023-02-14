@@ -64,17 +64,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAgentIdent
+// InstAgentIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAgentIdent
  */
 
-class ExtAttAgentIdent : public AttAgentIdent {
+class InstAgentIdent : public AttAgentIdent {
 public:
-    ExtAttAgentIdent() = default;
-    virtual ~ExtAttAgentIdent() = default;
+    InstAgentIdent() = default;
+    virtual ~InstAgentIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -117,17 +117,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttReasonIdent
+// InstReasonIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttReasonIdent
  */
 
-class ExtAttReasonIdent : public AttReasonIdent {
+class InstReasonIdent : public AttReasonIdent {
 public:
-    ExtAttReasonIdent() = default;
-    virtual ~ExtAttReasonIdent() = default;
+    InstReasonIdent() = default;
+    virtual ~InstReasonIdent() = default;
 };
 
 } // namespace vrv

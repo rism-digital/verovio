@@ -67,17 +67,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTabular
+// InstTabular
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTabular
  */
 
-class ExtAttTabular : public AttTabular {
+class InstTabular : public AttTabular {
 public:
-    ExtAttTabular() = default;
-    virtual ~ExtAttTabular() = default;
+    InstTabular() = default;
+    virtual ~InstTabular() = default;
 };
 
 } // namespace vrv

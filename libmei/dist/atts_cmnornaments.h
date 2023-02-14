@@ -70,17 +70,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMordentLog
+// InstMordentLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMordentLog
  */
 
-class ExtAttMordentLog : public AttMordentLog {
+class InstMordentLog : public AttMordentLog {
 public:
-    ExtAttMordentLog() = default;
-    virtual ~ExtAttMordentLog() = default;
+    InstMordentLog() = default;
+    virtual ~InstMordentLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -123,17 +123,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOrnamPresent
+// InstOrnamPresent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOrnamPresent
  */
 
-class ExtAttOrnamPresent : public AttOrnamPresent {
+class InstOrnamPresent : public AttOrnamPresent {
 public:
-    ExtAttOrnamPresent() = default;
-    virtual ~ExtAttOrnamPresent() = default;
+    InstOrnamPresent() = default;
+    virtual ~InstOrnamPresent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -178,17 +178,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOrnamentAccid
+// InstOrnamentAccid
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOrnamentAccid
  */
 
-class ExtAttOrnamentAccid : public AttOrnamentAccid {
+class InstOrnamentAccid : public AttOrnamentAccid {
 public:
-    ExtAttOrnamentAccid() = default;
-    virtual ~ExtAttOrnamentAccid() = default;
+    InstOrnamentAccid() = default;
+    virtual ~InstOrnamentAccid() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -233,17 +233,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTurnLog
+// InstTurnLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTurnLog
  */
 
-class ExtAttTurnLog : public AttTurnLog {
+class InstTurnLog : public AttTurnLog {
 public:
-    ExtAttTurnLog() = default;
-    virtual ~ExtAttTurnLog() = default;
+    InstTurnLog() = default;
+    virtual ~InstTurnLog() = default;
 };
 
 } // namespace vrv

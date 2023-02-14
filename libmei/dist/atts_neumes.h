@@ -67,17 +67,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNcLog
+// InstNcLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNcLog
  */
 
-class ExtAttNcLog : public AttNcLog {
+class InstNcLog : public AttNcLog {
 public:
-    ExtAttNcLog() = default;
-    virtual ~ExtAttNcLog() = default;
+    InstNcLog() = default;
+    virtual ~InstNcLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -164,17 +164,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNcForm
+// InstNcForm
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNcForm
  */
 
-class ExtAttNcForm : public AttNcForm {
+class InstNcForm : public AttNcForm {
 public:
-    ExtAttNcForm() = default;
-    virtual ~ExtAttNcForm() = default;
+    InstNcForm() = default;
+    virtual ~InstNcForm() = default;
 };
 
 } // namespace vrv

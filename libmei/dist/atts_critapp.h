@@ -64,17 +64,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCrit
+// InstCrit
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCrit
  */
 
-class ExtAttCrit : public AttCrit {
+class InstCrit : public AttCrit {
 public:
-    ExtAttCrit() = default;
-    virtual ~ExtAttCrit() = default;
+    InstCrit() = default;
+    virtual ~InstCrit() = default;
 };
 
 } // namespace vrv

@@ -65,17 +65,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAltSym
+// InstAltSym
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAltSym
  */
 
-class ExtAttAltSym : public AttAltSym {
+class InstAltSym : public AttAltSym {
 public:
-    ExtAttAltSym() = default;
-    virtual ~ExtAttAltSym() = default;
+    InstAltSym() = default;
+    virtual ~InstAltSym() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -114,17 +114,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAnchoredTextLog
+// InstAnchoredTextLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAnchoredTextLog
  */
 
-class ExtAttAnchoredTextLog : public AttAnchoredTextLog {
+class InstAnchoredTextLog : public AttAnchoredTextLog {
 public:
-    ExtAttAnchoredTextLog() = default;
-    virtual ~ExtAttAnchoredTextLog() = default;
+    InstAnchoredTextLog() = default;
+    virtual ~InstAnchoredTextLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -163,17 +163,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCurveLog
+// InstCurveLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCurveLog
  */
 
-class ExtAttCurveLog : public AttCurveLog {
+class InstCurveLog : public AttCurveLog {
 public:
-    ExtAttCurveLog() = default;
-    virtual ~ExtAttCurveLog() = default;
+    InstCurveLog() = default;
+    virtual ~InstCurveLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -212,17 +212,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLineLog
+// InstLineLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLineLog
  */
 
-class ExtAttLineLog : public AttLineLog {
+class InstLineLog : public AttLineLog {
 public:
-    ExtAttLineLog() = default;
-    virtual ~ExtAttLineLog() = default;
+    InstLineLog() = default;
+    virtual ~InstLineLog() = default;
 };
 
 } // namespace vrv

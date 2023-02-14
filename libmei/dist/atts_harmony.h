@@ -61,17 +61,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHarmLog
+// InstHarmLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHarmLog
  */
 
-class ExtAttHarmLog : public AttHarmLog {
+class InstHarmLog : public AttHarmLog {
 public:
-    ExtAttHarmLog() = default;
-    virtual ~ExtAttHarmLog() = default;
+    InstHarmLog() = default;
+    virtual ~InstHarmLog() = default;
 };
 
 } // namespace vrv
