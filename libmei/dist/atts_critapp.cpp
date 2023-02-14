@@ -31,8 +31,6 @@ AttCrit::AttCrit() : Att()
     ResetCrit();
 }
 
-AttCrit::~AttCrit() {}
-
 void AttCrit::ResetCrit()
 {
     m_cause = "";

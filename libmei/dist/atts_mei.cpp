@@ -31,8 +31,6 @@ AttNotationType::AttNotationType() : Att()
     ResetNotationType();
 }
 
-AttNotationType::~AttNotationType() {}
-
 void AttNotationType::ResetNotationType()
 {
     m_notationtype = NOTATIONTYPE_NONE;

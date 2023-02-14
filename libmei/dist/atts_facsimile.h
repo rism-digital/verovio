@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttFacsimile : public Att {
-public:
+protected:
     AttFacsimile();
-    virtual ~AttFacsimile();
+    ~AttFacsimile() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFacsimile();
 
@@ -60,6 +61,20 @@ private:
      * corresponds to it.
      **/
     std::string m_facs;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttFacsimile
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFacsimile
+ */
+
+class ExtAttFacsimile : public AttFacsimile {
+public:
+    ExtAttFacsimile() = default;
+    virtual ~ExtAttFacsimile() = default;
 };
 
 } // namespace vrv

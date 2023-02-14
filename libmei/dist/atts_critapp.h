@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttCrit : public Att {
-public:
+protected:
     AttCrit();
-    virtual ~AttCrit();
+    ~AttCrit() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCrit();
 
@@ -60,6 +61,20 @@ private:
      * typology of possible origins.
      **/
     std::string m_cause;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttCrit
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCrit
+ */
+
+class ExtAttCrit : public AttCrit {
+public:
+    ExtAttCrit() = default;
+    virtual ~ExtAttCrit() = default;
 };
 
 } // namespace vrv

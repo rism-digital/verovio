@@ -31,8 +31,6 @@ AttExtSym::AttExtSym() : Att()
     ResetExtSym();
 }
 
-AttExtSym::~AttExtSym() {}
-
 void AttExtSym::ResetExtSym()
 {
     m_glyphAuth = "";

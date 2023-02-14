@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttChannelized : public Att {
-public:
+protected:
     AttChannelized();
-    virtual ~AttChannelized();
+    ~AttChannelized() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetChannelized();
 
@@ -78,14 +79,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttChannelized
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttChannelized
+ */
+
+class ExtAttChannelized : public AttChannelized {
+public:
+    ExtAttChannelized() = default;
+    virtual ~ExtAttChannelized() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttInstrumentIdent
 //----------------------------------------------------------------------------
 
 class AttInstrumentIdent : public Att {
-public:
+protected:
     AttInstrumentIdent();
-    virtual ~AttInstrumentIdent();
+    ~AttInstrumentIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetInstrumentIdent();
 
@@ -115,14 +131,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttInstrumentIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttInstrumentIdent
+ */
+
+class ExtAttInstrumentIdent : public AttInstrumentIdent {
+public:
+    ExtAttInstrumentIdent() = default;
+    virtual ~ExtAttInstrumentIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMidiInstrument
 //----------------------------------------------------------------------------
 
 class AttMidiInstrument : public Att {
-public:
+protected:
     AttMidiInstrument();
-    virtual ~AttMidiInstrument();
+    ~AttMidiInstrument() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMidiInstrument();
 
@@ -188,14 +219,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMidiInstrument
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMidiInstrument
+ */
+
+class ExtAttMidiInstrument : public AttMidiInstrument {
+public:
+    ExtAttMidiInstrument() = default;
+    virtual ~ExtAttMidiInstrument() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMidiNumber
 //----------------------------------------------------------------------------
 
 class AttMidiNumber : public Att {
-public:
+protected:
     AttMidiNumber();
-    virtual ~AttMidiNumber();
+    ~AttMidiNumber() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMidiNumber();
 
@@ -222,14 +268,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMidiNumber
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMidiNumber
+ */
+
+class ExtAttMidiNumber : public AttMidiNumber {
+public:
+    ExtAttMidiNumber() = default;
+    virtual ~ExtAttMidiNumber() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMidiTempo
 //----------------------------------------------------------------------------
 
 class AttMidiTempo : public Att {
-public:
+protected:
     AttMidiTempo();
-    virtual ~AttMidiTempo();
+    ~AttMidiTempo() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMidiTempo();
 
@@ -271,14 +332,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMidiTempo
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMidiTempo
+ */
+
+class ExtAttMidiTempo : public AttMidiTempo {
+public:
+    ExtAttMidiTempo() = default;
+    virtual ~ExtAttMidiTempo() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMidiValue
 //----------------------------------------------------------------------------
 
 class AttMidiValue : public Att {
-public:
+protected:
     AttMidiValue();
-    virtual ~AttMidiValue();
+    ~AttMidiValue() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMidiValue();
 
@@ -305,14 +381,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMidiValue
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMidiValue
+ */
+
+class ExtAttMidiValue : public AttMidiValue {
+public:
+    ExtAttMidiValue() = default;
+    virtual ~ExtAttMidiValue() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMidiValue2
 //----------------------------------------------------------------------------
 
 class AttMidiValue2 : public Att {
-public:
+protected:
     AttMidiValue2();
-    virtual ~AttMidiValue2();
+    ~AttMidiValue2() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMidiValue2();
 
@@ -339,14 +430,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMidiValue2
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMidiValue2
+ */
+
+class ExtAttMidiValue2 : public AttMidiValue2 {
+public:
+    ExtAttMidiValue2() = default;
+    virtual ~ExtAttMidiValue2() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMidiVelocity
 //----------------------------------------------------------------------------
 
 class AttMidiVelocity : public Att {
-public:
+protected:
     AttMidiVelocity();
-    virtual ~AttMidiVelocity();
+    ~AttMidiVelocity() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMidiVelocity();
 
@@ -373,14 +479,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMidiVelocity
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMidiVelocity
+ */
+
+class ExtAttMidiVelocity : public AttMidiVelocity {
+public:
+    ExtAttMidiVelocity() = default;
+    virtual ~ExtAttMidiVelocity() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTimeBase
 //----------------------------------------------------------------------------
 
 class AttTimeBase : public Att {
-public:
+protected:
     AttTimeBase();
-    virtual ~AttTimeBase();
+    ~AttTimeBase() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTimeBase();
 
@@ -408,6 +529,20 @@ private:
      * Unlike MIDI, MEI permits different values for a score and individual staves.
      **/
     int m_ppq;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttTimeBase
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTimeBase
+ */
+
+class ExtAttTimeBase : public AttTimeBase {
+public:
+    ExtAttTimeBase() = default;
+    virtual ~ExtAttTimeBase() = default;
 };
 
 } // namespace vrv

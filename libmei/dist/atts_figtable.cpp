@@ -31,8 +31,6 @@ AttTabular::AttTabular() : Att()
     ResetTabular();
 }
 
-AttTabular::~AttTabular() {}
-
 void AttTabular::ResetTabular()
 {
     m_colspan = MEI_UNSET;

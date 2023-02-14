@@ -24,10 +24,13 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttConverter
+// AttConverterBase
 //----------------------------------------------------------------------------
 
-class AttConverter {
+class AttConverterBase {
+protected:
+    AttConverterBase() = default;
+    ~AttConverterBase() = default;
 public:
     std::string AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const;
     data_ACCIDENTAL_GESTURAL StrToAccidentalGestural(const std::string &value, bool logWarning = true) const;
@@ -475,6 +478,20 @@ public:
 
     std::string WhitespaceXmlspaceToStr(whitespace_XMLSPACE data) const;
     whitespace_XMLSPACE StrToWhitespaceXmlspace(const std::string &value, bool logWarning = true) const;
+};
+
+//----------------------------------------------------------------------------
+// AttConverter
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttConverterBase
+ */
+
+class AttConverter: public AttConverterBase {
+public:
+    AttConverter() = default;
+    virtual ~AttConverter() = default;
 };
 
 } // namespace vrv

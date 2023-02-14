@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttMordentLog : public Att {
-public:
+protected:
     AttMordentLog();
-    virtual ~AttMordentLog();
+    ~AttMordentLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMordentLog();
 
@@ -69,14 +70,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMordentLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMordentLog
+ */
+
+class ExtAttMordentLog : public AttMordentLog {
+public:
+    ExtAttMordentLog() = default;
+    virtual ~ExtAttMordentLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOrnamPresent
 //----------------------------------------------------------------------------
 
 class AttOrnamPresent : public Att {
-public:
+protected:
     AttOrnamPresent();
-    virtual ~AttOrnamPresent();
+    ~AttOrnamPresent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOrnamPresent();
 
@@ -107,14 +123,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttOrnamPresent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOrnamPresent
+ */
+
+class ExtAttOrnamPresent : public AttOrnamPresent {
+public:
+    ExtAttOrnamPresent() = default;
+    virtual ~ExtAttOrnamPresent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOrnamentAccid
 //----------------------------------------------------------------------------
 
 class AttOrnamentAccid : public Att {
-public:
+protected:
     AttOrnamentAccid();
-    virtual ~AttOrnamentAccid();
+    ~AttOrnamentAccid() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOrnamentAccid();
 
@@ -147,14 +178,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttOrnamentAccid
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOrnamentAccid
+ */
+
+class ExtAttOrnamentAccid : public AttOrnamentAccid {
+public:
+    ExtAttOrnamentAccid() = default;
+    virtual ~ExtAttOrnamentAccid() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTurnLog
 //----------------------------------------------------------------------------
 
 class AttTurnLog : public Att {
-public:
+protected:
     AttTurnLog();
-    virtual ~AttTurnLog();
+    ~AttTurnLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTurnLog();
 
@@ -184,6 +230,20 @@ private:
     data_BOOLEAN m_delayed;
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     turnLog_FORM m_form;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttTurnLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTurnLog
+ */
+
+class ExtAttTurnLog : public AttTurnLog {
+public:
+    ExtAttTurnLog() = default;
+    virtual ~ExtAttTurnLog() = default;
 };
 
 } // namespace vrv

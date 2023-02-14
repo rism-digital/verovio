@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttAnnotVis : public Att {
-public:
+protected:
     AttAnnotVis();
-    virtual ~AttAnnotVis();
+    ~AttAnnotVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAnnotVis();
 
@@ -62,14 +63,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttAnnotVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAnnotVis
+ */
+
+class ExtAttAnnotVis : public AttAnnotVis {
+public:
+    ExtAttAnnotVis() = default;
+    virtual ~ExtAttAnnotVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttArpegVis
 //----------------------------------------------------------------------------
 
 class AttArpegVis : public Att {
-public:
+protected:
     AttArpegVis();
-    virtual ~AttArpegVis();
+    ~AttArpegVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetArpegVis();
 
@@ -134,14 +150,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttArpegVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttArpegVis
+ */
+
+class ExtAttArpegVis : public AttArpegVis {
+public:
+    ExtAttArpegVis() = default;
+    virtual ~ExtAttArpegVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBarLineVis
 //----------------------------------------------------------------------------
 
 class AttBarLineVis : public Att {
-public:
+protected:
     AttBarLineVis();
-    virtual ~AttBarLineVis();
+    ~AttBarLineVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBarLineVis();
 
@@ -184,14 +215,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttBarLineVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBarLineVis
+ */
+
+class ExtAttBarLineVis : public AttBarLineVis {
+public:
+    ExtAttBarLineVis() = default;
+    virtual ~ExtAttBarLineVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
 class AttBeamingVis : public Att {
-public:
+protected:
     AttBeamingVis();
-    virtual ~AttBeamingVis();
+    ~AttBeamingVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBeamingVis();
 
@@ -230,14 +276,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttBeamingVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBeamingVis
+ */
+
+class ExtAttBeamingVis : public AttBeamingVis {
+public:
+    ExtAttBeamingVis() = default;
+    virtual ~ExtAttBeamingVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBeatRptVis
 //----------------------------------------------------------------------------
 
 class AttBeatRptVis : public Att {
-public:
+protected:
     AttBeatRptVis();
-    virtual ~AttBeatRptVis();
+    ~AttBeatRptVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBeatRptVis();
 
@@ -264,14 +325,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttBeatRptVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBeatRptVis
+ */
+
+class ExtAttBeatRptVis : public AttBeatRptVis {
+public:
+    ExtAttBeatRptVis() = default;
+    virtual ~ExtAttBeatRptVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttChordVis
 //----------------------------------------------------------------------------
 
 class AttChordVis : public Att {
-public:
+protected:
     AttChordVis();
-    virtual ~AttChordVis();
+    ~AttChordVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetChordVis();
 
@@ -303,14 +379,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttChordVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttChordVis
+ */
+
+class ExtAttChordVis : public AttChordVis {
+public:
+    ExtAttChordVis() = default;
+    virtual ~ExtAttChordVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCleffingVis
 //----------------------------------------------------------------------------
 
 class AttCleffingVis : public Att {
-public:
+protected:
     AttCleffingVis();
-    virtual ~AttCleffingVis();
+    ~AttCleffingVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCleffingVis();
 
@@ -343,14 +434,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttCleffingVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCleffingVis
+ */
+
+class ExtAttCleffingVis : public AttCleffingVis {
+public:
+    ExtAttCleffingVis() = default;
+    virtual ~ExtAttCleffingVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttEpisemaVis
 //----------------------------------------------------------------------------
 
 class AttEpisemaVis : public Att {
-public:
+protected:
     AttEpisemaVis();
-    virtual ~AttEpisemaVis();
+    ~AttEpisemaVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetEpisemaVis();
 
@@ -383,14 +489,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttEpisemaVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttEpisemaVis
+ */
+
+class ExtAttEpisemaVis : public AttEpisemaVis {
+public:
+    ExtAttEpisemaVis() = default;
+    virtual ~ExtAttEpisemaVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttFTremVis
 //----------------------------------------------------------------------------
 
 class AttFTremVis : public Att {
-public:
+protected:
     AttFTremVis();
-    virtual ~AttFTremVis();
+    ~AttFTremVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFTremVis();
 
@@ -429,14 +550,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttFTremVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFTremVis
+ */
+
+class ExtAttFTremVis : public AttFTremVis {
+public:
+    ExtAttFTremVis() = default;
+    virtual ~ExtAttFTremVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttFermataVis
 //----------------------------------------------------------------------------
 
 class AttFermataVis : public Att {
-public:
+protected:
     AttFermataVis();
-    virtual ~AttFermataVis();
+    ~AttFermataVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFermataVis();
 
@@ -469,14 +605,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttFermataVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFermataVis
+ */
+
+class ExtAttFermataVis : public AttFermataVis {
+public:
+    ExtAttFermataVis() = default;
+    virtual ~ExtAttFermataVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttFingGrpVis
 //----------------------------------------------------------------------------
 
 class AttFingGrpVis : public Att {
-public:
+protected:
     AttFingGrpVis();
-    virtual ~AttFingGrpVis();
+    ~AttFingGrpVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFingGrpVis();
 
@@ -503,14 +654,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttFingGrpVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFingGrpVis
+ */
+
+class ExtAttFingGrpVis : public AttFingGrpVis {
+public:
+    ExtAttFingGrpVis() = default;
+    virtual ~ExtAttFingGrpVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHairpinVis
 //----------------------------------------------------------------------------
 
 class AttHairpinVis : public Att {
-public:
+protected:
     AttHairpinVis();
-    virtual ~AttHairpinVis();
+    ~AttHairpinVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHairpinVis();
 
@@ -569,14 +735,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttHairpinVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHairpinVis
+ */
+
+class ExtAttHairpinVis : public AttHairpinVis {
+public:
+    ExtAttHairpinVis() = default;
+    virtual ~ExtAttHairpinVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHarmVis
 //----------------------------------------------------------------------------
 
 class AttHarmVis : public Att {
-public:
+protected:
     AttHarmVis();
-    virtual ~AttHarmVis();
+    ~AttHarmVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHarmVis();
 
@@ -603,14 +784,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttHarmVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHarmVis
+ */
+
+class ExtAttHarmVis : public AttHarmVis {
+public:
+    ExtAttHarmVis() = default;
+    virtual ~ExtAttHarmVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHispanTickVis
 //----------------------------------------------------------------------------
 
 class AttHispanTickVis : public Att {
-public:
+protected:
     AttHispanTickVis();
-    virtual ~AttHispanTickVis();
+    ~AttHispanTickVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHispanTickVis();
 
@@ -643,14 +839,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttHispanTickVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHispanTickVis
+ */
+
+class ExtAttHispanTickVis : public AttHispanTickVis {
+public:
+    ExtAttHispanTickVis() = default;
+    virtual ~ExtAttHispanTickVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigVis
 //----------------------------------------------------------------------------
 
 class AttKeySigVis : public Att {
-public:
+protected:
     AttKeySigVis();
-    virtual ~AttKeySigVis();
+    ~AttKeySigVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigVis();
 
@@ -677,14 +888,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttKeySigVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigVis
+ */
+
+class ExtAttKeySigVis : public AttKeySigVis {
+public:
+    ExtAttKeySigVis() = default;
+    virtual ~ExtAttKeySigVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigDefaultVis
 //----------------------------------------------------------------------------
 
 class AttKeySigDefaultVis : public Att {
-public:
+protected:
     AttKeySigDefaultVis();
-    virtual ~AttKeySigDefaultVis();
+    ~AttKeySigDefaultVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultVis();
 
@@ -717,14 +943,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttKeySigDefaultVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigDefaultVis
+ */
+
+class ExtAttKeySigDefaultVis : public AttKeySigDefaultVis {
+public:
+    ExtAttKeySigDefaultVis() = default;
+    virtual ~ExtAttKeySigDefaultVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLigatureVis
 //----------------------------------------------------------------------------
 
 class AttLigatureVis : public Att {
-public:
+protected:
     AttLigatureVis();
-    virtual ~AttLigatureVis();
+    ~AttLigatureVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLigatureVis();
 
@@ -751,14 +992,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttLigatureVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLigatureVis
+ */
+
+class ExtAttLigatureVis : public AttLigatureVis {
+public:
+    ExtAttLigatureVis() = default;
+    virtual ~ExtAttLigatureVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLineVis
 //----------------------------------------------------------------------------
 
 class AttLineVis : public Att {
-public:
+protected:
     AttLineVis();
-    virtual ~AttLineVis();
+    ~AttLineVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLineVis();
 
@@ -817,14 +1073,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttLineVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLineVis
+ */
+
+class ExtAttLineVis : public AttLineVis {
+public:
+    ExtAttLineVis() = default;
+    virtual ~ExtAttLineVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLiquescentVis
 //----------------------------------------------------------------------------
 
 class AttLiquescentVis : public Att {
-public:
+protected:
     AttLiquescentVis();
-    virtual ~AttLiquescentVis();
+    ~AttLiquescentVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLiquescentVis();
 
@@ -857,14 +1128,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttLiquescentVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLiquescentVis
+ */
+
+class ExtAttLiquescentVis : public AttLiquescentVis {
+public:
+    ExtAttLiquescentVis() = default;
+    virtual ~ExtAttLiquescentVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMensurVis
 //----------------------------------------------------------------------------
 
 class AttMensurVis : public Att {
-public:
+protected:
     AttMensurVis();
-    virtual ~AttMensurVis();
+    ~AttMensurVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMensurVis();
 
@@ -909,14 +1195,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMensurVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMensurVis
+ */
+
+class ExtAttMensurVis : public AttMensurVis {
+public:
+    ExtAttMensurVis() = default;
+    virtual ~ExtAttMensurVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMensuralVis
 //----------------------------------------------------------------------------
 
 class AttMensuralVis : public Att {
-public:
+protected:
     AttMensuralVis();
-    virtual ~AttMensuralVis();
+    ~AttMensuralVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMensuralVis();
 
@@ -993,14 +1294,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMensuralVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMensuralVis
+ */
+
+class ExtAttMensuralVis : public AttMensuralVis {
+public:
+    ExtAttMensuralVis() = default;
+    virtual ~ExtAttMensuralVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeterSigVis
 //----------------------------------------------------------------------------
 
 class AttMeterSigVis : public Att {
-public:
+protected:
     AttMeterSigVis();
-    virtual ~AttMeterSigVis();
+    ~AttMeterSigVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigVis();
 
@@ -1027,14 +1343,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMeterSigVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeterSigVis
+ */
+
+class ExtAttMeterSigVis : public AttMeterSigVis {
+public:
+    ExtAttMeterSigVis() = default;
+    virtual ~ExtAttMeterSigVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeterSigDefaultVis
 //----------------------------------------------------------------------------
 
 class AttMeterSigDefaultVis : public Att {
-public:
+protected:
     AttMeterSigDefaultVis();
-    virtual ~AttMeterSigDefaultVis();
+    ~AttMeterSigDefaultVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigDefaultVis();
 
@@ -1070,14 +1401,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMeterSigDefaultVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeterSigDefaultVis
+ */
+
+class ExtAttMeterSigDefaultVis : public AttMeterSigDefaultVis {
+public:
+    ExtAttMeterSigDefaultVis() = default;
+    virtual ~ExtAttMeterSigDefaultVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMultiRestVis
 //----------------------------------------------------------------------------
 
 class AttMultiRestVis : public Att {
-public:
+protected:
     AttMultiRestVis();
-    virtual ~AttMultiRestVis();
+    ~AttMultiRestVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMultiRestVis();
 
@@ -1108,14 +1454,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMultiRestVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMultiRestVis
+ */
+
+class ExtAttMultiRestVis : public AttMultiRestVis {
+public:
+    ExtAttMultiRestVis() = default;
+    virtual ~ExtAttMultiRestVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPbVis
 //----------------------------------------------------------------------------
 
 class AttPbVis : public Att {
-public:
+protected:
     AttPbVis();
-    virtual ~AttPbVis();
+    ~AttPbVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPbVis();
 
@@ -1145,14 +1506,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttPbVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPbVis
+ */
+
+class ExtAttPbVis : public AttPbVis {
+public:
+    ExtAttPbVis() = default;
+    virtual ~ExtAttPbVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPedalVis
 //----------------------------------------------------------------------------
 
 class AttPedalVis : public Att {
-public:
+protected:
     AttPedalVis();
-    virtual ~AttPedalVis();
+    ~AttPedalVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPedalVis();
 
@@ -1179,14 +1555,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttPedalVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPedalVis
+ */
+
+class ExtAttPedalVis : public AttPedalVis {
+public:
+    ExtAttPedalVis() = default;
+    virtual ~ExtAttPedalVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPlicaVis
 //----------------------------------------------------------------------------
 
 class AttPlicaVis : public Att {
-public:
+protected:
     AttPlicaVis();
-    virtual ~AttPlicaVis();
+    ~AttPlicaVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPlicaVis();
 
@@ -1223,14 +1614,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttPlicaVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPlicaVis
+ */
+
+class ExtAttPlicaVis : public AttPlicaVis {
+public:
+    ExtAttPlicaVis() = default;
+    virtual ~ExtAttPlicaVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttQuilismaVis
 //----------------------------------------------------------------------------
 
 class AttQuilismaVis : public Att {
-public:
+protected:
     AttQuilismaVis();
-    virtual ~AttQuilismaVis();
+    ~AttQuilismaVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetQuilismaVis();
 
@@ -1257,14 +1663,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttQuilismaVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttQuilismaVis
+ */
+
+class ExtAttQuilismaVis : public AttQuilismaVis {
+public:
+    ExtAttQuilismaVis() = default;
+    virtual ~ExtAttQuilismaVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSbVis
 //----------------------------------------------------------------------------
 
 class AttSbVis : public Att {
-public:
+protected:
     AttSbVis();
-    virtual ~AttSbVis();
+    ~AttSbVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSbVis();
 
@@ -1291,14 +1712,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttSbVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSbVis
+ */
+
+class ExtAttSbVis : public AttSbVis {
+public:
+    ExtAttSbVis() = default;
+    virtual ~ExtAttSbVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttScoreDefVis
 //----------------------------------------------------------------------------
 
 class AttScoreDefVis : public Att {
-public:
+protected:
     AttScoreDefVis();
-    virtual ~AttScoreDefVis();
+    ~AttScoreDefVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetScoreDefVis();
 
@@ -1329,14 +1765,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttScoreDefVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttScoreDefVis
+ */
+
+class ExtAttScoreDefVis : public AttScoreDefVis {
+public:
+    ExtAttScoreDefVis() = default;
+    virtual ~ExtAttScoreDefVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSectionVis
 //----------------------------------------------------------------------------
 
 class AttSectionVis : public Att {
-public:
+protected:
     AttSectionVis();
-    virtual ~AttSectionVis();
+    ~AttSectionVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSectionVis();
 
@@ -1363,14 +1814,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttSectionVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSectionVis
+ */
+
+class ExtAttSectionVis : public AttSectionVis {
+public:
+    ExtAttSectionVis() = default;
+    virtual ~ExtAttSectionVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSignifLetVis
 //----------------------------------------------------------------------------
 
 class AttSignifLetVis : public Att {
-public:
+protected:
     AttSignifLetVis();
-    virtual ~AttSignifLetVis();
+    ~AttSignifLetVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSignifLetVis();
 
@@ -1397,14 +1863,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttSignifLetVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSignifLetVis
+ */
+
+class ExtAttSignifLetVis : public AttSignifLetVis {
+public:
+    ExtAttSignifLetVis() = default;
+    virtual ~ExtAttSignifLetVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSpaceVis
 //----------------------------------------------------------------------------
 
 class AttSpaceVis : public Att {
-public:
+protected:
     AttSpaceVis();
-    virtual ~AttSpaceVis();
+    ~AttSpaceVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSpaceVis();
 
@@ -1434,14 +1915,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttSpaceVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSpaceVis
+ */
+
+class ExtAttSpaceVis : public AttSpaceVis {
+public:
+    ExtAttSpaceVis() = default;
+    virtual ~ExtAttSpaceVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffDefVis
 //----------------------------------------------------------------------------
 
 class AttStaffDefVis : public Att {
-public:
+protected:
     AttStaffDefVis();
-    virtual ~AttStaffDefVis();
+    ~AttStaffDefVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffDefVis();
 
@@ -1497,14 +1993,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttStaffDefVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffDefVis
+ */
+
+class ExtAttStaffDefVis : public AttStaffDefVis {
+public:
+    ExtAttStaffDefVis() = default;
+    virtual ~ExtAttStaffDefVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffGrpVis
 //----------------------------------------------------------------------------
 
 class AttStaffGrpVis : public Att {
-public:
+protected:
     AttStaffGrpVis();
-    virtual ~AttStaffGrpVis();
+    ~AttStaffGrpVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffGrpVis();
 
@@ -1534,14 +2045,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttStaffGrpVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffGrpVis
+ */
+
+class ExtAttStaffGrpVis : public AttStaffGrpVis {
+public:
+    ExtAttStaffGrpVis() = default;
+    virtual ~ExtAttStaffGrpVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStemVis
 //----------------------------------------------------------------------------
 
 class AttStemVis : public Att {
-public:
+protected:
     AttStemVis();
-    virtual ~AttStemVis();
+    ~AttStemVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStemVis();
 
@@ -1608,14 +2134,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttStemVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStemVis
+ */
+
+class ExtAttStemVis : public AttStemVis {
+public:
+    ExtAttStemVis() = default;
+    virtual ~ExtAttStemVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTupletVis
 //----------------------------------------------------------------------------
 
 class AttTupletVis : public Att {
-public:
+protected:
     AttTupletVis();
-    virtual ~AttTupletVis();
+    ~AttTupletVis() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTupletVis();
 
@@ -1660,6 +2201,20 @@ private:
     data_BOOLEAN m_durVisible;
     /** Controls how the num:numbase ratio is to be displayed. **/
     tupletVis_NUMFORMAT m_numFormat;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttTupletVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTupletVis
+ */
+
+class ExtAttTupletVis : public AttTupletVis {
+public:
+    ExtAttTupletVis() = default;
+    virtual ~ExtAttTupletVis() = default;
 };
 
 } // namespace vrv

@@ -31,8 +31,6 @@ AttAgentIdent::AttAgentIdent() : Att()
     ResetAgentIdent();
 }
 
-AttAgentIdent::~AttAgentIdent() {}
-
 void AttAgentIdent::ResetAgentIdent()
 {
     m_agent = "";
@@ -72,8 +70,6 @@ AttReasonIdent::AttReasonIdent() : Att()
 {
     ResetReasonIdent();
 }
-
-AttReasonIdent::~AttReasonIdent() {}
 
 void AttReasonIdent::ResetReasonIdent()
 {

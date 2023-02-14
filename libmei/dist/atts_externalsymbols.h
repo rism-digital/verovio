@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttExtSym : public Att {
-public:
+protected:
     AttExtSym();
-    virtual ~AttExtSym();
+    ~AttExtSym() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetExtSym();
 
@@ -84,6 +85,20 @@ private:
      * glyph.name or glyph.num is taken.
      **/
     std::string m_glyphUri;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttExtSym
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttExtSym
+ */
+
+class ExtAttExtSym : public AttExtSym {
+public:
+    ExtAttExtSym() = default;
+    virtual ~ExtAttExtSym() = default;
 };
 
 } // namespace vrv

@@ -31,8 +31,6 @@ AttHarmAnl::AttHarmAnl() : Att()
     ResetHarmAnl();
 }
 
-AttHarmAnl::~AttHarmAnl() {}
-
 void AttHarmAnl::ResetHarmAnl()
 {
     m_form = harmAnl_FORM_NONE;
@@ -72,8 +70,6 @@ AttHarmonicFunction::AttHarmonicFunction() : Att()
 {
     ResetHarmonicFunction();
 }
-
-AttHarmonicFunction::~AttHarmonicFunction() {}
 
 void AttHarmonicFunction::ResetHarmonicFunction()
 {
@@ -115,8 +111,6 @@ AttIntervalHarmonic::AttIntervalHarmonic() : Att()
     ResetIntervalHarmonic();
 }
 
-AttIntervalHarmonic::~AttIntervalHarmonic() {}
-
 void AttIntervalHarmonic::ResetIntervalHarmonic()
 {
     m_inth = "";
@@ -156,8 +150,6 @@ AttIntervalMelodic::AttIntervalMelodic() : Att()
 {
     ResetIntervalMelodic();
 }
-
-AttIntervalMelodic::~AttIntervalMelodic() {}
 
 void AttIntervalMelodic::ResetIntervalMelodic()
 {
@@ -199,8 +191,6 @@ AttKeySigAnl::AttKeySigAnl() : Att()
     ResetKeySigAnl();
 }
 
-AttKeySigAnl::~AttKeySigAnl() {}
-
 void AttKeySigAnl::ResetKeySigAnl()
 {
     m_mode = MODE_NONE;
@@ -240,8 +230,6 @@ AttKeySigDefaultAnl::AttKeySigDefaultAnl() : Att()
 {
     ResetKeySigDefaultAnl();
 }
-
-AttKeySigDefaultAnl::~AttKeySigDefaultAnl() {}
 
 void AttKeySigDefaultAnl::ResetKeySigDefaultAnl()
 {
@@ -313,8 +301,6 @@ AttMelodicFunction::AttMelodicFunction() : Att()
     ResetMelodicFunction();
 }
 
-AttMelodicFunction::~AttMelodicFunction() {}
-
 void AttMelodicFunction::ResetMelodicFunction()
 {
     m_mfunc = MELODICFUNCTION_NONE;
@@ -355,8 +341,6 @@ AttPitchClass::AttPitchClass() : Att()
     ResetPitchClass();
 }
 
-AttPitchClass::~AttPitchClass() {}
-
 void AttPitchClass::ResetPitchClass()
 {
     m_pclass = MEI_UNSET;
@@ -396,8 +380,6 @@ AttSolfa::AttSolfa() : Att()
 {
     ResetSolfa();
 }
-
-AttSolfa::~AttSolfa() {}
 
 void AttSolfa::ResetSolfa()
 {

@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttAccidentalGes : public Att {
-public:
+protected:
     AttAccidentalGes();
-    virtual ~AttAccidentalGes();
+    ~AttAccidentalGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAccidentalGes();
 
@@ -60,14 +61,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttAccidentalGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAccidentalGes
+ */
+
+class ExtAttAccidentalGes : public AttAccidentalGes {
+public:
+    ExtAttAccidentalGes() = default;
+    virtual ~ExtAttAccidentalGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttArticulationGes
 //----------------------------------------------------------------------------
 
 class AttArticulationGes : public Att {
-public:
+protected:
     AttArticulationGes();
-    virtual ~AttArticulationGes();
+    ~AttArticulationGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetArticulationGes();
 
@@ -94,14 +110,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttArticulationGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttArticulationGes
+ */
+
+class ExtAttArticulationGes : public AttArticulationGes {
+public:
+    ExtAttArticulationGes() = default;
+    virtual ~ExtAttArticulationGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBendGes
 //----------------------------------------------------------------------------
 
 class AttBendGes : public Att {
-public:
+protected:
     AttBendGes();
-    virtual ~AttBendGes();
+    ~AttBendGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBendGes();
 
@@ -132,14 +163,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttBendGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBendGes
+ */
+
+class ExtAttBendGes : public AttBendGes {
+public:
+    ExtAttBendGes() = default;
+    virtual ~ExtAttBendGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDurationGes
 //----------------------------------------------------------------------------
 
 class AttDurationGes : public Att {
-public:
+protected:
     AttDurationGes();
-    virtual ~AttDurationGes();
+    ~AttDurationGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDurationGes();
 
@@ -202,14 +248,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttDurationGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDurationGes
+ */
+
+class ExtAttDurationGes : public AttDurationGes {
+public:
+    ExtAttDurationGes() = default;
+    virtual ~ExtAttDurationGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMdivGes
 //----------------------------------------------------------------------------
 
 class AttMdivGes : public Att {
-public:
+protected:
     AttMdivGes();
-    virtual ~AttMdivGes();
+    ~AttMdivGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMdivGes();
 
@@ -239,14 +300,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttMdivGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMdivGes
+ */
+
+class ExtAttMdivGes : public AttMdivGes {
+public:
+    ExtAttMdivGes() = default;
+    virtual ~ExtAttMdivGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNcGes
 //----------------------------------------------------------------------------
 
 class AttNcGes : public Att {
-public:
+protected:
     AttNcGes();
-    virtual ~AttNcGes();
+    ~AttNcGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNcGes();
 
@@ -285,14 +361,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttNcGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNcGes
+ */
+
+class ExtAttNcGes : public AttNcGes {
+public:
+    ExtAttNcGes() = default;
+    virtual ~ExtAttNcGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
 
 class AttNoteGes : public Att {
-public:
+protected:
     AttNoteGes();
-    virtual ~AttNoteGes();
+    ~AttNoteGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNoteGes();
 
@@ -337,14 +428,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttNoteGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNoteGes
+ */
+
+class ExtAttNoteGes : public AttNoteGes {
+public:
+    ExtAttNoteGes() = default;
+    virtual ~ExtAttNoteGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOrnamentAccidGes
 //----------------------------------------------------------------------------
 
 class AttOrnamentAccidGes : public Att {
-public:
+protected:
     AttOrnamentAccidGes();
-    virtual ~AttOrnamentAccidGes();
+    ~AttOrnamentAccidGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOrnamentAccidGes();
 
@@ -377,14 +483,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttOrnamentAccidGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOrnamentAccidGes
+ */
+
+class ExtAttOrnamentAccidGes : public AttOrnamentAccidGes {
+public:
+    ExtAttOrnamentAccidGes() = default;
+    virtual ~ExtAttOrnamentAccidGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSectionGes
 //----------------------------------------------------------------------------
 
 class AttSectionGes : public Att {
-public:
+protected:
     AttSectionGes();
-    virtual ~AttSectionGes();
+    ~AttSectionGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSectionGes();
 
@@ -414,14 +535,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttSectionGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSectionGes
+ */
+
+class ExtAttSectionGes : public AttSectionGes {
+public:
+    ExtAttSectionGes() = default;
+    virtual ~ExtAttSectionGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSoundLocation
 //----------------------------------------------------------------------------
 
 class AttSoundLocation : public Att {
-public:
+protected:
     AttSoundLocation();
-    virtual ~AttSoundLocation();
+    ~AttSoundLocation() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSoundLocation();
 
@@ -454,14 +590,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttSoundLocation
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSoundLocation
+ */
+
+class ExtAttSoundLocation : public AttSoundLocation {
+public:
+    ExtAttSoundLocation() = default;
+    virtual ~ExtAttSoundLocation() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTimestampGes
 //----------------------------------------------------------------------------
 
 class AttTimestampGes : public Att {
-public:
+protected:
     AttTimestampGes();
-    virtual ~AttTimestampGes();
+    ~AttTimestampGes() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTimestampGes();
 
@@ -497,14 +648,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttTimestampGes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTimestampGes
+ */
+
+class ExtAttTimestampGes : public AttTimestampGes {
+public:
+    ExtAttTimestampGes() = default;
+    virtual ~ExtAttTimestampGes() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTimestamp2Ges
 //----------------------------------------------------------------------------
 
 class AttTimestamp2Ges : public Att {
-public:
+protected:
     AttTimestamp2Ges();
-    virtual ~AttTimestamp2Ges();
+    ~AttTimestamp2Ges() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTimestamp2Ges();
 
@@ -537,6 +703,20 @@ private:
     data_MEASUREBEAT m_tstamp2Ges;
     /** Records the ending point of an event in terms of ISO time. **/
     std::string m_tstamp2Real;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttTimestamp2Ges
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTimestamp2Ges
+ */
+
+class ExtAttTimestamp2Ges : public AttTimestamp2Ges {
+public:
+    ExtAttTimestamp2Ges() = default;
+    virtual ~ExtAttTimestamp2Ges() = default;
 };
 
 } // namespace vrv

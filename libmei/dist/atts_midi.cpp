@@ -31,8 +31,6 @@ AttChannelized::AttChannelized() : Att()
     ResetChannelized();
 }
 
-AttChannelized::~AttChannelized() {}
-
 void AttChannelized::ResetChannelized()
 {
     m_midiChannel = -1;
@@ -118,8 +116,6 @@ AttInstrumentIdent::AttInstrumentIdent() : Att()
     ResetInstrumentIdent();
 }
 
-AttInstrumentIdent::~AttInstrumentIdent() {}
-
 void AttInstrumentIdent::ResetInstrumentIdent()
 {
     m_instr = "";
@@ -159,8 +155,6 @@ AttMidiInstrument::AttMidiInstrument() : Att()
 {
     ResetMidiInstrument();
 }
-
-AttMidiInstrument::~AttMidiInstrument() {}
 
 void AttMidiInstrument::ResetMidiInstrument()
 {
@@ -277,8 +271,6 @@ AttMidiNumber::AttMidiNumber() : Att()
     ResetMidiNumber();
 }
 
-AttMidiNumber::~AttMidiNumber() {}
-
 void AttMidiNumber::ResetMidiNumber()
 {
     m_num = -1;
@@ -318,8 +310,6 @@ AttMidiTempo::AttMidiTempo() : Att()
 {
     ResetMidiTempo();
 }
-
-AttMidiTempo::~AttMidiTempo() {}
 
 void AttMidiTempo::ResetMidiTempo()
 {
@@ -376,8 +366,6 @@ AttMidiValue::AttMidiValue() : Att()
     ResetMidiValue();
 }
 
-AttMidiValue::~AttMidiValue() {}
-
 void AttMidiValue::ResetMidiValue()
 {
     m_val = -1;
@@ -417,8 +405,6 @@ AttMidiValue2::AttMidiValue2() : Att()
 {
     ResetMidiValue2();
 }
-
-AttMidiValue2::~AttMidiValue2() {}
 
 void AttMidiValue2::ResetMidiValue2()
 {
@@ -460,8 +446,6 @@ AttMidiVelocity::AttMidiVelocity() : Att()
     ResetMidiVelocity();
 }
 
-AttMidiVelocity::~AttMidiVelocity() {}
-
 void AttMidiVelocity::ResetMidiVelocity()
 {
     m_vel = -1;
@@ -501,8 +485,6 @@ AttTimeBase::AttTimeBase() : Att()
 {
     ResetTimeBase();
 }
-
-AttTimeBase::~AttTimeBase() {}
 
 void AttTimeBase::ResetTimeBase()
 {

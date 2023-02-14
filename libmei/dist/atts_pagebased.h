@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttMargins : public Att {
-public:
+protected:
     AttMargins();
-    virtual ~AttMargins();
+    ~AttMargins() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMargins();
 
@@ -75,6 +76,20 @@ private:
     data_MEASUREMENTUNSIGNED m_leftmar;
     /** Indicates the amount of whitespace at the right side of a page. **/
     data_MEASUREMENTUNSIGNED m_rightmar;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttMargins
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMargins
+ */
+
+class ExtAttMargins : public AttMargins {
+public:
+    ExtAttMargins() = default;
+    virtual ~ExtAttMargins() = default;
 };
 
 } // namespace vrv

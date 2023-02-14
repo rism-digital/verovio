@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttAltSym : public Att {
-public:
+protected:
     AttAltSym();
-    virtual ~AttAltSym();
+    ~AttAltSym() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAltSym();
 
@@ -64,14 +65,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttAltSym
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAltSym
+ */
+
+class ExtAttAltSym : public AttAltSym {
+public:
+    ExtAttAltSym() = default;
+    virtual ~ExtAttAltSym() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttAnchoredTextLog
 //----------------------------------------------------------------------------
 
 class AttAnchoredTextLog : public Att {
-public:
+protected:
     AttAnchoredTextLog();
-    virtual ~AttAnchoredTextLog();
+    ~AttAnchoredTextLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAnchoredTextLog();
 
@@ -98,14 +114,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttAnchoredTextLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAnchoredTextLog
+ */
+
+class ExtAttAnchoredTextLog : public AttAnchoredTextLog {
+public:
+    ExtAttAnchoredTextLog() = default;
+    virtual ~ExtAttAnchoredTextLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCurveLog
 //----------------------------------------------------------------------------
 
 class AttCurveLog : public Att {
-public:
+protected:
     AttCurveLog();
-    virtual ~AttCurveLog();
+    ~AttCurveLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCurveLog();
 
@@ -132,14 +163,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// ExtAttCurveLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCurveLog
+ */
+
+class ExtAttCurveLog : public AttCurveLog {
+public:
+    ExtAttCurveLog() = default;
+    virtual ~ExtAttCurveLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLineLog
 //----------------------------------------------------------------------------
 
 class AttLineLog : public Att {
-public:
+protected:
     AttLineLog();
-    virtual ~AttLineLog();
+    ~AttLineLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLineLog();
 
@@ -163,6 +209,20 @@ public:
 private:
     /** Describes the function of the bracketed event sequence. **/
     std::string m_func;
+};
+
+//----------------------------------------------------------------------------
+// ExtAttLineLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLineLog
+ */
+
+class ExtAttLineLog : public AttLineLog {
+public:
+    ExtAttLineLog() = default;
+    virtual ~ExtAttLineLog() = default;
 };
 
 } // namespace vrv

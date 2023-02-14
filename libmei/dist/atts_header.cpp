@@ -31,8 +31,6 @@ AttBifoliumSurfaces::AttBifoliumSurfaces() : Att()
     ResetBifoliumSurfaces();
 }
 
-AttBifoliumSurfaces::~AttBifoliumSurfaces() {}
-
 void AttBifoliumSurfaces::ResetBifoliumSurfaces()
 {
     m_outerRecto = "";
@@ -118,8 +116,6 @@ AttFoliumSurfaces::AttFoliumSurfaces() : Att()
     ResetFoliumSurfaces();
 }
 
-AttFoliumSurfaces::~AttFoliumSurfaces() {}
-
 void AttFoliumSurfaces::ResetFoliumSurfaces()
 {
     m_recto = "";
@@ -175,8 +171,6 @@ AttRecordType::AttRecordType() : Att()
     ResetRecordType();
 }
 
-AttRecordType::~AttRecordType() {}
-
 void AttRecordType::ResetRecordType()
 {
     m_recordtype = recordType_RECORDTYPE_NONE;
@@ -216,8 +210,6 @@ AttRegularMethod::AttRegularMethod() : Att()
 {
     ResetRegularMethod();
 }
-
-AttRegularMethod::~AttRegularMethod() {}
 
 void AttRegularMethod::ResetRegularMethod()
 {
