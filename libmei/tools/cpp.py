@@ -97,6 +97,10 @@ private:
 // ExtAtt{attGroupNameUpper}
 //----------------------------------------------------------------------------
 
+/**
+ * Instantiable version of Att{attGroupNameUpper}
+ */
+
 class ExtAtt{attGroupNameUpper} : public Att{attGroupNameUpper} {{
 public:
     ExtAtt{attGroupNameUpper}() = default;
@@ -348,11 +352,11 @@ CONVERTER_END_H = """}};
 // AttConverter
 //----------------------------------------------------------------------------
 
-class AttConverter: public AttConverterBase {
+class AttConverter: public AttConverterBase {{
 public:
     AttConverter() = default;
     virtual ~AttConverter() = default;
-};
+}};
 
 }} // namespace {ns}
 
