@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jan 26 22:41:11 PST 2023
+// Last Modified: Thu Feb  9 08:53:30 PST 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -32901,6 +32901,52 @@ HumNum HumdrumToken::getDurationToEnd(void) {
 
 HumNum HumdrumToken::getDurationToEnd(HumNum scale) {
 	return getLine()->getDurationToEnd() * scale;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getDurationFromNoteStart -- Returns the duration from the start
+//   of the resolved HumdrumToken to the starting time of this token. This is
+//   useful to get the pased duration of a null token.
+//
+
+HumNum HumdrumToken::getDurationFromNoteStart(void) {
+	HumNum dur = HumNum();
+	HTp resolvedToken = this->resolveNull();
+	HumdrumFile* infile = getLine()->getOwner();
+	int startLineIndex = resolvedToken->getLineIndex();
+	int thisLineIndex = getLineIndex();
+	for (int i = startLineIndex; i < thisLineIndex; i++) {
+		dur += infile->getLine(i)->getDuration();
+	}
+	// TODO handle tied notes
+	return dur;
+}
+
+
+HumNum HumdrumToken::getDurationFromNoteStart(HumNum scale) {
+	return this->getDurationFromNoteStart() * scale;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getDurationToNoteEnd -- Returns the duration from this token to
+//   the end of the resolved HumdrumToken duration. This is useful to get the
+//   remaining duration of a null token.
+//
+
+HumNum HumdrumToken::getDurationToNoteEnd(void) {
+	// TODO handle tied notes
+	return this->resolveNull()->getDuration() - getDurationFromNoteStart();
+}
+
+
+HumNum HumdrumToken::getDurationToNoteEnd(HumNum scale) {
+	return this->getDurationToNoteEnd() * scale;
 }
 
 
@@ -101830,8 +101876,8 @@ string Tool_musicxml2hum::getSystemDecoration(xml_document& doc, HumGrid& grid,
 					output += "[(";
 					typeendings[number] = ")]";
 				} else if (g == "brace") {
-					output += "[(";
-					typeendings[number] = ")]";
+					output += "{(";
+					typeendings[number] = ")}";
 				} else {
 					cerr << "Unknown part grouping symbol: " << g << endl;
 				}
@@ -101899,6 +101945,7 @@ Tool_myank::Tool_myank(void) {
 	define("T|M|bar-number-text=b", "print barnum with LO text above system ");
 	define("d|double|dm|md|mdsep|mdseparator=b", "Put double barline between non-consecutive measure segments");
 	define("m|b|measures|bars|measure|bar=s", "Measures to yank");
+	define("l|lines|line-range=s", "Line numbers range to yank (e.g. 40-50)");
 	define("I|i|instrument=b", "Include instrument codes from start of data");
 	define("visible|not-invisible=b", "Do not make initial measure invisible");
 	define("B|noendbar=b", "Do not print barline at end of data");
@@ -101910,6 +101957,8 @@ Tool_myank::Tool_myank(void) {
 	define("version=b",       "Program version");
 	define("example=b",       "Program examples");
 	define("h|help=b",        "Short description");
+	define("hide-starting=b", "Prevent printStarting");
+	define("hide-ending=b",   "Prevent printEnding");
 }
 
 
@@ -102061,26 +102110,31 @@ void Tool_myank::initialize(HumdrumFile& infile) {
 		return;
 	}
 
-	debugQ        = getBoolean("debug");
-	inlistQ       = getBoolean("inlist");
-	outlistQ      = getBoolean("outlist");
-	verboseQ      = getBoolean("verbose");
-	maxQ          = getBoolean("max");
-	minQ          = getBoolean("min");
+	m_debugQ        = getBoolean("debug");
+	m_inlistQ       = getBoolean("inlist");
+	m_outlistQ      = getBoolean("outlist");
+	m_verboseQ      = getBoolean("verbose");
+	m_maxQ          = getBoolean("max");
+	m_minQ          = getBoolean("min");
 
-	invisibleQ    = !getBoolean("not-invisible");
-	instrumentQ   =  getBoolean("instrument");
-	nolastbarQ    =  getBoolean("noendbar");
-	markQ         =  getBoolean("mark");
-	doubleQ       =  getBoolean("mdsep");
-	barnumtextQ   =  getBoolean("bar-number-text");
-	sectionCountQ =  getBoolean("section-count");
-	Section       =  getInteger("section");
+	m_invisibleQ    = !getBoolean("not-invisible");
+	m_instrumentQ   =  getBoolean("instrument");
+	m_nolastbarQ    =  getBoolean("noendbar");
+	m_markQ         =  getBoolean("mark");
+	m_doubleQ       =  getBoolean("mdsep");
+	m_barnumtextQ   =  getBoolean("bar-number-text");
+	m_sectionCountQ =  getBoolean("section-count");
+	m_section       =  getInteger("section");
 
-	if (!Section) {
-		if (!(getBoolean("measures") || markQ)) {
+	m_lineRange     = getString("lines");
+	m_hideStarting  = getBoolean("hide-starting");
+	m_hideEnding    = getBoolean("hide-ending");
+
+
+	if (!m_section) {
+		if (!(getBoolean("measures") || m_markQ) && !getBoolean("lines")) {
 			// if -m option is not given, then --mark option presumed
-			markQ = 1;
+			m_markQ = 1;
 			// cerr << "Error: the -m option is required" << endl;
 			// exit(1);
 		}
@@ -102096,62 +102150,143 @@ void Tool_myank::initialize(HumdrumFile& infile) {
 //
 
 void Tool_myank::processFile(HumdrumFile& infile) {
-	if (sectionCountQ) {
+	if (m_sectionCountQ) {
 		int sections = getSectionCount(infile);
 		m_humdrum_text << sections << endl;
 		return;
 	}
 
-	getMetStates(metstates, infile);
-	getMeasureStartStop(MeasureInList, infile);
+	getMetStates(m_metstates, infile);
+	getMeasureStartStop(m_measureInList, infile);
 
 	string measurestring = getString("measures");
+
+	if (getBoolean("lines")) {
+		int startLineNumber = getStartLineNumber();
+		int endLineNumber = getEndLineNumber();
+		if ((startLineNumber > endLineNumber) || (endLineNumber > infile.getLineCount())) {
+			// Disallow when end line number is bigger then line count or when
+			// start line number greather than end line number
+			return;
+		}
+		m_barNumbersPerLine = analyzeBarNumbers(infile);
+		int startBarNumber = getBarNumberForLineNumber(startLineNumber);
+		int endBarNumber = getBarNumberForLineNumber(endLineNumber);
+		measurestring = to_string(startBarNumber) + "-" + to_string(endBarNumber);
+	}
+
 	measurestring = expandMultipliers(measurestring);
-	if (markQ) {
+	if (m_markQ) {
 		stringstream mstring;
 		getMarkString(mstring, infile);
 		measurestring = mstring.str();
-		if (debugQ) {
+		if (m_debugQ) {
 			m_free_text << "MARK STRING: " << mstring.str() << endl;
 		}
-	} else if (Section) {
+	} else if (m_section) {
 		string sstring;
-		getSectionString(sstring, infile, Section);
+		getSectionString(sstring, infile, m_section);
 		measurestring = sstring;
 	}
-	if (debugQ) {
+	if (m_debugQ) {
 		m_free_text << "MARK MEASURES: " << measurestring << endl;
 	}
 
 	// expand to multiple measures later.
-	expandMeasureOutList(MeasureOutList, MeasureInList, infile,
+	expandMeasureOutList(m_measureOutList, m_measureInList, infile,
 			measurestring);
 
-	if (inlistQ) {
+	if (m_inlistQ) {
 		m_free_text << "INPUT MEASURE MAP: " << endl;
-		for (int i=0; i<(int)MeasureInList.size(); i++) {
-			m_free_text << MeasureInList[i];
+		for (int i=0; i<(int)m_measureInList.size(); i++) {
+			m_free_text << m_measureInList[i];
 		}
 	}
-	if (outlistQ) {
+	if (m_outlistQ) {
 		m_free_text << "OUTPUT MEASURE MAP: " << endl;
-		for (int i=0; i<(int)MeasureOutList.size(); i++) {
-			m_free_text << MeasureOutList[i];
+		for (int i=0; i<(int)m_measureOutList.size(); i++) {
+			m_free_text << m_measureOutList[i];
 		}
 	}
 
-	if (MeasureOutList.size() == 0) {
+	if (m_measureOutList.size() == 0) {
 		// disallow processing files with no barlines
 		return;
 	}
 
 	// move stopStyle to startStyle of next measure group.
-	for (int i=(int)MeasureOutList.size()-1; i>0; i--) {
-		MeasureOutList[i].startStyle = MeasureOutList[i-1].stopStyle;
-		MeasureOutList[i-1].stopStyle = "";
+	for (int i=(int)m_measureOutList.size()-1; i>0; i--) {
+		m_measureOutList[i].startStyle = m_measureOutList[i-1].stopStyle;
+		m_measureOutList[i-1].stopStyle = "";
 	}
 
-	myank(infile, MeasureOutList);
+	myank(infile, m_measureOutList);
+}
+
+
+
+////////////////////////
+//
+// Tool_myank::analyzeBarNumbers -- Stores the bar number of each line in a vector
+//
+
+vector<int> Tool_myank::analyzeBarNumbers(HumdrumFile& infile) {
+	vector<int> m_barnum;
+	m_barnum.resize(infile.getLineCount());
+	int current = -1;
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			m_barnum.at(i) = current;
+			continue;
+		}
+		if (hre.search(infile[i].token(0), "=(\\d+)")) {
+			current = hre.getMatchInt(1);
+		}
+		m_barnum.at(i) = current;
+	}
+	return m_barnum;
+}
+
+
+
+////////////////////////
+//
+// Tool_myank::getBarNumberForLineNumber --
+//
+
+int Tool_myank::getBarNumberForLineNumber(int lineNumber) {
+	return m_barNumbersPerLine[lineNumber-1];
+}
+
+
+
+////////////////////////
+//
+// Tool_myank::getStartLineNumber -- Get start line number from --lines
+//
+
+int Tool_myank::getStartLineNumber(void) {
+	HumRegex hre;
+	if (hre.search(m_lineRange, "^(\\d+)\\-(\\d+)$")) {
+		return hre.getMatchInt(1);
+	}
+	return -1;
+}
+
+
+
+////////////////////////
+//
+// Tool_myank::getEndLineNumber -- Get end line number from --lines
+//
+
+int Tool_myank::getEndLineNumber(void) {
+	HumRegex hre;
+	if (hre.search(m_lineRange, "^(\\d+)\\-(\\d+)$")) {
+		return hre.getMatchInt(2);
+	}
+	return -1;
 }
 
 
@@ -102224,7 +102359,7 @@ void Tool_myank::getMetStates(vector<vector<MyCoord> >& metstates,
 		}
 	}
 
-	if (debugQ) {
+	if (m_debugQ) {
 		for (int i=0; i<infile.getLineCount(); i++) {
 			for (int j=1; j<(int)metstates[i].size(); j++) {
 				if (metstates[i][j].x < 0) {
@@ -102332,7 +102467,7 @@ void Tool_myank::getMarkString(ostream& out, HumdrumFile& infile)  {
 		}
 	}
 
-	if (debugQ) {
+	if (m_debugQ) {
 		for (int i=0; i<(int)mchar.size(); i++) {
 			m_free_text << "\tMARK CHARCTER: " << mchar[i] << endl;
 		}
@@ -102369,9 +102504,9 @@ void Tool_myank::getMarkString(ostream& out, HumdrumFile& infile)  {
 					for (int m=0; m<(int)mchar.size(); m++) {
 						if (str[k] == mchar[m]) {
 							if (inserted) {
-							   out << ',';
+								out << ',';
 							} else {
-							   inserted++;
+								inserted++;
 							}
 							out << curmeasure;
 							hasmark = 1;
@@ -102400,6 +102535,7 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	}
 
 	int lastline = -1;
+	int lastDataLine = -1;
 	int h, i, j;
 	int counter;
 	int printed = 0;
@@ -102409,12 +102545,62 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	int barnum = -1;
 	int datastart = 0;
 	int bartextcount = 0;
+	bool startLineHandled = false;
+
+	int lastLineIndex = getBoolean("lines") ? getEndLineNumber() - 1 : outmeasures[outmeasures.size() - 1].stop;
+
+	// Find the actual last line of the selected section that is a line with
+	// data tokens
+	while (infile.getLine(lastLineIndex)->isData() == false) {
+		lastLineIndex--;
+	}
+
+	// Mapping with with the start token for each spine
+	vector<int> lastLineResolvedTokenLineIndex;
+	// Mapping with the later needed durations of the note that fits within the
+	// selected section
+	vector<HumNum> lastLineDurationsFromNoteStart;
+
+	lastLineResolvedTokenLineIndex.resize(infile.getLine(lastLineIndex)->getTokenCount());
+	lastLineDurationsFromNoteStart.resize(infile.getLine(lastLineIndex)->getTokenCount());
+
+	for (int a = 0; a < infile.getLine(lastLineIndex)->getTokenCount(); a++) {
+		HTp token = infile.token(lastLineIndex, a);
+		// Get lineIndex for last data token with an attack
+		lastLineResolvedTokenLineIndex[a] = infile.token(lastLineIndex, a)->resolveNull()->getLineIndex();
+		// Get needed duration for this token until section end
+		lastLineDurationsFromNoteStart[a] = token->getDurationFromNoteStart() + token->getLine()->getDuration();
+	}
+
+	int startLineNumber = getStartLineNumber();
+	int endLineNumber = getEndLineNumber();
+
+	if (getBoolean("lines")) {
+		int firstDataLineIndex = -1;
+		for (int b = startLineNumber - 1; b <= endLineNumber - 1; b++) {
+			if (infile.getLine(b)->isData()) {
+				firstDataLineIndex = b;
+				break;
+			}
+		}
+		if (firstDataLineIndex >= 0) {
+			if (infile.getLine(firstDataLineIndex)->getDurationFromBarline() == 0) {
+				for (int c = startLineNumber - 1; c >=  0; c--) {
+					if (infile.getLine(c)->isBarline()) {
+						startLineNumber = c + 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	for (h=0; h<(int)outmeasures.size(); h++) {
 		barnum = outmeasures[h].num;
 		measurestart = 1;
 		printed = 0;
 		counter = 0;
-		if (debugQ) {
+		if (m_debugQ) {
 			m_humdrum_text << "!! =====================================\n";
 			m_humdrum_text << "!! processing " << outmeasures[h].num << endl;
 		}
@@ -102424,14 +102610,28 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 		} else {
 			reconcileStartingPosition(infile, outmeasures[0].start);
 		}
-		for (i=outmeasures[h].start; i<outmeasures[h].stop; i++) {
+		int startLine = getBoolean("lines") ? std::max(startLineNumber-1, outmeasures[h].start)
+			: outmeasures[h].start;
+		int endLine = getBoolean("lines") ? std::min(endLineNumber, outmeasures[h].stop)
+			: outmeasures[h].stop;
+		for (i=startLine; i<endLine; i++) {
 			counter++;
 			if ((!printed) && ((mcount == 0) || (counter == 2))) {
 				if ((datastart == 0) && outmeasures[h].num == 0) {
 					// not ideal setup...
 					datastart = 1;
 				} else{
-					adjustGlobalInterpretations(infile, i, outmeasures, h);
+					// Fix adjustGlobalInterpretations when line is a global comment
+					int nextLineIndexWithSpines = i;
+					if (infile.getLine(i)->isCommentGlobal()) {
+						for (int d = i; d <= endLineNumber - 1; d++) {
+							if (!infile.getLine(d)->isCommentGlobal()) {
+								nextLineIndexWithSpines = d;
+								break;
+							}
+						}
+					}
+					adjustGlobalInterpretations(infile, nextLineIndexWithSpines, outmeasures, h);
 					printed = 1;
 				}
 			}
@@ -102441,25 +102641,25 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 			if (infile[i].isBarline()) {
 				mcount++;
 			}
-			if ((mcount == 1) && invisibleQ && infile[i].isBarline()) {
+			if ((mcount == 1) && m_invisibleQ && infile[i].isBarline()) {
 				printInvisibleMeasure(infile, i);
 				measurestart = 0;
 				if ((bartextcount++ == 0) && infile[i].isBarline()) {
 					int barline = 0;
 					sscanf(infile.token(i, 0)->c_str(), "=%d", &barline);
-					if (barnumtextQ && (barline > 0)) {
+					if (m_barnumtextQ && (barline > 0)) {
 						m_humdrum_text << "!!LO:TX:Z=20:X=-90:t=" << barline << endl;
 					}
 				}
-			} else if (doubleQ && (lastbarnum > -1) && (abs(barnum - lastbarnum) > 1)) {
+			} else if (m_doubleQ && (lastbarnum > -1) && (abs(barnum - lastbarnum) > 1)) {
 				printDoubleBarline(infile, i);
 				measurestart = 0;
 			} else if (measurestart && infile[i].isBarline()) {
 				printMeasureStart(infile, i, outmeasures[h].startStyle);
 				measurestart = 0;
 			} else {
-				m_humdrum_text << infile[i] << "\n";
-				if (barnumtextQ && (bartextcount++ == 0) && infile[i].isBarline()) {
+				printDataLine(infile.getLine(i), startLineHandled, lastLineResolvedTokenLineIndex, lastLineDurationsFromNoteStart);
+				if (m_barnumtextQ && (bartextcount++ == 0) && infile[i].isBarline()) {
 					int barline = 0;
 					sscanf(infile.token(i, 0)->c_str(), "=%d", &barline);
 					if (barline > 0) {
@@ -102468,8 +102668,16 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 				}
 			}
 			lastline = i;
+			if (infile.getLine(i)->isData()) {
+				lastDataLine = i;
+			}
 		}
 		lastbarnum = barnum;
+	}
+
+	if (getBoolean("lines") && (lastDataLine >= 0) &&
+			(infile.getLine(lastDataLine)->getDurationToBarline() > infile.getLine(lastDataLine)->getDuration())) {
+		m_nolastbarQ = true;
 	}
 
 	HumRegex hre;
@@ -102480,13 +102688,13 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 	} else {
 		lasti = -1;
 	}
-	if ((!nolastbarQ) &&  (lasti >= 0) && infile[lasti].isBarline()) {
+	if ((!m_nolastbarQ) &&  (lasti >= 0) && infile[lasti].isBarline()) {
 		for (j=0; j<infile[lasti].getFieldCount(); j++) {
 			token = *infile.token(lasti, j);
 			hre.replaceDestructive(token, outmeasures.back().stopStyle, "\\d+.*");
 			// collapse final barlines
 			hre.replaceDestructive(token, "==", "===+");
-			if (doubleQ) {
+			if (m_doubleQ) {
 				if (hre.search(token, "=(.+)")) {
 					// don't add double barline, there is already
 					// some style on the barline
@@ -102505,7 +102713,7 @@ void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
 
 	collapseSpines(infile, lasti);
 
-	if (debugQ) {
+	if (m_debugQ) {
 		m_free_text << "PROCESSING ENDING" << endl;
 	}
 
@@ -103016,6 +103224,81 @@ void Tool_myank::adjustGlobalInterpretationsStart(HumdrumFile& infile, int ii,
 }
 
 
+
+//////////////////////////////
+//
+// Tool_myank::printDataLine -- Print line with data tokens of selected section
+//
+
+void Tool_myank::printDataLine(HLp line,
+		bool& startLineHandled,
+		const vector<int>& lastLineResolvedTokenLineIndex,
+		const vector<HumNum>& lastLineDurationsFromNoteStart) {
+	bool lineChange = false;
+	// Handle cutting the previeous token of a note that hangs into the selected
+	// section
+	if (startLineHandled == false) {
+		if (line->isData()) {
+			vector<HTp> tokens;
+			line->getTokens(tokens);
+			for (HTp token : tokens) {
+				if (token->isKern() && token->isNull()) {
+					HTp resolvedToken = token->resolveNull();
+					if (resolvedToken->isNull()) {
+						continue;
+					}
+					string recip = Convert::durationToRecip(token->getDurationToNoteEnd());
+					string pitch;
+					HumRegex hre;
+					if (hre.search(resolvedToken, "([rRA-Ga-gxyXYn#-]+)")) {
+						pitch = hre.getMatch(1);
+					}
+					string tokenText = recip + pitch + "]";
+					token->setText(tokenText);
+					lineChange = true;
+				}
+			}
+			startLineHandled = true;
+		}
+	// Handle cutting the last attacked note of the selected section
+	} else {
+		// Check if line has a note that needs to be handled
+		if (find(lastLineResolvedTokenLineIndex.begin(), lastLineResolvedTokenLineIndex.end(), line->getLineIndex()) !=
+				lastLineResolvedTokenLineIndex.end()) {
+			for (int i = 0; i < line->getTokenCount(); i++) {
+				HTp token = line->token(i);
+				// Check if token need the be handled and is of type **kern
+				if (token->isKern() && (lastLineResolvedTokenLineIndex[i] == line->getLineIndex())) {
+					HTp resolvedToken = token->resolveNull();
+					if (resolvedToken->isNull()) {
+						continue;
+					}
+					HumNum dur = lastLineDurationsFromNoteStart[i];
+					string recip = Convert::durationToRecip(dur);
+					string pitch;
+					HumRegex hre;
+					if (hre.search(resolvedToken, "([rRA-Ga-gxyXYn#-]+)")) {
+						pitch = hre.getMatch(1);
+					}
+					string tokenText;
+					if (resolvedToken->getDuration() > dur) {
+						tokenText += "[";
+					}
+					tokenText += recip + pitch;
+					token->setText(tokenText);
+					lineChange = true;
+				}
+			}
+		}
+	}
+	if (lineChange) {
+		line->createLineFromTokens();
+	}
+	m_humdrum_text << line << "\n";
+}
+
+
+
 //////////////////////////////
 //
 // Tool_myank::printMeasureStart -- print a starting measure of a segment.
@@ -103052,7 +103335,7 @@ void Tool_myank::printMeasureStart(HumdrumFile& infile, int line, const string& 
 	}
 	m_humdrum_text << "\n";
 
-	if (barnumtextQ) {
+	if (m_barnumtextQ) {
 		int barline = 0;
 		sscanf(infile.token(line, 0)->c_str(), "=%d", &barline);
 		if (barline > 0) {
@@ -103089,7 +103372,7 @@ void Tool_myank::printDoubleBarline(HumdrumFile& infile, int line) {
 	}
 	m_humdrum_text << "\n";
 
-	if (barnumtextQ) {
+	if (m_barnumtextQ) {
 		int barline = 0;
 		sscanf(infile.token(line, 0)->c_str(), "=%d", &barline);
 		if (barline > 0) {
@@ -103147,12 +103430,12 @@ void Tool_myank::printInvisibleMeasure(HumdrumFile& infile, int line) {
 
 void Tool_myank::reconcileSpineBoundary(HumdrumFile& infile, int index1, int index2) {
 
-	if (debugQ) {
+	if (m_debugQ) {
 		m_humdrum_text << "RECONCILING LINES " << index1+1 << " and " << index2+1 << endl;
 		m_humdrum_text << "FIELD COUNT OF " << index1+1 << " is "
-			  << infile[index1].getFieldCount() << endl;
+			            << infile[index1].getFieldCount() << endl;
 		m_humdrum_text << "FIELD COUNT OF " << index2+1 << " is "
-			  << infile[index2].getFieldCount() << endl;
+			            << infile[index2].getFieldCount() << endl;
 	}
 
 	// check to see if any changes need reconciling; otherwise, exit function
@@ -103309,12 +103592,18 @@ void Tool_myank::printStarting(HumdrumFile& infile) {
 			exi = i;
 			break;
 		}
-		m_humdrum_text << infile[i] << "\n";
+		if (!m_hideStarting) {
+			m_humdrum_text << infile[i] << "\n";
+		} else {
+			if (infile[i].rfind("!!!RDF", 0) == 0) {
+				m_humdrum_text << infile[i] << "\n";
+			}
+		}
 	}
 
 	int hasI = 0;
 
-	if (instrumentQ) {
+	if (m_instrumentQ) {
 		// print any tandem interpretations which start with *I found
 		// at the start of the data before measures, notes, or any
 		// spine manipulator lines
@@ -103365,7 +103654,7 @@ void Tool_myank::printStarting(HumdrumFile& infile) {
 //
 
 void Tool_myank::printEnding(HumdrumFile& infile, int lastline, int adjlin) {
-	if (debugQ) {
+	if (m_debugQ) {
 		m_humdrum_text << "IN printEnding" << endl;
 	}
 	int ending = -1;
@@ -103401,7 +103690,13 @@ void Tool_myank::printEnding(HumdrumFile& infile, int lastline, int adjlin) {
 
 	if (startline >= 0) {
 		for (i=startline; i<infile.getLineCount(); i++) {
-			m_humdrum_text << infile[i] << "\n";
+			if (m_hideEnding && (i >= ending)) {
+				if (infile[i].rfind("!!!RDF", 0) == 0) {
+					m_humdrum_text << infile[i] << "\n";
+				}
+			} else {
+				m_humdrum_text << infile[i] << "\n";
+			}
 		}
 	}
 
@@ -103688,14 +103983,14 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 		cerr << "Error: ridiculusly large measure number: " << maxmeasure << endl;
 		exit(1);
 	}
-	if (maxQ) {
+	if (m_maxQ) {
 		if (measurein.size() == 0) {
 			m_humdrum_text << 0 << endl;
 		} else {
 			m_humdrum_text << maxmeasure << endl;
 		}
 		exit(0);
-	} else if (minQ) {
+	} else if (m_minQ) {
 		for (int ii=0; ii<infile.getLineCount(); ii++) {
 			if (infile[ii].isBarline()) {
 				if (hre.search(infile.token(ii, 0), "=\\d", "")) {
@@ -103729,7 +104024,7 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 	string ostring = optionstring;
 	removeDollarsFromString(ostring, maxmeasure);
 
-	if (debugQ) {
+	if (m_debugQ) {
 		m_free_text << "Option string expanded: " << ostring << endl;
 	}
 
@@ -103744,8 +104039,7 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 	while (value != 0) {
 		start += value - 1;
 		start += (int)hre.getMatch(1).size();
-		processFieldEntry(range, hre.getMatch(1), infile, maxmeasure,
-			 measurein, inmap);
+		processFieldEntry(range, hre.getMatch(1), infile, maxmeasure, measurein, inmap);
 		value = hre.search(ostring, start, searchexp);
 	}
 }
@@ -103763,7 +104057,7 @@ void Tool_myank::fillGlobalDefaults(HumdrumFile& infile, vector<MeasureInfo>& me
 	HumRegex hre;
 
 	int tracks = infile.getMaxTrack();
-   // cerr << "MAX TRACKS " << tracks << " ===============================" << endl;
+	// cerr << "MAX TRACKS " << tracks << " ===============================" << endl;
 
 	vector<MyCoord> currclef(tracks+1);
 	vector<MyCoord> currkeysig(tracks+1);
@@ -104260,7 +104554,7 @@ void Tool_myank::removeDollarsFromString(string& buffer, int maxx) {
 	int outval;
 	int value;
 
-	if (debugQ) {
+	if (m_debugQ) {
 		m_free_text << "MEASURE STRING BEFORE DOLLAR REMOVAL: " << buffer << endl;
 	}
 
@@ -104282,7 +104576,7 @@ void Tool_myank::removeDollarsFromString(string& buffer, int maxx) {
 		obuf += hre.getMatch(1);
 		hre.replaceDestructive(buffer, tbuf, obuf);
 	}
-	if (debugQ) {
+	if (m_debugQ) {
 		m_free_text << "DOLLAR EXPAND: " << buffer << endl;
 	}
 }

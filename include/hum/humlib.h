@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jan 26 22:41:11 PST 2023
+// Last Modified: Thu Feb  9 08:53:30 PST 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1618,6 +1618,12 @@ class HumdrumToken : public std::string, public HumHash {
 
 		HumNum   getDurationToEnd          (void);
 		HumNum   getDurationToEnd          (HumNum scale);
+
+		HumNum   getDurationFromNoteStart  (void);
+		HumNum   getDurationFromNoteStart  (HumNum scale);
+
+		HumNum   getDurationToNoteEnd      (void);
+		HumNum   getDurationToNoteEnd      (HumNum scale);
 
 		HumNum   getDurationFromBarline    (void);
 		HumNum   getDurationFromBarline    (HumNum scale);
@@ -9173,25 +9179,36 @@ class Tool_myank : public HumTool {
 		void      printMeasureStart    (HumdrumFile& infile, int line, const string& style);
 		std::string expandMultipliers  (const string& inputstring);
 
+		vector<int> analyzeBarNumbers  (HumdrumFile& infile);
+		int         getBarNumberForLineNumber(int lineNumber);
+		int         getStartLineNumber (void);
+		int         getEndLineNumber   (void);
+		void        printDataLine      (HLp line, bool& startLineHandled, const vector<int>& lastLineResolvedTokenLineIndex, const vector<HumNum>& lastLineDurationsFromNoteStart);
+
 	private:
-		int    debugQ      = 0;             // used with --debug option
-		// int    inputlist   = 0;             // used with --inlist option
-		int    inlistQ     = 0;             // used with --inlist option
-		int    outlistQ    = 0;             // used with --outlist option
-		int    verboseQ    = 0;             // used with -v option
-		int    invisibleQ  = 1;             // used with --visible option
-		int    maxQ        = 0;             // used with --max option
-		int    minQ        = 0;             // used with --min option
-		int    instrumentQ = 0;             // used with -I option
-		int    nolastbarQ  = 0;             // used with -B option
-		int    markQ       = 0;             // used with --mark option
-		int    doubleQ     = 0;             // used with --mdsep option
-		int    barnumtextQ = 0;             // used with -T option
-		int    Section     = 0;             // used with --section option
-		int    sectionCountQ = 0;           // used with --section-count option
-		vector<MeasureInfo> MeasureOutList; // used with -m option
-		vector<MeasureInfo> MeasureInList;  // used with -m option
-		vector<vector<MyCoord> > metstates;
+		int    m_debugQ      = 0;             // used with --debug option
+		// int    inputlist     = 0;             // used with --inlist option
+		int    m_inlistQ     = 0;             // used with --inlist option
+		int    m_outlistQ    = 0;             // used with --outlist option
+		int    m_verboseQ    = 0;             // used with -v option
+		int    m_invisibleQ  = 1;             // used with --visible option
+		int    m_maxQ        = 0;             // used with --max option
+		int    m_minQ        = 0;             // used with --min option
+		int    m_instrumentQ = 0;             // used with -I option
+		int    m_nolastbarQ  = 0;             // used with -B option
+		int    m_markQ       = 0;             // used with --mark option
+		int    m_doubleQ     = 0;             // used with --mdsep option
+		int    m_barnumtextQ = 0;             // used with -T option
+		int    m_section     = 0;             // used with --section option
+		int    m_sectionCountQ = 0;           // used with --section-count option
+		vector<MeasureInfo> m_measureOutList; // used with -m option
+		vector<MeasureInfo> m_measureInList;  // used with -m option
+		vector<vector<MyCoord> > m_metstates;
+
+		string      m_lineRange;              // used with -l option
+		vector<int> m_barNumbersPerLine;      // used with -l option
+		bool m_hideStarting;                  // used with --hide-starting option
+		bool m_hideEnding;                    // used with --hide-ending option
 
 };
 
