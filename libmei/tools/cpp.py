@@ -352,6 +352,10 @@ CONVERTER_END_H = """}};
 // AttConverter
 //----------------------------------------------------------------------------
 
+/**
+ * Instantiable version of AttConverterBase
+ */
+
 class AttConverter: public AttConverterBase {{
 public:
     AttConverter() = default;
