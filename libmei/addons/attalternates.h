@@ -413,6 +413,6 @@ protected:
     std::string m_nmtoken;
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATT_ALTERNATES_H__

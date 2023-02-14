@@ -176,6 +176,6 @@ public:
     ///@}
 };
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATT_H__

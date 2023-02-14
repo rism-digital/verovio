@@ -282,6 +282,6 @@ typedef std::vector<std::string> xsdAnyURI_List;
  */
 typedef std::vector<int> xsdPositiveInteger_List;
 
-} // namespace
+} // namespace vrv
 
 #endif // __LIBMEI_ATT_DEF_H__
