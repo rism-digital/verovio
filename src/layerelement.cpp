@@ -1124,11 +1124,13 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
             }
         }
         else {
-            Note *note = vrv_cast<Note *>(this);
-            if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
-                const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
-                margin = std::max(margin, tremWidth / 2);
-            }
+            if (this->Is(NOTE)) {
+                Note *note = vrv_cast<Note *>(this);
+                if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
+                    const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
+                    margin = std::max(margin, tremWidth / 2);
+                }
+            }            
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
         }
         // if there is no overlap between elements, make additinal checks for some of the edge cases
