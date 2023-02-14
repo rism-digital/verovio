@@ -221,19 +221,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    // TODO: Move to functor helper
-public:
-    /**
-     * Helper for calculating the slur direction
-     */
-    ///@{
-    // Determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection() const;
-    // Get preferred curve direction based on various conditions
-    curvature_CURVEDIR GetPreferredCurveDirection(
-        data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur) const;
-    ///@}
-
 private:
     /**
      * Helper for calculating spanned elements

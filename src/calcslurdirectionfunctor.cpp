@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "layer.h"
 #include "slur.h"
 #include "staff.h"
 #include "system.h"
@@ -103,7 +104,7 @@ FunctorCode CalcSlurDirectionFunctor::VisitSlur(Slur *slur)
 
         const int center = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
         const bool isAboveStaffCenter = (start->GetDrawingY() > center);
-        if (slur->GetPreferredCurveDirection(startStemDir, isAboveStaffCenter, isGraceToNoteSlur)
+        if (this->GetPreferredCurveDirection(slur, startStemDir, isAboveStaffCenter, isGraceToNoteSlur)
             == curvature_CURVEDIR_below) {
             slur->SetDrawingCurveDir(SlurCurveDirection::Below);
         }
@@ -113,6 +114,71 @@ FunctorCode CalcSlurDirectionFunctor::VisitSlur(Slur *slur)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+curvature_CURVEDIR CalcSlurDirectionFunctor::GetGraceCurveDirection(const Slur *slur) const
+{
+    // Start on the notehead side
+    const LayerElement *start = slur->GetStart();
+    const StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
+    const bool isStemDown
+        = startStemDrawInterface && (startStemDrawInterface->GetDrawingStemDir() == STEMDIRECTION_down);
+    return isStemDown ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+}
+
+curvature_CURVEDIR CalcSlurDirectionFunctor::GetPreferredCurveDirection(
+    const Slur *slur, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur) const
+{
+    const Note *startNote = NULL;
+    const Chord *startParentChord = NULL;
+    if (slur->GetStart()->Is(NOTE)) {
+        startNote = vrv_cast<const Note *>(slur->GetStart());
+        assert(startNote);
+        startParentChord = startNote->IsChordTone();
+    }
+
+    const Layer *layer = NULL;
+    const LayerElement *layerElement = NULL;
+    std::tie(layer, layerElement) = slur->GetBoundaryLayer();
+    data_STEMDIRECTION layerStemDir = STEMDIRECTION_NONE;
+
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
+    // first should be the slur @curvedir
+    if (slur->HasCurvedir()) {
+        drawingCurveDir
+            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // grace note slurs in case we have no drawing stem direction on the layer
+    else if (isGraceToNoteSlur && layer && layerElement
+        && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
+        drawingCurveDir = this->GetGraceCurveDirection(slur);
+    }
+    // otherwise layer direction trumps note direction
+    else if (layer && layerElement && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
+        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // look if in a chord
+    else if (startParentChord) {
+        if (startParentChord->PositionInChord(startNote) < 0) {
+            drawingCurveDir = curvature_CURVEDIR_below;
+        }
+        else if (startParentChord->PositionInChord(startNote) > 0) {
+            drawingCurveDir = curvature_CURVEDIR_above;
+        }
+        // away from the stem if odd number (center note)
+        else {
+            drawingCurveDir = (noteStemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        }
+    }
+    else if (noteStemDir == STEMDIRECTION_up) {
+        drawingCurveDir = curvature_CURVEDIR_below;
+    }
+    else if (noteStemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        drawingCurveDir = isAboveStaffCenter ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+
+    return drawingCurveDir;
 }
 
 } // namespace vrv

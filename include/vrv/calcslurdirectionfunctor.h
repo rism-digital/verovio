@@ -45,7 +45,12 @@ public:
 protected:
     //
 private:
-    //
+    // Determine curve direction for the slurs that start at grace note
+    curvature_CURVEDIR GetGraceCurveDirection(const Slur *slur) const;
+    // Get preferred curve direction based on various conditions
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        const Slur *slur, data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur) const;
+
 public:
     //
 private:
