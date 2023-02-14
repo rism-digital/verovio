@@ -23,7 +23,7 @@ namespace vrv {
 
 /**
  * This is the base class for all MEI att classes.
- * It cannot be instanciated outside the Att class hierarchy.
+ * It cannot be instantiated outside the Att class hierarchy.
  * The att classes are generated with the libmei parser for Verovio.
  */
 class Att : public AttConverterBase {
