@@ -1125,7 +1125,7 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
                 overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
             }
         }
-        else {         
+        else {
             overlap = std::max(overlap, boundingBox->HorizontalRightOverlap(this, params->m_doc, margin));
         }
         // if there is no overlap between elements, make additinal checks for some of the edge cases
