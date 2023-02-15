@@ -1214,7 +1214,7 @@ public:
 
 
 def create_basic_validator(configure: dict, outdir: Path):
-    basic_path = Path(configure["basic_odd"])
+    basic_path = Path(configure["config_dir"]) / Path(configure["basic_odd"])
     with basic_path.open("r") as basic_schema:
         bschema = MeiSchema(basic_schema, resolve_elements=True)
 
@@ -1268,7 +1268,8 @@ def create(schema, configure: dict) -> bool:
     global DATATYPES
     lg.debug("Begin Verovio C++ Output ...")
 
-    datatypes: Path = Path(configure["datatypes"])
+    config_dir: Path = Path(configure["config_dir"])
+    datatypes: Path = config_dir / Path(configure["datatypes"])
     if not datatypes.exists():
         lg.error("Datatypes file could not be found")
         return False
@@ -1276,13 +1277,13 @@ def create(schema, configure: dict) -> bool:
     DATATYPES = yaml.safe_load(datatypes.open("r"))
 
     ns: str = configure["namespace"]
-    outdir: Path = Path(configure["output_dir"])
+    outdir: Path = config_dir / Path(configure["output_dir"])
 
     # if we output element classes, then we do not output the attmodule class
     if configure["elements"]:
         create_element_classes(ns, schema, outdir)
         if addons := configure.get("addons_dir"):
-            copy_addons(ns, Path(addons), outdir)
+            copy_addons(ns, config_dir / Path(addons), outdir)
         else:
             lg.warning("Element output was configured, but no addons directory was provided.")
     else:

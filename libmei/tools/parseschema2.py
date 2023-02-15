@@ -66,6 +66,7 @@ if __name__ == "__main__":
 
     config: dict = yaml.safe_load(open(args.config, "r"))
     config["compiled"] = args.compiled
+    config["config_dir"] = args.config.parent
 
     if config["debug"]:
         log.setLevel(logging.DEBUG)
