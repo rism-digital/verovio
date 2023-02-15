@@ -2144,7 +2144,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
     else if (this->Is(NOTE) && (next == ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
         Note *note = vrv_cast<Note *>(this);
-        if (note->HasStemMod() && (note->GetStemMod() < STEMMODIFIER_MAX) && (note->GetDrawingStemDir() == STEMDIRECTION_up)) {
+        if (note->HasStemMod() && (note->GetStemMod() < STEMMODIFIER_MAX)
+            && (note->GetDrawingStemDir() == STEMDIRECTION_up)) {
             const int adjust = drawingUnit;
             params->m_cumulatedXShift += adjust;
             params->m_upcomingMinPos += adjust;
