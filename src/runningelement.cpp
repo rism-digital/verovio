@@ -247,7 +247,7 @@ bool RunningElement::AdjustRunningElementYPos()
         ArrayOfTextElements *textElements = &m_cells[i];
         // For each object
         for (TextElement *element : *textElements) {
-            if (element->HasContentBB()) {
+            if (!element->HasContentBB()) {
                 continue;
             }
             int yShift = element->GetContentY2();
