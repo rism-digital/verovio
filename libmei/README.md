@@ -19,15 +19,27 @@ LibMEI is released under the MIT license.
 Compilation & Usage
 -------------------
 
-To generate the code, do:
+To install you can use Python `poetry` which will create a virtual environment and automatically
+install the necessary dependencies. The first time you get things set up, from the `libmei` directory run:
 
-    python3 parseschema2.py ../mei/develop/mei-verovio_compiled.odd
+    $> poetry install 
 
-Where the positional argument points to an ODD file for which you wish to
-generate code.
+This will set up a virtual environment for you. When you want to activate the environment, run
+
+    $> poetry shell
+
+This allows you to run Python with all the necessary dependencies for running the libmei scripts.
+
+To generate the code, activate the poetry environment and, from the `libmei` directory, run:
+
+    $> python3 tools/parseschema2.py ./mei/develop/mei-verovio_compiled.odd
+
+Where the positional argument points to an ODD file for which you wish to generate code.
 
 Other options are:
-* `-c`: A path to a YML config file.
+* `-c`: A path to a YML config file. If not specified this will look for a file called "config.yml"
+        in your current working directory. (provided by default, but you can make your own if you 
+        have custom requirements.)   
 
 Config file
 -----------
@@ -38,10 +50,14 @@ The config file can contain several options:
 debug: true|false  # determines the log level while running 
 output_dir: "../dist"  # path to where the output should go
 addons_dir: "../addons"  # path to an optional addons directory
-elements: true|false  # whether or not code for element handling should be generated   
+elements: true|false  # whether code for element handling should be generated   
 namespace: "vrv"  # the namespace to use in generated CPP code
 datatypes: "./datatypes.yml"  # path to a datatypes mapping file
-basic_odd: "../mei/develop/mei-basic_compiled.odd"  # path to an MEI basic ODD file
+# path to an MEI basic ODD file. If not provided then the meibasic.h file will not
+# be written. (This contains a map of the elements and attributes allowed in MEI Basic
+# which is then used by Verovio to ensure the "full" MEI output is stripped when the user
+# requests "Basic" output.)
+basic_odd: "../mei/develop/mei-basic_compiled.odd"   
 ```
 
 For the `basic_odd` option, if provided the generator will generate a map of notes and allowed
