@@ -339,6 +339,7 @@ class AttConverterBase {{
 protected:
     AttConverterBase() = default;
     ~AttConverterBase() = default;
+
 public:"""
 
 CONVERTER_METHODS_H = """
@@ -356,7 +357,7 @@ CONVERTER_END_H = """}};
  * Instantiable version of AttConverterBase
  */
 
-class AttConverter: public AttConverterBase {{
+class AttConverter : public AttConverterBase {{
 public:
     AttConverter() = default;
     virtual ~AttConverter() = default;
