@@ -1408,6 +1408,12 @@
 		E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
 		E77C198328CD31AD00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
+		E7870354299CF03200156DC4 /* adjustarpegfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7870353299CF02900156DC4 /* adjustarpegfunctor.h */; };
+		E7870355299CF03300156DC4 /* adjustarpegfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7870353299CF02900156DC4 /* adjustarpegfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7870357299CF06D00156DC4 /* adjustarpegfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */; };
+		E7870358299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */; };
+		E7870359299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */; };
+		E787035A299CF07700156DC4 /* adjustarpegfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */; };
 		E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */; };
 		E788335E2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
@@ -1977,6 +1983,8 @@
 		E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdotsfunctor.h; path = include/vrv/calcdotsfunctor.h; sourceTree = "<group>"; };
 		E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcdotsfunctor.cpp; path = src/calcdotsfunctor.cpp; sourceTree = "<group>"; };
 		E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentxposfunctor.h; path = include/vrv/calcalignmentxposfunctor.h; sourceTree = "<group>"; };
+		E7870353299CF02900156DC4 /* adjustarpegfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustarpegfunctor.h; path = include/vrv/adjustarpegfunctor.h; sourceTree = "<group>"; };
+		E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustarpegfunctor.cpp; path = src/adjustarpegfunctor.cpp; sourceTree = "<group>"; };
 		E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcchordnoteheadsfunctor.h; path = include/vrv/calcchordnoteheadsfunctor.h; sourceTree = "<group>"; };
 		E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcchordnoteheadsfunctor.cpp; path = src/calcchordnoteheadsfunctor.cpp; sourceTree = "<group>"; };
 		E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcspanningbeamspansfunctor.h; path = include/vrv/calcspanningbeamspansfunctor.h; sourceTree = "<group>"; };
@@ -2757,6 +2765,8 @@
 		E786CD09298AA3BC009BAC58 /* horizontal-layout */ = {
 			isa = PBXGroup;
 			children = (
+				E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */,
+				E7870353299CF02900156DC4 /* adjustarpegfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
@@ -2872,6 +2882,7 @@
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
 				40C2E4202052A6E90003625F /* sb.h in Headers */,
 				4DE0B9A12988070C00D4C939 /* interface.h in Headers */,
+				E7870354299CF03200156DC4 /* adjustarpegfunctor.h in Headers */,
 				4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */,
 				E7D3389A293E057100C40B81 /* setscoredeffunctor.h in Headers */,
 				4DB3D8DB1F83D13F00B5FC2B /* turn.h in Headers */,
@@ -3144,6 +3155,7 @@
 				BB4C4B5422A932D7001F6AF0 /* halfmrpt.h in Headers */,
 				BB4C4B4E22A932D7001F6AF0 /* dot.h in Headers */,
 				4DBDD67C2939E1D8009EC466 /* symboltable.h in Headers */,
+				E7870355299CF03300156DC4 /* adjustarpegfunctor.h in Headers */,
 				BB4C4B1A22A932CF001F6AF0 /* anchoredtext.h in Headers */,
 				BB4C4AF422A932BC001F6AF0 /* rdg.h in Headers */,
 				BB4C4B2022A932CF001F6AF0 /* breath.h in Headers */,
@@ -3487,6 +3499,7 @@
 				4D766F0020ACAD6D006875D8 /* syllable.cpp in Sources */,
 				4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */,
 				E76046C228D496B300C36204 /* calcledgerlinesfunctor.cpp in Sources */,
+				E7870358299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				4D766F0120ACAD6D006875D8 /* view_neume.cpp in Sources */,
 				4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */,
 				4DACC9892990F29A00B55913 /* atts_mei.cpp in Sources */,
@@ -3776,6 +3789,7 @@
 				4DA0EACB22BB779400A7EBEB /* zone.cpp in Sources */,
 				8F086EF1188539540037FD8E /* keysig.cpp in Sources */,
 				E74A806C28BC98B2005274E7 /* functorinterface.cpp in Sources */,
+				E7870357299CF06D00156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				4DEC4D9E21C81E9400D1D273 /* orig.cpp in Sources */,
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
@@ -3987,6 +4001,7 @@
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				4DACC98A2990F29A00B55913 /* atts_mei.cpp in Sources */,
 				4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */,
+				E7870359299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				E76046C028D4829000C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				4DB3D8C21F83D0E600B5FC2B /* controlelement.cpp in Sources */,
 				4DB3D8DF1F83D15300B5FC2B /* btrem.cpp in Sources */,
@@ -4235,6 +4250,7 @@
 				BB4C4B5D22A932D7001F6AF0 /* metersig.cpp in Sources */,
 				BB4C4BB622A932F6001F6AF0 /* jsonxx.cc in Sources */,
 				4DACC98B2990F29A00B55913 /* atts_mei.cpp in Sources */,
+				E787035A299CF07700156DC4 /* adjustarpegfunctor.cpp in Sources */,
 				E76046C128D4829000C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				BB4C4B0B22A932C3001F6AF0 /* pghead2.cpp in Sources */,
 				BB4C4BBA22A932FC001F6AF0 /* MidiEvent.cpp in Sources */,
