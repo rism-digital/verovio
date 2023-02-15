@@ -31,6 +31,7 @@ class AttConverterBase {
 protected:
     AttConverterBase() = default;
     ~AttConverterBase() = default;
+
 public:
     std::string AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const;
     data_ACCIDENTAL_GESTURAL StrToAccidentalGestural(const std::string &value, bool logWarning = true) const;
@@ -488,7 +489,7 @@ public:
  * Instantiable version of AttConverterBase
  */
 
-class AttConverter: public AttConverterBase {
+class AttConverter : public AttConverterBase {
 public:
     AttConverter() = default;
     virtual ~AttConverter() = default;
