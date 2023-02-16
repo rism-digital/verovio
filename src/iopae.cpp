@@ -2778,11 +2778,19 @@ bool PAEInput::Import(const std::string &input)
     m_doc->Reset();
     m_doc->SetType(Raw);
 
+    // Genereate the header and add a comment to the project description
+    m_doc->GenerateMEIHeader(false);
+    pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
+    if (projectDesc) {
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.append_child(pugi::node_pcdata).set_value("Converted from Plaine and Easie to MEI");
+    }
+
     bool success = true;
 
     jsonxx::Object header;
-    if (jsonInput.has<jsonxx::Object>("header")) {
-        header = jsonInput.get<jsonxx::Object>("header");
+    if (jsonInput.has<jsonxx::Object>("x-header")) {
+        header = jsonInput.get<jsonxx::Object>("x-header");
         ParseHeader(header);
     }
 
@@ -3166,7 +3174,104 @@ bool PAEInput::ConvertKeySig()
 
 void PAEInput::ParseHeader(jsonxx::Object &header)
 {
-    m_doc->GenerateMEIHeader(false);
+    // Get the nodes for element that has to be already in the header
+    pugi::xml_node fileDesc = m_doc->m_header.first_child().select_node("//fileDesc").node();
+    if (!fileDesc) return;
+
+    pugi::xml_node titleStmt = fileDesc.select_node("//titleStmt").node();
+    if (!titleStmt) return;
+
+    pugi::xml_node pubStmt = fileDesc.select_node("//pubStmt").node();
+    if (!pubStmt) return;
+
+    // normally the header already has an empty title - add if missing
+    pugi::xml_node title = titleStmt.child("title");
+    if (!title) title = titleStmt.append_child("title");
+
+    if (header.has<jsonxx::String>("source_title")) {
+        title.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("source_title").c_str());
+    }
+
+    if (header.has<jsonxx::String>("title")) {
+        pugi::xml_node subTitle = titleStmt.append_child("title");
+        subTitle.append_attribute("type") = "subordinate";
+        subTitle.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("title").c_str());
+        if (header.has<jsonxx::String>("movement")) {
+            subTitle.append_attribute("label") = header.get<jsonxx::String>("movement").c_str();
+        }
+    }
+
+    if (header.has<jsonxx::String>("composer")) {
+        pugi::xml_node composer = titleStmt.append_child("composer");
+        composer.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("composer").c_str());
+    }
+
+    if (header.has<jsonxx::String>("source_url") || header.has<jsonxx::String>("download_url")) {
+        pugi::xml_node identifier = pubStmt.append_child("identifier");
+        if (header.has<jsonxx::String>("source_url")) {
+            pugi::xml_node ptr = identifier.append_child("ptr");
+            ptr.append_attribute("type") = "rism:Source";
+            ptr.append_attribute("target") = header.get<jsonxx::String>("source_url").c_str();
+        }
+        if (header.has<jsonxx::String>("download_url")) {
+            pugi::xml_node ptr = identifier.append_child("ptr");
+            ptr.append_attribute("type") = "rism:Incipit";
+            ptr.append_attribute("target") = header.get<jsonxx::String>("download_url").c_str();
+        }
+    }
+
+    if (header.has<jsonxx::Array>("notes")) {
+        pugi::xml_node notesStmt = fileDesc.append_child("notesStmt");
+        jsonxx::Array array = header.get<jsonxx::Array>("notes");
+        for (int i = 0; i < (int)array.size(); ++i) {
+            pugi::xml_node annot = notesStmt.append_child("annot");
+            annot.append_child(pugi::node_pcdata).set_value(array.get<jsonxx::String>(i).c_str());
+        }
+    }
+
+    bool hasIncip = false;
+    for (const std::string &key : { "scoring", "key_mode", "role", "voice_intrument" }) {
+        hasIncip = hasIncip || header.has<jsonxx::String>(key) || header.has<jsonxx::Array>(key);
+    }
+    if (hasIncip) {
+        pugi::xml_node work = m_doc->m_header.first_child().append_child("workList").append_child("work");
+        pugi::xml_node title = work.append_child("title");
+        if (header.has<jsonxx::String>("title")) {
+            title.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("title").c_str());
+        }
+        pugi::xml_node incip = work.append_child("incip");
+        if (header.has<jsonxx::String>("role")) {
+            incip.append_child("role")
+                .append_child(pugi::node_pcdata)
+                .set_value(header.get<jsonxx::String>("role").c_str());
+        }
+        if (header.has<jsonxx::String>("scoring") || header.has<jsonxx::String>("voice_intrument")) {
+            pugi::xml_node perfResList = incip.append_child("perfResList");
+            if (header.has<jsonxx::String>("voice_instrument")) {
+                perfResList.append_child("perfRes")
+                    .append_child(pugi::node_pcdata)
+                    .set_value(header.get<jsonxx::String>("voice_instrument").c_str());
+            }
+            if (header.has<jsonxx::String>("scoring")) {
+                perfResList.append_child("perfRes")
+                    .append_child(pugi::node_pcdata)
+                    .set_value(header.get<jsonxx::String>("scoring").c_str());
+            }
+        }
+        if (header.has<jsonxx::String>("key_mode")) {
+            incip.append_child("key")
+                .append_child(pugi::node_pcdata)
+                .set_value(header.get<jsonxx::String>("key_mode").c_str());
+        }
+        if (header.has<jsonxx::Array>("text_incipits")) {
+            pugi::xml_node incipText = incip.append_child("incipText");
+            jsonxx::Array array = header.get<jsonxx::Array>("text_incipits");
+            for (int i = 0; i < (int)array.size(); ++i) {
+                pugi::xml_node p = incipText.append_child("p");
+                p.append_child(pugi::node_pcdata).set_value(array.get<jsonxx::String>(i).c_str());
+            }
+        }
+    }
 }
 
 bool PAEInput::ConvertClef()
