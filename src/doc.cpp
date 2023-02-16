@@ -278,17 +278,24 @@ void Doc::GenerateMEIHeader(bool meiBasic)
     // date
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+    std::string dateStr = StringFormat("%d-%02d-%02d-%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
-    date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
+    date.append_attribute("isodate") = dateStr.c_str();
 
     if (!meiBasic) {
         // encodingDesc
         pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+        // appInfo/application/name
+        pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+        pugi::xml_node application = appInfo.append_child("application");
+        application.append_attribute("xml:id") = "verovio";
+        application.append_attribute("version") = GetVersion().c_str();
+        pugi::xml_node name = application.append_child("name");
+        name.append_child(pugi::node_pcdata).set_value(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+        // projectDesc
         pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.append_child(pugi::node_pcdata)
-            .set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
+        p1.append_child(pugi::node_pcdata).set_value(StringFormat("MEI encoded with Verovio").c_str());
     }
 }
 
