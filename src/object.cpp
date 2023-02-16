@@ -802,8 +802,27 @@ void Object::AddChild(Object *child)
     }
 
     child->SetParent(this);
-    m_children.push_back(child);
+    const int insertOrder = this->GetInsertOrderFor(child->GetClassId());
+    if (m_children.empty() || insertOrder == VRV_UNSET) {
+        m_children.push_back(child);
+    }
+    else {
+        int i = 0;
+        for (const Object *existingChild : m_children) {
+            if (this->GetInsertOrderFor(existingChild->GetClassId()) > insertOrder) break;
+            ++i;
+        }
+        i = std::min(i, (int)m_children.size());
+        m_children.insert(m_children.begin() + i, child);
+    }
     Modify();
+}
+
+int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const
+{
+    std::vector<ClassId>::const_iterator classIdIt = std::find(order.begin(), order.end(), classId);
+    if (classIdIt == order.end()) return VRV_UNSET;
+    return static_cast<int>(std::distance(order.begin(), classIdIt));
 }
 
 int Object::GetDrawingX() const
