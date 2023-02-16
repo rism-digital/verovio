@@ -281,9 +281,6 @@ bool ScoreDef::IsSupportedChild(Object *child)
     else if (child->Is(METERSIGGRP)) {
         assert(dynamic_cast<MeterSigGrp *>(child));
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
     else if (child->IsRunningElement()) {
         assert(dynamic_cast<RunningElement *>(child));
     }
