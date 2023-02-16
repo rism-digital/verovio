@@ -19,6 +19,7 @@
 
 #include "att.h"
 #include "vrv.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -438,28 +439,12 @@ bool OptionArray::SetValue(const std::string &value)
 
 std::string OptionArray::GetStrValue() const
 {
-    std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)m_values.size(); ++i) {
-        if (i != 0) {
-            ss << ", ";
-        }
-        ss << "\"" << m_values.at(i) << "\"";
-    }
-    return ss.str();
+    return this->GetStr(m_values);
 }
 
 std::string OptionArray::GetDefaultStrValue() const
 {
-    std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)m_defaultValues.size(); ++i) {
-        if (i != 0) {
-            ss << ", ";
-        }
-        ss << "\"" << m_defaultValues.at(i) << "\"";
-    }
-    return ss.str();
+    return this->GetStr(m_defaultValues);
 }
 
 bool OptionArray::SetValue(std::vector<std::string> const &values)
@@ -478,6 +463,20 @@ void OptionArray::Reset()
 bool OptionArray::IsSet() const
 {
     return !m_values.empty();
+}
+
+std::string OptionArray::GetStr(const std::vector<std::string> &values) const
+{
+    std::stringstream ss;
+    int i = 0;
+    for (std::string const &value : values) {
+        if (i != 0) {
+            ss << ", ";
+        }
+        ss << "\"" << value << "\"";
+        ++i;
+    }
+    return ss.str();
 }
 
 //----------------------------------------------------------------------------
@@ -568,8 +567,7 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 {
     std::vector<std::string> strValues = this->GetStrValues(withoutDefault);
     std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)strValues.size(); ++i) {
+    for (int i = 0; i < (int)strValues.size(); ++i) {
         if (i != 0) {
             ss << ", ";
         }
@@ -937,8 +935,9 @@ Options::Options()
     m_scale.SetShortOption('s', false);
     m_baseOptions.AddOption(&m_scale);
 
-    m_outputTo.SetInfo(
-        "Output to", "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", or \"midi\"");
+    m_outputTo.SetInfo("Output to",
+        "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", \"humdrum\" or "
+        "\"pae\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -1602,6 +1601,10 @@ Options::Options()
     m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
 
+    m_bottomMarginOctave.SetInfo("Bottom margin octave", "The margin for octave in MEI units");
+    m_bottomMarginOctave.Init(1.0, 0.0, 10.0);
+    this->Register(&m_bottomMarginOctave, "bottomMarginOctave", &m_elementMargins);
+
     m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
     m_bottomMarginPgHead.Init(2.0, 0.0, 24.0);
     this->Register(&m_bottomMarginPgHead, "bottomMarginHeader", &m_elementMargins);
@@ -1874,8 +1877,9 @@ void Options::Sync()
         else if (m_engravingDefaults.HasValue({ pair.first })) {
             jsonValue = m_engravingDefaults.GetDblValue({ pair.first });
         }
-        else
+        else {
             continue;
+        }
 
         if (!pair.second->IsSet()) {
             pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
@@ -1909,7 +1913,7 @@ jsonxx::Object Options::GetBaseOptGrp()
     grpBase << "name" << m_baseOptions.GetLabel();
 
     const std::vector<Option *> *options = this->GetBaseOptions();
-    for (auto const &option : *options) {
+    for (Option *option : *options) {
         baseOpts << option->GetKey() << option->ToJson();
     }
 

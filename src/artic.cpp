@@ -115,7 +115,6 @@ void Artic::SplitMultival(Object *parent)
         artic->AttEnclosingChars::operator=(*this);
         artic->AttExtSym::operator=(*this);
         artic->AttPlacementRelEvent::operator=(*this);
-        artic->SetParent(parent);
         parent->InsertChild(artic, idx);
         idx++;
     }
@@ -144,7 +143,7 @@ void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
     ClassIdComparison matchType(ARTIC);
     ListOfObjects children;
     parentNoteOrChord->FindAllDescendantsBetween(&children, &matchType, first, last);
-    for (auto &child : children) {
+    for (Object *child : children) {
         if (child == this) continue;
         Artic *artic = vrv_cast<Artic *>(child);
         assert(artic);
@@ -260,8 +259,9 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             default: return 0;
         }
     }
-    else
+    else {
         return 0;
+    }
 }
 
 std::pair<char32_t, char32_t> Artic::GetEnclosingGlyphs() const
@@ -296,6 +296,7 @@ bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
         case SMUFL_E614_stringsHarmonic: return true;
         case SMUFL_E630_pluckedSnapPizzicatoBelow: return true;
         case SMUFL_E633_pluckedLeftHandPizzicato: return true;
+        case SMUFL_E638_pluckedDamp: return true;
         default: return false;
     }
 }

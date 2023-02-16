@@ -82,10 +82,10 @@ public:
 
     /**
      * @name Get and set maximum drawing yRel that is persistent for the floating object across all its floating
-     * positioners, which allows for persisten vertical positioning for some elements
+     * positioners, which allows for persistent vertical positioning for some elements
      */
     ///@{
-    void SetMaxDrawingYRel(int maxDrawingYRel);
+    void SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place);
     int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
     ///@}
 
@@ -98,6 +98,15 @@ public:
      * Check whether the current object must be positioned closer to the staff than the other
      */
     virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary (relative to the object position)
+     * and a flag indicating whether refined layout was used.
+     */
+    virtual std::pair<int, bool> GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const;
 
     //----------//
     // Functors //
@@ -232,11 +241,6 @@ public:
      */
     char GetSpanningType() const { return m_spanningType; }
 
-    bool CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox);
-
-    int GetSpaceBelow(
-        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox) const;
-
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     /**
@@ -249,6 +253,57 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
     ///@}
+
+    /**
+     * @name Get and set the drawing extender width.
+     * Should be nonzero only if the extender line is not included in the bounding box.
+     */
+    ///@{
+    int GetDrawingExtenderWidth() const { return m_drawingExtenderWidth; }
+    void SetDrawingExtenderWidth(int extenderWidth) { m_drawingExtenderWidth = extenderWidth; }
+    ///@}
+
+    /**
+     * Check for horizontal overlap with special consideration for extender lines
+     */
+    bool HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const;
+
+    /**
+     * Return the horizontal margin for overlap with another element
+     * This can be negative, if elements are allowed to slightly overlap
+     */
+    int GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const;
+
+    /**
+     * Update the Y drawing relative position based on collision detection with the overlapping bounding box
+     */
+    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+
+    /**
+     * Align extender elements across systems
+     */
+    void AdjustExtenders();
+
+    /**
+     * Calculate the vertical space below the element and above the bounding box
+     */
+    int GetSpaceBelow(
+        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     */
+    ///@{
+    std::pair<int, bool> GetVerticalContentBoundaryRel(
+        const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+    int GetVerticalContentBoundary(const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+    ///@}
+
+    /**
+     * Version of Boundary::VerticalContentOverlap which takes refined boundaries into account
+     */
+    bool HasVerticalContentOverlap(const Doc *doc, const BoundingBox *horizOverlappingBBox, int margin) const;
 
 private:
     Object *m_objectX;
@@ -266,6 +321,11 @@ protected:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingYRel;
+
+    /**
+     * The horizontal width of the extender line whenever it is not included in the bounding box.
+     */
+    int m_drawingExtenderWidth;
 
     /**
      * A pointer to the FloatingObject it represents.

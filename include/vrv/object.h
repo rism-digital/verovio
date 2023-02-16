@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "attclasses.h"
+#include "attmodule.h"
 #include "boundingbox.h"
 #include "vrvdef.h"
 
@@ -1119,6 +1120,11 @@ public:
      * Calculate the Y relative position of tupletNum based on overlaps with other elements
      */
     virtual int AdjustTupletNumOverlap(FunctorParams *) const { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the Y position of tuplets by inner slurs
+     */
+    virtual int AdjustTupletWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.

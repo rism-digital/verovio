@@ -104,6 +104,11 @@ public:
     bool GenerateMeasureNumbers();
 
     /**
+     * Generate an MEI header
+     */
+    void GenerateMEIHeader(bool meiBasic);
+
+    /**
      * Getter and setter for the DocType.
      * The setter resets the document.
      */

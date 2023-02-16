@@ -55,6 +55,7 @@
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
+#include "tempo.h"
 #include "text.h"
 #include "timemap.h"
 #include "timestamp.h"
@@ -185,7 +186,7 @@ bool Doc::GenerateDocumentScoreDef()
 
     this->GetCurrentScoreDef()->Reset();
     StaffGrp *staffGrp = new StaffGrp();
-    for (auto &object : staves) {
+    for (Object *object : staves) {
         Staff *staff = vrv_cast<Staff *>(object);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
@@ -248,7 +249,7 @@ bool Doc::GenerateMeasureNumbers()
     ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
 
     // run through all measures and generate missing mNum from attribute
-    for (auto &object : measures) {
+    for (Object *object : measures) {
         Measure *measure = dynamic_cast<Measure *>(object);
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
@@ -262,6 +263,40 @@ bool Doc::GenerateMeasureNumbers()
     }
 
     return true;
+}
+
+void Doc::GenerateMEIHeader(bool meiBasic)
+{
+    m_header.remove_children();
+    pugi::xml_node meiHead = m_header.append_child("meiHead");
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    titleStmt.append_child("title");
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    pugi::xml_node date = pubStmt.append_child("date");
+
+    // date
+    time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    std::string dateStr = StringFormat("%d-%02d-%02d-%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+    date.append_attribute("isodate") = dateStr.c_str();
+
+    if (!meiBasic) {
+        // encodingDesc
+        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+        // appInfo/application/name
+        pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+        pugi::xml_node application = appInfo.append_child("application");
+        application.append_attribute("xml:id") = "verovio";
+        application.append_attribute("version") = GetVersion().c_str();
+        pugi::xml_node name = application.append_child("name");
+        name.append_child(pugi::node_pcdata).set_value(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+        // projectDesc
+        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.append_child(pugi::node_pcdata).set_value(StringFormat("MEI encoded with Verovio").c_str());
+    }
 }
 
 bool Doc::HasTimemap() const
@@ -288,6 +323,9 @@ void Doc::CalculateTimemap()
     // Set tempo
     if (this->GetCurrentScoreDef()->HasMidiBpm()) {
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
+    }
+    else if (this->GetCurrentScoreDef()->HasMm()) {
+        tempo = Tempo::CalcTempo(this->GetCurrentScoreDef());
     }
 
     // We first calculate the maximum duration of each measure
@@ -327,6 +365,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // set MIDI tempo
     if (this->GetCurrentScoreDef()->HasMidiBpm()) {
         tempo = this->GetCurrentScoreDef()->GetMidiBpm();
+    }
+    else if (this->GetCurrentScoreDef()->HasMm()) {
+        tempo = Tempo::CalcTempo(this->GetCurrentScoreDef());
     }
     midiFile->addTempo(0, 0, tempo);
 
@@ -533,7 +574,7 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const size_t unmatchedElements = std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
+    const int unmatchedElements = (int)std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
         prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
         [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
             return (entry.first->HasStartid() && entry.first->HasEndid());
@@ -825,8 +866,8 @@ void Doc::PrepareData()
 
     /************ Add default syl for syllables (if applicable) ************/
     ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
-    for (auto it = syllables.begin(); it != syllables.end(); ++it) {
-        Syllable *syllable = dynamic_cast<Syllable *>(*it);
+    for (Object *object : syllables) {
+        Syllable *syllable = dynamic_cast<Syllable *>(object);
         syllable->MarkupAddSyl();
     }
 
@@ -838,8 +879,8 @@ void Doc::PrepareData()
         this->Process(&prepareFacsimile, &prepareFacsimileParams);
 
         // Add default syl zone if one is not present.
-        for (auto &it : prepareFacsimileParams.m_zonelessSyls) {
-            Syl *syl = vrv_cast<Syl *>(it);
+        for (Object *object : prepareFacsimileParams.m_zonelessSyls) {
+            Syl *syl = vrv_cast<Syl *>(object);
             assert(syl);
             syl->CreateDefaultZone(this);
         }
@@ -990,7 +1031,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     this->SetDrawingPage(0);
 
     bool optimize = false;
-    for (auto const score : scores) {
+    for (Score *score : scores) {
         if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             optimize = true;
             break;
@@ -1013,7 +1054,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDataPage();
 
-    for (auto const score : scores) {
+    for (Score *score : scores) {
         score->CalcRunningElementHeight(this);
     }
 
@@ -1102,7 +1143,7 @@ void Doc::CastOffEncodingDoc()
     this->ScoreDefSetCurrentDoc(true);
 
     // Optimize the doc if one of the score requires optimization
-    for (auto const score : this->GetScores()) {
+    for (Score *score : this->GetScores()) {
         if (score->ScoreDefNeedsOptimization(m_options->m_condense.GetValue())) {
             this->ScoreDefOptimizeDoc();
             break;
@@ -1204,7 +1245,6 @@ void Doc::DeactiveateSelection()
     if (selectionScore->GetLabel() != "[selectionScore]") LogError("Deleting wrong score element. Something is wrong");
     selectionPage->DeleteChild(selectionScore);
 
-    m_selectionPreceding->SetParent(pages);
     pages->InsertChild(m_selectionPreceding, 0);
     pages->AddChild(m_selectionFollowing);
 
@@ -1228,7 +1268,6 @@ void Doc::ReactivateSelection(bool resetAligners)
     *selectionScore->GetScoreDef() = *system->GetDrawingScoreDef();
     // Use the drawing values as actual scoreDef
     selectionScore->GetScoreDef()->ResetFromDrawingValues();
-    selectionScore->SetParent(selectionPage);
     selectionPage->InsertChild(selectionScore, 0);
 
     m_selectionPreceding = vrv_cast<Page *>(pages->GetChild(0));
@@ -1872,6 +1911,7 @@ double Doc::GetBottomMargin(const ClassId classId) const
 {
     if (classId == ARTIC) return m_options->m_bottomMarginArtic.GetValue();
     if (classId == HARM) return m_options->m_bottomMarginHarm.GetValue();
+    if (classId == OCTAVE) return m_options->m_bottomMarginOctave.GetValue();
     return m_options->m_defaultBottomMargin.GetValue();
 }
 

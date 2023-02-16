@@ -75,6 +75,7 @@
 #include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "meibasic.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
@@ -262,6 +263,10 @@ bool MEIOutput::Export()
         }
         if (m_doc->GetOptions()->m_outputFormatRaw.GetValue()) {
             output_flags |= pugi::format_raw;
+        }
+
+        if (this->GetBasic()) {
+            this->PruneAttributes(m_mei.child("music"));
         }
 
         std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
@@ -1231,6 +1236,26 @@ bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
     return (m_filterMatchLocation == MatchLocation::Here);
 }
 
+void MEIOutput::PruneAttributes(pugi::xml_node node)
+{
+    if (node.text()) return;
+    if (!MEIBasic::map.count(node.name())) {
+        LogWarning("Element '%s' is not supported but will be preserved", node.name());
+        return;
+    }
+    std::list<std::string> unsupported;
+    for (pugi::xml_attribute attribute : node.attributes()) {
+        if (!MEIBasic::IsAllowed(node.name(), attribute.name())) {
+            unsupported.push_back(attribute.name());
+        }
+    }
+    for (const std::string &attribute : unsupported) node.remove_attribute(attribute.c_str());
+
+    for (pugi::xml_node &child : node.children()) {
+        this->PruneAttributes(child);
+    }
+}
+
 void MEIOutput::WriteStackedObjects()
 {
     // Write the objects from the stack
@@ -1414,36 +1439,12 @@ bool MEIOutput::WriteDoc(Doc *doc)
     assert(!m_mei.empty());
 
     // ---- header ----
-    if (!m_ignoreHeader && m_doc->m_header.first_child()) {
-        if (!m_doc->GetOptions()->m_transpose.GetValue().empty())
-            this->WriteRevisionDesc(m_doc->m_header.first_child());
+    if (!m_ignoreHeader) {
+        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
         m_mei.append_copy(m_doc->m_header.first_child());
-    }
-    else {
-        pugi::xml_node meiHead = m_mei.append_child("meiHead");
-        pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
-        pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-        titleStmt.append_child("title");
-        pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-        pugi::xml_node date = pubStmt.append_child("date");
-
-        // date
-        time_t t = time(0); // get time now
-        struct tm *now = localtime(&t);
-        std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
-            now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
-        date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
-
-        if (!this->GetBasic()) {
-            // encodingDesc
-            pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-            pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-            pugi::xml_node p1 = projectDesc.append_child("p");
-            p1.append_child(pugi::node_pcdata)
-                .set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
-
-            // revisionDesc
-            if (!m_doc->GetOptions()->m_transpose.GetValue().empty()) this->WriteRevisionDesc(meiHead);
+        // Add transposition in the revision list but not in mei-basic
+        if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {
+            this->WriteRevisionDesc(m_mei.first_child());
         }
     }
 
@@ -3015,6 +3016,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
     interface->WriteMidiTempo(element);
+    interface->WriteMmTempo(element);
     interface->WriteMultinumMeasures(element);
     interface->WritePianoPedals(element);
 }
@@ -3225,31 +3227,32 @@ std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
     std::u32string buffer;
     // approximate that we won't have a 1.1 longer string (for optimization)
     buffer.reserve(data.size() * 1.1);
-    for (size_t pos = 0; pos != data.size(); ++pos) {
-        if (data[pos] == '&') {
+    for (const char32_t &c : data) {
+        if (c == '&') {
             buffer.append(U"&amp;");
         }
-        else if (data[pos] == '\"') {
+        else if (c == '\"') {
             buffer.append(U"&quot;");
         }
-        else if (data[pos] == '\'') {
+        else if (c == '\'') {
             buffer.append(U"&apos;");
         }
-        else if (data[pos] == '<') {
+        else if (c == '<') {
             buffer.append(U"&lt;");
         }
-        else if (data[pos] == '>') {
+        else if (c == '>') {
             buffer.append(U"&gt;");
         }
         // Unicode private area for SMuFL characters (and unicode music symbols)
-        else if (data[pos] > 0xE000) {
+        else if (c > 0xE000) {
             std::ostringstream ss;
-            ss << std::hex << (int)data[pos];
+            ss << std::hex << (int)c;
             std::u32string smuflCode = UTF8to32(ss.str());
             buffer.append(U"&#x").append(smuflCode).append(U";");
         }
-        else
-            buffer.append(&data[pos], 1);
+        else {
+            buffer.append(&c, 1);
+        }
     }
     return buffer;
 }
@@ -6867,7 +6870,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
-        i++;
+        ++i;
     }
     return success;
 }
@@ -7132,6 +7135,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
     interface->ReadMidiTempo(element);
+    interface->ReadMmTempo(element);
     interface->ReadMultinumMeasures(element);
     interface->ReadPianoPedals(element);
     return true;
@@ -7696,10 +7700,12 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     assert(dynamic_cast<EditorialElement *>(parent));
 
     if (level == EDITORIAL_TOPLEVEL) {
-        if (m_readingScoreBased)
+        if (m_readingScoreBased) {
             return this->ReadSectionChildren(parent, parentNode);
-        else
+        }
+        else {
             return this->ReadSystemChildren(parent, parentNode);
+        }
     }
     else if (level == EDITORIAL_SCOREDEF) {
         return this->ReadScoreDefChildren(parent, parentNode);
@@ -7821,12 +7827,10 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     int startIdx = startChild->GetIdx();
     int endIdx = endChild->GetIdx();
     // LogDebug("%d %d %s!", startIdx, endIdx, start->GetID().c_str());
-    int i;
-    for (i = endIdx; i >= startIdx; i--) {
+    for (int i = endIdx; i >= startIdx; --i) {
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
         if (element) tuplet->AddChild(element);
     }
-    tuplet->SetParent(parentLayer);
     parentLayer->InsertChild(tuplet, startIdx);
 
     return true;
@@ -7916,14 +7920,12 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     // Works only for single page files
 
     Score *score = new Score();
-    score->SetParent(page);
     page->InsertChild(score, 0);
 
     PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
-    mdiv->SetParent(page);
     page->InsertChild(mdiv, 0);
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);

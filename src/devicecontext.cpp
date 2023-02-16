@@ -252,8 +252,7 @@ void DeviceContext::GetTextExtent(const std::u32string &string, TextExtend *exte
 
     const Glyph *unknown = resources->GetTextGlyph(L'o');
 
-    for (unsigned int i = 0; i < string.length(); ++i) {
-        char32_t c = string[i];
+    for (char32_t c : string) {
         const Glyph *glyph = resources->GetTextGlyph(c);
         if (!glyph) {
             glyph = resources->GetGlyph(c);
@@ -284,8 +283,7 @@ void DeviceContext::GetSmuflTextExtent(const std::u32string &string, TextExtend 
     extend->m_width = 0;
     extend->m_height = 0;
 
-    for (unsigned int i = 0; i < string.length(); ++i) {
-        char32_t c = string[i];
+    for (char32_t c : string) {
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;

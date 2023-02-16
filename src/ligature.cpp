@@ -146,9 +146,9 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     // For better clarify, we loop withing the Ligature::CalcLigatureNotePos instead of
     // implementing Note::CalcLigatureNotePos.
 
-    for (auto &iter : notes) {
+    for (Object *object : notes) {
 
-        Note *note = vrv_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
 
         m_drawingShapes.push_back(LIGATURE_DEFAULT);
@@ -267,7 +267,7 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 
         // With mensural black notation, stack longa going up
         if (isLastNote && isMensuralBlack && (dur2 == DUR_LG) && up) {
-            // Stack only if a least a third
+            // Stack only if at least a third
             int stackThreshold = 1;
             // If the previous was going down, adjust the threshold
             if ((n1 > 0) && !previousUp) {
@@ -290,9 +290,9 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     previousNote = NULL;
     n1 = 0;
 
-    for (auto &iter : notes) {
+    for (Object *object : notes) {
 
-        Note *note = vrv_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
 
         // previousRight is 0 for the first note

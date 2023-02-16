@@ -80,14 +80,13 @@ void PlistInterface::SetIDStrs()
     assert(m_ids.empty() && m_references.empty());
 
     xsdAnyURI_List list = this->GetPlist();
-    xsdAnyURI_List::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter) {
-        std::string id = ExtractIDFragment(*iter);
+    for (const std::string &uri : list) {
+        std::string id = ExtractIDFragment(uri);
         if (!id.empty()) {
             m_ids.push_back(id);
         }
         else {
-            LogError("Cannot parse the anyURI '%s'", (*iter).c_str());
+            LogError("Cannot parse the anyURI '%s'", uri.c_str());
         }
     }
 }

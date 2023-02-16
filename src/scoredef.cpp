@@ -33,6 +33,7 @@
 #include "staffgrp.h"
 #include "symboltable.h"
 #include "system.h"
+#include "tempo.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -474,9 +475,9 @@ void ScoreDef::ResetFromDrawingValues()
     const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : childList) {
-        if (!item->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(item);
+    for (Object *object : childList) {
+        if (!object->Is(STAFFDEF)) continue;
+        staffDef = vrv_cast<StaffDef *>(object);
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
@@ -533,8 +534,8 @@ const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
     ListOfConstObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
-    for (auto &item : staffGrps) {
-        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(item);
+    for (const Object *object : staffGrps) {
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(object);
         assert(staffGrp);
         if (staffGrp->GetN() == n) return staffGrp;
     }
@@ -815,6 +816,21 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
+{
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasMidiBpm()) {
+        params->m_currentTempo = this->GetMidiBpm();
+    }
+    else if (this->HasMm()) {
+        params->m_currentTempo = Tempo::CalcTempo(this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -855,7 +871,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         const double tuneHz = this->GetTuneHz();
         // Add tuning for all keys from 0 to 127
         std::vector<std::pair<int, double>> tuneFrequencies;
-        for (int i = 0; i < 127; i++) {
+        for (int i = 0; i < 127; ++i) {
             double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
             tuneFrequencies.push_back(std::make_pair(i, freq));
         }

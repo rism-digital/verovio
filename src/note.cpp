@@ -249,10 +249,7 @@ bool Note::IsClusterExtreme() const
 {
     ChordCluster *cluster = m_cluster;
     if (this == cluster->at(0)) return true;
-    if (this == cluster->at(cluster->size() - 1))
-        return true;
-    else
-        return false;
+    return (this == cluster->at(cluster->size() - 1)) ? true : false;
 }
 
 TabGrp *Note::IsTabGrpNote()
@@ -1119,7 +1116,8 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     }
 
     // Nothing to do for notes that are not in a cluster and without base diameter for the chord
-    if (!params->m_diameter && !m_cluster) return FUNCTOR_SIBLINGS;
+    if ((!params->m_diameter || params->m_alignmentType != this->GetAlignment()->GetType()) && !m_cluster)
+        return FUNCTOR_SIBLINGS;
 
     /************** notehead direction **************/
 

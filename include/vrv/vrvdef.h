@@ -20,6 +20,8 @@
 
 #include "attdef.h"
 
+#define VRV_UNSET MEI_UNSET
+
 //----------------------------------------------------------------------------
 
 #define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
@@ -505,7 +507,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 // data.LINEWIDTHTERM factors
 //----------------------------------------------------------------------------
 
-#define LINEWIDTHTERM_factor_narrow 0.5
+#define LINEWIDTHTERM_factor_narrow 1.0
 #define LINEWIDTHTERM_factor_medium 2.0
 #define LINEWIDTHTERM_factor_wide 4.0
 

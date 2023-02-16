@@ -108,21 +108,28 @@ void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h) const
 void Glyph::SetAnchor(std::string anchorStr, double x, double y)
 {
     SMuFLGlyphAnchor anchorId;
-    if (anchorStr == "stemDownNW")
+    if (anchorStr == "stemDownNW") {
         anchorId = SMUFL_stemDownNW;
-    else if (anchorStr == "stemUpSE")
+    }
+    else if (anchorStr == "stemUpSE") {
         anchorId = SMUFL_stemUpSE;
-    else if (anchorStr == "cutOutNE")
+    }
+    else if (anchorStr == "cutOutNE") {
         anchorId = SMUFL_cutOutNE;
-    else if (anchorStr == "cutOutNW")
+    }
+    else if (anchorStr == "cutOutNW") {
         anchorId = SMUFL_cutOutNW;
-    else if (anchorStr == "cutOutSE")
+    }
+    else if (anchorStr == "cutOutSE") {
         anchorId = SMUFL_cutOutSE;
-    else if (anchorStr == "cutOutSW")
+    }
+    else if (anchorStr == "cutOutSW") {
         anchorId = SMUFL_cutOutSW;
+    }
     // Silently ignore unused anchors
-    else
+    else {
         return;
+    }
     // Anchor points are given as staff spaces (upm / 4)
     m_anchors[anchorId] = Point(x * this->GetUnitsPerEm() / 4, y * this->GetUnitsPerEm() / 4);
 }

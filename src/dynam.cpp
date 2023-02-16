@@ -248,9 +248,8 @@ std::u32string Dynam::GetSymbolStr(const std::u32string &str, const bool singleG
 
     // Otherwise replace it letter by letter
     dynam = str;
-    int i;
     std::u32string from, to;
-    for (i = 0; i < DYNAM_CHARS; ++i) {
+    for (int i = 0; i < DYNAM_CHARS; ++i) {
         from = dynamChars[i];
         to = dynamSmufl[i];
         for (size_t pos = 0; (pos = dynam.find(from, pos)) != std::string::npos; pos += to.size())
@@ -276,12 +275,6 @@ int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
     if (!this->GetStart()) return FUNCTOR_CONTINUE;
 
     params->m_dynams.push_back(this);
-
-    for (auto &hairpin : params->m_hairpins) {
-        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
-        }
-    }
 
     return FUNCTOR_CONTINUE;
 }

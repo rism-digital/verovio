@@ -43,8 +43,8 @@ bindings/python/__pycache__/*
 bindings/python/CMakeCache.txt
 bindings/python/CMakeFiles/
 build
-dist
 verovio.egg-info
+/dist
 
 # java build
 bindings/java/verovio_wrap.cxx
@@ -98,3 +98,4 @@ Release/
 
 # Intermediate font files
 fonts/**/tmp
+libmei/tools/__pycache__
