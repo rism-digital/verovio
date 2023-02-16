@@ -297,8 +297,8 @@ bool ScoreDef::IsSupportedChild(Object *child)
 int ScoreDef::GetInsertOrderFor(ClassId classId) const
 {
 
-    static const std::vector s_order(
-        { SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT, PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
+    static const std::vector s_order({ SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT,
+        PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
     return this->GetInsertOrderForIn(classId, s_order);
 }
 

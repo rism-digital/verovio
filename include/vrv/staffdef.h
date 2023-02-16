@@ -53,6 +53,11 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
+     * Return an order for the given ClassId.
+     */
+    int GetInsertOrderFor(ClassId classId) const override;
+
+    /**
      * @name Setter and getter of the drawing visible flag
      */
     ///@{

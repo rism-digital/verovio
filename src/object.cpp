@@ -803,13 +803,15 @@ void Object::AddChild(Object *child)
 
     child->SetParent(this);
     const int insertOrder = this->GetInsertOrderFor(child->GetClassId());
+    // no child or no order specify, the child is appended at the end
     if (m_children.empty() || insertOrder == VRV_UNSET) {
         m_children.push_back(child);
     }
     else {
         int i = 0;
         for (const Object *existingChild : m_children) {
-            if (this->GetInsertOrderFor(existingChild->GetClassId()) > insertOrder) break;
+            // By doing abs() we convert VRV_UNSET to a positive and insert anything with an insertOrder before it
+            if (abs(this->GetInsertOrderFor(existingChild->GetClassId())) > insertOrder) break;
             ++i;
         }
         i = std::min(i, (int)m_children.size());
