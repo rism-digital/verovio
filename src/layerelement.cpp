@@ -955,6 +955,7 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int leftMargin = 0;
     int rightMargin = 0;
+    bool sameDirElement = false;
     std::vector<int> elementOverlaps;
     for (Object *object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
@@ -964,14 +965,37 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
         if (direction > 0) {
             // make sure that there's actual overlap first
             if ((elementBottom > y1) && (elementBottom > y2)) continue;
-            leftMargin = elementTop - y1;
-            rightMargin = elementTop - y2;
+            const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize, true);
+            if (currentBottom >= elementTop) continue;
+            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
+            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
+                if (elementBottom - stemInterface->GetDrawingStemLen() < currentBottom) continue;
+                leftMargin = unit + y1 - elementBottom;
+                rightMargin = unit + y2 - elementBottom;
+                sameDirElement = true;
+            }
+            else
+            {
+                leftMargin = elementTop - y1;
+                rightMargin = elementTop - y2;
+            }
         }
         else {
             // make sure that there's actual overlap first
             if ((elementTop < y1) && (elementTop < y2)) continue;
-            leftMargin = elementBottom - y1;
-            rightMargin = elementBottom - y2;
+            const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize, true);
+            if (currentTop <= elementBottom) continue;
+            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
+            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
+                if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
+                leftMargin = unit + y1 - elementTop;
+                rightMargin = unit + y2 - elementTop;
+                sameDirElement = true;
+            }
+            else {
+                leftMargin = elementBottom - y1;
+                rightMargin = elementBottom - y2;
+            }
         }
         elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
     }
@@ -980,7 +1004,12 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
     int overlap = 0;
     if (*maxOverlap >= 0) {
-        overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction;
+        if (sameDirElement) {
+            overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * -direction;
+        }
+        else {
+            overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction;
+        }
     }
     else {
         int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / unit) * 2;
@@ -1680,6 +1709,12 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
         assert(accid);
         if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
         if (accid->HasPlace()) return FUNCTOR_CONTINUE;
+    }
+    const StemmedDrawingInterface *stemInterface = this->GetStemmedDrawingInterface();
+    if (stemInterface
+        && (((params->m_directionBias == 1) && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))
+            || ((params->m_directionBias == -1) && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down)))) {
+        return FUNCTOR_CONTINUE;
     }
 
     Staff *staff = this->GetAncestorStaff();
@@ -2515,6 +2550,11 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
     // The element is starting after the event end - we can stop here
     if (time >= (params->m_time + params->m_duration)) return FUNCTOR_STOP;
 
+    if (this->Is(NOTE)
+        && (std::find(params->m_elements.begin(), params->m_elements.end(), this->GetParent())
+            != params->m_elements.end())) {
+        return FUNCTOR_CONTINUE;
+    }
     params->m_elements.push_back(this);
 
     // Not need to recurse for chords
