@@ -272,6 +272,7 @@ bool ScoreDef::IsSupportedChild(Object *child)
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
+    // Mensur is actually not allowed as child of scoreDef in MEI
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));
     }
@@ -297,7 +298,7 @@ int ScoreDef::GetInsertOrderFor(ClassId classId) const
 {
 
     static const std::vector s_order(
-        { SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, PGHEAD, PGFOOT, PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
+        { SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT, PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
     return this->GetInsertOrderForIn(classId, s_order);
 }
 
