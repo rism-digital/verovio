@@ -777,7 +777,7 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
 }
 
 void AlignmentReference::AdjustAccidWithAccidSpace(
-    Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
+    Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
     const ArrayOfObjects &children = this->GetChildren();
@@ -790,11 +790,8 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
 
-    // if current accidental is not in the list then XRel wasn't adjusted and position is fine as it is - add it to the
-    // list. Generally this would happen with octave accidentals, that are processed first and most likely have no
-    // overlaps with other elements
-    if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end())
-        adjustedAccids.push_back(accid);
+    // Mark as adjusted (even if position was not altered)
+    adjustedAccids.insert(accid);
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
@@ -1478,10 +1475,11 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;
     std::copy(m_accidSpace.begin(), m_accidSpace.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
 
-    std::vector<Accid *> adjustedAccids;
+    std::set<Accid *> adjustedAccids;
     // Align the octaves
     for (Accid *accid : m_accidSpace) {
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) != adjustedAccids.end()) continue;
+        // Skip any accid that was already adjusted
+        if (adjustedAccids.count(accid) > 0) continue;
         auto range = octaveEquivalence.equal_range(accid);
         // Handle at least two octave accids without unisons
         int octaveAccidCount = 0;
@@ -1517,16 +1515,18 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     const int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
-        // top one - but skip octaves
-        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
+        // top one - but skip if already adjusted (i.e. octaves)
+        if (adjustedAccids.count(m_accidSpace.at(j)) == 0) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);
+        }
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
-        // bottom one - but skip octaves
-        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
+        // bottom one - but skip if already adjusted
+        if (adjustedAccids.count(m_accidSpace.at(i)) == 0) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
+        }
     }
 
     return FUNCTOR_SIBLINGS;

@@ -103,7 +103,7 @@ void Accid::AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staff
 }
 
 void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
-    std::vector<Accid *> &adjustedAccids)
+    std::set<Accid *> &adjustedAccids)
 {
     assert(element);
     assert(doc);
@@ -152,7 +152,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
             leftAccids.push_back(accid);
             return;
         }
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end()) return;
+        if (adjustedAccids.count(accid) == 0) return;
     }
 
     int xRelShift = 0;
@@ -166,8 +166,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
     // Move only to the left
     if (xRelShift > 0) {
         this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), this) == adjustedAccids.end())
-            adjustedAccids.push_back(this);
+        adjustedAccids.insert(this);
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
@@ -295,8 +294,6 @@ int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
     LayerElement::ResetHorizontalAlignment(functorParams);
     PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
-    m_isDrawingOctave = false;
-    m_drawingOctave = NULL;
     m_drawingUnison = NULL;
 
     return FUNCTOR_CONTINUE;

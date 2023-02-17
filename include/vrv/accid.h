@@ -62,17 +62,6 @@ public:
     bool HasToBeAligned() const override { return true; }
 
     /**
-     * @name Set and get drawing octave flag
-     */
-    ///@{
-    void SetDrawingOctave(bool isDrawingOctave) { m_isDrawingOctave = isDrawingOctave; }
-    bool GetDrawingOctave() const { return m_isDrawingOctave; }
-    void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
-    Accid *GetDrawingOctaveAccid() { return m_drawingOctave; }
-    const Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
-    ///@}
-
-    /**
      * @name Set and get drawing unison accid
      */
     ///@{
@@ -91,7 +80,7 @@ public:
      * Adjust X position of accid in relation to other element
      */
     void AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
-        std::vector<Accid *> &adjustedAccids);
+        std::set<Accid *> &adjustedAccids);
 
     /**
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
@@ -141,9 +130,7 @@ private:
 public:
     //
 private:
-    Accid *m_drawingOctave;
     Accid *m_drawingUnison;
-    bool m_isDrawingOctave;
     bool m_alignedWithSameLayer;
 };
 
