@@ -1496,11 +1496,14 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
             this->AdjustAccidWithAccidSpace(*octaveIter, params->m_doc, staffSize, adjustedAccids);
             minDrawingX = std::min(minDrawingX, (*octaveIter)->GetDrawingX());
         }
-        // Finally, align the accidentals
+        // Finally, align the accidentals whenever the adjustment is not too large
         for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
             const int dist = (*octaveIter)->GetDrawingX() - minDrawingX;
-            if (dist > 0) {
-                (*octaveIter)->SetDrawingXRel((*octaveIter)->GetDrawingXRel() - dist);
+            if ((dist > 0) && (*octaveIter)->HasContentHorizontalBB()) {
+                const int accidWidth = (*octaveIter)->GetContentRight() - (*octaveIter)->GetContentLeft();
+                if (dist < accidWidth / 2) {
+                    (*octaveIter)->SetDrawingXRel((*octaveIter)->GetDrawingXRel() - dist);
+                }
             }
         }
     }
