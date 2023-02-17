@@ -1516,16 +1516,16 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip if already adjusted (i.e. octaves)
-        if (adjustedAccids.count(m_accidSpace.at(j)) == 0) {
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);
+        if (adjustedAccids.count(m_accidSpace.at(i)) == 0) {
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
         }
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
         // bottom one - but skip if already adjusted
-        if (adjustedAccids.count(m_accidSpace.at(i)) == 0) {
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
+        if (adjustedAccids.count(m_accidSpace.at(j)) == 0) {
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);
         }
     }
 
