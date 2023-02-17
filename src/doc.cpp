@@ -291,11 +291,11 @@ void Doc::GenerateMEIHeader(bool meiBasic)
         application.append_attribute("xml:id") = "verovio";
         application.append_attribute("version") = GetVersion().c_str();
         pugi::xml_node name = application.append_child("name");
-        name.append_child(pugi::node_pcdata).set_value(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+        name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
         // projectDesc
         pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.append_child(pugi::node_pcdata).set_value(StringFormat("MEI encoded with Verovio").c_str());
+        p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
     }
 }
 

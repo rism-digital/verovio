@@ -2783,7 +2783,7 @@ bool PAEInput::Import(const std::string &input)
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.append_child(pugi::node_pcdata).set_value("Converted from Plaine and Easie to MEI");
+        p1.text().set("Converted from Plaine and Easie to MEI");
     }
 
     bool success = true;
@@ -3189,13 +3189,13 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
     if (!title) title = titleStmt.append_child("title");
 
     if (header.has<jsonxx::String>("source_title")) {
-        title.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("source_title").c_str());
+        title.text().set(header.get<jsonxx::String>("source_title").c_str());
     }
 
     if (header.has<jsonxx::String>("title")) {
         pugi::xml_node subTitle = titleStmt.append_child("title");
         subTitle.append_attribute("type") = "subordinate";
-        subTitle.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("title").c_str());
+        subTitle.text().set(header.get<jsonxx::String>("title").c_str());
         if (header.has<jsonxx::String>("movement")) {
             subTitle.append_attribute("label") = header.get<jsonxx::String>("movement").c_str();
         }
@@ -3203,7 +3203,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
 
     if (header.has<jsonxx::String>("composer")) {
         pugi::xml_node composer = titleStmt.append_child("composer");
-        composer.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("composer").c_str());
+        composer.text().set(header.get<jsonxx::String>("composer").c_str());
     }
 
     if (header.has<jsonxx::String>("source_url") || header.has<jsonxx::String>("download_url")) {
@@ -3225,7 +3225,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
         jsonxx::Array array = header.get<jsonxx::Array>("notes");
         for (int i = 0; i < (int)array.size(); ++i) {
             pugi::xml_node annot = notesStmt.append_child("annot");
-            annot.append_child(pugi::node_pcdata).set_value(array.get<jsonxx::String>(i).c_str());
+            annot.text().set(array.get<jsonxx::String>(i).c_str());
         }
     }
 
@@ -3237,7 +3237,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
         pugi::xml_node work = m_doc->m_header.first_child().append_child("workList").append_child("work");
         pugi::xml_node title = work.append_child("title");
         if (header.has<jsonxx::String>("title")) {
-            title.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("title").c_str());
+            title.text().set(header.get<jsonxx::String>("title").c_str());
         }
         pugi::xml_node incip = work.append_child("incip");
         if (header.has<jsonxx::String>("role")) {
@@ -3268,7 +3268,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
             jsonxx::Array array = header.get<jsonxx::Array>("text_incipits");
             for (int i = 0; i < (int)array.size(); ++i) {
                 pugi::xml_node p = incipText.append_child("p");
-                p.append_child(pugi::node_pcdata).set_value(array.get<jsonxx::String>(i).c_str());
+                p.text().set(array.get<jsonxx::String>(i).c_str());
             }
         }
     }
