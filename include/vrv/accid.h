@@ -177,6 +177,27 @@ public:
     }
 };
 
+//----------------------------------------------------------------------------
+// AccidOctaveSort
+//----------------------------------------------------------------------------
+
+/**
+ * Equivalence of accidentals that are an octave apart
+ */
+class AccidOctaveSort {
+
+public:
+    AccidOctaveSort() = default;
+
+    // Encodes parent ID + accid type + pitch
+    std::string GetOctaveID(const Accid *accid) const;
+
+    bool operator()(const Accid *first, const Accid *second) const
+    {
+        return this->GetOctaveID(first) < this->GetOctaveID(second);
+    }
+};
+
 } // namespace vrv
 
 #endif

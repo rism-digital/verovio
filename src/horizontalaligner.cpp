@@ -1474,44 +1474,36 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     // process accid layer alignment
     this->SetAccidLayerAlignment();
 
-    // Detect the octave and mark them
-    std::vector<Accid *>::iterator iter, octaveIter;
-    for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; ++iter) {
-        Note *note = vrv_cast<Note *>((*iter)->GetFirstAncestor(NOTE));
-        assert(note);
-        if (!note) continue;
-        for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); ++octaveIter) {
-            Note *octave = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
-            assert(octave);
-            if (!octave) continue;
-            bool sameChordOctave = true;
-            if (Chord *chord = vrv_cast<Chord *>((*iter)->GetFirstAncestor(CHORD)); chord != NULL) {
-                if ((*octaveIter)->GetFirstAncestor(CHORD) != chord) sameChordOctave = false;
-            }
-            // Same pitch, different octave, same accid - for now?
-            if ((note->GetPname() == octave->GetPname()) && (note->GetOct() != octave->GetOct())
-                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid()) && sameChordOctave) {
-                (*iter)->SetDrawingOctaveAccid(*octaveIter);
-                (*octaveIter)->SetDrawingOctave(true);
-            }
-        }
-    }
-
-    int count = (int)m_accidSpace.size();
+    // Detect accids which are an octave apart => they will be grouped together in the multiset
+    std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;
+    std::copy(m_accidSpace.begin(), m_accidSpace.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
 
     std::vector<Accid *> adjustedAccids;
     // Align the octaves
-    for (int i = 0; i < count - 1; ++i) {
-        if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
-            this->AdjustAccidWithAccidSpace(
-                m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize, adjustedAccids);
-            int dist = m_accidSpace.at(i)->GetDrawingX() - m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
-            if (dist > 0)
-                m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
-            else if (dist < 0)
-                m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(
-                    m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
+    for (Accid *accid : m_accidSpace) {
+        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) != adjustedAccids.end()) continue;
+        auto range = octaveEquivalence.equal_range(accid);
+        // Handle at least two octave accids without unisons
+        int octaveAccidCount = 0;
+        std::set<data_OCTAVE> octaves;
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            Note *note = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
+            octaves.insert(note->GetOct());
+            ++octaveAccidCount;
+        }
+        if ((octaveAccidCount < 2) || (octaves.size() < octaveAccidCount)) continue;
+        // Now adjust the octave accids and store the left most position
+        int minDrawingX = -VRV_UNSET;
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            this->AdjustAccidWithAccidSpace(*octaveIter, params->m_doc, staffSize, adjustedAccids);
+            minDrawingX = std::min(minDrawingX, (*octaveIter)->GetDrawingX());
+        }
+        // Finally, align the accidentals
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            const int dist = (*octaveIter)->GetDrawingX() - minDrawingX;
+            if (dist > 0) {
+                (*octaveIter)->SetDrawingXRel((*octaveIter)->GetDrawingXRel() - dist);
+            }
         }
     }
 
@@ -1521,7 +1513,8 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
         accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
     }
 
-    int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
+    const int count = (int)m_accidSpace.size();
+    const int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip octaves

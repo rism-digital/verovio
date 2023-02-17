@@ -302,4 +302,21 @@ int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// AccidOctaveSort
+//----------------------------------------------------------------------------
+
+std::string AccidOctaveSort::GetOctaveID(const Accid *accid) const
+{
+    const Note *note = vrv_cast<const Note *>(accid->GetFirstAncestor(NOTE));
+    assert(note);
+    const Chord *chord = note->IsChordTone();
+
+    std::string octaveID = chord ? chord->GetID() : note->GetID();
+    octaveID += "-" + std::to_string(accid->GetAccid());
+    octaveID += "-" + std::to_string(note->GetPname());
+
+    return octaveID;
+}
+
 } // namespace vrv
