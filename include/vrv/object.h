@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "attclasses.h"
+#include "attmodule.h"
 #include "boundingbox.h"
 #include "vrvdef.h"
 
@@ -239,7 +240,7 @@ public:
     /**
      * Reset pointers after a copy and assignment constructor call.
      * This methods has to be called expicitly when overriden because it is not called from the constructors.
-     * Do not forget to call base-class equivalent whenever applicable (e.g, with more than one hierarchy level).
+     * Do not forget to call base-class equivalent whenever applicable (e.g., with more than one hierarchy level).
      */
     virtual void CloneReset();
 
@@ -725,7 +726,7 @@ public:
     virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Convert analytical markup (@fermata, @tie) to elements.
+     * Convert analytical markup (\@fermata, \@tie) to elements.
      * See Doc::ConvertMarkupAnalyticalDoc
      */
     virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1042,6 +1043,11 @@ public:
     virtual int AdjustTupletNumOverlap(FunctorParams *) const { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the Y position of tuplets by inner slurs
+     */
+    virtual int AdjustTupletWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1326,7 +1332,7 @@ private:
 
     /**
      * A flag indicating if the Object represents an attribute in the original MEI.
-     * For example, a Artic child in Note for an original @artic
+     * For example, a Artic child in Note for an original \@artic
      */
     bool m_isAttribute;
 
@@ -1583,8 +1589,8 @@ public:
     void GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds);
 
 public:
-    MapOfStrConstructors s_ctorsRegistry;
-    MapOfStrClassIds s_classIdsRegistry;
+    static thread_local MapOfStrConstructors s_ctorsRegistry;
+    static thread_local MapOfStrClassIds s_classIdsRegistry;
 };
 
 //----------------------------------------------------------------------------
@@ -1598,7 +1604,7 @@ public:
      */
     ClassRegistrar(std::string name, ClassId classId)
     {
-        ObjectFactory::GetInstance()->Register(name, classId, [](void) -> Object * { return new T(); });
+        ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
     }
 };
 

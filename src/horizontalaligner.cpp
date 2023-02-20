@@ -56,11 +56,10 @@ Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType t
 
 const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const
 {
-    int i;
     idx = -1; // the index if we reach the end.
     const Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
-    for (i = 0; i < this->GetAlignmentCount(); ++i) {
+    for (int i = 0; i < this->GetAlignmentCount(); ++i) {
         alignment = vrv_cast<const Alignment *>(this->GetChild(i));
         assert(alignment);
 
@@ -85,10 +84,8 @@ const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, Alignment
 
 void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
 {
-    alignment->SetParent(this);
-    ArrayOfObjects &children = this->GetChildrenForModification();
     if (idx == -1) {
-        children.push_back(alignment);
+        AddChild(alignment);
     }
     else {
         InsertChild(alignment, idx);
@@ -147,6 +144,12 @@ void MeasureAligner::Reset()
     m_initialTstampDur = -DUR_MAX;
 }
 
+bool MeasureAligner::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<Alignment *>(child));
+    return true;
+}
+
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
@@ -181,10 +184,9 @@ void MeasureAligner::SetMaxTime(double time)
     int idx = m_rightBarLineAlignment->GetIdx();
     assert(idx != -1);
 
-    int i;
     Alignment *alignment = NULL;
     // Increase the time position for all alignment from the right barline
-    for (i = idx; i < this->GetAlignmentCount(); ++i) {
+    for (int i = idx; i < this->GetAlignmentCount(); ++i) {
         alignment = vrv_cast<Alignment *>(this->GetChild(i));
         assert(alignment);
         // Change it only if higher than before
@@ -224,7 +226,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         int startX = start->GetXRel();
         int endX = end->GetXRel();
         // We use a reverse iterator
-        for (auto child : this->GetChildren()) {
+        for (Object *child : this->GetChildren()) {
             Alignment *current = vrv_cast<Alignment *>(child);
             assert(current);
             // Nothing to do once we passed the start alignment
@@ -390,9 +392,8 @@ void GraceAligner::StackGraceElement(LayerElement *element)
 
 void GraceAligner::AlignStack()
 {
-    int i;
     double time = 0.0;
-    for (i = (int)m_graceStack.size(); i > 0; i--) {
+    for (int i = (int)m_graceStack.size(); i > 0; --i) {
         LayerElement *element = vrv_cast<LayerElement *>(m_graceStack.at(i - 1));
         assert(element);
         // get the duration of the event
@@ -472,7 +473,7 @@ void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
         // We space with a notehead (non grace size) which seems to be a reasonable default spacing with margin
         // Ideally we should look at the duration in that alignment and also the maximum staff scaling for this aligner
         alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
-        i++;
+        ++i;
     }
 }
 
@@ -650,7 +651,7 @@ void Alignment::GetLeftRight(
     minLeft = -VRV_UNSET;
     maxRight = VRV_UNSET;
 
-    for (auto staffN : staffNs) {
+    for (int staffN : staffNs) {
         int staffMinLeft, staffMaxRight;
         this->GetLeftRight(staffN, staffMinLeft, staffMaxRight);
         if (staffMinLeft < minLeft) minLeft = staffMinLeft;
@@ -705,7 +706,7 @@ const AlignmentReference *Alignment::GetReferenceWithElement(const LayerElement 
 {
     const AlignmentReference *reference = NULL;
 
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         reference = dynamic_cast<const AlignmentReference *>(child);
         if (reference->GetN() == staffN) {
             return reference;
@@ -722,9 +723,9 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
     int max = VRV_UNSET, min = VRV_UNSET;
     // Iterate over each element in each alignment reference and find max/min Y value - these will serve as top/bottom
     // values for the Alignment
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         const AlignmentReference *reference = dynamic_cast<const AlignmentReference *>(child);
-        for (auto element : reference->GetChildren()) {
+        for (const Object *element : reference->GetChildren()) {
             const int top = element->GetSelfTop();
             if ((VRV_UNSET == max) || (top > max)) {
                 max = top;
@@ -863,7 +864,7 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
     const ArrayOfObjects &children = this->GetChildren();
 
     // bottom one
-    for (auto child : children) {
+    for (Object *child : children) {
         // if accidental has unison overlap, ignore elements on other layers for overlap
         if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
             continue;
@@ -972,9 +973,14 @@ void TimestampAligner::Reset()
     Object::Reset();
 }
 
+bool TimestampAligner::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<TimestampAttr *>(child));
+    return true;
+}
+
 TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 {
-    int i;
     int idx = -1; // the index if we reach the end.
     // We need to adjust the position since timestamp 0 to 1.0 are before 0 musical time
     time = time - 1.0;
@@ -983,8 +989,9 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     ArrayOfObjects &children = this->GetChildrenForModification();
 
     // First try to see if we already have something at the time position
-    for (i = 0; i < this->GetChildCount(); ++i) {
-        timestampAttr = vrv_cast<TimestampAttr *>(children.at(i));
+    int i = 0;
+    for (Object *child : children) {
+        timestampAttr = vrv_cast<TimestampAttr *>(child);
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
@@ -996,13 +1003,13 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
             idx = i;
             break;
         }
+        ++i;
     }
     // nothing found
     timestampAttr = new TimestampAttr();
     timestampAttr->SetDrawingPos(time);
-    timestampAttr->SetParent(this);
     if (idx == -1) {
-        children.push_back(timestampAttr);
+        AddChild(timestampAttr);
     }
     else {
         InsertChild(timestampAttr, idx);
@@ -1612,11 +1619,10 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     }
 
     int count = (int)m_accidSpace.size();
-    int i, j;
 
     std::vector<Accid *> adjustedAccids;
     // Align the octaves
-    for (i = 0; i < count - 1; ++i) {
+    for (int i = 0; i < count - 1; ++i) {
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
             this->AdjustAccidWithAccidSpace(
@@ -1638,7 +1644,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
-    for (i = 0, j = count - 1; i < middle; i++, j--) {
+    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip octaves
         if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);

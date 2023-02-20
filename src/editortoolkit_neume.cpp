@@ -10,6 +10,7 @@
 //--------------------------------------------------------------------------------
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <locale>
 #include <math.h>
@@ -201,7 +202,7 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 {
     bool status = true;
     jsonxx::Object results;
-    for (int i = 0; i < (int)actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); ++i) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
             m_infoObject.reset();
@@ -651,9 +652,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         stavesVector.push_back(newStaff);
         StaffSort staffSort;
         std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
-        for (int i = 0; i < (int)staves.size(); i++) {
+        for (int i = 0; i < (int)staves.size(); ++i) {
             if (stavesVector.at(i) == newStaff) {
-                newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
                 parent->Modify();
 
@@ -1029,31 +1029,31 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
     if (!m_doc->GetDrawingPage()) return false;
     Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     bool success = false;
-    if (Att::SetAnalytical(element, attrType, attrValue))
+    if (AttModule::SetAnalytical(element, attrType, attrValue))
         success = true;
-    else if (Att::SetCmn(element, attrType, attrValue))
+    else if (AttModule::SetCmn(element, attrType, attrValue))
         success = true;
-    else if (Att::SetCmnornaments(element, attrType, attrValue))
+    else if (AttModule::SetCmnornaments(element, attrType, attrValue))
         success = true;
-    else if (Att::SetCritapp(element, attrType, attrValue))
+    else if (AttModule::SetCritapp(element, attrType, attrValue))
         success = true;
-    else if (Att::SetExternalsymbols(element, attrType, attrValue))
+    else if (AttModule::SetExternalsymbols(element, attrType, attrValue))
         success = true;
-    else if (Att::SetGestural(element, attrType, attrValue))
+    else if (AttModule::SetGestural(element, attrType, attrValue))
         success = true;
-    else if (Att::SetMei(element, attrType, attrValue))
+    else if (AttModule::SetMei(element, attrType, attrValue))
         success = true;
-    else if (Att::SetMensural(element, attrType, attrValue))
+    else if (AttModule::SetMensural(element, attrType, attrValue))
         success = true;
-    else if (Att::SetMidi(element, attrType, attrValue))
+    else if (AttModule::SetMidi(element, attrType, attrValue))
         success = true;
-    else if (Att::SetNeumes(element, attrType, attrValue))
+    else if (AttModule::SetNeumes(element, attrType, attrValue))
         success = true;
-    else if (Att::SetPagebased(element, attrType, attrValue))
+    else if (AttModule::SetPagebased(element, attrType, attrValue))
         success = true;
-    else if (Att::SetShared(element, attrType, attrValue))
+    else if (AttModule::SetShared(element, attrType, attrValue))
         success = true;
-    else if (Att::SetVisual(element, attrType, attrValue))
+    else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
     if (success && m_doc->GetType() != Facs) {
         m_doc->PrepareData();
@@ -1187,7 +1187,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
     }
 
     if (clef->GetShape() != clefShape) {
-        success = Att::SetShared(clef, "shape", shape);
+        success = AttModule::SetShared(clef, "shape", shape);
         if (!success) {
             LogError("Unable to set clef shape");
             m_infoObject.import("status", "FAILURE");
@@ -2262,7 +2262,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
     Zone *zone = new Zone();
     // set ligature to false and update zone of second Nc
     if (isLigature == "true") {
-        if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
+        if (AttModule::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         const int ligUlx = firstNc->GetZone()->GetUlx();
         const int ligUly = firstNc->GetZone()->GetUly();
@@ -2281,11 +2281,11 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
         secondNc->AttachZone(zone);
 
-        if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
+        if (AttModule::SetNeumes(secondNc, "ligated", "false")) success2 = true;
     }
     // set ligature to true and update zones to be the same
     else if (isLigature == "false") {
-        if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
+        if (AttModule::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
         zone->SetUly(firstNc->GetZone()->GetUly());
@@ -2294,7 +2294,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds, std
 
         secondNc->AttachZone(zone);
 
-        if (Att::SetNeumes(secondNc, "ligated", "true")) success2 = true;
+        if (AttModule::SetNeumes(secondNc, "ligated", "true")) success2 = true;
     }
     else {
         LogError("isLigature is invalid!");
@@ -2544,7 +2544,7 @@ bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *el
     if (param.has<jsonxx::Object>("attributes")) {
         jsonxx::Object o = param.get<jsonxx::Object>("attributes");
         auto m = o.kv_map();
-        for (auto it = m.begin(); it != m.end(); it++) {
+        for (auto it = m.begin(); it != m.end(); ++it) {
             if (o.has<jsonxx::String>(it->first)) {
                 attributes->emplace(attributes->end(), it->first, o.get<jsonxx::String>(it->first));
             }
@@ -2570,7 +2570,7 @@ bool EditorToolkitNeume::ParseMergeAction(jsonxx::Object param, std::vector<std:
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < (int)array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); ++i) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
     return true;
@@ -2692,7 +2692,7 @@ bool EditorToolkitNeume::ParseGroupAction(
     (*groupType) = param.get<jsonxx::String>("groupType");
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < (int)array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); ++i) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
 
@@ -2706,7 +2706,7 @@ bool EditorToolkitNeume::ParseUngroupAction(
     (*groupType) = param.get<jsonxx::String>("groupType");
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < (int)array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); ++i) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
 
@@ -2727,7 +2727,7 @@ bool EditorToolkitNeume::ParseToggleLigatureAction(
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < (int)array.size(); i++) {
+    for (int i = 0; i < (int)array.size(); ++i) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
     if (!param.has<jsonxx::String>("isLigature")) return false;

@@ -178,10 +178,10 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
     m_spacingTypes.clear();
 
     const ListOfConstObjects &childList = scoreDef->GetList(scoreDef);
-    for (auto iter = childList.begin(); iter != childList.end(); ++iter) {
+    for (const Object *object : childList) {
         // It should be staffDef only, but double check.
-        if (!(*iter)->Is(STAFFDEF)) continue;
-        const StaffDef *staffDef = vrv_cast<const StaffDef *>(*iter);
+        if (!object->Is(STAFFDEF)) continue;
+        const StaffDef *staffDef = vrv_cast<const StaffDef *>(object);
         assert(staffDef);
 
         m_spacingTypes[staffDef->GetN()] = CalculateSpacingAbove(staffDef);
@@ -614,7 +614,7 @@ bool StaffAlignment::IsInBracketGroup(bool isFirst) const
 
     ScoreDef *scoreDef = this->m_system->GetDrawingScoreDef();
     ListOfObjects groups = scoreDef->FindAllDescendantsByType(STAFFGRP);
-    for (auto staffGrp : groups) {
+    for (Object *staffGrp : groups) {
         // Make sure that there is GrpSym present
         GrpSym *grpSym = vrv_cast<GrpSym *>(staffGrp->GetFirst(GRPSYM));
         if (!grpSym) continue;
@@ -885,28 +885,17 @@ int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
             if (params->m_classId == HAIRPIN) continue;
         }
 
-        auto i = overflowBoxes->begin();
-        auto end = overflowBoxes->end();
-        while (i != end) {
-            // find all the overflowing elements from the staff that overlap horizontally (and, in case of extender
-            // elements - vertically)
-            LayerElement *element = dynamic_cast<LayerElement *>(*i);
-            const bool additionalMargin
-                = ((*iter)->GetObject()->Is(DYNAM) && element && element->GetFirstAncestor(BEAM));
-            const int margin = additionalMargin ? params->m_doc->GetDrawingDoubleUnit(m_staff->m_drawingStaffSize) : 0;
-            i = std::find_if(i, end, [iter, drawingUnit, margin](BoundingBox *elem) {
-                if ((*iter)->GetObject()->IsExtenderElement() && !elem->Is(FLOATING_POSITIONER)) {
-                    return (*iter)->HorizontalContentOverlap(elem, drawingUnit * 8)
-                        || (*iter)->VerticalContentOverlap(elem);
-                }
-                return (*iter)->HorizontalContentOverlap(elem, margin);
-            });
-            if (i != end) {
+        // Find all the overflowing elements from the staff that overlap horizontally
+        for (auto i = overflowBoxes->begin(); i != overflowBoxes->end(); ++i) {
+            if ((*iter)->HasHorizontalOverlapWith(*i, drawingUnit)) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
-                i++;
             }
         }
+
+        // Vertically align extender elements across systems
+        (*iter)->AdjustExtenders();
+
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
         if (place == STAFFREL_above) {
@@ -972,7 +961,7 @@ int StaffAlignment::AdjustFloatingPositionersBetween(FunctorParams *functorParam
                     diffY = y;
                     adjusted = true;
                 }
-                i++;
+                ++i;
             }
         }
         if (!adjusted) {
@@ -1101,10 +1090,10 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
 
     // Detection of inner slurs
     std::map<FloatingCurvePositioner *, ArrayOfFloatingCurvePositioners> innerCurveMap;
-    for (size_t i = 0; i < positioners.size(); ++i) {
+    for (int i = 0; i < (int)positioners.size(); ++i) {
         Slur *firstSlur = vrv_cast<Slur *>(positioners[i]->GetObject());
         ArrayOfFloatingCurvePositioners innerCurves;
-        for (size_t j = 0; j < positioners.size(); ++j) {
+        for (int j = 0; j < (int)positioners.size(); ++j) {
             if (i == j) continue;
             Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
             // Check if second slur is inner slur of first

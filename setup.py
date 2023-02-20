@@ -30,7 +30,7 @@ class sdist(_sdist):
 
 
 def get_commit():
-    """Utility function to call tools/get_git_commit.sh on any platform."""
+    """Call tools/get_git_commit.sh on any platform."""
     if os.path.exists('./tools'):
         print('running tools/get_git_commit.sh')
         os.system('bash -c "cd tools; ./get_git_commit.sh"')
@@ -38,14 +38,14 @@ def get_commit():
         print('tools directory is missing')
 
 
-def get_readme():
-    """Utility function to read the README file into the long_description."""
+def get_readme() -> str:
+    """Read the README file into the long_description."""
     with open('README.md', 'r') as fh:
         return fh.read()
 
 
-def get_version():
-    """Utility function to get the version from the header file and the git sha for dev versions."""
+def get_version() -> str:
+    """Get the version from the header file and the git sha for dev versions."""
     version = '0.0.0'
     # If we have a PKG-INFO (e.g., in a sdist) use that
     if os.path.exists('PKG-INFO'):
@@ -90,7 +90,11 @@ else:
                            '-DNO_PAE_SUPPORT']
 
 verovio_module = Extension('verovio._verovio',
-                           sources=glob('./src/*.cpp') + glob('./src/hum/*.cpp') +
+                           sources=
+                                glob('./src/*.cpp') + 
+                                glob('./src/hum/*.cpp') +
+                                glob('./libmei/dist/*.cpp') +
+                                glob('./libmei/addons/*.cpp') +
                            [
                                './src/crc/crc.cpp',
                                './src/json/jsonxx.cc',
@@ -100,26 +104,9 @@ verovio_module = Extension('verovio._verovio',
                                './src/midi/MidiEventList.cpp',
                                './src/midi/MidiFile.cpp',
                                './src/midi/MidiMessage.cpp',
-                               './libmei/attconverter.cpp',
-                               './libmei/atts_analytical.cpp',
-                               './libmei/atts_cmn.cpp',
-                               './libmei/atts_cmnornaments.cpp',
-                               './libmei/atts_critapp.cpp',
-                               './libmei/atts_gestural.cpp',
-                               './libmei/atts_externalsymbols.cpp',
-                               './libmei/atts_facsimile.cpp',
-                               './libmei/atts_frettab.cpp',
-                               './libmei/atts_mei.cpp',
-                               './libmei/atts_mensural.cpp',
-                               './libmei/atts_midi.cpp',
-                               './libmei/atts_neumes.cpp',
-                               './libmei/atts_pagebased.cpp',
-                               './libmei/atts_shared.cpp',
-                               './libmei/atts_usersymbols.cpp',
-                               './libmei/atts_visual.cpp',
                                './bindings/python/verovio.i'],
                            swig_opts=['-c++', '-outdir',
-                                      './bindings/python', '-py3'],
+                                      './bindings/python', '-doxygen'],
                            include_dirs=['./include/vrv',
                                          './include/crc',
                                          './include/json',
@@ -128,7 +115,8 @@ verovio_module = Extension('verovio._verovio',
                                          './include/pugi',
                                          './include/win32',
                                          './include/zip',
-                                         './libmei'],
+                                         './libmei/dist',
+                                         './libmei/addons'],
                            extra_compile_args=EXTRA_COMPILE_ARGS
                            )
 
@@ -168,7 +156,7 @@ setup(name='verovio',
           'verovio.data.Petaluma': os.listdir('./data/Petaluma'),
           'verovio.data.text': os.listdir('./data/text'),
       },
-      python_requires='>=3.5',
+      python_requires='>=3.7',
       project_urls={
           'Bug Reports': 'https://github.com/rism-digital/verovio/issues',
           'Source': 'https://github.com/rism-digital/verovio',

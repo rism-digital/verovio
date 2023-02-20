@@ -327,10 +327,7 @@ public:
     AttDurExtremeComparison(DurExtreme extremeType) : ClassIdComparison(OBJECT)
     {
         m_extremeType = extremeType;
-        if (m_extremeType == LONGEST)
-            m_extremeDur = -VRV_UNSET;
-        else
-            m_extremeDur = VRV_UNSET;
+        m_extremeDur = (m_extremeType == LONGEST) ? -VRV_UNSET : VRV_UNSET;
     }
 
     bool operator()(const Object *object) override

@@ -10,6 +10,7 @@
 
 #include "att.h"
 #include "atts_usersymbols.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {

@@ -39,12 +39,11 @@ To fix this try:
 
  export LDFLAGS="-L/opt/homebrew/opt/lapack/lib"
  export LDFLAGS="-L/opt/homebrew/opt/lapack/include"
- export LDFLAGS="-L/opt/homebrew/opt/lapack/lib"
  export CPPFLAGS="-L/opt/homebrew/opt/lapack/include"
  export PKG_CONFIG_PATH="-L/opt/homebrew/opt/lapack/pkgconfig"
  export CFLAGS=-Wno-error=implicit-function-declaration
  export LAPACK=/opt/homebrew/opt/lapack/lib/liblapack.dylib
- export export BLAS=/opt/homebrew/opt/openblas/lib/libopenblas.dylib
+ export BLAS=/opt/homebrew/opt/openblas/lib/libopenblas.dylib
 ```
 
 After that, re-run `poetry install` and it should work.
