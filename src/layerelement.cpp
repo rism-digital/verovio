@@ -960,12 +960,12 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     for (Object *object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
         if (!this->HorizontalContentOverlap(object)) continue;
-        const int elementBottom = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true);
-        const int elementTop = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true);
+        const int elementBottom = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+        const int elementTop = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize);
         if (direction > 0) {
             // make sure that there's actual overlap first
             if ((elementBottom > y1) && (elementBottom > y2)) continue;
-            const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize, true);
+            const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize);
             if (currentBottom >= elementTop) continue;
             const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
             if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
@@ -983,10 +983,10 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
         else {
             // make sure that there's actual overlap first
             if ((elementTop < y1) && (elementTop < y2)) continue;
-            const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize, true);
+            const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize);
             if (currentTop <= elementBottom) continue;
             const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
+            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
                 if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
                 leftMargin = unit + y1 - elementTop;
                 rightMargin = unit + y2 - elementTop;
@@ -1004,12 +1004,8 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
     const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
     int overlap = 0;
     if (*maxOverlap >= 0) {
-        if (sameDirElement) {
-            overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * -direction;
-        }
-        else {
-            overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction;
-        }
+        const int multiplier = sameDirElement ? -1 : 1;
+        overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction * multiplier;
     }
     else {
         int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / unit) * 2;
@@ -2550,7 +2546,7 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
     // The element is starting after the event end - we can stop here
     if (time >= (params->m_time + params->m_duration)) return FUNCTOR_STOP;
 
-    if (this->Is(NOTE)
+    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)
         && (std::find(params->m_elements.begin(), params->m_elements.end(), this->GetParent())
             != params->m_elements.end())) {
         return FUNCTOR_CONTINUE;
