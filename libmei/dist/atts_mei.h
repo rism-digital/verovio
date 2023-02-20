@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttNotationType : public Att {
-public:
+protected:
     AttNotationType();
-    virtual ~AttNotationType();
+    ~AttNotationType() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNotationType();
 
@@ -69,6 +70,20 @@ private:
      * element, additional to that given by its notationtype attribute.
      **/
     std::string m_notationsubtype;
+};
+
+//----------------------------------------------------------------------------
+// InstNotationType
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNotationType
+ */
+
+class InstNotationType : public AttNotationType {
+public:
+    InstNotationType() = default;
+    virtual ~InstNotationType() = default;
 };
 
 } // namespace vrv

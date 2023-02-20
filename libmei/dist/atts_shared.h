@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttAccidLog : public Att {
-public:
+protected:
     AttAccidLog();
-    virtual ~AttAccidLog();
+    ~AttAccidLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAccidLog();
 
@@ -60,14 +61,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAccidLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAccidLog
+ */
+
+class InstAccidLog : public AttAccidLog {
+public:
+    InstAccidLog() = default;
+    virtual ~InstAccidLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttAccidental
 //----------------------------------------------------------------------------
 
 class AttAccidental : public Att {
-public:
+protected:
     AttAccidental();
-    virtual ~AttAccidental();
+    ~AttAccidental() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAccidental();
 
@@ -94,14 +110,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAccidental
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAccidental
+ */
+
+class InstAccidental : public AttAccidental {
+public:
+    InstAccidental() = default;
+    virtual ~InstAccidental() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttArticulation
 //----------------------------------------------------------------------------
 
 class AttArticulation : public Att {
-public:
+protected:
     AttArticulation();
-    virtual ~AttArticulation();
+    ~AttArticulation() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetArticulation();
 
@@ -134,14 +165,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstArticulation
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttArticulation
+ */
+
+class InstArticulation : public AttArticulation {
+public:
+    InstArticulation() = default;
+    virtual ~InstArticulation() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttAttaccaLog
 //----------------------------------------------------------------------------
 
 class AttAttaccaLog : public Att {
-public:
+protected:
     AttAttaccaLog();
-    virtual ~AttAttaccaLog();
+    ~AttAttaccaLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAttaccaLog();
 
@@ -168,14 +214,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAttaccaLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAttaccaLog
+ */
+
+class InstAttaccaLog : public AttAttaccaLog {
+public:
+    InstAttaccaLog() = default;
+    virtual ~InstAttaccaLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttAudience
 //----------------------------------------------------------------------------
 
 class AttAudience : public Att {
-public:
+protected:
     AttAudience();
-    virtual ~AttAudience();
+    ~AttAudience() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAudience();
 
@@ -202,14 +263,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAudience
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAudience
+ */
+
+class InstAudience : public AttAudience {
+public:
+    InstAudience() = default;
+    virtual ~InstAudience() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttAugmentDots
 //----------------------------------------------------------------------------
 
 class AttAugmentDots : public Att {
-public:
+protected:
     AttAugmentDots();
-    virtual ~AttAugmentDots();
+    ~AttAugmentDots() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAugmentDots();
 
@@ -236,14 +312,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAugmentDots
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAugmentDots
+ */
+
+class InstAugmentDots : public AttAugmentDots {
+public:
+    InstAugmentDots() = default;
+    virtual ~InstAugmentDots() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttAuthorized
 //----------------------------------------------------------------------------
 
 class AttAuthorized : public Att {
-public:
+protected:
     AttAuthorized();
-    virtual ~AttAuthorized();
+    ~AttAuthorized() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAuthorized();
 
@@ -284,14 +375,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAuthorized
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAuthorized
+ */
+
+class InstAuthorized : public AttAuthorized {
+public:
+    InstAuthorized() = default;
+    virtual ~InstAuthorized() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBarLineLog
 //----------------------------------------------------------------------------
 
 class AttBarLineLog : public Att {
-public:
+protected:
     AttBarLineLog();
-    virtual ~AttBarLineLog();
+    ~AttBarLineLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBarLineLog();
 
@@ -318,14 +424,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstBarLineLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBarLineLog
+ */
+
+class InstBarLineLog : public AttBarLineLog {
+public:
+    InstBarLineLog() = default;
+    virtual ~InstBarLineLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBarring
 //----------------------------------------------------------------------------
 
 class AttBarring : public Att {
-public:
+protected:
     AttBarring();
-    virtual ~AttBarring();
+    ~AttBarring() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBarring();
 
@@ -371,14 +492,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstBarring
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBarring
+ */
+
+class InstBarring : public AttBarring {
+public:
+    InstBarring() = default;
+    virtual ~InstBarring() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBasic
 //----------------------------------------------------------------------------
 
 class AttBasic : public Att {
-public:
+protected:
     AttBasic();
-    virtual ~AttBasic();
+    ~AttBasic() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBasic();
 
@@ -405,14 +541,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstBasic
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBasic
+ */
+
+class InstBasic : public AttBasic {
+public:
+    InstBasic() = default;
+    virtual ~InstBasic() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBibl
 //----------------------------------------------------------------------------
 
 class AttBibl : public Att {
-public:
+protected:
     AttBibl();
-    virtual ~AttBibl();
+    ~AttBibl() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBibl();
 
@@ -442,14 +593,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstBibl
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBibl
+ */
+
+class InstBibl : public AttBibl {
+public:
+    InstBibl() = default;
+    virtual ~InstBibl() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCalendared
 //----------------------------------------------------------------------------
 
 class AttCalendared : public Att {
-public:
+protected:
     AttCalendared();
-    virtual ~AttCalendared();
+    ~AttCalendared() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCalendared();
 
@@ -479,14 +645,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCalendared
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCalendared
+ */
+
+class InstCalendared : public AttCalendared {
+public:
+    InstCalendared() = default;
+    virtual ~InstCalendared() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCanonical
 //----------------------------------------------------------------------------
 
 class AttCanonical : public Att {
-public:
+protected:
     AttCanonical();
-    virtual ~AttCanonical();
+    ~AttCanonical() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCanonical();
 
@@ -517,14 +698,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCanonical
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCanonical
+ */
+
+class InstCanonical : public AttCanonical {
+public:
+    InstCanonical() = default;
+    virtual ~InstCanonical() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttClassed
 //----------------------------------------------------------------------------
 
 class AttClassed : public Att {
-public:
+protected:
     AttClassed();
-    virtual ~AttClassed();
+    ~AttClassed() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetClassed();
 
@@ -554,14 +750,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstClassed
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttClassed
+ */
+
+class InstClassed : public AttClassed {
+public:
+    InstClassed() = default;
+    virtual ~InstClassed() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttClefLog
 //----------------------------------------------------------------------------
 
 class AttClefLog : public Att {
-public:
+protected:
     AttClefLog();
-    virtual ~AttClefLog();
+    ~AttClefLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetClefLog();
 
@@ -591,14 +802,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstClefLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttClefLog
+ */
+
+class InstClefLog : public AttClefLog {
+public:
+    InstClefLog() = default;
+    virtual ~InstClefLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttClefShape
 //----------------------------------------------------------------------------
 
 class AttClefShape : public Att {
-public:
+protected:
     AttClefShape();
-    virtual ~AttClefShape();
+    ~AttClefShape() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetClefShape();
 
@@ -625,14 +851,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstClefShape
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttClefShape
+ */
+
+class InstClefShape : public AttClefShape {
+public:
+    InstClefShape() = default;
+    virtual ~InstClefShape() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCleffingLog
 //----------------------------------------------------------------------------
 
 class AttCleffingLog : public Att {
-public:
+protected:
     AttCleffingLog();
-    virtual ~AttCleffingLog();
+    ~AttCleffingLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCleffingLog();
 
@@ -681,14 +922,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCleffingLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCleffingLog
+ */
+
+class InstCleffingLog : public AttCleffingLog {
+public:
+    InstCleffingLog() = default;
+    virtual ~InstCleffingLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttColor
 //----------------------------------------------------------------------------
 
 class AttColor : public Att {
-public:
+protected:
     AttColor();
-    virtual ~AttColor();
+    ~AttColor() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetColor();
 
@@ -718,14 +974,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstColor
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttColor
+ */
+
+class InstColor : public AttColor {
+public:
+    InstColor() = default;
+    virtual ~InstColor() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttColoration
 //----------------------------------------------------------------------------
 
 class AttColoration : public Att {
-public:
+protected:
     AttColoration();
-    virtual ~AttColoration();
+    ~AttColoration() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetColoration();
 
@@ -759,14 +1030,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstColoration
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttColoration
+ */
+
+class InstColoration : public AttColoration {
+public:
+    InstColoration() = default;
+    virtual ~InstColoration() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCoordX1
 //----------------------------------------------------------------------------
 
 class AttCoordX1 : public Att {
-public:
+protected:
     AttCoordX1();
-    virtual ~AttCoordX1();
+    ~AttCoordX1() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCoordX1();
 
@@ -793,14 +1079,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCoordX1
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCoordX1
+ */
+
+class InstCoordX1 : public AttCoordX1 {
+public:
+    InstCoordX1() = default;
+    virtual ~InstCoordX1() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCoordX2
 //----------------------------------------------------------------------------
 
 class AttCoordX2 : public Att {
-public:
+protected:
     AttCoordX2();
-    virtual ~AttCoordX2();
+    ~AttCoordX2() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCoordX2();
 
@@ -827,14 +1128,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCoordX2
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCoordX2
+ */
+
+class InstCoordX2 : public AttCoordX2 {
+public:
+    InstCoordX2() = default;
+    virtual ~InstCoordX2() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCoordY1
 //----------------------------------------------------------------------------
 
 class AttCoordY1 : public Att {
-public:
+protected:
     AttCoordY1();
-    virtual ~AttCoordY1();
+    ~AttCoordY1() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCoordY1();
 
@@ -861,14 +1177,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCoordY1
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCoordY1
+ */
+
+class InstCoordY1 : public AttCoordY1 {
+public:
+    InstCoordY1() = default;
+    virtual ~InstCoordY1() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCoordinated
 //----------------------------------------------------------------------------
 
 class AttCoordinated : public Att {
-public:
+protected:
     AttCoordinated();
-    virtual ~AttCoordinated();
+    ~AttCoordinated() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCoordinated();
 
@@ -924,14 +1255,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCoordinated
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCoordinated
+ */
+
+class InstCoordinated : public AttCoordinated {
+public:
+    InstCoordinated() = default;
+    virtual ~InstCoordinated() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCue
 //----------------------------------------------------------------------------
 
 class AttCue : public Att {
-public:
+protected:
     AttCue();
-    virtual ~AttCue();
+    ~AttCue() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCue();
 
@@ -958,14 +1304,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCue
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCue
+ */
+
+class InstCue : public AttCue {
+public:
+    InstCue() = default;
+    virtual ~InstCue() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCurvature
 //----------------------------------------------------------------------------
 
 class AttCurvature : public Att {
-public:
+protected:
     AttCurvature();
-    virtual ~AttCurvature();
+    ~AttCurvature() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCurvature();
 
@@ -1016,14 +1377,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCurvature
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCurvature
+ */
+
+class InstCurvature : public AttCurvature {
+public:
+    InstCurvature() = default;
+    virtual ~InstCurvature() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCurveRend
 //----------------------------------------------------------------------------
 
 class AttCurveRend : public Att {
-public:
+protected:
     AttCurveRend();
-    virtual ~AttCurveRend();
+    ~AttCurveRend() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCurveRend();
 
@@ -1058,14 +1434,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCurveRend
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCurveRend
+ */
+
+class InstCurveRend : public AttCurveRend {
+public:
+    InstCurveRend() = default;
+    virtual ~InstCurveRend() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttCustosLog
 //----------------------------------------------------------------------------
 
 class AttCustosLog : public Att {
-public:
+protected:
     AttCustosLog();
-    virtual ~AttCustosLog();
+    ~AttCustosLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCustosLog();
 
@@ -1092,14 +1483,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCustosLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCustosLog
+ */
+
+class InstCustosLog : public AttCustosLog {
+public:
+    InstCustosLog() = default;
+    virtual ~InstCustosLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDataPointing
 //----------------------------------------------------------------------------
 
 class AttDataPointing : public Att {
-public:
+protected:
     AttDataPointing();
-    virtual ~AttDataPointing();
+    ~AttDataPointing() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDataPointing();
 
@@ -1126,14 +1532,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDataPointing
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDataPointing
+ */
+
+class InstDataPointing : public AttDataPointing {
+public:
+    InstDataPointing() = default;
+    virtual ~InstDataPointing() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDatable
 //----------------------------------------------------------------------------
 
 class AttDatable : public Att {
-public:
+protected:
     AttDatable();
-    virtual ~AttDatable();
+    ~AttDatable() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDatable();
 
@@ -1184,14 +1605,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDatable
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDatable
+ */
+
+class InstDatable : public AttDatable {
+public:
+    InstDatable() = default;
+    virtual ~InstDatable() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDistances
 //----------------------------------------------------------------------------
 
 class AttDistances : public Att {
-public:
+protected:
     AttDistances();
-    virtual ~AttDistances();
+    ~AttDistances() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDistances();
 
@@ -1245,14 +1681,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDistances
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDistances
+ */
+
+class InstDistances : public AttDistances {
+public:
+    InstDistances() = default;
+    virtual ~InstDistances() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDotLog
 //----------------------------------------------------------------------------
 
 class AttDotLog : public Att {
-public:
+protected:
     AttDotLog();
-    virtual ~AttDotLog();
+    ~AttDotLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDotLog();
 
@@ -1279,14 +1730,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDotLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDotLog
+ */
+
+class InstDotLog : public AttDotLog {
+public:
+    InstDotLog() = default;
+    virtual ~InstDotLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDurationAdditive
 //----------------------------------------------------------------------------
 
 class AttDurationAdditive : public Att {
-public:
+protected:
     AttDurationAdditive();
-    virtual ~AttDurationAdditive();
+    ~AttDurationAdditive() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDurationAdditive();
 
@@ -1316,14 +1782,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDurationAdditive
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDurationAdditive
+ */
+
+class InstDurationAdditive : public AttDurationAdditive {
+public:
+    InstDurationAdditive() = default;
+    virtual ~InstDurationAdditive() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDurationDefault
 //----------------------------------------------------------------------------
 
 class AttDurationDefault : public Att {
-public:
+protected:
     AttDurationDefault();
-    virtual ~AttDurationDefault();
+    ~AttDurationDefault() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDurationDefault();
 
@@ -1372,14 +1853,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDurationDefault
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDurationDefault
+ */
+
+class InstDurationDefault : public AttDurationDefault {
+public:
+    InstDurationDefault() = default;
+    virtual ~InstDurationDefault() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDurationLog
 //----------------------------------------------------------------------------
 
 class AttDurationLog : public Att {
-public:
+protected:
     AttDurationLog();
-    virtual ~AttDurationLog();
+    ~AttDurationLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDurationLog();
 
@@ -1409,14 +1905,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDurationLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDurationLog
+ */
+
+class InstDurationLog : public AttDurationLog {
+public:
+    InstDurationLog() = default;
+    virtual ~InstDurationLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttDurationRatio
 //----------------------------------------------------------------------------
 
 class AttDurationRatio : public Att {
-public:
+protected:
     AttDurationRatio();
-    virtual ~AttDurationRatio();
+    ~AttDurationRatio() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetDurationRatio();
 
@@ -1452,14 +1963,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstDurationRatio
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDurationRatio
+ */
+
+class InstDurationRatio : public AttDurationRatio {
+public:
+    InstDurationRatio() = default;
+    virtual ~InstDurationRatio() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttEnclosingChars
 //----------------------------------------------------------------------------
 
 class AttEnclosingChars : public Att {
-public:
+protected:
     AttEnclosingChars();
-    virtual ~AttEnclosingChars();
+    ~AttEnclosingChars() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetEnclosingChars();
 
@@ -1491,14 +2017,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstEnclosingChars
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttEnclosingChars
+ */
+
+class InstEnclosingChars : public AttEnclosingChars {
+public:
+    InstEnclosingChars() = default;
+    virtual ~InstEnclosingChars() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttEndings
 //----------------------------------------------------------------------------
 
 class AttEndings : public Att {
-public:
+protected:
     AttEndings();
-    virtual ~AttEndings();
+    ~AttEndings() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetEndings();
 
@@ -1525,14 +2066,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstEndings
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttEndings
+ */
+
+class InstEndings : public AttEndings {
+public:
+    InstEndings() = default;
+    virtual ~InstEndings() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttEvidence
 //----------------------------------------------------------------------------
 
 class AttEvidence : public Att {
-public:
+protected:
     AttEvidence();
-    virtual ~AttEvidence();
+    ~AttEvidence() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetEvidence();
 
@@ -1568,14 +2124,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstEvidence
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttEvidence
+ */
+
+class InstEvidence : public AttEvidence {
+public:
+    InstEvidence() = default;
+    virtual ~InstEvidence() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttExtender
 //----------------------------------------------------------------------------
 
 class AttExtender : public Att {
-public:
+protected:
     AttExtender();
-    virtual ~AttExtender();
+    ~AttExtender() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetExtender();
 
@@ -1602,14 +2173,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstExtender
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttExtender
+ */
+
+class InstExtender : public AttExtender {
+public:
+    InstExtender() = default;
+    virtual ~InstExtender() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttExtent
 //----------------------------------------------------------------------------
 
 class AttExtent : public Att {
-public:
+protected:
     AttExtent();
-    virtual ~AttExtent();
+    ~AttExtent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetExtent();
 
@@ -1640,14 +2226,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstExtent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttExtent
+ */
+
+class InstExtent : public AttExtent {
+public:
+    InstExtent() = default;
+    virtual ~InstExtent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttFermataPresent
 //----------------------------------------------------------------------------
 
 class AttFermataPresent : public Att {
-public:
+protected:
     AttFermataPresent();
-    virtual ~AttFermataPresent();
+    ~AttFermataPresent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFermataPresent();
 
@@ -1678,14 +2279,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstFermataPresent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFermataPresent
+ */
+
+class InstFermataPresent : public AttFermataPresent {
+public:
+    InstFermataPresent() = default;
+    virtual ~InstFermataPresent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttFiling
 //----------------------------------------------------------------------------
 
 class AttFiling : public Att {
-public:
+protected:
     AttFiling();
-    virtual ~AttFiling();
+    ~AttFiling() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFiling();
 
@@ -1715,14 +2331,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstFiling
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFiling
+ */
+
+class InstFiling : public AttFiling {
+public:
+    InstFiling() = default;
+    virtual ~InstFiling() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 
 class AttGrpSymLog : public Att {
-public:
+protected:
     AttGrpSymLog();
-    virtual ~AttGrpSymLog();
+    ~AttGrpSymLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetGrpSymLog();
 
@@ -1749,14 +2380,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstGrpSymLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttGrpSymLog
+ */
+
+class InstGrpSymLog : public AttGrpSymLog {
+public:
+    InstGrpSymLog() = default;
+    virtual ~InstGrpSymLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHandIdent
 //----------------------------------------------------------------------------
 
 class AttHandIdent : public Att {
-public:
+protected:
     AttHandIdent();
-    virtual ~AttHandIdent();
+    ~AttHandIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHandIdent();
 
@@ -1786,14 +2432,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstHandIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHandIdent
+ */
+
+class InstHandIdent : public AttHandIdent {
+public:
+    InstHandIdent() = default;
+    virtual ~InstHandIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHeight
 //----------------------------------------------------------------------------
 
 class AttHeight : public Att {
-public:
+protected:
     AttHeight();
-    virtual ~AttHeight();
+    ~AttHeight() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHeight();
 
@@ -1820,14 +2481,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstHeight
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHeight
+ */
+
+class InstHeight : public AttHeight {
+public:
+    InstHeight() = default;
+    virtual ~InstHeight() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHorizontalAlign
 //----------------------------------------------------------------------------
 
 class AttHorizontalAlign : public Att {
-public:
+protected:
     AttHorizontalAlign();
-    virtual ~AttHorizontalAlign();
+    ~AttHorizontalAlign() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHorizontalAlign();
 
@@ -1854,14 +2530,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstHorizontalAlign
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHorizontalAlign
+ */
+
+class InstHorizontalAlign : public AttHorizontalAlign {
+public:
+    InstHorizontalAlign() = default;
+    virtual ~InstHorizontalAlign() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttInternetMedia
 //----------------------------------------------------------------------------
 
 class AttInternetMedia : public Att {
-public:
+protected:
     AttInternetMedia();
-    virtual ~AttInternetMedia();
+    ~AttInternetMedia() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetInternetMedia();
 
@@ -1892,14 +2583,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstInternetMedia
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttInternetMedia
+ */
+
+class InstInternetMedia : public AttInternetMedia {
+public:
+    InstInternetMedia() = default;
+    virtual ~InstInternetMedia() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttJoined
 //----------------------------------------------------------------------------
 
 class AttJoined : public Att {
-public:
+protected:
     AttJoined();
-    virtual ~AttJoined();
+    ~AttJoined() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetJoined();
 
@@ -1933,14 +2639,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstJoined
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttJoined
+ */
+
+class InstJoined : public AttJoined {
+public:
+    InstJoined() = default;
+    virtual ~InstJoined() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
 class AttKeySigLog : public Att {
-public:
+protected:
     AttKeySigLog();
-    virtual ~AttKeySigLog();
+    ~AttKeySigLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigLog();
 
@@ -1967,14 +2688,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstKeySigLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigLog
+ */
+
+class InstKeySigLog : public AttKeySigLog {
+public:
+    InstKeySigLog() = default;
+    virtual ~InstKeySigLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigDefaultLog
 //----------------------------------------------------------------------------
 
 class AttKeySigDefaultLog : public Att {
-public:
+protected:
     AttKeySigDefaultLog();
-    virtual ~AttKeySigDefaultLog();
+    ~AttKeySigDefaultLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultLog();
 
@@ -2001,14 +2737,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstKeySigDefaultLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigDefaultLog
+ */
+
+class InstKeySigDefaultLog : public AttKeySigDefaultLog {
+public:
+    InstKeySigDefaultLog() = default;
+    virtual ~InstKeySigDefaultLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLabelled
 //----------------------------------------------------------------------------
 
 class AttLabelled : public Att {
-public:
+protected:
     AttLabelled();
-    virtual ~AttLabelled();
+    ~AttLabelled() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLabelled();
 
@@ -2039,14 +2790,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLabelled
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLabelled
+ */
+
+class InstLabelled : public AttLabelled {
+public:
+    InstLabelled() = default;
+    virtual ~InstLabelled() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLang
 //----------------------------------------------------------------------------
 
 class AttLang : public Att {
-public:
+protected:
     AttLang();
-    virtual ~AttLang();
+    ~AttLang() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLang();
 
@@ -2079,14 +2845,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLang
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLang
+ */
+
+class InstLang : public AttLang {
+public:
+    InstLang() = default;
+    virtual ~InstLang() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLayerLog
 //----------------------------------------------------------------------------
 
 class AttLayerLog : public Att {
-public:
+protected:
     AttLayerLog();
-    virtual ~AttLayerLog();
+    ~AttLayerLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLayerLog();
 
@@ -2113,14 +2894,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLayerLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLayerLog
+ */
+
+class InstLayerLog : public AttLayerLog {
+public:
+    InstLayerLog() = default;
+    virtual ~InstLayerLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLayerIdent
 //----------------------------------------------------------------------------
 
 class AttLayerIdent : public Att {
-public:
+protected:
     AttLayerIdent();
-    virtual ~AttLayerIdent();
+    ~AttLayerIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLayerIdent();
 
@@ -2147,14 +2943,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLayerIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLayerIdent
+ */
+
+class InstLayerIdent : public AttLayerIdent {
+public:
+    InstLayerIdent() = default;
+    virtual ~InstLayerIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLineLoc
 //----------------------------------------------------------------------------
 
 class AttLineLoc : public Att {
-public:
+protected:
     AttLineLoc();
-    virtual ~AttLineLoc();
+    ~AttLineLoc() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLineLoc();
 
@@ -2185,14 +2996,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLineLoc
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLineLoc
+ */
+
+class InstLineLoc : public AttLineLoc {
+public:
+    InstLineLoc() = default;
+    virtual ~InstLineLoc() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLineRend
 //----------------------------------------------------------------------------
 
 class AttLineRend : public Att {
-public:
+protected:
     AttLineRend();
-    virtual ~AttLineRend();
+    ~AttLineRend() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLineRend();
 
@@ -2237,14 +3063,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLineRend
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLineRend
+ */
+
+class InstLineRend : public AttLineRend {
+public:
+    InstLineRend() = default;
+    virtual ~InstLineRend() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLineRendBase
 //----------------------------------------------------------------------------
 
 class AttLineRendBase : public Att {
-public:
+protected:
     AttLineRendBase();
-    virtual ~AttLineRendBase();
+    ~AttLineRendBase() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLineRendBase();
 
@@ -2291,14 +3132,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLineRendBase
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLineRendBase
+ */
+
+class InstLineRendBase : public AttLineRendBase {
+public:
+    InstLineRendBase() = default;
+    virtual ~InstLineRendBase() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLinking
 //----------------------------------------------------------------------------
 
 class AttLinking : public Att {
-public:
+protected:
     AttLinking();
-    virtual ~AttLinking();
+    ~AttLinking() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLinking();
 
@@ -2379,14 +3235,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLinking
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLinking
+ */
+
+class InstLinking : public AttLinking {
+public:
+    InstLinking() = default;
+    virtual ~InstLinking() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttLyricStyle
 //----------------------------------------------------------------------------
 
 class AttLyricStyle : public Att {
-public:
+protected:
     AttLyricStyle();
-    virtual ~AttLyricStyle();
+    ~AttLyricStyle() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetLyricStyle();
 
@@ -2445,14 +3316,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstLyricStyle
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttLyricStyle
+ */
+
+class InstLyricStyle : public AttLyricStyle {
+public:
+    InstLyricStyle() = default;
+    virtual ~InstLyricStyle() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeasureNumbers
 //----------------------------------------------------------------------------
 
 class AttMeasureNumbers : public Att {
-public:
+protected:
     AttMeasureNumbers();
-    virtual ~AttMeasureNumbers();
+    ~AttMeasureNumbers() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeasureNumbers();
 
@@ -2479,14 +3365,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeasureNumbers
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeasureNumbers
+ */
+
+class InstMeasureNumbers : public AttMeasureNumbers {
+public:
+    InstMeasureNumbers() = default;
+    virtual ~InstMeasureNumbers() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeasurement
 //----------------------------------------------------------------------------
 
 class AttMeasurement : public Att {
-public:
+protected:
     AttMeasurement();
-    virtual ~AttMeasurement();
+    ~AttMeasurement() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeasurement();
 
@@ -2513,14 +3414,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeasurement
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeasurement
+ */
+
+class InstMeasurement : public AttMeasurement {
+public:
+    InstMeasurement() = default;
+    virtual ~InstMeasurement() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMediaBounds
 //----------------------------------------------------------------------------
 
 class AttMediaBounds : public Att {
-public:
+protected:
     AttMediaBounds();
-    virtual ~AttMediaBounds();
+    ~AttMediaBounds() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMediaBounds();
 
@@ -2572,14 +3488,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMediaBounds
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMediaBounds
+ */
+
+class InstMediaBounds : public AttMediaBounds {
+public:
+    InstMediaBounds() = default;
+    virtual ~InstMediaBounds() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMedium
 //----------------------------------------------------------------------------
 
 class AttMedium : public Att {
-public:
+protected:
     AttMedium();
-    virtual ~AttMedium();
+    ~AttMedium() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMedium();
 
@@ -2606,14 +3537,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMedium
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMedium
+ */
+
+class InstMedium : public AttMedium {
+public:
+    InstMedium() = default;
+    virtual ~InstMedium() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeiVersion
 //----------------------------------------------------------------------------
 
 class AttMeiVersion : public Att {
-public:
+protected:
     AttMeiVersion();
-    virtual ~AttMeiVersion();
+    ~AttMeiVersion() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeiVersion();
 
@@ -2640,14 +3586,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeiVersion
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeiVersion
+ */
+
+class InstMeiVersion : public AttMeiVersion {
+public:
+    InstMeiVersion() = default;
+    virtual ~InstMeiVersion() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 
 class AttMetadataPointing : public Att {
-public:
+protected:
     AttMetadataPointing();
-    virtual ~AttMetadataPointing();
+    ~AttMetadataPointing() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMetadataPointing();
 
@@ -2678,14 +3639,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMetadataPointing
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMetadataPointing
+ */
+
+class InstMetadataPointing : public AttMetadataPointing {
+public:
+    InstMetadataPointing() = default;
+    virtual ~InstMetadataPointing() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeterConformance
 //----------------------------------------------------------------------------
 
 class AttMeterConformance : public Att {
-public:
+protected:
     AttMeterConformance();
-    virtual ~AttMeterConformance();
+    ~AttMeterConformance() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeterConformance();
 
@@ -2715,14 +3691,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeterConformance
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeterConformance
+ */
+
+class InstMeterConformance : public AttMeterConformance {
+public:
+    InstMeterConformance() = default;
+    virtual ~InstMeterConformance() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeterConformanceBar
 //----------------------------------------------------------------------------
 
 class AttMeterConformanceBar : public Att {
-public:
+protected:
     AttMeterConformanceBar();
-    virtual ~AttMeterConformanceBar();
+    ~AttMeterConformanceBar() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeterConformanceBar();
 
@@ -2764,14 +3755,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeterConformanceBar
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeterConformanceBar
+ */
+
+class InstMeterConformanceBar : public AttMeterConformanceBar {
+public:
+    InstMeterConformanceBar() = default;
+    virtual ~InstMeterConformanceBar() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeterSigLog
 //----------------------------------------------------------------------------
 
 class AttMeterSigLog : public Att {
-public:
+protected:
     AttMeterSigLog();
-    virtual ~AttMeterSigLog();
+    ~AttMeterSigLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigLog();
 
@@ -2813,14 +3819,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeterSigLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeterSigLog
+ */
+
+class InstMeterSigLog : public AttMeterSigLog {
+public:
+    InstMeterSigLog() = default;
+    virtual ~InstMeterSigLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMeterSigDefaultLog
 //----------------------------------------------------------------------------
 
 class AttMeterSigDefaultLog : public Att {
-public:
+protected:
     AttMeterSigDefaultLog();
-    virtual ~AttMeterSigDefaultLog();
+    ~AttMeterSigDefaultLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigDefaultLog();
 
@@ -2870,14 +3891,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMeterSigDefaultLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMeterSigDefaultLog
+ */
+
+class InstMeterSigDefaultLog : public AttMeterSigDefaultLog {
+public:
+    InstMeterSigDefaultLog() = default;
+    virtual ~InstMeterSigDefaultLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMmTempo
 //----------------------------------------------------------------------------
 
 class AttMmTempo : public Att {
-public:
+protected:
     AttMmTempo();
-    virtual ~AttMmTempo();
+    ~AttMmTempo() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMmTempo();
 
@@ -2922,14 +3958,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMmTempo
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMmTempo
+ */
+
+class InstMmTempo : public AttMmTempo {
+public:
+    InstMmTempo() = default;
+    virtual ~InstMmTempo() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMultinumMeasures
 //----------------------------------------------------------------------------
 
 class AttMultinumMeasures : public Att {
-public:
+protected:
     AttMultinumMeasures();
-    virtual ~AttMultinumMeasures();
+    ~AttMultinumMeasures() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMultinumMeasures();
 
@@ -2959,14 +4010,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMultinumMeasures
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMultinumMeasures
+ */
+
+class InstMultinumMeasures : public AttMultinumMeasures {
+public:
+    InstMultinumMeasures() = default;
+    virtual ~InstMultinumMeasures() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNInteger
 //----------------------------------------------------------------------------
 
 class AttNInteger : public Att {
-public:
+protected:
     AttNInteger();
-    virtual ~AttNInteger();
+    ~AttNInteger() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNInteger();
 
@@ -2997,14 +4063,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstNInteger
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNInteger
+ */
+
+class InstNInteger : public AttNInteger {
+public:
+    InstNInteger() = default;
+    virtual ~InstNInteger() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNNumberLike
 //----------------------------------------------------------------------------
 
 class AttNNumberLike : public Att {
-public:
+protected:
     AttNNumberLike();
-    virtual ~AttNNumberLike();
+    ~AttNNumberLike() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNNumberLike();
 
@@ -3035,14 +4116,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstNNumberLike
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNNumberLike
+ */
+
+class InstNNumberLike : public AttNNumberLike {
+public:
+    InstNNumberLike() = default;
+    virtual ~InstNNumberLike() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttName
 //----------------------------------------------------------------------------
 
 class AttName : public Att {
-public:
+protected:
     AttName();
-    virtual ~AttName();
+    ~AttName() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetName();
 
@@ -3081,14 +4177,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstName
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttName
+ */
+
+class InstName : public AttName {
+public:
+    InstName() = default;
+    virtual ~InstName() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNotationStyle
 //----------------------------------------------------------------------------
 
 class AttNotationStyle : public Att {
-public:
+protected:
     AttNotationStyle();
-    virtual ~AttNotationStyle();
+    ~AttNotationStyle() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNotationStyle();
 
@@ -3123,14 +4234,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstNotationStyle
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNotationStyle
+ */
+
+class InstNotationStyle : public AttNotationStyle {
+public:
+    InstNotationStyle() = default;
+    virtual ~InstNotationStyle() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNoteHeads
 //----------------------------------------------------------------------------
 
 class AttNoteHeads : public Att {
-public:
+protected:
     AttNoteHeads();
-    virtual ~AttNoteHeads();
+    ~AttNoteHeads() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNoteHeads();
 
@@ -3219,14 +4345,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstNoteHeads
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNoteHeads
+ */
+
+class InstNoteHeads : public AttNoteHeads {
+public:
+    InstNoteHeads() = default;
+    virtual ~InstNoteHeads() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOctave
 //----------------------------------------------------------------------------
 
 class AttOctave : public Att {
-public:
+protected:
     AttOctave();
-    virtual ~AttOctave();
+    ~AttOctave() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOctave();
 
@@ -3253,14 +4394,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOctave
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOctave
+ */
+
+class InstOctave : public AttOctave {
+public:
+    InstOctave() = default;
+    virtual ~InstOctave() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOctaveDefault
 //----------------------------------------------------------------------------
 
 class AttOctaveDefault : public Att {
-public:
+protected:
     AttOctaveDefault();
-    virtual ~AttOctaveDefault();
+    ~AttOctaveDefault() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOctaveDefault();
 
@@ -3291,14 +4447,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOctaveDefault
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOctaveDefault
+ */
+
+class InstOctaveDefault : public AttOctaveDefault {
+public:
+    InstOctaveDefault() = default;
+    virtual ~InstOctaveDefault() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOctaveDisplacement
 //----------------------------------------------------------------------------
 
 class AttOctaveDisplacement : public Att {
-public:
+protected:
     AttOctaveDisplacement();
-    virtual ~AttOctaveDisplacement();
+    ~AttOctaveDisplacement() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOctaveDisplacement();
 
@@ -3331,14 +4502,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOctaveDisplacement
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOctaveDisplacement
+ */
+
+class InstOctaveDisplacement : public AttOctaveDisplacement {
+public:
+    InstOctaveDisplacement() = default;
+    virtual ~InstOctaveDisplacement() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOneLineStaff
 //----------------------------------------------------------------------------
 
 class AttOneLineStaff : public Att {
-public:
+protected:
     AttOneLineStaff();
-    virtual ~AttOneLineStaff();
+    ~AttOneLineStaff() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOneLineStaff();
 
@@ -3369,14 +4555,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOneLineStaff
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOneLineStaff
+ */
+
+class InstOneLineStaff : public AttOneLineStaff {
+public:
+    InstOneLineStaff() = default;
+    virtual ~InstOneLineStaff() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOptimization
 //----------------------------------------------------------------------------
 
 class AttOptimization : public Att {
-public:
+protected:
     AttOptimization();
-    virtual ~AttOptimization();
+    ~AttOptimization() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOptimization();
 
@@ -3406,14 +4607,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOptimization
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOptimization
+ */
+
+class InstOptimization : public AttOptimization {
+public:
+    InstOptimization() = default;
+    virtual ~InstOptimization() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOriginLayerIdent
 //----------------------------------------------------------------------------
 
 class AttOriginLayerIdent : public Att {
-public:
+protected:
     AttOriginLayerIdent();
-    virtual ~AttOriginLayerIdent();
+    ~AttOriginLayerIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOriginLayerIdent();
 
@@ -3440,14 +4656,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOriginLayerIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOriginLayerIdent
+ */
+
+class InstOriginLayerIdent : public AttOriginLayerIdent {
+public:
+    InstOriginLayerIdent() = default;
+    virtual ~InstOriginLayerIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOriginStaffIdent
 //----------------------------------------------------------------------------
 
 class AttOriginStaffIdent : public Att {
-public:
+protected:
     AttOriginStaffIdent();
-    virtual ~AttOriginStaffIdent();
+    ~AttOriginStaffIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOriginStaffIdent();
 
@@ -3477,14 +4708,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOriginStaffIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOriginStaffIdent
+ */
+
+class InstOriginStaffIdent : public AttOriginStaffIdent {
+public:
+    InstOriginStaffIdent() = default;
+    virtual ~InstOriginStaffIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOriginStartEndId
 //----------------------------------------------------------------------------
 
 class AttOriginStartEndId : public Att {
-public:
+protected:
     AttOriginStartEndId();
-    virtual ~AttOriginStartEndId();
+    ~AttOriginStartEndId() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOriginStartEndId();
 
@@ -3517,14 +4763,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOriginStartEndId
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOriginStartEndId
+ */
+
+class InstOriginStartEndId : public AttOriginStartEndId {
+public:
+    InstOriginStartEndId() = default;
+    virtual ~InstOriginStartEndId() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttOriginTimestampLog
 //----------------------------------------------------------------------------
 
 class AttOriginTimestampLog : public Att {
-public:
+protected:
     AttOriginTimestampLog();
-    virtual ~AttOriginTimestampLog();
+    ~AttOriginTimestampLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetOriginTimestampLog();
 
@@ -3564,14 +4825,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstOriginTimestampLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttOriginTimestampLog
+ */
+
+class InstOriginTimestampLog : public AttOriginTimestampLog {
+public:
+    InstOriginTimestampLog() = default;
+    virtual ~InstOriginTimestampLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPages
 //----------------------------------------------------------------------------
 
 class AttPages : public Att {
-public:
+protected:
     AttPages();
-    virtual ~AttPages();
+    ~AttPages() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPages();
 
@@ -3646,14 +4922,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPages
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPages
+ */
+
+class InstPages : public AttPages {
+public:
+    InstPages() = default;
+    virtual ~InstPages() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPartIdent
 //----------------------------------------------------------------------------
 
 class AttPartIdent : public Att {
-public:
+protected:
     AttPartIdent();
-    virtual ~AttPartIdent();
+    ~AttPartIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPartIdent();
 
@@ -3692,14 +4983,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPartIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPartIdent
+ */
+
+class InstPartIdent : public AttPartIdent {
+public:
+    InstPartIdent() = default;
+    virtual ~InstPartIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPitch
 //----------------------------------------------------------------------------
 
 class AttPitch : public Att {
-public:
+protected:
     AttPitch();
-    virtual ~AttPitch();
+    ~AttPitch() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPitch();
 
@@ -3726,14 +5032,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPitch
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPitch
+ */
+
+class InstPitch : public AttPitch {
+public:
+    InstPitch() = default;
+    virtual ~InstPitch() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPlacementOnStaff
 //----------------------------------------------------------------------------
 
 class AttPlacementOnStaff : public Att {
-public:
+protected:
     AttPlacementOnStaff();
-    virtual ~AttPlacementOnStaff();
+    ~AttPlacementOnStaff() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPlacementOnStaff();
 
@@ -3763,14 +5084,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPlacementOnStaff
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPlacementOnStaff
+ */
+
+class InstPlacementOnStaff : public AttPlacementOnStaff {
+public:
+    InstPlacementOnStaff() = default;
+    virtual ~InstPlacementOnStaff() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPlacementRelEvent
 //----------------------------------------------------------------------------
 
 class AttPlacementRelEvent : public Att {
-public:
+protected:
     AttPlacementRelEvent();
-    virtual ~AttPlacementRelEvent();
+    ~AttPlacementRelEvent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPlacementRelEvent();
 
@@ -3797,14 +5133,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPlacementRelEvent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPlacementRelEvent
+ */
+
+class InstPlacementRelEvent : public AttPlacementRelEvent {
+public:
+    InstPlacementRelEvent() = default;
+    virtual ~InstPlacementRelEvent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPlacementRelStaff
 //----------------------------------------------------------------------------
 
 class AttPlacementRelStaff : public Att {
-public:
+protected:
     AttPlacementRelStaff();
-    virtual ~AttPlacementRelStaff();
+    ~AttPlacementRelStaff() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPlacementRelStaff();
 
@@ -3831,14 +5182,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPlacementRelStaff
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPlacementRelStaff
+ */
+
+class InstPlacementRelStaff : public AttPlacementRelStaff {
+public:
+    InstPlacementRelStaff() = default;
+    virtual ~InstPlacementRelStaff() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPlist
 //----------------------------------------------------------------------------
 
 class AttPlist : public Att {
-public:
+protected:
     AttPlist();
-    virtual ~AttPlist();
+    ~AttPlist() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPlist();
 
@@ -3871,14 +5237,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPlist
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPlist
+ */
+
+class InstPlist : public AttPlist {
+public:
+    InstPlist() = default;
+    virtual ~InstPlist() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPointing
 //----------------------------------------------------------------------------
 
 class AttPointing : public Att {
-public:
+protected:
     AttPointing();
-    virtual ~AttPointing();
+    ~AttPointing() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPointing();
 
@@ -3935,14 +5316,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPointing
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPointing
+ */
+
+class InstPointing : public AttPointing {
+public:
+    InstPointing() = default;
+    virtual ~InstPointing() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttQuantity
 //----------------------------------------------------------------------------
 
 class AttQuantity : public Att {
-public:
+protected:
     AttQuantity();
-    virtual ~AttQuantity();
+    ~AttQuantity() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetQuantity();
 
@@ -3972,14 +5368,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstQuantity
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttQuantity
+ */
+
+class InstQuantity : public AttQuantity {
+public:
+    InstQuantity() = default;
+    virtual ~InstQuantity() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttRanging
 //----------------------------------------------------------------------------
 
 class AttRanging : public Att {
-public:
+protected:
     AttRanging();
-    virtual ~AttRanging();
+    ~AttRanging() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetRanging();
 
@@ -4040,14 +5451,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstRanging
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRanging
+ */
+
+class InstRanging : public AttRanging {
+public:
+    InstRanging() = default;
+    virtual ~InstRanging() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttResponsibility
 //----------------------------------------------------------------------------
 
 class AttResponsibility : public Att {
-public:
+protected:
     AttResponsibility();
-    virtual ~AttResponsibility();
+    ~AttResponsibility() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetResponsibility();
 
@@ -4078,14 +5504,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstResponsibility
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttResponsibility
+ */
+
+class InstResponsibility : public AttResponsibility {
+public:
+    InstResponsibility() = default;
+    virtual ~InstResponsibility() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttRestdurationLog
 //----------------------------------------------------------------------------
 
 class AttRestdurationLog : public Att {
-public:
+protected:
     AttRestdurationLog();
-    virtual ~AttRestdurationLog();
+    ~AttRestdurationLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetRestdurationLog();
 
@@ -4115,14 +5556,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstRestdurationLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRestdurationLog
+ */
+
+class InstRestdurationLog : public AttRestdurationLog {
+public:
+    InstRestdurationLog() = default;
+    virtual ~InstRestdurationLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttScalable
 //----------------------------------------------------------------------------
 
 class AttScalable : public Att {
-public:
+protected:
     AttScalable();
-    virtual ~AttScalable();
+    ~AttScalable() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetScalable();
 
@@ -4149,14 +5605,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstScalable
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttScalable
+ */
+
+class InstScalable : public AttScalable {
+public:
+    InstScalable() = default;
+    virtual ~InstScalable() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSequence
 //----------------------------------------------------------------------------
 
 class AttSequence : public Att {
-public:
+protected:
     AttSequence();
-    virtual ~AttSequence();
+    ~AttSequence() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSequence();
 
@@ -4186,14 +5657,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSequence
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSequence
+ */
+
+class InstSequence : public AttSequence {
+public:
+    InstSequence() = default;
+    virtual ~InstSequence() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSlashCount
 //----------------------------------------------------------------------------
 
 class AttSlashCount : public Att {
-public:
+protected:
     AttSlashCount();
-    virtual ~AttSlashCount();
+    ~AttSlashCount() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSlashCount();
 
@@ -4220,14 +5706,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSlashCount
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSlashCount
+ */
+
+class InstSlashCount : public AttSlashCount {
+public:
+    InstSlashCount() = default;
+    virtual ~InstSlashCount() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSlurPresent
 //----------------------------------------------------------------------------
 
 class AttSlurPresent : public Att {
-public:
+protected:
     AttSlurPresent();
-    virtual ~AttSlurPresent();
+    ~AttSlurPresent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSlurPresent();
 
@@ -4258,14 +5759,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSlurPresent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSlurPresent
+ */
+
+class InstSlurPresent : public AttSlurPresent {
+public:
+    InstSlurPresent() = default;
+    virtual ~InstSlurPresent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSource
 //----------------------------------------------------------------------------
 
 class AttSource : public Att {
-public:
+protected:
     AttSource();
-    virtual ~AttSource();
+    ~AttSource() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSource();
 
@@ -4297,14 +5813,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSource
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSource
+ */
+
+class InstSource : public AttSource {
+public:
+    InstSource() = default;
+    virtual ~InstSource() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSpacing
 //----------------------------------------------------------------------------
 
 class AttSpacing : public Att {
-public:
+protected:
     AttSpacing();
-    virtual ~AttSpacing();
+    ~AttSpacing() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSpacing();
 
@@ -4358,14 +5889,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSpacing
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSpacing
+ */
+
+class InstSpacing : public AttSpacing {
+public:
+    InstSpacing() = default;
+    virtual ~InstSpacing() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffLog
 //----------------------------------------------------------------------------
 
 class AttStaffLog : public Att {
-public:
+protected:
     AttStaffLog();
-    virtual ~AttStaffLog();
+    ~AttStaffLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffLog();
 
@@ -4392,14 +5938,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffLog
+ */
+
+class InstStaffLog : public AttStaffLog {
+public:
+    InstStaffLog() = default;
+    virtual ~InstStaffLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffDefLog
 //----------------------------------------------------------------------------
 
 class AttStaffDefLog : public Att {
-public:
+protected:
     AttStaffDefLog();
-    virtual ~AttStaffDefLog();
+    ~AttStaffDefLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffDefLog();
 
@@ -4426,14 +5987,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffDefLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffDefLog
+ */
+
+class InstStaffDefLog : public AttStaffDefLog {
+public:
+    InstStaffDefLog() = default;
+    virtual ~InstStaffDefLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffGroupingSym
 //----------------------------------------------------------------------------
 
 class AttStaffGroupingSym : public Att {
-public:
+protected:
     AttStaffGroupingSym();
-    virtual ~AttStaffGroupingSym();
+    ~AttStaffGroupingSym() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffGroupingSym();
 
@@ -4460,14 +6036,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffGroupingSym
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffGroupingSym
+ */
+
+class InstStaffGroupingSym : public AttStaffGroupingSym {
+public:
+    InstStaffGroupingSym() = default;
+    virtual ~InstStaffGroupingSym() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffIdent
 //----------------------------------------------------------------------------
 
 class AttStaffIdent : public Att {
-public:
+protected:
     AttStaffIdent();
-    virtual ~AttStaffIdent();
+    ~AttStaffIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffIdent();
 
@@ -4498,14 +6089,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffIdent
+ */
+
+class InstStaffIdent : public AttStaffIdent {
+public:
+    InstStaffIdent() = default;
+    virtual ~InstStaffIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffItems
 //----------------------------------------------------------------------------
 
 class AttStaffItems : public Att {
-public:
+protected:
     AttStaffItems();
-    virtual ~AttStaffItems();
+    ~AttStaffItems() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffItems();
 
@@ -4550,14 +6156,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffItems
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffItems
+ */
+
+class InstStaffItems : public AttStaffItems {
+public:
+    InstStaffItems() = default;
+    virtual ~InstStaffItems() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffLoc
 //----------------------------------------------------------------------------
 
 class AttStaffLoc : public Att {
-public:
+protected:
     AttStaffLoc();
-    virtual ~AttStaffLoc();
+    ~AttStaffLoc() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffLoc();
 
@@ -4584,14 +6205,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffLoc
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffLoc
+ */
+
+class InstStaffLoc : public AttStaffLoc {
+public:
+    InstStaffLoc() = default;
+    virtual ~InstStaffLoc() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStaffLocPitched
 //----------------------------------------------------------------------------
 
 class AttStaffLocPitched : public Att {
-public:
+protected:
     AttStaffLocPitched();
-    virtual ~AttStaffLocPitched();
+    ~AttStaffLocPitched() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStaffLocPitched();
 
@@ -4624,14 +6260,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStaffLocPitched
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStaffLocPitched
+ */
+
+class InstStaffLocPitched : public AttStaffLocPitched {
+public:
+    InstStaffLocPitched() = default;
+    virtual ~InstStaffLocPitched() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStartEndId
 //----------------------------------------------------------------------------
 
 class AttStartEndId : public Att {
-public:
+protected:
     AttStartEndId();
-    virtual ~AttStartEndId();
+    ~AttStartEndId() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStartEndId();
 
@@ -4661,14 +6312,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStartEndId
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStartEndId
+ */
+
+class InstStartEndId : public AttStartEndId {
+public:
+    InstStartEndId() = default;
+    virtual ~InstStartEndId() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStartId
 //----------------------------------------------------------------------------
 
 class AttStartId : public Att {
-public:
+protected:
     AttStartId();
-    virtual ~AttStartId();
+    ~AttStartId() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStartId();
 
@@ -4698,14 +6364,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStartId
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStartId
+ */
+
+class InstStartId : public AttStartId {
+public:
+    InstStartId() = default;
+    virtual ~InstStartId() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttStems
 //----------------------------------------------------------------------------
 
 class AttStems : public Att {
-public:
+protected:
     AttStems();
-    virtual ~AttStems();
+    ~AttStems() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetStems();
 
@@ -4781,14 +6462,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstStems
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttStems
+ */
+
+class InstStems : public AttStems {
+public:
+    InstStems() = default;
+    virtual ~InstStems() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSylLog
 //----------------------------------------------------------------------------
 
 class AttSylLog : public Att {
-public:
+protected:
     AttSylLog();
-    virtual ~AttSylLog();
+    ~AttSylLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSylLog();
 
@@ -4824,14 +6520,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSylLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSylLog
+ */
+
+class InstSylLog : public AttSylLog {
+public:
+    InstSylLog() = default;
+    virtual ~InstSylLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSylText
 //----------------------------------------------------------------------------
 
 class AttSylText : public Att {
-public:
+protected:
     AttSylText();
-    virtual ~AttSylText();
+    ~AttSylText() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSylText();
 
@@ -4858,14 +6569,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSylText
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSylText
+ */
+
+class InstSylText : public AttSylText {
+public:
+    InstSylText() = default;
+    virtual ~InstSylText() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSystems
 //----------------------------------------------------------------------------
 
 class AttSystems : public Att {
-public:
+protected:
     AttSystems();
-    virtual ~AttSystems();
+    ~AttSystems() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSystems();
 
@@ -4923,14 +6649,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstSystems
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSystems
+ */
+
+class InstSystems : public AttSystems {
+public:
+    InstSystems() = default;
+    virtual ~InstSystems() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTargetEval
 //----------------------------------------------------------------------------
 
 class AttTargetEval : public Att {
-public:
+protected:
     AttTargetEval();
-    virtual ~AttTargetEval();
+    ~AttTargetEval() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTargetEval();
 
@@ -4960,14 +6701,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTargetEval
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTargetEval
+ */
+
+class InstTargetEval : public AttTargetEval {
+public:
+    InstTargetEval() = default;
+    virtual ~InstTargetEval() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTempoLog
 //----------------------------------------------------------------------------
 
 class AttTempoLog : public Att {
-public:
+protected:
     AttTempoLog();
-    virtual ~AttTempoLog();
+    ~AttTempoLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTempoLog();
 
@@ -4994,14 +6750,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTempoLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTempoLog
+ */
+
+class InstTempoLog : public AttTempoLog {
+public:
+    InstTempoLog() = default;
+    virtual ~InstTempoLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTextRendition
 //----------------------------------------------------------------------------
 
 class AttTextRendition : public Att {
-public:
+protected:
     AttTextRendition();
-    virtual ~AttTextRendition();
+    ~AttTextRendition() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTextRendition();
 
@@ -5034,14 +6805,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTextRendition
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTextRendition
+ */
+
+class InstTextRendition : public AttTextRendition {
+public:
+    InstTextRendition() = default;
+    virtual ~InstTextRendition() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTextStyle
 //----------------------------------------------------------------------------
 
 class AttTextStyle : public Att {
-public:
+protected:
     AttTextStyle();
-    virtual ~AttTextStyle();
+    ~AttTextStyle() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTextStyle();
 
@@ -5109,14 +6895,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTextStyle
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTextStyle
+ */
+
+class InstTextStyle : public AttTextStyle {
+public:
+    InstTextStyle() = default;
+    virtual ~InstTextStyle() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTiePresent
 //----------------------------------------------------------------------------
 
 class AttTiePresent : public Att {
-public:
+protected:
     AttTiePresent();
-    virtual ~AttTiePresent();
+    ~AttTiePresent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTiePresent();
 
@@ -5147,14 +6948,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTiePresent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTiePresent
+ */
+
+class InstTiePresent : public AttTiePresent {
+public:
+    InstTiePresent() = default;
+    virtual ~InstTiePresent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTimestampLog
 //----------------------------------------------------------------------------
 
 class AttTimestampLog : public Att {
-public:
+protected:
     AttTimestampLog();
-    virtual ~AttTimestampLog();
+    ~AttTimestampLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTimestampLog();
 
@@ -5184,14 +7000,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTimestampLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTimestampLog
+ */
+
+class InstTimestampLog : public AttTimestampLog {
+public:
+    InstTimestampLog() = default;
+    virtual ~InstTimestampLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTimestamp2Log
 //----------------------------------------------------------------------------
 
 class AttTimestamp2Log : public Att {
-public:
+protected:
     AttTimestamp2Log();
-    virtual ~AttTimestamp2Log();
+    ~AttTimestamp2Log() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTimestamp2Log();
 
@@ -5221,14 +7052,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTimestamp2Log
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTimestamp2Log
+ */
+
+class InstTimestamp2Log : public AttTimestamp2Log {
+public:
+    InstTimestamp2Log() = default;
+    virtual ~InstTimestamp2Log() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTransposition
 //----------------------------------------------------------------------------
 
 class AttTransposition : public Att {
-public:
+protected:
     AttTransposition();
-    virtual ~AttTransposition();
+    ~AttTransposition() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTransposition();
 
@@ -5267,14 +7113,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTransposition
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTransposition
+ */
+
+class InstTransposition : public AttTransposition {
+public:
+    InstTransposition() = default;
+    virtual ~InstTransposition() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTuning
 //----------------------------------------------------------------------------
 
 class AttTuning : public Att {
-public:
+protected:
     AttTuning();
-    virtual ~AttTuning();
+    ~AttTuning() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTuning();
 
@@ -5316,14 +7177,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTuning
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTuning
+ */
+
+class InstTuning : public AttTuning {
+public:
+    InstTuning() = default;
+    virtual ~InstTuning() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTupletPresent
 //----------------------------------------------------------------------------
 
 class AttTupletPresent : public Att {
-public:
+protected:
     AttTupletPresent();
-    virtual ~AttTupletPresent();
+    ~AttTupletPresent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTupletPresent();
 
@@ -5354,14 +7230,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTupletPresent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTupletPresent
+ */
+
+class InstTupletPresent : public AttTupletPresent {
+public:
+    InstTupletPresent() = default;
+    virtual ~InstTupletPresent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTyped
 //----------------------------------------------------------------------------
 
 class AttTyped : public Att {
-public:
+protected:
     AttTyped();
-    virtual ~AttTyped();
+    ~AttTyped() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTyped();
 
@@ -5391,14 +7282,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTyped
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTyped
+ */
+
+class InstTyped : public AttTyped {
+public:
+    InstTyped() = default;
+    virtual ~InstTyped() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttTypography
 //----------------------------------------------------------------------------
 
 class AttTypography : public Att {
-public:
+protected:
     AttTypography();
-    virtual ~AttTypography();
+    ~AttTypography() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTypography();
 
@@ -5470,14 +7376,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstTypography
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTypography
+ */
+
+class InstTypography : public AttTypography {
+public:
+    InstTypography() = default;
+    virtual ~InstTypography() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVerticalAlign
 //----------------------------------------------------------------------------
 
 class AttVerticalAlign : public Att {
-public:
+protected:
     AttVerticalAlign();
-    virtual ~AttVerticalAlign();
+    ~AttVerticalAlign() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVerticalAlign();
 
@@ -5504,14 +7425,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVerticalAlign
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVerticalAlign
+ */
+
+class InstVerticalAlign : public AttVerticalAlign {
+public:
+    InstVerticalAlign() = default;
+    virtual ~InstVerticalAlign() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVerticalGroup
 //----------------------------------------------------------------------------
 
 class AttVerticalGroup : public Att {
-public:
+protected:
     AttVerticalGroup();
-    virtual ~AttVerticalGroup();
+    ~AttVerticalGroup() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVerticalGroup();
 
@@ -5538,14 +7474,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVerticalGroup
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVerticalGroup
+ */
+
+class InstVerticalGroup : public AttVerticalGroup {
+public:
+    InstVerticalGroup() = default;
+    virtual ~InstVerticalGroup() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisibility
 //----------------------------------------------------------------------------
 
 class AttVisibility : public Att {
-public:
+protected:
     AttVisibility();
-    virtual ~AttVisibility();
+    ~AttVisibility() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisibility();
 
@@ -5575,14 +7526,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisibility
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisibility
+ */
+
+class InstVisibility : public AttVisibility {
+public:
+    InstVisibility() = default;
+    virtual ~InstVisibility() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisualOffsetHo
 //----------------------------------------------------------------------------
 
 class AttVisualOffsetHo : public Att {
-public:
+protected:
     AttVisualOffsetHo();
-    virtual ~AttVisualOffsetHo();
+    ~AttVisualOffsetHo() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisualOffsetHo();
 
@@ -5613,14 +7579,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisualOffsetHo
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisualOffsetHo
+ */
+
+class InstVisualOffsetHo : public AttVisualOffsetHo {
+public:
+    InstVisualOffsetHo() = default;
+    virtual ~InstVisualOffsetHo() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisualOffsetTo
 //----------------------------------------------------------------------------
 
 class AttVisualOffsetTo : public Att {
-public:
+protected:
     AttVisualOffsetTo();
-    virtual ~AttVisualOffsetTo();
+    ~AttVisualOffsetTo() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisualOffsetTo();
 
@@ -5650,14 +7631,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisualOffsetTo
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisualOffsetTo
+ */
+
+class InstVisualOffsetTo : public AttVisualOffsetTo {
+public:
+    InstVisualOffsetTo() = default;
+    virtual ~InstVisualOffsetTo() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisualOffsetVo
 //----------------------------------------------------------------------------
 
 class AttVisualOffsetVo : public Att {
-public:
+protected:
     AttVisualOffsetVo();
-    virtual ~AttVisualOffsetVo();
+    ~AttVisualOffsetVo() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisualOffsetVo();
 
@@ -5688,14 +7684,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisualOffsetVo
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisualOffsetVo
+ */
+
+class InstVisualOffsetVo : public AttVisualOffsetVo {
+public:
+    InstVisualOffsetVo() = default;
+    virtual ~InstVisualOffsetVo() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisualOffset2Ho
 //----------------------------------------------------------------------------
 
 class AttVisualOffset2Ho : public Att {
-public:
+protected:
     AttVisualOffset2Ho();
-    virtual ~AttVisualOffset2Ho();
+    ~AttVisualOffset2Ho() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisualOffset2Ho();
 
@@ -5734,14 +7745,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisualOffset2Ho
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisualOffset2Ho
+ */
+
+class InstVisualOffset2Ho : public AttVisualOffset2Ho {
+public:
+    InstVisualOffset2Ho() = default;
+    virtual ~InstVisualOffset2Ho() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisualOffset2To
 //----------------------------------------------------------------------------
 
 class AttVisualOffset2To : public Att {
-public:
+protected:
     AttVisualOffset2To();
-    virtual ~AttVisualOffset2To();
+    ~AttVisualOffset2To() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisualOffset2To();
 
@@ -5780,14 +7806,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisualOffset2To
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisualOffset2To
+ */
+
+class InstVisualOffset2To : public AttVisualOffset2To {
+public:
+    InstVisualOffset2To() = default;
+    virtual ~InstVisualOffset2To() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVisualOffset2Vo
 //----------------------------------------------------------------------------
 
 class AttVisualOffset2Vo : public Att {
-public:
+protected:
     AttVisualOffset2Vo();
-    virtual ~AttVisualOffset2Vo();
+    ~AttVisualOffset2Vo() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVisualOffset2Vo();
 
@@ -5826,14 +7867,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVisualOffset2Vo
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVisualOffset2Vo
+ */
+
+class InstVisualOffset2Vo : public AttVisualOffset2Vo {
+public:
+    InstVisualOffset2Vo() = default;
+    virtual ~InstVisualOffset2Vo() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttVoltaGroupingSym
 //----------------------------------------------------------------------------
 
 class AttVoltaGroupingSym : public Att {
-public:
+protected:
     AttVoltaGroupingSym();
-    virtual ~AttVoltaGroupingSym();
+    ~AttVoltaGroupingSym() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetVoltaGroupingSym();
 
@@ -5860,14 +7916,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstVoltaGroupingSym
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttVoltaGroupingSym
+ */
+
+class InstVoltaGroupingSym : public AttVoltaGroupingSym {
+public:
+    InstVoltaGroupingSym() = default;
+    virtual ~InstVoltaGroupingSym() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttWhitespace
 //----------------------------------------------------------------------------
 
 class AttWhitespace : public Att {
-public:
+protected:
     AttWhitespace();
-    virtual ~AttWhitespace();
+    ~AttWhitespace() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetWhitespace();
 
@@ -5894,14 +7965,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstWhitespace
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttWhitespace
+ */
+
+class InstWhitespace : public AttWhitespace {
+public:
+    InstWhitespace() = default;
+    virtual ~InstWhitespace() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttWidth
 //----------------------------------------------------------------------------
 
 class AttWidth : public Att {
-public:
+protected:
     AttWidth();
-    virtual ~AttWidth();
+    ~AttWidth() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetWidth();
 
@@ -5928,14 +8014,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstWidth
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttWidth
+ */
+
+class InstWidth : public AttWidth {
+public:
+    InstWidth() = default;
+    virtual ~InstWidth() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttXy
 //----------------------------------------------------------------------------
 
 class AttXy : public Att {
-public:
+protected:
     AttXy();
-    virtual ~AttXy();
+    ~AttXy() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetXy();
 
@@ -5976,14 +8077,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstXy
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttXy
+ */
+
+class InstXy : public AttXy {
+public:
+    InstXy() = default;
+    virtual ~InstXy() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttXy2
 //----------------------------------------------------------------------------
 
 class AttXy2 : public Att {
-public:
+protected:
     AttXy2();
-    virtual ~AttXy2();
+    ~AttXy2() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetXy2();
 
@@ -6013,6 +8129,20 @@ private:
     double m_x2;
     /** Encodes the optional 2nd y coordinate. **/
     double m_y2;
+};
+
+//----------------------------------------------------------------------------
+// InstXy2
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttXy2
+ */
+
+class InstXy2 : public AttXy2 {
+public:
+    InstXy2() = default;
+    virtual ~InstXy2() = default;
 };
 
 } // namespace vrv

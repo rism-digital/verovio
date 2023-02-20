@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttFingGrpLog : public Att {
-public:
+protected:
     AttFingGrpLog();
-    virtual ~AttFingGrpLog();
+    ~AttFingGrpLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFingGrpLog();
 
@@ -57,6 +58,20 @@ public:
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
     fingGrpLog_FORM m_form;
+};
+
+//----------------------------------------------------------------------------
+// InstFingGrpLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFingGrpLog
+ */
+
+class InstFingGrpLog : public AttFingGrpLog {
+public:
+    InstFingGrpLog() = default;
+    virtual ~InstFingGrpLog() = default;
 };
 
 } // namespace vrv

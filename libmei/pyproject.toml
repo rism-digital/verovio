@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "libmei"
+version = "0.1.0"
+description = ""
+authors = ["Andrew Hankinson <andrew.hankinson@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyyaml = "^6.0"
+lxml = "^4.9.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

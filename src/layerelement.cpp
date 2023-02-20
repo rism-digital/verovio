@@ -1084,6 +1084,13 @@ std::pair<int, int> LayerElement::CalculateXPosOffset(FunctorParams *functorPara
         LayerElement *element = vrv_cast<LayerElement *>(boundingBox);
         assert(element);
         int margin = (params->m_doc->GetRightMargin(element) + selfLeftMargin) * drawingUnit;
+        if (element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(element);
+            if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
+                const int tremWidth = params->m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, params->m_staffSize, false);
+                margin = std::max(margin, drawingUnit / 3 + tremWidth / 2);
+            }
+        }
         bool hasOverlap = this->HorizontalContentOverlap(boundingBox, margin);
         if (!hasOverlap) continue;
 
@@ -2133,6 +2140,15 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         if (additionalOffset > params->m_currentAlignment.m_offset) {
             params->m_currentAlignment.m_offset = additionalOffset;
             params->m_currentAlignment.m_overlappingBB = this;
+        }
+    }
+    else if (this->Is(NOTE) && (next == ALIGNMENT_MEASURE_RIGHT_BARLINE)) {
+        Note *note = vrv_cast<Note *>(this);
+        if (note->HasStemMod() && (note->GetStemMod() < STEMMODIFIER_MAX)
+            && (note->GetDrawingStemDir() == STEMDIRECTION_up)) {
+            const int adjust = drawingUnit;
+            params->m_cumulatedXShift += adjust;
+            params->m_upcomingMinPos += adjust;
         }
     }
     else {

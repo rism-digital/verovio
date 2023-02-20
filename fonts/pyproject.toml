@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-svgpathtools = "^1.5.1"
+svgpathtools = "^1.6.0"
 
 [tool.poetry.dev-dependencies]
 

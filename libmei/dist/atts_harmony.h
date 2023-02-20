@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttHarmLog : public Att {
-public:
+protected:
     AttHarmLog();
-    virtual ~AttHarmLog();
+    ~AttHarmLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHarmLog();
 
@@ -57,6 +58,20 @@ public:
 private:
     /** Contains a reference to a chordDef element elsewhere in the document. **/
     std::string m_chordref;
+};
+
+//----------------------------------------------------------------------------
+// InstHarmLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHarmLog
+ */
+
+class InstHarmLog : public AttHarmLog {
+public:
+    InstHarmLog() = default;
+    virtual ~InstHarmLog() = default;
 };
 
 } // namespace vrv

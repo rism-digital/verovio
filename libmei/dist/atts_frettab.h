@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttCourseLog : public Att {
-public:
+protected:
     AttCourseLog();
-    virtual ~AttCourseLog();
+    ~AttCourseLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetCourseLog();
 
@@ -60,14 +61,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstCourseLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCourseLog
+ */
+
+class InstCourseLog : public AttCourseLog {
+public:
+    InstCourseLog() = default;
+    virtual ~InstCourseLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNoteGesTab
 //----------------------------------------------------------------------------
 
 class AttNoteGesTab : public Att {
-public:
+protected:
     AttNoteGesTab();
-    virtual ~AttNoteGesTab();
+    ~AttNoteGesTab() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNoteGesTab();
 
@@ -97,6 +113,20 @@ private:
     int m_tabCourse;
     /** Records which course is to be played. **/
     int m_tabFret;
+};
+
+//----------------------------------------------------------------------------
+// InstNoteGesTab
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNoteGesTab
+ */
+
+class InstNoteGesTab : public AttNoteGesTab {
+public:
+    InstNoteGesTab() = default;
+    virtual ~InstNoteGesTab() = default;
 };
 
 } // namespace vrv

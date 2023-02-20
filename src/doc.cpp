@@ -457,7 +457,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (!meterSig && (currentScoreDef->HasMeterSigInfo())) {
                 meterSig = vrv_cast<MeterSig *>(currentScoreDef->GetMeterSig());
             }
-            if (meterSig && meterSig->HasCount()) {
+            if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
         }

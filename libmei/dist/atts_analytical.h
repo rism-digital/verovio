@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttHarmAnl : public Att {
-public:
+protected:
     AttHarmAnl();
-    virtual ~AttHarmAnl();
+    ~AttHarmAnl() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHarmAnl();
 
@@ -60,14 +61,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstHarmAnl
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHarmAnl
+ */
+
+class InstHarmAnl : public AttHarmAnl {
+public:
+    InstHarmAnl() = default;
+    virtual ~InstHarmAnl() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHarmonicFunction
 //----------------------------------------------------------------------------
 
 class AttHarmonicFunction : public Att {
-public:
+protected:
     AttHarmonicFunction();
-    virtual ~AttHarmonicFunction();
+    ~AttHarmonicFunction() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetHarmonicFunction();
 
@@ -100,14 +116,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstHarmonicFunction
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttHarmonicFunction
+ */
+
+class InstHarmonicFunction : public AttHarmonicFunction {
+public:
+    InstHarmonicFunction() = default;
+    virtual ~InstHarmonicFunction() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttIntervalHarmonic
 //----------------------------------------------------------------------------
 
 class AttIntervalHarmonic : public Att {
-public:
+protected:
     AttIntervalHarmonic();
-    virtual ~AttIntervalHarmonic();
+    ~AttIntervalHarmonic() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetIntervalHarmonic();
 
@@ -134,14 +165,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstIntervalHarmonic
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttIntervalHarmonic
+ */
+
+class InstIntervalHarmonic : public AttIntervalHarmonic {
+public:
+    InstIntervalHarmonic() = default;
+    virtual ~InstIntervalHarmonic() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttIntervalMelodic
 //----------------------------------------------------------------------------
 
 class AttIntervalMelodic : public Att {
-public:
+protected:
     AttIntervalMelodic();
-    virtual ~AttIntervalMelodic();
+    ~AttIntervalMelodic() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetIntervalMelodic();
 
@@ -173,14 +219,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstIntervalMelodic
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttIntervalMelodic
+ */
+
+class InstIntervalMelodic : public AttIntervalMelodic {
+public:
+    InstIntervalMelodic() = default;
+    virtual ~InstIntervalMelodic() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigAnl
 //----------------------------------------------------------------------------
 
 class AttKeySigAnl : public Att {
-public:
+protected:
     AttKeySigAnl();
-    virtual ~AttKeySigAnl();
+    ~AttKeySigAnl() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigAnl();
 
@@ -207,14 +268,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstKeySigAnl
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigAnl
+ */
+
+class InstKeySigAnl : public AttKeySigAnl {
+public:
+    InstKeySigAnl() = default;
+    virtual ~InstKeySigAnl() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
 //----------------------------------------------------------------------------
 
 class AttKeySigDefaultAnl : public Att {
-public:
+protected:
     AttKeySigDefaultAnl();
-    virtual ~AttKeySigDefaultAnl();
+    ~AttKeySigDefaultAnl() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultAnl();
 
@@ -256,14 +332,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstKeySigDefaultAnl
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeySigDefaultAnl
+ */
+
+class InstKeySigDefaultAnl : public AttKeySigDefaultAnl {
+public:
+    InstKeySigDefaultAnl() = default;
+    virtual ~InstKeySigDefaultAnl() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMelodicFunction
 //----------------------------------------------------------------------------
 
 class AttMelodicFunction : public Att {
-public:
+protected:
     AttMelodicFunction();
-    virtual ~AttMelodicFunction();
+    ~AttMelodicFunction() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetMelodicFunction();
 
@@ -290,14 +381,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstMelodicFunction
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMelodicFunction
+ */
+
+class InstMelodicFunction : public AttMelodicFunction {
+public:
+    InstMelodicFunction() = default;
+    virtual ~InstMelodicFunction() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttPitchClass
 //----------------------------------------------------------------------------
 
 class AttPitchClass : public Att {
-public:
+protected:
     AttPitchClass();
-    virtual ~AttPitchClass();
+    ~AttPitchClass() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetPitchClass();
 
@@ -324,14 +430,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstPitchClass
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPitchClass
+ */
+
+class InstPitchClass : public AttPitchClass {
+public:
+    InstPitchClass() = default;
+    virtual ~InstPitchClass() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttSolfa
 //----------------------------------------------------------------------------
 
 class AttSolfa : public Att {
-public:
+protected:
     AttSolfa();
-    virtual ~AttSolfa();
+    ~AttSolfa() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetSolfa();
 
@@ -358,6 +479,20 @@ private:
      * movable Do system.
      **/
     std::string m_psolfa;
+};
+
+//----------------------------------------------------------------------------
+// InstSolfa
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttSolfa
+ */
+
+class InstSolfa : public AttSolfa {
+public:
+    InstSolfa() = default;
+    virtual ~InstSolfa() = default;
 };
 
 } // namespace vrv

@@ -31,8 +31,6 @@ AttAccidLog::AttAccidLog() : Att()
     ResetAccidLog();
 }
 
-AttAccidLog::~AttAccidLog() {}
-
 void AttAccidLog::ResetAccidLog()
 {
     m_func = accidLog_FUNC_NONE;
@@ -72,8 +70,6 @@ AttAccidental::AttAccidental() : Att()
 {
     ResetAccidental();
 }
-
-AttAccidental::~AttAccidental() {}
 
 void AttAccidental::ResetAccidental()
 {
@@ -115,8 +111,6 @@ AttArticulation::AttArticulation() : Att()
     ResetArticulation();
 }
 
-AttArticulation::~AttArticulation() {}
-
 void AttArticulation::ResetArticulation()
 {
     m_artic = std::vector<data_ARTICULATION>();
@@ -156,8 +150,6 @@ AttAttaccaLog::AttAttaccaLog() : Att()
 {
     ResetAttaccaLog();
 }
-
-AttAttaccaLog::~AttAttaccaLog() {}
 
 void AttAttaccaLog::ResetAttaccaLog()
 {
@@ -199,8 +191,6 @@ AttAudience::AttAudience() : Att()
     ResetAudience();
 }
 
-AttAudience::~AttAudience() {}
-
 void AttAudience::ResetAudience()
 {
     m_audience = audience_AUDIENCE_NONE;
@@ -241,8 +231,6 @@ AttAugmentDots::AttAugmentDots() : Att()
     ResetAugmentDots();
 }
 
-AttAugmentDots::~AttAugmentDots() {}
-
 void AttAugmentDots::ResetAugmentDots()
 {
     m_dots = MEI_UNSET;
@@ -282,8 +270,6 @@ AttAuthorized::AttAuthorized() : Att()
 {
     ResetAuthorized();
 }
-
-AttAuthorized::~AttAuthorized() {}
 
 void AttAuthorized::ResetAuthorized()
 {
@@ -340,8 +326,6 @@ AttBarLineLog::AttBarLineLog() : Att()
     ResetBarLineLog();
 }
 
-AttBarLineLog::~AttBarLineLog() {}
-
 void AttBarLineLog::ResetBarLineLog()
 {
     m_form = BARRENDITION_NONE;
@@ -381,8 +365,6 @@ AttBarring::AttBarring() : Att()
 {
     ResetBarring();
 }
-
-AttBarring::~AttBarring() {}
 
 void AttBarring::ResetBarring()
 {
@@ -454,8 +436,6 @@ AttBasic::AttBasic() : Att()
     ResetBasic();
 }
 
-AttBasic::~AttBasic() {}
-
 void AttBasic::ResetBasic()
 {
     m_base = "";
@@ -495,8 +475,6 @@ AttBibl::AttBibl() : Att()
 {
     ResetBibl();
 }
-
-AttBibl::~AttBibl() {}
 
 void AttBibl::ResetBibl()
 {
@@ -538,8 +516,6 @@ AttCalendared::AttCalendared() : Att()
     ResetCalendared();
 }
 
-AttCalendared::~AttCalendared() {}
-
 void AttCalendared::ResetCalendared()
 {
     m_calendar = "";
@@ -579,8 +555,6 @@ AttCanonical::AttCanonical() : Att()
 {
     ResetCanonical();
 }
-
-AttCanonical::~AttCanonical() {}
 
 void AttCanonical::ResetCanonical()
 {
@@ -622,8 +596,6 @@ AttClassed::AttClassed() : Att()
     ResetClassed();
 }
 
-AttClassed::~AttClassed() {}
-
 void AttClassed::ResetClassed()
 {
     m_class = "";
@@ -663,8 +635,6 @@ AttClefLog::AttClefLog() : Att()
 {
     ResetClefLog();
 }
-
-AttClefLog::~AttClefLog() {}
 
 void AttClefLog::ResetClefLog()
 {
@@ -706,8 +676,6 @@ AttClefShape::AttClefShape() : Att()
     ResetClefShape();
 }
 
-AttClefShape::~AttClefShape() {}
-
 void AttClefShape::ResetClefShape()
 {
     m_shape = CLEFSHAPE_NONE;
@@ -747,8 +715,6 @@ AttCleffingLog::AttCleffingLog() : Att()
 {
     ResetCleffingLog();
 }
-
-AttCleffingLog::~AttCleffingLog() {}
 
 void AttCleffingLog::ResetCleffingLog()
 {
@@ -835,8 +801,6 @@ AttColor::AttColor() : Att()
     ResetColor();
 }
 
-AttColor::~AttColor() {}
-
 void AttColor::ResetColor()
 {
     m_color = "";
@@ -876,8 +840,6 @@ AttColoration::AttColoration() : Att()
 {
     ResetColoration();
 }
-
-AttColoration::~AttColoration() {}
 
 void AttColoration::ResetColoration()
 {
@@ -919,8 +881,6 @@ AttCoordX1::AttCoordX1() : Att()
     ResetCoordX1();
 }
 
-AttCoordX1::~AttCoordX1() {}
-
 void AttCoordX1::ResetCoordX1()
 {
     m_coordX1 = 0.0;
@@ -960,8 +920,6 @@ AttCoordX2::AttCoordX2() : Att()
 {
     ResetCoordX2();
 }
-
-AttCoordX2::~AttCoordX2() {}
 
 void AttCoordX2::ResetCoordX2()
 {
@@ -1003,8 +961,6 @@ AttCoordY1::AttCoordY1() : Att()
     ResetCoordY1();
 }
 
-AttCoordY1::~AttCoordY1() {}
-
 void AttCoordY1::ResetCoordY1()
 {
     m_coordY1 = 0.0;
@@ -1044,8 +1000,6 @@ AttCoordinated::AttCoordinated() : Att()
 {
     ResetCoordinated();
 }
-
-AttCoordinated::~AttCoordinated() {}
 
 void AttCoordinated::ResetCoordinated()
 {
@@ -1147,8 +1101,6 @@ AttCue::AttCue() : Att()
     ResetCue();
 }
 
-AttCue::~AttCue() {}
-
 void AttCue::ResetCue()
 {
     m_cue = BOOLEAN_NONE;
@@ -1188,8 +1140,6 @@ AttCurvature::AttCurvature() : Att()
 {
     ResetCurvature();
 }
-
-AttCurvature::~AttCurvature() {}
 
 void AttCurvature::ResetCurvature()
 {
@@ -1261,8 +1211,6 @@ AttCurveRend::AttCurveRend() : Att()
     ResetCurveRend();
 }
 
-AttCurveRend::~AttCurveRend() {}
-
 void AttCurveRend::ResetCurveRend()
 {
     m_lform = LINEFORM_NONE;
@@ -1318,8 +1266,6 @@ AttCustosLog::AttCustosLog() : Att()
     ResetCustosLog();
 }
 
-AttCustosLog::~AttCustosLog() {}
-
 void AttCustosLog::ResetCustosLog()
 {
     m_target = "";
@@ -1360,8 +1306,6 @@ AttDataPointing::AttDataPointing() : Att()
     ResetDataPointing();
 }
 
-AttDataPointing::~AttDataPointing() {}
-
 void AttDataPointing::ResetDataPointing()
 {
     m_data = "";
@@ -1401,8 +1345,6 @@ AttDatable::AttDatable() : Att()
 {
     ResetDatable();
 }
-
-AttDatable::~AttDatable() {}
 
 void AttDatable::ResetDatable()
 {
@@ -1504,8 +1446,6 @@ AttDistances::AttDistances() : Att()
     ResetDistances();
 }
 
-AttDistances::~AttDistances() {}
-
 void AttDistances::ResetDistances()
 {
     m_dirDist = data_MEASUREMENTSIGNED();
@@ -1606,8 +1546,6 @@ AttDotLog::AttDotLog() : Att()
     ResetDotLog();
 }
 
-AttDotLog::~AttDotLog() {}
-
 void AttDotLog::ResetDotLog()
 {
     m_form = dotLog_FORM_NONE;
@@ -1648,8 +1586,6 @@ AttDurationAdditive::AttDurationAdditive() : Att()
     ResetDurationAdditive();
 }
 
-AttDurationAdditive::~AttDurationAdditive() {}
-
 void AttDurationAdditive::ResetDurationAdditive()
 {
     m_dur = DURATION_NONE;
@@ -1689,8 +1625,6 @@ AttDurationDefault::AttDurationDefault() : Att()
 {
     ResetDurationDefault();
 }
-
-AttDurationDefault::~AttDurationDefault() {}
 
 void AttDurationDefault::ResetDurationDefault()
 {
@@ -1762,8 +1696,6 @@ AttDurationLog::AttDurationLog() : Att()
     ResetDurationLog();
 }
 
-AttDurationLog::~AttDurationLog() {}
-
 void AttDurationLog::ResetDurationLog()
 {
     m_dur = DURATION_NONE;
@@ -1803,8 +1735,6 @@ AttDurationRatio::AttDurationRatio() : Att()
 {
     ResetDurationRatio();
 }
-
-AttDurationRatio::~AttDurationRatio() {}
 
 void AttDurationRatio::ResetDurationRatio()
 {
@@ -1861,8 +1791,6 @@ AttEnclosingChars::AttEnclosingChars() : Att()
     ResetEnclosingChars();
 }
 
-AttEnclosingChars::~AttEnclosingChars() {}
-
 void AttEnclosingChars::ResetEnclosingChars()
 {
     m_enclose = ENCLOSURE_NONE;
@@ -1903,8 +1831,6 @@ AttEndings::AttEndings() : Att()
     ResetEndings();
 }
 
-AttEndings::~AttEndings() {}
-
 void AttEndings::ResetEndings()
 {
     m_endingRend = endings_ENDINGREND_NONE;
@@ -1944,8 +1870,6 @@ AttEvidence::AttEvidence() : Att()
 {
     ResetEvidence();
 }
-
-AttEvidence::~AttEvidence() {}
 
 void AttEvidence::ResetEvidence()
 {
@@ -2002,8 +1926,6 @@ AttExtender::AttExtender() : Att()
     ResetExtender();
 }
 
-AttExtender::~AttExtender() {}
-
 void AttExtender::ResetExtender()
 {
     m_extender = BOOLEAN_NONE;
@@ -2043,8 +1965,6 @@ AttExtent::AttExtent() : Att()
 {
     ResetExtent();
 }
-
-AttExtent::~AttExtent() {}
 
 void AttExtent::ResetExtent()
 {
@@ -2086,8 +2006,6 @@ AttFermataPresent::AttFermataPresent() : Att()
     ResetFermataPresent();
 }
 
-AttFermataPresent::~AttFermataPresent() {}
-
 void AttFermataPresent::ResetFermataPresent()
 {
     m_fermata = STAFFREL_basic_NONE;
@@ -2127,8 +2045,6 @@ AttFiling::AttFiling() : Att()
 {
     ResetFiling();
 }
-
-AttFiling::~AttFiling() {}
 
 void AttFiling::ResetFiling()
 {
@@ -2170,8 +2086,6 @@ AttGrpSymLog::AttGrpSymLog() : Att()
     ResetGrpSymLog();
 }
 
-AttGrpSymLog::~AttGrpSymLog() {}
-
 void AttGrpSymLog::ResetGrpSymLog()
 {
     m_level = MEI_UNSET;
@@ -2211,8 +2125,6 @@ AttHandIdent::AttHandIdent() : Att()
 {
     ResetHandIdent();
 }
-
-AttHandIdent::~AttHandIdent() {}
 
 void AttHandIdent::ResetHandIdent()
 {
@@ -2254,8 +2166,6 @@ AttHeight::AttHeight() : Att()
     ResetHeight();
 }
 
-AttHeight::~AttHeight() {}
-
 void AttHeight::ResetHeight()
 {
     m_height = data_MEASUREMENTUNSIGNED();
@@ -2295,8 +2205,6 @@ AttHorizontalAlign::AttHorizontalAlign() : Att()
 {
     ResetHorizontalAlign();
 }
-
-AttHorizontalAlign::~AttHorizontalAlign() {}
 
 void AttHorizontalAlign::ResetHorizontalAlign()
 {
@@ -2338,8 +2246,6 @@ AttInternetMedia::AttInternetMedia() : Att()
     ResetInternetMedia();
 }
 
-AttInternetMedia::~AttInternetMedia() {}
-
 void AttInternetMedia::ResetInternetMedia()
 {
     m_mimetype = "";
@@ -2379,8 +2285,6 @@ AttJoined::AttJoined() : Att()
 {
     ResetJoined();
 }
-
-AttJoined::~AttJoined() {}
 
 void AttJoined::ResetJoined()
 {
@@ -2422,8 +2326,6 @@ AttKeySigLog::AttKeySigLog() : Att()
     ResetKeySigLog();
 }
 
-AttKeySigLog::~AttKeySigLog() {}
-
 void AttKeySigLog::ResetKeySigLog()
 {
     m_sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
@@ -2463,8 +2365,6 @@ AttKeySigDefaultLog::AttKeySigDefaultLog() : Att()
 {
     ResetKeySigDefaultLog();
 }
-
-AttKeySigDefaultLog::~AttKeySigDefaultLog() {}
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
@@ -2506,8 +2406,6 @@ AttLabelled::AttLabelled() : Att()
     ResetLabelled();
 }
 
-AttLabelled::~AttLabelled() {}
-
 void AttLabelled::ResetLabelled()
 {
     m_label = "";
@@ -2547,8 +2445,6 @@ AttLang::AttLang() : Att()
 {
     ResetLang();
 }
-
-AttLang::~AttLang() {}
 
 void AttLang::ResetLang()
 {
@@ -2605,8 +2501,6 @@ AttLayerLog::AttLayerLog() : Att()
     ResetLayerLog();
 }
 
-AttLayerLog::~AttLayerLog() {}
-
 void AttLayerLog::ResetLayerLog()
 {
     m_def = "";
@@ -2646,8 +2540,6 @@ AttLayerIdent::AttLayerIdent() : Att()
 {
     ResetLayerIdent();
 }
-
-AttLayerIdent::~AttLayerIdent() {}
 
 void AttLayerIdent::ResetLayerIdent()
 {
@@ -2689,8 +2581,6 @@ AttLineLoc::AttLineLoc() : Att()
     ResetLineLoc();
 }
 
-AttLineLoc::~AttLineLoc() {}
-
 void AttLineLoc::ResetLineLoc()
 {
     m_line = 0;
@@ -2730,8 +2620,6 @@ AttLineRend::AttLineRend() : Att()
 {
     ResetLineRend();
 }
-
-AttLineRend::~AttLineRend() {}
 
 void AttLineRend::ResetLineRend()
 {
@@ -2818,8 +2706,6 @@ AttLineRendBase::AttLineRendBase() : Att()
     ResetLineRendBase();
 }
 
-AttLineRendBase::~AttLineRendBase() {}
-
 void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
@@ -2889,8 +2775,6 @@ AttLinking::AttLinking() : Att()
 {
     ResetLinking();
 }
-
-AttLinking::~AttLinking() {}
 
 void AttLinking::ResetLinking()
 {
@@ -3037,8 +2921,6 @@ AttLyricStyle::AttLyricStyle() : Att()
     ResetLyricStyle();
 }
 
-AttLyricStyle::~AttLyricStyle() {}
-
 void AttLyricStyle::ResetLyricStyle()
 {
     m_lyricAlign = data_MEASUREMENTSIGNED();
@@ -3154,8 +3036,6 @@ AttMeasureNumbers::AttMeasureNumbers() : Att()
     ResetMeasureNumbers();
 }
 
-AttMeasureNumbers::~AttMeasureNumbers() {}
-
 void AttMeasureNumbers::ResetMeasureNumbers()
 {
     m_mnumVisible = BOOLEAN_NONE;
@@ -3196,8 +3076,6 @@ AttMeasurement::AttMeasurement() : Att()
     ResetMeasurement();
 }
 
-AttMeasurement::~AttMeasurement() {}
-
 void AttMeasurement::ResetMeasurement()
 {
     m_unit = "";
@@ -3237,8 +3115,6 @@ AttMediaBounds::AttMediaBounds() : Att()
 {
     ResetMediaBounds();
 }
-
-AttMediaBounds::~AttMediaBounds() {}
 
 void AttMediaBounds::ResetMediaBounds()
 {
@@ -3310,8 +3186,6 @@ AttMedium::AttMedium() : Att()
     ResetMedium();
 }
 
-AttMedium::~AttMedium() {}
-
 void AttMedium::ResetMedium()
 {
     m_medium = "";
@@ -3351,8 +3225,6 @@ AttMeiVersion::AttMeiVersion() : Att()
 {
     ResetMeiVersion();
 }
-
-AttMeiVersion::~AttMeiVersion() {}
 
 void AttMeiVersion::ResetMeiVersion()
 {
@@ -3394,8 +3266,6 @@ AttMetadataPointing::AttMetadataPointing() : Att()
     ResetMetadataPointing();
 }
 
-AttMetadataPointing::~AttMetadataPointing() {}
-
 void AttMetadataPointing::ResetMetadataPointing()
 {
     m_decls = "";
@@ -3436,8 +3306,6 @@ AttMeterConformance::AttMeterConformance() : Att()
     ResetMeterConformance();
 }
 
-AttMeterConformance::~AttMeterConformance() {}
-
 void AttMeterConformance::ResetMeterConformance()
 {
     m_metcon = meterConformance_METCON_NONE;
@@ -3477,8 +3345,6 @@ AttMeterConformanceBar::AttMeterConformanceBar() : Att()
 {
     ResetMeterConformanceBar();
 }
-
-AttMeterConformanceBar::~AttMeterConformanceBar() {}
 
 void AttMeterConformanceBar::ResetMeterConformanceBar()
 {
@@ -3534,8 +3400,6 @@ AttMeterSigLog::AttMeterSigLog() : Att()
 {
     ResetMeterSigLog();
 }
-
-AttMeterSigLog::~AttMeterSigLog() {}
 
 void AttMeterSigLog::ResetMeterSigLog()
 {
@@ -3607,8 +3471,6 @@ AttMeterSigDefaultLog::AttMeterSigDefaultLog() : Att()
     ResetMeterSigDefaultLog();
 }
 
-AttMeterSigDefaultLog::~AttMeterSigDefaultLog() {}
-
 void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
 {
     m_meterCount = std::pair<std::vector<int>, MeterCountSign>();
@@ -3678,8 +3540,6 @@ AttMmTempo::AttMmTempo() : Att()
 {
     ResetMmTempo();
 }
-
-AttMmTempo::~AttMmTempo() {}
 
 void AttMmTempo::ResetMmTempo()
 {
@@ -3751,8 +3611,6 @@ AttMultinumMeasures::AttMultinumMeasures() : Att()
     ResetMultinumMeasures();
 }
 
-AttMultinumMeasures::~AttMultinumMeasures() {}
-
 void AttMultinumMeasures::ResetMultinumMeasures()
 {
     m_multiNumber = BOOLEAN_NONE;
@@ -3792,8 +3650,6 @@ AttNInteger::AttNInteger() : Att()
 {
     ResetNInteger();
 }
-
-AttNInteger::~AttNInteger() {}
 
 void AttNInteger::ResetNInteger()
 {
@@ -3835,8 +3691,6 @@ AttNNumberLike::AttNNumberLike() : Att()
     ResetNNumberLike();
 }
 
-AttNNumberLike::~AttNNumberLike() {}
-
 void AttNNumberLike::ResetNNumberLike()
 {
     m_n = "";
@@ -3876,8 +3730,6 @@ AttName::AttName() : Att()
 {
     ResetName();
 }
-
-AttName::~AttName() {}
 
 void AttName::ResetName()
 {
@@ -3934,8 +3786,6 @@ AttNotationStyle::AttNotationStyle() : Att()
     ResetNotationStyle();
 }
 
-AttNotationStyle::~AttNotationStyle() {}
-
 void AttNotationStyle::ResetNotationStyle()
 {
     m_musicName = "";
@@ -3990,8 +3840,6 @@ AttNoteHeads::AttNoteHeads() : Att()
 {
     ResetNoteHeads();
 }
-
-AttNoteHeads::~AttNoteHeads() {}
 
 void AttNoteHeads::ResetNoteHeads()
 {
@@ -4153,8 +4001,6 @@ AttOctave::AttOctave() : Att()
     ResetOctave();
 }
 
-AttOctave::~AttOctave() {}
-
 void AttOctave::ResetOctave()
 {
     m_oct = -127;
@@ -4195,8 +4041,6 @@ AttOctaveDefault::AttOctaveDefault() : Att()
     ResetOctaveDefault();
 }
 
-AttOctaveDefault::~AttOctaveDefault() {}
-
 void AttOctaveDefault::ResetOctaveDefault()
 {
     m_octDefault = -127;
@@ -4236,8 +4080,6 @@ AttOctaveDisplacement::AttOctaveDisplacement() : Att()
 {
     ResetOctaveDisplacement();
 }
-
-AttOctaveDisplacement::~AttOctaveDisplacement() {}
 
 void AttOctaveDisplacement::ResetOctaveDisplacement()
 {
@@ -4294,8 +4136,6 @@ AttOneLineStaff::AttOneLineStaff() : Att()
     ResetOneLineStaff();
 }
 
-AttOneLineStaff::~AttOneLineStaff() {}
-
 void AttOneLineStaff::ResetOneLineStaff()
 {
     m_ontheline = BOOLEAN_NONE;
@@ -4335,8 +4175,6 @@ AttOptimization::AttOptimization() : Att()
 {
     ResetOptimization();
 }
-
-AttOptimization::~AttOptimization() {}
 
 void AttOptimization::ResetOptimization()
 {
@@ -4378,8 +4216,6 @@ AttOriginLayerIdent::AttOriginLayerIdent() : Att()
     ResetOriginLayerIdent();
 }
 
-AttOriginLayerIdent::~AttOriginLayerIdent() {}
-
 void AttOriginLayerIdent::ResetOriginLayerIdent()
 {
     m_originLayer = "";
@@ -4420,8 +4256,6 @@ AttOriginStaffIdent::AttOriginStaffIdent() : Att()
     ResetOriginStaffIdent();
 }
 
-AttOriginStaffIdent::~AttOriginStaffIdent() {}
-
 void AttOriginStaffIdent::ResetOriginStaffIdent()
 {
     m_originStaff = "";
@@ -4461,8 +4295,6 @@ AttOriginStartEndId::AttOriginStartEndId() : Att()
 {
     ResetOriginStartEndId();
 }
-
-AttOriginStartEndId::~AttOriginStartEndId() {}
 
 void AttOriginStartEndId::ResetOriginStartEndId()
 {
@@ -4519,8 +4351,6 @@ AttOriginTimestampLog::AttOriginTimestampLog() : Att()
     ResetOriginTimestampLog();
 }
 
-AttOriginTimestampLog::~AttOriginTimestampLog() {}
-
 void AttOriginTimestampLog::ResetOriginTimestampLog()
 {
     m_originTstamp = std::make_pair(-1, -1.0);
@@ -4575,8 +4405,6 @@ AttPages::AttPages() : Att()
 {
     ResetPages();
 }
-
-AttPages::~AttPages() {}
 
 void AttPages::ResetPages()
 {
@@ -4723,8 +4551,6 @@ AttPartIdent::AttPartIdent() : Att()
     ResetPartIdent();
 }
 
-AttPartIdent::~AttPartIdent() {}
-
 void AttPartIdent::ResetPartIdent()
 {
     m_part = "";
@@ -4780,8 +4606,6 @@ AttPitch::AttPitch() : Att()
     ResetPitch();
 }
 
-AttPitch::~AttPitch() {}
-
 void AttPitch::ResetPitch()
 {
     m_pname = PITCHNAME_NONE;
@@ -4821,8 +4645,6 @@ AttPlacementOnStaff::AttPlacementOnStaff() : Att()
 {
     ResetPlacementOnStaff();
 }
-
-AttPlacementOnStaff::~AttPlacementOnStaff() {}
 
 void AttPlacementOnStaff::ResetPlacementOnStaff()
 {
@@ -4864,8 +4686,6 @@ AttPlacementRelEvent::AttPlacementRelEvent() : Att()
     ResetPlacementRelEvent();
 }
 
-AttPlacementRelEvent::~AttPlacementRelEvent() {}
-
 void AttPlacementRelEvent::ResetPlacementRelEvent()
 {
     m_place = data_STAFFREL();
@@ -4905,8 +4725,6 @@ AttPlacementRelStaff::AttPlacementRelStaff() : Att()
 {
     ResetPlacementRelStaff();
 }
-
-AttPlacementRelStaff::~AttPlacementRelStaff() {}
 
 void AttPlacementRelStaff::ResetPlacementRelStaff()
 {
@@ -4948,8 +4766,6 @@ AttPlist::AttPlist() : Att()
     ResetPlist();
 }
 
-AttPlist::~AttPlist() {}
-
 void AttPlist::ResetPlist()
 {
     m_plist = std::vector<std::string>();
@@ -4989,8 +4805,6 @@ AttPointing::AttPointing() : Att()
 {
     ResetPointing();
 }
-
-AttPointing::~AttPointing() {}
 
 void AttPointing::ResetPointing()
 {
@@ -5092,8 +4906,6 @@ AttQuantity::AttQuantity() : Att()
     ResetQuantity();
 }
 
-AttQuantity::~AttQuantity() {}
-
 void AttQuantity::ResetQuantity()
 {
     m_quantity = 0.0;
@@ -5133,8 +4945,6 @@ AttRanging::AttRanging() : Att()
 {
     ResetRanging();
 }
-
-AttRanging::~AttRanging() {}
 
 void AttRanging::ResetRanging()
 {
@@ -5236,8 +5046,6 @@ AttResponsibility::AttResponsibility() : Att()
     ResetResponsibility();
 }
 
-AttResponsibility::~AttResponsibility() {}
-
 void AttResponsibility::ResetResponsibility()
 {
     m_resp = "";
@@ -5277,8 +5085,6 @@ AttRestdurationLog::AttRestdurationLog() : Att()
 {
     ResetRestdurationLog();
 }
-
-AttRestdurationLog::~AttRestdurationLog() {}
 
 void AttRestdurationLog::ResetRestdurationLog()
 {
@@ -5320,8 +5126,6 @@ AttScalable::AttScalable() : Att()
     ResetScalable();
 }
 
-AttScalable::~AttScalable() {}
-
 void AttScalable::ResetScalable()
 {
     m_scale = -1.0;
@@ -5361,8 +5165,6 @@ AttSequence::AttSequence() : Att()
 {
     ResetSequence();
 }
-
-AttSequence::~AttSequence() {}
 
 void AttSequence::ResetSequence()
 {
@@ -5404,8 +5206,6 @@ AttSlashCount::AttSlashCount() : Att()
     ResetSlashCount();
 }
 
-AttSlashCount::~AttSlashCount() {}
-
 void AttSlashCount::ResetSlashCount()
 {
     m_slash = 0;
@@ -5445,8 +5245,6 @@ AttSlurPresent::AttSlurPresent() : Att()
 {
     ResetSlurPresent();
 }
-
-AttSlurPresent::~AttSlurPresent() {}
 
 void AttSlurPresent::ResetSlurPresent()
 {
@@ -5488,8 +5286,6 @@ AttSource::AttSource() : Att()
     ResetSource();
 }
 
-AttSource::~AttSource() {}
-
 void AttSource::ResetSource()
 {
     m_source = "";
@@ -5529,8 +5325,6 @@ AttSpacing::AttSpacing() : Att()
 {
     ResetSpacing();
 }
-
-AttSpacing::~AttSpacing() {}
 
 void AttSpacing::ResetSpacing()
 {
@@ -5617,8 +5411,6 @@ AttStaffLog::AttStaffLog() : Att()
     ResetStaffLog();
 }
 
-AttStaffLog::~AttStaffLog() {}
-
 void AttStaffLog::ResetStaffLog()
 {
     m_def = "";
@@ -5658,8 +5450,6 @@ AttStaffDefLog::AttStaffDefLog() : Att()
 {
     ResetStaffDefLog();
 }
-
-AttStaffDefLog::~AttStaffDefLog() {}
 
 void AttStaffDefLog::ResetStaffDefLog()
 {
@@ -5701,8 +5491,6 @@ AttStaffGroupingSym::AttStaffGroupingSym() : Att()
     ResetStaffGroupingSym();
 }
 
-AttStaffGroupingSym::~AttStaffGroupingSym() {}
-
 void AttStaffGroupingSym::ResetStaffGroupingSym()
 {
     m_symbol = staffGroupingSym_SYMBOL_NONE;
@@ -5743,8 +5531,6 @@ AttStaffIdent::AttStaffIdent() : Att()
     ResetStaffIdent();
 }
 
-AttStaffIdent::~AttStaffIdent() {}
-
 void AttStaffIdent::ResetStaffIdent()
 {
     m_staff = std::vector<int>();
@@ -5784,8 +5570,6 @@ AttStaffItems::AttStaffItems() : Att()
 {
     ResetStaffItems();
 }
-
-AttStaffItems::~AttStaffItems() {}
 
 void AttStaffItems::ResetStaffItems()
 {
@@ -5857,8 +5641,6 @@ AttStaffLoc::AttStaffLoc() : Att()
     ResetStaffLoc();
 }
 
-AttStaffLoc::~AttStaffLoc() {}
-
 void AttStaffLoc::ResetStaffLoc()
 {
     m_loc = MEI_UNSET;
@@ -5898,8 +5680,6 @@ AttStaffLocPitched::AttStaffLocPitched() : Att()
 {
     ResetStaffLocPitched();
 }
-
-AttStaffLocPitched::~AttStaffLocPitched() {}
 
 void AttStaffLocPitched::ResetStaffLocPitched()
 {
@@ -5956,8 +5736,6 @@ AttStartEndId::AttStartEndId() : Att()
     ResetStartEndId();
 }
 
-AttStartEndId::~AttStartEndId() {}
-
 void AttStartEndId::ResetStartEndId()
 {
     m_endid = "";
@@ -5998,8 +5776,6 @@ AttStartId::AttStartId() : Att()
     ResetStartId();
 }
 
-AttStartId::~AttStartId() {}
-
 void AttStartId::ResetStartId()
 {
     m_startid = "";
@@ -6039,8 +5815,6 @@ AttStems::AttStems() : Att()
 {
     ResetStems();
 }
-
-AttStems::~AttStems() {}
 
 void AttStems::ResetStems()
 {
@@ -6187,8 +5961,6 @@ AttSylLog::AttSylLog() : Att()
     ResetSylLog();
 }
 
-AttSylLog::~AttSylLog() {}
-
 void AttSylLog::ResetSylLog()
 {
     m_con = sylLog_CON_NONE;
@@ -6244,8 +6016,6 @@ AttSylText::AttSylText() : Att()
     ResetSylText();
 }
 
-AttSylText::~AttSylText() {}
-
 void AttSylText::ResetSylText()
 {
     m_syl = "";
@@ -6285,8 +6055,6 @@ AttSystems::AttSystems() : Att()
 {
     ResetSystems();
 }
-
-AttSystems::~AttSystems() {}
 
 void AttSystems::ResetSystems()
 {
@@ -6373,8 +6141,6 @@ AttTargetEval::AttTargetEval() : Att()
     ResetTargetEval();
 }
 
-AttTargetEval::~AttTargetEval() {}
-
 void AttTargetEval::ResetTargetEval()
 {
     m_evaluate = targetEval_EVALUATE_NONE;
@@ -6415,8 +6181,6 @@ AttTempoLog::AttTempoLog() : Att()
     ResetTempoLog();
 }
 
-AttTempoLog::~AttTempoLog() {}
-
 void AttTempoLog::ResetTempoLog()
 {
     m_func = tempoLog_FUNC_NONE;
@@ -6456,8 +6220,6 @@ AttTextRendition::AttTextRendition() : Att()
 {
     ResetTextRendition();
 }
-
-AttTextRendition::~AttTextRendition() {}
 
 void AttTextRendition::ResetTextRendition()
 {
@@ -6513,8 +6275,6 @@ AttTextStyle::AttTextStyle() : Att()
 {
     ResetTextStyle();
 }
-
-AttTextStyle::~AttTextStyle() {}
 
 void AttTextStyle::ResetTextStyle()
 {
@@ -6616,8 +6376,6 @@ AttTiePresent::AttTiePresent() : Att()
     ResetTiePresent();
 }
 
-AttTiePresent::~AttTiePresent() {}
-
 void AttTiePresent::ResetTiePresent()
 {
     m_tie = TIE_NONE;
@@ -6657,8 +6415,6 @@ AttTimestampLog::AttTimestampLog() : Att()
 {
     ResetTimestampLog();
 }
-
-AttTimestampLog::~AttTimestampLog() {}
 
 void AttTimestampLog::ResetTimestampLog()
 {
@@ -6700,8 +6456,6 @@ AttTimestamp2Log::AttTimestamp2Log() : Att()
     ResetTimestamp2Log();
 }
 
-AttTimestamp2Log::~AttTimestamp2Log() {}
-
 void AttTimestamp2Log::ResetTimestamp2Log()
 {
     m_tstamp2 = std::make_pair(-1, -1.0);
@@ -6741,8 +6495,6 @@ AttTransposition::AttTransposition() : Att()
 {
     ResetTransposition();
 }
-
-AttTransposition::~AttTransposition() {}
 
 void AttTransposition::ResetTransposition()
 {
@@ -6798,8 +6550,6 @@ AttTuning::AttTuning() : Att()
 {
     ResetTuning();
 }
-
-AttTuning::~AttTuning() {}
 
 void AttTuning::ResetTuning()
 {
@@ -6871,8 +6621,6 @@ AttTupletPresent::AttTupletPresent() : Att()
     ResetTupletPresent();
 }
 
-AttTupletPresent::~AttTupletPresent() {}
-
 void AttTupletPresent::ResetTupletPresent()
 {
     m_tuplet = "";
@@ -6913,8 +6661,6 @@ AttTyped::AttTyped() : Att()
     ResetTyped();
 }
 
-AttTyped::~AttTyped() {}
-
 void AttTyped::ResetTyped()
 {
     m_type = "";
@@ -6954,8 +6700,6 @@ AttTypography::AttTypography() : Att()
 {
     ResetTypography();
 }
-
-AttTypography::~AttTypography() {}
 
 void AttTypography::ResetTypography()
 {
@@ -7087,8 +6831,6 @@ AttVerticalAlign::AttVerticalAlign() : Att()
     ResetVerticalAlign();
 }
 
-AttVerticalAlign::~AttVerticalAlign() {}
-
 void AttVerticalAlign::ResetVerticalAlign()
 {
     m_valign = VERTICALALIGNMENT_NONE;
@@ -7128,8 +6870,6 @@ AttVerticalGroup::AttVerticalGroup() : Att()
 {
     ResetVerticalGroup();
 }
-
-AttVerticalGroup::~AttVerticalGroup() {}
 
 void AttVerticalGroup::ResetVerticalGroup()
 {
@@ -7171,8 +6911,6 @@ AttVisibility::AttVisibility() : Att()
     ResetVisibility();
 }
 
-AttVisibility::~AttVisibility() {}
-
 void AttVisibility::ResetVisibility()
 {
     m_visible = BOOLEAN_NONE;
@@ -7212,8 +6950,6 @@ AttVisualOffsetHo::AttVisualOffsetHo() : Att()
 {
     ResetVisualOffsetHo();
 }
-
-AttVisualOffsetHo::~AttVisualOffsetHo() {}
 
 void AttVisualOffsetHo::ResetVisualOffsetHo()
 {
@@ -7255,8 +6991,6 @@ AttVisualOffsetTo::AttVisualOffsetTo() : Att()
     ResetVisualOffsetTo();
 }
 
-AttVisualOffsetTo::~AttVisualOffsetTo() {}
-
 void AttVisualOffsetTo::ResetVisualOffsetTo()
 {
     m_to = 0.0;
@@ -7297,8 +7031,6 @@ AttVisualOffsetVo::AttVisualOffsetVo() : Att()
     ResetVisualOffsetVo();
 }
 
-AttVisualOffsetVo::~AttVisualOffsetVo() {}
-
 void AttVisualOffsetVo::ResetVisualOffsetVo()
 {
     m_vo = data_MEASUREMENTSIGNED();
@@ -7338,8 +7070,6 @@ AttVisualOffset2Ho::AttVisualOffset2Ho() : Att()
 {
     ResetVisualOffset2Ho();
 }
-
-AttVisualOffset2Ho::~AttVisualOffset2Ho() {}
 
 void AttVisualOffset2Ho::ResetVisualOffset2Ho()
 {
@@ -7396,8 +7126,6 @@ AttVisualOffset2To::AttVisualOffset2To() : Att()
     ResetVisualOffset2To();
 }
 
-AttVisualOffset2To::~AttVisualOffset2To() {}
-
 void AttVisualOffset2To::ResetVisualOffset2To()
 {
     m_startto = 0.0;
@@ -7452,8 +7180,6 @@ AttVisualOffset2Vo::AttVisualOffset2Vo() : Att()
 {
     ResetVisualOffset2Vo();
 }
-
-AttVisualOffset2Vo::~AttVisualOffset2Vo() {}
 
 void AttVisualOffset2Vo::ResetVisualOffset2Vo()
 {
@@ -7510,8 +7236,6 @@ AttVoltaGroupingSym::AttVoltaGroupingSym() : Att()
     ResetVoltaGroupingSym();
 }
 
-AttVoltaGroupingSym::~AttVoltaGroupingSym() {}
-
 void AttVoltaGroupingSym::ResetVoltaGroupingSym()
 {
     m_voltasym = voltaGroupingSym_VOLTASYM_NONE;
@@ -7551,8 +7275,6 @@ AttWhitespace::AttWhitespace() : Att()
 {
     ResetWhitespace();
 }
-
-AttWhitespace::~AttWhitespace() {}
 
 void AttWhitespace::ResetWhitespace()
 {
@@ -7594,8 +7316,6 @@ AttWidth::AttWidth() : Att()
     ResetWidth();
 }
 
-AttWidth::~AttWidth() {}
-
 void AttWidth::ResetWidth()
 {
     m_width = data_MEASUREMENTUNSIGNED();
@@ -7635,8 +7355,6 @@ AttXy::AttXy() : Att()
 {
     ResetXy();
 }
-
-AttXy::~AttXy() {}
 
 void AttXy::ResetXy()
 {
@@ -7692,8 +7410,6 @@ AttXy2::AttXy2() : Att()
 {
     ResetXy2();
 }
-
-AttXy2::~AttXy2() {}
 
 void AttXy2::ResetXy2()
 {

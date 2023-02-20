@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttNcLog : public Att {
-public:
+protected:
     AttNcLog();
-    virtual ~AttNcLog();
+    ~AttNcLog() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNcLog();
 
@@ -66,14 +67,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstNcLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNcLog
+ */
+
+class InstNcLog : public AttNcLog {
+public:
+    InstNcLog() = default;
+    virtual ~InstNcLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNcForm
 //----------------------------------------------------------------------------
 
 class AttNcForm : public Att {
-public:
+protected:
     AttNcForm();
-    virtual ~AttNcForm();
+    ~AttNcForm() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetNcForm();
 
@@ -145,6 +161,20 @@ private:
     std::string m_sShape;
     /** Direction of the pen stroke. **/
     data_COMPASSDIRECTION m_tilt;
+};
+
+//----------------------------------------------------------------------------
+// InstNcForm
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNcForm
+ */
+
+class InstNcForm : public AttNcForm {
+public:
+    InstNcForm() = default;
+    virtual ~InstNcForm() = default;
 };
 
 } // namespace vrv

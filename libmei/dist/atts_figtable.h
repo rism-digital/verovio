@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttTabular : public Att {
-public:
+protected:
     AttTabular();
-    virtual ~AttTabular();
+    ~AttTabular() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetTabular();
 
@@ -63,6 +64,20 @@ private:
     int m_colspan;
     /** The number of rows spanned by this cell. **/
     int m_rowspan;
+};
+
+//----------------------------------------------------------------------------
+// InstTabular
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTabular
+ */
+
+class InstTabular : public AttTabular {
+public:
+    InstTabular() = default;
+    virtual ~InstTabular() = default;
 };
 
 } // namespace vrv

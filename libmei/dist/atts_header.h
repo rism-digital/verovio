@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttBifoliumSurfaces : public Att {
-public:
+protected:
     AttBifoliumSurfaces();
-    virtual ~AttBifoliumSurfaces();
+    ~AttBifoliumSurfaces() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetBifoliumSurfaces();
 
@@ -90,14 +91,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstBifoliumSurfaces
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttBifoliumSurfaces
+ */
+
+class InstBifoliumSurfaces : public AttBifoliumSurfaces {
+public:
+    InstBifoliumSurfaces() = default;
+    virtual ~InstBifoliumSurfaces() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttFoliumSurfaces
 //----------------------------------------------------------------------------
 
 class AttFoliumSurfaces : public Att {
-public:
+protected:
     AttFoliumSurfaces();
-    virtual ~AttFoliumSurfaces();
+    ~AttFoliumSurfaces() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetFoliumSurfaces();
 
@@ -130,14 +146,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstFoliumSurfaces
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFoliumSurfaces
+ */
+
+class InstFoliumSurfaces : public AttFoliumSurfaces {
+public:
+    InstFoliumSurfaces() = default;
+    virtual ~InstFoliumSurfaces() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttRecordType
 //----------------------------------------------------------------------------
 
 class AttRecordType : public Att {
-public:
+protected:
     AttRecordType();
-    virtual ~AttRecordType();
+    ~AttRecordType() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetRecordType();
 
@@ -164,14 +195,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstRecordType
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRecordType
+ */
+
+class InstRecordType : public AttRecordType {
+public:
+    InstRecordType() = default;
+    virtual ~InstRecordType() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttRegularMethod
 //----------------------------------------------------------------------------
 
 class AttRegularMethod : public Att {
-public:
+protected:
     AttRegularMethod();
-    virtual ~AttRegularMethod();
+    ~AttRegularMethod() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetRegularMethod();
 
@@ -195,6 +241,20 @@ public:
 private:
     /** Indicates the method employed to mark corrections and normalizations. **/
     regularMethod_METHOD m_method;
+};
+
+//----------------------------------------------------------------------------
+// InstRegularMethod
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRegularMethod
+ */
+
+class InstRegularMethod : public AttRegularMethod {
+public:
+    InstRegularMethod() = default;
+    virtual ~InstRegularMethod() = default;
 };
 
 } // namespace vrv

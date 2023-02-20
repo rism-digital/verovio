@@ -31,8 +31,6 @@ AttFacsimile::AttFacsimile() : Att()
     ResetFacsimile();
 }
 
-AttFacsimile::~AttFacsimile() {}
-
 void AttFacsimile::ResetFacsimile()
 {
     m_facs = "";

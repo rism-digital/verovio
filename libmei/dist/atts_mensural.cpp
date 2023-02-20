@@ -31,8 +31,6 @@ AttDurationQuality::AttDurationQuality() : Att()
     ResetDurationQuality();
 }
 
-AttDurationQuality::~AttDurationQuality() {}
-
 void AttDurationQuality::ResetDurationQuality()
 {
     m_durQuality = DURQUALITY_mensural_NONE;
@@ -72,8 +70,6 @@ AttMensuralLog::AttMensuralLog() : Att()
 {
     ResetMensuralLog();
 }
-
-AttMensuralLog::~AttMensuralLog() {}
 
 void AttMensuralLog::ResetMensuralLog()
 {
@@ -129,8 +125,6 @@ AttMensuralShared::AttMensuralShared() : Att()
 {
     ResetMensuralShared();
 }
-
-AttMensuralShared::~AttMensuralShared() {}
 
 void AttMensuralShared::ResetMensuralShared()
 {
@@ -232,8 +226,6 @@ AttNoteVisMensural::AttNoteVisMensural() : Att()
     ResetNoteVisMensural();
 }
 
-AttNoteVisMensural::~AttNoteVisMensural() {}
-
 void AttNoteVisMensural::ResetNoteVisMensural()
 {
     m_lig = LIGATUREFORM_NONE;
@@ -274,8 +266,6 @@ AttRestVisMensural::AttRestVisMensural() : Att()
     ResetRestVisMensural();
 }
 
-AttRestVisMensural::~AttRestVisMensural() {}
-
 void AttRestVisMensural::ResetRestVisMensural()
 {
     m_spaces = MEI_UNSET;
@@ -315,8 +305,6 @@ AttStemsMensural::AttStemsMensural() : Att()
 {
     ResetStemsMensural();
 }
-
-AttStemsMensural::~AttStemsMensural() {}
 
 void AttStemsMensural::ResetStemsMensural()
 {

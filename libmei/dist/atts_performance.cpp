@@ -31,8 +31,6 @@ AttAlignment::AttAlignment() : Att()
     ResetAlignment();
 }
 
-AttAlignment::~AttAlignment() {}
-
 void AttAlignment::ResetAlignment()
 {
     m_when = "";

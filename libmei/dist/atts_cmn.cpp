@@ -31,8 +31,6 @@ AttArpegLog::AttArpegLog() : Att()
     ResetArpegLog();
 }
 
-AttArpegLog::~AttArpegLog() {}
-
 void AttArpegLog::ResetArpegLog()
 {
     m_order = arpegLog_ORDER_NONE;
@@ -72,8 +70,6 @@ AttBTremLog::AttBTremLog() : Att()
 {
     ResetBTremLog();
 }
-
-AttBTremLog::~AttBTremLog() {}
 
 void AttBTremLog::ResetBTremLog()
 {
@@ -115,8 +111,6 @@ AttBeamPresent::AttBeamPresent() : Att()
     ResetBeamPresent();
 }
 
-AttBeamPresent::~AttBeamPresent() {}
-
 void AttBeamPresent::ResetBeamPresent()
 {
     m_beam = "";
@@ -156,8 +150,6 @@ AttBeamRend::AttBeamRend() : Att()
 {
     ResetBeamRend();
 }
-
-AttBeamRend::~AttBeamRend() {}
 
 void AttBeamRend::ResetBeamRend()
 {
@@ -244,8 +236,6 @@ AttBeamSecondary::AttBeamSecondary() : Att()
     ResetBeamSecondary();
 }
 
-AttBeamSecondary::~AttBeamSecondary() {}
-
 void AttBeamSecondary::ResetBeamSecondary()
 {
     m_breaksec = MEI_UNSET;
@@ -286,8 +276,6 @@ AttBeamedWith::AttBeamedWith() : Att()
     ResetBeamedWith();
 }
 
-AttBeamedWith::~AttBeamedWith() {}
-
 void AttBeamedWith::ResetBeamedWith()
 {
     m_beamWith = NEIGHBORINGLAYER_NONE;
@@ -327,8 +315,6 @@ AttBeamingLog::AttBeamingLog() : Att()
 {
     ResetBeamingLog();
 }
-
-AttBeamingLog::~AttBeamingLog() {}
 
 void AttBeamingLog::ResetBeamingLog()
 {
@@ -385,8 +371,6 @@ AttBeatRptLog::AttBeatRptLog() : Att()
     ResetBeatRptLog();
 }
 
-AttBeatRptLog::~AttBeatRptLog() {}
-
 void AttBeatRptLog::ResetBeatRptLog()
 {
     m_beatdef = 0.0;
@@ -426,8 +410,6 @@ AttBracketSpanLog::AttBracketSpanLog() : Att()
 {
     ResetBracketSpanLog();
 }
-
-AttBracketSpanLog::~AttBracketSpanLog() {}
 
 void AttBracketSpanLog::ResetBracketSpanLog()
 {
@@ -469,8 +451,6 @@ AttCutout::AttCutout() : Att()
     ResetCutout();
 }
 
-AttCutout::~AttCutout() {}
-
 void AttCutout::ResetCutout()
 {
     m_cutout = cutout_CUTOUT_NONE;
@@ -510,8 +490,6 @@ AttExpandable::AttExpandable() : Att()
 {
     ResetExpandable();
 }
-
-AttExpandable::~AttExpandable() {}
 
 void AttExpandable::ResetExpandable()
 {
@@ -553,8 +531,6 @@ AttFTremLog::AttFTremLog() : Att()
     ResetFTremLog();
 }
 
-AttFTremLog::~AttFTremLog() {}
-
 void AttFTremLog::ResetFTremLog()
 {
     m_form = fTremLog_FORM_NONE;
@@ -594,8 +570,6 @@ AttGlissPresent::AttGlissPresent() : Att()
 {
     ResetGlissPresent();
 }
-
-AttGlissPresent::~AttGlissPresent() {}
 
 void AttGlissPresent::ResetGlissPresent()
 {
@@ -637,8 +611,6 @@ AttGraceGrpLog::AttGraceGrpLog() : Att()
     ResetGraceGrpLog();
 }
 
-AttGraceGrpLog::~AttGraceGrpLog() {}
-
 void AttGraceGrpLog::ResetGraceGrpLog()
 {
     m_attach = graceGrpLog_ATTACH_NONE;
@@ -678,8 +650,6 @@ AttGraced::AttGraced() : Att()
 {
     ResetGraced();
 }
-
-AttGraced::~AttGraced() {}
 
 void AttGraced::ResetGraced()
 {
@@ -736,8 +706,6 @@ AttHairpinLog::AttHairpinLog() : Att()
     ResetHairpinLog();
 }
 
-AttHairpinLog::~AttHairpinLog() {}
-
 void AttHairpinLog::ResetHairpinLog()
 {
     m_form = hairpinLog_FORM_NONE;
@@ -792,8 +760,6 @@ AttHarpPedalLog::AttHarpPedalLog() : Att()
 {
     ResetHarpPedalLog();
 }
-
-AttHarpPedalLog::~AttHarpPedalLog() {}
 
 void AttHarpPedalLog::ResetHarpPedalLog()
 {
@@ -925,8 +891,6 @@ AttLvPresent::AttLvPresent() : Att()
     ResetLvPresent();
 }
 
-AttLvPresent::~AttLvPresent() {}
-
 void AttLvPresent::ResetLvPresent()
 {
     m_lv = BOOLEAN_NONE;
@@ -966,8 +930,6 @@ AttMeasureLog::AttMeasureLog() : Att()
 {
     ResetMeasureLog();
 }
-
-AttMeasureLog::~AttMeasureLog() {}
 
 void AttMeasureLog::ResetMeasureLog()
 {
@@ -1024,8 +986,6 @@ AttMeterSigGrpLog::AttMeterSigGrpLog() : Att()
     ResetMeterSigGrpLog();
 }
 
-AttMeterSigGrpLog::~AttMeterSigGrpLog() {}
-
 void AttMeterSigGrpLog::ResetMeterSigGrpLog()
 {
     m_func = meterSigGrpLog_FUNC_NONE;
@@ -1065,8 +1025,6 @@ AttNumberPlacement::AttNumberPlacement() : Att()
 {
     ResetNumberPlacement();
 }
-
-AttNumberPlacement::~AttNumberPlacement() {}
 
 void AttNumberPlacement::ResetNumberPlacement()
 {
@@ -1123,8 +1081,6 @@ AttNumbered::AttNumbered() : Att()
     ResetNumbered();
 }
 
-AttNumbered::~AttNumbered() {}
-
 void AttNumbered::ResetNumbered()
 {
     m_num = MEI_UNSET;
@@ -1165,8 +1121,6 @@ AttOctaveLog::AttOctaveLog() : Att()
     ResetOctaveLog();
 }
 
-AttOctaveLog::~AttOctaveLog() {}
-
 void AttOctaveLog::ResetOctaveLog()
 {
     m_coll = octaveLog_COLL_NONE;
@@ -1206,8 +1160,6 @@ AttPedalLog::AttPedalLog() : Att()
 {
     ResetPedalLog();
 }
-
-AttPedalLog::~AttPedalLog() {}
 
 void AttPedalLog::ResetPedalLog()
 {
@@ -1264,8 +1216,6 @@ AttPianoPedals::AttPianoPedals() : Att()
     ResetPianoPedals();
 }
 
-AttPianoPedals::~AttPianoPedals() {}
-
 void AttPianoPedals::ResetPianoPedals()
 {
     m_pedalStyle = PEDALSTYLE_NONE;
@@ -1305,8 +1255,6 @@ AttRehearsal::AttRehearsal() : Att()
 {
     ResetRehearsal();
 }
-
-AttRehearsal::~AttRehearsal() {}
 
 void AttRehearsal::ResetRehearsal()
 {
@@ -1348,8 +1296,6 @@ AttScoreDefVisCmn::AttScoreDefVisCmn() : Att()
     ResetScoreDefVisCmn();
 }
 
-AttScoreDefVisCmn::~AttScoreDefVisCmn() {}
-
 void AttScoreDefVisCmn::ResetScoreDefVisCmn()
 {
     m_gridShow = BOOLEAN_NONE;
@@ -1389,8 +1335,6 @@ AttSlurRend::AttSlurRend() : Att()
 {
     ResetSlurRend();
 }
-
-AttSlurRend::~AttSlurRend() {}
 
 void AttSlurRend::ResetSlurRend()
 {
@@ -1447,8 +1391,6 @@ AttStemsCmn::AttStemsCmn() : Att()
     ResetStemsCmn();
 }
 
-AttStemsCmn::~AttStemsCmn() {}
-
 void AttStemsCmn::ResetStemsCmn()
 {
     m_stemWith = NEIGHBORINGLAYER_NONE;
@@ -1488,8 +1430,6 @@ AttTieRend::AttTieRend() : Att()
 {
     ResetTieRend();
 }
-
-AttTieRend::~AttTieRend() {}
 
 void AttTieRend::ResetTieRend()
 {
@@ -1545,8 +1485,6 @@ AttTremMeasured::AttTremMeasured() : Att()
 {
     ResetTremMeasured();
 }
-
-AttTremMeasured::~AttTremMeasured() {}
 
 void AttTremMeasured::ResetTremMeasured()
 {

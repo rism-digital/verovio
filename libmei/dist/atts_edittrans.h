@@ -30,10 +30,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class AttAgentIdent : public Att {
-public:
+protected:
     AttAgentIdent();
-    virtual ~AttAgentIdent();
+    ~AttAgentIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetAgentIdent();
 
@@ -63,14 +64,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// InstAgentIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAgentIdent
+ */
+
+class InstAgentIdent : public AttAgentIdent {
+public:
+    InstAgentIdent() = default;
+    virtual ~InstAgentIdent() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttReasonIdent
 //----------------------------------------------------------------------------
 
 class AttReasonIdent : public Att {
-public:
+protected:
     AttReasonIdent();
-    virtual ~AttReasonIdent();
+    ~AttReasonIdent() = default;
 
+public:
     /** Reset the default values for the attribute class **/
     void ResetReasonIdent();
 
@@ -98,6 +114,20 @@ private:
      * (unclear).
      **/
     std::string m_reason;
+};
+
+//----------------------------------------------------------------------------
+// InstReasonIdent
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttReasonIdent
+ */
+
+class InstReasonIdent : public AttReasonIdent {
+public:
+    InstReasonIdent() = default;
+    virtual ~InstReasonIdent() = default;
 };
 
 } // namespace vrv
