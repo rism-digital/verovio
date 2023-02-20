@@ -542,7 +542,7 @@ void Doc::PrepareData()
     }
 
     // Display warning if some elements were not matched
-    const size_t unmatchedElements = std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
+    const int unmatchedElements = (int)std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
         [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
             return (entry.first->HasStartid() && entry.first->HasEndid());
         });
@@ -827,8 +827,8 @@ void Doc::PrepareData()
         this->Process(prepareFacsimile);
 
         // Add default syl zone if one is not present.
-        for (auto &it : prepareFacsimile.GetZonelessSyls()) {
-            Syl *syl = vrv_cast<Syl *>(it);
+        for (Object *object : prepareFacsimile.GetZonelessSyls()) {
+            Syl *syl = vrv_cast<Syl *>(object);
             assert(syl);
             syl->CreateDefaultZone(this);
         }
