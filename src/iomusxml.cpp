@@ -2681,7 +2681,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     const int duration = node.child("duration").text().as_int();
     const int noteStaffNum = node.child("staff").text().as_int();
     const pugi::xml_node rest = node.child("rest");
-    if (m_ppq == 0 && (duration && !typeStr.empty())) {
+    if (m_ppq < 0 && (duration && !typeStr.empty())) {
         // if divisions are missing, try to calculate
         m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
     }
