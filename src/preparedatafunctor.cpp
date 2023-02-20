@@ -1494,12 +1494,6 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitDynam(Dynam *dynam)
 
     m_dynams.push_back(dynam);
 
-    for (auto hairpin : m_hairpins) {
-        if ((hairpin->GetEnd() == dynam->GetStart()) && (hairpin->GetStaff() == dynam->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
-        }
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -1527,26 +1521,6 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHairpin(Hairpin *hairpin)
 
     // Only try to link them if start and end are resolved
     if (!hairpin->GetStart() || !hairpin->GetEnd()) return FUNCTOR_CONTINUE;
-
-    for (auto dynam : m_dynams) {
-        if ((dynam->GetStart() == hairpin->GetStart()) && (dynam->GetStaff() == hairpin->GetStaff())) {
-            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(dynam);
-        }
-        else if ((dynam->GetStart() == hairpin->GetEnd()) && (dynam->GetStaff() == hairpin->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
-        }
-    }
-
-    for (auto otherHairpin : m_hairpins) {
-        if ((otherHairpin->GetEnd() == hairpin->GetStart()) && (otherHairpin->GetStaff() == hairpin->GetStaff())) {
-            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(otherHairpin);
-            if (!otherHairpin->GetRightLink()) otherHairpin->SetRightLink(hairpin);
-        }
-        if ((otherHairpin->GetStart() == hairpin->GetEnd()) && (otherHairpin->GetStaff() == hairpin->GetStaff())) {
-            if (!otherHairpin->GetLeftLink()) otherHairpin->SetLeftLink(hairpin);
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(otherHairpin);
-        }
-    }
 
     m_hairpins.push_back(hairpin);
 
