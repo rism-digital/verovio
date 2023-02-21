@@ -1535,6 +1535,11 @@ Options::Options()
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
 
+    m_loadSelectedMdivOnly.SetInfo(
+        "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
+    m_loadSelectedMdivOnly.Init(false);
+    this->Register(&m_loadSelectedMdivOnly, "loadSelectedMdivOnly", &m_selectors);
+
     m_mdivAll.SetInfo("Mdiv all", "Load and render all <mdiv> elements in the MEI files");
     m_mdivAll.Init(false);
     this->Register(&m_mdivAll, "mdivAll", &m_selectors);
