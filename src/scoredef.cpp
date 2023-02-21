@@ -636,12 +636,12 @@ bool ScoreDef::IsSectionRestart() const
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
-bool ScoreDef::HasSystemStartLine() const
+bool ScoreDef::HasSystemStartLine(bool drawSingleSystemLine) const
 {
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
-        if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
+        if ((firstDef && lastDef && (drawSingleSystemLine || (firstDef != lastDef))) || staffGrp->GetFirst(GRPSYM)) {
             return (this->GetSystemLeftline() != BOOLEAN_false);
         }
         return (this->GetSystemLeftline() == BOOLEAN_true);

@@ -246,7 +246,7 @@ public:
     /**
      * @return True if a system start line will be drawn
      */
-    bool HasSystemStartLine() const;
+    bool HasSystemStartLine(bool drawSingleSystemLine = false) const;
 
     //----------//
     // Functors //
