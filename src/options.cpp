@@ -258,6 +258,8 @@ bool OptionDbl::SetValue(const std::string &value)
         number = std::stod(value);
     }
     catch (const std::exception &e) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
+            this->GetKey().c_str());
         return false;
     }
 
@@ -344,6 +346,8 @@ bool OptionInt::SetValue(const std::string &value)
         number = std::stoi(value);
     }
     catch (const std::exception &e) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
+            this->GetKey().c_str());
         return false;
     }
 
