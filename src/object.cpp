@@ -1213,6 +1213,15 @@ std::string Object::GenerateRandID()
     return BaseEncodeInt(nr, 36);
 }
 
+uint32_t Object::Hash(uint32_t number, bool reverse)
+{
+    const uint32_t magicNumber = reverse ? 0x119de1f3 : 0x45d9f3b;
+    number = ((number >> 16) ^ number) * magicNumber;
+    number = ((number >> 16) ^ number) * magicNumber;
+    number = (number >> 16) ^ number;
+    return number;
+}
+
 bool Object::sortByUlx(Object *a, Object *b)
 {
     FacsimileInterface *fa = NULL, *fb = NULL;

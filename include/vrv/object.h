@@ -651,6 +651,8 @@ public:
 
     static std::string GenerateRandID();
 
+    static uint32_t Hash(uint32_t number, bool reverse = false);
+
     static bool sortByUlx(Object *a, Object *b);
 
     /**
