@@ -367,7 +367,7 @@ void View::DrawStaffGrp(
     // draw the system start bar line
     ScoreDef *scoreDef = vrv_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
     if (topStaffGrp) {
-        if (scoreDef && scoreDef->HasSystemStartLine(m_options->m_systemStartLineOnSingleStaff.GetValue())) {
+        if (scoreDef && scoreDef->HasSystemStartLine()) {
             const int barLineWidth = m_doc->GetDrawingBarLineWidth(staffSize);
             this->DrawVerticalLine(dc, yTop, yBottom, x + barLineWidth / 2, barLineWidth);
         }

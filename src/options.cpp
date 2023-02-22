@@ -1488,11 +1488,6 @@ Options::Options()
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
-    m_systemStartLineOnSingleStaff.SetInfo(
-        "Start barline on single staff", "Draw system start barline even on single staves");
-    m_systemStartLineOnSingleStaff.Init(false);
-    this->Register(&m_systemStartLineOnSingleStaff, "systemStartLineOnSingleStaff", &m_generalLayout);
-
     m_textEnclosureThickness.SetInfo("Text box line thickness", "The thickness of the line text enclosing box");
     m_textEnclosureThickness.Init(0.2, 0.10, 0.80);
     this->Register(&m_textEnclosureThickness, "textEnclosureThickness", &m_generalLayout);
