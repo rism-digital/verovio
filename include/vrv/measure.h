@@ -342,11 +342,6 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustArpeg
-     */
-    int AdjustArpegEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustClefChanges
      */
     int AdjustClefChanges(FunctorParams *functorParams) override;

@@ -776,16 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the Arpeg position
-     */
-    virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AdjustArpeg
-     */
-    virtual int AdjustArpegEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the spacing for clef changes.
      */
     virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }

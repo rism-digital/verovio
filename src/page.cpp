@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "adjustarpegfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
@@ -438,10 +439,8 @@ void Page::LayOutHorizontally()
     this->Process(&adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingParams, &adjustHarmGrpsSpacingEnd);
 
     // Adjust the arpeg
-    Functor adjustArpeg(&Object::AdjustArpeg);
-    Functor adjustArpegEnd(&Object::AdjustArpegEnd);
-    AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
-    this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+    AdjustArpegFunctor adjustArpeg(doc);
+    this->Process(adjustArpeg);
 
     // Adjust the tempo
     Functor adjustTempo(&Object::AdjustTempo);

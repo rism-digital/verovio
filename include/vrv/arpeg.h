@@ -113,13 +113,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustArpeg
-     */
-    ///@{
-    int AdjustArpeg(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::CacheHorizontalLayout
      */
     int CacheHorizontalLayout(FunctorParams *functorParams) override;

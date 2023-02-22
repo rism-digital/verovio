@@ -838,20 +838,6 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AdjustArpegEnd(FunctorParams *functorParams)
-{
-    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_alignmentArpegTuples.empty()) {
-        params->m_measureAligner = &m_measureAligner;
-        m_measureAligner.Process(params->m_functor, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-        params->m_alignmentArpegTuples.clear();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::AdjustClefChanges(FunctorParams *functorParams)
 {
     AdjustClefsParams *params = vrv_params_cast<AdjustClefsParams *>(functorParams);

@@ -232,11 +232,6 @@ public:
     int JustifyX(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustArpeg
-     */
-    int AdjustArpeg(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustGraceXPos
      */
     ///@{
