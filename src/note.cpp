@@ -1107,7 +1107,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     assert(params);
 
     // Nothing to calculate if note is not part of the chord
-    if (!this->GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
+    if (!this->IsChordTone()) return FUNCTOR_SIBLINGS;
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
