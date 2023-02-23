@@ -1515,7 +1515,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     }
 
     const int count = (int)m_accidSpace.size();
-    const int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
+    const int middle = (count / 2) + (count % 2);
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip if already adjusted (i.e. octaves)
