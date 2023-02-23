@@ -776,11 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the spacing for clef changes.
-     */
-    virtual int AdjustClefChanges(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the position of the dots for multiple layers
      */
     virtual int AdjustDots(FunctorParams *) { return FUNCTOR_CONTINUE; }

@@ -85,15 +85,12 @@ public:
      */
     int AdjustBeams(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
-
 private:
+    //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

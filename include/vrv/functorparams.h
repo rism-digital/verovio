@@ -202,26 +202,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustClefsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the measureAligner
- * member 1: the Doc
- **/
-
-class AdjustClefsParams : public FunctorParams {
-public:
-    AdjustClefsParams(Doc *doc)
-    {
-        m_aligner = NULL;
-        m_doc = doc;
-    }
-    MeasureAligner *m_aligner;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustDotsParams
 //----------------------------------------------------------------------------
 

@@ -838,16 +838,6 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AdjustClefChanges(FunctorParams *functorParams)
-{
-    AdjustClefsParams *params = vrv_params_cast<AdjustClefsParams *>(functorParams);
-    assert(params);
-
-    params->m_aligner = &m_measureAligner;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
