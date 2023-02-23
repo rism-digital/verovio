@@ -1516,22 +1516,6 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::AdjustDots(FunctorParams *functorParams)
-{
-    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
-    assert(params);
-
-    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)) return FUNCTOR_SIBLINGS;
-    if (this->Is(DOTS)) {
-        params->m_dots.push_back(vrv_cast<Dots *>(this));
-    }
-    else {
-        params->m_elements.push_back(this);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int LayerElement::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);

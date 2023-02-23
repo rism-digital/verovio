@@ -15,6 +15,7 @@
 
 #include "adjustarpegfunctor.h"
 #include "adjustclefchangesfunctor.h"
+#include "adjustdotsfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
@@ -379,10 +380,8 @@ void Page::LayOutHorizontally()
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
-    Functor adjustDots(&Object::AdjustDots);
-    Functor adjustDotsEnd(&Object::AdjustDotsEnd);
-    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
+    AdjustDotsFunctor adjustDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(adjustDots);
 
     // adjust Layers again, this time including dots positioning
     AdjustLayersParams newAdjustLayersParams(

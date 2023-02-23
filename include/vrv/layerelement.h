@@ -336,11 +336,6 @@ public:
     int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetVerticalAlignment
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;

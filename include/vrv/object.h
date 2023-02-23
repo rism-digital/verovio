@@ -776,16 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the position of the dots for multiple layers
-     */
-    virtual int AdjustDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AdjustDots
-     */
-    virtual int AdjustDotsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the position of notes and chords for multiple layers
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }

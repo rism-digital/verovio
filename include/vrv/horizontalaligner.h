@@ -252,11 +252,6 @@ public:
      */
     int AdjustAccidX(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::AdjustDotsEnd
-     */
-    int AdjustDotsEnd(FunctorParams *functorParams) override;
-
 private:
     /**
      * Retrieve the AlignmentReference with staffN.

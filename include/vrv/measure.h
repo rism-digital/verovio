@@ -342,11 +342,6 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustLayers
      */
     int AdjustLayers(FunctorParams *functorParams) override;
