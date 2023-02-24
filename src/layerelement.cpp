@@ -974,8 +974,7 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
                 rightMargin = unit + y2 - elementBottom;
                 sameDirElement = true;
             }
-            else
-            {
+            else {
                 leftMargin = elementTop - y1;
                 rightMargin = elementTop - y2;
             }
