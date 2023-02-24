@@ -1492,6 +1492,12 @@
 		E7E1698729A898CE00FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
 		E7E1698829A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
 		E7E1698929A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
+		E7E1698B29A8BA3900FFF482 /* adjustgracexposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E1698A29A8BA2A00FFF482 /* adjustgracexposfunctor.h */; };
+		E7E1698C29A8BA3A00FFF482 /* adjustgracexposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E1698A29A8BA2A00FFF482 /* adjustgracexposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7E1698E29A8BA5200FFF482 /* adjustgracexposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */; };
+		E7E1698F29A8BA5A00FFF482 /* adjustgracexposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */; };
+		E7E1699029A8BA5B00FFF482 /* adjustgracexposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */; };
+		E7E1699129A8BA5B00FFF482 /* adjustgracexposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */; };
 		E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; };
 		E7F39C5F29A62B270055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7F39C6129A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
@@ -2028,6 +2034,8 @@
 		E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = setscoredeffunctor.cpp; path = src/setscoredeffunctor.cpp; sourceTree = "<group>"; };
 		E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustlayersfunctor.h; path = include/vrv/adjustlayersfunctor.h; sourceTree = "<group>"; };
 		E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustlayersfunctor.cpp; path = src/adjustlayersfunctor.cpp; sourceTree = "<group>"; };
+		E7E1698A29A8BA2A00FFF482 /* adjustgracexposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustgracexposfunctor.h; path = include/vrv/adjustgracexposfunctor.h; sourceTree = "<group>"; };
+		E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustgracexposfunctor.cpp; path = src/adjustgracexposfunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2795,6 +2803,8 @@
 				E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */,
 				E76A9D4929A74E4B0044682D /* adjustdotsfunctor.cpp */,
 				E76A9D4629A74E060044682D /* adjustdotsfunctor.h */,
+				E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */,
+				E7E1698A29A8BA2A00FFF482 /* adjustgracexposfunctor.h */,
 				E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */,
 				E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
@@ -3052,6 +3062,7 @@
 				400FEDD4206FA74A000D3233 /* gracegrp.h in Headers */,
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
 				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
+				E7E1698B29A8BA3900FFF482 /* adjustgracexposfunctor.h in Headers */,
 				4DB3D8B41F83D08700B5FC2B /* devicecontextbase.h in Headers */,
 				E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BDEF9ECC26725248008A3A47 /* caesura.h in Headers */,
@@ -3328,6 +3339,7 @@
 				BB4C4AA222A9328F001F6AF0 /* verticalaligner.h in Headers */,
 				BB4C4B0E22A932C8001F6AF0 /* systemmilestone.h in Headers */,
 				BB4C4A9622A9328F001F6AF0 /* floatingobject.h in Headers */,
+				E7E1698C29A8BA3A00FFF482 /* adjustgracexposfunctor.h in Headers */,
 				BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */,
 				4DACC9C72990F29A00B55913 /* atts_cmn.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
@@ -3738,6 +3750,7 @@
 				4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */,
 				4DC12A821F741110000440E9 /* pgfoot.cpp in Sources */,
 				4DEC4D7B21C8048700D1D273 /* abbr.cpp in Sources */,
+				E7E1698F29A8BA5A00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */,
 				4D6331F61F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4D674B47255F40B7008AEF4C /* plica.cpp in Sources */,
@@ -3851,6 +3864,7 @@
 				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
+				E7E1698E29A8BA5200FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */,
 				4D79641F26C1621A0026288B /* pageelement.cpp in Sources */,
 				4DC12A811F741110000440E9 /* pgfoot.cpp in Sources */,
@@ -4241,6 +4255,7 @@
 				4D1BD1B721908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D766F0520ACAD6E006875D8 /* view_neume.cpp in Sources */,
 				4DEC4DA421C81EB300D1D273 /* rdg.cpp in Sources */,
+				E7E1699029A8BA5B00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
@@ -4493,6 +4508,7 @@
 				BB4C4B6322A932D7001F6AF0 /* mrpt2.cpp in Sources */,
 				BB4C4B8322A932DF001F6AF0 /* fig.cpp in Sources */,
 				BB4C4BB022A932EB001F6AF0 /* view_neume.cpp in Sources */,
+				E7E1699129A8BA5B00FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				BB4C4AFB22A932BC001F6AF0 /* sic.cpp in Sources */,
 				BB4C4B1B22A932CF001F6AF0 /* arpeg.cpp in Sources */,
 				BB4C4AF922A932BC001F6AF0 /* restore.cpp in Sources */,
