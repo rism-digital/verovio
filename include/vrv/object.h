@@ -776,16 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the position of notes and chords for multiple layers
-     */
-    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AdjustLayers
-     */
-    virtual int AdjustLayersEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner

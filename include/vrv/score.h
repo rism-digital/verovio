@@ -89,11 +89,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustXPos
      */
     int AdjustXPos(FunctorParams *functorParams) override;

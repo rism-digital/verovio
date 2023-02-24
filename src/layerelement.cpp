@@ -1516,43 +1516,6 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::AdjustLayers(FunctorParams *functorParams)
-{
-    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Check if we are starting a new layer content - if yes copy the current elements to previous
-    if (!params->m_current.empty() && (this->GetAlignmentLayerN() != params->m_currentLayerN)) {
-        params->m_previous.reserve(params->m_previous.size() + params->m_current.size());
-        params->m_previous.insert(params->m_previous.end(), params->m_current.begin(), params->m_current.end());
-        params->m_current.clear();
-    }
-
-    params->m_currentLayerN = this->GetAlignmentLayerN();
-
-    // These are the only ones we want to keep for further collision detection
-    // Eventually  we also need stem for overlapping voices
-    if (this->HasSelfBB()) {
-        if (this->Is({ NOTE, STEM })) {
-            params->m_current.push_back(this);
-        }
-        else if (!params->m_ignoreDots && this->Is(DOTS)) {
-            params->m_current.push_back(this);
-        }
-    }
-
-    // We are processing the first layer, nothing to do yet
-    if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
-
-    const int shift = AdjustOverlappingLayers(
-        params->m_doc, params->m_previous, !params->m_ignoreDots, params->m_unison, params->m_stemSameas);
-    params->m_accumulatedShift += shift;
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int LayerElement::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements,
     bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {

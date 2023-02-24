@@ -16,6 +16,7 @@
 #include "adjustarpegfunctor.h"
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
+#include "adjustlayersfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
@@ -369,25 +370,21 @@ void Page::LayOutHorizontally()
     Functor adjustArtic(&Object::AdjustArtic);
     this->Process(&adjustArtic, &adjustArticParams);
 
-    // Adjust the x position of the LayerElement where multiple layer collide
+    // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
-    Functor adjustLayers(&Object::AdjustLayers);
-    Functor adjustLayersEnd(&Object::AdjustLayersEnd);
-    AdjustLayersParams adjustLayersParams(
-        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    this->Process(&adjustLayers, &adjustLayersParams, &adjustLayersEnd);
+    AdjustLayersFunctor adjustLayers(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(adjustLayers);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
     AdjustDotsFunctor adjustDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
     this->Process(adjustDots);
 
-    // adjust Layers again, this time including dots positioning
-    AdjustLayersParams newAdjustLayersParams(
-        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    newAdjustLayersParams.m_ignoreDots = false;
-    this->Process(&adjustLayers, &newAdjustLayersParams, &adjustLayersEnd);
+    // Adjust layers again, this time including dots positioning
+    AdjustLayersFunctor adjustLayersWithDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    adjustLayersWithDots.IgnoreDots(false);
+    this->Process(adjustLayersWithDots);
 
     // Adjust the X position of the accidentals, including in chords
     Functor adjustAccidX(&Object::AdjustAccidX);

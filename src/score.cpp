@@ -175,16 +175,6 @@ FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreEnd(this);
 }
 
-int Score::AdjustLayers(FunctorParams *functorParams)
-{
-    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);

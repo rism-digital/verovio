@@ -360,50 +360,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustLayersParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the list of staffN in the top-level scoreDef
- * member 1: the current layerN set in the AlignmentRef (negative values for cross-staff)
- * member 2: the elements for the previous layer(s)
- * member 3: the elements of the current layer
- * member 4: the doc
- * member 5: a pointer to the functor for passing it to the system aligner
- * member 6: a pointer to the end functor for passing it to the system aligner
- * member 7: flag whether the element is in unison
- * member 8: flag whether the element (note) has as stem.sameas note
- * member 9: the total shift of the current note or chord
- **/
-
-class AdjustLayersParams : public FunctorParams {
-public:
-    AdjustLayersParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
-    {
-        m_currentLayerN = VRV_UNSET;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
-        m_unison = false;
-        m_ignoreDots = true;
-        m_stemSameas = false;
-        m_accumulatedShift = 0;
-    }
-    std::vector<int> m_staffNs;
-    int m_currentLayerN;
-    std::vector<LayerElement *> m_previous;
-    std::vector<LayerElement *> m_current;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-    bool m_unison;
-    bool m_ignoreDots;
-    bool m_stemSameas;
-    int m_accumulatedShift;
-};
-
-//----------------------------------------------------------------------------
 // AdjustSlursParams
 //----------------------------------------------------------------------------
 

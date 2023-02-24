@@ -368,12 +368,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-    int AdjustLayersEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustGraceXPos
      */
     int AdjustGraceXPos(FunctorParams *functorParams) override;
