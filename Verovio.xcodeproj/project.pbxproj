@@ -1486,6 +1486,12 @@
 		E7D3389E293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
 		E7D3389F293E05F200C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
 		E7D338A0293E05F300C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
+		E7E1698329A8988E00FFF482 /* adjustlayersfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */; };
+		E7E1698429A8988F00FFF482 /* adjustlayersfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7E1698629A898C700FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
+		E7E1698729A898CE00FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
+		E7E1698829A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
+		E7E1698929A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
 		E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; };
 		E7F39C5F29A62B270055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7F39C6129A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
@@ -2020,6 +2026,8 @@
 		E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preparedatafunctor.cpp; path = src/preparedatafunctor.cpp; sourceTree = "<group>"; };
 		E7D33899293E057100C40B81 /* setscoredeffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setscoredeffunctor.h; path = include/vrv/setscoredeffunctor.h; sourceTree = "<group>"; };
 		E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = setscoredeffunctor.cpp; path = src/setscoredeffunctor.cpp; sourceTree = "<group>"; };
+		E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustlayersfunctor.h; path = include/vrv/adjustlayersfunctor.h; sourceTree = "<group>"; };
+		E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustlayersfunctor.cpp; path = src/adjustlayersfunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2787,6 +2795,8 @@
 				E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */,
 				E76A9D4929A74E4B0044682D /* adjustdotsfunctor.cpp */,
 				E76A9D4629A74E060044682D /* adjustdotsfunctor.h */,
+				E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */,
+				E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
@@ -3025,6 +3035,7 @@
 				8F59295818854BF800FE51AD /* view.h in Headers */,
 				8F59295918854BF800FE51AD /* vrv.h in Headers */,
 				8F59295A18854BF800FE51AD /* vrvdef.h in Headers */,
+				E7E1698329A8988E00FFF482 /* adjustlayersfunctor.h in Headers */,
 				4DB3D89B1F7C326A00B5FC2B /* lb.h in Headers */,
 				4D22C41C18890E9900D0831F /* mrest.h in Headers */,
 				4DB3D8FF1F83D20800B5FC2B /* options.h in Headers */,
@@ -3320,6 +3331,7 @@
 				BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */,
 				4DACC9C72990F29A00B55913 /* atts_cmn.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
+				E7E1698429A8988F00FFF482 /* adjustlayersfunctor.h in Headers */,
 				BB4C4A9E22A9328F001F6AF0 /* smufl.h in Headers */,
 				35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */,
 				BB4C4B3E22A932D7001F6AF0 /* artic.h in Headers */,
@@ -3515,6 +3527,7 @@
 				4DBDD6762939E1CA009EC466 /* symboltable.cpp in Sources */,
 				4D1693F91E3A44F300569BF4 /* artic.cpp in Sources */,
 				4DEC4DB321C826E000D1D273 /* supplied.cpp in Sources */,
+				E7E1698729A898CE00FFF482 /* adjustlayersfunctor.cpp in Sources */,
 				4DC12A851F741110000440E9 /* pgfoot2.cpp in Sources */,
 				40E1CEE0205060FD0007C8AF /* labelabbr.cpp in Sources */,
 				35F6580F24F92B6100C99A2D /* fing.cpp in Sources */,
@@ -3778,6 +3791,7 @@
 				4D766EFD20ACAD63006875D8 /* neume.cpp in Sources */,
 				4DACCA022990F29A00B55913 /* atts_usersymbols.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
+				E7E1698629A898C700FFF482 /* adjustlayersfunctor.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
 				4DC12A781F7400B9000440E9 /* runningelement.cpp in Sources */,
@@ -4019,6 +4033,7 @@
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				4DBDD6772939E1CB009EC466 /* symboltable.cpp in Sources */,
 				4DB3D8D11F83D11D00B5FC2B /* octave.cpp in Sources */,
+				E7E1698829A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
@@ -4271,6 +4286,7 @@
 				BB4C4B6F22A932D7001F6AF0 /* proport.cpp in Sources */,
 				4DBDD6782939E1CC009EC466 /* symboltable.cpp in Sources */,
 				BB4C4AE522A932BC001F6AF0 /* corr.cpp in Sources */,
+				E7E1698929A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */,
 				BB4C4AFF22A932BC001F6AF0 /* supplied.cpp in Sources */,
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
 				BB4C4B2122A932CF001F6AF0 /* dir.cpp in Sources */,
