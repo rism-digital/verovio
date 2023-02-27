@@ -753,6 +753,7 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
