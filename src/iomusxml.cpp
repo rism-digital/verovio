@@ -2616,7 +2616,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
-        MRpt *mRpt = dynamic_cast<MRpt *>((*layer).GetFirst(MRPT));
+        MRpt *mRpt = vrv_cast<MRpt *>(layer->GetFirst(MRPT));
         if (!mRpt) {
             mRpt = new MRpt();
             AddLayerElement(layer, mRpt);
@@ -2824,7 +2824,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
             if (pitch.child("alter")) {
-                Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);

@@ -895,7 +895,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     else if (elementType == "custos") {
         Custos *custos = new Custos();
         zone->SetUlx(ulx);
-        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        Surface *surface = vrv_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
         custos->AttachZone(zone);
         layer->AddChild(custos);
@@ -999,7 +999,7 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     stavesIt++;
     for (; stavesIt != staves.end(); ++stavesIt) {
         Staff *sourceStaff = dynamic_cast<Staff *>(*stavesIt);
-        Layer *sourceLayer = dynamic_cast<Layer *>(sourceStaff->GetFirst(LAYER));
+        Layer *sourceLayer = vrv_cast<Layer *>(sourceStaff->GetFirst(LAYER));
         fillLayer->MoveChildrenFrom(sourceLayer);
         assert(sourceLayer->GetChildCount() == 0);
         Object *parent = sourceStaff->GetParent();
@@ -1117,7 +1117,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
     else if (element->Is(SYLLABLE)) {
         Syllable *syllable = vrv_cast<Syllable *>(element);
         assert(syllable);
-        Syl *syl = dynamic_cast<Syl *>(syllable->GetFirst(SYL));
+        Syl *syl = vrv_cast<Syl *>(syllable->GetFirst(SYL));
         if (syl == NULL) {
             syl = new Syl();
             syllable->AddChild(syl);
@@ -1281,8 +1281,8 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
             staff->GetZone()->GetLry() + (newLrx - x) * tan(staff->GetZone()->GetRotate() * M_PI / 180.0));
     }
 
-    Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
-    Layer *splitLayer = dynamic_cast<Layer *>(splitStaff->GetFirst(LAYER));
+    Layer *layer = vrv_cast<Layer *>(staff->GetFirst(LAYER));
+    Layer *splitLayer = vrv_cast<Layer *>(splitStaff->GetFirst(LAYER));
 
     // Move any elements that should be on the second staff there.
     for (Object *child = layer->GetFirst(); child != NULL; child = layer->GetNext()) {

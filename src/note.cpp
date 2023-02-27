@@ -764,7 +764,7 @@ bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dot
     const Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
-    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
+    const Flag *flag = vrv_cast<const Flag *>(stem->GetFirst(FLAG));
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
@@ -1298,7 +1298,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!this->IsChordTone() && !this->IsTabGrpNote()) {
         if (!currentStem) {

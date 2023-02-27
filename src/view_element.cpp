@@ -1791,7 +1791,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
 
     const data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
     int y = stem->GetDrawingY() - stem->GetDrawingStemLen();
-    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
+    Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
     if (flag) {
         const char32_t glyph = flag->GetFlagGlyph(stemDir);
         if (glyph) {

@@ -632,7 +632,7 @@ bool ScoreDef::IsSectionRestart() const
     // In page-based structure, Section is a sibling to scoreDef
     // This has limitations: will not work with editorial markup, additional nested sections, and
     // if the section milestone is in the previous system.
-    const Section *section = dynamic_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    const Section *section = vrv_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 

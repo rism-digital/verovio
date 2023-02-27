@@ -1379,7 +1379,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
-                auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                auto accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
