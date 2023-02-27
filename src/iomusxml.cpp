@@ -1774,7 +1774,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         short int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
+        Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
         Clef *meiClef = ConvertClef(clef);
         if (meiClef) {
@@ -2914,7 +2914,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!isTablature && (nextIsChord || node.child("chord"))) {
             if (chord == NULL && m_elementStackMap.at(layer).size() > 0
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
-                chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
+                chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
             }
             if (!chord) {
                 LogError("MusicXML import: Chord starting point has not been found.");
@@ -3562,11 +3562,11 @@ void MusicXmlInput::ReadMusicXmlNote(
         int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
         if (breakSec) {
             if (element->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(element);
+                Note *note = vrv_cast<Note *>(element);
                 note->SetBreaksec(breakSec);
             }
             else if (element->Is(CHORD)) {
-                Chord *chord = dynamic_cast<Chord *>(element);
+                Chord *chord = vrv_cast<Chord *>(element);
                 chord->SetBreaksec(breakSec);
             }
             else if (element->Is(TABGRP)) {

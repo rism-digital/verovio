@@ -215,7 +215,7 @@ bool EditorToolkitCMN::Delete(std::string &elementId)
     if (!element) return false;
 
     if (element->Is(NOTE)) {
-        return this->DeleteNote(dynamic_cast<Note *>(element));
+        return this->DeleteNote(vrv_cast<Note *>(element));
     }
     return false;
 }

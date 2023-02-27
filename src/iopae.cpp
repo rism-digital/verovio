@@ -89,71 +89,71 @@ bool PAEOutput::Export(std::string &output)
 bool PAEOutput::WriteObject(Object *object)
 {
     if (object->Is(MDIV)) {
-        this->WriteMdiv(dynamic_cast<Mdiv *>(object));
+        this->WriteMdiv(vrv_cast<Mdiv *>(object));
     }
     if (object->Is(SCOREDEF)) {
-        this->WriteScoreDef(dynamic_cast<ScoreDef *>(object));
+        this->WriteScoreDef(vrv_cast<ScoreDef *>(object));
     }
     else if (object->Is(STAFFDEF)) {
-        this->WriteStaffDef(dynamic_cast<StaffDef *>(object));
+        this->WriteStaffDef(vrv_cast<StaffDef *>(object));
     }
     else if (object->Is(MEASURE)) {
-        this->WriteMeasure(dynamic_cast<Measure *>(object));
+        this->WriteMeasure(vrv_cast<Measure *>(object));
     }
     else if (object->Is(STAFF)) {
-        this->WriteStaff(dynamic_cast<Staff *>(object));
+        this->WriteStaff(vrv_cast<Staff *>(object));
     }
     else if (object->Is(LAYER)) {
-        this->WriteLayer(dynamic_cast<Layer *>(object));
+        this->WriteLayer(vrv_cast<Layer *>(object));
     }
 
     // Measure elements
 
     // Layer elements
     else if (object->Is(BARLINE)) {
-        this->WriteBarLine(dynamic_cast<BarLine *>(object));
+        this->WriteBarLine(vrv_cast<BarLine *>(object));
     }
     else if (object->Is(BEAM)) {
-        this->WriteBeam(dynamic_cast<Beam *>(object));
+        this->WriteBeam(vrv_cast<Beam *>(object));
     }
     else if (object->Is(CHORD)) {
-        this->WriteChord(dynamic_cast<Chord *>(object));
+        this->WriteChord(vrv_cast<Chord *>(object));
     }
     else if (object->Is(CLEF)) {
-        this->WriteClef(dynamic_cast<Clef *>(object));
+        this->WriteClef(vrv_cast<Clef *>(object));
     }
     else if (object->Is(GRACEGRP)) {
-        this->WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
+        this->WriteGraceGrp(vrv_cast<GraceGrp *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        this->WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
+        this->WriteKeyAccid(vrv_cast<KeyAccid *>(object));
     }
     else if (object->Is(KEYSIG)) {
-        this->WriteKeySig(dynamic_cast<KeySig *>(object));
+        this->WriteKeySig(vrv_cast<KeySig *>(object));
     }
     else if (object->Is(MENSUR)) {
-        this->WriteMensur(dynamic_cast<Mensur *>(object));
+        this->WriteMensur(vrv_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        this->WriteMeterSig(dynamic_cast<MeterSig *>(object));
+        this->WriteMeterSig(vrv_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
-        this->WriteMRest(dynamic_cast<MRest *>(object));
+        this->WriteMRest(vrv_cast<MRest *>(object));
     }
     else if (object->Is(MULTIREST)) {
-        this->WriteMultiRest(dynamic_cast<MultiRest *>(object));
+        this->WriteMultiRest(vrv_cast<MultiRest *>(object));
     }
     else if (object->Is(NOTE)) {
-        this->WriteNote(dynamic_cast<Note *>(object));
+        this->WriteNote(vrv_cast<Note *>(object));
     }
     else if (object->Is(REST)) {
-        this->WriteRest(dynamic_cast<Rest *>(object));
+        this->WriteRest(vrv_cast<Rest *>(object));
     }
     else if (object->Is(SPACE)) {
-        this->WriteSpace(dynamic_cast<Space *>(object));
+        this->WriteSpace(vrv_cast<Space *>(object));
     }
     else if (object->Is(TUPLET)) {
-        this->WriteTuplet(dynamic_cast<Tuplet *>(object));
+        this->WriteTuplet(vrv_cast<Tuplet *>(object));
     }
     else {
         // Log something?
@@ -165,13 +165,13 @@ bool PAEOutput::WriteObject(Object *object)
 bool PAEOutput::WriteObjectEnd(Object *object)
 {
     if (object->Is(MEASURE)) {
-        this->WriteMeasureEnd(dynamic_cast<Measure *>(object));
+        this->WriteMeasureEnd(vrv_cast<Measure *>(object));
     }
     else if (object->Is(BEAM)) {
-        this->WriteBeamEnd(dynamic_cast<Beam *>(object));
+        this->WriteBeamEnd(vrv_cast<Beam *>(object));
     }
     else if (object->Is(TUPLET)) {
-        this->WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+        this->WriteTupletEnd(vrv_cast<Tuplet *>(object));
     }
 
     return true;
@@ -2034,7 +2034,7 @@ void PAEInput::parseNote(pae::Note *note)
 
     // note in a chord
     if (note->chord && element->Is(NOTE)) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {

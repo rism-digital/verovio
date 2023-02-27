@@ -1611,7 +1611,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     for (Object *current : parent->GetChildren()) {
         if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
-            this->DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
+            this->DrawMeasure(dc, vrv_cast<Measure *>(current), system);
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is(SCOREDEF)) {
@@ -1659,7 +1659,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     for (Object *current : parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
-            this->DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
+            this->DrawStaff(dc, vrv_cast<Staff *>(current), measure, system);
         }
         else if (current->IsControlElement()) {
             // cast to ControlElement check in DrawControlElement
@@ -1686,7 +1686,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
     for (Object *current : parent->GetChildren()) {
         if (current->Is(LAYER)) {
             // cast to Layer check in DrawLayer
-            this->DrawLayer(dc, dynamic_cast<Layer *>(current), staff, measure);
+            this->DrawLayer(dc, vrv_cast<Layer *>(current), staff, measure);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawStaffEditorialElement

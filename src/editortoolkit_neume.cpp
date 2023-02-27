@@ -513,7 +513,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
     }
     else if (element->Is(STAFF)) {
-        Staff *staff = dynamic_cast<Staff *>(element);
+        Staff *staff = vrv_cast<Staff *>(element);
         if (!staff->HasFacs()) {
             LogError("Staff dragging is only supported for staves with facsimiles!");
             m_infoObject.import("status", "FAILURE");

@@ -250,7 +250,7 @@ bool Doc::GenerateMeasureNumbers()
 
     // run through all measures and generate missing mNum from attribute
     for (Object *object : measures) {
-        Measure *measure = dynamic_cast<Measure *>(object);
+        Measure *measure = vrv_cast<Measure *>(object);
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;
