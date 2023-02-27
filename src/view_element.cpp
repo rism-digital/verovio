@@ -1717,7 +1717,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Verse *verse = vrv_cast<Verse *>(element);
     assert(verse);
 
-    Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
+    Label *label = vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
 
     if (label || labelAbbr) {

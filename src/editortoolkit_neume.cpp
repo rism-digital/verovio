@@ -630,7 +630,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             assert(parent);
             newStaff = new Staff(1);
             newStaff->m_drawingStaffDef
-                = dynamic_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(STAFFDEF));
+                = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -693,7 +693,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         std::string contour = "";
         nc->AttachZone(zone);
 
-        Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
+        Surface *surface = vrv_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         surface->AddChild(zone);
         zone->SetUlx(ulx);
 
@@ -1133,7 +1133,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
                     zone->SetUly(uly);
                     zone->SetLrx(lrx);
                     zone->SetLry(lry);
-                    Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
+                    Surface *surface = vrv_cast<Surface *>(m_doc->GetFacsimile()->FindDescendantByType(SURFACE));
                     surface->AddChild(zone);
                     syl->AttachZone(zone);
                 }
@@ -1795,12 +1795,12 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             // construct concatenated string of all the syls
             std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
+                Syl *syl = vrv_cast<Syl *>((*it)->FindDescendantByType(SYL));
                 if (syl == NULL) continue;
                 if (fullSyl == NULL) {
                     fullSyl = syl;
                 }
-                Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
+                Text *text = vrv_cast<Text *>(syl->FindDescendantByType(TEXT));
                 if (text != NULL) {
                     std::u32string currentString = text->GetText();
                     fullString = fullString + currentString;

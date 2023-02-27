@@ -517,8 +517,7 @@ bool Alignment::HasTimestampOnly() const
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef
-        = dynamic_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef = vrv_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);

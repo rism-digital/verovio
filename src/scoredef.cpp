@@ -582,42 +582,42 @@ void ScoreDef::SetDrawingLabelsWidth(int width)
 
 PgFoot *ScoreDef::GetPgFoot()
 {
-    return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 const PgFoot *ScoreDef::GetPgFoot() const
 {
-    return dynamic_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 PgFoot2 *ScoreDef::GetPgFoot2()
 {
-    return dynamic_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 const PgFoot2 *ScoreDef::GetPgFoot2() const
 {
-    return dynamic_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 PgHead *ScoreDef::GetPgHead()
 {
-    return dynamic_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 const PgHead *ScoreDef::GetPgHead() const
 {
-    return dynamic_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 PgHead2 *ScoreDef::GetPgHead2()
 {
-    return dynamic_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 const PgHead2 *ScoreDef::GetPgHead2() const
 {
-    return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 int ScoreDef::GetMaxStaffSize() const

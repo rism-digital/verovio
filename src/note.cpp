@@ -201,12 +201,12 @@ void Note::AlignDotsShift(const Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
 const Accid *Note::GetDrawingAccid() const
 {
-    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
 }
 
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
@@ -1295,7 +1295,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
+    Stem *currentStem = vrv_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
@@ -1344,7 +1344,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (chord && (chord->GetDots() == this->GetDots())) {

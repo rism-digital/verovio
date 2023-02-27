@@ -2274,7 +2274,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossLayer = NULL;
 
     AttNIntegerComparison comparisonFirst(STAFF, crossElement->GetStaff().at(0));
-    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
+    m_crossStaff = vrv_cast<Staff *>(params->m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", crossElement->GetStaff().at(0),
             this->GetID().c_str());
@@ -2298,10 +2298,10 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
     bool direction = (parentStaff->GetN() < m_crossStaff->GetN()) ? FORWARD : BACKWARD;
-    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
+    m_crossLayer = vrv_cast<Layer *>(m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         // Just try to pick the first one... (i.e., last one when crossing above)
-        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
+        m_crossLayer = vrv_cast<Layer *>(m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
     }
     if (!m_crossLayer) {
         // Nothing we can do

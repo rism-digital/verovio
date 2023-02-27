@@ -151,7 +151,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
 
     for (int staffN : staffList) {
         AttNIntegerComparison comparison(STAFF, staffN);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;

@@ -488,7 +488,7 @@ Layer *MusicXmlInput::SelectLayer(short int layerNum, Staff *staff)
     }
     else {
         AttNIntegerComparison comparisonLayer(LAYER, layerNum);
-        layer = dynamic_cast<Layer *>(staff->FindDescendantByComparison(&comparisonLayer, 1));
+        layer = vrv_cast<Layer *>(staff->FindDescendantByComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
     // else add it
@@ -1088,7 +1088,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
+            measure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning("MusicXML import: Element '%s' could not be added to measure %s",
@@ -1309,7 +1309,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
         for (int i = 0; i < nbStaves; ++i) {
             // Find or create the staffDef
             AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&comparisonStaffDef, 1));
+            StaffDef *staffDef = vrv_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);

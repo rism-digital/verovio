@@ -171,7 +171,7 @@ bool Doc::IsSupportedChild(Object *child)
 
 bool Doc::GenerateDocumentScoreDef()
 {
-    Measure *measure = dynamic_cast<Measure *>(this->FindDescendantByType(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE));
     if (!measure) {
         LogError("No measure found for generating a scoreDef");
         return false;
@@ -378,11 +378,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
-            InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
+            InstrDef *instrdef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
             if (!instrdef) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
-                instrdef = dynamic_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
+                instrdef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
             }
             if (instrdef) {
                 if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
@@ -1502,12 +1502,12 @@ std::list<Score *> Doc::GetScores()
 
 Pages *Doc::GetPages()
 {
-    return dynamic_cast<Pages *>(this->FindDescendantByType(PAGES));
+    return vrv_cast<Pages *>(this->FindDescendantByType(PAGES));
 }
 
 const Pages *Doc::GetPages() const
 {
-    return dynamic_cast<const Pages *>(this->FindDescendantByType(PAGES));
+    return vrv_cast<const Pages *>(this->FindDescendantByType(PAGES));
 }
 
 int Doc::GetPageCount() const
@@ -2129,7 +2129,7 @@ int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    Measure *lastMeasure = dynamic_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    Measure *lastMeasure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     if (!lastMeasure) {
         return FUNCTOR_CONTINUE;
     }

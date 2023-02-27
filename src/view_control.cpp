@@ -225,7 +225,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = start->GetDrawingX();
         objectX = start;
@@ -236,7 +236,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // We are in the system of the last note - draw the element from the beginning of the system
     else if (system == parentSystem2) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
@@ -248,13 +248,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     // throughout the system => recheck that the systems are in correct order
     else if (Object::IsPreOrdered(parentSystem1, system) && Object::IsPreOrdered(system, parentSystem2)) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        Measure *last = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
@@ -1213,7 +1213,7 @@ void View::DrawSylConnector(
             assert(measure);
             System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
             assert(system);
-            if (measure == dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE))) {
+            if (measure == vrv_cast<Measure *>(system->FindDescendantByType(MEASURE))) {
                 return;
             }
         }
@@ -2360,7 +2360,7 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
             && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
     if ((system->GetFirst(MEASURE) == measure) && adjustPosition) {
         // StaffDef information is always in the first layer
-        Layer *layer = dynamic_cast<Layer *>(measure->FindDescendantByType(LAYER));
+        Layer *layer = vrv_cast<Layer *>(measure->FindDescendantByType(LAYER));
         assert(layer);
         if (!system->IsFirstOfMdiv()) {
             if (Clef *clef = layer->GetStaffDefClef(); clef) {
@@ -2739,7 +2739,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
         objectX = measure;
@@ -2752,7 +2752,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // We are in the system where the ending ends - draw it from the beginning of the system
     else if (system == parentSystem2) {
         // We need the last measure of the system for x2
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
@@ -2764,13 +2764,13 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
         endingMeasure = measure;
         // We need the last measure of the system for x2
-        measure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;

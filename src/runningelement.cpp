@@ -312,10 +312,10 @@ void RunningElement::SetCurrentPageNum(const Page *currentPage)
 
     int currentNum = currentPage->GetIdx() + 1;
 
-    Num *num = dynamic_cast<Num *>(this->FindDescendantByType(NUM));
+    Num *num = vrv_cast<Num *>(this->FindDescendantByType(NUM));
     if (!num || (num->GetLabel() != "page")) return;
 
-    Text *text = dynamic_cast<Text *>(num->FindDescendantByType(TEXT));
+    Text *text = vrv_cast<Text *>(num->FindDescendantByType(TEXT));
     if (!text || (text->GetText() != U"#")) return;
 
     Text *currentText = num->GetCurrentText();

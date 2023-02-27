@@ -441,7 +441,7 @@ void PAEOutput::WriteNote(Note *note)
         this->WriteGrace(note);
     }
 
-    Accid *noteAccid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
+    Accid *noteAccid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
     if (noteAccid) {
         std::string accid;
         switch (noteAccid->GetAccid()) {
@@ -458,7 +458,7 @@ void PAEOutput::WriteNote(Note *note)
 
     PointingToComparison pointingToComparisonFermata(FERMATA, note);
     Fermata *fermata
-        = dynamic_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
     if (fermata) m_streamStringOutput << "(";
 
     std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
@@ -468,11 +468,11 @@ void PAEOutput::WriteNote(Note *note)
     if (fermata) m_streamStringOutput << ")";
 
     PointingToComparison pointingToComparisonTrill(TRILL, note);
-    Trill *trill = dynamic_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
+    Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
     if (trill) m_streamStringOutput << "t";
 
     PointingToComparison pointingToComparisonTie(TIE, note);
-    Tie *tie = dynamic_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
+    Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
     if (tie) m_streamStringOutput << "+";
 }
 

@@ -349,7 +349,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
 
     dc->StartGraphic(fig, "", fig->GetID());
 
-    Svg *svg = dynamic_cast<Svg *>(fig->FindDescendantByType(SVG));
+    Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
