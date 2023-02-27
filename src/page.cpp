@@ -109,7 +109,7 @@ const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
@@ -135,7 +135,7 @@ const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }

@@ -203,8 +203,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     }
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstAncestor(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstAncestor(SYSTEM));
+    System *parentSystem1 = vrv_cast<System *>(start->GetFirstAncestor(SYSTEM));
+    System *parentSystem2 = vrv_cast<System *>(end->GetFirstAncestor(SYSTEM));
 
     int x1, x2;
     Object *objectX = NULL;
@@ -2713,8 +2713,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if (!ending->GetMeasure() || !endingEndMilestone->GetMeasure()) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstAncestor(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(endingEndMilestone->GetFirstAncestor(SYSTEM));
+    System *parentSystem1 = vrv_cast<System *>(ending->GetFirstAncestor(SYSTEM));
+    System *parentSystem2 = vrv_cast<System *>(endingEndMilestone->GetFirstAncestor(SYSTEM));
 
     assert(parentSystem1 && parentSystem2);
     // in non debug mode

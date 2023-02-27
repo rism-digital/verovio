@@ -242,7 +242,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     assert(element);
 
     if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+        Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) {
             LogError("Element does not have Layer parent. This should not happen.");
             m_infoObject.import("status", "FAILURE");
@@ -253,8 +253,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
-        Syllable *syllable = ((element->Is(SYLLABLE)) ? (dynamic_cast<Syllable *>(element))
-                                                      : dynamic_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
+        Syllable *syllable = ((element->Is(SYLLABLE)) ? (vrv_cast<Syllable *>(element))
+                                                      : vrv_cast<Syllable *>(element->GetFirstAncestor(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
@@ -267,7 +267,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             if (element->Is(NC)) {
                 Nc *nc = dynamic_cast<Nc *>(element);
                 if (nc->GetLigated() == BOOLEAN_true) {
-                    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstAncestor(NEUME));
+                    Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
                     Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
                     if (nextNc != NULL && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone()) {
                         ignoreFacs = true;
@@ -306,7 +306,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     else if (element->Is(CLEF)) {
         Clef *clef = vrv_cast<Clef *>(element);
         assert(clef);
-        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
+        Layer *layer = vrv_cast<Layer *>(clef->GetFirstAncestor(LAYER));
         if (!layer) return false;
 
         Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
@@ -561,7 +561,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         m_infoObject.import("message", "Unsupported element for dragging.");
         return false;
     }
-    Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+    Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
     m_infoObject.import("status", status);
     m_infoObject.import("message", message);
@@ -1361,7 +1361,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
 
         if (previousClef == NULL) {
             // if there is no previous clef, get the default one from the staff def
-            Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
+            Layer *layer = vrv_cast<Layer *>(clef->GetFirstAncestor(LAYER));
             previousClef = layer->GetCurrentClef();
         }
 
@@ -1652,7 +1652,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
             Clef *tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
             if (tempClef == NULL) {
-                Layer *layer = dynamic_cast<Layer *>((*it)->GetFirstAncestor(LAYER));
+                Layer *layer = vrv_cast<Layer *>((*it)->GetFirstAncestor(LAYER));
                 tempClef = layer->GetCurrentClef();
             }
             clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), tempClef));
@@ -2398,7 +2398,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    Layer *parent = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+    Layer *parent = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     Staff *sParent = vrv_cast<Staff *>(parent->GetFirstAncestor(STAFF));
     assert(parent);
     if (parent == NULL || sParent == NULL) {

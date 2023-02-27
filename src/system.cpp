@@ -655,7 +655,7 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     Alignment *left = objectX->GetAlignment();
-    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
+    Measure *objectXMeasure = vrv_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
     if (objectXMeasure != params->m_lastMeasure) {
         left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
     }

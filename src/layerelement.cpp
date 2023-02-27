@@ -194,10 +194,10 @@ bool LayerElement::IsGraceNote() const
     // For accid, artic, etc.. look at the parent note / chord
     else {
         // For an accid we expect to be the child of a note - the note will lookup at the chord parent in necessary
-        const Note *note = dynamic_cast<const Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+        const Note *note = vrv_cast<const Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) return note->IsGraceNote();
         // For an artic we can be direct child of a chord
-        const Chord *chord = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
+        const Chord *chord = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
         if (chord) return chord->IsGraceNote();
     }
     return false;
@@ -1196,11 +1196,11 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 
     AlignmentType type = ALIGNMENT_DEFAULT;
 
-    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
-    Ligature *ligatureParent = dynamic_cast<Ligature *>(this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
-    Note *noteParent = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
-    Rest *restParent = dynamic_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
-    TabGrp *tabGrpParent = dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    Chord *chordParent = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    Ligature *ligatureParent = vrv_cast<Ligature *>(this->GetFirstAncestor(LIGATURE, MAX_LIGATURE_DEPTH));
+    Note *noteParent = vrv_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
+    Rest *restParent = vrv_cast<Rest *>(this->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
+    TabGrp *tabGrpParent = vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = params->m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
 
     if (chordParent) {
@@ -1413,7 +1413,7 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
     if (this->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(this);
         assert(accid);
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE));
+        Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
         // We should probably also avoid to add editorial accidentals to the accid space
         // However, since they are placed above by View::DrawNote it works without avoiding it
         if (note) {
@@ -1535,7 +1535,7 @@ int LayerElement::CalcAlignmentPitchPos(FunctorParams *functorParams)
             if ((rest->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
 
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
-            Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
+            Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM, 1));
             if (beam) {
                 beam->ResetList(beam);
 
@@ -2230,16 +2230,16 @@ int LayerElement::PrepareCueSize(FunctorParams *functorParams)
         if (accid->GetFunc() == accidLog_FUNC_edit)
             m_drawingCueSize = true;
         else {
-            Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+            Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
             if (note) m_drawingCueSize = note->GetDrawingCueSize();
         }
     }
     else if (this->Is({ ARTIC, DOTS, FLAG, STEM })) {
-        Note *note = dynamic_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
+        Note *note = vrv_cast<Note *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
         if (note)
             m_drawingCueSize = note->GetDrawingCueSize();
         else {
-            Chord *chord = dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+            Chord *chord = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
             if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
         }
     }

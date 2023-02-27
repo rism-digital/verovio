@@ -146,7 +146,7 @@ int RunningElement::GetWidth() const
 {
     if (!m_drawingPage) return 0;
 
-    Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
     if (!doc) return 0;
 
     return (doc->m_drawingPageContentWidth);

@@ -1340,7 +1340,7 @@ int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
             TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
             assert(interface);
             if (interface->GetEnd()) {
-                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
+                endParent = vrv_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
             }
         }
         if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
@@ -1350,7 +1350,7 @@ int Measure::PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
                 // We should have one because we allow only control Event (dir and dynam) to be linked as target
                 TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
                 assert(nextInterface);
-                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
+                endParent = vrv_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
             }
         }
         assert(endParent);
@@ -1459,7 +1459,7 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
     std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
     while (iter != params->m_hairpins.end()) {
         assert((*iter)->GetEnd());
-        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
+        Measure *measureEnd = vrv_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
         if (measureEnd == this) {
             iter = params->m_hairpins.erase(iter);
         }

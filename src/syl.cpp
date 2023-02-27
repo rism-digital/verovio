@@ -146,15 +146,15 @@ int Syl::PrepareLyrics(FunctorParams *functorParams)
     PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
-    Verse *verse = dynamic_cast<Verse *>(this->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
+    Verse *verse = vrv_cast<Verse *>(this->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
     if (verse) {
         m_drawingVerse = std::max(verse->GetN(), 1);
     }
 
-    this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
+    this->SetStart(vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
     // If there isn't an ancestor note, it should be a chord
     if (!this->GetStart()) {
-        this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
+        this->SetStart(vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
     }
 
     // At this stage currentSyl is actually the previous one that is ending here
@@ -230,7 +230,7 @@ bool Syl::CreateDefaultZone(Doc *doc)
     const int offsetLrx = 100;
     const int offsetLry = 200;
 
-    LayerElement *syllable = dynamic_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
+    LayerElement *syllable = vrv_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
     if (syllable == NULL) { // Only do this for neume notation
         return false;
     }

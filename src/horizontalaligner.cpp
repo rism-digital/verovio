@@ -557,8 +557,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         }
         // Non cross staff normal case
         else {
-            layerRef = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
-            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
+            layerRef = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+            if (layerRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
             if (staffRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();

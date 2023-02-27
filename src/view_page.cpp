@@ -412,7 +412,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
 
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
 
         if (!staff || !scoreDef) {
             LogDebug("Staff or ScoreDef missing in View::DrawStaffDefLabels");
@@ -893,7 +893,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
     if (eraseIntersections && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-        System *system = dynamic_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
+        System *system = vrv_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
         if (system) {
             int minX = x - barLineWidth / 2;
             int maxX = x + barLineWidth / 2;
