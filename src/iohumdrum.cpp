@@ -13567,7 +13567,7 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
         for (int i = 0; i < (int)m_signifiers.mens_mark.size(); ++i) {
             if (subtoken.find(m_signifiers.mens_mark[i]) != std::string::npos) {
                 note->SetColor(m_signifiers.mens_mcolor[i]);
-                appendTypeTag(note, "marked");
+                appendTypeTag(note, "color-marked");
                 if (!m_signifiers.mens_markdir[i].empty()) {
                     bool bold = true;
                     bool italic = false;
@@ -13586,7 +13586,7 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
         for (int i = 0; i < (int)m_signifiers.mark.size(); ++i) {
             if (subtoken.find(m_signifiers.mark[i]) != std::string::npos) {
                 markcolors.push_back(m_signifiers.mcolor[i]);
-                appendTypeTag(note, "marked");
+                appendTypeTag(note, "color-marked");
                 if (!m_signifiers.markdir[i].empty()) {
                     bool bold = true;
                     bool italic = false;
