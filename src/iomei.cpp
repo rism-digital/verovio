@@ -2412,13 +2412,13 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(clef)) {
-        ExtAttCleffingLog cleffingLog;
+        InstCleffingLog cleffingLog;
         cleffingLog.SetClefShape(clef->GetShape());
         cleffingLog.SetClefLine(clef->GetLine());
         cleffingLog.SetClefDis(clef->GetDis());
         cleffingLog.SetClefDisPlace(clef->GetDisPlace());
         cleffingLog.WriteCleffingLog(currentNode);
-        ExtAttCleffingVis cleffingVis;
+        InstCleffingVis cleffingVis;
         cleffingVis.SetClefColor(clef->GetColor());
         cleffingVis.SetClefVisible(clef->GetVisible());
         cleffingVis.WriteCleffingVis(currentNode);
@@ -2505,18 +2505,18 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(keySig)) {
-        ExtAttKeySigDefaultAnl attKeySigDefaultAnl;
+        InstKeySigDefaultAnl attKeySigDefaultAnl;
         // Broken in MEI 4.0.2 - waiting for a fix
         // attKeySigDefaultAnl.SetKeyAccid(keySig->GetAccid());
         attKeySigDefaultAnl.SetKeyMode(keySig->GetMode());
         attKeySigDefaultAnl.SetKeyPname(keySig->GetPname());
         attKeySigDefaultAnl.WriteKeySigDefaultAnl(currentNode);
-        ExtAttKeySigDefaultLog attKeySigDefaultLog;
+        InstKeySigDefaultLog attKeySigDefaultLog;
         // If there is no @sig, try to build it from the keyAccid children.
         const data_KEYSIGNATURE sig = (keySig->HasSig()) ? keySig->GetSig() : keySig->ConvertToSig();
         attKeySigDefaultLog.SetKeySig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
-        ExtAttKeySigDefaultVis attKeySigDefaultVis;
+        InstKeySigDefaultVis attKeySigDefaultVis;
         attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
         attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
         attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
@@ -2545,18 +2545,18 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     assert(mensur);
 
     if (!this->IsTreeObject(mensur)) {
-        ExtAttMensuralLog mensuralLog;
+        InstMensuralLog mensuralLog;
 
         mensuralLog.SetProportNum(mensur->GetNum());
         mensuralLog.SetProportNumbase(mensur->GetNumbase());
         mensuralLog.WriteMensuralLog(currentNode);
-        ExtAttMensuralShared mensuralShared;
+        InstMensuralShared mensuralShared;
         mensuralShared.SetModusmaior(mensur->GetModusmaior());
         mensuralShared.SetModusminor(mensur->GetModusminor());
         mensuralShared.SetProlatio(mensur->GetProlatio());
         mensuralShared.SetTempus(mensur->GetTempus());
         mensuralShared.WriteMensuralShared(currentNode);
-        ExtAttMensuralVis mensuralVis;
+        InstMensuralVis mensuralVis;
         mensuralVis.SetMensurDot(mensur->GetDot());
         mensuralVis.SetMensurColor(mensur->GetColor());
         mensuralVis.SetMensurOrient(mensur->GetOrient());
@@ -2582,12 +2582,12 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(meterSig)) {
-        ExtAttMeterSigDefaultLog meterSigDefaultLog;
+        InstMeterSigDefaultLog meterSigDefaultLog;
         meterSigDefaultLog.SetMeterCount(meterSig->GetCount());
         meterSigDefaultLog.SetMeterSym(meterSig->GetSym());
         meterSigDefaultLog.SetMeterUnit(meterSig->GetUnit());
         meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
-        ExtAttMeterSigDefaultVis meterSigDefaultVis;
+        InstMeterSigDefaultVis meterSigDefaultVis;
         meterSigDefaultVis.SetMeterForm(meterSig->GetForm());
         meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
         return;
@@ -4218,6 +4218,9 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
             success = this->ReadMdiv(parent, current, makeVisible);
         }
         else if (std::string(current.name()) == "score") {
+            // Possibly skip content on load
+            if (!isVisible && m_doc->GetOptions()->m_loadSelectedMdivOnly.GetValue()) continue;
+            // Read only the first score
             success = this->ReadScore(parent, current);
             if (parentNode.last_child() != current) {
                 LogWarning("Skipping nodes after <score> element");
@@ -4590,9 +4593,9 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     object->ReadSystems(element);
     object->ReadTyped(element);
 
-    ExtAttCleffingLog cleffingLog;
+    InstCleffingLog cleffingLog;
     cleffingLog.ReadCleffingLog(element);
-    ExtAttCleffingVis cleffingVis;
+    InstCleffingVis cleffingVis;
     cleffingVis.ReadCleffingVis(element);
     if (cleffingLog.HasClefShape()) {
         Clef *vrvClef = new Clef();
@@ -4606,11 +4609,11 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvClef);
     }
 
-    ExtAttKeySigDefaultAnl keySigDefaultAnl;
+    InstKeySigDefaultAnl keySigDefaultAnl;
     keySigDefaultAnl.ReadKeySigDefaultAnl(element);
-    ExtAttKeySigDefaultLog keySigDefaultLog;
+    InstKeySigDefaultLog keySigDefaultLog;
     keySigDefaultLog.ReadKeySigDefaultLog(element);
-    ExtAttKeySigDefaultVis keySigDefaultVis;
+    InstKeySigDefaultVis keySigDefaultVis;
     keySigDefaultVis.ReadKeySigDefaultVis(element);
     if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
         || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigShow() || keySigDefaultVis.HasKeysigShowchange()) {
@@ -4626,11 +4629,11 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvKeySig);
     }
 
-    ExtAttMensuralLog mensuralLog;
+    InstMensuralLog mensuralLog;
     mensuralLog.ReadMensuralLog(element);
-    ExtAttMensuralShared mensuralShared;
+    InstMensuralShared mensuralShared;
     mensuralShared.ReadMensuralShared(element);
-    ExtAttMensuralVis mensuralVis;
+    InstMensuralVis mensuralVis;
     mensuralVis.ReadMensuralVis(element);
     if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum()
         || mensuralLog.HasProportNumbase() || mensuralVis.HasMensurSign()) {
@@ -4658,9 +4661,9 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvMensur);
     }
 
-    ExtAttMeterSigDefaultLog meterSigDefaultLog;
+    InstMeterSigDefaultLog meterSigDefaultLog;
     meterSigDefaultLog.ReadMeterSigDefaultLog(element);
-    ExtAttMeterSigDefaultVis meterSigDefaultVis;
+    InstMeterSigDefaultVis meterSigDefaultVis;
     meterSigDefaultVis.ReadMeterSigDefaultVis(element);
     if (meterSigDefaultLog.HasMeterCount() || meterSigDefaultLog.HasMeterSym() || meterSigDefaultLog.HasMeterUnit()) {
         MeterSig *vrvMeterSig = new MeterSig();
@@ -4796,7 +4799,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
     vrvStaffGrp->ReadNNumberLike(staffGrp);
-    ExtAttStaffGroupingSym groupingSym;
+    InstStaffGroupingSym groupingSym;
     groupingSym.ReadStaffGroupingSym(staffGrp);
     if (groupingSym.HasSymbol()) {
         GrpSym *vrvGrpSym = new GrpSym();
@@ -6285,7 +6288,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadTiePresent(chord);
     vrvChord->ReadVisibility(chord);
 
-    ExtAttArticulation artic;
+    InstArticulation artic;
     artic.ReadArticulation(chord);
     if (artic.HasArtic()) {
         Artic *vrvArtic = new Artic();
@@ -6325,9 +6328,9 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
 void MEIInput::ReadAccidAttr(pugi::xml_node node, Object *object)
 {
-    ExtAttAccidental accidental;
+    InstAccidental accidental;
     accidental.ReadAccidental(node);
-    ExtAttAccidentalGes accidentalGestural;
+    InstAccidentalGes accidentalGestural;
     accidentalGestural.ReadAccidentalGes(node);
     if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
         Accid *vrvAccid = new Accid();
@@ -6658,7 +6661,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadTiePresent(note);
     vrvNote->ReadVisibility(note);
 
-    ExtAttArticulation artic;
+    InstArticulation artic;
     artic.ReadArticulation(note);
     if (artic.HasArtic()) {
         Artic *vrvArtic = new Artic();

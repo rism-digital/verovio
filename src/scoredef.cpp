@@ -889,7 +889,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     // set MIDI time signature
     if (this->HasMeterSigInfo()) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(this->GetMeterSig());
-        if (meterSig && meterSig->HasCount()) {
+        if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             params->m_midiFile->addTimeSignature(
                 params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }

@@ -61,17 +61,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHarmAnl
+// InstHarmAnl
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHarmAnl
  */
 
-class ExtAttHarmAnl : public AttHarmAnl {
+class InstHarmAnl : public AttHarmAnl {
 public:
-    ExtAttHarmAnl() = default;
-    virtual ~ExtAttHarmAnl() = default;
+    InstHarmAnl() = default;
+    virtual ~InstHarmAnl() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -116,17 +116,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHarmonicFunction
+// InstHarmonicFunction
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHarmonicFunction
  */
 
-class ExtAttHarmonicFunction : public AttHarmonicFunction {
+class InstHarmonicFunction : public AttHarmonicFunction {
 public:
-    ExtAttHarmonicFunction() = default;
-    virtual ~ExtAttHarmonicFunction() = default;
+    InstHarmonicFunction() = default;
+    virtual ~InstHarmonicFunction() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -165,17 +165,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttIntervalHarmonic
+// InstIntervalHarmonic
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttIntervalHarmonic
  */
 
-class ExtAttIntervalHarmonic : public AttIntervalHarmonic {
+class InstIntervalHarmonic : public AttIntervalHarmonic {
 public:
-    ExtAttIntervalHarmonic() = default;
-    virtual ~ExtAttIntervalHarmonic() = default;
+    InstIntervalHarmonic() = default;
+    virtual ~InstIntervalHarmonic() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -219,17 +219,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttIntervalMelodic
+// InstIntervalMelodic
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttIntervalMelodic
  */
 
-class ExtAttIntervalMelodic : public AttIntervalMelodic {
+class InstIntervalMelodic : public AttIntervalMelodic {
 public:
-    ExtAttIntervalMelodic() = default;
-    virtual ~ExtAttIntervalMelodic() = default;
+    InstIntervalMelodic() = default;
+    virtual ~InstIntervalMelodic() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -268,17 +268,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttKeySigAnl
+// InstKeySigAnl
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttKeySigAnl
  */
 
-class ExtAttKeySigAnl : public AttKeySigAnl {
+class InstKeySigAnl : public AttKeySigAnl {
 public:
-    ExtAttKeySigAnl() = default;
-    virtual ~ExtAttKeySigAnl() = default;
+    InstKeySigAnl() = default;
+    virtual ~InstKeySigAnl() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -332,17 +332,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttKeySigDefaultAnl
+// InstKeySigDefaultAnl
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttKeySigDefaultAnl
  */
 
-class ExtAttKeySigDefaultAnl : public AttKeySigDefaultAnl {
+class InstKeySigDefaultAnl : public AttKeySigDefaultAnl {
 public:
-    ExtAttKeySigDefaultAnl() = default;
-    virtual ~ExtAttKeySigDefaultAnl() = default;
+    InstKeySigDefaultAnl() = default;
+    virtual ~InstKeySigDefaultAnl() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -381,17 +381,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMelodicFunction
+// InstMelodicFunction
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMelodicFunction
  */
 
-class ExtAttMelodicFunction : public AttMelodicFunction {
+class InstMelodicFunction : public AttMelodicFunction {
 public:
-    ExtAttMelodicFunction() = default;
-    virtual ~ExtAttMelodicFunction() = default;
+    InstMelodicFunction() = default;
+    virtual ~InstMelodicFunction() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -430,17 +430,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPitchClass
+// InstPitchClass
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPitchClass
  */
 
-class ExtAttPitchClass : public AttPitchClass {
+class InstPitchClass : public AttPitchClass {
 public:
-    ExtAttPitchClass() = default;
-    virtual ~ExtAttPitchClass() = default;
+    InstPitchClass() = default;
+    virtual ~InstPitchClass() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -482,17 +482,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSolfa
+// InstSolfa
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSolfa
  */
 
-class ExtAttSolfa : public AttSolfa {
+class InstSolfa : public AttSolfa {
 public:
-    ExtAttSolfa() = default;
-    virtual ~ExtAttSolfa() = default;
+    InstSolfa() = default;
+    virtual ~InstSolfa() = default;
 };
 
 } // namespace vrv

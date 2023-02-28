@@ -73,17 +73,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNotationType
+// InstNotationType
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNotationType
  */
 
-class ExtAttNotationType : public AttNotationType {
+class InstNotationType : public AttNotationType {
 public:
-    ExtAttNotationType() = default;
-    virtual ~ExtAttNotationType() = default;
+    InstNotationType() = default;
+    virtual ~InstNotationType() = default;
 };
 
 } // namespace vrv

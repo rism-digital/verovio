@@ -79,17 +79,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttChannelized
+// InstChannelized
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttChannelized
  */
 
-class ExtAttChannelized : public AttChannelized {
+class InstChannelized : public AttChannelized {
 public:
-    ExtAttChannelized() = default;
-    virtual ~ExtAttChannelized() = default;
+    InstChannelized() = default;
+    virtual ~InstChannelized() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -131,17 +131,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttInstrumentIdent
+// InstInstrumentIdent
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttInstrumentIdent
  */
 
-class ExtAttInstrumentIdent : public AttInstrumentIdent {
+class InstInstrumentIdent : public AttInstrumentIdent {
 public:
-    ExtAttInstrumentIdent() = default;
-    virtual ~ExtAttInstrumentIdent() = default;
+    InstInstrumentIdent() = default;
+    virtual ~InstInstrumentIdent() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -219,17 +219,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMidiInstrument
+// InstMidiInstrument
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMidiInstrument
  */
 
-class ExtAttMidiInstrument : public AttMidiInstrument {
+class InstMidiInstrument : public AttMidiInstrument {
 public:
-    ExtAttMidiInstrument() = default;
-    virtual ~ExtAttMidiInstrument() = default;
+    InstMidiInstrument() = default;
+    virtual ~InstMidiInstrument() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -268,17 +268,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMidiNumber
+// InstMidiNumber
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMidiNumber
  */
 
-class ExtAttMidiNumber : public AttMidiNumber {
+class InstMidiNumber : public AttMidiNumber {
 public:
-    ExtAttMidiNumber() = default;
-    virtual ~ExtAttMidiNumber() = default;
+    InstMidiNumber() = default;
+    virtual ~InstMidiNumber() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -332,17 +332,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMidiTempo
+// InstMidiTempo
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMidiTempo
  */
 
-class ExtAttMidiTempo : public AttMidiTempo {
+class InstMidiTempo : public AttMidiTempo {
 public:
-    ExtAttMidiTempo() = default;
-    virtual ~ExtAttMidiTempo() = default;
+    InstMidiTempo() = default;
+    virtual ~InstMidiTempo() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -381,17 +381,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMidiValue
+// InstMidiValue
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMidiValue
  */
 
-class ExtAttMidiValue : public AttMidiValue {
+class InstMidiValue : public AttMidiValue {
 public:
-    ExtAttMidiValue() = default;
-    virtual ~ExtAttMidiValue() = default;
+    InstMidiValue() = default;
+    virtual ~InstMidiValue() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -430,17 +430,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMidiValue2
+// InstMidiValue2
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMidiValue2
  */
 
-class ExtAttMidiValue2 : public AttMidiValue2 {
+class InstMidiValue2 : public AttMidiValue2 {
 public:
-    ExtAttMidiValue2() = default;
-    virtual ~ExtAttMidiValue2() = default;
+    InstMidiValue2() = default;
+    virtual ~InstMidiValue2() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -479,17 +479,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMidiVelocity
+// InstMidiVelocity
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMidiVelocity
  */
 
-class ExtAttMidiVelocity : public AttMidiVelocity {
+class InstMidiVelocity : public AttMidiVelocity {
 public:
-    ExtAttMidiVelocity() = default;
-    virtual ~ExtAttMidiVelocity() = default;
+    InstMidiVelocity() = default;
+    virtual ~InstMidiVelocity() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -532,17 +532,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTimeBase
+// InstTimeBase
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTimeBase
  */
 
-class ExtAttTimeBase : public AttTimeBase {
+class InstTimeBase : public AttTimeBase {
 public:
-    ExtAttTimeBase() = default;
-    virtual ~ExtAttTimeBase() = default;
+    InstTimeBase() = default;
+    virtual ~InstTimeBase() = default;
 };
 
 } // namespace vrv

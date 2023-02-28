@@ -79,17 +79,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMargins
+// InstMargins
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMargins
  */
 
-class ExtAttMargins : public AttMargins {
+class InstMargins : public AttMargins {
 public:
-    ExtAttMargins() = default;
-    virtual ~ExtAttMargins() = default;
+    InstMargins() = default;
+    virtual ~InstMargins() = default;
 };
 
 } // namespace vrv

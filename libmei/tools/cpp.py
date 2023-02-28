@@ -94,17 +94,17 @@ private:
 {members}}};
 
 //----------------------------------------------------------------------------
-// ExtAtt{attGroupNameUpper}
+// Inst{attGroupNameUpper}
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of Att{attGroupNameUpper}
  */
 
-class ExtAtt{attGroupNameUpper} : public Att{attGroupNameUpper} {{
+class Inst{attGroupNameUpper} : public Att{attGroupNameUpper} {{
 public:
-    ExtAtt{attGroupNameUpper}() = default;
-    virtual ~ExtAtt{attGroupNameUpper}() = default;
+    Inst{attGroupNameUpper}() = default;
+    virtual ~Inst{attGroupNameUpper}() = default;
 }};
 """
 
@@ -339,6 +339,7 @@ class AttConverterBase {{
 protected:
     AttConverterBase() = default;
     ~AttConverterBase() = default;
+
 public:"""
 
 CONVERTER_METHODS_H = """
@@ -356,7 +357,7 @@ CONVERTER_END_H = """}};
  * Instantiable version of AttConverterBase
  */
 
-class AttConverter: public AttConverterBase {{
+class AttConverter : public AttConverterBase {{
 public:
     AttConverter() = default;
     virtual ~AttConverter() = default;
@@ -1258,7 +1259,6 @@ def create_basic_validator(configure: dict, outdir: Path):
     name_attribute_map = "".join(formatted_attr_map).strip()
     formatted_output = BASIC_VALID_CPP.format(nameAttributeMap=name_attribute_map)
 
-    # TODO: Actually write the output somewhere!
     with Path(outdir, "meibasic.h").open("w") as mei_basic_h:
         lg.debug("Writing meibasic.h")
         mei_basic_h.write(MEI_BASIC_H.format(basicAttributeMap=formatted_output))

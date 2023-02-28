@@ -8,10 +8,10 @@
 #ifndef __VRV_H__
 #define __VRV_H__
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
 #include <map>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -40,7 +40,7 @@ void LogInfo(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
 
 /**
- * Member and functions specific to loging that uses a vector of string to buffer the logs.
+ * Member and functions specific to logging that uses a vector of string to buffer the logs.
  */
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);

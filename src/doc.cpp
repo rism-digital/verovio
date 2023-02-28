@@ -272,14 +272,17 @@ bool Doc::HasTimemap() const
 
 void Doc::CalculateTimemap()
 {
+    // There is no data to calculate the timemap
+    if (this->GetPageCount() == 0) {
+        return;
+    }
+
     m_timemapTempo = 0.0;
 
     // This happens if the document was never cast off (breaks none option in the toolkit)
-    if (!m_drawingPage && this->GetPageCount() == 1) {
+    if (!m_drawingPage) {
         Page *page = this->SetDrawingPage(0);
-        if (!page) {
-            return;
-        }
+        assert(page);
         this->ScoreDefSetCurrentDoc();
         page->LayOutHorizontally();
     }
@@ -323,7 +326,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         CalculateTimemap();
     }
     if (!Doc::HasTimemap()) {
-        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        LogWarning("Calculation of the timemap failed, MIDI cannot be exported.");
     }
 
     double tempo = MIDI_TEMPO;
@@ -423,7 +426,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (!meterSig && (currentScoreDef->HasMeterSigInfo())) {
                 meterSig = vrv_cast<MeterSig *>(currentScoreDef->GetMeterSig());
             }
-            if (meterSig && meterSig->HasCount()) {
+            if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
         }
@@ -468,7 +471,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
         CalculateTimemap();
     }
     if (!Doc::HasTimemap()) {
-        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        LogWarning("Calculation of the timemap failed, the timemap cannot be exported.");
         output = "";
         return false;
     }
@@ -490,7 +493,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
         CalculateTimemap();
     }
     if (!Doc::HasTimemap()) {
-        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        LogWarning("Calculation of the timemap failed, the features cannot be exported.");
         output = "";
         return false;
     }

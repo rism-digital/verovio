@@ -65,17 +65,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDurationQuality
+// InstDurationQuality
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDurationQuality
  */
 
-class ExtAttDurationQuality : public AttDurationQuality {
+class InstDurationQuality : public AttDurationQuality {
 public:
-    ExtAttDurationQuality() = default;
-    virtual ~ExtAttDurationQuality() = default;
+    InstDurationQuality() = default;
+    virtual ~InstDurationQuality() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -128,17 +128,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMensuralLog
+// InstMensuralLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMensuralLog
  */
 
-class ExtAttMensuralLog : public AttMensuralLog {
+class InstMensuralLog : public AttMensuralLog {
 public:
-    ExtAttMensuralLog() = default;
-    virtual ~ExtAttMensuralLog() = default;
+    InstMensuralLog() = default;
+    virtual ~InstMensuralLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -201,17 +201,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMensuralShared
+// InstMensuralShared
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMensuralShared
  */
 
-class ExtAttMensuralShared : public AttMensuralShared {
+class InstMensuralShared : public AttMensuralShared {
 public:
-    ExtAttMensuralShared() = default;
-    virtual ~ExtAttMensuralShared() = default;
+    InstMensuralShared() = default;
+    virtual ~InstMensuralShared() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -250,17 +250,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNoteVisMensural
+// InstNoteVisMensural
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNoteVisMensural
  */
 
-class ExtAttNoteVisMensural : public AttNoteVisMensural {
+class InstNoteVisMensural : public AttNoteVisMensural {
 public:
-    ExtAttNoteVisMensural() = default;
-    virtual ~ExtAttNoteVisMensural() = default;
+    InstNoteVisMensural() = default;
+    virtual ~InstNoteVisMensural() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -299,17 +299,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttRestVisMensural
+// InstRestVisMensural
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttRestVisMensural
  */
 
-class ExtAttRestVisMensural : public AttRestVisMensural {
+class InstRestVisMensural : public AttRestVisMensural {
 public:
-    ExtAttRestVisMensural() = default;
-    virtual ~ExtAttRestVisMensural() = default;
+    InstRestVisMensural() = default;
+    virtual ~InstRestVisMensural() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -348,17 +348,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStemsMensural
+// InstStemsMensural
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStemsMensural
  */
 
-class ExtAttStemsMensural : public AttStemsMensural {
+class InstStemsMensural : public AttStemsMensural {
 public:
-    ExtAttStemsMensural() = default;
-    virtual ~ExtAttStemsMensural() = default;
+    InstStemsMensural() = default;
+    virtual ~InstStemsMensural() = default;
 };
 
 } // namespace vrv

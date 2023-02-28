@@ -88,17 +88,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttExtSym
+// InstExtSym
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttExtSym
  */
 
-class ExtAttExtSym : public AttExtSym {
+class InstExtSym : public AttExtSym {
 public:
-    ExtAttExtSym() = default;
-    virtual ~ExtAttExtSym() = default;
+    InstExtSym() = default;
+    virtual ~InstExtSym() = default;
 };
 
 } // namespace vrv

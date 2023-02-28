@@ -313,7 +313,6 @@ int main(int argc, char **argv)
     }
 
     int c;
-    int seed = 0;
     std::string key;
     int option_index = 0;
     vrv::Option *opt = NULL;
@@ -367,17 +366,18 @@ int main(int argc, char **argv)
                 break;
 
             case 's':
-                if (!toolkit.SetScale(atoi(optarg))) {
-                    exit(1);
+                if (!options->m_scale.SetValue(optarg)) {
+                    vrv::LogWarning("Setting scale with %s failed, default value used", optarg);
                 }
                 break;
 
             case 'v': show_version = 1; break;
 
             case 'x':
-                seed = atoi(optarg);
-                options->m_xmlIdSeed.SetValue(seed);
-                vrv::Object::SeedID(seed);
+                if (!options->m_xmlIdSeed.SetValue(optarg)) {
+                    vrv::LogWarning("Setting xml id seed with %s failed, default value used", optarg);
+                }
+                vrv::Object::SeedID(options->m_xmlIdSeed.GetValue());
                 break;
 
             case 'z':

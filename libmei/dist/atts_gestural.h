@@ -61,17 +61,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAccidentalGes
+// InstAccidentalGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAccidentalGes
  */
 
-class ExtAttAccidentalGes : public AttAccidentalGes {
+class InstAccidentalGes : public AttAccidentalGes {
 public:
-    ExtAttAccidentalGes() = default;
-    virtual ~ExtAttAccidentalGes() = default;
+    InstAccidentalGes() = default;
+    virtual ~InstAccidentalGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -110,17 +110,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttArticulationGes
+// InstArticulationGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttArticulationGes
  */
 
-class ExtAttArticulationGes : public AttArticulationGes {
+class InstArticulationGes : public AttArticulationGes {
 public:
-    ExtAttArticulationGes() = default;
-    virtual ~ExtAttArticulationGes() = default;
+    InstArticulationGes() = default;
+    virtual ~InstArticulationGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -163,17 +163,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBendGes
+// InstBendGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBendGes
  */
 
-class ExtAttBendGes : public AttBendGes {
+class InstBendGes : public AttBendGes {
 public:
-    ExtAttBendGes() = default;
-    virtual ~ExtAttBendGes() = default;
+    InstBendGes() = default;
+    virtual ~InstBendGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -248,17 +248,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttDurationGes
+// InstDurationGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttDurationGes
  */
 
-class ExtAttDurationGes : public AttDurationGes {
+class InstDurationGes : public AttDurationGes {
 public:
-    ExtAttDurationGes() = default;
-    virtual ~ExtAttDurationGes() = default;
+    InstDurationGes() = default;
+    virtual ~InstDurationGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -300,17 +300,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMdivGes
+// InstMdivGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMdivGes
  */
 
-class ExtAttMdivGes : public AttMdivGes {
+class InstMdivGes : public AttMdivGes {
 public:
-    ExtAttMdivGes() = default;
-    virtual ~ExtAttMdivGes() = default;
+    InstMdivGes() = default;
+    virtual ~InstMdivGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -361,17 +361,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNcGes
+// InstNcGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNcGes
  */
 
-class ExtAttNcGes : public AttNcGes {
+class InstNcGes : public AttNcGes {
 public:
-    ExtAttNcGes() = default;
-    virtual ~ExtAttNcGes() = default;
+    InstNcGes() = default;
+    virtual ~InstNcGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -428,17 +428,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNoteGes
+// InstNoteGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNoteGes
  */
 
-class ExtAttNoteGes : public AttNoteGes {
+class InstNoteGes : public AttNoteGes {
 public:
-    ExtAttNoteGes() = default;
-    virtual ~ExtAttNoteGes() = default;
+    InstNoteGes() = default;
+    virtual ~InstNoteGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -483,17 +483,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttOrnamentAccidGes
+// InstOrnamentAccidGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttOrnamentAccidGes
  */
 
-class ExtAttOrnamentAccidGes : public AttOrnamentAccidGes {
+class InstOrnamentAccidGes : public AttOrnamentAccidGes {
 public:
-    ExtAttOrnamentAccidGes() = default;
-    virtual ~ExtAttOrnamentAccidGes() = default;
+    InstOrnamentAccidGes() = default;
+    virtual ~InstOrnamentAccidGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -535,17 +535,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSectionGes
+// InstSectionGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSectionGes
  */
 
-class ExtAttSectionGes : public AttSectionGes {
+class InstSectionGes : public AttSectionGes {
 public:
-    ExtAttSectionGes() = default;
-    virtual ~ExtAttSectionGes() = default;
+    InstSectionGes() = default;
+    virtual ~InstSectionGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -590,17 +590,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSoundLocation
+// InstSoundLocation
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSoundLocation
  */
 
-class ExtAttSoundLocation : public AttSoundLocation {
+class InstSoundLocation : public AttSoundLocation {
 public:
-    ExtAttSoundLocation() = default;
-    virtual ~ExtAttSoundLocation() = default;
+    InstSoundLocation() = default;
+    virtual ~InstSoundLocation() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -648,17 +648,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTimestampGes
+// InstTimestampGes
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTimestampGes
  */
 
-class ExtAttTimestampGes : public AttTimestampGes {
+class InstTimestampGes : public AttTimestampGes {
 public:
-    ExtAttTimestampGes() = default;
-    virtual ~ExtAttTimestampGes() = default;
+    InstTimestampGes() = default;
+    virtual ~InstTimestampGes() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -706,17 +706,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTimestamp2Ges
+// InstTimestamp2Ges
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTimestamp2Ges
  */
 
-class ExtAttTimestamp2Ges : public AttTimestamp2Ges {
+class InstTimestamp2Ges : public AttTimestamp2Ges {
 public:
-    ExtAttTimestamp2Ges() = default;
-    virtual ~ExtAttTimestamp2Ges() = default;
+    InstTimestamp2Ges() = default;
+    virtual ~InstTimestamp2Ges() = default;
 };
 
 } // namespace vrv

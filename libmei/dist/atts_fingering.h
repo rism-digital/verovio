@@ -61,17 +61,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFingGrpLog
+// InstFingGrpLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFingGrpLog
  */
 
-class ExtAttFingGrpLog : public AttFingGrpLog {
+class InstFingGrpLog : public AttFingGrpLog {
 public:
-    ExtAttFingGrpLog() = default;
-    virtual ~ExtAttFingGrpLog() = default;
+    InstFingGrpLog() = default;
+    virtual ~InstFingGrpLog() = default;
 };
 
 } // namespace vrv

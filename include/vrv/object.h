@@ -1923,7 +1923,7 @@ public:
      */
     ClassRegistrar(std::string name, ClassId classId)
     {
-        ObjectFactory::GetInstance()->Register(name, classId, [](void) -> Object * { return new T(); });
+        ObjectFactory::GetInstance()->Register(name, classId, []() -> Object * { return new T(); });
     }
 };
 

@@ -64,17 +64,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAlignment
+// InstAlignment
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAlignment
  */
 
-class ExtAttAlignment : public AttAlignment {
+class InstAlignment : public AttAlignment {
 public:
-    ExtAttAlignment() = default;
-    virtual ~ExtAttAlignment() = default;
+    InstAlignment() = default;
+    virtual ~InstAlignment() = default;
 };
 
 } // namespace vrv

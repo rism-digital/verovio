@@ -61,17 +61,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCourseLog
+// InstCourseLog
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCourseLog
  */
 
-class ExtAttCourseLog : public AttCourseLog {
+class InstCourseLog : public AttCourseLog {
 public:
-    ExtAttCourseLog() = default;
-    virtual ~ExtAttCourseLog() = default;
+    InstCourseLog() = default;
+    virtual ~InstCourseLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -116,17 +116,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttNoteGesTab
+// InstNoteGesTab
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttNoteGesTab
  */
 
-class ExtAttNoteGesTab : public AttNoteGesTab {
+class InstNoteGesTab : public AttNoteGesTab {
 public:
-    ExtAttNoteGesTab() = default;
-    virtual ~ExtAttNoteGesTab() = default;
+    InstNoteGesTab() = default;
+    virtual ~InstNoteGesTab() = default;
 };
 
 } // namespace vrv

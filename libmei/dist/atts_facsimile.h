@@ -64,17 +64,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFacsimile
+// InstFacsimile
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFacsimile
  */
 
-class ExtAttFacsimile : public AttFacsimile {
+class InstFacsimile : public AttFacsimile {
 public:
-    ExtAttFacsimile() = default;
-    virtual ~ExtAttFacsimile() = default;
+    InstFacsimile() = default;
+    virtual ~InstFacsimile() = default;
 };
 
 } // namespace vrv

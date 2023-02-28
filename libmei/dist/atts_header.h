@@ -91,17 +91,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBifoliumSurfaces
+// InstBifoliumSurfaces
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBifoliumSurfaces
  */
 
-class ExtAttBifoliumSurfaces : public AttBifoliumSurfaces {
+class InstBifoliumSurfaces : public AttBifoliumSurfaces {
 public:
-    ExtAttBifoliumSurfaces() = default;
-    virtual ~ExtAttBifoliumSurfaces() = default;
+    InstBifoliumSurfaces() = default;
+    virtual ~InstBifoliumSurfaces() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -146,17 +146,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFoliumSurfaces
+// InstFoliumSurfaces
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFoliumSurfaces
  */
 
-class ExtAttFoliumSurfaces : public AttFoliumSurfaces {
+class InstFoliumSurfaces : public AttFoliumSurfaces {
 public:
-    ExtAttFoliumSurfaces() = default;
-    virtual ~ExtAttFoliumSurfaces() = default;
+    InstFoliumSurfaces() = default;
+    virtual ~InstFoliumSurfaces() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -195,17 +195,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttRecordType
+// InstRecordType
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttRecordType
  */
 
-class ExtAttRecordType : public AttRecordType {
+class InstRecordType : public AttRecordType {
 public:
-    ExtAttRecordType() = default;
-    virtual ~ExtAttRecordType() = default;
+    InstRecordType() = default;
+    virtual ~InstRecordType() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -244,17 +244,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttRegularMethod
+// InstRegularMethod
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttRegularMethod
  */
 
-class ExtAttRegularMethod : public AttRegularMethod {
+class InstRegularMethod : public AttRegularMethod {
 public:
-    ExtAttRegularMethod() = default;
-    virtual ~ExtAttRegularMethod() = default;
+    InstRegularMethod() = default;
+    virtual ~InstRegularMethod() = default;
 };
 
 } // namespace vrv

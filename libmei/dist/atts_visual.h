@@ -63,17 +63,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttAnnotVis
+// InstAnnotVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttAnnotVis
  */
 
-class ExtAttAnnotVis : public AttAnnotVis {
+class InstAnnotVis : public AttAnnotVis {
 public:
-    ExtAttAnnotVis() = default;
-    virtual ~ExtAttAnnotVis() = default;
+    InstAnnotVis() = default;
+    virtual ~InstAnnotVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -150,17 +150,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttArpegVis
+// InstArpegVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttArpegVis
  */
 
-class ExtAttArpegVis : public AttArpegVis {
+class InstArpegVis : public AttArpegVis {
 public:
-    ExtAttArpegVis() = default;
-    virtual ~ExtAttArpegVis() = default;
+    InstArpegVis() = default;
+    virtual ~InstArpegVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -215,17 +215,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBarLineVis
+// InstBarLineVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBarLineVis
  */
 
-class ExtAttBarLineVis : public AttBarLineVis {
+class InstBarLineVis : public AttBarLineVis {
 public:
-    ExtAttBarLineVis() = default;
-    virtual ~ExtAttBarLineVis() = default;
+    InstBarLineVis() = default;
+    virtual ~InstBarLineVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -276,17 +276,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBeamingVis
+// InstBeamingVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBeamingVis
  */
 
-class ExtAttBeamingVis : public AttBeamingVis {
+class InstBeamingVis : public AttBeamingVis {
 public:
-    ExtAttBeamingVis() = default;
-    virtual ~ExtAttBeamingVis() = default;
+    InstBeamingVis() = default;
+    virtual ~InstBeamingVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -325,17 +325,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttBeatRptVis
+// InstBeatRptVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttBeatRptVis
  */
 
-class ExtAttBeatRptVis : public AttBeatRptVis {
+class InstBeatRptVis : public AttBeatRptVis {
 public:
-    ExtAttBeatRptVis() = default;
-    virtual ~ExtAttBeatRptVis() = default;
+    InstBeatRptVis() = default;
+    virtual ~InstBeatRptVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -379,17 +379,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttChordVis
+// InstChordVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttChordVis
  */
 
-class ExtAttChordVis : public AttChordVis {
+class InstChordVis : public AttChordVis {
 public:
-    ExtAttChordVis() = default;
-    virtual ~ExtAttChordVis() = default;
+    InstChordVis() = default;
+    virtual ~InstChordVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -434,17 +434,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttCleffingVis
+// InstCleffingVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttCleffingVis
  */
 
-class ExtAttCleffingVis : public AttCleffingVis {
+class InstCleffingVis : public AttCleffingVis {
 public:
-    ExtAttCleffingVis() = default;
-    virtual ~ExtAttCleffingVis() = default;
+    InstCleffingVis() = default;
+    virtual ~InstCleffingVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -489,17 +489,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttEpisemaVis
+// InstEpisemaVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttEpisemaVis
  */
 
-class ExtAttEpisemaVis : public AttEpisemaVis {
+class InstEpisemaVis : public AttEpisemaVis {
 public:
-    ExtAttEpisemaVis() = default;
-    virtual ~ExtAttEpisemaVis() = default;
+    InstEpisemaVis() = default;
+    virtual ~InstEpisemaVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -550,17 +550,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFTremVis
+// InstFTremVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFTremVis
  */
 
-class ExtAttFTremVis : public AttFTremVis {
+class InstFTremVis : public AttFTremVis {
 public:
-    ExtAttFTremVis() = default;
-    virtual ~ExtAttFTremVis() = default;
+    InstFTremVis() = default;
+    virtual ~InstFTremVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -605,17 +605,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFermataVis
+// InstFermataVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFermataVis
  */
 
-class ExtAttFermataVis : public AttFermataVis {
+class InstFermataVis : public AttFermataVis {
 public:
-    ExtAttFermataVis() = default;
-    virtual ~ExtAttFermataVis() = default;
+    InstFermataVis() = default;
+    virtual ~InstFermataVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -654,17 +654,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttFingGrpVis
+// InstFingGrpVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttFingGrpVis
  */
 
-class ExtAttFingGrpVis : public AttFingGrpVis {
+class InstFingGrpVis : public AttFingGrpVis {
 public:
-    ExtAttFingGrpVis() = default;
-    virtual ~ExtAttFingGrpVis() = default;
+    InstFingGrpVis() = default;
+    virtual ~InstFingGrpVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -735,17 +735,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHairpinVis
+// InstHairpinVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHairpinVis
  */
 
-class ExtAttHairpinVis : public AttHairpinVis {
+class InstHairpinVis : public AttHairpinVis {
 public:
-    ExtAttHairpinVis() = default;
-    virtual ~ExtAttHairpinVis() = default;
+    InstHairpinVis() = default;
+    virtual ~InstHairpinVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -784,17 +784,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHarmVis
+// InstHarmVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHarmVis
  */
 
-class ExtAttHarmVis : public AttHarmVis {
+class InstHarmVis : public AttHarmVis {
 public:
-    ExtAttHarmVis() = default;
-    virtual ~ExtAttHarmVis() = default;
+    InstHarmVis() = default;
+    virtual ~InstHarmVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -839,17 +839,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttHispanTickVis
+// InstHispanTickVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttHispanTickVis
  */
 
-class ExtAttHispanTickVis : public AttHispanTickVis {
+class InstHispanTickVis : public AttHispanTickVis {
 public:
-    ExtAttHispanTickVis() = default;
-    virtual ~ExtAttHispanTickVis() = default;
+    InstHispanTickVis() = default;
+    virtual ~InstHispanTickVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -888,17 +888,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttKeySigVis
+// InstKeySigVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttKeySigVis
  */
 
-class ExtAttKeySigVis : public AttKeySigVis {
+class InstKeySigVis : public AttKeySigVis {
 public:
-    ExtAttKeySigVis() = default;
-    virtual ~ExtAttKeySigVis() = default;
+    InstKeySigVis() = default;
+    virtual ~InstKeySigVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -943,17 +943,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttKeySigDefaultVis
+// InstKeySigDefaultVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttKeySigDefaultVis
  */
 
-class ExtAttKeySigDefaultVis : public AttKeySigDefaultVis {
+class InstKeySigDefaultVis : public AttKeySigDefaultVis {
 public:
-    ExtAttKeySigDefaultVis() = default;
-    virtual ~ExtAttKeySigDefaultVis() = default;
+    InstKeySigDefaultVis() = default;
+    virtual ~InstKeySigDefaultVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -992,17 +992,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLigatureVis
+// InstLigatureVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLigatureVis
  */
 
-class ExtAttLigatureVis : public AttLigatureVis {
+class InstLigatureVis : public AttLigatureVis {
 public:
-    ExtAttLigatureVis() = default;
-    virtual ~ExtAttLigatureVis() = default;
+    InstLigatureVis() = default;
+    virtual ~InstLigatureVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1073,17 +1073,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLineVis
+// InstLineVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLineVis
  */
 
-class ExtAttLineVis : public AttLineVis {
+class InstLineVis : public AttLineVis {
 public:
-    ExtAttLineVis() = default;
-    virtual ~ExtAttLineVis() = default;
+    InstLineVis() = default;
+    virtual ~InstLineVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1128,17 +1128,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttLiquescentVis
+// InstLiquescentVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttLiquescentVis
  */
 
-class ExtAttLiquescentVis : public AttLiquescentVis {
+class InstLiquescentVis : public AttLiquescentVis {
 public:
-    ExtAttLiquescentVis() = default;
-    virtual ~ExtAttLiquescentVis() = default;
+    InstLiquescentVis() = default;
+    virtual ~InstLiquescentVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1195,17 +1195,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMensurVis
+// InstMensurVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMensurVis
  */
 
-class ExtAttMensurVis : public AttMensurVis {
+class InstMensurVis : public AttMensurVis {
 public:
-    ExtAttMensurVis() = default;
-    virtual ~ExtAttMensurVis() = default;
+    InstMensurVis() = default;
+    virtual ~InstMensurVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1294,17 +1294,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMensuralVis
+// InstMensuralVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMensuralVis
  */
 
-class ExtAttMensuralVis : public AttMensuralVis {
+class InstMensuralVis : public AttMensuralVis {
 public:
-    ExtAttMensuralVis() = default;
-    virtual ~ExtAttMensuralVis() = default;
+    InstMensuralVis() = default;
+    virtual ~InstMensuralVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1343,17 +1343,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeterSigVis
+// InstMeterSigVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeterSigVis
  */
 
-class ExtAttMeterSigVis : public AttMeterSigVis {
+class InstMeterSigVis : public AttMeterSigVis {
 public:
-    ExtAttMeterSigVis() = default;
-    virtual ~ExtAttMeterSigVis() = default;
+    InstMeterSigVis() = default;
+    virtual ~InstMeterSigVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1401,17 +1401,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMeterSigDefaultVis
+// InstMeterSigDefaultVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMeterSigDefaultVis
  */
 
-class ExtAttMeterSigDefaultVis : public AttMeterSigDefaultVis {
+class InstMeterSigDefaultVis : public AttMeterSigDefaultVis {
 public:
-    ExtAttMeterSigDefaultVis() = default;
-    virtual ~ExtAttMeterSigDefaultVis() = default;
+    InstMeterSigDefaultVis() = default;
+    virtual ~InstMeterSigDefaultVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1454,17 +1454,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttMultiRestVis
+// InstMultiRestVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttMultiRestVis
  */
 
-class ExtAttMultiRestVis : public AttMultiRestVis {
+class InstMultiRestVis : public AttMultiRestVis {
 public:
-    ExtAttMultiRestVis() = default;
-    virtual ~ExtAttMultiRestVis() = default;
+    InstMultiRestVis() = default;
+    virtual ~InstMultiRestVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1506,17 +1506,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPbVis
+// InstPbVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPbVis
  */
 
-class ExtAttPbVis : public AttPbVis {
+class InstPbVis : public AttPbVis {
 public:
-    ExtAttPbVis() = default;
-    virtual ~ExtAttPbVis() = default;
+    InstPbVis() = default;
+    virtual ~InstPbVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1555,17 +1555,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPedalVis
+// InstPedalVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPedalVis
  */
 
-class ExtAttPedalVis : public AttPedalVis {
+class InstPedalVis : public AttPedalVis {
 public:
-    ExtAttPedalVis() = default;
-    virtual ~ExtAttPedalVis() = default;
+    InstPedalVis() = default;
+    virtual ~InstPedalVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1614,17 +1614,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttPlicaVis
+// InstPlicaVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttPlicaVis
  */
 
-class ExtAttPlicaVis : public AttPlicaVis {
+class InstPlicaVis : public AttPlicaVis {
 public:
-    ExtAttPlicaVis() = default;
-    virtual ~ExtAttPlicaVis() = default;
+    InstPlicaVis() = default;
+    virtual ~InstPlicaVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1663,17 +1663,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttQuilismaVis
+// InstQuilismaVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttQuilismaVis
  */
 
-class ExtAttQuilismaVis : public AttQuilismaVis {
+class InstQuilismaVis : public AttQuilismaVis {
 public:
-    ExtAttQuilismaVis() = default;
-    virtual ~ExtAttQuilismaVis() = default;
+    InstQuilismaVis() = default;
+    virtual ~InstQuilismaVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1712,17 +1712,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSbVis
+// InstSbVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSbVis
  */
 
-class ExtAttSbVis : public AttSbVis {
+class InstSbVis : public AttSbVis {
 public:
-    ExtAttSbVis() = default;
-    virtual ~ExtAttSbVis() = default;
+    InstSbVis() = default;
+    virtual ~InstSbVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1765,17 +1765,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttScoreDefVis
+// InstScoreDefVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttScoreDefVis
  */
 
-class ExtAttScoreDefVis : public AttScoreDefVis {
+class InstScoreDefVis : public AttScoreDefVis {
 public:
-    ExtAttScoreDefVis() = default;
-    virtual ~ExtAttScoreDefVis() = default;
+    InstScoreDefVis() = default;
+    virtual ~InstScoreDefVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1814,17 +1814,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSectionVis
+// InstSectionVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSectionVis
  */
 
-class ExtAttSectionVis : public AttSectionVis {
+class InstSectionVis : public AttSectionVis {
 public:
-    ExtAttSectionVis() = default;
-    virtual ~ExtAttSectionVis() = default;
+    InstSectionVis() = default;
+    virtual ~InstSectionVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1863,17 +1863,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSignifLetVis
+// InstSignifLetVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSignifLetVis
  */
 
-class ExtAttSignifLetVis : public AttSignifLetVis {
+class InstSignifLetVis : public AttSignifLetVis {
 public:
-    ExtAttSignifLetVis() = default;
-    virtual ~ExtAttSignifLetVis() = default;
+    InstSignifLetVis() = default;
+    virtual ~InstSignifLetVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1915,17 +1915,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttSpaceVis
+// InstSpaceVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttSpaceVis
  */
 
-class ExtAttSpaceVis : public AttSpaceVis {
+class InstSpaceVis : public AttSpaceVis {
 public:
-    ExtAttSpaceVis() = default;
-    virtual ~ExtAttSpaceVis() = default;
+    InstSpaceVis() = default;
+    virtual ~InstSpaceVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1993,17 +1993,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffDefVis
+// InstStaffDefVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffDefVis
  */
 
-class ExtAttStaffDefVis : public AttStaffDefVis {
+class InstStaffDefVis : public AttStaffDefVis {
 public:
-    ExtAttStaffDefVis() = default;
-    virtual ~ExtAttStaffDefVis() = default;
+    InstStaffDefVis() = default;
+    virtual ~InstStaffDefVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2045,17 +2045,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStaffGrpVis
+// InstStaffGrpVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStaffGrpVis
  */
 
-class ExtAttStaffGrpVis : public AttStaffGrpVis {
+class InstStaffGrpVis : public AttStaffGrpVis {
 public:
-    ExtAttStaffGrpVis() = default;
-    virtual ~ExtAttStaffGrpVis() = default;
+    InstStaffGrpVis() = default;
+    virtual ~InstStaffGrpVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2134,17 +2134,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttStemVis
+// InstStemVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttStemVis
  */
 
-class ExtAttStemVis : public AttStemVis {
+class InstStemVis : public AttStemVis {
 public:
-    ExtAttStemVis() = default;
-    virtual ~ExtAttStemVis() = default;
+    InstStemVis() = default;
+    virtual ~InstStemVis() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2204,17 +2204,17 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// ExtAttTupletVis
+// InstTupletVis
 //----------------------------------------------------------------------------
 
 /**
  * Instantiable version of AttTupletVis
  */
 
-class ExtAttTupletVis : public AttTupletVis {
+class InstTupletVis : public AttTupletVis {
 public:
-    ExtAttTupletVis() = default;
-    virtual ~ExtAttTupletVis() = default;
+    InstTupletVis() = default;
+    virtual ~InstTupletVis() = default;
 };
 
 } // namespace vrv
