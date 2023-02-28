@@ -2150,6 +2150,9 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
             params->m_cumulatedXShift += adjust;
             params->m_upcomingMinPos += adjust;
         }
+        else {
+            params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
+        }
     }
     else {
         params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
