@@ -71,7 +71,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
 
     m_outdata.clear();
 
-    m_glyphPostfixId = Object::GenerateRandID();
+    m_glyphPostfixId = Object::GenerateHashID();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}

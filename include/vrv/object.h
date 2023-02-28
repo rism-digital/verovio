@@ -12,7 +12,6 @@
 #include <functional>
 #include <iterator>
 #include <map>
-#include <random>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -647,9 +646,11 @@ public:
     // Static methods //
     //----------------//
 
-    static void SeedID(unsigned int seed = 0);
+    static void SeedID(uint32_t seed = 0);
 
-    static std::string GenerateRandID();
+    static std::string GenerateHashID();
+
+    static uint32_t Hash(uint32_t number, bool reverse = false);
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -1670,9 +1671,9 @@ private:
     static thread_local unsigned long s_objectCounter;
 
     /**
-     * Pseudo random number engine for ID generation
+     * XML id counter
      */
-    static thread_local std::mt19937 s_randomGenerator;
+    static thread_local uint32_t s_xmlIDCounter;
 };
 
 //----------------------------------------------------------------------------
