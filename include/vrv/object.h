@@ -776,18 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the X positions of the grace notes looking at the bounding boxes.
-     * The functor is redirected from the MeasureAligner and then from the appropriate
-     * alignment to the GraceAligner
-     */
-    virtual int AdjustGraceXPos(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * End Functor for Object::AdjustGraceXPos
-     */
-    virtual int AdjustGraceXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    /**
      * Adjust the horizontal position of harms by groups in order to avoid overlapping
      */
     virtual int AdjustHarmGrpsSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };

@@ -1052,113 +1052,6 @@ int MeasureAligner::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
-    if (!params->m_isGraceAlignment) {
-        // Do not process AlignmentReference children if no GraceAligner
-        if (m_graceAligners.empty()) {
-            // We store the default alignment before we hit the grace alignment
-            if (m_type == ALIGNMENT_DEFAULT) params->m_rightDefaultAlignment = this;
-            return FUNCTOR_SIBLINGS;
-        }
-        assert(m_type == ALIGNMENT_GRACENOTE);
-
-        // Change the flag for indicating that the alignment is child of a GraceAligner
-        params->m_isGraceAlignment = true;
-
-        // Get the parent measure Aligner
-        MeasureAligner *measureAligner = vrv_cast<MeasureAligner *>(this->GetFirstAncestor(MEASURE_ALIGNER));
-        assert(measureAligner);
-
-        std::vector<int>::iterator iter;
-        Filters filters;
-        for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-            const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
-
-            std::vector<ClassId> exclude;
-            if (this->HasGraceAligner(graceAlignerId) && params->m_rightDefaultAlignment) {
-                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
-                // last alignment of GraceAligner is rightmost one, so get it
-                Alignment *alignment = vrv_cast<Alignment *>(graceAligner->GetLast(ALIGNMENT));
-                // if there is no overlap with accidentals, exclude them when getting left-right margins of alignment
-                if (alignment && !alignment->HasAccidVerticalOverlap(params->m_rightDefaultAlignment, graceAlignerId)) {
-                    exclude.push_back(ACCID);
-                }
-            }
-
-            // Rescue value, used at the end of a measure without a barline
-            int graceMaxPos = this->GetXRel() - params->m_doc->GetDrawingUnit(100);
-            // If we have a rightDefault, then this is (quite likely) the next note / chord
-            // Get its minimum left and make it the max right position of the grace group
-            if (params->m_rightDefaultAlignment) {
-                int minLeft, maxRight;
-                params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight, exclude);
-                if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
-            }
-            // This happens when grace notes are at the end of a measure before a barline
-            else {
-                int minLeft, maxRight;
-                assert(measureAligner->GetRightBarLineAlignment());
-                // staffN -1 is barline
-                measureAligner->GetRightBarLineAlignment()->GetLeftRight(
-                    BARLINE_REFERENCES, minLeft, maxRight, exclude);
-                if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
-            }
-
-            params->m_graceMaxPos = graceMaxPos;
-            params->m_graceUpcomingMaxPos = -VRV_UNSET;
-            params->m_graceCumulatedXShift = VRV_UNSET;
-            filters.Clear();
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            filters.Add(&matchStaff);
-
-            if (this->HasGraceAligner(graceAlignerId)) {
-                this->GetGraceAligner(graceAlignerId)
-                    ->Process(params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
-
-                // There was not grace notes for that staff
-                if (params->m_graceCumulatedXShift == VRV_UNSET) continue;
-
-                // Now we need to adjust the space for the grace not group
-                measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
-            }
-        }
-
-        // Change the flag back
-        params->m_isGraceAlignment = false;
-
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (params->m_graceCumulatedXShift != VRV_UNSET) {
-        // This is happening when aligning the grace aligner itself
-        this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustGraceXPosEnd(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    if (params->m_graceUpcomingMaxPos != -VRV_UNSET) {
-        params->m_graceMaxPos = params->m_graceUpcomingMaxPos;
-        // We reset it for the next aligner
-        params->m_graceUpcomingMaxPos = -VRV_UNSET;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Alignment::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
@@ -1260,21 +1153,6 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    // Because we are processing grace notes alignment backward (see Alignment::AdjustGraceXPos) we need
-    // to process the children (LayerElement) "by hand" in FORWARD manner
-    // (filters can be NULL because filtering was already applied in the parent)
-    for (auto child : this->GetChildren()) {
-        child->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)

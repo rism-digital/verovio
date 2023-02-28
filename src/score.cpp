@@ -185,16 +185,6 @@ int Score::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Score::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::ConvertMarkupScoreDef(FunctorParams *functorParams)
 {
     ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);

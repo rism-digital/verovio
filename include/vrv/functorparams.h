@@ -273,51 +273,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustGraceXPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the maximum position
- * member 1: the upcoming maximum position (i.e., the min pos for the next element)
- * member 2: the cumulated shift on the previous aligners
- * member 3: the list of staffN in the top-level scoreDef
- * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
- * member 5: list of tie endpoints for the current measure
- * member 6: the pointer to the right ALIGNMENT_DEFAULT (if any)
- * member 7: the Doc
- * member 8: the Functor to be redirected to MeasureAligner and GraceAligner
- * member 9: the end Functor for redirection
- **/
-
-class AdjustGraceXPosParams : public FunctorParams {
-public:
-    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
-    {
-        m_graceMaxPos = 0;
-        m_graceUpcomingMaxPos = -VRV_UNSET;
-        m_graceCumulatedXShift = 0;
-        m_staffNs = staffNs;
-        m_isGraceAlignment = false;
-        m_measureTieEndpoints.clear();
-        m_rightDefaultAlignment = NULL;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-        m_staffNs = staffNs;
-    }
-    int m_graceMaxPos;
-    int m_graceUpcomingMaxPos;
-    int m_graceCumulatedXShift;
-    std::vector<int> m_staffNs;
-    bool m_isGraceAlignment;
-    MeasureTieEndpoints m_measureTieEndpoints;
-    Alignment *m_rightDefaultAlignment;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-};
-
-//----------------------------------------------------------------------------
 // AdjustHarmGrpsSpacingParams
 //----------------------------------------------------------------------------
 

@@ -232,14 +232,6 @@ public:
     int JustifyX(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustGraceXPos
-     */
-    ///@{
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-    int AdjustGraceXPosEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::AdjustXPos
      */
     ///@{
@@ -366,11 +358,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::AjustAccidX

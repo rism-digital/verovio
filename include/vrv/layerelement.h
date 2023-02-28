@@ -346,13 +346,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustGraceXPos
-     */
-    ///@{
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::AdjustTupletNumOverlap
      */
     int AdjustTupletNumOverlap(FunctorParams *functorParams) const override;

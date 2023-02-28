@@ -16,6 +16,7 @@
 #include "adjustarpegfunctor.h"
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
+#include "adjustgracexposfunctor.h"
 #include "adjustlayersfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
@@ -410,11 +411,8 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor adjustGraceXPos(&Object::AdjustGraceXPos);
-    Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
-    AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
+    AdjustGraceXPosFunctor adjustGraceXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(adjustGraceXPos);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
     // Look at each clef change and  move them to the left and add space if necessary

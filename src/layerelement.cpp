@@ -1728,54 +1728,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     return { shift, isInUnison };
 }
 
-int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
-
-    // LogDebug("********* Aligning %s", this->GetClassName().c_str());
-
-    // With non grace alignment we do not need to do this
-    this->ResetCachedDrawingX();
-
-    if (!this->HasGraceAlignment()) return FUNCTOR_SIBLINGS;
-
-    if (!this->HasSelfBB() || this->HasEmptyBB()) {
-        // if nothing was drawn, do not take it into account
-        return FUNCTOR_SIBLINGS;
-    }
-
-    int selfRight = this->GetSelfRight();
-    int offset = selfRight - params->m_graceMaxPos;
-    if (offset > 0) {
-        this->GetGraceAlignment()->SetXRel(this->GetGraceAlignment()->GetXRel() - offset);
-        // Also move the accumulated x shift and the minimum position for the next alignment accordingly
-        params->m_graceCumulatedXShift += (-offset);
-        params->m_graceUpcomingMaxPos += (-offset);
-    }
-
-    int selfLeft = this->GetSelfLeft()
-        - params->m_doc->GetLeftMargin(this) * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
-
-    params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
-
-    auto it = std::find_if(params->m_measureTieEndpoints.cbegin(), params->m_measureTieEndpoints.cend(),
-        [this](const std::pair<LayerElement *, LayerElement *> &pair) { return pair.first == this; });
-    if (it != params->m_measureTieEndpoints.end() && params->m_rightDefaultAlignment) {
-        const int unit = params->m_doc->GetDrawingUnit(100);
-        const int minTieLength = params->m_doc->GetOptions()->m_tieMinLength.GetValue() * unit;
-        const int diff = params->m_rightDefaultAlignment->GetXRel() - this->GetSelfRight();
-
-        if (diff < (minTieLength + unit)) params->m_graceMaxPos -= (unit + minTieLength - diff);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams) const
 {
     AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);

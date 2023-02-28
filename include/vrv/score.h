@@ -94,11 +94,6 @@ public:
     int AdjustXPos(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertToPageBased
      */
     ///@{

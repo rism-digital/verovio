@@ -347,11 +347,6 @@ public:
     int AdjustAccidX(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustXOverflow
      */
     int AdjustXOverflow(FunctorParams *functorParams) override;
