@@ -641,7 +641,8 @@ bool ScoreDef::HasSystemStartLine() const
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
-        if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
+        ListOfConstObjects allDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+        if ((firstDef && lastDef && allDefs.size() > 1) || staffGrp->GetFirst(GRPSYM)) {
             return (this->GetSystemLeftline() != BOOLEAN_false);
         }
         return (this->GetSystemLeftline() == BOOLEAN_true);
