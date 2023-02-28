@@ -112,7 +112,6 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
 
     const int unit = doc->GetDrawingUnit(staffSize);
     int horizontalMargin = doc->GetRightMargin(ACCID) * unit;
-
     // Reduce spacing for successive accidentals
     if (element->Is(ACCID)) {
         horizontalMargin *= 0.66;
@@ -126,8 +125,9 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
             horizontalMargin = std::max(horizontalMargin, value);
         }
     }
+    const int verticalMargin = unit / 4;
 
-    if (!this->VerticalSelfOverlap(element)) {
+    if (!this->VerticalSelfOverlap(element, verticalMargin)) {
         this->AdjustToLedgerLines(doc, element, staffSize);
         return;
     }
@@ -144,7 +144,6 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
         }
     }
 
-    const int verticalMargin = unit / 4;
     if (element->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(element);
         if (!this->HorizontalLeftOverlap(element, doc, horizontalMargin, verticalMargin)) {
