@@ -1,0 +1,255 @@
+# Warning: do not use tabs, only spaces!
+---
+excludes:
+    [
+    data.COLOR,
+    data.DURATION,
+    data.DURATION.cmn,
+    data.DURATION.mensural,
+    data.DURATION.gestural,
+    data.DURATIONRESTS,
+    data.HEXNUM,
+    data.KEYSIGNATURE,
+    data.MEASUREMENTTYPOGRAPHYSIGNED,
+    data.MODUSMAIOR,
+    data.MODUSMINOR,
+    data.OCTAVE.DIS,
+    data.PROLATIO,
+    data.TEMPUS,
+    # string
+    data.URI,
+    # alternates but with .
+    data.FONTSIZE,
+    data.LINEWIDTH,
+    data.PLACEMENT
+    ]
+
+alternates:
+    [
+    data_FONTSIZE,
+    data_LINEWIDTH,
+    data_PLACEMENT
+    ]
+
+mapped:
+    data.AUGMENTDOT:
+        int
+    data.BEAM:
+        std::string
+    data.BEAT:
+        double
+    data.BEND.AMOUNT:
+        double
+    data.COLOR:
+        std::string
+    data.CONFIDENCE:
+        double
+    data.DEGREES:
+        double
+    data.CLEFLINE:
+        char
+    data.COURSENUMBER:
+        int
+    data.DURATION.cmn:
+        data_DURATION
+    data.DURATION.gestural:
+        data_DURATION
+    data.DURATION.mensural:
+        data_DURATION
+    data.DURATIONRESTS:
+        data_DURATION
+    data.FONTFAMILY:
+        std::string
+    data.FONTNAME:
+        std::string
+    data.FONTSIZESCALE:
+        int
+    data.INTERVAL.HARMONIC:
+        std::string
+    data.INTERVAL.MELODIC:
+        std::string
+    data.ISODATE:
+        std::string
+    data.ISOTIME:
+        std::string
+    data.KEYFIFTHS:
+        std::string
+    data.KEYSIGTOKEN:
+        std::string
+    data.LINESTARTENDSYMBOLSIZE:
+        std::string
+    data.MEASUREBEATOFFSET:
+        data_MEASUREBEAT
+    data.MEASUREMENTTYPOGRAPHYSIGNED:
+        double
+    data.MEASUREMENTTYPOGRAPHYUNSIGNED:
+        double
+    data.MIDIBPM:
+        double
+    data.MIDIVALUE_PERCENT:
+        data_PERCENT
+    data.MUSICFONT:
+        std::string
+    data.ORNAM.cmn:
+        std::string
+    data.PAGE.PANELS:
+        std::string
+    data.PGSCALE:
+        std::string
+    data.PITCHNAME.GES:
+        data_PITCHNAME
+    data.PITCHCLASS:
+        int
+    data.PITCHNUMBER:
+        int
+    data.SCALEDEGREE:
+        std::string
+    data.SLASH:
+        char
+    data.SLUR:
+        std::string
+    data.STAFFLOC:
+        int
+    data.TEMPOVALUE:
+        double
+    data.TSTAMPOFFSET:
+        double
+    data.TUPLET:
+        std::string
+    data.URI:
+        std::string
+    data.URIS:
+        std::string
+    # For MEI Basic
+    data.FINGER.FRET:
+        std::string
+    data.FRETNUMBER:
+        std::string
+    data.STRINGNUMBER:
+        std::string
+
+defaults:
+    data_ARTICULATION_List:
+        std::vector<data_ARTICULATION>()
+    data_BULGE:
+        std::vector<std::pair<double, double>>()
+    data_COMPASSDIRECTION:
+        data_COMPASSDIRECTION()
+    data_EVENTREL:
+        data_EVENTREL()
+    data_HEXNUM:
+        0
+    data_FONTSIZE:
+        data_FONTSIZE()
+    data_KEYSIGNATURE:
+        std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE)
+    data_LINEWIDTH:
+        data_LINEWIDTH()
+    data_MEASUREBEAT:
+        std::make_pair(-1, -1.0)
+    data_MEASUREMENTSIGNED:
+        data_MEASUREMENTSIGNED()
+    data_MEASUREMENTUNSIGNED:
+        data_MEASUREMENTUNSIGNED()
+    data_MEASUREMENTTYPOGRAPHYSIGNED:
+        MEI_UNSET
+    data_MEASUREMENTTYPOGRAPHYUNSIGNED:
+        MEI_UNSET
+    data_METERCOUNT_pair:
+        std::pair<std::vector<int>, MeterCountSign>()
+    data_MIDICHANNEL:
+        -1
+    data_MIDIMSPB:
+        -1
+    data_MIDIVALUE:
+        -1
+    data_MIDIVALUE_NAME:
+        data_MIDIVALUE_NAME()
+    data_MIDIVALUE_PAN:
+        data_MIDIVALUE_PAN()
+    data_OCTAVE:
+        -127
+    data_SUMMAND_List:
+        std::vector<int>()
+    xsdAnyURI_List:
+        std::vector<std::string>()
+    xsdPositiveInteger_List:
+        std::vector<int>()
+    data_PLACEMENT:
+        data_PLACEMENT()
+    data_PERCENT:
+        -1.0
+    data_PERCENT_LIMITED:
+        -1.0
+    data_STAFFITEM:
+        data_STAFFITEM()
+    data_STAFFREL:
+        data_STAFFREL()
+
+modules:
+    externalsymbols:
+        att.extsym:
+            glyphnum:
+                type: wchar_t
+                default: 0
+
+    gestural:
+        att.articulation.ges:
+            artic.ges:
+                type: data_ARTICULATION_List
+
+    mensural:
+        att.plica.vis:
+            len:
+                type: double
+                default: -1.0
+        att.stem.vis:
+            len:
+                type: double
+                default: -1.0
+
+    shared:
+        att.articulation:
+            artic:
+                type: data_ARTICULATION_List
+        att.curvature:
+            bulge:
+                type: data_BULGE
+        att.keySig.log:
+            sig:
+                type: data_KEYSIGNATURE
+        att.keySigDefault.log:
+            key.sig:
+                type: data_KEYSIGNATURE
+        att.meterSig.log:
+            count:
+                type: data_METERCOUNT_pair
+            unit:
+                type: int
+        att.meterSigDefault.log:
+            meter.count:
+                type: data_METERCOUNT_pair
+            meter.unit:
+                type: int
+        att.nNumberLike:
+            n:
+                type: std::string
+        att.plist:
+            plist:
+                type: xsdAnyURI_List
+        att.staffIdent:
+            staff:
+                type: xsdPositiveInteger_List
+        att.stems:
+            stem.len:
+                type: double
+                default: -1.0
+        att.timestamp.log:
+            tstamp:
+                default: -1.0
+
+    frettab:
+        att.note.ges.tab:
+            tab.fret:
+                type: int
+                default: -1

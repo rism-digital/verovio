@@ -74,10 +74,12 @@ void View::SetPage(int pageIdx, bool doLayout)
         m_doc->ScoreDefSetCurrentDoc();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
-        if (m_doc->GetType() == Transcription || m_doc->GetType() == Facs)
+        if (m_doc->GetType() == Transcription || m_doc->GetType() == Facs) {
             m_currentPage->LayOutTranscription();
-        else
+        }
+        else {
             m_currentPage->LayOut();
+        }
     }
 
     m_currentElement = NULL;
@@ -166,9 +168,8 @@ std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
     stream << number;
     std::u32string str = UTF8to32(stream.str());
 
-    int i;
-    for (i = 0; i < (int)str.size(); ++i) {
-        str[i] += offset - 48;
+    for (char32_t &c : str) {
+        c += offset - 48;
     }
     return str;
 }

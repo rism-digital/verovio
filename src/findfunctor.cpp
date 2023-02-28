@@ -268,7 +268,7 @@ FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
     if (object->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = object->GetPlistInterface();
         assert(interface);
-        for (auto &object : interface->GetRefs()) {
+        for (Object *object : interface->GetRefs()) {
             m_elements->push_back(object);
         }
     }

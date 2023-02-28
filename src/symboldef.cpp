@@ -73,7 +73,7 @@ std::pair<int, int> SymbolDef::GetSymbolSize(Doc *doc, int staffSize, bool dimin
     int height = 0;
     int width = 0;
 
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         if (child->Is(SVG)) {
             const Svg *svg = vrv_cast<const Svg *>(child);
             assert(svg);

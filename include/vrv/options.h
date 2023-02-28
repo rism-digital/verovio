@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
@@ -352,7 +353,8 @@ public:
     bool IsSet() const override;
 
 private:
-    //
+    std::string GetStr(const std::vector<std::string> &values) const;
+
 public:
     //
 private:
@@ -771,6 +773,7 @@ public:
     //
     OptionDbl m_bottomMarginArtic;
     OptionDbl m_bottomMarginHarm;
+    OptionDbl m_bottomMarginOctave;
     OptionDbl m_bottomMarginPgHead;
     //
     OptionDbl m_leftMarginAccid;

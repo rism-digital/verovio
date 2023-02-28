@@ -56,6 +56,11 @@ public:
     }
     ///@}
 
+    /**
+     * Calculate the bracket line width.
+     */
+    int GetLineWidth(const Doc *doc, int unit) const;
+
     //----------//
     // Functors //
     //----------//

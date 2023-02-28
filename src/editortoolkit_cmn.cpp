@@ -202,7 +202,7 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 {
     bool status = true;
     m_chainedId = "";
-    for (int i = 0; i < (int)actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); ++i) {
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
         m_editInfo.import("uuid", m_chainedId);
     }
@@ -365,33 +365,33 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
     if (!element) return false;
 
     bool success = false;
-    if (Att::SetAnalytical(element, attribute, value))
+    if (AttModule::SetAnalytical(element, attribute, value))
         success = true;
-    else if (Att::SetCmn(element, attribute, value))
+    else if (AttModule::SetCmn(element, attribute, value))
         success = true;
-    else if (Att::SetCmnornaments(element, attribute, value))
+    else if (AttModule::SetCmnornaments(element, attribute, value))
         success = true;
-    else if (Att::SetCritapp(element, attribute, value))
+    else if (AttModule::SetCritapp(element, attribute, value))
         success = true;
-    else if (Att::SetExternalsymbols(element, attribute, value))
+    else if (AttModule::SetExternalsymbols(element, attribute, value))
         success = true;
-    else if (Att::SetFacsimile(element, attribute, value))
+    else if (AttModule::SetFacsimile(element, attribute, value))
         success = true;
-    else if (Att::SetGestural(element, attribute, value))
+    else if (AttModule::SetGestural(element, attribute, value))
         success = true;
-    else if (Att::SetMei(element, attribute, value))
+    else if (AttModule::SetMei(element, attribute, value))
         success = true;
-    else if (Att::SetMensural(element, attribute, value))
+    else if (AttModule::SetMensural(element, attribute, value))
         success = true;
-    else if (Att::SetMidi(element, attribute, value))
+    else if (AttModule::SetMidi(element, attribute, value))
         success = true;
-    else if (Att::SetNeumes(element, attribute, value))
+    else if (AttModule::SetNeumes(element, attribute, value))
         success = true;
-    else if (Att::SetPagebased(element, attribute, value))
+    else if (AttModule::SetPagebased(element, attribute, value))
         success = true;
-    else if (Att::SetShared(element, attribute, value))
+    else if (AttModule::SetShared(element, attribute, value))
         success = true;
-    else if (Att::SetVisual(element, attribute, value))
+    else if (AttModule::SetVisual(element, attribute, value))
         success = true;
     if (success) {
         return true;
@@ -483,7 +483,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         chord->AddChild(note);
 
         ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
-        for (auto &artic : artics) {
+        for (Object *artic : artics) {
             artic->MoveItselfTo(chord);
         }
         currentNote->ClearRelinquishedChildren();
@@ -536,7 +536,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             parent->ReplaceChild(chord, otherNote);
 
             ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
-            for (auto &artic : artics) {
+            for (Object *artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }
             m_chainedId = chord->GetID();

@@ -76,6 +76,7 @@
 #include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "meibasic.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
@@ -262,6 +263,10 @@ bool MEIOutput::Export()
         }
         if (m_doc->GetOptions()->m_outputFormatRaw.GetValue()) {
             output_flags |= pugi::format_raw;
+        }
+
+        if (this->GetBasic()) {
+            this->PruneAttributes(m_mei.child("music"));
         }
 
         std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
@@ -1229,6 +1234,26 @@ bool MEIOutput::ProcessScoreBasedFilterEnd(Object *object)
     }
 
     return (m_filterMatchLocation == MatchLocation::Here);
+}
+
+void MEIOutput::PruneAttributes(pugi::xml_node node)
+{
+    if (node.text()) return;
+    if (!MEIBasic::map.count(node.name())) {
+        LogWarning("Element '%s' is not supported but will be preserved", node.name());
+        return;
+    }
+    std::list<std::string> unsupported;
+    for (pugi::xml_attribute attribute : node.attributes()) {
+        if (!MEIBasic::IsAllowed(node.name(), attribute.name())) {
+            unsupported.push_back(attribute.name());
+        }
+    }
+    for (const std::string &attribute : unsupported) node.remove_attribute(attribute.c_str());
+
+    for (pugi::xml_node &child : node.children()) {
+        this->PruneAttributes(child);
+    }
 }
 
 void MEIOutput::WriteStackedObjects()
@@ -2387,13 +2412,13 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(clef)) {
-        AttCleffingLog cleffingLog;
+        InstCleffingLog cleffingLog;
         cleffingLog.SetClefShape(clef->GetShape());
         cleffingLog.SetClefLine(clef->GetLine());
         cleffingLog.SetClefDis(clef->GetDis());
         cleffingLog.SetClefDisPlace(clef->GetDisPlace());
         cleffingLog.WriteCleffingLog(currentNode);
-        AttCleffingVis cleffingVis;
+        InstCleffingVis cleffingVis;
         cleffingVis.SetClefColor(clef->GetColor());
         cleffingVis.SetClefVisible(clef->GetVisible());
         cleffingVis.WriteCleffingVis(currentNode);
@@ -2480,18 +2505,18 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(keySig)) {
-        AttKeySigDefaultAnl attKeySigDefaultAnl;
+        InstKeySigDefaultAnl attKeySigDefaultAnl;
         // Broken in MEI 4.0.2 - waiting for a fix
         // attKeySigDefaultAnl.SetKeyAccid(keySig->GetAccid());
         attKeySigDefaultAnl.SetKeyMode(keySig->GetMode());
         attKeySigDefaultAnl.SetKeyPname(keySig->GetPname());
         attKeySigDefaultAnl.WriteKeySigDefaultAnl(currentNode);
-        AttKeySigDefaultLog attKeySigDefaultLog;
+        InstKeySigDefaultLog attKeySigDefaultLog;
         // If there is no @sig, try to build it from the keyAccid children.
         const data_KEYSIGNATURE sig = (keySig->HasSig()) ? keySig->GetSig() : keySig->ConvertToSig();
         attKeySigDefaultLog.SetKeySig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
-        AttKeySigDefaultVis attKeySigDefaultVis;
+        InstKeySigDefaultVis attKeySigDefaultVis;
         attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
         attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
         attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
@@ -2520,18 +2545,18 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     assert(mensur);
 
     if (!this->IsTreeObject(mensur)) {
-        AttMensuralLog mensuralLog;
+        InstMensuralLog mensuralLog;
 
         mensuralLog.SetProportNum(mensur->GetNum());
         mensuralLog.SetProportNumbase(mensur->GetNumbase());
         mensuralLog.WriteMensuralLog(currentNode);
-        AttMensuralShared mensuralShared;
+        InstMensuralShared mensuralShared;
         mensuralShared.SetModusmaior(mensur->GetModusmaior());
         mensuralShared.SetModusminor(mensur->GetModusminor());
         mensuralShared.SetProlatio(mensur->GetProlatio());
         mensuralShared.SetTempus(mensur->GetTempus());
         mensuralShared.WriteMensuralShared(currentNode);
-        AttMensuralVis mensuralVis;
+        InstMensuralVis mensuralVis;
         mensuralVis.SetMensurDot(mensur->GetDot());
         mensuralVis.SetMensurColor(mensur->GetColor());
         mensuralVis.SetMensurOrient(mensur->GetOrient());
@@ -2557,12 +2582,12 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(meterSig)) {
-        AttMeterSigDefaultLog meterSigDefaultLog;
+        InstMeterSigDefaultLog meterSigDefaultLog;
         meterSigDefaultLog.SetMeterCount(meterSig->GetCount());
         meterSigDefaultLog.SetMeterSym(meterSig->GetSym());
         meterSigDefaultLog.SetMeterUnit(meterSig->GetUnit());
         meterSigDefaultLog.WriteMeterSigDefaultLog(currentNode);
-        AttMeterSigDefaultVis meterSigDefaultVis;
+        InstMeterSigDefaultVis meterSigDefaultVis;
         meterSigDefaultVis.SetMeterForm(meterSig->GetForm());
         meterSigDefaultVis.WriteMeterSigDefaultVis(currentNode);
         return;
@@ -3015,6 +3040,7 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
     interface->WriteMidiTempo(element);
+    interface->WriteMmTempo(element);
     interface->WriteMultinumMeasures(element);
     interface->WritePianoPedals(element);
 }
@@ -3225,31 +3251,32 @@ std::u32string MEIOutput::EscapeSMuFL(std::u32string data)
     std::u32string buffer;
     // approximate that we won't have a 1.1 longer string (for optimization)
     buffer.reserve(data.size() * 1.1);
-    for (size_t pos = 0; pos != data.size(); ++pos) {
-        if (data[pos] == '&') {
+    for (const char32_t &c : data) {
+        if (c == '&') {
             buffer.append(U"&amp;");
         }
-        else if (data[pos] == '\"') {
+        else if (c == '\"') {
             buffer.append(U"&quot;");
         }
-        else if (data[pos] == '\'') {
+        else if (c == '\'') {
             buffer.append(U"&apos;");
         }
-        else if (data[pos] == '<') {
+        else if (c == '<') {
             buffer.append(U"&lt;");
         }
-        else if (data[pos] == '>') {
+        else if (c == '>') {
             buffer.append(U"&gt;");
         }
         // Unicode private area for SMuFL characters (and unicode music symbols)
-        else if (data[pos] > 0xE000) {
+        else if (c > 0xE000) {
             std::ostringstream ss;
-            ss << std::hex << (int)data[pos];
+            ss << std::hex << (int)c;
             std::u32string smuflCode = UTF8to32(ss.str());
             buffer.append(U"&#x").append(smuflCode).append(U";");
         }
-        else
-            buffer.append(&data[pos], 1);
+        else {
+            buffer.append(&c, 1);
+        }
     }
     return buffer;
 }
@@ -4562,9 +4589,9 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     object->ReadSystems(element);
     object->ReadTyped(element);
 
-    AttCleffingLog cleffingLog;
+    InstCleffingLog cleffingLog;
     cleffingLog.ReadCleffingLog(element);
-    AttCleffingVis cleffingVis;
+    InstCleffingVis cleffingVis;
     cleffingVis.ReadCleffingVis(element);
     if (cleffingLog.HasClefShape()) {
         Clef *vrvClef = new Clef();
@@ -4578,11 +4605,11 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvClef);
     }
 
-    AttKeySigDefaultAnl keySigDefaultAnl;
+    InstKeySigDefaultAnl keySigDefaultAnl;
     keySigDefaultAnl.ReadKeySigDefaultAnl(element);
-    AttKeySigDefaultLog keySigDefaultLog;
+    InstKeySigDefaultLog keySigDefaultLog;
     keySigDefaultLog.ReadKeySigDefaultLog(element);
-    AttKeySigDefaultVis keySigDefaultVis;
+    InstKeySigDefaultVis keySigDefaultVis;
     keySigDefaultVis.ReadKeySigDefaultVis(element);
     if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
         || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigShow() || keySigDefaultVis.HasKeysigShowchange()) {
@@ -4598,11 +4625,11 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvKeySig);
     }
 
-    AttMensuralLog mensuralLog;
+    InstMensuralLog mensuralLog;
     mensuralLog.ReadMensuralLog(element);
-    AttMensuralShared mensuralShared;
+    InstMensuralShared mensuralShared;
     mensuralShared.ReadMensuralShared(element);
-    AttMensuralVis mensuralVis;
+    InstMensuralVis mensuralVis;
     mensuralVis.ReadMensuralVis(element);
     if (mensuralShared.HasProlatio() || mensuralShared.HasTempus() || mensuralLog.HasProportNum()
         || mensuralLog.HasProportNumbase() || mensuralVis.HasMensurSign()) {
@@ -4630,9 +4657,9 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         object->AddChild(vrvMensur);
     }
 
-    AttMeterSigDefaultLog meterSigDefaultLog;
+    InstMeterSigDefaultLog meterSigDefaultLog;
     meterSigDefaultLog.ReadMeterSigDefaultLog(element);
-    AttMeterSigDefaultVis meterSigDefaultVis;
+    InstMeterSigDefaultVis meterSigDefaultVis;
     meterSigDefaultVis.ReadMeterSigDefaultVis(element);
     if (meterSigDefaultLog.HasMeterCount() || meterSigDefaultLog.HasMeterSym() || meterSigDefaultLog.HasMeterUnit()) {
         MeterSig *vrvMeterSig = new MeterSig();
@@ -4768,7 +4795,7 @@ bool MEIInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
     vrvStaffGrp->ReadNNumberLike(staffGrp);
-    AttStaffGroupingSym groupingSym;
+    InstStaffGroupingSym groupingSym;
     groupingSym.ReadStaffGroupingSym(staffGrp);
     if (groupingSym.HasSymbol()) {
         GrpSym *vrvGrpSym = new GrpSym();
@@ -6257,7 +6284,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadTiePresent(chord);
     vrvChord->ReadVisibility(chord);
 
-    AttArticulation artic;
+    InstArticulation artic;
     artic.ReadArticulation(chord);
     if (artic.HasArtic()) {
         Artic *vrvArtic = new Artic();
@@ -6297,9 +6324,9 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 
 void MEIInput::ReadAccidAttr(pugi::xml_node node, Object *object)
 {
-    AttAccidental accidental;
+    InstAccidental accidental;
     accidental.ReadAccidental(node);
-    AttAccidentalGes accidentalGestural;
+    InstAccidentalGes accidentalGestural;
     accidentalGestural.ReadAccidentalGes(node);
     if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
         Accid *vrvAccid = new Accid();
@@ -6629,7 +6656,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadTiePresent(note);
     vrvNote->ReadVisibility(note);
 
-    AttArticulation artic;
+    InstArticulation artic;
     artic.ReadArticulation(note);
     if (artic.HasArtic()) {
         Artic *vrvArtic = new Artic();
@@ -6867,7 +6894,7 @@ bool MEIInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
         else {
             LogWarning("Element <%s> is unknown and will be ignored", xmlElement.name());
         }
-        i++;
+        ++i;
     }
     return success;
 }
@@ -7132,6 +7159,7 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
     interface->ReadMidiTempo(element);
+    interface->ReadMmTempo(element);
     interface->ReadMultinumMeasures(element);
     interface->ReadPianoPedals(element);
     return true;
@@ -7696,10 +7724,12 @@ bool MEIInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     assert(dynamic_cast<EditorialElement *>(parent));
 
     if (level == EDITORIAL_TOPLEVEL) {
-        if (m_readingScoreBased)
+        if (m_readingScoreBased) {
             return this->ReadSectionChildren(parent, parentNode);
-        else
+        }
+        else {
             return this->ReadSystemChildren(parent, parentNode);
+        }
     }
     else if (level == EDITORIAL_SCOREDEF) {
         return this->ReadScoreDefChildren(parent, parentNode);
@@ -7821,12 +7851,10 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     int startIdx = startChild->GetIdx();
     int endIdx = endChild->GetIdx();
     // LogDebug("%d %d %s!", startIdx, endIdx, start->GetID().c_str());
-    int i;
-    for (i = endIdx; i >= startIdx; i--) {
+    for (int i = endIdx; i >= startIdx; --i) {
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
         if (element) tuplet->AddChild(element);
     }
-    tuplet->SetParent(parentLayer);
     parentLayer->InsertChild(tuplet, startIdx);
 
     return true;
@@ -7916,14 +7944,12 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     // Works only for single page files
 
     Score *score = new Score();
-    score->SetParent(page);
     page->InsertChild(score, 0);
 
     PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
-    mdiv->SetParent(page);
     page->InsertChild(mdiv, 0);
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);

@@ -10,6 +10,7 @@ jobs:
             exclude: "(hum|crc|midi|json|pugi|utf8|win32|zip)"
           - check: "src"
             exclude: "(hum|crc|midi|json|pugi)"
+          - check: "libmei/addons"
           - check: "tools"
     
     name: Check for ${{ matrix.path['check'] }}

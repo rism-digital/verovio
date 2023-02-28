@@ -282,7 +282,7 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElementEnd(LayerElement *layerEl
         layerElement->FindAllDescendantsByComparison(&durations, &hasInterface);
         Staff *crossStaff = NULL;
         Layer *crossLayer = NULL;
-        for (auto object : durations) {
+        for (Object *object : durations) {
             LayerElement *durElement = vrv_cast<LayerElement *>(object);
             assert(durElement);
             // The duration element is not cross-staff or the cross-staff is not the same staff (very rare)
@@ -962,11 +962,13 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
         }
         // The previous syl was a underscore -> the previous but one was the end
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
-            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord)
+            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     m_currentSyl->GetStart()->GetID().c_str());
-            else
+            }
+            else {
                 m_currentSyl->SetEnd(m_penultimateNoteOrChord);
+            }
         }
     }
 
@@ -1208,14 +1210,14 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
 {
-    TupletBracket *currentBracket = dynamic_cast<TupletBracket *>(tuplet->FindDescendantByType(TUPLET_BRACKET, 1));
-    TupletNum *currentNum = dynamic_cast<TupletNum *>(tuplet->FindDescendantByType(TUPLET_NUM, 1));
+    TupletBracket *currentBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
+    TupletNum *currentNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
 
     bool beamed = false;
     // Are we contained in a beam?
     if (tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
         // is only the tuplet beamed? (will not work with nested tuplets)
-        Beam *currentBeam = dynamic_cast<Beam *>(tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+        Beam *currentBeam = vrv_cast<Beam *>(tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
         if (currentBeam->GetChildCount() == 1) {
             beamed = true;
         }
@@ -1262,9 +1264,9 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
     /*********** Set the left and right element ***********/
 
     ClassIdsComparison comparison({ CHORD, NOTE, REST });
-    tuplet->SetDrawingLeft(dynamic_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison)));
+    tuplet->SetDrawingLeft(vrv_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison)));
     tuplet->SetDrawingRight(
-        dynamic_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)));
+        vrv_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)));
 
     return FUNCTOR_CONTINUE;
 }
@@ -1494,12 +1496,6 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitDynam(Dynam *dynam)
 
     m_dynams.push_back(dynam);
 
-    for (auto hairpin : m_hairpins) {
-        if ((hairpin->GetEnd() == dynam->GetStart()) && (hairpin->GetStaff() == dynam->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
-        }
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -1527,26 +1523,6 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHairpin(Hairpin *hairpin)
 
     // Only try to link them if start and end are resolved
     if (!hairpin->GetStart() || !hairpin->GetEnd()) return FUNCTOR_CONTINUE;
-
-    for (auto dynam : m_dynams) {
-        if ((dynam->GetStart() == hairpin->GetStart()) && (dynam->GetStaff() == hairpin->GetStaff())) {
-            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(dynam);
-        }
-        else if ((dynam->GetStart() == hairpin->GetEnd()) && (dynam->GetStaff() == hairpin->GetStaff())) {
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
-        }
-    }
-
-    for (auto otherHairpin : m_hairpins) {
-        if ((otherHairpin->GetEnd() == hairpin->GetStart()) && (otherHairpin->GetStaff() == hairpin->GetStaff())) {
-            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(otherHairpin);
-            if (!otherHairpin->GetRightLink()) otherHairpin->SetRightLink(hairpin);
-        }
-        if ((otherHairpin->GetStart() == hairpin->GetEnd()) && (otherHairpin->GetStaff() == hairpin->GetStaff())) {
-            if (!otherHairpin->GetLeftLink()) otherHairpin->SetLeftLink(hairpin);
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(otherHairpin);
-        }
-    }
 
     m_hairpins.push_back(hairpin);
 
@@ -1588,6 +1564,45 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode PrepareFloatingGrpsFunctor::VisitMeasureEnd(Measure *measure)
 {
+    // Link dynamics and hairpins at the end of the measure to make sure that the order of elements in MEI does not
+    // dictate their linkage. With this, linking dynamics to hairpin is prioritized and hairpins are linked only after
+    // all dynamics were processed.
+
+    for (auto &dynam : m_dynams) {
+        for (auto &hairpin : m_hairpins) {
+            if ((hairpin->GetEnd() == dynam->GetStart()) && (hairpin->GetStaff() == dynam->GetStaff())) {
+                if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+            }
+        }
+    }
+
+    for (auto &hairpin : m_hairpins) {
+        for (auto &dynam : m_dynams) {
+            if ((dynam->GetStart() == hairpin->GetStart()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(dynam);
+            }
+            else if ((dynam->GetStart() == hairpin->GetEnd()) && (dynam->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetRightLink()) hairpin->SetRightLink(dynam);
+            }
+        }
+
+        for (auto &hairpin2 : m_hairpins) {
+            if (hairpin == hairpin2) continue;
+            if ((hairpin2->GetEnd() == hairpin->GetStart()) && (hairpin2->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin->GetLeftLink() && !hairpin2->GetRightLink()) {
+                    hairpin->SetLeftLink(hairpin2);
+                    hairpin2->SetRightLink(hairpin);
+                }
+            }
+            if ((hairpin2->GetStart() == hairpin->GetEnd()) && (hairpin2->GetStaff() == hairpin->GetStaff())) {
+                if (!hairpin2->GetLeftLink() && !hairpin->GetRightLink()) {
+                    hairpin2->SetLeftLink(hairpin);
+                    hairpin->SetRightLink(hairpin2);
+                }
+            }
+        }
+    }
+
     m_dynams.clear();
 
     std::vector<Hairpin *>::iterator iter = m_hairpins.begin();
@@ -1735,18 +1750,23 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitMeasureEnd(Measure *mea
 
 FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitStaff(Staff *staff)
 {
-    ArrayOfObjects::iterator iter = m_timeSpanningElements.begin();
-    while (iter != m_timeSpanningElements.end()) {
-        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
+    for (Object *element : m_timeSpanningElements) {
+        TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
         assert(interface);
         Measure *currentMeasure = vrv_cast<Measure *>(staff->GetFirstAncestor(MEASURE));
         assert(currentMeasure);
+        // Special case for harm/fb/f where we are likely not to have a \@staff on /f
+        // Use the parent harm to get the staff (necessary when calling IsOnStaff with timestamps)
+        if (element->Is(FIGURE) && !interface->HasStaff()) {
+            Object *harm = element->GetFirstAncestor(HARM);
+            if (harm) interface = harm->GetTimeSpanningInterface();
+            assert(interface);
+        }
         // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
         // notation
         if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(staff->GetN()))) {
-            staff->m_timeSpanningElements.push_back(*iter);
+            staff->m_timeSpanningElements.push_back(element);
         }
-        ++iter;
     }
     return FUNCTOR_CONTINUE;
 }
