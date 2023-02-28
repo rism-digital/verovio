@@ -867,8 +867,8 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
         return {};
     }
 
-    Staff *staff = this->GetAncestorStaff();
-    const int layerCount = staff->GetChildCount(LAYER);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    const int layerCount = layer->GetLayerCountForTimeSpanOf(this);
 
     // Calculate primary/secondary dot locations
     const MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
