@@ -4193,6 +4193,9 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
             success = this->ReadMdiv(parent, current, makeVisible);
         }
         else if (std::string(current.name()) == "score") {
+            // Possibly skip content on load
+            if (!isVisible && m_doc->GetOptions()->m_loadSelectedMdivOnly.GetValue()) continue;
+            // Read only the first score
             success = this->ReadScore(parent, current);
             if (parentNode.last_child() != current) {
                 LogWarning("Skipping nodes after <score> element");

@@ -252,7 +252,19 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    return this->SetValue(std::stod(value));
+    // Convert string to double
+    double number = 0.0;
+    try {
+        number = std::stod(value);
+    }
+    catch (const std::exception &e) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
+            this->GetKey().c_str());
+        return false;
+    }
+
+    // Check bounds and set the value
+    return this->SetValue(number);
 }
 
 std::string OptionDbl::GetStrValue() const
@@ -328,7 +340,19 @@ bool OptionInt::SetValueDbl(double value)
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    return this->SetValue(std::stoi(value));
+    // Convert string to int
+    int number = 0;
+    try {
+        number = std::stoi(value);
+    }
+    catch (const std::exception &e) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
+            this->GetKey().c_str());
+        return false;
+    }
+
+    // Check bounds and set the value
+    return this->SetValue(number);
 }
 
 std::string OptionInt::GetStrValue() const
@@ -1534,6 +1558,11 @@ Options::Options()
         "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
+
+    m_loadSelectedMdivOnly.SetInfo(
+        "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
+    m_loadSelectedMdivOnly.Init(false);
+    this->Register(&m_loadSelectedMdivOnly, "loadSelectedMdivOnly", &m_selectors);
 
     m_mdivAll.SetInfo("Mdiv all", "Load and render all <mdiv> elements in the MEI files");
     m_mdivAll.Init(false);
