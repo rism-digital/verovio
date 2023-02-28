@@ -673,7 +673,7 @@ void View::DrawOctave(
 
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
         x1 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
-        if (!m_doc->GetOptions()->m_octaveNoSpanningParenthesis.GetValue()) {
+        if (!m_doc->GetOptions()->m_octaveNoSpanningParentheses.GetValue()) {
             x1 += m_doc->GetGlyphWidth(SMUFL_E51A_octaveParensLeft, staff->m_drawingStaffSize, false);
         }
     }
@@ -707,7 +707,7 @@ void View::DrawOctave(
     const int octaveX = altSymbols ? x1 - extend.m_width / 2 : x1 - extend.m_width;
     this->DrawSmuflCode(dc, octaveX, yCode, code, staff->m_drawingStaffSize, false);
     if (((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE))
-        && !m_doc->GetOptions()->m_octaveNoSpanningParenthesis.GetValue()) {
+        && !m_doc->GetOptions()->m_octaveNoSpanningParentheses.GetValue()) {
         const int leftWidth = m_doc->GetGlyphWidth(SMUFL_E51A_octaveParensLeft, staff->m_drawingStaffSize, false);
         const int rightWidth = m_doc->GetGlyphWidth(SMUFL_E51B_octaveParensRight, staff->m_drawingStaffSize, false);
         const int octaveWidth = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false);
