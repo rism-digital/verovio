@@ -2545,10 +2545,13 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
     // The element is starting after the event end - we can stop here
     if (time >= (params->m_time + params->m_duration)) return FUNCTOR_STOP;
 
-    if (this->Is(NOTE) && this->GetParent()->Is(CHORD)
-        && (std::find(params->m_elements.begin(), params->m_elements.end(), this->GetParent())
-            != params->m_elements.end())) {
-        return FUNCTOR_CONTINUE;
+    if (this->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(this);
+        if (note->IsChordTone()
+            && (std::find(params->m_elements.begin(), params->m_elements.end(), this->GetParent())
+                != params->m_elements.end())) {
+            return FUNCTOR_CONTINUE;
+        }
     }
     params->m_elements.push_back(this);
 
