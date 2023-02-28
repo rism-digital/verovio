@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Feb  9 08:53:30 PST 2023
+// Last Modified: Mon Feb 27 16:47:59 PST 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -51423,7 +51423,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	const string& cs = colorstring;
 
 	char fc = '\0';
-	if (cs.empty()) {
+	if (!cs.empty()) {
 		fc = cs[0];
 	}
 
@@ -51456,6 +51456,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	if (cs == "darkcyan"            ) { output.setColor("#008b8b");  return output; }
 	if (cs == "darkgoldenrod"       ) { output.setColor("#b8860b");  return output; }
 	if (cs == "darkgray"            ) { output.setColor("#a9a9a9");  return output; }
+	if (cs == "darkgrey"            ) { output.setColor("#a9a9a9");  return output; }
 	if (cs == "darkgreen"           ) { output.setColor("#006400");  return output; }
 	if (cs == "darkkhaki"           ) { output.setColor("#bdb76b");  return output; }
 	if (cs == "darkmagenta"         ) { output.setColor("#8b008b");  return output; }
@@ -51467,11 +51468,13 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	if (cs == "darkseagreen"        ) { output.setColor("#8dbc8f");  return output; }
 	if (cs == "darkslateblue"       ) { output.setColor("#483d8b");  return output; }
 	if (cs == "darkslategray"       ) { output.setColor("#2e4e4e");  return output; }
+	if (cs == "darkslategrey"       ) { output.setColor("#2e4e4e");  return output; }
 	if (cs == "darkturquoise"       ) { output.setColor("#00ded1");  return output; }
 	if (cs == "darkviolet"          ) { output.setColor("#9400d3");  return output; }
 	if (cs == "deeppink"            ) { output.setColor("#ff1493");  return output; }
 	if (cs == "deepskyblue"         ) { output.setColor("#00bfff");  return output; }
 	if (cs == "dimgray"             ) { output.setColor("#696969");  return output; }
+	if (cs == "dimgrey"             ) { output.setColor("#696969");  return output; }
 	if (cs == "dodgerblue"          ) { output.setColor("#1e90ff");  return output; }
 	break; case 'f':
 	if (cs == "firebrick"           ) { output.setColor("#b22222");  return output; }
@@ -51484,7 +51487,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	if (cs == "gold"                ) { output.setColor("#ffd700");  return output; }
 	if (cs == "goldenrod"           ) { output.setColor("#daa520");  return output; }
 	if (cs == "gray"                ) { output.setColor("#808080");  return output; }
-	if (cs == "gray"                ) { output.setColor("#808080");  return output; }
+	if (cs == "grey"                ) { output.setColor("#808080");  return output; }
 	if (cs == "green"               ) { output.setColor("#008000");  return output; }
 	if (cs == "greenyellow"         ) { output.setColor("#adff2f");  return output; }
 	break; case 'h':
@@ -51513,6 +51516,7 @@ PixelColor PixelColor::getColor(const string& colorstring) {
 	if (cs == "lightseagreen"       ) { output.setColor("#20b2aa");  return output; }
 	if (cs == "lightskyblue"        ) { output.setColor("#87cefa");  return output; }
 	if (cs == "lightslategray"      ) { output.setColor("#778899");  return output; }
+	if (cs == "lightslategrey"      ) { output.setColor("#778899");  return output; }
 	if (cs == "lightsteelblue"      ) { output.setColor("#b0c4de");  return output; }
 	if (cs == "lightyellow"         ) { output.setColor("#ffffe0");  return output; }
 	if (cs == "lime"                ) { output.setColor("#00ff00");  return output; }
@@ -94455,6 +94459,10 @@ void Tool_msearch::addMusicSearchSummary(HumdrumFile& infile, int mcount, const 
 
 void Tool_msearch::addMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 	if (match.empty()) {
+		return;
+	}
+	if (match.back() == NULL) {
+		// strange problem
 		return;
 	}
 	int startIndex   = match.at(0)->getLineIndex();
