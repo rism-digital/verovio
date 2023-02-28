@@ -1109,6 +1109,9 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
     assert(params);
 
+    // Nothing to calculate if note is not part of the chord
+    if (!this->IsChordTone()) return FUNCTOR_SIBLINGS;
+
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
 
