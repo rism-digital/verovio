@@ -1489,7 +1489,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
             octaves.insert(note->GetOct());
             ++octaveAccidCount;
         }
-        if ((octaveAccidCount < 2) || (octaves.size() < octaveAccidCount)) continue;
+        if ((octaveAccidCount < 2) || ((int)octaves.size() < octaveAccidCount)) continue;
         // Now adjust the octave accids and store the left most position
         int minDrawingX = -VRV_UNSET;
         for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
