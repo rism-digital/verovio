@@ -89,71 +89,71 @@ bool PAEOutput::Export(std::string &output)
 bool PAEOutput::WriteObject(Object *object)
 {
     if (object->Is(MDIV)) {
-        this->WriteMdiv(dynamic_cast<Mdiv *>(object));
+        this->WriteMdiv(vrv_cast<Mdiv *>(object));
     }
     if (object->Is(SCOREDEF)) {
-        this->WriteScoreDef(dynamic_cast<ScoreDef *>(object));
+        this->WriteScoreDef(vrv_cast<ScoreDef *>(object));
     }
     else if (object->Is(STAFFDEF)) {
-        this->WriteStaffDef(dynamic_cast<StaffDef *>(object));
+        this->WriteStaffDef(vrv_cast<StaffDef *>(object));
     }
     else if (object->Is(MEASURE)) {
-        this->WriteMeasure(dynamic_cast<Measure *>(object));
+        this->WriteMeasure(vrv_cast<Measure *>(object));
     }
     else if (object->Is(STAFF)) {
-        this->WriteStaff(dynamic_cast<Staff *>(object));
+        this->WriteStaff(vrv_cast<Staff *>(object));
     }
     else if (object->Is(LAYER)) {
-        this->WriteLayer(dynamic_cast<Layer *>(object));
+        this->WriteLayer(vrv_cast<Layer *>(object));
     }
 
     // Measure elements
 
     // Layer elements
     else if (object->Is(BARLINE)) {
-        this->WriteBarLine(dynamic_cast<BarLine *>(object));
+        this->WriteBarLine(vrv_cast<BarLine *>(object));
     }
     else if (object->Is(BEAM)) {
-        this->WriteBeam(dynamic_cast<Beam *>(object));
+        this->WriteBeam(vrv_cast<Beam *>(object));
     }
     else if (object->Is(CHORD)) {
-        this->WriteChord(dynamic_cast<Chord *>(object));
+        this->WriteChord(vrv_cast<Chord *>(object));
     }
     else if (object->Is(CLEF)) {
-        this->WriteClef(dynamic_cast<Clef *>(object));
+        this->WriteClef(vrv_cast<Clef *>(object));
     }
     else if (object->Is(GRACEGRP)) {
-        this->WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
+        this->WriteGraceGrp(vrv_cast<GraceGrp *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        this->WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
+        this->WriteKeyAccid(vrv_cast<KeyAccid *>(object));
     }
     else if (object->Is(KEYSIG)) {
-        this->WriteKeySig(dynamic_cast<KeySig *>(object));
+        this->WriteKeySig(vrv_cast<KeySig *>(object));
     }
     else if (object->Is(MENSUR)) {
-        this->WriteMensur(dynamic_cast<Mensur *>(object));
+        this->WriteMensur(vrv_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        this->WriteMeterSig(dynamic_cast<MeterSig *>(object));
+        this->WriteMeterSig(vrv_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
-        this->WriteMRest(dynamic_cast<MRest *>(object));
+        this->WriteMRest(vrv_cast<MRest *>(object));
     }
     else if (object->Is(MULTIREST)) {
-        this->WriteMultiRest(dynamic_cast<MultiRest *>(object));
+        this->WriteMultiRest(vrv_cast<MultiRest *>(object));
     }
     else if (object->Is(NOTE)) {
-        this->WriteNote(dynamic_cast<Note *>(object));
+        this->WriteNote(vrv_cast<Note *>(object));
     }
     else if (object->Is(REST)) {
-        this->WriteRest(dynamic_cast<Rest *>(object));
+        this->WriteRest(vrv_cast<Rest *>(object));
     }
     else if (object->Is(SPACE)) {
-        this->WriteSpace(dynamic_cast<Space *>(object));
+        this->WriteSpace(vrv_cast<Space *>(object));
     }
     else if (object->Is(TUPLET)) {
-        this->WriteTuplet(dynamic_cast<Tuplet *>(object));
+        this->WriteTuplet(vrv_cast<Tuplet *>(object));
     }
     else {
         // Log something?
@@ -165,13 +165,13 @@ bool PAEOutput::WriteObject(Object *object)
 bool PAEOutput::WriteObjectEnd(Object *object)
 {
     if (object->Is(MEASURE)) {
-        this->WriteMeasureEnd(dynamic_cast<Measure *>(object));
+        this->WriteMeasureEnd(vrv_cast<Measure *>(object));
     }
     else if (object->Is(BEAM)) {
-        this->WriteBeamEnd(dynamic_cast<Beam *>(object));
+        this->WriteBeamEnd(vrv_cast<Beam *>(object));
     }
     else if (object->Is(TUPLET)) {
-        this->WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+        this->WriteTupletEnd(vrv_cast<Tuplet *>(object));
     }
 
     return true;
@@ -441,7 +441,7 @@ void PAEOutput::WriteNote(Note *note)
         this->WriteGrace(note);
     }
 
-    Accid *noteAccid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
+    Accid *noteAccid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
     if (noteAccid) {
         std::string accid;
         switch (noteAccid->GetAccid()) {
@@ -458,7 +458,7 @@ void PAEOutput::WriteNote(Note *note)
 
     PointingToComparison pointingToComparisonFermata(FERMATA, note);
     Fermata *fermata
-        = dynamic_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
     if (fermata) m_streamStringOutput << "(";
 
     std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
@@ -468,11 +468,11 @@ void PAEOutput::WriteNote(Note *note)
     if (fermata) m_streamStringOutput << ")";
 
     PointingToComparison pointingToComparisonTrill(TRILL, note);
-    Trill *trill = dynamic_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
+    Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
     if (trill) m_streamStringOutput << "t";
 
     PointingToComparison pointingToComparisonTie(TIE, note);
-    Tie *tie = dynamic_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
+    Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
     if (tie) m_streamStringOutput << "+";
 }
 
@@ -742,10 +742,12 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_clef)) {
         Clef *c = new Clef;
         getClefInfo(c_clef, c); // do we need to put a default clef?
-        if (!staffDefClef)
+        if (!staffDefClef) {
             staffDefClef = c;
-        else
+        }
+        else {
             current_measure.clef = c;
+        }
     }
 
     if (strlen(c_keysig)) {
@@ -800,7 +802,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
 
         if (incipit[i] == ' ') {
             // just skip
-            i++;
+            ++i;
         }
 
         // octaves
@@ -822,10 +824,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         // beaming starts
         else if (incipit[i] == '{') {
             // current_note.beam = 1;
-            if (current_note.tuplet_note > 0)
-                current_note.beam = BEAM_TUPLET;
-            else
-                current_note.beam = BEAM_INITIAL;
+            current_note.beam = (current_note.tuplet_note > 0) ? BEAM_TUPLET : BEAM_INITIAL;
             in_beam++;
         }
 
@@ -967,7 +966,7 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
             }
         }
 
-        i++;
+        ++i;
     }
 
     // we need to add the last measure if it has no barLine at the end
@@ -1057,7 +1056,7 @@ int PAEInput::getOctave(const char *incipit, char *octave, int index)
         *octave = BASE_OCT;
         while ((i + 1 < length) && (incipit[i + 1] == '\'')) {
             (*octave)++;
-            i++;
+            ++i;
         }
     }
     else if (incipit[i] == ',') {
@@ -1065,7 +1064,7 @@ int PAEInput::getOctave(const char *incipit, char *octave, int index)
         *octave = BASE_OCT - 1;
         while ((i + 1 < length) && (incipit[i + 1] == ',')) {
             (*octave)--;
-            i++;
+            ++i;
         }
     }
 
@@ -1121,7 +1120,7 @@ int PAEInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
     *dot = 0;
     while ((i + 1 < length) && (incipit[i + 1] == '.')) {
         (*dot)++;
-        i++;
+        ++i;
     }
     if ((*dot == 1) && (incipit[i] == 7)) {
         // neumatic notation
@@ -1157,7 +1156,7 @@ int PAEInput::getDurations(const char *incipit, pae::Measure *measure, int index
         measure->dots.push_back(dot);
         // j++;
         if ((i + 1 < length) && isdigit(incipit[i + 1])) {
-            i++;
+            ++i;
         }
         else {
             break;
@@ -1184,14 +1183,14 @@ int PAEInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accide
         *accident = ACCIDENTAL_WRITTEN_s;
         if ((i + 1 < length) && (incipit[i + 1] == 'x')) {
             *accident = ACCIDENTAL_WRITTEN_x;
-            i++;
+            ++i;
         }
     }
     else if (incipit[i] == 'b') {
         *accident = ACCIDENTAL_WRITTEN_f;
         if ((i + 1 < length) && (incipit[i + 1] == 'b')) {
             *accident = ACCIDENTAL_WRITTEN_ff;
-            i++;
+            ++i;
         }
     }
     return i - index;
@@ -1322,7 +1321,7 @@ int PAEInput::getGraceNote(const char *incipit, pae::Note *note, int index)
     else if (incipit[i] == 'q') {
         note->appoggiatura = 1;
         if ((i + 1 < length) && (incipit[i + 1] == 'q')) {
-            i++;
+            ++i;
             int r = i;
             while ((r < length) && (incipit[r] != 'r')) {
                 if ((incipit[r] - 'A' >= 0) && (incipit[r] - 'A' < 7)) {
@@ -1377,12 +1376,12 @@ int PAEInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
     }
 
     // find the end of time signature
-    i++; // the time signature length is a least 1
+    ++i; // the time signature length is a least 1
     while (i < length) {
         if (!isdigit(incipit[i]) && (incipit[i] != '/') && (incipit[i] != '.')) {
             break;
         }
-        i++;
+        ++i;
     }
 
     // use a substring for the time signature
@@ -1496,7 +1495,7 @@ int PAEInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         if (incipit[index] == '+') {
             m_is_mensural = true;
         }
-        i++;
+        ++i;
         index++;
     }
 
@@ -1625,7 +1624,7 @@ int PAEInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
     else { //
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
-            i++;
+            ++i;
             for (int j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes.at(j));
                 // With abbreviation, repeat clefs but do not copy keySig, meterSig and mensur
@@ -1696,7 +1695,7 @@ int PAEInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             if (alt_nr < 7) {
                 enclosedAccids.at(alt_nr) = enclosed;
             }
-            i++;
+            ++i;
         }
     }
 
@@ -1888,7 +1887,7 @@ void PAEInput::convertMeasure(pae::Measure *measure)
 
     m_nested_objects.clear();
 
-    for (unsigned int i = 0; i < measure->notes.size(); ++i) {
+    for (int i = 0; i < (int)measure->notes.size(); ++i) {
         pae::Note *note = &measure->notes.at(i);
         parseNote(note);
     }
@@ -2035,7 +2034,7 @@ void PAEInput::parseNote(pae::Note *note)
 
     // note in a chord
     if (note->chord && element->Is(NOTE)) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {
@@ -2190,8 +2189,7 @@ void PAEInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     strcpy(value, &input[index]);
 
     // Truncate string to first space
-    size_t i;
-    for (i = strlen(value) - 2; i > 0; i--) {
+    for (int i = strlen(value) - 2; i > 0; --i) {
         if (isspace(value[i])) {
             value[i] = EMPTY;
             continue;
@@ -2451,7 +2449,7 @@ void PAEInput::ClearTokenObjects()
 {
     // Before we clear the pae list of tokens, we need to delete all token objects.
     // Normally, they should be none because they are passed to the doc.
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (!token.m_object || token.IsContainerEnd()) continue;
         LogDebug("Delete token %s", token.m_object->GetClassName().c_str());
         delete token.m_object;
@@ -2541,7 +2539,7 @@ void PAEInput::LogDebugTokens(bool vertical)
 {
     // For long incipits or to see full class name
     if (vertical) {
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c1 = (token.m_char) ? token.m_char : ' ';
             char c2 = (token.m_inputChar) ? token.m_inputChar : ' ';
             std::string className = (token.m_object) ? token.m_object->GetClassName() : "";
@@ -2551,7 +2549,7 @@ void PAEInput::LogDebugTokens(bool vertical)
     }
     else {
         std::string row;
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c = (token.m_inputChar) ? token.m_inputChar : ' ';
             row.push_back(c);
         }
@@ -2559,20 +2557,20 @@ void PAEInput::LogDebugTokens(bool vertical)
         LogDebug(row.c_str());
         if (m_hasErrors) {
             row.clear();
-            for (auto &token : m_pae) {
+            for (pae::Token &token : m_pae) {
                 char c = (token.m_isError) ? '^' : ' ';
                 row.push_back(c);
             }
             LogDebug(row.c_str());
         }
         row.clear();
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             std::string className = (token.m_object) ? token.m_object->GetClassName() : " ";
             row.push_back(className.at(0));
         }
         LogDebug(row.c_str());
         row.clear();
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             char c = (token.m_char) ? token.m_char : ' ';
             row.push_back(c);
         }
@@ -2624,7 +2622,7 @@ void PAEInput::AddToken(char c, int &position)
 
 void PAEInput::PrepareInsertion(int position, std::list<pae::Token> &insertion)
 {
-    for (auto &token : insertion) {
+    for (pae::Token &token : insertion) {
         token.m_position = position;
         if (token.m_object) {
             token.m_object = token.m_object->Clone();
@@ -2777,7 +2775,24 @@ bool PAEInput::Import(const std::string &input)
     m_hasMeterSig = false;
     m_hasMensur = false;
 
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+
+    // Genereate the header and add a comment to the project description
+    m_doc->GenerateMEIHeader(false);
+    pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
+    if (projectDesc) {
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.text().set("Converted from Plaine and Easie to MEI");
+    }
+
     bool success = true;
+
+    jsonxx::Object header;
+    if (jsonInput.has<jsonxx::Object>("x-header")) {
+        header = jsonInput.get<jsonxx::Object>("x-header");
+        ParseHeader(header);
+    }
 
     std::string keySigStr;
     if (jsonInput.has<jsonxx::String>("keysig")) keySigStr = jsonInput.get<jsonxx::String>("keysig");
@@ -2865,7 +2880,7 @@ bool PAEInput::Import(const std::string &input)
         if (c == pae::CONTAINER_END) continue;
         // Otherwise go ahead
         this->AddToken(c, i);
-        i++;
+        ++i;
     }
 
     // Add a token marking the end - special use of the CONTAINER_END with no object
@@ -2934,8 +2949,6 @@ bool PAEInput::Parse()
         return false;
     }
 
-    m_doc->Reset();
-    m_doc->SetType(Raw);
     // Set the notation type
     if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
@@ -2988,7 +3001,7 @@ bool PAEInput::Parse()
     // The current meterSig, used to calculate the tstamp2 for open ties
     MeterSig *currentMeterSig = &m_meterSig;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // Double check that we don't have more than the layer on the layerStack
@@ -3126,7 +3139,7 @@ bool PAEInput::ConvertKeySig()
     pae::Token *keySigToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::KEYSIG_START) {
@@ -3159,12 +3172,114 @@ bool PAEInput::ConvertKeySig()
     return true;
 }
 
+void PAEInput::ParseHeader(jsonxx::Object &header)
+{
+    // Get the nodes for element that has to be already in the header
+    pugi::xml_node fileDesc = m_doc->m_header.first_child().select_node("//fileDesc").node();
+    if (!fileDesc) return;
+
+    pugi::xml_node titleStmt = fileDesc.select_node("//titleStmt").node();
+    if (!titleStmt) return;
+
+    pugi::xml_node pubStmt = fileDesc.select_node("//pubStmt").node();
+    if (!pubStmt) return;
+
+    // normally the header already has an empty title - add if missing
+    pugi::xml_node title = titleStmt.child("title");
+    if (!title) title = titleStmt.append_child("title");
+
+    if (header.has<jsonxx::String>("source_title")) {
+        title.text().set(header.get<jsonxx::String>("source_title").c_str());
+    }
+
+    if (header.has<jsonxx::String>("title")) {
+        pugi::xml_node subTitle = titleStmt.append_child("title");
+        subTitle.append_attribute("type") = "subordinate";
+        subTitle.text().set(header.get<jsonxx::String>("title").c_str());
+        if (header.has<jsonxx::String>("movement")) {
+            subTitle.append_attribute("label") = header.get<jsonxx::String>("movement").c_str();
+        }
+    }
+
+    if (header.has<jsonxx::String>("composer")) {
+        pugi::xml_node composer = titleStmt.append_child("composer");
+        composer.text().set(header.get<jsonxx::String>("composer").c_str());
+    }
+
+    if (header.has<jsonxx::String>("source_url") || header.has<jsonxx::String>("download_url")) {
+        pugi::xml_node identifier = pubStmt.append_child("identifier");
+        if (header.has<jsonxx::String>("source_url")) {
+            pugi::xml_node ptr = identifier.append_child("ptr");
+            ptr.append_attribute("type") = "rism:Source";
+            ptr.append_attribute("target") = header.get<jsonxx::String>("source_url").c_str();
+        }
+        if (header.has<jsonxx::String>("download_url")) {
+            pugi::xml_node ptr = identifier.append_child("ptr");
+            ptr.append_attribute("type") = "rism:Incipit";
+            ptr.append_attribute("target") = header.get<jsonxx::String>("download_url").c_str();
+        }
+    }
+
+    if (header.has<jsonxx::Array>("notes")) {
+        pugi::xml_node notesStmt = fileDesc.append_child("notesStmt");
+        jsonxx::Array array = header.get<jsonxx::Array>("notes");
+        for (int i = 0; i < (int)array.size(); ++i) {
+            pugi::xml_node annot = notesStmt.append_child("annot");
+            annot.text().set(array.get<jsonxx::String>(i).c_str());
+        }
+    }
+
+    bool hasIncip = false;
+    for (const std::string &key : { "scoring", "key_mode", "role", "voice_intrument" }) {
+        hasIncip = hasIncip || header.has<jsonxx::String>(key) || header.has<jsonxx::Array>(key);
+    }
+    if (hasIncip) {
+        pugi::xml_node work = m_doc->m_header.first_child().append_child("workList").append_child("work");
+        pugi::xml_node title = work.append_child("title");
+        if (header.has<jsonxx::String>("title")) {
+            title.text().set(header.get<jsonxx::String>("title").c_str());
+        }
+        pugi::xml_node incip = work.append_child("incip");
+        if (header.has<jsonxx::String>("role")) {
+            incip.append_child("role")
+                .append_child(pugi::node_pcdata)
+                .set_value(header.get<jsonxx::String>("role").c_str());
+        }
+        if (header.has<jsonxx::String>("scoring") || header.has<jsonxx::String>("voice_intrument")) {
+            pugi::xml_node perfResList = incip.append_child("perfResList");
+            if (header.has<jsonxx::String>("voice_instrument")) {
+                perfResList.append_child("perfRes")
+                    .append_child(pugi::node_pcdata)
+                    .set_value(header.get<jsonxx::String>("voice_instrument").c_str());
+            }
+            if (header.has<jsonxx::String>("scoring")) {
+                perfResList.append_child("perfRes")
+                    .append_child(pugi::node_pcdata)
+                    .set_value(header.get<jsonxx::String>("scoring").c_str());
+            }
+        }
+        if (header.has<jsonxx::String>("key_mode")) {
+            incip.append_child("key")
+                .append_child(pugi::node_pcdata)
+                .set_value(header.get<jsonxx::String>("key_mode").c_str());
+        }
+        if (header.has<jsonxx::Array>("text_incipits")) {
+            pugi::xml_node incipText = incip.append_child("incipText");
+            jsonxx::Array array = header.get<jsonxx::Array>("text_incipits");
+            for (int i = 0; i < (int)array.size(); ++i) {
+                pugi::xml_node p = incipText.append_child("p");
+                p.text().set(array.get<jsonxx::String>(i).c_str());
+            }
+        }
+    }
+}
+
 bool PAEInput::ConvertClef()
 {
     pae::Token *clefToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::CLEF_START) {
@@ -3202,7 +3317,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
     pae::Token *meterSigOrMensurToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::METERSIG_START) {
@@ -3251,7 +3366,7 @@ bool PAEInput::ConvertMeasure()
     // measureCount is currently ignored by the Measure constructor
     int measureCount = 1;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // This is the first (default) measure added to the tokens ::Import
@@ -3446,7 +3561,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
     pae::Token *mRestOrMultiRestToken = NULL;
     std::string paeStr;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '=') {
@@ -3487,7 +3602,7 @@ bool PAEInput::ConvertMRestOrMultiRest()
 
 bool PAEInput::ConvertPitch()
 {
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::NOTENAME)) {
@@ -3517,7 +3632,7 @@ bool PAEInput::ConvertOctave()
     int oct = 4;
     char readingOct = 0;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == pae::OCTAVEUP) {
@@ -3562,7 +3677,7 @@ bool PAEInput::ConvertTrill()
 {
     Object *note = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         // Keep a pointer and simply continue
@@ -3602,7 +3717,7 @@ bool PAEInput::ConvertFermata()
     pae::Token *fermataToken = NULL;
     Object *fermataTarget = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '(') {
@@ -3665,7 +3780,7 @@ bool PAEInput::ConvertAccidental()
 {
     data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::ACCIDENTAL_INTERNAL)) {
@@ -3704,7 +3819,7 @@ bool PAEInput::ConvertAccidental()
 
 bool PAEInput::ConvertRest()
 {
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == '-') {
@@ -3899,7 +4014,7 @@ bool PAEInput::ConvertGraceGrp()
     // Do a first loop to change 'qq' to 'Q' for eaiser grace groups detection
     pae::Token *graceGrpToken = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.m_char == 'q') {
@@ -3975,7 +4090,7 @@ bool PAEInput::ConvertGrace()
     pae::Token *graceToken = NULL;
     bool isAcciaccatura = false;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (this->Is(token, pae::GRACE)) {
@@ -4224,7 +4339,7 @@ bool PAEInput::ConvertTie()
     // A pointer to the token be able to reset it to '+' in mensural notation
     pae::Token *tieToken = NULL;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.Is(NOTE)) {
@@ -4400,7 +4515,7 @@ bool PAEInput::ConvertAccidGes()
     Note *lastNote = NULL;
     std::map<std::string, data_ACCIDENTAL_WRITTEN> ties;
 
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid()) continue;
 
         if (token.Is(KEYSIG)) {
@@ -4485,7 +4600,7 @@ bool PAEInput::CheckHierarchy()
     while (!isValid && checkCount < 5) {
         checkCount++;
         isValid = true;
-        for (auto &token : m_pae) {
+        for (pae::Token &token : m_pae) {
             if (token.IsVoid()) continue;
 
             if (!token.m_object) continue;
@@ -4603,7 +4718,7 @@ bool PAEInput::CheckContentPostBuild()
 void PAEInput::RemoveContainerToken(Object *object)
 {
     bool deleted = false;
-    for (auto &token : m_pae) {
+    for (pae::Token &token : m_pae) {
         if (token.IsVoid() || !token.m_object) continue;
 
         if (token.m_object == object) {
@@ -4639,7 +4754,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     enclosedAccids.resize(7);
     bool cancel = false;
     data_ACCIDENTAL_WRITTEN alterationType = ACCIDENTAL_WRITTEN_NONE;
-    for (auto c : paeStr) {
+    for (char c : paeStr) {
         switch (c) {
             case 'b':
                 altNumber = 0;

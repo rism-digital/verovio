@@ -78,7 +78,7 @@ bool Harm::IsSupportedChild(Object *child)
 
 bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
 {
-    const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
+    const Text *textObject = vrv_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
     std::u32string text = textObject->GetText();
 
@@ -86,16 +86,21 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
         int pname = (text.at(pos) - 'C' + 7) % 7;
         int accid = 0;
         for (pos++; pos < text.length(); pos++) {
-            if (text.at(pos) == UNICODE_DOUBLE_FLAT)
+            if (text.at(pos) == UNICODE_DOUBLE_FLAT) {
                 accid -= 2;
-            else if (text.at(pos) == 'b' || text.at(pos) == UNICODE_FLAT)
+            }
+            else if (text.at(pos) == 'b' || text.at(pos) == UNICODE_FLAT) {
                 accid--;
-            else if (text.at(pos) == '#' || text.at(pos) == UNICODE_SHARP)
+            }
+            else if (text.at(pos) == '#' || text.at(pos) == UNICODE_SHARP) {
                 accid++;
-            else if (text.at(pos) == UNICODE_DOUBLE_SHARP)
+            }
+            else if (text.at(pos) == UNICODE_DOUBLE_SHARP) {
                 accid += 2;
-            else
+            }
+            else {
                 break;
+            }
         }
         pitch = TransPitch(pname, accid, 4);
         return true;
@@ -106,7 +111,7 @@ bool Harm::GetRootPitch(TransPitch &pitch, unsigned int &pos) const
 
 void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
 {
-    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    Text *textObject = vrv_cast<Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return;
     std::u32string text = textObject->GetText();
 
@@ -120,7 +125,7 @@ void Harm::SetRootPitch(const TransPitch &pitch, unsigned int endPos)
 
 bool Harm::GetBassPitch(TransPitch &pitch) const
 {
-    const Text *textObject = dynamic_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
+    const Text *textObject = vrv_cast<const Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return false;
     std::u32string text = textObject->GetText();
     if (!text.length()) return false;
@@ -136,7 +141,7 @@ bool Harm::GetBassPitch(TransPitch &pitch) const
 
 void Harm::SetBassPitch(const TransPitch &pitch)
 {
-    Text *textObject = dynamic_cast<Text *>(this->FindDescendantByType(TEXT, 1));
+    Text *textObject = vrv_cast<Text *>(this->FindDescendantByType(TEXT, 1));
     if (!textObject) return;
     std::u32string text = textObject->GetText();
     unsigned int pos;

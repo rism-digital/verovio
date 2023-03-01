@@ -9,6 +9,7 @@
 #define __VRV_TIME_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -118,7 +119,7 @@ public:
 
 protected:
     /**
-     * Extract the fragment of the start or end @xml:id if given
+     * Extract the fragment of the start or end \@xml:id if given
      */
     void SetIDStr();
 

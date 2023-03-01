@@ -9,6 +9,7 @@
 #define __VRV_IOMUSXML_H__
 
 #include <map>
+#include <optional>
 #include <queue>
 #include <string>
 #include <vector>
@@ -259,8 +260,9 @@ private:
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
+     * Returns true if the measure was added to the tree (did not exist before)
      */
-    void AddMeasure(Section *section, Measure *measure, int i);
+    bool AddMeasure(Section *section, Measure *measure, int i);
 
     /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
@@ -278,7 +280,7 @@ private:
     Layer *SelectLayer(short int staffNb, Measure *measure);
 
     /*
-     * Returns the layer with @n=layerNb on the staff.
+     * Returns the layer with \@n=layerNb on the staff.
      * Creates the layer if not found.
      */
     Layer *SelectLayer(short int layerNb, Staff *staff);
@@ -313,10 +315,10 @@ private:
     ///@}
 
     /*
-     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     * @name Helper method to check whether an ending measure is already present in m_endingStack.
      */
     ///@{
-    bool NotInEndingStack(std::string const &measureN);
+    bool NotInEndingStack(const Measure *measure) const;
     ///@}
 
     /*
@@ -404,7 +406,7 @@ private:
     ///@}
 
     /*
-     * @name Helper method for setting @staff attribute for chords
+     * @name Helper method for setting \@staff attribute for chords
      */
     ///@{
     void SetChordStaff(Layer *layer);
@@ -465,7 +467,7 @@ private:
     /* measure repeats */
     bool m_slash = false;
     /* MIDI ticks */
-    int m_ppq = 1;
+    int m_ppq = -1;
     /* measure time */
     int m_durTotal = 0;
     /* measure time */
@@ -507,6 +509,9 @@ private:
     std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
     std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
+    /* Current ending info for start/stop */
+    std::optional<musicxml::EndingInfo> m_currentEndingStart;
+    std::optional<musicxml::EndingInfo> m_currentEndingStop;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>> m_endingStack;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */

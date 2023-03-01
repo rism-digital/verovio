@@ -78,18 +78,12 @@ static const ClassRegistrar<MNum> s_factory("mNum", MNUM);
 
 int MNum::Save(FunctorParams *functorParams)
 {
-    if (this->IsGenerated())
-        return FUNCTOR_SIBLINGS;
-    else
-        return Object::Save(functorParams);
+    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::Save(functorParams);
 }
 
 int MNum::SaveEnd(FunctorParams *functorParams)
 {
-    if (this->IsGenerated())
-        return FUNCTOR_SIBLINGS;
-    else
-        return Object::SaveEnd(functorParams);
+    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::SaveEnd(functorParams);
 }
 
 } // namespace vrv

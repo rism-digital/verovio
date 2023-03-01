@@ -255,7 +255,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
 
         // look at the note position and adjust it if necessary
-        Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+        Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             const int drawingDur = note->GetDrawingDur();
             int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
@@ -1506,8 +1506,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // We check if this belongs to a mensural note
     Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
     if (parent && parent->IsMensuralDur()) {
-        if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
-            && stem->GetVisible() != BOOLEAN_false) {
+        if (parent->GetDrawingDur() > DUR_1) {
             /************** Stem/notehead direction: **************/
             const int staffCenter
                 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
@@ -1695,7 +1694,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        System *currentSystem = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1718,7 +1717,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Verse *verse = vrv_cast<Verse *>(element);
     assert(verse);
 
-    Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
+    Label *label = vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
 
     if (label || labelAbbr) {
@@ -1792,7 +1791,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
 
     const data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
     int y = stem->GetDrawingY() - stem->GetDrawingStemLen();
-    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
+    Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
     if (flag) {
         const char32_t glyph = flag->GetFlagGlyph(stemDir);
         if (glyph) {
@@ -1953,10 +1952,10 @@ int View::GetFYRel(F *f, Staff *staff)
     y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
 
     FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
-    // There is no other harm, we use the bottom line.
-    if (!positioner) return y;
-
-    y = positioner->GetDrawingY();
+    // If there is no other harm, we use the bottom line.
+    if (positioner) {
+        y = positioner->GetDrawingY();
+    }
 
     Object *fb = f->GetFirstAncestor(FB);
     assert(fb);

@@ -100,15 +100,15 @@ jobs:
 
           - os: macos-latest
             compiler: xcode
-            version: "11.7"
+            version: "13.1"
 
           - os: macos-latest
             compiler: xcode
-            version: "12.5.1"
+            version: "14.2"
 
-          - os: macos-latest
+          - os: macos-11
             compiler: g++
-            version: "9"
+            version: "12"
 
     steps:
       - name: Checkout main repo
@@ -141,7 +141,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           if [ "${{ matrix.compiler }}" == "g++" ]; then
-            # set environment variables (use alias gcc-9)
+            # set environment variables (use alias gcc)
             echo CC=gcc-${{ matrix.version }} >> $GITHUB_ENV
             echo CXX=g++-${{ matrix.version }} >> $GITHUB_ENV
 

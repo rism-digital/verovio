@@ -165,7 +165,7 @@ char32_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
                                                                                  : SMUFL_E052_gClef8vb;
                             break;
                         case OCTAVE_DIS_15:
-                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E053_gClef8va
+                            return (this->GetDisPlace() == STAFFREL_basic_above) ? SMUFL_E054_gClef15ma
                                                                                  : SMUFL_E051_gClef15mb;
                             break;
                         default: return (clefChange) ? SMUFL_E07A_gClefChange : SMUFL_E050_gClef; break;

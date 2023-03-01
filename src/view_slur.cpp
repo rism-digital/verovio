@@ -40,10 +40,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Point points[4];
     curve->GetPoints(points);
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetID());
-    else
+    }
+    else {
         dc->StartGraphic(slur, "", slur->GetID(), SPANNING);
+    }
 
     int penStyle = AxSOLID;
     switch (slur->GetLform()) {
@@ -60,10 +62,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     this->DrawThickBezierCurve(
         dc, points, thicknessCoefficient * curve->GetThickness(), staff->m_drawingStaffSize, penWidth, penStyle);
 
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
-    else
+    }
+    else {
         dc->EndGraphic(slur, this);
+    }
 }
 
 FloatingCurvePositioner *View::CalcInitialSlur(

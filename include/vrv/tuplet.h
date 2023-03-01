@@ -77,6 +77,15 @@ public:
     ///@}
 
     /**
+     * @name Getter and setter for the inner slurs.
+     */
+    ///@{
+    const std::set<const FloatingCurvePositioner *> &GetInnerSlurs() const { return m_innerSlurs; }
+    void AddInnerSlur(const FloatingCurvePositioner *slur) { m_innerSlurs.insert(slur); }
+    void ResetInnerSlurs() { m_innerSlurs.clear(); }
+    ///@}
+
+    /**
      * Calculate the position of the bracket and the num looking at the stem direction or at the encoded values (if
      * any). Called in View::DrawTuplet the first time it is called (and not trough a dedicated CalcTuplet functor)
      */
@@ -108,9 +117,19 @@ public:
     int AdjustTupletsY(FunctorParams *functorParams) override;
 
     /**
+     * See Object::AdjustTupletWithSlurs
+     */
+    int AdjustTupletWithSlurs(FunctorParams *functorParams) override;
+
+    /**
      * See Object::ResetHorizontalAlignment
      */
     int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetData
@@ -163,14 +182,16 @@ private:
      * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
      */
     LayerElement *m_drawingRight;
-    /** The calcultated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
+    /** The calculated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingBracketPos;
-    /** The calcultated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
+    /** The calculated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingNumPos;
     /** The beam with which the bracket aligns (in any) set in Tuplet::AdjustTupletsX */
     Beam *m_bracketAlignedBeam;
     /** The beam with which the num aligns (in any) set in Tuplet::AdjustTupletsX */
     Beam *m_numAlignedBeam;
+    /** The slurs avoided by the tuplet, set during drawing */
+    std::set<const FloatingCurvePositioner *> m_innerSlurs;
 };
 
 } // namespace vrv

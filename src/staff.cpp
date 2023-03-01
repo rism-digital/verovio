@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
+#include <iterator>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -252,8 +253,7 @@ void Staff::AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int r
     assert(left < right);
 
     if ((int)lines.size() < count) lines.resize(count);
-    int i = 0;
-    for (i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i) {
         lines.at(i).AddDash(left, right, extension);
     }
 }
@@ -606,18 +606,23 @@ int Staff::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
         = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
 
-    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
-    while (iter != params->m_timeSpanningElements.end()) {
-        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
+    for (auto element : params->m_timeSpanningElements) {
+        TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
         assert(interface);
         Measure *currentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
         assert(currentMeasure);
+        // Special case for harm/fb/f where we are likely not to have a \@staff on /f
+        // Use the parent harm to get the staff (necessary when calling IsOnStaff with timestamps)
+        if (element->Is(FIGURE) && !interface->HasStaff()) {
+            Object *harm = element->GetFirstAncestor(HARM);
+            if (harm) interface = harm->GetTimeSpanningInterface();
+            assert(interface);
+        }
         // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
         // notation
         if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
-            m_timeSpanningElements.push_back(*iter);
+            m_timeSpanningElements.push_back(element);
         }
-        ++iter;
     }
     return FUNCTOR_CONTINUE;
 }

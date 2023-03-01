@@ -314,7 +314,7 @@ public:
     ///@}
 
     /**
-     * Override the method of adding AlignmentReference children
+     * Override the method of adding Alignment children
      */
     bool IsSupportedChild(Object *object) override;
 
@@ -329,9 +329,9 @@ public:
     void AddToAccidSpace(Accid *accid);
 
     /**
-     * See Object::AjustAccidX
+     * See Object::AdjustAccidX
      */
-    void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids);
+    void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids);
 
     /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
@@ -468,6 +468,11 @@ public:
     virtual ~MeasureAligner();
     void Reset() override;
     ///@}
+
+    /**
+     * Override the method of adding AlignmentReference children
+     */
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Retrieve the alignmnet of the type at that time.
@@ -695,6 +700,11 @@ public:
      * Reset the aligner (clear the content)
      */
     void Reset() override;
+
+    /**
+     * Override the method of adding TimestampAttr children
+     */
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Look for an existing TimestampAttr at a certain time.

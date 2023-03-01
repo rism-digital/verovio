@@ -8,10 +8,10 @@
 #ifndef __VRV_H__
 #define __VRV_H__
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
 #include <map>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -40,7 +40,7 @@ void LogInfo(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
 
 /**
- * Member and functions specific to loging that uses a vector of string to buffer the logs.
+ * Member and functions specific to logging that uses a vector of string to buffer the logs.
  */
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
@@ -99,7 +99,7 @@ std::string GetVersion();
  * Encode the integer value using the specified base (max is 62)
  * Base 36 uses 0-9 and a-z, base 62 also A-Z.
  */
-std::string BaseEncodeInt(unsigned int value, unsigned int base);
+std::string BaseEncodeInt(uint32_t value, uint8_t base);
 
 /**
  *
@@ -127,6 +127,14 @@ void LogElapsedTimeEnd(const char *msg = "unspecified operation");
  * Also asserts it for stopping in debug mode
  */
 bool Check(Object *object);
+
+//----------------------------------------------------------------------------
+// Notation type checks
+//----------------------------------------------------------------------------
+
+bool IsMensuralType(data_NOTATIONTYPE notationType);
+bool IsNeumeType(data_NOTATIONTYPE notationType);
+bool IsTabType(data_NOTATIONTYPE notationType);
 
 //----------------------------------------------------------------------------
 // Base64 code borrowed

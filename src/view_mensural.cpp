@@ -201,11 +201,11 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     Note *note = vrv_cast<Note *>(element);
     assert(note);
 
-    bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
+    const bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    const bool fillNotehead = (isMensuralBlack || note->GetColored()) && !(isMensuralBlack && note->GetColored());
 
-    int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    int strokeWidth = 2.8 * stemWidth;
+    const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int strokeWidth = 2.8 * stemWidth;
 
     int shape = LIGATURE_DEFAULT;
     if (note->GetActualDur() != DUR_BR) {
@@ -289,8 +289,8 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
             Note *lastNote = ligature->GetLastNote();
             int x2 = lastNote->GetContentRight();
             // Look for the highest note position in the ligature
-            for (auto &iter : notes) {
-                Note *note = vrv_cast<Note *>(iter);
+            for (Object *object : notes) {
+                Note *note = vrv_cast<Note *>(object);
                 assert(note);
                 y = std::max(y, note->GetContentTop());
             }
@@ -465,11 +465,11 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Note *note = vrv_cast<Note *>(plica->GetFirstAncestor(NOTE));
     assert(note);
 
-    bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-    bool isLonga = (note->GetActualDur() == DUR_LG);
-    bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
+    const bool isLonga = (note->GetActualDur() == DUR_LG);
+    const bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
 
     int shape = LIGATURE_DEFAULT;
     Point topLeft, bottomRight;
@@ -521,8 +521,9 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
         ynum = y + m_doc->GetDrawingDoubleUnit(textSize);
         yden = y - m_doc->GetDrawingDoubleUnit(textSize);
     }
-    else
+    else {
         ynum = y;
+    }
 
     if (numBase > 9 || num > 9) {
         x += m_doc->GetDrawingUnit(textSize) * 2;

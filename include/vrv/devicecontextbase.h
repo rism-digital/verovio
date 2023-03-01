@@ -204,8 +204,8 @@ public:
     bool operator!=(const Point &p) const { return !(*this == p); }
 
     // arithmetic operations (component wise)
-    Point operator+(const Point &p) const { return Point(x + p.x, y + p.y); }
-    Point operator-(const Point &p) const { return Point(x - p.x, y - p.y); }
+    Point operator+(const Point &p) const { return { x + p.x, y + p.y }; }
+    Point operator-(const Point &p) const { return { x - p.x, y - p.y }; }
 
     Point &operator+=(const Point &p)
     {
@@ -220,20 +220,20 @@ public:
         return *this;
     }
 
-    Point operator-() const { return Point(-x, -y); }
+    Point operator-() const { return { -x, -y }; }
 
     Point min(const Point &p) const
     {
         int x = std::min(this->x, p.x);
         int y = std::min(this->y, p.y);
-        return Point(x, y);
+        return { x, y };
     }
 
     Point max(const Point &p) const
     {
         int x = std::max(this->x, p.x);
         int y = std::max(this->y, p.y);
-        return Point(x, y);
+        return { x, y };
     }
 };
 
@@ -256,7 +256,7 @@ public:
     BezierCurve() {}
     BezierCurve(const Point &p1, const Point &c1, const Point &c2, const Point &p2) : p1(p1), c1(c1), c2(c2), p2(p2) {}
 
-    // Helper to rotate all points within bezier curve around @rotationPoint by @angle
+    // Helper to rotate all points within bezier curve around \@rotationPoint by \@angle
     void Rotate(float angle, const Point &rotationPoint);
 
     /**

@@ -61,6 +61,7 @@ Note::Note()
     , AttCue()
     , AttExtSym()
     , AttGraced()
+    , AttHarmonicFunction()
     , AttMidiVelocity()
     , AttNoteGesTab()
     , AttNoteHeads()
@@ -78,6 +79,7 @@ Note::Note()
     this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_HARMONICFUNCTION);
     this->RegisterAttClass(ATT_NOTEGESTAB);
     this->RegisterAttClass(ATT_NOTEHEADS);
     this->RegisterAttClass(ATT_NOTEVISMENSURAL);
@@ -104,6 +106,7 @@ void Note::Reset()
     this->ResetCue();
     this->ResetExtSym();
     this->ResetGraced();
+    this->ResetHarmonicFunction();
     this->ResetNoteGesTab();
     this->ResetNoteHeads();
     this->ResetNoteVisMensural();
@@ -201,12 +204,12 @@ void Note::AlignDotsShift(const Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
 const Accid *Note::GetDrawingAccid() const
 {
-    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
 }
 
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
@@ -226,17 +229,17 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) 
 
 Chord *Note::IsChordTone()
 {
-    return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 const Chord *Note::IsChordTone() const
 {
-    return dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur() const
 {
-    const Chord *chordParent = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -249,20 +252,17 @@ bool Note::IsClusterExtreme() const
 {
     ChordCluster *cluster = m_cluster;
     if (this == cluster->at(0)) return true;
-    if (this == cluster->at(cluster->size() - 1))
-        return true;
-    else
-        return false;
+    return (this == cluster->at(cluster->size() - 1)) ? true : false;
 }
 
 TabGrp *Note::IsTabGrpNote()
 {
-    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 const TabGrp *Note::IsTabGrpNote() const
 {
-    return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
@@ -767,7 +767,7 @@ bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dot
     const Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
-    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
+    const Flag *flag = vrv_cast<const Flag *>(stem->GetFirst(FLAG));
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
@@ -1109,6 +1109,9 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
     assert(params);
 
+    // Nothing to calculate if note is not part of the chord
+    if (!this->IsChordTone()) return FUNCTOR_SIBLINGS;
+
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
 
@@ -1119,7 +1122,8 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     }
 
     // Nothing to do for notes that are not in a cluster and without base diameter for the chord
-    if (!params->m_diameter && !m_cluster) return FUNCTOR_SIBLINGS;
+    if ((!params->m_diameter || params->m_alignmentType != this->GetAlignment()->GetType()) && !m_cluster)
+        return FUNCTOR_SIBLINGS;
 
     /************** notehead direction **************/
 
@@ -1297,10 +1301,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
+    Stem *currentStem = vrv_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!this->IsChordTone() && !this->IsTabGrpNote()) {
         if (!currentStem) {
@@ -1346,7 +1350,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (chord && (chord->GetDots() == this->GetDots())) {

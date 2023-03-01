@@ -59,9 +59,41 @@ public:
     }
     ///@}
 
+    /**
+     * Store the horizontal extender line coordinates
+     */
+    ///@{
+    void ResetDrawingExtenderX();
+    void SetDrawingExtenderX(int left, int right);
+    ///@}
+
+    /**
+     * Get the SMuFL glyph.
+     */
+    char32_t GetOctaveGlyph(bool withAltaBassa) const;
+
+    /**
+     * Calculate the octave line width.
+     */
+    int GetLineWidth(const Doc *doc, int unit) const;
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary (relative to the object position)
+     * and a flag indicating whether refined layout was used.
+     */
+    std::pair<int, bool> GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const override;
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
 protected:
     //
@@ -70,7 +102,10 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The left and right X coordinates of the drawn horizontal extender line
+     */
+    std::map<const FloatingPositioner *, std::pair<int, int>> m_drawingExtenderX;
 };
 
 } // namespace vrv

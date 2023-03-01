@@ -221,7 +221,7 @@ public:
     /** Page top margin (MEI scoredef@page.topmar). Saved if != 0 */
     int m_pageMarginTop;
     /**
-     * Surface (MEI @surface). Saved as facsimile for transciption layout.
+     * Surface (MEI \@surface). Saved as facsimile for transciption layout.
      * For now, the target of the <graphic> element within surface is loaded here.
      */
     std::string m_surface;

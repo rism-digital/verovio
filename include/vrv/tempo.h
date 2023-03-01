@@ -98,6 +98,15 @@ public:
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
+    //----------//
+    //  Static  //
+    //----------//
+
+    /**
+     * Calculate tempo from attMmTempo (@mm, @mm.unit, @mm.dots)
+     */
+    static double CalcTempo(const AttMmTempo *attMmTempo);
+
 private:
     //
 public:

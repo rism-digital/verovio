@@ -1,0 +1,20 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        libmei.h
+// Author:      Laurent Pugin
+// Created:     2023
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef __VRV_LIBMEI_H__
+#define __VRV_LIBMEI_H__
+
+/////////////////////////////////////////////////////////////////////////////
+/// File include from the libmei code that needs to define:
+// * StringFormat
+// * LogWarning
+// * DEFINITION_FACTOR
+
+#include "vrv.h"
+#include "vrvdef.h"
+
+#endif // __VRV_LIBMEI_H__

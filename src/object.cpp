@@ -13,6 +13,7 @@
 #include <climits>
 #include <iostream>
 #include <math.h>
+#include <random>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -62,7 +63,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local unsigned long Object::s_objectCounter = 0;
-thread_local std::mt19937 Object::s_randomGenerator;
+thread_local uint32_t Object::s_xmlIDCounter = 0;
 
 Object::Object() : BoundingBox()
 {
@@ -120,9 +121,7 @@ Object::Object(const Object &object) : BoundingBox(object)
         return;
     }
 
-    int i;
-    for (i = 0; i < (int)object.m_children.size(); ++i) {
-        Object *current = object.m_children.at(i);
+    for (Object *current : object.m_children) {
         Object *clone = current->Clone();
         if (clone) {
             LinkingInterface *link = clone->GetLinkingInterface();
@@ -167,9 +166,7 @@ Object &Object::operator=(const Object &object)
         if (link) link->AddBackLink(&object);
 
         if (object.CopyChildren()) {
-            int i;
-            for (i = 0; i < (int)object.m_children.size(); ++i) {
-                Object *current = object.m_children.at(i);
+            for (Object *current : object.m_children) {
                 Object *clone = current->Clone();
                 if (clone) {
                     LinkingInterface *link = clone->GetLinkingInterface();
@@ -288,16 +285,14 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
         assert("Object must be of the same type");
     }
 
-    int i;
-    for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
+    for (int i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
-        child->SetParent(this);
         if (idx != -1) {
             this->InsertChild(child, idx);
             idx++;
         }
         else {
-            m_children.push_back(child);
+            AddChild(child);
         }
     }
 }
@@ -320,7 +315,6 @@ void Object::InsertBefore(Object *child, Object *newChild)
     assert(this->GetChildIndex(newChild) == -1);
 
     int idx = this->GetChildIndex(child);
-    newChild->SetParent(this);
     this->InsertChild(newChild, idx);
 
     this->Modify();
@@ -332,7 +326,6 @@ void Object::InsertAfter(Object *child, Object *newChild)
     assert(this->GetChildIndex(newChild) == -1);
 
     int idx = this->GetChildIndex(child);
-    newChild->SetParent(this);
     this->InsertChild(newChild, idx + 1);
 
     this->Modify();
@@ -403,28 +396,28 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     assert(attributes);
     attributes->clear();
 
-    Att::GetAnalytical(this, attributes);
-    Att::GetCmn(this, attributes);
-    Att::GetCmnornaments(this, attributes);
-    Att::GetCritapp(this, attributes);
-    // Att::GetEdittrans(this, attributes);
-    Att::GetExternalsymbols(this, attributes);
-    Att::GetFrettab(this, attributes);
-    Att::GetFacsimile(this, attributes);
-    // Att::GetFigtable(this, attributes);
-    // Att::GetFingering(this, attributes);
-    Att::GetGestural(this, attributes);
-    // Att::GetHarmony(this, attributes);
-    // Att::GetHeader(this, attributes);
-    Att::GetMei(this, attributes);
-    Att::GetMensural(this, attributes);
-    Att::GetMidi(this, attributes);
-    Att::GetNeumes(this, attributes);
-    Att::GetPagebased(this, attributes);
-    // Att::GetPerformance(this, attributes);
-    Att::GetShared(this, attributes);
-    // Att::GetUsersymbols(this, attributes);
-    Att::GetVisual(this, attributes);
+    AttModule::GetAnalytical(this, attributes);
+    AttModule::GetCmn(this, attributes);
+    AttModule::GetCmnornaments(this, attributes);
+    AttModule::GetCritapp(this, attributes);
+    // AttModule::GetEdittrans(this, attributes);
+    AttModule::GetExternalsymbols(this, attributes);
+    AttModule::GetFrettab(this, attributes);
+    AttModule::GetFacsimile(this, attributes);
+    // AttModule::GetFigtable(this, attributes);
+    // AttModule::GetFingering(this, attributes);
+    AttModule::GetGestural(this, attributes);
+    // AttModule::GetHarmony(this, attributes);
+    // AttModule::GetHeader(this, attributes);
+    AttModule::GetMei(this, attributes);
+    AttModule::GetMensural(this, attributes);
+    AttModule::GetMidi(this, attributes);
+    AttModule::GetNeumes(this, attributes);
+    AttModule::GetPagebased(this, attributes);
+    // AttModule::GetPerformance(this, attributes);
+    AttModule::GetShared(this, attributes);
+    // AttModule::GetUsersymbols(this, attributes);
+    AttModule::GetVisual(this, attributes);
 
     for (auto &pair : m_unsupported) {
         attributes->push_back({ pair.first, pair.second });
@@ -437,9 +430,8 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
 {
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
-        if (((*iter).first == attribute) && ((*iter).second == value)) return true;
+    for (auto &attributePair : attributes) {
+        if ((attributePair.first == attribute) && (attributePair.second == value)) return true;
     }
     return false;
 }
@@ -524,8 +516,9 @@ int Object::GetIdx() const
 
 void Object::InsertChild(Object *element, int idx)
 {
-    // With this method we require the parent to be set before
-    assert(element->GetParent() == this);
+    // With this method we require the parent to be NULL
+    assert(!element->GetParent());
+    element->SetParent(this);
 
     if (idx >= (int)m_children.size()) {
         m_children.push_back(element);
@@ -580,8 +573,9 @@ void Object::ClearRelinquishedChildren()
         if ((*iter)->GetParent() != this) {
             iter = m_children.erase(iter);
         }
-        else
+        else {
             ++iter;
+        }
     }
 }
 
@@ -775,7 +769,7 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    m_id = m_classIdStr.at(0) + Object::GenerateRandID();
+    m_id = m_classIdStr.at(0) + Object::GenerateHashID();
 }
 
 void Object::ResetID()
@@ -861,7 +855,7 @@ int Object::GetDescendantIndex(const Object *child, const ClassId classId, int d
 {
     ListOfObjects objects = this->FindAllDescendantsByType(classId, true, depth);
     int i = 0;
-    for (auto &object : objects) {
+    for (Object *object : objects) {
         if (child == object) return i;
         ++i;
     }
@@ -1197,27 +1191,34 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 // Static methods for Object
 //----------------------------------------------------------------------------
 
-void Object::SeedID(unsigned int seed)
+void Object::SeedID(uint32_t seed)
 {
-    // Init random number generator for ids
     if (seed == 0) {
+        // Random start ID
         std::random_device rd;
-        s_randomGenerator.seed(rd());
+        std::mt19937 randomGenerator(rd());
+        s_xmlIDCounter = randomGenerator();
     }
     else {
-        s_randomGenerator.seed(seed);
+        // Deterministic start ID
+        s_xmlIDCounter = Hash(seed);
     }
 }
 
-std::string Object::GenerateRandID()
+std::string Object::GenerateHashID()
 {
-    unsigned int nr = s_randomGenerator();
-
-    // char str[17];
-    // snprintf(str, 17, "%016d", nr);
-    // return std::string(str);
+    uint32_t nr = Hash(++s_xmlIDCounter);
 
     return BaseEncodeInt(nr, 36);
+}
+
+uint32_t Object::Hash(uint32_t number, bool reverse)
+{
+    const uint32_t magicNumber = reverse ? 0x119de1f3 : 0x45d9f3b;
+    number = ((number >> 16) ^ number) * magicNumber;
+    number = ((number >> 16) ^ number) * magicNumber;
+    number = (number >> 16) ^ number;
+    return number;
 }
 
 bool Object::sortByUlx(Object *a, Object *b)
@@ -1229,9 +1230,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         a->FindAllDescendantsByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
+        for (Object *object : children) {
+            if (object->Is(SYL)) continue;
+            FacsimileInterface *temp = object->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fa == NULL || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
                 fa = temp;
@@ -1243,9 +1244,9 @@ bool Object::sortByUlx(Object *a, Object *b)
     else {
         ListOfObjects children;
         b->FindAllDescendantsByComparison(&children, &comp);
-        for (auto it = children.begin(); it != children.end(); ++it) {
-            if ((*it)->Is(SYL)) continue;
-            FacsimileInterface *temp = (*it)->GetFacsimileInterface();
+        for (Object *object : children) {
+            if (object->Is(SYL)) continue;
+            FacsimileInterface *temp = object->GetFacsimileInterface();
             assert(temp);
             if (temp->HasFacs() && (fb == NULL || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
                 fb = temp;
@@ -1574,6 +1575,9 @@ void Functor::Call(const Object *ptr, FunctorParams *functorParams)
 // ObjectFactory methods
 //----------------------------------------------------------------------------
 
+thread_local MapOfStrConstructors ObjectFactory::s_ctorsRegistry;
+thread_local MapOfStrClassIds ObjectFactory::s_classIdsRegistry;
+
 ObjectFactory *ObjectFactory::GetInstance()
 {
     static thread_local ObjectFactory factory;
@@ -1613,7 +1617,7 @@ ClassId ObjectFactory::GetClassId(std::string name)
 
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
-    for (auto str : classStrings) {
+    for (const std::string &str : classStrings) {
         if (s_classIdsRegistry.count(str) > 0) {
             classIds.push_back(s_classIdsRegistry.at(str));
         }
@@ -1800,7 +1804,7 @@ int Object::FindAllReferencedObjects(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_PLIST)) {
         PlistInterface *interface = this->GetPlistInterface();
         assert(interface);
-        for (auto &object : interface->GetRefs()) {
+        for (Object *object : interface->GetRefs()) {
             params->m_elements->push_back(object);
         }
     }
@@ -2174,7 +2178,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
         assert(staff->m_drawingTuning == NULL);
-        staff->m_drawingTuning = dynamic_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
+        staff->m_drawingTuning = vrv_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
         staff->m_drawingStaffSize = 100;
@@ -2387,8 +2391,8 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
             }
             else {
                 above->SetOverflowAbove(overflowAbove);
-                above->AddBBoxAbove(current);
             }
+            above->AddBBoxAbove(current);
         }
     }
 
@@ -2402,8 +2406,8 @@ int Object::CalcBBoxOverflows(FunctorParams *functorParams)
             }
             else {
                 below->SetOverflowBelow(overflowBelow);
-                below->AddBBoxBelow(current);
             }
+            below->AddBBoxBelow(current);
         }
     }
 

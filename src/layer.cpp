@@ -687,10 +687,7 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     params->m_time = DUR_MAX * -1.0;
 
-    if (params->m_isFirstMeasure)
-        params->m_scoreDefRole = SCOREDEF_SYSTEM;
-    else
-        params->m_scoreDefRole = SCOREDEF_INTERMEDIATE;
+    params->m_scoreDefRole = (params->m_isFirstMeasure) ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
     if (this->GetStaffDefClef()) {
         if (this->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
@@ -750,8 +747,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     assert(staff);
     int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
-    int i;
-    for (i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
+    for (int i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = vrv_cast<Alignment *>(params->m_measureAligner->GetChild(i));
         assert(alignment);
         if (alignment->HasGraceAligner(graceAlignerId)) {

@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
@@ -352,7 +353,8 @@ public:
     bool IsSet() const override;
 
 private:
-    //
+    std::string GetStr(const std::vector<std::string> &values) const;
+
 public:
     //
 private:
@@ -714,6 +716,7 @@ public:
     OptionDbl m_multiRestThickness;
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
+    OptionBool m_octaveNoSpanningParentheses;
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
@@ -751,6 +754,7 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;
@@ -771,6 +775,7 @@ public:
     //
     OptionDbl m_bottomMarginArtic;
     OptionDbl m_bottomMarginHarm;
+    OptionDbl m_bottomMarginOctave;
     OptionDbl m_bottomMarginPgHead;
     //
     OptionDbl m_leftMarginAccid;

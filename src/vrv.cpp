@@ -16,8 +16,6 @@
 #include <iostream>
 #include <locale>
 #include <sstream>
-#include <stdarg.h>
-#include <stdio.h>
 #include <vector>
 
 #ifndef _WIN32
@@ -180,10 +178,8 @@ LogLevel StrToLogLevel(const std::string &level)
 
 bool LogBufferContains(const std::string &s)
 {
-    std::vector<std::string>::iterator iter = logBuffer.begin();
-    while (iter != logBuffer.end()) {
-        if ((*iter) == s) return true;
-        ++iter;
+    for (const std::string &logStr : logBuffer) {
+        if (logStr == s) return true;
     }
     return false;
 }
@@ -286,7 +282,7 @@ std::string GetVersion()
 
 static const std::string base62Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-std::string BaseEncodeInt(unsigned int value, unsigned int base)
+std::string BaseEncodeInt(uint32_t value, uint8_t base)
 {
     assert(base > 10);
     assert(base < 63);
@@ -301,6 +297,28 @@ std::string BaseEncodeInt(unsigned int value, unsigned int base)
 
     reverse(base62.begin(), base62.end());
     return base62;
+}
+
+//----------------------------------------------------------------------------
+// Notation type checks
+//----------------------------------------------------------------------------
+
+bool IsMensuralType(data_NOTATIONTYPE notationType)
+{
+    return (notationType == NOTATIONTYPE_mensural || notationType == NOTATIONTYPE_mensural_white
+        || notationType == NOTATIONTYPE_mensural_black);
+}
+
+bool IsNeumeType(data_NOTATIONTYPE notationType)
+{
+    // Maybe one day we will have other neume types too
+    return (notationType == NOTATIONTYPE_neume);
+}
+
+bool IsTabType(data_NOTATIONTYPE notationType)
+{
+    // Next version of MEI will have other tab types
+    return (notationType == NOTATIONTYPE_tab);
 }
 
 //----------------------------------------------------------------------------
@@ -360,20 +378,20 @@ std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int inLen)
             charArray4[2] = ((charArray3[1] & 0x0f) << 2) + ((charArray3[2] & 0xc0) >> 6);
             charArray4[3] = charArray3[2] & 0x3f;
 
-            for (i = 0; (i < 4); i++) ret += base64Chars[charArray4[i]];
+            for (i = 0; (i < 4); ++i) ret += base64Chars[charArray4[i]];
             i = 0;
         }
     }
 
     if (i) {
-        for (int j = i; j < 3; j++) charArray3[j] = '\0';
+        for (int j = i; j < 3; ++j) charArray3[j] = '\0';
 
         charArray4[0] = (charArray3[0] & 0xfc) >> 2;
         charArray4[1] = ((charArray3[0] & 0x03) << 4) + ((charArray3[1] & 0xf0) >> 4);
         charArray4[2] = ((charArray3[1] & 0x0f) << 2) + ((charArray3[2] & 0xc0) >> 6);
         charArray4[3] = charArray3[2] & 0x3f;
 
-        for (int j = 0; (j < i + 1); j++) ret += base64Chars[charArray4[j]];
+        for (int j = 0; (j < i + 1); ++j) ret += base64Chars[charArray4[j]];
 
         while ((i++ < 3)) ret += '=';
     }

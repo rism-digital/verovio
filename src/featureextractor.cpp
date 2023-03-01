@@ -75,7 +75,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);
         pitch << std::string(signCount, octSign);
 
-        Accid *accid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
+        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
         if (accid) {
             // We need to check both written and gestural accidentals
             std::string accidStrWritten;
@@ -130,7 +130,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
                 = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
             m_intervalsDiatonic << intervalDiatonicStr;
             jsonxx::Array intervalsIds;
-            for (auto previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
+            for (Note *previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
             intervalsIds << note->GetID();
             m_intervalsIds << jsonxx::Value(intervalsIds);
         }

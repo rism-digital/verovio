@@ -209,19 +209,22 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
             default: barLine = BARRENDITION_single; break;
         }
     }
-    else
+    else {
         barLine = BARRENDITION_single;
+    }
     // if the measure is still empty, put the bar line on the left
-    if (!m_layer->GetChildCount())
+    if (!m_layer->GetChildCount()) {
         m_barLines.first = barLine;
-    else
+    }
+    else {
         m_barLines.second = barLine;
+    }
     return i;
 }
 
 void ABCInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
+    MeterSig *meterSig = vrv_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -484,53 +487,73 @@ void ABCInput::parseDecoration(const std::string &decorationString)
         LogWarning("ABC import: Fingering not supported", decorationString.c_str());
         return;
     }
-    if (!strcmp(decorationString.c_str(), "."))
+    if (!strcmp(decorationString.c_str(), ".")) {
         m_artic.push_back(ARTICULATION_stacc);
-    else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T"))
+    }
+    else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T")) {
         m_ornam.push_back('T');
+    }
     else if (!strcmp(decorationString.c_str(), "mordent") || !strcmp(decorationString.c_str(), "lowermordent")
-        || !strcmp(decorationString.c_str(), "M"))
+        || !strcmp(decorationString.c_str(), "M")) {
         m_ornam.push_back('m');
+    }
     else if (!strcmp(decorationString.c_str(), "pralltriller") || !strcmp(decorationString.c_str(), "uppermordent")
-        || !strcmp(decorationString.c_str(), "P"))
+        || !strcmp(decorationString.c_str(), "P")) {
         m_ornam.push_back('M');
-    else if (!strcmp(decorationString.c_str(), "turn"))
+    }
+    else if (!strcmp(decorationString.c_str(), "turn")) {
         m_ornam.push_back('S');
-    else if (!strcmp(decorationString.c_str(), "invertedturn"))
+    }
+    else if (!strcmp(decorationString.c_str(), "invertedturn")) {
         m_ornam.push_back('s');
-    else if (!strcmp(decorationString.c_str(), ">"))
+    }
+    else if (!strcmp(decorationString.c_str(), ">")) {
         m_artic.push_back(ARTICULATION_acc);
-    else if (!strcmp(decorationString.c_str(), "accent"))
+    }
+    else if (!strcmp(decorationString.c_str(), "accent")) {
         m_artic.push_back(ARTICULATION_acc);
-    else if (!strcmp(decorationString.c_str(), "emphasis"))
+    }
+    else if (!strcmp(decorationString.c_str(), "emphasis")) {
         m_artic.push_back(ARTICULATION_acc);
-    else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H"))
+    }
+    else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H")) {
         m_fermata = STAFFREL_above;
-    else if (!strcmp(decorationString.c_str(), "invertedfermata"))
+    }
+    else if (!strcmp(decorationString.c_str(), "invertedfermata")) {
         m_fermata = STAFFREL_below;
-    else if (!strcmp(decorationString.c_str(), "tenuto"))
+    }
+    else if (!strcmp(decorationString.c_str(), "tenuto")) {
         m_artic.push_back(ARTICULATION_ten);
-    else if (!strcmp(decorationString.c_str(), "+"))
+    }
+    else if (!strcmp(decorationString.c_str(), "+")) {
         m_artic.push_back(ARTICULATION_stop);
-    else if (!strcmp(decorationString.c_str(), "plus"))
+    }
+    else if (!strcmp(decorationString.c_str(), "plus")) {
         m_artic.push_back(ARTICULATION_stop);
-    else if (!strcmp(decorationString.c_str(), "snap"))
+    }
+    else if (!strcmp(decorationString.c_str(), "snap")) {
         m_artic.push_back(ARTICULATION_snap);
-    else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u"))
+    }
+    else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u")) {
         m_artic.push_back(ARTICULATION_upbow);
-    else if (!strcmp(decorationString.c_str(), "downbow") || !strcmp(decorationString.c_str(), "v"))
+    }
+    else if (!strcmp(decorationString.c_str(), "downbow") || !strcmp(decorationString.c_str(), "v")) {
         m_artic.push_back(ARTICULATION_dnbow);
-    else if (!strcmp(decorationString.c_str(), "open"))
+    }
+    else if (!strcmp(decorationString.c_str(), "open")) {
         m_artic.push_back(ARTICULATION_open);
+    }
     else if (!strcmp(decorationString.c_str(), "pppp") || !strcmp(decorationString.c_str(), "ppp")
         || !strcmp(decorationString.c_str(), "pp") || !strcmp(decorationString.c_str(), "p")
         || !strcmp(decorationString.c_str(), "mp") || !strcmp(decorationString.c_str(), "mf")
         || !strcmp(decorationString.c_str(), "f") || !strcmp(decorationString.c_str(), "ff")
         || !strcmp(decorationString.c_str(), "fff") || !strcmp(decorationString.c_str(), "ffff")
-        || !strcmp(decorationString.c_str(), "sfz"))
+        || !strcmp(decorationString.c_str(), "sfz")) {
         m_dynam.push_back(decorationString);
-    else
+    }
+    else {
         LogWarning("ABC import: Decoration %s not supported", decorationString.c_str());
+    }
 }
 
 //////////////////////////////
@@ -1094,11 +1117,11 @@ void ABCInput::parseLyrics()
 
     // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
     // for several notes if syllable needs to be held
-    for (size_t i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
-        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
+    for (int i = 0, j = 0; (i < (int)m_lineNoteArray.size()) && (j < (int)syllables.size()); ++j) {
+        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < (int)m_lineNoteArray.size())) {
             ++i;
         }
-        if (i >= m_lineNoteArray.size()) break;
+        if (i >= (int)m_lineNoteArray.size()) break;
         Verse *verse = NULL;
         verse = vrv_cast<Verse *>(m_lineNoteArray.at(i)->GetChild(0, VERSE));
         if (!verse) {
@@ -1219,10 +1242,12 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
                 information.push_back(musicCode.at(i));
                 ++i;
             }
-            if (dataKey == 'r')
+            if (dataKey == 'r') {
                 AddAnnot(information);
-            else
+            }
+            else {
                 readInformationField(dataKey, information);
+            }
         }
 
         // linebreaks
@@ -1354,7 +1379,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
-                auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                auto accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
@@ -1364,18 +1389,22 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             // set pitch name
-            if (isupper(musicCode.at(i)))
+            if (isupper(musicCode.at(i))) {
                 oct = 4;
-            else
+            }
+            else {
                 oct = 5;
+            }
             note->SetPname(note->AttPitch::StrToPitchname(std::string(1, tolower(musicCode.at(i)))));
 
             // set octave
             while (i + 1 < (int)musicCode.length() && (musicCode.at(i + 1) == '\'' || musicCode.at(i + 1) == ',')) {
-                if (musicCode.at(i + 1) == ',')
+                if (musicCode.at(i + 1) == ',') {
                     oct -= 1;
-                else
+                }
+                else {
                     oct += 1;
+                }
                 ++i;
             }
             note->SetOct(oct);

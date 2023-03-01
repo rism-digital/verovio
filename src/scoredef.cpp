@@ -33,6 +33,7 @@
 #include "staffgrp.h"
 #include "symboltable.h"
 #include "system.h"
+#include "tempo.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -474,9 +475,9 @@ void ScoreDef::ResetFromDrawingValues()
     const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : childList) {
-        if (!item->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(item);
+    for (Object *object : childList) {
+        if (!object->Is(STAFFDEF)) continue;
+        staffDef = vrv_cast<StaffDef *>(object);
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
@@ -533,8 +534,8 @@ const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
     ListOfConstObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
-    for (auto &item : staffGrps) {
-        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(item);
+    for (const Object *object : staffGrps) {
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(object);
         assert(staffGrp);
         if (staffGrp->GetN() == n) return staffGrp;
     }
@@ -581,42 +582,42 @@ void ScoreDef::SetDrawingLabelsWidth(int width)
 
 PgFoot *ScoreDef::GetPgFoot()
 {
-    return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 const PgFoot *ScoreDef::GetPgFoot() const
 {
-    return dynamic_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 PgFoot2 *ScoreDef::GetPgFoot2()
 {
-    return dynamic_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 const PgFoot2 *ScoreDef::GetPgFoot2() const
 {
-    return dynamic_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 PgHead *ScoreDef::GetPgHead()
 {
-    return dynamic_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 const PgHead *ScoreDef::GetPgHead() const
 {
-    return dynamic_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 PgHead2 *ScoreDef::GetPgHead2()
 {
-    return dynamic_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 const PgHead2 *ScoreDef::GetPgHead2() const
 {
-    return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 int ScoreDef::GetMaxStaffSize() const
@@ -631,7 +632,7 @@ bool ScoreDef::IsSectionRestart() const
     // In page-based structure, Section is a sibling to scoreDef
     // This has limitations: will not work with editorial markup, additional nested sections, and
     // if the section milestone is in the previous system.
-    const Section *section = dynamic_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    const Section *section = vrv_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
@@ -640,7 +641,8 @@ bool ScoreDef::HasSystemStartLine() const
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
-        if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
+        ListOfConstObjects allDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+        if ((firstDef && lastDef && allDefs.size() > 1) || staffGrp->GetFirst(GRPSYM)) {
             return (this->GetSystemLeftline() != BOOLEAN_false);
         }
         return (this->GetSystemLeftline() == BOOLEAN_true);
@@ -815,6 +817,21 @@ int ScoreDef::AlignMeasures(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
+{
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    if (this->HasMidiBpm()) {
+        params->m_currentTempo = this->GetMidiBpm();
+    }
+    else if (this->HasMm()) {
+        params->m_currentTempo = Tempo::CalcTempo(this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -855,7 +872,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         const double tuneHz = this->GetTuneHz();
         // Add tuning for all keys from 0 to 127
         std::vector<std::pair<int, double>> tuneFrequencies;
-        for (int i = 0; i < 127; i++) {
+        for (int i = 0; i < 127; ++i) {
             double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
             tuneFrequencies.push_back(std::make_pair(i, freq));
         }
@@ -873,7 +890,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     // set MIDI time signature
     if (this->HasMeterSigInfo()) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(this->GetMeterSig());
-        if (meterSig && meterSig->HasCount()) {
+        if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             params->m_midiFile->addTimeSignature(
                 params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
