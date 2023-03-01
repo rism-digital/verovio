@@ -2409,7 +2409,7 @@ int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
 
     if (params->m_previousElement) {
         assert(params->m_currentTurn);
-        if (this->Is(NOTE)) {
+        if (this->Is(NOTE) && params->m_currentChord) {
             Note *note = vrv_cast<Note *>(this);
             if (note->IsChordTone() == params->m_currentChord) return FUNCTOR_CONTINUE;
         }
