@@ -61,6 +61,7 @@ Note::Note()
     , AttCue()
     , AttExtSym()
     , AttGraced()
+    , AttHarmonicFunction()
     , AttMidiVelocity()
     , AttNoteGesTab()
     , AttNoteHeads()
@@ -78,6 +79,7 @@ Note::Note()
     this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_HARMONICFUNCTION);
     this->RegisterAttClass(ATT_NOTEGESTAB);
     this->RegisterAttClass(ATT_NOTEHEADS);
     this->RegisterAttClass(ATT_NOTEVISMENSURAL);
@@ -104,6 +106,7 @@ void Note::Reset()
     this->ResetCue();
     this->ResetExtSym();
     this->ResetGraced();
+    this->ResetHarmonicFunction();
     this->ResetNoteGesTab();
     this->ResetNoteHeads();
     this->ResetNoteVisMensural();
