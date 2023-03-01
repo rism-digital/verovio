@@ -51,6 +51,8 @@ public:
 private:
     // The diameter of the anchoring note of the chord
     int m_diameter;
+    // The alignment type
+    int m_alignmentType;
 };
 
 } // namespace vrv

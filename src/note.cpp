@@ -971,62 +971,6 @@ int Note::AdjustArtic(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::CalcChordNoteHeads(FunctorParams *functorParams)
-{
-    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
-    assert(params);
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-
-    const int diameter = 2 * this->GetDrawingRadius(params->m_doc);
-    int noteheadShift = 0;
-    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (params->m_diameter)) {
-        noteheadShift = params->m_diameter - diameter;
-    }
-
-    // Nothing to do for notes that are not in a cluster and without base diameter for the chord
-    if ((!params->m_diameter || params->m_alignmentType != this->GetAlignment()->GetType()) && !m_cluster)
-        return FUNCTOR_SIBLINGS;
-
-    /************** notehead direction **************/
-
-    bool flippedNotehead = false;
-
-    // if the note is clustered, calculations are different
-    if (m_cluster) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
-            // stem down/even cluster = noteheads start on left (incorrect side)
-            if (m_cluster->size() % 2 == 0) {
-                flippedNotehead = (m_clusterPosition % 2 != 0);
-            }
-            // else they start on normal side
-            else {
-                flippedNotehead = (m_clusterPosition % 2 == 0);
-            }
-        }
-        else {
-            // flipped noteheads start on normal side no matter what
-            flippedNotehead = (m_clusterPosition % 2 == 0);
-        }
-    }
-
-    // positions notehead
-    if (flippedNotehead) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingXRel(diameter - params->m_doc->GetDrawingStemWidth(staffSize));
-        }
-        else {
-            this->SetDrawingXRel(-diameter + params->m_doc->GetDrawingStemWidth(staffSize));
-        }
-    }
-    this->SetDrawingXRel(this->GetDrawingXRel() + noteheadShift);
-
-    this->SetFlippedNotehead(flippedNotehead);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate) const
 {
     if (predicate && !predicate(this)) return {};

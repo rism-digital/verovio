@@ -23,6 +23,7 @@ namespace vrv {
 CalcChordNoteHeadsFunctor::CalcChordNoteHeadsFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_diameter = 0;
+    m_alignmentType = 0;
 }
 
 FunctorCode CalcChordNoteHeadsFunctor::VisitChord(Chord *chord)
@@ -40,6 +41,7 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitChord(Chord *chord)
             m_diameter = m_doc->GetGlyphWidth(
                 code, staff->m_drawingStaffSize, chord->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
         }
+        m_alignmentType = chord->GetAlignment()->GetType();
     }
 
     return FUNCTOR_CONTINUE;
@@ -58,7 +60,7 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitNote(Note *note)
 
     // Nothing to do for notes that are not in a cluster and without base diameter for the chord
     const ChordCluster *cluster = note->GetCluster();
-    if (!m_diameter && !cluster) return FUNCTOR_SIBLINGS;
+    if ((!m_diameter || (m_alignmentType != note->GetAlignment()->GetType())) && !cluster) return FUNCTOR_SIBLINGS;
 
     /************** notehead direction **************/
 

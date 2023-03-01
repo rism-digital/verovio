@@ -830,23 +830,6 @@ int ScoreDef::CastOffToSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int ScoreDef::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    params->m_shift += m_drawingLabelsWidth;
-
-    if (params->m_applySectionRestartShift) {
-        ClassIdsComparison comparison({ LABEL, LABELABBR });
-        if (this->FindDescendantByComparison(&comparison)) {
-            params->m_applySectionRestartShift = false;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
     InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);

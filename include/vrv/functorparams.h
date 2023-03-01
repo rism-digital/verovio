@@ -737,43 +737,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcSlurDirectionParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the doc
- **/
-
-class CalcSlurDirectionParams : public FunctorParams {
-public:
-    CalcSlurDirectionParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// CalcChordNoteHeadsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the doc
- * member 1: diameter of the anchoring note of the chord
- **/
-
-class CalcChordNoteHeadsParams : public FunctorParams {
-public:
-    CalcChordNoteHeadsParams(Doc *doc)
-    {
-        m_doc = doc;
-        m_diameter = 0;
-        m_alignmentType = 0;
-    }
-
-    Doc *m_doc;
-    int m_diameter;
-    int m_alignmentType;
-};
-
-//----------------------------------------------------------------------------
 // CastOffEncodingParams
 //----------------------------------------------------------------------------
 

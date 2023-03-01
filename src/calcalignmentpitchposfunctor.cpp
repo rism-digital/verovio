@@ -50,10 +50,12 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         // We should probably also avoid to add editorial accidentals to the accid space
         // However, since they are placed above by View::DrawNote it works without avoiding it
         if (note) {
-            if (note->HasGraceAlignment())
+            if (note->HasGraceAlignment()) {
                 note->GetGraceAlignment()->AddToAccidSpace(accid);
-            else
+            }
+            else {
                 accid->GetAlignment()->AddToAccidSpace(accid);
+            }
         }
         else if (accid->GetFirstAncestor(CUSTOS)) {
             accid->GetAlignment()->AddToAccidSpace(
@@ -268,10 +270,12 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                 if (loc % 2 != 0) {
                     // if it's above the staff, offset downwards
                     // if below the staff, offset upwards
-                    if (loc > 4)
+                    if (loc > 4) {
                         loc--;
-                    else
+                    }
+                    else {
                         loc++;
+                    }
                 }
             }
 

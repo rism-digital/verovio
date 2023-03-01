@@ -160,10 +160,13 @@ FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
     chord->SetDrawingStemDir(stemDir);
 
     // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up) stem->SetDrawingYRel(yMin - chord->GetDrawingY());
+    if (stemDir == STEMDIRECTION_up) {
+        stem->SetDrawingYRel(yMin - chord->GetDrawingY());
+    }
     // And to the top note when down
-    else
+    else {
         stem->SetDrawingYRel(yMax - chord->GetDrawingY());
+    }
 
     return FUNCTOR_CONTINUE;
 }

@@ -48,10 +48,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     m_time = DUR_MAX * -1.0;
 
-    if (m_isFirstMeasure)
-        m_scoreDefRole = SCOREDEF_SYSTEM;
-    else
-        m_scoreDefRole = SCOREDEF_INTERMEDIATE;
+    m_scoreDefRole = m_isFirstMeasure ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
     if (layer->GetStaffDefClef()) {
         if (layer->GetStaffDefClef()->GetVisible() != BOOLEAN_false) {
@@ -109,8 +106,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerEnd(Layer *layer)
     assert(staff);
     int graceAlignerId = m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
-    int i;
-    for (i = 0; i < m_measureAligner->GetChildCount(); ++i) {
+    for (int i = 0; i < m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = vrv_cast<Alignment *>(m_measureAligner->GetChild(i));
         assert(alignment);
         if (alignment->HasGraceAligner(graceAlignerId)) {
