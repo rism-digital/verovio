@@ -1468,6 +1468,12 @@
 		E79C87C62694407B0098FE85 /* lv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79C87C2269440570098FE85 /* lv.cpp */; };
 		E79C87C7269440800098FE85 /* lv.h in Headers */ = {isa = PBXBuildFile; fileRef = E79C87C1269440420098FE85 /* lv.h */; };
 		E79C87C8269440810098FE85 /* lv.h in Headers */ = {isa = PBXBuildFile; fileRef = E79C87C1269440420098FE85 /* lv.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7A1640929AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7A1640A29AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */; };
+		E7A1640C29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
+		E7A1640D29AF347E0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
+		E7A1640E29AF347F0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
+		E7A1640F29AF347F0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
 		E7BCFFB5281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB6281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB8281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
@@ -2026,6 +2032,8 @@
 		E79ADDC626BD645B00527E4B /* runtimeclock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = runtimeclock.cpp; path = src/runtimeclock.cpp; sourceTree = "<group>"; };
 		E79C87C1269440420098FE85 /* lv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lv.h; path = include/vrv/lv.h; sourceTree = "<group>"; };
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
+		E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustharmgrpsspacingfunctor.h; path = include/vrv/adjustharmgrpsspacingfunctor.h; sourceTree = "<group>"; };
+		E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustharmgrpsspacingfunctor.cpp; path = src/adjustharmgrpsspacingfunctor.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
 		E7C3AED52955018F002DE5AB /* preparedatafunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = preparedatafunctor.h; path = include/vrv/preparedatafunctor.h; sourceTree = "<group>"; };
@@ -2805,6 +2813,8 @@
 				E76A9D4629A74E060044682D /* adjustdotsfunctor.h */,
 				E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */,
 				E7E1698A29A8BA2A00FFF482 /* adjustgracexposfunctor.h */,
+				E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */,
+				E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */,
 				E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */,
 				E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
@@ -2987,6 +2997,7 @@
 				E76046BD28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */,
 				E765675C28BC01A000BC6490 /* functor.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
+				E7A1640A29AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
 				4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */,
 				4DACC9402990ED2600B55913 /* libmei.h in Headers */,
@@ -3317,6 +3328,7 @@
 				4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */,
 				BB4C4AA422A9328F001F6AF0 /* vrv.h in Headers */,
 				E76046BE28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */,
+				E7A1640929AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */,
 				BB4C4AD222A932B6001F6AF0 /* scoredef.h in Headers */,
 				BB4C4B9A22A932E5001F6AF0 /* linkinginterface.h in Headers */,
 				BB4C4B5E22A932D7001F6AF0 /* metersig.h in Headers */,
@@ -3628,6 +3640,7 @@
 				4D766EFE20ACAD6D006875D8 /* nc.cpp in Sources */,
 				4DACC9812990F29A00B55913 /* atts_edittrans.cpp in Sources */,
 				E79C87C4269440790098FE85 /* lv.cpp in Sources */,
+				E7A1640D29AF347E0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */,
 				E7C3AEDB295501C9002DE5AB /* preparedatafunctor.cpp in Sources */,
 				4DEC4D9321C81E0B00D1D273 /* del.cpp in Sources */,
@@ -3862,6 +3875,7 @@
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
 				4DACC9902990F29A00B55913 /* atts_critapp.cpp in Sources */,
 				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
+				E7A1640C29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
 				E7E1698E29A8BA5200FFF482 /* adjustgracexposfunctor.cpp in Sources */,
@@ -4135,6 +4149,7 @@
 				4DC12A5B1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DACC9822990F29A00B55913 /* atts_edittrans.cpp in Sources */,
 				8F3DD34A18854B2E0051330C /* multirest.cpp in Sources */,
+				E7A1640E29AF347F0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				8F3DD34C18854B2E0051330C /* note.cpp in Sources */,
 				4D20740C22A4FDFA00E0765F /* course.cpp in Sources */,
 				4DB3D8A91F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
@@ -4389,6 +4404,7 @@
 				4DACC9832990F29A00B55913 /* atts_edittrans.cpp in Sources */,
 				BB4C4B6722A932D7001F6AF0 /* multirpt.cpp in Sources */,
 				E7C3AEDA295501A5002DE5AB /* preparedatafunctor.cpp in Sources */,
+				E7A1640F29AF347F0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				4D508C3326D4E64C00020F35 /* crc.cpp in Sources */,
 				BB4C4A9A22A9328F001F6AF0 /* object.cpp in Sources */,
 				BB4C4B4722A932D7001F6AF0 /* chord.cpp in Sources */,
