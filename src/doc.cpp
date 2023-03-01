@@ -265,6 +265,40 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
+void Doc::GenerateMEIHeader(bool meiBasic)
+{
+    m_header.remove_children();
+    pugi::xml_node meiHead = m_header.append_child("meiHead");
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    titleStmt.append_child("title");
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    pugi::xml_node date = pubStmt.append_child("date");
+
+    // date
+    time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    std::string dateStr = StringFormat("%d-%02d-%02d-%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+    date.append_attribute("isodate") = dateStr.c_str();
+
+    if (!meiBasic) {
+        // encodingDesc
+        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+        // appInfo/application/name
+        pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+        pugi::xml_node application = appInfo.append_child("application");
+        application.append_attribute("xml:id") = "verovio";
+        application.append_attribute("version") = GetVersion().c_str();
+        pugi::xml_node name = application.append_child("name");
+        name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+        // projectDesc
+        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+    }
+}
+
 bool Doc::HasTimemap() const
 {
     return (m_timemapTempo == m_options->m_midiTempoAdjustment.GetValue());

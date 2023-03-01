@@ -1252,10 +1252,10 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     GenerateID(app);
     pugi::xml_node appName = app.append_child("name");
     GenerateID(appName);
-    appName.append_child(pugi::node_pcdata).set_value("Verovio");
+    appName.text().set("Verovio");
     pugi::xml_node appText = app.append_child("p");
     GenerateID(appText);
-    appText.append_child(pugi::node_pcdata).set_value("Transcoded from MusicXML");
+    appText.text().set("Transcoded from MusicXML");
 
     // isodate and version
     time_t t = time(0); // get time now
