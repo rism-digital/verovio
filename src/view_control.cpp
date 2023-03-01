@@ -667,11 +667,15 @@ void View::DrawOctave(
 
     int y1 = octave->GetDrawingY();
     int y2 = y1;
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     /********** adjust the start / end positions ***********/
 
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
         x1 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+        if (!m_doc->GetOptions()->m_octaveNoSpanningParentheses.GetValue()) {
+            x1 += m_doc->GetGlyphWidth(SMUFL_E51A_octaveParensLeft, staff->m_drawingStaffSize, false);
+        }
     }
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
@@ -702,15 +706,25 @@ void View::DrawOctave(
     const int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
     const int octaveX = altSymbols ? x1 - extend.m_width / 2 : x1 - extend.m_width;
     this->DrawSmuflCode(dc, octaveX, yCode, code, staff->m_drawingStaffSize, false);
+    if (((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE))
+        && !m_doc->GetOptions()->m_octaveNoSpanningParentheses.GetValue()) {
+        const int leftWidth = m_doc->GetGlyphWidth(SMUFL_E51A_octaveParensLeft, staff->m_drawingStaffSize, false);
+        const int rightWidth = m_doc->GetGlyphWidth(SMUFL_E51B_octaveParensRight, staff->m_drawingStaffSize, false);
+        const int octaveWidth = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(
+            dc, octaveX - leftWidth, yCode, SMUFL_E51A_octaveParensLeft, staff->m_drawingStaffSize, false);
+        this->DrawSmuflCode(
+            dc, octaveX + octaveWidth, yCode, SMUFL_E51B_octaveParensRight, staff->m_drawingStaffSize, false);
+        x1 += rightWidth;
+    }
     dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int lineWidth = octave->GetLineWidth(m_doc, unit);
         const int gap = lineWidth * 4;
 
         // adjust is to avoid the figure to touch the line
-        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) + lineWidth;
+        x1 += lineWidth;
         if (altSymbols) x1 += extend.m_width / 2;
 
         dc->SetPen(m_currentColour, lineWidth, AxSHORT_DASH, 0, gap, AxCAP_SQUARE);
@@ -735,11 +749,14 @@ void View::DrawOctave(
         y1 += (disPlace == STAFFREL_basic_above) ? -lineWidth / 2 : lineWidth / 2;
         y2 = (disPlace == STAFFREL_basic_above) ? y1 - unit * 2 : y1 + unit * 2;
 
-        if (x1 > x2) {
+        if (x1 + unit > x2) {
             // make sure we have a minimal extender line
-            x2 = x1 + lineWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            x2 = x1 + unit - lineWidth / 2;
         }
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        else {
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        }
+
         octave->SetDrawingExtenderX(x1, x2);
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none) {
