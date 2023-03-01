@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.15.0] - 2023-03-01
 * Improved generation of `xml:id`s (@eNote-GmbH)
 * Improved positioning of accidentals in chords (@eNote-GmbH)
 * Improved MusicXML import (@eNote-GmbH)
