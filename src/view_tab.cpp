@@ -166,7 +166,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     TabDurSym *tabDurSym = dynamic_cast<TabDurSym *>(element);
     assert(tabDurSym);
 
-    TabGrp *tabGrp = dynamic_cast<TabGrp *>(tabDurSym->GetFirstAncestor(TABGRP));
+    TabGrp *tabGrp = vrv_cast<TabGrp *>(tabDurSym->GetFirstAncestor(TABGRP));
     assert(tabGrp);
 
     dc->StartGraphic(tabDurSym, "", tabDurSym->GetID());

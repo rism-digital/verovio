@@ -1554,7 +1554,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = dynamic_cast<Page *>(measure->GetFirstAncestor(PAGE));
+    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
     if (page) pageNo = page->GetIdx() + 1;
 
     NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
@@ -1636,7 +1636,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
         LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
-    Page *page = dynamic_cast<Page *>(element->GetFirstAncestor(PAGE));
+    Page *page = vrv_cast<Page *>(element->GetFirstAncestor(PAGE));
     if (!page) {
         return 0;
     }

@@ -51,7 +51,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     this->DrawTextChildren(dc, f, params);
 
     if (f->GetStart() && f->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(f->GetFirstAncestor(SYSTEM));
+        System *currentSystem = vrv_cast<System *>(f->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the end of the system; this will call DrawFConnector
         if (currentSystem) {
             currentSystem->AddToDrawingList(f);
@@ -349,7 +349,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
 
     dc->StartGraphic(fig, "", fig->GetID());
 
-    Svg *svg = dynamic_cast<Svg *>(fig->FindDescendantByType(SVG));
+    Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
@@ -495,7 +495,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {
-        this->DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
+        this->DrawDynamString(dc, text->GetText(), params, vrv_cast<Rend *>(text->GetFirstAncestor(REND)));
     }
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     else if (text->GetFirstAncestor(HARM)) {

@@ -169,7 +169,7 @@ bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, 
     Layer *layer1 = NULL;
     if (note1) {
         durElement = note1;
-        layer1 = note1->m_crossStaff ? note1->m_crossLayer : dynamic_cast<Layer *>(note1->GetFirstAncestor(LAYER));
+        layer1 = note1->m_crossStaff ? note1->m_crossLayer : vrv_cast<Layer *>(note1->GetFirstAncestor(LAYER));
         startParentChord = note1->IsChordTone();
     }
     if (startParentChord) {

@@ -73,7 +73,7 @@ void ControlElement::Reset()
 
 data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment() const
 {
-    const Rend *rend = dynamic_cast<const Rend *>(this->FindDescendantByType(REND));
+    const Rend *rend = vrv_cast<const Rend *>(this->FindDescendantByType(REND));
     if (!rend || !rend->HasHalign()) return HORIZONTALALIGNMENT_NONE;
 
     return rend->GetHalign();
