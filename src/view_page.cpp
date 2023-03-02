@@ -76,7 +76,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     // The page one has previously been set by Object::ScoreDefSetCurrent
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    if (m_options->m_shrinkToFit.GetValue()) {
+    if ((m_doc->GetAdjustedDrawingPageHeight() > dc->GetHeight()) && m_options->m_shrinkToFit.GetValue()) {
         dc->SetContentHeight(m_doc->GetAdjustedDrawingPageHeight());
     }
     else {
