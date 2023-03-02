@@ -198,14 +198,6 @@ public:
     ///@}
 
     /**
-     * @name See Object::AdjustHarmGrpsSpacing
-     */
-    ///@{
-    int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;
-    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * @name See Object::AdjustSylSpacing
      */
     ///@{

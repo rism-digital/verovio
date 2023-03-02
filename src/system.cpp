@@ -603,66 +603,6 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
-{
-    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    // reset it, but not the current grpId!
-    params->m_currentSystem = this;
-    params->m_overlappingHarm.clear();
-    params->m_previousHarmPositioner = NULL;
-    params->m_previousHarmStart = NULL;
-    params->m_previousMeasure = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    // End of the first pass - loop over for each group id
-    if (params->m_currentGrp == 0) {
-        for (auto grpId : params->m_grpIds) {
-            params->m_currentGrp = grpId;
-            this->Process(params->m_functor, functorParams, params->m_functorEnd);
-        }
-        // Make sure we reset it for the next system
-        params->m_currentGrp = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    /************** End of a system when actually adjusting **************/
-
-    if (!params->m_previousMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Here we also need to handle the last harm of the measure - we check the alignment with the right barline
-    if (params->m_previousHarmPositioner) {
-        const Object *positioner = params->m_previousHarmPositioner->GetObject();
-        assert(positioner);
-        // We do this only if it is the harm is in the last measure
-        if (params->m_previousMeasure == positioner->GetFirstAncestor(MEASURE)) {
-            int overlap = params->m_previousHarmPositioner->GetContentRight()
-                - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
-
-            if (overlap > 0) {
-                params->m_overlappingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
-                    params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
-            }
-        }
-    }
-
-    // Ajust the postion of the alignment according to what we have collected for this harm group id
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
-    params->m_overlappingHarm.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);

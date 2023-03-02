@@ -17,6 +17,7 @@
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
 #include "adjustgracexposfunctor.h"
+#include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
@@ -427,10 +428,8 @@ void Page::LayOutHorizontally()
 
     this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
 
-    Functor adjustHarmGrpsSpacing(&Object::AdjustHarmGrpsSpacing);
-    Functor adjustHarmGrpsSpacingEnd(&Object::AdjustHarmGrpsSpacingEnd);
-    AdjustHarmGrpsSpacingParams adjustHarmGrpsSpacingParams(doc, &adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingEnd);
-    this->Process(&adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingParams, &adjustHarmGrpsSpacingEnd);
+    AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
+    this->Process(adjustHarmGrpsSpacing);
 
     // Adjust the arpeg
     AdjustArpegFunctor adjustArpeg(doc);

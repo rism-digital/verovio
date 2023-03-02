@@ -776,16 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the horizontal position of harms by groups in order to avoid overlapping
-     */
-    virtual int AdjustHarmGrpsSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * End Functor for Object::AdjustHarmGrpsSpacing
-     */
-    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    /**
      * Adjust the X position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }

@@ -357,11 +357,6 @@ public:
     int AdjustXPos(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustHarmGrpsSpacing
-     */
-    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustSylSpacing
      */
     int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
