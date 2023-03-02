@@ -1510,6 +1510,12 @@
 		E7E9C11629B0A20300CFCE2F /* adjustaccidxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11429B0A1FF00CFCE2F /* adjustaccidxfunctor.cpp */; };
 		E7E9C11729B0A20400CFCE2F /* adjustaccidxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11429B0A1FF00CFCE2F /* adjustaccidxfunctor.cpp */; };
 		E7E9C11829B0A20500CFCE2F /* adjustaccidxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11429B0A1FF00CFCE2F /* adjustaccidxfunctor.cpp */; };
+		E7E9C11A29B0EF9600CFCE2F /* adjusttempofunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */; };
+		E7E9C11B29B0EF9700CFCE2F /* adjusttempofunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7E9C11D29B0EFB400CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
+		E7E9C11E29B0EFBC00CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
+		E7E9C11F29B0EFBD00CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
+		E7E9C12029B0EFBE00CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
 		E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; };
 		E7F39C5F29A62B270055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7F39C6129A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
@@ -2052,6 +2058,8 @@
 		E7E1698D29A8BA5200FFF482 /* adjustgracexposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustgracexposfunctor.cpp; path = src/adjustgracexposfunctor.cpp; sourceTree = "<group>"; };
 		E7E9C11129B0A1D500CFCE2F /* adjustaccidxfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustaccidxfunctor.h; path = include/vrv/adjustaccidxfunctor.h; sourceTree = "<group>"; };
 		E7E9C11429B0A1FF00CFCE2F /* adjustaccidxfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustaccidxfunctor.cpp; path = src/adjustaccidxfunctor.cpp; sourceTree = "<group>"; };
+		E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjusttempofunctor.h; path = include/vrv/adjusttempofunctor.h; sourceTree = "<group>"; };
+		E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjusttempofunctor.cpp; path = src/adjusttempofunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2827,6 +2835,8 @@
 				E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */,
 				E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */,
 				E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */,
+				E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */,
+				E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
@@ -2963,6 +2973,7 @@
 				4DB3D8EC1F83D18300B5FC2B /* proport.h in Headers */,
 				4DEC4DDE21C8295700D1D273 /* lem.h in Headers */,
 				4DC12A5D1F73F888000440E9 /* pghead2.h in Headers */,
+				E7E9C11A29B0EF9600CFCE2F /* adjusttempofunctor.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				E77C197D28CD317B00F5BADA /* calcdotsfunctor.h in Headers */,
 				4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */,
@@ -3300,6 +3311,7 @@
 				BB4C4B8622A932DF001F6AF0 /* lb.h in Headers */,
 				E77C197E28CD317B00F5BADA /* calcdotsfunctor.h in Headers */,
 				BD0562302518CD12004057EB /* beamspan.h in Headers */,
+				E7E9C11B29B0EF9700CFCE2F /* adjusttempofunctor.h in Headers */,
 				BB4C4AFE22A932BC001F6AF0 /* subst.h in Headers */,
 				BB4C4AFC22A932BC001F6AF0 /* sic.h in Headers */,
 				BB4C4AEE22A932BC001F6AF0 /* expan.h in Headers */,
@@ -3790,6 +3802,7 @@
 				40BD9392206B950C0037BF8E /* annot.cpp in Sources */,
 				4DB787642022F0BB00394520 /* jsonxx.cc in Sources */,
 				4DEC4DBB21C8288900D1D273 /* choice.cpp in Sources */,
+				E7E9C11E29B0EFBC00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0C289674000006D7DA /* symbol.cpp in Sources */,
 				4D64137F2035F68600BB630E /* mdiv.cpp in Sources */,
 				4D1694571E3A44F300569BF4 /* anchoredtext.cpp in Sources */,
@@ -3877,6 +3890,7 @@
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
 				4DACC9B82990F29A00B55913 /* atts_frettab.cpp in Sources */,
 				4D27E13727F582BB00D64FBD /* docselection.cpp in Sources */,
+				E7E9C11D29B0EFB400CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D2073F822A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */,
 				4DEC4D9A21C81E6600D1D273 /* lem.cpp in Sources */,
@@ -4301,6 +4315,7 @@
 				4DB3D8991F7C325D00B5FC2B /* lb.cpp in Sources */,
 				4DC34BA919BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAB19BC4A83006175CD /* custos.cpp in Sources */,
+				E7E9C11F29B0EFBD00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0D289674010006D7DA /* symbol.cpp in Sources */,
 				4DEC4DB821C8270100D1D273 /* unclear.cpp in Sources */,
 				4D89F910201771AE00A4D336 /* num.cpp in Sources */,
@@ -4557,6 +4572,7 @@
 				BB4C4AA622A932A0001F6AF0 /* bboxdevicecontext.cpp in Sources */,
 				BB4C4BAD22A932EB001F6AF0 /* view_element.cpp in Sources */,
 				BB4C4B2522A932CF001F6AF0 /* fermata.cpp in Sources */,
+				E7E9C12029B0EFBE00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0E289674010006D7DA /* symbol.cpp in Sources */,
 				BB4C4BB322A932EB001F6AF0 /* view_slur.cpp in Sources */,
 				BB4C4B1922A932CF001F6AF0 /* anchoredtext.cpp in Sources */,
