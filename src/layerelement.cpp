@@ -2547,8 +2547,9 @@ int LayerElement::LayerElementsInTimeSpan(FunctorParams *functorParams) const
 
     if (this->Is(NOTE)) {
         const Note *note = vrv_cast<const Note *>(this);
-        if (note->IsChordTone()
-            && (std::find(params->m_elements.begin(), params->m_elements.end(), this->GetParent())
+        const Chord *chord = note->IsChordTone();
+        if (chord
+            && (std::find(params->m_elements.begin(), params->m_elements.end(), chord)
                 != params->m_elements.end())) {
             return FUNCTOR_CONTINUE;
         }
