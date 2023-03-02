@@ -320,7 +320,7 @@ public:
     void AddToAccidSpace(Accid *accid);
 
     /**
-     * See Object::AjustAccidX
+     * See AdjustAccidXFunctor
      */
     void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids);
 
@@ -367,13 +367,12 @@ public:
 private:
     //
 public:
-    //
-private:
     /**
      * The accid space of the AlignmentReference.
      */
     std::vector<Accid *> m_accidSpace;
 
+private:
     /**
      *
      */
