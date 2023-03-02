@@ -326,8 +326,8 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(
-        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
+    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility,
+        bool isBelow, char spanningType) const;
 
     // Determine a quadratic interpolation function between zero and one and evaluate it
     double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
