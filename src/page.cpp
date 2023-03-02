@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "adjustaccidxfunctor.h"
 #include "adjustarpegfunctor.h"
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
@@ -389,9 +390,8 @@ void Page::LayOutHorizontally()
     this->Process(adjustLayersWithDots);
 
     // Adjust the X position of the accidentals, including in chords
-    Functor adjustAccidX(&Object::AdjustAccidX);
-    AdjustAccidXParams adjustAccidXParams(doc, &adjustAccidX);
-    this->Process(&adjustAccidX, &adjustAccidXParams);
+    AdjustAccidXFunctor adjustAccidX(doc);
+    this->Process(adjustAccidX);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping

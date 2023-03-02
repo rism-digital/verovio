@@ -342,11 +342,6 @@ public:
     int AlignVertically(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustXOverflow
      */
     int AdjustXOverflow(FunctorParams *functorParams) override;

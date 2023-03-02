@@ -239,11 +239,6 @@ public:
     int AdjustXPosEnd(FunctorParams *functorParams) override;
     ///@}
 
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
 private:
     /**
      * Retrieve the AlignmentReference with staffN.
@@ -358,11 +353,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
 
 private:
     //

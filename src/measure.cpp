@@ -838,18 +838,6 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AdjustAccidX(FunctorParams *functorParams)
-{
-    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);

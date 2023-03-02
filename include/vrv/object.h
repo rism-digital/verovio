@@ -778,11 +778,6 @@ public:
     /**
      * Adjust the X position of accidental.
      */
-    virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the X position of accidental.
-     */
     virtual int AdjustTempo(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
