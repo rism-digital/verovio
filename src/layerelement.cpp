@@ -2409,7 +2409,12 @@ int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
 
     if (params->m_previousElement) {
         assert(params->m_currentTurn);
+        if (this->Is(NOTE) && params->m_currentChord) {
+            Note *note = vrv_cast<Note *>(this);
+            if (note->IsChordTone() == params->m_currentChord) return FUNCTOR_CONTINUE;
+        }
         params->m_currentTurn->m_drawingEndElement = this;
+        params->m_currentChord = NULL;
         params->m_currentTurn = NULL;
         params->m_previousElement = NULL;
     }
@@ -2417,6 +2422,14 @@ int LayerElement::PrepareDelayedTurns(FunctorParams *functorParams)
     if (params->m_delayedTurns.count(this)) {
         params->m_previousElement = this;
         params->m_currentTurn = params->m_delayedTurns.at(this);
+        if (this->Is(CHORD)) {
+            return FUNCTOR_SIBLINGS;
+        }
+        else if (this->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(this);
+            Chord *chord = note->IsChordTone();
+            if (chord) params->m_currentChord = chord;
+        }
     }
 
     return FUNCTOR_CONTINUE;
