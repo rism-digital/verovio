@@ -810,40 +810,49 @@ void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int int
     // Filter collisions near the endpoints
     // Collisions with ratio beyond the partialShiftRadius do not contribute to shifts
     // They are compensated later by shifting the control points
+    double fullShiftRadius = 0.0;
+    double partialShiftRadius = 0.0;
+    std::tie(fullShiftRadius, partialShiftRadius) = this->CalcShiftRadii(true, flexibility, spanningType);
 
-    double fullShiftLeftRadius = 0.05 + flexibility * 0.15;
-    // Use full flexibility for broken slur endpoints
-    if ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END)) {
-        fullShiftLeftRadius = 0.2;
-    }
-
-    double fullShiftRightRadius = 0.05 + flexibility * 0.15;
-    // Use full flexibility for broken slur endpoints
-    if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)) {
-        fullShiftRightRadius = 0.2;
-    }
-
-    const double partialShiftLeftRadius = fullShiftLeftRadius * 3.0;
-    const double partialShiftRightRadius = fullShiftRightRadius * 3.0;
-
-    if ((ratio < partialShiftLeftRadius) && (this->HasEndpointAboveStart() == isBelow)) {
-        if (ratio > fullShiftLeftRadius) {
+    if ((ratio < partialShiftRadius) && (this->HasEndpointAboveStart() == isBelow)) {
+        if (ratio > fullShiftRadius) {
             // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 1 and 0
-            intersection *= this->CalcQuadraticInterpolation(partialShiftLeftRadius, fullShiftLeftRadius, ratio);
+            intersection *= this->CalcQuadraticInterpolation(partialShiftRadius, fullShiftRadius, ratio);
         }
         shiftLeft = std::max(shiftLeft, intersection);
     }
 
-    if ((ratio > 1.0 - partialShiftRightRadius) && (this->HasEndpointAboveEnd() == isBelow)) {
-        if (ratio < 1.0 - fullShiftRightRadius) {
+    std::tie(fullShiftRadius, partialShiftRadius) = this->CalcShiftRadii(false, flexibility, spanningType);
+
+    if ((ratio > 1.0 - partialShiftRadius) && (this->HasEndpointAboveEnd() == isBelow)) {
+        if (ratio < 1.0 - fullShiftRadius) {
             // Collisions here only partially contribute to shifts
             // We multiply with a function that interpolates between 0 and 1
-            intersection
-                *= this->CalcQuadraticInterpolation(1.0 - partialShiftRightRadius, 1.0 - fullShiftRightRadius, ratio);
+            intersection *= this->CalcQuadraticInterpolation(1.0 - partialShiftRadius, 1.0 - fullShiftRadius, ratio);
         }
         shiftRight = std::max(shiftRight, intersection);
     }
+}
+
+std::pair<double, double> Slur::CalcShiftRadii(bool forShiftLeft, double flexibility, char spanningType) const
+{
+    // Use full flexibility for broken slur endpoints
+    if (forShiftLeft) {
+        if ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END)) {
+            flexibility = 1.0;
+        }
+    }
+    else {
+        if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)) {
+            flexibility = 1.0;
+        }
+    }
+
+    const double fullShiftRadius = 0.05 + flexibility * 0.15;
+    const double partialShiftRadius = fullShiftRadius * 3.0;
+
+    return { fullShiftRadius, partialShiftRadius };
 }
 
 double Slur::CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const
