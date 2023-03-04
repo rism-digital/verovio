@@ -2200,10 +2200,12 @@ public:
     {
         m_initMap = true;
         m_previousElement = NULL;
+        m_currentChord = NULL;
         m_currentTurn = NULL;
     }
     bool m_initMap;
     LayerElement *m_previousElement;
+    Chord *m_currentChord;
     Turn *m_currentTurn;
     std::map<LayerElement *, Turn *> m_delayedTurns;
 };

@@ -1420,6 +1420,11 @@ Options::Options()
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
 
+    m_octaveNoSpanningParentheses.SetInfo("No parentheses on spanning octaves",
+        "Do not enclose octaves that are spanning over systems with parentheses.");
+    m_octaveNoSpanningParentheses.Init(false);
+    this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
+
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_pedalLineThickness, "pedalLineThickness", &m_generalLayout);

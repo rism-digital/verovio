@@ -224,7 +224,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 
 void ABCInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
+    MeterSig *meterSig = vrv_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -1379,7 +1379,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
-                auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                auto accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);

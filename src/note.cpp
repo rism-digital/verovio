@@ -204,12 +204,12 @@ void Note::AlignDotsShift(const Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
 const Accid *Note::GetDrawingAccid() const
 {
-    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
 }
 
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
@@ -229,17 +229,17 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) 
 
 Chord *Note::IsChordTone()
 {
-    return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 const Chord *Note::IsChordTone() const
 {
-    return dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur() const
 {
-    const Chord *chordParent = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -257,12 +257,12 @@ bool Note::IsClusterExtreme() const
 
 TabGrp *Note::IsTabGrpNote()
 {
-    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 const TabGrp *Note::IsTabGrpNote() const
 {
-    return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
@@ -767,7 +767,7 @@ bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dot
     const Object *stem = this->GetFirst(STEM);
     if (!stem) return false;
 
-    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
+    const Flag *flag = vrv_cast<const Flag *>(stem->GetFirst(FLAG));
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
@@ -1301,10 +1301,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
+    Stem *currentStem = vrv_cast<Stem *>(this->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!this->IsChordTone() && !this->IsTabGrpNote()) {
         if (!currentStem) {
@@ -1350,7 +1350,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
         if (chord && (chord->GetDots() == this->GetDots())) {

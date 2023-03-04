@@ -395,7 +395,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     int yIn, yOut, yRel;
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     const int staffHeight
         = params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 

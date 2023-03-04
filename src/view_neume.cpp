@@ -81,7 +81,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstAncestor(NEUME));
+    Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
     assert(neume);
     int position = neume->GetChildIndex(element);
 

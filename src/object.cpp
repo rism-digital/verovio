@@ -2178,7 +2178,7 @@ int Object::ScoreDefSetCurrent(FunctorParams *functorParams)
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
         assert(staff->m_drawingTuning == NULL);
-        staff->m_drawingTuning = dynamic_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
+        staff->m_drawingTuning = vrv_cast<Tuning *>(params->m_currentStaffDef->FindDescendantByType(TUNING));
         staff->m_drawingLines = params->m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
         staff->m_drawingStaffSize = 100;

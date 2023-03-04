@@ -1,8 +1,19 @@
 # Changelog
 
 ## [unreleased]
+
+## [3.15.0] - 2023-03-01
+* Improved generation of `xml:id`s (@eNote-GmbH)
+* Improved positioning of accidentals in chords (@eNote-GmbH)
+* Improved MusicXML import (@eNote-GmbH)
 * Improved rendering of brackets (@eNote-GmbH)
 * Improved interaction between slurs and tuplets (@eNote-GmbH)
+* Improved harm annotations in the Humdrum importer (@WolfgangDrescher)
+* Refactoring of LibMEI and integration within the Verovio repository
+* Reduced memory usage of the LibMEI code (@eNote-GmbH)
+* Option to add metadata in the Plaine and Easie importer
+* Option --octave-no-spanning-parentheses for octave brackets without brackets (@eNote-GmbH)
+* Option --load-selected-mdiv-only (@eNote-GmbH)
 * Fix in MIDI tempo calculation with `@mm.dots` (@wergo)
 * Fixes in the MusicXML importer (@eNote-GmbH)
 

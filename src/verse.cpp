@@ -138,7 +138,7 @@ int Verse::AdjustSylSpacing(FunctorParams *functorParams)
     m_drawingLabelAbbr = NULL;
     // Find the labelAbbr (if none previously given)
     if (params->m_currentLabelAbbr == NULL) {
-        params->m_currentLabelAbbr = dynamic_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
+        params->m_currentLabelAbbr = vrv_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
         // Keep indication that this is a new abbreviation and that is should not be displayed on this verse
         newLabelAbbr = true;
     }

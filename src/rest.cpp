@@ -610,7 +610,7 @@ int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
 int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
 
     if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
         if (!currentDots) {
