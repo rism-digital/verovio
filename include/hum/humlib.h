@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 27 16:47:59 PST 2023
+// Last Modified: Fri  3 Mar 11:37:45 GMT 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -7259,7 +7259,7 @@ class FiguredBassAbbreviationMapping {
 	public:
 		FiguredBassAbbreviationMapping(string s, vector<int> n);
 
-		static vector<FiguredBassAbbreviationMapping*> s_mappings;
+		const static vector<FiguredBassAbbreviationMapping> s_mappings;
 
 		// String to compare the numbers with
 		// e.g. "6 4 3"

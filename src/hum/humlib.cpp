@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 27 16:47:59 PST 2023
+// Last Modified: Fri  3 Mar 11:37:45 GMT 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -78714,22 +78714,19 @@ vector<FiguredBassNumber*> Tool_fb::getAbbreviatedNumbers(const vector<FiguredBa
 
 	vector<FiguredBassNumber*> abbreviatedNumbers;
 
-	vector<FiguredBassAbbreviationMapping*> mappings = FiguredBassAbbreviationMapping::s_mappings;
-
 	string numberString = getNumberString(numbers);
 
 	// Check if an abbreviation exists for passed numbers
-	auto it = find_if(mappings.begin(), mappings.end(), [numberString](FiguredBassAbbreviationMapping* abbr) {
-		return abbr->m_str == numberString;
+	auto it = find_if(FiguredBassAbbreviationMapping::s_mappings.begin(), FiguredBassAbbreviationMapping::s_mappings.end(), [&numberString](const FiguredBassAbbreviationMapping& abbr) {
+		return abbr.m_str == numberString;
 	});
 
-	if (it != mappings.end()) {
-		int index = it - mappings.begin();
-		FiguredBassAbbreviationMapping* abbr = mappings[index];
+	if (it != FiguredBassAbbreviationMapping::s_mappings.end()) {
+		const FiguredBassAbbreviationMapping& abbr = *it;
 		bool aQ = m_accidentalsQ;
 		// Store numbers to display by the abbreviation mapping in abbreviatedNumbers
-		copy_if(numbers.begin(), numbers.end(), back_inserter(abbreviatedNumbers), [abbr, aQ](FiguredBassNumber* num) {
-			vector<int> nums = abbr->m_numbers;
+		copy_if(numbers.begin(), numbers.end(), back_inserter(abbreviatedNumbers), [&abbr, aQ](FiguredBassNumber* num) {
+			const vector<int>& nums = abbr.m_numbers;
 			// Show numbers if they are part of the abbreviation mapping or if they have an accidental
 			return (find(nums.begin(), nums.end(), num->getNumberWithinOctave()) != nums.end()) || (num->m_showAccidentals && aQ);
 		});
@@ -78932,21 +78929,21 @@ FiguredBassAbbreviationMapping::FiguredBassAbbreviationMapping(string s, vector<
 // FiguredBassAbbreviationMapping::s_mappings -- Mapping to abbreviate figured bass numbers
 //
 
-vector<FiguredBassAbbreviationMapping*> FiguredBassAbbreviationMapping::s_mappings = {
-	new FiguredBassAbbreviationMapping("3", {}),
-	new FiguredBassAbbreviationMapping("5", {}),
-	new FiguredBassAbbreviationMapping("5 3", {}),
-	new FiguredBassAbbreviationMapping("6 3", {6}),
-	new FiguredBassAbbreviationMapping("5 4", {4}),
-	new FiguredBassAbbreviationMapping("7 5 3", {7}),
-	new FiguredBassAbbreviationMapping("7 3", {7}),
-	new FiguredBassAbbreviationMapping("7 5", {7}),
-	new FiguredBassAbbreviationMapping("6 5 3", {6, 5}),
-	new FiguredBassAbbreviationMapping("6 4 3", {4, 3}),
-	new FiguredBassAbbreviationMapping("6 4 2", {4, 2}),
-	new FiguredBassAbbreviationMapping("9 5 3", {9}),
-	new FiguredBassAbbreviationMapping("9 5", {9}),
-	new FiguredBassAbbreviationMapping("9 3", {9}),
+const vector<FiguredBassAbbreviationMapping> FiguredBassAbbreviationMapping::s_mappings = {
+	FiguredBassAbbreviationMapping("3", {}),
+	FiguredBassAbbreviationMapping("5", {}),
+	FiguredBassAbbreviationMapping("5 3", {}),
+	FiguredBassAbbreviationMapping("6 3", {6}),
+	FiguredBassAbbreviationMapping("5 4", {4}),
+	FiguredBassAbbreviationMapping("7 5 3", {7}),
+	FiguredBassAbbreviationMapping("7 3", {7}),
+	FiguredBassAbbreviationMapping("7 5", {7}),
+	FiguredBassAbbreviationMapping("6 5 3", {6, 5}),
+	FiguredBassAbbreviationMapping("6 4 3", {4, 3}),
+	FiguredBassAbbreviationMapping("6 4 2", {4, 2}),
+	FiguredBassAbbreviationMapping("9 5 3", {9}),
+	FiguredBassAbbreviationMapping("9 5", {9}),
+	FiguredBassAbbreviationMapping("9 3", {9}),
 };
 
 
