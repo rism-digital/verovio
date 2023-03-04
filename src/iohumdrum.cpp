@@ -4315,7 +4315,6 @@ std::string HumdrumInput::processTemplateOperator(const std::string &value, cons
         // Show only years for birth/death, and shorten if in same century.
         // Still need to include circa, flourish, and birth/death only.
         std::string cdates = input;
-        std::string outputdate;
         std::string birth;
         std::string death;
         auto pos = cdates.find("-");
@@ -4331,13 +4330,16 @@ std::string HumdrumInput::processTemplateOperator(const std::string &value, cons
                 deathyear = hre.getMatchInt(1);
             }
             if ((deathyear > 0) && (birthyear > 0)) {
-                outputdate = to_string(birthyear);
-                outputdate += "&#8211;";
+                output = to_string(birthyear);
+                output += "&#8211;";
                 if ((deathyear / 100) == (birthyear / 100)) {
-                    outputdate += to_string(deathyear % 100);
+                    if ((deathyear % 100) < 10) {
+                        output += "0";
+                    }
+                    output += to_string(deathyear % 100);
                 }
                 else {
-                    outputdate += to_string(deathyear);
+                    output += to_string(deathyear);
                 }
             }
         }
@@ -4345,8 +4347,11 @@ std::string HumdrumInput::processTemplateOperator(const std::string &value, cons
             if (hre.search(cdates, "(\\d{4})")) {
                 output = hre.getMatch(1);
             }
+            else {
+                // some problem, so output the input:
+                output = cdates;
+            }
         }
-        output = outputdate;
     }
     else if (op.find("Y") != std::string::npos) {
         // Show only years for birth/death, but do not shorten if in same century.
@@ -4758,9 +4763,9 @@ std::string HumdrumInput::automaticHeaderLeft(std::vector<std::pair<std::string,
     std::string output;
 
     auto PTL = refmap.find("PTL");
-    auto PPR = refmap.find("PTL");
-    auto PPP = refmap.find("PTL");
-    auto PDT = refmap.find("PTL");
+    auto PPR = refmap.find("PPR");
+    auto PPP = refmap.find("PPP");
+    auto PDT = refmap.find("PDF");
 
     int count = 0;
     if (PTL != refmap.end()) {
