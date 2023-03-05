@@ -810,7 +810,7 @@ bool HumdrumInput::convertHumdrum()
         if (datatype.find("kern") != std::string::npos) {
             staffindex++;
         }
-        else if (it->isDataType("**mxhm")) {
+        else if (it->isDataType("**harm")) {
             m_harm = true;
         }
         else if (it->isDataType("**mxhm")) {
@@ -8125,29 +8125,57 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
 
 //////////////////////////////
 //
-// HumdrumInput::addHarmFloatsForMeasure -- Does not handle chords in **deg yet.
+// HumdrumInput::addHarmFloatsForMeasure --  Insert <harm> type data.
+//   Input variables:
+//     startline  == the starting line to search for harm-like data. (inclusive)
+//     endline    == the endline line to search for harm-like data. (exclusive)
+//
+//   Exclusive interpretations processed by this function:
+//     **harm      == Roman-numeral analysis
+//     **rhrm      == Roman-numeral analysis prefixed by **recip rhythms.
+//     **mxhm      == pitch-class based chord labels
+//     **deg       == Scale degree data
+//     **degree    == Scale degree data with octave information
+//     **cdata     == Textual data that should be inserted into score
+//                    via timestamps (applies to multiple staves).
+//     **cdata-xxx == Textual data that should be given @type="string".
+//                    Used to differentiate between different types of
+//                    free-form **cdata content.
+//
+//    N.B.: Does not handle chords in **deg/**degree yet.
 //
 
 void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 {
     if (!m_measure) {
+        // <harm> data can only be inserted into measures
+        // (i.e., ignore harm-like data in mensural music).
         return;
     }
-    hum::HumRegex hre;
+
     int xstaffindex;
-    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
+    hum::HumRegex hre;
     hum::HumdrumFile &infile = m_infiles[0];
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
+
+    // Search the staff from startline to endline for harm-like
+    // harm-like data to process.
     for (int i = startline; i < endline; ++i) {
         if (infile[i].isInterpretation()) {
+            // Check for color styling.
             for (int j = 0; j < infile[i].getFieldCount(); j++) {
                 if (hre.search(infile.token(i, j), "^\\*color:(.*)")) {
                     int ctrack = infile.token(i, j)->getTrack();
                     int strack = infile.token(i, j)->getSubtrack();
                     m_spine_color[ctrack][strack] = hre.getMatch(1);
                     if (strack == 1) {
+                        // If setting from the first subspine, also update
+                        // the global track color to match:
                         m_spine_color[ctrack][0] = m_spine_color[ctrack][1];
                     }
                     else if (strack == 0) {
+                        // If setting from a primary track without splits,
+                        // set all subtracks to the given color:
                         for (int z = 1; z < (int)m_spine_color[ctrack].size(); z++) {
                             m_spine_color[ctrack][z] = m_spine_color[ctrack][0];
                         }
@@ -8155,103 +8183,115 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 }
             }
         }
+
         if (!infile[i].isData()) {
             continue;
         }
-        int track = 0;
+
+        // active is set to true to allow for harm data given
+        // before the first **kern spine to be processed.  This
+        // should be enhanced to check for the next staff
+        // spine after the data: if it is **mens data, then
+        // do not process harm-like data.
         int active = true;
+        int track = 0;
+
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
+
+            // Check to see if data should be
+            // processed for current staff.
             hum::HTp token = infile.token(i, j);
             std::string exinterp = token->getDataType();
-            if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
+            if (token->isMensLike()) {
                 active = false;
                 continue;
             }
-            if (token->isDataType("**kern")) {
-                track = token->getTrack();
+            if (token->isKernLike()) {
                 active = true;
-            }
-            if (token->getValueInt("auto", "hidden")) {
                 continue;
             }
+
             if (!active) {
                 continue;
             }
             if (token->isNull()) {
                 continue;
             }
+
+            // isCData -- is free-form harmony data.
             bool isCData = token->getDataType().compare(0, 7, "**cdata") == 0;
-            bool isDegree = (token->getDataType() == "**deg") || (token->getDataType() == "**degree");
-            if (!(token->isDataType("**mxhm") || token->isDataType("**harm") || token->isDataType("**rhrm") || isCData
-                    || isDegree)) {
+
+            // isDegree -- is degree type data.
+            bool isDegree = (token->isDataType("**deg") || token->isDataType("**degree"));
+
+            // isHarm -- is another type of harm-type data spine.
+            bool isHarm = token->isDataType("**mxhm") || token->isDataType("**harm") || token->isDataType("**rhrm");
+
+            if (!(isCData || isDegree || isHarm)) {
+                continue;
+            }
+
+            if (token->getValueInt("auto", "hidden")) {
+                // Don't process invisible harm-like data, using token
+                // parameter method to hide data.
                 continue;
             }
             if (token->find("yy") != std::string::npos) {
-                // skip displaying the scale degree
+                // Skip displaying the scale degree if "yy" text present in data.
                 continue;
             }
+
             if (isDegree && (token->find('r') != std::string::npos)) {
                 if (token->find('0') == std::string::npos) {
-                    // Don't add rest marker data (otherwise it will be labeled as the "0" scale degree).
+                    // Don't add rest marker data for degree data; otherwise,
+                    // it will be labeled as scale degree "0".
                     continue;
                 }
             }
+
+            // At this point, only non-null harm-like data is being processed.
+            // Also no suppressed (invisible) data should be passing this point.
+
+            // Create and insert storage for conversion of harm-like data.
             Harm *harm = new Harm();
-            Text *text = new Text();
-            Rend *rend = NULL;
+            Rend *harmRend = new Rend();
 
+            harm->AddChild(harmRend);
             addChildMeasureOrSection(harm);
+            setLocationId(harm, token);
 
+            // Set rend styling for harm-like token (color, circle, box).
             int line = token->getLineIndex();
             int field = token->getFieldIndex();
-
             std::string ccolor = getSpineColor(line, field);
             if (!ccolor.empty()) {
-                rend = new Rend();
-                rend->SetColor(ccolor);
-                harm->AddChild(rend);
-                rend->AddChild(text);
+                harmRend->SetColor(ccolor);
                 if (token->getValueInt("auto", "circle")) {
-                    rend->SetRend(TEXTRENDITION_circle);
+                    harmRend->SetRend(TEXTRENDITION_circle);
                 }
                 else if (token->getValueInt("auto", "box")) {
-                    rend->SetRend(TEXTRENDITION_box);
+                    harmRend->SetRend(TEXTRENDITION_box);
                 }
             }
             else {
                 if (token->getValueInt("auto", "circle")) {
-                    rend = new Rend();
-                    rend->SetRend(TEXTRENDITION_circle);
-                    harm->AddChild(rend);
-                    rend->AddChild(text);
+                    harmRend->SetRend(TEXTRENDITION_circle);
                 }
                 else if (token->getValueInt("auto", "box")) {
-                    rend = new Rend();
-                    rend->SetRend(TEXTRENDITION_box);
-                    harm->AddChild(rend);
-                    rend->AddChild(text);
+                    harmRend->SetRend(TEXTRENDITION_box);
                 }
                 else {
                     if (token->getValueInt("auto", "circle")) {
-                        rend = new Rend();
-                        rend->SetRend(TEXTRENDITION_circle);
-                        harm->AddChild(rend);
-                        rend->AddChild(rend);
+                        harmRend->SetRend(TEXTRENDITION_circle);
                     }
                     else if (token->getValueInt("auto", "box")) {
-                        rend = new Rend();
-                        rend->SetRend(TEXTRENDITION_box);
-                        harm->AddChild(rend);
-                        rend->AddChild(rend);
-                    }
-                    else {
-                        harm->AddChild(text);
+                        harmRend->SetRend(TEXTRENDITION_box);
                     }
                 }
             }
 
-            std::string octave;
             if (token->isDataType("**degree")) {
+                std::string octave;
                 int octaveQ = !token->getValueInt("auto", "Xoctave");
                 if (octaveQ) {
                     hum::HumRegex hre2;
@@ -8259,41 +8299,39 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                         octave = hre2.getMatch(1);
                     }
                 }
-            }
 
-            if (!octave.empty()) {
-                Rend *subrend = new Rend();
-                Text *subtext = new Text();
-                subrend->AddChild(subtext);
-                subrend->SetRend(TEXTRENDITION_sub);
-                subrend->SetType("octave");
-                std::u32string subcontent = UTF8to32(octave);
-                subtext->SetText(subcontent);
-                if (rend) {
-                    rend->AddChild(subrend);
-                }
-                else {
-                    harm->AddChild(subrend);
+                if (!octave.empty()) {
+                    Rend *subrend = new Rend();
+                    Text *subtext = new Text();
+                    subrend->AddChild(subtext);
+                    subrend->SetRend(TEXTRENDITION_sub);
+                    subrend->SetType("octave");
+                    std::u32string subcontent = UTF8to32(octave);
+                    subtext->SetText(subcontent);
+                    harmRend->AddChild(subrend);
                 }
             }
 
             std::string tracktext = getTrackText(token);
             harm->SetN(tracktext);
 
+            track = token->getTrack();
             int staffindex = m_rkern[track];
-
             if (staffindex >= 0) {
                 xstaffindex = staffindex;
                 setStaff(harm, staffindex + 1);
             }
             else {
-                // data is not attached to a **kern spine since it comes before
+                // Data is not attached to a **kern spine since it comes before
                 // any **kern data.  Treat it as attached to the bottom staff.
                 // (or the top staff depending on @place="above|below".
                 xstaffindex = (int)staffstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
 
+            // Add @type for cdata and deg/degree spines.
+            // Data types could be added to other harm-like
+            // spines in the future.
             std::string datatype = token->getDataType();
             if (datatype.compare(0, 8, "**cdata-") == 0) {
                 std::string subdatatype = datatype.substr(8);
@@ -8308,207 +8346,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 }
             }
 
-            std::u32string content;
-            std::u32string precontent;
-            std::u32string postcontent;
-            bool preleapQ = false;
-            bool preupdirQ = false;
-            bool predowndirQ = false;
-            bool postleapQ = false;
-            bool postupdirQ = false;
-            bool postdowndirQ = false;
-            if (datatype == "**harm") {
-                content = cleanHarmString2(*token);
-            }
-            else if (datatype == "**rhrm") {
-                content = cleanHarmString3(*token);
-            }
-            else if (isDegree) {
-                content = cleanDegreeString(token);
-
-                // *dir/*Xdir: do/do_not show melodic approaches (directions)
-                int dirQ = !token->getValueInt("auto", "Xdir");
-
-                if (dirQ) {
-                    // note: token is presumend to not be a chord
-
-                    // process melodic departure information
-                    int upcount = 0;
-                    int downcount = 0;
-                    std::string firstnote;
-                    for (int m = 0; m < (int)token->size(); m++) {
-                        if (token->at(m) == ' ') {
-                            // currently only processing first note of chords
-                            break;
-                        }
-                        else {
-                            firstnote.push_back(token->at(m));
-                        }
-                        if (token->at(m) == '^') {
-                            upcount++;
-                        }
-                        else if (token->at(m) == 'v') {
-                            downcount++;
-                        }
-                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '^')) {
-                            upcount = 0;
-                        }
-                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == 'v')) {
-                            downcount = 0;
-                        }
-                    }
-
-                    if (upcount == 1) {
-                        precontent = U"\u2197"; // single up diagonal arrow
-                        // precontent = U"\u2191"; // up arrow
-                        preupdirQ = true;
-                    }
-                    else if (upcount >= 2) {
-                        // precontent = U"\u21d7"; // double up diagonal arrow
-                        precontent = U"\u2b08"; // thick up diagonal arrow
-                        preupdirQ = true;
-                        preleapQ = true;
-                    }
-                    else if (downcount == 1) {
-                        precontent = U"\u2198"; // single up diagonal arrow
-                        // precontent = U"\u2193"; // down arrow
-                        predowndirQ = true;
-                    }
-                    else if (downcount >= 2) {
-                        // precontent = U"\u21d8"; // double down arrow
-                        precontent = U"\u2b0a"; // thick down diagonal arrow
-                        predowndirQ = true;
-                        preleapQ = true;
-                    }
-                }
-
-                if (dirQ) {
-                    // note: token is presumend to not be a chord.
-
-                    // process melodic departure information
-                    int upcount = 0;
-                    int downcount = 0;
-                    for (int m = 0; m < (int)token->size(); m++) {
-                        if (token->at(m) == ' ') {
-                            // only process first note of chord for now
-                            break;
-                        }
-                        if (token->at(m) == '\'') {
-                            upcount++;
-                        }
-                        else if (token->at(m) == ',') {
-                            downcount++;
-                        }
-                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '\'')) {
-                            upcount = 0;
-                        }
-                        if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == ',')) {
-                            downcount = 0;
-                        }
-                    }
-                    if (upcount == 1) {
-                        postcontent = U"\u2197"; // single up diagonal arrow
-                        // postcontent = U"\u2191"; // up arrow
-                        postupdirQ = true;
-                    }
-                    else if (upcount >= 2) {
-                        // postcontent = U"\u21d7"; // double up diagonal arrow
-                        postcontent = U"\u2b08"; // thick up diagonal arrow
-                        postupdirQ = true;
-                        postleapQ = true;
-                    }
-                    else if (downcount == 1) {
-                        postcontent = U"\u2198"; // single up diagonal arrow
-                        // postcontent = U"\u2193"; // down arrow
-                        postdowndirQ = true;
-                    }
-                    else if (downcount >= 2) {
-                        // postcontent = U"\u21d8"; // double down arrow
-                        postcontent = U"\u2b0a"; // thick down diagonal arrow
-                        postdowndirQ = true;
-                        postleapQ = true;
-                    }
-                }
-            }
-
-            else if (isCData) {
-                content = UTF8to32(*token);
-            }
-            else {
-                content = cleanHarmString(*token);
-            }
-
-            text->SetText(content);
-
-            if (isDegree && (preupdirQ || predowndirQ) && !precontent.empty()) {
-                Rend *prerend = new Rend();
-                Text *pretext = new Text();
-                prerend->AddChild(pretext);
-                pretext->SetText(precontent);
-                if (preupdirQ) {
-                    prerend->SetRend(TEXTRENDITION_sub);
-                    if (preleapQ) {
-                        setFontsize(prerend, "", "120%");
-                        prerend->SetType("approach-up-leap");
-                    }
-                    else {
-                        prerend->SetType("approach-up-step");
-                    }
-                }
-                else if (predowndirQ) {
-                    prerend->SetRend(TEXTRENDITION_sup);
-                    if (preleapQ) {
-                        setFontsize(prerend, "", "120%");
-                        prerend->SetType("approach-down-leap");
-                    }
-                    else {
-                        prerend->SetType("approach-down-step");
-                    }
-                }
-                if (rend) {
-                    rend->InsertChild(prerend, 0);
-                    prerend->SetParent(rend);
-                }
-                else {
-                    harm->InsertChild(prerend, 0);
-                    prerend->SetParent(harm);
-                }
-            }
-
-            if (isDegree && (postupdirQ || postdowndirQ) && !postcontent.empty()) {
-                Rend *postrend = new Rend();
-                Text *posttext = new Text();
-                postrend->AddChild(posttext);
-                posttext->SetText(postcontent);
-                if (postupdirQ) {
-                    postrend->SetRend(TEXTRENDITION_sup);
-                    if (postleapQ) {
-                        setFontsize(postrend, "", "120%");
-                        postrend->SetType("departure-up-leap");
-                    }
-                    else {
-                        postrend->SetType("departure-up-step");
-                    }
-                }
-                else if (postdowndirQ) {
-                    postrend->SetRend(TEXTRENDITION_sub);
-                    if (postleapQ) {
-                        setFontsize(postrend, "", "120%");
-                        postrend->SetType("departure-down-leap");
-                    }
-                    else {
-                        postrend->SetType("departure-down-step");
-                    }
-                }
-
-                if (rend) {
-                    rend->AddChild(postrend);
-                }
-                else {
-                    harm->AddChild(postrend);
-                }
-            }
-
+            // Add timestamp for harm data:
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
             std::string meilabel = token->getValue("auto", "meilabel");
@@ -8516,6 +8354,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 addHarmLabel(harm, meilabel);
             }
 
+            // Place harm data above/below staff:
             int aboveQ = token->getValueInt("auto", "above");
             if (aboveQ) {
                 setPlaceRelStaff(harm, "above", false);
@@ -8524,11 +8363,11 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 setPlaceRelStaff(harm, "below", false);
             }
 
+            // Set font size/styling for harm data:
             std::string fontsize = token->getValue("auto", "fontsize");
             if ((!fontsize.empty()) && (fontsize != "true") && (fontsize != "false")) {
                 setFontsizeForHarm(harm, fontsize);
             }
-
             int boldQ = token->getValueInt("auto", "bold");
             if (boldQ) {
                 setFontStyleForHarm(harm, "bold");
@@ -8538,7 +8377,28 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 setFontStyleForHarm(harm, "italic");
             }
 
-            setLocationId(harm, token);
+            // Convert harm-type data for <harm> element:
+            if (datatype == "**harm") {
+                setHarmContent(harmRend, *token);
+            }
+            else if (datatype == "**rhrm") {
+                setHarmContent(harmRend, *token);
+            }
+            else if (datatype == "*mxhm") {
+                setMxHarmContent(harmRend, *token);
+            }
+            else if (isDegree) {
+                setDegreeContent(harmRend, token);
+            }
+            else if (isCData) {
+                Text *text = new Text();
+                harmRend->AddChild(text);
+                text->SetText(UTF8to32(*token));
+            }
+            else {
+                cerr << "Unknown type of harm data: " << datatype << endl;
+                continue;
+            }
         }
     }
 }
@@ -9059,7 +8919,7 @@ std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 
 //////////////////////////////
 //
-// HumdrumInput::cleanDegreeString --
+// HumdrumInput::setDegreeContent --
 //    n = 0 : the entire degree chord (default: currently mapped to n = 1)
 //    n = 1 : the first degree in a chord
 //    n = 2 : the second degree in a chord
@@ -9067,7 +8927,7 @@ std::u32string HumdrumInput::getVisualFBAccidental(int accidental)
 //    etc.
 //
 
-std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
+void HumdrumInput::setDegreeContent(Rend *rend, hum::HTp token, int n)
 {
     std::string firstnote = *token;
     size_t spacepos = firstnote.find(" ");
@@ -9164,7 +9024,132 @@ std::u32string HumdrumInput::cleanDegreeString(hum::HTp token, int n)
         output += addSemitoneAdjustmentsToDeg(token, arrowQ, accidQ, solfegeQ, sharps, flats);
     }
 
-    return output;
+    Text *text = new Text();
+    rend->AddChild(text);
+    text->SetText(output);
+
+    std::u32string content;
+    std::u32string precontent;
+    std::u32string postcontent;
+    bool preleapQ = false;
+    bool preupdirQ = false;
+    bool predowndirQ = false;
+    bool postleapQ = false;
+    bool postupdirQ = false;
+    bool postdowndirQ = false;
+
+    // *dir/*Xdir: do/do_not show melodic approaches (directions)
+    int dirQ = !token->getValueInt("auto", "Xdir");
+
+    if (dirQ) {
+        // note: token is presumend to not be a chord
+
+        // process melodic departure information
+        int upcount = 0;
+        int downcount = 0;
+        std::string firstnote;
+        for (int m = 0; m < (int)token->size(); m++) {
+            if (token->at(m) == ' ') {
+                // currently only processing first note of chords
+                break;
+            }
+            else {
+                firstnote.push_back(token->at(m));
+            }
+            if (token->at(m) == '^') {
+                upcount++;
+            }
+            else if (token->at(m) == 'v') {
+                downcount++;
+            }
+            if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == '^')) {
+                upcount = 0;
+            }
+            if ((m > 0) && (token->at(m) == 'y') && (token->at(m - 1) == 'v')) {
+                downcount = 0;
+            }
+        }
+
+        if (upcount == 1) {
+            precontent = U"\u2197"; // single up diagonal arrow
+            // precontent = U"\u2191"; // up arrow
+            preupdirQ = true;
+        }
+        else if (upcount >= 2) {
+            // precontent = U"\u21d7"; // double up diagonal arrow
+            precontent = U"\u2b08"; // thick up diagonal arrow
+            preupdirQ = true;
+            preleapQ = true;
+        }
+        else if (downcount == 1) {
+            precontent = U"\u2198"; // single up diagonal arrow
+            // precontent = U"\u2193"; // down arrow
+            predowndirQ = true;
+        }
+        else if (downcount >= 2) {
+            // precontent = U"\u21d8"; // double down arrow
+            precontent = U"\u2b0a"; // thick down diagonal arrow
+            predowndirQ = true;
+            preleapQ = true;
+        }
+    }
+
+    if ((preupdirQ || predowndirQ) && !precontent.empty()) {
+        Rend *prerend = new Rend();
+        Text *pretext = new Text();
+        prerend->AddChild(pretext);
+        pretext->SetText(precontent);
+        if (preupdirQ) {
+            prerend->SetRend(TEXTRENDITION_sub);
+            if (preleapQ) {
+                setFontsize(prerend, "", "120%");
+                prerend->SetType("approach-up-leap");
+            }
+            else {
+                prerend->SetType("approach-up-step");
+            }
+        }
+        else if (predowndirQ) {
+            prerend->SetRend(TEXTRENDITION_sup);
+            if (preleapQ) {
+                setFontsize(prerend, "", "120%");
+                prerend->SetType("approach-down-leap");
+            }
+            else {
+                prerend->SetType("approach-down-step");
+            }
+        }
+        rend->InsertChild(prerend, 0);
+        prerend->SetParent(rend);
+    }
+
+    if ((postupdirQ || postdowndirQ) && !postcontent.empty()) {
+        Rend *postrend = new Rend();
+        Text *posttext = new Text();
+        postrend->AddChild(posttext);
+        posttext->SetText(postcontent);
+        if (postupdirQ) {
+            postrend->SetRend(TEXTRENDITION_sup);
+            if (postleapQ) {
+                setFontsize(postrend, "", "120%");
+                postrend->SetType("departure-up-leap");
+            }
+            else {
+                postrend->SetType("departure-up-step");
+            }
+        }
+        else if (postdowndirQ) {
+            postrend->SetRend(TEXTRENDITION_sub);
+            if (postleapQ) {
+                setFontsize(postrend, "", "120%");
+                postrend->SetType("departure-down-leap");
+            }
+            else {
+                postrend->SetType("departure-down-step");
+            }
+        }
+        rend->AddChild(postrend);
+    }
 }
 
 //////////////////////////////
@@ -9346,99 +9331,181 @@ std::u32string HumdrumInput::getMoveableDoName(hum::HTp token, int degree, int a
 
 //////////////////////////////
 //
-// HumdrumInput::cleanHarmString3 -- Adjust **rhrm text to remove
-//     **recip data and then clean with cleanHarmString2.
-//     **rhrm cannot contain alternate chords using [vi] syntax,
-//     because [, _, ], are for tied notes, **rhrm tokens with _ or ]
-//     will be suppressed.
+// HumdrumInput::removeRecipFromHarmContent -- Adjust **rhrm text to remove
+//     **recip data.
 //
 
-std::u32string HumdrumInput::cleanHarmString3(const std::string &content)
+std::string HumdrumInput::removeRecipFromHarmContent(const std::string &input)
 {
-    std::string temp;
-
-    // hide **rhrm token if not a harmony "attack":
-
-    if (content.find("_") != std::string::npos) {
-        return U"";
-    }
-    if (content.find("]") != std::string::npos) {
-        return U"";
+    std::string output;
+    if (input.empty()) {
+        return "";
     }
 
-    // skip over **recip data:
-    int i;
-    for (i = 0; i < (int)content.size(); ++i) {
-        if ((content[i] == '-') || (content[i] == '#')) {
+    // Skip over **recip data by searching
+    // for the first non-recip character.
+    int harmpos = (int)input.size();
+    for (int i = 0; i < (int)input.size(); ++i) {
+        if ((input.at(i) == '-') || (input.at(i) == '#')) {
+            harmpos = i;
             break;
         }
-        if (isalpha(content[i])) {
+        if (isalpha(input.at(i))) {
             // V, I, ii, vi, Lt, Gn, Fr, N
+            harmpos = i;
             break;
         }
     }
 
-    int foundstartsquare = false;
-    for (int ii = i; ii < (int)content.size(); ++ii) {
-        if (content[ii] == '[') {
-            foundstartsquare = true;
+    // If the previous character before the first **harm
+    // character is "[" then include it in the **harm data
+    // (for an ambiguous harmonic label).
+    if ((harmpos > 0) && (harmpos <= (int)input.size())) {
+        if (input.at(harmpos) == '[') {
+            harmpos--;
         }
-        if (content[ii] == ']') {
-            if (!foundstartsquare) {
-                continue;
-            }
-        }
-        if (content[ii] == '_') {
-            continue;
-        }
-        temp += content[i];
     }
 
-    return cleanHarmString2(temp);
+    output = input.substr(harmpos);
+    std::string recip = input.substr(0, harmpos);
+
+    // Hide **rhrm token if not a harmony "attack":
+    // The following condition needs to be refined to extract
+    // the **recip data and check that instead of the
+    // entire token.
+
+    if (recip.find("_") != std::string::npos) {
+        return "";
+    }
+    if (recip.find("]") != std::string::npos) {
+        return "";
+    }
+
+    return output;
 }
 
 //////////////////////////////
 //
-// HumdrumInput::cleanHarmString2 -- Adjust **harm text
+// HumdrumInput::setHarmContent -- Convert  **harm data into
 //
 
-std::u32string HumdrumInput::cleanHarmString2(const std::string &content)
+void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
 {
+    if (input.empty()) {
+        return;
+    }
     std::u32string output;
-    bool nonrhythm = false;
-    for (int i = 0; i < (int)content.size(); ++i) {
-        if (!nonrhythm) {
-            if (isdigit(content[i])) {
-                continue;
-            }
-            if (content[i] == '%') {
-                continue;
-            }
-            if (isdigit(content[i] == '.')) {
-                continue;
-            }
+
+    std::string input2 = removeRecipFromHarmContent(input);
+
+    hum::HumRegex hre;
+    int firstNumber = -1;
+    if (hre.search(input2, "(\\d+)")) {
+        firstNumber = hre.getMatchInt(1);
+    }
+
+    std::vector<std::string> numbers;
+
+    if (firstNumber < 0) {
+        // triad
+
+        // Could possibly be autmented 6th chord, so maybe search for [IiVv] before number.
+        // Could possibly be Neopolitan chord, but that is OK.
+
+        if (hre.search(input2, "b")) {
+            // triad, first inversion
+            numbers.push_back("6");
+            hre.replaceDestructive(input2, "", "b");
         }
-        nonrhythm = true;
-        if (content[i] == '-') {
+        else if (hre.search(input2, "c")) {
+            // triad, second inversion
+            numbers.push_back("6");
+            numbers.push_back("4");
+            hre.replaceDestructive(input2, "", "c");
+        }
+    }
+    else if (firstNumber == 7) {
+        // seventh chords
+        if (hre.search(input2, "b")) {
+            // seventh chord, first inversion
+            numbers.push_back("6");
+            numbers.push_back("5");
+            hre.replaceDestructive(input2, "", "7b");
+        }
+        else if (hre.search(input2, "c")) {
+            // seventh chord, second inversion
+            numbers.push_back("4");
+            numbers.push_back("3");
+            hre.replaceDestructive(input2, "", "7c");
+        }
+        else if (hre.search(input2, "d")) {
+            // seventh chord, third inversion
+            numbers.push_back("4");
+            numbers.push_back("2");
+            hre.replaceDestructive(input2, "", "7d");
+        }
+        else {
+            // sevent chord, root position
+            numbers.push_back("7");
+            hre.replaceDestructive(input2, "", "7a?");
+        }
+    }
+    // 9th, 11th, 13th chords
+
+    // Don't display any explicit root-position marker:
+    hre.replaceDestructive(input2, "", "a");
+
+    for (int i = 0; i < (int)input2.size(); ++i) {
+        if (input2[i] == '-') {
             output += U"\u266D"; // unicode flat
         }
-        else if (content[i] == '#') {
+        else if (input2[i] == '#') {
             output += U"\u266F"; // unicode sharp
         }
-        else if (content[i] == 'D') {
+        else if (input2[i] == 'D') {
             output += U"\u00F8"; // o-slash
         }
-        else if (content[i] == 'o') {
+        else if (input2[i] == 'o') {
             output += U"\u00B0"; // degree sign
         }
         else {
             std::string tdee;
-            tdee = content[i];
+            tdee = input[i];
             output += UTF8to32(tdee);
         }
     }
 
-    return output;
+    Text *text = new Text();
+    rend->AddChild(text);
+    text->SetText(output);
+
+    if (numbers.size() == 1) {
+        Rend *subrend = new Rend();
+        rend->AddChild(subrend);
+        subrend->SetRend(TEXTRENDITION_sub);
+        Text *subtext = new Text();
+        subrend->AddChild(subtext);
+        subtext->SetText(UTF8to32(numbers.at(0)));
+    }
+    else if (numbers.size() == 2) {
+        // first number in list goes on top
+        Rend *subrendTop = new Rend();
+        rend->AddChild(subrendTop);
+        subrendTop->SetRend(TEXTRENDITION_sup);
+        Text *subtextTop = new Text();
+        subrendTop->AddChild(subtextTop);
+        subtextTop->SetText(UTF8to32(numbers.at(0)));
+
+        // second number in list goes on bottom
+        Rend *subrendBot = new Rend();
+        rend->AddChild(subrendBot);
+        subrendBot->SetRend(TEXTRENDITION_sub);
+        subrendBot->SetType("move-back");
+        Text *subtextBot = new Text();
+        subrendBot->AddChild(subtextBot);
+        subtextBot->SetText(UTF8to32(numbers.at(1)));
+    }
+    // handle more than three numbers here
 }
 
 //////////////////////////////
@@ -9474,10 +9541,10 @@ std::u32string HumdrumInput::cleanStringString(const std::string &content)
 
 //////////////////////////////
 //
-// HumdrumInput::cleanHarmString --
+// HumdrumInput::setMxHarmContent --
 //
 
-std::u32string HumdrumInput::cleanHarmString(const std::string &content)
+void HumdrumInput::setMxHarmContent(Rend *rend, const std::string &content)
 {
     std::u32string root;
     std::u32string kind;
@@ -9656,7 +9723,10 @@ std::u32string HumdrumInput::cleanHarmString(const std::string &content)
         kind += U'/';
     }
     std::u32string output = root + kind + bass;
-    return output;
+
+    Text *text = new Text();
+    rend->AddChild(text);
+    text->SetText(output);
 }
 
 //////////////////////////////
@@ -18210,7 +18280,8 @@ bool HumdrumInput::getNoteStateSlur(hum::HTp token, int slurnumber)
 
 //////////////////////////////
 //
-// HumdrumInput::getNoteStatePhrase -- Return any phrase attachment to a note parameter in a layout command for phrases.
+// HumdrumInput::getNoteStatePhrase -- Return any phrase attachment to a note parameter in a layout command for
+// phrases.
 //
 
 bool HumdrumInput::getNoteStatePhrase(hum::HTp token, int phrasenumber)
@@ -23482,7 +23553,8 @@ template <class ELEMENT> void HumdrumInput::appendTypeTag(ELEMENT *element, cons
 
 //////////////////////////////
 //
-// HumdrumInput::checkNoteForScordatura -- Return the **kern written note if scordatura; otherwise, return empty string.
+// HumdrumInput::checkNoteForScordatura -- Return the **kern written note if scordatura; otherwise, return empty
+// string.
 //
 
 std::string HumdrumInput::checkNoteForScordatura(const std::string &token)

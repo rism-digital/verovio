@@ -801,7 +801,6 @@ protected:
     void setClefOctaveDisplacement(Clef *clef, const std::string &token);
     void setClefBasicShape(Clef *clef, const std::string &tok);
     void setClefStaffLine(Clef *clef, const std::string &tok);
-    std::u32string cleanDegreeString(hum::HTp token, int n = 0);
     void analyzeHarmInterpretations(hum::HTp starttok);
     void analyzeDegreeInterpretations(hum::HTp starttok);
     void analyzeTextInterpretation(hum::HTp starttok);
@@ -812,6 +811,18 @@ protected:
     std::u32string addSemitoneAdjustmentsToDeg(
         hum::HTp token, int arrowQ, int accidQ, int solfegeQ, int sharps, int flats);
     int hasParallelNote(hum::HTp token);
+    void setHarmContent(Rend *rend, const std::string &content);
+    std::string removeRecipFromHarmContent(const std::string &input);
+    void setMxHarmContent(Rend *rend, const std::string &content);
+    void setDegreeContent(Rend *rend, hum::HTp token, int n = 0);
+    std::u32string cleanStringString(const std::string &content);
+    std::vector<std::u32string> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
+    std::u32string cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
+    std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
+    std::u32string getVisualFBAccidental(int accidental);
+    std::u32string convertFBNumber(const std::string &input, hum::HTp token);
+    void checkForLineContinuations(hum::HTp token);
+    std::u32string convertNumberToWstring(int number);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -898,17 +909,6 @@ protected:
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     static bool replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr);
-    std::u32string cleanHarmString(const std::string &content);
-    std::u32string cleanHarmString2(const std::string &content);
-    std::u32string cleanHarmString3(const std::string &content);
-    std::u32string cleanStringString(const std::string &content);
-    std::vector<std::u32string> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
-    std::u32string cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
-    std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
-    std::u32string getVisualFBAccidental(int accidental);
-    std::u32string convertFBNumber(const std::string &input, hum::HTp token);
-    void checkForLineContinuations(hum::HTp token);
-    std::u32string convertNumberToWstring(int number);
 
 private:
     // m_filename == Filename to read/was read.
