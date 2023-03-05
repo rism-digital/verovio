@@ -9397,8 +9397,14 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
     std::u32string output;
 
     std::string input2 = removeRecipFromHarmContent(input);
+    std::string secondaryText;
 
     hum::HumRegex hre;
+    if (hre.search(input2, "^([^/]+)(/.*)$")) {
+        secondaryText = hre.getMatch(2);
+        input2 = hre.getMatch(1);
+    }
+
     int firstNumber = -1;
     if (hre.search(input2, "(\\d+)")) {
         firstNumber = hre.getMatchInt(1);
@@ -9479,9 +9485,12 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
     rend->AddChild(text);
     text->SetText(output);
 
+    bool rendAfter = false;
+
     if (numbers.size() == 1) {
         Rend *subrend = new Rend();
         rend->AddChild(subrend);
+        rendAfter = true;
         subrend->SetRend(TEXTRENDITION_sub);
         Text *subtext = new Text();
         subrend->AddChild(subtext);
@@ -9491,6 +9500,7 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         // first number in list goes on top
         Rend *subrendTop = new Rend();
         rend->AddChild(subrendTop);
+        rendAfter = true;
         subrendTop->SetRend(TEXTRENDITION_sup);
         Text *subtextTop = new Text();
         subrendTop->AddChild(subtextTop);
@@ -9499,6 +9509,7 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         // second number in list goes on bottom
         Rend *subrendBot = new Rend();
         rend->AddChild(subrendBot);
+        rendAfter = true;
         subrendBot->SetRend(TEXTRENDITION_sub);
         subrendBot->SetType("move-back");
         Text *subtextBot = new Text();
@@ -9506,6 +9517,22 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         subtextBot->SetText(UTF8to32(numbers.at(1)));
     }
     // handle more than three numbers here
+
+    // Add secondary text
+    if (!secondaryText.empty()) {
+        if (!rendAfter) {
+            // place secondary text inside of main text element
+            std::u32string ztext = text->GetText();
+            std::u32string ytext = UTF8to32(secondaryText);
+            ztext += ytext;
+            text->SetText(ztext);
+        }
+        else {
+            Text *stext = new Text();
+            rend->AddChild(stext);
+            stext->SetText(UTF8to32(secondaryText));
+        }
+    }
 }
 
 //////////////////////////////
