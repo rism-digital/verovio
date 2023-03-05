@@ -9451,7 +9451,7 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
             hre.replaceDestructive(input2, "", "7d");
         }
         else {
-            // sevent chord, root position
+            // seventh chord, root position
             numbers.push_back("7");
             hre.replaceDestructive(input2, "", "7a?");
         }
@@ -9460,6 +9460,9 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
 
     // Don't display any explicit root-position marker:
     hre.replaceDestructive(input2, "", "a");
+    bool hasDim = false;
+    bool hasHalfDim = false;
+    bool hasAug = false;
 
     for (int i = 0; i < (int)input2.size(); ++i) {
         if (input2[i] == '-') {
@@ -9469,10 +9472,13 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
             output += U"\u266F"; // unicode sharp
         }
         else if (input2[i] == 'D') {
-            output += U"\u00F8"; // o-slash
+            hasHalfDim = true;
         }
         else if (input2[i] == 'o') {
-            output += U"\u00B0"; // degree sign
+            hasDim = true;
+        }
+        else if (input2[i] == '+') {
+            hasAug = true;
         }
         else {
             std::string tdee;
@@ -9481,11 +9487,32 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         }
     }
 
+    if (hasDim) {
+        output += U"\u00B0"; // degree sign
+    }
+
     Text *text = new Text();
     rend->AddChild(text);
     text->SetText(output);
 
     bool rendAfter = false;
+
+    if (hasHalfDim) {
+        Rend *hrend = new Rend();
+        Text *htext = new Text();
+        rend->AddChild(hrend);
+        hrend->AddChild(htext);
+        hrend->SetRend(TEXTRENDITION_sup);
+        htext->SetText(U"\u00F8"); // o-slash
+    }
+    if (hasAug) {
+        Rend *frend = new Rend();
+        Text *ftext = new Text();
+        rend->AddChild(frend);
+        frend->AddChild(ftext);
+        frend->SetRend(TEXTRENDITION_sup);
+        ftext->SetText(U"+"); // augmentation
+    }
 
     if (numbers.size() == 1) {
         Rend *subrend = new Rend();
@@ -22308,7 +22335,6 @@ void HumdrumInput::appendElement(const std::vector<std::string> &name, const std
 
 void HumdrumInput::convertMRest(MRest *rest, hum::HTp token, int subtoken, int staffindex)
 {
-
     std::string oloc = token->getValue("auto", "oloc");
     std::string ploc = token->getValue("auto", "ploc");
     int ottava = token->getValueInt("auto", "ottava");
