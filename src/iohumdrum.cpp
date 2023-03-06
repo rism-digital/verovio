@@ -9350,8 +9350,8 @@ std::string HumdrumInput::removeRecipFromHarmContent(const std::string &input)
             harmpos = i;
             break;
         }
-        if (isalpha(input.at(i))) {
-            // V, I, ii, vi, Lt, Gn, Fr, N
+        if (isalpha(input.at(i)) || (input.at(i) == '~')) {
+            // V, I, ii, vi, Lt, Gn, Fr, N, Tr
             harmpos = i;
             break;
         }
@@ -9435,8 +9435,8 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
     if (firstNumber < 0) {
         // triad
 
-        // Could possibly be autmented 6th chord, so maybe search for [IiVv] before number.
-        // Could possibly be Neopolitan chord, but that is OK.
+        // Could possibly be autmented 6th chord, so maybe search for [IiVv]
+        //  before number. Could possibly be Neopolitan chord, but that is OK.
 
         if (hre.search(input2, "b")) {
             // triad, first inversion
@@ -9491,18 +9491,29 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         output += U"[";
     }
 
+    // Temporary code to generalize later:
+    if (hre.search(input2, "oD")) {
+        hasDim = true;
+        hre.replaceDestructive(input2, "", "oD");
+    }
+    else if (hre.search(input2, "[vi]+o")) {
+        if (firstNumber == 7) {
+            hasHalfDim = true;
+            hre.replaceDestructive(input2, "", "o.*");
+        }
+        else {
+            hasDim = true;
+            hre.replaceDestructive(input2, "", "o.*");
+        }
+    }
+    hre.replaceDestructive(input2, "", "m");
+
     for (int i = 0; i < (int)input2.size(); ++i) {
         if (input2[i] == '-') {
             output += U"\u266D"; // unicode flat
         }
         else if (input2[i] == '#') {
             output += U"\u266F"; // unicode sharp
-        }
-        else if (input2[i] == 'D') {
-            hasHalfDim = true;
-        }
-        else if (input2[i] == 'o') {
-            hasDim = true;
         }
         else if (input2[i] == '+') {
             hasAug = true;
