@@ -97,11 +97,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustTempoX
-     */
-    int AdjustTempo(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;

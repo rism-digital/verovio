@@ -206,11 +206,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustTempo
-     */
-    int AdjustTempo(FunctorParams *functorParams) override;
-
-    /**
      * @name See Object::AlignVertically
      */
     ///@{

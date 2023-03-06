@@ -107,44 +107,6 @@ FunctorCode Tempo::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTempoEnd(this);
 }
 
-int Tempo::AdjustTempo(FunctorParams *functorParams)
-{
-    AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
-    assert(params);
-
-    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
-    ArrayOfFloatingPositioners positioners;
-    params->m_systemAligner->FindAllPositionerPointingTo(&positioners, this);
-
-    if (positioners.empty()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
-    Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-
-    for (auto positioner : positioners) {
-        int left, right;
-        int start = this->GetStart()->GetDrawingX();
-        const int staffN = positioner->GetAlignment()->GetStaff()->GetN();
-        if (!this->HasStartid() && (this->GetTstamp() <= 1) && pos) {
-            left = measure->GetDrawingX() + pos->GetXRel();
-        }
-        else {
-            Alignment *align = this->GetStart()->GetAlignment();
-            align->GetLeftRight(staffN, left, right);
-        }
-
-        if (std::abs(left) != std::abs(VRV_UNSET)) {
-            m_drawingXRels[staffN] = left - start;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
     InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);

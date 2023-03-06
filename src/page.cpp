@@ -20,6 +20,7 @@
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
+#include "adjusttempofunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
@@ -436,9 +437,8 @@ void Page::LayOutHorizontally()
     this->Process(adjustArpeg);
 
     // Adjust the tempo
-    Functor adjustTempo(&Object::AdjustTempo);
-    AdjustTempoParams adjustTempoParams(doc);
-    this->Process(&adjustTempo, &adjustTempoParams);
+    AdjustTempoFunctor adjustTempo(doc);
+    this->Process(adjustTempo);
 
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsXParams(doc);
