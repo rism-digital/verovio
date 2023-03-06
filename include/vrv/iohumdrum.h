@@ -823,6 +823,7 @@ protected:
     std::u32string convertFBNumber(const std::string &input, hum::HTp token);
     void checkForLineContinuations(hum::HTp token);
     std::u32string convertNumberToWstring(int number);
+    void appendTextToRend(Rend *rend, const std::string &content);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

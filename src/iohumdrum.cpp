@@ -9396,15 +9396,35 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
     }
     std::u32string output;
 
-    std::string input2 = removeRecipFromHarmContent(input);
-    std::string secondaryText;
+    std::string input2 = input;
+    // Pull out implicit harmony marker to deal with later:
+    bool parens = false;
+    if ((input2.at(0) == '(') && (input2.back() == ')')) {
+        input2 = input2.substr(1, input2.size() - 2);
+        parens = true;
+    }
+    // Pull out alternate harmony label (but this will need improvement
+    // since the alternate harmony label is usually appended to primary
+    // interpretation..
+    bool brackets = false;
+    if ((input2.at(0) == '[') && (input2.back() == ']')) {
+        input2 = input2.substr(1, input2.size() - 2);
+        brackets = true;
+    }
 
+    input2 = removeRecipFromHarmContent(input2);
+
+    // Remove secondary dominant information to append later:
+    std::string secondaryText;
     hum::HumRegex hre;
     if (hre.search(input2, "^([^/]+)(/.*)$")) {
         secondaryText = hre.getMatch(2);
         input2 = hre.getMatch(1);
     }
 
+    // Note the first number in the string.   This needs improving
+    // Since the last number is more important.  (So this code
+    // only differentiates between triads and seventh chords).
     int firstNumber = -1;
     if (hre.search(input2, "(\\d+)")) {
         firstNumber = hre.getMatchInt(1);
@@ -9456,13 +9476,20 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
             hre.replaceDestructive(input2, "", "7a?");
         }
     }
-    // 9th, 11th, 13th chords
+    // 9th, 11th, 13th chords to be dealt with later.
 
     // Don't display any explicit root-position marker:
     hre.replaceDestructive(input2, "", "a");
     bool hasDim = false;
     bool hasHalfDim = false;
     bool hasAug = false;
+
+    if (parens) {
+        output += U"(";
+    }
+    else if (brackets) {
+        output += U"[";
+    }
 
     for (int i = 0; i < (int)input2.size(); ++i) {
         if (input2[i] == '-') {
@@ -9482,7 +9509,7 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         }
         else {
             std::string tdee;
-            tdee = input[i];
+            tdee = input2[i];
             output += UTF8to32(tdee);
         }
     }
@@ -9494,8 +9521,6 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
     Text *text = new Text();
     rend->AddChild(text);
     text->SetText(output);
-
-    bool rendAfter = false;
 
     if (hasHalfDim) {
         Rend *hrend = new Rend();
@@ -9517,7 +9542,6 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
     if (numbers.size() == 1) {
         Rend *subrend = new Rend();
         rend->AddChild(subrend);
-        rendAfter = true;
         subrend->SetRend(TEXTRENDITION_sub);
         Text *subtext = new Text();
         subrend->AddChild(subtext);
@@ -9527,38 +9551,70 @@ void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
         // first number in list goes on top
         Rend *subrendTop = new Rend();
         rend->AddChild(subrendTop);
-        rendAfter = true;
         subrendTop->SetRend(TEXTRENDITION_sup);
         Text *subtextTop = new Text();
         subrendTop->AddChild(subtextTop);
         subtextTop->SetText(UTF8to32(numbers.at(0)));
 
-        // second number in list goes on bottom
+        // Second number in list goes on bottom:
         Rend *subrendBot = new Rend();
         rend->AddChild(subrendBot);
-        rendAfter = true;
         subrendBot->SetRend(TEXTRENDITION_sub);
         subrendBot->SetType("move-back");
         Text *subtextBot = new Text();
         subrendBot->AddChild(subtextBot);
         subtextBot->SetText(UTF8to32(numbers.at(1)));
     }
-    // handle more than three numbers here
+    // Handle more than three numbers here.
 
-    // Add secondary text
     if (!secondaryText.empty()) {
-        if (!rendAfter) {
-            // place secondary text inside of main text element
-            std::u32string ztext = text->GetText();
-            std::u32string ytext = UTF8to32(secondaryText);
+        appendTextToRend(rend, secondaryText);
+    }
+
+    // handle paren and bracket closing
+    if (parens) {
+        appendTextToRend(rend, ")");
+    }
+    else if (brackets) {
+        appendTextToRend(rend, "]");
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::appendTextToRend -- Add some text at the end of a rend.
+//    If the last child element in the rend is Text, then insert content
+//    into that Text element; otherwise, create a new Text and append
+//    as the last child of the Rend.
+//
+
+void HumdrumInput::appendTextToRend(Rend *rend, const std::string &content)
+{
+    if (content.empty()) {
+        return;
+    }
+
+    Object *lastRendChild = rend->GetLast();
+    if (lastRendChild) {
+        std::string classname = lastRendChild->GetClassName();
+        if (classname == "text") {
+            // Place secondary text inside of last text element:
+            std::u32string ztext = ((Text *)lastRendChild)->GetText();
+            std::u32string ytext = UTF8to32(content);
             ztext += ytext;
-            text->SetText(ztext);
+            ((Text *)lastRendChild)->SetText(ztext);
         }
         else {
+            // Need to add a new text element at end of main rend:
             Text *stext = new Text();
             rend->AddChild(stext);
-            stext->SetText(UTF8to32(secondaryText));
+            stext->SetText(UTF8to32(content));
         }
+    }
+    else {
+        Text *text = new Text();
+        rend->AddChild(text);
+        text->SetText(UTF8to32(content));
     }
 }
 
