@@ -73,6 +73,7 @@ public:
      */
     ///@{
     int GetDrawingXRelativeToStaff(int staffN) const;
+    void SetDrawingXRelative(int staffN, int drawingX) { m_drawingXRels[staffN] = drawingX; }
     void ResetDrawingXRelative() { m_drawingXRels.clear(); }
     ///@}
 
