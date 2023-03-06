@@ -811,6 +811,10 @@ bool HumdrumInput::convertHumdrum()
             staffindex++;
         }
         else if (it->isDataType("**harm")) {
+            analyzeHarmInterpretations(it);
+            m_harm = true;
+        }
+        else if (it->isDataType("**rhrm")) { // **recip + **harm
             m_harm = true;
         }
         else if (it->isDataType("**mxhm")) {
@@ -832,10 +836,6 @@ bool HumdrumInput::convertHumdrum()
         else if (it->isDataType("**silbe")) {
             analyzeTextInterpretation(it);
         }
-        else if (it->isDataType("**harm")) {
-            analyzeHarmInterpretations(it);
-            m_harm = true;
-        }
         else if (it->isDataType("**deg")) {
             analyzeDegreeInterpretations(it);
             m_degree = true;
@@ -843,9 +843,6 @@ bool HumdrumInput::convertHumdrum()
         else if (it->isDataType("**degree")) {
             analyzeDegreeInterpretations(it);
             m_degree = true;
-        }
-        else if (it->isDataType("**rhrm")) { // **recip + **harm
-            m_harm = true;
         }
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
             m_harm = true;
@@ -954,7 +951,7 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
                 current->setValue("auto", "above", 1);
             }
             else if (keydesig) {
-                current->setValue("auto", "meilabel", keydesig->substr(1));
+                current->setValue("auto", "keylabel", keydesig->substr(1));
                 keydesig = NULL;
             }
         }
@@ -988,6 +985,7 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 //      *Xhat    == don't add a hat (default)
 //      *solf    == display in moveable do
 //      *Xsolf   == do not display in moveable do
+//   See: https://doc.verovio.humdrum.org/humdrum/scale_degrees/#signifier-summary
 //
 
 void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
@@ -1094,7 +1092,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             if (keydesig) {
                 // add key designation as a label on the next
                 // scale degree found in the data
-                current->setValue("auto", "meilabel", keydesig->substr(1));
+                current->setValue("auto", "keylabel", keydesig->substr(1));
                 keydesig = NULL;
             }
             if (minorQ) {
@@ -8349,18 +8347,21 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             // Add timestamp for harm data:
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
-            std::string meilabel = token->getValue("auto", "meilabel");
-            if (!meilabel.empty()) {
-                addHarmLabel(harm, meilabel);
-            }
 
             // Place harm data above/below staff:
+            std::string place = "below";
             int aboveQ = token->getValueInt("auto", "above");
             if (aboveQ) {
-                setPlaceRelStaff(harm, "above", false);
+                place = "above";
             }
-            else {
-                setPlaceRelStaff(harm, "below", false);
+            setPlaceRelStaff(harm, place, false);
+
+            // Add key label (for harm/rhrm/deg/degree data)
+            if (isHarm || isDegree) {
+                std::string keylabel = token->getValue("auto", "keylabel");
+                if (!keylabel.empty()) {
+                    addHarmLabel(tstamp, keylabel, tracktext, place, xstaffindex + 1);
+                }
             }
 
             // Set font size/styling for harm data:
@@ -8379,10 +8380,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             // Convert harm-type data for <harm> element:
             if (datatype == "**harm") {
-                setHarmContent(harmRend, *token);
+                setHarmContent(harmRend, token);
             }
             else if (datatype == "**rhrm") {
-                setHarmContent(harmRend, *token);
+                setHarmContent(harmRend, token);
             }
             else if (datatype == "*mxhm") {
                 setMxHarmContent(harmRend, *token);
@@ -8551,9 +8552,51 @@ void HumdrumInput::setFontsizeForHarm(Harm *harm, const std::string &fontsize)
 // HumdrumInput::addHarmLabel --
 //
 
-void HumdrumInput::addHarmLabel(Harm *harm, const std::string &label)
+void HumdrumInput::addHarmLabel(
+    hum::HumNum timestamp, const std::string &label, const std::string &n, const std::string &place, int staffNum)
 {
-    cerr << "ADD HARM LABEL " << label << " HERE" << endl;
+    if (label.empty()) {
+        return;
+    }
+
+    Harm *harm = new Harm();
+    addChildMeasureOrSection(harm);
+    harm->SetTstamp(timestamp.getFloat());
+    harm->SetN(n);
+    setPlaceRelStaff(harm, place, false);
+    setStaff(harm, staffNum);
+
+    Rend *rend = new Rend();
+    Rend *rend2 = new Rend();
+    Text *text = new Text();
+    harm->AddChild(rend);
+    rend->AddChild(rend2);
+    rend2->AddChild(text);
+    harm->SetType("key-label");
+
+    rend->SetHalign(HORIZONTALALIGNMENT_right);
+    // hardwire style to circle, for now at least:
+    // rend2->SetRend(TEXTRENDITION_circle);
+    // and hardwire the font to sans-serif, at least for now:
+    rend2->SetColor("darkred");
+    rend2->SetFontname("sans-serif");
+
+    std::u32string output;
+    std::string tempChar;
+    for (int i = 0; i < (int)label.size(); i++) {
+        switch (label[i]) {
+            case '#': output += output += U"\u266f"; break; // unicode sharp
+            case '-': output += output += U"\u266d"; break; // unicode flat
+            default: tempChar = label[i]; output += UTF8to32(tempChar);
+        }
+    }
+    // output += U"\u00a0"; // non-breaking space
+    text->SetText(output);
+
+    // add some extra space to separate from chord:
+    Text *stext = new Text();
+    rend->AddChild(stext);
+    stext->SetText(U"\u00a0"); // non-breaking space
 }
 
 //////////////////////////////
@@ -9389,8 +9432,9 @@ std::string HumdrumInput::removeRecipFromHarmContent(const std::string &input)
 // HumdrumInput::setHarmContent -- Convert  **harm data into
 //
 
-void HumdrumInput::setHarmContent(Rend *rend, const std::string &input)
+void HumdrumInput::setHarmContent(Rend *rend, hum::HTp token)
 {
+    std::string input = *token;
     if (input.empty()) {
         return;
     }

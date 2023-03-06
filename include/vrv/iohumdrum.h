@@ -804,14 +804,15 @@ protected:
     void analyzeHarmInterpretations(hum::HTp starttok);
     void analyzeDegreeInterpretations(hum::HTp starttok);
     void analyzeTextInterpretation(hum::HTp starttok);
-    void addHarmLabel(Harm *harm, const std::string &label);
+    void addHarmLabel(
+        hum::HumNum timestamp, const std::string &label, const std::string &n, const std::string &place, int staffNum);
     std::u32string getMoveableDoName(hum::HTp token, int degree, int semitones);
     void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
     void setFontStyleForHarm(Harm *harm, const std::string &style);
     std::u32string addSemitoneAdjustmentsToDeg(
         hum::HTp token, int arrowQ, int accidQ, int solfegeQ, int sharps, int flats);
     int hasParallelNote(hum::HTp token);
-    void setHarmContent(Rend *rend, const std::string &content);
+    void setHarmContent(Rend *rend, hum::HTp token);
     std::string removeRecipFromHarmContent(const std::string &input);
     void setMxHarmContent(Rend *rend, const std::string &content);
     void setDegreeContent(Rend *rend, hum::HTp token, int n = 0);
