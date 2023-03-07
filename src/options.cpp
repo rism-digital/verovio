@@ -1048,7 +1048,7 @@ Options::Options()
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
 
-    m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
+    m_landscape.SetInfo("Landscape orientation", "Swap the values for page height and page width");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
@@ -1408,7 +1408,7 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
-    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in unit");
+    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in MEI units");
     m_multiRestThickness.Init(2.0, 0.50, 6.00);
     this->Register(&m_multiRestThickness, "multiRestThickness", &m_generalLayout);
 
@@ -1497,7 +1497,7 @@ Options::Options()
     m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
-    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
+    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in MEI units");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
 
