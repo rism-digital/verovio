@@ -774,13 +774,13 @@ std::pair<int, int> Slur::CalcEndPointShift(
             // Now apply the intersections on the left and right hand side of the bounding box
             const int xLeft = std::max(bezierCurve.p1.x, spannedElement->m_boundingBox->GetSelfLeft());
             const float distanceRatioLeft = float(xLeft - bezierCurve.p1.x) / float(dist);
-            this->ShiftEndPoints(
-                shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, flexibility, spannedElement->m_isBelow);
+            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioLeft, intersectionLeft, flexibility,
+                spannedElement->m_isBelow, curve->m_spanningType);
 
             const int xRight = std::min(bezierCurve.p2.x, spannedElement->m_boundingBox->GetSelfRight());
             const float distanceRatioRight = float(xRight - bezierCurve.p1.x) / float(dist);
-            this->ShiftEndPoints(
-                shiftLeft, shiftRight, distanceRatioRight, intersectionRight, flexibility, spannedElement->m_isBelow);
+            this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioRight, intersectionRight, flexibility,
+                spannedElement->m_isBelow, curve->m_spanningType);
         }
     }
 
@@ -808,14 +808,15 @@ void Slur::ApplyEndPointShift(
     }
 }
 
-void Slur::ShiftEndPoints(
-    int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const
+void Slur::ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility,
+    bool isBelow, char spanningType) const
 {
     // Filter collisions near the endpoints
     // Collisions with ratio beyond the partialShiftRadius do not contribute to shifts
     // They are compensated later by shifting the control points
-    const double fullShiftRadius = 0.05 + flexibility * 0.15;
-    const double partialShiftRadius = fullShiftRadius * 3.0;
+    double fullShiftRadius = 0.0;
+    double partialShiftRadius = 0.0;
+    std::tie(fullShiftRadius, partialShiftRadius) = this->CalcShiftRadii(true, flexibility, spanningType);
 
     if ((ratio < partialShiftRadius) && (this->HasEndpointAboveStart() == isBelow)) {
         if (ratio > fullShiftRadius) {
@@ -826,6 +827,8 @@ void Slur::ShiftEndPoints(
         shiftLeft = std::max(shiftLeft, intersection);
     }
 
+    std::tie(fullShiftRadius, partialShiftRadius) = this->CalcShiftRadii(false, flexibility, spanningType);
+
     if ((ratio > 1.0 - partialShiftRadius) && (this->HasEndpointAboveEnd() == isBelow)) {
         if (ratio < 1.0 - fullShiftRadius) {
             // Collisions here only partially contribute to shifts
@@ -834,6 +837,26 @@ void Slur::ShiftEndPoints(
         }
         shiftRight = std::max(shiftRight, intersection);
     }
+}
+
+std::pair<double, double> Slur::CalcShiftRadii(bool forShiftLeft, double flexibility, char spanningType) const
+{
+    // Use full flexibility for broken slur endpoints
+    if (forShiftLeft) {
+        if ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END)) {
+            flexibility = 1.0;
+        }
+    }
+    else {
+        if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)) {
+            flexibility = 1.0;
+        }
+    }
+
+    const double fullShiftRadius = 0.05 + flexibility * 0.15;
+    const double partialShiftRadius = fullShiftRadius * 3.0;
+
+    return { fullShiftRadius, partialShiftRadius };
 }
 
 double Slur::CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const
@@ -1340,8 +1363,8 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
             const int intersectionStart = (innerPoints[0].y - yStart) * sign + 1.5 * margin;
             if (intersectionStart > 0) {
                 const float distanceRatioStart = float(xInnerStart - bezierCurve.p1.x) / float(dist);
-                this->ShiftEndPoints(
-                    shiftLeft, shiftRight, distanceRatioStart, intersectionStart, flexibility, isBelow);
+                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioStart, intersectionStart, flexibility, isBelow,
+                    curve->m_spanningType);
             }
         }
 
@@ -1352,7 +1375,8 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
             const int intersectionMid = (innerMidPoint.y - yMid) * sign + 1.5 * margin;
             if (intersectionMid > 0) {
                 const float distanceRatioMid = float(innerMidPoint.x - bezierCurve.p1.x) / float(dist);
-                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioMid, intersectionMid, flexibility, isBelow);
+                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioMid, intersectionMid, flexibility, isBelow,
+                    curve->m_spanningType);
             }
         }
 
@@ -1363,7 +1387,8 @@ std::pair<int, int> Slur::CalcEndPointShift(FloatingCurvePositioner *curve, cons
             const int intersectionEnd = (innerPoints[3].y - yEnd) * sign + 1.5 * margin;
             if (intersectionEnd > 0) {
                 const float distanceRatioEnd = float(xInnerEnd - bezierCurve.p1.x) / float(dist);
-                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioEnd, intersectionEnd, flexibility, isBelow);
+                this->ShiftEndPoints(shiftLeft, shiftRight, distanceRatioEnd, intersectionEnd, flexibility, isBelow,
+                    curve->m_spanningType);
             }
         }
     }
@@ -1793,19 +1818,23 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
     const int staffTop = staff->GetDrawingY();
     const int staffBottom = staffTop - staffSize;
 
-    int brokenLoc = 0;
-    int pitchDiff = 0;
-    std::tie(brokenLoc, pitchDiff) = this->CalcBrokenLoc(staff, startLoc, endLoc);
+    const int pitchDiff = this->CalcPitchDifference(staff, startLoc, endLoc);
     if (spanningType == SPANNING_START) {
         if (this->HasEndpointAboveStart()) {
-            y2 = std::max(staffTop, y1);
-            y2 += pitchDiff * unit / 2;
-            y2 = std::max(staffTop, y2);
+            y2 = staffTop + unit;
+            if (this->ConsiderMelodicDirection()) {
+                y2 = std::max(staffTop, y1);
+                y2 += pitchDiff * unit / 2;
+                y2 = std::max(staffTop, y2);
+            }
         }
         else {
-            y2 = std::min(staffBottom, y1);
-            y2 += pitchDiff * unit / 2;
-            y2 = std::min(staffBottom, y2);
+            y2 = staffBottom - unit;
+            if (this->ConsiderMelodicDirection()) {
+                y2 = std::min(staffBottom, y1);
+                y2 += pitchDiff * unit / 2;
+                y2 = std::min(staffBottom, y2);
+            }
         }
         // Make sure that broken slurs do not look like ties
         if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
@@ -1825,14 +1854,20 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
     }
     if (spanningType == SPANNING_END) {
         if (isSshaped != this->HasEndpointAboveEnd()) {
-            y1 = std::max(staffTop, y2);
-            y1 -= pitchDiff * unit / 2;
-            y1 = std::max(staffTop, y1);
+            y1 = staffTop + unit;
+            if (this->ConsiderMelodicDirection()) {
+                y1 = std::max(staffTop, y2);
+                y1 -= pitchDiff * unit / 2;
+                y1 = std::max(staffTop, y1);
+            }
         }
         else {
-            y1 = std::min(staffBottom, y2);
-            y1 -= pitchDiff * unit / 2;
-            y1 = std::min(staffBottom, y1);
+            y1 = staffBottom - unit;
+            if (this->ConsiderMelodicDirection()) {
+                y1 = std::min(staffBottom, y2);
+                y1 -= pitchDiff * unit / 2;
+                y1 = std::min(staffBottom, y1);
+            }
         }
         // Make sure that broken slurs do not look like ties
         if ((std::abs(y1 - y2) < 2 * unit) && (std::abs(x1 - x2) < 2 * staffSize)) {
@@ -1850,7 +1885,7 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
     }
     // slur across an entire system; use the staff position
     else if (spanningType == SPANNING_MIDDLE) {
-        y1 = staffBottom + brokenLoc * unit;
+        y1 = (drawingCurveDir == curvature_CURVEDIR_above) ? staffTop + unit : staffBottom - unit;
         y2 = y1;
     }
 
@@ -1866,6 +1901,18 @@ std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, 
     y2 += 1.25 * sign * unit;
 
     return std::make_pair(Point(x1, y1), Point(x2, y2));
+}
+
+bool Slur::ConsiderMelodicDirection() const
+{
+    const Measure *startMeasure = vrv_cast<const Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
+    const Measure *endMeasure = vrv_cast<const Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
+
+    // Return true if the slur starts in the last measure and ends in the first measure of the next system
+    if (startMeasure && endMeasure) {
+        return (startMeasure->IsLastInSystem() && endMeasure->IsFirstInSystem() && (startMeasure != endMeasure));
+    }
+    return false;
 }
 
 std::pair<int, int> Slur::GetStartEndLocs(
@@ -1894,7 +1941,7 @@ std::pair<int, int> Slur::GetStartEndLocs(
     return { startLoc, endLoc };
 }
 
-std::pair<int, int> Slur::CalcBrokenLoc(const Staff *staff, int startLoc, int endLoc) const
+int Slur::CalcPitchDifference(const Staff *staff, int startLoc, int endLoc) const
 {
     assert(staff);
 
@@ -1902,7 +1949,7 @@ std::pair<int, int> Slur::CalcBrokenLoc(const Staff *staff, int startLoc, int en
     const int loc1 = this->HasEndpointAboveStart() ? std::max(startLoc, staffTopLoc - 1) : std::min(startLoc, 1);
     const int loc2 = this->HasEndpointAboveEnd() ? std::max(endLoc, staffTopLoc - 1) : std::min(endLoc, 1);
 
-    return { (loc1 + loc2) / 2, loc2 - loc1 };
+    return loc2 - loc1;
 }
 
 PortatoSlurType Slur::IsPortatoSlur(const Doc *doc, const Note *startNote, const Chord *startChord) const

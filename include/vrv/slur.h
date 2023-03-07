@@ -252,11 +252,13 @@ private:
     // Calculate the endpoint coordinates depending on the curve direction and spanning type of the slur
     std::pair<Point, Point> CalcEndPoints(const Doc *doc, const Staff *staff, NearEndCollision *nearEndCollision,
         int x1, int x2, curvature_CURVEDIR drawingCurveDir, char spanningType) const;
+    // Consider the melodic direction for the break location?
+    bool ConsiderMelodicDirection() const;
     // Retrieve the start and end note locations of the slur
     std::pair<int, int> GetStartEndLocs(
         const Note *startNote, const Chord *startChord, const Note *endNote, const Chord *endChord) const;
-    // Calculate the break location at system start/end and the pitch difference
-    std::pair<int, int> CalcBrokenLoc(const Staff *staff, int startLoc, int endLoc) const;
+    // Calculate the pitch difference used to adjust for melodic direction
+    int CalcPitchDifference(const Staff *staff, int startLoc, int endLoc) const;
     // Check if the slur resembles portato
     PortatoSlurType IsPortatoSlur(const Doc *doc, const Note *startNote, const Chord *startChord) const;
     // Check if the slur starts or ends on a beam
@@ -324,8 +326,11 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(
-        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
+    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility,
+        bool isBelow, char spanningType) const;
+
+    // Calculate the full and partial shift radii
+    std::pair<double, double> CalcShiftRadii(bool forShiftLeft, double flexibility, char spanningType) const;
 
     // Determine a quadratic interpolation function between zero and one and evaluate it
     double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
