@@ -149,7 +149,15 @@ public:
     std::string GetClassName() const override { return "ScoreDef"; }
     ///@}
 
+    /**
+     * Check if a object is allowed as child.
+     */
     bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Return an order for the given ClassId.
+     */
+    int GetInsertOrderFor(ClassId classId) const override;
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.

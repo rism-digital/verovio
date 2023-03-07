@@ -259,6 +259,7 @@ void ScoreDef::Reset()
 
 bool ScoreDef::IsSupportedChild(Object *child)
 {
+    // Clef is actually not allowed as child of scoreDef in MEI
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
@@ -271,6 +272,7 @@ bool ScoreDef::IsSupportedChild(Object *child)
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
+    // Mensur is actually not allowed as child of scoreDef in MEI
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));
     }
@@ -279,9 +281,6 @@ bool ScoreDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(METERSIGGRP)) {
         assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
     }
     else if (child->IsRunningElement()) {
         assert(dynamic_cast<RunningElement *>(child));
@@ -293,6 +292,14 @@ bool ScoreDef::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+int ScoreDef::GetInsertOrderFor(ClassId classId) const
+{
+
+    static const std::vector s_order({ SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT,
+        PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
+    return this->GetInsertOrderForIn(classId, s_order);
 }
 
 void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)

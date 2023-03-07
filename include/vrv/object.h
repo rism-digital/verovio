@@ -369,6 +369,18 @@ public:
     virtual void AddChild(Object *object);
 
     /**
+     * Return the child order for a the given ClassId.
+     * By default, a child is added at the end, but a class can override the method to order them.
+     * The overriden method specifies a static vector with the expected order of ClassIds.
+     */
+    virtual int GetInsertOrderFor(ClassId classId) const { return VRV_UNSET; }
+
+    /**
+     * Find the order from an overriden GetInsertOrderFor method.
+     */
+    int GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const;
+
+    /**
      * Return the index position of the object in its parent (-1 if not found)
      */
     int GetIdx() const;
