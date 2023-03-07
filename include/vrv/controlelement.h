@@ -78,11 +78,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AdjustXOverflow
-     */
-    int AdjustXOverflow(FunctorParams *functorParams) override;
-
 private:
     //
 public:

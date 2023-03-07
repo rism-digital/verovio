@@ -21,6 +21,7 @@
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
 #include "adjusttempofunctor.h"
+#include "adjustxoverflowfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
@@ -446,10 +447,8 @@ void Page::LayOutHorizontally()
     this->Process(&adjustTupletsX, &adjustTupletsXParams);
 
     // Prevent a margin overflow
-    Functor adjustXOverflow(&Object::AdjustXOverflow);
-    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams(doc->GetDrawingUnit(100));
-    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
+    AdjustXOverflowFunctor adjustXOverflow(doc->GetDrawingUnit(100));
+    this->Process(adjustXOverflow);
 
     // Adjust measure X position
     AlignMeasuresFunctor alignMeasures(doc);

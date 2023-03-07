@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "adjustxoverflowfunctor.h"
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
@@ -365,17 +366,18 @@ int Measure::GetInnerCenterX() const
 
 int Measure::GetDrawingOverflow()
 {
-    Functor adjustXOverflow(&Object::AdjustXOverflow);
-    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams(0);
-    adjustXOverflowParams.m_currentSystem = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
-    assert(adjustXOverflowParams.m_currentSystem);
-    adjustXOverflowParams.m_lastMeasure = this;
-    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
-    if (!adjustXOverflowParams.m_currentWidest) return 0;
+    AdjustXOverflowFunctor adjustXOverflow(0);
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+    adjustXOverflow.SetCurrentSystem(system);
+    adjustXOverflow.SetLastMeasure(this);
+    this->Process(adjustXOverflow);
+
+    FloatingPositioner *widestPositioner = adjustXOverflow.GetWidestPositioner();
+    if (!widestPositioner) return 0;
 
     int measureRightX = this->GetDrawingX() + this->GetWidth();
-    int overflow = adjustXOverflowParams.m_currentWidest->GetContentRight() - measureRightX;
+    int overflow = widestPositioner->GetContentRight() - measureRightX;
     return std::max(0, overflow);
 }
 
@@ -944,21 +946,6 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
     // Adjust the postion of the alignment according to what we have collected for this verse
     m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
     params->m_overlappingSyl.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustXOverflow(FunctorParams *functorParams)
-{
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    params->m_lastMeasure = this;
-    // For now look only at the content of the last measure, so discard any previous control event.
-    // We need to do this because AdjustXOverflow is run before measures are aligned, so the right
-    // position comparison do not actually tell us which one is the longest. This is not optimal
-    // and can be improved.
-    params->m_currentWidest = NULL;
 
     return FUNCTOR_CONTINUE;
 }

@@ -190,14 +190,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::AdjustXOverflow
-     */
-    ///@{
-    int AdjustXOverflow(FunctorParams *functorParams) override;
-    int AdjustXOverflowEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * @name See Object::AdjustSylSpacing
      */
     ///@{

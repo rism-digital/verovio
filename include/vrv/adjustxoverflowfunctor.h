@@ -36,6 +36,15 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Getter and setter for various properties
+     */
+    ///@{
+    void SetCurrentSystem(System *system) { m_currentSystem = system; }
+    void SetLastMeasure(Measure *measure) { m_lastMeasure = measure; }
+    FloatingPositioner *GetWidestPositioner() const { return m_currentWidest; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{
