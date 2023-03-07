@@ -141,8 +141,12 @@ bool Slur::HasInnerSlur(const Slur *innerSlur) const
     const LayerElement *innerEnd = innerSlur->GetEnd();
     if (!innerStart || !innerEnd) return false;
 
-    if (std::abs(start->GetAlignmentLayerN()) != std::abs(innerStart->GetAlignmentLayerN())) return false;
-    if (std::abs(end->GetAlignmentLayerN()) != std::abs(innerEnd->GetAlignmentLayerN())) return false;
+    std::set<int> admissibleLayers = { std::abs(start->GetAlignmentLayerN()), std::abs(end->GetAlignmentLayerN()) };
+    std::set<int> innerLayers
+        = { std::abs(innerStart->GetAlignmentLayerN()), std::abs(innerEnd->GetAlignmentLayerN()) };
+    if (!std::includes(admissibleLayers.begin(), admissibleLayers.end(), innerLayers.begin(), innerLayers.end())) {
+        return false;
+    }
 
     // Check the alignment
     if (this->IsOrdered(innerStart, start) || this->IsOrdered(end, innerEnd)) return false;
