@@ -433,9 +433,10 @@ void FloatingPositioner::CalcDrawingYRel(
             }
         }
 
-        if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
-            minStaffDistance = 2.5 * unit;
+        if (staffAlignment->GetStaff()->m_drawingLines == 1) {
+            minStaffDistance += 2.5 * unit;
         }
+
         if (m_place == STAFFREL_above) {
             yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * unit;
