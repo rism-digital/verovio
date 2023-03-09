@@ -57,6 +57,11 @@ LogLevel StrToLogLevel(const std::string &level);
 bool AreEqual(double dFirstVal, double dSecondVal);
 
 /**
+ * Utility for check the string is a number
+ */
+bool IsNumber(const std::string value);
+
+/**
  * Extract the ID from any URI
  */
 std::string ExtractIDFragment(std::string refID);
