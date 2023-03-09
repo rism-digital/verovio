@@ -252,16 +252,13 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    // Convert string to double
-    double number = 0.0;
-    try {
-        number = std::stod(value);
-    }
-    catch (const std::exception &e) {
+    if (!IsNumber(value)) {
         LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
             this->GetKey().c_str());
         return false;
     }
+    // Convert string to double
+    double number = std::stod(value);
 
     // Check bounds and set the value
     return this->SetValue(number);
@@ -340,16 +337,13 @@ bool OptionInt::SetValueDbl(double value)
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    // Convert string to int
-    int number = 0;
-    try {
-        number = std::stoi(value);
-    }
-    catch (const std::exception &e) {
+    if (!IsNumber(value)) {
         LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
             this->GetKey().c_str());
         return false;
     }
+    // Convert string to int
+    int number = std::stoi(value);
 
     // Check bounds and set the value
     return this->SetValue(number);
@@ -848,13 +842,13 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
             path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
         }
         else if (val.is<jsonxx::Array>()) {
-            try {
+            if (IsNumber(*iter)) {
                 const int index = std::stoi(*iter);
                 if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
                 path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
             }
-            catch (const std::logic_error &) {
+            else {
                 // invalid index, leaving
                 break;
             }
