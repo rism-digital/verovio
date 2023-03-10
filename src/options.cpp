@@ -252,7 +252,7 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    if (!IsNumber(value)) {
+    if (!IsValidDouble(value)) {
         LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
             this->GetKey().c_str());
         return false;
@@ -337,7 +337,7 @@ bool OptionInt::SetValueDbl(double value)
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    if (!IsNumber(value)) {
+    if (!IsValidInteger(value)) {
         LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
             this->GetKey().c_str());
         return false;
@@ -842,7 +842,7 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
             path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
         }
         else if (val.is<jsonxx::Array>()) {
-            if (IsNumber(*iter)) {
+            if (IsValidDouble(*iter)) {
                 const int index = std::stoi(*iter);
                 if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
