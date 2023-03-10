@@ -707,6 +707,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // generate missing measure numbers
+    // TODO better move this to PrepareData()
     m_doc.GenerateMeasureNumbers();
 
     // transpose the content if necessary
