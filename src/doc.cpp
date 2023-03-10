@@ -2061,9 +2061,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // every time for now.
 
     m_drawingBeamMaxSlope = m_options->m_beamMaxSlope.GetValue();
-    m_drawingBeamMinSlope = m_options->m_beamMinSlope.GetValue();
     m_drawingBeamMaxSlope /= 100;
-    m_drawingBeamMinSlope /= 100;
 
     // values for beams
     m_drawingBeamWidth = m_options->m_unit.GetValue();

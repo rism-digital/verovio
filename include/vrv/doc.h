@@ -514,8 +514,6 @@ public:
     int m_drawingPageMarginRight;
     /** The current page top margin */
     int m_drawingPageMarginTop;
-    /** the current beam minimal slope */
-    float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
 

@@ -1241,10 +1241,6 @@ Options::Options()
     m_beamMaxSlope.Init(10, 0, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
 
-    m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
-    m_beamMinSlope.Init(0, 0, 0);
-    this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
-
     m_beamMixedPreserve.SetInfo("Preserve mixed beams", "Mixed beams will be drawn even if there is not enough space");
     m_beamMixedPreserve.Init(false);
     this->Register(&m_beamMixedPreserve, "beamMixedPreserve", &m_generalLayout);
