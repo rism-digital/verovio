@@ -258,7 +258,7 @@ bool TimeSpanningInterface::IsOrdered(const LayerElement *start, const LayerElem
         return Object::IsPreOrdered(start->GetAlignment(), end->GetAlignment());
     }
     else {
-        return Object::IsPreOrdered(startMeasure, endMeasure);
+        return (startMeasure->GetIndex() < endMeasure->GetIndex());
     }
 }
 
