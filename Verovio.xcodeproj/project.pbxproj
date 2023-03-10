@@ -1480,6 +1480,12 @@
 		E7A1640D29AF347E0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
 		E7A1640E29AF347F0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
 		E7A1640F29AF347F0099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */; };
+		E7A3790A29BB41DB00E3BA98 /* adjustxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7A3790929BB41CD00E3BA98 /* adjustxposfunctor.h */; };
+		E7A3790B29BB41DB00E3BA98 /* adjustxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7A3790929BB41CD00E3BA98 /* adjustxposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7A3790D29BB41F600E3BA98 /* adjustxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */; };
+		E7A3790E29BB420300E3BA98 /* adjustxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */; };
+		E7A3790F29BB420400E3BA98 /* adjustxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */; };
+		E7A3791029BB420400E3BA98 /* adjustxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */; };
 		E7BCFFB5281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB6281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB8281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
@@ -2054,6 +2060,8 @@
 		E79C87C2269440570098FE85 /* lv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lv.cpp; path = src/lv.cpp; sourceTree = "<group>"; };
 		E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustharmgrpsspacingfunctor.h; path = include/vrv/adjustharmgrpsspacingfunctor.h; sourceTree = "<group>"; };
 		E7A1640B29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustharmgrpsspacingfunctor.cpp; path = src/adjustharmgrpsspacingfunctor.cpp; sourceTree = "<group>"; };
+		E7A3790929BB41CD00E3BA98 /* adjustxposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustxposfunctor.h; path = include/vrv/adjustxposfunctor.h; sourceTree = "<group>"; };
+		E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustxposfunctor.cpp; path = src/adjustxposfunctor.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
 		E7C3AED52955018F002DE5AB /* preparedatafunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = preparedatafunctor.h; path = include/vrv/preparedatafunctor.h; sourceTree = "<group>"; };
@@ -2847,6 +2855,8 @@
 				E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */,
 				E7231E0429B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp */,
 				E7231E0129B64B08000A2BF3 /* adjustxoverflowfunctor.h */,
+				E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */,
+				E7A3790929BB41CD00E3BA98 /* adjustxposfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
@@ -2987,6 +2997,7 @@
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				E77C197D28CD317B00F5BADA /* calcdotsfunctor.h in Headers */,
 				4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */,
+				E7A3790A29BB41DB00E3BA98 /* adjustxposfunctor.h in Headers */,
 				4D674B3F255F40AC008AEF4C /* plica.h in Headers */,
 				4DB3D8C41F83D0F300B5FC2B /* anchoredtext.h in Headers */,
 				40ACDEA624079F6900F82B8C /* reh.h in Headers */,
@@ -3356,6 +3367,7 @@
 				BB4C4AC222A932B6001F6AF0 /* layer.h in Headers */,
 				4DA0EAE622BB77AF00A7EBEB /* editortoolkit.h in Headers */,
 				4DACC98D2990F29A00B55913 /* atts_usersymbols.h in Headers */,
+				E7A3790B29BB41DB00E3BA98 /* adjustxposfunctor.h in Headers */,
 				BB4C4B3622A932CF001F6AF0 /* tie.h in Headers */,
 				BB4C4B7C22A932D7001F6AF0 /* tuplet.h in Headers */,
 				BB4C4B4422A932D7001F6AF0 /* beatrpt.h in Headers */,
@@ -3708,6 +3720,7 @@
 				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
 				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
 				4DBDD6732939E1BC009EC466 /* symboldef.cpp in Sources */,
+				E7A3790E29BB420300E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				BDEF9EC826725234008A3A47 /* caesura.cpp in Sources */,
 				4DACC9D92990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				4D16942A1E3A44F300569BF4 /* octave.cpp in Sources */,
@@ -4003,6 +4016,7 @@
 				4DACC9962990F29A00B55913 /* atts_facsimile.cpp in Sources */,
 				4DACC9A22990F29A00B55913 /* atts_cmnornaments.cpp in Sources */,
 				E7D338A0293E05F300C40B81 /* setscoredeffunctor.cpp in Sources */,
+				E7A3790D29BB41F600E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D79642126C167100026288B /* pagemilestone.cpp in Sources */,
 				4D2073FB22A3BCE000E0765F /* tabgrp.cpp in Sources */,
@@ -4223,6 +4237,7 @@
 				4D1BE7721C688F5A0086DC0E /* MidiFile.cpp in Sources */,
 				4DA0EAC922BB779400A7EBEB /* facsimile.cpp in Sources */,
 				4DEC4DAC21C81EEC00D1D273 /* restore.cpp in Sources */,
+				E7A3790F29BB420400E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */,
 				4DACC9DA2990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				4DBDD6742939E1BD009EC466 /* symboldef.cpp in Sources */,
@@ -4481,6 +4496,7 @@
 				BB4C4BA522A932E5001F6AF0 /* timeinterface.cpp in Sources */,
 				BB4C4B7522A932D7001F6AF0 /* syl.cpp in Sources */,
 				BB4C4B3122A932CF001F6AF0 /* slur.cpp in Sources */,
+				E7A3791029BB420400E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				4DACC9DB2990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				BB4C4AC722A932B6001F6AF0 /* page.cpp in Sources */,
 				BB4C4AE322A932BC001F6AF0 /* choice.cpp in Sources */,
