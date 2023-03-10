@@ -233,7 +233,7 @@ bool AreEqual(double dFirstVal, double dSecondVal)
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }
 
-bool IsNumber(const std::string value)
+bool IsNumber(const std::string &value)
 {
     std::regex re("^\\s*[+-]?(\\d+\\.?|\\.?\\d+)\\d*\\s*$");
     return std::regex_match(value, re);
