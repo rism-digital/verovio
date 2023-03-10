@@ -244,7 +244,7 @@ bool Doc::GenerateHeader()
     return true;
 }
 
-void Doc::GenerateMeasureIndices()
+void Doc::PrepareMeasureIndices()
 {
     ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
 
@@ -553,6 +553,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 void Doc::PrepareData()
 {
     /************ Reset and initialization ************/
+
     if (m_dataPreparationDone) {
         Functor resetData(&Object::ResetData);
         this->Process(&resetData, NULL);
@@ -560,6 +561,10 @@ void Doc::PrepareData()
     Functor prepareDataInitialization(&Object::PrepareDataInitialization);
     PrepareDataInitializationParams prepareDataInitializationParams(&prepareDataInitialization, this);
     this->Process(&prepareDataInitialization, &prepareDataInitializationParams);
+
+    /************ Generate measure indices ************/
+
+    this->PrepareMeasureIndices();
 
     /************ Store default durations ************/
 

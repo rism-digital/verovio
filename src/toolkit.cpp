@@ -695,9 +695,6 @@ bool Toolkit::LoadData(const std::string &data)
         }
     }
 
-    // generate the measure indices
-    m_doc.GenerateMeasureIndices();
-
     bool adjustPageHeight = m_options->m_adjustPageHeight.GetValue();
     int footerOption = m_options->m_footer.GetValue();
     // With adjusted page height, show the footer if explicitly set (i.e., not with "auto")

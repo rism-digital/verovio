@@ -99,11 +99,6 @@ public:
     bool GenerateHeader();
 
     /**
-     * Generate the measure indices
-     */
-    void GenerateMeasureIndices();
-
-    /**
      * Generate measure numbers from measure attributes
      */
     bool GenerateMeasureNumbers();
@@ -481,6 +476,11 @@ private:
      * Calculates the music font size according to the m_interlDefin reference value.
      */
     int CalcMusicFontSize();
+
+    /**
+     * Generate the measure indices
+     */
+    void PrepareMeasureIndices();
 
 public:
     Page *m_selectionPreceding;
