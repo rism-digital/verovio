@@ -244,6 +244,16 @@ bool Doc::GenerateHeader()
     return true;
 }
 
+void Doc::GenerateMeasureIndices()
+{
+    ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
+
+    int index = 0;
+    for (Object *object : measures) {
+        vrv_cast<Measure *>(object)->SetIndex(++index);
+    }
+}
+
 bool Doc::GenerateMeasureNumbers()
 {
     ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);

@@ -99,6 +99,11 @@ public:
     bool GenerateHeader();
 
     /**
+     * Generate the measure indices
+     */
+    void GenerateMeasureIndices();
+
+    /**
      * Generate measure numbers from measure attributes
      */
     bool GenerateMeasureNumbers();
