@@ -477,6 +477,11 @@ private:
      */
     int CalcMusicFontSize();
 
+    /**
+     * Generate the measure indices
+     */
+    void PrepareMeasureIndices();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;

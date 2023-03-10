@@ -1910,7 +1910,7 @@ bool Slur::ConsiderMelodicDirection() const
 
     // Return true if the slur starts in the last measure and ends in the first measure of the next system
     if (startMeasure && endMeasure) {
-        return (startMeasure->IsLastInSystem() && endMeasure->IsFirstInSystem() && (startMeasure != endMeasure));
+        return (startMeasure->IsLastInSystem() && (endMeasure->GetIndex() == startMeasure->GetIndex() + 1));
     }
     return false;
 }
