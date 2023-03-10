@@ -1020,7 +1020,7 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
-    m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
+    m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
