@@ -243,7 +243,7 @@ bool IsValidInteger(const std::string &value)
 bool IsValidDouble(const std::string &value)
 {
     // Accept "1.0" " 1.0 " ".0"  "1." "+1.0" "-1.0"
-    std::regex re("^\\s*[+-]?(\\d+\\.?\\d*|\\.?\\d+)\\s*$");
+    std::regex re("^\\s*[+-]?(?:\\d+\\.?\\d*|\\.\\d+)\\s*$");
     return std::regex_match(value, re);
 }
 
