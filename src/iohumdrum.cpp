@@ -13349,7 +13349,6 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             articloc.at(intch) = i + 1;
             posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
             i++;
-            continue;
         }
         if ((ch == '"') && (posch == '"')) {
             // use 9 slot in array for ""^" (snap pizzicato)
