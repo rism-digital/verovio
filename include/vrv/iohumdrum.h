@@ -825,6 +825,7 @@ protected:
     void checkForLineContinuations(hum::HTp token);
     std::u32string convertNumberToWstring(int number);
     void appendTextToRend(Rend *rend, const std::string &content);
+    void parseMultiVerovioOptions(std::map<std::string, std::string> &parameters, const string &input);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

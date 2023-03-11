@@ -2279,7 +2279,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
         if (groups.empty()) {
             break;
         }
-        hre.split(pgroups, groups, "[\\s,]+");
+        hre.split(pgroups, groups, R"re([\s,]+)re");
         break;
     }
 
@@ -2307,11 +2307,15 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
 
             std::string pkey;
             std::string pvalue;
-            if (hre.search(value, "^\\s*([^\\s]+)\\s+(.*)\\s*$")) {
+            if (hre.search(value, R"re((?!<\\)\|)re")) {
+                parseMultiVerovioOptions(inputparameters, value);
+                continue;
+            }
+            if (hre.search(value, R"re(^\s*([^\s]+)\s+(.*)\s*$)re")) {
                 pkey = hre.getMatch(1);
                 pvalue = hre.getMatch(2);
             }
-            else if (hre.search(value, "^\\s*([^\\s]+)\\s*$")) {
+            else if (hre.search(value, R"re(^\s*([^\s]+)\s*$)re")) {
                 // Empty value which will be interpreted as boolean true.
                 pkey = hre.getMatch(1);
                 pvalue = "";
@@ -2333,7 +2337,7 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
                 }
                 value = infile[i].getReferenceValue();
 
-                if (!hre.search(value, "\\s*([^\\s]+)\\s+(.*)\\s*$")) {
+                if (!hre.search(value, R"re(\s*([^\s]+)\s+(.*)\s*$)re")) {
                     continue;
                 }
                 std::string pkey = hre.getMatch(1);
@@ -2356,19 +2360,58 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
             continue;
         }
 
-        if (hre.search(inputoption.second, "^([+-]?\\d+\\.?\\d*)$")) {
+        if (hre.search(inputoption.second, R"re(^([+-]?\d+\.?\d*)$)re")) {
             double value = hre.getMatchDouble(1);
             entry->second->SetValueDbl(value);
         }
-        else if (hre.search(inputoption.second, "^([+-]?\\.\\d+)$")) {
+        else if (hre.search(inputoption.second, R"re(^([+-]?\.\d+)$)re")) {
             double value = hre.getMatchDouble(1);
             entry->second->SetValueDbl(value);
         }
-        else if (hre.search(inputoption.second, "^\\s*$")) {
+        else if (hre.search(inputoption.second, R"re(^\s*$)re")) {
             entry->second->SetValueBool(true);
         }
         else {
             entry->second->SetValue(inputoption.second);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::parseMultiVerovioOptions --
+//
+
+void HumdrumInput::parseMultiVerovioOptions(std::map<std::string, std::string> &parameters, const string &input)
+{
+    std::vector<std::string> pieces(1);
+    for (int i = 0; i < (int)input.size(); i++) {
+        if ((i < (int)input.size() - 1) && (input[i] == '\\')) {
+            if (input[i + 1] == '|') {
+                pieces.back() += '|';
+                i++;
+            }
+            else {
+                pieces.back() += '\\';
+            }
+            continue;
+        }
+        else if (input[i] == '|') {
+            pieces.resize(pieces.size() + 1);
+            continue;
+        }
+        pieces.back() += input[i];
+    }
+
+    hum::HumRegex hre;
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        if (hre.search(pieces[i], R"re(^\s*$)re")) {
+            continue;
+        }
+        if (hre.search(pieces[i], R"re(^\s*([^\s]+)\s*(.*)\s*$)re")) {
+            std::string key = hre.getMatch(1);
+            std::string value = hre.getMatch(2);
+            parameters[key] = value;
         }
     }
 }
