@@ -15966,19 +15966,23 @@ void HumdrumInput::addDirection(const std::string &text, const std::string &plac
 
 /////////////////////////////
 //
-// HumdrumInput::processDynamics --
+// HumdrumInput::processDynamics -- The input is a note/chord/rest
+//   token on the given staff.
 //
 
 void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 {
-    std::string tok;
+    addSforzandoToNote(token, staffindex);
+
+    int &si = staffindex;
     std::string dynamic;
     bool graceQ = token->isGrace();
-    hum::HumdrumLine *line = token->getLine();
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    hum::HumdrumLine *line = token->getLine();
     if (line == NULL) {
         return;
     }
+
     int track = token->getTrack();
     int lasttrack = track;
     int ttrack;
@@ -15987,179 +15991,26 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool forceAboveQ = false;
     bool forceBelowQ = false;
     bool forceCenterQ = false;
-    // int forcebelowadj = 0;
-    // int forceaboveadj = 0;
     int trackdiff = 0;
-    int staffadj = ss[staffindex].m_dynamstaffadj;
-    int forceQ = false;
+    int staffadj = ss[si].m_dynamstaffadj;
 
-    if (ss[staffindex].m_dynampos > 0) {
-        forceQ = true;
+    if (ss[si].m_dynampos > 0) {
         forceAboveQ = true;
-        // forceaboveadj = -(ss[staffindex].m_dynampos - 1);
     }
-    else if (ss[staffindex].m_dynampos < 0) {
-        forceQ = true;
+    else if (ss[si].m_dynampos < 0) {
         forceBelowQ = true;
-        // forcebelowadj = -ss[staffindex].m_dynamstaffadj;
     }
-    else if ((ss[staffindex].m_dynampos == 0) && (ss[staffindex].m_dynamposdefined)) {
+    else if ((ss[si].m_dynampos == 0) && (ss[si].m_dynamposdefined)) {
         forceCenterQ = true;
     }
-    else if (ss[staffindex].verse) {
+    else if (ss[si].verse) {
         forceAboveQ = true;
-    }
-
-    int justification = 0;
-    if (token->getLayoutParameter("DY", "rj") == "true") {
-        justification = 1;
-    }
-    if (token->getLayoutParameter("DY", "cj") == "true") {
-        justification = 2;
-    }
-
-    std::string dcolor = token->getLayoutParameter("DY", "color");
-
-    bool needsrend = justification || dcolor.size();
-
-    // Handle "z" for sforzando (sf), or "zz" for sfz:
-
-    bool aboveQ = false;
-    bool belowQ = false;
-    bool centerQ = false;
-    bool showpos = false;
-
-    auto loc = token->rfind("z");
-    if (token->find("zy") != std::string::npos) {
-        // don't show invisible sfz.
-        // do nothing
-    }
-    else if (loc != std::string::npos) {
-        int subtrack = token->getSubtrack();
-        switch (subtrack) {
-            case 1:
-                aboveQ = true;
-                belowQ = false;
-                centerQ = false;
-                break;
-            case 2:
-                belowQ = true;
-                aboveQ = false;
-                centerQ = false;
-                break;
-        }
-        if (hasAboveParameter(token, "DY", staffadj)) {
-            aboveQ = true;
-            belowQ = false;
-            centerQ = false;
-            showpos = true;
-        }
-        if (!aboveQ) {
-            if (hasBelowParameter(token, "DY", staffadj)) {
-                aboveQ = false;
-                belowQ = true;
-                centerQ = false;
-                showpos = true;
-                if (belowQ && staffadj) {
-                    staffadj--;
-                }
-                else if (forceQ && forceBelowQ) {
-                    staffadj = -ss[staffindex].m_dynamstaffadj;
-                }
-            }
-        }
-        if (!aboveQ && !belowQ) {
-            if (hasCenterParameter(token, "DY", staffadj)) {
-                aboveQ = false;
-                belowQ = false;
-                centerQ = true;
-                showpos = true;
-            }
-        }
-
-        // This code block should probably be deleted.
-        if (m_signifiers.below && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.below)) {
-            aboveQ = false;
-            belowQ = true;
-            showpos = true;
-        }
-        if (m_signifiers.above && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.above)) {
-            aboveQ = true;
-            belowQ = false;
-            showpos = true;
-        }
-
-        Dynam *dynam = new Dynam();
-        addChildMeasureOrSection(dynam);
-
-        int newstaff = m_currentstaff + staffadj;
-        if (newstaff < 1) {
-            newstaff = 1;
-        }
-        if (newstaff > (int)ss.size()) {
-            newstaff = (int)ss.size();
-        }
-        setStaff(dynam, newstaff);
-
-        if (needsrend) {
-            Rend *rend = new Rend();
-            dynam->AddChild(rend);
-            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
-            data_FONTSIZE fs;
-            fs.SetTerm(FONTSIZETERM_large);
-            rend->SetFontsize(fs);
-            if (token->find("zz") != std::string::npos) {
-                addTextElement(rend, "sfz&#160;");
-            }
-            else {
-                addTextElement(rend, "sf&#160;");
-            }
-            if (!dcolor.empty()) {
-                rend->SetColor(dcolor);
-            }
-            if (justification == 1) {
-                rend->SetHalign(HORIZONTALALIGNMENT_right);
-            }
-            else if (justification == 2) {
-                rend->SetHalign(HORIZONTALALIGNMENT_center);
-            }
-        }
-        else {
-            if (token->find("zz") != std::string::npos) {
-                addTextElement(dynam, "sfz");
-            }
-            else {
-                addTextElement(dynam, "sf");
-            }
-        }
-
-        setLocationId(dynam, token, -1);
-        hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
-        dynam->SetTstamp(barstamp.getFloat());
-
-        if (aboveQ) {
-            setPlaceRelStaff(dynam, "above", showpos);
-        }
-        else if (belowQ) {
-            setPlaceRelStaff(dynam, "below", showpos);
-        }
-        else if (centerQ) {
-            setPlaceRelStaff(dynam, "between", showpos);
-        }
-        else if (forceAboveQ) {
-            setPlaceRelStaff(dynam, "above", showpos);
-        }
-        else if (forceBelowQ) {
-            setPlaceRelStaff(dynam, "below", showpos);
-        }
-        else if (forceCenterQ) {
-            setPlaceRelStaff(dynam, "between", showpos);
-        }
     }
 
     bool active = true;
     for (int i = startfield; i < line->getFieldCount(); ++i) {
-        staffadj = ss[staffindex].m_dynamstaffadj;
+        bool centerQ = false;
+        staffadj = ss[si].m_dynamstaffadj;
         hum::HTp dyntok = line->token(i);
         std::string exinterp = dyntok->getDataType();
         if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
@@ -16231,7 +16082,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             dynamic = letters;
         }
         if (!dynamic.empty()) {
-            staffadj = ss[staffindex].m_dynamstaffadj;
+            staffadj = ss[si].m_dynamstaffadj;
 
             std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
             if (!dyntext.empty()) {
@@ -16406,7 +16257,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
             }
             else {
-                hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
+                hum::HumNum barstamp = getMeasureTstamp(token, si);
                 dynam->SetTstamp(barstamp.getFloat());
             }
 
@@ -16460,7 +16311,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 endtok = getCrescendoEnd(dyntok);
             }
-            staffadj = ss[staffindex].m_dynamstaffadj;
+            staffadj = ss[si].m_dynamstaffadj;
             bool aboveQ = hasAboveParameter(dyntok, "HP", staffadj);
             bool belowQ = false;
             bool centerQ = false;
@@ -16511,17 +16362,17 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 if (!color.empty()) {
                     hairpin->SetColor(color);
                 }
-                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, si);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
-                    tstamp2 = getMeasureTstamp(dyntok, duration, staffindex);
+                    tstamp2 = getMeasureTstamp(dyntok, duration, si);
                 }
                 else {
-                    tstamp2 = getMeasureTstamp(endtok, staffindex);
+                    tstamp2 = getMeasureTstamp(endtok, si);
                 }
                 if ((duration == 0) && (endline || (endtok->find("[[") != std::string::npos))) {
                     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-                    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+                    hum::HumNum mfactor = ss[si].meter_bottom / 4;
                     tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
                 int measures = getMeasureDifference(dyntok, endtok);
@@ -16612,7 +16463,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endtok = getDecrescendoEnd(dyntok);
             }
 
-            staffadj = ss[staffindex].m_dynamstaffadj;
+            staffadj = ss[si].m_dynamstaffadj;
             bool aboveQ = hasAboveParameter(dyntok, "HP", staffadj);
             bool belowQ = false;
             bool centerQ = false;
@@ -16660,17 +16511,17 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     hairpin->SetColor(color);
                 }
                 setLocationId(hairpin, dyntok, -1);
-                hum::HumNum tstamp = getMeasureTstamp(dyntok, staffindex);
+                hum::HumNum tstamp = getMeasureTstamp(dyntok, si);
                 hum::HumNum tstamp2;
                 if (duration > 0) {
-                    tstamp2 = getMeasureTstamp(dyntok, duration, staffindex);
+                    tstamp2 = getMeasureTstamp(dyntok, duration, si);
                 }
                 else {
-                    tstamp2 = getMeasureTstamp(endtok, staffindex);
+                    tstamp2 = getMeasureTstamp(endtok, si);
                 }
                 if ((duration == 0) && (endline || (endtok->find("]]") != std::string::npos))) {
                     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-                    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+                    hum::HumNum mfactor = ss[si].meter_bottom / 4;
                     tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
                 int measures = getMeasureDifference(dyntok, endtok);
@@ -16699,7 +16550,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 // no endpoint so print as the word "decresc."
                 Dir *dir = new Dir();
                 addChildMeasureOrSection(dir);
-                int staffadj = ss[staffindex].m_dynamstaffadj;
+                int staffadj = ss[si].m_dynamstaffadj;
                 bool aboveQ = hasAboveParameter(dyntok, "HP", staffadj);
                 bool belowQ = false;
                 bool centerQ = false;
@@ -16778,7 +16629,203 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // there may be dynamics unattached to a note (for various often
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
-    processDynamics(token, staffindex);
+    processDynamics(token, si);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addSforzandoToNote -- A "z" on a note/chord indicates
+//    a sforzando mark ("sf", or use "zz" for "sfz").  This will be
+//    inserted into the floating elements as a <dynam> with a @startid
+//    pointing to the note/chord.  Other dynamics are placed using @tstamp.
+//
+
+void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
+{
+    size_t loc = token->rfind("z");
+    if (loc == std::string::npos) {
+        // No sf.
+        return;
+    }
+    if (token->find("zy") != std::string::npos) {
+        // Invisible sf.
+        return;
+    }
+
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int &si = staffindex;
+    int staffadj = ss[si].m_dynamstaffadj;
+
+    int forceQ = false;
+    bool forceAboveQ = false;
+    bool forceBelowQ = false;
+    bool forceCenterQ = false;
+    bool aboveQ = false;
+    bool belowQ = false;
+    bool centerQ = false;
+    bool showpos = false;
+
+    if (ss[si].m_dynampos > 0) {
+        forceQ = true;
+        forceAboveQ = true;
+    }
+    else if (ss[si].m_dynampos < 0) {
+        forceQ = true;
+        forceBelowQ = true;
+    }
+    else if ((ss[si].m_dynampos == 0) && (ss[si].m_dynamposdefined)) {
+        forceCenterQ = true;
+    }
+    else if (ss[si].verse) {
+        // If there are lyrics for the staff, place dynamics
+        // above by default.
+        forceAboveQ = true;
+    }
+
+    int justification = 0;
+    if (token->getLayoutParameter("DY", "rj") == "true") {
+        justification = 1;
+    }
+    if (token->getLayoutParameter("DY", "cj") == "true") {
+        justification = 2;
+    }
+
+    std::string dcolor = token->getLayoutParameter("DY", "color");
+
+    bool needsrend = justification || dcolor.size();
+
+    int subtrack = token->getSubtrack();
+    switch (subtrack) {
+        case 1:
+            aboveQ = true;
+            belowQ = false;
+            centerQ = false;
+            break;
+        case 2:
+            belowQ = true;
+            aboveQ = false;
+            centerQ = false;
+            break;
+    }
+    if (hasAboveParameter(token, "DY", staffadj)) {
+        aboveQ = true;
+        belowQ = false;
+        centerQ = false;
+        showpos = true;
+    }
+    if (!aboveQ) {
+        if (hasBelowParameter(token, "DY", staffadj)) {
+            aboveQ = false;
+            belowQ = true;
+            centerQ = false;
+            showpos = true;
+            if (belowQ && staffadj) {
+                staffadj--;
+            }
+            else if (forceQ && forceBelowQ) {
+                staffadj = -ss[si].m_dynamstaffadj;
+            }
+        }
+    }
+    if (!aboveQ && !belowQ) {
+        if (hasCenterParameter(token, "DY", staffadj)) {
+            aboveQ = false;
+            belowQ = false;
+            centerQ = true;
+            showpos = true;
+        }
+    }
+
+    // This code block should probably be deleted.
+    if (m_signifiers.below && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.below)) {
+        aboveQ = false;
+        belowQ = true;
+        showpos = true;
+    }
+    if (m_signifiers.above && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.above)) {
+        aboveQ = true;
+        belowQ = false;
+        showpos = true;
+    }
+
+    Dynam *dynam = new Dynam();
+    addChildMeasureOrSection(dynam);
+
+    int newstaff = m_currentstaff + staffadj;
+    if (newstaff < 1) {
+        newstaff = 1;
+    }
+    if (newstaff > (int)ss.size()) {
+        newstaff = (int)ss.size();
+    }
+    setStaff(dynam, newstaff);
+
+    if (needsrend) {
+        Rend *rend = new Rend();
+        dynam->AddChild(rend);
+        rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_large);
+        rend->SetFontsize(fs);
+        if (token->find("zz") != std::string::npos) {
+            addTextElement(rend, "sfz&#160;");
+        }
+        else {
+            addTextElement(rend, "sf&#160;");
+        }
+        if (!dcolor.empty()) {
+            rend->SetColor(dcolor);
+        }
+        if (justification == 1) {
+            rend->SetHalign(HORIZONTALALIGNMENT_right);
+        }
+        else if (justification == 2) {
+            rend->SetHalign(HORIZONTALALIGNMENT_center);
+        }
+    }
+    else {
+        if (token->find("zz") != std::string::npos) {
+            addTextElement(dynam, "sfz");
+        }
+        else {
+            addTextElement(dynam, "sf");
+        }
+    }
+
+    setLocationId(dynam, token, -1);
+    std::string startid = dynam->GetID();
+    hum::HumRegex hre;
+    if (token->isRest()) {
+        hre.replaceDestructive(startid, "rest", "^dynam");
+    }
+    else if (token->isChord()) {
+        hre.replaceDestructive(startid, "chord", "^dynam");
+    }
+    else {
+        hre.replaceDestructive(startid, "note", "^dynam");
+    }
+    dynam->SetStartid(startid);
+    // hum::HumNum barstamp = getMeasureTstamp(token, si);
+    // dynam->SetTstamp(barstamp.getFloat());
+
+    if (aboveQ) {
+        setPlaceRelStaff(dynam, "above", showpos);
+    }
+    else if (belowQ) {
+        setPlaceRelStaff(dynam, "below", showpos);
+    }
+    else if (centerQ) {
+        setPlaceRelStaff(dynam, "between", showpos);
+    }
+    else if (forceAboveQ) {
+        setPlaceRelStaff(dynam, "above", showpos);
+    }
+    else if (forceBelowQ) {
+        setPlaceRelStaff(dynam, "below", showpos);
+    }
+    else if (forceCenterQ) {
+        setPlaceRelStaff(dynam, "between", showpos);
+    }
 }
 
 //////////////////////////////

@@ -826,6 +826,7 @@ protected:
     std::u32string convertNumberToWstring(int number);
     void appendTextToRend(Rend *rend, const std::string &content);
     void parseMultiVerovioOptions(std::map<std::string, std::string> &parameters, const string &input);
+    void addSforzandoToNote(hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
