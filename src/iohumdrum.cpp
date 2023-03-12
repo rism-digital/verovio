@@ -15975,10 +15975,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     addSforzandoToNote(token, staffindex);
 
     int &si = staffindex;
-    std::string dynamic;
     bool graceQ = token->isGrace();
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
-    hum::HumdrumLine *line = token->getLine();
+    hum::HLp line = token->getLine();
     if (line == NULL) {
         return;
     }
@@ -15992,7 +15991,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool forceBelowQ = false;
     bool forceCenterQ = false;
     int trackdiff = 0;
-    int staffadj = ss[si].m_dynamstaffadj;
 
     if (ss[si].m_dynampos > 0) {
         forceAboveQ = true;
@@ -16009,9 +16007,27 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
     bool active = true;
     for (int i = startfield; i < line->getFieldCount(); ++i) {
-        bool centerQ = false;
-        staffadj = ss[si].m_dynamstaffadj;
+        int staffadj = ss[si].m_dynamstaffadj;
         hum::HTp dyntok = line->token(i);
+        if (!dyntok) {
+            continue;
+        }
+        if (dyntok->isNull()) {
+            continue;
+        }
+
+        int staffadj2 = 0;
+        std::string spineinfo = dyntok->getSpineInfo();
+        if (spineinfo.find('(') != std::string::npos) {
+            if (dyntok->getSubtrack() % 2) {
+                forceAboveQ = true;
+            }
+            else {
+                forceBelowQ = true;
+                staffadj2 = 1;
+            }
+        }
+
         std::string exinterp = dyntok->getDataType();
         if ((exinterp != "**kern") && (exinterp.find("kern") != std::string::npos)) {
             active = false;
@@ -16067,238 +16083,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpins.push_back(tok[i]);
             }
         }
-        hum::HumRegex hre;
 
-        if (hre.search(letters, "^[sr]?f+z?$")) {
-            dynamic = letters;
-        }
-        else if (hre.search(letters, "^p+$")) {
-            dynamic = letters;
-        }
-        else if (hre.search(letters, "^m?(f|p)$")) {
-            dynamic = letters;
-        }
-        else if (hre.search(letters, "^s?f+z?p+$")) {
-            dynamic = letters;
-        }
-        if (!dynamic.empty()) {
-            staffadj = ss[si].m_dynamstaffadj;
+        addDynamicsMark(dyntok, token, line, letters, si, staffadj, trackdiff);
 
-            std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
-            if (!dyntext.empty()) {
-                hum::HumRegex hre;
-                hre.replaceDestructive(dyntext, dynamic, "%s", "g");
-                dynamic = dyntext;
-            }
-
-            bool aboveQ = hasAboveParameter(dyntok, "DY", staffadj);
-            bool belowQ = false;
-            bool showplace = aboveQ;
-            if (!aboveQ) {
-                belowQ = hasBelowParameter(dyntok, "DY", staffadj);
-                showplace = belowQ;
-            }
-            if (!aboveQ && !belowQ) {
-                if (hasCenterParameter(dyntok, "DY", staffadj)) {
-                    aboveQ = false;
-                    belowQ = false;
-                    centerQ = true;
-                    showplace = centerQ;
-                }
-            }
-
-            // if pcount > 0, then search for prefix and postfix text
-            // to add to the dynamic.
-            // std::string prefix = "aaa ";
-            // std::string postfix = " bbb";
-            // See https://github.com/music-encoding/music-encoding/issues/540
-
-            int justification = 0;
-            if (dyntok->getLayoutParameter("DY", "rj") == "true") {
-                justification = 1;
-            }
-            else if (dyntok->getLayoutParameter("DY", "cj") == "true") {
-                justification = 2;
-            }
-
-            bool editQ = false;
-            bool brackQ = false;
-            bool parenQ = false;
-            bool curlyQ = false;
-            bool angleQ = false;
-
-            std::string editstr = getLayoutParameter(dyntok, "DY", "ed", "true");
-            if (editstr == "true") {
-                editQ = true;
-            }
-            if (editstr.find("brack") != std::string::npos) {
-                brackQ = true;
-                editQ = true;
-            }
-            else if (editstr.find("paren") != std::string::npos) {
-                parenQ = true;
-                editQ = true;
-            }
-            else if (editstr.find("curly") != std::string::npos) {
-                curlyQ = true;
-                std::string newdynamic = "{ ";
-                newdynamic += dynamic;
-                newdynamic += " }";
-                dynamic = newdynamic;
-            }
-            else if (editstr.find("angle") != std::string::npos) {
-                angleQ = true;
-                std::string newdynamic = "< ";
-                newdynamic += dynamic;
-                newdynamic += " >";
-                dynamic = newdynamic;
-            }
-            if (!(parenQ || brackQ || curlyQ || angleQ)) {
-                std::string parenP = getLayoutParameter(dyntok, "DY", "paren", "true");
-                std::string brackP = getLayoutParameter(dyntok, "DY", "brack", "true");
-                std::string curlyP = getLayoutParameter(dyntok, "DY", "curly", "true");
-                std::string angleP = getLayoutParameter(dyntok, "DY", "angle", "true");
-                if (parenP == "true") {
-                    parenQ = true;
-                }
-                else if (brackP == "true") {
-                    brackQ = true;
-                }
-                else if (curlyP == "true") {
-                    curlyQ = true;
-                    std::string newdynamic = "{ ";
-                    newdynamic += dynamic;
-                    newdynamic += " }";
-                    dynamic = newdynamic;
-                }
-                else if (angleP == "true") {
-                    angleQ = true;
-                    std::string newdynamic = "< ";
-                    newdynamic += dynamic;
-                    newdynamic += " >";
-                    dynamic = newdynamic;
-                }
-            }
-
-            std::string dcolor = dyntok->getLayoutParameter("DY", "color");
-            int needsrend = justification || dcolor.size();
-
-            Dynam *dynam = new Dynam();
-            if (editQ) {
-                Supplied *supplied = new Supplied();
-                appendElement(supplied, dynam);
-                addChildMeasureOrSection(supplied);
-                appendTypeTag(dynam, "editorial");
-            }
-            else {
-                addChildMeasureOrSection(dynam);
-            }
-
-            if (parenQ) {
-                dynam->SetEnclose(ENCLOSURE_paren);
-            }
-            if (brackQ) {
-                dynam->SetEnclose(ENCLOSURE_brack);
-            }
-
-            int newstaff = m_currentstaff - staffadj;
-            if (newstaff < 1) {
-                newstaff = 1;
-            }
-            if (newstaff > (int)ss.size()) {
-                newstaff = (int)ss.size();
-            }
-
-            if ((centerQ || forceCenterQ) && !aboveQ && !belowQ) {
-                setStaffBetween(dynam, newstaff);
-            }
-            else {
-                setStaff(dynam, newstaff);
-            }
-            setLocationId(dynam, dyntok, -1);
-
-            if (needsrend) {
-                Rend *rend = new Rend();
-                dynam->AddChild(rend);
-                rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
-                data_FONTSIZE fs;
-                fs.SetTerm(FONTSIZETERM_large);
-                rend->SetFontsize(fs);
-                // addTextElement(rend, prefix);
-                std::string newtext = dynamic + "&#160;";
-                addTextElement(rend, newtext);
-                // addTextElement(rend, postfix);
-                if (!dcolor.empty()) {
-                    rend->SetColor(dcolor);
-                }
-                if (justification == 1) {
-                    rend->SetHalign(HORIZONTALALIGNMENT_right);
-                }
-                else if (justification == 2) {
-                    rend->SetHalign(HORIZONTALALIGNMENT_center);
-                }
-            }
-            else {
-                // addTextElement(dynam, prefix);
-                addTextElement(dynam, dynamic);
-                // addTextElement(dynam, postfix);
-            }
-
-            hum::HumNum linedur = line->getDuration();
-            if (linedur == 0) {
-                // Grace note line, so attach to the note rather than
-                // the timestamp.
-                if (token->isChord()) {
-                    dynam->SetStartid("#" + getLocationId("chord", token));
-                }
-                else {
-                    // maybe check if a null token instead of a note here.
-                    dynam->SetStartid("#" + getLocationId("note", token));
-                }
-            }
-            else {
-                hum::HumNum barstamp = getMeasureTstamp(token, si);
-                dynam->SetTstamp(barstamp.getFloat());
-            }
-
-            std::string verticalgroup = dyntok->getLayoutParameter("DY", "vg");
-            if (!forceCenterQ) {
-                // Not allowing vertical groups for "between" placements for now.
-                if (verticalgroup.empty()) {
-                    // 100 is the default group for dynamics:
-                    dynam->SetVgrp(VGRP_DYNAM_DEFAULT);
-                }
-                else if (std::isdigit(verticalgroup[0])) {
-                    dynam->SetVgrp(stoi(verticalgroup));
-                }
-                else {
-                    // don't set a vertical group for this token
-                }
-            }
-
-            if (trackdiff == 1) {
-                // case needed for grace notes in the bottom staff of a grand staff.
-                setPlaceRelStaff(dynam, "above", false);
-            }
-            if (aboveQ) {
-                setPlaceRelStaff(dynam, "above", showplace);
-            }
-            else if (belowQ) {
-                setPlaceRelStaff(dynam, "below", showplace);
-            }
-            else if (centerQ) {
-                setPlaceRelStaff(dynam, "between", showplace);
-            }
-            else if (forceAboveQ) {
-                setPlaceRelStaff(dynam, "above", false);
-            }
-            else if (forceBelowQ) {
-                setPlaceRelStaff(dynam, "below", false);
-            }
-            else if (forceCenterQ) {
-                setPlaceRelStaff(dynam, "between", false);
-            }
-        }
         if (hairpins.find("<") != std::string::npos) {
             int endline = false;
             hum::HTp endtok = NULL;
@@ -16331,7 +16118,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
             if (endtok != NULL) {
                 Hairpin *hairpin = new Hairpin();
-                int newstaff = m_currentstaff - staffadj;
+                int newstaff = m_currentstaff - staffadj + staffadj2;
                 if (newstaff < 1) {
                     newstaff = 1;
                 }
@@ -16402,7 +16189,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 // no endpoint so print as the word "cresc."
                 Dir *dir = new Dir();
                 addChildMeasureOrSection(dir);
-                int newstaff = m_currentstaff - staffadj;
+                int newstaff = m_currentstaff - staffadj + staffadj2;
                 if (newstaff < 1) {
                     newstaff = 1;
                 }
@@ -16479,7 +16266,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
             if (endtok != NULL) {
                 Hairpin *hairpin = new Hairpin();
-                int newstaff = m_currentstaff - staffadj;
+                int newstaff = m_currentstaff - staffadj + staffadj2;
 
                 if (newstaff < 1) {
                     newstaff = 1;
@@ -16561,7 +16348,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     centerQ = hasCenterParameter(dyntok, "HP", staffadj);
                 }
 
-                int newstaff = m_currentstaff - staffadj;
+                int newstaff = m_currentstaff - staffadj + staffadj2;
                 if (newstaff < 1) {
                     newstaff = 1;
                 }
@@ -16630,6 +16417,280 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, si);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addDynamicsMark -- Add dynamics marks such as p, f, sfz, rfz.
+//     The dynamics marking will be added at a tstamp rather than a startid.
+//
+
+void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters,
+    int staffindex, int staffadj, int trackdiff)
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int &si = staffindex;
+
+    bool defaultAboveQ = false;
+    bool defaultBelowQ = false;
+    bool defaultCenterQ = false;
+    bool centerQ = false;
+    hum::HumRegex hre;
+    std::string dynamic;
+    int staffadj2 = 0;
+
+    if (ss[si].m_dynamposdefined && (ss[si].m_dynampos == 0)) {
+        defaultCenterQ = true;
+    }
+
+    std::string spineinfo = dyntok->getSpineInfo();
+    if (spineinfo.find('(') != std::string::npos) {
+        if (dyntok->getSubtrack() % 2) {
+            defaultAboveQ = true;
+        }
+        else {
+            defaultBelowQ = true;
+            staffadj2 = 1;
+        }
+    }
+    if (hre.search(letters, "^[sr]?f+z?$")) {
+        dynamic = letters;
+    }
+    else if (hre.search(letters, "^p+$")) {
+        dynamic = letters;
+    }
+    else if (hre.search(letters, "^m?(f|p)$")) {
+        dynamic = letters;
+    }
+    else if (hre.search(letters, "^s?f+z?p+$")) {
+        dynamic = letters;
+    }
+
+    if (!dynamic.empty()) {
+        int staffadj = ss[si].m_dynamstaffadj;
+
+        std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
+        if (!dyntext.empty()) {
+            hum::HumRegex hre;
+            hre.replaceDestructive(dyntext, dynamic, "%s", "g");
+            dynamic = dyntext;
+        }
+
+        bool aboveQ = hasAboveParameter(dyntok, "DY", staffadj);
+        bool belowQ = false;
+        bool showplace = aboveQ;
+        if (!aboveQ) {
+            belowQ = hasBelowParameter(dyntok, "DY", staffadj);
+            showplace = belowQ;
+        }
+        if (!aboveQ && !belowQ) {
+            if (hasCenterParameter(dyntok, "DY", staffadj)) {
+                aboveQ = false;
+                belowQ = false;
+                centerQ = true;
+                showplace = centerQ;
+            }
+        }
+
+        // if pcount > 0, then search for prefix and postfix text
+        // to add to the dynamic.
+        // std::string prefix = "aaa ";
+        // std::string postfix = " bbb";
+        // See https://github.com/music-encoding/music-encoding/issues/540
+
+        int justification = 0;
+        if (dyntok->getLayoutParameter("DY", "rj") == "true") {
+            justification = 1;
+        }
+        else if (dyntok->getLayoutParameter("DY", "cj") == "true") {
+            justification = 2;
+        }
+
+        bool editQ = false;
+        bool brackQ = false;
+        bool parenQ = false;
+        bool curlyQ = false;
+        bool angleQ = false;
+
+        std::string editstr = getLayoutParameter(dyntok, "DY", "ed", "true");
+        if (editstr == "true") {
+            editQ = true;
+        }
+        if (editstr.find("brack") != std::string::npos) {
+            brackQ = true;
+            editQ = true;
+        }
+        else if (editstr.find("paren") != std::string::npos) {
+            parenQ = true;
+            editQ = true;
+        }
+        else if (editstr.find("curly") != std::string::npos) {
+            curlyQ = true;
+            std::string newdynamic = "{ ";
+            newdynamic += dynamic;
+            newdynamic += " }";
+            dynamic = newdynamic;
+        }
+        else if (editstr.find("angle") != std::string::npos) {
+            angleQ = true;
+            std::string newdynamic = "< ";
+            newdynamic += dynamic;
+            newdynamic += " >";
+            dynamic = newdynamic;
+        }
+        if (!(parenQ || brackQ || curlyQ || angleQ)) {
+            std::string parenP = getLayoutParameter(dyntok, "DY", "paren", "true");
+            std::string brackP = getLayoutParameter(dyntok, "DY", "brack", "true");
+            std::string curlyP = getLayoutParameter(dyntok, "DY", "curly", "true");
+            std::string angleP = getLayoutParameter(dyntok, "DY", "angle", "true");
+            if (parenP == "true") {
+                parenQ = true;
+            }
+            else if (brackP == "true") {
+                brackQ = true;
+            }
+            else if (curlyP == "true") {
+                curlyQ = true;
+                std::string newdynamic = "{ ";
+                newdynamic += dynamic;
+                newdynamic += " }";
+                dynamic = newdynamic;
+            }
+            else if (angleP == "true") {
+                angleQ = true;
+                std::string newdynamic = "< ";
+                newdynamic += dynamic;
+                newdynamic += " >";
+                dynamic = newdynamic;
+            }
+        }
+
+        std::string dcolor = dyntok->getLayoutParameter("DY", "color");
+        int needsrend = justification || dcolor.size();
+
+        Dynam *dynam = new Dynam();
+        if (editQ) {
+            Supplied *supplied = new Supplied();
+            appendElement(supplied, dynam);
+            addChildMeasureOrSection(supplied);
+            appendTypeTag(dynam, "editorial");
+        }
+        else {
+            addChildMeasureOrSection(dynam);
+        }
+
+        if (parenQ) {
+            dynam->SetEnclose(ENCLOSURE_paren);
+        }
+        if (brackQ) {
+            dynam->SetEnclose(ENCLOSURE_brack);
+        }
+
+        int newstaff = m_currentstaff - staffadj + staffadj2;
+        if (newstaff < 1) {
+            newstaff = 1;
+        }
+        if (newstaff > (int)ss.size()) {
+            newstaff = (int)ss.size();
+        }
+
+        if (defaultAboveQ) {
+            setStaff(dynam, newstaff);
+        }
+        else if (defaultBelowQ) {
+            setStaff(dynam, newstaff);
+            newstaff = m_currentstaff - staffadj + staffadj2;
+        }
+        else if ((centerQ || defaultCenterQ) && !aboveQ && !belowQ) {
+            setStaffBetween(dynam, newstaff);
+        }
+        else {
+            setStaff(dynam, newstaff);
+        }
+        setLocationId(dynam, dyntok, -1);
+
+        if (needsrend) {
+            Rend *rend = new Rend();
+            dynam->AddChild(rend);
+            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+            data_FONTSIZE fs;
+            fs.SetTerm(FONTSIZETERM_large);
+            rend->SetFontsize(fs);
+            // addTextElement(rend, prefix);
+            std::string newtext = dynamic + "&#160;";
+            addTextElement(rend, newtext);
+            // addTextElement(rend, postfix);
+            if (!dcolor.empty()) {
+                rend->SetColor(dcolor);
+            }
+            if (justification == 1) {
+                rend->SetHalign(HORIZONTALALIGNMENT_right);
+            }
+            else if (justification == 2) {
+                rend->SetHalign(HORIZONTALALIGNMENT_center);
+            }
+        }
+        else {
+            // addTextElement(dynam, prefix);
+            addTextElement(dynam, dynamic);
+            // addTextElement(dynam, postfix);
+        }
+
+        hum::HumNum linedur = line->getDuration();
+        if (linedur == 0) {
+            // Grace note line, so attach to the note rather than
+            // the timestamp.
+            if (token->isChord()) {
+                dynam->SetStartid("#" + getLocationId("chord", token));
+            }
+            else {
+                // maybe check if a null token instead of a note here.
+                dynam->SetStartid("#" + getLocationId("note", token));
+            }
+        }
+        else {
+            hum::HumNum barstamp = getMeasureTstamp(token, si);
+            dynam->SetTstamp(barstamp.getFloat());
+        }
+
+        std::string verticalgroup = dyntok->getLayoutParameter("DY", "vg");
+        if (!defaultCenterQ) {
+            // Not allowing vertical groups for "between" placements for now.
+            if (verticalgroup.empty()) {
+                // 100 is the default group for dynamics:
+                dynam->SetVgrp(VGRP_DYNAM_DEFAULT);
+            }
+            else if (std::isdigit(verticalgroup[0])) {
+                dynam->SetVgrp(stoi(verticalgroup));
+            }
+            else {
+                // don't set a vertical group for this token
+            }
+        }
+
+        if (trackdiff == 1) {
+            // case needed for grace notes in the bottom staff of a grand staff.
+            setPlaceRelStaff(dynam, "above", false);
+        }
+        if (aboveQ) {
+            setPlaceRelStaff(dynam, "above", showplace);
+        }
+        else if (belowQ) {
+            setPlaceRelStaff(dynam, "below", showplace);
+        }
+        else if (centerQ) {
+            setPlaceRelStaff(dynam, "between", showplace);
+        }
+        else if (defaultAboveQ) {
+            setPlaceRelStaff(dynam, "above", false);
+        }
+        else if (defaultBelowQ) {
+            setPlaceRelStaff(dynam, "below", false);
+        }
+        else if (defaultCenterQ) {
+            setPlaceRelStaff(dynam, "between", false);
+        }
+    }
 }
 
 //////////////////////////////
