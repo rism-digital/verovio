@@ -16453,6 +16453,7 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
             staffadj2 = 1;
         }
     }
+
     if (hre.search(letters, "^[sr]?f+z?$")) {
         dynamic = letters;
     }
@@ -16490,6 +16491,9 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
                 centerQ = true;
                 showplace = centerQ;
             }
+        }
+        if (staffadj2) {
+            showplace = true;
         }
 
         // if pcount > 0, then search for prefix and postfix text
@@ -16594,15 +16598,20 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
             newstaff = (int)ss.size();
         }
 
-        if (defaultAboveQ) {
+        if (centerQ && !aboveQ && !belowQ) {
+            setStaffBetween(dynam, m_currentstaff);
+            showplace = true;
+        }
+        else if (defaultAboveQ) {
             setStaff(dynam, newstaff);
         }
         else if (defaultBelowQ) {
             setStaff(dynam, newstaff);
-            newstaff = m_currentstaff - staffadj + staffadj2;
+            // newstaff = m_currentstaff - staffadj + staffadj2;
         }
-        else if ((centerQ || defaultCenterQ) && !aboveQ && !belowQ) {
-            setStaffBetween(dynam, newstaff);
+        else if (defaultCenterQ && !aboveQ && !belowQ) {
+            setStaffBetween(dynam, m_currentstaff);
+            showplace = true;
         }
         else {
             setStaff(dynam, newstaff);
