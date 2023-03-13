@@ -84,7 +84,11 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Calculate offset and left overlap of the element
+     */
+    std::pair<int, int> CalculateXPosOffset(LayerElement *layerElement);
+
 public:
     //
 private:
