@@ -776,18 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the X positions of the staff content looking at the bounding boxes.
-     * The functor process by aligned-staff content, that is from a rediction in the
-     * MeasureAligner and then staff by staff but taking into account cross-staff elements
-     */
-    virtual int AdjustXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AdjustXPos
-     */
-    virtual int AdjustXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the spacing of the syl processing verse by verse
      */
     virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };

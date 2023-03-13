@@ -71,6 +71,11 @@ public:
     ///@}
 
     /*
+     * Set the right bar lines only flag
+     */
+    void SetRightBarLinesOnly(bool rightBarLinesOnly) { m_rightBarLinesOnly = rightBarLinesOnly; }
+
+    /*
      * Functor interface
      */
     ///@{

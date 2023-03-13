@@ -87,7 +87,7 @@ FunctorCode AdjustClefChangesFunctor::VisitClef(Clef *clef)
         return FUNCTOR_CONTINUE;
     }
 
-    // LayerElement::AdjustXPos can have spread the alignment apart.
+    // AdjustXPosFunctor can have spread the alignment apart.
     // We want them to point to the same position. Otherwise, adjusting proportionally
     // (below) will yield displacements.
     clef->GetAlignment()->SetXRel(nextAlignment->GetXRel());

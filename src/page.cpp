@@ -22,6 +22,7 @@
 #include "adjustlayersfunctor.h"
 #include "adjusttempofunctor.h"
 #include "adjustxoverflowfunctor.h"
+#include "adjustxposfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "calcalignmentpitchposfunctor.h"
@@ -397,20 +398,15 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor adjustXPos(&Object::AdjustXPos);
-    Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    adjustXPosParams.m_excludes.push_back(TABDURSYM);
-    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
+    AdjustXPosFunctor adjustXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    adjustXPos.SetExcluded({ TABDURSYM });
+    this->Process(adjustXPos);
 
-    // Adjust tabRhyhtm separately
-    adjustXPosParams.m_excludes.clear();
-    adjustXPosParams.m_includes.push_back(TABDURSYM);
-    adjustXPosParams.m_includes.push_back(BARLINE);
-    adjustXPosParams.m_includes.push_back(METERSIG);
-    adjustXPosParams.m_includes.push_back(KEYSIG);
-    adjustXPosParams.m_rightBarLinesOnly = true;
-    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
+    // Adjust tabRhythm separately
+    adjustXPos.ClearExcluded();
+    adjustXPos.SetIncluded({ BARLINE, KEYSIG, METERSIG, TABDURSYM });
+    adjustXPos.SetRightBarLinesOnly(true);
+    this->Process(adjustXPos);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping

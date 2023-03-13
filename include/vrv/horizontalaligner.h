@@ -231,14 +231,6 @@ public:
      */
     int JustifyX(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::AdjustXPos
-     */
-    ///@{
-    int AdjustXPos(FunctorParams *functorParams) override;
-    int AdjustXPosEnd(FunctorParams *functorParams) override;
-    ///@}
-
 private:
     /**
      * Retrieve the AlignmentReference with staffN.

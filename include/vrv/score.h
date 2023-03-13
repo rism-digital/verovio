@@ -89,11 +89,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertToPageBased
      */
     ///@{

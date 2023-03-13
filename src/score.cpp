@@ -175,16 +175,6 @@ FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreEnd(this);
 }
 
-int Score::AdjustXPos(FunctorParams *functorParams)
-{
-    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::ConvertMarkupScoreDef(FunctorParams *functorParams)
 {
     ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
