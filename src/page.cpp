@@ -22,6 +22,7 @@
 #include "adjustlayersfunctor.h"
 #include "adjustsylspacingfunctor.h"
 #include "adjusttempofunctor.h"
+#include "adjusttupletsxfunctor.h"
 #include "adjustxoverflowfunctor.h"
 #include "adjustxposfunctor.h"
 #include "alignfunctor.h"
@@ -439,9 +440,8 @@ void Page::LayOutHorizontally()
     this->Process(adjustTempo);
 
     // Adjust the position of the tuplets
-    FunctorDocParams adjustTupletsXParams(doc);
-    Functor adjustTupletsX(&Object::AdjustTupletsX);
-    this->Process(&adjustTupletsX, &adjustTupletsXParams);
+    AdjustTupletsXFunctor adjustTupletsX(doc);
+    this->Process(adjustTupletsX);
 
     // Prevent a margin overflow
     AdjustXOverflowFunctor adjustXOverflow(doc->GetDrawingUnit(100));

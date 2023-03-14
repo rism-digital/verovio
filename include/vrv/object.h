@@ -776,11 +776,6 @@ public:
     ///@{
 
     /**
-     * Calculate the X position of tuplet brackets and num
-     */
-    virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Cache or restore cached horizontal layout for faster layout redoing
      */
     virtual int CacheHorizontalLayout(FunctorParams *) { return FUNCTOR_CONTINUE; }

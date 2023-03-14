@@ -116,11 +116,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustTupletsX
-     */
-    int AdjustTupletsX(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustTupletsY
      */
     int AdjustTupletsY(FunctorParams *functorParams) override;
@@ -173,21 +168,21 @@ public:
 private:
     /**
      * The first Chord / Note / Rest in the tuplet.
-     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     * Set in Tuplet::GetDrawingLeftRightXRel from AdjustTupletsXFunctor.
      */
     LayerElement *m_drawingLeft;
     /**
      * The last Chord / Note / Rest in the tuplet.
-     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     * Set in Tuplet::GetDrawingLeftRightXRel from AdjustTupletsXFunctor.
      */
     LayerElement *m_drawingRight;
     /** The calculated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingBracketPos;
     /** The calculated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingNumPos;
-    /** The beam with which the bracket aligns (in any) set in Tuplet::AdjustTupletsX */
+    /** The beam with which the bracket aligns (if any) set in AdjustTupletsXFunctor */
     Beam *m_bracketAlignedBeam;
-    /** The beam with which the num aligns (in any) set in Tuplet::AdjustTupletsX */
+    /** The beam with which the num aligns (if any) set in AdjustTupletsXFunctor */
     Beam *m_numAlignedBeam;
     /** The slurs avoided by the tuplet, set during drawing */
     std::set<const FloatingCurvePositioner *> m_innerSlurs;
