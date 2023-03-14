@@ -512,7 +512,6 @@ public:
     /**
      * Adjust the spacing of the measure looking at each tuple of start / end alignment and a distance.
      * The distance is an expansion value (positive) of compression (negative).
-     * Called from Measure::AdjustSylSpacingEnd.
      */
     void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
 

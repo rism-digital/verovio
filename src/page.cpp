@@ -20,6 +20,7 @@
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
+#include "adjustsylspacingfunctor.h"
 #include "adjusttempofunctor.h"
 #include "adjustxoverflowfunctor.h"
 #include "adjustxposfunctor.h"
@@ -774,12 +775,9 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
                 AttNIntegerComparison matchVerse(VERSE, verses->first);
                 filters = { &matchStaff, &matchLayer, &matchVerse };
 
-                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
-                // m_drawingLastNote is set only if the syl has a forward connector
-                AdjustSylSpacingParams adjustSylSpacingParams(doc);
-                Functor adjustSylSpacing(&Object::AdjustSylSpacing);
-                Functor adjustSylSpacingEnd(&Object::AdjustSylSpacingEnd);
-                this->Process(&adjustSylSpacing, &adjustSylSpacingParams, &adjustSylSpacingEnd, &filters);
+                AdjustSylSpacingFunctor adjustSylSpacing(doc);
+                adjustSylSpacing.SetFilters(&filters);
+                this->Process(adjustSylSpacing);
             }
         }
     }

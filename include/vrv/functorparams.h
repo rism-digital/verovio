@@ -297,38 +297,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustSylSpacingParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a vector adjustment tuples (Aligment start, Aligment end, distance)
- * member 1: a pointer to the previous Syl
- * member 2: the doc
- **/
-
-class AdjustSylSpacingParams : public FunctorParams {
-public:
-    AdjustSylSpacingParams(Doc *doc)
-    {
-        m_previousVerse = NULL;
-        m_lastSyl = NULL;
-        m_previousMeasure = NULL;
-        m_currentLabelAbbr = NULL;
-        m_freeSpace = 0;
-        m_staffSize = 100;
-        m_doc = doc;
-    }
-    ArrayOfAdjustmentTuples m_overlappingSyl;
-    Verse *m_previousVerse;
-    Syl *m_lastSyl;
-    Measure *m_previousMeasure;
-    LabelAbbr *m_currentLabelAbbr;
-    int m_freeSpace;
-    int m_staffSize;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustTupletNumOverlapParams
 //----------------------------------------------------------------------------
 

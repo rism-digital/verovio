@@ -776,16 +776,6 @@ public:
     ///@{
 
     /**
-     * Adjust the spacing of the syl processing verse by verse
-     */
-    virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * End Functor for Object::AdjustSylSpacing
-     */
-    virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    /**
      * Calculate the X position of tuplet brackets and num
      */
     virtual int AdjustTupletsX(FunctorParams *) { return FUNCTOR_CONTINUE; }

@@ -190,14 +190,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * @name See Object::AdjustSylSpacing
-     */
-    ///@{
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
-    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * @name See Object::AlignVertically
      */
     ///@{

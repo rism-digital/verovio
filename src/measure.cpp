@@ -840,21 +840,6 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // At the end of the measure - pass it along for overlapping verses
-    params->m_previousMeasure = this;
-
-    // Adjust the postion of the alignment according to what we have collected for this verse
-    m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
-    params->m_overlappingSyl.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);

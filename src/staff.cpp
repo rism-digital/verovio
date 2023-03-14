@@ -471,17 +471,6 @@ int Staff::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // Set the staff size for this pass
-    params->m_staffSize = m_drawingStaffSize;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

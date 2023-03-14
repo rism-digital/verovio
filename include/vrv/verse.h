@@ -52,7 +52,7 @@ public:
     /**
      * Calculate the adjustment according to the overlap and the free space available before.
      * Will move the verse accordingly.
-     * Called from Verse::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     * Called from AdjustSylSpacingFunctor
      */
     int AdjustPosition(int &overlap, int freeSpace, const Doc *doc);
 
@@ -74,11 +74,6 @@ public:
      * See Object::AlignVertically
      */
     int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitProcessingLists

@@ -227,11 +227,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

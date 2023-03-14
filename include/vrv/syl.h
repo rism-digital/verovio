@@ -15,7 +15,6 @@
 
 namespace vrv {
 
-class AdjustSylSpacingParams;
 class Note;
 class TextElement;
 
