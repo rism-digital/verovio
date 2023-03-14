@@ -1432,6 +1432,12 @@
 		E7876F1929C07F22002147DC /* adjustsylspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1729C07F16002147DC /* adjustsylspacingfunctor.cpp */; };
 		E7876F1A29C07F22002147DC /* adjustsylspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1729C07F16002147DC /* adjustsylspacingfunctor.cpp */; };
 		E7876F1B29C07F23002147DC /* adjustsylspacingfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1729C07F16002147DC /* adjustsylspacingfunctor.cpp */; };
+		E7876F1D29C0A6EB002147DC /* adjusttupletsxfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7876F1C29C0A6E2002147DC /* adjusttupletsxfunctor.h */; };
+		E7876F1E29C0A6EC002147DC /* adjusttupletsxfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7876F1C29C0A6E2002147DC /* adjusttupletsxfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7876F2029C0A702002147DC /* adjusttupletsxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1F29C0A702002147DC /* adjusttupletsxfunctor.cpp */; };
+		E7876F2129C0A708002147DC /* adjusttupletsxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1F29C0A702002147DC /* adjusttupletsxfunctor.cpp */; };
+		E7876F2229C0A708002147DC /* adjusttupletsxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1F29C0A702002147DC /* adjusttupletsxfunctor.cpp */; };
+		E7876F2329C0A709002147DC /* adjusttupletsxfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7876F1F29C0A702002147DC /* adjusttupletsxfunctor.cpp */; };
 		E788335D2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */; };
 		E788335E2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */; };
@@ -2051,6 +2057,8 @@
 		E7870356299CF06D00156DC4 /* adjustarpegfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustarpegfunctor.cpp; path = src/adjustarpegfunctor.cpp; sourceTree = "<group>"; };
 		E7876F1429C07EE1002147DC /* adjustsylspacingfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustsylspacingfunctor.h; path = include/vrv/adjustsylspacingfunctor.h; sourceTree = "<group>"; };
 		E7876F1729C07F16002147DC /* adjustsylspacingfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustsylspacingfunctor.cpp; path = src/adjustsylspacingfunctor.cpp; sourceTree = "<group>"; };
+		E7876F1C29C0A6E2002147DC /* adjusttupletsxfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjusttupletsxfunctor.h; path = include/vrv/adjusttupletsxfunctor.h; sourceTree = "<group>"; };
+		E7876F1F29C0A702002147DC /* adjusttupletsxfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjusttupletsxfunctor.cpp; path = src/adjusttupletsxfunctor.cpp; sourceTree = "<group>"; };
 		E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcchordnoteheadsfunctor.h; path = include/vrv/calcchordnoteheadsfunctor.h; sourceTree = "<group>"; };
 		E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcchordnoteheadsfunctor.cpp; path = src/calcchordnoteheadsfunctor.cpp; sourceTree = "<group>"; };
 		E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcspanningbeamspansfunctor.h; path = include/vrv/calcspanningbeamspansfunctor.h; sourceTree = "<group>"; };
@@ -2863,6 +2871,8 @@
 				E7876F1429C07EE1002147DC /* adjustsylspacingfunctor.h */,
 				E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */,
 				E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */,
+				E7876F1F29C0A702002147DC /* adjusttupletsxfunctor.cpp */,
+				E7876F1C29C0A6E2002147DC /* adjusttupletsxfunctor.h */,
 				E7231E0429B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp */,
 				E7231E0129B64B08000A2BF3 /* adjustxoverflowfunctor.h */,
 				E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */,
@@ -3170,6 +3180,7 @@
 				BDA81C22268B38770065B802 /* metersiggrp.h in Headers */,
 				4DB3D8BD1F83D0D500B5FC2B /* expansion.h in Headers */,
 				4DF2AF7E1A62F6A50016F869 /* drawinginterface.h in Headers */,
+				E7876F1D29C0A6EB002147DC /* adjusttupletsxfunctor.h in Headers */,
 				4DACC9BE2990F29A00B55913 /* atts_midi.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3211,6 +3222,7 @@
 				BB4C4B1822A932CF001F6AF0 /* controlelement.h in Headers */,
 				BB4C4AA522A9328F001F6AF0 /* vrvdef.h in Headers */,
 				BB4C4BA022A932E5001F6AF0 /* positioninterface.h in Headers */,
+				E7876F1E29C0A6EC002147DC /* adjusttupletsxfunctor.h in Headers */,
 				4D15DE3C2411782B00457C05 /* expansionmap.h in Headers */,
 				E78833662995007800D44B01 /* calcspanningbeamspansfunctor.h in Headers */,
 				4DF092A32497706600239195 /* phrase.h in Headers */,
@@ -3833,6 +3845,7 @@
 				4D674B47255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */,
 				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
+				E7876F2329C0A709002147DC /* adjusttupletsxfunctor.cpp in Sources */,
 				4DC3B9E7239E2AE1007F185E /* transposition.cpp in Sources */,
 				40ACDEAA24079F9000F82B8C /* reh.cpp in Sources */,
 				BDC366D62576AF9C00E4D826 /* grpsym.cpp in Sources */,
@@ -4041,6 +4054,7 @@
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
 				8F086F09188539540037FD8E /* view_graph.cpp in Sources */,
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
+				E7876F2029C0A702002147DC /* adjusttupletsxfunctor.cpp in Sources */,
 				E79C87C3269440570098FE85 /* lv.cpp in Sources */,
 				4DEC4DA621C81ED400D1D273 /* reg.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
@@ -4352,6 +4366,7 @@
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DC3B9E9239E2AE3007F185E /* transposition.cpp in Sources */,
 				40ACDEAB24079F9000F82B8C /* reh.cpp in Sources */,
+				E7876F2229C0A708002147DC /* adjusttupletsxfunctor.cpp in Sources */,
 				4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				BDC366D12576AF9C00E4D826 /* grpsym.cpp in Sources */,
 				40D45EC4204EEB03009C1EC9 /* instrdef.cpp in Sources */,
@@ -4612,6 +4627,7 @@
 				4D674B49255F40B7008AEF4C /* plica.cpp in Sources */,
 				BB4C4A9C22A9328F001F6AF0 /* options.cpp in Sources */,
 				4DC3B9E8239E2AE2007F185E /* transposition.cpp in Sources */,
+				E7876F2129C0A708002147DC /* adjusttupletsxfunctor.cpp in Sources */,
 				40ACDEAC24079F9000F82B8C /* reh.cpp in Sources */,
 				BB4C4A9822A9328F001F6AF0 /* horizontalaligner.cpp in Sources */,
 				BDC366CC2576AF9B00E4D826 /* grpsym.cpp in Sources */,
