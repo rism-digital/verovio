@@ -71,12 +71,4 @@ FunctorCode Dot::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitDotEnd(this);
 }
 
-int Dot::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

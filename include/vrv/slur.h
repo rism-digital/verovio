@@ -183,6 +183,14 @@ public:
     ///@}
 
     /**
+     * Determine the slur's layer/cross staff by only considering the boundary
+     */
+    ///@{
+    std::pair<const Layer *, const LayerElement *> GetBoundaryLayer() const;
+    const Staff *GetBoundaryCrossStaff() const;
+    ///@}
+
+    /**
      * Set the bezier control sides depending on the curve direction
      */
     void InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveDir) const;
@@ -213,27 +221,7 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcSlurDirection
-     */
-    int CalcSlurDirection(FunctorParams *functorParams) override;
-
 private:
-    /**
-     * Helper for calculating the slur direction
-     */
-    ///@{
-    // Get layer by only considering the slur boundary
-    std::pair<const Layer *, const LayerElement *> GetBoundaryLayer() const;
-    // Get cross staff by only considering the slur boundary
-    const Staff *GetBoundaryCrossStaff() const;
-    // Determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection() const;
-    // Get preferred curve direction based on various conditions
-    curvature_CURVEDIR GetPreferredCurveDirection(
-        data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur) const;
-    ///@}
-
     /**
      * Helper for calculating spanned elements
      */
@@ -349,7 +337,7 @@ public:
 private:
     /**
      * The drawing curve direction
-     * This is calculated in the CalcSlurDirection functor and contains an additional distinction
+     * This is calculated in the CalcSlurDirectionFunctor and contains an additional distinction
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;

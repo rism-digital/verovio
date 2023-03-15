@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "adjustxoverflowfunctor.h"
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
@@ -238,6 +239,18 @@ void Measure::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
+void Measure::CacheXRel(bool restore)
+{
+    if (restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedWidth = this->GetWidth();
+        m_cachedOverflow = this->GetDrawingOverflow();
+        m_cachedXRel = m_drawingXRel;
+    }
+}
+
 bool Measure::IsFirstInSystem() const
 {
     assert(this->GetParent());
@@ -365,17 +378,18 @@ int Measure::GetInnerCenterX() const
 
 int Measure::GetDrawingOverflow()
 {
-    Functor adjustXOverflow(&Object::AdjustXOverflow);
-    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams(0);
-    adjustXOverflowParams.m_currentSystem = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
-    assert(adjustXOverflowParams.m_currentSystem);
-    adjustXOverflowParams.m_lastMeasure = this;
-    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
-    if (!adjustXOverflowParams.m_currentWidest) return 0;
+    AdjustXOverflowFunctor adjustXOverflow(0);
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+    adjustXOverflow.SetCurrentSystem(system);
+    adjustXOverflow.SetLastMeasure(this);
+    this->Process(adjustXOverflow);
+
+    FloatingPositioner *widestPositioner = adjustXOverflow.GetWidestPositioner();
+    if (!widestPositioner) return 0;
 
     int measureRightX = this->GetDrawingX() + this->GetWidth();
-    int overflow = adjustXOverflowParams.m_currentWidest->GetContentRight() - measureRightX;
+    int overflow = widestPositioner->GetContentRight() - measureRightX;
     return std::max(0, overflow);
 }
 
@@ -816,24 +830,6 @@ int Measure::SaveEnd(FunctorParams *functorParams)
     return (this->IsMeasuredMusic()) ? Object::SaveEnd(functorParams) : FUNCTOR_CONTINUE;
 }
 
-int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingXRel(0);
-    if (m_measureAligner.GetLeftAlignment()) {
-        m_measureAligner.GetLeftAlignment()->SetXRel(0);
-    }
-    if (m_measureAligner.GetRightAlignment()) {
-        m_measureAligner.GetRightAlignment()->SetXRel(0);
-    }
-
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
-
-    m_hasAlignmentRefWithMultipleLayers = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
@@ -841,47 +837,6 @@ int Measure::ApplyPPUFactor(FunctorParams *functorParams)
 
     if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
     if (m_xAbs2 != VRV_UNSET) m_xAbs2 /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AlignHorizontally(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    // clear the content of the measureAligner
-    m_measureAligner.Reset();
-
-    // point to it
-    params->m_measureAligner = &m_measureAligner;
-    params->m_hasMultipleLayer = false;
-
-    if (m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment())) params->m_hasMultipleLayer = true;
-    if (m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment())) params->m_hasMultipleLayer = true;
-
-    assert(params->m_measureAligner);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    int meterUnit = (params->m_currentMeterSig) ? params->m_currentMeterSig->GetUnit() : 4;
-    m_measureAligner.SetInitialTstamp(meterUnit);
-
-    // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
-    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work
-    // in MEI anyway.
-    m_timestampAligner.Process(params->m_functor, params);
-
-    // Next scoreDef will be INTERMEDIATE_SCOREDEF (See Layer::AlignHorizontally)
-    params->m_isFirstMeasure = false;
-
-    if (params->m_hasMultipleLayer) m_hasAlignmentRefWithMultipleLayers = true;
 
     return FUNCTOR_CONTINUE;
 }
@@ -895,272 +850,6 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     params->m_staffIdx = 0;
 
     return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustArpegEnd(FunctorParams *functorParams)
-{
-    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_alignmentArpegTuples.empty()) {
-        params->m_measureAligner = &m_measureAligner;
-        m_measureAligner.Process(params->m_functor, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-        params->m_alignmentArpegTuples.clear();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustClefChanges(FunctorParams *functorParams)
-{
-    AdjustClefsParams *params = vrv_params_cast<AdjustClefsParams *>(functorParams);
-    assert(params);
-
-    params->m_aligner = &m_measureAligner;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustLayers(FunctorParams *functorParams)
-{
-    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
-
-    std::vector<int>::iterator iter;
-    Filters filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.Clear();
-        // Create ad comparison object for each type / @n
-        std::vector<int> ns;
-        // -1 for barline attributes that need to be taken into account each time
-        ns.push_back(BARLINE_REFERENCES);
-        ns.push_back(*iter);
-        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.Add(&matchStaff);
-
-        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustDots(FunctorParams *functorParams)
-{
-    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
-    assert(params);
-
-    if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
-
-    std::vector<int>::iterator iter;
-    Filters filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.Clear();
-        // Create ad comparison object for each type / @n
-        std::vector<int> ns;
-        // -1 for barline attributes that need to be taken into account each time
-        ns.push_back(BARLINE_REFERENCES);
-        ns.push_back(*iter);
-        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.Add(&matchStaff);
-
-        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustAccidX(FunctorParams *functorParams)
-{
-    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    m_measureAligner.PushAlignmentsRight();
-    params->m_rightDefaultAlignment = NULL;
-
-    // We process it backward because we want to get the rightDefaultAlignment
-    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-
-    // We need to process the staves in the reverse order
-    std::vector<int> staffNs = params->m_staffNs;
-    std::vector<int> staffNsReversed;
-    staffNsReversed.resize(staffNs.size());
-    std::reverse_copy(staffNs.begin(), staffNs.end(), staffNsReversed.begin());
-
-    m_measureAligner.PushAlignmentsRight();
-    params->m_rightDefaultAlignment = NULL;
-
-    params->m_staffNs = staffNsReversed;
-    params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
-    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-
-    // Put params back
-    params->m_staffNs = staffNs;
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustXPos(FunctorParams *functorParams)
-{
-    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    params->m_minPos = 0;
-    params->m_upcomingMinPos = VRV_UNSET;
-    params->m_cumulatedXShift = 0;
-
-    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
-    assert(system);
-
-    const bool hasSystemStartLine = this->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
-
-    Filters filters;
-    for (auto staffN : params->m_staffNs) {
-        params->m_minPos = 0;
-        params->m_upcomingMinPos = VRV_UNSET;
-        params->m_cumulatedXShift = 0;
-        params->m_staffN = (staffN);
-        params->m_boundingBoxes.clear();
-        params->m_previousAlignment.Reset();
-        params->m_currentAlignment.Reset();
-        StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
-        params->m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
-
-        // Prevent collisions of scoredef clefs with thick barlines
-        if (hasSystemStartLine) {
-            params->m_upcomingMinPos = params->m_doc->GetDrawingBarLineWidth(params->m_staffSize);
-        }
-
-        // Create ad comparison object for each type / @n
-        std::vector<int> ns;
-        // -1 for barline attributes that need to be taken into account each time
-        ns.push_back(-1);
-        ns.push_back(staffN);
-        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        CrossAlignmentReferenceComparison matchCrossStaff;
-        filters.SetType(Filters::Type::AnyOf);
-        filters = { &matchStaff, &matchCrossStaff };
-
-        params->m_measureTieEndpoints = this->GetInternalTieEndpoints();
-        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
-    }
-
-    // m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
-
-    int minMeasureWidth
-        = params->m_doc->GetOptions()->m_unit.GetValue() * params->m_doc->GetOptions()->m_measureMinWidth.GetValue();
-    // First try to see if we have a double measure length element
-    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
-    Alignment *fullMeasure2
-        = dynamic_cast<Alignment *>(m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-
-    // With a double measure with element (mRpt2, multiRpt)
-    if (fullMeasure2 != NULL) {
-        minMeasureWidth *= 2;
-    }
-    // Nothing if the measure has at least one note or @metcon="false"
-    else if ((this->FindDescendantByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
-        minMeasureWidth = 0;
-    }
-    // Adjust min width based on multirest attributes (@num and @width), but only if these values are larger than
-    // current min width
-    else if (this->FindDescendantByType(MULTIREST) != NULL) {
-        const int unit = params->m_doc->GetDrawingUnit(params->m_staffSize);
-        MultiRest *multiRest = vrv_cast<MultiRest *>(this->FindDescendantByType(MULTIREST));
-        const int num = multiRest->GetNum();
-        if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
-            const int fixedWidth = multiRest->AttWidth::GetWidth().GetVu() * (unit + 4);
-            if (minMeasureWidth < fixedWidth) minMeasureWidth = fixedWidth;
-        }
-        else if (num > 10) {
-            minMeasureWidth *= log1p(num) / 2;
-        }
-        Object *layer = multiRest->GetFirstAncestor(LAYER);
-        if (layer->GetLast() != multiRest) {
-            Object *object = layer->GetNext(multiRest);
-            if (object && object->Is(CLEF)) {
-                const int clefWidth = object->GetContentRight() - object->GetContentLeft();
-                minMeasureWidth += clefWidth + unit;
-            }
-        }
-    }
-
-    int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
-    if (currentMeasureWidth < minMeasureWidth) {
-        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this->GetLeftBarLine()->GetAlignment(),
-            this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
-        m_measureAligner.AdjustProportionally(boundaries);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    // At the end of the measure - pass it along for overlapping verses
-    params->m_previousMeasure = this;
-
-    // Adjust the postion of the alignment according to what we have collected for this harm gpr
-    m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
-    params->m_overlappingHarm.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // At the end of the measure - pass it along for overlapping verses
-    params->m_previousMeasure = this;
-
-    // Adjust the postion of the alignment according to what we have collected for this verse
-    m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
-    params->m_overlappingSyl.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustXOverflow(FunctorParams *functorParams)
-{
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    params->m_lastMeasure = this;
-    // For now look only at the content of the last measure, so discard any previous control event.
-    // We need to do this because AdjustXOverflow is run before measures are aligned, so the right
-    // position comparison do not actually tell us which one is the longest. This is not optimal
-    // and can be improved.
-    params->m_currentWidest = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int Measure::JustifyX(FunctorParams *functorParams)
@@ -1181,24 +870,6 @@ int Measure::JustifyX(FunctorParams *functorParams)
     }
 
     m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    if (params->m_applySectionRestartShift) {
-        params->m_shift += this->GetSectionRestartShift(params->m_doc);
-        params->m_applySectionRestartShift = false;
-    }
-
-    this->SetDrawingXRel(params->m_shift);
-
-    params->m_shift += this->GetWidth();
-    params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1393,25 +1064,6 @@ int Measure::UnCastOff(FunctorParams *functorParams)
         m_cachedWidth = VRV_UNSET;
         m_cachedOverflow = VRV_UNSET;
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::CacheHorizontalLayout(FunctorParams *functorParams)
-{
-    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
-    assert(params);
-
-    if (params->m_restore) {
-        m_drawingXRel = m_cachedXRel;
-    }
-    else {
-        m_cachedWidth = this->GetWidth();
-        m_cachedOverflow = this->GetDrawingOverflow();
-        m_cachedXRel = m_drawingXRel;
-    }
-    if (this->GetLeftBarLine()) this->GetLeftBarLine()->CacheHorizontalLayout(functorParams);
-    if (this->GetRightBarLine()) this->GetRightBarLine()->CacheHorizontalLayout(functorParams);
 
     return FUNCTOR_CONTINUE;
 }

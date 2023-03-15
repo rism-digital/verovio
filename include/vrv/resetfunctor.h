@@ -83,6 +83,63 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// ResetHorizontalAlignmentFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class resets the horizontal alignment for various types.
+ */
+class ResetHorizontalAlignmentFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ResetHorizontalAlignmentFunctor();
+    virtual ~ResetHorizontalAlignmentFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitAccid(Accid *accid) override;
+    FunctorCode VisitArpeg(Arpeg *arpeg) override;
+    FunctorCode VisitBeam(Beam *beam) override;
+    FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
+    FunctorCode VisitCustos(Custos *custos) override;
+    FunctorCode VisitDot(Dot *dot) override;
+    FunctorCode VisitDots(Dots *dots) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMRest(MRest *mRest) override;
+    FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitRest(Rest *rest) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitTuplet(Tuplet *tuplet) override;
+    FunctorCode VisitTupletBracket(TupletBracket *tupletBracket) override;
+    FunctorCode VisitTupletNum(TupletNum *tupletNum) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_RESETFUNCTOR_H__

@@ -229,8 +229,14 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    /**
+     * @name Set and get the drawing label width.
+     */
+    ///@{
     int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
+    void ResetDrawingLabelsWidth() { m_drawingLabelsWidth = 0; }
+    ///@}
 
     /**
      * @name Getters for running elements
@@ -273,11 +279,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertToPageBased
      */
     int ConvertToPageBased(FunctorParams *functorParams) override;
@@ -301,11 +302,6 @@ public:
      * See Object::CastOffToSelection
      */
     int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcMaxMeasureDuration

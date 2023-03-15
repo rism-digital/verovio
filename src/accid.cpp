@@ -302,16 +302,4 @@ FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitAccidEnd(this);
 }
 
-int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    m_isDrawingOctave = false;
-    m_drawingOctave = NULL;
-    m_drawingUnison = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

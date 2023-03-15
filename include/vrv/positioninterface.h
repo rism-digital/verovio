@@ -13,10 +13,10 @@
 
 namespace vrv {
 
-class FunctorParams;
 class Layer;
 class LayerElement;
 class ResetDataFunctor;
+class ResetHorizontalAlignmentFunctor;
 
 //----------------------------------------------------------------------------
 // PositionInterface
@@ -42,7 +42,7 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPosFunctor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
@@ -68,12 +68,8 @@ public:
      */
     ///@{
     FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    FunctorCode InterfaceResetHorizontalAlignment(ResetHorizontalAlignmentFunctor &functor, Object *object);
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
 
 private:
     //

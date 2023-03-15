@@ -100,17 +100,7 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
 private:
-    /**
-     * Addjusts flag placement and stem length if they are crossing notehead or ledger lines
-     */
-    void AdjustFlagPlacement(const Doc *doc, Flag *flag, int staffSize, int verticalCenter, int duration);
-
     /**
      * Helper to adjust length of stem based on presence of slashes
      */

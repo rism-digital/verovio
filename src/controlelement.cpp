@@ -132,41 +132,4 @@ FunctorCode ControlElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitControlElementEnd(this);
 }
 
-int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
-{
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    if (!this->Is({ DIR, DYNAM, ORNAM, TEMPO })) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Right aligned cannot overflow
-    if (this->GetChildRendAlignment() == HORIZONTALALIGNMENT_right) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    assert(params->m_currentSystem);
-
-    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
-    ArrayOfFloatingPositioners positioners;
-    params->m_currentSystem->m_systemAligner.FindAllPositionerPointingTo(&positioners, this);
-
-    // Something is probably not right if nothing found - maybe no @staff
-    if (positioners.empty()) {
-        LogDebug("Something was wrong when searching positioners for %s '%s'", this->GetClassName().c_str(),
-            this->GetID().c_str());
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Keep the one with the highest right position
-    for (auto const &positioner : positioners) {
-        if (!params->m_currentWidest || (params->m_currentWidest->GetContentRight() < positioner->GetContentRight())) {
-            params->m_currentWidest = positioner;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

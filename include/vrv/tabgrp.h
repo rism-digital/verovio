@@ -77,11 +77,6 @@ public:
      */
     virtual int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note elements.

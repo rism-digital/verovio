@@ -73,6 +73,7 @@ public:
      */
     ///@{
     int GetDrawingXRelativeToStaff(int staffN) const;
+    void SetDrawingXRelative(int staffN, int drawingX) { m_drawingXRels[staffN] = drawingX; }
     void ResetDrawingXRelative() { m_drawingXRels.clear(); }
     ///@}
 
@@ -94,11 +95,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::AdjustTempoX
-     */
-    int AdjustTempo(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcMaxMeasureDuration

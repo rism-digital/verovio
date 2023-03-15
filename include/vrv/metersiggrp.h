@@ -91,11 +91,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only meterSigGrp elements.

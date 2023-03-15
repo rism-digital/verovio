@@ -82,7 +82,8 @@ FunctorCode PositionInterface::InterfaceResetData(ResetDataFunctor &functor, Obj
     return FUNCTOR_CONTINUE;
 }
 
-int PositionInterface::InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object)
+FunctorCode PositionInterface::InterfaceResetHorizontalAlignment(
+    ResetHorizontalAlignmentFunctor &functor, Object *object)
 {
     m_drawingLoc = 0;
 

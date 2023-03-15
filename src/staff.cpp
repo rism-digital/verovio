@@ -399,25 +399,6 @@ int Staff::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::AlignHorizontally(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    assert(m_drawingStaffDef);
-
-    if (m_drawingStaffDef->HasNotationtype()) {
-        params->m_notationType = m_drawingStaffDef->GetNotationtype();
-    }
-    else {
-        params->m_notationType = NOTATIONTYPE_cmn;
-    }
-    Measure *parentMeasure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-    if (parentMeasure) m_drawingStaffDef->AlternateCurrentMeterSig(parentMeasure);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
@@ -486,64 +467,6 @@ int Staff::InitOnsetOffset(FunctorParams *functorParams)
     else {
         params->m_notationType = NOTATIONTYPE_cmn;
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::CalcStem(FunctorParams *)
-{
-    ListOfObjects layers = this->FindAllDescendantsByType(LAYER, false);
-    if (layers.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Not more than one layer - drawing stem dir remains unset unless there is cross-staff content
-    if (layers.size() < 2) {
-        Layer *layer = vrv_cast<Layer *>(layers.front());
-        assert(layer);
-        if (layer->HasCrossStaffFromBelow()) {
-            layer->SetDrawingStemDir(STEMDIRECTION_up);
-        }
-        else if (layer->HasCrossStaffFromAbove()) {
-            layer->SetDrawingStemDir(STEMDIRECTION_down);
-        }
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Detecting empty layers (empty layers can also have @sameas) which have to be ignored for stem direction
-    IsEmptyComparison isEmptyElement(LAYER);
-    ListOfObjects emptyLayers;
-    this->FindAllDescendantsByComparison(&emptyLayers, &isEmptyElement);
-
-    // We have only one layer (or less) with content - drawing stem dir remains unset
-    if ((layers.size() < 3) && (emptyLayers.size() > 0)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (!emptyLayers.empty()) {
-        ListOfObjects nonEmptyLayers;
-        // not need to sort since it already sorted
-        std::set_difference(layers.begin(), layers.end(), emptyLayers.begin(), emptyLayers.end(),
-            std::inserter(nonEmptyLayers, nonEmptyLayers.begin()));
-        layers = nonEmptyLayers;
-    }
-
-    for (auto &object : layers) {
-        // Alter stem direction between even and odd numbered layers
-        Layer *layer = dynamic_cast<Layer *>(object);
-        layer->SetDrawingStemDir(layer->GetN() % 2 ? STEMDIRECTION_up : STEMDIRECTION_down);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // Set the staff size for this pass
-    params->m_staffSize = m_drawingStaffSize;
 
     return FUNCTOR_CONTINUE;
 }

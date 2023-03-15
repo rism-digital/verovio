@@ -89,26 +89,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertToPageBased
      */
     ///@{

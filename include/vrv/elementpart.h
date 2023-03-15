@@ -81,11 +81,6 @@ public:
     void SetFlagShift(int shiftVal) { m_flagShift = shiftVal; }
     ///@}
 
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
 private:
     //
 public:
@@ -241,11 +236,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetVerticalAlignment
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
@@ -340,11 +330,6 @@ public:
     int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment

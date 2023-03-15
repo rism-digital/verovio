@@ -197,7 +197,7 @@ public:
 
 private:
     /**
-     * Adjust the horizontal postition of the syl processing verse by verse
+     * Adjust the horizontal position of the syl processing verse by verse
      */
     void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
 

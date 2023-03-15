@@ -178,8 +178,10 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel);
+    void CacheYRel(bool restore = false);
     ///@}
 
     /**
@@ -204,11 +206,13 @@ public:
     int GetDrawingRadius(const Doc *doc, bool isInLigature = false) const;
 
     /**
-     * Alignment getter
+     * Alignment setter and getter
      */
     ///@{
     Alignment *GetAlignment() { return m_alignment; }
     const Alignment *GetAlignment() const { return m_alignment; }
+    void ResetAlignment() { m_alignment = NULL; }
+    void SetAlignment(Alignment *alignment) { m_alignment = alignment; }
     ///@}
 
     /**
@@ -247,6 +251,7 @@ public:
     ///@{
     Alignment *GetGraceAlignment();
     const Alignment *GetGraceAlignment() const;
+    void ResetGraceAlignment() { m_graceAlignment = NULL; }
     void SetGraceAlignment(Alignment *graceAlignment);
     bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
     ///@}
@@ -333,16 +338,6 @@ public:
     int AdjustBeams(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ResetVerticalAlignment
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
@@ -353,41 +348,14 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    ///@{
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::AdjustTupletNumOverlap
      */
     int AdjustTupletNumOverlap(FunctorParams *functorParams) const override;
 
     /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustXRelForTranscription
      */
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcAlignmentPitchPos
-     */
-    int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitOnsetOffset
@@ -419,16 +387,6 @@ public:
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcSlurDirection
-     */
-    int CalcSlurDirection(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -480,11 +438,6 @@ private:
      * Get above/below overflow for the chord elements
      */
     void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
-
-    /**
-     * Calculate offset and left overlap of the element
-     */
-    std::pair<int, int> CalculateXPosOffset(FunctorParams *functorParams);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

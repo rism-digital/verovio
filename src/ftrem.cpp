@@ -217,40 +217,6 @@ int FTrem::AdjustBeamsEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FTrem::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    const ListOfObjects &fTremChildren = this->GetList(this);
-
-    // Should we assert this at the beginning?
-    if (fTremChildren.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (!this->HasCoords()) {
-        this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
-        this->InitCue(false);
-    }
-
-    if (this->GetElementCoords()->size() != 2) {
-        LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
-        return FUNCTOR_CONTINUE;
-    }
-
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int FTrem::GenerateMIDI(FunctorParams *functorParams)
 {
     // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

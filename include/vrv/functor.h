@@ -38,6 +38,7 @@ public:
      */
     ///@{
     FunctorCode GetCode() const { return m_code; }
+    void ResetCode() { m_code = FUNCTOR_CONTINUE; }
     void SetCode(FunctorCode code) { m_code = code; }
     ///@}
 

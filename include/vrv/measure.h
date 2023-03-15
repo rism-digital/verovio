@@ -99,6 +99,7 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     ///@}
 
     /**
@@ -236,6 +237,15 @@ public:
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
     ///@}
 
+    /**
+     * @name Setter and getter for the flag indicating if there is an AlignmentReference
+     * with multiple layers
+     */
+    ///@{
+    bool HasAlignmentRefWithMultipleLayers() const { return m_hasAlignmentRefWithMultipleLayers; }
+    void HasAlignmentRefWithMultipleLayers(bool hasRef) { m_hasAlignmentRefWithMultipleLayers = hasRef; }
+    ///@}
+
     /*
      * Return the first staff of each staffGrp according to the scoreDef
      */
@@ -323,85 +333,14 @@ public:
     ///@}
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AlignVertically
      */
     int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcAlignmentXPos
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArpeg
-     */
-    int AdjustArpegEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXOverflow
-     */
-    int AdjustXOverflow(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustHarmGrpsSpacing
-     */
-    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyX
@@ -455,11 +394,6 @@ public:
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions

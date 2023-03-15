@@ -210,11 +210,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AlignVertically
      */
     int AlignVertically(FunctorParams *functorParams) override;
@@ -230,16 +225,6 @@ public:
     ///@{
     int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI

@@ -107,12 +107,4 @@ FunctorCode Custos::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitCustosEnd(this);
 }
 
-int Custos::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

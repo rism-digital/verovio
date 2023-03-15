@@ -90,11 +90,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustHarmGrpsSpacing
-     */
-    int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

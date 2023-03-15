@@ -18,6 +18,8 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "calcalignmentpitchposfunctor.h"
+#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
@@ -380,44 +382,6 @@ Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter) const
-{
-    const ListOfConstObjects &childList = this->GetList(this);
-    ListOfConstObjects topNotes, bottomNotes;
-
-    // split notes into two vectors - notes above vertical center and below
-    std::partition_copy(childList.begin(), childList.end(), std::back_inserter(topNotes),
-        std::back_inserter(bottomNotes),
-        [verticalCenter](const Object *note) { return note->GetDrawingY() > verticalCenter; });
-
-    auto bottomIter = bottomNotes.begin();
-    auto topIter = topNotes.rbegin();
-    for (; bottomIter != bottomNotes.end() && topIter != topNotes.rend(); ++bottomIter, ++topIter) {
-        const int bottomY = (*bottomIter)->GetDrawingY();
-        const int topY = (*topIter)->GetDrawingY();
-        const int middlePoint = (topY + bottomY) / 2;
-
-        // if notes are equidistant - proceed to the next pair of notes
-        if (middlePoint == verticalCenter) {
-            continue;
-        }
-        // otherwise return corresponding stem direction
-        else if (middlePoint > verticalCenter) {
-            return STEMDIRECTION_down;
-        }
-        else if (middlePoint < verticalCenter) {
-            return STEMDIRECTION_up;
-        }
-    }
-
-    // if there are still unprocessed notes left on the bottom that are not on the center - stem direction should be up
-    if ((bottomIter != bottomNotes.end()) && ((*bottomIter)->GetDrawingY() != verticalCenter)) {
-        return STEMDIRECTION_up;
-    }
-    // otherwise place it down
-    return STEMDIRECTION_down;
-}
-
 int Chord::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
@@ -606,13 +570,11 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(params->m_doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(params->m_doc);
+    this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(params->m_doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(params->m_doc);
+    this->Process(calcStem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -703,105 +665,6 @@ int Chord::AdjustArtic(FunctorParams *functorParams)
     params->m_parent = this;
     params->m_articAbove.clear();
     params->m_articBelow.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    // Set them to NULL in any case
-    params->m_interface = NULL;
-
-    // Stems have been calculated previously in beam or fTrem - siblings because flags do not need to
-    // be processed either
-    if (this->IsInBeam() || this->GetAncestorFTrem()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // if the chord isn't visible, carry on
-    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Stem *stem = this->GetDrawingStem();
-    assert(stem);
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    if (m_crossStaff) {
-        staff = m_crossStaff;
-        layer = m_crossLayer;
-    }
-
-    // Cache the in params to avoid further lookup
-    params->m_staff = staff;
-    params->m_layer = layer;
-    params->m_interface = this;
-    params->m_dur = this->GetNoteOrChordDur(this);
-    params->m_isGraceNote = this->IsGraceNote();
-    params->m_isStemSameasSecondary = false;
-
-    /************ Set the direction ************/
-
-    int yMax, yMin;
-    this->GetYExtremes(yMax, yMin);
-    params->m_chordStemLength = yMin - yMax;
-
-    int staffY = staff->GetDrawingY();
-    int staffSize = staff->m_drawingStaffSize;
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    if (stem->HasDir()) {
-        stemDir = stem->GetDir();
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        stemDir = this->CalcStemDirection(params->m_verticalCenter);
-    }
-
-    this->SetDrawingStemDir(stemDir);
-
-    // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up) {
-        stem->SetDrawingYRel(yMin - this->GetDrawingY());
-    }
-    // And to the top note when down
-    else {
-        stem->SetDrawingYRel(yMax - this->GetDrawingY());
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
-{
-    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
-    assert(params);
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-
-    params->m_diameter = 0;
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-        if (this->IsInBeam()) {
-            params->m_diameter = 2 * this->GetDrawingRadius(params->m_doc);
-        }
-        else {
-            const Note *bottomNote = this->GetBottomNote();
-            const char32_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
-            params->m_diameter = params->m_doc->GetGlyphWidth(
-                code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
-        }
-        params->m_alignmentType = this->GetAlignment()->GetType();
-    }
 
     return FUNCTOR_CONTINUE;
 }

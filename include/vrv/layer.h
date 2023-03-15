@@ -262,21 +262,6 @@ public:
     int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontallyEnd
-     */
-    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitProcessingLists
      */
     int InitProcessingLists(FunctorParams *functorParams) override;

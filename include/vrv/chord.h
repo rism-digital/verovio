@@ -215,16 +215,6 @@ public:
     int CalcArtic(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcChordNoteHeads
-     */
-    int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffsetEnd
      */
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
@@ -251,12 +241,6 @@ protected:
      * secondary
      */
     MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
-
-    /**
-     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
-     * the top-/bottommost and moving inward towards the center of the chord
-     */
-    data_STEMDIRECTION CalcStemDirection(int verticalCenter) const;
 
     /**
      * Clear the m_clusters vector and delete all the objects.
