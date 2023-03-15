@@ -1540,6 +1540,12 @@
 		E7E9C11E29B0EFBC00CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
 		E7E9C11F29B0EFBD00CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
 		E7E9C12029B0EFBE00CFCE2F /* adjusttempofunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */; };
+		E7ED8A6529C1119800735875 /* cachehorizontallayoutfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7ED8A6429C1119000735875 /* cachehorizontallayoutfunctor.h */; };
+		E7ED8A6629C1119900735875 /* cachehorizontallayoutfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7ED8A6429C1119000735875 /* cachehorizontallayoutfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7ED8A6829C111C300735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
+		E7ED8A6929C111CA00735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
+		E7ED8A6A29C111CA00735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
+		E7ED8A6B29C111CB00735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
 		E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; };
 		E7F39C5F29A62B270055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7F39C6129A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
@@ -2092,6 +2098,8 @@
 		E7E9C11429B0A1FF00CFCE2F /* adjustaccidxfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustaccidxfunctor.cpp; path = src/adjustaccidxfunctor.cpp; sourceTree = "<group>"; };
 		E7E9C11929B0EF8A00CFCE2F /* adjusttempofunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjusttempofunctor.h; path = include/vrv/adjusttempofunctor.h; sourceTree = "<group>"; };
 		E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjusttempofunctor.cpp; path = src/adjusttempofunctor.cpp; sourceTree = "<group>"; };
+		E7ED8A6429C1119000735875 /* cachehorizontallayoutfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cachehorizontallayoutfunctor.h; path = include/vrv/cachehorizontallayoutfunctor.h; sourceTree = "<group>"; };
+		E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cachehorizontallayoutfunctor.cpp; path = src/cachehorizontallayoutfunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2877,6 +2885,8 @@
 				E7231E0129B64B08000A2BF3 /* adjustxoverflowfunctor.h */,
 				E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */,
 				E7A3790929BB41CD00E3BA98 /* adjustxposfunctor.h */,
+				E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */,
+				E7ED8A6429C1119000735875 /* cachehorizontallayoutfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
@@ -3139,6 +3149,7 @@
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
 				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
 				E7E1698B29A8BA3900FFF482 /* adjustgracexposfunctor.h in Headers */,
+				E7ED8A6529C1119800735875 /* cachehorizontallayoutfunctor.h in Headers */,
 				4DB3D8B41F83D08700B5FC2B /* devicecontextbase.h in Headers */,
 				E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BDEF9ECC26725248008A3A47 /* caesura.h in Headers */,
@@ -3190,6 +3201,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E79320652991452200D80975 /* calcstemfunctor.h in Headers */,
+				E7ED8A6629C1119900735875 /* cachehorizontallayoutfunctor.h in Headers */,
 				4DA0EAE022BB77AF00A7EBEB /* facsimileinterface.h in Headers */,
 				BB4C4B9C22A932E5001F6AF0 /* pitchinterface.h in Headers */,
 				4DACC9E92990F29A00B55913 /* atts_fingering.h in Headers */,
@@ -3624,6 +3636,7 @@
 				4D1693F91E3A44F300569BF4 /* artic.cpp in Sources */,
 				4DEC4DB321C826E000D1D273 /* supplied.cpp in Sources */,
 				E7E1698729A898CE00FFF482 /* adjustlayersfunctor.cpp in Sources */,
+				E7ED8A6929C111CA00735875 /* cachehorizontallayoutfunctor.cpp in Sources */,
 				4DC12A851F741110000440E9 /* pgfoot2.cpp in Sources */,
 				40E1CEE0205060FD0007C8AF /* labelabbr.cpp in Sources */,
 				35F6580F24F92B6100C99A2D /* fing.cpp in Sources */,
@@ -3975,6 +3988,7 @@
 				4D766EFA20ACAD63006875D8 /* syllable.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				E7908EA5298582DF0004C1F9 /* alignfunctor.cpp in Sources */,
+				E7ED8A6829C111C300735875 /* cachehorizontallayoutfunctor.cpp in Sources */,
 				4D766EFB20ACAD63006875D8 /* nc.cpp in Sources */,
 				4DEC4DAE21C81F0600D1D273 /* sic.cpp in Sources */,
 				40C2E41F2052A6E00003625F /* pb.cpp in Sources */,
@@ -4145,6 +4159,7 @@
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				4DBDD6772939E1CB009EC466 /* symboltable.cpp in Sources */,
 				4DB3D8D11F83D11D00B5FC2B /* octave.cpp in Sources */,
+				E7ED8A6A29C111CA00735875 /* cachehorizontallayoutfunctor.cpp in Sources */,
 				E7E1698829A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D4C26EF1EF7E75400681770 /* label.cpp in Sources */,
@@ -4406,6 +4421,7 @@
 				BB4C4B6F22A932D7001F6AF0 /* proport.cpp in Sources */,
 				4DBDD6782939E1CC009EC466 /* symboltable.cpp in Sources */,
 				BB4C4AE522A932BC001F6AF0 /* corr.cpp in Sources */,
+				E7ED8A6B29C111CB00735875 /* cachehorizontallayoutfunctor.cpp in Sources */,
 				E7E1698929A898CF00FFF482 /* adjustlayersfunctor.cpp in Sources */,
 				BB4C4AFF22A932BC001F6AF0 /* supplied.cpp in Sources */,
 				BB4C4BB522A932EB001F6AF0 /* view_tuplet.cpp in Sources */,
