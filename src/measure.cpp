@@ -239,6 +239,18 @@ void Measure::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
+void Measure::CacheXRel(bool restore)
+{
+    if (restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedWidth = this->GetWidth();
+        m_cachedOverflow = this->GetDrawingOverflow();
+        m_cachedXRel = m_drawingXRel;
+    }
+}
+
 bool Measure::IsFirstInSystem() const
 {
     assert(this->GetParent());

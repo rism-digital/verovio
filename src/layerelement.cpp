@@ -497,10 +497,30 @@ void LayerElement::SetDrawingXRel(int drawingXRel)
     m_drawingXRel = drawingXRel;
 }
 
+void LayerElement::CacheXRel(bool restore)
+{
+    if (restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
+    }
+}
+
 void LayerElement::SetDrawingYRel(int drawingYRel)
 {
     this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
+}
+
+void LayerElement::CacheYRel(bool restore)
+{
+    if (restore) {
+        m_drawingYRel = m_cachedYRel;
+    }
+    else {
+        m_cachedYRel = m_drawingYRel;
+    }
 }
 
 void LayerElement::CenterDrawingX()

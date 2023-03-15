@@ -101,6 +101,16 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
     }
 }
 
+void Arpeg::CacheXRel(bool restore)
+{
+    if (restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
+    }
+}
+
 std::set<Note *> Arpeg::GetNotes()
 {
     std::set<Note *> result;

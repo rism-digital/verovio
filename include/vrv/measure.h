@@ -99,6 +99,7 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     ///@}
 
     /**

@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
+
 //----------------------------------------------------------------------------
 
 namespace vrv {
@@ -24,16 +26,26 @@ CacheHorizontalLayoutFunctor::CacheHorizontalLayoutFunctor(Doc *doc) : DocFuncto
 
 FunctorCode CacheHorizontalLayoutFunctor::VisitArpeg(Arpeg *arpeg)
 {
+    arpeg->CacheXRel(m_restore);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CacheHorizontalLayoutFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    layerElement->CacheXRel(m_restore);
+    layerElement->CacheYRel(m_restore);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CacheHorizontalLayoutFunctor::VisitMeasure(Measure *measure)
 {
+    measure->CacheXRel(m_restore);
+
+    if (measure->GetLeftBarLine()) this->VisitBarLine(measure->GetLeftBarLine());
+    if (measure->GetRightBarLine()) this->VisitBarLine(measure->GetRightBarLine());
+
     return FUNCTOR_CONTINUE;
 }
 

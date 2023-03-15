@@ -178,8 +178,10 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel);
+    void CacheYRel(bool restore = false);
     ///@}
 
     /**

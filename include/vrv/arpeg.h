@@ -91,6 +91,7 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     ///@}
 
     /**
@@ -131,7 +132,7 @@ public:
 private:
     /**
      * The X drawing relative position of the object.
-     * Arpeg are positionned according to the top note through the FloatingPositioner
+     * Arpeg are positioned according to the top note through the FloatingPositioner
      * (See View::DrawArpeg that sets the FloatingPositioner)
      */
     int m_drawingXRel;
