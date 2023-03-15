@@ -771,18 +771,6 @@ public:
     ///@}
 
     /**
-     * @name Functors for aligning and adjusting the content horizontally
-     */
-    ///@{
-
-    /**
-     * Cache or restore cached horizontal layout for faster layout redoing
-     */
-    virtual int CacheHorizontalLayout(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for aligning the content vertically.
      */
     ///@{

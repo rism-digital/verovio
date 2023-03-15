@@ -437,26 +437,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CacheHorizontalLayoutParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating if the cache should be stored (default) or restored
- * member 1: a pointer to the Doc
- **/
-
-class CacheHorizontalLayoutParams : public FunctorParams {
-public:
-    CacheHorizontalLayoutParams(Doc *doc)
-    {
-        m_restore = false;
-        m_doc = doc;
-    }
-    bool m_restore;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CalcArticParams
 //----------------------------------------------------------------------------
 

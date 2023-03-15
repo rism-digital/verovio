@@ -1068,23 +1068,4 @@ int Measure::UnCastOff(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CacheHorizontalLayout(FunctorParams *functorParams)
-{
-    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
-    assert(params);
-
-    if (params->m_restore) {
-        m_drawingXRel = m_cachedXRel;
-    }
-    else {
-        m_cachedWidth = this->GetWidth();
-        m_cachedOverflow = this->GetDrawingOverflow();
-        m_cachedXRel = m_drawingXRel;
-    }
-    if (this->GetLeftBarLine()) this->GetLeftBarLine()->CacheHorizontalLayout(functorParams);
-    if (this->GetRightBarLine()) this->GetRightBarLine()->CacheHorizontalLayout(functorParams);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

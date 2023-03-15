@@ -35,6 +35,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Set the restore flag
+     */
+    void SetRestore(bool restore) { m_restore = restore; }
+
+    /*
      * Functor interface
      */
     ///@{

@@ -27,6 +27,7 @@
 #include "adjustxposfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
+#include "cachehorizontallayoutfunctor.h"
 #include "calcalignmentpitchposfunctor.h"
 #include "calcalignmentxposfunctor.h"
 #include "calcchordnoteheadsfunctor.h"
@@ -457,10 +458,9 @@ void Page::LayOutHorizontallyWithCache(bool restore)
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    CacheHorizontalLayoutParams cacheHorizontalLayoutParams(doc);
-    cacheHorizontalLayoutParams.m_restore = restore;
-    Functor cacheHorizontalLayout(&Object::CacheHorizontalLayout);
-    this->Process(&cacheHorizontalLayout, &cacheHorizontalLayoutParams);
+    CacheHorizontalLayoutFunctor cacheHorizontalLayout(doc);
+    cacheHorizontalLayout.SetRestore(restore);
+    this->Process(cacheHorizontalLayout);
 }
 
 void Page::LayOutVertically()

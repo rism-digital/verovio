@@ -114,11 +114,6 @@ public:
     ///@}
 
     /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;

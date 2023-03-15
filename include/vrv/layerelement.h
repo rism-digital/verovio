@@ -388,11 +388,6 @@ public:
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.

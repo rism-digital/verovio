@@ -214,21 +214,6 @@ FunctorCode Arpeg::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitArpegEnd(this);
 }
 
-int Arpeg::CacheHorizontalLayout(FunctorParams *functorParams)
-{
-    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
-    assert(params);
-
-    if (params->m_restore) {
-        m_drawingXRel = m_cachedXRel;
-    }
-    else {
-        m_cachedXRel = m_drawingXRel;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Arpeg::InitMIDI(FunctorParams *functorParams)
 {
     InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);

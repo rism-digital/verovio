@@ -1558,21 +1558,4 @@ int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::CacheHorizontalLayout(FunctorParams *functorParams)
-{
-    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
-    assert(params);
-
-    if (params->m_restore) {
-        m_drawingXRel = m_cachedXRel;
-        m_drawingYRel = m_cachedYRel;
-    }
-    else {
-        m_cachedXRel = m_drawingXRel;
-        m_cachedYRel = m_drawingYRel;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
