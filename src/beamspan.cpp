@@ -105,7 +105,13 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, const Staff *staff
     // find all elements between startId and endId of the beamSpan
     ClassIdsComparison classIds({ NOTE, CHORD });
     ListOfObjects objects;
-    layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, 1);
+    layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, 3);
+    // To make sure that notes from tuplets and btrems are included, lookup for decendants is done up to depth of 3.
+    // However this might result in notes from chords being added as standalone elements. To avoid this we remove any
+    // note that is in the span and is a chord tone. Same happens when nextLayerObjects are being processed.
+    objects.erase(std::remove_if(objects.begin(), objects.end(),
+                      [](Object *object) { return object->Is(NOTE) && vrv_cast<Note *>(object)->IsChordTone(); }),
+        objects.end());
 
     if (objects.empty()) return {};
 
@@ -134,7 +140,11 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, const Staff *staff
         ListOfObjects nextLayerObjects;
         // pass NULL as starting element to add all elements until end is reached
         if (endMeasure == nextMeasure) {
-            nextStaffLayer->FindAllDescendantsBetween(&nextLayerObjects, &classIds, NULL, this->GetEnd(), true, 1);
+            nextStaffLayer->FindAllDescendantsBetween(&nextLayerObjects, &classIds, NULL, this->GetEnd(), true, 3);
+            nextLayerObjects.erase(
+                std::remove_if(nextLayerObjects.begin(), nextLayerObjects.end(),
+                    [](Object *object) { return object->Is(NOTE) && vrv_cast<Note *>(object)->IsChordTone(); }),
+                nextLayerObjects.end());
             // Handle only next measure for the time being
             if (nextLayerObjects.back() == this->GetEnd()) {
                 beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
