@@ -47,7 +47,7 @@ Clef::Clef()
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_LINELOC);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
-    this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    this->RegisterAttClass(ATT_STAFFIDENT);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
