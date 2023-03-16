@@ -36,6 +36,7 @@ Clef::Clef()
     , AttClefShape()
     , AttColor()
     , AttLineLoc()
+    , AttOctave()
     , AttOctaveDisplacement()
     , AttStaffIdent()
     , AttVisibility()
@@ -46,6 +47,7 @@ Clef::Clef()
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_LINELOC);
+    this->RegisterAttClass(ATT_OCTAVE);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     this->RegisterAttClass(ATT_STAFFIDENT);
     this->RegisterAttClass(ATT_VISIBILITY);
@@ -64,6 +66,7 @@ void Clef::Reset()
     this->ResetEnclosingChars();
     this->ResetExtSym();
     this->ResetLineLoc();
+    this->ResetOctave();
     this->ResetOctaveDisplacement();
     this->ResetStaffIdent();
     this->ResetVisibility();
