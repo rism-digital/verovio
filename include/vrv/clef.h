@@ -25,6 +25,7 @@ class ScoreDefInterface;
  * This class models the MEI <clef> element.
  */
 class Clef : public LayerElement,
+             public AttClefLog,
              public AttClefShape,
              public AttColor,
              public AttEnclosingChars,

@@ -32,6 +32,7 @@ static const ClassRegistrar<Clef> s_factory("clef", CLEF);
 
 Clef::Clef()
     : LayerElement(CLEF, "clef-")
+    , AttClefLog()
     , AttClefShape()
     , AttColor()
     , AttLineLoc()
@@ -39,6 +40,7 @@ Clef::Clef()
     , AttStaffIdent()
     , AttVisibility()
 {
+    this->RegisterAttClass(ATT_CLEFLOG);
     this->RegisterAttClass(ATT_CLEFSHAPE);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -56,6 +58,7 @@ Clef::~Clef() {}
 void Clef::Reset()
 {
     LayerElement::Reset();
+    this->ResetClefLog();
     this->ResetClefShape();
     this->ResetColor();
     this->ResetEnclosingChars();
