@@ -108,7 +108,7 @@ int Clef::GetClefLocOffset() const
         disPlace = (this->GetDisPlace() == STAFFREL_basic_above) ? -1 : 1;
     }
 
-    if ((disPlace != 0) && (this->HasDis())) offset += (disPlace * (this->GetDis() - 1));
+    if (disPlace != 0 && this->HasDis()) offset += (disPlace * (this->GetDis() - 1));
 
     return offset;
 }
