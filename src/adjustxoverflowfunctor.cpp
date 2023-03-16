@@ -103,7 +103,7 @@ FunctorCode AdjustXOverflowFunctor::VisitSystemEnd(System *system)
         return FUNCTOR_CONTINUE;
     }
     Alignment *left = objectX->GetAlignment();
-    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
+    Measure *objectXMeasure = vrv_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
     if (objectXMeasure != m_lastMeasure) {
         left = m_lastMeasure->GetLeftBarLine()->GetAlignment();
     }

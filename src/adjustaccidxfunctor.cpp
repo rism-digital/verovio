@@ -46,44 +46,40 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     // process accid layer alignment
     alignmentReference->SetAccidLayerAlignment();
 
-    // Detect the octave and mark them
-    std::vector<Accid *>::iterator iter, octaveIter;
-    for (iter = accidSpace.begin(); iter != accidSpace.end() - 1; ++iter) {
-        Note *note = vrv_cast<Note *>((*iter)->GetFirstAncestor(NOTE));
-        assert(note);
-        if (!note) continue;
-        for (octaveIter = iter + 1; octaveIter != accidSpace.end(); ++octaveIter) {
-            Note *octave = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
-            assert(octave);
-            if (!octave) continue;
-            bool sameChordOctave = true;
-            if (Chord *chord = vrv_cast<Chord *>((*iter)->GetFirstAncestor(CHORD)); chord != NULL) {
-                if ((*octaveIter)->GetFirstAncestor(CHORD) != chord) sameChordOctave = false;
-            }
-            // Same pitch, different octave, same accid - for now?
-            if ((note->GetPname() == octave->GetPname()) && (note->GetOct() != octave->GetOct())
-                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid()) && sameChordOctave) {
-                (*iter)->SetDrawingOctaveAccid(*octaveIter);
-                (*octaveIter)->SetDrawingOctave(true);
-            }
-        }
-    }
+    // Detect accids which are an octave apart => they will be grouped together in the multiset
+    std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;
+    std::copy(accidSpace.begin(), accidSpace.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
 
-    int count = (int)accidSpace.size();
-
-    std::vector<Accid *> adjustedAccids;
+    std::set<Accid *> adjustedAccids;
     // Align the octaves
-    for (int i = 0; i < count - 1; ++i) {
-        if (accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
-            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(i), m_doc, staffSize, adjustedAccids);
-            alignmentReference->AdjustAccidWithAccidSpace(
-                accidSpace.at(i)->GetDrawingOctaveAccid(), m_doc, staffSize, adjustedAccids);
-            int dist = accidSpace.at(i)->GetDrawingX() - accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
-            if (dist > 0)
-                accidSpace.at(i)->SetDrawingXRel(accidSpace.at(i)->GetDrawingXRel() - dist);
-            else if (dist < 0)
-                accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(
-                    accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
+    for (Accid *accid : accidSpace) {
+        // Skip any accid that was already adjusted
+        if (adjustedAccids.count(accid) > 0) continue;
+        auto range = octaveEquivalence.equal_range(accid);
+        // Handle at least two octave accids without unisons
+        int octaveAccidCount = 0;
+        std::set<data_OCTAVE> octaves;
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            Note *note = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
+            octaves.insert(note->GetOct());
+            ++octaveAccidCount;
+        }
+        if ((octaveAccidCount < 2) || ((int)octaves.size() < octaveAccidCount)) continue;
+        // Now adjust the octave accids and store the left most position
+        int minDrawingX = -VRV_UNSET;
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            alignmentReference->AdjustAccidWithAccidSpace(*octaveIter, m_doc, staffSize, adjustedAccids);
+            minDrawingX = std::min(minDrawingX, (*octaveIter)->GetDrawingX());
+        }
+        // Finally, align the accidentals whenever the adjustment is not too large
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            const int dist = (*octaveIter)->GetDrawingX() - minDrawingX;
+            if ((dist > 0) && (*octaveIter)->HasContentHorizontalBB()) {
+                const int accidWidth = (*octaveIter)->GetContentRight() - (*octaveIter)->GetContentLeft();
+                if (dist < accidWidth / 2) {
+                    (*octaveIter)->SetDrawingXRel((*octaveIter)->GetDrawingXRel() - dist);
+                }
+            }
         }
     }
 
@@ -93,19 +89,22 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
         accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
     }
 
-    int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
+    const int count = (int)accidSpace.size();
+    const int middle = (count / 2) + (count % 2);
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
-        // top one - but skip octaves
-        if (!accidSpace.at(j)->GetDrawingOctaveAccid() && !accidSpace.at(j)->GetDrawingOctave())
-            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(j), m_doc, staffSize, adjustedAccids);
+        // top one - but skip if already adjusted (i.e. octaves)
+        if (adjustedAccids.count(accidSpace.at(i)) == 0) {
+            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(i), m_doc, staffSize, adjustedAccids);
+        }
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
-        // bottom one - but skip octaves
-        if (!accidSpace.at(i)->GetDrawingOctaveAccid() && !accidSpace.at(i)->GetDrawingOctave())
-            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(i), m_doc, staffSize, adjustedAccids);
+        // bottom one - but skip if already adjusted
+        if (adjustedAccids.count(accidSpace.at(j)) == 0) {
+            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(j), m_doc, staffSize, adjustedAccids);
+        }
     }
 
     return FUNCTOR_SIBLINGS;

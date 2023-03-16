@@ -226,13 +226,8 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
 
     FindSpannedLayerElementsFunctor findSpannedLayerElements(this);
     findSpannedLayerElements.SetMinMaxPos(xMin, xMax);
-    findSpannedLayerElements.SetClassIds({ ACCID, ARTIC, CHORD, CLEF, FLAG, GLISS, NOTE, STEM, TUPLET_BRACKET,
-        TUPLET_NUM }); // Ties should be handled separately
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
-    findSpannedLayerElementsParams.m_minPos = xMin;
-    findSpannedLayerElementsParams.m_maxPos = xMax;
-    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, DOT, DOTS, FLAG, GLISS, NOTE, STEM,
-        TUPLET_BRACKET, TUPLET_NUM }; // Ties should be handled separately
+    findSpannedLayerElements.SetClassIds({ ACCID, ARTIC, CHORD, CLEF, DOT, DOTS, FLAG, GLISS, NOTE, STEM,
+        TUPLET_BRACKET, TUPLET_NUM }); // Ties should be handled separately
 
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());

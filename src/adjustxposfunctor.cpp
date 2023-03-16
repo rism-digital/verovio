@@ -174,6 +174,9 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
             m_cumulatedXShift += adjust;
             m_upcomingMinPos += adjust;
         }
+        else {
+            m_upcomingMinPos = std::max(selfRight, m_upcomingMinPos);
+        }
     }
     else {
         m_upcomingMinPos = std::max(selfRight, m_upcomingMinPos);

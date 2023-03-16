@@ -826,6 +826,8 @@ public:
 private:
     // The element to which a turn is pointing to
     LayerElement *m_previousElement;
+    // The current chord
+    Chord *m_currentChord;
     // The turn to which we want to set a m_drawingEndElement
     Turn *m_currentTurn;
     // A map of the delayed turns and the layer elements they point to

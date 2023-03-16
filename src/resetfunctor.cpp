@@ -416,8 +416,6 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitAccid(Accid *accid)
     this->VisitLayerElement(accid);
     accid->PositionInterface::InterfaceResetHorizontalAlignment(*this, accid);
 
-    accid->SetDrawingOctave(false);
-    accid->SetDrawingOctaveAccid(NULL);
     accid->SetDrawingUnisonAccid(NULL);
 
     return FUNCTOR_CONTINUE;

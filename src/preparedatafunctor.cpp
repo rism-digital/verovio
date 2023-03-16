@@ -155,16 +155,16 @@ FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
         if (accid->GetFunc() == accidLog_FUNC_edit)
             accid->SetDrawingCueSize(true);
         else {
-            Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+            Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
             if (note) accid->SetDrawingCueSize(note->GetDrawingCueSize());
         }
     }
     else if (layerElement->Is({ ARTIC, DOTS, FLAG, STEM })) {
-        Note *note = dynamic_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
+        Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH));
         if (note)
             layerElement->SetDrawingCueSize(note->GetDrawingCueSize());
         else {
-            Chord *chord = dynamic_cast<Chord *>(layerElement->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+            Chord *chord = vrv_cast<Chord *>(layerElement->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
             if (chord) layerElement->SetDrawingCueSize(chord->GetDrawingCueSize());
         }
     }
@@ -207,8 +207,7 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
     m_currentCrossLayer = NULL;
 
     AttNIntegerComparison comparisonFirst(STAFF, crossElement->GetStaff().at(0));
-    layerElement->m_crossStaff
-        = dynamic_cast<Staff *>(m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
+    layerElement->m_crossStaff = vrv_cast<Staff *>(m_currentMeasure->FindDescendantByComparison(&comparisonFirst, 1));
     if (!layerElement->m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", crossElement->GetStaff().at(0),
             layerElement->GetID().c_str());
@@ -233,18 +232,17 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
     bool direction = (parentStaff->GetN() < layerElement->m_crossStaff->GetN()) ? FORWARD : BACKWARD;
     layerElement->m_crossLayer
-        = dynamic_cast<Layer *>(layerElement->m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
+        = vrv_cast<Layer *>(layerElement->m_crossStaff->FindDescendantByComparison(&comparisonFirstLayer, 1));
     if (!layerElement->m_crossLayer) {
         // Just try to pick the first one... (i.e., last one when crossing above)
         layerElement->m_crossLayer
-            = dynamic_cast<Layer *>(layerElement->m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
+            = vrv_cast<Layer *>(layerElement->m_crossStaff->FindDescendantByType(LAYER, UNSPECIFIED, direction));
     }
     if (!layerElement->m_crossLayer) {
         // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             crossElement->GetStaff().at(0), layerElement->GetID().c_str());
         layerElement->m_crossStaff = NULL;
-        return FUNCTOR_CONTINUE;
     }
 
     if (direction == FORWARD) {
@@ -728,7 +726,7 @@ FunctorCode PrepareTimestampsFunctor::VisitDocEnd(Doc *doc)
         return FUNCTOR_CONTINUE;
     }
 
-    Measure *lastMeasure = dynamic_cast<Measure *>(doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
+    Measure *lastMeasure = vrv_cast<Measure *>(doc->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
     if (!lastMeasure) {
         return FUNCTOR_CONTINUE;
     }
@@ -942,15 +940,15 @@ FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 
 FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 {
-    Verse *verse = dynamic_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
+    Verse *verse = vrv_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
     if (verse) {
         syl->m_drawingVerse = std::max(verse->GetN(), 1);
     }
 
-    syl->SetStart(dynamic_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
+    syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
     // If there isn't an ancestor note, it should be a chord
     if (!syl->GetStart()) {
-        syl->SetStart(dynamic_cast<LayerElement *>(syl->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
+        syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
     }
 
     // At this stage currentSyl is actually the previous one that is ending here
@@ -996,9 +994,9 @@ PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(chord->FindDescendantByType(STEM, 1));
+    Stem *currentStem = vrv_cast<Stem *>(chord->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!currentStem) {
         currentStem = new Stem();
@@ -1043,7 +1041,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(chord->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(chord->FindDescendantByType(DOTS, 1));
 
     if (chord->GetDots() > 0) {
         if (!currentDots) {
@@ -1069,10 +1067,10 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(note->FindDescendantByType(STEM, 1));
+    Stem *currentStem = vrv_cast<Stem *>(note->FindDescendantByType(STEM, 1));
     Flag *currentFlag = NULL;
     Chord *chord = note->IsChordTone();
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->GetFirst(FLAG));
+    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!note->IsChordTone() && !note->IsTabGrpNote()) {
         if (!currentStem) {
@@ -1118,7 +1116,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
 
     /************ dots ***********/
 
-    Dots *currentDots = dynamic_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
 
     if (note->GetDots() > 0) {
         if (chord && (chord->GetDots() == note->GetDots())) {
@@ -1148,7 +1146,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
 {
-    Dots *currentDots = dynamic_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
+    Dots *currentDots = vrv_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
 
     if ((rest->GetDur() > DUR_BR) && (rest->GetDots() > 0)) {
         if (!currentDots) {
@@ -1345,6 +1343,7 @@ PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor()
 void PrepareDelayedTurnsFunctor::ResetCurrent()
 {
     m_previousElement = NULL;
+    m_currentChord = NULL;
     m_currentTurn = NULL;
 }
 
@@ -1357,6 +1356,10 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
 
     if (m_previousElement) {
         assert(m_currentTurn);
+        if (layerElement->Is(NOTE) && m_currentChord) {
+            Note *note = vrv_cast<Note *>(layerElement);
+            if (note->IsChordTone() == m_currentChord) return FUNCTOR_CONTINUE;
+        }
         m_currentTurn->m_drawingEndElement = layerElement;
         this->ResetCurrent();
     }
@@ -1364,6 +1367,14 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
     if (m_delayedTurns.count(layerElement)) {
         m_previousElement = layerElement;
         m_currentTurn = m_delayedTurns.at(layerElement);
+        if (layerElement->Is(CHORD)) {
+            return FUNCTOR_SIBLINGS;
+        }
+        else if (layerElement->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(layerElement);
+            Chord *chord = note->IsChordTone();
+            if (chord) m_currentChord = chord;
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -1608,7 +1619,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitMeasureEnd(Measure *measure)
     std::vector<Hairpin *>::iterator iter = m_hairpins.begin();
     while (iter != m_hairpins.end()) {
         assert((*iter)->GetEnd());
-        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
+        Measure *measureEnd = vrv_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
         if (measureEnd == measure) {
             iter = m_hairpins.erase(iter);
         }
@@ -1723,7 +1734,7 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitMeasureEnd(Measure *mea
             TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
             assert(interface);
             if (interface->GetEnd()) {
-                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
+                endParent = vrv_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
             }
         }
         if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
@@ -1733,7 +1744,7 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitMeasureEnd(Measure *mea
                 // We should have one because we allow only control events (dir and dynam) to be linked as target
                 TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
                 assert(nextInterface);
-                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
+                endParent = vrv_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
             }
         }
         assert(endParent);

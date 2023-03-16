@@ -181,7 +181,7 @@ bool CalcDotsFunctor::IsDotOverlappingWithFlag(const Note *note, const int staff
     const Object *stem = note->GetFirst(STEM);
     if (!stem) return false;
 
-    const Flag *flag = dynamic_cast<const Flag *>(stem->GetFirst(FLAG));
+    const Flag *flag = vrv_cast<const Flag *>(stem->GetFirst(FLAG));
     if (!flag) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
