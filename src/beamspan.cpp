@@ -106,6 +106,9 @@ ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, const Staff *staff
     ClassIdsComparison classIds({ NOTE, CHORD });
     ListOfObjects objects;
     layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, 3);
+    // To make sure that notes from tuplets and btrems are included, lookup for decendants is done up to depth of 3.
+    // However this might result in notes from chords being added as standalone elements. To avoid this we remove any
+    // note that is in the span and is a chord tone. Same happens when nextLayerObjects are being processed.
     objects.erase(std::remove_if(objects.begin(), objects.end(),
                       [](Object *object) { return object->Is(NOTE) && vrv_cast<Note *>(object)->IsChordTone(); }),
         objects.end());
