@@ -81,28 +81,34 @@ int Clef::GetClefLocOffset() const
     }
 
     int offset = 0;
+    int defaultOct = 4; // C clef
     if (this->GetShape() == CLEFSHAPE_G) {
+        defaultOct = 4;
         offset = -4;
     }
     else if (this->GetShape() == CLEFSHAPE_GG) {
+        defaultOct = 3;
         offset = 3;
     }
     else if (this->GetShape() == CLEFSHAPE_F) {
+        defaultOct = 3;
         offset = 4;
+    }
+
+    if (this->HasOct()) {
+        int oct = this->GetOct();
+        int octDifference = oct - defaultOct;
+        offset -= octDifference * 7;
     }
 
     offset += (this->GetLine() - 1) * 2;
 
     int disPlace = 0;
-    if (this->GetDisPlace() == STAFFREL_basic_above)
-        disPlace = -1;
-    else if (this->GetDisPlace() == STAFFREL_basic_below)
-        disPlace = 1;
+    if (this->HasDisPlace()) {
+        disPlace = (this->GetDisPlace() == STAFFREL_basic_above) ? -1 : 1;
+    }
 
-    // ignore disPlace for gClef8vbOld
-    if (this->GetShape() == CLEFSHAPE_GG) disPlace = 0;
-
-    if ((disPlace != 0) && (this->GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (this->GetDis() - 1));
+    if ((disPlace != 0) && (this->HasDis())) offset += (disPlace * (this->GetDis() - 1));
 
     return offset;
 }
