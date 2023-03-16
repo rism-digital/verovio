@@ -106,7 +106,7 @@ const StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) cons
 System *SystemAligner::GetSystem()
 {
     if (m_system == NULL) {
-        m_system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
+        m_system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
     }
     return m_system;
 }
@@ -1097,12 +1097,10 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
             if (i == j) continue;
             Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
             // Check if second slur is inner slur of first
-            if (!positioners[i]->IsCrossStaff() && !positioners[j]->IsCrossStaff()) {
-                if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
-                    if (firstSlur->HasInnerSlur(secondSlur)) {
-                        innerCurves.push_back(positioners[j]);
-                        continue;
-                    }
+            if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
+                if (firstSlur->HasInnerSlur(secondSlur)) {
+                    innerCurves.push_back(positioners[j]);
+                    continue;
                 }
             }
             // Adjust positioning of slurs with common start/end

@@ -12,7 +12,6 @@
 #include <functional>
 #include <iterator>
 #include <map>
-#include <random>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -372,6 +371,18 @@ public:
     virtual void AddChild(Object *object);
 
     /**
+     * Return the child order for a the given ClassId.
+     * By default, a child is added at the end, but a class can override the method to order them.
+     * The overriden method specifies a static vector with the expected order of ClassIds.
+     */
+    virtual int GetInsertOrderFor(ClassId classId) const { return VRV_UNSET; }
+
+    /**
+     * Find the order from an overriden GetInsertOrderFor method.
+     */
+    int GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const;
+
+    /**
      * Return the index position of the object in its parent (-1 if not found)
      */
     int GetIdx() const;
@@ -661,9 +672,11 @@ public:
     // Static methods //
     //----------------//
 
-    static void SeedID(unsigned int seed = 0);
+    static void SeedID(uint32_t seed = 0);
 
-    static std::string GenerateRandID();
+    static std::string GenerateHashID();
+
+    static uint32_t Hash(uint32_t number, bool reverse = false);
 
     static bool sortByUlx(Object *a, Object *b);
 
@@ -1171,9 +1184,9 @@ private:
     static thread_local unsigned long s_objectCounter;
 
     /**
-     * Pseudo random number engine for ID generation
+     * XML id counter
      */
-    static thread_local std::mt19937 s_randomGenerator;
+    static thread_local uint32_t s_xmlIDCounter;
 };
 
 //----------------------------------------------------------------------------

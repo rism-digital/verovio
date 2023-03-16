@@ -104,7 +104,7 @@ void Accid::AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staff
 }
 
 void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
-    std::vector<Accid *> &adjustedAccids)
+    std::set<Accid *> &adjustedAccids)
 {
     assert(element);
     assert(doc);
@@ -153,7 +153,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
             leftAccids.push_back(accid);
             return;
         }
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end()) return;
+        if (adjustedAccids.count(accid) == 0) return;
     }
 
     int xRelShift = 0;
@@ -167,8 +167,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
     // Move only to the left
     if (xRelShift > 0) {
         this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), this) == adjustedAccids.end())
-            adjustedAccids.push_back(this);
+        adjustedAccids.insert(this);
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
@@ -300,6 +299,23 @@ FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
 FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitAccidEnd(this);
+}
+
+//----------------------------------------------------------------------------
+// AccidOctaveSort
+//----------------------------------------------------------------------------
+
+std::string AccidOctaveSort::GetOctaveID(const Accid *accid) const
+{
+    const Note *note = vrv_cast<const Note *>(accid->GetFirstAncestor(NOTE));
+    assert(note);
+    const Chord *chord = note->IsChordTone();
+
+    std::string octaveID = chord ? chord->GetID() : note->GetID();
+    octaveID += "-" + std::to_string(accid->GetAccid());
+    octaveID += "-" + std::to_string(note->GetPname());
+
+    return octaveID;
 }
 
 } // namespace vrv

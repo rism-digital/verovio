@@ -674,7 +674,6 @@ public:
     OptionDbl m_barLineWidth;
     OptionBool m_beamFrenchStyle;
     OptionInt m_beamMaxSlope;
-    OptionInt m_beamMinSlope;
     OptionBool m_beamMixedPreserve;
     OptionDbl m_beamMixedStemMin;
     OptionDbl m_bracketThickness;
@@ -716,6 +715,7 @@ public:
     OptionDbl m_multiRestThickness;
     OptionBool m_octaveAlternativeSymbols;
     OptionDbl m_octaveLineThickness;
+    OptionBool m_octaveNoSpanningParentheses;
     OptionDbl m_pedalLineThickness;
     OptionDbl m_repeatBarLineDotSeparation;
     OptionDbl m_repeatEndingLineThickness;
@@ -753,6 +753,7 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
     OptionArray m_substXPathQuery;

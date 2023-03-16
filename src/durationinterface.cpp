@@ -159,7 +159,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
 
 bool DurationInterface::IsFirstInBeam(const LayerElement *noteOrRest) const
 {
-    const Beam *beam = dynamic_cast<const Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    const Beam *beam = vrv_cast<const Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
@@ -168,7 +168,7 @@ bool DurationInterface::IsFirstInBeam(const LayerElement *noteOrRest) const
 
 bool DurationInterface::IsLastInBeam(const LayerElement *noteOrRest) const
 {
-    const Beam *beam = dynamic_cast<const Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
+    const Beam *beam = vrv_cast<const Beam *>(noteOrRest->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }

@@ -1439,36 +1439,12 @@ bool MEIOutput::WriteDoc(Doc *doc)
     assert(!m_mei.empty());
 
     // ---- header ----
-    if (!m_ignoreHeader && m_doc->m_header.first_child()) {
-        if (!m_doc->GetOptions()->m_transpose.GetValue().empty())
-            this->WriteRevisionDesc(m_doc->m_header.first_child());
+    if (!m_ignoreHeader) {
+        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
         m_mei.append_copy(m_doc->m_header.first_child());
-    }
-    else {
-        pugi::xml_node meiHead = m_mei.append_child("meiHead");
-        pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
-        pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-        titleStmt.append_child("title");
-        pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-        pugi::xml_node date = pubStmt.append_child("date");
-
-        // date
-        time_t t = time(0); // get time now
-        struct tm *now = localtime(&t);
-        std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
-            now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
-        date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
-
-        if (!this->GetBasic()) {
-            // encodingDesc
-            pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-            pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-            pugi::xml_node p1 = projectDesc.append_child("p");
-            p1.append_child(pugi::node_pcdata)
-                .set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
-
-            // revisionDesc
-            if (!m_doc->GetOptions()->m_transpose.GetValue().empty()) this->WriteRevisionDesc(meiHead);
+        // Add transposition in the revision list but not in mei-basic
+        if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {
+            this->WriteRevisionDesc(m_mei.first_child());
         }
     }
 
@@ -2693,6 +2669,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteCue(currentNode);
     note->WriteExtSym(currentNode);
     note->WriteGraced(currentNode);
+    note->WriteHarmonicFunction(currentNode);
     note->WriteMidiVelocity(currentNode);
     note->WriteNoteGesTab(currentNode);
     note->WriteNoteHeads(currentNode);
@@ -4217,6 +4194,9 @@ bool MEIInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
             success = this->ReadMdiv(parent, current, makeVisible);
         }
         else if (std::string(current.name()) == "score") {
+            // Possibly skip content on load
+            if (!isVisible && m_doc->GetOptions()->m_loadSelectedMdivOnly.GetValue()) continue;
+            // Read only the first score
             success = this->ReadScore(parent, current);
             if (parentNode.last_child() != current) {
                 LogWarning("Skipping nodes after <score> element");
@@ -6647,6 +6627,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadCue(note);
     vrvNote->ReadExtSym(note);
     vrvNote->ReadGraced(note);
+    vrvNote->ReadHarmonicFunction(note);
     vrvNote->ReadMidiVelocity(note);
     vrvNote->ReadNoteGesTab(note);
     vrvNote->ReadNoteHeads(note);
@@ -8068,8 +8049,8 @@ void MEIInput::UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMorden
 
 void MEIInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement)
 {
-    KeySig *keySig = dynamic_cast<KeySig *>(vrvScoreDefElement->FindDescendantByType(KEYSIG));
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(vrvScoreDefElement->FindDescendantByType(METERSIG));
+    KeySig *keySig = vrv_cast<KeySig *>(vrvScoreDefElement->FindDescendantByType(KEYSIG));
+    MeterSig *meterSig = vrv_cast<MeterSig *>(vrvScoreDefElement->FindDescendantByType(METERSIG));
 
     if (scoreDefElement.attribute("key.sig.show")) {
         if (keySig) {

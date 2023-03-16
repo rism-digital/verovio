@@ -176,7 +176,7 @@ bool Doc::IsSupportedChild(Object *child)
 
 bool Doc::GenerateDocumentScoreDef()
 {
-    Measure *measure = dynamic_cast<Measure *>(this->FindDescendantByType(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE));
     if (!measure) {
         LogError("No measure found for generating a scoreDef");
         return false;
@@ -249,13 +249,23 @@ bool Doc::GenerateHeader()
     return true;
 }
 
+void Doc::PrepareMeasureIndices()
+{
+    ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
+
+    int index = 0;
+    for (Object *object : measures) {
+        vrv_cast<Measure *>(object)->SetIndex(++index);
+    }
+}
+
 bool Doc::GenerateMeasureNumbers()
 {
     ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
 
     // run through all measures and generate missing mNum from attribute
     for (Object *object : measures) {
-        Measure *measure = dynamic_cast<Measure *>(object);
+        Measure *measure = vrv_cast<Measure *>(object);
         if (measure->HasN() && !measure->FindDescendantByType(MNUM)) {
             MNum *mnum = new MNum;
             Text *text = new Text;
@@ -270,6 +280,40 @@ bool Doc::GenerateMeasureNumbers()
     return true;
 }
 
+void Doc::GenerateMEIHeader(bool meiBasic)
+{
+    m_header.remove_children();
+    pugi::xml_node meiHead = m_header.append_child("meiHead");
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    titleStmt.append_child("title");
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    pugi::xml_node date = pubStmt.append_child("date");
+
+    // date
+    time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    std::string dateStr = StringFormat("%d-%02d-%02d-%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+    date.append_attribute("isodate") = dateStr.c_str();
+
+    if (!meiBasic) {
+        // encodingDesc
+        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+        // appInfo/application/name
+        pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+        pugi::xml_node application = appInfo.append_child("application");
+        application.append_attribute("xml:id") = "verovio";
+        application.append_attribute("version") = GetVersion().c_str();
+        pugi::xml_node name = application.append_child("name");
+        name.text().set(StringFormat("Verovio (%s)", GetVersion().c_str()).c_str());
+        // projectDesc
+        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
+    }
+}
+
 bool Doc::HasTimemap() const
 {
     return (m_timemapTempo == m_options->m_midiTempoAdjustment.GetValue());
@@ -277,14 +321,17 @@ bool Doc::HasTimemap() const
 
 void Doc::CalculateTimemap()
 {
+    // There is no data to calculate the timemap
+    if (this->GetPageCount() == 0) {
+        return;
+    }
+
     m_timemapTempo = 0.0;
 
     // This happens if the document was never cast off (breaks none option in the toolkit)
-    if (!m_drawingPage && this->GetPageCount() == 1) {
+    if (!m_drawingPage) {
         Page *page = this->SetDrawingPage(0);
-        if (!page) {
-            return;
-        }
+        assert(page);
         this->ScoreDefSetCurrentDoc();
         page->LayOutHorizontally();
     }
@@ -328,7 +375,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         CalculateTimemap();
     }
     if (!Doc::HasTimemap()) {
-        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        LogWarning("Calculation of the timemap failed, MIDI cannot be exported.");
     }
 
     double tempo = MIDI_TEMPO;
@@ -383,11 +430,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 midiFile->addTracks(midiTrack + 1 - midiFile->getTrackCount());
             }
             // set MIDI channel and instrument
-            InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
+            InstrDef *instrdef = vrv_cast<InstrDef *>(staffDef->FindDescendantByType(INSTRDEF, 1));
             if (!instrdef) {
                 StaffGrp *staffGrp = vrv_cast<StaffGrp *>(staffDef->GetFirstAncestor(STAFFGRP));
                 assert(staffGrp);
-                instrdef = dynamic_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
+                instrdef = vrv_cast<InstrDef *>(staffGrp->FindDescendantByType(INSTRDEF, 1));
             }
             if (instrdef) {
                 if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
@@ -473,7 +520,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
         CalculateTimemap();
     }
     if (!Doc::HasTimemap()) {
-        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        LogWarning("Calculation of the timemap failed, the timemap cannot be exported.");
         output = "";
         return false;
     }
@@ -495,7 +542,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
         CalculateTimemap();
     }
     if (!Doc::HasTimemap()) {
-        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        LogWarning("Calculation of the timemap failed, the features cannot be exported.");
         output = "";
         return false;
     }
@@ -511,12 +558,17 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 void Doc::PrepareData()
 {
     /************ Reset and initialization ************/
+
     if (m_dataPreparationDone) {
         ResetDataFunctor resetData;
         this->Process(resetData);
     }
     PrepareDataInitializationFunctor prepareDataInitialization(this);
     this->Process(prepareDataInitialization);
+
+    /************ Generate measure indices ************/
+
+    this->PrepareMeasureIndices();
 
     /************ Store default durations ************/
 
@@ -1473,12 +1525,12 @@ std::list<Score *> Doc::GetScores()
 
 Pages *Doc::GetPages()
 {
-    return dynamic_cast<Pages *>(this->FindDescendantByType(PAGES));
+    return vrv_cast<Pages *>(this->FindDescendantByType(PAGES));
 }
 
 const Pages *Doc::GetPages() const
 {
-    return dynamic_cast<const Pages *>(this->FindDescendantByType(PAGES));
+    return vrv_cast<const Pages *>(this->FindDescendantByType(PAGES));
 }
 
 int Doc::GetPageCount() const
@@ -1995,9 +2047,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // every time for now.
 
     m_drawingBeamMaxSlope = m_options->m_beamMaxSlope.GetValue();
-    m_drawingBeamMinSlope = m_options->m_beamMinSlope.GetValue();
     m_drawingBeamMaxSlope /= 100;
-    m_drawingBeamMinSlope /= 100;
 
     // values for beams
     m_drawingBeamWidth = m_options->m_unit.GetValue();

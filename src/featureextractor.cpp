@@ -75,7 +75,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);
         pitch << std::string(signCount, octSign);
 
-        Accid *accid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
+        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
         if (accid) {
             // We need to check both written and gestural accidentals
             std::string accidStrWritten;

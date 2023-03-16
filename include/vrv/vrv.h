@@ -99,7 +99,7 @@ std::string GetVersion();
  * Encode the integer value using the specified base (max is 62)
  * Base 36 uses 0-9 and a-z, base 62 also A-Z.
  */
-std::string BaseEncodeInt(unsigned int value, unsigned int base);
+std::string BaseEncodeInt(uint32_t value, uint8_t base);
 
 /**
  *
@@ -121,12 +121,6 @@ extern bool loggingToBuffer;
 extern struct timeval start;
 void LogElapsedTimeStart();
 void LogElapsedTimeEnd(const char *msg = "unspecified operation");
-
-/**
- * Method that simply checks if the Object is not NULL
- * Also asserts it for stopping in debug mode
- */
-bool Check(Object *object);
 
 //----------------------------------------------------------------------------
 // Notation type checks

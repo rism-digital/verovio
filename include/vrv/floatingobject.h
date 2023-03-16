@@ -325,7 +325,7 @@ protected:
 
 public:
     /**
-     * The spanning type of the positionner for spanning control elements
+     * The spanning type of the positioner for spanning control elements
      */
     char m_spanningType;
 };

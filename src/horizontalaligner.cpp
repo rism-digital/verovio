@@ -578,8 +578,7 @@ bool Alignment::HasTimestampOnly() const
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef
-        = dynamic_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef = vrv_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
@@ -618,8 +617,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         }
         // Non cross staff normal case
         else {
-            layerRef = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
-            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
+            layerRef = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+            if (layerRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
             if (staffRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
@@ -858,7 +857,7 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
 }
 
 void AlignmentReference::AdjustAccidWithAccidSpace(
-    Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
+    Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
     const ArrayOfObjects &children = this->GetChildren();
@@ -871,11 +870,8 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
 
-    // if current accidental is not in the list then XRel wasn't adjusted and position is fine as it is - add it to the
-    // list. Generally this would happen with octave accidentals, that are processed first and most likely have no
-    // overlaps with other elements
-    if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end())
-        adjustedAccids.push_back(accid);
+    // Mark as adjusted (even if position was not altered)
+    adjustedAccids.insert(accid);
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
@@ -1078,6 +1074,183 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasMultipleLayer()) return FUNCTOR_SIBLINGS;
+
+    params->m_currentLayerN = VRV_UNSET;
+    params->m_current.clear();
+    params->m_previous.clear();
+    params->m_accumulatedShift = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::AdjustLayersEnd(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    // Determine staff
+    if (params->m_current.empty()) return FUNCTOR_CONTINUE;
+    LayerElement *firstElem = params->m_current.at(0);
+    Staff *staff = firstElem->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+
+    const int extension
+        = params->m_doc->GetDrawingLedgerLineExtension(staff->m_drawingStaffSize, firstElem->GetDrawingCueSize());
+
+    if ((abs(params->m_accumulatedShift) < 2 * extension) && params->m_ignoreDots) {
+        // Check each pair of notes from different layers for possible collisions of ledger lines with note stems
+        const bool handleLedgerLineStemCollision = std::any_of(
+            params->m_current.begin(), params->m_current.end(), [params, staff](LayerElement *currentElem) {
+                if (!currentElem->Is(NOTE)) return false;
+                Note *currentNote = vrv_cast<Note *>(currentElem);
+                assert(currentNote);
+
+                return std::any_of(params->m_previous.begin(), params->m_previous.end(),
+                    [params, staff, currentNote](LayerElement *previousElem) {
+                        if (!previousElem->Is(NOTE)) return false;
+                        Note *previousNote = vrv_cast<Note *>(previousElem);
+                        assert(previousNote);
+
+                        return Note::HandleLedgerLineStemCollision(params->m_doc, staff, currentNote, previousNote);
+                    });
+            });
+
+        // To avoid collisions shift the chord or note to the left
+        if (handleLedgerLineStemCollision) {
+            auto itElem = std::find_if(
+                params->m_current.begin(), params->m_current.end(), [](LayerElement *elem) { return elem->Is(NOTE); });
+            assert(itElem != params->m_current.end());
+
+            LayerElement *chord = vrv_cast<Note *>(*itElem)->IsChordTone();
+            LayerElement *element = chord ? chord : (*itElem);
+
+            const int shift = 2 * extension - abs(params->m_accumulatedShift);
+            element->SetDrawingXRel(element->GetDrawingXRel() - shift);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
+{
+    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
+    assert(params);
+
+    // Because we are processing grace notes alignment backward (see Alignment::AdjustGraceXPos) we need
+    // to process the children (LayerElement) "by hand" in FORWARD manner
+    // (filters can be NULL because filtering was already applied in the parent)
+    for (auto child : this->GetChildren()) {
+        child->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
+{
+    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
+    assert(params);
+
+    if (m_accidSpace.empty()) return FUNCTOR_SIBLINGS;
+
+    assert(params->m_doc);
+    StaffDef *staffDef = params->m_doc->GetCurrentScoreDef()->GetStaffDef(this->GetN());
+    int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
+
+    std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
+    // process accid layer alignment
+    this->SetAccidLayerAlignment();
+
+    // Detect accids which are an octave apart => they will be grouped together in the multiset
+    std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;
+    std::copy(m_accidSpace.begin(), m_accidSpace.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
+
+    std::set<Accid *> adjustedAccids;
+    // Align the octaves
+    for (Accid *accid : m_accidSpace) {
+        // Skip any accid that was already adjusted
+        if (adjustedAccids.count(accid) > 0) continue;
+        auto range = octaveEquivalence.equal_range(accid);
+        // Handle at least two octave accids without unisons
+        int octaveAccidCount = 0;
+        std::set<data_OCTAVE> octaves;
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            Note *note = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
+            octaves.insert(note->GetOct());
+            ++octaveAccidCount;
+        }
+        if ((octaveAccidCount < 2) || ((int)octaves.size() < octaveAccidCount)) continue;
+        // Now adjust the octave accids and store the left most position
+        int minDrawingX = -VRV_UNSET;
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            this->AdjustAccidWithAccidSpace(*octaveIter, params->m_doc, staffSize, adjustedAccids);
+            minDrawingX = std::min(minDrawingX, (*octaveIter)->GetDrawingX());
+        }
+        // Finally, align the accidentals whenever the adjustment is not too large
+        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
+            const int dist = (*octaveIter)->GetDrawingX() - minDrawingX;
+            if ((dist > 0) && (*octaveIter)->HasContentHorizontalBB()) {
+                const int accidWidth = (*octaveIter)->GetContentRight() - (*octaveIter)->GetContentLeft();
+                if (dist < accidWidth / 2) {
+                    (*octaveIter)->SetDrawingXRel((*octaveIter)->GetDrawingXRel() - dist);
+                }
+            }
+        }
+    }
+
+    // Align accidentals for unison notes if any of them are present
+    for (Accid *accid : m_accidSpace) {
+        if (accid->GetDrawingUnisonAccid() == NULL) continue;
+        accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
+    }
+
+    const int count = (int)m_accidSpace.size();
+    const int middle = (count / 2) + (count % 2);
+    // Zig-zag processing
+    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
+        // top one - but skip if already adjusted (i.e. octaves)
+        if (adjustedAccids.count(m_accidSpace.at(i)) == 0) {
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
+        }
+
+        // Break with odd number of elements once the middle is reached
+        if (i == j) break;
+
+        // bottom one - but skip if already adjusted
+        if (adjustedAccids.count(m_accidSpace.at(j)) == 0) {
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int AlignmentReference::ScoreDefUnsetCurrent(FunctorParams *functorParams)
+{
+    Alignment *alignment = vrv_cast<Alignment *>(this->GetParent());
+    assert(alignment);
+
+    switch (alignment->GetType()) {
+        case ALIGNMENT_SCOREDEF_CLEF:
+        case ALIGNMENT_SCOREDEF_KEYSIG:
+        case ALIGNMENT_SCOREDEF_MENSUR:
+        case ALIGNMENT_SCOREDEF_METERSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_CLEF:
+        case ALIGNMENT_SCOREDEF_CAUTION_KEYSIG:
+        case ALIGNMENT_SCOREDEF_CAUTION_MENSUR:
+        case ALIGNMENT_SCOREDEF_CAUTION_METERSIG: this->ClearChildren(); break;
+        default: break;
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
