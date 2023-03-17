@@ -1741,7 +1741,6 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
-                && (iter->m_note->GetOct() == jter->m_note->GetOct())
                 && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
                 && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
