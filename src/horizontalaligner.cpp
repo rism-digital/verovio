@@ -578,8 +578,7 @@ bool Alignment::HasTimestampOnly() const
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef
-        = dynamic_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef = vrv_cast<AlignmentReference *>(this->FindDescendantByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
@@ -618,8 +617,8 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         }
         // Non cross staff normal case
         else {
-            layerRef = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
-            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
+            layerRef = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
+            if (layerRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
             if (staffRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
@@ -858,7 +857,7 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
 }
 
 void AlignmentReference::AdjustAccidWithAccidSpace(
-    Accid *accid, const Doc *doc, int staffSize, std::vector<Accid *> &adjustedAccids)
+    Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids)
 {
     std::vector<Accid *> leftAccids;
     const ArrayOfObjects &children = this->GetChildren();
@@ -871,11 +870,8 @@ void AlignmentReference::AdjustAccidWithAccidSpace(
         accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
     }
 
-    // if current accidental is not in the list then XRel wasn't adjusted and position is fine as it is - add it to the
-    // list. Generally this would happen with octave accidentals, that are processed first and most likely have no
-    // overlaps with other elements
-    if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end())
-        adjustedAccids.push_back(accid);
+    // Mark as adjusted (even if position was not altered)
+    adjustedAccids.insert(accid);
 }
 
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const

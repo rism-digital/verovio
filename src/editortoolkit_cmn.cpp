@@ -215,7 +215,7 @@ bool EditorToolkitCMN::Delete(std::string &elementId)
     if (!element) return false;
 
     if (element->Is(NOTE)) {
-        return this->DeleteNote(dynamic_cast<Note *>(element));
+        return this->DeleteNote(vrv_cast<Note *>(element));
     }
     return false;
 }
@@ -227,7 +227,7 @@ bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+        Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname

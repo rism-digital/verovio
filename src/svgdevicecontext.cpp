@@ -71,7 +71,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
 
     m_outdata.clear();
 
-    m_glyphPostfixId = Object::GenerateRandID();
+    m_glyphPostfixId = Object::GenerateHashID();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -112,7 +112,7 @@ void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resour
 
     pugi::xml_node css = m_svgNode.append_child("style");
     css.append_attribute("type") = "text/css";
-    css.append_child(pugi::node_pcdata).set_value(cssContent.c_str());
+    css.text().set(cssContent.c_str());
 }
 
 void SvgDeviceContext::Commit(bool xml_declaration)
@@ -272,7 +272,7 @@ void SvgDeviceContext::StartGraphic(
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
             svgTitle.append_attribute("class") = "labelAttr";
-            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+            svgTitle.text().set(att->GetLabel().c_str());
         }
     }
 
@@ -350,7 +350,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
             svgTitle.append_attribute("class") = "labelAttr";
-            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+            svgTitle.text().set(att->GetLabel().c_str());
         }
     }
 
@@ -451,7 +451,7 @@ void SvgDeviceContext::StartPage()
     if (!m_css.empty()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.append_child(pugi::node_pcdata).set_value(m_css.c_str());
+        m_currentNode.text().set(m_css.c_str());
         m_currentNode = m_svgNodeStack.back();
     }
 
@@ -967,7 +967,7 @@ void SvgDeviceContext::DrawText(
         }
     }
     textChild.append_attribute("class") = "text";
-    textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
+    textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
         && (width != VRV_UNSET) && (height != VRV_UNSET)) {
@@ -1071,7 +1071,7 @@ void SvgDeviceContext::DrawBackgroundImage(int x, int y) {}
 void SvgDeviceContext::AddDescription(const std::string &text)
 {
     pugi::xml_node desc = m_currentNode.append_child("desc");
-    desc.append_child(pugi::node_pcdata).set_value(text.c_str());
+    desc.text().set(text.c_str());
 }
 
 void SvgDeviceContext::AppendIdAndClass(

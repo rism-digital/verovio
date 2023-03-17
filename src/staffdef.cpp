@@ -115,6 +115,13 @@ bool StaffDef::IsSupportedChild(Object *child)
     return true;
 }
 
+int StaffDef::GetInsertOrderFor(ClassId classId) const
+{
+    // Anything else goes at the end
+    static const std::vector s_order({ LABEL, LABELABBR });
+    return this->GetInsertOrderForIn(classId, s_order);
+}
+
 bool StaffDef::HasLayerDefWithLabel() const
 {
     // First get all the staffGrps

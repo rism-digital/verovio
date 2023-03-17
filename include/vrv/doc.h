@@ -104,6 +104,11 @@ public:
     bool GenerateMeasureNumbers();
 
     /**
+     * Generate an MEI header
+     */
+    void GenerateMEIHeader(bool meiBasic);
+
+    /**
      * Getter and setter for the DocType.
      * The setter resets the document.
      */
@@ -472,6 +477,11 @@ private:
      */
     int CalcMusicFontSize();
 
+    /**
+     * Generate the measure indices
+     */
+    void PrepareMeasureIndices();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
@@ -509,8 +519,6 @@ public:
     int m_drawingPageMarginRight;
     /** The current page top margin */
     int m_drawingPageMarginTop;
-    /** the current beam minimal slope */
-    float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
 

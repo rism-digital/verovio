@@ -98,6 +98,13 @@ bool StaffGrp::IsSupportedChild(Object *child)
     return true;
 }
 
+int StaffGrp::GetInsertOrderFor(ClassId classId) const
+{
+    // Anything else goes at the end
+    static const std::vector s_order({ GRPSYM, LABEL, LABELABBR, INSTRDEF });
+    return this->GetInsertOrderForIn(classId, s_order);
+}
+
 void StaffGrp::FilterList(ListOfConstObjects &childList) const
 {
     // We want to keep only staffDef

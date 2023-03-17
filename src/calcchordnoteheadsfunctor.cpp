@@ -49,6 +49,9 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitChord(Chord *chord)
 
 FunctorCode CalcChordNoteHeadsFunctor::VisitNote(Note *note)
 {
+    // Nothing to calculate if note is not part of the chord
+    if (!note->IsChordTone()) return FUNCTOR_SIBLINGS;
+
     Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
     const int staffSize = staff->m_drawingStaffSize;
 

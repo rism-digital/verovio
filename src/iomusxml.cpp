@@ -488,7 +488,7 @@ Layer *MusicXmlInput::SelectLayer(short int layerNum, Staff *staff)
     }
     else {
         AttNIntegerComparison comparisonLayer(LAYER, layerNum);
-        layer = dynamic_cast<Layer *>(staff->FindDescendantByComparison(&comparisonLayer, 1));
+        layer = vrv_cast<Layer *>(staff->FindDescendantByComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
     // else add it
@@ -547,7 +547,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
 void MusicXmlInput::GenerateID(pugi::xml_node node)
 {
-    std::string id = StringFormat("%s-%s", node.name(), Object::GenerateRandID().c_str()).c_str();
+    std::string id = StringFormat("%s-%s", node.name(), Object::GenerateHashID().c_str()).c_str();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     node.append_attribute("xml:id").set_value(id.c_str());
 }
@@ -1088,7 +1088,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
+            measure = vrv_cast<Measure *>(section->FindDescendantByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning("MusicXML import: Element '%s' could not be added to measure %s",
@@ -1252,10 +1252,10 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     GenerateID(app);
     pugi::xml_node appName = app.append_child("name");
     GenerateID(appName);
-    appName.append_child(pugi::node_pcdata).set_value("Verovio");
+    appName.text().set("Verovio");
     pugi::xml_node appText = app.append_child("p");
     GenerateID(appText);
-    appText.append_child(pugi::node_pcdata).set_value("Transcoded from MusicXML");
+    appText.text().set("Transcoded from MusicXML");
 
     // isodate and version
     time_t t = time(0); // get time now
@@ -1309,7 +1309,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
         for (int i = 0; i < nbStaves; ++i) {
             // Find or create the staffDef
             AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&comparisonStaffDef, 1));
+            StaffDef *staffDef = vrv_cast<StaffDef *>(staffGrp->FindDescendantByComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
@@ -1774,7 +1774,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         // check if we have a staff number
         short int staffNum = clef.attribute("number").as_int();
         staffNum = (staffNum < 1) ? 1 : staffNum;
-        Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
+        Staff *staff = vrv_cast<Staff *>(measure->GetChild(staffNum - 1, STAFF));
         assert(staff);
         Clef *meiClef = ConvertClef(clef);
         if (meiClef) {
@@ -2616,7 +2616,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
-        MRpt *mRpt = dynamic_cast<MRpt *>((*layer).GetFirst(MRPT));
+        MRpt *mRpt = vrv_cast<MRpt *>(layer->GetFirst(MRPT));
         if (!mRpt) {
             mRpt = new MRpt();
             AddLayerElement(layer, mRpt);
@@ -2681,6 +2681,11 @@ void MusicXmlInput::ReadMusicXmlNote(
     const int duration = node.child("duration").text().as_int();
     const int noteStaffNum = node.child("staff").text().as_int();
     const pugi::xml_node rest = node.child("rest");
+    if (m_ppq < 0 && duration && !typeStr.empty()) {
+        // if divisions are missing, try to calculate
+        m_ppq = (double)duration * pow(2, ConvertTypeToDur(typeStr) - 2) / 4;
+    }
+
     if (rest) {
         const std::string stepStr = rest.child("display-step").text().as_string();
         const std::string octaveStr = rest.child("display-octave").text().as_string();
@@ -2824,7 +2829,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
             if (pitch.child("alter")) {
-                Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
@@ -2914,7 +2919,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!isTablature && (nextIsChord || node.child("chord"))) {
             if (chord == NULL && m_elementStackMap.at(layer).size() > 0
                 && m_elementStackMap.at(layer).back()->Is(CHORD)) {
-                chord = dynamic_cast<Chord *>(m_elementStackMap.at(layer).back());
+                chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
             }
             if (!chord) {
                 LogError("MusicXML import: Chord starting point has not been found.");
@@ -3562,11 +3567,11 @@ void MusicXmlInput::ReadMusicXmlNote(
         int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
         if (breakSec) {
             if (element->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(element);
+                Note *note = vrv_cast<Note *>(element);
                 note->SetBreaksec(breakSec);
             }
             else if (element->Is(CHORD)) {
-                Chord *chord = dynamic_cast<Chord *>(element);
+                Chord *chord = vrv_cast<Chord *>(element);
                 chord->SetBreaksec(breakSec);
             }
             else if (element->Is(TABGRP)) {

@@ -182,7 +182,7 @@ bool Syl::CreateDefaultZone(Doc *doc)
     const int offsetLrx = 100;
     const int offsetLry = 200;
 
-    LayerElement *syllable = dynamic_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
+    LayerElement *syllable = vrv_cast<LayerElement *>(this->GetFirstAncestor(SYLLABLE));
     if (syllable == NULL) { // Only do this for neume notation
         return false;
     }

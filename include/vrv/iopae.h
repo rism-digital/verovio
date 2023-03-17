@@ -92,8 +92,6 @@ public:
     bool WriteObjectEnd(Object *object) override;
 
 private:
-    bool WriteDoc(Doc *doc);
-
     /**
      * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
      */
@@ -558,6 +556,11 @@ private:
      * The method then performs some additional checks of the content (to be implemented)
      */
     bool Parse();
+
+    /**
+     * Parse the metadata in the \@header json object
+     */
+    void ParseHeader(jsonxx::Object &header);
 
     /**
      * @name Methods that convert pae::Token::m_char to pae::Token::m_objects

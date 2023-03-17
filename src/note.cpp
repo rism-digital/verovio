@@ -62,6 +62,7 @@ Note::Note()
     , AttCue()
     , AttExtSym()
     , AttGraced()
+    , AttHarmonicFunction()
     , AttMidiVelocity()
     , AttNoteGesTab()
     , AttNoteHeads()
@@ -79,6 +80,7 @@ Note::Note()
     this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_HARMONICFUNCTION);
     this->RegisterAttClass(ATT_NOTEGESTAB);
     this->RegisterAttClass(ATT_NOTEHEADS);
     this->RegisterAttClass(ATT_NOTEVISMENSURAL);
@@ -105,6 +107,7 @@ void Note::Reset()
     this->ResetCue();
     this->ResetExtSym();
     this->ResetGraced();
+    this->ResetHarmonicFunction();
     this->ResetNoteGesTab();
     this->ResetNoteHeads();
     this->ResetNoteVisMensural();
@@ -202,12 +205,12 @@ void Note::AlignDotsShift(const Note *otherNote)
 
 Accid *Note::GetDrawingAccid()
 {
-    return dynamic_cast<Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<Accid *>(this->FindDescendantByType(ACCID));
 }
 
 const Accid *Note::GetDrawingAccid() const
 {
-    return dynamic_cast<const Accid *>(this->FindDescendantByType(ACCID));
+    return vrv_cast<const Accid *>(this->FindDescendantByType(ACCID));
 }
 
 bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) const
@@ -227,17 +230,17 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) 
 
 Chord *Note::IsChordTone()
 {
-    return dynamic_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast<Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 const Chord *Note::IsChordTone() const
 {
-    return dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur() const
 {
-    const Chord *chordParent = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
+    const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
@@ -255,12 +258,12 @@ bool Note::IsClusterExtreme() const
 
 TabGrp *Note::IsTabGrpNote()
 {
-    return dynamic_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return vrv_cast<TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 const TabGrp *Note::IsTabGrpNote() const
 {
-    return dynamic_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
+    return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
 std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const

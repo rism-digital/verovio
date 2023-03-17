@@ -252,7 +252,19 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    return this->SetValue(std::stod(value));
+    // Convert string to double
+    double number = 0.0;
+    try {
+        number = std::stod(value);
+    }
+    catch (const std::exception &e) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
+            this->GetKey().c_str());
+        return false;
+    }
+
+    // Check bounds and set the value
+    return this->SetValue(number);
 }
 
 std::string OptionDbl::GetStrValue() const
@@ -328,7 +340,19 @@ bool OptionInt::SetValueDbl(double value)
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    return this->SetValue(std::stoi(value));
+    // Convert string to int
+    int number = 0;
+    try {
+        number = std::stoi(value);
+    }
+    catch (const std::exception &e) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
+            this->GetKey().c_str());
+        return false;
+    }
+
+    // Check bounds and set the value
+    return this->SetValue(number);
 }
 
 std::string OptionInt::GetStrValue() const
@@ -996,7 +1020,7 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
-    m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
+    m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
@@ -1024,7 +1048,7 @@ Options::Options()
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
 
-    m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
+    m_landscape.SetInfo("Landscape orientation", "Swap the values for page height and page width");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
@@ -1097,7 +1121,7 @@ Options::Options()
     this->Register(&m_pageMarginTop, "pageMarginTop", &m_general);
 
     m_pageWidth.SetInfo("Page width", "The page width");
-    m_pageWidth.Init(2100, 100, 60000, true);
+    m_pageWidth.Init(2100, 100, 100000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
     m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
@@ -1216,10 +1240,6 @@ Options::Options()
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
     m_beamMaxSlope.Init(10, 0, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
-
-    m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
-    m_beamMinSlope.Init(0, 0, 0);
-    this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
     m_beamMixedPreserve.SetInfo("Preserve mixed beams", "Mixed beams will be drawn even if there is not enough space");
     m_beamMixedPreserve.Init(false);
@@ -1384,7 +1404,7 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
-    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in unit");
+    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in MEI units");
     m_multiRestThickness.Init(2.0, 0.50, 6.00);
     this->Register(&m_multiRestThickness, "multiRestThickness", &m_generalLayout);
 
@@ -1395,6 +1415,11 @@ Options::Options()
     m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
+
+    m_octaveNoSpanningParentheses.SetInfo("No parentheses on spanning octaves",
+        "Do not enclose octaves that are spanning over systems with parentheses.");
+    m_octaveNoSpanningParentheses.Init(false);
+    this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
@@ -1468,7 +1493,7 @@ Options::Options()
     m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
-    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
+    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in MEI units");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
 
@@ -1534,6 +1559,11 @@ Options::Options()
         "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
+
+    m_loadSelectedMdivOnly.SetInfo(
+        "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
+    m_loadSelectedMdivOnly.Init(false);
+    this->Register(&m_loadSelectedMdivOnly, "loadSelectedMdivOnly", &m_selectors);
 
     m_mdivAll.SetInfo("Mdiv all", "Load and render all <mdiv> elements in the MEI files");
     m_mdivAll.Init(false);

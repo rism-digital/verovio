@@ -77,6 +77,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     this->RegisterAttClass(ATT_TYPED);
 
     m_measuredMusic = measureMusic;
+
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
     // Idem for timestamps
@@ -129,6 +130,8 @@ void Measure::Reset()
     this->ResetNNumberLike();
     this->ResetPointing();
     this->ResetTyped();
+
+    m_index = VRV_UNSET;
 
     this->ResetDrawingScoreDef();
 

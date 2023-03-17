@@ -127,6 +127,13 @@ FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement
     // The element is starting after the event end - we can stop here
     if (time >= (m_time + m_duration)) return FUNCTOR_STOP;
 
+    if (layerElement->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(layerElement);
+        const Chord *chord = note->IsChordTone();
+        if (chord && (std::find(m_elements.begin(), m_elements.end(), chord) != m_elements.end())) {
+            return FUNCTOR_CONTINUE;
+        }
+    }
     m_elements.push_back(layerElement);
 
     // Not need to recurse for chords

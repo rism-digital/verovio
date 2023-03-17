@@ -13,6 +13,7 @@
 #include <climits>
 #include <iostream>
 #include <math.h>
+#include <random>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -64,7 +65,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 thread_local unsigned long Object::s_objectCounter = 0;
-thread_local std::mt19937 Object::s_randomGenerator;
+thread_local uint32_t Object::s_xmlIDCounter = 0;
 
 Object::Object() : BoundingBox()
 {
@@ -769,7 +770,7 @@ int Object::DeleteChildrenByComparison(Comparison *comparison)
 
 void Object::GenerateID()
 {
-    m_id = m_classIdStr.at(0) + Object::GenerateRandID();
+    m_id = m_classIdStr.at(0) + Object::GenerateHashID();
 }
 
 void Object::ResetID()
@@ -803,8 +804,29 @@ void Object::AddChild(Object *child)
     }
 
     child->SetParent(this);
-    m_children.push_back(child);
+    const int insertOrder = this->GetInsertOrderFor(child->GetClassId());
+    // no child or no order specify, the child is appended at the end
+    if (m_children.empty() || insertOrder == VRV_UNSET) {
+        m_children.push_back(child);
+    }
+    else {
+        int i = 0;
+        for (const Object *existingChild : m_children) {
+            // By doing abs() we convert VRV_UNSET to a positive and insert anything with an insertOrder before it
+            if (abs(this->GetInsertOrderFor(existingChild->GetClassId())) > insertOrder) break;
+            ++i;
+        }
+        i = std::min(i, (int)m_children.size());
+        m_children.insert(m_children.begin() + i, child);
+    }
     Modify();
+}
+
+int Object::GetInsertOrderForIn(ClassId classId, const std::vector<ClassId> &order) const
+{
+    std::vector<ClassId>::const_iterator classIdIt = std::find(order.begin(), order.end(), classId);
+    if (classIdIt == order.end()) return VRV_UNSET;
+    return static_cast<int>(std::distance(order.begin(), classIdIt));
 }
 
 int Object::GetDrawingX() const
@@ -1323,27 +1345,34 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
 // Static methods for Object
 //----------------------------------------------------------------------------
 
-void Object::SeedID(unsigned int seed)
+void Object::SeedID(uint32_t seed)
 {
-    // Init random number generator for ids
     if (seed == 0) {
+        // Random start ID
         std::random_device rd;
-        s_randomGenerator.seed(rd());
+        std::mt19937 randomGenerator(rd());
+        s_xmlIDCounter = randomGenerator();
     }
     else {
-        s_randomGenerator.seed(seed);
+        // Deterministic start ID
+        s_xmlIDCounter = Hash(seed);
     }
 }
 
-std::string Object::GenerateRandID()
+std::string Object::GenerateHashID()
 {
-    unsigned int nr = s_randomGenerator();
-
-    // char str[17];
-    // snprintf(str, 17, "%016d", nr);
-    // return std::string(str);
+    uint32_t nr = Hash(++s_xmlIDCounter);
 
     return BaseEncodeInt(nr, 36);
+}
+
+uint32_t Object::Hash(uint32_t number, bool reverse)
+{
+    const uint32_t magicNumber = reverse ? 0x119de1f3 : 0x45d9f3b;
+    number = ((number >> 16) ^ number) * magicNumber;
+    number = ((number >> 16) ^ number) * magicNumber;
+    number = (number >> 16) ^ number;
+    return number;
 }
 
 bool Object::sortByUlx(Object *a, Object *b)

@@ -133,7 +133,7 @@ const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
@@ -159,7 +159,7 @@ const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
@@ -718,7 +718,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    const System *last = dynamic_cast<const System *>(this->GetLast(SYSTEM));
+    const System *last = vrv_cast<const System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -902,7 +902,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
         // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             if (this->GetChildCount()) {
-                System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
+                System *last = vrv_cast<System *>(this->GetLast(SYSTEM));
                 assert(last);
                 const int unit = params->m_doc->GetDrawingUnit(100);
                 const int topMargin = params->m_doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;

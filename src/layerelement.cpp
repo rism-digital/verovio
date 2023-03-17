@@ -195,10 +195,10 @@ bool LayerElement::IsGraceNote() const
     // For accid, artic, etc.. look at the parent note / chord
     else {
         // For an accid we expect to be the child of a note - the note will lookup at the chord parent in necessary
-        const Note *note = dynamic_cast<const Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+        const Note *note = vrv_cast<const Note *>(this->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) return note->IsGraceNote();
         // For an artic we can be direct child of a chord
-        const Chord *chord = dynamic_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
+        const Chord *chord = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_ACCID_DEPTH));
         if (chord) return chord->IsGraceNote();
     }
     return false;
@@ -883,8 +883,8 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
         return {};
     }
 
-    Staff *staff = this->GetAncestorStaff();
-    const int layerCount = staff->GetChildCount(LAYER);
+    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
+    const int layerCount = layer->GetLayerCountForTimeSpanOf(this);
 
     // Calculate primary/secondary dot locations
     const MapOfDotLocs dotLocs1 = this->CalcDotLocations(layerCount, true);
@@ -968,40 +968,62 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
 
     Staff *staff = this->GetAncestorStaff();
 
+    const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int leftMargin = 0;
     int rightMargin = 0;
+    bool sameDirElement = false;
     std::vector<int> elementOverlaps;
     for (Object *object : collidingElementsList) {
         LayerElement *layerElement = vrv_cast<LayerElement *>(object);
         if (!this->HorizontalContentOverlap(object)) continue;
+        const int elementBottom = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+        const int elementTop = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize);
         if (direction > 0) {
             // make sure that there's actual overlap first
-            if ((layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y1)
-                && (layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) > y2))
-                continue;
-            leftMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y1;
-            rightMargin = layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) - y2;
+            if ((elementBottom > y1) && (elementBottom > y2)) continue;
+            const int currentBottom = this->GetDrawingBottom(doc, staff->m_drawingStaffSize);
+            if (currentBottom >= elementTop) continue;
+            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
+            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))) {
+                if (elementBottom - stemInterface->GetDrawingStemLen() < currentBottom) continue;
+                leftMargin = unit + y1 - elementBottom;
+                rightMargin = unit + y2 - elementBottom;
+                sameDirElement = true;
+            }
+            else {
+                leftMargin = elementTop - y1;
+                rightMargin = elementTop - y2;
+            }
         }
         else {
             // make sure that there's actual overlap first
-            if ((layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y1)
-                && (layerElement->GetDrawingTop(doc, staff->m_drawingStaffSize, true) < y2))
-                continue;
-            leftMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y1;
-            rightMargin = layerElement->GetDrawingBottom(doc, staff->m_drawingStaffSize, true) - y2;
+            if ((elementTop < y1) && (elementTop < y2)) continue;
+            const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize);
+            if (currentTop <= elementBottom) continue;
+            const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
+            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
+                if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
+                leftMargin = unit + y1 - elementTop;
+                rightMargin = unit + y2 - elementTop;
+                sameDirElement = true;
+            }
+            else {
+                leftMargin = elementBottom - y1;
+                rightMargin = elementBottom - y2;
+            }
         }
         elementOverlaps.emplace_back(std::max(leftMargin * direction, rightMargin * direction));
     }
     if (elementOverlaps.empty()) return 0;
 
-    const int staffOffset = doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const auto maxOverlap = std::max_element(elementOverlaps.begin(), elementOverlaps.end());
     int overlap = 0;
     if (*maxOverlap >= 0) {
-        overlap = ((*maxOverlap == 0) ? staffOffset : *maxOverlap) * direction;
+        const int multiplier = sameDirElement ? -1 : 1;
+        overlap = ((*maxOverlap == 0) ? unit : *maxOverlap) * direction * multiplier;
     }
     else {
-        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / staffOffset) * 2;
+        int maxShorteningInHalfUnits = (std::abs(*maxOverlap) / unit) * 2;
         if (maxShorteningInHalfUnits > 0) --maxShorteningInHalfUnits;
         this->SetElementShortening(maxShorteningInHalfUnits);
     }
@@ -1125,6 +1147,12 @@ int LayerElement::AdjustBeams(FunctorParams *functorParams)
         assert(accid);
         if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
         if (accid->HasPlace()) return FUNCTOR_CONTINUE;
+    }
+    const StemmedDrawingInterface *stemInterface = this->GetStemmedDrawingInterface();
+    if (stemInterface
+        && (((params->m_directionBias == 1) && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))
+            || ((params->m_directionBias == -1) && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down)))) {
+        return FUNCTOR_CONTINUE;
     }
 
     Staff *staff = this->GetAncestorStaff();

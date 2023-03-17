@@ -262,7 +262,7 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitObject(Object *object)
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = m_currentStaffDef;
         assert(staff->m_drawingTuning == NULL);
-        staff->m_drawingTuning = dynamic_cast<Tuning *>(m_currentStaffDef->FindDescendantByType(TUNING));
+        staff->m_drawingTuning = vrv_cast<Tuning *>(m_currentStaffDef->FindDescendantByType(TUNING));
         staff->m_drawingLines = m_currentStaffDef->GetLines();
         staff->m_drawingNotationType = m_currentStaffDef->GetNotationtype();
         staff->m_drawingStaffSize = 100;

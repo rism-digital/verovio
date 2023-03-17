@@ -69,6 +69,14 @@ public:
     bool IsMeasuredMusic() const { return m_measuredMusic; }
 
     /**
+     * Get and set the measure index
+     */
+    ///@{
+    int GetIndex() const { return m_index; }
+    void SetIndex(int index) { m_index = index; }
+    ///@}
+
+    /**
      * Methods for adding allowed content
      */
     bool IsSupportedChild(Object *object) override;
@@ -440,7 +448,15 @@ protected:
     ///@}
 
 private:
+    /**
+     * Indicates measured music (otherwise we have fake measures)
+     */
     bool m_measuredMusic;
+
+    /**
+     * The unique measure index
+     */
+    int m_index;
 
     /**
      * @name The measure barlines (left and right) used when drawing

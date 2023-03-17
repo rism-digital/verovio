@@ -261,6 +261,7 @@ void ScoreDef::Reset()
 
 bool ScoreDef::IsSupportedChild(Object *child)
 {
+    // Clef is actually not allowed as child of scoreDef in MEI
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
@@ -273,6 +274,7 @@ bool ScoreDef::IsSupportedChild(Object *child)
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
+    // Mensur is actually not allowed as child of scoreDef in MEI
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));
     }
@@ -281,9 +283,6 @@ bool ScoreDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(METERSIGGRP)) {
         assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
     }
     else if (child->IsRunningElement()) {
         assert(dynamic_cast<RunningElement *>(child));
@@ -295,6 +294,14 @@ bool ScoreDef::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+int ScoreDef::GetInsertOrderFor(ClassId classId) const
+{
+
+    static const std::vector s_order({ SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT,
+        PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
+    return this->GetInsertOrderForIn(classId, s_order);
 }
 
 void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
@@ -580,42 +587,42 @@ void ScoreDef::SetDrawingLabelsWidth(int width)
 
 PgFoot *ScoreDef::GetPgFoot()
 {
-    return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 const PgFoot *ScoreDef::GetPgFoot() const
 {
-    return dynamic_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 PgFoot2 *ScoreDef::GetPgFoot2()
 {
-    return dynamic_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 const PgFoot2 *ScoreDef::GetPgFoot2() const
 {
-    return dynamic_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 PgHead *ScoreDef::GetPgHead()
 {
-    return dynamic_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 const PgHead *ScoreDef::GetPgHead() const
 {
-    return dynamic_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 PgHead2 *ScoreDef::GetPgHead2()
 {
-    return dynamic_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 const PgHead2 *ScoreDef::GetPgHead2() const
 {
-    return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 int ScoreDef::GetMaxStaffSize() const
@@ -630,7 +637,7 @@ bool ScoreDef::IsSectionRestart() const
     // In page-based structure, Section is a sibling to scoreDef
     // This has limitations: will not work with editorial markup, additional nested sections, and
     // if the section milestone is in the previous system.
-    const Section *section = dynamic_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    const Section *section = vrv_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
@@ -639,7 +646,8 @@ bool ScoreDef::HasSystemStartLine() const
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
-        if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
+        ListOfConstObjects allDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+        if ((firstDef && lastDef && allDefs.size() > 1) || staffGrp->GetFirst(GRPSYM)) {
             return (this->GetSystemLeftline() != BOOLEAN_false);
         }
         return (this->GetSystemLeftline() == BOOLEAN_true);
