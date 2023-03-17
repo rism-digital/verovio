@@ -80,10 +80,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
     /**
-     * See Object::AlignHorizontally
+     * Interface for class functor visitation
      */
-    int AlignHorizontally(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     /**

@@ -119,8 +119,6 @@ public:
     ///@{
     /** Return true if the element is a grace note */
     bool IsGraceNote() const;
-    /** Return true if the element is has to be rederred as cue sized */
-    bool GetDrawingCueSize() const;
     /** Return true if the element is a note within a ligature */
     bool IsInLigature() const;
     /** Return the FTrem parten if the element is a note or a chord within a fTrem */
@@ -135,6 +133,14 @@ public:
     Beam *GetAncestorBeam();
     const Beam *GetAncestorBeam() const;
     bool IsInBeam() const;
+    ///@}
+
+    /**
+     * @name Setter and getter for the drawingCueSize flag
+     */
+    ///@{
+    void SetDrawingCueSize(bool drawingCueSize) { m_drawingCueSize = drawingCueSize; }
+    bool GetDrawingCueSize() const { return m_drawingCueSize; }
     ///@}
 
     /**
@@ -172,8 +178,10 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel);
+    void CacheYRel(bool restore = false);
     ///@}
 
     /**
@@ -198,11 +206,13 @@ public:
     int GetDrawingRadius(const Doc *doc, bool isInLigature = false) const;
 
     /**
-     * Alignment getter
+     * Alignment setter and getter
      */
     ///@{
     Alignment *GetAlignment() { return m_alignment; }
     const Alignment *GetAlignment() const { return m_alignment; }
+    void ResetAlignment() { m_alignment = NULL; }
+    void SetAlignment(Alignment *alignment) { m_alignment = alignment; }
     ///@}
 
     /**
@@ -241,6 +251,7 @@ public:
     ///@{
     Alignment *GetGraceAlignment();
     const Alignment *GetGraceAlignment() const;
+    void ResetGraceAlignment() { m_graceAlignment = NULL; }
     void SetGraceAlignment(Alignment *graceAlignment);
     bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
     ///@}
@@ -301,24 +312,30 @@ public:
      */
     char32_t StemModToGlyph(data_STEMMODIFIER stemMod) const;
 
+    /**
+     * Calculate the optimal dot location for a note or chord
+     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
+     */
+    MapOfDotLocs CalcOptimalDotLocations();
+
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::AdjustBeams
      */
     int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
@@ -331,89 +348,14 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    ///@{
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::AdjustTupletNumOverlap
      */
     int AdjustTupletNumOverlap(FunctorParams *functorParams) const override;
 
     /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustXRelForTranscription
      */
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareCueSize
-     */
-    int PrepareCueSize(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareCrossStaff
-     */
-    ///@{
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-    int PrepareCrossStaffEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::PreparePointersByLayer
-     */
-    int PreparePointersByLayer(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDelayedTurns
-     */
-    int PrepareDelayedTurns(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimePointing
-     */
-    int PrepareTimePointing(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    int PrepareTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcAlignmentPitchPos
-     */
-    int CalcAlignmentPitchPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::FindSpannedLayerElements
-     */
-    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::LayerCountInTimeSpan
-     */
-    int LayerCountInTimeSpan(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::LayerElementsInTimeSpan
-     */
-    int LayerElementsInTimeSpan(FunctorParams *functorParams) const override;
 
     /**
      * See Object::InitOnsetOffset
@@ -446,31 +388,6 @@ public:
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GetRelativeLayerElement
-     */
-    int GetRelativeLayerElement(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::CalcSlurDirection
-     */
-    int CalcSlurDirection(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.
@@ -499,12 +416,6 @@ protected:
      */
     int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
 
-    /**
-     * Calculate the optimal dot location for a note or chord
-     * Takes two layers into account in order to avoid collisions of dots between corresponding notes/chords
-     */
-    MapOfDotLocs CalcOptimalDotLocations();
-
     //----------------//
     // Static methods //
     //----------------//
@@ -528,17 +439,12 @@ private:
      */
     void GetChordOverflow(StaffAlignment *&above, StaffAlignment *&below, int staffN);
 
-    /**
-     * Calculate offset and left overlap of the element
-     */
-    std::pair<int, int> CalculateXPosOffset(FunctorParams *functorParams);
-
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
-     * See Object::PrepareCrossStaff
+     * See PrepareCrossStaffFunctor
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;
@@ -574,7 +480,7 @@ protected:
     int m_cachedXRel;
 
     /**
-     * The cached drawing cue size set by PrepareCueSize
+     * The cached drawing cue size set by PrepareCueSizeFunctor
      */
     bool m_drawingCueSize;
 

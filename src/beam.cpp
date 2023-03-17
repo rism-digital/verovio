@@ -19,6 +19,7 @@
 #include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "gracegrp.h"
 #include "layer.h"
@@ -1735,6 +1736,26 @@ bool Beam::IsTabBeam() const
     return (this->FindDescendantByType(TABGRP));
 }
 
+FunctorCode Beam::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBeam(this);
+}
+
+FunctorCode Beam::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeam(this);
+}
+
+FunctorCode Beam::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeamEnd(this);
+}
+
+FunctorCode Beam::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeamEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // BeamSpanSegment
 //----------------------------------------------------------------------------
@@ -1811,7 +1832,8 @@ BeamElementCoord::~BeamElementCoord() {}
 data_STEMDIRECTION BeamElementCoord::GetStemDir() const
 {
     // m_stem is not necessary set, so we need to look at the Note / Chord original value
-    // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
+    // Example: IsInBeam called in PrepareLayerElementPartsFunctor::VisitNote when reaching
+    // the first note of the beam
     if (m_stem) {
         return m_stem->GetDir();
     }
@@ -2178,69 +2200,6 @@ int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
     }
     params->m_beam = NULL;
     params->m_overlapMargin = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    const ListOfObjects &beamChildren = this->GetList(this);
-
-    // Should we assert this at the beginning?
-    if (beamChildren.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (!this->HasCoords()) {
-        this->InitCoords(beamChildren, staff, this->GetPlace());
-        const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
-        this->InitCue(isCue);
-    }
-
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
-
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    data_BEAMPLACE initialPlace = this->GetPlace();
-    if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
-
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
-
-    if (this->HasStemSameasBeam())
-        m_beamSegment.CalcNoteHeadShiftForStemSameas(this->GetStemSameasBeam(), initialPlace);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_beamSegment.m_stemSameasRole = SAMEAS_NONE;
-    m_beamSegment.m_stemSameasReverseRole = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    BeamDrawingInterface::Reset();
-
-    m_beamSegment.Reset();
-    m_stemSameas = NULL;
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
 
     return FUNCTOR_CONTINUE;
 }

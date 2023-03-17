@@ -16,6 +16,7 @@
 #include "artic.h"
 #include "controlelement.h"
 #include "fig.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -121,6 +122,26 @@ bool EditorialElement::IsSupportedChild(Object *child)
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode EditorialElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitEditorialElement(this);
+}
+
+FunctorCode EditorialElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitEditorialElement(this);
+}
+
+FunctorCode EditorialElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitEditorialElementEnd(this);
+}
+
+FunctorCode EditorialElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitEditorialElementEnd(this);
+}
+
 int EditorialElement::Save(FunctorParams *functorParams)
 {
     SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
@@ -166,24 +187,6 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     assert(params);
 
     if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int EditorialElement::PrepareMilestones(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int EditorialElement::ResetData(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-    }
 
     return FUNCTOR_CONTINUE;
 }

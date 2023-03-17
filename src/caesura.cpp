@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -64,6 +65,26 @@ char32_t Caesura::GetCaesuraGlyph() const
 
     // return standard glyph
     return SMUFL_E4D1_caesura;
+}
+
+FunctorCode Caesura::Accept(MutableFunctor &functor)
+{
+    return functor.VisitCaesura(this);
+}
+
+FunctorCode Caesura::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitCaesura(this);
+}
+
+FunctorCode Caesura::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitCaesuraEnd(this);
+}
+
+FunctorCode Caesura::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitCaesuraEnd(this);
 }
 
 } // namespace vrv

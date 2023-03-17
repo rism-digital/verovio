@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
@@ -127,14 +128,24 @@ std::pair<char32_t, char32_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) cons
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams) const
+FunctorCode MeterSig::Accept(MutableFunctor &functor)
 {
-    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
+    return functor.VisitMeterSig(this);
+}
 
-    params->m_meterSig = this;
+FunctorCode MeterSig::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMeterSig(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode MeterSig::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMeterSigEnd(this);
+}
+
+FunctorCode MeterSig::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeterSigEnd(this);
 }
 
 } // namespace vrv

@@ -18,11 +18,14 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "calcalignmentpitchposfunctor.h"
+#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "gracegrp.h"
 #include "horizontalaligner.h"
@@ -379,44 +382,6 @@ Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-data_STEMDIRECTION Chord::CalcStemDirection(int verticalCenter) const
-{
-    const ListOfConstObjects &childList = this->GetList(this);
-    ListOfConstObjects topNotes, bottomNotes;
-
-    // split notes into two vectors - notes above vertical center and below
-    std::partition_copy(childList.begin(), childList.end(), std::back_inserter(topNotes),
-        std::back_inserter(bottomNotes),
-        [verticalCenter](const Object *note) { return note->GetDrawingY() > verticalCenter; });
-
-    auto bottomIter = bottomNotes.begin();
-    auto topIter = topNotes.rbegin();
-    for (; bottomIter != bottomNotes.end() && topIter != topNotes.rend(); ++bottomIter, ++topIter) {
-        const int bottomY = (*bottomIter)->GetDrawingY();
-        const int topY = (*topIter)->GetDrawingY();
-        const int middlePoint = (topY + bottomY) / 2;
-
-        // if notes are equidistant - proceed to the next pair of notes
-        if (middlePoint == verticalCenter) {
-            continue;
-        }
-        // otherwise return corresponding stem direction
-        else if (middlePoint > verticalCenter) {
-            return STEMDIRECTION_down;
-        }
-        else if (middlePoint < verticalCenter) {
-            return STEMDIRECTION_up;
-        }
-    }
-
-    // if there are still unprocessed notes left on the bottom that are not on the center - stem direction should be up
-    if ((bottomIter != bottomNotes.end()) && ((*bottomIter)->GetDrawingY() != verticalCenter)) {
-        return STEMDIRECTION_up;
-    }
-    // otherwise place it down
-    return STEMDIRECTION_down;
-}
-
 int Chord::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
@@ -577,6 +542,26 @@ std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Chord::Accept(MutableFunctor &functor)
+{
+    return functor.VisitChord(this);
+}
+
+FunctorCode Chord::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitChord(this);
+}
+
+FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitChordEnd(this);
+}
+
+FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitChordEnd(this);
+}
+
 int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
@@ -585,13 +570,11 @@ int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
     if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(params->m_doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(params->m_doc);
+    this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(params->m_doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(params->m_doc);
+    this->Process(calcStem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -686,105 +669,6 @@ int Chord::AdjustArtic(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    // Set them to NULL in any case
-    params->m_interface = NULL;
-
-    // Stems have been calculated previously in beam or fTrem - siblings because flags do not need to
-    // be processed either
-    if (this->IsInBeam() || this->GetAncestorFTrem()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // if the chord isn't visible, carry on
-    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Stem *stem = this->GetDrawingStem();
-    assert(stem);
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    if (m_crossStaff) {
-        staff = m_crossStaff;
-        layer = m_crossLayer;
-    }
-
-    // Cache the in params to avoid further lookup
-    params->m_staff = staff;
-    params->m_layer = layer;
-    params->m_interface = this;
-    params->m_dur = this->GetNoteOrChordDur(this);
-    params->m_isGraceNote = this->IsGraceNote();
-    params->m_isStemSameasSecondary = false;
-
-    /************ Set the direction ************/
-
-    int yMax, yMin;
-    this->GetYExtremes(yMax, yMin);
-    params->m_chordStemLength = yMin - yMax;
-
-    int staffY = staff->GetDrawingY();
-    int staffSize = staff->m_drawingStaffSize;
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    if (stem->HasDir()) {
-        stemDir = stem->GetDir();
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        stemDir = this->CalcStemDirection(params->m_verticalCenter);
-    }
-
-    this->SetDrawingStemDir(stemDir);
-
-    // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up) {
-        stem->SetDrawingYRel(yMin - this->GetDrawingY());
-    }
-    // And to the top note when down
-    else {
-        stem->SetDrawingYRel(yMax - this->GetDrawingY());
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::CalcChordNoteHeads(FunctorParams *functorParams)
-{
-    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
-    assert(params);
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-
-    params->m_diameter = 0;
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-        if (this->IsInBeam()) {
-            params->m_diameter = 2 * this->GetDrawingRadius(params->m_doc);
-        }
-        else {
-            const Note *bottomNote = this->GetBottomNote();
-            const char32_t code = bottomNote->GetNoteheadGlyph(this->GetActualDur());
-            params->m_diameter = params->m_doc->GetGlyphWidth(
-                code, staff->m_drawingStaffSize, this->GetDrawingCueSize() ? bottomNote->GetDrawingCueSize() : false);
-        }
-        params->m_alignmentType = this->GetAlignment()->GetType();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
     const ListOfConstObjects &notes = this->GetList(this);
@@ -820,121 +704,6 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Chord::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // if the chord isn't visible, stop here
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    // if there aren't dot, stop here but only if no note has a dot
-    if (this->GetDots() < 1) {
-        if (!this->HasNoteWithDots()) {
-            return FUNCTOR_SIBLINGS;
-        }
-        else {
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    params->m_chordDots = dots;
-    params->m_chordDrawingX = this->GetDrawingX();
-    params->m_chordStemDir = this->GetDrawingStemDir();
-
-    dots->SetMapOfDotLocs(this->CalcOptimalDotLocations());
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Stem *currentStem = vrv_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
-
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        this->AddChild(currentStem);
-    }
-    currentStem->AttGraced::operator=(*this);
-    currentStem->FillAttributes(*this);
-
-    int duration = this->GetNoteOrChordDur(this);
-    if ((duration < DUR_2) || (this->GetStemVisible() == BOOLEAN_false)) {
-        currentStem->IsVirtual(true);
-    }
-
-    if ((duration > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    this->SetDrawingStem(currentStem);
-
-    // Calculate chord clusters
-    this->CalculateClusters();
-
-    // Also set the drawing stem object (or NULL) to all child notes
-    const ListOfObjects &childList = this->GetList(this);
-    for (ListOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        assert((*it)->Is(NOTE));
-        Note *note = vrv_cast<Note *>(*it);
-        assert(note);
-        note->SetDrawingStem(currentStem);
-    }
-
-    /************ dots ***********/
-
-    Dots *currentDots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if (this->GetDots() > 0) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareLyrics(FunctorParams *functorParams)
-{
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
-    params->m_lastNoteOrChord = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
@@ -949,28 +718,6 @@ int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 
     params->m_currentScoreTime += incrementScoreTime;
     params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareDataInitialization(FunctorParams *)
-{
-    if (this->HasEmptyList(this)) {
-        LogWarning("Chord '%s' has no child note - a default note is added", this->GetID().c_str());
-        Note *rescueNote = new Note();
-        this->AddChild(rescueNote);
-    }
-    this->Modify();
 
     return FUNCTOR_CONTINUE;
 }

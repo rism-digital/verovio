@@ -172,9 +172,24 @@ public:
      */
     std::list<const Note *> GetAdjacentNotesList(const Staff *staff, int loc) const;
 
+    /**
+     * Recalculate the m_clusters vector
+     */
+    void CalculateClusters();
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::AdjustCrossStaffYPos
@@ -200,44 +215,9 @@ public:
     int CalcArtic(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcChordNoteHeads
-     */
-    int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffsetEnd
      */
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
 
     /**
      * See Object::JustifyYAdjustCrossStaff
@@ -263,20 +243,9 @@ protected:
     MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
 
     /**
-     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
-     * the top-/bottommost and moving inward towards the center of the chord
-     */
-    data_STEMDIRECTION CalcStemDirection(int verticalCenter) const;
-
-    /**
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
-
-    /**
-     * Recalculate the m_clusters vector
-     */
-    void CalculateClusters();
 
     /**
      * Filter the flat list and keep only Note elements.

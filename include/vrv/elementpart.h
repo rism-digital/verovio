@@ -46,6 +46,7 @@ public:
 
     const MapOfDotLocs &GetMapOfDotLocs() const { return m_dotLocsByStaff; }
     void SetMapOfDotLocs(const MapOfDotLocs &dotLocs) { m_dotLocsByStaff = dotLocs; };
+    void ResetMapOfDotLocs() { m_dotLocsByStaff.clear(); }
 
     void IsAdjusted(bool isAdjusted) { m_isAdjusted = isAdjusted; }
     bool IsAdjusted() const { return m_isAdjusted; }
@@ -53,6 +54,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * Overwritten version of Save that avoids anything to be written
@@ -69,16 +80,6 @@ public:
     int GetFlagShift() const { return m_flagShift; }
     void SetFlagShift(int shiftVal) { m_flagShift = shiftVal; }
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
 private:
     //
@@ -128,17 +129,22 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
     int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
 private:
     //
@@ -212,17 +218,22 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
     int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment
@@ -303,17 +314,22 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
     int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
 
     /**
      * See Object::ResetVerticalAlignment

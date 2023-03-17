@@ -75,14 +75,15 @@ int PositionInterface::CalcDrawingLoc(const Layer *layer, const LayerElement *el
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int PositionInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
+FunctorCode PositionInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_drawingLoc = 0;
 
     return FUNCTOR_CONTINUE;
 }
 
-int PositionInterface::InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object)
+FunctorCode PositionInterface::InterfaceResetHorizontalAlignment(
+    ResetHorizontalAlignmentFunctor &functor, Object *object)
 {
     m_drawingLoc = 0;
 

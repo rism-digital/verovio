@@ -20,7 +20,9 @@
 #include "comparison.h"
 #include "doc.h"
 #include "elementpart.h"
+#include "findlayerelementsfunctor.h"
 #include "ftrem.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -222,11 +224,10 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     // Decide whether we search the whole parent system or just one measure which is much faster
     const Object *container = this->IsSpanningMeasures() ? staff->GetFirstAncestor(SYSTEM) : this->GetStartMeasure();
 
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(this);
-    findSpannedLayerElementsParams.m_minPos = xMin;
-    findSpannedLayerElementsParams.m_maxPos = xMax;
-    findSpannedLayerElementsParams.m_classIds = { ACCID, ARTIC, CHORD, CLEF, DOT, DOTS, FLAG, GLISS, NOTE, STEM,
-        TUPLET_BRACKET, TUPLET_NUM }; // Ties should be handled separately
+    FindSpannedLayerElementsFunctor findSpannedLayerElements(this);
+    findSpannedLayerElements.SetMinMaxPos(xMin, xMax);
+    findSpannedLayerElements.SetClassIds({ ACCID, ARTIC, CHORD, CLEF, DOT, DOTS, FLAG, GLISS, NOTE, STEM,
+        TUPLET_BRACKET, TUPLET_NUM }); // Ties should be handled separately
 
     std::set<int> staffNumbers;
     staffNumbers.emplace(staff->GetN());
@@ -238,11 +239,10 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     else if (endStaff && (endStaff != staff)) {
         staffNumbers.emplace(endStaff->GetN());
     }
-    findSpannedLayerElementsParams.m_staffNs = staffNumbers;
+    findSpannedLayerElements.SetStaffNs(staffNumbers);
 
     // Run the search without layer bounds
-    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
+    container->Process(findSpannedLayerElements);
 
     // Now determine the minimal and maximal layer
     std::set<int> layersN;
@@ -259,8 +259,9 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     const int maxLayerN = *layersN.rbegin();
 
     // Check whether outside layers exist
-    const bool hasOutsideLayers = std::any_of(findSpannedLayerElementsParams.m_elements.cbegin(),
-        findSpannedLayerElementsParams.m_elements.cend(), [minLayerN, maxLayerN](const LayerElement *element) {
+    std::vector<const LayerElement *> spannedElements = findSpannedLayerElements.GetElements();
+    const bool hasOutsideLayers = std::any_of(
+        spannedElements.cbegin(), spannedElements.cend(), [minLayerN, maxLayerN](const LayerElement *element) {
             const int layerN = element->GetOriginalLayerN();
             return ((layerN < minLayerN) || (layerN > maxLayerN));
         });
@@ -268,8 +269,7 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
     if (hasOutsideLayers) {
         // Filter all notes, also include the notes of the start and end of the slur
         ListOfConstObjects notes;
-        std::copy_if(findSpannedLayerElementsParams.m_elements.cbegin(),
-            findSpannedLayerElementsParams.m_elements.cend(), std::back_inserter(notes),
+        std::copy_if(spannedElements.cbegin(), spannedElements.cend(), std::back_inserter(notes),
             [](const LayerElement *element) { return element->Is(NOTE); });
         ClassIdComparison cmp(NOTE);
         if (this->GetStart()->Is(NOTE)) {
@@ -316,18 +316,18 @@ SpannedElements Slur::CollectSpannedElements(const Staff *staff, int xMin, int x
 
         // For separated voices or prescribed layers rerun the search with layer bounds
         if (layersAreSeparated || this->HasLayer()) {
-            findSpannedLayerElementsParams.m_elements.clear();
-            findSpannedLayerElementsParams.m_minLayerN = minLayerN;
-            findSpannedLayerElementsParams.m_maxLayerN = maxLayerN;
-            container->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
+            findSpannedLayerElements.ClearElements();
+            findSpannedLayerElements.SetMinMaxLayerN(minLayerN, maxLayerN);
+            container->Process(findSpannedLayerElements);
+            spannedElements = findSpannedLayerElements.GetElements();
         }
     }
 
     // Collect the layers used for collision avoidance
-    std::for_each(findSpannedLayerElementsParams.m_elements.cbegin(), findSpannedLayerElementsParams.m_elements.cend(),
+    std::for_each(spannedElements.cbegin(), spannedElements.cend(),
         [&layersN](const LayerElement *element) { layersN.insert(element->GetOriginalLayerN()); });
 
-    return { findSpannedLayerElementsParams.m_elements, layersN };
+    return { spannedElements, layersN };
 }
 
 void Slur::AddSpannedElements(
@@ -1427,71 +1427,6 @@ float Slur::GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature
     return slurAngle;
 }
 
-curvature_CURVEDIR Slur::GetGraceCurveDirection() const
-{
-    // Start on the notehead side
-    const LayerElement *start = this->GetStart();
-    const StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
-    const bool isStemDown
-        = startStemDrawInterface && (startStemDrawInterface->GetDrawingStemDir() == STEMDIRECTION_down);
-    return isStemDown ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-}
-
-curvature_CURVEDIR Slur::GetPreferredCurveDirection(
-    data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur) const
-{
-    const Note *startNote = NULL;
-    const Chord *startParentChord = NULL;
-    if (this->GetStart()->Is(NOTE)) {
-        startNote = vrv_cast<const Note *>(this->GetStart());
-        assert(startNote);
-        startParentChord = startNote->IsChordTone();
-    }
-
-    const Layer *layer = NULL;
-    const LayerElement *layerElement = NULL;
-    std::tie(layer, layerElement) = this->GetBoundaryLayer();
-    data_STEMDIRECTION layerStemDir = STEMDIRECTION_NONE;
-
-    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
-    // first should be the slur @curvedir
-    if (this->HasCurvedir()) {
-        drawingCurveDir
-            = (this->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-    }
-    // grace note slurs in case we have no drawing stem direction on the layer
-    else if (isGraceToNoteSlur && layer && layerElement
-        && (layer->GetDrawingStemDir(layerElement) == STEMDIRECTION_NONE)) {
-        drawingCurveDir = this->GetGraceCurveDirection();
-    }
-    // otherwise layer direction trumps note direction
-    else if (layer && layerElement && ((layerStemDir = layer->GetDrawingStemDir(layerElement)) != STEMDIRECTION_NONE)) {
-        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-    }
-    // look if in a chord
-    else if (startParentChord) {
-        if (startParentChord->PositionInChord(startNote) < 0) {
-            drawingCurveDir = curvature_CURVEDIR_below;
-        }
-        else if (startParentChord->PositionInChord(startNote) > 0) {
-            drawingCurveDir = curvature_CURVEDIR_above;
-        }
-        // away from the stem if odd number (center note)
-        else {
-            drawingCurveDir = (noteStemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-        }
-    }
-    else if (noteStemDir == STEMDIRECTION_up) {
-        drawingCurveDir = curvature_CURVEDIR_below;
-    }
-    else if (noteStemDir == STEMDIRECTION_NONE) {
-        // no information from the note stem directions, look at the position in the notes
-        drawingCurveDir = (isAboveStaffCenter) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
-    }
-
-    return drawingCurveDir;
-}
-
 std::pair<Point, Point> Slur::CalcEndPoints(const Doc *doc, const Staff *staff, NearEndCollision *nearEndCollision,
     int x1, int x2, curvature_CURVEDIR drawingCurveDir, char spanningType) const
 {
@@ -2071,103 +2006,24 @@ void Slur::CalcInitialCurve(const Doc *doc, FloatingCurvePositioner *curve, Near
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Slur::ResetData(FunctorParams *functorParams)
+FunctorCode Slur::Accept(MutableFunctor &functor)
 {
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_drawingCurveDir = SlurCurveDirection::None;
-    // m_isCrossStaff = false;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSlur(this);
 }
 
-int Slur::CalcSlurDirection(FunctorParams *functorParams)
+FunctorCode Slur::Accept(ConstFunctor &functor) const
 {
-    CalcSlurDirectionParams *params = vrv_params_cast<CalcSlurDirectionParams *>(functorParams);
-    assert(params);
+    return functor.VisitSlur(this);
+}
 
-    // If curve direction is prescribed as above or below, use it
-    if (this->HasCurvedir() && (this->GetCurvedir() != curvature_CURVEDIR_mixed)) {
-        this->SetDrawingCurveDir(
-            (this->GetCurvedir() == curvature_CURVEDIR_above) ? SlurCurveDirection::Above : SlurCurveDirection::Below);
-    }
-    if (this->HasDrawingCurveDir()) return FUNCTOR_CONTINUE;
+FunctorCode Slur::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSlurEnd(this);
+}
 
-    // Retrieve boundary
-    LayerElement *start = this->GetStart();
-    LayerElement *end = this->GetEnd();
-    if (!start || !end) {
-        this->SetDrawingCurveDir(SlurCurveDirection::Above);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // If curve direction is prescribed as mixed, use it if boundary lies in different staves
-    if (this->GetCurvedir() == curvature_CURVEDIR_mixed) {
-        if (this->HasBulge()) {
-            LogWarning("Mixed curve direction is ignored for slurs with prescribed bulge.");
-        }
-        else {
-            const int startStaffN = start->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-            const int endStaffN = end->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-            if (startStaffN < endStaffN) {
-                this->SetDrawingCurveDir(SlurCurveDirection::BelowAbove);
-                return FUNCTOR_CONTINUE;
-            }
-            else if (startStaffN > endStaffN) {
-                this->SetDrawingCurveDir(SlurCurveDirection::AboveBelow);
-                return FUNCTOR_CONTINUE;
-            }
-            else {
-                LogWarning("Mixed curve direction is ignored for slurs starting and ending on the same staff.");
-            }
-        }
-    }
-
-    // Retrieve staves and system
-    std::vector<Staff *> staffList = this->GetTstampStaves(this->GetStartMeasure(), this);
-    if (staffList.empty()) {
-        this->SetDrawingCurveDir(SlurCurveDirection::Above);
-        return FUNCTOR_CONTINUE;
-    }
-    Staff *staff = staffList.at(0);
-    System *system = vrv_cast<System *>(staff->GetFirstAncestor(SYSTEM));
-    assert(system);
-
-    const bool isCrossStaff = (this->GetBoundaryCrossStaff() != NULL);
-    const bool isGraceToNoteSlur = !this->GetStart()->Is(TIMESTAMP_ATTR) && !this->GetEnd()->Is(TIMESTAMP_ATTR)
-        && this->GetStart()->IsGraceNote() && !this->GetEnd()->IsGraceNote();
-
-    if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && !isGraceToNoteSlur
-        && system->HasMixedDrawingStemDir(start, end)) {
-        // Handle mixed stem direction
-        if (isCrossStaff && (system->GetPreferredCurveDirection(start, end, this) == curvature_CURVEDIR_below)) {
-            this->SetDrawingCurveDir(SlurCurveDirection::Below);
-        }
-        else {
-            this->SetDrawingCurveDir(SlurCurveDirection::Above);
-        }
-    }
-    else {
-        // Handle uniform stem direction, time stamp boundaries and grace note slurs
-        StemmedDrawingInterface *startStemDrawInterface = start->GetStemmedDrawingInterface();
-        data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
-        if (startStemDrawInterface) {
-            startStemDir = startStemDrawInterface->GetDrawingStemDir();
-        }
-
-        const int center = staff->GetDrawingY() - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) / 2;
-        const bool isAboveStaffCenter = (start->GetDrawingY() > center);
-        if (this->GetPreferredCurveDirection(startStemDir, isAboveStaffCenter, isGraceToNoteSlur)
-            == curvature_CURVEDIR_below) {
-            this->SetDrawingCurveDir(SlurCurveDirection::Below);
-        }
-        else {
-            this->SetDrawingCurveDir(SlurCurveDirection::Above);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+FunctorCode Slur::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSlurEnd(this);
 }
 
 } // namespace vrv

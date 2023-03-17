@@ -79,29 +79,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareDataInitialization
+     * Interface for class functor visitation
      */
-    int PrepareDataInitialization(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::ConvertToPageBased
@@ -125,16 +110,6 @@ public:
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose

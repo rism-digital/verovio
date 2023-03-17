@@ -15,7 +15,6 @@
 
 namespace vrv {
 
-class AdjustSylSpacingParams;
 class Note;
 class TextElement;
 
@@ -26,7 +25,7 @@ class TextElement;
 /**
  * Syl is a TimeSpanningInterface for managing syllable connectors. This means
  * that TimeSpanningInterface attributes will not be read from the MEI but
- * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
+ * pointers will be populated in the PrepareLyricsFunctor.
  */
 
 class Syl : public LayerElement,
@@ -86,24 +85,19 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareLyrics
+     * Interface for class functor visitation
      */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
     /** Create a default zone for a syl based on syllable. */
     bool CreateDefaultZone(Doc *doc);

@@ -462,14 +462,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareLyricsEnd
+     * Interface for class functor visitation
      */
-    int PrepareLyricsEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestampsEnd
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     /**
@@ -596,7 +596,7 @@ private:
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.
-     * If yes, ScoreDefSetCurrent will not parse the document (again) unless
+     * If yes, ScoreDefSetCurrentDoc will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;

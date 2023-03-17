@@ -15,6 +15,8 @@ namespace vrv {
 
 class Measure;
 class Object;
+class PrepareMilestonesFunctor;
+class ResetDataFunctor;
 
 //----------------------------------------------------------------------------
 // SystemMilestoneEnd
@@ -54,24 +56,19 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareMilestones
+     * Interface for class functor visitation
      */
-    int PrepareMilestones(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::CastOffSystems
      */
     int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffToSelection
@@ -138,16 +135,12 @@ public:
     //-----------------//
 
     /**
-     * See Object::PrepareMilestones
-     * Called from Ending::PrepareMilestones and EditorialElement::PrepareMilestones
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
      */
-    virtual int InterfacePrepareMilestones(FunctorParams *functorParams);
-
-    /**
-     * Reset the drawing values before calling PrepareData after changes.
-     * Called from Ending::ResetData and EditorialElement::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams);
+    ///@{
+    FunctorCode InterfacePrepareMilestones(PrepareMilestonesFunctor &functor);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor);
+    ///@}
 
 protected:
     //

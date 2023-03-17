@@ -104,6 +104,16 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::ConvertMarkupScoreDef
      */
     int ConvertMarkupScoreDef(FunctorParams *) override;
@@ -227,8 +237,14 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    /**
+     * @name Set and get the drawing label width.
+     */
+    ///@{
     int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
+    void ResetDrawingLabelsWidth() { m_drawingLabelsWidth = 0; }
+    ///@}
 
     /**
      * @name Getters for running elements
@@ -261,9 +277,14 @@ public:
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
+     * Interface for class functor visitation
      */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::ConvertToPageBased
@@ -291,11 +312,6 @@ public:
     int CastOffToSelection(FunctorParams *) override;
 
     /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
@@ -309,11 +325,6 @@ public:
      * See Object::JustifyX
      */
     int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose

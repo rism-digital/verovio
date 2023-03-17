@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "tabdursym.h"
@@ -116,6 +117,26 @@ const Note *TabGrp::GetBottomNote() const
 // Functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode TabGrp::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTabGrp(this);
+}
+
+FunctorCode TabGrp::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTabGrp(this);
+}
+
+FunctorCode TabGrp::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTabGrpEnd(this);
+}
+
+FunctorCode TabGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTabGrpEnd(this);
+}
+
 int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
@@ -130,17 +151,6 @@ int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
 
     params->m_currentScoreTime += incrementScoreTime;
     params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int TabGrp::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    params->m_dur = this->GetActualDur();
-    params->m_tabGrpWithNoNote = (!this->FindDescendantByType(NOTE));
 
     return FUNCTOR_CONTINUE;
 }

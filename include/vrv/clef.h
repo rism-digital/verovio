@@ -73,19 +73,26 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::AdjustBeams
      */
     int AdjustBeams(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
-
 private:
+    //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

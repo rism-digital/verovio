@@ -75,19 +75,14 @@ public:
     //----------//
 
     /**
-     * See Object::ReplaceDrawingValuesInStaffDef
+     * Interface for class functor visitation
      */
-    int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::SetStaffDefRedrawFlags
-     */
-    int SetStaffDefRedrawFlags(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::GenerateMIDI

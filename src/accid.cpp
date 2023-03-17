@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
@@ -280,23 +281,24 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Accid::ResetData(FunctorParams *functorParams)
+FunctorCode Accid::Accept(MutableFunctor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitAccid(this);
 }
 
-int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Accid::Accept(ConstFunctor &functor) const
 {
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+    return functor.VisitAccid(this);
+}
 
-    m_drawingUnison = NULL;
+FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAccidEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAccidEnd(this);
 }
 
 //----------------------------------------------------------------------------

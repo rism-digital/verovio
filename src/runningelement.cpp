@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "fig.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "num.h"
 #include "page.h"
@@ -71,9 +72,7 @@ void RunningElement::Reset()
     m_drawingPage = NULL;
     m_drawingYRel = 0;
 
-    for (int i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
+    this->ResetDrawingScaling();
 }
 
 bool RunningElement::IsSupportedChild(Object *child)
@@ -163,6 +162,26 @@ void RunningElement::SetDrawingPage(Page *page)
 
     if (page) {
         this->SetCurrentPageNum(page);
+    }
+}
+
+void RunningElement::ResetCells()
+{
+    for (int i = 0; i < 9; ++i) {
+        m_cells[i].clear();
+    }
+}
+
+void RunningElement::AppendTextToCell(int index, TextElement *text)
+{
+    assert((index >= 0) && (index < 9));
+    m_cells[index].push_back(text);
+}
+
+void RunningElement::ResetDrawingScaling()
+{
+    for (int i = 0; i < 3; ++i) {
+        m_drawingScalingPercent[i] = 100;
     }
 }
 
@@ -368,27 +387,24 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 // Functor methods
 //----------------------------------------------------------------------------
 
-int RunningElement::PrepareDataInitialization(FunctorParams *)
+FunctorCode RunningElement::Accept(MutableFunctor &functor)
 {
-    for (int i = 0; i < 9; ++i) {
-        m_cells[i].clear();
-    }
-    for (int i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
+    return functor.VisitRunningElement(this);
+}
 
-    const ListOfObjects &childList = this->GetList(this);
-    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        m_cells[pos].push_back(text);
-    }
+FunctorCode RunningElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitRunningElement(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode RunningElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRunningElementEnd(this);
+}
+
+FunctorCode RunningElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRunningElementEnd(this);
 }
 
 int RunningElement::Save(FunctorParams *functorParams)

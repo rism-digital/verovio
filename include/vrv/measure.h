@@ -107,6 +107,7 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     ///@}
 
     /**
@@ -232,6 +233,7 @@ public:
     ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
     const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    void ResetDrawingScoreDef();
     ///@}
 
     /**
@@ -241,6 +243,15 @@ public:
     Ending *GetDrawingEnding() { return m_drawingEnding; }
     const Ending *GetDrawingEnding() const { return m_drawingEnding; }
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
+    ///@}
+
+    /**
+     * @name Setter and getter for the flag indicating if there is an AlignmentReference
+     * with multiple layers
+     */
+    ///@{
+    bool HasAlignmentRefWithMultipleLayers() const { return m_hasAlignmentRefWithMultipleLayers; }
+    void HasAlignmentRefWithMultipleLayers(bool hasRef) { m_hasAlignmentRefWithMultipleLayers = hasRef; }
     ///@}
 
     /*
@@ -292,9 +303,14 @@ public:
     //----------//
 
     /**
-     * See Object::FindSpannedLayerElements
+     * Interface for class functor visitation
      */
-    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::ConvertMarkupAnalytical
@@ -325,95 +341,14 @@ public:
     ///@}
 
     /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AlignVertically
      */
     int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcAlignmentXPos
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArpeg
-     */
-    int AdjustArpegEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXOverflow
-     */
-    int AdjustXOverflow(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustHarmGrpsSpacing
-     */
-    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyX
@@ -434,44 +369,6 @@ public:
      * See Object::CastOffToSelection
      */
     int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanningEnd
-     */
-    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareCrossStaff
-     */
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::PrepareFloatingGrps
-     */
-    ///@{
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-    int PrepareFloatingGrpsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::PrepareTimePointingEnd
-     */
-    int PrepareTimePointingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanningEnd
-     */
-    int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareMilestones
-     */
-    int PrepareMilestones(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitMIDI
@@ -502,19 +399,9 @@ public:
     int InitOnsetOffset(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions
@@ -587,9 +474,8 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareMilestones and passed to the System drawing
-     * list
-     * in DrawMeasure
+     * A pointer to the ending to which the measure belongs. Set by PrepareMilestonesFunctor
+     * and passed to the System drawing list in DrawMeasure
      */
     Ending *m_drawingEnding;
 
