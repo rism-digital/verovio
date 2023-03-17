@@ -166,9 +166,7 @@ namespace musicxml {
         int m_measureCount; // measure number of dashes start
     };
 
-    class OpenTie {
-    public:
-        OpenTie() = delete;
+    struct OpenTie {
         OpenTie(Tie* tie, Note* note, int layerNum)
         {
             m_tie = tie;
@@ -181,9 +179,7 @@ namespace musicxml {
         int m_layerNum = 0;
     };
     
-    class CloseTie {
-    public:
-        CloseTie() = delete;
+    struct CloseTie {
         CloseTie(Note *note, int layerNum)
         {
             m_note = note;

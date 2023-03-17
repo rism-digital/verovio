@@ -1740,7 +1740,7 @@ void MusicXmlInput::MatchTies(bool matchLayers)
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
-            if ((iter->m_note->GetPname() == jter->m_note->GetPname())
+            if ((iter->m_note->IsEnharmonicWith(jter->m_note))
                 && (iter->m_note->GetOct() == jter->m_note->GetOct())
                 && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
                 && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
@@ -3794,7 +3794,7 @@ void MusicXmlInput::ReadMusicXmlTies(
         }
         else if (tieType == "stop") { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
             if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().m_note)
-                && m_tieStack.back().m_layerNum == layer->GetN()) {
+                && (m_tieStack.back().m_layerNum == layer->GetN())) {
                 m_tieStack.back().m_tie->SetEndid("#" + note->GetID());
                 m_tieStack.pop_back();
             }
