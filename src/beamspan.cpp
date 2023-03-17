@@ -101,6 +101,67 @@ const BeamSpanSegment *BeamSpan::GetSegmentForSystem(const System *system) const
     return NULL;
 }
 
+ArrayOfObjects BeamSpan::GetBeamSpanElementList(Layer *layer, const Staff *staff)
+{
+    // find all elements between startId and endId of the beamSpan
+    ClassIdsComparison classIds({ NOTE, CHORD });
+    ListOfObjects objects;
+    layer->FindAllDescendantsBetween(&objects, &classIds, this->GetStart(), this->GetEnd(), true, 3);
+    // To make sure that notes from tuplets and btrems are included, lookup for decendants is done up to depth of 3.
+    // However this might result in notes from chords being added as standalone elements. To avoid this we remove any
+    // note that is in the span and is a chord tone. Same happens when nextLayerObjects are being processed.
+    objects.erase(std::remove_if(objects.begin(), objects.end(),
+                      [](Object *object) { return object->Is(NOTE) && vrv_cast<Note *>(object)->IsChordTone(); }),
+        objects.end());
+
+    if (objects.empty()) return {};
+
+    ArrayOfObjects beamSpanElements(objects.begin(), objects.end());
+    // If last element is not equal to the end, there is high chance that this beamSpan is cross-measure.
+    // Look for the same N-staff N-layer in next measure and try finding end there
+    Measure *startMeasure = vrv_cast<Measure *>(this->GetStart()->GetFirstAncestor(MEASURE));
+    Measure *endMeasure = vrv_cast<Measure *>(this->GetEnd()->GetFirstAncestor(MEASURE));
+    Measure *nextMeasure = NULL;
+    while ((beamSpanElements.back() != this->GetEnd()) && (startMeasure != endMeasure)) {
+        Object *parent = startMeasure->GetParent();
+
+        nextMeasure = vrv_cast<Measure *>(parent->GetNext(startMeasure, MEASURE));
+        if (!nextMeasure) break;
+
+        AttNIntegerComparison snc(STAFF, staff->GetN());
+        Staff *nextStaff = vrv_cast<Staff *>(nextMeasure->FindDescendantByComparison(&snc));
+        if (!nextStaff) break;
+
+        AttNIntegerComparison lnc(LAYER, layer->GetN());
+        Layer *nextStaffLayer = vrv_cast<Layer *>(nextStaff->FindDescendantByComparison(&lnc));
+        if (!nextStaffLayer) break;
+
+        // find all elements between startId and endId of the beamSpan
+        ClassIdsComparison classIds({ NOTE, CHORD });
+        ListOfObjects nextLayerObjects;
+        // pass NULL as starting element to add all elements until end is reached
+        if (endMeasure == nextMeasure) {
+            nextStaffLayer->FindAllDescendantsBetween(&nextLayerObjects, &classIds, NULL, this->GetEnd(), true, 3);
+            nextLayerObjects.erase(
+                std::remove_if(nextLayerObjects.begin(), nextLayerObjects.end(),
+                    [](Object *object) { return object->Is(NOTE) && vrv_cast<Note *>(object)->IsChordTone(); }),
+                nextLayerObjects.end());
+            // Handle only next measure for the time being
+            if (nextLayerObjects.back() == this->GetEnd()) {
+                beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
+            }
+        }
+        else {
+            nextStaffLayer->FindAllDescendantsByComparison(&nextLayerObjects, &classIds);
+            beamSpanElements.insert(beamSpanElements.end(), nextLayerObjects.begin(), nextLayerObjects.end());
+        }
+
+        startMeasure = nextMeasure;
+    }
+
+    return beamSpanElements;
+}
+
 bool BeamSpan::AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment)
 {
     Layer *layer = vrv_cast<Layer *>((*elements.at(index).first)->GetFirstAncestor(LAYER));
