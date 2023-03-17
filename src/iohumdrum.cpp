@@ -14307,7 +14307,8 @@ bool HumdrumInput::processOverfillingNotes(hum::HTp token)
     }
 
     std::string logical_rhythm = hum::Convert::durationToRecip(barend);
-    std::string visual_rhythm = hum::Convert::kernToRecip(token);
+    std::string visValue = token->getValue("LO", "N", "vis");
+    std::string visual_rhythm = visValue.empty() ? hum::Convert::kernToRecip(token) : visValue;
     token->setValue("auto", "N", "vis", visual_rhythm);
     token->setValue("auto", "MEI", "dur.logical", logical_rhythm);
     token->setValue("auto", "MEI", "type", "straddle");
