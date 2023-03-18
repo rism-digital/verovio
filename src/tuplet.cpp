@@ -293,8 +293,9 @@ void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
     }
 
     // Calculate relative Y for the tupletNum
+    const int margin = 2 * doc->GetDrawingUnit(staffSize);
     AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum, tupletNumStaff);
-    adjustTupletNumOverlapParams.m_horizontalMargin = 2 * doc->GetDrawingUnit(staffSize);
+    adjustTupletNumOverlapParams.m_horizontalMargin = margin;
     adjustTupletNumOverlapParams.m_drawingNumPos = m_drawingNumPos;
     adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
     Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
@@ -321,6 +322,23 @@ void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
     if (((m_drawingNumPos == STAFFREL_basic_below) && (yRel > adjustedPosition))
         || ((m_drawingNumPos == STAFFREL_basic_above) && (yRel < adjustedPosition))) {
         yRel = adjustedPosition;
+    }
+
+    FTrem *fTremChild = vrv_cast<FTrem *>(this->FindDescendantByType(FTREM));
+    if (fTremChild) {
+        const ArrayOfBeamElementCoords *beamElementCoords = fTremChild->GetElementCoords();
+        BeamElementCoord *firstElement = beamElementCoords->at(0);
+        BeamElementCoord *secondElement = beamElementCoords->at(1);
+
+        const int y1 = firstElement->m_yBeam;
+        const int y2 = secondElement->m_yBeam;
+        const int currentPosition = this->GetDrawingY() + yRel;
+        if ((m_drawingNumPos == STAFFREL_basic_above) && (currentPosition < (y1 + y2) / 2)) {
+            yRel += (y1 + y2) / 2 - currentPosition;
+        }
+        else if ((m_drawingNumPos == STAFFREL_basic_below) && (currentPosition + margin > (y1 + y2) / 2)) {
+            yRel += (y1 + y2) / 2 - (currentPosition + margin);
+        }
     }
 
     tupletNum->SetDrawingYRel(yRel);
