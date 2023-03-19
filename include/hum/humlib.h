@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Mar 10 16:46:32 PST 2023
+// Last Modified: Fri Mar 17 12:44:09 PDT 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -6204,6 +6204,35 @@ class Tool_colorgroups : public HumTool {
 	protected:
 		void     processFile       (HumdrumFile& infile);
 		void     initialize        (void);
+
+};
+
+
+class Tool_colorthirds : public HumTool {
+	public:
+		         Tool_colorthirds  (void);
+		        ~Tool_colorthirds  () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void             initialize        (void);
+		void             processFile       (HumdrumFile& infile);
+		std::vector<int> getMidiNotes(std::vector<HTp>& kernNotes);
+		std::vector<int> getChordPositions(std::vector<int>& midiNotes);
+		void             labelChordPositions(std::vector<HTp>& kernNotes, std::vector<int>& chordPositions);
+
+	private:
+		std::string m_root_marker = "@";
+		std::string m_third_marker = "N";
+		std::string m_fifth_marker = "Z";
+
+		std::string m_root_color = "crimson";
+		std::string m_third_color = "limegreen";
+		std::string m_fifth_color = "royalblue";
 
 };
 
