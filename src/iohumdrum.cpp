@@ -24985,6 +24985,13 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
     int layer = m_currentlayer;
     int staff = m_currentstaff;
 
+    int fermataProcessed = token->getValueInt("auto", "fermataProcessed");
+    if (fermataProcessed) {
+        // Only add one fermata (or pair) per note/chord/rest/barline.
+        return;
+    }
+    token->setValue("auto", "fermataProcessed", true);
+
     if (token->find(";") == std::string::npos) {
         return;
     }
