@@ -11210,6 +11210,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     // of the rest because there will be invisible rests
                     // added in later measure(s).
                     Rest *rest = new Rest;
+					setLocationId(rest, trest);
                     appendElement(layer, rest);
                     convertRest(rest, trest, -1, staffindex);
                 }
