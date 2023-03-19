@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -122,6 +123,26 @@ void FTrem::SetElementShortening(int shortening)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode FTrem::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFTrem(this);
+}
+
+FunctorCode FTrem::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFTrem(this);
+}
+
+FunctorCode FTrem::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFTremEnd(this);
+}
+
+FunctorCode FTrem::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFTremEnd(this);
+}
+
 int FTrem::AdjustBeams(FunctorParams *functorParams)
 {
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
@@ -193,52 +214,6 @@ int FTrem::AdjustBeamsEnd(FunctorParams *functorParams)
     params->m_beam = NULL;
     params->m_overlapMargin = 0;
 
-    return FUNCTOR_CONTINUE;
-}
-
-int FTrem::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    const ListOfObjects &fTremChildren = this->GetList(this);
-
-    // Should we assert this at the beginning?
-    if (fTremChildren.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (!this->HasCoords()) {
-        this->InitCoords(fTremChildren, staff, BEAMPLACE_NONE);
-        this->InitCue(false);
-    }
-
-    if (this->GetElementCoords()->size() != 2) {
-        LogError("Stem calculation: <fTrem> element has invalid number of descendants.");
-        return FUNCTOR_CONTINUE;
-    }
-
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int FTrem::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_beamSegment.Reset();
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
     return FUNCTOR_CONTINUE;
 }
 

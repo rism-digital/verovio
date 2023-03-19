@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "staff.h"
@@ -118,6 +119,26 @@ int Ligature::GetDrawingNoteShape(const Note *note) const
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Ligature::Accept(MutableFunctor &functor)
+{
+    return functor.VisitLigature(this);
+}
+
+FunctorCode Ligature::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitLigature(this);
+}
+
+FunctorCode Ligature::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitLigatureEnd(this);
+}
+
+FunctorCode Ligature::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLigatureEnd(this);
+}
 
 int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
@@ -322,18 +343,6 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Ligature::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingShapes.clear();
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

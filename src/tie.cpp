@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "elementpart.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -592,6 +593,26 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
 //----------------------------------------------------------------------------
 // Tie functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Tie::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTie(this);
+}
+
+FunctorCode Tie::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTie(this);
+}
+
+FunctorCode Tie::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTieEnd(this);
+}
+
+FunctorCode Tie::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTieEnd(this);
+}
 
 int Tie::InitTimemapTies(FunctorParams *)
 {

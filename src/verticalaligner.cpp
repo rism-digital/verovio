@@ -18,6 +18,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "floatingobject.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "scoredef.h"
 #include "slur.h"
@@ -248,6 +249,26 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(const StaffDef *
     }
 
     return spacingType;
+}
+
+FunctorCode SystemAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSystemAligner(this);
+}
+
+FunctorCode SystemAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSystemAligner(this);
+}
+
+FunctorCode SystemAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSystemAlignerEnd(this);
+}
+
+FunctorCode SystemAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSystemAlignerEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -745,6 +766,26 @@ void StaffAlignment::ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrp
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode StaffAlignment::Accept(MutableFunctor &functor)
+{
+    return functor.VisitStaffAlignment(this);
+}
+
+FunctorCode StaffAlignment::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitStaffAlignment(this);
+}
+
+FunctorCode StaffAlignment::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitStaffAlignmentEnd(this);
+}
+
+FunctorCode StaffAlignment::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStaffAlignmentEnd(this);
+}
+
 int StaffAlignment::AdjustFloatingPositioners(FunctorParams *functorParams)
 {
     AdjustFloatingPositionersParams *params = vrv_params_cast<AdjustFloatingPositionersParams *>(functorParams);
@@ -1056,12 +1097,10 @@ int StaffAlignment::AdjustSlurs(FunctorParams *functorParams)
             if (i == j) continue;
             Slur *secondSlur = vrv_cast<Slur *>(positioners[j]->GetObject());
             // Check if second slur is inner slur of first
-            if (!positioners[i]->IsCrossStaff() && !positioners[j]->IsCrossStaff()) {
-                if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
-                    if (firstSlur->HasInnerSlur(secondSlur)) {
-                        innerCurves.push_back(positioners[j]);
-                        continue;
-                    }
+            if (positioners[j]->GetSpanningType() == SPANNING_START_END) {
+                if (firstSlur->HasInnerSlur(secondSlur)) {
+                    innerCurves.push_back(positioners[j]);
+                    continue;
                 }
             }
             // Adjust positioning of slurs with common start/end

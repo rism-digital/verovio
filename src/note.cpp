@@ -20,6 +20,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "gracegrp.h"
@@ -358,7 +359,7 @@ Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
     char32_t code = this->GetNoteheadGlyph(this->GetDrawingDur());
 
     // This is never called for now because mensural notes do not have stem/flag children
-    // For changing this, change Note::CalcStem and Note::PrepareLayerElementParts
+    // For changing this, change CalcStemFunctor::VisitNote and PrepareLayerElementPartsFunctor::VisitNote
     if (this->IsMensuralDur()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralNoteheadGlyph();
@@ -563,47 +564,6 @@ bool Note::IsVisible() const
     return true;
 }
 
-void Note::ResolveStemSameas(PrepareLinkingParams *params)
-{
-    assert(params);
-
-    // First pass we fill m_stemSameasIDPairs
-    if (params->m_fillList) {
-        if (this->HasStemSameas()) {
-            std::string idTarget = ExtractIDFragment(this->GetStemSameas());
-            params->m_stemSameasIDPairs[idTarget] = this;
-        }
-    }
-    // Second pass we resolve links
-    else {
-        const std::string id = this->GetID();
-        if (params->m_stemSameasIDPairs.count(id)) {
-            Note *noteStemSameas = params->m_stemSameasIDPairs.at(id);
-            // Instanciate the bi-directional references and mark the roles as unset
-            this->SetStemSameasNote(noteStemSameas);
-            this->m_stemSameasRole = SAMEAS_UNSET;
-            noteStemSameas->SetStemSameasNote(this);
-            noteStemSameas->m_stemSameasRole = SAMEAS_UNSET;
-            // Also resovle beams and instanciate the bi-directional references
-            Beam *beamStemSameas = noteStemSameas->GetAncestorBeam();
-            if (beamStemSameas) {
-                Beam *thisBeam = this->GetAncestorBeam();
-                if (!thisBeam) {
-                    // This is one thing that can go wrong. We can have many others here...
-                    // E.g., not the same number of notes, conflicting durations, not all notes sharing stems, ...
-                    // Not sure everything could be checked here.
-                    LogError("Notes with @stem.sameas in a beam should refer only to a note also in beam.");
-                }
-                else {
-                    thisBeam->SetStemSameasBeam(beamStemSameas);
-                    beamStemSameas->SetStemSameasBeam(thisBeam);
-                }
-            }
-            params->m_stemSameasIDPairs.erase(id);
-        }
-    }
-}
-
 data_STEMDIRECTION Note::CalcStemDirForSameasNote(int verticalCenter)
 {
     assert(m_stemSameas);
@@ -762,26 +722,6 @@ void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
     }
 }
 
-bool Note::IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const
-{
-    const Object *stem = this->GetFirst(STEM);
-    if (!stem) return false;
-
-    const Flag *flag = vrv_cast<const Flag *>(stem->GetFirst(FLAG));
-    if (!flag) return false;
-
-    // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
-    char32_t flagGlyph = SMUFL_E242_flag16thUp;
-    data_DURATION dur = this->GetDur();
-    if (dur < DURATION_16) flagGlyph = flag->GetFlagGlyph(this->GetDrawingStemDir());
-    const int flagHeight = doc->GetGlyphHeight(flagGlyph, staffSize, this->GetDrawingCueSize());
-
-    const int dotMargin = flag->GetDrawingY() - this->GetDrawingY() - flagHeight - this->GetDrawingRadius(doc) / 2
-        - dotLocShift * doc->GetDrawingUnit(staffSize);
-
-    return dotMargin < 0;
-}
-
 void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -911,6 +851,26 @@ int Note::PnameToPclass(data_PITCHNAME pitchName)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Note::Accept(MutableFunctor &functor)
+{
+    return functor.VisitNote(this);
+}
+
+FunctorCode Note::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNote(this);
+}
+
+FunctorCode Note::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitNoteEnd(this);
+}
+
+FunctorCode Note::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNoteEnd(this);
+}
+
 int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
@@ -1014,155 +974,6 @@ int Note::AdjustArtic(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Stems have been calculated previously in Beam or fTrem - siblings because flags do not need to
-    // be processed either
-    if (this->IsInBeam() || this->GetAncestorFTrem()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // We do not need to calc stems for mensural notes
-    // We have no stem with tab because it belongs to tabDurSym in this case
-    if (this->IsMensuralDur() || this->IsTabGrpNote()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    if (this->IsChordTone()) {
-        assert(params->m_interface);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // This now should be NULL and the chord stem length will be 0
-    params->m_interface = NULL;
-    params->m_chordStemLength = 0;
-
-    Stem *stem = this->GetDrawingStem();
-    assert(stem);
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    if (m_crossStaff) {
-        staff = m_crossStaff;
-        layer = m_crossLayer;
-    }
-
-    // Cache the in params to avoid further lookup
-    params->m_staff = staff;
-    params->m_layer = layer;
-    params->m_interface = this;
-    params->m_dur = this->GetActualDur();
-    params->m_isGraceNote = this->IsGraceNote();
-    params->m_isStemSameasSecondary = false;
-
-    const int staffSize = staff->m_drawingStaffSize;
-
-    params->m_verticalCenter
-        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
-
-    /************ Set the direction ************/
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    if (this->HasStemSameasNote()) {
-        stemDir = this->CalcStemDirForSameasNote(params->m_verticalCenter);
-    }
-    else if (stem->HasDir()) {
-        stemDir = stem->GetDir();
-    }
-    else if (this->IsGraceNote()) {
-        stemDir = STEMDIRECTION_up;
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
-    }
-
-    this->SetDrawingStemDir(stemDir);
-
-    // Make sure the relative position of the stem is the same
-    stem->SetDrawingYRel(0);
-
-    // Use the params->m_chordStemLength for the length of the stem beetween the notes
-    // The value of m_stemSameasRole is set by Note::CalcStemDirForSameasNote
-    if (this->HasStemSameasNote() && m_stemSameasRole == SAMEAS_SECONDARY) {
-        params->m_chordStemLength = -std::abs(this->GetDrawingY() - this->GetStemSameasNote()->GetDrawingY());
-        params->m_isStemSameasSecondary = true;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::CalcChordNoteHeads(FunctorParams *functorParams)
-{
-    CalcChordNoteHeadsParams *params = vrv_params_cast<CalcChordNoteHeadsParams *>(functorParams);
-    assert(params);
-
-    // Nothing to calculate if note is not part of the chord
-    if (!this->IsChordTone()) return FUNCTOR_SIBLINGS;
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-
-    const int diameter = 2 * this->GetDrawingRadius(params->m_doc);
-    int noteheadShift = 0;
-    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (params->m_diameter)) {
-        noteheadShift = params->m_diameter - diameter;
-    }
-
-    // Nothing to do for notes that are not in a cluster and without base diameter for the chord
-    if ((!params->m_diameter || params->m_alignmentType != this->GetAlignment()->GetType()) && !m_cluster)
-        return FUNCTOR_SIBLINGS;
-
-    /************** notehead direction **************/
-
-    bool flippedNotehead = false;
-
-    // if the note is clustered, calculations are different
-    if (m_cluster) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
-            // stem down/even cluster = noteheads start on left (incorrect side)
-            if (m_cluster->size() % 2 == 0) {
-                flippedNotehead = (m_clusterPosition % 2 != 0);
-            }
-            // else they start on normal side
-            else {
-                flippedNotehead = (m_clusterPosition % 2 == 0);
-            }
-        }
-        else {
-            // flipped noteheads start on normal side no matter what
-            flippedNotehead = (m_clusterPosition % 2 == 0);
-        }
-    }
-
-    // positions notehead
-    if (flippedNotehead) {
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            this->SetDrawingXRel(diameter - params->m_doc->GetDrawingStemWidth(staffSize));
-        }
-        else {
-            this->SetDrawingXRel(-diameter + params->m_doc->GetDrawingStemWidth(staffSize));
-        }
-    }
-    this->SetDrawingXRel(this->GetDrawingXRel() + noteheadShift);
-
-    this->SetFlippedNotehead(flippedNotehead);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate) const
 {
     if (predicate && !predicate(this)) return {};
@@ -1187,235 +998,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
     dotLocs[staff] = { loc };
     return dotLocs;
-}
-
-int Note::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // We currently have no dots object with mensural notes
-    if (this->IsMensuralDur()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-    const bool drawingCueSize = this->GetDrawingCueSize();
-
-    Dots *dots = NULL;
-    Chord *chord = this->IsChordTone();
-
-    // The shift to the left when a stem flag requires it
-    int flagShift = 0;
-    int radius = this->GetDrawingRadius(params->m_doc);
-
-    if (chord && (chord->GetDots() > 0)) {
-        dots = params->m_chordDots;
-        assert(dots);
-
-        // Stem up, shorter than 4th and not in beam
-        if ((this->GetDots() > 0) && (params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4)
-            && !this->IsInBeam()) {
-            // Shift according to the flag width if the top note is not flipped
-            if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
-                // HARDCODED
-                flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
-            }
-        }
-
-        int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
-        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-    }
-    if (this->GetDots() > 0) {
-        // For single notes we need here to set the dot loc
-        dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-        assert(dots);
-
-        MapOfDotLocs dotLocs = this->CalcOptimalDotLocations();
-        dots->SetMapOfDotLocs(dotLocs);
-
-        const int dotLocShift = *(dotLocs.cbegin()->second.rbegin()) - this->GetDrawingLoc();
-
-        // Stem up, shorter than 4th and not in beam
-        if (const int shift = dots->GetFlagShift(); shift) {
-            flagShift += shift;
-        }
-        else if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && !this->IsInBeam() && (this->GetDrawingStemLen() < 3)
-            && (this->IsDotOverlappingWithFlag(params->m_doc, staffSize, dotLocShift))) {
-            // HARDCODED
-            const int shift = params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
-            flagShift += shift;
-            dots->SetFlagShift(shift);
-        }
-
-        int xRel = 2 * radius + flagShift;
-        dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Note::CalcLedgerLines(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (this->GetVisible() == BOOLEAN_false) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const int staffSize = staff->m_drawingStaffSize;
-    const int staffX = staff->GetDrawingX();
-    const bool drawingCueSize = this->GetDrawingCueSize();
-    const int radius = this->GetDrawingRadius(params->m_doc);
-
-    /************** Ledger lines: **************/
-
-    int linesAbove = 0;
-    int linesBelow = 0;
-
-    if (!this->HasLedgerLines(linesAbove, linesBelow, staff)) return FUNCTOR_SIBLINGS;
-
-    const int extension = params->m_doc->GetDrawingLedgerLineExtension(staffSize, drawingCueSize);
-    const int left = this->GetDrawingX() - extension - staffX;
-    int right = this->GetDrawingX() + 2 * radius + extension - staffX;
-
-    if (linesAbove > 0) {
-        staff->AddLedgerLineAbove(linesAbove, left, right, extension, drawingCueSize);
-    }
-    else {
-        staff->AddLedgerLineBelow(linesBelow, left, right, extension, drawingCueSize);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Note::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Stem *currentStem = vrv_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    Chord *chord = this->IsChordTone();
-    if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
-
-    if (!this->IsChordTone() && !this->IsTabGrpNote()) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            currentStem->IsAttribute(true);
-            this->AddChild(currentStem);
-        }
-        currentStem->AttGraced::operator=(*this);
-        currentStem->FillAttributes(*this);
-
-        if (this->GetActualDur() < DUR_2 || (this->GetStemVisible() == BOOLEAN_false)) {
-            currentStem->IsVirtual(true);
-        }
-    }
-    // This will happen only if the duration has changed
-    else if (currentStem) {
-        if (this->DeleteChild(currentStem)) {
-            currentStem = NULL;
-            // The currentFlag (if any) will have been deleted above
-            currentFlag = NULL;
-        }
-    }
-
-    // We don't care about flags or dots in mensural notes
-    if (this->IsMensuralDur()) return FUNCTOR_CONTINUE;
-
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->GetAncestorFTrem() && !this->IsChordTone()
-        && !this->IsTabGrpNote()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    if (!chord) this->SetDrawingStem(currentStem);
-
-    /************ dots ***********/
-
-    Dots *currentDots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if (this->GetDots() > 0) {
-        if (chord && (chord->GetDots() == this->GetDots())) {
-            LogWarning(
-                "Note '%s' with a @dots attribute with the same value as its chord parent", this->GetID().c_str());
-        }
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::PrepareLyrics(FunctorParams *functorParams)
-{
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsChordTone()) {
-        params->m_penultimateNoteOrChord = params->m_lastNoteOrChord;
-        params->m_lastNoteOrChord = this;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    m_drawingLoc = 0;
-    m_flippedNotehead = false;
-    m_stemSameas = NULL;
-    m_stemSameasRole = SAMEAS_NONE;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    m_drawingLoc = 0;
-    m_flippedNotehead = false;
-    // Re-mark the role as unsed if we have a shared stem
-    if (this->HasStemSameasNote()) m_stemSameasRole = SAMEAS_UNSET;
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Note::GenerateMIDI(FunctorParams *functorParams)

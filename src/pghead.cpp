@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "lb.h"
 #include "rend.h"
 #include "text.h"
@@ -112,5 +113,25 @@ bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode PgHead::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPgHead(this);
+}
+
+FunctorCode PgHead::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPgHead(this);
+}
+
+FunctorCode PgHead::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPgHeadEnd(this);
+}
+
+FunctorCode PgHead::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPgHeadEnd(this);
+}
 
 } // namespace vrv

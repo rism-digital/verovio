@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "pitchinterface.h"
@@ -57,6 +58,26 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode MRest::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMRest(this);
+}
+
+FunctorCode MRest::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMRest(this);
+}
+
+FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMRestEnd(this);
+}
+
+FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRestEnd(this);
+}
+
 int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
@@ -66,23 +87,6 @@ int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
         Fermata *fermata = new Fermata();
         fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int MRest::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

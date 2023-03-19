@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -74,6 +75,26 @@ double BeatRpt::GetScoreTimeOnset() const
 //----------------------------------------------------------------------------
 // BeatRpt functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode BeatRpt::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBeatRpt(this);
+}
+
+FunctorCode BeatRpt::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeatRpt(this);
+}
+
+FunctorCode BeatRpt::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeatRptEnd(this);
+}
+
+FunctorCode BeatRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeatRptEnd(this);
+}
 
 int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
 {

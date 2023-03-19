@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "system.h"
 
@@ -57,6 +58,26 @@ void SystemElement::Reset()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode SystemElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSystemElement(this);
+}
+
+FunctorCode SystemElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSystemElement(this);
+}
+
+FunctorCode SystemElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSystemElementEnd(this);
+}
+
+FunctorCode SystemElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSystemElementEnd(this);
+}
 
 int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
 {

@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "rend.h"
@@ -262,21 +263,24 @@ std::u32string Dynam::GetSymbolStr(const std::u32string &str, const bool singleG
 // Dynam functor methods
 //----------------------------------------------------------------------------
 
-int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
+FunctorCode Dynam::Accept(MutableFunctor &functor)
 {
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
+    return functor.VisitDynam(this);
+}
 
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
+FunctorCode Dynam::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDynam(this);
+}
 
-    // Keep it for linking only if start is resolved
-    if (!this->GetStart()) return FUNCTOR_CONTINUE;
+FunctorCode Dynam::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDynamEnd(this);
+}
 
-    params->m_dynams.push_back(this);
-
-    return FUNCTOR_CONTINUE;
+FunctorCode Dynam::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDynamEnd(this);
 }
 
 } // namespace vrv

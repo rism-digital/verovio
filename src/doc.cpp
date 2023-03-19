@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "alignfunctor.h"
 #include "barline.h"
 #include "beatrpt.h"
 #include "chord.h"
@@ -21,6 +22,7 @@
 #include "docselection.h"
 #include "expansion.h"
 #include "featureextractor.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
@@ -45,8 +47,11 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "preparedatafunctor.h"
+#include "resetfunctor.h"
 #include "runningelement.h"
 #include "score.h"
+#include "setscoredeffunctor.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -242,6 +247,16 @@ bool Doc::GenerateHeader()
     this->GetCurrentScoreDef()->AddChild(pgHead2);
 
     return true;
+}
+
+void Doc::PrepareMeasureIndices()
+{
+    ListOfObjects measures = this->FindAllDescendantsByType(MEASURE, false);
+
+    int index = 0;
+    for (Object *object : measures) {
+        vrv_cast<Measure *>(object)->SetIndex(++index);
+    }
 }
 
 bool Doc::GenerateMeasureNumbers()
@@ -543,42 +558,44 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
 void Doc::PrepareData()
 {
     /************ Reset and initialization ************/
+
     if (m_dataPreparationDone) {
-        Functor resetData(&Object::ResetData);
-        this->Process(&resetData, NULL);
+        ResetDataFunctor resetData;
+        this->Process(resetData);
     }
-    Functor prepareDataInitialization(&Object::PrepareDataInitialization);
-    PrepareDataInitializationParams prepareDataInitializationParams(&prepareDataInitialization, this);
-    this->Process(&prepareDataInitialization, &prepareDataInitializationParams);
+    PrepareDataInitializationFunctor prepareDataInitialization(this);
+    this->Process(prepareDataInitialization);
+
+    /************ Generate measure indices ************/
+
+    this->PrepareMeasureIndices();
 
     /************ Store default durations ************/
 
-    Functor prepareDuration(&Object::PrepareDuration);
-    PrepareDurationParams prepareDurationParams(&prepareDuration);
-    this->Process(&prepareDuration, &prepareDurationParams);
+    PrepareDurationFunctor prepareDuration;
+    this->Process(prepareDuration);
 
     /************ Resolve @startid / @endid ************/
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
-    PrepareTimeSpanningParams prepareTimeSpanningParams;
-    Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
-    Functor prepareTimeSpanningEnd(&Object::PrepareTimeSpanningEnd);
-    this->Process(
-        &prepareTimeSpanning, &prepareTimeSpanningParams, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    PrepareTimeSpanningFunctor prepareTimeSpanning;
+    prepareTimeSpanning.SetDirection(BACKWARD);
+    this->Process(prepareTimeSpanning);
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
     // the spanning elements will remain in the timeSpanningElements array. We try again forwards
     // but this time without filling the list (that is only will the remaining elements)
-    if (!prepareTimeSpanningParams.m_timeSpanningInterfaces.empty()) {
-        prepareTimeSpanningParams.m_fillList = false;
-        this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
+    const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
+    if (!interfaceOwnerPairs.empty()) {
+        prepareTimeSpanning.FillMode(false);
+        prepareTimeSpanning.SetDirection(FORWARD);
+        this->Process(prepareTimeSpanning);
     }
 
     // Display warning if some elements were not matched
-    const int unmatchedElements = (int)std::count_if(prepareTimeSpanningParams.m_timeSpanningInterfaces.cbegin(),
-        prepareTimeSpanningParams.m_timeSpanningInterfaces.cend(),
+    const int unmatchedElements = (int)std::count_if(interfaceOwnerPairs.cbegin(), interfaceOwnerPairs.cend(),
         [](const ListOfSpanningInterOwnerPairs::value_type &entry) {
             return (entry.first->HasStartid() && entry.first->HasEndid());
         });
@@ -590,93 +607,84 @@ void Doc::PrepareData()
 
     // Resolve <reh> elements first, since they can be encoded without @startid or @tstamp, but we need one internally
     // for placement
-    Functor prepareRehPosition(&Object::PrepareRehPosition);
-    this->Process(&prepareRehPosition, NULL);
+    PrepareRehPositionFunctor prepareRehPosition;
+    this->Process(prepareRehPosition);
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
-    PrepareTimePointingParams prepareTimePointingParams;
-    Functor prepareTimePointing(&Object::PrepareTimePointing);
-    Functor prepareTimePointingEnd(&Object::PrepareTimePointingEnd);
-    this->Process(
-        &prepareTimePointing, &prepareTimePointingParams, &prepareTimePointingEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    PrepareTimePointingFunctor prepareTimePointing;
+    prepareTimePointing.SetDirection(BACKWARD);
+    this->Process(prepareTimePointing);
 
     /************ Resolve @tstamp / tstamp2 ************/
 
     // Now try to match the @tstamp and @tstamp2 attributes.
-    PrepareTimestampsParams prepareTimestampsParams;
-    Functor prepareTimestamps(&Object::PrepareTimestamps);
-    Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
-    this->Process(&prepareTimestamps, &prepareTimestampsParams, &prepareTimestampsEnd);
+    PrepareTimestampsFunctor prepareTimestamps;
+    this->Process(prepareTimestamps);
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
+    if (!prepareTimestamps.GetInterfaceIDPairs().empty()) {
         LogWarning("%d time spanning element(s) with timestamps could not be matched.",
-            prepareTimestampsParams.m_timeSpanningInterfaces.size());
+            prepareTimestamps.GetInterfaceIDPairs().size());
     }
 
     /************ Resolve linking (@next) ************/
 
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
-    PrepareLinkingParams prepareLinkingParams;
-    Functor prepareLinking(&Object::PrepareLinking);
-    this->Process(&prepareLinking, &prepareLinkingParams);
+    PrepareLinkingFunctor prepareLinking;
+    this->Process(prepareLinking);
 
     // If we have some left process again backward
-    if (!prepareLinkingParams.m_sameasIDPairs.empty() || !prepareLinkingParams.m_stemSameasIDPairs.empty()) {
-        prepareLinkingParams.m_fillList = false;
-        this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
+        prepareLinking.FillMode(false);
+        prepareLinking.SetDirection(BACKWARD);
+        this->Process(prepareLinking);
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareLinkingParams.m_nextIDPairs.empty()) {
-        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextIDPairs.size());
+    if (!prepareLinking.GetNextIDPairs().empty()) {
+        LogWarning("%d element(s) with a @next could not match the target", prepareLinking.GetNextIDPairs().size());
     }
-    if (!prepareLinkingParams.m_sameasIDPairs.empty()) {
-        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasIDPairs.size());
+    if (!prepareLinking.GetSameasIDPairs().empty()) {
+        LogWarning("%d element(s) with a @sameas could not match the target", prepareLinking.GetSameasIDPairs().size());
     }
-    if (!prepareLinkingParams.m_stemSameasIDPairs.empty()) {
-        LogWarning("%d element(s) with a @stem.sameas could match the target",
-            prepareLinkingParams.m_stemSameasIDPairs.size());
+    if (!prepareLinking.GetStemSameasIDPairs().empty()) {
+        LogWarning("%d element(s) with a @stem.sameas could not match the target",
+            prepareLinking.GetStemSameasIDPairs().size());
     }
 
     /************ Resolve @plist ************/
 
     // Try to match all pointing elements using @plist
-    PreparePlistParams preparePlistParams;
-    Functor preparePlist(&Object::PreparePlist);
-    this->Process(&preparePlist, &preparePlistParams);
+    PreparePlistFunctor preparePlist;
+    this->Process(preparePlist);
 
-    // Process plist after all pairs has been collected
-    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
-        preparePlistParams.m_fillList = false;
-        Functor processPlist(&Object::PrepareProcessPlist);
-        this->Process(&processPlist, &preparePlistParams);
+    // Process plist after all pairs have been collected
+    if (!preparePlist.GetInterfaceIDTuples().empty()) {
+        preparePlist.FillMode(false);
+        this->Process(preparePlist);
 
-        for (const auto &[plistInterface, id, objectReference] : preparePlistParams.m_interfaceIDTuples) {
+        for (const auto &[plistInterface, id, objectReference] : preparePlist.GetInterfaceIDTuples()) {
             plistInterface->SetRef(objectReference);
         }
-        preparePlistParams.m_interfaceIDTuples.clear();
+        preparePlist.ClearInterfaceIDTuples();
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlistParams.m_interfaceIDTuples.empty()) {
+    if (!preparePlist.GetInterfaceIDTuples().empty()) {
         LogWarning(
-            "%d element(s) with a @plist could not match the target", preparePlistParams.m_interfaceIDTuples.size());
+            "%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDTuples().size());
     }
 
     /************ Resolve cross staff ************/
 
     // Prepare the cross-staff pointers
-    PrepareCrossStaffParams prepareCrossStaffParams;
-    Functor prepareCrossStaff(&Object::PrepareCrossStaff);
-    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
-    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
+    PrepareCrossStaffFunctor prepareCrossStaff;
+    this->Process(prepareCrossStaff);
 
     /************ Resolve beamspan elements ***********/
 
-    FunctorDocParams functorDocParams(this);
-    Functor prepareBeamSpanElements(&Object::PrepareBeamSpanElements);
-    this->Process(&prepareBeamSpanElements, &functorDocParams);
+    PrepareBeamSpanElementsFunctor prepareBeamSpanElements;
+    this->Process(prepareBeamSpanElements);
 
     /************ Prepare processing by staff/layer/verse ************/
 
@@ -713,20 +721,19 @@ void Doc::PrepareData()
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
-            PreparePointersByLayerParams preparePointersByLayerParams;
-            Functor preparePointersByLayer(&Object::PreparePointersByLayer);
-            this->Process(&preparePointersByLayer, &preparePointersByLayerParams, NULL, &filters);
+            PreparePointersByLayerFunctor preparePointersByLayer;
+            preparePointersByLayer.SetFilters(&filters);
+            this->Process(preparePointersByLayer);
         }
     }
 
     /************ Resolve delayed turns ************/
 
-    PrepareDelayedTurnsParams prepareDelayedTurnsParams;
-    Functor prepareDelayedTurns(&Object::PrepareDelayedTurns);
-    this->Process(&prepareDelayedTurns, &prepareDelayedTurnsParams);
+    PrepareDelayedTurnsFunctor prepareDelayedTurns;
+    this->Process(prepareDelayedTurns);
 
-    if (!prepareDelayedTurnsParams.m_delayedTurns.empty()) {
-        prepareDelayedTurnsParams.m_initMap = false;
+    if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
+        prepareDelayedTurns.FillMode(false);
         for (staves = initProcessingListsParams.m_layerTree.child.begin();
              staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -737,10 +744,9 @@ void Doc::PrepareData()
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
-                prepareDelayedTurnsParams.m_currentTurn = NULL;
-                prepareDelayedTurnsParams.m_previousElement = NULL;
-
-                this->Process(&prepareDelayedTurns, &prepareDelayedTurnsParams, NULL, &filters);
+                prepareDelayedTurns.SetFilters(&filters);
+                prepareDelayedTurns.ResetCurrent();
+                this->Process(prepareDelayedTurns);
             }
         }
     }
@@ -764,10 +770,9 @@ void Doc::PrepareData()
 
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
-                PrepareLyricsParams prepareLyricsParams;
-                Functor prepareLyrics(&Object::PrepareLyrics);
-                Functor prepareLyricsEnd(&Object::PrepareLyricsEnd);
-                this->Process(&prepareLyrics, &prepareLyricsParams, &prepareLyricsEnd, &filters);
+                PrepareLyricsFunctor prepareLyrics;
+                prepareLyrics.SetFilters(&filters);
+                this->Process(prepareLyrics);
             }
         }
     }
@@ -776,16 +781,14 @@ void Doc::PrepareData()
 
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
-    // can just check the staff->GetN to see where we are (see Staff::PrepareStaffCurrentTimeSpanning)
-    PrepareStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
-    Functor fillStaffCurrentTimeSpanning(&Object::PrepareStaffCurrentTimeSpanning);
-    Functor fillStaffCurrentTimeSpanningEnd(&Object::PrepareStaffCurrentTimeSpanningEnd);
-    this->Process(&fillStaffCurrentTimeSpanning, &fillStaffCurrentTimeSpanningParams, &fillStaffCurrentTimeSpanningEnd);
+    // can just check the staff->GetN to see where we are (see PrepareStaffCurrentTimeSpanningFunctor::VisitStaff)
+    PrepareStaffCurrentTimeSpanningFunctor prepareStaffCurrentTimeSpanning;
+    this->Process(prepareStaffCurrentTimeSpanning);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if (!fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.empty()) {
+    if (!prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().empty()) {
         LogDebug("%d time spanning elements could not be set as running",
-            fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.size());
+            prepareStaffCurrentTimeSpanning.GetTimeSpanningElements().size());
     }
 
     /************ Resolve mRpt ************/
@@ -802,44 +805,40 @@ void Doc::PrepareData()
             filters.Add(&matchLayer);
 
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
-            PrepareRptParams prepareRptParams(this);
-            Functor prepareRpt(&Object::PrepareRpt);
-            this->Process(&prepareRpt, &prepareRptParams, NULL, &filters);
+            PrepareRptFunctor prepareRpt(this);
+            prepareRpt.SetFilters(&filters);
+            this->Process(prepareRpt);
         }
     }
 
     /************ Resolve endings ************/
 
-    // Prepare the endings (pointers to the measure after and before the boundaries
-    PrepareMilestonesParams prepareEndingsParams;
-    Functor prepareEndings(&Object::PrepareMilestones);
-    this->Process(&prepareEndings, &prepareEndingsParams);
+    // Prepare the endings (pointers to the measure after and before the boundaries)
+    PrepareMilestonesFunctor prepareMilestones;
+    this->Process(prepareMilestones);
 
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
-    PrepareFloatingGrpsParams prepareFloatingGrpsParams(this);
-    Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
-    Functor prepareFloatingGrpsEnd(&Object::PrepareFloatingGrpsEnd);
-    this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);
+    PrepareFloatingGrpsFunctor prepareFloatingGrps(this);
+    this->Process(prepareFloatingGrps);
 
     /************ Resolve cue size ************/
 
     // Prepare the drawing cue size
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
+    PrepareCueSizeFunctor prepareCueSize;
+    this->Process(prepareCueSize);
 
     /************ Resolve @altsym ************/
 
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
-    PrepareAltSymParams prepareAltSymParams;
-    Functor prepareAltSym(&Object::PrepareAltSym);
-    this->Process(&prepareAltSym, &prepareAltSymParams);
+    PrepareAltSymFunctor prepareAltSym;
+    this->Process(prepareAltSym);
 
-    /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
+    /************ Instanciate LayerElement parts (stem, flag, dots, etc) ************/
 
-    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
-    this->Process(&prepareLayerElementParts, NULL);
+    PrepareLayerElementPartsFunctor prepareLayerElementParts;
+    this->Process(prepareLayerElementParts);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -859,9 +858,9 @@ void Doc::PrepareData()
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
 
-                FunctorParams paramsLyrics;
-                Functor prepareLyrics(&Object::PrepareLyrics);
-                this->Process(&prepareLyrics, paramsLyrics, NULL, &filters);
+                PrepareLyricsFunctor prepareLyrics;
+                prepareLyrics.SetFilters(&filters);
+                this->Process(prepareLyrics);
             }
         }
     }
@@ -877,20 +876,19 @@ void Doc::PrepareData()
     /************ Resolve @facs ************/
     if (this->GetType() == Facs) {
         // Associate zones with elements
-        PrepareFacsimileParams prepareFacsimileParams(this->GetFacsimile());
-        Functor prepareFacsimile(&Object::PrepareFacsimile);
-        this->Process(&prepareFacsimile, &prepareFacsimileParams);
+        PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
+        this->Process(prepareFacsimile);
 
         // Add default syl zone if one is not present.
-        for (Object *object : prepareFacsimileParams.m_zonelessSyls) {
+        for (Object *object : prepareFacsimile.GetZonelessSyls()) {
             Syl *syl = vrv_cast<Syl *>(object);
             assert(syl);
             syl->CreateDefaultZone(this);
         }
     }
 
-    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
-    this->GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
+    ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+    this->GetCurrentScoreDef()->Process(scoreDefSetGrpSym);
 
     // LogElapsedTimeEnd ("Preparing drawing");
 
@@ -904,27 +902,21 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     }
 
     if (m_currentScoreDefDone) {
-        Functor scoreDefUnsetCurrent(&Object::ScoreDefUnsetCurrent);
-        ScoreDefUnsetCurrentParams scoreDefUnsetCurrentParams(&scoreDefUnsetCurrent);
-        this->Process(&scoreDefUnsetCurrent, &scoreDefUnsetCurrentParams);
+        ScoreDefUnsetCurrentFunctor scoreDefUnsetCurrent;
+        this->Process(scoreDefUnsetCurrent);
     }
 
     // First we need to set Page::m_score and Page::m_scoreEnd
     // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
-    // The Doc::m_currentScore is set by Object::Process
-    // The Page::m_score in Page::ScoreDefSetCurrentPageEnd
-    Functor scoreDefSetCurrentPage(&Object::ScoreDefSetCurrentPage);
-    Functor scoreDefSetCurrentPageEnd(&Object::ScoreDefSetCurrentPageEnd);
-    FunctorDocParams scoreDefSetCurrentPageParams(this);
-    this->Process(
-        &scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, BACKWARD);
+    ScoreDefSetCurrentPageFunctor scoreDefSetCurrentPage(this);
+    scoreDefSetCurrentPage.SetDirection(BACKWARD);
+    this->Process(scoreDefSetCurrentPage, 3);
     // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
-    this->Process(&scoreDefSetCurrentPage, &scoreDefSetCurrentPageParams, &scoreDefSetCurrentPageEnd, NULL, 3, FORWARD);
+    scoreDefSetCurrentPage.SetDirection(FORWARD);
+    this->Process(scoreDefSetCurrentPage, 3);
 
-    // ScoreDef upcomingScoreDef;
-    Functor scoreDefSetCurrent(&Object::ScoreDefSetCurrent);
-    ScoreDefSetCurrentParams scoreDefSetCurrentParams(this, &scoreDefSetCurrent);
-    this->Process(&scoreDefSetCurrent, &scoreDefSetCurrentParams);
+    ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
+    this->Process(scoreDefSetCurrent);
 
     this->ScoreDefSetGrpSymDoc();
 
@@ -933,11 +925,8 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
 
 void Doc::ScoreDefOptimizeDoc()
 {
-    Functor scoreDefOptimize(&Object::ScoreDefOptimize);
-    Functor scoreDefOptimizeEnd(&Object::ScoreDefOptimizeEnd);
-    ScoreDefOptimizeParams scoreDefOptimizeParams(this, &scoreDefOptimize, &scoreDefOptimizeEnd);
-
-    this->Process(&scoreDefOptimize, &scoreDefOptimizeParams, &scoreDefOptimizeEnd);
+    ScoreDefOptimizeFunctor scoreDefOptimize(this);
+    this->Process(scoreDefOptimize);
 
     this->ScoreDefSetGrpSymDoc();
 }
@@ -946,10 +935,9 @@ void Doc::ScoreDefSetGrpSymDoc()
 {
     // Group symbols need to be resolved using scoreDef, since there might be @starid/@endid attributes that determine
     // their positioning
-    Functor scoreDefSetGrpSym(&Object::ScoreDefSetGrpSym);
-    // this->GetCurrentScoreDef()->Process(&scoreDefSetGrpSym, NULL);
-    ScoreDefSetGrpSymParams scoreDefSetGrpSymParams(&scoreDefSetGrpSym);
-    this->Process(&scoreDefSetGrpSym, &scoreDefSetGrpSymParams);
+    ScoreDefSetGrpSymFunctor scoreDefSetGrpSym;
+    // this->GetCurrentScoreDef()->Process(scoreDefSetGrpSym);
+    this->Process(scoreDefSetGrpSym);
 }
 
 void Doc::CastOffDoc()
@@ -1022,11 +1010,9 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     // Store the cast off system widths => these are used to adjust the horizontal spacing
     // for a given duration during page layout
-    AlignMeasuresParams alignMeasuresParams(this);
-    alignMeasuresParams.m_storeCastOffSystemWidths = true;
-    Functor alignMeasures(&Object::AlignMeasures);
-    Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
-    castOffSinglePage->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+    AlignMeasuresFunctor alignMeasures(this);
+    alignMeasures.StoreCastOffSystemWidths(true);
+    castOffSinglePage->Process(alignMeasures);
 
     // Replace it with the castOffSinglePage
     pages->AddChild(castOffSinglePage);
@@ -2061,9 +2047,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // every time for now.
 
     m_drawingBeamMaxSlope = m_options->m_beamMaxSlope.GetValue();
-    m_drawingBeamMinSlope = m_options->m_beamMinSlope.GetValue();
     m_drawingBeamMaxSlope /= 100;
-    m_drawingBeamMinSlope /= 100;
 
     // values for beams
     m_drawingBeamWidth = m_options->m_unit.GetValue();
@@ -2135,51 +2119,24 @@ void Doc::SetCurrentScore(Score *score)
 // Doc functors methods
 //----------------------------------------------------------------------------
 
-int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
+FunctorCode Doc::Accept(MutableFunctor &functor)
 {
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-    if (!params->m_currentSyl) {
-        return FUNCTOR_STOP; // early return
-    }
-    if (params->m_lastNoteOrChord && (params->m_currentSyl->GetStart() != params->m_lastNoteOrChord)) {
-        params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
-    }
-    else if (m_options->m_openControlEvents.GetValue()) {
-        sylLog_WORDPOS wordpos = params->m_currentSyl->GetWordpos();
-        if ((wordpos == sylLog_WORDPOS_i) || (wordpos == sylLog_WORDPOS_m)) {
-            Measure *lastMeasure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
-            assert(lastMeasure);
-            params->m_currentSyl->SetEnd(lastMeasure->GetRightBarLine());
-        }
-    }
-
-    return FUNCTOR_STOP;
+    return functor.VisitDoc(this);
 }
 
-int Doc::PrepareTimestampsEnd(FunctorParams *functorParams)
+FunctorCode Doc::Accept(ConstFunctor &functor) const
 {
-    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
+    return functor.VisitDoc(this);
+}
 
-    if (!m_options->m_openControlEvents.GetValue() || params->m_timeSpanningInterfaces.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
+FunctorCode Doc::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDocEnd(this);
+}
 
-    Measure *lastMeasure = vrv_cast<Measure *>(this->FindDescendantByType(MEASURE, UNLIMITED_DEPTH, BACKWARD));
-    if (!lastMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    for (auto &pair : params->m_timeSpanningInterfaces) {
-        TimeSpanningInterface *interface = pair.first;
-        assert(interface);
-        if (!interface->GetEnd()) {
-            interface->SetEnd(lastMeasure->GetRightBarLine());
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+FunctorCode Doc::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDocEnd(this);
 }
 
 } // namespace vrv

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "metersig.h"
 #include "vrv.h"
@@ -171,9 +172,24 @@ void MeterSigGrp::SetMeasureBasedCount(const Measure *measure)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSigGrp::AlignHorizontally(FunctorParams *)
+FunctorCode MeterSigGrp::Accept(MutableFunctor &functor)
 {
-    return this->IsScoreDefElement() ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
+    return functor.VisitMeterSigGrp(this);
+}
+
+FunctorCode MeterSigGrp::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMeterSigGrp(this);
+}
+
+FunctorCode MeterSigGrp::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMeterSigGrpEnd(this);
+}
+
+FunctorCode MeterSigGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeterSigGrpEnd(this);
 }
 
 } // namespace vrv

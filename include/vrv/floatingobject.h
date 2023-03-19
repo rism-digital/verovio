@@ -37,6 +37,7 @@ public:
     FloatingObject(ClassId classId, const std::string &classIdStr);
     virtual ~FloatingObject();
     void Reset() override;
+    void ResetDrawing();
     ///@}
 
     void UpdateContentBBoxX(int x1, int x2) override;
@@ -85,8 +86,16 @@ public:
      * positioners, which allows for persistent vertical positioning for some elements
      */
     ///@{
+    void ResetMaxDrawingYRel() { m_maxDrawingYRel = VRV_UNSET; }
     void SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place);
     int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
+    ///@}
+
+    /**
+     * @name Get and set the drawing object IDs
+     */
+    ///@{
+    void ResetDrawingObjectIDs();
     ///@}
 
     /**
@@ -113,44 +122,19 @@ public:
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
+     * Interface for class functor visitation
      */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::ResetVerticalAlignment
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimePointing
-     */
-    int PrepareTimePointing(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    int PrepareTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestamps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
 
     /**
      * See Object::UnCastOff
@@ -341,7 +325,7 @@ protected:
 
 public:
     /**
-     * The spanning type of the positionner for spanning control elements
+     * The spanning type of the positioner for spanning control elements
      */
     char m_spanningType;
 };

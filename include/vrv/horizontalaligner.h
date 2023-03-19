@@ -134,6 +134,11 @@ public:
     void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {}) const;
 
     /**
+     * Return all GraceAligners for the Alignment.
+     */
+    const MapOfIntGraceAligners &GetGraceAligners() { return m_graceAligners; }
+
+    /**
      * Returns the GraceAligner for the Alignment.
      * Create it if necessary.
      */
@@ -211,47 +216,20 @@ public:
     //----------//
 
     /**
-     * Calc the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
+     * Interface for class functor visitation
      */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
     int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArpeg
-     */
-    int AdjustArpeg(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    ///@{
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-    int AdjustGraceXPosEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::AdjustXPos
-     */
-    ///@{
-    int AdjustXPos(FunctorParams *functorParams) override;
-    int AdjustXPosEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustDotsEnd
-     */
-    int AdjustDotsEnd(FunctorParams *functorParams) override;
 
 private:
     /**
@@ -265,14 +243,14 @@ public:
 private:
     /**
      * Stores the position relative to the measure.
-     * This is instanciated by the Object::CalcAlignmentXPos functor.
+     * This is instanciated by the CalcAlignmentXPosFunctor.
      * It takes into account a non-linear according to the time interval with
      * the previous Alignement
      */
     int m_xRel;
     /**
      * Stores the time at which the alignment occur.
-     * It is set by Object::AlignHorizontally.
+     * It is set by the AlignHorizontallyFunctor.
      */
     double m_time;
     /**
@@ -329,7 +307,7 @@ public:
     void AddToAccidSpace(Accid *accid);
 
     /**
-     * See Object::AdjustAccidX
+     * See AdjustAccidXFunctor
      */
     void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids);
 
@@ -359,36 +337,24 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustLayers
+     * Interface for class functor visitation
      */
-    int AdjustLayers(FunctorParams *functorParams) override;
-    int AdjustLayersEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
 public:
-    //
-private:
     /**
      * The accid space of the AlignmentReference.
      */
     std::vector<Accid *> m_accidSpace;
 
+private:
     /**
      *
      */
@@ -426,6 +392,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     /**
@@ -536,7 +512,6 @@ public:
     /**
      * Adjust the spacing of the measure looking at each tuple of start / end alignment and a distance.
      * The distance is an expansion value (positive) of compression (negative).
-     * Called from Measure::AdjustSylSpacingEnd.
      */
     void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
 
@@ -557,11 +532,14 @@ public:
     //----------//
 
     /**
-     * Set the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
-     * For each MeasureAlignment, we need to reset the previous time position.
+     * Interface for class functor visitation
      */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * Justify the X positions
@@ -656,13 +634,23 @@ public:
 
     /**
      * Set an linear defaut position for each grace note
-     * This is called from the CalcAlignmentXPos Functor.
+     * This is called from the CalcAlignmentXPosFunctor.
      */
     void SetGraceAlignmentXPos(const Doc *doc);
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
@@ -711,6 +699,20 @@ public:
      * Creates it if not found
      */
     TimestampAttr *GetTimestampAtTime(double time);
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

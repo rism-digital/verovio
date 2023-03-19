@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "lb.h"
 #include "num.h"
@@ -90,6 +91,26 @@ bool Rend::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Rend::Accept(MutableFunctor &functor)
+{
+    return functor.VisitRend(this);
+}
+
+FunctorCode Rend::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitRend(this);
+}
+
+FunctorCode Rend::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRendEnd(this);
+}
+
+FunctorCode Rend::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRendEnd(this);
+}
 
 int Rend::AlignVertically(FunctorParams *functorParams)
 {

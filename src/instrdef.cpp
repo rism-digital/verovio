@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "scoredef.h"
 #include "vrv.h"
 
@@ -49,5 +50,25 @@ void InstrDef::Reset()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode InstrDef::Accept(MutableFunctor &functor)
+{
+    return functor.VisitInstrDef(this);
+}
+
+FunctorCode InstrDef::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitInstrDef(this);
+}
+
+FunctorCode InstrDef::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitInstrDefEnd(this);
+}
+
+FunctorCode InstrDef::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitInstrDefEnd(this);
+}
 
 } // namespace vrv

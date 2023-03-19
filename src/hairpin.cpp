@@ -17,6 +17,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "system.h"
@@ -217,33 +218,24 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
 // Hairpin functor methods
 //----------------------------------------------------------------------------
 
-int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
+FunctorCode Hairpin::Accept(MutableFunctor &functor)
 {
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    // Only try to link them if start and end are resolved
-    if (!this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
-
-    params->m_hairpins.push_back(this);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitHairpin(this);
 }
 
-int Hairpin::ResetData(FunctorParams *functorParams)
+FunctorCode Hairpin::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
+    return functor.VisitHairpin(this);
+}
 
-    m_leftLink = NULL;
-    m_rightLink = NULL;
-    m_drawingLength = 0;
+FunctorCode Hairpin::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHairpinEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Hairpin::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHairpinEnd(this);
 }
 
 } // namespace vrv

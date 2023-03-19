@@ -462,20 +462,25 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareLyricsEnd
+     * Interface for class functor visitation
      */
-    int PrepareLyricsEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestampsEnd
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     /**
      * Calculates the music font size according to the m_interlDefin reference value.
      */
     int CalcMusicFontSize();
+
+    /**
+     * Generate the measure indices
+     */
+    void PrepareMeasureIndices();
 
 public:
     Page *m_selectionPreceding;
@@ -514,8 +519,6 @@ public:
     int m_drawingPageMarginRight;
     /** The current page top margin */
     int m_drawingPageMarginTop;
-    /** the current beam minimal slope */
-    float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
 
@@ -593,7 +596,7 @@ private:
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.
-     * If yes, ScoreDefSetCurrent will not parse the document (again) unless
+     * If yes, ScoreDefSetCurrentDoc will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;

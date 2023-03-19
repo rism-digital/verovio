@@ -122,12 +122,6 @@ extern struct timeval start;
 void LogElapsedTimeStart();
 void LogElapsedTimeEnd(const char *msg = "unspecified operation");
 
-/**
- * Method that simply checks if the Object is not NULL
- * Also asserts it for stopping in debug mode
- */
-bool Check(Object *object);
-
 //----------------------------------------------------------------------------
 // Notation type checks
 //----------------------------------------------------------------------------

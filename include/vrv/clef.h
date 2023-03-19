@@ -25,11 +25,13 @@ class ScoreDefInterface;
  * This class models the MEI <clef> element.
  */
 class Clef : public LayerElement,
+             public AttClefLog,
              public AttClefShape,
              public AttColor,
              public AttEnclosingChars,
              public AttExtSym,
              public AttLineLoc,
+             public AttOctave,
              public AttOctaveDisplacement,
              public AttStaffIdent,
              public AttVisibility {
@@ -71,19 +73,26 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::AdjustBeams
      */
     int AdjustBeams(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
-
 private:
+    //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

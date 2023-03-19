@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -75,6 +76,26 @@ bool MNum::IsSupportedChild(Object *child)
 //----------------------------------------------------------------------------
 
 static const ClassRegistrar<MNum> s_factory("mNum", MNUM);
+
+FunctorCode MNum::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMNum(this);
+}
+
+FunctorCode MNum::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMNum(this);
+}
+
+FunctorCode MNum::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMNumEnd(this);
+}
+
+FunctorCode MNum::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMNumEnd(this);
+}
 
 int MNum::Save(FunctorParams *functorParams)
 {

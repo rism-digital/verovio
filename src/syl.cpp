@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "note.h"
@@ -141,62 +142,24 @@ int Syl::GetDrawingHeight() const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Syl::PrepareLyrics(FunctorParams *functorParams)
+FunctorCode Syl::Accept(MutableFunctor &functor)
 {
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    Verse *verse = vrv_cast<Verse *>(this->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
-    if (verse) {
-        m_drawingVerse = std::max(verse->GetN(), 1);
-    }
-
-    this->SetStart(vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
-    // If there isn't an ancestor note, it should be a chord
-    if (!this->GetStart()) {
-        this->SetStart(vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
-    }
-
-    // At this stage currentSyl is actually the previous one that is ending here
-    if (params->m_currentSyl) {
-        // The previous syl was an initial or median -> The note we just parsed is the end
-        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
-            || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
-            params->m_currentSyl->m_nextWordSyl = this;
-        }
-        // The previous syl was a underscore -> the previous but one was the end
-        else if (params->m_currentSyl->GetCon() == sylLog_CON_u) {
-            if (params->m_currentSyl->GetStart() == params->m_penultimateNoteOrChord) {
-                LogWarning("Syllable with underline extender under one single note '%s'",
-                    params->m_currentSyl->GetStart()->GetID().c_str());
-            }
-            else {
-                params->m_currentSyl->SetEnd(params->m_penultimateNoteOrChord);
-            }
-        }
-    }
-
-    // Now decide what to do with the starting syl and check if it has a forward connector
-    if ((this->GetWordpos() == sylLog_WORDPOS_i) || (this->GetWordpos() == sylLog_WORDPOS_m)) {
-        params->m_currentSyl = this;
-        return FUNCTOR_CONTINUE;
-    }
-    else if (this->GetCon() == sylLog_CON_u) {
-        params->m_currentSyl = this;
-        return FUNCTOR_CONTINUE;
-    }
-    else {
-        params->m_currentSyl = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSyl(this);
 }
 
-int Syl::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
+FunctorCode Syl::Accept(ConstFunctor &functor) const
 {
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
+    return functor.VisitSyl(this);
+}
+
+FunctorCode Syl::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSylEnd(this);
+}
+
+FunctorCode Syl::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSylEnd(this);
 }
 
 int Syl::GenerateMIDI(FunctorParams *functorParams)
@@ -211,17 +174,6 @@ int Syl::GenerateMIDI(FunctorParams *functorParams)
     params->m_midiFile->addLyric(params->m_midiTrack, startTime * params->m_midiFile->getTPQ(), sylText);
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Syl::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_nextWordSyl = NULL;
-
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceResetData(functorParams, this);
 }
 
 bool Syl::CreateDefaultZone(Doc *doc)

@@ -1020,7 +1020,7 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
-    m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
+    m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
@@ -1048,7 +1048,7 @@ Options::Options()
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
 
-    m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
+    m_landscape.SetInfo("Landscape orientation", "Swap the values for page height and page width");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
@@ -1121,7 +1121,7 @@ Options::Options()
     this->Register(&m_pageMarginTop, "pageMarginTop", &m_general);
 
     m_pageWidth.SetInfo("Page width", "The page width");
-    m_pageWidth.Init(2100, 100, 60000, true);
+    m_pageWidth.Init(2100, 100, 100000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
     m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
@@ -1240,10 +1240,6 @@ Options::Options()
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
     m_beamMaxSlope.Init(10, 0, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
-
-    m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
-    m_beamMinSlope.Init(0, 0, 0);
-    this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
     m_beamMixedPreserve.SetInfo("Preserve mixed beams", "Mixed beams will be drawn even if there is not enough space");
     m_beamMixedPreserve.Init(false);
@@ -1408,7 +1404,7 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
-    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in unit");
+    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in MEI units");
     m_multiRestThickness.Init(2.0, 0.50, 6.00);
     this->Register(&m_multiRestThickness, "multiRestThickness", &m_generalLayout);
 
@@ -1497,7 +1493,7 @@ Options::Options()
     m_spacingSystem.Init(12, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
-    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
+    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in MEI units");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
 

@@ -1,6 +1,11 @@
 # Changelog
 
 ## [unreleased]
+* Support for delayed turns on chords (@eNote-GmbH)
+* Improve endpoint location for spanning slurs (@eNote-GmbH)
+* Improve layout for inner slurs in cross-staff situations (@eNote-GmbH)
+* Fix validity of MEI output by ensuring correct element order
+* Option --octave-no-spanning-parentheses to prevent () in spanning octave displacements (@eNote-GmbH)
 
 ## [3.15.0] - 2023-03-01
 * Improved generation of `xml:id`s (@eNote-GmbH)

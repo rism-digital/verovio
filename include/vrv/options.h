@@ -674,7 +674,6 @@ public:
     OptionDbl m_barLineWidth;
     OptionBool m_beamFrenchStyle;
     OptionInt m_beamMaxSlope;
-    OptionInt m_beamMinSlope;
     OptionBool m_beamMixedPreserve;
     OptionDbl m_beamMixedStemMin;
     OptionDbl m_bracketThickness;

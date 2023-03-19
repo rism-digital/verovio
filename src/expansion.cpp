@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -39,5 +41,25 @@ void Expansion::Reset()
 //----------------------------------------------------------------------------
 // Expansion functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Expansion::Accept(MutableFunctor &functor)
+{
+    return functor.VisitExpansion(this);
+}
+
+FunctorCode Expansion::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitExpansion(this);
+}
+
+FunctorCode Expansion::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitExpansionEnd(this);
+}
+
+FunctorCode Expansion::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitExpansionEnd(this);
+}
 
 } // namespace vrv

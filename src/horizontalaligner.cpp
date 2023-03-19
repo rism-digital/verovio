@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "elementpart.h"
 #include "floatingobject.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -89,6 +90,26 @@ void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
     else {
         InsertChild(alignment, idx);
     }
+}
+
+FunctorCode HorizontalAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitHorizontalAligner(this);
+}
+
+FunctorCode HorizontalAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitHorizontalAligner(this);
+}
+
+FunctorCode HorizontalAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHorizontalAlignerEnd(this);
+}
+
+FunctorCode HorizontalAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHorizontalAlignerEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -302,6 +323,26 @@ void MeasureAligner::AdjustGraceNoteSpacing(const Doc *doc, Alignment *alignment
     }
 }
 
+FunctorCode MeasureAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMeasureAligner(this);
+}
+
+FunctorCode MeasureAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMeasureAligner(this);
+}
+
+FunctorCode MeasureAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMeasureAlignerEnd(this);
+}
+
+FunctorCode MeasureAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeasureAlignerEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // GraceAligner
 //----------------------------------------------------------------------------
@@ -434,6 +475,26 @@ void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
         alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
         ++i;
     }
+}
+
+FunctorCode GraceAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitGraceAligner(this);
+}
+
+FunctorCode GraceAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGraceAligner(this);
+}
+
+FunctorCode GraceAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitGraceAlignerEnd(this);
+}
+
+FunctorCode GraceAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGraceAlignerEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -699,6 +760,26 @@ int Alignment::HorizontalSpaceForDuration(
     return pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
+FunctorCode Alignment::Accept(MutableFunctor &functor)
+{
+    return functor.VisitAlignment(this);
+}
+
+FunctorCode Alignment::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitAlignment(this);
+}
+
+FunctorCode Alignment::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAlignmentEnd(this);
+}
+
+FunctorCode Alignment::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAlignmentEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // AlignmentReference
 //----------------------------------------------------------------------------
@@ -852,6 +933,26 @@ void AlignmentReference::SetAccidLayerAlignment()
     }
 }
 
+FunctorCode AlignmentReference::Accept(MutableFunctor &functor)
+{
+    return functor.VisitAlignmentReference(this);
+}
+
+FunctorCode AlignmentReference::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitAlignmentReference(this);
+}
+
+FunctorCode AlignmentReference::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAlignmentReferenceEnd(this);
+}
+
+FunctorCode AlignmentReference::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAlignmentReferenceEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // TimestampAligner
 //----------------------------------------------------------------------------
@@ -912,24 +1013,29 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     return timestampAttr;
 }
 
+FunctorCode TimestampAligner::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTimestampAligner(this);
+}
+
+FunctorCode TimestampAligner::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTimestampAligner(this);
+}
+
+FunctorCode TimestampAligner::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTimestampAlignerEnd(this);
+}
+
+FunctorCode TimestampAligner::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTimestampAlignerEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-
-int MeasureAligner::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    // We start a new MeasureAligner
-    // Reset the previous time position and x_rel to 0;
-    params->m_previousTime = 0.0;
-    params->m_previousXRel = params->m_doc->GetDrawingUnit(100);
-    params->m_lastNonTimestamp = m_leftBarLineAlignment;
-    params->m_measureAligner = this;
-
-    return FUNCTOR_CONTINUE;
-}
 
 int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
@@ -938,413 +1044,6 @@ int MeasureAligner::JustifyX(FunctorParams *functorParams)
 
     params->m_leftBarLineX = this->GetLeftBarLineAlignment()->GetXRel();
     params->m_rightBarLineX = this->GetRightBarLineAlignment()->GetXRel();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustArpeg(FunctorParams *functorParams)
-{
-    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
-    assert(params);
-
-    // An array of Alignment / arpeg / staffN / bool (for indicating if we have reached the alignment yet)
-    ArrayOfAlignmentArpegTuples::iterator iter = params->m_alignmentArpegTuples.begin();
-
-    while (iter != params->m_alignmentArpegTuples.end()) {
-        // We are reaching the alignment to which an arpeg points to (i.e, the topNote one)
-        if (std::get<0>(*iter) == this) {
-            std::get<3>(*iter) = true;
-            ++iter;
-            continue;
-        }
-        // We have not reached the alignment of the arpeg, just continue (backwards)
-        else if (std::get<3>(*iter) == false) {
-            ++iter;
-            continue;
-        }
-        // We are now in an alignment preceeding an arpeg - check for overlap
-        int minLeft, maxRight;
-        this->GetLeftRight(std::get<2>(*iter), minLeft, maxRight);
-
-        // Nothing for the staff we are looking at, we also need to check with barlines
-        if (maxRight == VRV_UNSET) {
-            this->GetLeftRight(-1, minLeft, maxRight);
-        }
-
-        // Make sure that there is no overlap with right barline of the previous measure
-        if ((maxRight == VRV_UNSET) && (m_type == ALIGNMENT_MEASURE_LEFT_BARLINE)) {
-            Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-            auto parent = measure->GetParent();
-            Measure *previous = vrv_cast<Measure *>(parent->GetPrevious(measure, MEASURE));
-            if (previous) {
-                Alignment *alignment = previous->m_measureAligner.GetRightBarLineAlignment();
-                alignment->GetLeftRight(-1, minLeft, maxRight);
-                if (maxRight != VRV_UNSET) {
-                    const int previousWidth = previous->GetWidth();
-                    minLeft -= previousWidth;
-                    maxRight -= previousWidth;
-                }
-            }
-        }
-
-        // Make sure that there is no overlap with grace notes (since they are handled separately by graceAligner)
-        if (m_type == ALIGNMENT_GRACENOTE) {
-            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : std::get<2>(*iter);
-            if (this->HasGraceAligner(graceAlignerId)) {
-                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
-                maxRight = graceAligner->GetGraceGroupRight(std::get<2>(*iter));
-                const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
-                if (overlap > 0) {
-                    const int drawingUnit = params->m_doc->GetDrawingUnit(100);
-                    this->SetXRel(this->GetXRel() - drawingUnit / 6);
-                }
-            }
-        }
-
-        // Nothing, just continue
-        if (maxRight == VRV_UNSET) {
-            ++iter;
-            continue;
-        }
-
-        const int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
-        const int drawingUnit = params->m_doc->GetDrawingUnit(100);
-        // HARDCODED
-        int adjust = overlap + drawingUnit / 2 * 3;
-        // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
-        if (adjust > 0) {
-            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), adjust) };
-            params->m_measureAligner->AdjustProportionally(boundaries);
-            // After adjusting, make sure that arpeggio does not overlap with elements from the previous alignment
-            if (m_type == ALIGNMENT_CLEF) {
-                auto [currentMin, currentMax] = this->GetAlignmentTopBottom();
-                Note *topNote = NULL;
-                Note *bottomNote = NULL;
-                std::get<1>(*iter)->GetDrawingTopBottomNotes(topNote, bottomNote);
-                if (topNote && bottomNote) {
-                    const int arpegMax = topNote->GetDrawingY() + drawingUnit / 2;
-                    const int arpegMin = bottomNote->GetDrawingY() - drawingUnit / 2;
-                    // Make sure that there is vertical overlap, otherwise do not shift arpeggio
-                    if (((currentMin < arpegMin) && (currentMax > arpegMin))
-                        || ((currentMax > arpegMax) && (currentMin < arpegMax))) {
-                        std::get<0>(*iter)->SetXRel(std::get<0>(*iter)->GetXRel() + overlap + drawingUnit / 2);
-                    }
-                }
-            }
-        }
-
-        // We can remove it from the list
-        iter = params->m_alignmentArpegTuples.erase(iter);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
-    if (!params->m_isGraceAlignment) {
-        // Do not process AlignmentReference children if no GraceAligner
-        if (m_graceAligners.empty()) {
-            // We store the default alignment before we hit the grace alignment
-            if (m_type == ALIGNMENT_DEFAULT) params->m_rightDefaultAlignment = this;
-            return FUNCTOR_SIBLINGS;
-        }
-        assert(m_type == ALIGNMENT_GRACENOTE);
-
-        // Change the flag for indicating that the alignment is child of a GraceAligner
-        params->m_isGraceAlignment = true;
-
-        // Get the parent measure Aligner
-        MeasureAligner *measureAligner = vrv_cast<MeasureAligner *>(this->GetFirstAncestor(MEASURE_ALIGNER));
-        assert(measureAligner);
-
-        std::vector<int>::iterator iter;
-        Filters filters;
-        for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-            const int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
-
-            std::vector<ClassId> exclude;
-            if (this->HasGraceAligner(graceAlignerId) && params->m_rightDefaultAlignment) {
-                GraceAligner *graceAligner = this->GetGraceAligner(graceAlignerId);
-                // last alignment of GraceAligner is rightmost one, so get it
-                Alignment *alignment = vrv_cast<Alignment *>(graceAligner->GetLast(ALIGNMENT));
-                // if there is no overlap with accidentals, exclude them when getting left-right margins of alignment
-                if (alignment && !alignment->HasAccidVerticalOverlap(params->m_rightDefaultAlignment, graceAlignerId)) {
-                    exclude.push_back(ACCID);
-                }
-            }
-
-            // Rescue value, used at the end of a measure without a barline
-            int graceMaxPos = this->GetXRel() - params->m_doc->GetDrawingUnit(100);
-            // If we have a rightDefault, then this is (quite likely) the next note / chord
-            // Get its minimum left and make it the max right position of the grace group
-            if (params->m_rightDefaultAlignment) {
-                int minLeft, maxRight;
-                params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight, exclude);
-                if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
-            }
-            // This happens when grace notes are at the end of a measure before a barline
-            else {
-                int minLeft, maxRight;
-                assert(measureAligner->GetRightBarLineAlignment());
-                // staffN -1 is barline
-                measureAligner->GetRightBarLineAlignment()->GetLeftRight(
-                    BARLINE_REFERENCES, minLeft, maxRight, exclude);
-                if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
-            }
-
-            params->m_graceMaxPos = graceMaxPos;
-            params->m_graceUpcomingMaxPos = -VRV_UNSET;
-            params->m_graceCumulatedXShift = VRV_UNSET;
-            filters.Clear();
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            filters.Add(&matchStaff);
-
-            if (this->HasGraceAligner(graceAlignerId)) {
-                this->GetGraceAligner(graceAlignerId)
-                    ->Process(params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
-
-                // There was not grace notes for that staff
-                if (params->m_graceCumulatedXShift == VRV_UNSET) continue;
-
-                // Now we need to adjust the space for the grace not group
-                measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
-            }
-        }
-
-        // Change the flag back
-        params->m_isGraceAlignment = false;
-
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (params->m_graceCumulatedXShift != VRV_UNSET) {
-        // This is happening when aligning the grace aligner itself
-        this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustGraceXPosEnd(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    if (params->m_graceUpcomingMaxPos != -VRV_UNSET) {
-        params->m_graceMaxPos = params->m_graceUpcomingMaxPos;
-        // We reset it for the next aligner
-        params->m_graceUpcomingMaxPos = -VRV_UNSET;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustXPos(FunctorParams *functorParams)
-{
-    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    // LogDebug("Alignment type %d", m_type);
-
-    this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
-
-    if (m_type == ALIGNMENT_MEASURE_END && this->GetXRel() < params->m_minPos) {
-        this->SetXRel(params->m_minPos);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
-{
-    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    if (params->m_upcomingMinPos != VRV_UNSET) {
-        params->m_minPos = params->m_upcomingMinPos;
-        // We reset it for the next aligner
-        params->m_upcomingMinPos = VRV_UNSET;
-    }
-
-    // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
-    // Eventually we might want to have a more sophisticated pruning algorithm
-    if (params->m_upcomingBoundingBoxes.empty()) return FUNCTOR_CONTINUE;
-
-    // Handle additional offsets that can happen when we have overlapping dots/flags. This should happen only for
-    // default alignments, so other ones should be ignored. If there are at least one bounding box that overlaps with
-    // dot/flag from the previous alignment - we need to consider additional offset for those elements. In such case,
-    // all current elements should have their XRel adjusted (as they would normally have) and increase minXPosition by
-    // the dot/flag offset
-    if (params->m_previousAlignment.m_overlappingBB && params->m_previousAlignment.m_alignment
-        && (params->m_previousAlignment.m_alignment->GetType() == ALIGNMENT_DEFAULT)) {
-        auto it = std::find_if(
-            params->m_upcomingBoundingBoxes.begin(), params->m_upcomingBoundingBoxes.end(), [params](BoundingBox *bb) {
-                if (params->m_previousAlignment.m_overlappingBB == bb) return false;
-                // check if elements actually overlap
-                return (bb->HorizontalSelfOverlap(params->m_previousAlignment.m_overlappingBB)
-                    && bb->VerticalSelfOverlap(params->m_previousAlignment.m_overlappingBB));
-            });
-        if (it != params->m_upcomingBoundingBoxes.end()) {
-            params->m_currentAlignment.m_alignment->SetXRel(
-                params->m_currentAlignment.m_alignment->GetXRel() + params->m_previousAlignment.m_offset);
-            params->m_minPos += params->m_previousAlignment.m_offset;
-            params->m_cumulatedXShift += params->m_previousAlignment.m_offset;
-        }
-    }
-    params->m_previousAlignment = params->m_currentAlignment;
-    // Reset current alignment
-    params->m_currentAlignment.Reset();
-
-    params->m_boundingBoxes = params->m_upcomingBoundingBoxes;
-    params->m_upcomingBoundingBoxes.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustAccidX(FunctorParams *functorParams)
-{
-    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
-    assert(params);
-
-    MapOfIntGraceAligners::const_iterator iter;
-    for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
-        iter->second->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::AdjustDotsEnd(FunctorParams *functorParams)
-{
-    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
-    assert(params);
-
-    // process dots only if there is at least 1 dot (vertical group) in the alignment
-    if (!params->m_elements.empty() && !params->m_dots.empty()) {
-        // multimap of overlapping dots with other elements
-        std::multimap<LayerElement *, LayerElement *> overlapElements;
-
-        // Try to find which dots can be grouped together. To achieve this, find layer elements that collide with these
-        // dots. Then find if their parents (note/chord) have dots - if they do then we can group these dots together,
-        // otherwise they should be kept separate
-        for (auto dot : params->m_dots) {
-            // A third staff size will be used as required margin
-            const Staff *staff = dot->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-            const int staffSize = staff->m_drawingStaffSize;
-            const int thirdUnit = params->m_doc->GetDrawingUnit(staffSize) / 3;
-
-            for (LayerElement *element : params->m_elements) {
-                if (dot->HorizontalSelfOverlap(element, thirdUnit)
-                    && dot->VerticalSelfOverlap(element, 2 * thirdUnit)) {
-                    if (element->Is({ CHORD, NOTE })) {
-                        if (dynamic_cast<AttAugmentDots *>(element)->GetDots() < 1) continue;
-                        overlapElements.emplace(dot, element);
-                    }
-                    else if (Object *chord = element->GetFirstAncestor(CHORD, UNLIMITED_DEPTH); chord) {
-                        if (vrv_cast<Chord *>(chord)->GetDots() < 1) continue;
-                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(chord));
-                    }
-                    else if (Object *note = element->GetFirstAncestor(NOTE, UNLIMITED_DEPTH); note) {
-                        if (vrv_cast<Note *>(note)->GetDots() < 1) continue;
-                        overlapElements.emplace(dot, vrv_cast<LayerElement *>(note));
-                    }
-                }
-            }
-        }
-
-        // if at least one overlapping element has been found, make sure to adjust relative positioning of the dots in
-        // the group to the rightmost one
-        if (!overlapElements.empty()) {
-            for (auto dot : params->m_dots) {
-                auto pair = overlapElements.equal_range(dot);
-                int max = 0;
-                for (auto it = pair.first; it != pair.second; ++it) {
-                    const int diff = it->second->GetDrawingX() + it->first->GetDrawingXRel() - it->first->GetDrawingX();
-                    if (diff > max) max = diff;
-                }
-                if (max) dot->SetDrawingXRel(dot->GetDrawingXRel() + max);
-                dot->IsAdjusted(true);
-            }
-        }
-    }
-
-    params->m_elements.clear();
-    params->m_dots.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    // Do not set an x pos for anything before the barline (including it)
-    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-
-    int intervalXRel = 0;
-    double intervalTime = (m_time - params->m_previousTime);
-
-    if (m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        intervalTime = 0.0;
-    }
-
-    // Do not move aligner that are only time-stamps at this stage but add it to the pending list
-    if (this->HasTimestampOnly()) {
-        params->m_timestamps.push_back(this);
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (intervalTime > 0.0) {
-        intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-            params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
-            params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
-        // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
-    }
-
-    MapOfIntGraceAligners::const_iterator iter;
-    for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
-        iter->second->SetGraceAlignmentXPos(params->m_doc);
-    }
-
-    this->SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR * params->m_estimatedJustificationRatio);
-    params->m_previousTime = m_time;
-    params->m_previousXRel = m_xRel;
-
-    // This is an alignment which is not timestamp only. If we have a list of pendings timetamp
-    // alignments, then we now need to move them appropriately
-    if (!params->m_timestamps.empty() && params->m_lastNonTimestamp) {
-        int startXRel = params->m_lastNonTimestamp->GetXRel();
-        double startTime = params->m_lastNonTimestamp->GetTime();
-        double endTime = this->GetTime();
-        // We have timestamp alignments between the left barline and the first beat. We need
-        // to use the MeasureAligner::m_initialTstampDur to calculate the time (percentage) position
-        if (params->m_lastNonTimestamp->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
-            startTime = params->m_measureAligner->GetInitialTstampDur();
-        }
-        // The duration since the last alignment and the current one
-        double duration = endTime - startTime;
-        int space = m_xRel - params->m_lastNonTimestamp->GetXRel();
-        // For each timestamp alignment, move them proportionally to the space we currently have
-        for (auto &alignment : params->m_timestamps) {
-            // Avoid division by zero (nothing to move with the alignment anyway
-            if (duration == 0.0) break;
-            double percent = (alignment->GetTime() - startTime) / duration;
-            alignment->SetXRel(startXRel + space * percent);
-        }
-        params->m_timestamps.clear();
-    }
-
-    // Do not use clef change and grancenote alignment as reference since these are not aligned at this stage
-    if (!this->IsOfType({ ALIGNMENT_CLEF, ALIGNMENT_GRACENOTE })) params->m_lastNonTimestamp = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1375,183 +1074,6 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
-{
-    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasMultipleLayer()) return FUNCTOR_SIBLINGS;
-
-    params->m_currentLayerN = VRV_UNSET;
-    params->m_current.clear();
-    params->m_previous.clear();
-    params->m_accumulatedShift = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::AdjustLayersEnd(FunctorParams *functorParams)
-{
-    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    // Determine staff
-    if (params->m_current.empty()) return FUNCTOR_CONTINUE;
-    LayerElement *firstElem = params->m_current.at(0);
-    Staff *staff = firstElem->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-
-    const int extension
-        = params->m_doc->GetDrawingLedgerLineExtension(staff->m_drawingStaffSize, firstElem->GetDrawingCueSize());
-
-    if ((abs(params->m_accumulatedShift) < 2 * extension) && params->m_ignoreDots) {
-        // Check each pair of notes from different layers for possible collisions of ledger lines with note stems
-        const bool handleLedgerLineStemCollision = std::any_of(
-            params->m_current.begin(), params->m_current.end(), [params, staff](LayerElement *currentElem) {
-                if (!currentElem->Is(NOTE)) return false;
-                Note *currentNote = vrv_cast<Note *>(currentElem);
-                assert(currentNote);
-
-                return std::any_of(params->m_previous.begin(), params->m_previous.end(),
-                    [params, staff, currentNote](LayerElement *previousElem) {
-                        if (!previousElem->Is(NOTE)) return false;
-                        Note *previousNote = vrv_cast<Note *>(previousElem);
-                        assert(previousNote);
-
-                        return Note::HandleLedgerLineStemCollision(params->m_doc, staff, currentNote, previousNote);
-                    });
-            });
-
-        // To avoid collisions shift the chord or note to the left
-        if (handleLedgerLineStemCollision) {
-            auto itElem = std::find_if(
-                params->m_current.begin(), params->m_current.end(), [](LayerElement *elem) { return elem->Is(NOTE); });
-            assert(itElem != params->m_current.end());
-
-            LayerElement *chord = vrv_cast<Note *>(*itElem)->IsChordTone();
-            LayerElement *element = chord ? chord : (*itElem);
-
-            const int shift = 2 * extension - abs(params->m_accumulatedShift);
-            element->SetDrawingXRel(element->GetDrawingXRel() - shift);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    // Because we are processing grace notes alignment backward (see Alignment::AdjustGraceXPos) we need
-    // to process the children (LayerElement) "by hand" in FORWARD manner
-    // (filters can be NULL because filtering was already applied in the parent)
-    for (auto child : this->GetChildren()) {
-        child->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
-{
-    AdjustAccidXParams *params = vrv_params_cast<AdjustAccidXParams *>(functorParams);
-    assert(params);
-
-    if (m_accidSpace.empty()) return FUNCTOR_SIBLINGS;
-
-    assert(params->m_doc);
-    StaffDef *staffDef = params->m_doc->GetCurrentScoreDef()->GetStaffDef(this->GetN());
-    int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
-
-    std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
-    // process accid layer alignment
-    this->SetAccidLayerAlignment();
-
-    // Detect accids which are an octave apart => they will be grouped together in the multiset
-    std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;
-    std::copy(m_accidSpace.begin(), m_accidSpace.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
-
-    std::set<Accid *> adjustedAccids;
-    // Align the octaves
-    for (Accid *accid : m_accidSpace) {
-        // Skip any accid that was already adjusted
-        if (adjustedAccids.count(accid) > 0) continue;
-        auto range = octaveEquivalence.equal_range(accid);
-        // Handle at least two octave accids without unisons
-        int octaveAccidCount = 0;
-        std::set<data_OCTAVE> octaves;
-        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
-            Note *note = vrv_cast<Note *>((*octaveIter)->GetFirstAncestor(NOTE));
-            octaves.insert(note->GetOct());
-            ++octaveAccidCount;
-        }
-        if ((octaveAccidCount < 2) || ((int)octaves.size() < octaveAccidCount)) continue;
-        // Now adjust the octave accids and store the left most position
-        int minDrawingX = -VRV_UNSET;
-        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
-            this->AdjustAccidWithAccidSpace(*octaveIter, params->m_doc, staffSize, adjustedAccids);
-            minDrawingX = std::min(minDrawingX, (*octaveIter)->GetDrawingX());
-        }
-        // Finally, align the accidentals whenever the adjustment is not too large
-        for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
-            const int dist = (*octaveIter)->GetDrawingX() - minDrawingX;
-            if ((dist > 0) && (*octaveIter)->HasContentHorizontalBB()) {
-                const int accidWidth = (*octaveIter)->GetContentRight() - (*octaveIter)->GetContentLeft();
-                if (dist < accidWidth / 2) {
-                    (*octaveIter)->SetDrawingXRel((*octaveIter)->GetDrawingXRel() - dist);
-                }
-            }
-        }
-    }
-
-    // Align accidentals for unison notes if any of them are present
-    for (Accid *accid : m_accidSpace) {
-        if (accid->GetDrawingUnisonAccid() == NULL) continue;
-        accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
-    }
-
-    const int count = (int)m_accidSpace.size();
-    const int middle = (count / 2) + (count % 2);
-    // Zig-zag processing
-    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
-        // top one - but skip if already adjusted (i.e. octaves)
-        if (adjustedAccids.count(m_accidSpace.at(i)) == 0) {
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize, adjustedAccids);
-        }
-
-        // Break with odd number of elements once the middle is reached
-        if (i == j) break;
-
-        // bottom one - but skip if already adjusted
-        if (adjustedAccids.count(m_accidSpace.at(j)) == 0) {
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize, adjustedAccids);
-        }
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int AlignmentReference::ScoreDefUnsetCurrent(FunctorParams *functorParams)
-{
-    Alignment *alignment = vrv_cast<Alignment *>(this->GetParent());
-    assert(alignment);
-
-    switch (alignment->GetType()) {
-        case ALIGNMENT_SCOREDEF_CLEF:
-        case ALIGNMENT_SCOREDEF_KEYSIG:
-        case ALIGNMENT_SCOREDEF_MENSUR:
-        case ALIGNMENT_SCOREDEF_METERSIG:
-        case ALIGNMENT_SCOREDEF_CAUTION_CLEF:
-        case ALIGNMENT_SCOREDEF_CAUTION_KEYSIG:
-        case ALIGNMENT_SCOREDEF_CAUTION_MENSUR:
-        case ALIGNMENT_SCOREDEF_CAUTION_METERSIG: this->ClearChildren(); break;
-        default: break;
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

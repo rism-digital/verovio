@@ -24,6 +24,7 @@
 #include "dynam.h"
 #include "fermata.h"
 #include "fing.h"
+#include "functor.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "mordent.h"
@@ -66,9 +67,6 @@ FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
 FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
 {
     this->Reset();
-
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
 }
 
 FloatingObject::~FloatingObject() {}
@@ -77,7 +75,15 @@ void FloatingObject::Reset()
 {
     Object::Reset();
 
+    this->ResetDrawing();
+
     m_drawingGrpId = 0;
+}
+
+void FloatingObject::ResetDrawing()
+{
+    m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
 }
 
 void FloatingObject::UpdateContentBBoxX(int x1, int x2)
@@ -126,6 +132,11 @@ void FloatingObject::SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place)
     }
 }
 
+void FloatingObject::ResetDrawingObjectIDs()
+{
+    FloatingObject::s_drawingObjectIds.clear();
+}
+
 void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
 {
     m_currentPositioner = boundingBox;
@@ -170,6 +181,26 @@ std::pair<int, bool> FloatingObject::GetVerticalContentBoundaryRel(const Doc *do
 
     const int boundary = contentTop ? positioner->GetContentY2() : positioner->GetContentY1();
     return { boundary, false };
+}
+
+FunctorCode FloatingObject::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFloatingObject(this);
+}
+
+FunctorCode FloatingObject::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFloatingObject(this);
+}
+
+FunctorCode FloatingObject::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFloatingObjectEnd(this);
+}
+
+FunctorCode FloatingObject::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFloatingObjectEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -433,9 +464,10 @@ void FloatingPositioner::CalcDrawingYRel(
             }
         }
 
-        if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
-            minStaffDistance = 2.5 * unit;
+        if (staffAlignment->GetStaff()->m_drawingLines == 1) {
+            minStaffDistance += 2.5 * unit;
         }
+
         if (m_place == STAFFREL_above) {
             yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * unit;
@@ -889,100 +921,11 @@ std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const Staff
 // FloatingObject functor methods
 //----------------------------------------------------------------------------
 
-int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
     m_maxDrawingYRel = VRV_UNSET;
 
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareDataInitialization(FunctorParams *functorParams)
-{
-    // Clear all
-    FloatingObject::s_drawingObjectIds.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareTimePointing(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimePointing(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimeSpanning(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareTimestamps(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimestamps(functorParams, this);
-    }
-    else if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimestamps(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-    }
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::ResetData(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    else if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;
 }
 
