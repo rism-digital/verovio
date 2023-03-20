@@ -146,7 +146,8 @@ public:
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
     // Calculate shift for the articulation based on its type and presence of other articulations
-    int CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const;
+    int CalculateHorizontalShift(
+        const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir, const bool virtualStem) const;
 
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;
