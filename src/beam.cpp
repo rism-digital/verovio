@@ -242,7 +242,8 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             }
         }
 
-        coord->UpdateStemLength(stemmedInterface, y1, y2, stemAdjust);
+        coord->UpdateStemLength(
+            stemmedInterface, y1, y2, stemAdjust, (beamInterface->m_drawingPlace == BEAMPLACE_mixed));
     }
 
     if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
@@ -2036,7 +2037,8 @@ void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, boo
     }
 }
 
-void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust)
+void BeamElementCoord::UpdateStemLength(
+    StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust, bool inMixedBeam)
 {
     Stem *stem = stemmedInterface->GetDrawingStem();
     // This is the case with fTrem on whole notes
@@ -2050,8 +2052,8 @@ void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterfac
     stem->SetDrawingStemLen(newStemLen);
     stem->SetDrawingStemAdjust(-stemAdjust);
     const int lenChange = newStemLen - prevStemLen;
-    // If length didn't change -just exit
-    if (!lenChange) return;
+    // If length didn't change or no mixed beam - just exit
+    if (!lenChange || !inMixedBeam) return;
 
     // Adjust existing artic
     ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);
