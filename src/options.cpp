@@ -842,8 +842,8 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
             path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(jsonNode));
         }
         else if (val.is<jsonxx::Array>()) {
-            if (IsValidDouble(jsonNode)) {
-                const int index = std::strtod(jsonNode.c_str(), NULL);
+            if (IsValidInteger(jsonNode)) {
+                const int index = (int)std::strtol(jsonNode.c_str(), NULL, 10);
                 if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
                 path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
