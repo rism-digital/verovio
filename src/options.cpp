@@ -258,7 +258,7 @@ bool OptionDbl::SetValue(const std::string &value)
         return false;
     }
     // Convert string to double
-    double number = std::stod(value);
+    double number = std::strtod(value.c_str(), NULL);
 
     // Check bounds and set the value
     return this->SetValue(number);
@@ -343,7 +343,7 @@ bool OptionInt::SetValue(const std::string &value)
         return false;
     }
     // Convert string to int
-    int number = std::stoi(value);
+    int number = (int)std::strtol(value.c_str(), NULL, 10);
 
     // Check bounds and set the value
     return this->SetValue(number);
