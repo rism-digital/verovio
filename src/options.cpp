@@ -836,14 +836,14 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
     }
     path.reserve(jsonNodePath.size());
     path.push_back(const_cast<jsonxx::Value &>(obj.get<jsonxx::Value>(jsonNodePath.front())));
-    for (auto iter = jsonNodePath.begin() + 1; iter != jsonNodePath.end(); ++iter) {
+    for (const std::string &jsonNode : jsonNodePath) {
         jsonxx::Value &val = path.back();
-        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(*iter)) {
-            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
+        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(jsonNode)) {
+            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(jsonNode));
         }
         else if (val.is<jsonxx::Array>()) {
-            if (IsValidDouble(*iter)) {
-                const int index = std::stoi(*iter);
+            if (IsValidDouble(jsonNode)) {
+                const int index = std::strtod(jsonNode.c_str(), NULL);
                 if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
                 path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
