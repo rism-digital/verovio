@@ -167,7 +167,7 @@ namespace musicxml {
     };
 
     struct OpenTie {
-        OpenTie(Tie* tie, Note* note, int layerNum)
+        OpenTie(Tie *tie, Note *note, int layerNum)
         {
             m_tie = tie;
             m_note = note;
@@ -178,7 +178,7 @@ namespace musicxml {
         Note *m_note = NULL;
         int m_layerNum = 0;
     };
-    
+
     struct CloseTie {
         CloseTie(Note *note, int layerNum)
         {
