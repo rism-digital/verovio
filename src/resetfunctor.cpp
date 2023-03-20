@@ -622,4 +622,65 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ResetVerticalAlignmentFunctor
+//----------------------------------------------------------------------------
+
+ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() {}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitArtic(Artic *artic)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitOctave(Octave *octave)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitPage(Page *page)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTextElement(TextElement *textElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTuplet(Tuplet *tuplet)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTupletBracket(TupletBracket *tupletBracket)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
