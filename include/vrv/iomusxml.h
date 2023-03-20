@@ -65,8 +65,7 @@ class Trill;
 
 namespace musicxml {
 
-    class OpenSlur {
-    public:
+    struct OpenSlur {
         OpenSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
@@ -79,8 +78,7 @@ namespace musicxml {
         curvature_CURVEDIR m_curvedir;
     };
 
-    class CloseSlur {
-    public:
+    struct CloseSlur {
         CloseSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
@@ -93,8 +91,7 @@ namespace musicxml {
         curvature_CURVEDIR m_curvedir;
     };
 
-    class OpenSpanner {
-    public:
+    struct OpenSpanner {
         OpenSpanner(const int &dirN, const int &lastMeasureCount)
         {
             m_dirN = dirN;
@@ -105,8 +102,7 @@ namespace musicxml {
         int m_lastMeasureCount;
     };
 
-    class OpenArpeggio {
-    public:
+    struct OpenArpeggio {
         OpenArpeggio(const int &arpegN, const int &timeStamp)
         {
             m_arpegN = arpegN;
@@ -117,8 +113,7 @@ namespace musicxml {
         int m_timeStamp;
     };
 
-    class EndingInfo {
-    public:
+    struct EndingInfo {
         EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
         {
             m_endingNumber = endingNumber;
@@ -131,8 +126,7 @@ namespace musicxml {
         std::string m_endingText;
     };
 
-    class ClefChange {
-    public:
+    struct ClefChange {
         ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset,
             bool afterBarline)
         {
@@ -152,8 +146,7 @@ namespace musicxml {
         bool m_afterBarline = false; // musicXML attribute
     };
 
-    class OpenDashes {
-    public:
+    struct OpenDashes {
         OpenDashes(const int dirN, int staffNum, const int measureCount)
         {
             m_dirN = dirN;
