@@ -131,11 +131,12 @@ public:
     int CalcPitchPosYRel(const Doc *doc, int loc) const;
 
     /**
-     * Getter for the StaffAlignment
+     * Getter and setter for the StaffAlignment
      */
     ///@{
     StaffAlignment *GetAlignment() { return m_staffAlignment; }
     const StaffAlignment *GetAlignment() const { return m_staffAlignment; }
+    void ResetAlignment() { m_staffAlignment = NULL; }
     ///@}
 
     /**

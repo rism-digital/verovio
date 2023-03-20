@@ -161,7 +161,7 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-    
+
     /*
      * Functor interface
      */
@@ -176,7 +176,6 @@ public:
     FunctorCode VisitTextElement(TextElement *textElement) override;
     FunctorCode VisitTuplet(Tuplet *tuplet) override;
     FunctorCode VisitTupletBracket(TupletBracket *tupletBracket) override;
-    FunctorCode VisitTupletNum(TupletNum *tupletNum) override;
     ///@}
 
 protected:
