@@ -277,7 +277,23 @@ void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
         return;
     }
 
+    Beam *beam = this->GetNumAlignedBeam();
     this->CalculateTupletNumCrossStaff(tupletNum);
+    bool isPartialBeamTuplet = false;
+    if (beam && m_crossStaff) {
+        const auto coords = beam->m_beamSegment.GetElementCoordRefs();
+        ListOfObjects descendants;
+        ClassIdsComparison comparison({ CHORD, NOTE, REST });
+        this->FindAllDescendantsByComparison(&descendants, &comparison);
+        if ((beam->m_beamSegment.m_nbNotesOrChords > descendants.size())
+            && std::any_of(coords->begin(), coords->end(),
+                [](const auto coord) { return NULL == coord->m_element->m_crossStaff; })) {
+            if (!this->HasValidTupletNumPosition(tupletNum->m_crossStaff, beam->m_beamStaff)) {
+                tupletNum->m_crossStaff = beam->m_beamStaff;
+            }
+            isPartialBeamTuplet = true;
+        }
+    }
 
     const Staff *tupletNumStaff = tupletNum->m_crossStaff ? tupletNum->m_crossStaff : staff;
     const int staffSize = staff->m_drawingStaffSize;
@@ -288,7 +304,6 @@ void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
     const int numVerticalMargin = (m_drawingNumPos == STAFFREL_basic_above) ? doubleUnit : -doubleUnit;
     const int staffHeight = doc->GetDrawingStaffSize(staffSize);
     const int adjustedPosition = (m_drawingNumPos == STAFFREL_basic_above) ? 0 : -staffHeight;
-    Beam *beam = this->GetNumAlignedBeam();
     if (!beam) {
         tupletNum->SetDrawingYRel(adjustedPosition);
     }
@@ -303,7 +318,7 @@ void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
     int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
 
     // If we have a beam, see if we can move it to more appropriate position
-    if (beam && !m_crossStaff && !FindDescendantByType(ARTIC)) {
+    if (beam && (!m_crossStaff || isPartialBeamTuplet) && !this->FindDescendantByType(ARTIC)) {
         const int xMid = tupletNum->GetDrawingXMid(doc);
         const int yMid = beam->m_beamSegment.GetStartingY()
             + beam->m_beamSegment.m_beamSlope * (xMid - beam->m_beamSegment.GetStartingX());
