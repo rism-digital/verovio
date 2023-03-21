@@ -370,11 +370,11 @@ void Doc::CalculateTimemap()
 void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
 
-    if (!Doc::HasTimemap()) {
+    if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
         CalculateTimemap();
     }
-    if (!Doc::HasTimemap()) {
+    if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, MIDI cannot be exported.");
     }
 
@@ -515,11 +515,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
 bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
 {
-    if (!Doc::HasTimemap()) {
+    if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
         CalculateTimemap();
     }
-    if (!Doc::HasTimemap()) {
+    if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the timemap cannot be exported.");
         output = "";
         return false;
@@ -537,11 +537,11 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
 
 bool Doc::ExportFeatures(std::string &output, const std::string &options)
 {
-    if (!Doc::HasTimemap()) {
+    if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
         CalculateTimemap();
     }
-    if (!Doc::HasTimemap()) {
+    if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the features cannot be exported.");
         output = "";
         return false;
