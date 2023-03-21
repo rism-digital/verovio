@@ -466,4 +466,68 @@ FunctorCode AlignMeasuresFunctor::VisitSystemEnd(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// AlignVerticallyFunctor
+//----------------------------------------------------------------------------
+
+AlignVerticallyFunctor::AlignVerticallyFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_systemAligner = NULL;
+    m_staffIdx = 0;
+    m_staffN = 0;
+    m_cumulatedShift = 0;
+    m_justificationSum = 0;
+    m_pageWidth = 0;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staffAlignment)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitSystemEnd(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

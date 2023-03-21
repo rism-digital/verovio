@@ -132,6 +132,66 @@ private:
     bool m_storeCastOffSystemWidths;
 };
 
+//----------------------------------------------------------------------------
+// AlignVerticallyFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class vertically aligns the content of a page.
+ * For each staff instanciate its StaffAlignment.
+ */
+class AlignVerticallyFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AlignVerticallyFunctor(Doc *doc);
+    virtual ~AlignVerticallyFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitFig(Fig *fig) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPageEnd(Page *page) override;
+    FunctorCode VisitRend(Rend *rend) override;
+    FunctorCode VisitRunningElement(RunningElement *runningElement) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffAlignmentEnd(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemEnd(System *system) override;
+    FunctorCode VisitVerse(Verse *verse) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The systemAligner
+    SystemAligner *m_systemAligner;
+    // The staff index
+    int m_staffIdx;
+    // The staffN
+    int m_staffN;
+    // The cumulated shift for the default alignment
+    int m_cumulatedShift;
+    // The sum of justification factors per page
+    int m_justificationSum;
+    // The page width
+    int m_pageWidth;
+};
+
 } // namespace vrv
 
 #endif // __VRV_ALIGNFUNCTOR_H__
