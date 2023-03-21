@@ -235,11 +235,6 @@ public:
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
 private:
     //
 public:
@@ -330,11 +325,6 @@ public:
     int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
 private:
     //

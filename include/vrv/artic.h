@@ -138,11 +138,6 @@ public:
      */
     int AdjustArticWithSlurs(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
     // Calculate shift for the articulation based on its type and presence of other articulations

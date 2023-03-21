@@ -538,17 +538,6 @@ int Artic::AdjustArticWithSlurs(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetVerticalAlignment(functorParams);
-
-    m_startSlurPositioners.clear();
-    m_endSlurPositioners.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Artic::CalculateHorizontalShift(
     const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir, const bool virtualStem) const
 {

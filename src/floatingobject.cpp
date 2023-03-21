@@ -921,14 +921,6 @@ std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const Staff
 // FloatingObject functor methods
 //----------------------------------------------------------------------------
 
-int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int FloatingObject::UnCastOff(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;

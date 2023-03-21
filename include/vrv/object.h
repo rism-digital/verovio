@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Reset the verticall alignment environment for various types for object.
-     */
-    virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */

@@ -509,15 +509,6 @@ FunctorCode System::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemEnd(this);
 }
 
-int System::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingYRel(0);
-
-    m_systemAligner.Reset();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);

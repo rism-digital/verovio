@@ -380,15 +380,6 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    m_staffAlignment = NULL;
-
-    ClearLedgerLines();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);

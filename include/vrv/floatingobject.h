@@ -132,11 +132,6 @@ public:
     ///@}
 
     /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::UnCastOff
      */
     int UnCastOff(FunctorParams *functorParams) override;

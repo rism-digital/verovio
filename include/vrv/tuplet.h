@@ -125,11 +125,6 @@ public:
      */
     int AdjustTupletWithSlurs(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note elements.

@@ -222,8 +222,8 @@ void Page::LayOutTranscription(bool force)
     this->Process(resetHorizontalAlignment);
 
     // Reset the vertical alignment
-    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    this->Process(&resetVerticalAlignment, NULL);
+    ResetVerticalAlignmentFunctor resetVerticalAlignment;
+    this->Process(resetVerticalAlignment);
 
     // Align the content of the page using measure aligners
     // After this:
@@ -283,8 +283,8 @@ void Page::ResetAligners()
     this->Process(resetHorizontalAlignment);
 
     // Reset the vertical alignment
-    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    this->Process(&resetVerticalAlignment, NULL);
+    ResetVerticalAlignmentFunctor resetVerticalAlignment;
+    this->Process(resetVerticalAlignment);
 
     // Align the content of the page using measure aligners
     // After this:
@@ -473,8 +473,8 @@ void Page::LayOutVertically()
     assert(this == doc->GetDrawingPage());
 
     // Reset the vertical alignment
-    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    this->Process(&resetVerticalAlignment, NULL);
+    ResetVerticalAlignmentFunctor resetVerticalAlignment;
+    this->Process(resetVerticalAlignment);
 
     CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);
@@ -819,27 +819,6 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     m_pageMarginLeft /= params->m_page->GetPPUFactor();
     m_pageMarginRight /= params->m_page->GetPPUFactor();
     m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Same functor, but we have not FunctorParams so we just re-instantiate it
-    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-
-    RunningElement *header = this->GetHeader();
-    if (header) {
-        header->Process(&resetVerticalAlignment, NULL);
-        header->SetDrawingPage(NULL);
-        header->SetDrawingYRel(0);
-    }
-    RunningElement *footer = this->GetFooter();
-    if (footer) {
-        footer->Process(&resetVerticalAlignment, NULL);
-        footer->SetDrawingPage(NULL);
-        footer->SetDrawingYRel(0);
-    }
 
     return FUNCTOR_CONTINUE;
 }

@@ -654,14 +654,4 @@ int Tuplet::AdjustTupletWithSlurs(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Tuplet::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetVerticalAlignment(functorParams);
-
-    this->ResetInnerSlurs();
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

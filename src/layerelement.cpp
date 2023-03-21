@@ -1103,13 +1103,6 @@ FunctorCode LayerElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitLayerElementEnd(this);
 }
 
-int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in CalcAlignmentPitchPos
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
