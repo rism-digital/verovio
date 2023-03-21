@@ -8249,6 +8249,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             if (token->isKernLike()) {
                 active = true;
+                track = token->getTrack();
                 continue;
             }
 
@@ -8356,7 +8357,6 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             std::string tracktext = getTrackText(token);
             harm->SetN(tracktext);
 
-            track = token->getTrack();
             int staffindex = m_rkern[track];
             if (staffindex >= 0) {
                 xstaffindex = staffindex;
