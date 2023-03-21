@@ -11,13 +11,19 @@
 
 #include "doc.h"
 #include "dot.h"
+#include "fig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "page.h"
+#include "rend.h"
 #include "rest.h"
+#include "runningelement.h"
 #include "section.h"
 #include "staff.h"
+#include "svg.h"
 #include "system.h"
 #include "tabgrp.h"
+#include "verse.h"
 
 //----------------------------------------------------------------------------
 
@@ -482,51 +488,148 @@ AlignVerticallyFunctor::AlignVerticallyFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)
 {
-    return FUNCTOR_CONTINUE;
+    Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
+    int width = svg ? svg->GetWidth() : 0;
+
+    if (fig->GetHalign() == HORIZONTALALIGNMENT_right) {
+        fig->SetDrawingXRel(m_pageWidth - width);
+    }
+    else if (fig->GetHalign() == HORIZONTALALIGNMENT_center) {
+        fig->SetDrawingXRel((m_pageWidth - width) / 2);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitMeasure(Measure *measure)
 {
+    // we also need to reset the staff index
+    m_staffIdx = 0;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
 {
+    m_cumulatedShift = 0;
+
+    // Also align the header and footer
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        header->SetDrawingPage(page);
+        header->SetDrawingYRel(0);
+        header->Process(*this);
+    }
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        footer->SetDrawingPage(page);
+        footer->SetDrawingYRel(0);
+        footer->Process(*this);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 {
-    return FUNCTOR_CONTINUE;
+    if (rend->GetHalign()) {
+        switch (rend->GetHalign()) {
+            case HORIZONTALALIGNMENT_right: rend->SetDrawingXRel(m_pageWidth); break;
+            case HORIZONTALALIGNMENT_center: rend->SetDrawingXRel(m_pageWidth / 2); break;
+            default: break;
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningElement)
 {
+    m_pageWidth = runningElement->GetWidth();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
 {
+    if (!staff->DrawingIsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    m_staffN = staff->GetN();
+
+    // this gets (or creates) the staff alignment
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignment(m_staffIdx, staff, m_doc);
+    assert(alignment);
+    staff->SetAlignment(alignment);
+
+    std::vector<Object *>::const_iterator verseIterator = std::find_if(
+        staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(VERSE));
+    if (verseIterator != staff->m_timeSpanningElements.end()) {
+        Verse *v = vrv_cast<Verse *>(*verseIterator);
+        assert(v);
+        alignment->AddVerseN(v->GetN());
+    }
+
+    // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
+    // generally happens with verses spanning over several systems which results in invalid placement of connector lines
+    std::vector<Object *>::const_iterator sylIterator = std::find_if(
+        staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(SYL));
+    if (sylIterator != staff->m_timeSpanningElements.end()) {
+        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
+        if (verse) {
+            const int verseNumber = verse->GetN();
+            const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
+            if (!alignment->GetVersePosition(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber);
+            }
+        }
+    }
+
+    // for next staff
+    ++m_staffIdx;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staffAlignment)
 {
+    m_cumulatedShift += staffAlignment->GetMinimumSpacing(m_doc);
+
+    staffAlignment->SetYRel(m_cumulatedShift);
+
+    m_cumulatedShift += staffAlignment->GetStaffHeight();
+    ++m_staffIdx;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitSystem(System *system)
 {
+    m_systemAligner = &system->m_systemAligner;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitSystemEnd(System *system)
 {
-    return FUNCTOR_CONTINUE;
+    m_cumulatedShift = 0;
+    m_staffIdx = 0;
+
+    system->m_systemAligner.Process(*this);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
 {
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+
+    if (!alignment) return FUNCTOR_CONTINUE;
+
+    // Add the number count
+    alignment->AddVerseN(verse->GetN());
+
     return FUNCTOR_CONTINUE;
 }
 

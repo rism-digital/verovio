@@ -136,7 +136,7 @@ public:
     ///@{
     StaffAlignment *GetAlignment() { return m_staffAlignment; }
     const StaffAlignment *GetAlignment() const { return m_staffAlignment; }
-    void ResetAlignment() { m_staffAlignment = NULL; }
+    void SetAlignment(StaffAlignment *alignment) { m_staffAlignment = alignment; }
     ///@}
 
     /**

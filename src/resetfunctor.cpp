@@ -686,7 +686,7 @@ FunctorCode ResetVerticalAlignmentFunctor::VisitPage(Page *page)
 
 FunctorCode ResetVerticalAlignmentFunctor::VisitStaff(Staff *staff)
 {
-    staff->ResetAlignment();
+    staff->SetAlignment(NULL);
     staff->ClearLedgerLines();
 
     return FUNCTOR_CONTINUE;
