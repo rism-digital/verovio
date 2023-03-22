@@ -715,6 +715,20 @@ bool HumdrumInput::convertHumdrum()
         }
     }
 
+    // Kernify files if they have no stafflike spine.
+    hum::Tool_kernify kernify;
+    for (int i = 0; i < m_infiles.getCount(); ++i) {
+        if (hasNoStaves(m_infiles[i])) {
+            kernify.run(m_infiles[i]);
+            if (kernify.hasHumdrumText()) {
+                m_infiles[i].readString(kernify.getHumdrumText());
+            }
+            else {
+                // should have auto updated itself in the kernify filter.
+            }
+        }
+    }
+
     hum::HumdrumFile &infile = m_infiles[0];
 
     // Check if a mensural music score should be produced (and ignore **kerns,
@@ -927,6 +941,28 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasNoStaves --
+//
+
+bool HumdrumInput::hasNoStaves(hum::HumdrumFile &infile)
+{
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isExclusiveInterpretation()) {
+            continue;
+        }
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            hum::HTp token = infile.token(i, j);
+            if (token->isKernLike()) {
+                cerr << "\tSTAFF FOUND " << token << endl;
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 //////////////////////////////

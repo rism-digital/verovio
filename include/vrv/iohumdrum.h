@@ -498,7 +498,6 @@ protected:
     void prepareBeamAndTupletGroups(
         std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
     void assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAndTuplet *> &tggroup);
-
     void printGroupInfo(const std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
@@ -829,6 +828,7 @@ protected:
     void addSforzandoToNote(hum::HTp token, int staffindex);
     void addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters, int staffindex,
         int staffadj, int trackdiff);
+    bool hasNoStaves(hum::HumdrumFile& infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
