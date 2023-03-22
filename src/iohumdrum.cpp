@@ -957,7 +957,6 @@ bool HumdrumInput::hasNoStaves(hum::HumdrumFile &infile)
         for (int j = 0; j < infile[i].getFieldCount(); j++) {
             hum::HTp token = infile.token(i, j);
             if (token->isKernLike()) {
-                cerr << "\tSTAFF FOUND " << token << endl;
                 return false;
             }
         }

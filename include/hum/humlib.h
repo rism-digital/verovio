@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Mar 21 20:29:14 PDT 2023
+// Last Modified: Wed Mar 22 05:59:42 PDT 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -7924,8 +7924,10 @@ class Tool_kernify : public HumTool {
 		void        processFile            (HumdrumFile& infile);
 		void        generateDummyKernSpine (HumdrumFile& infile);
 		std::string makeNullLine           (HumdrumLine& line);
+		std::string makeReverseLine        (HumdrumLine& line);
 
 	private:
+		bool m_forceQ = false;  // used with -f option
 
 };
 
