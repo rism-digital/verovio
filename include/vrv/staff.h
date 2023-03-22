@@ -206,11 +206,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignVertically
-     */
-    int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;

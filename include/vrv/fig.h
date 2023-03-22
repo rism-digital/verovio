@@ -65,13 +65,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AlignVertically
-     */
-    ///@{
-    int AlignVertically(FunctorParams *functorParams) override;
-    ///@}
-
 private:
     //
 public:

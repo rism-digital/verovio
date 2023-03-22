@@ -234,10 +234,8 @@ void Page::LayOutTranscription(bool force)
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    Functor alignVertically(&Object::AlignVertically);
-    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
-    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
+    AlignVerticallyFunctor alignVertically(doc);
+    this->Process(alignVertically);
 
     // Set the pitch / pos alignment
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
@@ -295,10 +293,8 @@ void Page::ResetAligners()
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    Functor alignVertically(&Object::AlignVertically);
-    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
-    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
+    AlignVerticallyFunctor alignVertically(doc);
+    this->Process(alignVertically);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
@@ -482,10 +478,8 @@ void Page::LayOutVertically()
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    Functor alignVertically(&Object::AlignVertically);
-    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
-    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
+    AlignVerticallyFunctor alignVertically(doc);
+    this->Process(alignVertically);
 
     // Render it for filling the bounding box
     View view;
@@ -819,31 +813,6 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     m_pageMarginLeft /= params->m_page->GetPPUFactor();
     m_pageMarginRight /= params->m_page->GetPPUFactor();
     m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::AlignVerticallyEnd(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    params->m_cumulatedShift = 0;
-
-    // Also align the header and footer
-
-    RunningElement *header = this->GetHeader();
-    if (header) {
-        header->SetDrawingPage(this);
-        header->SetDrawingYRel(0);
-        header->Process(params->m_functor, params, params->m_functorEnd);
-    }
-    RunningElement *footer = this->GetFooter();
-    if (footer) {
-        footer->SetDrawingPage(this);
-        footer->SetDrawingYRel(0);
-        footer->Process(params->m_functor, params, params->m_functorEnd);
-    }
 
     return FUNCTOR_CONTINUE;
 }

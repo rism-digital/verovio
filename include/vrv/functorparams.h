@@ -382,47 +382,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AlignVerticallyParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the systemAligner
- * member 1: the staffIdx
- * member 2: the staffN
- * member 3: the cumulated shift for the default alignment
- * member 4: the sum of justification factors per page
- * member 5: the page width
- * member 6: the functor (for redirecting from page running elements)
- * member 7: the end functor (for redirecting from measure)
- * member 8: the doc
- **/
-
-class AlignVerticallyParams : public FunctorParams {
-public:
-    AlignVerticallyParams(Doc *doc, Functor *functor, Functor *functorEnd)
-    {
-        m_systemAligner = NULL;
-        m_staffIdx = 0;
-        m_staffN = 0;
-        m_cumulatedShift = 0;
-        m_justificationSum = 0.;
-        m_pageWidth = 0;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-        m_doc = doc;
-    }
-    SystemAligner *m_systemAligner;
-    int m_staffIdx;
-    int m_staffN;
-    int m_cumulatedShift;
-    int m_justificationSum;
-    int m_pageWidth;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // ApplyPPUFactorParams
 //----------------------------------------------------------------------------
 

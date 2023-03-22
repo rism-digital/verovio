@@ -172,13 +172,6 @@ public:
     int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
-    /**
-     * See Object::AlignVertically
-     */
-    ///@{
-    int AlignVertically(FunctorParams *functorParams) override;
-    ///@}
-
 protected:
     /**
      * Filter the list for a specific class.

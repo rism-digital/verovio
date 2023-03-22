@@ -1218,21 +1218,6 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    params->m_cumulatedShift += this->GetMinimumSpacing(params->m_doc);
-
-    this->SetYRel(-params->m_cumulatedShift);
-
-    params->m_cumulatedShift += m_staffHeight;
-    params->m_staffIdx++;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);

@@ -789,17 +789,6 @@ public:
     ///@{
 
     /**
-     * Align vertically the content of a page.
-     * For each Staff, instanciate its StaffAlignment.
-     */
-    virtual int AlignVertically(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AlignVertically
-     */
-    virtual int AlignVerticallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the note position for each note in ligature
      */
     virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }

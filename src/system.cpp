@@ -522,29 +522,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    params->m_systemAligner = &m_systemAligner;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AlignVerticallyEnd(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    params->m_cumulatedShift = 0;
-    params->m_staffIdx = 0;
-
-    m_systemAligner.Process(params->m_functorEnd, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);

@@ -171,13 +171,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignVertically
-     */
-    ///@{
-    int AlignVerticallyEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::AlignSystems
      */
     ///@{

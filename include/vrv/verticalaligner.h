@@ -341,11 +341,6 @@ public:
     ///@}
 
     /**
-     * See Object::AlignVertically
-     */
-    int AlignVerticallyEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustYPos
      */
     int AdjustYPos(FunctorParams *functorParams) override;
