@@ -1415,13 +1415,18 @@ int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams) const
         return FUNCTOR_CONTINUE;
     }
 
+    int stemAdjust = 0;
+    if (this->Is(STEM)) {
+        const Stem *stem = vrv_cast<const Stem *>(this);
+        stemAdjust = stem->GetDrawingStemAdjust();
+    }
     if (params->m_drawingNumPos == STAFFREL_basic_above) {
         int dist = this->GetSelfTop();
-        if (params->m_yRel < dist) params->m_yRel = dist;
+        if (params->m_yRel < dist) params->m_yRel = dist + stemAdjust;
     }
     else {
         int dist = this->GetSelfBottom();
-        if (params->m_yRel > dist) params->m_yRel = dist;
+        if (params->m_yRel > dist) params->m_yRel = dist + stemAdjust;
     }
 
     return FUNCTOR_CONTINUE;
