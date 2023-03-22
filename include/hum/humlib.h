@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Mar 17 12:44:09 PDT 2023
+// Last Modified: Tue Mar 21 20:29:14 PDT 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1654,7 +1654,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isKernLike                (void) const;
 		bool     isMens                    (void) const;
 		bool     isMensLike                (void) const;
-		bool     isStaffLike               (void) const { return isKernLike() && isMensLike(); }
+		bool     isStaffLike               (void) const { return isKernLike() || isMensLike(); }
 		std::string   getSpineInfo         (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
@@ -7905,6 +7905,27 @@ class Tool_kern2mens : public HumTool {
 		bool     m_invisibleQ = true;      // used with -I option
 		bool     m_doublebarQ = true;      // used with -D option
 		string   m_clef;                   // used with -c option
+
+};
+
+
+class Tool_kernify : public HumTool {
+	public:
+		         Tool_kernify (void);
+		        ~Tool_kernify () {};
+
+		bool     run          (HumdrumFileSet& infiles);
+		bool     run          (HumdrumFile& infile);
+		bool     run          (const string& indata, ostream& out);
+		bool     run          (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void        initialize             (void);
+		void        processFile            (HumdrumFile& infile);
+		void        generateDummyKernSpine (HumdrumFile& infile);
+		std::string makeNullLine           (HumdrumLine& line);
+
+	private:
 
 };
 
