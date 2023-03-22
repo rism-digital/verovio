@@ -555,18 +555,18 @@ void MusicXmlInput::GenerateID(pugi::xml_node node)
 //////////////////////////////////////////////////////////////////////////////
 // Tie and slurs stack management
 
-void MusicXmlInput::OpenTie(Note *note, Tie *tie)
+void MusicXmlInput::OpenTie(Note *note, Tie *tie, int layerNum)
 {
     tie->SetStartid("#" + note->GetID());
-    m_tieStack.push_back({ tie, note });
+    m_tieStack.push_back(musicxml::OpenTie(tie, note, layerNum));
 }
 
-void MusicXmlInput::CloseTie(Note *note)
+void MusicXmlInput::CloseTie(Note *note, int layerNum)
 {
     // add all notes with identical pitch/oct to m_tieStopStack
     for (auto iter = m_tieStack.begin(); iter != m_tieStack.end(); ++iter) {
-        if (note->IsEnharmonicWith(iter->second)) {
-            m_tieStopStack.push_back(note);
+        if (note->IsEnharmonicWith(iter->m_note)) {
+            m_tieStopStack.push_back(musicxml::CloseTie(note, layerNum));
         }
     }
 }
@@ -1697,31 +1697,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
     }
 
-    // match open ties with close ties
-    std::vector<std::pair<Tie *, Note *>>::iterator iter = m_tieStack.begin();
-    while (iter != m_tieStack.end()) {
-        double lastScoreTimeOnset = 9999; // __DBL_MAX__;
-        bool tieMatched = false;
-        std::vector<Note *>::iterator jter;
-        for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
-            // match tie stop with pitch/oct identity, with start note earlier than end note,
-            // and with earliest end note.
-            if (iter->second->GetPname() == (*jter)->GetPname() && iter->second->GetOct() == (*jter)->GetOct()
-                && (iter->second->GetScoreTimeOnset() < (*jter)->GetScoreTimeOnset()
-                    && (*jter)->GetScoreTimeOnset() < lastScoreTimeOnset)) {
-                iter->first->SetEndid("#" + (*jter)->GetID());
-                lastScoreTimeOnset = (*jter)->GetScoreTimeOnset();
-                tieMatched = true;
-            }
-        }
-        if (tieMatched) {
-            iter = m_tieStack.erase(iter);
-        }
-        else {
-            iter->second->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
-            ++iter;
-        }
-    }
+    this->MatchTies(true);
+    if (!m_tieStack.empty()) this->MatchTies(false);
 
     // clear stop stacks after each measure
     m_hairpinStopStack.clear();
@@ -1750,6 +1727,38 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     m_currentLayer = NULL;
 
     return true;
+}
+
+void MusicXmlInput::MatchTies(bool matchLayers)
+{
+    // match open ties with close ties
+    std::vector<musicxml::OpenTie>::iterator iter = m_tieStack.begin();
+    while (iter != m_tieStack.end()) {
+        double lastScoreTimeOnset = 9999; // __DBL_MAX__;
+        bool tieMatched = false;
+        std::vector<musicxml::CloseTie>::iterator jter;
+        for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
+            // match tie stop with pitch/oct identity, with start note earlier than end note,
+            // and with earliest end note.
+            if ((iter->m_note->IsEnharmonicWith(jter->m_note))
+                && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
+                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
+                && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
+                iter->m_tie->SetEndid("#" + jter->m_note->GetID());
+                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
+                tieMatched = true;
+                break;
+            }
+        }
+        if (tieMatched) {
+            iter = m_tieStack.erase(iter);
+            m_tieStopStack.erase(jter);
+        }
+        else {
+            iter->m_note->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
+            ++iter;
+        }
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlAttributes(
@@ -3783,12 +3792,13 @@ void MusicXmlInput::ReadMusicXmlTies(
             continue;
         }
         else if (tieType == "stop") { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-            if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().second)) {
-                m_tieStack.back().first->SetEndid("#" + note->GetID());
+            if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().m_note)
+                && (m_tieStack.back().m_layerNum == layer->GetN())) {
+                m_tieStack.back().m_tie->SetEndid("#" + note->GetID());
                 m_tieStack.pop_back();
             }
             else {
-                CloseTie(note);
+                CloseTie(note, layer->GetN());
             }
         }
         // if we have start attribute - start new tie
@@ -3802,7 +3812,7 @@ void MusicXmlInput::ReadMusicXmlTies(
             if (xmlTie.attribute("id")) tie->SetID(xmlTie.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back({ measureNum, tie });
-            OpenTie(note, tie);
+            OpenTie(note, tie, layer->GetN());
         }
         // or add lv element if let-ring attribute present
         else if (tieType == "let-ring") {

@@ -252,16 +252,13 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    // Convert string to double
-    double number = 0.0;
-    try {
-        number = std::stod(value);
-    }
-    catch (const std::exception &e) {
+    if (!IsValidDouble(value)) {
         LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
             this->GetKey().c_str());
         return false;
     }
+    // Convert string to double
+    double number = std::strtod(value.c_str(), NULL);
 
     // Check bounds and set the value
     return this->SetValue(number);
@@ -340,16 +337,13 @@ bool OptionInt::SetValueDbl(double value)
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    // Convert string to int
-    int number = 0;
-    try {
-        number = std::stoi(value);
-    }
-    catch (const std::exception &e) {
+    if (!IsValidInteger(value)) {
         LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
             this->GetKey().c_str());
         return false;
     }
+    // Convert string to int
+    int number = (int)std::strtol(value.c_str(), NULL, 10);
 
     // Check bounds and set the value
     return this->SetValue(number);
@@ -842,19 +836,19 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
     }
     path.reserve(jsonNodePath.size());
     path.push_back(const_cast<jsonxx::Value &>(obj.get<jsonxx::Value>(jsonNodePath.front())));
-    for (auto iter = jsonNodePath.begin() + 1; iter != jsonNodePath.end(); ++iter) {
+    for (const std::string &jsonNode : jsonNodePath) {
         jsonxx::Value &val = path.back();
-        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(*iter)) {
-            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
+        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(jsonNode)) {
+            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(jsonNode));
         }
         else if (val.is<jsonxx::Array>()) {
-            try {
-                const int index = std::stoi(*iter);
+            if (IsValidInteger(jsonNode)) {
+                const int index = (int)std::strtol(jsonNode.c_str(), NULL, 10);
                 if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
                 path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
             }
-            catch (const std::logic_error &) {
+            else {
                 // invalid index, leaving
                 break;
             }

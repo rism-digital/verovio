@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <locale>
+#include <regex>
 #include <sstream>
 #include <vector>
 
@@ -230,6 +231,20 @@ std::string StringFormatVariable(const char *format, va_list arg)
 bool AreEqual(double dFirstVal, double dSecondVal)
 {
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
+}
+
+bool IsValidInteger(const std::string &value)
+{
+    // Accept "1" " 1 " "+1" "-1" "1." "1.0"
+    std::regex re(R"(^\s*[+-]?\d+\.?\d*\s*$)");
+    return std::regex_match(value, re);
+}
+
+bool IsValidDouble(const std::string &value)
+{
+    // Accept "1.0" " 1.0 " ".0"  "1." "+1.0" "-1.0"
+    std::regex re(R"(^\s*[+-]?(?:\d+\.?\d*|\.\d+)\s*$)");
+    return std::regex_match(value, re);
 }
 
 std::string ExtractIDFragment(std::string refID)
