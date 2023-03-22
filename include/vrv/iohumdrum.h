@@ -828,7 +828,7 @@ protected:
     void addSforzandoToNote(hum::HTp token, int staffindex);
     void addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters, int staffindex,
         int staffadj, int trackdiff);
-    bool hasNoStaves(hum::HumdrumFile& infile);
+    bool hasNoStaves(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
