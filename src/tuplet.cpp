@@ -279,13 +279,16 @@ void Tuplet::AdjustTupletNumY(const Doc *doc, const Staff *staff)
 
     Beam *beam = this->GetNumAlignedBeam();
     this->CalculateTupletNumCrossStaff(tupletNum);
+    // Additional checks are required if tuplet is fully cross-staff and is part of the cross-staff beam. If beam is not
+    // fully cross-staff and has more elements than tuplet does, we need to adjust tuplet number position accordingly to
+    // make sure that there is no overlap.
     bool isPartialBeamTuplet = false;
     if (beam && m_crossStaff) {
         const auto coords = beam->m_beamSegment.GetElementCoordRefs();
         ListOfObjects descendants;
         ClassIdsComparison comparison({ CHORD, NOTE, REST });
         this->FindAllDescendantsByComparison(&descendants, &comparison);
-        if ((beam->m_beamSegment.m_nbNotesOrChords > descendants.size())
+        if ((beam->m_beamSegment.m_nbNotesOrChords > static_cast<int>(descendants.size()))
             && std::any_of(coords->begin(), coords->end(),
                 [](const auto coord) { return NULL == coord->m_element->m_crossStaff; })) {
             if (!this->HasValidTupletNumPosition(tupletNum->m_crossStaff, beam->m_beamStaff)) {
