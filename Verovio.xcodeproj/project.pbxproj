@@ -1404,6 +1404,12 @@
 		E74A806A28BC9843005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
 		E74A806B28BC98B1005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
 		E74A806C28BC98B2005274E7 /* functorinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A806828BC9842005274E7 /* functorinterface.cpp */; };
+		E75EA9FA29CC3A6B003A97A7 /* calcarticfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E75EA9F929CC3A65003A97A7 /* calcarticfunctor.h */; };
+		E75EA9FB29CC3A6C003A97A7 /* calcarticfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E75EA9F929CC3A65003A97A7 /* calcarticfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E75EA9FD29CC3A88003A97A7 /* calcarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */; };
+		E75EA9FE29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */; };
+		E75EA9FF29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */; };
+		E75EAA0029CC3A8C003A97A7 /* calcarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */; };
 		E76046BD28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */; };
 		E76046BE28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E76046C028D4829000C36204 /* calcledgerlinesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */; };
@@ -2058,6 +2064,8 @@
 		E74A806028BC9111005274E7 /* findfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findfunctor.cpp; path = src/findfunctor.cpp; sourceTree = "<group>"; };
 		E74A806528BC97D5005274E7 /* findfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findfunctor.h; path = include/vrv/findfunctor.h; sourceTree = "<group>"; };
 		E74A806828BC9842005274E7 /* functorinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functorinterface.cpp; path = src/functorinterface.cpp; sourceTree = "<group>"; };
+		E75EA9F929CC3A65003A97A7 /* calcarticfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcarticfunctor.h; path = include/vrv/calcarticfunctor.h; sourceTree = "<group>"; };
+		E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcarticfunctor.cpp; path = src/calcarticfunctor.cpp; sourceTree = "<group>"; };
 		E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcledgerlinesfunctor.h; path = include/vrv/calcledgerlinesfunctor.h; sourceTree = "<group>"; };
 		E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcledgerlinesfunctor.cpp; path = src/calcledgerlinesfunctor.cpp; sourceTree = "<group>"; };
 		E765675828BBFBA400BC6490 /* functorinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functorinterface.h; path = include/vrv/functorinterface.h; sourceTree = "<group>"; };
@@ -2918,6 +2926,8 @@
 		E786CD0A298AA3D8009BAC58 /* vertical-layout */ = {
 			isa = PBXGroup;
 			children = (
+				E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */,
+				E75EA9F929CC3A65003A97A7 /* calcarticfunctor.h */,
 				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
 				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
 			);
@@ -3118,6 +3128,7 @@
 				4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */,
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
 				E78833652995007700D44B01 /* calcspanningbeamspansfunctor.h in Headers */,
+				E75EA9FA29CC3A6B003A97A7 /* calcarticfunctor.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
 				4D766F0820ACAD74006875D8 /* syllable.h in Headers */,
 				4DACC9F22990F29A00B55913 /* atts_frettab.h in Headers */,
@@ -3444,6 +3455,7 @@
 				BB4C4B5C22A932D7001F6AF0 /* mensur.h in Headers */,
 				4D79641E26C152400026288B /* pageelement.h in Headers */,
 				BB4C4AEC22A932BC001F6AF0 /* editorial.h in Headers */,
+				E75EA9FB29CC3A6C003A97A7 /* calcarticfunctor.h in Headers */,
 				BB4C4AA222A9328F001F6AF0 /* verticalaligner.h in Headers */,
 				BB4C4B0E22A932C8001F6AF0 /* systemmilestone.h in Headers */,
 				BB4C4A9622A9328F001F6AF0 /* floatingobject.h in Headers */,
@@ -3684,6 +3696,7 @@
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
 				4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */,
 				4DEC4DAF21C81F0600D1D273 /* sic.cpp in Sources */,
+				E75EA9FE29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */,
 				4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */,
 				4D79642226C167100026288B /* pagemilestone.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
@@ -3943,6 +3956,7 @@
 				E79320672991453C00D80975 /* calcstemfunctor.cpp in Sources */,
 				E738715F29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
+				E75EA9FD29CC3A88003A97A7 /* calcarticfunctor.cpp in Sources */,
 				35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				4DACC9762990F29A00B55913 /* atts_neumes.cpp in Sources */,
@@ -4209,6 +4223,7 @@
 				4DF092A72497711800239195 /* phrase.cpp in Sources */,
 				4D20741422A708C600E0765F /* view_tab.cpp in Sources */,
 				4D1BE7861C6A40A80086DC0E /* pugixml.cpp in Sources */,
+				E75EA9FF29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */,
 				400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */,
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
@@ -4472,6 +4487,7 @@
 				4DF092A82497711800239195 /* phrase.cpp in Sources */,
 				BB4C4ABF22A932B6001F6AF0 /* labelabbr.cpp in Sources */,
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
+				E75EAA0029CC3A8C003A97A7 /* calcarticfunctor.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
 				4D79642426C167100026288B /* pagemilestone.cpp in Sources */,
 				E741AD05299A3D6500854426 /* calcslurdirectionfunctor.cpp in Sources */,
