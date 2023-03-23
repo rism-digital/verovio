@@ -439,8 +439,9 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
             - staff->GetDrawingY();
         if (flag && isStemDown) yBelowStem += flag->GetStemDownNW(params->m_doc, staff->m_drawingStaffSize, false).y;
         yIn = std::min(yBelowStem, 0);
-        if (beam && beam->m_crossStaffContent && (beam->m_drawingPlace == BEAMPLACE_mixed) && isStemDown)
+        if (beam && beam->m_crossStaffContent && (beam->m_drawingPlace == BEAMPLACE_mixed) && isStemDown) {
             yIn -= beam->m_beamWidthBlack;
+        }
         yOut = std::min(yIn, -staffHeight);
     }
 
