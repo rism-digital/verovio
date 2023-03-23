@@ -33,6 +33,7 @@
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
+#include "calcligaturenoteposfunctor.h"
 #include "calcslurdirectionfunctor.h"
 #include "calcspanningbeamspansfunctor.h"
 #include "calcstemfunctor.h"
@@ -324,9 +325,8 @@ void Page::ResetAligners()
     this->Process(calcAlignmentPitchPos);
 
     if (IsMensuralType(doc->m_notationType)) {
-        FunctorDocParams calcLigatureNotePosParams(doc);
-        Functor calcLigatureNotePos(&Object::CalcLigatureNotePos);
-        this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
+        CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
+        this->Process(calcLigatureNotePos);
     }
 
     CalcStemFunctor calcStem(doc);

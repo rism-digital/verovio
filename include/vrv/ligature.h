@@ -76,11 +76,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcLigatureNotePos
-     */
-    int CalcLigatureNotePos(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note elements.

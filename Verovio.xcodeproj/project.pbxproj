@@ -2903,6 +2903,8 @@
 				E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
 				E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */,
+				E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */,
+				E738715B29CAFA6700982DE5 /* calcligaturenoteposfunctor.h */,
 				E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */,
 				E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */,
 				E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */,
@@ -2918,8 +2920,6 @@
 			children = (
 				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
 				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
-				E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */,
-				E738715B29CAFA6700982DE5 /* calcligaturenoteposfunctor.h */,
 			);
 			name = "vertical-layout";
 			sourceTree = "<group>";

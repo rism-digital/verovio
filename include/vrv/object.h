@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Set the note position for each note in ligature
-     */
-    virtual int CalcLigatureNotePos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the position of the outside articulations.
      */
     virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
