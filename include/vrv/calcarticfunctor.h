@@ -46,7 +46,9 @@ public:
 protected:
     //
 private:
-    //
+    // Calculate shift for the articulation based on its type and presence of other articulations
+    int CalculateHorizontalShift(const Artic *artic, bool virtualStem) const;
+
 public:
     //
 private:
