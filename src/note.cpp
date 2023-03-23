@@ -927,39 +927,6 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::CalcArtic(FunctorParams *functorParams)
-{
-    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
-    assert(params);
-
-    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
-
-    params->m_parent = this;
-    params->m_stemDir = this->GetDrawingStemDir();
-
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    params->m_staffAbove = staff;
-    params->m_staffBelow = staff;
-    params->m_layerAbove = layer;
-    params->m_layerBelow = layer;
-    params->m_crossStaffAbove = false;
-    params->m_crossStaffBelow = false;
-
-    if (m_crossStaff) {
-        params->m_staffAbove = m_crossStaff;
-        params->m_staffBelow = m_crossStaff;
-        params->m_layerAbove = m_crossLayer;
-        params->m_layerBelow = m_crossLayer;
-        params->m_crossStaffAbove = true;
-        params->m_crossStaffBelow = true;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Note::AdjustArtic(FunctorParams *functorParams)
 {
     AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);

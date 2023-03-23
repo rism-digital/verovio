@@ -307,11 +307,6 @@ public:
     int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

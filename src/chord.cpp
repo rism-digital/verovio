@@ -612,51 +612,6 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::CalcArtic(FunctorParams *functorParams)
-{
-    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
-    assert(params);
-
-    params->m_parent = this;
-    params->m_stemDir = this->GetDrawingStemDir();
-
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    params->m_staffAbove = staff;
-    params->m_staffBelow = staff;
-    params->m_layerAbove = layer;
-    params->m_layerBelow = layer;
-    params->m_crossStaffAbove = false;
-    params->m_crossStaffBelow = false;
-
-    if (m_crossStaff) {
-        params->m_staffAbove = m_crossStaff;
-        params->m_staffBelow = m_crossStaff;
-        params->m_layerAbove = m_crossLayer;
-        params->m_layerBelow = m_crossLayer;
-        params->m_crossStaffAbove = true;
-        params->m_crossStaffBelow = true;
-    }
-    else {
-        this->GetCrossStaffExtremes(
-            params->m_staffAbove, params->m_staffBelow, &params->m_layerAbove, &params->m_layerBelow);
-        if (params->m_staffAbove) {
-            params->m_crossStaffAbove = true;
-            params->m_staffBelow = staff;
-            params->m_layerBelow = layer;
-        }
-        else if (params->m_staffBelow) {
-            params->m_crossStaffBelow = true;
-            params->m_staffAbove = staff;
-            params->m_layerAbove = layer;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Chord::AdjustArtic(FunctorParams *functorParams)
 {
     AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);

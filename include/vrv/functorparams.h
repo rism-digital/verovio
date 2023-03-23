@@ -396,39 +396,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcArticParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the chord dots object when processing chord notes
- * member 7: the doc
- **/
-
-class CalcArticParams : public FunctorParams {
-public:
-    CalcArticParams(Doc *doc)
-    {
-        m_parent = NULL;
-        m_doc = doc;
-        m_staffAbove = NULL;
-        m_staffBelow = NULL;
-        m_layerAbove = NULL;
-        m_layerBelow = NULL;
-        m_crossStaffAbove = false;
-        m_crossStaffBelow = false;
-    }
-    LayerElement *m_parent;
-    data_STEMDIRECTION m_stemDir;
-    Staff *m_staffAbove;
-    Staff *m_staffBelow;
-    Layer *m_layerAbove;
-    Layer *m_layerBelow;
-    bool m_crossStaffAbove;
-    bool m_crossStaffBelow;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CalcBBoxOverflowsParams
 //----------------------------------------------------------------------------
 

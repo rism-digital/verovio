@@ -25,6 +25,7 @@ namespace vrv {
 CalcArticFunctor::CalcArticFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_parent = NULL;
+    m_stemDir = STEMDIRECTION_NONE;
     m_staffAbove = NULL;
     m_staffBelow = NULL;
     m_layerAbove = NULL;

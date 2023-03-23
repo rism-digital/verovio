@@ -30,6 +30,7 @@
 #include "cachehorizontallayoutfunctor.h"
 #include "calcalignmentpitchposfunctor.h"
 #include "calcalignmentxposfunctor.h"
+#include "calcarticfunctor.h"
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
@@ -339,9 +340,8 @@ void Page::ResetAligners()
     this->Process(calcDots);
 
     // Adjust the position of outside articulations
-    CalcArticParams calcArticParams(doc);
-    Functor calcArtic(&Object::CalcArtic);
-    this->Process(&calcArtic, &calcArticParams);
+    CalcArticFunctor calcArtic(doc);
+    this->Process(calcArtic);
 
     CalcSlurDirectionFunctor calcSlurDirection(doc);
     this->Process(calcSlurDirection);

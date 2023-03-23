@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Calculate the position of the outside articulations.
-     */
-    virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the vertical position adjustment for the beam if it overlaps with layer elements
      */
     virtual int AdjustBeams(FunctorParams *) { return FUNCTOR_CONTINUE; }

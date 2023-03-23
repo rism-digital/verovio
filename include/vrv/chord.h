@@ -210,11 +210,6 @@ public:
     ///@}
 
     /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffsetEnd
      */
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;

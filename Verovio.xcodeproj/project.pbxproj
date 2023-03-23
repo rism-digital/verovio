@@ -2907,6 +2907,8 @@
 				E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */,
 				E797C45F298EC2C500CAD67E /* calcalignmentpitchposfunctor.cpp */,
 				E797C45E298EC2B400CAD67E /* calcalignmentpitchposfunctor.h */,
+				E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */,
+				E75EA9F929CC3A65003A97A7 /* calcarticfunctor.h */,
 				E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */,
 				E788335C2994EC5100D44B01 /* calcchordnoteheadsfunctor.h */,
 				E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */,
@@ -2926,8 +2928,6 @@
 		E786CD0A298AA3D8009BAC58 /* vertical-layout */ = {
 			isa = PBXGroup;
 			children = (
-				E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */,
-				E75EA9F929CC3A65003A97A7 /* calcarticfunctor.h */,
 				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
 				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
 			);

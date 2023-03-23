@@ -339,70 +339,6 @@ int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Artic::CalcArtic(FunctorParams *functorParams)
-{
-    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_parent) return FUNCTOR_CONTINUE;
-
-    /************** placement **************/
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    if (params->m_parent->m_crossLayer) {
-        layer = params->m_parent->m_crossLayer;
-    }
-
-    bool allowAbove = true;
-    data_STEMDIRECTION layerStemDir;
-
-    // for now we ignore within @place
-    if (this->GetPlace() != STAFFREL_NONE) {
-        m_drawingPlace = this->GetPlace();
-        // if we have a place indication do not allow to be changed to above
-        allowAbove = false;
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(params->m_parent)) != STEMDIRECTION_NONE) {
-        m_drawingPlace = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
-        // If we have more than one layer do not allow to be changed to above
-        allowAbove = false;
-    }
-    else if (params->m_stemDir == STEMDIRECTION_up) {
-        m_drawingPlace = STAFFREL_below;
-    }
-    else {
-        m_drawingPlace = STAFFREL_above;
-    }
-
-    // Not sure what this is anymore...
-    if (this->IsOutsideArtic()) {
-        // If allowAbove is true it will place the above if the content requires so (even if place below if given)
-        if (m_drawingPlace == STAFFREL_below && allowAbove && this->AlwaysAbove()) m_drawingPlace = STAFFREL_above;
-    }
-
-    /************** adjust the xRel position **************/
-
-    Stem *stem = vrv_cast<Stem *>(params->m_parent->FindDescendantByType(STEM));
-    this->SetDrawingXRel(
-        CalculateHorizontalShift(params->m_doc, params->m_parent, params->m_stemDir, stem->IsVirtual()));
-
-    /************** set cross-staff / layer **************/
-
-    // Exception for artic because they are relative to the staff - we set m_crossStaff and m_crossLayer
-    if (this->GetDrawingPlace() == STAFFREL_above && params->m_crossStaffAbove) {
-        this->m_crossStaff = params->m_staffAbove;
-        this->m_crossLayer = params->m_layerAbove;
-    }
-    else if (this->GetDrawingPlace() == STAFFREL_below && params->m_crossStaffBelow) {
-        this->m_crossStaff = params->m_staffBelow;
-        this->m_crossLayer = params->m_layerBelow;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Artic::AdjustArtic(FunctorParams *functorParams)
 {
     AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
@@ -536,35 +472,6 @@ int Artic::AdjustArticWithSlurs(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Artic::CalculateHorizontalShift(
-    const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir, const bool virtualStem) const
-{
-    int shift = parent->GetDrawingRadius(doc);
-    if (virtualStem || (parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {
-        return shift;
-    }
-    data_ARTICULATION artic = this->GetArticFirst();
-    switch (artic) {
-        case ARTICULATION_stacc:
-        case ARTICULATION_stacciss: {
-            const Staff *staff = this->GetAncestorStaff();
-            const int stemWidth = doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            if ((stemDir == STEMDIRECTION_up) && (m_drawingPlace == STAFFREL_above)) {
-                shift += shift - stemWidth / 2;
-            }
-            else if ((stemDir == STEMDIRECTION_down) && (m_drawingPlace == STAFFREL_below)) {
-                shift = stemWidth / 2;
-            }
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-
-    return shift;
 }
 
 } // namespace vrv
