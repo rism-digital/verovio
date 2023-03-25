@@ -596,7 +596,7 @@ FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staff
 {
     m_cumulatedShift += staffAlignment->GetMinimumSpacing(m_doc);
 
-    staffAlignment->SetYRel(m_cumulatedShift);
+    staffAlignment->SetYRel(-m_cumulatedShift);
 
     m_cumulatedShift += staffAlignment->GetStaffHeight();
     ++m_staffIdx;
