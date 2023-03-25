@@ -24089,6 +24089,11 @@ std::vector<hum::HTp> HumdrumInput::getVerseAbbrLabels(hum::HTp token, int staff
 
 template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::HTp token)
 {
+	// Ignore verse when token is suppressed with yy signifier
+	if (token->find("yy") != std::string::npos) {
+		return;
+	}
+
     int staff = m_rkern[token->getTrack()];
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (!ss[staff].verse) {
