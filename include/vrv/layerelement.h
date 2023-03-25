@@ -318,6 +318,12 @@ public:
      */
     MapOfDotLocs CalcOptimalDotLocations();
 
+    /**
+     * Calculate the overlap with other layer elements that
+     * are placed within the duration of the element
+     */
+    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
+
     //----------//
     // Functors //
     //----------//
@@ -404,12 +410,6 @@ protected:
      * secondary
      */
     virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const { return {}; }
-
-    /**
-     * Helper function to calculate overlap with layer elements that
-     * are placed within the duration of element
-     */
-    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
 
     //----------------//
     // Static methods //

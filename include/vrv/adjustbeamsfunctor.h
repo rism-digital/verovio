@@ -50,12 +50,15 @@ public:
 protected:
     //
 private:
-    //
+    // Get the drawing interface of the outer beam or the outer ftrem
+    BeamDrawingInterface *GetOuterBeamInterface() const;
+
 public:
     //
 private:
-    // The beam that should be adjusted
-    Object *m_beam;
+    // The top-level beam or ftrem that should be adjusted
+    Beam *m_outerBeam;
+    FTrem *m_outerFTrem;
     // The y coordinates of the beam left and right side
     int m_y1;
     int m_y2;
