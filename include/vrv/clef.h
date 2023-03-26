@@ -82,11 +82,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AdjustBeams
-     */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
 private:
     //
 public:

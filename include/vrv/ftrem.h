@@ -83,16 +83,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustBeams
-     */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustBeamsEnd
-     */
-    int AdjustBeamsEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

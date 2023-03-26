@@ -15,6 +15,7 @@
 
 #include "adjustaccidxfunctor.h"
 #include "adjustarpegfunctor.h"
+#include "adjustbeamsfunctor.h"
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
 #include "adjustgracexposfunctor.h"
@@ -495,10 +496,8 @@ void Page::LayOutVertically()
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
     // Adjust the position of the beams in regards of layer elements
-    AdjustBeamParams adjustBeamParams(doc);
-    Functor adjustBeams(&Object::AdjustBeams);
-    Functor adjustBeamsEnd(&Object::AdjustBeamsEnd);
-    this->Process(&adjustBeams, &adjustBeamParams, &adjustBeamsEnd);
+    AdjustBeamsFunctor adjustBeams(doc);
+    this->Process(adjustBeams);
 
     // Adjust the position of the tuplets
     FunctorDocParams adjustTupletsYParams(doc);

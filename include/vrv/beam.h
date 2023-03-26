@@ -363,16 +363,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AdjustBeams
-     */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustBeamsEnd
-     */
-    int AdjustBeamsEnd(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note and Chords elements.
