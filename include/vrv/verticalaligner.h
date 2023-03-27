@@ -195,6 +195,11 @@ public:
     void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY, char spanningType);
 
     /**
+     * Retrieve all FloatingPositioner.
+     */
+    const ArrayOfFloatingPositioners &GetFloatingPositioners() { return m_floatingPositioners; }
+
+    /**
      * Look for the first FloatingPositioner corresponding to the FloatingObject of the ClassId.
      * Return NULL if not found and does not create anything.
      */
