@@ -57,6 +57,45 @@ private:
     LayerElement *m_parent;
 };
 
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts the position of outside articulations with slur.
+ */
+class AdjustArticWithSlursFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AdjustArticWithSlursFunctor(Doc *doc);
+    virtual ~AdjustArticWithSlursFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitArtic(Artic *artic) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_ADJUSTARTICFUNCTOR_H__

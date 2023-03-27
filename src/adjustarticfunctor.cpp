@@ -147,4 +147,31 @@ FunctorCode AdjustArticFunctor::VisitNote(Note *note)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursFunctor
+//----------------------------------------------------------------------------
+
+AdjustArticWithSlursFunctor::AdjustArticWithSlursFunctor(Doc *doc) : DocFunctor(doc) {}
+
+FunctorCode AdjustArticWithSlursFunctor::VisitArtic(Artic *artic)
+{
+    if (artic->m_startSlurPositioners.empty() && artic->m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
+
+    for (FloatingCurvePositioner *curve : artic->m_endSlurPositioners) {
+        int shift = artic->Intersects(curve, CONTENT, m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            artic->SetDrawingYRel(artic->GetDrawingYRel() + shift);
+        }
+    }
+
+    for (FloatingCurvePositioner *curve : artic->m_startSlurPositioners) {
+        int shift = artic->Intersects(curve, CONTENT, m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            artic->SetDrawingYRel(artic->GetDrawingYRel() + shift);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 } // namespace vrv
