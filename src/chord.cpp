@@ -18,8 +18,6 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
-#include "calcalignmentpitchposfunctor.h"
-#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
@@ -560,23 +558,6 @@ FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
 FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitChordEnd(this);
-}
-
-int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
-
-    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(params->m_doc);
-    this->Process(calcAlignmentPitchPos);
-
-    CalcStemFunctor calcStem(params->m_doc);
-    this->Process(calcStem);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)

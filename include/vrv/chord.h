@@ -192,11 +192,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustCrossStaffYPos
-     */
-    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{

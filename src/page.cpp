@@ -28,6 +28,7 @@
 #include "adjusttupletsxfunctor.h"
 #include "adjustxoverflowfunctor.h"
 #include "adjustxposfunctor.h"
+#include "adjustyposfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "cachehorizontallayoutfunctor.h"
@@ -546,9 +547,8 @@ void Page::LayOutVertically()
         doc, &adjustFloatingPositionersBetween);
     this->Process(&adjustFloatingPositionersBetween, &adjustFloatingPositionersBetweenParams);
 
-    Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
-    FunctorDocParams adjustCrossStaffYPosParams(doc);
-    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams);
+    AdjustCrossStaffYPosFunctor adjustCrossStaffYPos(doc);
+    this->Process(adjustCrossStaffYPos);
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
     if (adjustSlurs.HasCrossStaffSlurs()) {

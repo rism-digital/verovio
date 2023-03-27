@@ -789,12 +789,6 @@ public:
     ///@{
 
     /**
-     * Adjust the position of cross-staff elements after the adjustment of the staves.
-     * This is called by chords and tuplets with cross-staff content.
-     */
-    virtual int AdjustCrossStaffYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the position of all floating positionners, staff by staff.
      */
     virtual int AdjustFloatingPositioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
