@@ -612,18 +612,6 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::AdjustArtic(FunctorParams *functorParams)
-{
-    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
-    assert(params);
-
-    params->m_parent = this;
-    params->m_articAbove.clear();
-    params->m_articBelow.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
     const ListOfConstObjects &notes = this->GetList(this);

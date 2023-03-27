@@ -124,11 +124,6 @@ public:
     int ConvertMarkupArtic(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustArtic
-     */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustArticWithSlurs
      */
     int AdjustArticWithSlurs(FunctorParams *functorParams) override;

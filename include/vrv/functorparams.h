@@ -112,30 +112,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: list of above articulations
- * member 1: list of below articulations
- * member 2: the parent element to which the articulations refer
- * member 3: the doc
- **/
-
-class AdjustArticParams : public FunctorParams {
-public:
-    AdjustArticParams(Doc *doc)
-    {
-        m_parent = NULL;
-        m_doc = doc;
-    }
-    std::list<Artic *> m_articAbove;
-    std::list<Artic *> m_articBelow;
-    LayerElement *m_parent;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustBeamParams
 //----------------------------------------------------------------------------
 

@@ -927,20 +927,6 @@ int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Note::AdjustArtic(FunctorParams *functorParams)
-{
-    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
-    assert(params);
-
-    if (this->IsChordTone()) return FUNCTOR_CONTINUE;
-
-    params->m_parent = this;
-    params->m_articAbove.clear();
-    params->m_articBelow.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate) const
 {
     if (predicate && !predicate(this)) return {};

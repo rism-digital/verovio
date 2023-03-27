@@ -197,11 +197,6 @@ public:
     int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustArtic
-     */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{

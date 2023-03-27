@@ -15,6 +15,7 @@
 
 #include "adjustaccidxfunctor.h"
 #include "adjustarpegfunctor.h"
+#include "adjustarticfunctor.h"
 #include "adjustbeamsfunctor.h"
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
@@ -373,9 +374,8 @@ void Page::LayOutHorizontally()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations
-    AdjustArticParams adjustArticParams(doc);
-    Functor adjustArtic(&Object::AdjustArtic);
-    this->Process(&adjustArtic, &adjustArticParams);
+    AdjustArticFunctor adjustArtic(doc);
+    this->Process(adjustArtic);
 
     // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
