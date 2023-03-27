@@ -27,13 +27,14 @@
 
 namespace vrv {
 
-const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_acc_soft,
-    ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp,
-    ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic
+    = { ARTICULATION_acc, ARTICULATION_acc_soft, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow,
+          ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_fingernail, ARTICULATION_damp, ARTICULATION_dampall,
+          ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
 
-const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
-    = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap,
-          ARTICULATION_damp, ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
+const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_fingernail, ARTICULATION_damp,
+    ARTICULATION_dampall, ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
 
 //----------------------------------------------------------------------------
 // Artic
@@ -197,7 +198,6 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             case ARTICULATION_ten: return SMUFL_E4A4_articTenutoAbove;
             case ARTICULATION_stacciss: return SMUFL_E4A8_articStaccatissimoWedgeAbove;
             case ARTICULATION_marc: return SMUFL_E4AC_articMarcatoAbove;
-            // case ARTICULATION_marc_stacc: return SMUFL_E4AE_articMarcatoStaccatoAbove;
             case ARTICULATION_spicc: return SMUFL_E4A6_articStaccatissimoAbove;
             // case ARTICULATION_doit;
             // case ARTICULATION_scoop;
@@ -213,10 +213,9 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             case ARTICULATION_upbow: return SMUFL_E612_stringsUpBow;
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             case ARTICULATION_snap: return SMUFL_E631_pluckedSnapPizzicatoAbove;
-            // case ARTICULATION_fingernail;
-            // case ARTICULATION_ten_stacc: return SMUFL_E4B2_articTenutoStaccatoAbove;
+            case ARTICULATION_fingernail: return SMUFL_E636_pluckedWithFingernails;
             case ARTICULATION_damp: return SMUFL_E638_pluckedDamp;
-            // case ARTICULATION_dampall;
+            case ARTICULATION_dampall: return SMUFL_E639_pluckedDampAll;
             case ARTICULATION_open: return SMUFL_E5E7_brassMuteOpen;
             case ARTICULATION_stop: return SMUFL_E5E5_brassMuteClosed;
             // case ARTICULATION_dbltongue;
@@ -238,22 +237,16 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             case ARTICULATION_ten: return SMUFL_E4A5_articTenutoBelow;
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
             case ARTICULATION_marc: return SMUFL_E4AD_articMarcatoBelow;
-            // Removed in MEI 4.0
-            // case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
             case ARTICULATION_spicc: return SMUFL_E4A7_articStaccatissimoBelow;
-            //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
             case ARTICULATION_upbow: return SMUFL_E613_stringsUpBowTurned;
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             case ARTICULATION_snap: return SMUFL_E630_pluckedSnapPizzicatoBelow;
+            case ARTICULATION_fingernail: return SMUFL_E636_pluckedWithFingernails;
             case ARTICULATION_damp: return SMUFL_E638_pluckedDamp;
-            // case ARTICULATION_dampall;
+            case ARTICULATION_dampall: return SMUFL_E639_pluckedDampAll;
             case ARTICULATION_open: return SMUFL_E5E7_brassMuteOpen;
             case ARTICULATION_stop: return SMUFL_E5E5_brassMuteClosed;
-            //
-            // Removed in MEI 4.0
-            // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
-            //
             case ARTICULATION_lhpizz: return SMUFL_E633_pluckedLeftHandPizzicato;
             case ARTICULATION_dot: return SMUFL_E4A3_articStaccatoBelow;
             case ARTICULATION_stroke: return SMUFL_E4AB_articStaccatissimoStrokeBelow;
@@ -297,7 +290,9 @@ bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
         case SMUFL_E614_stringsHarmonic: return true;
         case SMUFL_E630_pluckedSnapPizzicatoBelow: return true;
         case SMUFL_E633_pluckedLeftHandPizzicato: return true;
+        case SMUFL_E636_pluckedWithFingernails: return true;
         case SMUFL_E638_pluckedDamp: return true;
+        case SMUFL_E639_pluckedDampAll: return true;
         default: return false;
     }
 }
