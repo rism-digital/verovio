@@ -123,11 +123,6 @@ public:
      */
     int ConvertMarkupArtic(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::AdjustArticWithSlurs
-     */
-    int AdjustArticWithSlurs(FunctorParams *functorParams) override;
-
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
 

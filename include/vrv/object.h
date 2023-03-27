@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Adjust the position the outside articulations with slur.
-     */
-    virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the position of cross-staff elements after the adjustment of the staves.
      * This is called by chords and tuplets with cross-staff content.
      */

@@ -492,9 +492,8 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations with slurs end and start positions
-    FunctorDocParams adjustArticWithSlursParams(doc);
-    Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
-    this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
+    AdjustArticWithSlursFunctor adjustArticWithSlurs(doc);
+    this->Process(adjustArticWithSlurs);
 
     // Adjust the position of the beams in regards of layer elements
     AdjustBeamsFunctor adjustBeams(doc);
