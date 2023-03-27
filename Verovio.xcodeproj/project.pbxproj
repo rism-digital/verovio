@@ -1546,6 +1546,12 @@
 		E7D3389E293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
 		E7D3389F293E05F200C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
 		E7D338A0293E05F300C40B81 /* setscoredeffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */; };
+		E7D48C7129D21F040031D89D /* adjustyposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7D48C7029D21EFA0031D89D /* adjustyposfunctor.h */; };
+		E7D48C7229D21F050031D89D /* adjustyposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7D48C7029D21EFA0031D89D /* adjustyposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7D48C7429D21F250031D89D /* adjustyposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */; };
+		E7D48C7529D21F2B0031D89D /* adjustyposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */; };
+		E7D48C7629D21F2C0031D89D /* adjustyposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */; };
+		E7D48C7729D21F2D0031D89D /* adjustyposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */; };
 		E7E1698329A8988E00FFF482 /* adjustlayersfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */; };
 		E7E1698429A8988F00FFF482 /* adjustlayersfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7E1698629A898C700FFF482 /* adjustlayersfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */; };
@@ -2130,6 +2136,8 @@
 		E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preparedatafunctor.cpp; path = src/preparedatafunctor.cpp; sourceTree = "<group>"; };
 		E7D33899293E057100C40B81 /* setscoredeffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setscoredeffunctor.h; path = include/vrv/setscoredeffunctor.h; sourceTree = "<group>"; };
 		E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = setscoredeffunctor.cpp; path = src/setscoredeffunctor.cpp; sourceTree = "<group>"; };
+		E7D48C7029D21EFA0031D89D /* adjustyposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustyposfunctor.h; path = include/vrv/adjustyposfunctor.h; sourceTree = "<group>"; };
+		E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustyposfunctor.cpp; path = src/adjustyposfunctor.cpp; sourceTree = "<group>"; };
 		E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustlayersfunctor.h; path = include/vrv/adjustlayersfunctor.h; sourceTree = "<group>"; };
 		E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustlayersfunctor.cpp; path = src/adjustlayersfunctor.cpp; sourceTree = "<group>"; };
 		E7E1698A29A8BA2A00FFF482 /* adjustgracexposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustgracexposfunctor.h; path = include/vrv/adjustgracexposfunctor.h; sourceTree = "<group>"; };
@@ -2958,6 +2966,8 @@
 				E75A699C29CCF87300414819 /* adjustbeamsfunctor.h */,
 				E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */,
 				E7770F8229D0D9ED00A9BECF /* adjustslursfunctor.h */,
+				E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */,
+				E7D48C7029D21EFA0031D89D /* adjustyposfunctor.h */,
 				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
 				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
 			);
@@ -3155,6 +3165,7 @@
 				BDC366E02576AFA500E4D826 /* grpsym.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
+				E7D48C7129D21F040031D89D /* adjustyposfunctor.h in Headers */,
 				4DFB3E8A23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				4DEC4DD821C8295700D1D273 /* unclear.h in Headers */,
 				4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */,
@@ -3431,6 +3442,7 @@
 				BB4C4B2822A932CF001F6AF0 /* hairpin.h in Headers */,
 				BB4C4B3222A932CF001F6AF0 /* slur.h in Headers */,
 				BB4C4BA822A932EB001F6AF0 /* glyph.h in Headers */,
+				E7D48C7229D21F050031D89D /* adjustyposfunctor.h in Headers */,
 				BB4C4B8822A932DF001F6AF0 /* num.h in Headers */,
 				4DACC9A12990F29A00B55913 /* atts_gestural.h in Headers */,
 				4D2E759122BC2B80004C51F0 /* tuning.h in Headers */,
@@ -3776,6 +3788,7 @@
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
+				E7D48C7529D21F2B0031D89D /* adjustyposfunctor.cpp in Sources */,
 				E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */,
 				4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */,
@@ -4104,6 +4117,7 @@
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
 				E7BCFFBB281298630012513D /* resources.cpp in Sources */,
+				E7D48C7429D21F250031D89D /* adjustyposfunctor.cpp in Sources */,
 				4DACC99A2990F29A00B55913 /* atts_header.cpp in Sources */,
 				4D95D4F21D6E042400B2B856 /* section.cpp in Sources */,
 				4D20741222A708C600E0765F /* view_tab.cpp in Sources */,
@@ -4309,6 +4323,7 @@
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */,
+				E7D48C7629D21F2C0031D89D /* adjustyposfunctor.cpp in Sources */,
 				4DB3D8CA1F83D10700B5FC2B /* fermata.cpp in Sources */,
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
@@ -4576,6 +4591,7 @@
 				E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,
+				E7D48C7729D21F2D0031D89D /* adjustyposfunctor.cpp in Sources */,
 				BB4C4B1322A932C8001F6AF0 /* section.cpp in Sources */,
 				BB4C4B0D22A932C8001F6AF0 /* systemmilestone.cpp in Sources */,
 				BB4C4B6D22A932D7001F6AF0 /* note.cpp in Sources */,
