@@ -371,11 +371,6 @@ public:
     int AdjustFloatingPositionerGrps(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustSlurs
-     */
-    int AdjustSlurs(FunctorParams *functorParams) override;
-
-    /**
      * See Object::JustifyY
      */
     int JustifyY(FunctorParams *functorParams) override;

@@ -804,16 +804,6 @@ int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustSlurs(FunctorParams *functorParams)
-{
-    AdjustSlursParams *params = vrv_params_cast<AdjustSlursParams *>(functorParams);
-    assert(params);
-
-    m_systemAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);

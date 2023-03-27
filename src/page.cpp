@@ -21,6 +21,7 @@
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
+#include "adjustslursfunctor.h"
 #include "adjustsylspacingfunctor.h"
 #include "adjusttempofunctor.h"
 #include "adjusttupletsxfunctor.h"
@@ -505,9 +506,8 @@ void Page::LayOutVertically()
     this->Process(&adjustTupletsY, &adjustTupletsYParams);
 
     // Adjust the position of the slurs
-    Functor adjustSlurs(&Object::AdjustSlurs);
-    AdjustSlursParams adjustSlursParams(doc, &adjustSlurs);
-    this->Process(&adjustSlurs, &adjustSlursParams);
+    AdjustSlursFunctor adjustSlurs(doc);
+    this->Process(adjustSlurs);
 
     // At this point slurs must not be reinitialized, otherwise the adjustment we just did was in vain
     view.SetSlurHandling(SlurHandling::Drawing);
@@ -552,11 +552,11 @@ void Page::LayOutVertically()
     this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams);
 
     // Redraw are re-adjust the position of the slurs when we have cross-staff ones
-    if (adjustSlursParams.m_crossStaffSlurs) {
+    if (adjustSlurs.HasCrossStaffSlurs()) {
         view.SetSlurHandling(SlurHandling::Initialize);
         view.SetPage(this->GetIdx(), false);
         view.DrawCurrentPage(&bBoxDC, false);
-        this->Process(&adjustSlurs, &adjustSlursParams);
+        this->Process(adjustSlurs);
     }
 
     doc->SetCurrentScore(this->m_score);

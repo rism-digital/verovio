@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Adjust the postion position of slurs.
-     */
-    virtual int AdjustSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust the position the articulations.
      */
     virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }

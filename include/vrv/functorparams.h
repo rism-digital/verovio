@@ -251,29 +251,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustSlursParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a flag indicating that there is at least one cross-staff slur
- * member 1: the doc
- * member 2: a pointer to the functor for passing it to the system aligner
- **/
-
-class AdjustSlursParams : public FunctorParams {
-public:
-    AdjustSlursParams(Doc *doc, Functor *functor)
-    {
-        m_crossStaffSlurs = false;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    bool m_crossStaffSlurs;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // AdjustStaffOverlapParams
 //----------------------------------------------------------------------------
 

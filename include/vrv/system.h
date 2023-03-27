@@ -225,11 +225,6 @@ public:
     int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustSlurs
-     */
-    int AdjustSlurs(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffPages
      */
     int CastOffPages(FunctorParams *functorParams) override;

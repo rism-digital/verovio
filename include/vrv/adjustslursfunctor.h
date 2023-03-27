@@ -35,6 +35,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Check existence of cross-staff slurs
+     */
+    bool HasCrossStaffSlurs() const { return m_crossStaffSlurs; }
+
+    /*
      * Functor interface
      */
     ///@{
