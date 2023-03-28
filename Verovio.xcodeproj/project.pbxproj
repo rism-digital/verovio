@@ -1364,6 +1364,12 @@
 		BDEF9ECA26725234008A3A47 /* caesura.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEF9EC626725234008A3A47 /* caesura.cpp */; };
 		BDEF9ECC26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
 		BDEF9ECD26725248008A3A47 /* caesura.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEF9ECB26725248008A3A47 /* caesura.h */; };
+		E708AA6229D2B96A001F937A /* adjustfloatingpositionerfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */; };
+		E708AA6329D2B96B001F937A /* adjustfloatingpositionerfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E708AA6529D2B985001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
+		E708AA6629D2B98B001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
+		E708AA6729D2B98B001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
+		E708AA6829D2B98C001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
 		E71EF3C32975E4DC00D36264 /* resetfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E71EF3C22975E4DC00D36264 /* resetfunctor.h */; };
 		E71EF3C42975E4DC00D36264 /* resetfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E71EF3C22975E4DC00D36264 /* resetfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E71EF3C62975ED3800D36264 /* resetfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E71EF3C52975ED3800D36264 /* resetfunctor.cpp */; };
@@ -2075,6 +2081,8 @@
 		BDC366C62576AF9300E4D826 /* grpsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grpsym.h; path = include/vrv/grpsym.h; sourceTree = "<group>"; };
 		BDEF9EC626725234008A3A47 /* caesura.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = caesura.cpp; path = src/caesura.cpp; sourceTree = "<group>"; };
 		BDEF9ECB26725248008A3A47 /* caesura.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = caesura.h; path = include/vrv/caesura.h; sourceTree = "<group>"; };
+		E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustfloatingpositionerfunctor.h; path = include/vrv/adjustfloatingpositionerfunctor.h; sourceTree = "<group>"; };
+		E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustfloatingpositionerfunctor.cpp; path = src/adjustfloatingpositionerfunctor.cpp; sourceTree = "<group>"; };
 		E71EF3C22975E4DC00D36264 /* resetfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resetfunctor.h; path = include/vrv/resetfunctor.h; sourceTree = "<group>"; };
 		E71EF3C52975ED3800D36264 /* resetfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resetfunctor.cpp; path = src/resetfunctor.cpp; sourceTree = "<group>"; };
 		E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findlayerelementsfunctor.h; path = include/vrv/findlayerelementsfunctor.h; sourceTree = "<group>"; };
@@ -2964,6 +2972,8 @@
 				E7ADB3AA29D1920D00825D5D /* adjustarticfunctor.h */,
 				E75A699F29CCF8A200414819 /* adjustbeamsfunctor.cpp */,
 				E75A699C29CCF87300414819 /* adjustbeamsfunctor.h */,
+				E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */,
+				E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */,
 				E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */,
 				E7770F8229D0D9ED00A9BECF /* adjustslursfunctor.h */,
 				E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */,
@@ -3165,6 +3175,7 @@
 				BDC366E02576AFA500E4D826 /* grpsym.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
+				E708AA6229D2B96A001F937A /* adjustfloatingpositionerfunctor.h in Headers */,
 				E7D48C7129D21F040031D89D /* adjustyposfunctor.h in Headers */,
 				4DFB3E8A23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				4DEC4DD821C8295700D1D273 /* unclear.h in Headers */,
@@ -3478,6 +3489,7 @@
 				BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */,
 				4D4992502926B4E9007E3431 /* toolkitdef.h in Headers */,
 				BB4C4AA422A9328F001F6AF0 /* vrv.h in Headers */,
+				E708AA6329D2B96B001F937A /* adjustfloatingpositionerfunctor.h in Headers */,
 				E76046BE28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */,
 				E7A1640929AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */,
 				BB4C4AD222A932B6001F6AF0 /* scoredef.h in Headers */,
@@ -3792,6 +3804,7 @@
 				E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */,
 				4D15DE3B2411782300457C05 /* expansionmap.cpp in Sources */,
+				E708AA6629D2B98B001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */,
 				4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */,
 				4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */,
 				4D72A5E3208A3822009DEC1E /* beatrpt.cpp in Sources */,
@@ -4109,6 +4122,7 @@
 				E722106928F85982002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				E741AD02299A3D5B00854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				E7231E0529B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */,
+				E708AA6529D2B985001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */,
 				E7C3AEDC295501CA002DE5AB /* preparedatafunctor.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DBDD6722939E1AE009EC466 /* symboldef.cpp in Sources */,
@@ -4327,6 +4341,7 @@
 				4DB3D8CA1F83D10700B5FC2B /* fermata.cpp in Sources */,
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
+				E708AA6729D2B98B001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */,
 				E77C198028CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768527CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
@@ -4595,6 +4610,7 @@
 				BB4C4B1322A932C8001F6AF0 /* section.cpp in Sources */,
 				BB4C4B0D22A932C8001F6AF0 /* systemmilestone.cpp in Sources */,
 				BB4C4B6D22A932D7001F6AF0 /* note.cpp in Sources */,
+				E708AA6829D2B98C001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */,
 				BB4C4B3322A932CF001F6AF0 /* tempo.cpp in Sources */,
 				BB4C4B1D22A932CF001F6AF0 /* bracketspan.cpp in Sources */,
 				BB4C4BAB22A932EB001F6AF0 /* view_beam.cpp in Sources */,
