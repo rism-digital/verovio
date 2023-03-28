@@ -19,6 +19,7 @@
 #include "adjustbeamsfunctor.h"
 #include "adjustclefchangesfunctor.h"
 #include "adjustdotsfunctor.h"
+#include "adjustfloatingpositionerfunctor.h"
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
@@ -526,9 +527,8 @@ void Page::LayOutVertically()
     this->Process(&calcBBoxOverflows, &calcBBoxOverflowsParams, &calcBBoxOverflowsEnd);
 
     // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
-    Functor adjustFloatingPositioners(&Object::AdjustFloatingPositioners);
-    AdjustFloatingPositionersParams adjustFloatingPositionersParams(doc, &adjustFloatingPositioners);
-    this->Process(&adjustFloatingPositioners, &adjustFloatingPositionersParams);
+    AdjustFloatingPositionersFunctor adjustFloatingPositioners(doc);
+    this->Process(adjustFloatingPositioners);
 
     // Adjust the overlap of the staff alignments by looking at the overflow bounding boxes params.clear();
     Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);

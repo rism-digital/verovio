@@ -210,11 +210,6 @@ public:
     int AdjustStaffOverlap(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustFloatingPositioners
-     */
-    int AdjustFloatingPositioners(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustFloatingPositionersBetween
      */
     int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
