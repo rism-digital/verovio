@@ -300,11 +300,15 @@ public:
     ///@}
 
     /**
-     * @name Adds a bounding box to the array of overflowing objects above or below
+     * @name Modify the array of overflowing objects above or below
      */
     ///@{
     void AddBBoxAbove(BoundingBox *box) { m_overflowAboveBBoxes.push_back(box); }
     void AddBBoxBelow(BoundingBox *box) { m_overflowBelowBBoxes.push_back(box); }
+    void ClearBBoxesAbove() { m_overflowAboveBBoxes.clear(); }
+    void ClearBBoxesBelow() { m_overflowBelowBBoxes.clear(); }
+    ArrayOfBoundingBoxes &GetBBoxesAboveForModification() { return m_overflowAboveBBoxes; }
+    ArrayOfBoundingBoxes &GetBBoxesBelowForModification() { return m_overflowBelowBBoxes; }
     ///@}
 
     /**
@@ -439,8 +443,8 @@ private:
     /**
      * The list of overflowing bounding boxes (e.g., LayerElement or FloatingPositioner)
      */
-    std::vector<BoundingBox *> m_overflowAboveBBoxes;
-    std::vector<BoundingBox *> m_overflowBelowBBoxes;
+    ArrayOfBoundingBoxes m_overflowAboveBBoxes;
+    ArrayOfBoundingBoxes m_overflowBelowBBoxes;
 };
 
 } // namespace vrv
