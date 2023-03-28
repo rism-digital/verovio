@@ -112,6 +112,16 @@ std::string GetVersion();
 std::string BaseEncodeInt(uint32_t value, uint8_t base);
 
 /**
+ * Convert string from camelCase.
+ */
+std::string FromCamelCase(const std::string &s);
+
+/**
+ * Convert string to camelCase.
+ */
+std::string ToCamelCase(const std::string &s);
+
+/**
  *
  */
 extern LogLevel logLevel;

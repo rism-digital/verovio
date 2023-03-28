@@ -314,6 +314,35 @@ std::string BaseEncodeInt(uint32_t value, uint8_t base)
     return base62;
 }
 
+std::string FromCamelCase(const std::string &s)
+{
+    std::regex regExp1("(.)([A-Z][a-z]+)");
+    std::regex regExp2("([a-z0-9])([A-Z])");
+
+    std::string result = s;
+    result = std::regex_replace(result, regExp1, "$1-$2");
+    result = std::regex_replace(result, regExp2, "$1-$2");
+
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+std::string ToCamelCase(const std::string &s)
+{
+    std::istringstream iss(s);
+    std::string token;
+    std::string result;
+
+    while (getline(iss, token, '-')) {
+        token[0] = toupper(token[0]);
+        result += token;
+    }
+
+    result[0] = tolower(result[0]);
+
+    return result;
+}
+
 //----------------------------------------------------------------------------
 // Notation type checks
 //----------------------------------------------------------------------------
