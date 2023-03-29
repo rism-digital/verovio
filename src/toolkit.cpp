@@ -1112,7 +1112,7 @@ void Toolkit::ResetOptions()
     this->SetFont(m_options->m_font.GetValue());
 }
 
-void Toolkit::GetOptionUsageOutput(vrv::Option *option, std::ostream &output) const
+void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &output) const
 {
     if (!option) return;
     std::string option_str = " ";
@@ -1134,7 +1134,7 @@ void Toolkit::GetOptionUsageOutput(vrv::Option *option, std::ostream &output) co
     const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(option);
     const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(option);
 
-    if (typeid(*optDbl) == typeid(OptionDbl)) {
+    if (optDbl) {
         option_str.append(" <f>");
     }
     else if (optInt) {
@@ -1166,8 +1166,8 @@ void Toolkit::GetOptionUsageOutput(vrv::Option *option, std::ostream &output) co
     }
     if (optDbl && (optDbl->GetMin() != optDbl->GetMax())) {
         output << std::fixed << " (default: " << optDbl->GetDefault();
-        output << std::fixed << "; min: " << optDbl->GetMin();
-        output << std::fixed << "; max: " << optDbl->GetMax() << ")";
+        output << "; min: " << optDbl->GetMin();
+        output << "; max: " << optDbl->GetMax() << ")";
     }
     if (optString) {
         output << " (default: \"" << optString->GetDefault() << "\")";
@@ -1179,7 +1179,7 @@ void Toolkit::GetOptionUsageOutput(vrv::Option *option, std::ostream &output) co
     output << std::endl;
 }
 
-void Toolkit::GetOptionUsage(const std::string &category, std::ostream &output) const
+void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
 {
     // map of all categories and expected string arguments for them
     const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
@@ -1246,8 +1246,8 @@ void Toolkit::GetOptionUsage(const std::string &category, std::ostream &output) 
 
 std::string Toolkit::GetOptionUsageString() const
 {
-    stringstream ss;
-    this->GetOptionUsage("full", ss);
+    std::stringstream ss;
+    this->PrintOptionUsage("full", ss);
     return ss.str();
 }
 

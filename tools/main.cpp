@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     if (argc < 2) {
         std::cerr << "Expected one input file but found none." << std::endl << std::endl;
         //display_usage(options, "");
-        toolkit.GetOptionUsage("", std::cout);
+        toolkit.PrintOptionUsage("", std::cout);
         exit(1);
     }
 
@@ -225,12 +225,12 @@ int main(int argc, char **argv)
                 break;
 
             case 'h':
-                toolkit.GetOptionUsage(optarg, std::cout);
+                toolkit.PrintOptionUsage(optarg, std::cout);
                 exit(0);
                 break;
 
             case '?':
-                toolkit.GetOptionUsage("", std::cout);
+                toolkit.PrintOptionUsage("", std::cout);
                 exit(1);
                 break;
 
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     }
     else if (infile != "-") {
         std::cerr << "Incorrect number of arguments: expected one input file but found none." << std::endl << std::endl;
-        toolkit.GetOptionUsage("base", std::cout);
+        toolkit.PrintOptionUsage("base", std::cout);
         exit(1);
     }
 
