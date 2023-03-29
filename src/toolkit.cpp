@@ -1226,7 +1226,7 @@ void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output
         if ((it->first == vrv::OptionsCategory::Base) || (it->first == vrv::OptionsCategory::Full)) {
             const std::vector<vrv::Option *> *baseOptions = m_options->GetBaseOptions();
             for (vrv::Option *option : *baseOptions) {
-                this->GetOptionUsageOutput(option, output);
+                this->PrintOptionUsageOutput(option, output);
             }
         }
         const std::vector<vrv::OptionGrp *> *grps = m_options->GetGrps();
@@ -1237,7 +1237,7 @@ void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output
                 const std::vector<vrv::Option *> *options = group->GetOptions();
 
                 for (vrv::Option *option : *options) {
-                    this->GetOptionUsageOutput(option, output);
+                    this->PrintOptionUsageOutput(option, output);
                 }
             }
         }
