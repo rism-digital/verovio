@@ -1924,6 +1924,11 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
 void HumdrumInput::processHangingTieEnd(
     Note *note, hum::HTp token, const std::string &tstring, int subindex, hum::HumNum meterunit)
 {
+    // Ignore tie when token is suppressed with yy signifier
+    if (token->find("yy") != std::string::npos) {
+        return;
+    }
+
     Tie *tie = NULL;
     hum::HumNum position = token->getDurationFromStart();
     if (position == 0) {
@@ -24089,6 +24094,11 @@ std::vector<hum::HTp> HumdrumInput::getVerseAbbrLabels(hum::HTp token, int staff
 
 template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::HTp token)
 {
+    // Ignore verse when token is suppressed with yy signifier
+    if (token->find("yy") != std::string::npos) {
+        return;
+    }
+
     int staff = m_rkern[token->getTrack()];
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (!ss[staff].verse) {
