@@ -114,7 +114,6 @@ int main(int argc, char **argv)
 
     if (argc < 2) {
         std::cerr << "Expected one input file but found none." << std::endl << std::endl;
-        //display_usage(options, "");
         toolkit.PrintOptionUsage("", std::cout);
         exit(1);
     }
