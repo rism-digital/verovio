@@ -245,7 +245,7 @@ public:
     /**
      * Print formatted option usage for specific category (with max/min/default values) to output stream.
      */
-    void GetOptionUsage(const std::string &category, std::ostream &output) const;
+    void PrintOptionUsage(const std::string &category, std::ostream &output) const;
 
     /**
      * Get all usage for all option categories as string.
@@ -738,7 +738,7 @@ protected:
     /**
      * Print formatted option usage for specific option to output stream.
      */
-    void GetOptionUsageOutput(vrv::Option *option, std::ostream &output) const;
+    void PrintOptionUsageOutput(const vrv::Option *option, std::ostream &output) const;
 
     /**
      * Resets the vrv::logBuffer.
