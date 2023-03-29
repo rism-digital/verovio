@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.81",
+    "fontVersion": "5.2.83",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1954,7 +1954,7 @@
         },
         "fermataAbove": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 1.28
             ],
             "bBoxSW": [
@@ -1964,7 +1964,7 @@
         },
         "fermataBelow": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 0.012
             ],
             "bBoxSW": [
@@ -1994,7 +1994,7 @@
         },
         "fermataLongHenzeAbove": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 1.28
             ],
             "bBoxSW": [
@@ -2004,7 +2004,7 @@
         },
         "fermataLongHenzeBelow": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 0.012
             ],
             "bBoxSW": [
@@ -2034,7 +2034,7 @@
         },
         "fermataShortHenzeAbove": {
             "bBoxNE": [
-                1.432,
+                1.42,
                 1.28
             ],
             "bBoxSW": [
@@ -2044,7 +2044,7 @@
         },
         "fermataShortHenzeBelow": {
             "bBoxNE": [
-                1.432,
+                1.42,
                 0.012
             ],
             "bBoxSW": [
@@ -4672,6 +4672,46 @@
                 -0.5
             ]
         },
+        "octaveBaselineA": {
+            "bBoxNE": [
+                0.72,
+                0.744
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "octaveBaselineB": {
+            "bBoxNE": [
+                0.588,
+                1.176
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "octaveBaselineM": {
+            "bBoxNE": [
+                1.244,
+                0.732
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.02
+            ]
+        },
+        "octaveBaselineV": {
+            "bBoxNE": [
+                0.744,
+                0.788
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "octaveParensLeft": {
             "bBoxNE": [
                 0.46,
@@ -4690,6 +4730,46 @@
             "bBoxSW": [
                 0.0,
                 -0.1
+            ]
+        },
+        "octaveSuperscriptA": {
+            "bBoxNE": [
+                0.72,
+                1.376
+            ],
+            "bBoxSW": [
+                0.0,
+                0.632
+            ]
+        },
+        "octaveSuperscriptB": {
+            "bBoxNE": [
+                0.588,
+                1.808
+            ],
+            "bBoxSW": [
+                0.0,
+                0.632
+            ]
+        },
+        "octaveSuperscriptM": {
+            "bBoxNE": [
+                1.244,
+                1.364
+            ],
+            "bBoxSW": [
+                0.0,
+                0.612
+            ]
+        },
+        "octaveSuperscriptV": {
+            "bBoxNE": [
+                0.74,
+                1.4
+            ],
+            "bBoxSW": [
+                -0.004,
+                0.612
             ]
         },
         "ornamentHaydn": {
@@ -5372,6 +5452,36 @@
                 0.0
             ]
         },
+        "pluckedDampAll": {
+            "bBoxNE": [
+                1.32,
+                1.32
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedDampOnStem": {
+            "bBoxNE": [
+                1.304,
+                0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedFingernailFlick": {
+            "bBoxNE": [
+                0.568,
+                0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "pluckedLeftHandPizzicato": {
             "bBoxNE": [
                 1.32,
@@ -5396,6 +5506,16 @@
             "bBoxNE": [
                 0.824,
                 1.064
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedWithFingernails": {
+            "bBoxNE": [
+                0.824,
+                0.572
             ],
             "bBoxSW": [
                 0.0,
@@ -5800,6 +5920,16 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "segnoSerpent1": {
+            "bBoxNE": [
+                1.796,
+                4.384
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.38
             ]
         },
         "segnoSerpent2": {
