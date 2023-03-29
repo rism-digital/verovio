@@ -95,7 +95,11 @@ public:
 protected:
     //
 private:
-    //
+    // Adjust the position of groups to ensure that any group is positioned further away from the staff
+    // than preceding groups
+    void AdjustGroupsMonotone(const StaffAlignment *staffAlignment, const ArrayOfFloatingPositioners &positioners,
+        ArrayOfIntPairs &grpIdYRel) const;
+
 public:
     //
 private:

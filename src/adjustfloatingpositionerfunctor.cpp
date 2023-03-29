@@ -288,7 +288,127 @@ AdjustFloatingPositionerGrpsFunctor::AdjustFloatingPositionerGrpsFunctor(Doc *do
 
 FunctorCode AdjustFloatingPositionerGrpsFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
 {
-    return FUNCTOR_CONTINUE;
+    ArrayOfFloatingPositioners positioners;
+    // make a temporary copy of positioners with desired classId and a drawing grpId
+    const ArrayOfFloatingPositioners &allPositioners = staffAlignment->GetFloatingPositioners();
+    std::copy_if(allPositioners.begin(), allPositioners.end(), std::back_inserter(positioners),
+        [this](FloatingPositioner *positioner) {
+            assert(positioner->GetObject());
+            // search in the desired classIds
+            return ((std::find(m_classIds.begin(), m_classIds.end(), positioner->GetObject()->GetClassId())
+                        != m_classIds.end())
+                && (positioner->GetObject()->GetDrawingGrpId() != 0) && (positioner->GetDrawingPlace() == m_place)
+                && !positioner->HasEmptyBB());
+        });
+
+    if (positioners.empty()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // A vector storing a pair with the grpId and the min or max YRel
+    ArrayOfIntPairs grpIdYRel;
+
+    for (FloatingPositioner *positioner : positioners) {
+        int currentGrpId = positioner->GetObject()->GetDrawingGrpId();
+        // Look if we already have a pair for this grpId
+        auto iter = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+        // if not, then just add a new pair with the YRel of the current positioner
+        if (iter == grpIdYRel.end()) {
+            grpIdYRel.push_back({ currentGrpId, positioner->GetDrawingYRel() });
+        }
+        // else, adjust the min or max YRel of the pair if necessary
+        else {
+            if (m_place == STAFFREL_above) {
+                if (positioner->GetDrawingYRel() < (*iter).second) (*iter).second = positioner->GetDrawingYRel();
+            }
+            else {
+                if (positioner->GetDrawingYRel() > (*iter).second) (*iter).second = positioner->GetDrawingYRel();
+            }
+        }
+    }
+
+    if (std::find(m_classIds.begin(), m_classIds.end(), HARM) != m_classIds.end()) {
+        // Adjust the position of groups to ensure that any group is positioned further away
+        this->AdjustGroupsMonotone(staffAlignment, positioners, grpIdYRel);
+        // This already moves them, so the loop below is not necessary.
+    }
+    else {
+        // Now go through all the positioners again and adjust the YRel with the value of the pair
+        for (FloatingPositioner *positioner : positioners) {
+            int currentGrpId = positioner->GetObject()->GetDrawingGrpId();
+            auto iter = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+                [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+            // We must have found it
+            assert(iter != grpIdYRel.end());
+            positioner->SetDrawingYRel((*iter).second);
+        }
+    }
+
+    //  Now update the staffAlignment max overflow (above or below)
+    for (FloatingPositioner *positioner : positioners) {
+        if (m_place == STAFFREL_above) {
+            int overflowAbove = staffAlignment->CalcOverflowAbove(positioner);
+            staffAlignment->SetOverflowAbove(overflowAbove);
+        }
+        else {
+            int overflowBelow = staffAlignment->CalcOverflowBelow(positioner);
+            staffAlignment->SetOverflowBelow(overflowBelow);
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void AdjustFloatingPositionerGrpsFunctor::AdjustGroupsMonotone(const StaffAlignment *staffAlignment,
+    const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel) const
+{
+    if (grpIdYRel.empty()) {
+        return;
+    }
+
+    std::sort(grpIdYRel.begin(), grpIdYRel.end());
+
+    int yRel;
+    // The initial next position is the original position of the first group. Nothing will happen for it.
+    int nextYRel = grpIdYRel.at(0).second;
+
+    // For each grpId (sorted, see above), loop to find the highest / lowest position to put the next group
+    // Then move the next group (if not already higher or lower)
+    for (const auto &grp : grpIdYRel) {
+        // Check if the next group is not already higher or lower.
+        if (m_place == STAFFREL_above) {
+            yRel = (nextYRel < grp.second) ? nextYRel : grp.second;
+        }
+        else {
+            yRel = (nextYRel > grp.second) ? nextYRel : grp.second;
+        }
+        // Go through all the positioners, but filter by group
+        for (FloatingPositioner *positioner : positioners) {
+            int currentGrpId = positioner->GetObject()->GetDrawingGrpId();
+            // Not the grpId we are processing, skip it.
+            if (currentGrpId != grp.first) continue;
+            // Set its position
+            positioner->SetDrawingYRel(yRel);
+            // Then find the highest / lowest position for the next group
+            if (m_place == STAFFREL_above) {
+                int positionerY = yRel - positioner->GetContentY2()
+                    - (m_doc->GetTopMargin(positioner->GetObject()->GetClassId())
+                        * m_doc->GetDrawingUnit(staffAlignment->GetStaffSize()));
+                if (nextYRel > positionerY) {
+                    nextYRel = positionerY;
+                }
+            }
+            else {
+                int positionerY = yRel + positioner->GetContentY2()
+                    + (m_doc->GetBottomMargin(positioner->GetObject()->GetClassId())
+                        * m_doc->GetDrawingUnit(staffAlignment->GetStaffSize()));
+                if (nextYRel < positionerY) {
+                    nextYRel = positionerY;
+                }
+            }
+        }
+    }
 }
 
 } // namespace vrv
