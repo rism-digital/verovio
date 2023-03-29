@@ -794,11 +794,6 @@ public:
     virtual int AdjustFloatingPositionersBetween(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Adjust the position of all floating positionner that are grouped, staff by staff.
-     */
-    virtual int AdjustFloatingPositionerGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }

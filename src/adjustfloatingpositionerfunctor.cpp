@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "doc.h"
 #include "staff.h"
 #include "system.h"
 
@@ -152,8 +152,7 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
 {
     m_inBetween = false;
 
-    AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(m_doc);
-    Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
+    AdjustFloatingPositionerGrpsFunctor adjustFloatingPositionerGrps(m_doc);
 
     m_classId = LV;
     system->m_systemAligner.Process(*this);
@@ -188,13 +187,11 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = HAIRPIN;
     system->m_systemAligner.Process(*this);
 
-    adjustFloatingPositionerGrpsParams.m_classIds.clear();
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(HAIRPIN);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_above;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrps.SetClassIDs({ DYNAM, HAIRPIN });
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_above);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
     m_classId = BRACKETSPAN;
     system->m_systemAligner.Process(*this);
@@ -211,12 +208,11 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = DIR;
     system->m_systemAligner.Process(*this);
 
-    adjustFloatingPositionerGrpsParams.m_classIds.clear();
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DIR);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_above;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrps.SetClassIDs({ DIR });
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_above);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
     m_classId = TEMPO;
     system->m_systemAligner.Process(*this);
@@ -224,32 +220,29 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = PEDAL;
     system->m_systemAligner.Process(*this);
 
-    adjustFloatingPositionerGrpsParams.m_classIds.clear();
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(PEDAL);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_above;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrps.SetClassIDs({ PEDAL });
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_above);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
     m_classId = HARM;
     system->m_systemAligner.Process(*this);
 
-    adjustFloatingPositionerGrpsParams.m_classIds.clear();
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(HARM);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_above;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrps.SetClassIDs({ HARM });
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_above);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
     m_classId = ENDING;
     system->m_systemAligner.Process(*this);
 
-    adjustFloatingPositionerGrpsParams.m_classIds.clear();
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(ENDING);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_above;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_below;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrps.SetClassIDs({ ENDING });
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_above);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
     m_classId = REH;
     system->m_systemAligner.Process(*this);
@@ -269,10 +262,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     m_classId = OBJECT;
     system->m_systemAligner.Process(*this);
 
-    adjustFloatingPositionerGrpsParams.m_classIds.clear();
-    adjustFloatingPositionerGrpsParams.m_classIds.push_back(DYNAM);
-    adjustFloatingPositionerGrpsParams.m_place = STAFFREL_between;
-    system->m_systemAligner.Process(&adjustFloatingPositionerGrps, &adjustFloatingPositionerGrpsParams);
+    adjustFloatingPositionerGrps.SetClassIDs({ DYNAM });
+    adjustFloatingPositionerGrps.SetPlace(STAFFREL_between);
+    system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
     return FUNCTOR_SIBLINGS;
 }

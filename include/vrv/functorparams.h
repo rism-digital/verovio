@@ -180,27 +180,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustFloatingPositionerGrpsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a vector of the classId to group
- * member 1: the doc
- **/
-
-class AdjustFloatingPositionerGrpsParams : public FunctorParams {
-public:
-    AdjustFloatingPositionerGrpsParams(Doc *doc)
-    {
-        m_doc = doc;
-        m_place = STAFFREL_above;
-    }
-    std::vector<ClassId> m_classIds;
-    data_STAFFREL m_place;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustStaffOverlapParams
 //----------------------------------------------------------------------------
 

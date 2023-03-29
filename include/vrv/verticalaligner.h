@@ -12,7 +12,6 @@
 
 namespace vrv {
 
-class AdjustFloatingPositionerGrpsParams;
 class AttSpacing;
 class FloatingObject;
 class ScoreDef;
@@ -327,9 +326,6 @@ public:
     void FindAllIntersectionPoints(
         SegmentedLine &line, const BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin) const;
 
-    void ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
-        const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
-
     /**
      * Find overflow for the alignments taking bracket group elements into account
      */
@@ -363,11 +359,6 @@ public:
      * See Object::AdjustFloatingPositionersBetween
      */
     int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositionerGrps
-     */
-    int AdjustFloatingPositionerGrps(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyY
