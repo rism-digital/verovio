@@ -11249,10 +11249,21 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     // (so not an mRest), and update the visual duration
                     // of the rest because there will be invisible rests
                     // added in later measure(s).
-                    Rest *rest = new Rest;
-                    setLocationId(rest, trest);
-                    appendElement(layer, rest);
-                    convertRest(rest, trest, -1, staffindex);
+                    if (trest->find("yy") != std::string::npos) {
+                        Space *irest = new Space();
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, trest, *trest);
+                        }
+                        setLocationId(irest, trest);
+                        appendElement(elements, pointers, irest);
+                        convertRhythm(irest, trest);
+                    }
+                    else {
+                        Rest *rest = new Rest;
+                        setLocationId(rest, trest);
+                        appendElement(layer, rest);
+                        convertRest(rest, trest, -1, staffindex);
+                    }
                 }
                 else {
                     std::cerr << "Strange error for adding rest " << trest << std::endl;
