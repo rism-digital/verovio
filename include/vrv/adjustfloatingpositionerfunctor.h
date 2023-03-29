@@ -55,6 +55,56 @@ private:
     bool m_inBetween;
 };
 
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionerGrpsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts the position of all floating positioners that are grouped, staff by staff.
+ */
+class AdjustFloatingPositionerGrpsFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AdjustFloatingPositionerGrpsFunctor(Doc *doc);
+    virtual ~AdjustFloatingPositionerGrpsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Various setter
+     */
+    ///@{
+    void SetClassIDs(const std::vector<ClassId> &classIds) { m_classIds = classIds; }
+    void SetPlace(data_STAFFREL place) { m_place = place; }
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The class IDs to group
+    std::vector<ClassId> m_classIds;
+    // The place w.r.t. the staff
+    data_STAFFREL m_place;
+};
+
 } // namespace vrv
 
 #endif // __VRV_ADJUSTFLOATINGPOSITIONERFUNCTOR_H__

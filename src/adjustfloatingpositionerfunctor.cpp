@@ -277,4 +277,18 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     return FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionerGrpsFunctor
+//----------------------------------------------------------------------------
+
+AdjustFloatingPositionerGrpsFunctor::AdjustFloatingPositionerGrpsFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_place = STAFFREL_above;
+}
+
+FunctorCode AdjustFloatingPositionerGrpsFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
