@@ -48,11 +48,11 @@ FunctorCode AdjustArticFunctor::VisitArtic(Artic *artic)
         yOut = std::max(yIn, 0);
     }
     else {
+        const bool isStemDown = stem && (stem->GetDrawingStemDir() == STEMDIRECTION_down);
         int yBelowStem = m_parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY();
-        if (flag && stem && (stem->GetDrawingStemDir() == STEMDIRECTION_down))
-            yBelowStem += flag->GetStemDownNW(m_doc, staff->m_drawingStaffSize, false).y;
+        if (flag && isStemDown) yBelowStem += flag->GetStemDownNW(m_doc, staff->m_drawingStaffSize, false).y;
         yIn = std::min(yBelowStem, 0);
-        if (beam && beam->m_crossStaffContent && (beam->m_drawingPlace == BEAMPLACE_mixed)) {
+        if (beam && beam->m_crossStaffContent && (beam->m_drawingPlace == BEAMPLACE_mixed) && isStemDown) {
             yIn -= beam->m_beamWidthBlack;
         }
         yOut = std::min(yIn, -staffHeight);
