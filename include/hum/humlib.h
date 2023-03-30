@@ -10259,15 +10259,8 @@ class Tool_trillspell : public HumTool {
 
 	private:
 		bool m_xmark = false;
-
 };
-
-
 
 } // end of namespace hum
 
-
 #endif /* _HUMLIB_H_INCLUDED */
-
-
-
