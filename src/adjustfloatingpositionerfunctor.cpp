@@ -436,7 +436,7 @@ FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAl
 
         int diffY = centerYRel - positioner->GetDrawingYRel();
 
-        ArrayOfBoundingBoxes &overflowBoxes = staffAlignment->GetBBoxesAboveForModification();
+        const ArrayOfBoundingBoxes &overflowBoxes = staffAlignment->GetBBoxesAbove();
         auto i = overflowBoxes.begin();
         auto end = overflowBoxes.end();
         bool adjusted = false;

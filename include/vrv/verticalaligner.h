@@ -299,7 +299,7 @@ public:
     ///@}
 
     /**
-     * @name Modify the array of overflowing objects above or below
+     * @name Modify/Get the array of overflowing objects above or below
      */
     ///@{
     void AddBBoxAbove(BoundingBox *box) { m_overflowAboveBBoxes.push_back(box); }
@@ -308,6 +308,8 @@ public:
     void ClearBBoxesBelow() { m_overflowBelowBBoxes.clear(); }
     ArrayOfBoundingBoxes &GetBBoxesAboveForModification() { return m_overflowAboveBBoxes; }
     ArrayOfBoundingBoxes &GetBBoxesBelowForModification() { return m_overflowBelowBBoxes; }
+    const ArrayOfBoundingBoxes &GetBBoxesAbove() { return m_overflowAboveBBoxes; }
+    const ArrayOfBoundingBoxes &GetBBoxesBelow() { return m_overflowBelowBBoxes; }
     ///@}
 
     /**
