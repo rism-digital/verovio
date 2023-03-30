@@ -1444,6 +1444,12 @@
 		E7770F8729D0DA1F00A9BECF /* adjustslursfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */; };
 		E7770F8829D0DA2000A9BECF /* adjustslursfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */; };
 		E7770F8929D0DA2100A9BECF /* adjustslursfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */; };
+		E778BDAE29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E778BDAD29D5BD2F00672D51 /* adjuststaffoverlapfunctor.h */; };
+		E778BDAF29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E778BDAD29D5BD2F00672D51 /* adjuststaffoverlapfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E778BDB129D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E778BDB029D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp */; };
+		E778BDB229D5BD6600672D51 /* adjuststaffoverlapfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E778BDB029D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp */; };
+		E778BDB329D5BD6600672D51 /* adjuststaffoverlapfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E778BDB029D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp */; };
+		E778BDB429D5BD6700672D51 /* adjuststaffoverlapfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E778BDB029D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp */; };
 		E77C197D28CD317B00F5BADA /* calcdotsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */; };
 		E77C197E28CD317B00F5BADA /* calcdotsfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E77C198028CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */; };
@@ -2108,6 +2114,8 @@
 		E76A9D4929A74E4B0044682D /* adjustdotsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustdotsfunctor.cpp; path = src/adjustdotsfunctor.cpp; sourceTree = "<group>"; };
 		E7770F8229D0D9ED00A9BECF /* adjustslursfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustslursfunctor.h; path = include/vrv/adjustslursfunctor.h; sourceTree = "<group>"; };
 		E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustslursfunctor.cpp; path = src/adjustslursfunctor.cpp; sourceTree = "<group>"; };
+		E778BDAD29D5BD2F00672D51 /* adjuststaffoverlapfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjuststaffoverlapfunctor.h; path = include/vrv/adjuststaffoverlapfunctor.h; sourceTree = "<group>"; };
+		E778BDB029D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjuststaffoverlapfunctor.cpp; path = src/adjuststaffoverlapfunctor.cpp; sourceTree = "<group>"; };
 		E77C197C28CD317B00F5BADA /* calcdotsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcdotsfunctor.h; path = include/vrv/calcdotsfunctor.h; sourceTree = "<group>"; };
 		E77C197F28CD318B00F5BADA /* calcdotsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcdotsfunctor.cpp; path = src/calcdotsfunctor.cpp; sourceTree = "<group>"; };
 		E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcalignmentxposfunctor.h; path = include/vrv/calcalignmentxposfunctor.h; sourceTree = "<group>"; };
@@ -2976,6 +2984,8 @@
 				E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */,
 				E7770F8529D0DA1800A9BECF /* adjustslursfunctor.cpp */,
 				E7770F8229D0D9ED00A9BECF /* adjustslursfunctor.h */,
+				E778BDB029D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp */,
+				E778BDAD29D5BD2F00672D51 /* adjuststaffoverlapfunctor.h */,
 				E7D48C7329D21F250031D89D /* adjustyposfunctor.cpp */,
 				E7D48C7029D21EFA0031D89D /* adjustyposfunctor.h */,
 				E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */,
@@ -3094,6 +3104,7 @@
 				4DB3D8EC1F83D18300B5FC2B /* proport.h in Headers */,
 				4DEC4DDE21C8295700D1D273 /* lem.h in Headers */,
 				4DC12A5D1F73F888000440E9 /* pghead2.h in Headers */,
+				E778BDAE29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */,
 				E7E9C11A29B0EF9600CFCE2F /* adjusttempofunctor.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				E77C197D28CD317B00F5BADA /* calcdotsfunctor.h in Headers */,
@@ -3479,6 +3490,7 @@
 				BB4C4AB822A932A6001F6AF0 /* iomusxml.h in Headers */,
 				BB4C4B6622A932D7001F6AF0 /* multirest.h in Headers */,
 				4DACC9C52990F29A00B55913 /* atts_analytical.h in Headers */,
+				E778BDAF29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */,
 				BB4C4AC222A932B6001F6AF0 /* layer.h in Headers */,
 				4DA0EAE622BB77AF00A7EBEB /* editortoolkit.h in Headers */,
 				4DACC98D2990F29A00B55913 /* atts_usersymbols.h in Headers */,
@@ -3934,6 +3946,7 @@
 				4DACC9C92990F29A00B55913 /* attconverter.cpp in Sources */,
 				4D1694471E3A44F300569BF4 /* ligature.cpp in Sources */,
 				4D6122BF1F77E1E000FC90A0 /* rend.cpp in Sources */,
+				E778BDB229D5BD6600672D51 /* adjuststaffoverlapfunctor.cpp in Sources */,
 				E7883369299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,
 				4D1694481E3A44F300569BF4 /* controlelement.cpp in Sources */,
 				4DFB3E8623ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
@@ -4144,6 +4157,7 @@
 				4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4DF092A52497711800239195 /* phrase.cpp in Sources */,
 				E74A806428BC911E005274E7 /* findfunctor.cpp in Sources */,
+				E778BDB129D5BD6000672D51 /* adjuststaffoverlapfunctor.cpp in Sources */,
 				403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
@@ -4471,6 +4485,7 @@
 				4DACC9CA2990F29A00B55913 /* attconverter.cpp in Sources */,
 				E788336A299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */,
 				4D1BE7701C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
+				E778BDB329D5BD6600672D51 /* adjuststaffoverlapfunctor.cpp in Sources */,
 				4DFB3E8723ABDFC200D688C7 /* pitchinflection.cpp in Sources */,
 				4DD11DC42240E78B00A405D8 /* c_wrapper.cpp in Sources */,
 				40DA9C3620905CE8006BED92 /* ioabc.cpp in Sources */,
@@ -4740,6 +4755,7 @@
 				4DACC9CB2990F29A00B55913 /* attconverter.cpp in Sources */,
 				BB4C4B4D22A932D7001F6AF0 /* dot.cpp in Sources */,
 				BB4C4B1722A932CF001F6AF0 /* controlelement.cpp in Sources */,
+				E778BDB429D5BD6700672D51 /* adjuststaffoverlapfunctor.cpp in Sources */,
 				BB4C4ACF22A932B6001F6AF0 /* score.cpp in Sources */,
 				BB4C4B0122A932BC001F6AF0 /* unclear.cpp in Sources */,
 				BB4C4AC322A932B6001F6AF0 /* mdiv.cpp in Sources */,
