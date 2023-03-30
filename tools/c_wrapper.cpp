@@ -301,4 +301,11 @@ const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getOptionUsageString(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetOptionUsageString());
+    return tk->GetCString();
+}
+
 } // extern C
