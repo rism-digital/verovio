@@ -70606,7 +70606,7 @@ void Tool_deg::ScaleDegree::analyzeTokenScaleDegrees(void) {
 
 	// Only processing non-null data from here.
 	m_subtokens = m_linkedKernToken->getSubtokens();
-	int subtokCount = m_subtokens.size();
+	int subtokCount = (int)m_subtokens.size();
 
 	m_degrees.resize(subtokCount);
 	fill(m_degrees.begin(), m_degrees.end(), -1);
@@ -70868,7 +70868,7 @@ string Tool_deg::ScaleDegree::generateDegDataToken(void) const {
 		return ".";
 	}
 
-	int newCount = nontied.size();
+	int newCount = (int)nontied.size();
 	string output;
 	for (int i=0; i<newCount; i++) {
 		output += nontied[i];
@@ -78724,7 +78724,7 @@ vector<FiguredBassNumber*> Tool_fb::getAbbreviatedNumbers(const vector<FiguredBa
 	});
 
 	if (it != mappings.end()) {
-		int index = it - mappings.begin();
+		int index = int(it - mappings.begin());
 		FiguredBassAbbreviationMapping* abbr = mappings[index];
 		bool aQ = m_accidentalsQ;
 		// Store numbers to display by the abbreviation mapping in abbreviatedNumbers
