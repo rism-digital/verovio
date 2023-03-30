@@ -639,19 +639,6 @@ int System::AdjustStaffOverlap(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustFloatingPositionersBetween(FunctorParams *functorParams)
-{
-    AdjustFloatingPositionersBetweenParams *params
-        = vrv_params_cast<AdjustFloatingPositionersBetweenParams *>(functorParams);
-    assert(params);
-
-    params->m_previousStaffPositioners = NULL;
-    params->m_previousStaffAlignment = NULL;
-    m_systemAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);

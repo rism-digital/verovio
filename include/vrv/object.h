@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Adjust the position of floating positionners placed between staves
-     */
-    virtual int AdjustFloatingPositionersBetween(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
     virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
