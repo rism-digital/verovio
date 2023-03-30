@@ -24,6 +24,7 @@
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
 #include "adjustslursfunctor.h"
+#include "adjuststaffoverlapfunctor.h"
 #include "adjustsylspacingfunctor.h"
 #include "adjusttempofunctor.h"
 #include "adjusttupletsxfunctor.h"
@@ -530,10 +531,9 @@ void Page::LayOutVertically()
     AdjustFloatingPositionersFunctor adjustFloatingPositioners(doc);
     this->Process(adjustFloatingPositioners);
 
-    // Adjust the overlap of the staff alignments by looking at the overflow bounding boxes params.clear();
-    Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
-    AdjustStaffOverlapParams adjustStaffOverlapParams(doc, &adjustStaffOverlap);
-    this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
+    // Adjust the overlap of the staff alignments by looking at the overflow bounding boxes
+    AdjustStaffOverlapFunctor adjustStaffOverlap(doc);
+    this->Process(adjustStaffOverlap);
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff

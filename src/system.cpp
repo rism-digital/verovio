@@ -628,17 +628,6 @@ int System::JustifyY(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustStaffOverlap(FunctorParams *functorParams)
-{
-    AdjustStaffOverlapParams *params = vrv_params_cast<AdjustStaffOverlapParams *>(functorParams);
-    assert(params);
-
-    params->m_previous = NULL;
-    m_systemAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);

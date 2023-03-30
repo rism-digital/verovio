@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
-     */
-    virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the Y position of tuplet brackets and num
      */
     virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }

@@ -353,11 +353,6 @@ public:
     int AdjustYPos(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustStaffOverlap
-     */
-    int AdjustStaffOverlap(FunctorParams *functorParams) override;
-
-    /**
      * See Object::JustifyY
      */
     int JustifyY(FunctorParams *functorParams) override;

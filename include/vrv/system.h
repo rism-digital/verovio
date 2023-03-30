@@ -205,11 +205,6 @@ public:
     int JustifyY(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustStaffOverlap
-     */
-    int AdjustStaffOverlap(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffPages
      */
     int CastOffPages(FunctorParams *functorParams) override;
