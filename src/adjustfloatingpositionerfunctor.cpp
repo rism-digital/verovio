@@ -403,4 +403,23 @@ void AdjustFloatingPositionerGrpsFunctor::AdjustGroupsMonotone(const StaffAlignm
     }
 }
 
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionersBetweenFunctor
+//----------------------------------------------------------------------------
+
+AdjustFloatingPositionersBetweenFunctor::AdjustFloatingPositionersBetweenFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_previousStaffAlignment = NULL;
+}
+
+FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

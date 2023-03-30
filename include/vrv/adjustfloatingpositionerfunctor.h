@@ -109,6 +109,47 @@ private:
     data_STAFFREL m_place;
 };
 
+//----------------------------------------------------------------------------
+// AdjustFloatingPositionersBetweenFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts the position of floating positioners placed between staves.
+ */
+class AdjustFloatingPositionersBetweenFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AdjustFloatingPositionersBetweenFunctor(Doc *doc);
+    virtual ~AdjustFloatingPositionersBetweenFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The previous staff alignment
+    StaffAlignment *m_previousStaffAlignment;
+};
+
 } // namespace vrv
 
 #endif // __VRV_ADJUSTFLOATINGPOSITIONERFUNCTOR_H__
