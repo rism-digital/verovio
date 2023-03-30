@@ -414,12 +414,66 @@ AdjustFloatingPositionersBetweenFunctor::AdjustFloatingPositionersBetweenFunctor
 
 FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
 {
-    return FUNCTOR_CONTINUE;
+    // First staff - nothing to do
+    if (m_previousStaffAlignment == NULL) {
+        m_previousStaffAlignment = staffAlignment;
+        return FUNCTOR_SIBLINGS;
+    }
+    assert(m_previousStaffAlignment);
+
+    int dist = m_previousStaffAlignment->GetYRel() - staffAlignment->GetYRel();
+    dist -= m_previousStaffAlignment->GetStaffHeight();
+    int centerYRel = dist / 2 + m_previousStaffAlignment->GetStaffHeight();
+
+    for (FloatingPositioner *positioner : m_previousStaffAlignment->GetFloatingPositioners()) {
+        assert(positioner->GetObject());
+        if (!positioner->GetObject()->Is({ DIR, DYNAM, HAIRPIN, TEMPO })) continue;
+
+        if (positioner->GetDrawingPlace() != STAFFREL_between) continue;
+
+        // Skip if no content bounding box is available
+        if (!positioner->HasContentBB()) continue;
+
+        int diffY = centerYRel - positioner->GetDrawingYRel();
+
+        ArrayOfBoundingBoxes &overflowBoxes = staffAlignment->GetBBoxesAboveForModification();
+        auto i = overflowBoxes.begin();
+        auto end = overflowBoxes.end();
+        bool adjusted = false;
+        while (i != end) {
+
+            // find all the overflowing elements from the staff that overlap horizontally
+            i = std::find_if(
+                i, end, [positioner](BoundingBox *elem) { return positioner->HorizontalContentOverlap(elem); });
+            if (i != end) {
+                // update the yRel accordingly
+                int y = positioner->GetSpaceBelow(m_doc, staffAlignment, *i);
+                if (y < diffY) {
+                    diffY = y;
+                    adjusted = true;
+                }
+                ++i;
+            }
+        }
+        if (!adjusted) {
+            positioner->SetDrawingYRel(centerYRel);
+        }
+        else {
+            positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
+        }
+    }
+
+    m_previousStaffAlignment = staffAlignment;
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitSystem(System *system)
 {
-    return FUNCTOR_CONTINUE;
+    m_previousStaffAlignment = NULL;
+    system->m_systemAligner.Process(*this);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
