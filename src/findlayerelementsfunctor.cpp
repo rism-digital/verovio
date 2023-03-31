@@ -112,9 +112,16 @@ FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement
     if ((!m_allLayersButCurrent && (currentLayer != m_layer)) || (m_allLayersButCurrent && (currentLayer == m_layer))) {
         return FUNCTOR_SIBLINGS;
     }
-    if (!currentLayer || layerElement->IsScoreDefElement() || layerElement->Is(MREST)) return FUNCTOR_SIBLINGS;
-    if (!layerElement->GetDurationInterface() || layerElement->Is({ MSPACE, SPACE }) || layerElement->HasSameasLink())
+    if (!currentLayer || layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    if (layerElement->HasSameasLink()) return FUNCTOR_CONTINUE;
+
+    if (layerElement->Is(MREST)) {
+        m_elements.push_back(layerElement);
         return FUNCTOR_CONTINUE;
+    }
+
+    if (!layerElement->GetDurationInterface() || layerElement->Is({ MSPACE, SPACE })) return FUNCTOR_CONTINUE;
 
     const double duration = !layerElement->GetFirstAncestor(CHORD)
         ? layerElement->GetAlignmentDuration(m_mensur, m_meterSig)

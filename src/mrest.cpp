@@ -119,11 +119,14 @@ int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) cons
             int loc = rest->GetDrawingLoc();
             locations.push_back(loc);
         }
+        else if (element->Is(MREST)) {
+            locations.push_back(4);
+        }
     }
     // if there are no other elements - just return default location
     if (locations.empty()) return defaultLocation;
 
-    const int locAdjust = isTopLayer ? 3 : -2;
+    const int locAdjust = isTopLayer ? 4 : -3;
     int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
                                   : *std::min_element(locations.begin(), locations.end());
     extremePoint += locAdjust;
