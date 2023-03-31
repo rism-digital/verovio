@@ -36,6 +36,7 @@ const char *vrvToolkit_getMEI(void *tkPtr, const char *options);
 const char *vrvToolkit_getMIDIValuesForElement(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getNotatedIdForElement(void *tkPtr, const char *xmlId);
 const char *vrvToolkit_getOptions(void *tkPtr);
+const char *vrvToolkit_getOptionUsageString(void *tkPtr);
 int vrvToolkit_getPageCount(void *tkPtr);
 int vrvToolkit_getPageWithElement(void *tkPtr, const char *xmlId);
 double vrvToolkit_getTimeForElement(void *tkPtr, const char *xmlId);
