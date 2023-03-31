@@ -44,7 +44,19 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Adjust tuplet relative positioning based on possible overlaps
+     */
+    ///@{
+    void AdjustTupletBracketY(Tuplet *tuplet, const Staff *staff) const;
+    void AdjustTupletNumY(Tuplet *tuplet, const Staff *staff) const;
+    ///@}
+
+    /**
+     * Adjust tuplet relative positioning based on beams
+     */
+    void AdjustTupletBracketBeamY(Tuplet *tuplet, TupletBracket *bracket, const Beam *beam, const Staff *staff) const;
+
 public:
     //
 private:

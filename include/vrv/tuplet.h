@@ -101,6 +101,17 @@ public:
      */
     void GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const;
 
+    /**
+     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
+     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
+     */
+    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
+
+    /**
+     * Check whether tuplet number has valid positioning staffwise
+     */
+    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
+
     //----------//
     // Functors //
     //----------//
@@ -146,17 +157,6 @@ private:
      * Adjust tuplet relative positioning based on possible overlaps
      */
     void AdjustTupletNumY(const Doc *doc, const Staff *staff);
-
-    /**
-     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
-     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
-     */
-    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
-
-    /**
-     * Check whether tuplet number has valid postioning staffwise
-     */
-    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
 
 public:
     //
