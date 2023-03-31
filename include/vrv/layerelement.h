@@ -344,11 +344,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AdjustTupletNumOverlap
-     */
-    int AdjustTupletNumOverlap(FunctorParams *functorParams) const override;
-
-    /**
      * See Object::AdjustXRelForTranscription
      */
     int AdjustXRelForTranscription(FunctorParams *functorParams) override;

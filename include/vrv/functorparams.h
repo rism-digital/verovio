@@ -156,37 +156,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustTupletNumOverlapParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: tupletNum relative position for which is being calculatied
- * member 1: drawing position of tupletNum
- * member 2: margin for tupletNum vertical overlap
- * member 3: staff relevant to positioning of tuplet
- * member 4: resulting relative Y for the tupletNum
- **/
-class AdjustTupletNumOverlapParams : public FunctorParams {
-public:
-    AdjustTupletNumOverlapParams(const TupletNum *tupletNum, const Staff *staff)
-    {
-        m_tupletNum = tupletNum;
-        m_drawingNumPos = STAFFREL_basic_NONE;
-        m_horizontalMargin = 0;
-        m_verticalMargin = 0;
-        m_staff = staff;
-        m_yRel = 0;
-    }
-
-    const TupletNum *m_tupletNum;
-    data_STAFFREL_basic m_drawingNumPos;
-    int m_horizontalMargin;
-    int m_verticalMargin;
-    const Staff *m_staff;
-    int m_yRel;
-};
-
-//----------------------------------------------------------------------------
 // AdjustYPosParams
 //----------------------------------------------------------------------------
 

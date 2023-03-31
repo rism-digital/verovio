@@ -77,7 +77,7 @@ public:
      */
     ///@{
     AdjustTupletNumOverlapFunctor(
-        const TupletNum *tupletNum, const Staff *staff, data_STAFFREL_basic drawingNumPos, int yRel);
+        const TupletNum *tupletNum, const Staff *staff, data_STAFFREL_basic drawingNumPos, int drawingY);
     virtual ~AdjustTupletNumOverlapFunctor() = default;
     ///@}
 
@@ -95,9 +95,9 @@ public:
     ///@}
 
     /*
-     * Getter for the relative Y
+     * Getter for the drawing Y
      */
-    int GetYRel() const { return m_yRel; }
+    int GetDrawingY() const { return m_drawingY; }
 
     /*
      * Functor interface
@@ -122,8 +122,8 @@ private:
     int m_verticalMargin;
     // The staff relevant for positioning the tuplet
     const Staff *m_staff;
-    // The resulting relative Y
-    int m_yRel;
+    // The drawing Y position
+    int m_drawingY;
 };
 
 } // namespace vrv

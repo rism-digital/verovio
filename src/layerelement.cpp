@@ -1327,39 +1327,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     return { shift, isInUnison };
 }
 
-int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams) const
-{
-    AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
-    assert(params);
-
-    if (!this->Is({ ARTIC, ACCID, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !this->HasSelfBB()) return FUNCTOR_CONTINUE;
-
-    if (this->Is({ CHORD, NOTE, REST })
-        && ((m_crossStaff || (this->GetFirstAncestor(STAFF) != params->m_staff)) && (m_crossStaff != params->m_staff)))
-        return FUNCTOR_SIBLINGS;
-
-    if (!params->m_tupletNum->HorizontalSelfOverlap(this, params->m_horizontalMargin)
-        && !params->m_tupletNum->VerticalSelfOverlap(this, params->m_verticalMargin)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    int stemAdjust = 0;
-    if (this->Is(STEM)) {
-        const Stem *stem = vrv_cast<const Stem *>(this);
-        stemAdjust = stem->GetDrawingStemAdjust();
-    }
-    if (params->m_drawingNumPos == STAFFREL_basic_above) {
-        int dist = this->GetSelfTop();
-        if (params->m_yRel < dist) params->m_yRel = dist + stemAdjust;
-    }
-    else {
-        int dist = this->GetSelfBottom();
-        if (params->m_yRel > dist) params->m_yRel = dist + stemAdjust;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;

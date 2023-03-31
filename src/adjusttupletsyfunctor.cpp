@@ -12,7 +12,6 @@
 #include "doc.h"
 #include "elementpart.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "staff.h"
 #include "stem.h"
 #include "tuplet.h"
@@ -145,13 +144,10 @@ void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff)
 
     // Calculate relative Y for the tupletNum
     const int margin = 2 * m_doc->GetDrawingUnit(staffSize);
-    AdjustTupletNumOverlapParams adjustTupletNumOverlapParams(tupletNum, tupletNumStaff);
-    adjustTupletNumOverlapParams.m_horizontalMargin = margin;
-    adjustTupletNumOverlapParams.m_drawingNumPos = numPos;
-    adjustTupletNumOverlapParams.m_yRel = tupletNum->GetDrawingY();
-    Functor adjustTupletNumOverlap(&Object::AdjustTupletNumOverlap);
-    tuplet->Process(&adjustTupletNumOverlap, &adjustTupletNumOverlapParams);
-    int yRel = adjustTupletNumOverlapParams.m_yRel - yReference;
+    AdjustTupletNumOverlapFunctor adjustTupletNumOverlap(tupletNum, tupletNumStaff, numPos, tupletNum->GetDrawingY());
+    adjustTupletNumOverlap.SetHorizontalMargin(margin);
+    tuplet->Process(adjustTupletNumOverlap);
+    int yRel = adjustTupletNumOverlap.GetDrawingY() - yReference;
 
     // If we have a beam, see if we can move it to more appropriate position
     if (beam && (!tuplet->m_crossStaff || isPartialBeamTuplet) && !tuplet->FindDescendantByType(ARTIC)) {
@@ -288,14 +284,14 @@ void AdjustTupletsYFunctor::AdjustTupletBracketBeamY(
 //----------------------------------------------------------------------------
 
 AdjustTupletNumOverlapFunctor::AdjustTupletNumOverlapFunctor(
-    const TupletNum *tupletNum, const Staff *staff, data_STAFFREL_basic drawingNumPos, int yRel)
+    const TupletNum *tupletNum, const Staff *staff, data_STAFFREL_basic drawingNumPos, int drawingY)
 {
     m_tupletNum = tupletNum;
     m_drawingNumPos = drawingNumPos;
     m_horizontalMargin = 0;
     m_verticalMargin = 0;
     m_staff = staff;
-    m_yRel = yRel;
+    m_drawingY = drawingY;
 }
 
 FunctorCode AdjustTupletNumOverlapFunctor::VisitLayerElement(const LayerElement *layerElement)
@@ -320,11 +316,11 @@ FunctorCode AdjustTupletNumOverlapFunctor::VisitLayerElement(const LayerElement 
     }
     if (m_drawingNumPos == STAFFREL_basic_above) {
         int dist = layerElement->GetSelfTop();
-        if (m_yRel < dist) m_yRel = dist + stemAdjust;
+        if (m_drawingY < dist) m_drawingY = dist + stemAdjust;
     }
     else {
         int dist = layerElement->GetSelfBottom();
-        if (m_yRel > dist) m_yRel = dist + stemAdjust;
+        if (m_drawingY > dist) m_drawingY = dist + stemAdjust;
     }
 
     return FUNCTOR_CONTINUE;
