@@ -11,6 +11,7 @@
 
 #include "doc.h"
 #include "elementpart.h"
+#include "floatingobject.h"
 #include "ftrem.h"
 #include "staff.h"
 #include "stem.h"
@@ -324,6 +325,65 @@ FunctorCode AdjustTupletNumOverlapFunctor::VisitLayerElement(const LayerElement 
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// AdjustTupletWithSlursFunctor
+//----------------------------------------------------------------------------
+
+AdjustTupletWithSlursFunctor::AdjustTupletWithSlursFunctor(Doc *doc) : DocFunctor(doc) {}
+
+FunctorCode AdjustTupletWithSlursFunctor::VisitTuplet(Tuplet *tuplet)
+{
+    TupletBracket *tupletBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
+    if (!tupletBracket || tuplet->GetInnerSlurs().empty()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    TupletNum *tupletNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
+
+    const Staff *staff = tuplet->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+    const int margin = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    const data_STAFFREL_basic bracketPos = tuplet->GetDrawingBracketPos();
+    const int sign = (bracketPos == STAFFREL_basic_above) ? 1 : -1;
+
+    const int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft();
+    const int xRight = tuplet->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight();
+    const int yLeft = tupletBracket->GetDrawingYLeft();
+    const int yRight = tupletBracket->GetDrawingYRight();
+    const double tupletSlope = double(yRight - yLeft) / double(xRight - xLeft);
+    int tupletShift = 0;
+
+    for (auto curve : tuplet->GetInnerSlurs()) {
+        const int shift = tupletBracket->Intersects(curve, CONTENT, margin) * sign;
+        if (shift > 0) {
+            // The shift is calculated from the entire bounding box of the tuplet bracket.
+            // If the bracket is angled and the slur is short, then this might be too coarse.
+            // We reduce the shift by the height of the subbox that cannot be hit.
+            Point points[4];
+            curve->GetPoints(points);
+            const int curveXLeft = std::max(points[0].x, xLeft);
+            const int curveXRight = std::min(points[3].x, xRight);
+            const int curveYLeft = tupletSlope * (curveXLeft - xLeft) + yLeft;
+            const int curveYRight = tupletSlope * (curveXRight - xLeft) + yLeft;
+
+            int reduction = 0;
+            if (bracketPos == STAFFREL_basic_above) {
+                reduction = std::min(curveYLeft, curveYRight) - std::min(yLeft, yRight);
+            }
+            else {
+                reduction = std::max(yLeft, yRight) - std::max(curveYLeft, curveYRight);
+            }
+            tupletShift = std::max(shift - reduction, tupletShift);
+        }
+    }
+
+    // Apply the tuplet shift from slurs
+    if (tupletShift) {
+        tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + sign * tupletShift);
+        if (tupletNum) tupletNum->SetDrawingYRel(tupletNum->GetDrawingYRel() + sign * tupletShift);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

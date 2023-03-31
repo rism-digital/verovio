@@ -126,6 +126,45 @@ private:
     int m_drawingY;
 };
 
+//----------------------------------------------------------------------------
+// AdjustTupletWithSlursFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts the Y position of tuplets with inner slurs.
+ */
+class AdjustTupletWithSlursFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AdjustTupletWithSlursFunctor(Doc *doc);
+    virtual ~AdjustTupletWithSlursFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitTuplet(Tuplet *tuplet) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_ADJUSTTUPLETSYFUNCTOR_H__
