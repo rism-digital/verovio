@@ -789,11 +789,6 @@ public:
     ///@{
 
     /**
-     * Calculate the Y position of tuplet brackets and num
-     */
-    virtual int AdjustTupletsY(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the Y relative position of tupletNum based on overlaps with other elements
      */
     virtual int AdjustTupletNumOverlap(FunctorParams *) const { return FUNCTOR_CONTINUE; }

@@ -28,6 +28,7 @@
 #include "adjustsylspacingfunctor.h"
 #include "adjusttempofunctor.h"
 #include "adjusttupletsxfunctor.h"
+#include "adjusttupletsyfunctor.h"
 #include "adjustxoverflowfunctor.h"
 #include "adjustxposfunctor.h"
 #include "adjustyposfunctor.h"
@@ -503,9 +504,8 @@ void Page::LayOutVertically()
     this->Process(adjustBeams);
 
     // Adjust the position of the tuplets
-    FunctorDocParams adjustTupletsYParams(doc);
-    Functor adjustTupletsY(&Object::AdjustTupletsY);
-    this->Process(&adjustTupletsY, &adjustTupletsYParams);
+    AdjustTupletsYFunctor adjustTupletsY(doc);
+    this->Process(adjustTupletsY);
 
     // Adjust the position of the slurs
     AdjustSlursFunctor adjustSlurs(doc);

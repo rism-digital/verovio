@@ -127,11 +127,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustTupletsY
-     */
-    int AdjustTupletsY(FunctorParams *functorParams) override;
-
-    /**
      * See Object::AdjustTupletWithSlurs
      */
     int AdjustTupletWithSlurs(FunctorParams *functorParams) override;
@@ -143,21 +138,7 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletBracketY(const Doc *doc, const Staff *staff);
-
-    /**
-     * Adjust tuplet relative positioning for tuplets based on beams
-     */
-    void AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam);
-
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletNumY(const Doc *doc, const Staff *staff);
-
+    //
 public:
     //
 private:
