@@ -335,8 +335,8 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     double duration = 0.0;
     // For the sake of counting number of layers consider only current measure. If first and last elements' layers are
     // different, take only time within current measure to run GetLayerCountInTimeSpan.
-    const Layer *lastLayer = vrv_cast<const Layer *>(last->GetFirstAncestor(LAYER));
-    if (this == lastLayer) {
+    const Measure *lastMeasure = vrv_cast<const Measure *>(last->GetFirstAncestor(MEASURE));
+    if (lastMeasure == measure) {
         duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
     }
     else {
