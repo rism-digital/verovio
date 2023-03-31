@@ -63,6 +63,69 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// AdjustTupletNumOverlapFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class calculates the Y relative position of tupletNum based on overlaps with other elements.
+ */
+class AdjustTupletNumOverlapFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AdjustTupletNumOverlapFunctor(
+        const TupletNum *tupletNum, const Staff *staff, data_STAFFREL_basic drawingNumPos, int yRel);
+    virtual ~AdjustTupletNumOverlapFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Setter for the margins
+     */
+    ///@{
+    void SetHorizontalMargin(int margin) { m_horizontalMargin = margin; }
+    void SetVerticalMargin(int margin) { m_verticalMargin = margin; }
+    ///@}
+
+    /*
+     * Getter for the relative Y
+     */
+    int GetYRel() const { return m_yRel; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The tupletNum for which the relative position is calculated
+    const TupletNum *m_tupletNum;
+    // The drawing position of tupletNum
+    data_STAFFREL_basic m_drawingNumPos;
+    // The margins for tupletNum overlap
+    int m_horizontalMargin;
+    int m_verticalMargin;
+    // The staff relevant for positioning the tuplet
+    const Staff *m_staff;
+    // The resulting relative Y
+    int m_yRel;
+};
+
 } // namespace vrv
 
 #endif // __VRV_ADJUSTTUPLETSYFUNCTOR_H__

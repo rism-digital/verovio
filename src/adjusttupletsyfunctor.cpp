@@ -14,6 +14,7 @@
 #include "ftrem.h"
 #include "functorparams.h"
 #include "staff.h"
+#include "stem.h"
 #include "tuplet.h"
 
 //----------------------------------------------------------------------------
@@ -280,6 +281,53 @@ void AdjustTupletsYFunctor::AdjustTupletBracketBeamY(
             bracket->SetDrawingYRelRight(bracket->GetDrawingYRelRight() - doubleUnit / 4);
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// AdjustTupletNumOverlapFunctor
+//----------------------------------------------------------------------------
+
+AdjustTupletNumOverlapFunctor::AdjustTupletNumOverlapFunctor(
+    const TupletNum *tupletNum, const Staff *staff, data_STAFFREL_basic drawingNumPos, int yRel)
+{
+    m_tupletNum = tupletNum;
+    m_drawingNumPos = drawingNumPos;
+    m_horizontalMargin = 0;
+    m_verticalMargin = 0;
+    m_staff = staff;
+    m_yRel = yRel;
+}
+
+FunctorCode AdjustTupletNumOverlapFunctor::VisitLayerElement(const LayerElement *layerElement)
+{
+    if (!layerElement->Is({ ACCID, ARTIC, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !layerElement->HasSelfBB())
+        return FUNCTOR_CONTINUE;
+
+    if (layerElement->Is({ CHORD, NOTE, REST })
+        && ((layerElement->m_crossStaff || (layerElement->GetFirstAncestor(STAFF) != m_staff))
+            && (layerElement->m_crossStaff != m_staff)))
+        return FUNCTOR_SIBLINGS;
+
+    if (!m_tupletNum->HorizontalSelfOverlap(layerElement, m_horizontalMargin)
+        && !m_tupletNum->VerticalSelfOverlap(layerElement, m_verticalMargin)) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    int stemAdjust = 0;
+    if (layerElement->Is(STEM)) {
+        const Stem *stem = vrv_cast<const Stem *>(layerElement);
+        stemAdjust = stem->GetDrawingStemAdjust();
+    }
+    if (m_drawingNumPos == STAFFREL_basic_above) {
+        int dist = layerElement->GetSelfTop();
+        if (m_yRel < dist) m_yRel = dist + stemAdjust;
+    }
+    else {
+        int dist = layerElement->GetSelfBottom();
+        if (m_yRel > dist) m_yRel = dist + stemAdjust;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
