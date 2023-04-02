@@ -1486,6 +1486,12 @@
 		E7883369299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
 		E788336A299500DC00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
 		E788336B299500DD00D44B01 /* calcspanningbeamspansfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */; };
+		E78F204729D98CFC00CD5910 /* adjustxrelfortranscriptionfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E78F204629D98CD400CD5910 /* adjustxrelfortranscriptionfunctor.h */; };
+		E78F204829D98CFD00CD5910 /* adjustxrelfortranscriptionfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E78F204629D98CD400CD5910 /* adjustxrelfortranscriptionfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E78F204A29D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E78F204929D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp */; };
+		E78F204B29D98D2B00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E78F204929D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp */; };
+		E78F204C29D98D2C00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E78F204929D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp */; };
+		E78F204D29D98D2D00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E78F204929D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp */; };
 		E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; };
 		E790165A298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E786CD0E298AA772009BAC58 /* calcalignmentxposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */; };
@@ -2135,6 +2141,8 @@
 		E788335F2994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcchordnoteheadsfunctor.cpp; path = src/calcchordnoteheadsfunctor.cpp; sourceTree = "<group>"; };
 		E78833642995007200D44B01 /* calcspanningbeamspansfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcspanningbeamspansfunctor.h; path = include/vrv/calcspanningbeamspansfunctor.h; sourceTree = "<group>"; };
 		E7883367299500D600D44B01 /* calcspanningbeamspansfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcspanningbeamspansfunctor.cpp; path = src/calcspanningbeamspansfunctor.cpp; sourceTree = "<group>"; };
+		E78F204629D98CD400CD5910 /* adjustxrelfortranscriptionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustxrelfortranscriptionfunctor.h; path = include/vrv/adjustxrelfortranscriptionfunctor.h; sourceTree = "<group>"; };
+		E78F204929D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustxrelfortranscriptionfunctor.cpp; path = src/adjustxrelfortranscriptionfunctor.cpp; sourceTree = "<group>"; };
 		E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcalignmentxposfunctor.cpp; path = src/calcalignmentxposfunctor.cpp; sourceTree = "<group>"; };
 		E7908E9E298582090004C1F9 /* alignfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alignfunctor.h; path = include/vrv/alignfunctor.h; sourceTree = "<group>"; };
 		E7908EA12985829F0004C1F9 /* alignfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignfunctor.cpp; path = src/alignfunctor.cpp; sourceTree = "<group>"; };
@@ -2957,6 +2965,8 @@
 				E7231E0129B64B08000A2BF3 /* adjustxoverflowfunctor.h */,
 				E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */,
 				E7A3790929BB41CD00E3BA98 /* adjustxposfunctor.h */,
+				E78F204929D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp */,
+				E78F204629D98CD400CD5910 /* adjustxrelfortranscriptionfunctor.h */,
 				E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */,
 				E7ED8A6429C1119000735875 /* cachehorizontallayoutfunctor.h */,
 				E790165E298BCB27008FDB4E /* calcalignmentxposfunctor.cpp */,
@@ -3084,6 +3094,7 @@
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
 				4DACC9A02990F29A00B55913 /* atts_gestural.h in Headers */,
 				4DACC9CC2990F29A00B55913 /* attclasses.h in Headers */,
+				E78F204729D98CFC00CD5910 /* adjustxrelfortranscriptionfunctor.h in Headers */,
 				4DBDD6792939E1D1009EC466 /* symboldef.h in Headers */,
 				35FDEBCE24B6DBC100AC1696 /* fing.h in Headers */,
 				4DACC9BC2990F29A00B55913 /* atts_harmony.h in Headers */,
@@ -3556,6 +3567,7 @@
 				BB4C4B5622A932D7001F6AF0 /* keysig.h in Headers */,
 				BB4C4B1022A932C8001F6AF0 /* ending.h in Headers */,
 				4DACC9BF2990F29A00B55913 /* atts_midi.h in Headers */,
+				E78F204829D98CFD00CD5910 /* adjustxrelfortranscriptionfunctor.h in Headers */,
 				BB4C4BBD22A932FC001F6AF0 /* MidiEventList.h in Headers */,
 				BB4C4BBB22A932FC001F6AF0 /* MidiEvent.h in Headers */,
 				BB4C4B4A22A932D7001F6AF0 /* clef.h in Headers */,
@@ -3821,6 +3833,7 @@
 				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
 				BD6E5C3D290007C90039B0F1 /* graphic.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
+				E78F204B29D98D2B00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
@@ -4031,6 +4044,7 @@
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
 				4DC12A781F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4DA0EAEE22BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
+				E78F204A29D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				4DACC9FC2990F29A00B55913 /* atts_fingering.cpp in Sources */,
 				4DC12A631F73F898000440E9 /* pghead2.cpp in Sources */,
 				4DACC9EC2990F29A00B55913 /* atts_shared.cpp in Sources */,
@@ -4362,6 +4376,7 @@
 				4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				40BD9391206B950B0037BF8E /* annot.cpp in Sources */,
 				4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */,
+				E78F204C29D98D2C00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */,
@@ -4633,6 +4648,7 @@
 				402492BF232E70000017BB75 /* gracegrp.cpp in Sources */,
 				BD0562392518CD20004057EB /* beamspan.cpp in Sources */,
 				BB4C4B3D22A932D7001F6AF0 /* artic.cpp in Sources */,
+				E78F204D29D98D2D00CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
 				E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,
