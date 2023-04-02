@@ -19,6 +19,43 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AdjustYPosFunctor
+//----------------------------------------------------------------------------
+
+AdjustYPosFunctor::AdjustYPosFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_cumulatedShift = 0;
+}
+
+FunctorCode AdjustYPosFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
+{
+    const int defaultSpacing = staffAlignment->GetMinimumSpacing(m_doc);
+    int minSpacing = staffAlignment->CalcMinimumRequiredSpacing(m_doc);
+    minSpacing = std::max(staffAlignment->GetRequestedSpacing(), minSpacing);
+
+    if (minSpacing > defaultSpacing) {
+        m_cumulatedShift += minSpacing - defaultSpacing;
+    }
+
+    staffAlignment->SetYRel(staffAlignment->GetYRel() - m_cumulatedShift);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AdjustYPosFunctor::VisitSystem(System *system)
+{
+    // We need to call this explicitly because changing the YRel of the StaffAligner (below in the functor)
+    // will not trigger it
+    system->ResetCachedDrawingY();
+
+    m_cumulatedShift = 0;
+
+    system->m_systemAligner.Process(*this);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
 // AdjustCrossStaffYPosFunctor
 //----------------------------------------------------------------------------
 

@@ -13,6 +13,47 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AdjustYPosFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts the position of the StaffAlignment.
+ */
+class AdjustYPosFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AdjustYPosFunctor(Doc *doc);
+    virtual ~AdjustYPosFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The cumulated shift
+    int m_cumulatedShift;
+};
+
+//----------------------------------------------------------------------------
 // AdjustCrossStaffYPosFunctor
 //----------------------------------------------------------------------------
 
