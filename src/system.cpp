@@ -522,22 +522,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::AdjustYPos(FunctorParams *functorParams)
-{
-    AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);
-    assert(params);
-
-    // We need to call this explicitly because changing the YRel of the StaffAligner (below in the functor)
-    // will not trigger it
-    this->ResetCachedDrawingY();
-
-    params->m_cumulatedShift = 0;
-
-    m_systemAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);

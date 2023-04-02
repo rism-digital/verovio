@@ -734,24 +734,6 @@ FunctorCode StaffAlignment::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffAlignmentEnd(this);
 }
 
-int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
-{
-    AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);
-    assert(params);
-
-    const int defaultSpacing = this->GetMinimumSpacing(params->m_doc);
-    int minSpacing = this->CalcMinimumRequiredSpacing(params->m_doc);
-    minSpacing = std::max(this->GetRequestedSpacing(), minSpacing);
-
-    if (minSpacing > defaultSpacing) {
-        params->m_cumulatedShift += minSpacing - defaultSpacing;
-    }
-
-    this->SetYRel(this->GetYRel() - params->m_cumulatedShift);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int StaffAlignment::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);

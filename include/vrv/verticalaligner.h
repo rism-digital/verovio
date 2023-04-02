@@ -348,11 +348,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustYPos
-     */
-    int AdjustYPos(FunctorParams *functorParams) override;
-
-    /**
      * See Object::JustifyY
      */
     int JustifyY(FunctorParams *functorParams) override;

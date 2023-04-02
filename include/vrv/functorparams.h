@@ -156,29 +156,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustYPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 1: the doc
- * member 2: the functor to be redirected to SystemAligner
- **/
-
-class AdjustYPosParams : public FunctorParams {
-public:
-    AdjustYPosParams(Doc *doc, Functor *functor)
-    {
-        m_cumulatedShift = 0;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    int m_cumulatedShift;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // AlignSystemsParams
 //----------------------------------------------------------------------------
 

@@ -536,9 +536,8 @@ void Page::LayOutVertically()
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
-    Functor adjustYPos(&Object::AdjustYPos);
-    AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
-    this->Process(&adjustYPos, &adjustYPosParams);
+    AdjustYPosFunctor adjustYPos(doc);
+    this->Process(adjustYPos);
 
     // Adjust the positioners of floating elements placed between staves
     AdjustFloatingPositionersBetweenFunctor adjustFloatingPositionersBetween(doc);
