@@ -31,6 +31,7 @@
 #include "adjusttupletsyfunctor.h"
 #include "adjustxoverflowfunctor.h"
 #include "adjustxposfunctor.h"
+#include "adjustxrelfortranscriptionfunctor.h"
 #include "adjustyposfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
@@ -267,8 +268,8 @@ void Page::LayOutTranscription(bool force)
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
-    Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
-    this->Process(&adjustXRelForTranscription, NULL);
+    AdjustXRelForTranscriptionFunctor adjustXRelForTranscription;
+    this->Process(adjustXRelForTranscription);
 
     CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);

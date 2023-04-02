@@ -1327,19 +1327,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     return { shift, isInUnison };
 }
 
-int LayerElement::AdjustXRelForTranscription(FunctorParams *)
-{
-    if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    if (!this->HasSelfBB()) return FUNCTOR_CONTINUE;
-
-    this->SetDrawingXRel(-this->GetSelfX1());
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
 {
     InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
