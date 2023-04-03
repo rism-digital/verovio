@@ -201,26 +201,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcBBoxOverflowsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current staffAlignment
- * member 1: the doc
- **/
-
-class CalcBBoxOverflowsParams : public FunctorParams {
-public:
-    CalcBBoxOverflowsParams(Doc *doc)
-    {
-        m_staffAlignment = NULL;
-        m_doc = doc;
-    }
-    StaffAlignment *m_staffAlignment;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CastOffEncodingParams
 //----------------------------------------------------------------------------
 

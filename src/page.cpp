@@ -39,6 +39,7 @@
 #include "calcalignmentpitchposfunctor.h"
 #include "calcalignmentxposfunctor.h"
 #include "calcarticfunctor.h"
+#include "calcbboxoverflowsfunctor.h"
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
@@ -522,10 +523,8 @@ void Page::LayOutVertically()
     this->Process(adjustTupletWithSlurs);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
-    CalcBBoxOverflowsParams calcBBoxOverflowsParams(doc);
-    Functor calcBBoxOverflows(&Object::CalcBBoxOverflows);
-    Functor calcBBoxOverflowsEnd(&Object::CalcBBoxOverflowsEnd);
-    this->Process(&calcBBoxOverflows, &calcBBoxOverflowsParams, &calcBBoxOverflowsEnd);
+    CalcBBoxOverflowsFunctor calcBBoxOverflows(doc);
+    this->Process(calcBBoxOverflows);
 
     // Adjust the positioners of floating elements (slurs, hairpin, dynam, etc)
     AdjustFloatingPositionersFunctor adjustFloatingPositioners(doc);
