@@ -180,32 +180,9 @@ public:
     ///@}
 
     /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::AlignVertically
-     */
-    ///@{
-    int AlignVertically(FunctorParams *functorParams) override;
-    int AlignVerticallyEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::AdjustYPos
-     */
-    int AdjustYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignSystems
-     */
-    int AlignSystems(FunctorParams *functorParams) override;
 
     /**
      * See Object::JustifyX
@@ -216,31 +193,6 @@ public:
      * See Object::JustifyY
      */
     int JustifyY(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustCrossStaffYPos
-     */
-    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustStaffOverlap
-     */
-    int AdjustStaffOverlap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositioners
-     */
-    int AdjustFloatingPositioners(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositionersBetween
-     */
-    int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSlurs
-     */
-    int AdjustSlurs(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffPages

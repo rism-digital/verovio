@@ -1103,13 +1103,6 @@ FunctorCode LayerElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitLayerElementEnd(this);
 }
 
-int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in CalcAlignmentPitchPos
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
@@ -1118,71 +1111,6 @@ int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
     if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::AdjustBeams(FunctorParams *functorParams)
-{
-    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
-    assert(params);
-
-    // ignore elements that are not in the beam or are direct children of the beam
-    if (!params->m_beam) return FUNCTOR_CONTINUE;
-    if (!params->m_isOtherLayer && !this->Is(ACCID) && !this->IsGraceNote()
-        && ((this->GetFirstAncestor(BEAM) == params->m_beam) || (this->GetFirstAncestor(FTREM) == params->m_beam)))
-        return FUNCTOR_CONTINUE;
-    // ignore elements that are both on other layer and cross-staff
-    if (params->m_isOtherLayer && m_crossStaff) return FUNCTOR_CONTINUE;
-    // ignore specific elements, since they should not be influencing beam positioning
-    if (this->Is({ BTREM, GRACEGRP, SPACE, TUPLET, TUPLET_BRACKET, TUPLET_NUM })) return FUNCTOR_CONTINUE;
-    // ignore elements that start before the beam
-    if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
-    // ignore elements that have @visible attribute set to false
-    AttVisibilityComparison isInvisible(this->GetClassId(), BOOLEAN_false);
-    if (isInvisible(this)) return FUNCTOR_SIBLINGS;
-    // ignore accidentals outside the staff
-    if (this->Is(ACCID)) {
-        Accid *accid = vrv_cast<Accid *>(this);
-        assert(accid);
-        if (accid->GetFunc() == accidLog_FUNC_edit) return FUNCTOR_CONTINUE;
-        if (accid->HasPlace()) return FUNCTOR_CONTINUE;
-    }
-    const StemmedDrawingInterface *stemInterface = this->GetStemmedDrawingInterface();
-    if (stemInterface
-        && (((params->m_directionBias == 1) && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up))
-            || ((params->m_directionBias == -1) && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down)))) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Staff *staff = this->GetAncestorStaff();
-
-    // check if top/bottom of the element overlaps with beam coordinates
-    int leftMargin = 0, rightMargin = 0;
-    BeamDrawingInterface *beam = params->m_beam->GetBeamDrawingInterface();
-    const auto [above, below] = beam->GetAdditionalBeamCount();
-    int beamCount = std::max(above, below);
-    if (params->m_beam->Is(FTREM)) --beamCount;
-    const int currentBeamYLeft = params->m_y1 + params->m_beamSlope * (this->GetContentLeft() - params->m_x1);
-    const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
-    if (params->m_directionBias > 0) {
-        leftMargin = this->GetContentTop() - currentBeamYLeft + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
-        rightMargin
-            = this->GetContentTop() - currentBeamYRight + beamCount * beam->m_beamWidth + beam->m_beamWidthBlack;
-    }
-    else {
-        leftMargin
-            = this->GetContentBottom() - currentBeamYLeft - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
-        rightMargin
-            = this->GetContentBottom() - currentBeamYRight - beamCount * beam->m_beamWidth - beam->m_beamWidthBlack;
-    }
-
-    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
-    if (overlapMargin >= params->m_directionBias * params->m_overlapMargin) {
-        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin
-            = (((overlapMargin + staffOffset - 1) / staffOffset + 0.5) * staffOffset) * params->m_directionBias;
-    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -1397,52 +1325,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     }
 
     return { shift, isInUnison };
-}
-
-int LayerElement::AdjustTupletNumOverlap(FunctorParams *functorParams) const
-{
-    AdjustTupletNumOverlapParams *params = vrv_params_cast<AdjustTupletNumOverlapParams *>(functorParams);
-    assert(params);
-
-    if (!this->Is({ ARTIC, ACCID, CHORD, DOT, FLAG, NOTE, REST, STEM }) || !this->HasSelfBB()) return FUNCTOR_CONTINUE;
-
-    if (this->Is({ CHORD, NOTE, REST })
-        && ((m_crossStaff || (this->GetFirstAncestor(STAFF) != params->m_staff)) && (m_crossStaff != params->m_staff)))
-        return FUNCTOR_SIBLINGS;
-
-    if (!params->m_tupletNum->HorizontalSelfOverlap(this, params->m_horizontalMargin)
-        && !params->m_tupletNum->VerticalSelfOverlap(this, params->m_verticalMargin)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    int stemAdjust = 0;
-    if (this->Is(STEM)) {
-        const Stem *stem = vrv_cast<const Stem *>(this);
-        stemAdjust = stem->GetDrawingStemAdjust();
-    }
-    if (params->m_drawingNumPos == STAFFREL_basic_above) {
-        int dist = this->GetSelfTop();
-        if (params->m_yRel < dist) params->m_yRel = dist + stemAdjust;
-    }
-    else {
-        int dist = this->GetSelfBottom();
-        if (params->m_yRel > dist) params->m_yRel = dist + stemAdjust;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::AdjustXRelForTranscription(FunctorParams *)
-{
-    if (m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    if (!this->HasSelfBB()) return FUNCTOR_CONTINUE;
-
-    this->SetDrawingXRel(-this->GetSelfX1());
-
-    return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::InitOnsetOffset(FunctorParams *functorParams)

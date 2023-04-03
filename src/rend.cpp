@@ -112,20 +112,4 @@ FunctorCode Rend::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitRendEnd(this);
 }
 
-int Rend::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    if (this->GetHalign()) {
-        switch (this->GetHalign()) {
-            case (HORIZONTALALIGNMENT_right): this->SetDrawingXRel(params->m_pageWidth); break;
-            case (HORIZONTALALIGNMENT_center): this->SetDrawingXRel(params->m_pageWidth / 2); break;
-            default: break;
-        }
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

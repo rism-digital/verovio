@@ -336,17 +336,6 @@ FunctorCode TupletBracket::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTupletBracketEnd(this);
 }
 
-int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetVerticalAlignment(functorParams);
-
-    m_drawingYRelLeft = 0;
-    m_drawingYRelRight = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode TupletNum::Accept(MutableFunctor &functor)
 {
     return functor.VisitTupletNum(this);
@@ -365,14 +354,6 @@ FunctorCode TupletNum::AcceptEnd(MutableFunctor &functor)
 FunctorCode TupletNum::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTupletNumEnd(this);
-}
-
-int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetVerticalAlignment(functorParams);
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -548,69 +548,6 @@ FunctorCode Rest::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitRestEnd(this);
 }
 
-int Rest::AdjustBeams(FunctorParams *functorParams)
-{
-    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_beam) return FUNCTOR_SIBLINGS;
-
-    // Calculate possible overlap for the rest with beams
-    int leftMargin = 0, rightMargin = 0;
-    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this, false) - DUR_4;
-    const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
-    if (params->m_directionBias > 0) {
-        leftMargin = params->m_y1 - beams * beamWidth - this->GetSelfTop();
-        rightMargin = params->m_y2 - beams * beamWidth - this->GetSelfTop();
-    }
-    else {
-        leftMargin = this->GetSelfBottom() - params->m_y1 - beams * beamWidth;
-        rightMargin = this->GetSelfBottom() - params->m_y2 - beams * beamWidth;
-    }
-
-    // Adjust drawing location for the rest based on the overlap with beams.
-    // Adjustment should be an even number, so that the rest is positioned properly
-    const int overlapMargin = std::min(leftMargin, rightMargin);
-    if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
-
-    Staff *staff = this->GetAncestorStaff();
-
-    if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) {
-        // constants
-        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // calculate new and old locations for the rest
-        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-        const int oldLoc = this->GetDrawingLoc();
-        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
-        if (staff->GetChildCount(LAYER) == 1) {
-            this->SetDrawingLoc(newLoc);
-            this->SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
-            // If there are dots, adjust their location as well
-            if (this->GetDots() > 0) {
-                Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-                if (dots) {
-                    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-                    const int dotLoc = (oldLoc % 2) ? oldLoc : oldLoc + 1;
-                    if (std::find(dotLocs.cbegin(), dotLocs.cend(), dotLoc) != dotLocs.cend()) {
-                        dotLocs.erase(dotLoc);
-                        dotLocs.insert(newLoc);
-                    }
-                }
-            }
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
-    if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * unit * params->m_directionBias;
-        if (std::abs(adjust) > std::abs(params->m_overlapMargin)) params->m_overlapMargin = adjust;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);

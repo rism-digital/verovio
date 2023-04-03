@@ -192,27 +192,12 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustCrossStaffYPos
-     */
-    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArtic
-     */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertMarkupAnalytical
      */
     ///@{
     int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
     int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
     ///@}
-
-    /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitOnsetOffsetEnd

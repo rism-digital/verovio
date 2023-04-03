@@ -235,45 +235,4 @@ FunctorCode Clef::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitClefEnd(this);
 }
 
-int Clef::AdjustBeams(FunctorParams *functorParams)
-{
-    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
-    assert(params);
-    if (!params->m_beam) return FUNCTOR_SIBLINGS;
-    // ignore elements that start before/after the beam
-    if (this->GetDrawingX() < params->m_x1) return FUNCTOR_CONTINUE;
-    if (this->GetDrawingX() > params->m_x2) return FUNCTOR_CONTINUE;
-
-    Staff *staff = this->GetAncestorStaff();
-    // find number of beams at current position
-    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this) - DUR_4;
-    const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
-    // find beam Y positions that are relevant to current clef
-    const int currentBeamYLeft = params->m_y1 + params->m_beamSlope * (this->GetContentLeft() - params->m_x1);
-    const int currentBeamYRight = params->m_y1 + params->m_beamSlope * (this->GetContentRight() - params->m_x1);
-    // get clef code and find its bounds on the staff (anchor point and top/bottom depending on the beam place)
-    const char32_t clefCode = this->GetClefGlyph(staff->m_drawingNotationType);
-    if (!clefCode) return FUNCTOR_SIBLINGS;
-
-    const int clefPosition = staff->GetDrawingY()
-        - params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - this->GetLine());
-    const int clefBounds = clefPosition
-        + ((params->m_directionBias > 0) ? params->m_doc->GetGlyphTop(clefCode, staff->m_drawingStaffSize, false)
-                                         : params->m_doc->GetGlyphBottom(clefCode, staff->m_drawingStaffSize, false));
-    // calculate margins for the clef
-    const int leftMargin = params->m_directionBias * (currentBeamYLeft - clefBounds) - beams * beamWidth;
-    const int rightMargin = params->m_directionBias * (currentBeamYRight - clefBounds) - beams * beamWidth;
-    const int overlapMargin = std::min(leftMargin, rightMargin);
-    if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
-    // calculate offset required for the beam
-    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
-    if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * unit * params->m_directionBias;
-        if (std::abs(adjust) > std::abs(params->m_overlapMargin)) params->m_overlapMargin = adjust;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

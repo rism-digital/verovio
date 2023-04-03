@@ -844,17 +844,6 @@ int Measure::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    // we also need to reset the staffNb
-    params->m_staffIdx = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);

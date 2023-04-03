@@ -427,14 +427,4 @@ int RunningElement::SaveEnd(FunctorParams *functorParams)
     }
 }
 
-int RunningElement::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    params->m_pageWidth = this->GetWidth();
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

@@ -131,11 +131,12 @@ public:
     int CalcPitchPosYRel(const Doc *doc, int loc) const;
 
     /**
-     * Getter for the StaffAlignment
+     * Getter and setter for the StaffAlignment
      */
     ///@{
     StaffAlignment *GetAlignment() { return m_staffAlignment; }
     const StaffAlignment *GetAlignment() const { return m_staffAlignment; }
+    void SetAlignment(StaffAlignment *alignment) { m_staffAlignment = alignment; }
     ///@}
 
     /**
@@ -200,19 +201,9 @@ public:
     int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignVertically
-     */
-    int AlignVertically(FunctorParams *functorParams) override;
 
     /**
      * See Object::CastOffEncoding
