@@ -648,17 +648,78 @@ AlignSystemsFunctor::AlignSystemsFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignSystemsFunctor::VisitPage(Page *page)
 {
+    m_justificationSum = 0;
+
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        header->SetDrawingYRel(m_shift);
+        const int headerHeight = header->GetTotalHeight(m_doc);
+        if (headerHeight > 0) {
+            m_shift -= headerHeight;
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignSystemsFunctor::VisitPageEnd(Page *page)
 {
+    page->m_drawingJustifiableHeight = m_shift;
+    page->m_justificationSum = m_justificationSum;
+
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        page->m_drawingJustifiableHeight -= footer->GetTotalHeight(m_doc);
+
+        // Move it up below the last system
+        if (m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
+            if (page->GetChildCount()) {
+                System *last = vrv_cast<System *>(page->GetLast(SYSTEM));
+                assert(last);
+                const int unit = m_doc->GetDrawingUnit(100);
+                const int topMargin = m_doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;
+                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight() - topMargin);
+            }
+        }
+        else {
+            footer->SetDrawingYRel(footer->GetContentHeight());
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignSystemsFunctor::VisitSystem(System *system)
 {
-    return FUNCTOR_CONTINUE;
+    SystemAligner &systemAligner = system->m_systemAligner;
+    assert(systemAligner.GetBottomAlignment());
+
+    // No spacing for the first system
+    int systemSpacing = system->IsFirstInPage() ? 0 : m_systemSpacing;
+    if (systemSpacing) {
+        const int contentOverflow = m_prevBottomOverflow + systemAligner.GetOverflowAbove(m_doc);
+        const int clefOverflow = m_prevBottomClefOverflow + systemAligner.GetOverflowAbove(m_doc, true);
+        // Alignment is already pre-determined with staff alignment overflow
+        // We need to subtract them from the desired spacing
+        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = m_doc->GetDrawingUnit(100);
+        m_shift -= std::max(actualSpacing, 2 * unit);
+    }
+
+    system->SetDrawingYRel(m_shift);
+
+    m_shift += systemAligner.GetBottomAlignment()->GetYRel();
+
+    m_justificationSum += systemAligner.GetJustificationSum(m_doc);
+    if (system->IsFirstInPage()) {
+        // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
+        m_justificationSum -= m_doc->GetOptions()->m_justificationSystem.GetValue();
+    }
+
+    m_prevBottomOverflow = systemAligner.GetOverflowBelow(m_doc);
+    m_prevBottomClefOverflow = systemAligner.GetOverflowBelow(m_doc, true);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
