@@ -633,4 +633,32 @@ FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// AlignSystemsFunctor
+//----------------------------------------------------------------------------
+
+AlignSystemsFunctor::AlignSystemsFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_shift = 0;
+    m_systemSpacing = 0;
+    m_prevBottomOverflow = 0;
+    m_prevBottomClefOverflow = 0;
+    m_justificationSum = 0.0;
+}
+
+FunctorCode AlignSystemsFunctor::VisitPage(Page *page)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignSystemsFunctor::VisitPageEnd(Page *page)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignSystemsFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

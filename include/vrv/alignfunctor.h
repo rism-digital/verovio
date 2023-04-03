@@ -192,6 +192,55 @@ private:
     int m_pageWidth;
 };
 
+//----------------------------------------------------------------------------
+// AlignSystemsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class aligns the system by adjusting the m_drawingYRel position looking at the SystemAligner.
+ */
+class AlignSystemsFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AlignSystemsFunctor(Doc *doc);
+    virtual ~AlignSystemsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitPageEnd(Page *page) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The cumulated shift
+    int m_shift;
+    // The system margin
+    int m_systemSpacing;
+    // The (clef) overflow below of the previous system
+    int m_prevBottomOverflow;
+    int m_prevBottomClefOverflow;
+    // The sum of justification factors per page
+    double m_justificationSum;
+};
+
 } // namespace vrv
 
 #endif // __VRV_ALIGNFUNCTOR_H__
