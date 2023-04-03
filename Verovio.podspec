@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'Verovio'
-  s.version        = '3.15.0-dev'
+  s.version        = '3.16.0-dev'
   s.license        = { :type => 'LGPL' }
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
@@ -9,16 +9,10 @@ Pod::Spec.new do |s|
   s.swift_versions = ['3.0', '4.0', '4.1', '4.2', '5.0','5.1']
   s.source_files        = 'src/**/*.{h,cpp,cc}',
                           'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-                          'libmei/{attclasses,attconverter,atts_analytical,atts_cmn,atts_cmnornaments}.{h,cpp}',
-                          'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_frettab,atts_gestural,atts_mei}.{h,cpp}', 
-                          'libmei/{atts_mensural,atts_midi,atts_neumes,atts_pagebased,atts_shared}.{h,cpp}',
-                          'libmei/{atts_visual,atttypes}.{h,cpp}'
+                          'libmei/{dist,addons}/*.{h,cpp}'
   s.public_header_files = 'src/**/*.{h}',
                           'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-                          'libmei/{attclasses,attconverter,atts_analytical,atts_cmn,atts_cmnornaments}.{h}',
-                          'libmei/{atts_critapp,atts_externalsymbols,atts_facsimile,atts_frettab,atts_gestural,atts_mei}.{h}', 
-                          'libmei/{atts_mensural,atts_midi,atts_neumes,atts_pagebased,atts_shared}.{h}',
-                          'libmei/{atts_visual,atttypes}.{h}'
+                          'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.13'

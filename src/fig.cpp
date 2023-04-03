@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "svg.h"
 #include "vrv.h"
@@ -55,12 +56,32 @@ bool Fig::IsSupportedChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Fig::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFig(this);
+}
+
+FunctorCode Fig::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFig(this);
+}
+
+FunctorCode Fig::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFigEnd(this);
+}
+
+FunctorCode Fig::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFigEnd(this);
+}
+
 int Fig::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    Svg *svg = dynamic_cast<Svg *>(this->FindDescendantByType(SVG));
+    Svg *svg = vrv_cast<Svg *>(this->FindDescendantByType(SVG));
     int width = (svg) ? svg->GetWidth() : 0;
 
     if (this->GetHalign() == HORIZONTALALIGNMENT_right) {

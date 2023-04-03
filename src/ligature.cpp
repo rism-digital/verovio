@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "staff.h"
@@ -119,6 +120,26 @@ int Ligature::GetDrawingNoteShape(const Note *note) const
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Ligature::Accept(MutableFunctor &functor)
+{
+    return functor.VisitLigature(this);
+}
+
+FunctorCode Ligature::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitLigature(this);
+}
+
+FunctorCode Ligature::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitLigatureEnd(this);
+}
+
+FunctorCode Ligature::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitLigatureEnd(this);
+}
+
 int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
 {
     FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
@@ -146,9 +167,9 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     // For better clarify, we loop withing the Ligature::CalcLigatureNotePos instead of
     // implementing Note::CalcLigatureNotePos.
 
-    for (auto &iter : notes) {
+    for (Object *object : notes) {
 
-        Note *note = vrv_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
 
         m_drawingShapes.push_back(LIGATURE_DEFAULT);
@@ -290,9 +311,9 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     previousNote = NULL;
     n1 = 0;
 
-    for (auto &iter : notes) {
+    for (Object *object : notes) {
 
-        Note *note = vrv_cast<Note *>(iter);
+        Note *note = vrv_cast<Note *>(object);
         assert(note);
 
         // previousRight is 0 for the first note
@@ -322,18 +343,6 @@ int Ligature::CalcLigatureNotePos(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Ligature::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingShapes.clear();
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

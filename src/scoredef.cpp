@@ -16,6 +16,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "grpsym.h"
 #include "keysig.h"
@@ -29,6 +30,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "section.h"
+#include "setscoredeffunctor.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "symboltable.h"
@@ -259,6 +261,7 @@ void ScoreDef::Reset()
 
 bool ScoreDef::IsSupportedChild(Object *child)
 {
+    // Clef is actually not allowed as child of scoreDef in MEI
     if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
@@ -271,6 +274,7 @@ bool ScoreDef::IsSupportedChild(Object *child)
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
+    // Mensur is actually not allowed as child of scoreDef in MEI
     else if (child->Is(MENSUR)) {
         assert(dynamic_cast<Mensur *>(child));
     }
@@ -279,9 +283,6 @@ bool ScoreDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(METERSIGGRP)) {
         assert(dynamic_cast<MeterSigGrp *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
     }
     else if (child->IsRunningElement()) {
         assert(dynamic_cast<RunningElement *>(child));
@@ -293,6 +294,14 @@ bool ScoreDef::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+int ScoreDef::GetInsertOrderFor(ClassId classId) const
+{
+
+    static const std::vector s_order({ SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT,
+        PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
+    return this->GetInsertOrderForIn(classId, s_order);
 }
 
 void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
@@ -332,10 +341,8 @@ void ScoreDef::ReplaceDrawingValues(const ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams(
-        clef, keySig, mensur, meterSig, meterSigGrp);
-    Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
-    this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
+    ReplaceDrawingValuesInStaffDefFunctor replaceDrawingValuesInStaffDef(clef, keySig, mensur, meterSig, meterSigGrp);
+    this->Process(replaceDrawingValuesInStaffDef);
 
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
@@ -475,9 +482,9 @@ void ScoreDef::ResetFromDrawingValues()
     const ListOfObjects &childList = this->GetList(this);
 
     StaffDef *staffDef = NULL;
-    for (auto item : childList) {
-        if (!item->Is(STAFFDEF)) continue;
-        staffDef = vrv_cast<StaffDef *>(item);
+    for (Object *object : childList) {
+        if (!object->Is(STAFFDEF)) continue;
+        staffDef = vrv_cast<StaffDef *>(object);
         assert(staffDef);
 
         Clef *clef = vrv_cast<Clef *>(staffDef->FindDescendantByType(CLEF));
@@ -534,8 +541,8 @@ const StaffGrp *ScoreDef::GetStaffGrp(const std::string &n) const
     ListOfConstObjects staffGrps = this->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
-    for (auto &item : staffGrps) {
-        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(item);
+    for (const Object *object : staffGrps) {
+        const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(object);
         assert(staffGrp);
         if (staffGrp->GetN() == n) return staffGrp;
     }
@@ -562,10 +569,8 @@ std::vector<int> ScoreDef::GetStaffNs() const
 void ScoreDef::SetRedrawFlags(int redrawFlags)
 {
     m_setAsDrawing = true;
-    SetStaffDefRedrawFlagsParams setStaffDefRedrawFlagsParams;
-    setStaffDefRedrawFlagsParams.m_redrawFlags = redrawFlags;
-    Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
-    this->Process(&setStaffDefDraw, &setStaffDefRedrawFlagsParams);
+    SetStaffDefRedrawFlagsFunctor setStaffDefRedrawFlags(redrawFlags);
+    this->Process(setStaffDefRedrawFlags);
 }
 
 void ScoreDef::SetDrawingWidth(int drawingWidth)
@@ -582,42 +587,42 @@ void ScoreDef::SetDrawingLabelsWidth(int width)
 
 PgFoot *ScoreDef::GetPgFoot()
 {
-    return dynamic_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 const PgFoot *ScoreDef::GetPgFoot() const
 {
-    return dynamic_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
+    return vrv_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
 }
 
 PgFoot2 *ScoreDef::GetPgFoot2()
 {
-    return dynamic_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 const PgFoot2 *ScoreDef::GetPgFoot2() const
 {
-    return dynamic_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    return vrv_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
 }
 
 PgHead *ScoreDef::GetPgHead()
 {
-    return dynamic_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 const PgHead *ScoreDef::GetPgHead() const
 {
-    return dynamic_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
+    return vrv_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
 }
 
 PgHead2 *ScoreDef::GetPgHead2()
 {
-    return dynamic_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 const PgHead2 *ScoreDef::GetPgHead2() const
 {
-    return dynamic_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    return vrv_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
 }
 
 int ScoreDef::GetMaxStaffSize() const
@@ -632,7 +637,7 @@ bool ScoreDef::IsSectionRestart() const
     // In page-based structure, Section is a sibling to scoreDef
     // This has limitations: will not work with editorial markup, additional nested sections, and
     // if the section milestone is in the previous system.
-    const Section *section = dynamic_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
+    const Section *section = vrv_cast<const Section *>(this->GetParent()->GetPrevious(this, SECTION));
     return (section && (section->GetRestart() == BOOLEAN_true));
 }
 
@@ -641,7 +646,8 @@ bool ScoreDef::HasSystemStartLine() const
     const StaffGrp *staffGrp = vrv_cast<const StaffGrp *>(this->FindDescendantByType(STAFFGRP));
     if (staffGrp) {
         auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
-        if ((firstDef && lastDef && (firstDef != lastDef)) || staffGrp->GetFirst(GRPSYM)) {
+        ListOfConstObjects allDefs = staffGrp->FindAllDescendantsByType(STAFFDEF);
+        if ((firstDef && lastDef && allDefs.size() > 1) || staffGrp->GetFirst(GRPSYM)) {
             return (this->GetSystemLeftline() != BOOLEAN_false);
         }
         return (this->GetSystemLeftline() == BOOLEAN_true);
@@ -652,6 +658,26 @@ bool ScoreDef::HasSystemStartLine() const
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode ScoreDefElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitScoreDefElement(this);
+}
+
+FunctorCode ScoreDefElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDefElement(this);
+}
+
+FunctorCode ScoreDefElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitScoreDefElementEnd(this);
+}
+
+FunctorCode ScoreDefElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDefElementEnd(this);
+}
 
 int ScoreDefElement::ConvertMarkupScoreDef(FunctorParams *functorParams)
 {
@@ -725,11 +751,24 @@ int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ScoreDef::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode ScoreDef::Accept(MutableFunctor &functor)
 {
-    m_drawingLabelsWidth = 0;
+    return functor.VisitScoreDef(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode ScoreDef::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDef(this);
+}
+
+FunctorCode ScoreDef::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitScoreDefEnd(this);
+}
+
+FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitScoreDefEnd(this);
 }
 
 int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
@@ -799,23 +838,6 @@ int ScoreDef::CastOffToSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int ScoreDef::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    params->m_shift += m_drawingLabelsWidth;
-
-    if (params->m_applySectionRestartShift) {
-        ClassIdsComparison comparison({ LABEL, LABELABBR });
-        if (this->FindDescendantByComparison(&comparison)) {
-            params->m_applySectionRestartShift = false;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
     InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
@@ -871,7 +893,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
         const double tuneHz = this->GetTuneHz();
         // Add tuning for all keys from 0 to 127
         std::vector<std::pair<int, double>> tuneFrequencies;
-        for (int i = 0; i < 127; i++) {
+        for (int i = 0; i < 127; ++i) {
             double freq = pow(2.0, (i - 69.0) / 12.0) * tuneHz;
             tuneFrequencies.push_back(std::make_pair(i, freq));
         }
@@ -889,7 +911,7 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     // set MIDI time signature
     if (this->HasMeterSigInfo()) {
         MeterSig *meterSig = vrv_cast<MeterSig *>(this->GetMeterSig());
-        if (meterSig && meterSig->HasCount()) {
+        if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             params->m_midiFile->addTimeSignature(
                 params->m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
@@ -909,17 +931,6 @@ int ScoreDef::JustifyX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int ScoreDef::PrepareDuration(FunctorParams *functorParams)
-{
-    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
-    assert(params);
-
-    params->m_durDefaultForStaffN.clear();
-    params->m_durDefault = this->GetDurDefault();
-
-    return FUNCTOR_CONTINUE;
 }
 
 int ScoreDef::Transpose(FunctorParams *functorParams)

@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "elementpart.h"
 #include "floatingobject.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
@@ -26,13 +27,14 @@
 
 namespace vrv {
 
-const std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_acc_soft,
-    ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_damp,
-    ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
+const std::vector<data_ARTICULATION> Artic::s_outStaffArtic
+    = { ARTICULATION_acc, ARTICULATION_acc_soft, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow,
+          ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_fingernail, ARTICULATION_damp, ARTICULATION_dampall,
+          ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
 
-const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
-    = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap,
-          ARTICULATION_damp, ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
+const std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_upbow, ARTICULATION_harm, ARTICULATION_snap, ARTICULATION_fingernail, ARTICULATION_damp,
+    ARTICULATION_dampall, ARTICULATION_lhpizz, ARTICULATION_open, ARTICULATION_stop };
 
 //----------------------------------------------------------------------------
 // Artic
@@ -143,7 +145,7 @@ void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
     ClassIdComparison matchType(ARTIC);
     ListOfObjects children;
     parentNoteOrChord->FindAllDescendantsBetween(&children, &matchType, first, last);
-    for (auto &child : children) {
+    for (Object *child : children) {
         if (child == this) continue;
         Artic *artic = vrv_cast<Artic *>(child);
         assert(artic);
@@ -196,7 +198,6 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             case ARTICULATION_ten: return SMUFL_E4A4_articTenutoAbove;
             case ARTICULATION_stacciss: return SMUFL_E4A8_articStaccatissimoWedgeAbove;
             case ARTICULATION_marc: return SMUFL_E4AC_articMarcatoAbove;
-            // case ARTICULATION_marc_stacc: return SMUFL_E4AE_articMarcatoStaccatoAbove;
             case ARTICULATION_spicc: return SMUFL_E4A6_articStaccatissimoAbove;
             // case ARTICULATION_doit;
             // case ARTICULATION_scoop;
@@ -212,10 +213,9 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             case ARTICULATION_upbow: return SMUFL_E612_stringsUpBow;
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             case ARTICULATION_snap: return SMUFL_E631_pluckedSnapPizzicatoAbove;
-            // case ARTICULATION_fingernail;
-            // case ARTICULATION_ten_stacc: return SMUFL_E4B2_articTenutoStaccatoAbove;
+            case ARTICULATION_fingernail: return SMUFL_E636_pluckedWithFingernails;
             case ARTICULATION_damp: return SMUFL_E638_pluckedDamp;
-            // case ARTICULATION_dampall;
+            case ARTICULATION_dampall: return SMUFL_E639_pluckedDampAll;
             case ARTICULATION_open: return SMUFL_E5E7_brassMuteOpen;
             case ARTICULATION_stop: return SMUFL_E5E5_brassMuteClosed;
             // case ARTICULATION_dbltongue;
@@ -237,22 +237,16 @@ char32_t Artic::GetArticGlyph(data_ARTICULATION artic, data_STAFFREL place) cons
             case ARTICULATION_ten: return SMUFL_E4A5_articTenutoBelow;
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
             case ARTICULATION_marc: return SMUFL_E4AD_articMarcatoBelow;
-            // Removed in MEI 4.0
-            // case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
             case ARTICULATION_spicc: return SMUFL_E4A7_articStaccatissimoBelow;
-            //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
             case ARTICULATION_upbow: return SMUFL_E613_stringsUpBowTurned;
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             case ARTICULATION_snap: return SMUFL_E630_pluckedSnapPizzicatoBelow;
+            case ARTICULATION_fingernail: return SMUFL_E636_pluckedWithFingernails;
             case ARTICULATION_damp: return SMUFL_E638_pluckedDamp;
-            // case ARTICULATION_dampall;
+            case ARTICULATION_dampall: return SMUFL_E639_pluckedDampAll;
             case ARTICULATION_open: return SMUFL_E5E7_brassMuteOpen;
             case ARTICULATION_stop: return SMUFL_E5E5_brassMuteClosed;
-            //
-            // Removed in MEI 4.0
-            // case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
-            //
             case ARTICULATION_lhpizz: return SMUFL_E633_pluckedLeftHandPizzicato;
             case ARTICULATION_dot: return SMUFL_E4A3_articStaccatoBelow;
             case ARTICULATION_stroke: return SMUFL_E4AB_articStaccatissimoStrokeBelow;
@@ -296,6 +290,9 @@ bool Artic::VerticalCorr(char32_t code, data_STAFFREL place)
         case SMUFL_E614_stringsHarmonic: return true;
         case SMUFL_E630_pluckedSnapPizzicatoBelow: return true;
         case SMUFL_E633_pluckedLeftHandPizzicato: return true;
+        case SMUFL_E636_pluckedWithFingernails: return true;
+        case SMUFL_E638_pluckedDamp: return true;
+        case SMUFL_E639_pluckedDampAll: return true;
         default: return false;
     }
 }
@@ -310,6 +307,26 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Artic::Accept(MutableFunctor &functor)
+{
+    return functor.VisitArtic(this);
+}
+
+FunctorCode Artic::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitArtic(this);
+}
+
+FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitArticEnd(this);
+}
+
+FunctorCode Artic::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitArticEnd(this);
+}
 
 int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
 {
@@ -367,7 +384,9 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** adjust the xRel position **************/
 
-    this->SetDrawingXRel(CalculateHorizontalShift(params->m_doc, params->m_parent, params->m_stemDir));
+    Stem *stem = vrv_cast<Stem *>(params->m_parent->FindDescendantByType(STEM));
+    this->SetDrawingXRel(
+        CalculateHorizontalShift(params->m_doc, params->m_parent, params->m_stemDir, stem->IsVirtual()));
 
     /************** set cross-staff / layer **************/
 
@@ -394,7 +413,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     int yIn, yOut, yRel;
 
     Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    Beam *beam = dynamic_cast<Beam *>(this->GetFirstAncestor(BEAM));
+    Beam *beam = vrv_cast<Beam *>(this->GetFirstAncestor(BEAM));
     const int staffHeight
         = params->m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
 
@@ -410,12 +429,14 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         yOut = std::max(yIn, 0);
     }
     else {
+        const bool isStemDown = stem && (stem->GetDrawingStemDir() == STEMDIRECTION_down);
         int yBelowStem = params->m_parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false)
             - staff->GetDrawingY();
-        if (flag && stem && (stem->GetDrawingStemDir() == STEMDIRECTION_down))
-            yBelowStem += flag->GetStemDownNW(params->m_doc, staff->m_drawingStaffSize, false).y;
+        if (flag && isStemDown) yBelowStem += flag->GetStemDownNW(params->m_doc, staff->m_drawingStaffSize, false).y;
         yIn = std::min(yBelowStem, 0);
-        if (beam && beam->m_crossStaffContent && beam->m_drawingPlace == BEAMPLACE_mixed) yIn -= beam->m_beamWidthBlack;
+        if (beam && beam->m_crossStaffContent && (beam->m_drawingPlace == BEAMPLACE_mixed) && isStemDown) {
+            yIn -= beam->m_beamWidthBlack;
+        }
         yOut = std::min(yIn, -staffHeight);
     }
 
@@ -528,20 +549,11 @@ int Artic::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Artic::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingPlace = STAFFREL_NONE;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Artic::CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const
+int Artic::CalculateHorizontalShift(
+    const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir, const bool virtualStem) const
 {
     int shift = parent->GetDrawingRadius(doc);
-    if ((parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {
+    if (virtualStem || (parent->GetChildCount(ARTIC) > 1) || (doc->GetOptions()->m_staccatoCenter.GetValue())) {
         return shift;
     }
     data_ARTICULATION artic = this->GetArticFirst();

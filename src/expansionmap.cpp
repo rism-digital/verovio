@@ -40,10 +40,10 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
 {
     assert(prevSect);
     // find all siblings of expansion element to know what in MEI file
-    const vrv::ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
+    const ArrayOfObjects &expansionSiblings = prevSect->GetParent()->GetChildren();
     std::vector<std::string> reductionList;
-    for (auto o : expansionSiblings) {
-        if (o->Is(SECTION) || o->Is(ENDING) || o->Is(LEM) || o->Is(RDG)) reductionList.push_back(o->GetID());
+    for (Object *object : expansionSiblings) {
+        if (object->Is({ SECTION, ENDING, LEM, RDG })) reductionList.push_back(object->GetID());
     }
 
     for (std::string s : expansionList) {
@@ -82,7 +82,7 @@ void ExpansionMap::Expand(const xsdAnyURI_List &expansionList, xsdAnyURI_List &e
                 std::vector<std::string> clonedIds;
                 clonedIds.push_back(clonedObject->GetID());
                 this->GetIDList(clonedObject, clonedIds);
-                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); i++) {
+                for (int i = 0; (i < (int)oldIds.size()) && (i < (int)clonedIds.size()); ++i) {
                     this->AddExpandedIDToExpansionMap(oldIds.at(i), clonedIds.at(i));
                 }
 
@@ -225,10 +225,10 @@ bool ExpansionMap::AddExpandedIDToExpansionMap(const std::string &origXmlId, std
 
 std::vector<std::string> ExpansionMap::GetExpansionIDsForElement(const std::string &xmlId)
 {
-    try {
+    if (m_map.count(xmlId)) {
         return m_map.at(xmlId);
     }
-    catch (std::out_of_range &e) {
+    else {
         std::vector<std::string> ids;
         ids.push_back(xmlId.c_str());
         return ids;

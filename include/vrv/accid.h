@@ -62,17 +62,6 @@ public:
     bool HasToBeAligned() const override { return true; }
 
     /**
-     * @name Set and get drawing octave flag
-     */
-    ///@{
-    void SetDrawingOctave(bool isDrawingOctave) { m_isDrawingOctave = isDrawingOctave; }
-    bool GetDrawingOctave() const { return m_isDrawingOctave; }
-    void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
-    Accid *GetDrawingOctaveAccid() { return m_drawingOctave; }
-    const Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
-    ///@}
-
-    /**
      * @name Set and get drawing unison accid
      */
     ///@{
@@ -91,7 +80,7 @@ public:
      * Adjust X position of accid in relation to other element
      */
     void AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
-        std::vector<Accid *> &adjustedAccids);
+        std::set<Accid *> &adjustedAccids);
 
     /**
      * Adjust accid position if it's placed above/below staff so that it does not overlap with ledger lines
@@ -127,23 +116,21 @@ public:
     //----------//
 
     /**
-     * See Object::ResetData
+     * Interface for class functor visitation
      */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
 public:
     //
 private:
-    Accid *m_drawingOctave;
     Accid *m_drawingUnison;
-    bool m_isDrawingOctave;
     bool m_alignedWithSameLayer;
 };
 
@@ -152,28 +139,43 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * Sort Object by drawing Y value or by layerN
+ * Sort Object by drawing Y value
  */
 class AccidSpaceSort {
 
 public:
-    AccidSpaceSort() {}
+    AccidSpaceSort() = default;
 
     bool operator()(const Accid *first, const Accid *second) const
     {
-        if (first->GetDrawingY() < second->GetDrawingY()) {
-            return true;
-        }
-        else if (first->GetDrawingY() > second->GetDrawingY()) {
-            return false;
+        if (first->GetDrawingY() == second->GetDrawingY()) {
+            // with unissons, natural should always be the last accidental
+            return ((first->GetAccid() == ACCIDENTAL_WRITTEN_n) && (second->GetAccid() != ACCIDENTAL_WRITTEN_n));
         }
         else {
-            // with unissons, natural should always be the last accidental (assuming there is a natural)
-            if ((first->GetAccid() == ACCIDENTAL_WRITTEN_n) || (second->GetAccid() == ACCIDENTAL_WRITTEN_n)) {
-                return (first->GetAccid() != ACCIDENTAL_WRITTEN_n);
-            }
-            return first->GetDrawingY() < second->GetDrawingY();
+            return (first->GetDrawingY() > second->GetDrawingY());
         }
+    }
+};
+
+//----------------------------------------------------------------------------
+// AccidOctaveSort
+//----------------------------------------------------------------------------
+
+/**
+ * Equivalence of accidentals that are an octave apart
+ */
+class AccidOctaveSort {
+
+public:
+    AccidOctaveSort() = default;
+
+    // Encodes parent ID + accid type + pitch
+    std::string GetOctaveID(const Accid *accid) const;
+
+    bool operator()(const Accid *first, const Accid *second) const
+    {
+        return this->GetOctaveID(first) < this->GetOctaveID(second);
     }
 };
 

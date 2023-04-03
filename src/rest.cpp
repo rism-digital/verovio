@@ -18,6 +18,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "findlayerelementsfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
@@ -372,23 +373,19 @@ int Rest::GetLocationRelativeToCurrentLayer(const Staff *currentStaff, const Lay
 {
     if (!currentStaff || !currentLayer) return VRV_UNSET;
 
-    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
-    GetRelativeLayerElementParams getRelativeLayerElementParams(this->GetIdx(), BACKWARD, false);
-
     const Object *previousElement = NULL;
     const Object *nextElement = NULL;
     // Get previous and next elements from the current layer
     if (currentLayer->GetFirstChildNot(REST)) {
-        currentLayer->Process(
-            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-        previousElement = getRelativeLayerElementParams.m_relativeElement;
-        // reset and search in other direction
-        getRelativeLayerElementParams.m_relativeElement = NULL;
-        getRelativeLayerElementParams.m_searchDirection = FORWARD;
-        getRelativeLayerElement.m_returnCode = FUNCTOR_CONTINUE;
-        currentLayer->Process(
-            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD);
-        nextElement = getRelativeLayerElementParams.m_relativeElement;
+        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), BACKWARD, false);
+        getRelativeLayerElementBackwards.SetDirection(BACKWARD);
+        currentLayer->Process(getRelativeLayerElementBackwards);
+        previousElement = getRelativeLayerElementBackwards.GetRelativeElement();
+
+        // search in other direction
+        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), FORWARD, false);
+        currentLayer->Process(getRelativeLayerElementForwards);
+        nextElement = getRelativeLayerElementForwards.GetRelativeElement();
     }
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
@@ -452,12 +449,11 @@ int Rest::GetFirstRelativeElementLocation(
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
-    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
-    GetRelativeLayerElementParams getRelativeLayerElementParams(this->GetIdx(), !isPrevious, true);
-    (*layerIter)
-        ->Process(&getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, !isPrevious);
+    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), !isPrevious, true);
+    getRelativeLayerElement.SetDirection(!isPrevious);
+    (*layerIter)->Process(getRelativeLayerElement);
 
-    const Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
+    const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();
     if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
         return this->GetElementLocation(lastLayerElement, vrv_cast<const Layer *>(*layerIter), !isTopLayer).first;
     }
@@ -532,6 +528,26 @@ int Rest::GetRestOffsetFromOptions(
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode Rest::Accept(MutableFunctor &functor)
+{
+    return functor.VisitRest(this);
+}
+
+FunctorCode Rest::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitRest(this);
+}
+
+FunctorCode Rest::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRestEnd(this);
+}
+
+FunctorCode Rest::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRestEnd(this);
+}
+
 int Rest::AdjustBeams(FunctorParams *functorParams)
 {
     AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
@@ -604,103 +620,6 @@ int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
         Fermata *fermata = new Fermata();
         fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
-{
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Rest::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // We currently have no dots object with mensural rests
-    if (this->IsMensuralDur()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Nothing to do
-    if ((this->GetDur() <= DUR_BR) || (this->GetDots() < 1)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const bool drawingCueSize = this->GetDrawingCueSize();
-    const int staffSize = staff->m_drawingStaffSize;
-
-    // For single rests we need here to set the dot loc
-    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-    int loc = this->GetDrawingLoc();
-
-    // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-    if ((loc % 2) == 0) {
-        loc += 1;
-    }
-
-    switch (this->GetActualDur()) {
-        case DUR_32:
-        case DUR_64: loc += 2; break;
-        case DUR_128:
-        case DUR_256: loc += 4; break;
-        case DUR_512: loc += 6; break;
-        case DUR_1024: loc += 8; break;
-        default: break;
-    }
-
-    dotLocs.insert(loc);
-
-    // HARDCODED
-    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;
-    if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
-    if (this->GetDur() > DUR_2) {
-        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
-    }
-    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Rest::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Rest::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }

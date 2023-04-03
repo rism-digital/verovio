@@ -224,7 +224,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 
 void ABCInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
+    MeterSig *meterSig = vrv_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -1117,11 +1117,11 @@ void ABCInput::parseLyrics()
 
     // Iterate over notes and syllables simultaneously. Move through note array using counters for each syllable, moving
     // for several notes if syllable needs to be held
-    for (size_t i = 0, j = 0; (i < m_lineNoteArray.size()) && (j < syllables.size()); ++j) {
-        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < m_lineNoteArray.size())) {
+    for (int i = 0, j = 0; (i < (int)m_lineNoteArray.size()) && (j < (int)syllables.size()); ++j) {
+        while (m_lineNoteArray.at(i)->IsGraceNote() && (i < (int)m_lineNoteArray.size())) {
             ++i;
         }
-        if (i >= m_lineNoteArray.size()) break;
+        if (i >= (int)m_lineNoteArray.size()) break;
         Verse *verse = NULL;
         verse = vrv_cast<Verse *>(m_lineNoteArray.at(i)->GetChild(0, VERSE));
         if (!verse) {
@@ -1379,7 +1379,7 @@ void ABCInput::readMusicCode(const std::string &musicCode, Section *section)
             }
 
             if (keyPitchAlter.find(static_cast<char>(toupper(musicCode.at(i)))) != std::string::npos) {
-                auto accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
+                auto accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);

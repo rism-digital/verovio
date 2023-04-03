@@ -16,6 +16,7 @@
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -106,6 +107,26 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
 // Verse functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Verse::Accept(MutableFunctor &functor)
+{
+    return functor.VisitVerse(this);
+}
+
+FunctorCode Verse::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitVerse(this);
+}
+
+FunctorCode Verse::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitVerseEnd(this);
+}
+
+FunctorCode Verse::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitVerseEnd(this);
+}
+
 int Verse::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
@@ -118,116 +139,6 @@ int Verse::AlignVertically(FunctorParams *functorParams)
 
     // Add the number count
     alignment->AddVerseN(this->GetN());
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Verse::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    /****** find label / labelAbbr */
-
-    // If we have a <label>, reset the previous abbreviation
-    if (this->FindDescendantByType(LABEL)) {
-        params->m_currentLabelAbbr = NULL;
-    }
-
-    bool newLabelAbbr = false;
-    m_drawingLabelAbbr = NULL;
-    // Find the labelAbbr (if none previously given)
-    if (params->m_currentLabelAbbr == NULL) {
-        params->m_currentLabelAbbr = dynamic_cast<LabelAbbr *>(this->FindDescendantByType(LABELABBR));
-        // Keep indication that this is a new abbreviation and that is should not be displayed on this verse
-        newLabelAbbr = true;
-    }
-
-    /*******/
-
-    ListOfObjects syls = this->FindAllDescendantsByType(SYL);
-
-    int shift = params->m_doc->GetDrawingUnit(params->m_staffSize);
-    // Adjust it proportionally to the lyric size
-    shift
-        *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-
-    int previousSylShift = 0;
-
-    this->SetDrawingXRel(-1 * shift);
-
-    ListOfObjects::iterator iter = syls.begin();
-    while (iter != syls.end()) {
-        if ((*iter)->HasContentHorizontalBB()) {
-            Syl *syl = vrv_cast<Syl *>(*iter);
-            assert(syl);
-            syl->SetDrawingXRel(previousSylShift);
-            previousSylShift += syl->GetContentX2() + syl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
-            ++iter;
-        }
-        else {
-            iter = syls.erase(iter);
-        }
-    }
-
-    if (syls.empty()) return FUNCTOR_CONTINUE;
-
-    Syl *firstSyl = vrv_cast<Syl *>(syls.front());
-    assert(firstSyl);
-    // We keep a pointer to the last syl because we move it (when more than one) and the verse content bounding box is
-    // not updated
-    Syl *lastSyl = vrv_cast<Syl *>(syls.back());
-    assert(lastSyl);
-
-    // Not much to do when we hit the first syllable of the system
-    if (params->m_previousVerse == NULL) {
-        params->m_previousVerse = this;
-        params->m_lastSyl = lastSyl;
-
-        if (!newLabelAbbr && params->m_currentLabelAbbr) {
-            m_drawingLabelAbbr = params->m_currentLabelAbbr;
-        }
-
-        // No free space because we never move the first one back
-        params->m_freeSpace = 0;
-        params->m_previousMeasure = NULL;
-        return FUNCTOR_CONTINUE;
-    }
-
-    int xShift = 0;
-
-    // We have a previous syllable from the previous measure - we need to add the measure with because the measures are
-    // not aligned yet
-    if (params->m_previousMeasure) {
-        xShift = params->m_previousMeasure->GetWidth();
-    }
-
-    // Use the syl because the content bounding box of the verse might be invalid at this stage
-    int overlap = params->m_lastSyl->GetContentRight() - (firstSyl->GetContentLeft() + xShift);
-    overlap += params->m_lastSyl->CalcConnectorSpacing(params->m_doc, params->m_staffSize);
-
-    int nextFreeSpace = params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
-
-    if (overlap > 0) {
-        // We are adjusting syl in two different measures - move only the to right barline of the first measure
-        if (params->m_previousMeasure) {
-            params->m_overlappingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
-                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
-            // Do it now
-            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
-            params->m_overlappingSyl.clear();
-        }
-        else {
-            // Normal case, both in the same measure
-            params->m_overlappingSyl.push_back(
-                std::make_tuple(params->m_previousVerse->GetAlignment(), this->GetAlignment(), overlap));
-        }
-    }
-
-    params->m_previousVerse = this;
-    params->m_lastSyl = lastSyl;
-    params->m_freeSpace = nextFreeSpace;
-    params->m_previousMeasure = NULL;
 
     return FUNCTOR_CONTINUE;
 }
@@ -258,16 +169,6 @@ int Verse::GenerateMIDI(FunctorParams *)
     Verse *previousVerse = vrv_cast<Verse *>(parent->GetPrevious(this, VERSE));
 
     if (previousVerse) return FUNCTOR_SIBLINGS;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Verse::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingLabelAbbr = NULL;
 
     return FUNCTOR_CONTINUE;
 }

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "measure.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -69,14 +70,24 @@ bool Reh::IsSupportedChild(Object *child)
 // Reh functor methods
 //----------------------------------------------------------------------------
 
-int Reh::PrepareRehPosition(FunctorParams *)
+FunctorCode Reh::Accept(MutableFunctor &functor)
 {
-    if (!this->HasStart() && !this->HasTstamp()) {
-        Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-        if (measure->GetLeftBarLine()) this->SetStart(measure->GetLeftBarLine());
-    }
+    return functor.VisitReh(this);
+}
 
-    return FUNCTOR_SIBLINGS;
+FunctorCode Reh::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitReh(this);
+}
+
+FunctorCode Reh::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRehEnd(this);
+}
+
+FunctorCode Reh::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRehEnd(this);
 }
 
 } // namespace vrv

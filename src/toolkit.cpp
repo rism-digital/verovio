@@ -21,6 +21,7 @@
 #include "editortoolkit_cmn.h"
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
+#include "findfunctor.h"
 #include "functorparams.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -78,8 +79,6 @@ Toolkit::Toolkit(bool initFont)
     }
 
     m_options = m_doc.GetOptions();
-
-    m_skipLayoutOnLoad = false;
 
     m_editorToolkit = NULL;
 
@@ -262,7 +261,7 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;
         return UNKNOWN;
     }
-    size_t searchLimit = 600;
+    const int searchLimit = 600;
     std::string initial = data.substr(0, searchLimit);
     if (data[0] == '<') {
         // <mei> == root node for standard organization of MEI data
@@ -423,7 +422,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 
     std::string filename;
     // Look for the meta file in the zip
-    for (auto &member : file.infolist()) {
+    for (miniz_cpp::zip_info &member : file.infolist()) {
         if (member.filename == "META-INF/container.xml") {
             std::string container = file.read(member.filename);
             // Find the file name with an xpath query
@@ -712,6 +711,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // generate missing measure numbers
+    // TODO better move this to PrepareData()
     m_doc.GenerateMeasureNumbers();
 
     // transpose the content if necessary
@@ -749,7 +749,7 @@ bool Toolkit::LoadData(const std::string &data)
     // to be converted
     if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
 
-    if (!m_skipLayoutOnLoad && (breaks != BREAKS_none)) {
+    if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
             && (breaks == BREAKS_encoded || breaks == BREAKS_line || breaks == BREAKS_smart)) {
             if (breaks == BREAKS_encoded) {
@@ -799,11 +799,6 @@ bool Toolkit::LoadData(const std::string &data)
 #endif
 
     return true;
-}
-
-void Toolkit::SkipLayoutOnLoad(bool value)
-{
-    m_skipLayoutOnLoad = value;
 }
 
 std::string Toolkit::GetMEI(const std::string &jsonOptions)
@@ -959,10 +954,9 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         }
         else if (optArray) {
             std::vector<std::string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
-            std::vector<std::string>::iterator strIter;
             jsonxx::Array values;
-            for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
-                values << (*strIter);
+            for (const std::string &strValue : strValues) {
+                values << strValue;
             }
             o << iter->first << values;
         }
@@ -998,7 +992,7 @@ std::string Toolkit::GetAvailableOptions() const
     grps << "0-base" << m_options->GetBaseOptGrp();
 
     const std::vector<OptionGrp *> *optionGrps = m_options->GetGrps();
-    for (auto const &optionGrp : *optionGrps) {
+    for (OptionGrp *optionGrp : *optionGrps) {
 
         jsonxx::Object grp;
         grp << "name" << optionGrp->GetLabel();
@@ -1007,7 +1001,7 @@ std::string Toolkit::GetAvailableOptions() const
 
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
-        for (auto const &option : *options) {
+        for (Option *option : *options) {
             // Reading json from file is not supported in toolkit
             const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
             if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
@@ -1086,8 +1080,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         else if (json.has<jsonxx::Array>(iter->first)) {
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
             std::vector<std::string> strValues;
-            int i;
-            for (i = 0; i < (int)values.size(); ++i) {
+            for (int i = 0; i < (int)values.size(); ++i) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
                 // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }
@@ -1122,6 +1115,145 @@ void Toolkit::ResetOptions()
     this->SetFont(m_options->m_font.GetValue());
 }
 
+void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &output) const
+{
+    if (!option) return;
+    std::string option_str = " ";
+    if (option->GetShortOption()) {
+        option_str.append("-");
+        option_str.push_back(option->GetShortOption());
+        option_str.append(", ");
+    }
+
+    if (!option->GetKey().empty()) {
+        option_str.append("--");
+        option_str.append(vrv::FromCamelCase(option->GetKey()));
+    }
+
+    const vrv::OptionDbl *optDbl = dynamic_cast<const vrv::OptionDbl *>(option);
+    const vrv::OptionInt *optInt = dynamic_cast<const vrv::OptionInt *>(option);
+    const vrv::OptionIntMap *optIntMap = dynamic_cast<const vrv::OptionIntMap *>(option);
+    const vrv::OptionString *optString = dynamic_cast<const vrv::OptionString *>(option);
+    const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(option);
+    const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(option);
+
+    if (optDbl) {
+        option_str.append(" <f>");
+    }
+    else if (optInt) {
+        option_str.append(" <i>");
+    }
+    else if (optString) {
+        option_str.append(" <s>");
+    }
+    else if (optArray) {
+        option_str.append("* <s>");
+    }
+    else if (!optBool) {
+        option_str.append(" <s>");
+    }
+
+    const int helpTabs = 32;
+    if (option_str.size() < helpTabs) {
+        option_str.insert(option_str.end(), helpTabs - option_str.size(), ' ');
+    }
+    else {
+        option_str.append("\t");
+    }
+
+    output << option_str << option->GetDescription();
+    if (optInt && (optInt->GetMin() != optInt->GetMax())) {
+        output << " (default: " << optInt->GetDefault();
+        output << "; min: " << optInt->GetMin();
+        output << "; max: " << optInt->GetMax() << ")";
+    }
+    if (optDbl && (optDbl->GetMin() != optDbl->GetMax())) {
+        output << std::fixed << " (default: " << optDbl->GetDefault();
+        output << "; min: " << optDbl->GetMin();
+        output << "; max: " << optDbl->GetMax() << ")";
+    }
+    if (optString) {
+        output << " (default: \"" << optString->GetDefault() << "\")";
+    }
+    if (optIntMap) {
+        output << " (default: \"" << optIntMap->GetDefaultStrValue()
+               << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
+    }
+    output << std::endl;
+}
+
+void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
+{
+    // map of all categories and expected string arguments for them
+    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
+        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Layout, "layout" },
+        { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Midi, "midi" },
+        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+
+    output.precision(2);
+    // display_version();
+    output << "Verovio " << this->GetVersion() << std::endl;
+    output << std::endl << "Example usage:" << std::endl << std::endl;
+    output << " verovio [-s scale] [-r resource-path] [-o outfile] infile" << std::endl << std::endl;
+
+    auto it = std::find_if(
+        categories.begin(), categories.end(), [&category](const std::pair<vrv::OptionsCategory, std::string> &value) {
+            return std::equal(value.second.begin(), value.second.end(), category.begin(), category.end(),
+                [](const char a, const char b) { return a == tolower(b); });
+        });
+
+    if (it == categories.end()) {
+        std::string optionStr;
+        output << "Help manual categories: " << std::endl;
+        // Print base group options
+        optionStr.append(" -h ");
+        optionStr.append(categories.at(m_options->m_baseOptions.GetCategory()));
+        optionStr.append("\t");
+        optionStr.append(m_options->m_baseOptions.GetLabel());
+        optionStr.append("\n");
+
+        const std::vector<vrv::OptionGrp *> *grps = m_options->GetGrps();
+        // Print each group one by one
+        for (const auto group : *grps) {
+            optionStr.append(" -h ");
+            optionStr.append(categories.at(group->GetCategory()));
+            optionStr.append("\t");
+            optionStr.append(group->GetLabel());
+            optionStr.append("\n");
+        }
+        optionStr.append(" -h full\tPrint all help manual and exit");
+        output << optionStr << std::endl;
+    }
+    else {
+        output << "Options (marked as * are repeatable)" << std::endl;
+        if ((it->first == vrv::OptionsCategory::Base) || (it->first == vrv::OptionsCategory::Full)) {
+            const std::vector<vrv::Option *> *baseOptions = m_options->GetBaseOptions();
+            for (vrv::Option *option : *baseOptions) {
+                this->PrintOptionUsageOutput(option, output);
+            }
+        }
+        const std::vector<vrv::OptionGrp *> *grps = m_options->GetGrps();
+        for (const auto group : *grps) {
+            if (it->first == group->GetCategory() || (it->first == vrv::OptionsCategory::Full)) {
+                // Options with long forms only
+                output << std::endl << group->GetLabel() << std::endl;
+                const std::vector<vrv::Option *> *options = group->GetOptions();
+
+                for (vrv::Option *option : *options) {
+                    this->PrintOptionUsageOutput(option, output);
+                }
+            }
+        }
+    }
+}
+
+std::string Toolkit::GetOptionUsageString() const
+{
+    std::stringstream ss;
+    this->PrintOptionUsage("full", ss);
+    return ss.str();
+}
+
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
@@ -1138,16 +1270,15 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
-        Functor findByID(&Object::FindElementInLayerStaffDefsByID);
-        FindLayerIDWithinStaffDefParams params(xmlId);
+        FindElementInLayerStaffDefFunctor findElementInLayerStaffDef(xmlId);
         // Check drawing page elements first
         if (m_doc.GetDrawingPage()) {
-            m_doc.GetDrawingPage()->Process(&findByID, &params);
-            element = params.m_object;
+            m_doc.GetDrawingPage()->Process(findElementInLayerStaffDef);
+            element = findElementInLayerStaffDef.GetElement();
         }
         if (!element) {
-            m_doc.Process(&findByID, &params);
-            element = params.m_object;
+            m_doc.Process(findElementInLayerStaffDef);
+            element = findElementInLayerStaffDef.GetElement();
         }
         // If element is found within layer staffdef - check for the linking interface @corresp attribute to find
         // original ID of the element
@@ -1226,14 +1357,13 @@ std::string Toolkit::EditInfo()
 std::string Toolkit::GetLog()
 {
     std::string str;
-    std::vector<std::string>::iterator iter;
-    for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
-        str += (*iter);
+    for (const std::string &logStr : logBuffer) {
+        str += logStr;
     }
     return str;
 }
 
-std::string Toolkit::GetVersion()
+std::string Toolkit::GetVersion() const
 {
     return vrv::GetVersion();
 }
@@ -1576,7 +1706,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
-    Page *page = dynamic_cast<Page *>(measure->GetFirstAncestor(PAGE));
+    Page *page = vrv_cast<Page *>(measure->GetFirstAncestor(PAGE));
     if (page) pageNo = page->GetIdx() + 1;
 
     NoteOrRestOnsetOffsetComparison matchTime(millisec - measureTimeOffset);
@@ -1586,21 +1716,21 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     measure->FindAllDescendantsByComparison(&notesOrRests, &matchTime);
 
     // Fill the JSON object
-    for (auto const item : notesOrRests) {
-        if (item->Is(NOTE)) {
-            noteArray << item->GetID();
-            Note *note = vrv_cast<Note *>(item);
+    for (Object *object : notesOrRests) {
+        if (object->Is(NOTE)) {
+            noteArray << object->GetID();
+            Note *note = vrv_cast<Note *>(object);
             assert(note);
             Chord *chord = note->IsChordTone();
             if (chord) chords.push_back(chord);
         }
-        else if (item->Is(REST)) {
-            restArray << item->GetID();
+        else if (object->Is(REST)) {
+            restArray << object->GetID();
         }
     }
     chords.unique();
-    for (auto const item : chords) {
-        chordArray << item->GetID();
+    for (Object *object : chords) {
+        chordArray << object->GetID();
     }
 
     o << "notes" << noteArray;
@@ -1671,7 +1801,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
         LogWarning("Element '%s' not found", xmlId.c_str());
         return 0;
     }
-    Page *page = dynamic_cast<Page *>(element->GetFirstAncestor(PAGE));
+    Page *page = vrv_cast<Page *>(element->GetFirstAncestor(PAGE));
     if (!page) {
         return 0;
     }
@@ -1816,7 +1946,7 @@ std::string Toolkit::GetMIDIValuesForElement(const std::string &xmlId)
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     this->ClearHumdrumBuffer();
-    size_t size = strlen(data) + 1;
+    int size = (int)strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong

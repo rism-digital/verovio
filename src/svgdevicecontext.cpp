@@ -71,7 +71,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
 
     m_outdata.clear();
 
-    m_glyphPostfixId = Object::GenerateRandID();
+    m_glyphPostfixId = Object::GenerateHashID();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -112,7 +112,7 @@ void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resour
 
     pugi::xml_node css = m_svgNode.append_child("style");
     css.append_attribute("type") = "text/css";
-    css.append_child(pugi::node_pcdata).set_value(cssContent.c_str());
+    css.text().set(cssContent.c_str());
 }
 
 void SvgDeviceContext::Commit(bool xml_declaration)
@@ -171,9 +171,9 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (auto it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
+        for (const Glyph *smuflGlyph : m_smuflGlyphs) {
             // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source((*it)->GetPath());
+            std::ifstream source(smuflGlyph->GetPath());
             sourceDoc.load(source);
 
             // copy all the nodes inside into the master document
@@ -272,7 +272,7 @@ void SvgDeviceContext::StartGraphic(
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
             svgTitle.append_attribute("class") = "labelAttr";
-            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+            svgTitle.text().set(att->GetLabel().c_str());
         }
     }
 
@@ -289,11 +289,9 @@ void SvgDeviceContext::StartGraphic(
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
         if (att->HasFontstyle())
-            m_currentNode.append_attribute("font-style")
-                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+            m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
-            m_currentNode.append_attribute("font-weight")
-                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+            m_currentNode.append_attribute("font-weight") = att->FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -352,7 +350,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
             svgTitle.append_attribute("class") = "labelAttr";
-            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+            svgTitle.text().set(att->GetLabel().c_str());
         }
     }
 
@@ -369,11 +367,9 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
         if (att->HasFontstyle())
-            m_currentNode.append_attribute("font-style")
-                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+            m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
-            m_currentNode.append_attribute("font-weight")
-                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+            m_currentNode.append_attribute("font-weight") = att->FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_WHITESPACE)) {
@@ -443,7 +439,7 @@ void SvgDeviceContext::StartPage()
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
-            .set_value("g.page-margin{font-family:Times;} "
+            .set_value("g.page-margin{font-family:Times,serif;} "
                        //"g.page-margin{background: pink;} "
                        //"g.bounding-box{stroke:red; stroke-width:10} "
                        //"g.content-bounding-box{stroke:blue; stroke-width:10} "
@@ -455,7 +451,7 @@ void SvgDeviceContext::StartPage()
     if (!m_css.empty()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.append_child(pugi::node_pcdata).set_value(m_css.c_str());
+        m_currentNode.text().set(m_css.c_str());
         m_currentNode = m_svgNodeStack.back();
     }
 
@@ -971,7 +967,7 @@ void SvgDeviceContext::DrawText(
         }
     }
     textChild.append_attribute("class") = "text";
-    textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
+    textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
         && (width != VRV_UNSET) && (height != VRV_UNSET)) {
@@ -1011,8 +1007,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
     }
 
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); ++i) {
-        char32_t c = text.at(i);
+    for (char32_t c : text) {
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
@@ -1076,7 +1071,7 @@ void SvgDeviceContext::DrawBackgroundImage(int x, int y) {}
 void SvgDeviceContext::AddDescription(const std::string &text)
 {
     pugi::xml_node desc = m_currentNode.append_child("desc");
-    desc.append_child(pugi::node_pcdata).set_value(text.c_str());
+    desc.text().set(text.c_str());
 }
 
 void SvgDeviceContext::AppendIdAndClass(

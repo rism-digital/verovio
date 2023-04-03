@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
@@ -74,6 +75,26 @@ bool Section::IsSupportedChild(Object *child)
 // Section functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Section::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSection(this);
+}
+
+FunctorCode Section::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSection(this);
+}
+
+FunctorCode Section::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSectionEnd(this);
+}
+
+FunctorCode Section::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSectionEnd(this);
+}
+
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
@@ -102,38 +123,6 @@ int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
     params->m_contentMeasure = NULL;
     params->m_contentLayer = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::PrepareMilestones(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::ResetData(FunctorParams *functorParams)
-{
-    FloatingObject::ResetData(functorParams);
-
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    if (this->GetRestart() == BOOLEAN_true) {
-        params->m_applySectionRestartShift = true;
-    }
 
     return FUNCTOR_CONTINUE;
 }

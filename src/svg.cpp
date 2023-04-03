@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "fig.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -56,6 +57,26 @@ int Svg::GetHeight() const
         return atoi(m_svg.first_child().attribute("height").value()) * DEFINITION_FACTOR;
     }
     return 0;
+}
+
+FunctorCode Svg::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSvg(this);
+}
+
+FunctorCode Svg::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSvg(this);
+}
+
+FunctorCode Svg::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSvgEnd(this);
+}
+
+FunctorCode Svg::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSvgEnd(this);
 }
 
 } // namespace vrv

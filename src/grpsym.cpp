@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "staffgrp.h"
 #include "vrv.h"
@@ -79,57 +80,24 @@ int GrpSym::GetDrawingY() const
 // GrpSym functor methods
 //----------------------------------------------------------------------------
 
-int GrpSym::ScoreDefSetGrpSym(FunctorParams *)
+FunctorCode GrpSym::Accept(MutableFunctor &functor)
 {
-    // For the grpSym that is encoded in the scope of the staffGrp just get first and last staffDefs and set then as
-    // starting and ending points
-    if (this->GetParent()->Is(STAFFGRP)) {
-        StaffGrp *staffGrp = vrv_cast<StaffGrp *>(this->GetParent());
-        assert(staffGrp);
-        auto [firstDef, lastDef] = staffGrp->GetFirstLastStaffDef();
-        if (firstDef && lastDef) {
-            this->SetStartDef(firstDef);
-            this->SetEndDef(lastDef);
-            staffGrp->SetGroupSymbol(this);
-        }
-    }
-    // For the grpSym that is encoded in the scope of the scoreDef we need to find corresponding staffDefs with matching
-    // @startid and @endid. We also need to make sure that @level attribute is adhered to, hence we limit search depth.
-    // Finally, we need to make sure that both starting and ending elements have the same parent (since we cannot draw
-    // cross-group grpSym)
-    else if (this->GetParent()->Is(SCOREDEF)) {
-        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(this->GetParent());
-        assert(scoreDef);
+    return functor.VisitGrpSym(this);
+}
 
-        const std::string startId = ExtractIDFragment(this->GetStartid());
-        const std::string endId = ExtractIDFragment(this->GetEndid());
-        const int level = this->GetLevel();
+FunctorCode GrpSym::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGrpSym(this);
+}
 
-        IDComparison compare(STAFFDEF, startId);
-        StaffDef *start = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
-        compare.SetID(endId);
-        StaffDef *end = vrv_cast<StaffDef *>(scoreDef->FindDescendantByComparison(&compare, level));
+FunctorCode GrpSym::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitGrpSymEnd(this);
+}
 
-        if (!start || !end) {
-            LogWarning("Could not find startid/endid on level %d for <'%s'>", level, this->GetID().c_str());
-            return FUNCTOR_CONTINUE;
-        }
-
-        if (start->GetParent() != end->GetParent()) {
-            LogWarning("<'%s'> has mismatching parents for startid:<'%s'> and endid:<'%s'>", this->GetID().c_str(),
-                startId.c_str(), endId.c_str());
-            return FUNCTOR_CONTINUE;
-        }
-
-        this->SetStartDef(start);
-        this->SetEndDef(end);
-        // dynamic_cast because we never check parent type
-        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(start->GetParent());
-        assert(staffGrp);
-        staffGrp->SetGroupSymbol(this);
-    }
-
-    return FUNCTOR_CONTINUE;
+FunctorCode GrpSym::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGrpSymEnd(this);
 }
 
 } // namespace vrv

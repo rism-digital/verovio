@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 
 namespace vrv {
 
@@ -72,6 +73,26 @@ bool MultiRest::UseBlockStyle(const Doc *doc) const
             break;
     }
     return useBlock;
+}
+
+FunctorCode MultiRest::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMultiRest(this);
+}
+
+FunctorCode MultiRest::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMultiRest(this);
+}
+
+FunctorCode MultiRest::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMultiRestEnd(this);
+}
+
+FunctorCode MultiRest::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMultiRestEnd(this);
 }
 
 } // namespace vrv

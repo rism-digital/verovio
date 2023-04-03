@@ -9,6 +9,7 @@
 #define __VRV_AREA_POS_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {

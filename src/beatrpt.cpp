@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -75,6 +76,26 @@ double BeatRpt::GetScoreTimeOnset() const
 // BeatRpt functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode BeatRpt::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBeatRpt(this);
+}
+
+FunctorCode BeatRpt::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeatRpt(this);
+}
+
+FunctorCode BeatRpt::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeatRptEnd(this);
+}
+
+FunctorCode BeatRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeatRptEnd(this);
+}
+
 int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
@@ -88,7 +109,7 @@ int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
     // filter last beat and copy all notes
     smf::MidiEvent event;
     int eventcount = params->m_midiFile->getEventCount(params->m_midiTrack);
-    for (int i = 0; i < eventcount; i++) {
+    for (int i = 0; i < eventcount; ++i) {
         event = params->m_midiFile->getEvent(params->m_midiTrack, i);
         if (event.tick > starttime * tpq)
             break;

@@ -14,9 +14,9 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -80,14 +80,13 @@ void PlistInterface::SetIDStrs()
     assert(m_ids.empty() && m_references.empty());
 
     xsdAnyURI_List list = this->GetPlist();
-    xsdAnyURI_List::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter) {
-        std::string id = ExtractIDFragment(*iter);
+    for (const std::string &uri : list) {
+        std::string id = ExtractIDFragment(uri);
         if (!id.empty()) {
             m_ids.push_back(id);
         }
         else {
-            LogError("Cannot parse the anyURI '%s'", (*iter).c_str());
+            LogError("Cannot parse the anyURI '%s'", uri.c_str());
         }
     }
 }
@@ -96,13 +95,10 @@ void PlistInterface::SetIDStrs()
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *object)
+FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, Object *object)
 {
-    PreparePlistParams *params = vrv_params_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
     // This should not happen?
-    if (params->m_fillList == false) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -110,13 +106,13 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
 
     std::vector<std::string>::iterator iter;
     for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
-        params->m_interfaceIDTuples.push_back(std::make_tuple(this, *iter, (Object *)NULL));
+        functor.InsertInterfaceIDTuple(*iter, this);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int PlistInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
+FunctorCode PlistInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_ids.clear();
     m_references.clear();

@@ -19,6 +19,8 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
+#include "findfunctor.h"
+#include "findlayerelementsfunctor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -66,10 +68,7 @@ void System::Reset()
     DrawingListInterface::Reset();
     this->ResetTyped();
 
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
+    this->ResetDrawingScoreDef();
 
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
@@ -196,11 +195,19 @@ bool System::SetCurrentFloatingPositioner(
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnscoreDefSetCurrent before
+    assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
     m_drawingScoreDef->SetParent(this);
+}
+
+void System::ResetDrawingScoreDef()
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 }
 
 bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElement *end) const
@@ -223,15 +230,14 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
     // otherwise look for a measures in between
     else {
         ClassIdComparison isMeasure(MEASURE);
-        Functor findAllConstBetween(&Object::FindAllConstBetween);
-        FindAllConstBetweenParams findAllConstBetweenParams(&isMeasure, &measures, measureStart, measureEnd);
-        this->Process(&findAllConstBetween, &findAllConstBetweenParams, NULL, NULL, 1);
+        FindAllBetweenFunctor findAllBetween(&isMeasure, &measures, measureStart, measureEnd);
+        this->Process(findAllBetween, 1);
     }
 
     // Now we can look for chords and note
     ClassIdsComparison matchType({ CHORD, NOTE });
     ListOfConstObjects children;
-    for (auto &measure : measures) {
+    for (const Object *measure : measures) {
         const Object *curStart = (measure == measureStart) ? start : measure->GetFirst();
         const Object *curEnd = (measure == measureEnd) ? end : measure->GetLast();
         measure->FindAllDescendantsBetween(&children, &matchType, curStart, curEnd, false);
@@ -244,10 +250,10 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    for (auto &child : children) {
-        const Layer *layer = vrv_cast<const Layer *>((child)->GetFirstAncestor(LAYER));
+    for (const Object *child : children) {
+        const Layer *layer = vrv_cast<const Layer *>(child->GetFirstAncestor(LAYER));
         assert(layer);
-        const Staff *staff = vrv_cast<const Staff *>((child)->GetFirstAncestor(STAFF));
+        const Staff *staff = vrv_cast<const Staff *>(child->GetFirstAncestor(STAFF));
         assert(staff);
 
         // If the slur is spanning over several measures, the children list will include notes and chords
@@ -276,19 +282,17 @@ bool System::HasMixedDrawingStemDir(const LayerElement *start, const LayerElemen
 curvature_CURVEDIR System::GetPreferredCurveDirection(
     const LayerElement *start, const LayerElement *end, const Slur *slur) const
 {
-    FindSpannedLayerElementsParams findSpannedLayerElementsParams(slur);
-    findSpannedLayerElementsParams.m_minPos = start->GetDrawingX();
-    findSpannedLayerElementsParams.m_maxPos = end->GetDrawingX();
-    findSpannedLayerElementsParams.m_classIds = { CHORD, NOTE };
+    FindSpannedLayerElementsFunctor findSpannedLayerElements(slur);
+    findSpannedLayerElements.SetMinMaxPos(start->GetDrawingX(), end->GetDrawingX());
+    findSpannedLayerElements.SetClassIds({ CHORD, NOTE });
 
     const Layer *layerStart = vrv_cast<const Layer *>(start->GetFirstAncestor(LAYER));
     assert(layerStart);
 
-    Functor findSpannedLayerElements(&Object::FindSpannedLayerElements);
-    this->Process(&findSpannedLayerElements, &findSpannedLayerElementsParams);
+    this->Process(findSpannedLayerElements);
 
     curvature_CURVEDIR preferredDirection = curvature_CURVEDIR_NONE;
-    for (auto element : findSpannedLayerElementsParams.m_elements) {
+    for (auto element : findSpannedLayerElements.GetElements()) {
         const Layer *layer = vrv_cast<const Layer *>((element)->GetFirstAncestor(LAYER));
         assert(layer);
         if (layer == layerStart) continue;
@@ -485,71 +489,24 @@ void System::ConvertToUnCastOffMensuralSystem()
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::ScoreDefUnsetCurrent(FunctorParams *functorParams)
+FunctorCode System::Accept(MutableFunctor &functor)
 {
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    m_drawingIsOptimized = false;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSystem(this);
 }
 
-int System::ScoreDefOptimize(FunctorParams *functorParams)
+FunctorCode System::Accept(ConstFunctor &functor) const
 {
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    this->IsDrawingOptimized(true);
-
-    if (params->m_firstScoreDef) {
-        params->m_firstScoreDef = false;
-        if (!params->m_doc->GetOptions()->m_condenseFirstPage.GetValue()) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    if (this->IsLastOfMdiv()) {
-        if (params->m_doc->GetOptions()->m_condenseNotLastSystem.GetValue()) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    params->m_currentScoreDef = this->GetDrawingScoreDef();
-    assert(params->m_currentScoreDef);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSystem(this);
 }
 
-int System::ScoreDefOptimizeEnd(FunctorParams *functorParams)
+FunctorCode System::AcceptEnd(MutableFunctor &functor)
 {
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
-    m_systemAligner.SetSpacing(params->m_currentScoreDef);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSystemEnd(this);
 }
 
-int System::ScoreDefSetGrpSym(FunctorParams *functorParams)
+FunctorCode System::AcceptEnd(ConstFunctor &functor) const
 {
-    ScoreDefSetGrpSymParams *params = vrv_params_cast<ScoreDefSetGrpSymParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingScoreDef) m_drawingScoreDef->Process(params->m_functor, functorParams);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingXRel(0);
-    m_drawingAbbrLabelsWidth = 0;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSystemEnd(this);
 }
 
 int System::ResetVerticalAlignment(FunctorParams *functorParams)
@@ -570,17 +527,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
     m_systemLeftMar *= params->m_page->GetPPUFactor();
     m_systemRightMar *= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AlignHorizontally(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = vrv_params_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    // since we are starting a new system its first scoreDef will need to be a SYSTEM_SCOREDEF
-    params->m_isFirstMeasure = true;
 
     return FUNCTOR_CONTINUE;
 }
@@ -608,181 +554,6 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::CalcAlignmentXPos(FunctorParams *functorParams)
-{
-    CalcAlignmentXPosParams *params = vrv_params_cast<CalcAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    const double ratio = this->EstimateJustificationRatio(params->m_doc);
-    if ((!this->IsLastOfMdiv() && !this->IsLastOfSelection()) || (ratio < params->m_estimatedJustificationRatio)) {
-        params->m_estimatedJustificationRatio = ratio;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustXOverflow(FunctorParams *functorParams)
-{
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    params->m_currentSystem = this;
-    params->m_lastMeasure = NULL;
-    params->m_currentWidest = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustXOverflowEnd(FunctorParams *functorParams)
-{
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    // Continue if no measure of not widest element
-    if (!params->m_lastMeasure || !params->m_currentWidest) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Continue if the right position of the measure is larger than the widest element right
-    int measureRightX
-        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetRightBarLineLeft() - params->m_margin;
-    if (measureRightX > params->m_currentWidest->GetContentRight()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    LayerElement *objectX = dynamic_cast<LayerElement *>(params->m_currentWidest->GetObjectX());
-    if (!objectX) {
-        return FUNCTOR_CONTINUE;
-    }
-    Alignment *left = objectX->GetAlignment();
-    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstAncestor(MEASURE));
-    if (objectXMeasure != params->m_lastMeasure) {
-        left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
-    }
-
-    int overflow = params->m_currentWidest->GetContentRight() - measureRightX;
-    if (overflow > 0) {
-        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
-            left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
-        params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
-{
-    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    // reset it, but not the current grpId!
-    params->m_currentSystem = this;
-    params->m_overlappingHarm.clear();
-    params->m_previousHarmPositioner = NULL;
-    params->m_previousHarmStart = NULL;
-    params->m_previousMeasure = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    // End of the first pass - loop over for each group id
-    if (params->m_currentGrp == 0) {
-        for (auto grpId : params->m_grpIds) {
-            params->m_currentGrp = grpId;
-            this->Process(params->m_functor, functorParams, params->m_functorEnd);
-        }
-        // Make sure we reset it for the next system
-        params->m_currentGrp = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    /************** End of a system when actually adjusting **************/
-
-    if (!params->m_previousMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Here we also need to handle the last harm of the measure - we check the alignment with the right barline
-    if (params->m_previousHarmPositioner) {
-        const Object *positioner = params->m_previousHarmPositioner->GetObject();
-        assert(positioner);
-        // We do this only if it is the harm is in the last measure
-        if (params->m_previousMeasure == positioner->GetFirstAncestor(MEASURE)) {
-            int overlap = params->m_previousHarmPositioner->GetContentRight()
-                - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
-
-            if (overlap > 0) {
-                params->m_overlappingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
-                    params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
-            }
-        }
-    }
-
-    // Ajust the postion of the alignment according to what we have collected for this harm group id
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
-    params->m_overlappingHarm.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustSylSpacing(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // reset it
-    params->m_overlappingSyl.clear();
-    params->m_previousVerse = NULL;
-    params->m_previousMeasure = NULL;
-    params->m_freeSpace = 0;
-    params->m_staffSize = 100;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustSylSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = vrv_params_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_previousMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Here we also need to handle the last syl of the measure - we check the alignment with the right barline
-    if (params->m_previousVerse && params->m_lastSyl) {
-        int overlap = params->m_lastSyl->GetContentRight()
-            - params->m_previousMeasure->GetRightBarLine()->GetAlignment()->GetXRel();
-        params->m_previousVerse->AdjustPosition(overlap, params->m_freeSpace, params->m_doc);
-
-        if (overlap > 0) {
-            params->m_overlappingSyl.push_back(std::make_tuple(params->m_previousVerse->GetAlignment(),
-                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
-        }
-    }
-
-    // Ajust the postion of the alignment according to what we have collected for this harm grp
-    params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingSyl);
-    params->m_overlappingSyl.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AdjustTempo(FunctorParams *functorParams)
-{
-    AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
-    assert(params);
-
-    params->m_systemAligner = &m_systemAligner;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = vrv_params_cast<AdjustYPosParams *>(functorParams);
@@ -797,35 +568,6 @@ int System::AdjustYPos(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
-}
-
-int System::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    this->SetDrawingXRel(m_systemLeftMar + this->GetDrawingLabelsWidth());
-    params->m_shift = 0;
-    params->m_justifiableWidth = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::AlignMeasuresEnd(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    if (params->m_storeCastOffSystemWidths) {
-        m_castOffTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-        m_castOffJustifiableWidth = params->m_justifiableWidth;
-    }
-    else {
-        m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
-        m_drawingJustifiableWidth = params->m_justifiableWidth;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 int System::AlignSystems(FunctorParams *functorParams)
@@ -958,9 +700,6 @@ int System::AdjustFloatingPositioners(FunctorParams *functorParams)
 
     AdjustFloatingPositionerGrpsParams adjustFloatingPositionerGrpsParams(params->m_doc);
     Functor adjustFloatingPositionerGrps(&Object::AdjustFloatingPositionerGrps);
-
-    params->m_classId = GLISS;
-    m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = LV;
     m_systemAligner.Process(params->m_functor, params);

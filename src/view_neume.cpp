@@ -81,7 +81,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstAncestor(NEUME));
+    Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
     assert(neume);
     int position = neume->GetChildIndex(element);
 
@@ -182,8 +182,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
-    for (auto it = params.begin(); it != params.end(); it++) {
-        this->DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+    for (drawingParams &param : params) {
+        this->DrawSmuflCode(dc, noteX + param.xOffset * noteWidth, yValue + param.yOffset * noteHeight, param.fontNo,
             staff->m_drawingStaffSize, false, true);
     }
 

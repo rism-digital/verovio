@@ -24,6 +24,7 @@
 #include "dynam.h"
 #include "fermata.h"
 #include "fing.h"
+#include "functor.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "mordent.h"
@@ -66,9 +67,6 @@ FloatingObject::FloatingObject(ClassId classId) : Object(classId, "fe")
 FloatingObject::FloatingObject(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr)
 {
     this->Reset();
-
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
 }
 
 FloatingObject::~FloatingObject() {}
@@ -77,7 +75,15 @@ void FloatingObject::Reset()
 {
     Object::Reset();
 
+    this->ResetDrawing();
+
     m_drawingGrpId = 0;
+}
+
+void FloatingObject::ResetDrawing()
+{
+    m_currentPositioner = NULL;
+    m_maxDrawingYRel = VRV_UNSET;
 }
 
 void FloatingObject::UpdateContentBBoxX(int x1, int x2)
@@ -116,16 +122,19 @@ int FloatingObject::GetDrawingY() const
     return m_currentPositioner->GetDrawingY();
 }
 
-void FloatingObject::SetMaxDrawingYRel(int maxDrawingYRel)
+void FloatingObject::SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place)
 {
-    if (!m_currentPositioner) return;
-    data_STAFFREL drawingPlace = m_currentPositioner->GetDrawingPlace();
-    if (drawingPlace == STAFFREL_above) {
+    if (place == STAFFREL_above) {
         if ((m_maxDrawingYRel == VRV_UNSET) || (m_maxDrawingYRel > maxDrawingYRel)) m_maxDrawingYRel = maxDrawingYRel;
     }
     else {
         if ((m_maxDrawingYRel == VRV_UNSET) || (m_maxDrawingYRel < maxDrawingYRel)) m_maxDrawingYRel = maxDrawingYRel;
     }
+}
+
+void FloatingObject::ResetDrawingObjectIDs()
+{
+    FloatingObject::s_drawingObjectIds.clear();
 }
 
 void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
@@ -172,6 +181,26 @@ std::pair<int, bool> FloatingObject::GetVerticalContentBoundaryRel(const Doc *do
 
     const int boundary = contentTop ? positioner->GetContentY2() : positioner->GetContentY1();
     return { boundary, false };
+}
+
+FunctorCode FloatingObject::Accept(MutableFunctor &functor)
+{
+    return functor.VisitFloatingObject(this);
+}
+
+FunctorCode FloatingObject::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitFloatingObject(this);
+}
+
+FunctorCode FloatingObject::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitFloatingObjectEnd(this);
+}
+
+FunctorCode FloatingObject::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFloatingObjectEnd(this);
 }
 
 //----------------------------------------------------------------------------
@@ -321,6 +350,8 @@ void FloatingPositioner::ResetPositioner()
 
     m_drawingYRel = 0;
     m_drawingXRel = 0;
+
+    m_drawingExtenderWidth = 0;
 }
 
 int FloatingPositioner::GetDrawingX() const
@@ -376,10 +407,28 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
     }
 }
 
+bool FloatingPositioner::HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const
+{
+    int bboxExtenderWidth = 0;
+    const FloatingPositioner *bboxPositioner = dynamic_cast<const FloatingPositioner *>(bbox);
+    if (bboxPositioner) {
+        bboxExtenderWidth = bboxPositioner->GetDrawingExtenderWidth();
+    }
+
+    const int margin = this->GetAdmissibleHorizOverlapMargin(bbox, unit);
+
+    if (!this->HasContentBB() || !bbox->HasContentBB()) return false;
+    if (this->GetContentRight() + m_drawingExtenderWidth <= bbox->GetContentLeft() - margin) return false;
+    if (this->GetContentLeft() >= bbox->GetContentRight() + bboxExtenderWidth + margin) return false;
+
+    return true;
+}
+
 int FloatingPositioner::GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const
 {
     const LayerElement *element = dynamic_cast<const LayerElement *>(bbox);
     if (element) {
+        if (this->GetObject()->IsExtenderElement()) return 8 * unit;
         if ((this->GetObject()->Is(DYNAM)) && element->GetFirstAncestor(BEAM)) {
             return 2 * unit;
         }
@@ -415,9 +464,10 @@ void FloatingPositioner::CalcDrawingYRel(
             }
         }
 
-        if (this->GetObject()->Is(FERMATA) && (staffAlignment->GetStaff()->m_drawingLines == 1)) {
-            minStaffDistance = 2.5 * unit;
+        if (staffAlignment->GetStaff()->m_drawingLines == 1) {
+            minStaffDistance += 2.5 * unit;
         }
+
         if (m_place == STAFFREL_above) {
             yRel = this->GetContentY1();
             yRel -= doc->GetBottomMargin(m_object->GetClassId()) * unit;
@@ -449,7 +499,6 @@ void FloatingPositioner::CalcDrawingYRel(
             assert(curve->m_object);
         }
         const int margin = doc->GetBottomMargin(m_object->GetClassId()) * unit;
-        const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
 
         int staffSideContentBoundary = 0;
         bool hasRefinedContentBoundary = false;
@@ -465,7 +514,7 @@ void FloatingPositioner::CalcDrawingYRel(
                 }
                 return;
             }
-            else if (horizOverlappingBBox->Is(BEAM) && !isExtender) {
+            else if (horizOverlappingBBox->Is(BEAM)) {
                 const int shift = this->Intersects(vrv_cast<const Beam *>(horizOverlappingBBox), CONTENT, margin);
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -478,14 +527,7 @@ void FloatingPositioner::CalcDrawingYRel(
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlappingBBox) + staffSideContentBoundary - margin;
 
             const Object *object = dynamic_cast<const Object *>(horizOverlappingBBox);
-            // For elements, that can have extender lines, we need to make sure that they continue in next system on the
-            // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (isExtender) {
-                m_object->SetMaxDrawingYRel(yRel);
-                this->SetDrawingYRel(std::min(yRel, m_object->GetMaxDrawingYRel()));
-            }
-            // With LayerElement always move them up
-            else if (object && object->IsLayerElement()) {
+            if (object && object->IsLayerElement()) {
                 if (yRel < 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if there is a vertical overlap
@@ -498,14 +540,7 @@ void FloatingPositioner::CalcDrawingYRel(
                 + staffSideContentBoundary + margin;
 
             const Object *object = dynamic_cast<const Object *>(horizOverlappingBBox);
-            // For elements, that can have extender lines, we need to make sure that they continue in next system on the
-            // same height, as they were before (even if there are no overlapping elements in subsequent measures)
-            if (isExtender) {
-                m_object->SetMaxDrawingYRel(yRel);
-                this->SetDrawingYRel(std::max(yRel, m_object->GetMaxDrawingYRel()));
-            }
-            // With LayerElement always move them down
-            else if (object && object->IsLayerElement()) {
+            if (object && object->IsLayerElement()) {
                 if (yRel > 0) this->SetDrawingYRel(yRel);
             }
             // Otherwise only if there is a vertical overlap
@@ -514,6 +549,15 @@ void FloatingPositioner::CalcDrawingYRel(
             }
         }
     }
+}
+
+void FloatingPositioner::AdjustExtenders()
+{
+    const bool isExtender = m_object->Is({ DIR, DYNAM, TEMPO }) && m_object->IsExtenderElement();
+    if (!isExtender) return;
+
+    m_object->SetMaxDrawingYRel(this->GetDrawingYRel(), m_place);
+    this->SetDrawingYRel(m_object->GetMaxDrawingYRel());
 }
 
 int FloatingPositioner::GetSpaceBelow(
@@ -608,7 +652,7 @@ bool FloatingCurvePositioner::HasCachedX12() const
 
 void FloatingCurvePositioner::ClearSpannedElements()
 {
-    for (auto &spannedElement : m_spannedElements) {
+    for (CurveSpannedElement *spannedElement : m_spannedElements) {
         delete spannedElement;
     }
     m_spannedElements.clear();
@@ -877,100 +921,11 @@ std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const Staff
 // FloatingObject functor methods
 //----------------------------------------------------------------------------
 
-int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
     m_maxDrawingYRel = VRV_UNSET;
 
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareDataInitialization(FunctorParams *functorParams)
-{
-    // Clear all
-    FloatingObject::s_drawingObjectIds.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareTimePointing(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimePointing(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimeSpanning(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareTimestamps(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimestamps(functorParams, this);
-    }
-    else if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimestamps(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-    }
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        interface->InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int FloatingObject::ResetData(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-    m_maxDrawingYRel = VRV_UNSET;
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    else if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = this->GetTimePointInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;
 }
 

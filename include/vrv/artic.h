@@ -70,7 +70,13 @@ public:
 
     void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
+    /**
+     * Getter and setter for the drawing place
+     */
+    ///@{
     data_STAFFREL GetDrawingPlace() const { return m_drawingPlace; }
+    void SetDrawingPlace(data_STAFFREL drawingPlace) { m_drawingPlace = drawingPlace; }
+    ///@}
 
     /**
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
@@ -103,6 +109,16 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::ConvertMarkupArtic
      */
     int ConvertMarkupArtic(FunctorParams *functorParams) override;
@@ -127,15 +143,11 @@ public:
      */
     int ResetVerticalAlignment(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
     // Calculate shift for the articulation based on its type and presence of other articulations
-    int CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const;
+    int CalculateHorizontalShift(
+        const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir, const bool virtualStem) const;
 
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;

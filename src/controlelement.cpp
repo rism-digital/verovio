@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "rend.h"
@@ -73,7 +74,7 @@ void ControlElement::Reset()
 
 data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment() const
 {
-    const Rend *rend = dynamic_cast<const Rend *>(this->FindDescendantByType(REND));
+    const Rend *rend = vrv_cast<const Rend *>(this->FindDescendantByType(REND));
     if (!rend || !rend->HasHalign()) return HORIZONTALALIGNMENT_NONE;
 
     return rend->GetHalign();
@@ -111,61 +112,24 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
+FunctorCode ControlElement::Accept(MutableFunctor &functor)
 {
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    if (!this->Is({ DIR, DYNAM, ORNAM, TEMPO })) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Right aligned cannot overflow
-    if (this->GetChildRendAlignment() == HORIZONTALALIGNMENT_right) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    assert(params->m_currentSystem);
-
-    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
-    ArrayOfFloatingPositioners positioners;
-    params->m_currentSystem->m_systemAligner.FindAllPositionerPointingTo(&positioners, this);
-
-    // Something is probably not right if nothing found - maybe no @staff
-    if (positioners.empty()) {
-        LogDebug("Something was wrong when searching positioners for %s '%s'", this->GetClassName().c_str(),
-            this->GetID().c_str());
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Keep the one with the highest right position
-    for (auto const &positioner : positioners) {
-        if (!params->m_currentWidest || (params->m_currentWidest->GetContentRight() < positioner->GetContentRight())) {
-            params->m_currentWidest = positioner;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitControlElement(this);
 }
 
-int ControlElement::ResetData(FunctorParams *functorParams)
+FunctorCode ControlElement::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    FloatingObject::ResetData(functorParams);
+    return functor.VisitControlElement(this);
+}
 
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = this->GetAltSymInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
+FunctorCode ControlElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitControlElementEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode ControlElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitControlElementEnd(this);
 }
 
 } // namespace vrv

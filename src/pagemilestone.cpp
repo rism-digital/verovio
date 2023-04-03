@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "page.h"
 #include "system.h"
@@ -79,6 +80,26 @@ void PageMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Object 
 //----------------------------------------------------------------------------
 // PageMilestoneEnd functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode PageMilestoneEnd::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPageMilestone(this);
+}
+
+FunctorCode PageMilestoneEnd::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPageMilestone(this);
+}
+
+FunctorCode PageMilestoneEnd::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPageMilestoneEnd(this);
+}
+
+FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPageMilestoneEnd(this);
+}
 
 int PageMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
 {

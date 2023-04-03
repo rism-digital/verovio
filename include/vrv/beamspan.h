@@ -35,9 +35,6 @@ class BeamSpan : public ControlElement,
                  public AttBeamedWith,
                  public AttBeamRend,
                  public AttColor {
-private:
-    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::iterator, Object *>>;
-
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -81,8 +78,26 @@ public:
      * Access the beam segments
      */
     ///@{
+    BeamSpanSegment *GetSegment(int index) { return m_beamSegments.at(index); }
+    const BeamSpanSegment *GetSegment(int index) const { return m_beamSegments.at(index); }
     BeamSpanSegment *GetSegmentForSystem(const System *system);
     const BeamSpanSegment *GetSegmentForSystem(const System *system) const;
+    ///@}
+
+    /**
+     * Getter and setter for the beamed elements
+     */
+    ///@{
+    const ArrayOfObjects &GetBeamedElements() const { return m_beamedElements; }
+    void SetBeamedElements(const ArrayOfObjects &beamedElements) { m_beamedElements = beamedElements; }
+    ///@}
+
+    /**
+     * Break one big spanning beamSpan into smaller beamSpans
+     */
+    ///@{
+    using SpanIndexVector = std::vector<std::pair<vrv::ArrayOfObjects::const_iterator, Object *>>;
+    bool AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
     ///@}
 
     //----------//
@@ -90,33 +105,17 @@ public:
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
+     * Interface for class functor visitation
      */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareBeamSpanElements
-     */
-    int PrepareBeamSpanElements(FunctorParams *) override;
-
-    /**
-     * See Object::CalcSpanningBeamSpans
-     */
-    int CalcSpanningBeamSpans(FunctorParams *) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
-    // Helper for breaking one big spanning beamSpan into smaller beamSpans
-    bool AddSpanningSegment(const Doc *doc, const SpanIndexVector &elements, int index, bool newSegment = true);
-
-    // Helper to get element list for the beamSpan - elements are acquired from all layerElements that are located
-    // in between start and end of the beamSpan
-    ArrayOfObjects GetBeamSpanElementList(Layer *layer, const Staff *staff);
-
+    //
 public:
     //
 private:

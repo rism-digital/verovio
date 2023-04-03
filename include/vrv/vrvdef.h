@@ -20,6 +20,8 @@
 
 #include "attdef.h"
 
+#define VRV_UNSET MEI_UNSET
+
 //----------------------------------------------------------------------------
 
 #define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
@@ -37,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 15
+#define VERSION_MINOR 16
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true

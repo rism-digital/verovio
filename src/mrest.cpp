@@ -15,6 +15,7 @@
 
 #include "comparison.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "pitchinterface.h"
@@ -57,6 +58,26 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode MRest::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMRest(this);
+}
+
+FunctorCode MRest::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMRest(this);
+}
+
+FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMRestEnd(this);
+}
+
+FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRestEnd(this);
+}
+
 int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
@@ -66,23 +87,6 @@ int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
         Fermata *fermata = new Fermata();
         fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int MRest::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -104,7 +108,7 @@ int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) cons
 
     // find all locations for other layer
     std::vector<int> locations;
-    for (auto element : collidingElementsList) {
+    for (const Object *element : collidingElementsList) {
         if (element->Is({ CHORD, NOTE })) {
             const LayerElement *layerElement = vrv_cast<const LayerElement *>(element);
             int loc = PitchInterface::CalcLoc(layerElement, layer, layerElement, isTopLayer);
@@ -115,11 +119,14 @@ int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) cons
             int loc = rest->GetDrawingLoc();
             locations.push_back(loc);
         }
+        else if (element->Is(MREST)) {
+            locations.push_back(4);
+        }
     }
     // if there are no other elements - just return default location
     if (locations.empty()) return defaultLocation;
 
-    const int locAdjust = isTopLayer ? 3 : -2;
+    const int locAdjust = isTopLayer ? 4 : -3;
     int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
                                   : *std::min_element(locations.begin(), locations.end());
     extremePoint += locAdjust;

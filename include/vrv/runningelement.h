@@ -88,6 +88,21 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the text element cells
+     */
+    ///@{
+    void ResetCells();
+    void AppendTextToCell(int index, TextElement *text);
+    ///@}
+
+    /**
+     * @name Setter and getter for the drawing scaling
+     */
+    ///@{
+    void ResetDrawingScaling();
+    ///@}
+
+    /**
      * @name Get the size of row, cols or cells
      */
     ///@{
@@ -126,6 +141,11 @@ public:
     void LoadFooter(const Doc *doc);
 
     /**
+     * Calculate the cell position
+     */
+    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
+
+    /**
      * Add page numbering to the running element.
      */
     void AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALALIGNMENT valign);
@@ -135,9 +155,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareDataInitialization
+     * Interface for class functor visitation
      */
-    int PrepareDataInitialization(FunctorParams *) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::Save
@@ -162,10 +187,7 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    /**
-     *
-     */
-    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
+    //
 
 public:
     //

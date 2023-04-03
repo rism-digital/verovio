@@ -156,14 +156,14 @@ public:
     //----------//
 
     /**
-     * See Object::ScoreDefSetCurrentPage
+     * Interface for class functor visitation
      */
-    int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
@@ -197,7 +197,7 @@ public:
 
 private:
     /**
-     * Adjust the horizontal postition of the syl processing verse by verse
+     * Adjust the horizontal position of the syl processing verse by verse
      */
     void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
 
@@ -230,13 +230,13 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized by the Object::ScoreDefSetCurrent functor.
+     * The value is initialized by the ScoreDefSetCurrentFunctor.
      */
     ScoreDef m_drawingScoreDef;
 
     /**
      * @name Pointers to the score at the beginning and end of the page
-     * Set in Page::ScoreDefSetCurrentPageEnd
+     * Set in ScoreDefSetCurrentPageFunctor
      */
     ///@{
     Score *m_score;

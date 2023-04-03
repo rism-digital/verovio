@@ -13,16 +13,41 @@
 
 //----------------------------------------------------------------------------
 
+#include "adjustaccidxfunctor.h"
+#include "adjustarpegfunctor.h"
+#include "adjustclefchangesfunctor.h"
+#include "adjustdotsfunctor.h"
+#include "adjustgracexposfunctor.h"
+#include "adjustharmgrpsspacingfunctor.h"
+#include "adjustlayersfunctor.h"
+#include "adjustsylspacingfunctor.h"
+#include "adjusttempofunctor.h"
+#include "adjusttupletsxfunctor.h"
+#include "adjustxoverflowfunctor.h"
+#include "adjustxposfunctor.h"
+#include "alignfunctor.h"
 #include "bboxdevicecontext.h"
+#include "cachehorizontallayoutfunctor.h"
+#include "calcalignmentpitchposfunctor.h"
+#include "calcalignmentxposfunctor.h"
+#include "calcchordnoteheadsfunctor.h"
+#include "calcdotsfunctor.h"
+#include "calcledgerlinesfunctor.h"
+#include "calcslurdirectionfunctor.h"
+#include "calcspanningbeamspansfunctor.h"
+#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
+#include "libmei.h"
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
+#include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "system.h"
@@ -108,7 +133,7 @@ const RunningElement *Page::GetHeader() const
 {
     assert(m_score);
 
-    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_header.GetValue() == HEADER_none)) {
         return NULL;
     }
@@ -134,7 +159,7 @@ const RunningElement *Page::GetFooter() const
 {
     assert(m_scoreEnd);
 
-    const Doc *doc = dynamic_cast<const Doc *>(this->GetFirstAncestor(DOC));
+    const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     if (!doc || (doc->GetOptions()->m_footer.GetValue() == FOOTER_none)) {
         return NULL;
     }
@@ -193,8 +218,8 @@ void Page::LayOutTranscription(bool force)
     assert(this == doc->GetDrawingPage());
 
     // Reset the horizontal alignment
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    this->Process(&resetHorizontalAlignment, NULL);
+    ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
+    this->Process(resetHorizontalAlignment);
 
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
@@ -203,10 +228,8 @@ void Page::LayOutTranscription(bool force)
     // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
-    Functor alignHorizontally(&Object::AlignHorizontally);
-    Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
-    this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
+    AlignHorizontallyFunctor alignHorizontally(doc);
+    this->Process(alignHorizontally);
 
     // Align the content of the page using system aligners
     // After this:
@@ -217,21 +240,17 @@ void Page::LayOutTranscription(bool force)
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignment
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
+    this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(doc);
+    this->Process(calcStem);
 
-    CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
-    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
-    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+    CalcChordNoteHeadsFunctor calcChordNoteHeads(doc);
+    this->Process(calcChordNoteHeads);
 
-    CalcDotsParams calcDotsParams(doc);
-    Functor calcDots(&Object::CalcDots);
-    this->Process(&calcDots, &calcDotsParams);
+    CalcDotsFunctor calcDots(doc);
+    this->Process(calcDots);
 
     // Render it for filling the bounding box
     View view;
@@ -244,10 +263,8 @@ void Page::LayOutTranscription(bool force)
     Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
     this->Process(&adjustXRelForTranscription, NULL);
 
-    FunctorDocParams calcLedgerLinesParams(doc);
-    Functor calcLedgerLines(&Object::CalcLedgerLines);
-    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 
     m_layoutDone = true;
 }
@@ -262,8 +279,8 @@ void Page::ResetAligners()
     assert(this == doc->GetDrawingPage());
 
     // Reset the horizontal alignment
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    this->Process(&resetHorizontalAlignment, NULL);
+    ResetHorizontalAlignmentFunctor resetHorizontalAlignment;
+    this->Process(resetHorizontalAlignment);
 
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
@@ -272,10 +289,8 @@ void Page::ResetAligners()
     // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
-    Functor alignHorizontally(&Object::AlignHorizontally);
-    Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
-    this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
+    AlignHorizontallyFunctor alignHorizontally(doc);
+    this->Process(alignHorizontally);
 
     // Align the content of the page using system aligners
     // After this:
@@ -303,47 +318,40 @@ void Page::ResetAligners()
             }
         }
 
-        Functor setAlignmentX(&Object::CalcAlignmentXPos);
-        CalcAlignmentXPosParams calcAlignmentXPosParams(doc, &setAlignmentX);
-        calcAlignmentXPosParams.m_longestActualDur = longestActualDur;
-        this->Process(&setAlignmentX, &calcAlignmentXPosParams);
+        CalcAlignmentXPosFunctor calcAlignmentXPos(doc);
+        calcAlignmentXPos.SetLongestActualDur(longestActualDur);
+        this->Process(calcAlignmentXPos);
     }
 
     // Set the pitch / pos alignment
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
+    this->Process(calcAlignmentPitchPos);
 
-    if (Att::IsMensuralType(doc->m_notationType)) {
+    if (IsMensuralType(doc->m_notationType)) {
         FunctorDocParams calcLigatureNotePosParams(doc);
         Functor calcLigatureNotePos(&Object::CalcLigatureNotePos);
         this->Process(&calcLigatureNotePos, &calcLigatureNotePosParams);
     }
 
-    CalcStemParams calcStemParams(doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(doc);
+    this->Process(calcStem);
 
-    CalcChordNoteHeadsParams calcChordNoteHeadsParams(doc);
-    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
-    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+    CalcChordNoteHeadsFunctor calcChordNoteHeads(doc);
+    this->Process(calcChordNoteHeads);
 
-    CalcDotsParams calcDotsParams(doc);
-    Functor calcDots(&Object::CalcDots);
-    this->Process(&calcDots, &calcDotsParams);
+    CalcDotsFunctor calcDots(doc);
+    this->Process(calcDots);
 
     // Adjust the position of outside articulations
     CalcArticParams calcArticParams(doc);
     Functor calcArtic(&Object::CalcArtic);
     this->Process(&calcArtic, &calcArticParams);
 
-    CalcSlurDirectionParams calcSlurDirectionParams(doc);
-    Functor calcSlurDirection(&Object::CalcSlurDirection);
-    this->Process(&calcSlurDirection, &calcSlurDirectionParams);
+    CalcSlurDirectionFunctor calcSlurDirection(doc);
+    this->Process(calcSlurDirection);
 
-    FunctorDocParams calcSpanningBeamSpansParams(doc);
-    Functor calcSpanningBeamSpans(&Object::CalcSpanningBeamSpans);
-    this->Process(&calcSpanningBeamSpans, &calcSpanningBeamSpansParams);
+    CalcSpanningBeamSpansFunctor calcSpanningBeamSpans(doc);
+    this->Process(calcSpanningBeamSpans);
 }
 
 void Page::LayOutHorizontally()
@@ -371,63 +379,47 @@ void Page::LayOutHorizontally()
     Functor adjustArtic(&Object::AdjustArtic);
     this->Process(&adjustArtic, &adjustArticParams);
 
-    // Adjust the x position of the LayerElement where multiple layer collide
+    // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
-    Functor adjustLayers(&Object::AdjustLayers);
-    Functor adjustLayersEnd(&Object::AdjustLayersEnd);
-    AdjustLayersParams adjustLayersParams(
-        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    this->Process(&adjustLayers, &adjustLayersParams, &adjustLayersEnd);
+    AdjustLayersFunctor adjustLayers(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(adjustLayers);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
-    Functor adjustDots(&Object::AdjustDots);
-    Functor adjustDotsEnd(&Object::AdjustDotsEnd);
-    AdjustDotsParams adjustDotsParams(doc, &adjustDots, &adjustDotsEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    this->Process(&adjustDots, &adjustDotsParams, &adjustDotsEnd);
+    AdjustDotsFunctor adjustDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(adjustDots);
 
-    // adjust Layers again, this time including dots positioning
-    AdjustLayersParams newAdjustLayersParams(
-        doc, &adjustLayers, &adjustLayersEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    newAdjustLayersParams.m_ignoreDots = false;
-    this->Process(&adjustLayers, &newAdjustLayersParams, &adjustLayersEnd);
+    // Adjust layers again, this time including dots positioning
+    AdjustLayersFunctor adjustLayersWithDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    adjustLayersWithDots.IgnoreDots(false);
+    this->Process(adjustLayersWithDots);
 
     // Adjust the X position of the accidentals, including in chords
-    Functor adjustAccidX(&Object::AdjustAccidX);
-    AdjustAccidXParams adjustAccidXParams(doc, &adjustAccidX);
-    this->Process(&adjustAccidX, &adjustAccidXParams);
+    AdjustAccidXFunctor adjustAccidX(doc);
+    this->Process(adjustAccidX);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor adjustXPos(&Object::AdjustXPos);
-    Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    adjustXPosParams.m_excludes.push_back(TABDURSYM);
-    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
+    AdjustXPosFunctor adjustXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    adjustXPos.SetExcluded({ TABDURSYM });
+    this->Process(adjustXPos);
 
-    // Adjust tabRhyhtm separately
-    adjustXPosParams.m_excludes.clear();
-    adjustXPosParams.m_includes.push_back(TABDURSYM);
-    adjustXPosParams.m_includes.push_back(BARLINE);
-    adjustXPosParams.m_includes.push_back(METERSIG);
-    adjustXPosParams.m_includes.push_back(KEYSIG);
-    adjustXPosParams.m_rightBarLinesOnly = true;
-    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
+    // Adjust tabRhythm separately
+    adjustXPos.ClearExcluded();
+    adjustXPos.SetIncluded({ BARLINE, KEYSIG, METERSIG, TABDURSYM });
+    adjustXPos.SetRightBarLinesOnly(true);
+    this->Process(adjustXPos);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor adjustGraceXPos(&Object::AdjustGraceXPos);
-    Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
-    AdjustGraceXPosParams adjustGraceXPosParams(
-        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->GetCurrentScoreDef()->GetStaffNs());
-    this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
+    AdjustGraceXPosFunctor adjustGraceXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    this->Process(adjustGraceXPos);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
     // Look at each clef change and  move them to the left and add space if necessary
-    Functor adjustClefChanges(&Object::AdjustClefChanges);
-    AdjustClefsParams adjustClefChangesParams(doc);
-    this->Process(&adjustClefChanges, &adjustClefChangesParams);
+    AdjustClefChangesFunctor adjustClefChanges(doc);
+    this->Process(adjustClefChanges);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -437,38 +429,28 @@ void Page::LayOutHorizontally()
 
     this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
 
-    Functor adjustHarmGrpsSpacing(&Object::AdjustHarmGrpsSpacing);
-    Functor adjustHarmGrpsSpacingEnd(&Object::AdjustHarmGrpsSpacingEnd);
-    AdjustHarmGrpsSpacingParams adjustHarmGrpsSpacingParams(doc, &adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingEnd);
-    this->Process(&adjustHarmGrpsSpacing, &adjustHarmGrpsSpacingParams, &adjustHarmGrpsSpacingEnd);
+    AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
+    this->Process(adjustHarmGrpsSpacing);
 
     // Adjust the arpeg
-    Functor adjustArpeg(&Object::AdjustArpeg);
-    Functor adjustArpegEnd(&Object::AdjustArpegEnd);
-    AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
-    this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+    AdjustArpegFunctor adjustArpeg(doc);
+    this->Process(adjustArpeg);
 
     // Adjust the tempo
-    Functor adjustTempo(&Object::AdjustTempo);
-    AdjustTempoParams adjustTempoParams(doc);
-    this->Process(&adjustTempo, &adjustTempoParams);
+    AdjustTempoFunctor adjustTempo(doc);
+    this->Process(adjustTempo);
 
     // Adjust the position of the tuplets
-    FunctorDocParams adjustTupletsXParams(doc);
-    Functor adjustTupletsX(&Object::AdjustTupletsX);
-    this->Process(&adjustTupletsX, &adjustTupletsXParams);
+    AdjustTupletsXFunctor adjustTupletsX(doc);
+    this->Process(adjustTupletsX);
 
     // Prevent a margin overflow
-    Functor adjustXOverflow(&Object::AdjustXOverflow);
-    Functor adjustXOverflowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams(doc->GetDrawingUnit(100));
-    this->Process(&adjustXOverflow, &adjustXOverflowParams, &adjustXOverflowEnd);
+    AdjustXOverflowFunctor adjustXOverflow(doc->GetDrawingUnit(100));
+    this->Process(adjustXOverflow);
 
     // Adjust measure X position
-    AlignMeasuresParams alignMeasuresParams(doc);
-    Functor alignMeasures(&Object::AlignMeasures);
-    Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
-    this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+    AlignMeasuresFunctor alignMeasures(doc);
+    this->Process(alignMeasures);
 }
 
 void Page::LayOutHorizontallyWithCache(bool restore)
@@ -476,10 +458,9 @@ void Page::LayOutHorizontallyWithCache(bool restore)
     Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
 
-    CacheHorizontalLayoutParams cacheHorizontalLayoutParams(doc);
-    cacheHorizontalLayoutParams.m_restore = restore;
-    Functor cacheHorizontalLayout(&Object::CacheHorizontalLayout);
-    this->Process(&cacheHorizontalLayout, &cacheHorizontalLayoutParams);
+    CacheHorizontalLayoutFunctor cacheHorizontalLayout(doc);
+    cacheHorizontalLayout.SetRestore(restore);
+    this->Process(cacheHorizontalLayout);
 }
 
 void Page::LayOutVertically()
@@ -495,10 +476,8 @@ void Page::LayOutVertically()
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
 
-    FunctorDocParams calcLedgerLinesParams(doc);
-    Functor calcLedgerLines(&Object::CalcLedgerLines);
-    Functor calcLedgerLinesEnd(&Object::CalcLedgerLinesEnd);
-    this->Process(&calcLedgerLines, &calcLedgerLinesParams, &calcLedgerLinesEnd);
+    CalcLedgerLinesFunctor calcLedgerLines(doc);
+    this->Process(calcLedgerLines);
 
     // Align the content of the page using system aligners
     // After this:
@@ -541,6 +520,11 @@ void Page::LayOutVertically()
     view.SetSlurHandling(SlurHandling::Drawing);
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    // Adjust the position of tuplets by slurs
+    FunctorDocParams adjustTupletWithSlursParams(doc);
+    Functor adjustTupletWithSlurs(&Object::AdjustTupletWithSlurs);
+    this->Process(&adjustTupletWithSlurs, &adjustTupletWithSlursParams);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     CalcBBoxOverflowsParams calcBBoxOverflowsParams(doc);
@@ -714,13 +698,11 @@ void Page::LayOutPitchPos()
     assert(this == doc->GetDrawingPage());
 
     // Set the pitch / pos alignment
-    CalcAlignmentPitchPosParams calcAlignmentPitchPosParams(doc);
-    Functor calcAlignmentPitchPos(&Object::CalcAlignmentPitchPos);
-    this->Process(&calcAlignmentPitchPos, &calcAlignmentPitchPosParams);
+    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
+    this->Process(calcAlignmentPitchPos);
 
-    CalcStemParams calcStemParams(doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
+    CalcStemFunctor calcStem(doc);
+    this->Process(calcStem);
 }
 
 int Page::GetContentHeight() const
@@ -736,7 +718,7 @@ int Page::GetContentHeight() const
         return 0;
     }
 
-    const System *last = dynamic_cast<const System *>(this->GetLast(SYSTEM));
+    const System *last = vrv_cast<const System *>(this->GetLast(SYSTEM));
     assert(last);
     int height = doc->m_drawingPageContentHeight - last->GetDrawingYRel() + last->GetHeight();
 
@@ -759,7 +741,7 @@ int Page::GetContentWidth() const
     assert(this == doc->GetDrawingPage());
 
     int maxWidth = 0;
-    for (auto child : this->GetChildren()) {
+    for (const Object *child : this->GetChildren()) {
         const System *system = dynamic_cast<const System *>(child);
         if (system) {
             // we include the left margin and the right margin
@@ -793,12 +775,9 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
                 AttNIntegerComparison matchVerse(VERSE, verses->first);
                 filters = { &matchStaff, &matchLayer, &matchVerse };
 
-                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
-                // m_drawingLastNote is set only if the syl has a forward connector
-                AdjustSylSpacingParams adjustSylSpacingParams(doc);
-                Functor adjustSylSpacing(&Object::AdjustSylSpacing);
-                Functor adjustSylSpacingEnd(&Object::AdjustSylSpacingEnd);
-                this->Process(&adjustSylSpacing, &adjustSylSpacingParams, &adjustSylSpacingEnd, &filters);
+                AdjustSylSpacingFunctor adjustSylSpacing(doc);
+                adjustSylSpacing.SetFilters(&filters);
+                this->Process(adjustSylSpacing);
             }
         }
     }
@@ -808,27 +787,24 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Page::ScoreDefSetCurrentPageEnd(FunctorParams *functorParams)
+FunctorCode Page::Accept(MutableFunctor &functor)
 {
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (!this->m_score) {
-        this->m_score = params->m_doc->GetCurrentScore();
-    }
-    else {
-        this->m_scoreEnd = params->m_doc->GetCurrentScore();
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitPage(this);
 }
 
-int Page::ScoreDefUnsetCurrent(FunctorParams *functorParams)
+FunctorCode Page::Accept(ConstFunctor &functor) const
 {
-    m_score = NULL;
-    m_scoreEnd = NULL;
+    return functor.VisitPage(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Page::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPageEnd(this);
+}
+
+FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPageEnd(this);
 }
 
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
@@ -926,7 +902,7 @@ int Page::AlignSystemsEnd(FunctorParams *functorParams)
         // Move it up below the last system
         if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
             if (this->GetChildCount()) {
-                System *last = dynamic_cast<System *>(this->GetLast(SYSTEM));
+                System *last = vrv_cast<System *>(this->GetLast(SYSTEM));
                 assert(last);
                 const int unit = params->m_doc->GetDrawingUnit(100);
                 const int topMargin = params->m_doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;

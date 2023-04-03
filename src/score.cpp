@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "page.h"
 #include "pages.h"
@@ -154,55 +155,24 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Score::PrepareDataInitialization(FunctorParams *functorParams)
+FunctorCode Score::Accept(MutableFunctor &functor)
 {
-    PrepareDataInitializationParams *params = vrv_params_cast<PrepareDataInitializationParams *>(functorParams);
-    assert(params);
-
-    // Evaluate functor on scoreDef
-    this->GetScoreDef()->Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitScore(this);
 }
 
-int Score::AdjustDots(FunctorParams *functorParams)
+FunctorCode Score::Accept(ConstFunctor &functor) const
 {
-    AdjustDotsParams *params = vrv_params_cast<AdjustDotsParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitScore(this);
 }
 
-int Score::AdjustLayers(FunctorParams *functorParams)
+FunctorCode Score::AcceptEnd(MutableFunctor &functor)
 {
-    AdjustLayersParams *params = vrv_params_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitScoreEnd(this);
 }
 
-int Score::AdjustXPos(FunctorParams *functorParams)
+FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
 {
-    AdjustXPosParams *params = vrv_params_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Score::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = vrv_params_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    params->m_staffNs = params->m_doc->GetCurrentScoreDef()->GetStaffNs();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitScoreEnd(this);
 }
 
 int Score::ConvertMarkupScoreDef(FunctorParams *functorParams)
@@ -267,33 +237,6 @@ int Score::UnCastOff(FunctorParams *functorParams)
     System *system = new System();
     params->m_currentSystem = system;
     params->m_page->AddChild(system);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Score::ScoreDefOptimize(FunctorParams *functorParams)
-{
-    ScoreDefOptimizeParams *params = vrv_params_cast<ScoreDefOptimizeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreDef = NULL;
-    params->m_encoded = false;
-    params->m_firstScoreDef = true;
-    params->m_hasFermata = false;
-    params->m_hasTempo = false;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Score::PrepareDuration(FunctorParams *functorParams)
-{
-    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
-    assert(params);
-
-    ScoreDef *scoreDef = this->GetScoreDef();
-    if (scoreDef) {
-        scoreDef->Process(params->m_functor, params);
-    }
 
     return FUNCTOR_CONTINUE;
 }

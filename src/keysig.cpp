@@ -17,6 +17,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
@@ -196,7 +197,7 @@ void KeySig::FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const
 
     const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
     if (!childList.empty()) {
-        for (auto &child : childList) {
+        for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
             for (int oct = 0; oct < 10; ++oct) {
@@ -252,7 +253,7 @@ data_KEYSIGNATURE KeySig::ConvertToSig() const
         data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_NONE;
         bool isCommon = true;
         int pos = 0;
-        for (auto &child : childList) {
+        for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
             assert(keyAccid);
             data_ACCIDENTAL_WRITTEN curType = keyAccid->GetAccid();
@@ -365,12 +366,24 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
 // Functors methods
 //----------------------------------------------------------------------------
 
-int KeySig::PrepareDataInitialization(FunctorParams *)
+FunctorCode KeySig::Accept(MutableFunctor &functor)
 {
-    // Clear and regenerate attribute children
-    this->GenerateKeyAccidAttribChildren();
+    return functor.VisitKeySig(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode KeySig::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitKeySig(this);
+}
+
+FunctorCode KeySig::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitKeySigEnd(this);
+}
+
+FunctorCode KeySig::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitKeySigEnd(this);
 }
 
 int KeySig::Transpose(FunctorParams *functorParams)
