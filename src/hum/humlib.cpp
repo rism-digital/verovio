@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Mar 22 05:59:42 PDT 2023
+// Last Modified: Mon Apr  3 14:44:20 BST 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -70873,7 +70873,7 @@ void Tool_deg::ScaleDegree::analyzeTokenScaleDegrees(void) {
 
 	// Only processing non-null data from here.
 	m_subtokens = m_linkedKernToken->getSubtokens();
-	int subtokCount = m_subtokens.size();
+	int subtokCount = (int)m_subtokens.size();
 
 	m_degrees.resize(subtokCount);
 	fill(m_degrees.begin(), m_degrees.end(), -1);
@@ -71135,7 +71135,7 @@ string Tool_deg::ScaleDegree::generateDegDataToken(void) const {
 		return ".";
 	}
 
-	int newCount = nontied.size();
+	int newCount = (int)nontied.size();
 	string output;
 	for (int i=0; i<newCount; i++) {
 		output += nontied[i];
@@ -76266,6 +76266,7 @@ Tool_extract::Tool_extract(void) {
 	define("t|trace=s:", "use a trace file to extract data");
 	define("e|expand=b", "expand spines with subspines");
 	define("k|kern=s", "Extract by kern spine group");
+	define("K|reverse-kern=s", "Extract by kern spine group top to bottom numbering");
 	define("E|expand-interp=s:", "expand subspines limited to exinterp");
 	define("m|model|method=s:d", "method for extracting secondary spines");
 	define("M|cospine-model=s:d", "method for extracting cospines");
@@ -78251,6 +78252,7 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	interpQ     = getBoolean("i");
 	interps     = getString("i");
 	kernQ       = getBoolean("k");
+	rkernQ      = getBoolean("K");
 
 	interpstate = 1;
 	if (!interpQ) {
@@ -78319,6 +78321,10 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	} else if (kernQ) {
 		fieldstring = getString("k");
 		fieldQ = 1;
+	} else if (rkernQ) {
+		fieldstring = getString("K");
+		fieldQ = 1;
+		fieldstring = reverseFieldString(fieldstring, infile.getMaxTrack());
 	}
 
 	spineListQ = getBoolean("spine-list");
@@ -78338,6 +78344,37 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 		}
 	}
 
+}
+
+
+//////////////////////////////
+//
+// Tool_extract::reverseFieldString --  No dollar expansion for now.
+//
+
+string Tool_extract::reverseFieldString(const string& input, int maxval) {
+	string output;
+	string number;
+	for (int i=0; i<(int)input.size(); i++) {
+		if (isdigit(input[i])) {
+			number += input[i];
+			continue;
+		} else {
+			if (!number.empty()) {
+				int value = strtol(number.c_str(), NULL, 10);
+				value = maxval - value + 1;
+				output += to_string(value);
+				output += input[i];
+				number.clear();
+			}
+		}
+	}
+	if (!number.empty()) {
+		int value = strtol(number.c_str(), NULL, 10);
+		value = maxval - value + 1;
+		output += to_string(value);
+	}
+	return output;
 }
 
 
