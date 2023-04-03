@@ -103,7 +103,7 @@ FunctorCode AdjustBeamsFunctor::VisitBeamEnd(Beam *beam)
             m_isOtherLayer = true;
             for (const auto element : otherLayersElements) {
                 if (!m_outerBeam->HorizontalContentOverlap(element)) continue;
-                element->Process(*this, 1);
+                element->Process(*this, 0);
             }
             m_isOtherLayer = false;
         }
@@ -212,7 +212,7 @@ FunctorCode AdjustBeamsFunctor::VisitFTremEnd(FTrem *fTrem)
             m_isOtherLayer = true;
             for (const auto element : otherLayersElements) {
                 if (!m_outerFTrem->HorizontalContentOverlap(element)) continue;
-                element->Process(*this, 1);
+                element->Process(*this, 0);
             }
             m_isOtherLayer = false;
         }
