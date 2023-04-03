@@ -565,12 +565,10 @@ void Page::LayOutVertically()
     }
 
     // Adjust system Y position
-    AlignSystemsParams alignSystemsParams(doc);
-    alignSystemsParams.m_shift = doc->m_drawingPageContentHeight;
-    alignSystemsParams.m_systemSpacing = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
-    Functor alignSystems(&Object::AlignSystems);
-    Functor alignSystemsEnd(&Object::AlignSystemsEnd);
-    this->Process(&alignSystems, &alignSystemsParams, &alignSystemsEnd);
+    AlignSystemsFunctor alignSystems(doc);
+    alignSystems.SetShift(doc->m_drawingPageContentHeight);
+    alignSystems.SetSystemSpacing(doc->GetOptions()->m_spacingSystem.GetValue() * doc->GetDrawingUnit(100));
+    this->Process(alignSystems);
 }
 
 void Page::JustifyHorizontally()
@@ -807,54 +805,6 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     m_pageMarginLeft /= params->m_page->GetPPUFactor();
     m_pageMarginRight /= params->m_page->GetPPUFactor();
     m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::AlignSystems(FunctorParams *functorParams)
-{
-    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
-    assert(params);
-
-    params->m_justificationSum = 0;
-
-    RunningElement *header = this->GetHeader();
-    if (header) {
-        header->SetDrawingYRel(params->m_shift);
-        const int headerHeight = header->GetTotalHeight(params->m_doc);
-        if (headerHeight > 0) {
-            params->m_shift -= headerHeight;
-        }
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::AlignSystemsEnd(FunctorParams *functorParams)
-{
-    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
-    assert(params);
-
-    m_drawingJustifiableHeight = params->m_shift;
-    m_justificationSum = params->m_justificationSum;
-
-    RunningElement *footer = this->GetFooter();
-    if (footer) {
-        m_drawingJustifiableHeight -= footer->GetTotalHeight(params->m_doc);
-
-        // Move it up below the last system
-        if (params->m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
-            if (this->GetChildCount()) {
-                System *last = vrv_cast<System *>(this->GetLast(SYSTEM));
-                assert(last);
-                const int unit = params->m_doc->GetDrawingUnit(100);
-                const int topMargin = params->m_doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;
-                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight() - topMargin);
-            }
-        }
-        else {
-            footer->SetDrawingYRel(footer->GetContentHeight());
-        }
-    }
 
     return FUNCTOR_CONTINUE;
 }

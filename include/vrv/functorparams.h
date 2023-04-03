@@ -156,37 +156,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AlignSystemsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 1: the system margin
- * member 2: the overflow below of previous system
- * member 3: the sum of justification factors per page
- * member 4: the doc
- **/
-
-class AlignSystemsParams : public FunctorParams {
-public:
-    AlignSystemsParams(Doc *doc)
-    {
-        m_shift = 0;
-        m_systemSpacing = 0;
-        m_prevBottomOverflow = 0;
-        m_prevBottomClefOverflow = 0;
-        m_justificationSum = 0.;
-        m_doc = doc;
-    }
-    int m_shift;
-    int m_systemSpacing;
-    int m_prevBottomOverflow;
-    int m_prevBottomClefOverflow;
-    double m_justificationSum;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // ApplyPPUFactorParams
 //----------------------------------------------------------------------------
 

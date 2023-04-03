@@ -522,42 +522,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignSystems(FunctorParams *functorParams)
-{
-    AlignSystemsParams *params = vrv_params_cast<AlignSystemsParams *>(functorParams);
-    assert(params);
-    assert(m_systemAligner.GetBottomAlignment());
-
-    // No spacing for the first system
-    int systemSpacing = this->IsFirstInPage() ? 0 : params->m_systemSpacing;
-    if (systemSpacing) {
-        const int contentOverflow = params->m_prevBottomOverflow + m_systemAligner.GetOverflowAbove(params->m_doc);
-        const int clefOverflow
-            = params->m_prevBottomClefOverflow + m_systemAligner.GetOverflowAbove(params->m_doc, true);
-        // Alignment is already pre-determined with staff alignment overflow
-        // We need to subtract them from the desired spacing
-        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
-        // Ensure minimal white space between consecutive systems by adding one staff space
-        const int unit = params->m_doc->GetDrawingUnit(100);
-        params->m_shift -= std::max(actualSpacing, 2 * unit);
-    }
-
-    this->SetDrawingYRel(params->m_shift);
-
-    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel();
-
-    params->m_justificationSum += m_systemAligner.GetJustificationSum(params->m_doc);
-    if (this->IsFirstInPage()) {
-        // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
-        params->m_justificationSum -= params->m_doc->GetOptions()->m_justificationSystem.GetValue();
-    }
-
-    params->m_prevBottomOverflow = m_systemAligner.GetOverflowBelow(params->m_doc);
-    params->m_prevBottomClefOverflow = m_systemAligner.GetOverflowBelow(params->m_doc, true);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);

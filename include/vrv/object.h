@@ -784,23 +784,6 @@ public:
     ///@}
 
     /**
-     * @name Functors for aligning the content vertically.
-     */
-    ///@{
-
-    /**
-     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
-     */
-    virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::AlignSystems
-     */
-    virtual int AlignSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for aligning the pages.
      */
     ///@{

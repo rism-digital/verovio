@@ -215,6 +215,14 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Setter for shift and spacing
+     */
+    ///@{
+    void SetShift(int shift) { m_shift = shift; }
+    void SetSystemSpacing(int spacing) { m_systemSpacing = spacing; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

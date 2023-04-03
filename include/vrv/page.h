@@ -171,14 +171,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignSystems
-     */
-    ///@{
-    int AlignSystems(FunctorParams *functorParams) override;
-    int AlignSystemsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::CastOffPages
      */
     int CastOffPagesEnd(FunctorParams *functorParams) override;
