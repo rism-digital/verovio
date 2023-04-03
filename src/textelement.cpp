@@ -133,12 +133,4 @@ FunctorCode TextElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTextElementEnd(this);
 }
 
-int TextElement::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    this->SetDrawingXRel(0);
-    this->SetDrawingYRel(0);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

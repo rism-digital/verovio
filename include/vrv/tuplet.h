@@ -101,6 +101,17 @@ public:
      */
     void GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const;
 
+    /**
+     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
+     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
+     */
+    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
+
+    /**
+     * Check whether tuplet number has valid positioning staffwise
+     */
+    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
+
     //----------//
     // Functors //
     //----------//
@@ -115,21 +126,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AdjustTupletsY
-     */
-    int AdjustTupletsY(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustTupletWithSlurs
-     */
-    int AdjustTupletWithSlurs(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note elements.
@@ -137,32 +133,7 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletBracketY(const Doc *doc, const Staff *staff);
-
-    /**
-     * Adjust tuplet relative positioning for tuplets based on beams
-     */
-    void AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam);
-
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletNumY(const Doc *doc, const Staff *staff);
-
-    /**
-     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
-     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
-     */
-    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
-
-    /**
-     * Check whether tuplet number has valid postioning staffwise
-     */
-    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
-
+    //
 public:
     //
 private:

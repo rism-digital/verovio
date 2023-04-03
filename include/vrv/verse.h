@@ -71,11 +71,6 @@ public:
     ///@}
 
     /**
-     * See Object::AlignVertically
-     */
-    int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitProcessingLists
      */
     int InitProcessingLists(FunctorParams *functorParams) override;

@@ -106,11 +106,6 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustBeams
-     */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertMarkupAnalytical
      */
     int ConvertMarkupAnalytical(FunctorParams *functorParams) override;

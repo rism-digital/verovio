@@ -140,6 +140,54 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// ResetVerticalAlignmentFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class resets the vertical alignment for various types.
+ */
+class ResetVerticalAlignmentFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ResetVerticalAlignmentFunctor();
+    virtual ~ResetVerticalAlignmentFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitArtic(Artic *artic) override;
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitOctave(Octave *octave) override;
+    FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitTextElement(TextElement *textElement) override;
+    FunctorCode VisitTuplet(Tuplet *tuplet) override;
+    FunctorCode VisitTupletBracket(TupletBracket *tupletBracket) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_RESETFUNCTOR_H__

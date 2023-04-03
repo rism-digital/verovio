@@ -11,13 +11,19 @@
 
 #include "doc.h"
 #include "dot.h"
+#include "fig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "page.h"
+#include "rend.h"
 #include "rest.h"
+#include "runningelement.h"
 #include "section.h"
 #include "staff.h"
+#include "svg.h"
 #include "system.h"
 #include "tabgrp.h"
+#include "verse.h"
 
 //----------------------------------------------------------------------------
 
@@ -464,6 +470,256 @@ FunctorCode AlignMeasuresFunctor::VisitSystemEnd(System *system)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// AlignVerticallyFunctor
+//----------------------------------------------------------------------------
+
+AlignVerticallyFunctor::AlignVerticallyFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_systemAligner = NULL;
+    m_staffIdx = 0;
+    m_staffN = 0;
+    m_cumulatedShift = 0;
+    m_justificationSum = 0;
+    m_pageWidth = 0;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)
+{
+    Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
+    int width = svg ? svg->GetWidth() : 0;
+
+    if (fig->GetHalign() == HORIZONTALALIGNMENT_right) {
+        fig->SetDrawingXRel(m_pageWidth - width);
+    }
+    else if (fig->GetHalign() == HORIZONTALALIGNMENT_center) {
+        fig->SetDrawingXRel((m_pageWidth - width) / 2);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitMeasure(Measure *measure)
+{
+    // we also need to reset the staff index
+    m_staffIdx = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
+{
+    m_cumulatedShift = 0;
+
+    // Also align the header and footer
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        header->SetDrawingPage(page);
+        header->SetDrawingYRel(0);
+        header->Process(*this);
+    }
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        footer->SetDrawingPage(page);
+        footer->SetDrawingYRel(0);
+        footer->Process(*this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
+{
+    if (rend->GetHalign()) {
+        switch (rend->GetHalign()) {
+            case HORIZONTALALIGNMENT_right: rend->SetDrawingXRel(m_pageWidth); break;
+            case HORIZONTALALIGNMENT_center: rend->SetDrawingXRel(m_pageWidth / 2); break;
+            default: break;
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningElement)
+{
+    m_pageWidth = runningElement->GetWidth();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitStaff(Staff *staff)
+{
+    if (!staff->DrawingIsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    m_staffN = staff->GetN();
+
+    // this gets (or creates) the staff alignment
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignment(m_staffIdx, staff, m_doc);
+    assert(alignment);
+    staff->SetAlignment(alignment);
+
+    std::vector<Object *>::const_iterator verseIterator = std::find_if(
+        staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(VERSE));
+    if (verseIterator != staff->m_timeSpanningElements.end()) {
+        Verse *v = vrv_cast<Verse *>(*verseIterator);
+        assert(v);
+        alignment->AddVerseN(v->GetN());
+    }
+
+    // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
+    // generally happens with verses spanning over several systems which results in invalid placement of connector lines
+    std::vector<Object *>::const_iterator sylIterator = std::find_if(
+        staff->m_timeSpanningElements.begin(), staff->m_timeSpanningElements.end(), ObjectComparison(SYL));
+    if (sylIterator != staff->m_timeSpanningElements.end()) {
+        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
+        if (verse) {
+            const int verseNumber = verse->GetN();
+            const bool verseCollapse = m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
+            if (!alignment->GetVersePosition(verseNumber, verseCollapse)) {
+                alignment->AddVerseN(verseNumber);
+            }
+        }
+    }
+
+    // for next staff
+    ++m_staffIdx;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitStaffAlignmentEnd(StaffAlignment *staffAlignment)
+{
+    m_cumulatedShift += staffAlignment->GetMinimumSpacing(m_doc);
+
+    staffAlignment->SetYRel(-m_cumulatedShift);
+
+    m_cumulatedShift += staffAlignment->GetStaffHeight();
+    ++m_staffIdx;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitSystem(System *system)
+{
+    m_systemAligner = &system->m_systemAligner;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitSystemEnd(System *system)
+{
+    m_cumulatedShift = 0;
+    m_staffIdx = 0;
+
+    system->m_systemAligner.Process(*this);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitVerse(Verse *verse)
+{
+    StaffAlignment *alignment = m_systemAligner->GetStaffAlignmentForStaffN(m_staffN);
+
+    if (!alignment) return FUNCTOR_CONTINUE;
+
+    // Add the number count
+    alignment->AddVerseN(verse->GetN());
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// AlignSystemsFunctor
+//----------------------------------------------------------------------------
+
+AlignSystemsFunctor::AlignSystemsFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_shift = 0;
+    m_systemSpacing = 0;
+    m_prevBottomOverflow = 0;
+    m_prevBottomClefOverflow = 0;
+    m_justificationSum = 0.0;
+}
+
+FunctorCode AlignSystemsFunctor::VisitPage(Page *page)
+{
+    m_justificationSum = 0;
+
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        header->SetDrawingYRel(m_shift);
+        const int headerHeight = header->GetTotalHeight(m_doc);
+        if (headerHeight > 0) {
+            m_shift -= headerHeight;
+        }
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignSystemsFunctor::VisitPageEnd(Page *page)
+{
+    page->m_drawingJustifiableHeight = m_shift;
+    page->m_justificationSum = m_justificationSum;
+
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        page->m_drawingJustifiableHeight -= footer->GetTotalHeight(m_doc);
+
+        // Move it up below the last system
+        if (m_doc->GetOptions()->m_adjustPageHeight.GetValue()) {
+            if (page->GetChildCount()) {
+                System *last = vrv_cast<System *>(page->GetLast(SYSTEM));
+                assert(last);
+                const int unit = m_doc->GetDrawingUnit(100);
+                const int topMargin = m_doc->GetOptions()->m_topMarginPgFooter.GetValue() * unit;
+                footer->SetDrawingYRel(last->GetDrawingYRel() - last->GetHeight() - topMargin);
+            }
+        }
+        else {
+            footer->SetDrawingYRel(footer->GetContentHeight());
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode AlignSystemsFunctor::VisitSystem(System *system)
+{
+    SystemAligner &systemAligner = system->m_systemAligner;
+    assert(systemAligner.GetBottomAlignment());
+
+    // No spacing for the first system
+    int systemSpacing = system->IsFirstInPage() ? 0 : m_systemSpacing;
+    if (systemSpacing) {
+        const int contentOverflow = m_prevBottomOverflow + systemAligner.GetOverflowAbove(m_doc);
+        const int clefOverflow = m_prevBottomClefOverflow + systemAligner.GetOverflowAbove(m_doc, true);
+        // Alignment is already pre-determined with staff alignment overflow
+        // We need to subtract them from the desired spacing
+        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
+        // Ensure minimal white space between consecutive systems by adding one staff space
+        const int unit = m_doc->GetDrawingUnit(100);
+        m_shift -= std::max(actualSpacing, 2 * unit);
+    }
+
+    system->SetDrawingYRel(m_shift);
+
+    m_shift += systemAligner.GetBottomAlignment()->GetYRel();
+
+    m_justificationSum += systemAligner.GetJustificationSum(m_doc);
+    if (system->IsFirstInPage()) {
+        // remove extra system justification factor to get exactly (systemsCount-1)*justificationSystem
+        m_justificationSum -= m_doc->GetOptions()->m_justificationSystem.GetValue();
+    }
+
+    m_prevBottomOverflow = systemAligner.GetOverflowBelow(m_doc);
+    m_prevBottomClefOverflow = systemAligner.GetOverflowBelow(m_doc, true);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

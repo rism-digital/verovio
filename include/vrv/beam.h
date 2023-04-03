@@ -344,7 +344,10 @@ public:
     /**
      * Return duration of the beam part that is closest to the specified object X position
      */
+    ///@{
+    int GetBeamPartDuration(int x, bool includeRests = true) const;
     int GetBeamPartDuration(const Object *object, bool includeRests = true) const;
+    ///@}
 
     //----------//
     // Functors //
@@ -360,16 +363,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::AdjustBeams
-     */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustBeamsEnd
-     */
-    int AdjustBeamsEnd(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note and Chords elements.
@@ -381,12 +374,6 @@ protected:
      * See LayerElement::SetElementShortening
      */
     void SetElementShortening(int shortening) override;
-
-    /**
-     * Return duration of beam part for specified X coordinate. Duration of two closest elements is taken for this
-     * purpose.
-     */
-    int GetBeamPartDuration(int x, bool includeRests = true) const;
 
 private:
     /**

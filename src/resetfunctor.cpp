@@ -22,7 +22,10 @@
 #include "layer.h"
 #include "ligature.h"
 #include "mrest.h"
+#include "octave.h"
+#include "page.h"
 #include "rest.h"
+#include "runningelement.h"
 #include "section.h"
 #include "slur.h"
 #include "staff.h"
@@ -618,6 +621,111 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum
     this->VisitLayerElement(tupletNum);
 
     tupletNum->SetAlignedBracket(NULL);
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// ResetVerticalAlignmentFunctor
+//----------------------------------------------------------------------------
+
+ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() {}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitArtic(Artic *artic)
+{
+    // Call parent one too
+    this->VisitLayerElement(artic);
+
+    artic->m_startSlurPositioners.clear();
+    artic->m_endSlurPositioners.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    floatingObject->SetCurrentFloatingPositioner(NULL);
+    floatingObject->ResetMaxDrawingYRel();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in CalcAlignmentPitchPos
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitOctave(Octave *octave)
+{
+    this->VisitFloatingObject(octave);
+
+    octave->ResetDrawingExtenderX();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitPage(Page *page)
+{
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        header->Process(*this);
+        header->SetDrawingPage(NULL);
+        header->SetDrawingYRel(0);
+    }
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        footer->Process(*this);
+        footer->SetDrawingPage(NULL);
+        footer->SetDrawingYRel(0);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitStaff(Staff *staff)
+{
+    staff->SetAlignment(NULL);
+    staff->ClearLedgerLines();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitSystem(System *system)
+{
+    system->SetDrawingYRel(0);
+
+    system->m_systemAligner.Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTextElement(TextElement *textElement)
+{
+    textElement->SetDrawingXRel(0);
+    textElement->SetDrawingYRel(0);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTuplet(Tuplet *tuplet)
+{
+    // Call parent one too
+    this->VisitLayerElement(tuplet);
+
+    tuplet->ResetInnerSlurs();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetVerticalAlignmentFunctor::VisitTupletBracket(TupletBracket *tupletBracket)
+{
+    // Call parent one too
+    this->VisitLayerElement(tupletBracket);
+
+    tupletBracket->SetDrawingYRelLeft(0);
+    tupletBracket->SetDrawingYRelRight(0);
 
     return FUNCTOR_CONTINUE;
 }

@@ -380,69 +380,12 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
-{
-    m_staffAlignment = NULL;
-
-    ClearLedgerLines();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    if (!this->DrawingIsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    params->m_staffN = this->GetN();
-
-    // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = params->m_systemAligner->GetStaffAlignment(params->m_staffIdx, this, params->m_doc);
-
-    assert(alignment);
-
-    // Set the pointer of the m_alignment
-    m_staffAlignment = alignment;
-
-    std::vector<Object *>::const_iterator verseIterator
-        = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
-    if (verseIterator != m_timeSpanningElements.end()) {
-        Verse *v = vrv_cast<Verse *>(*verseIterator);
-        assert(v);
-        alignment->AddVerseN(v->GetN());
-    }
-
-    // add verse number to alignment in case there are spanning SYL elements but there is no verse number already - this
-    // generally happens with verses spanning over several systems which results in invalid placement of connector lines
-    std::vector<Object *>::const_iterator sylIterator
-        = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(SYL));
-    if (sylIterator != m_timeSpanningElements.end()) {
-        Verse *verse = vrv_cast<Verse *>((*sylIterator)->GetFirstAncestor(VERSE));
-        if (verse) {
-            const int verseNumber = verse->GetN();
-            const bool verseCollapse = params->m_doc->GetOptions()->m_lyricVerseCollapse.GetValue();
-            if (!alignment->GetVersePosition(verseNumber, verseCollapse)) {
-                alignment->AddVerseN(verseNumber);
-            }
-        }
-    }
-
-    // for next staff
-    params->m_staffIdx++;
 
     return FUNCTOR_CONTINUE;
 }

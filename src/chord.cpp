@@ -18,8 +18,6 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
-#include "calcalignmentpitchposfunctor.h"
-#include "calcstemfunctor.h"
 #include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
@@ -562,23 +560,6 @@ FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitChordEnd(this);
 }
 
-int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
-{
-    FunctorDocParams *params = vrv_params_cast<FunctorDocParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
-
-    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(params->m_doc);
-    this->Process(calcAlignmentPitchPos);
-
-    CalcStemFunctor calcStem(params->m_doc);
-    this->Process(calcStem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
     ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
@@ -608,63 +589,6 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 
     assert(params->m_currentChord);
     params->m_currentChord = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::CalcArtic(FunctorParams *functorParams)
-{
-    CalcArticParams *params = vrv_params_cast<CalcArticParams *>(functorParams);
-    assert(params);
-
-    params->m_parent = this;
-    params->m_stemDir = this->GetDrawingStemDir();
-
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    params->m_staffAbove = staff;
-    params->m_staffBelow = staff;
-    params->m_layerAbove = layer;
-    params->m_layerBelow = layer;
-    params->m_crossStaffAbove = false;
-    params->m_crossStaffBelow = false;
-
-    if (m_crossStaff) {
-        params->m_staffAbove = m_crossStaff;
-        params->m_staffBelow = m_crossStaff;
-        params->m_layerAbove = m_crossLayer;
-        params->m_layerBelow = m_crossLayer;
-        params->m_crossStaffAbove = true;
-        params->m_crossStaffBelow = true;
-    }
-    else {
-        this->GetCrossStaffExtremes(
-            params->m_staffAbove, params->m_staffBelow, &params->m_layerAbove, &params->m_layerBelow);
-        if (params->m_staffAbove) {
-            params->m_crossStaffAbove = true;
-            params->m_staffBelow = staff;
-            params->m_layerBelow = layer;
-        }
-        else if (params->m_staffBelow) {
-            params->m_crossStaffBelow = true;
-            params->m_staffAbove = staff;
-            params->m_layerAbove = layer;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::AdjustArtic(FunctorParams *functorParams)
-{
-    AdjustArticParams *params = vrv_params_cast<AdjustArticParams *>(functorParams);
-    assert(params);
-
-    params->m_parent = this;
-    params->m_articAbove.clear();
-    params->m_articBelow.clear();
 
     return FUNCTOR_CONTINUE;
 }

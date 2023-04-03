@@ -318,6 +318,12 @@ public:
      */
     MapOfDotLocs CalcOptimalDotLocations();
 
+    /**
+     * Calculate the overlap with other layer elements that
+     * are placed within the duration of the element
+     */
+    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
+
     //----------//
     // Functors //
     //----------//
@@ -333,29 +339,9 @@ public:
     ///@}
 
     /**
-     * See Object::AdjustBeams
-     */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustTupletNumOverlap
-     */
-    int AdjustTupletNumOverlap(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::AdjustXRelForTranscription
-     */
-    int AdjustXRelForTranscription(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitOnsetOffset
@@ -409,12 +395,6 @@ protected:
      * secondary
      */
     virtual MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const { return {}; }
-
-    /**
-     * Helper function to calculate overlap with layer elements that
-     * are placed within the duration of element
-     */
-    int CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2);
 
     //----------------//
     // Static methods //

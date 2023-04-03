@@ -127,22 +127,6 @@ FunctorCode Verse::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitVerseEnd(this);
 }
 
-int Verse::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = params->m_systemAligner->GetStaffAlignmentForStaffN(params->m_staffN);
-
-    if (!alignment) return FUNCTOR_CONTINUE;
-
-    // Add the number count
-    alignment->AddVerseN(this->GetN());
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Verse::InitProcessingLists(FunctorParams *functorParams)
 {
     InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);

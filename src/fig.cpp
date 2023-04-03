@@ -76,22 +76,4 @@ FunctorCode Fig::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitFigEnd(this);
 }
 
-int Fig::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    Svg *svg = vrv_cast<Svg *>(this->FindDescendantByType(SVG));
-    int width = (svg) ? svg->GetWidth() : 0;
-
-    if (this->GetHalign() == HORIZONTALALIGNMENT_right) {
-        this->SetDrawingXRel(params->m_pageWidth - width);
-    }
-    else if (this->GetHalign() == HORIZONTALALIGNMENT_center) {
-        this->SetDrawingXRel((params->m_pageWidth - width) / 2);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv
