@@ -39,8 +39,8 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitLayerEnd(Layer *layer) override;
     FunctorCode VisitObject(Object *object) override;
-    FunctorCode VisitObjectEnd(Object *object) override;
     ///@}
 
 protected:
@@ -50,8 +50,7 @@ private:
 public:
     //
 private:
-    // The current staffAlignment
-    StaffAlignment *m_staffAlignment;
+    //
 };
 
 } // namespace vrv

@@ -22,9 +22,24 @@ namespace vrv {
 // CalcBBoxOverflowsFunctor
 //----------------------------------------------------------------------------
 
-CalcBBoxOverflowsFunctor::CalcBBoxOverflowsFunctor(Doc *doc) : DocFunctor(doc)
+CalcBBoxOverflowsFunctor::CalcBBoxOverflowsFunctor(Doc *doc) : DocFunctor(doc) {}
+
+FunctorCode CalcBBoxOverflowsFunctor::VisitLayerEnd(Layer *layer)
 {
-    m_staffAlignment = NULL;
+    // set scoreDef attr
+    if (layer->GetCautionStaffDefClef()) {
+        this->VisitClef(layer->GetCautionStaffDefClef());
+    }
+    if (layer->GetCautionStaffDefKeySig()) {
+        this->VisitKeySig(layer->GetCautionStaffDefKeySig());
+    }
+    if (layer->GetCautionStaffDefMensur()) {
+        this->VisitMensur(layer->GetCautionStaffDefMensur());
+    }
+    if (layer->GetCautionStaffDefMeterSig()) {
+        this->VisitMeterSig(layer->GetCautionStaffDefMeterSig());
+    }
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CalcBBoxOverflowsFunctor::VisitObject(Object *object)
@@ -37,8 +52,6 @@ FunctorCode CalcBBoxOverflowsFunctor::VisitObject(Object *object)
         if (!currentStaff->DrawingIsVisible()) {
             return FUNCTOR_SIBLINGS;
         }
-
-        m_staffAlignment = currentStaff->GetAlignment();
         return FUNCTOR_CONTINUE;
     }
 
@@ -113,8 +126,6 @@ FunctorCode CalcBBoxOverflowsFunctor::VisitObject(Object *object)
         return FUNCTOR_CONTINUE;
     }
 
-    assert(m_staffAlignment);
-
     LayerElement *current = vrv_cast<LayerElement *>(object);
     assert(current);
 
@@ -157,29 +168,6 @@ FunctorCode CalcBBoxOverflowsFunctor::VisitObject(Object *object)
         }
     }
 
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode CalcBBoxOverflowsFunctor::VisitObjectEnd(Object *object)
-{
-    // starting new layer
-    if (object->Is(LAYER)) {
-        Layer *currentLayer = vrv_cast<Layer *>(object);
-        assert(currentLayer);
-        // set scoreDef attr
-        if (currentLayer->GetCautionStaffDefClef()) {
-            this->VisitClef(currentLayer->GetCautionStaffDefClef());
-        }
-        if (currentLayer->GetCautionStaffDefKeySig()) {
-            this->VisitKeySig(currentLayer->GetCautionStaffDefKeySig());
-        }
-        if (currentLayer->GetCautionStaffDefMensur()) {
-            this->VisitMensur(currentLayer->GetCautionStaffDefMensur());
-        }
-        if (currentLayer->GetCautionStaffDefMeterSig()) {
-            this->VisitMeterSig(currentLayer->GetCautionStaffDefMeterSig());
-        }
-    }
     return FUNCTOR_CONTINUE;
 }
 
