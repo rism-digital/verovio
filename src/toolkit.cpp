@@ -466,6 +466,8 @@ bool Toolkit::LoadData(const std::string &data)
     std::string newData;
     Input *input = NULL;
 
+    m_doc.m_expansionMap.Reset();
+
     if (m_options->m_xmlIdChecksum.GetValue()) {
         crcInit();
         unsigned int cr = crcFast((unsigned char *)data.c_str(), (int)data.size());
