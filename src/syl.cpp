@@ -81,6 +81,12 @@ bool Syl::IsSupportedChild(Object *child)
     return true;
 }
 
+int Syl::CalcDashLength(Doc *doc, int staffSize)
+{
+    FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
+    return doc->GetTextGlyphWidth(L'-', lyricFont, false);
+}
+
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 {
     assert(doc);
