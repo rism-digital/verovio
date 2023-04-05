@@ -112,8 +112,7 @@ FunctorCode AdjustSylSpacingFunctor::VisitVerse(Verse *verse)
     ListOfObjects syls = verse->FindAllDescendantsByType(SYL);
 
     int shift = m_doc->GetDrawingUnit(m_staffSize);
-    // Adjust it proportionally to the lyric size
-    shift *= m_doc->GetOptions()->m_lyricSize.GetValue() / m_doc->GetOptions()->m_lyricSize.GetDefault();
+    Syl::AdjustToLyricSize(m_doc, shift);
 
     int previousSylShift = 0;
 

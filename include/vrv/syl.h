@@ -85,6 +85,15 @@ public:
     int GetDrawingWidth() const;
     int GetDrawingHeight() const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Adjust proportionally to the lyric size
+     */
+    static void AdjustToLyricSize(const Doc *doc, int &value);
+
     //----------//
     // Functors //
     //----------//

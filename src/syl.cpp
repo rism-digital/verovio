@@ -86,9 +86,7 @@ int Syl::CalcHyphenLength(Doc *doc, int staffSize)
     FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
     int dashLength = doc->GetTextGlyphWidth(L'-', lyricFont, false);
 
-    // Adjust it proportionally to the lyric size
-    const OptionDbl &lyricSize = doc->GetOptions()->m_lyricSize;
-    dashLength *= lyricSize.GetValue() / lyricSize.GetDefault();
+    Syl::AdjustToLyricSize(doc, dashLength);
 
     return dashLength;
 }
@@ -110,22 +108,18 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
     else if (con == sylLog_CON_b) {
         if (doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
             // Equivalent spacing with 0x230F
-            spacing += doc->GetDrawingUnit(staffSize) * 2.2;
+            spacing = doc->GetDrawingUnit(staffSize) * 2.2;
         }
         else {
             // Calculate the elision space with the current music font
-            int elisionSpace = doc->GetGlyphAdvX(doc->GetOptions()->m_lyricElision.GetValue(), staffSize, false);
-            // Adjust it proportionally to the lyric size
-            elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-            spacing = elisionSpace;
+            spacing = doc->GetGlyphAdvX(doc->GetOptions()->m_lyricElision.GetValue(), staffSize, false);
+            Syl::AdjustToLyricSize(doc, spacing);
         }
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
-        int wordSpace = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricWordSpace.GetValue();
-        // Adjust it proportionally to the lyric size
-        wordSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-        spacing = wordSpace;
+        spacing = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricWordSpace.GetValue();
+        Syl::AdjustToLyricSize(doc, spacing);
     }
 
     return spacing;
@@ -145,6 +139,12 @@ int Syl::GetDrawingHeight() const
         return FacsimileInterface::GetHeight();
     }
     return 0;
+}
+
+void Syl::AdjustToLyricSize(const Doc *doc, int &value)
+{
+    const OptionDbl &lyricSize = doc->GetOptions()->m_lyricSize;
+    value *= lyricSize.GetValue() / lyricSize.GetDefault();
 }
 
 //----------------------------------------------------------------------------

@@ -1183,8 +1183,8 @@ void View::DrawFConnector(DeviceContext *dc, F *f, int x1, int x2, Staff *staff,
     dc->DeactivateGraphic();
 
     int width = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    // Adjust it proportionally to the lyric size
-    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+    Syl::AdjustToLyricSize(m_doc, width);
+
     this->DrawFilledRectangle(dc, x1, y, x2, y + width);
 
     dc->ReactivateGraphic();
@@ -1277,8 +1277,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
 
     int thickness = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    // Adjust it proportionally to the lyric size
-    thickness *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+    Syl::AdjustToLyricSize(m_doc, thickness);
 
     if (syl->GetCon() == sylLog_CON_d) {
 
