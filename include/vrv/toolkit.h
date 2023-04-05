@@ -434,7 +434,7 @@ public:
 
     /**
      * Render a document's expansionMap and save it to a file.
-     * 
+     *
      * @remark nojs
      *
      * @param filename The output filename
