@@ -433,7 +433,9 @@ public:
     bool RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions = "");
 
     /**
-     * Render a document's expansionMap and save it to a file
+     * Render a document's expansionMap and save it to a file.
+     * 
+     * @remark nojs
      *
      * @param filename The output filename
      */
