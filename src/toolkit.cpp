@@ -314,8 +314,6 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
-    m_doc.m_expansionMap.Reset();
-
     return this->LoadData(content);
 }
 
