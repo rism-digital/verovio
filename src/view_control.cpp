@@ -1285,9 +1285,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
 
         // the length of the dash and the space between them
-        int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_lyricHyphenLength.GetValue();
-        // Adjust it proportionally to the lyric size
-        dashLength *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+        const int dashLength = syl->CalcHyphenLength(m_doc, staff->m_drawingStaffSize);
         const int halfDashLength = dashLength / 2;
 
         const int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;

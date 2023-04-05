@@ -81,10 +81,16 @@ bool Syl::IsSupportedChild(Object *child)
     return true;
 }
 
-int Syl::CalcDashLength(Doc *doc, int staffSize)
+int Syl::CalcHyphenLength(Doc *doc, int staffSize)
 {
     FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
-    return doc->GetTextGlyphWidth(L'-', lyricFont, false);
+    int dashLength = doc->GetTextGlyphWidth(L'-', lyricFont, false);
+
+    // Adjust it proportionally to the lyric size
+    const OptionDbl &lyricSize = doc->GetOptions()->m_lyricSize;
+    dashLength *= lyricSize.GetValue() / lyricSize.GetDefault();
+
+    return dashLength;
 }
 
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
@@ -98,10 +104,7 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 
     // We have a word connector - the space have to be wide enough
     if ((pos == sylLog_WORDPOS_i) || (pos == sylLog_WORDPOS_m)) {
-        int hyphen = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricHyphenLength.GetValue();
-        // Adjust it proportionally to the lyric size
-        hyphen *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-        spacing = (2 * hyphen);
+        spacing = 2 * this->CalcHyphenLength(doc, staffSize);
     }
     // Elision
     else if (con == sylLog_CON_b) {

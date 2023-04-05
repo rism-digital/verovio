@@ -73,9 +73,9 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * Calculate the dash length based on the text fonts hyphen length
+     * Calculate the hyphen length using the text font
      */
-    int CalcDashLength(Doc *doc, int staffSize);
+    int CalcHyphenLength(Doc *doc, int staffSize);
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con
