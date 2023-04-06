@@ -108,6 +108,7 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
     void CacheXRel(bool restore = false);
+    int GetCachedXRel() const { return m_cachedXRel; }
     ///@}
 
     /**
@@ -214,6 +215,14 @@ public:
      * Return the center x of the inner of the measure
      */
     int GetInnerCenterX() const;
+
+    /**
+     * Return the cached width / overflow
+     */
+    ///@{
+    int GetCachedWidth() const { return m_cachedWidth; }
+    int GetCachedOverflow() const { return m_cachedOverflow; }
+    ///@}
 
     /**
      * Return the right overflow of the control events in the measure.
