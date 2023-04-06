@@ -438,11 +438,11 @@ void SvgDeviceContext::StartPage()
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.text().set("g.page-margin{font-family:Times,serif;} "
-                       //"g.page-margin{background: pink;} "
-                       //"g.bounding-box{stroke:red; stroke-width:10} "
-                       //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                       "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-                       "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
+                                 //"g.page-margin{background: pink;} "
+                                 //"g.bounding-box{stroke:red; stroke-width:10} "
+                                 //"g.content-bounding-box{stroke:blue; stroke-width:10} "
+                                 "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                                 "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
 
