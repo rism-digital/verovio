@@ -177,7 +177,7 @@ void ABCInput::ParseABC(std::istream &infile)
 /**********************************
  *
  * SetBarLine
- * Translation from ABC to verovio representaion:
+ * Translation from ABC to Verovio representaion:
  *
  BARRENDITION_single     |
  BARRENDITION_end        |]
@@ -912,7 +912,7 @@ void ABCInput::CreateHeader()
     pugi::xml_node appName = app.append_child("name");
     appName.append_child(pugi::node_pcdata).set_value("Verovio");
     pugi::xml_node appText = app.append_child("p");
-    appText.append_child(pugi::node_pcdata).set_value("Transcoded from abc music");
+    appText.append_child(pugi::node_pcdata).set_value("Transcoded from abc music.");
 
     // isodate and version //
     const time_t t = time(0); // get time now
