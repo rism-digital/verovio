@@ -477,7 +477,7 @@ private:
     static int PitchToMidi(const std::string &step, int alter, int octave);
     static void MidiToPitch(int midi, std::string &step, int &alter, int &octave);
     ///@}
-private:
+
     /* octave offset */
     std::vector<int> m_octDis;
     /* measure repeats */
