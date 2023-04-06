@@ -1236,9 +1236,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
         pugi::xml_node availability = pubStmt.append_child("availability");
         for (pugi::xpath_node_set::const_iterator it = rightsSet.begin(); it != rightsSet.end(); ++it) {
             pugi::xpath_node rights = *it;
-            availability.append_child("distributor")
-                .append_child(pugi::node_pcdata)
-                .set_value(rights.node().text().as_string());
+            availability.append_child("distributor").text().set(rights.node().text().as_string());
         }
     }
 
