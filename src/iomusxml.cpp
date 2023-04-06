@@ -1252,6 +1252,10 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     appText.text().set("Transcoded from MusicXML");
 
     if (!m_doc->GetOptions()->m_removeIds.GetValue()) {
+        GenerateID(meiHead);
+        GenerateID(fileDesc);
+        GenerateID(titleStmt);
+        GenerateID(pubStmt);
         GenerateID(encodingDesc);
         GenerateID(appInfo);
         GenerateID(app);
