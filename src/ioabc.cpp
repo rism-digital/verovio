@@ -912,7 +912,7 @@ void ABCInput::CreateHeader()
     pugi::xml_node appName = app.append_child("name");
     appName.text().set("Verovio");
     pugi::xml_node appText = app.append_child("p");
-    appText.text().set("Transcoded from abc music.");
+    appText.text().set("Transcoded from abc music");
 
     // isodate and version //
     const time_t t = time(0); // get time now

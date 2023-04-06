@@ -2783,7 +2783,7 @@ bool PAEInput::Import(const std::string &input)
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.text().set("Converted from Plaine and Easie to MEI.");
+        p1.text().set("Converted from Plaine and Easie to MEI");
     }
 
     bool success = true;

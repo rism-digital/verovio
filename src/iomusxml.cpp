@@ -1246,7 +1246,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pugi::xml_node appName = app.append_child("name");
     appName.text().set("Verovio");
     pugi::xml_node appText = app.append_child("p");
-    appText.text().set("Transcoded from MusicXML.");
+    appText.text().set("Transcoded from MusicXML");
 
     if (!m_doc->GetOptions()->m_removeIds.GetValue()) {
         GenerateID(meiHead);

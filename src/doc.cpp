@@ -310,7 +310,7 @@ void Doc::GenerateMEIHeader(bool meiBasic)
         // projectDesc
         pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.text().set(StringFormat("MEI encoded with Verovio.").c_str());
+        p1.text().set(StringFormat("MEI encoded with Verovio").c_str());
     }
 }
 
