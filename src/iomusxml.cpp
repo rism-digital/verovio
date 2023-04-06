@@ -1210,7 +1210,6 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     }
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pubStmt.append_child(pugi::node_pcdata);
 
     pugi::xml_node respStmt = titleStmt.append_child("respStmt");
 
