@@ -3241,27 +3241,19 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
         }
         pugi::xml_node incip = work.append_child("incip");
         if (header.has<jsonxx::String>("role")) {
-            incip.append_child("role")
-                .append_child(pugi::node_pcdata)
-                .set_value(header.get<jsonxx::String>("role").c_str());
+            incip.append_child("role").text().set(header.get<jsonxx::String>("role").c_str());
         }
         if (header.has<jsonxx::String>("scoring") || header.has<jsonxx::String>("voice_intrument")) {
             pugi::xml_node perfResList = incip.append_child("perfResList");
             if (header.has<jsonxx::String>("voice_instrument")) {
-                perfResList.append_child("perfRes")
-                    .append_child(pugi::node_pcdata)
-                    .set_value(header.get<jsonxx::String>("voice_instrument").c_str());
+                perfResList.append_child("perfRes").text().set(header.get<jsonxx::String>("voice_instrument").c_str());
             }
             if (header.has<jsonxx::String>("scoring")) {
-                perfResList.append_child("perfRes")
-                    .append_child(pugi::node_pcdata)
-                    .set_value(header.get<jsonxx::String>("scoring").c_str());
+                perfResList.append_child("perfRes").text().set(header.get<jsonxx::String>("scoring").c_str());
             }
         }
         if (header.has<jsonxx::String>("key_mode")) {
-            incip.append_child("key")
-                .append_child(pugi::node_pcdata)
-                .set_value(header.get<jsonxx::String>("key_mode").c_str());
+            incip.append_child("key").text().set(header.get<jsonxx::String>("key_mode").c_str());
         }
         if (header.has<jsonxx::Array>("text_incipits")) {
             pugi::xml_node incipText = incip.append_child("incipText");

@@ -547,8 +547,7 @@ void MusicXmlInput::FillSpace(Layer *layer, int dur)
 
 void MusicXmlInput::GenerateID(pugi::xml_node node)
 {
-    std::string id = StringFormat("%s-%s", node.name(), Object::GenerateHashID().c_str()).c_str();
-    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    std::string id = std::string(node.name()).at(0) + Object::GenerateHashID();
     node.append_attribute("xml:id").set_value(id.c_str());
 }
 
@@ -1211,7 +1210,6 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     }
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pubStmt.append_child(pugi::node_pcdata);
 
     pugi::xml_node respStmt = titleStmt.append_child("respStmt");
 
@@ -1238,24 +1236,29 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
         pugi::xml_node availability = pubStmt.append_child("availability");
         for (pugi::xpath_node_set::const_iterator it = rightsSet.begin(); it != rightsSet.end(); ++it) {
             pugi::xpath_node rights = *it;
-            availability.append_child("distributor")
-                .append_child(pugi::node_pcdata)
-                .set_value(rights.node().text().as_string());
+            availability.append_child("distributor").text().set(rights.node().text().as_string());
         }
     }
 
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-    GenerateID(encodingDesc);
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
-    GenerateID(appInfo);
     pugi::xml_node app = appInfo.append_child("application");
-    GenerateID(app);
     pugi::xml_node appName = app.append_child("name");
-    GenerateID(appName);
     appName.text().set("Verovio");
     pugi::xml_node appText = app.append_child("p");
-    GenerateID(appText);
     appText.text().set("Transcoded from MusicXML");
+
+    if (!m_doc->GetOptions()->m_removeIds.GetValue()) {
+        GenerateID(meiHead);
+        GenerateID(fileDesc);
+        GenerateID(titleStmt);
+        GenerateID(pubStmt);
+        GenerateID(encodingDesc);
+        GenerateID(appInfo);
+        GenerateID(app);
+        GenerateID(appName);
+        GenerateID(appText);
+    }
 
     // isodate and version
     time_t t = time(0); // get time now
