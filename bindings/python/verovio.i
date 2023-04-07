@@ -131,6 +131,20 @@ def renderData(toolkit, data, options: dict) -> str:
     return $action(toolkit, data, json.dumps(options))
 %}
 
+// Toolkit::RenderToExpansionMap
+%feature("shadow") vrv::Toolkit::RenderToExpansionMap() %{
+def renderToExpansionMap(toolkit) -> list:
+    """Render a document's expansion map, if existing."""
+    return json.loads($action(toolkit))
+%}
+
+// Toolkit::RenderToExpansionMapFile
+%feature("shadow") vrv::Toolkit::RenderToExpansionMapFile(const std::string &) %{
+def renderToExpansionMapFile(toolkit, filename: str) -> bool:
+    """Render a document's expansion map and save it to a file."""
+    return $action(toolkit, filename)
+%}
+
 // Toolkit::RenderToTimemap
 %feature("shadow") vrv::Toolkit::RenderToTimemap(const std::string & = "") %{
 def renderToTimemap(toolkit, options: Optional[dict] = None) -> list:

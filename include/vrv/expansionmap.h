@@ -45,6 +45,11 @@ public:
 
     std::vector<std::string> GetExpansionIDsForElement(const std::string &xmlId);
 
+    /**
+     * Write the currentexpansionMap to a JSON string
+     */
+    void ToJson(std::string &output);
+
 private:
     bool UpdateIDs(Object *object);
 

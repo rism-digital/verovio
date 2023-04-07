@@ -47,6 +47,7 @@ bool vrvToolkit_loadZipDataBuffer(void *tkPtr, const unsigned char *data, int le
 void vrvToolkit_redoLayout(void *tkPtr, const char *c_options);
 void vrvToolkit_redoPagePitchPosLayout(void *tkPtr);
 const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *options);
+const char *vrvToolkit_renderToExpansionMap(void *tkPtr);
 const char *vrvToolkit_renderToMIDI(void *tkPtr, const char *c_options);
 const char *vrvToolkit_renderToPAE(void *tkPtr);
 const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, bool xmlDeclaration);

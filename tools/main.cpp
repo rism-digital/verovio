@@ -279,10 +279,11 @@ int main(int argc, char **argv)
     }
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
-        && (outformat != "midi") && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum")
-        && (outformat != "pae")) {
+        && (outformat != "midi") && (outformat != "timemap") && (outformat != "expansionmap")
+        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")) {
         std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'timemap', 'humdrum' or 'pae'."
+                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'timemap', 'expansionmap', 'humdrum' "
+                     "or 'pae'."
                   << std::endl;
         exit(1);
     }
@@ -306,7 +307,7 @@ int main(int argc, char **argv)
     }
 
     // Skip the layout for MIDI and timemap output by setting --breaks to none
-    if ((outformat == "midi") || (outformat == "timemap")) {
+    if ((outformat == "midi") || (outformat == "timemap") || (outformat == "expansionmap")) {
         toolkit.SetOptions("{'breaks': 'none'}");
     }
 
@@ -432,7 +433,21 @@ int main(int argc, char **argv)
             std::cout << toolkit.RenderToTimemap();
         }
         else if (!toolkit.RenderToTimemapFile(outfile)) {
-            std::cerr << "Unable to write MIDI to " << outfile << "." << std::endl;
+            std::cerr << "Unable to write timemap to " << outfile << "." << std::endl;
+            exit(1);
+        }
+        else {
+            std::cerr << "Output written to " << outfile << "." << std::endl;
+        }
+    }
+    else if (outformat == "expansionmap") {
+        outfile += "-em.json";
+        if (std_output) {
+            std::string output;
+            std::cout << toolkit.RenderToExpansionMap();
+        }
+        else if (!toolkit.RenderToExpansionMapFile(outfile)) {
+            std::cerr << "Unable to write expansionmap to " << outfile << "." << std::endl;
             exit(1);
         }
         else {
