@@ -199,48 +199,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CastOffPagesParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the page we are taking the content from
- * member 1: a pointer the document we are adding pages to
- * member 2: a pointer to the current page
- * member 3: the cummulated shift (m_drawingYRel of the first system of the current page)
- * members 4-8: the page heights
- * member 9: a pointer to the leftover system (last system with only one measure)
- * member 10: the current pending elements (Mdiv, Score) to be place at the beginning of a page
- **/
-
-class CastOffPagesParams : public FunctorParams {
-public:
-    CastOffPagesParams(Page *contentPage, Doc *doc, Page *currentPage)
-    {
-        m_contentPage = contentPage;
-        m_doc = doc;
-        m_currentPage = currentPage;
-        m_shift = 0;
-        m_pageHeight = 0;
-        m_pgHeadHeight = 0;
-        m_pgFootHeight = 0;
-        m_pgHead2Height = 0;
-        m_pgFoot2Height = 0;
-        m_leftoverSystem = NULL;
-    }
-    Page *m_contentPage;
-    Doc *m_doc;
-    Page *m_currentPage;
-    int m_shift;
-    int m_pageHeight;
-    int m_pgHeadHeight;
-    int m_pgFootHeight;
-    int m_pgHead2Height;
-    int m_pgFoot2Height;
-    System *m_leftoverSystem;
-    ArrayOfObjects m_pendingPageElements;
-};
-
-//----------------------------------------------------------------------------
 // CastOffToSelectionParams
 //----------------------------------------------------------------------------
 

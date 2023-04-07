@@ -112,6 +112,16 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Set the leftover system
+     */
+    void SetLeftoverSystem(System *system) { m_leftoverSystem = system; }
+
+    /*
+     * Set the page height
+     */
+    void SetPageHeight(int height) { m_pageHeight = height; }
+
+    /*
      * Functor interface
      */
     ///@{

@@ -576,62 +576,6 @@ int System::JustifyY(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::CastOffPages(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    int currentShift = params->m_shift;
-    // We use params->m_pageHeadHeight to check if we have passed the first page already
-    if (params->m_pgHeadHeight != VRV_UNSET) {
-        currentShift += params->m_pgHeadHeight + params->m_pgFootHeight;
-    }
-    else {
-        currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
-    }
-
-    const int systemMaxPerPage = params->m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
-    const int childCount = params->m_currentPage->GetChildCount();
-    if ((systemMaxPerPage && systemMaxPerPage == childCount)
-        || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
-        // If this is the last system in the list, it doesn't fit the page and it's leftover system (has just one
-        // measure) => add the system content to the previous system
-        Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
-        Object *lastSystem = params->m_currentPage->GetLast(SYSTEM);
-        if (!nextSystem && lastSystem && (this == params->m_leftoverSystem)) {
-            ArrayOfObjects &children = this->GetChildrenForModification();
-            for (Object *child : children) {
-                child->MoveItselfTo(lastSystem);
-            }
-            return FUNCTOR_SIBLINGS;
-        }
-
-        params->m_currentPage = new Page();
-        // Use VRV_UNSET value as a flag
-        params->m_pgHeadHeight = VRV_UNSET;
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
-    }
-
-    // First add all pending objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
-        params->m_currentPage->AddChild(*iter);
-    }
-    params->m_pendingPageElements.clear();
-
-    // Special case where we use the Relinquish method.
-    // We want to move the system to the currentPage. However, we cannot use DetachChild
-    // from the contentPage because this screws up the iterator. Relinquish gives up
-    // the ownership of the system - the contentPage itself will be deleted afterwards.
-    System *system = vrv_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    assert(system);
-    params->m_currentPage->AddChild(system);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);

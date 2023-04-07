@@ -101,27 +101,6 @@ FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageMilestoneEnd(this);
 }
 
-int PageMilestoneEnd::CastOffPages(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentPage);
-
-    PageMilestoneEnd *endMilestone
-        = dynamic_cast<PageMilestoneEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    // End milestones can be added to the page only if the pending list is empty
-    // Otherwise we are going to mess up the order
-    if (params->m_pendingPageElements.empty()) {
-        params->m_currentPage->AddChild(endMilestone);
-    }
-    else {
-        params->m_pendingPageElements.push_back(endMilestone);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int PageMilestoneEnd::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);

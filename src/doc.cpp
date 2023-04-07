@@ -1046,7 +1046,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     castOffSinglePage->ResetCachedDrawingX();
     castOffSinglePage->LayOutVertically();
 
-    // Detach the contentPage in order to be able call CastOffRunningElements
+    // Detach the contentPage to prepare for CastOffPages
     pages->DetachChild(0);
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDataPage();
@@ -1056,14 +1056,12 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     }
 
     Page *castOffFirstPage = new Page();
-    CastOffPagesParams castOffPagesParams(castOffSinglePage, this, castOffFirstPage);
-    castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
-    castOffPagesParams.m_leftoverSystem = leftoverSystem;
+    CastOffPagesFunctor castOffPages(castOffSinglePage, this, castOffFirstPage);
+    castOffPages.SetPageHeight(m_drawingPageContentHeight);
+    castOffPages.SetLeftoverSystem(leftoverSystem);
 
-    Functor castOffPages(&Object::CastOffPages);
-    Functor castOffPagesEnd(&Object::CastOffPagesEnd);
     pages->AddChild(castOffFirstPage);
-    castOffSinglePage->Process(&castOffPages, &castOffPagesParams, &castOffPagesEnd);
+    castOffSinglePage->Process(castOffPages);
     delete castOffSinglePage;
 
     this->ScoreDefSetCurrentDoc(true);

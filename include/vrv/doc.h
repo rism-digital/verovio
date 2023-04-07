@@ -21,7 +21,6 @@ class MidiFile;
 
 namespace vrv {
 
-class CastOffPagesParams;
 class DocSelection;
 class FontInfo;
 class Glyph;
@@ -313,15 +312,6 @@ public:
      * @param smart - true to sometimes use encoded sb and pb.
      */
     void CastOffDocBase(bool useSb, bool usePb, bool smart = false);
-
-    /**
-     * Casts off the running elements (headers and footer)
-     * Called from Doc::CastOffDoc
-     * The doc needs to be empty, the methods adds two empty pages to calculate the
-     * size of the header and footer of the page one and two.
-     * Calcultated sizes are set in the CastOffPagesParams object.
-     */
-    void CastOffRunningElements(CastOffPagesParams *params);
 
     /**
      * Undo the cast off of the entire document.

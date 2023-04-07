@@ -170,11 +170,6 @@ public:
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CastOffPages
-     */
-    int CastOffPagesEnd(FunctorParams *functorParams) override;
-
 private:
     /**
      * Adjust the horizontal position of the syl processing verse by verse

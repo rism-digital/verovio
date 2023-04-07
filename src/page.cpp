@@ -809,20 +809,4 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Page::CastOffPagesEnd(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    if (params->m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
-
-    // Otherwise add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
-        params->m_currentPage->AddChild(*iter);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

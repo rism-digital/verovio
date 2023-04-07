@@ -76,19 +76,6 @@ FunctorCode PageElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageElementEnd(this);
 }
 
-int PageElement::CastOffPages(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    PageElement *element = dynamic_cast<PageElement *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    assert(element);
-    // move as pending since we want it at the beginning of the page in case of system break coming
-    params->m_pendingPageElements.push_back(element);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int PageElement::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);

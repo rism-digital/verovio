@@ -823,16 +823,6 @@ public:
     ///@{
 
     /**
-     * Fill a doc by adding pages with the appropriate length.
-     */
-    virtual int CastOffPages(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CastOffPages
-     */
-    virtual int CastOffPagesEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Cast off the document according to the encoding provided (pb and sb)
      */
     virtual int CastOffEncoding(FunctorParams *) { return FUNCTOR_CONTINUE; }

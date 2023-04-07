@@ -195,11 +195,6 @@ public:
     int JustifyY(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CastOffPages
-     */
-    int CastOffPages(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
