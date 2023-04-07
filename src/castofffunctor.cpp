@@ -16,8 +16,10 @@
 #include "pageelement.h"
 #include "pagemilestone.h"
 #include "pages.h"
+#include "pb.h"
 #include "sb.h"
 #include "score.h"
+#include "staff.h"
 #include "system.h"
 
 //----------------------------------------------------------------------------
@@ -385,57 +387,118 @@ CastOffEncodingFunctor::CastOffEncodingFunctor(Doc *doc, Page *currentPage, bool
 
 FunctorCode CastOffEncodingFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
-    return FUNCTOR_CONTINUE;
+    // Only move editorial elements that are a child of the system
+    if (editorialElement->GetParent() && editorialElement->GetParent()->Is(SYSTEM)) {
+        editorialElement->MoveItselfTo(m_currentSystem);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitEnding(Ending *ending)
 {
-    return FUNCTOR_CONTINUE;
+    ending->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitMeasure(Measure *measure)
 {
+    measure->MoveItselfTo(m_currentSystem);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitPageElement(PageElement *pageElement)
 {
-    return FUNCTOR_CONTINUE;
+    pageElement->MoveItselfTo(m_currentPage);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    return FUNCTOR_CONTINUE;
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(SCORE)) {
+        // This is the end of a score, which means that the current system has to be added
+        // to the current page
+        assert(m_currentSystem);
+        m_currentPage->AddChild(m_currentSystem);
+        m_currentSystem = NULL;
+    }
+
+    pageMilestoneEnd->MoveItselfTo(m_currentPage);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitPb(Pb *pb)
 {
-    return FUNCTOR_CONTINUE;
+    // We look if the current system has a pb or at least one measure, or the current page has at least a system
+    // if yes, we assume that the <pb> is not the one at the beginning of the content.
+    // This is not very robust but at least make it work when rendering a <mdiv> that does not start with a <pb> (which
+    // we cannot force)
+    if ((m_currentSystem->GetChildCount(PB) > 0) || (m_currentSystem->GetChildCount(MEASURE) > 0)
+        || (m_currentPage->GetChildCount(SYSTEM) > 0)) {
+        m_currentPage->AddChild(m_currentSystem);
+        m_currentSystem = new System();
+        if (m_usePages) {
+            m_currentPage = new Page();
+            assert(m_doc->GetPages());
+            m_doc->GetPages()->AddChild(m_currentPage);
+        }
+    }
+
+    pb->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitSb(Sb *sb)
 {
-    return FUNCTOR_CONTINUE;
+    // We look if the current system has at least one measure - if yes, we assume that the <sb>
+    // is not the one at the beginning of the content (<mdiv>). This is not very robust but at least make it
+    // work when rendering a <mdiv> that does not start with a <pb> or a <sb> (which we cannot enforce)
+    if (m_currentSystem->GetChildCount(MEASURE) > 0) {
+        m_currentPage->AddChild(m_currentSystem);
+        m_currentSystem = new System();
+    }
+
+    sb->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
-    return FUNCTOR_CONTINUE;
+    scoreDef->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitStaff(Staff *staff)
 {
-    return FUNCTOR_CONTINUE;
+    // Staff alignments must be reset, otherwise they would dangle whenever they belong to a deleted system
+    staff->SetAlignment(NULL);
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitSystem(System *system)
 {
+    // We are starting a new system we need to cast off
+    m_contentSystem = system;
+    // Create the new system but do not add it to the page yet.
+    // It will be added when reaching a pb / sb or at the end of the score in PageMilestoneEnd::CastOffEncoding
+    assert(!m_currentSystem);
+    m_currentSystem = new System();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CastOffEncodingFunctor::VisitSystemElement(SystemElement *systemElement)
 {
-    return FUNCTOR_CONTINUE;
+    systemElement->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
