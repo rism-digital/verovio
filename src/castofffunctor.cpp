@@ -15,7 +15,9 @@
 #include "page.h"
 #include "pageelement.h"
 #include "pagemilestone.h"
+#include "pages.h"
 #include "sb.h"
+#include "score.h"
 #include "system.h"
 
 //----------------------------------------------------------------------------
@@ -100,9 +102,9 @@ FunctorCode CastOffSystemsFunctor::VisitMeasure(Measure *measure)
             if (isLeftoverMeasure) {
                 m_leftoverSystem = m_currentSystem;
             }
-            for (Object *oneOfPendingObjects : m_pendingElements) {
-                if (oneOfPendingObjects->Is(MEASURE)) {
-                    Measure *firstPendingMeasure = vrv_cast<Measure *>(oneOfPendingObjects);
+            for (Object *pendingElement : m_pendingElements) {
+                if (pendingElement->Is(MEASURE)) {
+                    Measure *firstPendingMeasure = vrv_cast<Measure *>(pendingElement);
                     assert(firstPendingMeasure);
                     m_shift = firstPendingMeasure->GetCachedXRel();
                     m_leftoverSystem = NULL;
@@ -114,8 +116,8 @@ FunctorCode CastOffSystemsFunctor::VisitMeasure(Measure *measure)
     }
 
     // First add all pending objects
-    for (Object *element : m_pendingElements) {
-        m_currentSystem->AddChild(element);
+    for (Object *pendingElement : m_pendingElements) {
+        m_currentSystem->AddChild(pendingElement);
     }
     m_pendingElements.clear();
 
@@ -205,8 +207,8 @@ FunctorCode CastOffSystemsFunctor::VisitSystemEnd(System *system)
     if (m_pendingElements.empty()) return FUNCTOR_CONTINUE;
 
     // Otherwise add all pendings objects
-    for (Object *element : m_pendingElements) {
-        m_currentSystem->AddChild(element);
+    for (Object *pendingElement : m_pendingElements) {
+        m_currentSystem->AddChild(pendingElement);
     }
     m_pendingElements.clear();
 
@@ -267,27 +269,106 @@ CastOffPagesFunctor::CastOffPagesFunctor(Page *contentPage, Doc *doc, Page *curr
 
 FunctorCode CastOffPagesFunctor::VisitPageEnd(Page *page)
 {
+    if (m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
+
+    // Otherwise add all pendings objects
+    for (Object *pendingElement : m_pendingPageElements) {
+        m_currentPage->AddChild(pendingElement);
+    }
+    m_pendingPageElements.clear();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CastOffPagesFunctor::VisitPageElement(PageElement *pageElement)
 {
+    pageElement = dynamic_cast<PageElement *>(m_contentPage->Relinquish(pageElement->GetIdx()));
+    assert(pageElement);
+    // move as pending since we want it at the beginning of the page in case of system break coming
+    m_pendingPageElements.push_back(pageElement);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CastOffPagesFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    return FUNCTOR_CONTINUE;
+    assert(m_currentPage);
+
+    pageMilestoneEnd = dynamic_cast<PageMilestoneEnd *>(m_contentPage->Relinquish(pageMilestoneEnd->GetIdx()));
+    // End milestones can be added to the page only if the pending list is empty
+    // Otherwise we are going to mess up the order
+    if (m_pendingPageElements.empty()) {
+        m_currentPage->AddChild(pageMilestoneEnd);
+    }
+    else {
+        m_pendingPageElements.push_back(pageMilestoneEnd);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffPagesFunctor::VisitScore(Score *score)
 {
+    this->VisitPageElement(score);
+
+    m_pgHeadHeight = score->m_drawingPgHeadHeight;
+    m_pgFootHeight = score->m_drawingPgFootHeight;
+    m_pgHead2Height = score->m_drawingPgHead2Height;
+    m_pgFoot2Height = score->m_drawingPgFoot2Height;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
 {
-    return FUNCTOR_CONTINUE;
+    int currentShift = m_shift;
+    // We use m_pageHeadHeight to check if we have passed the first page already
+    if (m_pgHeadHeight != VRV_UNSET) {
+        currentShift += m_pgHeadHeight + m_pgFootHeight;
+    }
+    else {
+        currentShift += m_pgHead2Height + m_pgFoot2Height;
+    }
+
+    const int systemMaxPerPage = m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
+    const int childCount = m_currentPage->GetChildCount();
+    if ((systemMaxPerPage && (systemMaxPerPage == childCount))
+        || ((childCount > 0) && (system->GetDrawingYRel() - system->GetHeight() - currentShift < 0))) {
+        // If this is the last system in the list, it doesn't fit the page and it's a leftover system (has just one
+        // measure) => add the system content to the previous system
+        Object *nextSystem = m_contentPage->GetNext(system, SYSTEM);
+        Object *lastSystem = m_currentPage->GetLast(SYSTEM);
+        if (!nextSystem && lastSystem && (system == m_leftoverSystem)) {
+            ArrayOfObjects &children = system->GetChildrenForModification();
+            for (Object *child : children) {
+                child->MoveItselfTo(lastSystem);
+            }
+            return FUNCTOR_SIBLINGS;
+        }
+
+        m_currentPage = new Page();
+        // Use VRV_UNSET value as a flag
+        m_pgHeadHeight = VRV_UNSET;
+        assert(m_doc->GetPages());
+        m_doc->GetPages()->AddChild(m_currentPage);
+        m_shift = system->GetDrawingYRel() - m_pageHeight;
+    }
+
+    // First add all pending objects
+    for (Object *pendingElement : m_pendingPageElements) {
+        m_currentPage->AddChild(pendingElement);
+    }
+    m_pendingPageElements.clear();
+
+    // Special case where we use the Relinquish method.
+    // We want to move the system to the currentPage. However, we cannot use DetachChild
+    // from the contentPage because this screws up the iterator. Relinquish gives up
+    // the ownership of the system - the contentPage itself will be deleted afterwards.
+    system = vrv_cast<System *>(m_contentPage->Relinquish(system->GetIdx()));
+    assert(system);
+    m_currentPage->AddChild(system);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
