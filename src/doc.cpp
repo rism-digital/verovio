@@ -1000,9 +1000,8 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
-        CastOffEncodingParams castOffEncodingParams(this, castOffSinglePage, false);
-        Functor castOffEncoding(&Object::CastOffEncoding);
-        unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+        CastOffEncodingFunctor castOffEncoding(this, castOffSinglePage, false);
+        unCastOffPage->Process(castOffEncoding);
     }
     else {
         CastOffSystemsFunctor castOffSystems(castOffSinglePage, this, smart);
@@ -1126,10 +1125,8 @@ void Doc::CastOffEncodingDoc()
     Page *castOffFirstPage = new Page();
     pages->AddChild(castOffFirstPage);
 
-    CastOffEncodingParams castOffEncodingParams(this, castOffFirstPage);
-
-    Functor castOffEncoding(&Object::CastOffEncoding);
-    unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+    CastOffEncodingFunctor castOffEncoding(this, castOffFirstPage);
+    unCastOffPage->Process(castOffEncoding);
     delete unCastOffPage;
 
     // We need to reset the drawing page to NULL

@@ -101,24 +101,6 @@ FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageMilestoneEnd(this);
 }
 
-int PageMilestoneEnd::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(SCORE)) {
-        // This is the end of a score, which means that the current system has to be added
-        // to the current page
-        assert(params->m_currentSystem);
-        params->m_currentPage->AddChild(params->m_currentSystem);
-        params->m_currentSystem = NULL;
-    }
-
-    MoveItselfTo(params->m_currentPage);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int PageMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
 {
     CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);

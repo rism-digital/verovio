@@ -794,16 +794,6 @@ int ScoreDef::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int ScoreDef::CastOffToSelection(FunctorParams *functorParams)
 {
     CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);

@@ -866,16 +866,6 @@ int Measure::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::CastOffToSelection(FunctorParams *functorParams)
 {
     CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);

@@ -191,19 +191,6 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    // Only move editorial elements that are a child of the system
-    if (this->GetParent() && this->GetParent()->Is(SYSTEM)) {
-        MoveItselfTo(params->m_currentSystem);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int EditorialElement::CastOffToSelection(FunctorParams *functorParams)
 {
     CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);

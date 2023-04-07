@@ -69,22 +69,4 @@ FunctorCode Sb::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSbEnd(this);
 }
 
-int Sb::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    // We look if the current system has at least one measure - if yes, we assume that the <sb>
-    // is not the one at the beginning of the content (<mdiv>). This is not very robust but at least make it
-    // work when rendering a <mdiv> that does not start with a <pb> or a <sb> (which we cannot enforce)
-    if (params->m_currentSystem->GetChildCount(MEASURE) > 0) {
-        params->m_currentPage->AddChild(params->m_currentSystem);
-        params->m_currentSystem = new System();
-    }
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

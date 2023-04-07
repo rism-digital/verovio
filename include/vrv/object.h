@@ -823,11 +823,6 @@ public:
     ///@{
 
     /**
-     * Cast off the document according to the encoding provided (pb and sb)
-     */
-    virtual int CastOffEncoding(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Undo the cast of both pages and system.
      * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
      */

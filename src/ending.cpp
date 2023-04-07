@@ -117,14 +117,4 @@ int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Ending::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

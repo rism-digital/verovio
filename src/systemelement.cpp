@@ -101,16 +101,6 @@ int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int SystemElement::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int SystemElement::CastOffToSelection(FunctorParams *functorParams)
 {
     CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
