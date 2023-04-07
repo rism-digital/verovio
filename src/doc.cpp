@@ -521,7 +521,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the timemap cannot be exported.");
-        output = "";
+        output = "{}";
         return false;
     }
     Timemap timemap;
@@ -541,6 +541,7 @@ bool Doc::ExportExpansionMap(std::string &output)
         m_expansionMap.ToJson(output);
         return true;
     }
+    output = "{}";
     return false;
 }
 
@@ -552,7 +553,7 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
     }
     if (!this->HasTimemap()) {
         LogWarning("Calculation of the timemap failed, the features cannot be exported.");
-        output = "";
+        output = "{}";
         return false;
     }
     FeatureExtractor extractor(options);
