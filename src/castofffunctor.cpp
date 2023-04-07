@@ -371,4 +371,71 @@ FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
     return FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// CastOffEncodingFunctor
+//----------------------------------------------------------------------------
+
+CastOffEncodingFunctor::CastOffEncodingFunctor(Doc *doc, Page *currentPage, bool usePages) : DocFunctor(doc)
+{
+    m_currentPage = currentPage;
+    m_currentSystem = NULL;
+    m_contentSystem = NULL;
+    m_usePages = usePages;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitEditorialElement(EditorialElement *editorialElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitEnding(Ending *ending)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitPageElement(PageElement *pageElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitPb(Pb *pb)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitSb(Sb *sb)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffEncodingFunctor::VisitSystemElement(SystemElement *systemElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

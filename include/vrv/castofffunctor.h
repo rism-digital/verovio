@@ -157,6 +157,62 @@ private:
     ArrayOfObjects m_pendingPageElements;
 };
 
+//----------------------------------------------------------------------------
+// CastOffEncodingFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class casts off the document according to the encoding provided (pb and sb).
+ */
+class CastOffEncodingFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CastOffEncodingFunctor(Doc *doc, Page *currentPage, bool usePages = true);
+    virtual ~CastOffEncodingFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
+    FunctorCode VisitEnding(Ending *ending) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPageElement(PageElement *pageElement) override;
+    FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
+    FunctorCode VisitPb(Pb *pb) override;
+    FunctorCode VisitSb(Sb *sb) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemElement(SystemElement *systemElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current page
+    Page *m_currentPage;
+    // The system we are taking the content from
+    System *m_contentSystem;
+    // The current system
+    System *m_currentSystem;
+    // Indicates if we want to use the pageBreaks from the document
+    bool m_usePages;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CASTOFFFUNCTOR_H__
