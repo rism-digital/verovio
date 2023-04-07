@@ -89,6 +89,64 @@ private:
     System *m_leftoverSystem;
 };
 
+//----------------------------------------------------------------------------
+// CastOffPagesFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class fills a document by adding pages with the appropriate length.
+ */
+class CastOffPagesFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CastOffPagesFunctor(Page *contentPage, Doc *doc, Page *currentPage);
+    virtual ~CastOffPagesFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitPageEnd(Page *page) override;
+    FunctorCode VisitPageElement(PageElement *pageElement) override;
+    FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The page we are taking the content from
+    Page *m_contentPage;
+    // The current page
+    Page *m_currentPage;
+    // The cumulated shift (m_drawingYRel of the first system of the current page)
+    int m_shift;
+    // The page heights
+    int m_pageHeight;
+    int m_pgHeadHeight;
+    int m_pgFootHeight;
+    int m_pgHead2Height;
+    int m_pgFoot2Height;
+    // The leftover system (last system with only one measure)
+    System *m_leftoverSystem;
+    // The pending elements (Mdiv, Score) to be placed at the beginning of a page
+    ArrayOfObjects m_pendingPageElements;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CASTOFFFUNCTOR_H__

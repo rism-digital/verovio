@@ -248,4 +248,46 @@ FunctorCode CastOffSystemsFunctor::VisitSystemMilestone(SystemMilestoneEnd *syst
     return FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// CastOffPagesFunctor
+//----------------------------------------------------------------------------
+
+CastOffPagesFunctor::CastOffPagesFunctor(Page *contentPage, Doc *doc, Page *currentPage) : DocFunctor(doc)
+{
+    m_contentPage = contentPage;
+    m_currentPage = currentPage;
+    m_shift = 0;
+    m_pageHeight = 0;
+    m_pgHeadHeight = 0;
+    m_pgFootHeight = 0;
+    m_pgHead2Height = 0;
+    m_pgFoot2Height = 0;
+    m_leftoverSystem = NULL;
+}
+
+FunctorCode CastOffPagesFunctor::VisitPageEnd(Page *page)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffPagesFunctor::VisitPageElement(PageElement *pageElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffPagesFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffPagesFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
