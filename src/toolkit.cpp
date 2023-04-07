@@ -1665,7 +1665,7 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    std::string output;
+    std::string output = "{}";
     m_doc.ExportTimemap(output, includeRests, includeMeasures);
     return output;
 }
@@ -1674,7 +1674,7 @@ std::string Toolkit::RenderToExpansionMap()
 {
     this->ResetLogBuffer();
 
-    std::string output;
+    std::string output = "{}";
     m_doc.ExportExpansionMap(output);
     return output;
 }

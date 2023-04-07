@@ -151,8 +151,7 @@ export class VerovioToolkit {
     }
 
     renderToExpansionMap() {
-        const str = this.proxy.renderToExpansionMap(this.ptr);
-        return JSON.parse(str ? str : null);
+        return JSON.parse(this.proxy.renderToExpansionMap(this.ptr));
     }
 
     renderToMIDI(options) {
