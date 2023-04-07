@@ -76,17 +76,6 @@ FunctorCode PageElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageElementEnd(this);
 }
 
-int PageElement::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_page);
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int PageElement::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);

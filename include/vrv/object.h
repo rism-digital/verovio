@@ -823,17 +823,6 @@ public:
     ///@{
 
     /**
-     * Fill a page by adding systems with the appropriate length.
-     * At the end, add all the pending objects where reaching the end
-     */
-    virtual int CastOffSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CastOffSystems
-     */
-    virtual int CastOffSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Fill a doc by adding pages with the appropriate length.
      */
     virtual int CastOffPages(FunctorParams *) { return FUNCTOR_CONTINUE; }

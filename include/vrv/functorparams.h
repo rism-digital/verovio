@@ -241,49 +241,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CastOffSystemsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the system we are taking the content from
- * member 1: a pointer the page we are adding system to
- * member 2: a pointer to the current system
- * member 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
- * member 4: the system width
- * member 5: the current scoreDef width
- * member 6: the current pending elements (ScoreDef, Endings, etc.) to be place at the beginning of a system
- * member 7: the doc
- * member 8: whether to smartly use encoded system breaks
- * member 9: a pointer to the leftover system (last system with only one measure)
- **/
-
-class CastOffSystemsParams : public FunctorParams {
-public:
-    CastOffSystemsParams(Page *page, Doc *doc, bool smart)
-    {
-        m_page = page;
-        m_contentSystem = NULL;
-        m_currentSystem = NULL;
-        m_shift = 0;
-        m_systemWidth = 0;
-        m_currentScoreDefWidth = 0;
-        m_doc = doc;
-        m_smart = smart;
-        m_leftoverSystem = NULL;
-    }
-    System *m_contentSystem;
-    Page *m_page;
-    System *m_currentSystem;
-    int m_shift;
-    int m_systemWidth;
-    int m_currentScoreDefWidth;
-    ArrayOfObjects m_pendingElements;
-    Doc *m_doc;
-    bool m_smart;
-    System *m_leftoverSystem;
-};
-
-//----------------------------------------------------------------------------
 // CastOffToSelectionParams
 //----------------------------------------------------------------------------
 

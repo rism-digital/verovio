@@ -60,11 +60,6 @@ public:
     ///@}
 
     /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffPages
      */
     int CastOffPages(FunctorParams *functorParams) override;

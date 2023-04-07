@@ -191,27 +191,6 @@ int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int EditorialElement::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
-
-    // Special case where we use the Relinquish method.
-    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
-    // from the content System because this screws up the iterator. Relinquish gives up
-    // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement
-        = vrv_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    assert(editorialElement);
-    // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingElements.push_back(editorialElement);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);

@@ -54,11 +54,6 @@ public:
      */
     int CastOffEncoding(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
 private:
     //
 public:

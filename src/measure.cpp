@@ -866,66 +866,6 @@ int Measure::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    const bool hasCache = this->HasCachedHorizontalLayout();
-    int overflow = hasCache ? this->m_cachedOverflow : this->GetDrawingOverflow();
-    int width = hasCache ? this->m_cachedWidth : this->GetWidth();
-    int drawingXRel = this->m_drawingXRel;
-
-    Object *nextMeasure = params->m_contentSystem->GetNext(this, MEASURE);
-    const bool isLeftoverMeasure = ((NULL == nextMeasure) && params->m_doc->GetOptions()->m_breaksNoWidow.GetValue()
-        && (params->m_doc->GetOptions()->m_breaks.GetValue() != BREAKS_encoded));
-    if (params->m_currentSystem->GetChildCount() > 0) {
-        // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
-        if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
-            Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-            assert(measure);
-            // move as pending since we want it not to be broken with the next measure
-            params->m_pendingElements.push_back(measure);
-            // continue
-            return FUNCTOR_SIBLINGS;
-        }
-        // Break it if necessary
-        else if (drawingXRel + width + params->m_currentScoreDefWidth - params->m_shift > params->m_systemWidth) {
-            params->m_currentSystem = new System();
-            params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = drawingXRel;
-            // If last measure requires separate system - mark that system as leftover for the future CastOffPages call
-            if (isLeftoverMeasure) {
-                params->m_leftoverSystem = params->m_currentSystem;
-            }
-            for (Object *oneOfPendingObjects : params->m_pendingElements) {
-                if (oneOfPendingObjects->Is(MEASURE)) {
-                    Measure *firstPendingMesure = vrv_cast<Measure *>(oneOfPendingObjects);
-                    assert(firstPendingMesure);
-                    params->m_shift = firstPendingMesure->m_cachedXRel;
-                    params->m_leftoverSystem = NULL;
-                    // it has to be first measure
-                    break;
-                }
-            }
-        }
-    }
-
-    // First add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
-        params->m_currentSystem->AddChild(*iter);
-    }
-    params->m_pendingElements.clear();
-
-    // Special case where we use the Relinquish method.
-    Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    assert(measure);
-    params->m_currentSystem->AddChild(measure);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Measure::CastOffEncoding(FunctorParams *functorParams)
 {
     CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);

@@ -36,6 +36,16 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Retrieve the leftover system
+     */
+    System *GetLeftoverSystem() const { return m_leftoverSystem; }
+
+    /*
+     * Set the system width
+     */
+    void SetSystemWidth(int width) { m_systemWidth = width; }
+
+    /*
      * Functor interface
      */
     ///@{

@@ -360,11 +360,6 @@ public:
     int JustifyX(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CastOffEncoding
      */
     int CastOffEncoding(FunctorParams *functorParams) override;

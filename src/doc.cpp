@@ -17,6 +17,7 @@
 #include "alignfunctor.h"
 #include "barline.h"
 #include "beatrpt.h"
+#include "castofffunctor.h"
 #include "chord.h"
 #include "comparison.h"
 #include "docselection.h"
@@ -1004,13 +1005,10 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
         unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
     }
     else {
-        CastOffSystemsParams castOffSystemsParams(castOffSinglePage, this, smart);
-        castOffSystemsParams.m_systemWidth = m_drawingPageContentWidth;
-
-        Functor castOffSystems(&Object::CastOffSystems);
-        Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
-        unCastOffPage->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
-        leftoverSystem = castOffSystemsParams.m_leftoverSystem;
+        CastOffSystemsFunctor castOffSystems(castOffSinglePage, this, smart);
+        castOffSystems.SetSystemWidth(m_drawingPageContentWidth);
+        unCastOffPage->Process(castOffSystems);
+        leftoverSystem = castOffSystems.GetLeftoverSystem();
     }
     // We can now detach and delete the old content page
     pages->DetachChild(0);
