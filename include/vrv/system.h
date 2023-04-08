@@ -200,11 +200,6 @@ public:
     int CastOffToSelection(FunctorParams *) override;
 
     /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

@@ -591,19 +591,6 @@ int System::CastOffToSelection(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    // Just move all the content of the system to the continuous one (parameter)
-    // Use the MoveChildrenFrom method that moves and relinquishes them
-    // See Object::Relinquish
-    params->m_currentSystem->MoveChildrenFrom(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

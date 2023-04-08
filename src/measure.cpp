@@ -976,18 +976,4 @@ int Measure::InitOnsetOffset(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    if (params->m_resetCache) {
-        m_cachedXRel = VRV_UNSET;
-        m_cachedWidth = VRV_UNSET;
-        m_cachedOverflow = VRV_UNSET;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

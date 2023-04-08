@@ -1082,11 +1082,9 @@ void Doc::UnCastOffDoc(bool resetCache)
     assert(pages);
 
     Page *unCastOffPage = new Page();
-    UnCastOffParams unCastOffParams(unCastOffPage);
-    unCastOffParams.m_resetCache = resetCache;
-
-    Functor unCastOff(&Object::UnCastOff);
-    this->Process(&unCastOff, &unCastOffParams);
+    UnCastOffFunctor unCastOff(unCastOffPage);
+    unCastOff.SetResetCache(resetCache);
+    this->Process(unCastOff);
 
     pages->ClearChildren();
 

@@ -791,29 +791,6 @@ public:
     std::map<int, int> m_transposeIntervalForStaffN;
 };
 
-//----------------------------------------------------------------------------
-// UnCastOffParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the page we are adding system to
- * member 1: a pointer to the system we are adding content to
- * member 2: a flag indicating if we need to reset the horizontal layout cache
- **/
-
-class UnCastOffParams : public FunctorParams {
-public:
-    UnCastOffParams(Page *page)
-    {
-        m_page = page;
-        m_currentSystem = NULL;
-        m_resetCache = true;
-    }
-    Page *m_page;
-    System *m_currentSystem;
-    bool m_resetCache;
-};
-
 } // namespace vrv
 
 #endif

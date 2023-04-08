@@ -112,23 +112,6 @@ int PageMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int PageMilestoneEnd::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(SCORE)) {
-        // This is the end of a score, which means that nothing else should be added to
-        // the current system and we set it to NULL;
-        assert(params->m_currentSystem);
-        params->m_currentSystem = NULL;
-    }
-
-    MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

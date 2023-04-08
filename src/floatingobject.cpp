@@ -907,15 +907,4 @@ std::pair<int, int> FloatingCurvePositioner::CalcRequestedStaffSpace(const Staff
     return { 0, 0 };
 }
 
-//----------------------------------------------------------------------------
-// FloatingObject functor methods
-//----------------------------------------------------------------------------
-
-int FloatingObject::UnCastOff(FunctorParams *functorParams)
-{
-    m_currentPositioner = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

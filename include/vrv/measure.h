@@ -395,11 +395,6 @@ public:
      */
     int InitOnsetOffset(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
-
 public:
     // flags for drawing measure barline based on visibility or other conditions
     enum BarlineDrawingFlags {

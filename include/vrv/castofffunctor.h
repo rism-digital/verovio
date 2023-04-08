@@ -237,6 +237,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Set the reset cache flag
+     */
+    void SetResetCache(bool resetCache) { m_resetCache = resetCache; }
+
+    /*
      * Functor interface
      */
     ///@{

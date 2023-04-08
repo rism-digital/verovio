@@ -823,12 +823,6 @@ public:
     ///@{
 
     /**
-     * Undo the cast of both pages and system.
-     * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
-     */
-    virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * CastOff a document to selection.
      * Move everything before the selection to the first page, the selection to a second page,
      * and everthing after the selection to a third page.
