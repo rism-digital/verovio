@@ -501,4 +501,45 @@ FunctorCode CastOffEncodingFunctor::VisitSystemElement(SystemElement *systemElem
     return FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// UnCastOffFunctor
+//----------------------------------------------------------------------------
+
+UnCastOffFunctor::UnCastOffFunctor(Page *page)
+{
+    m_page = page;
+    m_currentSystem = NULL;
+    m_resetCache = true;
+}
+
+FunctorCode UnCastOffFunctor::VisitFloatingObject(FloatingObject *floatingObject)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode UnCastOffFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode UnCastOffFunctor::VisitPageElement(PageElement *pageElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode UnCastOffFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode UnCastOffFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

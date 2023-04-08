@@ -213,6 +213,56 @@ private:
     bool m_usePages;
 };
 
+//----------------------------------------------------------------------------
+// UnCastOffFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class undoes the cast off for both pages and systems.
+ * This is used by Doc::UnCastOffDoc for putting all pages / systems continously.
+ */
+class UnCastOffFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    UnCastOffFunctor(Page *page);
+    virtual ~UnCastOffFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPageElement(PageElement *pageElement) override;
+    FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The page we are adding systems to
+    Page *m_page;
+    // The system we are adding content to
+    System *m_currentSystem;
+    // Indicates if we need to reset the horizontal layout cache
+    bool m_resetCache;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CASTOFFFUNCTOR_H__
