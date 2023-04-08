@@ -514,31 +514,62 @@ UnCastOffFunctor::UnCastOffFunctor(Page *page)
 
 FunctorCode UnCastOffFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    floatingObject->SetCurrentFloatingPositioner(NULL);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode UnCastOffFunctor::VisitMeasure(Measure *measure)
 {
+    if (m_resetCache) {
+        measure->ResetCachedXRel();
+        measure->ResetCachedWidth();
+        measure->ResetCachedOverflow();
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode UnCastOffFunctor::VisitPageElement(PageElement *pageElement)
 {
+    pageElement->MoveItselfTo(m_page);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode UnCastOffFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(SCORE)) {
+        // This is the end of a score, which means that nothing else should be added to
+        // the current system and we set it to NULL;
+        assert(m_currentSystem);
+        m_currentSystem = NULL;
+    }
+
+    pageMilestoneEnd->MoveItselfTo(m_page);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode UnCastOffFunctor::VisitScore(Score *score)
 {
+    this->VisitPageElement(score);
+
+    assert(!m_currentSystem);
+    System *system = new System();
+    m_currentSystem = system;
+    m_page->AddChild(system);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode UnCastOffFunctor::VisitSystem(System *system)
 {
+    // Just move all the content of the system to the continuous one
+    // Use the MoveChildrenFrom method that moves and relinquishes them
+    // See Object::Relinquish
+    m_currentSystem->MoveChildrenFrom(system);
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -109,6 +109,7 @@ public:
     void SetDrawingXRel(int drawingXRel);
     void CacheXRel(bool restore = false);
     int GetCachedXRel() const { return m_cachedXRel; }
+    void ResetCachedXRel() { m_cachedXRel = VRV_UNSET; }
     ///@}
 
     /**
@@ -217,11 +218,13 @@ public:
     int GetInnerCenterX() const;
 
     /**
-     * Return the cached width / overflow
+     * Return and reset the cached width / overflow
      */
     ///@{
     int GetCachedWidth() const { return m_cachedWidth; }
     int GetCachedOverflow() const { return m_cachedOverflow; }
+    void ResetCachedWidth() { m_cachedWidth = VRV_UNSET; }
+    void ResetCachedOverflow() { m_cachedOverflow = VRV_UNSET; }
     ///@}
 
     /**
