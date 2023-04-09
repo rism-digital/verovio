@@ -591,42 +591,84 @@ CastOffToSelectionFunctor::CastOffToSelectionFunctor(
 
 FunctorCode CastOffToSelectionFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
-    return FUNCTOR_CONTINUE;
+    editorialElement->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitMeasure(Measure *measure)
 {
-    return FUNCTOR_CONTINUE;
+    const bool startSelection = !m_isSelection && (measure->GetID() == m_start);
+
+    if (startSelection) {
+        m_page = new Page();
+        m_doc->GetPages()->AddChild(m_page);
+        m_currentSystem = new System();
+        m_page->AddChild(m_currentSystem);
+        m_isSelection = true;
+    }
+
+    const bool endSelection = m_isSelection && (measure->GetID() == m_end);
+
+    measure->MoveItselfTo(m_currentSystem);
+
+    if (endSelection) {
+        m_page = new Page();
+        m_doc->GetPages()->AddChild(m_page);
+        m_currentSystem = new System();
+        m_page->AddChild(m_currentSystem);
+        m_isSelection = false;
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitPageElement(PageElement *pageElement)
 {
-    return FUNCTOR_CONTINUE;
+    pageElement->MoveItselfTo(m_page);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    return FUNCTOR_CONTINUE;
+    assert(m_page);
+    pageMilestoneEnd->MoveItselfTo(m_page);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
-    return FUNCTOR_CONTINUE;
+    scoreDef->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitSystem(System *system)
 {
+    // We are starting a new system we need to cast off
+    m_contentSystem = system;
+    // We also need to create a new target system and add it to the page
+    System *targetSystem = new System();
+    m_page->AddChild(targetSystem);
+    m_currentSystem = targetSystem;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitSystemElement(SystemElement *systemElement)
 {
-    return FUNCTOR_CONTINUE;
+    systemElement->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
 {
-    return FUNCTOR_CONTINUE;
+    systemMilestoneEnd->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

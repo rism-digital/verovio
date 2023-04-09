@@ -319,9 +319,9 @@ private:
     Page *m_page;
     // The current system
     System *m_currentSystem;
-    // The start of the selection
+    // The start measure ID of the selection
     std::string m_start;
-    // The end of the selection
+    // The end measure ID of the selection
     std::string m_end;
     // Indicates whether we are currently in the selection range
     bool m_isSelection;
