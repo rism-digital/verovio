@@ -573,4 +573,60 @@ FunctorCode UnCastOffFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// CastOffToSelectionFunctor
+//----------------------------------------------------------------------------
+
+CastOffToSelectionFunctor::CastOffToSelectionFunctor(
+    Page *page, Doc *doc, const std::string &start, const std::string &end)
+    : DocFunctor(doc)
+{
+    m_page = page;
+    m_contentSystem = NULL;
+    m_currentSystem = NULL;
+    m_start = start;
+    m_end = end;
+    m_isSelection = false;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitEditorialElement(EditorialElement *editorialElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitPageElement(PageElement *pageElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitSystemElement(SystemElement *systemElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

@@ -268,6 +268,65 @@ private:
     bool m_resetCache;
 };
 
+//----------------------------------------------------------------------------
+// CastOffToSelectionFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class casts off a document to selection.
+ * Moves everything before the selection to the first page, the selection to a second page,
+ * and everything after the selection to a third page.
+ */
+class CastOffToSelectionFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CastOffToSelectionFunctor(Page *page, Doc *doc, const std::string &start, const std::string &end);
+    virtual ~CastOffToSelectionFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPageElement(PageElement *pageElement) override;
+    FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitSystem(System *system) override;
+    FunctorCode VisitSystemElement(SystemElement *systemElement) override;
+    FunctorCode VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The system we are taking the content from
+    System *m_contentSystem;
+    // The page we are adding systems to
+    Page *m_page;
+    // The current system
+    System *m_currentSystem;
+    // The start of the selection
+    std::string m_start;
+    // The end of the selection
+    std::string m_end;
+    // Indicates whether we are currently in the selection range
+    bool m_isSelection;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CASTOFFFUNCTOR_H__
