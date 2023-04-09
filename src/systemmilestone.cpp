@@ -102,16 +102,6 @@ FunctorCode SystemMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemMilestoneEnd(this);
 }
 
-int SystemMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------

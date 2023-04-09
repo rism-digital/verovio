@@ -818,20 +818,6 @@ public:
     ///@}
 
     /**
-     * @name Functors for calculating the layout of a document or of a selection.
-     */
-    ///@{
-
-    /**
-     * CastOff a document to selection.
-     * Move everything before the selection to the first page, the selection to a second page,
-     * and everthing after the selection to a third page.
-     */
-    virtual int CastOffToSelection(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    ///@}
-
-    /**
      * @name Functors for generating MIDI output.
      */
     ///@{

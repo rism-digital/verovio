@@ -65,11 +65,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
 protected:
     //
 private:

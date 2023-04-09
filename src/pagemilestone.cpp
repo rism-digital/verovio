@@ -101,17 +101,6 @@ FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageMilestoneEnd(this);
 }
 
-int PageMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_page);
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

@@ -363,11 +363,6 @@ public:
     int JustifyX(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;

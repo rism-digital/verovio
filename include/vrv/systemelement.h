@@ -60,11 +60,6 @@ public:
      */
     int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
 private:
     //
 public:

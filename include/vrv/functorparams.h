@@ -170,38 +170,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CastOffToSelectionParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the system we are taking the content from
- * member 1: a pointer the page we are adding system to
- * member 2: a pointer to the current system
- * member 3: a pointer to the doc
- **/
-
-class CastOffToSelectionParams : public FunctorParams {
-public:
-    CastOffToSelectionParams(Page *page, Doc *doc, const std::string &start, const std::string &end)
-    {
-        m_page = page;
-        m_contentSystem = NULL;
-        m_currentSystem = NULL;
-        m_start = start;
-        m_end = end;
-        m_isSelection = false;
-        m_doc = doc;
-    }
-    System *m_contentSystem;
-    Page *m_page;
-    System *m_currentSystem;
-    std::string m_start;
-    std::string m_end;
-    bool m_isSelection;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // ConvertMarkupAnalyticalParams
 //----------------------------------------------------------------------------
 

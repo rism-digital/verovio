@@ -866,36 +866,6 @@ int Measure::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    const bool startSelection = (!params->m_isSelection && this->GetID() == params->m_start);
-
-    if (startSelection) {
-        params->m_page = new Page();
-        params->m_doc->GetPages()->AddChild(params->m_page);
-        params->m_currentSystem = new System();
-        params->m_page->AddChild(params->m_currentSystem);
-        params->m_isSelection = true;
-    }
-
-    const bool endSelection = (params->m_isSelection && this->GetID() == params->m_end);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    if (endSelection) {
-        params->m_page = new Page();
-        params->m_doc->GetPages()->AddChild(params->m_page);
-        params->m_currentSystem = new System();
-        params->m_page->AddChild(params->m_currentSystem);
-        params->m_isSelection = false;
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Measure::InitMIDI(FunctorParams *functorParams)
 {
     InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);

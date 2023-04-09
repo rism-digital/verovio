@@ -297,11 +297,6 @@ public:
     int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;

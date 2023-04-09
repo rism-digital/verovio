@@ -76,14 +76,4 @@ FunctorCode PageElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageElementEnd(this);
 }
 
-int PageElement::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_page);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

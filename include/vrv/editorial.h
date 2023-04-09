@@ -84,11 +84,6 @@ public:
     int ConvertToPageBased(FunctorParams *functorParams) override;
     int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
 private:
     //
 public:

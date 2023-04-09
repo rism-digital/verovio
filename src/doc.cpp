@@ -1177,10 +1177,8 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
     Page *selectionFirstPage = new Page();
     pages->AddChild(selectionFirstPage);
 
-    CastOffToSelectionParams castOffToSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
-    Functor castOffToSelection(&Object::CastOffToSelection);
-
-    unCastOffPage->Process(&castOffToSelection, &castOffToSelectionParams);
+    CastOffToSelectionFunctor castOffToSelection(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
+    unCastOffPage->Process(castOffToSelection);
 
     delete unCastOffPage;
 

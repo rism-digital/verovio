@@ -60,11 +60,6 @@ public:
     ///@}
 
     /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;
