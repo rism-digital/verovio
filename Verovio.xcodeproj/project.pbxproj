@@ -1570,6 +1570,12 @@
 		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
 		E7BCFFBA281298620012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFBB281298630012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7BF80E429E3374600EA38F0 /* justifyfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BF80E329E3374600EA38F0 /* justifyfunctor.h */; };
+		E7BF80E529E3374600EA38F0 /* justifyfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BF80E329E3374600EA38F0 /* justifyfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7BF80E729E3625700EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
+		E7BF80E829E3625700EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
+		E7BF80E929E3625F00EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
+		E7BF80EA29E3626000EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
 		E7C3AED629550190002DE5AB /* preparedatafunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7C3AED52955018F002DE5AB /* preparedatafunctor.h */; };
 		E7C3AED729550190002DE5AB /* preparedatafunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7C3AED52955018F002DE5AB /* preparedatafunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7C3AED9295501A5002DE5AB /* preparedatafunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */; };
@@ -2180,6 +2186,8 @@
 		E7ADB3AD29D1923200825D5D /* adjustarticfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustarticfunctor.cpp; path = src/adjustarticfunctor.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
+		E7BF80E329E3374600EA38F0 /* justifyfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = justifyfunctor.h; path = include/vrv/justifyfunctor.h; sourceTree = "<group>"; };
+		E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = justifyfunctor.cpp; path = src/justifyfunctor.cpp; sourceTree = "<group>"; };
 		E7C3AED52955018F002DE5AB /* preparedatafunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = preparedatafunctor.h; path = include/vrv/preparedatafunctor.h; sourceTree = "<group>"; };
 		E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preparedatafunctor.cpp; path = src/preparedatafunctor.cpp; sourceTree = "<group>"; };
 		E7D33899293E057100C40B81 /* setscoredeffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setscoredeffunctor.h; path = include/vrv/setscoredeffunctor.h; sourceTree = "<group>"; };
@@ -2946,6 +2954,8 @@
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
+				E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */,
+				E7BF80E329E3374600EA38F0 /* justifyfunctor.h */,
 				E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */,
 				E7C3AED52955018F002DE5AB /* preparedatafunctor.h */,
 				E71EF3C52975ED3800D36264 /* resetfunctor.cpp */,
@@ -3197,6 +3207,7 @@
 				E76046BD28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */,
 				E765675C28BC01A000BC6490 /* functor.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
+				E7BF80E429E3374600EA38F0 /* justifyfunctor.h in Headers */,
 				E7A1640A29AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */,
 				E7770F8329D0D9F600A9BECF /* adjustslursfunctor.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
@@ -3583,6 +3594,7 @@
 				4DACC9C72990F29A00B55913 /* atts_cmn.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
 				E7E1698429A8988F00FFF482 /* adjustlayersfunctor.h in Headers */,
+				E7BF80E529E3374600EA38F0 /* justifyfunctor.h in Headers */,
 				BB4C4A9E22A9328F001F6AF0 /* smufl.h in Headers */,
 				35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */,
 				BB4C4B3E22A932D7001F6AF0 /* artic.h in Headers */,
@@ -4026,6 +4038,7 @@
 				E7E9C11E29B0EFBC00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0C289674000006D7DA /* symbol.cpp in Sources */,
 				4D64137F2035F68600BB630E /* mdiv.cpp in Sources */,
+				E7BF80EA29E3626000EA38F0 /* justifyfunctor.cpp in Sources */,
 				4D1694571E3A44F300569BF4 /* anchoredtext.cpp in Sources */,
 				4DB3D8C51F83D0F900B5FC2B /* breath.cpp in Sources */,
 				4DEC4D9721C81E3B00D1D273 /* expan.cpp in Sources */,
@@ -4081,6 +4094,7 @@
 				4DACC9D82990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4DACC9842990F29A00B55913 /* atts_performance.cpp in Sources */,
+				E7BF80E929E3625F00EA38F0 /* justifyfunctor.cpp in Sources */,
 				E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
@@ -4573,6 +4587,7 @@
 				E7E9C11F29B0EFBD00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0D289674010006D7DA /* symbol.cpp in Sources */,
 				4DEC4DB821C8270100D1D273 /* unclear.cpp in Sources */,
+				E7BF80E729E3625700EA38F0 /* justifyfunctor.cpp in Sources */,
 				4D89F910201771AE00A4D336 /* num.cpp in Sources */,
 				4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
@@ -4847,6 +4862,7 @@
 				E7E9C12029B0EFBE00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0E289674010006D7DA /* symbol.cpp in Sources */,
 				BB4C4BB322A932EB001F6AF0 /* view_slur.cpp in Sources */,
+				E7BF80E829E3625700EA38F0 /* justifyfunctor.cpp in Sources */,
 				BB4C4B1922A932CF001F6AF0 /* anchoredtext.cpp in Sources */,
 				BB4C4AF322A932BC001F6AF0 /* rdg.cpp in Sources */,
 				BB4C4B7F22A932DF001F6AF0 /* fb.cpp in Sources */,
