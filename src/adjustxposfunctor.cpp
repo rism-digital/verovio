@@ -246,6 +246,15 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
 
         m_measureTieEndpoints = measure->GetInternalTieEndpoints();
         measure->m_measureAligner.Process(*this);
+
+        // In some cases with low enough linear spacing xRel of barline might shift due to overlaps with previous
+        // alignments. Make sure that timestamp-only alignments that have the same time as barline follow its xRel. 
+        const Alignment *rightBar = measure->m_measureAligner.GetRightBarLineAlignment();
+        Alignment *rightBarDefault
+            = measure->m_measureAligner.GetAlignmentAtTime(rightBar->GetTime(), ALIGNMENT_DEFAULT);
+        if (rightBarDefault->HasTimestampOnly() && (rightBarDefault->GetXRel() != rightBar->GetXRel())) {
+            rightBarDefault->SetXRel(rightBar->GetXRel());
+        }
     }
 
     this->SetFilters(previousFilters);
