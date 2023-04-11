@@ -844,28 +844,6 @@ int Measure::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (params->m_applySectionRestartShift) {
-        params->m_measureXRel += this->GetSectionRestartShift(params->m_doc);
-        params->m_applySectionRestartShift = false;
-    }
-
-    if (params->m_measureXRel > 0) {
-        this->SetDrawingXRel(params->m_measureXRel);
-    }
-    else {
-        params->m_measureXRel = this->GetDrawingXRel();
-    }
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Measure::InitMIDI(FunctorParams *functorParams)
 {
     InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);

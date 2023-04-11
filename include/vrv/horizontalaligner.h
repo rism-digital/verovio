@@ -225,12 +225,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * Justify the X positions
-     * Special case of functor redirected from Measure.
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
 private:
     /**
      * Retrieve the AlignmentReference with staffN.
@@ -540,12 +534,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * Justify the X positions
-     * Special case of functor redirected from Measure.
-     */
-    int JustifyX(FunctorParams *functorParams) override;
 
 private:
     //

@@ -112,50 +112,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustBeamParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the beam that should be adjusted
- * member 1: y coordinate of the beam left side
- * member 2: y coordinate of the beam right side
- * member 3: x coordinate of the beam left side (starting point)
- * member 4: x coordinate of the beam right side (end point)
- * member 5: slope of the beam
- * member 6: overlap margin that beam needs to be displaced by
- * member 7: the Doc
- * member 8: the flag indicating whether element from different layer is being processed
- **/
-
-class AdjustBeamParams : public FunctorParams {
-public:
-    AdjustBeamParams(Doc *doc)
-    {
-        m_beam = NULL;
-        m_y1 = 0;
-        m_y2 = 0;
-        m_x1 = 0;
-        m_x2 = 0;
-        m_beamSlope = 0.0;
-        m_directionBias = 0;
-        m_overlapMargin = 0;
-        m_doc = doc;
-        m_isOtherLayer = false;
-    }
-
-    Object *m_beam;
-    int m_y1;
-    int m_y2;
-    int m_x1;
-    int m_x2;
-    double m_beamSlope;
-    int m_directionBias;
-    int m_overlapMargin;
-    Doc *m_doc;
-    bool m_isOtherLayer;
-};
-
-//----------------------------------------------------------------------------
 // ApplyPPUFactorParams
 //----------------------------------------------------------------------------
 
@@ -578,44 +534,6 @@ public:
     InitProcessingListsParams() {}
     IntTree m_verseTree;
     IntTree m_layerTree;
-};
-
-//----------------------------------------------------------------------------
-// JustifyXParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the relative X position of the next measure
- * member 1: the justification ratio
- * member 2: the left barline X position
- * member 3: the right barline X position
- * member 4: the system full width (without system margins)
- * member 5: shift next measure due to section restart
- * member 6: the functor to be redirected to the MeasureAligner
- * member 7: the doc
- **/
-
-class JustifyXParams : public FunctorParams {
-public:
-    JustifyXParams(Functor *functor, Doc *doc)
-    {
-        m_measureXRel = 0;
-        m_justifiableRatio = 1.0;
-        m_leftBarLineX = 0;
-        m_rightBarLineX = 0;
-        m_systemFullWidth = 0;
-        m_applySectionRestartShift = false;
-        m_functor = functor;
-        m_doc = doc;
-    }
-    int m_measureXRel;
-    double m_justifiableRatio;
-    int m_leftBarLineX;
-    int m_rightBarLineX;
-    int m_systemFullWidth;
-    bool m_applySectionRestartShift;
-    Functor *m_functor;
-    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

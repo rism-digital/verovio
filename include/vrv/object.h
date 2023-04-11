@@ -801,11 +801,6 @@ public:
     ///@{
 
     /**
-     * Justify the X positions
-     */
-    virtual int JustifyX(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Justify the Y positions
      */
     virtual int JustifyY(FunctorParams *) { return FUNCTOR_CONTINUE; }

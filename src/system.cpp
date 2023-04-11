@@ -522,38 +522,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    params->m_measureXRel = 0;
-    int margins = m_systemLeftMar + m_systemRightMar;
-    int nonJustifiableWidth
-        = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
-    params->m_justifiableRatio
-        = (double)(params->m_systemFullWidth - nonJustifiableWidth) / ((double)m_drawingJustifiableWidth);
-
-    if (params->m_justifiableRatio < 0.8) {
-        // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
-        LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
-        LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
-        LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
-    }
-
-    // Check if we are on the last system of an mdiv.
-    // Do not justify it if the non-justified width is less than a specified percent.
-    if (this->IsLastOfMdiv() || this->IsLastOfSelection()) {
-        double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
-        if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::JustifyY(FunctorParams *functorParams)
 {
     JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);

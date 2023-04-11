@@ -876,19 +876,6 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ScoreDef::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingLabelsWidth > 0) {
-        params->m_measureXRel += m_drawingLabelsWidth;
-        params->m_applySectionRestartShift = false;
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int ScoreDef::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

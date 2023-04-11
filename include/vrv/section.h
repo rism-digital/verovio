@@ -71,11 +71,6 @@ public:
      */
     int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
 private:
     //
 public:

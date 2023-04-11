@@ -35,6 +35,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Set the full system width
+     */
+    void SetSystemFullWidth(int width) { m_systemFullWidth = width; }
+
+    /*
      * Functor interface
      */
     ///@{

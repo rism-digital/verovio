@@ -51,6 +51,7 @@
 #include "doc.h"
 #include "functor.h"
 #include "functorparams.h"
+#include "justifyfunctor.h"
 #include "libmei.h"
 #include "pageelement.h"
 #include "pages.h"
@@ -591,10 +592,9 @@ void Page::JustifyHorizontally()
     }
     else {
         // Justify X position
-        Functor justifyX(&Object::JustifyX);
-        JustifyXParams justifyXParams(&justifyX, doc);
-        justifyXParams.m_systemFullWidth = doc->m_drawingPageContentWidth;
-        this->Process(&justifyX, &justifyXParams);
+        JustifyXFunctor justifyX(doc);
+        justifyX.SetSystemFullWidth(doc->m_drawingPageContentWidth);
+        this->Process(justifyX);
     }
 }
 

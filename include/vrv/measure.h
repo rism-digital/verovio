@@ -358,11 +358,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;

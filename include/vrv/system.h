@@ -185,11 +185,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
      * See Object::JustifyY
      */
     int JustifyY(FunctorParams *functorParams) override;
