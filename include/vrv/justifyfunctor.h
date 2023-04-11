@@ -71,6 +71,56 @@ private:
     bool m_applySectionRestartShift;
 };
 
+//----------------------------------------------------------------------------
+// JustifyYFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class justifies the Y positions.
+ */
+class JustifyYFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    JustifyYFunctor(Doc *doc);
+    virtual ~JustifyYFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The cumulated shift
+    int m_cumulatedShift;
+    // The relative shift of the staff w.r.t. the system
+    int m_relativeShift;
+    // The amount of space for distribution
+    int m_spaceToDistribute;
+    // The sum of justification factors per page
+    double m_justificationSum;
+    // A map of calculated shifts per StaffAlignment
+    // => this is transferred to the JustifyYAdjustCrossStaffFunctor
+    std::map<StaffAlignment *, int> m_shiftForStaff;
+};
+
 } // namespace vrv
 
 #endif // __VRV_JUSTIFYFUNCTOR_H__

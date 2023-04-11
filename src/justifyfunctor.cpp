@@ -131,4 +131,26 @@ FunctorCode JustifyXFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// JustifyYFunctor
+//----------------------------------------------------------------------------
+
+JustifyYFunctor::JustifyYFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_cumulatedShift = 0;
+    m_relativeShift = 0;
+    m_spaceToDistribute = 0;
+    m_justificationSum = 0.0;
+}
+
+FunctorCode JustifyYFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode JustifyYFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
