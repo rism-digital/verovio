@@ -565,18 +565,8 @@ int FloatingPositioner::GetSpaceBelow(
 {
     if (m_place != STAFFREL_between) return VRV_UNSET;
 
-    int staffSize = staffAlignment->GetStaffSize();
-
-    const FloatingCurvePositioner *curve = dynamic_cast<const FloatingCurvePositioner *>(horizOverlappingBBox);
-    if (curve) {
-        assert(curve->m_object);
-    }
-    int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
-
-    if (curve && curve->m_object->Is({ LV, PHRASE, SLUR, TIE })) {
-        // For now ignore curves
-        return 0;
-    }
+    const int staffSize = staffAlignment->GetStaffSize();
+    const int margin = doc->GetBottomMargin(m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
     return this->GetContentBottom() - horizOverlappingBBox->GetSelfTop() - margin;
 }
