@@ -796,18 +796,6 @@ public:
     ///@}
 
     /**
-     * @name Functors for justification.
-     */
-    ///@{
-
-    /**
-     * Adjust cross staff content after vertical justification
-     */
-    virtual int JustifyYAdjustCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for generating MIDI output.
      */
     ///@{

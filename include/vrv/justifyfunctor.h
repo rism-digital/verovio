@@ -155,6 +155,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Transfer the shift map
+     */
+    void SetShiftForStaff(const ShiftMap &shiftMap) { m_shiftForStaff = shiftMap; }
+
+    /*
      * Functor interface
      */
     ///@{

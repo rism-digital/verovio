@@ -628,11 +628,9 @@ void Page::JustifyVertically()
 
     if (!justifyY.GetShiftForStaff().empty()) {
         // Adjust cross staff content which is displaced through vertical justification
-        Functor justifyYAdjustCrossStaff(&Object::JustifyYAdjustCrossStaff);
-        JustifyYAdjustCrossStaffParams justifyYAdjustCrossStaffParams(doc);
-        // TODO: adjust later
-        // justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyY.GetShiftForStaff();
-        this->Process(&justifyYAdjustCrossStaff, &justifyYAdjustCrossStaffParams);
+        JustifyYAdjustCrossStaffFunctor justifyYAdjustCrossStaff(doc);
+        justifyYAdjustCrossStaff.SetShiftForStaff(justifyY.GetShiftForStaff());
+        this->Process(justifyYAdjustCrossStaff);
     }
 }
 
