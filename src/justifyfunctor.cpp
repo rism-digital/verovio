@@ -145,12 +145,41 @@ JustifyYFunctor::JustifyYFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode JustifyYFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
 {
-    return FUNCTOR_CONTINUE;
+    if (m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (m_spaceToDistribute <= 0) return FUNCTOR_STOP;
+
+    // Skip bottom aligner and first staff
+    if (staffAlignment->GetStaff() && (staffAlignment->GetSpacingType() != SystemAligner::SpacingType::System)) {
+        const int shift = staffAlignment->GetJustificationFactor(m_doc) / m_justificationSum * m_spaceToDistribute;
+        m_relativeShift += shift;
+        m_cumulatedShift += shift;
+
+        staffAlignment->SetYRel(staffAlignment->GetYRel() - m_relativeShift);
+    }
+
+    m_shiftForStaff[staffAlignment] = m_cumulatedShift;
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode JustifyYFunctor::VisitSystem(System *system)
 {
-    return FUNCTOR_CONTINUE;
+    if (m_justificationSum <= 0.0) return FUNCTOR_STOP;
+    if (m_spaceToDistribute <= 0) return FUNCTOR_STOP;
+
+    const double systemJustificationFactor = m_doc->GetOptions()->m_justificationSystem.GetValue();
+    const double shift = systemJustificationFactor / m_justificationSum * m_spaceToDistribute;
+
+    if (!system->IsFirstInPage()) {
+        m_cumulatedShift += shift;
+    }
+
+    system->SetDrawingYRel(system->GetDrawingY() - m_cumulatedShift);
+
+    m_relativeShift = 0;
+    system->m_systemAligner.Process(*this);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
