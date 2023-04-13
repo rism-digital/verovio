@@ -75,6 +75,8 @@ private:
 // JustifyYFunctor
 //----------------------------------------------------------------------------
 
+using ShiftMap = std::map<const StaffAlignment *, int>;
+
 /**
  * This class justifies the Y positions.
  */
@@ -99,7 +101,7 @@ public:
     ///@{
     void SetJustificationSum(double justificationSum) { m_justificationSum = justificationSum; }
     void SetSpaceToDistribute(int space) { m_spaceToDistribute = space; }
-    const std::map<StaffAlignment *, int> &GetShiftForStaff() const { return m_shiftForStaff; }
+    const ShiftMap &GetShiftForStaff() const { return m_shiftForStaff; }
     ///@}
 
     /*
@@ -127,7 +129,52 @@ private:
     double m_justificationSum;
     // A map of calculated shifts per StaffAlignment
     // => this is transferred to the JustifyYAdjustCrossStaffFunctor
-    std::map<StaffAlignment *, int> m_shiftForStaff;
+    ShiftMap m_shiftForStaff;
+};
+
+//----------------------------------------------------------------------------
+// JustifyYAdjustCrossStaffFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts the cross staff content after vertical justification.
+ */
+class JustifyYAdjustCrossStaffFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    JustifyYAdjustCrossStaffFunctor(Doc *doc);
+    virtual ~JustifyYAdjustCrossStaffFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitChord(Chord *chord) override;
+    ///@}
+
+protected:
+    //
+private:
+    /*
+     * Calculate the shift due to vertical justification
+     */
+    int GetShift(const Staff *staff) const;
+
+public:
+    //
+private:
+    // A map of calculated shifts per StaffAlignment
+    // => this is transferred from the JustifyYFunctor
+    ShiftMap m_shiftForStaff;
 };
 
 } // namespace vrv
