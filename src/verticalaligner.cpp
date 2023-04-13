@@ -734,26 +734,4 @@ FunctorCode StaffAlignment::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffAlignmentEnd(this);
 }
 
-int StaffAlignment::JustifyY(FunctorParams *functorParams)
-{
-    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
-    assert(params);
-    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
-    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
-
-    // Skip bottom aligner and first staff
-    if (m_staff && (m_spacingType != SystemAligner::SpacingType::System)) {
-        const int shift
-            = this->GetJustificationFactor(params->m_doc) / params->m_justificationSum * params->m_spaceToDistribute;
-        params->m_relativeShift += shift;
-        params->m_cumulatedShift += shift;
-
-        this->SetYRel(this->GetYRel() - params->m_relativeShift);
-    }
-
-    params->m_shiftForStaff[this] = params->m_cumulatedShift;
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

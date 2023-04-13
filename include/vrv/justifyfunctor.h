@@ -94,6 +94,15 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Setter and getter for various properties
+     */
+    ///@{
+    void SetJustificationSum(double justificationSum) { m_justificationSum = justificationSum; }
+    void SetSpaceToDistribute(int space) { m_spaceToDistribute = space; }
+    const std::map<StaffAlignment *, int> &GetShiftForStaff() const { return m_shiftForStaff; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

@@ -522,28 +522,6 @@ int System::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::JustifyY(FunctorParams *functorParams)
-{
-    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
-    assert(params);
-    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
-    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
-
-    const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
-    const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
-
-    if (!this->IsFirstInPage()) {
-        params->m_cumulatedShift += shift;
-    }
-
-    this->SetDrawingYRel(this->GetDrawingY() - params->m_cumulatedShift);
-
-    params->m_relativeShift = 0;
-    m_systemAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int System::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

@@ -348,11 +348,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::JustifyY
-     */
-    int JustifyY(FunctorParams *functorParams) override;
-
 private:
     /**
      * Returns minimus preset spacing

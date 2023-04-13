@@ -621,17 +621,16 @@ void Page::JustifyVertically()
     if (!this->IsJustificationRequired(doc)) return;
 
     // Justify Y position
-    Functor justifyY(&Object::JustifyY);
-    JustifyYParams justifyYParams(&justifyY, doc);
-    justifyYParams.m_justificationSum = m_justificationSum;
-    justifyYParams.m_spaceToDistribute = m_drawingJustifiableHeight;
-    this->Process(&justifyY, &justifyYParams);
+    JustifyYFunctor justifyY(doc);
+    justifyY.SetJustificationSum(m_justificationSum);
+    justifyY.SetSpaceToDistribute(m_drawingJustifiableHeight);
+    this->Process(justifyY);
 
-    if (!justifyYParams.m_shiftForStaff.empty()) {
+    if (!justifyY.GetShiftForStaff().empty()) {
         // Adjust cross staff content which is displaced through vertical justification
         Functor justifyYAdjustCrossStaff(&Object::JustifyYAdjustCrossStaff);
         JustifyYAdjustCrossStaffParams justifyYAdjustCrossStaffParams(doc);
-        justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
+        justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyY.GetShiftForStaff();
         this->Process(&justifyYAdjustCrossStaff, &justifyYAdjustCrossStaffParams);
     }
 }
