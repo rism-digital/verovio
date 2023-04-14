@@ -829,6 +829,7 @@ protected:
     void addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters, int staffindex,
         int staffadj, int trackdiff);
     bool hasNoStaves(hum::HumdrumFile &infile);
+    hum::HTp getVisualKeySignature(hum::HTp keysigtok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
