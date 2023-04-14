@@ -26,7 +26,8 @@ enum FileFormat {
     MUSEDATAHUM,
     ESAC,
     MIDI,
-    TIMEMAP
+    TIMEMAP,
+    EXPANSIONMAP
 };
 
 enum { LOG_OFF = 0, LOG_ERROR, LOG_WARNING, LOG_INFO, LOG_DEBUG };

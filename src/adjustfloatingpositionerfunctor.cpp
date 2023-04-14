@@ -439,7 +439,6 @@ FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAl
         const ArrayOfBoundingBoxes &overflowBoxes = staffAlignment->GetBBoxesAbove();
         auto i = overflowBoxes.begin();
         auto end = overflowBoxes.end();
-        bool adjusted = false;
         while (i != end) {
 
             // find all the overflowing elements from the staff that overlap horizontally
@@ -447,20 +446,14 @@ FunctorCode AdjustFloatingPositionersBetweenFunctor::VisitStaffAlignment(StaffAl
                 i, end, [positioner](BoundingBox *elem) { return positioner->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
-                int y = positioner->GetSpaceBelow(m_doc, staffAlignment, *i);
-                if (y < diffY) {
-                    diffY = y;
-                    adjusted = true;
+                const int spaceY = positioner->GetSpaceBelow(m_doc, staffAlignment, *i);
+                if (spaceY != VRV_UNSET) {
+                    diffY = std::min(diffY, spaceY);
                 }
                 ++i;
             }
         }
-        if (!adjusted) {
-            positioner->SetDrawingYRel(centerYRel);
-        }
-        else {
-            positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
-        }
+        positioner->SetDrawingYRel(positioner->GetDrawingYRel() + diffY);
     }
 
     m_previousStaffAlignment = staffAlignment;

@@ -954,7 +954,8 @@ Options::Options()
     m_baseOptions.AddOption(&m_scale);
 
     m_outputTo.SetInfo("Output to",
-        "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", \"humdrum\" or "
+        "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
+        "\"expansionmap\", \"humdrum\" or "
         "\"pae\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
@@ -1358,10 +1359,6 @@ Options::Options()
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
-    m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
-    m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
-    this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
-
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
@@ -1503,7 +1500,7 @@ Options::Options()
     m_systemDivider.Init(SYSTEMDIVIDER_auto, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
-    m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
+    m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximum number of systems per page");
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 

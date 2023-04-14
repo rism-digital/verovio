@@ -73,12 +73,26 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
+     * Calculate the hyphen length using the text font
+     */
+    int CalcHyphenLength(Doc *doc, int staffSize);
+
+    /**
      * Calculate the spacing needed depending on the @worpos and @con
      */
     int CalcConnectorSpacing(Doc *doc, int staffSize);
 
     int GetDrawingWidth() const;
     int GetDrawingHeight() const;
+
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Adjust proportionally to the lyric size
+     */
+    static void AdjustToLyricSize(const Doc *doc, int &value);
 
     //----------//
     // Functors //

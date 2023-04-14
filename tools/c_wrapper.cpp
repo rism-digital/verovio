@@ -249,6 +249,13 @@ const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *opt
     return tk->GetCString();
 }
 
+const char *vrvToolkit_renderToExpansionMap(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RenderToExpansionMap());
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_renderToMIDI(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);

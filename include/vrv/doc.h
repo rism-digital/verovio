@@ -254,6 +254,11 @@ public:
     bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures);
 
     /**
+     *  Extract expansionMap from the document to JSON string.
+     */
+    bool ExportExpansionMap(std::string &output);
+
+    /**
      * Extract music features to JSON string.
      */
     bool ExportFeatures(std::string &output, const std::string &options);
