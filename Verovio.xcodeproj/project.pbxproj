@@ -1434,6 +1434,12 @@
 		E76046C128D4829000C36204 /* calcledgerlinesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */; };
 		E76046C228D496B300C36204 /* calcledgerlinesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */; };
 		E76046C328D496B400C36204 /* calcledgerlinesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */; };
+		E763EF3F29E939C00029E56D /* convertfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E763EF3E29E939C00029E56D /* convertfunctor.h */; };
+		E763EF4029E939C00029E56D /* convertfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E763EF3E29E939C00029E56D /* convertfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E763EF4229E939FB0029E56D /* convertfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E763EF4129E939FB0029E56D /* convertfunctor.cpp */; };
+		E763EF4329E939FB0029E56D /* convertfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E763EF4129E939FB0029E56D /* convertfunctor.cpp */; };
+		E763EF4429E93A0B0029E56D /* convertfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E763EF4129E939FB0029E56D /* convertfunctor.cpp */; };
+		E763EF4529E93A0C0029E56D /* convertfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E763EF4129E939FB0029E56D /* convertfunctor.cpp */; };
 		E765675928BBFBA400BC6490 /* functorinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675828BBFBA400BC6490 /* functorinterface.h */; };
 		E765675A28BBFBA400BC6490 /* functorinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675828BBFBA400BC6490 /* functorinterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E765675C28BC01A000BC6490 /* functor.h in Headers */ = {isa = PBXBuildFile; fileRef = E765675B28BC019F00BC6490 /* functor.h */; };
@@ -2140,6 +2146,8 @@
 		E75EA9FC29CC3A88003A97A7 /* calcarticfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcarticfunctor.cpp; path = src/calcarticfunctor.cpp; sourceTree = "<group>"; };
 		E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcledgerlinesfunctor.h; path = include/vrv/calcledgerlinesfunctor.h; sourceTree = "<group>"; };
 		E76046BF28D4829000C36204 /* calcledgerlinesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcledgerlinesfunctor.cpp; path = src/calcledgerlinesfunctor.cpp; sourceTree = "<group>"; };
+		E763EF3E29E939C00029E56D /* convertfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = convertfunctor.h; path = include/vrv/convertfunctor.h; sourceTree = "<group>"; };
+		E763EF4129E939FB0029E56D /* convertfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = convertfunctor.cpp; path = src/convertfunctor.cpp; sourceTree = "<group>"; };
 		E765675828BBFBA400BC6490 /* functorinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functorinterface.h; path = include/vrv/functorinterface.h; sourceTree = "<group>"; };
 		E765675B28BC019F00BC6490 /* functor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functor.h; path = include/vrv/functor.h; sourceTree = "<group>"; };
 		E76A9D4629A74E060044682D /* adjustdotsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustdotsfunctor.h; path = include/vrv/adjustdotsfunctor.h; sourceTree = "<group>"; };
@@ -2951,6 +2959,8 @@
 				E7908E9E298582090004C1F9 /* alignfunctor.h */,
 				E7265E7029DC700800D11F41 /* castofffunctor.cpp */,
 				E7265E6D29DC6FD200D11F41 /* castofffunctor.h */,
+				E763EF4129E939FB0029E56D /* convertfunctor.cpp */,
+				E763EF3E29E939C00029E56D /* convertfunctor.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
@@ -3103,6 +3113,7 @@
 				E78F204F29D9B02600CD5910 /* calcbboxoverflowsfunctor.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
+				E763EF3F29E939C00029E56D /* convertfunctor.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
 				40C2E4212052A6EC0003625F /* pb.h in Headers */,
 				40BD9393206B95120037BF8E /* annot.h in Headers */,
@@ -3605,6 +3616,7 @@
 				4DACC9BF2990F29A00B55913 /* atts_midi.h in Headers */,
 				E78F204829D98CFD00CD5910 /* adjustxrelfortranscriptionfunctor.h in Headers */,
 				BB4C4BBD22A932FC001F6AF0 /* MidiEventList.h in Headers */,
+				E763EF4029E939C00029E56D /* convertfunctor.h in Headers */,
 				BB4C4BBB22A932FC001F6AF0 /* MidiEvent.h in Headers */,
 				BB4C4B4A22A932D7001F6AF0 /* clef.h in Headers */,
 				BB4C4B4222A932D7001F6AF0 /* beam.h in Headers */,
@@ -3907,6 +3919,7 @@
 				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
 				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
+				E763EF4429E93A0B0029E56D /* convertfunctor.cpp in Sources */,
 				4DC12A791F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */,
 				4DACCA032990F29A00B55913 /* atts_usersymbols.cpp in Sources */,
@@ -4096,6 +4109,7 @@
 				4DACC9842990F29A00B55913 /* atts_performance.cpp in Sources */,
 				E7BF80E929E3625F00EA38F0 /* justifyfunctor.cpp in Sources */,
 				E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
+				E763EF4529E93A0C0029E56D /* convertfunctor.cpp in Sources */,
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
 				E79320672991453C00D80975 /* calcstemfunctor.cpp in Sources */,
@@ -4456,6 +4470,7 @@
 				4D27E13927F582BB00D64FBD /* docselection.cpp in Sources */,
 				E7908EA22985829F0004C1F9 /* alignfunctor.cpp in Sources */,
 				E74A806128BC9111005274E7 /* findfunctor.cpp in Sources */,
+				E763EF4229E939FB0029E56D /* convertfunctor.cpp in Sources */,
 				8F3DD35218854B2E0051330C /* rest.cpp in Sources */,
 				4DEC4D9421C81E0B00D1D273 /* del.cpp in Sources */,
 				4DACCA042990F29A00B55913 /* atts_usersymbols.cpp in Sources */,
@@ -4731,6 +4746,7 @@
 				BB4C4B2D22A932CF001F6AF0 /* octave.cpp in Sources */,
 				BB4C4BA922A932EB001F6AF0 /* view.cpp in Sources */,
 				BB4C4A5A22A9318B001F6AF0 /* humlib.cpp in Sources */,
+				E763EF4329E939FB0029E56D /* convertfunctor.cpp in Sources */,
 				4DA0EAF522BB77C300A7EBEB /* facsimileinterface.cpp in Sources */,
 				4DACCA052990F29A00B55913 /* atts_usersymbols.cpp in Sources */,
 				BB4C4B0722A932C3001F6AF0 /* pgfoot2.cpp in Sources */,
