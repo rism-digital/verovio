@@ -130,7 +130,7 @@ private:
      * Get the rest vertical location relative to location of elements placed on other layers
      */
     std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
-        const ListOfConstObjects &layersList, const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const;
+        const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const;
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers
@@ -159,6 +159,12 @@ private:
      */
     int GetRestOffsetFromOptions(
         RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const;
+
+    /**
+     * Find whether there is correct number of rests for automatic placement and determine position of the rest
+     * (top/bottom) if there is.
+     */
+    bool DetermineRestPosition(const Staff *currentStaff, const Layer *currentLayer, bool &isTopLayer) const;
 
 public:
     //

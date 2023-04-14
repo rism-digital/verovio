@@ -285,23 +285,51 @@ void Rest::UpdateFromTransLoc(const TransPitch &tp)
     }
 }
 
+bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &isTopLayer) const
+{
+    auto elements = layer->GetLayerElementsForTimeSpanOf(this, true);
+    if (elements.empty()) return false;
+
+    const LayerElement *elem = NULL;
+    std::set<int> layers;
+    for (const Object *element : elements) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(element);
+        layers.insert(layerElement->GetAlignmentLayerN());
+        if (!elem) elem = layerElement;
+    }
+
+    // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
+    if (layers.size() == 1) {
+        if (m_crossStaff) {
+            isTopLayer = staff->GetN() < m_crossStaff->GetN();
+        }
+        else if (layer->GetN() < (*layers.begin())) {
+            isTopLayer = true;
+        }
+        else {
+            if (elem && ((*layers.begin()) < 0)) {
+                isTopLayer = staff->GetN() < elem->GetAncestorStaff()->GetN();
+            }
+            else {
+                isTopLayer = false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int defaultLocation) const
 {
     const Layer *parentLayer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
-    const std::set<int> layersN = parentLayer->GetLayersNForTimeSpanOf(this);
-    // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
-    if (layersN.size() != 2) return defaultLocation;
-
-    const bool isTopLayer
-        = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (layer->GetN() == *layersN.cbegin());
+    bool isTopLayer = false;
+    if (!this->DetermineRestPosition(staff, layer, isTopLayer)) return defaultLocation;
 
     // find best rest location relative to elements on other layers
     const Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
-    ListOfConstObjects layers = realStaff->FindAllDescendantsByType(LAYER, false);
     bool restOverlap = true;
-    const auto otherLayerRelativeLocationInfo
-        = this->GetLocationRelativeToOtherLayers(layers, layer, isTopLayer, restOverlap);
+    const auto otherLayerRelativeLocationInfo = this->GetLocationRelativeToOtherLayers(layer, isTopLayer, restOverlap);
     int currentLayerRelativeLocation = this->GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
         + this->GetRestOffsetFromOptions(RL_otherLayer, otherLayerRelativeLocationInfo, isTopLayer);
@@ -318,7 +346,7 @@ int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int de
             otherLayerRelativeLocation += defaultLocation + 2;
         }
         else {
-            otherLayerRelativeLocation -= defaultLocation + 2;
+            otherLayerRelativeLocation -= 2;
         }
     }
 
@@ -331,25 +359,22 @@ int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int de
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
-    const ListOfConstObjects &layersList, const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const
+    const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const
 {
     if (!currentLayer) return { VRV_UNSET, RA_none };
 
-    // Get iterator to another layer. We're going to find coliding elements there
-    auto layerIter = std::find_if(layersList.begin(), layersList.end(),
-        [&](const Object *foundLayer) { return vrv_cast<const Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == layersList.end()) {
-        if (!m_crossStaff) return { VRV_UNSET, RA_none };
-        // if we're dealing with cross-staff item, get first/last layer, depending whether rest is on top or bottom
-        layerIter = isTopLayer ? layersList.begin() : std::prev(layersList.end());
-    }
-    auto collidingElementsList = vrv_cast<const Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+    auto collidingElementsList = currentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    if (collidingElementsList.empty()) return { VRV_UNSET, RA_none };
 
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
     // Go through each colliding element and figure out optimal location for the rest
     for (const Object *object : collidingElementsList) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(object);
+        const Layer *objectLayer = layerElement->m_crossLayer
+            ? layerElement->m_crossLayer
+            : vrv_cast<const Layer *>(object->GetFirstAncestor(LAYER));
         if (object->Is(NOTE)) restOverlap = false;
-        auto currentElementInfo = this->GetElementLocation(object, vrv_cast<const Layer *>(*layerIter), isTopLayer);
+        auto currentElementInfo = this->GetElementLocation(object, objectLayer, isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
         //  If note on other layer is not on the same x position as rest - ignore its accidental
         if (this->GetAlignment()->GetTime() != vrv_cast<const LayerElement *>(object)->GetAlignment()->GetTime()) {
