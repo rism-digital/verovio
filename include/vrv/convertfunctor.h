@@ -66,6 +66,68 @@ private:
     Page *m_page;
 };
 
+//----------------------------------------------------------------------------
+// ConvertToCastOffMensuralFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class converts mensural MEI into cast-off (measure) segments looking at the barLine objects.
+ * Segment positions occur where a barLine is set on all staves.
+ */
+class ConvertToCastOffMensuralFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem, IntTree *layerTree);
+    virtual ~ConvertToCastOffMensuralFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitBarLine(BarLine *barLine) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystemElement(SystemElement *systemElement) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The staff @n for finding splitting bar lines
+    std::vector<int> m_staffNs;
+    // The content layer from which we are copying the elements
+    Layer *m_contentLayer;
+    // The target system, measure, staff & layer
+    System *m_targetSystem;
+    Measure *m_targetMeasure;
+    Staff *m_targetStaff;
+    Layer *m_targetLayer;
+    // A sub-system (e.g., section) to add measure segments
+    System *m_targetSubSystem;
+    // A counter for segments in the sub-system (section)
+    int m_segmentIdx;
+    // The total number of segments (previous sections)
+    int m_segmentTotal;
+    // An IntTree for processing by layer
+    IntTree *m_layerTree;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CONVERTFUNCTOR_H__

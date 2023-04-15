@@ -138,4 +138,57 @@ FunctorCode ConvertToPageBasedFunctor::VisitSystemElement(SystemElement *systemE
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ConvertToCastOffMensuralFunctor
+//----------------------------------------------------------------------------
+
+ConvertToCastOffMensuralFunctor::ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem, IntTree *layerTree)
+    : DocFunctor(doc)
+{
+    m_contentLayer = NULL;
+    m_targetSystem = targetSystem;
+    m_targetSubSystem = NULL;
+    m_targetMeasure = NULL;
+    m_targetStaff = NULL;
+    m_targetLayer = NULL;
+    m_segmentIdx = 0;
+    m_segmentTotal = 0;
+    m_layerTree = layerTree;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitBarLine(BarLine *barLine)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitLayer(Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToCastOffMensuralFunctor::VisitSystemElement(SystemElement *systemElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
