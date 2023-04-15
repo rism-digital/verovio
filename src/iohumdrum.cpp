@@ -7133,7 +7133,7 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
     std::vector<std::string> elements;
     std::vector<void *> pointers;
     if (cleftok) {
-        setClefColorOrEditorial(cleftok, vrvclef, elements, pointers, false);
+        setClefColorOrEditorial(cleftok, vrvclef, elements, pointers);
         setLocationId(vrvclef, cleftok);
     }
 }
@@ -19429,6 +19429,18 @@ Clef *HumdrumInput::insertClefElement(
     setClefStaffLine(clef, *token);
     setClefOctaveDisplacement(clef, *token);
     checkForClefStyling(clef, token);
+
+    bool iseditorial = getBooleanParameter(token, "CL", "ed");
+    if (iseditorial) {
+        // Initial clef cannot yet be supplied.
+        Supplied *supplied = new Supplied();
+        appendElement(supplied, clef);
+        appendElement(elements, pointers, supplied);
+    }
+    else {
+        appendElement(elements, pointers, clef);
+    }
+
     return clef;
 }
 
@@ -19489,7 +19501,7 @@ void HumdrumInput::setClefOctaveDisplacement(Clef *clef, const std::string &tok)
 //
 
 void HumdrumInput::setClefColorOrEditorial(
-    hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers, bool append)
+    hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers)
 {
     if (!token) {
         return;
@@ -19502,27 +19514,11 @@ void HumdrumInput::setClefColorOrEditorial(
     std::string color = getStringParameter(token, "CL", "color");
 
     if (iseditorial) {
-        if (append) {
-            // Initial clef cannot yet be supplied.
-            Supplied *supplied = new Supplied();
-            appendElement(supplied, clef);
-            appendElement(elements, pointers, supplied);
-            if (color.empty()) {
-                clef->SetColor("#aaa"); // hard-code to gray by default for now
-            }
-            else {
-                clef->SetColor(color);
-            }
-            appendTypeTag(clef, "editorial");
-        }
+        appendTypeTag(clef, "editorial");
+        clef->SetEnclose(ENCLOSURE_brack);
     }
-    else {
-        if (append) {
-            appendElement(elements, pointers, clef);
-        }
-        if (!color.empty()) {
-            clef->SetColor(color);
-        }
+    if (!color.empty()) {
+        clef->SetColor(color);
     }
 }
 
