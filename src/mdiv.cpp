@@ -122,26 +122,6 @@ int Mdiv::SaveEnd(FunctorParams *functorParams)
     return Object::SaveEnd(functorParams);
 }
 
-int Mdiv::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_page);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Mdiv::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

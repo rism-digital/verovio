@@ -287,11 +287,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertToCastOffMensural
      */
     int ConvertToCastOffMensural(FunctorParams *functorParams) override;

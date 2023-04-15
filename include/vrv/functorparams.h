@@ -237,25 +237,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ConvertToPageBasedParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the system we are moving the content to
- **/
-
-class ConvertToPageBasedParams : public FunctorParams {
-public:
-    ConvertToPageBasedParams(Page *page)
-    {
-        m_currentSystem = NULL;
-        m_page = page;
-    }
-    System *m_currentSystem;
-    Page *m_page;
-};
-
-//----------------------------------------------------------------------------
 // ConvertToUnCastOffMensuralParams
 //----------------------------------------------------------------------------
 

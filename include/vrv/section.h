@@ -59,14 +59,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::ConvertToUnCastOffMensural
      */
     int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;

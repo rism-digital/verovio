@@ -72,14 +72,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

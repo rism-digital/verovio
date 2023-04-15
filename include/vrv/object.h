@@ -718,16 +718,6 @@ public:
     ///@{
 
     /**
-     * Convert top-level all container (section, endings) and editorial elements to milestone elements.
-     */
-    virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
      * Segment positions occur where a barLine is set on all staves.
      */

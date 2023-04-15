@@ -771,18 +771,6 @@ FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreDefEnd(this);
 }
 
-int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    // Move itself to the pageBasedSystem - do not process children
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int ScoreDef::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);

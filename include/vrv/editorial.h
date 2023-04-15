@@ -78,12 +78,6 @@ public:
     int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
-    /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-
 private:
     //
 public:

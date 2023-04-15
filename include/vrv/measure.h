@@ -330,11 +330,6 @@ public:
     int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ConvertToCastOffMensural
      */
     int ConvertToCastOffMensural(FunctorParams *functorParams) override;

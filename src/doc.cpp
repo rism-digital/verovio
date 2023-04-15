@@ -20,6 +20,7 @@
 #include "castofffunctor.h"
 #include "chord.h"
 #include "comparison.h"
+#include "convertfunctor.h"
 #include "docselection.h"
 #include "expansion.h"
 #include "featureextractor.h"
@@ -1285,10 +1286,8 @@ void Doc::ConvertToPageBasedDoc()
     Page *page = new Page();
     pages->AddChild(page);
 
-    ConvertToPageBasedParams convertToPageBasedParams(page);
-    Functor convertToPageBased(&Object::ConvertToPageBased);
-    Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
-    this->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+    ConvertToPageBasedFunctor convertToPageBased(page);
+    this->Process(convertToPageBased);
 
     this->ClearRelinquishedChildren();
     assert(this->GetChildCount() == 0);

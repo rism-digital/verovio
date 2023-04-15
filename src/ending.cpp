@@ -96,25 +96,4 @@ FunctorCode Ending::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitEndingEnd(this);
 }
 
-int Ending::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
