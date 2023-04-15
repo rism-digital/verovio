@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Apr 12 20:03:52 PDT 2023
+// Last Modified: Sat Apr 15 11:52:53 PDT 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -78366,7 +78366,7 @@ string Tool_extract::reverseFieldString(const string& input, int maxval) {
 			continue;
 		} else {
 			if (!number.empty()) {
-				int value = strtol(number.c_str(), NULL, 10);
+				int value = (int)strtol(number.c_str(), NULL, 10);
 				value = maxval - value + 1;
 				output += to_string(value);
 				output += input[i];
@@ -78375,7 +78375,7 @@ string Tool_extract::reverseFieldString(const string& input, int maxval) {
 		}
 	}
 	if (!number.empty()) {
-		int value = strtol(number.c_str(), NULL, 10);
+		int value = (int)strtol(number.c_str(), NULL, 10);
 		value = maxval - value + 1;
 		output += to_string(value);
 	}
