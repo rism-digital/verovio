@@ -37,6 +37,7 @@
 #include "corr.h"
 #include "course.h"
 #include "custos.h"
+#include "divline.h"
 #include "damage.h"
 #include "del.h"
 #include "dir.h"
@@ -73,6 +74,7 @@
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
+#include "liquescent.h"
 #include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -2292,8 +2294,9 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
         return;
     }
 
-    this->WriteLayerElement(currentNode, accid);
-    this->WritePositionInterface(currentNode, accid);
+    WriteLayerElement(currentNode, accid);
+    WriteFacsimileInterface(currentNode, accid);
+    WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
     accid->WriteAccidLog(currentNode);
@@ -2427,6 +2430,17 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     custos->WriteExtSym(currentNode);
 }
 
+void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
+{
+    assert(divLine);
+
+    WriteLayerElement(currentNode, divLine);
+    WriteFacsimileInterface(currentNode, divLine);
+    divLine->WriteDivLineLog(currentNode);
+    divLine->WriteColor(currentNode);
+    divLine->WriteVisibility(currentNode);
+}
+
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
 {
     assert(dot);
@@ -2516,6 +2530,16 @@ void MEIOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
 
     this->WriteLayerElement(currentNode, ligature);
     ligature->WriteLigatureVis(currentNode);
+}
+
+void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquescent)
+{
+    assert(liquescent);
+
+    WriteLayerElement(currentNode, liquescent);
+    WritePositionInterface(currentNode, liquescent);
+    // liquescent->WriteAccidLog(currentNode);
+    // liquescent->WriteEnclosingChars(currentNode);
 }
 
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
@@ -6014,6 +6038,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "custos") {
             success = this->ReadCustos(parent, xmlElement);
         }
+        else if (elementName == "divLine") {
+            success = ReadDivLine(parent, xmlElement);
+        }
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
         }
@@ -6146,7 +6173,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     Accid *vrvAccid = new Accid();
     this->ReadLayerElement(accid, vrvAccid);
 
-    this->ReadPositionInterface(accid, vrvAccid);
+    ReadPositionInterface(accid, vrvAccid);
+    ReadFacsimileInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
@@ -6337,6 +6365,21 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     parent->AddChild(vrvCustos);
     this->ReadUnsupportedAttr(custos, vrvCustos);
     return this->ReadLayerChildren(vrvCustos, custos, vrvCustos);
+}
+
+bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
+{
+    DivLine *vrvDivLine = new DivLine();
+    ReadLayerElement(divLine, vrvDivLine);
+
+    ReadFacsimileInterface(divLine, vrvDivLine);
+    vrvDivLine->ReadDivLineLog(divLine);
+    vrvDivLine->ReadColor(divLine);
+    vrvDivLine->ReadVisibility(divLine);
+
+    parent->AddChild(vrvDivLine);
+    ReadUnsupportedAttr(divLine, vrvDivLine);
+    return true;
 }
 
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
