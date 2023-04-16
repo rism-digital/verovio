@@ -93,7 +93,6 @@ int Neume::GetLigatureCount(int position) {
     return ligCount;
 }
 
-bool Neume::IsLastInNeume(LayerElement *element)
 bool Neume::IsLastInNeume(const LayerElement *element) const
 {
     const int size = this->GetListSize(this);
