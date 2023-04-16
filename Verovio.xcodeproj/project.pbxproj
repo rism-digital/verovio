@@ -253,6 +253,12 @@
 		4D308104203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
 		4D308105203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
 		4D308106203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
+		4D38EF1E29EC7CB700FEE923 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */; };
+		4D38EF1F29EC7CC100FEE923 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */; };
+		4D38EF2029EC7CC200FEE923 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */; };
+		4D38EF2129EC7CC300FEE923 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */; };
+		4D38EF2229EC7CD300FEE923 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D38EF1C29EC7CA900FEE923 /* liquescent.h */; };
+		4D38EF2329EC7CD300FEE923 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D38EF1C29EC7CA900FEE923 /* liquescent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D3C3F0C294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
 		4D3C3F0D294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
 		4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
@@ -1751,6 +1757,8 @@
 		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
 		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
+		4D38EF1C29EC7CA900FEE923 /* liquescent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = liquescent.h; path = include/vrv/liquescent.h; sourceTree = "<group>"; };
+		4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = liquescent.cpp; path = src/liquescent.cpp; sourceTree = "<group>"; };
 		4D3C3F0B294B89AF009993E6 /* ornam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ornam.cpp; path = src/ornam.cpp; sourceTree = "<group>"; };
 		4D3C3F10294B89C9009993E6 /* ornam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ornam.h; path = include/vrv/ornam.h; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
@@ -2877,6 +2885,8 @@
 				8F59291E18854BF800FE51AD /* layerelement.h */,
 				152886C41C9CA86100B515BB /* ligature.cpp */,
 				152886C11C9CA2E000B515BB /* ligature.h */,
+				4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */,
+				4D38EF1C29EC7CA900FEE923 /* liquescent.h */,
 				8F086ECA188539540037FD8E /* mensur.cpp */,
 				8F59292118854BF800FE51AD /* mensur.h */,
 				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
@@ -3110,6 +3120,7 @@
 				4DEC4DD621C8295700D1D273 /* del.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
+				4D38EF2229EC7CD300FEE923 /* liquescent.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				4DF092A22497706600239195 /* phrase.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
@@ -3580,6 +3591,7 @@
 				4DE0B9A22988070C00D4C939 /* interface.h in Headers */,
 				4DC3B9EB239E2B23007F185E /* transposition.h in Headers */,
 				BB4C4BC122A932FC001F6AF0 /* MidiMessage.h in Headers */,
+				4D38EF2329EC7CD300FEE923 /* liquescent.h in Headers */,
 				BB4C4B9222A932DF001F6AF0 /* textelement.h in Headers */,
 				BB4C4B5C22A932D7001F6AF0 /* mensur.h in Headers */,
 				4D79641E26C152400026288B /* pageelement.h in Headers */,
@@ -4047,6 +4059,7 @@
 				4DACC9912990F29A00B55913 /* atts_critapp.cpp in Sources */,
 				4D1694591E3A44F300569BF4 /* custos.cpp in Sources */,
 				4D16945A1E3A44F300569BF4 /* dot.cpp in Sources */,
+				4D38EF1F29EC7CC100FEE923 /* liquescent.cpp in Sources */,
 				4D20740B22A4FDFA00E0765F /* course.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4163,6 +4176,7 @@
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				E7908EA5298582DF0004C1F9 /* alignfunctor.cpp in Sources */,
 				E7ED8A6829C111C300735875 /* cachehorizontallayoutfunctor.cpp in Sources */,
+				4D38EF1E29EC7CB700FEE923 /* liquescent.cpp in Sources */,
 				4D766EFB20ACAD63006875D8 /* nc.cpp in Sources */,
 				4DEC4DAE21C81F0600D1D273 /* sic.cpp in Sources */,
 				40C2E41F2052A6E00003625F /* pb.cpp in Sources */,
@@ -4596,6 +4610,7 @@
 				4DACC9922990F29A00B55913 /* atts_critapp.cpp in Sources */,
 				4DB3D8B91F83D0C600B5FC2B /* systemmilestone.cpp in Sources */,
 				4D2073FA22A3BCE000E0765F /* tabdursym.cpp in Sources */,
+				4D38EF2029EC7CC200FEE923 /* liquescent.cpp in Sources */,
 				4DEC4DB421C826E000D1D273 /* supplied.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4871,6 +4886,7 @@
 				4DACC9932990F29A00B55913 /* atts_critapp.cpp in Sources */,
 				BB4C4BA122A932E5001F6AF0 /* scoredefinterface.cpp in Sources */,
 				BB4C4B4322A932D7001F6AF0 /* beatrpt.cpp in Sources */,
+				4D38EF2129EC7CC300FEE923 /* liquescent.cpp in Sources */,
 				BB4C4AB122A932A6001F6AF0 /* iodarms.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
