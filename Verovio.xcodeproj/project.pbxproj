@@ -259,6 +259,12 @@
 		4D38EF2129EC7CC300FEE923 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */; };
 		4D38EF2229EC7CD300FEE923 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D38EF1C29EC7CA900FEE923 /* liquescent.h */; };
 		4D38EF2329EC7CD300FEE923 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D38EF1C29EC7CA900FEE923 /* liquescent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D38EF2529EC7E1500FEE923 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF2429EC7E1500FEE923 /* divline.cpp */; };
+		4D38EF2729EC7E2800FEE923 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF2429EC7E1500FEE923 /* divline.cpp */; };
+		4D38EF2829EC7E2900FEE923 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF2429EC7E1500FEE923 /* divline.cpp */; };
+		4D38EF2929EC7E2A00FEE923 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D38EF2429EC7E1500FEE923 /* divline.cpp */; };
+		4D38EF2A29EC7E2D00FEE923 /* divline.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D38EF2629EC7E2400FEE923 /* divline.h */; };
+		4D38EF2B29EC7E2E00FEE923 /* divline.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D38EF2629EC7E2400FEE923 /* divline.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D3C3F0C294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
 		4D3C3F0D294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
 		4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3C3F0B294B89AF009993E6 /* ornam.cpp */; };
@@ -1759,6 +1765,8 @@
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
 		4D38EF1C29EC7CA900FEE923 /* liquescent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = liquescent.h; path = include/vrv/liquescent.h; sourceTree = "<group>"; };
 		4D38EF1D29EC7CB700FEE923 /* liquescent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = liquescent.cpp; path = src/liquescent.cpp; sourceTree = "<group>"; };
+		4D38EF2429EC7E1500FEE923 /* divline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = divline.cpp; path = src/divline.cpp; sourceTree = "<group>"; };
+		4D38EF2629EC7E2400FEE923 /* divline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = divline.h; path = include/vrv/divline.h; sourceTree = "<group>"; };
 		4D3C3F0B294B89AF009993E6 /* ornam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ornam.cpp; path = src/ornam.cpp; sourceTree = "<group>"; };
 		4D3C3F10294B89C9009993E6 /* ornam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ornam.h; path = include/vrv/ornam.h; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
@@ -2867,6 +2875,8 @@
 				8F59291218854BF800FE51AD /* clef.h */,
 				4DC34BA619BC4A83006175CD /* custos.cpp */,
 				4DC34BA019BC4A70006175CD /* custos.h */,
+				4D38EF2429EC7E1500FEE923 /* divline.cpp */,
+				4D38EF2629EC7E2400FEE923 /* divline.h */,
 				4DC34BA719BC4A83006175CD /* dot.cpp */,
 				4DC34BA119BC4A70006175CD /* dot.h */,
 				4DEEDE631E617C930087E8BC /* elementpart.cpp */,
@@ -3166,6 +3176,7 @@
 				4DACCA172990F2E600B55913 /* attdef.h in Headers */,
 				4DB3D8EC1F83D18300B5FC2B /* proport.h in Headers */,
 				4DEC4DDE21C8295700D1D273 /* lem.h in Headers */,
+				4D38EF2A29EC7E2D00FEE923 /* divline.h in Headers */,
 				4DC12A5D1F73F888000440E9 /* pghead2.h in Headers */,
 				E778BDAE29D5BD3D00672D51 /* adjuststaffoverlapfunctor.h in Headers */,
 				E7E9C11A29B0EF9600CFCE2F /* adjusttempofunctor.h in Headers */,
@@ -3613,6 +3624,7 @@
 				BB4C4B2222A932CF001F6AF0 /* dir.h in Headers */,
 				BB4C4B3C22A932D7001F6AF0 /* accid.h in Headers */,
 				BB4C4B5622A932D7001F6AF0 /* keysig.h in Headers */,
+				4D38EF2B29EC7E2E00FEE923 /* divline.h in Headers */,
 				BB4C4B1022A932C8001F6AF0 /* ending.h in Headers */,
 				4DACC9BF2990F29A00B55913 /* atts_midi.h in Headers */,
 				E78F204829D98CFD00CD5910 /* adjustxrelfortranscriptionfunctor.h in Headers */,
@@ -3933,6 +3945,7 @@
 				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
 				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
 				4DBDD6732939E1BC009EC466 /* symboldef.cpp in Sources */,
+				4D38EF2729EC7E2800FEE923 /* divline.cpp in Sources */,
 				E7A3790E29BB420300E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				E78F205329D9B04700CD5910 /* calcbboxoverflowsfunctor.cpp in Sources */,
 				BDEF9EC826725234008A3A47 /* caesura.cpp in Sources */,
@@ -4206,6 +4219,7 @@
 				4D6413782035F58200BB630E /* pages.cpp in Sources */,
 				8F086EFE188539540037FD8E /* scoredef.cpp in Sources */,
 				4D3C3F0C294B89AF009993E6 /* ornam.cpp in Sources */,
+				4D38EF2529EC7E1500FEE923 /* divline.cpp in Sources */,
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				4DEC4DAA21C81EEC00D1D273 /* restore.cpp in Sources */,
@@ -4484,6 +4498,7 @@
 				4D1BE7721C688F5A0086DC0E /* MidiFile.cpp in Sources */,
 				4DA0EAC922BB779400A7EBEB /* facsimile.cpp in Sources */,
 				4DEC4DAC21C81EEC00D1D273 /* restore.cpp in Sources */,
+				4D38EF2829EC7E2900FEE923 /* divline.cpp in Sources */,
 				E7A3790F29BB420400E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				E78F205429D9B04800CD5910 /* calcbboxoverflowsfunctor.cpp in Sources */,
 				8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */,
@@ -4760,6 +4775,7 @@
 				BB4C4BA522A932E5001F6AF0 /* timeinterface.cpp in Sources */,
 				BB4C4B7522A932D7001F6AF0 /* syl.cpp in Sources */,
 				BB4C4B3122A932CF001F6AF0 /* slur.cpp in Sources */,
+				4D38EF2929EC7E2A00FEE923 /* divline.cpp in Sources */,
 				E7A3791029BB420400E3BA98 /* adjustxposfunctor.cpp in Sources */,
 				E78F205529D9B04A00CD5910 /* calcbboxoverflowsfunctor.cpp in Sources */,
 				4DACC9DB2990F29A00B55913 /* atts_gestural.cpp in Sources */,
