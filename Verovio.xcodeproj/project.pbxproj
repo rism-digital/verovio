@@ -1388,6 +1388,12 @@
 		E7231E0629B64B33000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7231E0429B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp */; };
 		E7231E0729B64B33000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7231E0429B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp */; };
 		E7231E0829B64B34000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7231E0429B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp */; };
+		E7265E6E29DC6FD300D11F41 /* castofffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7265E6D29DC6FD200D11F41 /* castofffunctor.h */; };
+		E7265E6F29DC6FD300D11F41 /* castofffunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7265E6D29DC6FD200D11F41 /* castofffunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7265E7129DC700800D11F41 /* castofffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7265E7029DC700800D11F41 /* castofffunctor.cpp */; };
+		E7265E7229DC700800D11F41 /* castofffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7265E7029DC700800D11F41 /* castofffunctor.cpp */; };
+		E7265E7329DC701000D11F41 /* castofffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7265E7029DC700800D11F41 /* castofffunctor.cpp */; };
+		E7265E7429DC701100D11F41 /* castofffunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7265E7029DC700800D11F41 /* castofffunctor.cpp */; };
 		E738715C29CAFA7700982DE5 /* calcligaturenoteposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E738715B29CAFA6700982DE5 /* calcligaturenoteposfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E738715D29CAFA7800982DE5 /* calcligaturenoteposfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E738715B29CAFA6700982DE5 /* calcligaturenoteposfunctor.h */; };
 		E738715F29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */; };
@@ -1564,6 +1570,12 @@
 		E7BCFFB9281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
 		E7BCFFBA281298620012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFBB281298630012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
+		E7BF80E429E3374600EA38F0 /* justifyfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BF80E329E3374600EA38F0 /* justifyfunctor.h */; };
+		E7BF80E529E3374600EA38F0 /* justifyfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BF80E329E3374600EA38F0 /* justifyfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7BF80E729E3625700EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
+		E7BF80E829E3625700EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
+		E7BF80E929E3625F00EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
+		E7BF80EA29E3626000EA38F0 /* justifyfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */; };
 		E7C3AED629550190002DE5AB /* preparedatafunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7C3AED52955018F002DE5AB /* preparedatafunctor.h */; };
 		E7C3AED729550190002DE5AB /* preparedatafunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7C3AED52955018F002DE5AB /* preparedatafunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7C3AED9295501A5002DE5AB /* preparedatafunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */; };
@@ -2113,6 +2125,8 @@
 		E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findlayerelementsfunctor.cpp; path = src/findlayerelementsfunctor.cpp; sourceTree = "<group>"; };
 		E7231E0129B64B08000A2BF3 /* adjustxoverflowfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustxoverflowfunctor.h; path = include/vrv/adjustxoverflowfunctor.h; sourceTree = "<group>"; };
 		E7231E0429B64B2D000A2BF3 /* adjustxoverflowfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustxoverflowfunctor.cpp; path = src/adjustxoverflowfunctor.cpp; sourceTree = "<group>"; };
+		E7265E6D29DC6FD200D11F41 /* castofffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = castofffunctor.h; path = include/vrv/castofffunctor.h; sourceTree = "<group>"; };
+		E7265E7029DC700800D11F41 /* castofffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = castofffunctor.cpp; path = src/castofffunctor.cpp; sourceTree = "<group>"; };
 		E738715B29CAFA6700982DE5 /* calcligaturenoteposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcligaturenoteposfunctor.h; path = include/vrv/calcligaturenoteposfunctor.h; sourceTree = "<group>"; };
 		E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcligaturenoteposfunctor.cpp; path = src/calcligaturenoteposfunctor.cpp; sourceTree = "<group>"; };
 		E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcslurdirectionfunctor.h; path = include/vrv/calcslurdirectionfunctor.h; sourceTree = "<group>"; };
@@ -2172,6 +2186,8 @@
 		E7ADB3AD29D1923200825D5D /* adjustarticfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustarticfunctor.cpp; path = src/adjustarticfunctor.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
+		E7BF80E329E3374600EA38F0 /* justifyfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = justifyfunctor.h; path = include/vrv/justifyfunctor.h; sourceTree = "<group>"; };
+		E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = justifyfunctor.cpp; path = src/justifyfunctor.cpp; sourceTree = "<group>"; };
 		E7C3AED52955018F002DE5AB /* preparedatafunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = preparedatafunctor.h; path = include/vrv/preparedatafunctor.h; sourceTree = "<group>"; };
 		E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preparedatafunctor.cpp; path = src/preparedatafunctor.cpp; sourceTree = "<group>"; };
 		E7D33899293E057100C40B81 /* setscoredeffunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setscoredeffunctor.h; path = include/vrv/setscoredeffunctor.h; sourceTree = "<group>"; };
@@ -2933,9 +2949,13 @@
 				E786CD0B298AA450009BAC58 /* search */,
 				E7908EA12985829F0004C1F9 /* alignfunctor.cpp */,
 				E7908E9E298582090004C1F9 /* alignfunctor.h */,
+				E7265E7029DC700800D11F41 /* castofffunctor.cpp */,
+				E7265E6D29DC6FD200D11F41 /* castofffunctor.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
+				E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */,
+				E7BF80E329E3374600EA38F0 /* justifyfunctor.h */,
 				E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */,
 				E7C3AED52955018F002DE5AB /* preparedatafunctor.h */,
 				E71EF3C52975ED3800D36264 /* resetfunctor.cpp */,
@@ -3187,6 +3207,7 @@
 				E76046BD28D4828200C36204 /* calcledgerlinesfunctor.h in Headers */,
 				E765675C28BC01A000BC6490 /* functor.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
+				E7BF80E429E3374600EA38F0 /* justifyfunctor.h in Headers */,
 				E7A1640A29AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */,
 				E7770F8329D0D9F600A9BECF /* adjustslursfunctor.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
@@ -3269,6 +3290,7 @@
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
 				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
 				E7E1698B29A8BA3900FFF482 /* adjustgracexposfunctor.h in Headers */,
+				E7265E6E29DC6FD300D11F41 /* castofffunctor.h in Headers */,
 				E7ED8A6529C1119800735875 /* cachehorizontallayoutfunctor.h in Headers */,
 				4DB3D8B41F83D08700B5FC2B /* devicecontextbase.h in Headers */,
 				E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
@@ -3338,6 +3360,7 @@
 				BB4C4BC222A9330D001F6AF0 /* pugiconfig.hpp in Headers */,
 				4DACC9F12990F29A00B55913 /* atts_critapp.h in Headers */,
 				4D81351C2322C2CC00F59C01 /* keyaccid.h in Headers */,
+				E7265E6F29DC6FD300D11F41 /* castofffunctor.h in Headers */,
 				BBC19FC922B39AC400100F42 /* git_commit.h in Headers */,
 				E7D3389B293E057100C40B81 /* setscoredeffunctor.h in Headers */,
 				BB4C4AA022A9328F001F6AF0 /* toolkit.h in Headers */,
@@ -3571,6 +3594,7 @@
 				4DACC9C72990F29A00B55913 /* atts_cmn.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
 				E7E1698429A8988F00FFF482 /* adjustlayersfunctor.h in Headers */,
+				E7BF80E529E3374600EA38F0 /* justifyfunctor.h in Headers */,
 				BB4C4A9E22A9328F001F6AF0 /* smufl.h in Headers */,
 				35FDEBCF24B6DBC100AC1696 /* fing.h in Headers */,
 				BB4C4B3E22A932D7001F6AF0 /* artic.h in Headers */,
@@ -3849,6 +3873,7 @@
 				BD0562372518CD20004057EB /* beamspan.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
 				4DC12A7D1F740FB9000440E9 /* view_running.cpp in Sources */,
+				E7265E7329DC701000D11F41 /* castofffunctor.cpp in Sources */,
 				E7D48C7529D21F2B0031D89D /* adjustyposfunctor.cpp in Sources */,
 				E77C198228CD31AC00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768427CE8A19005B97EA /* layerdef.cpp in Sources */,
@@ -4013,6 +4038,7 @@
 				E7E9C11E29B0EFBC00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0C289674000006D7DA /* symbol.cpp in Sources */,
 				4D64137F2035F68600BB630E /* mdiv.cpp in Sources */,
+				E7BF80EA29E3626000EA38F0 /* justifyfunctor.cpp in Sources */,
 				4D1694571E3A44F300569BF4 /* anchoredtext.cpp in Sources */,
 				4DB3D8C51F83D0F900B5FC2B /* breath.cpp in Sources */,
 				4DEC4D9721C81E3B00D1D273 /* expan.cpp in Sources */,
@@ -4068,6 +4094,7 @@
 				4DACC9D82990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4DACC9842990F29A00B55913 /* atts_performance.cpp in Sources */,
+				E7BF80E929E3625F00EA38F0 /* justifyfunctor.cpp in Sources */,
 				E78833602994EC7900D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
@@ -4265,6 +4292,7 @@
 				E76A9D4A29A74E4B0044682D /* adjustdotsfunctor.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
 				4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */,
+				E7265E7429DC701100D11F41 /* castofffunctor.cpp in Sources */,
 				4DB3D8A71F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
 				E78F205229D9B03E00CD5910 /* calcbboxoverflowsfunctor.cpp in Sources */,
 				4DACC9D02990F29A00B55913 /* atts_mensural.cpp in Sources */,
@@ -4394,6 +4422,7 @@
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				BD6E5C3E290007CA0039B0F1 /* graphic.cpp in Sources */,
+				E7265E7129DC700800D11F41 /* castofffunctor.cpp in Sources */,
 				E7D48C7629D21F2C0031D89D /* adjustyposfunctor.cpp in Sources */,
 				4DB3D8CA1F83D10700B5FC2B /* fermata.cpp in Sources */,
 				BD0562382518CD20004057EB /* beamspan.cpp in Sources */,
@@ -4558,6 +4587,7 @@
 				E7E9C11F29B0EFBD00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0D289674010006D7DA /* symbol.cpp in Sources */,
 				4DEC4DB821C8270100D1D273 /* unclear.cpp in Sources */,
+				E7BF80E729E3625700EA38F0 /* justifyfunctor.cpp in Sources */,
 				4D89F910201771AE00A4D336 /* num.cpp in Sources */,
 				4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
@@ -4667,6 +4697,7 @@
 				E77C198128CD318B00F5BADA /* calcdotsfunctor.cpp in Sources */,
 				BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */,
 				BB4C4AF722A932BC001F6AF0 /* reg.cpp in Sources */,
+				E7265E7229DC700800D11F41 /* castofffunctor.cpp in Sources */,
 				E7D48C7729D21F2D0031D89D /* adjustyposfunctor.cpp in Sources */,
 				BB4C4B1322A932C8001F6AF0 /* section.cpp in Sources */,
 				BB4C4B0D22A932C8001F6AF0 /* systemmilestone.cpp in Sources */,
@@ -4831,6 +4862,7 @@
 				E7E9C12029B0EFBE00CFCE2F /* adjusttempofunctor.cpp in Sources */,
 				4D88AD0E289674010006D7DA /* symbol.cpp in Sources */,
 				BB4C4BB322A932EB001F6AF0 /* view_slur.cpp in Sources */,
+				E7BF80E829E3625700EA38F0 /* justifyfunctor.cpp in Sources */,
 				BB4C4B1922A932CF001F6AF0 /* anchoredtext.cpp in Sources */,
 				BB4C4AF322A932BC001F6AF0 /* rdg.cpp in Sources */,
 				BB4C4B7F22A932DF001F6AF0 /* fb.cpp in Sources */,

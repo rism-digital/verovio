@@ -211,36 +211,6 @@ int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Score::CastOffPages(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    PageElement::CastOffPages(functorParams);
-
-    params->m_pgHeadHeight = m_drawingPgHeadHeight;
-    params->m_pgFootHeight = m_drawingPgFootHeight;
-    params->m_pgHead2Height = m_drawingPgHead2Height;
-    params->m_pgFoot2Height = m_drawingPgFoot2Height;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Score::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    PageElement::UnCastOff(functorParams);
-
-    assert(!params->m_currentSystem);
-    System *system = new System();
-    params->m_currentSystem = system;
-    params->m_page->AddChild(system);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

@@ -108,6 +108,8 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
     void CacheXRel(bool restore = false);
+    int GetCachedXRel() const { return m_cachedXRel; }
+    void ResetCachedXRel() { m_cachedXRel = VRV_UNSET; }
     ///@}
 
     /**
@@ -214,6 +216,16 @@ public:
      * Return the center x of the inner of the measure
      */
     int GetInnerCenterX() const;
+
+    /**
+     * Return and reset the cached width / overflow
+     */
+    ///@{
+    int GetCachedWidth() const { return m_cachedWidth; }
+    int GetCachedOverflow() const { return m_cachedOverflow; }
+    void ResetCachedWidth() { m_cachedWidth = VRV_UNSET; }
+    void ResetCachedOverflow() { m_cachedOverflow = VRV_UNSET; }
+    ///@}
 
     /**
      * Return the right overflow of the control events in the measure.
@@ -346,26 +358,6 @@ public:
     int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
      * See Object::InitMIDI
      */
     int InitMIDI(FunctorParams *functorParams) override;
@@ -392,11 +384,6 @@ public:
      * See Object::InitOnsetOffset
      */
     int InitOnsetOffset(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions

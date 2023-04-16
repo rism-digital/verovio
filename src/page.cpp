@@ -51,6 +51,7 @@
 #include "doc.h"
 #include "functor.h"
 #include "functorparams.h"
+#include "justifyfunctor.h"
 #include "libmei.h"
 #include "pageelement.h"
 #include "pages.h"
@@ -591,10 +592,9 @@ void Page::JustifyHorizontally()
     }
     else {
         // Justify X position
-        Functor justifyX(&Object::JustifyX);
-        JustifyXParams justifyXParams(&justifyX, doc);
-        justifyXParams.m_systemFullWidth = doc->m_drawingPageContentWidth;
-        this->Process(&justifyX, &justifyXParams);
+        JustifyXFunctor justifyX(doc);
+        justifyX.SetSystemFullWidth(doc->m_drawingPageContentWidth);
+        this->Process(justifyX);
     }
 }
 
@@ -621,18 +621,16 @@ void Page::JustifyVertically()
     if (!this->IsJustificationRequired(doc)) return;
 
     // Justify Y position
-    Functor justifyY(&Object::JustifyY);
-    JustifyYParams justifyYParams(&justifyY, doc);
-    justifyYParams.m_justificationSum = m_justificationSum;
-    justifyYParams.m_spaceToDistribute = m_drawingJustifiableHeight;
-    this->Process(&justifyY, &justifyYParams);
+    JustifyYFunctor justifyY(doc);
+    justifyY.SetJustificationSum(m_justificationSum);
+    justifyY.SetSpaceToDistribute(m_drawingJustifiableHeight);
+    this->Process(justifyY);
 
-    if (!justifyYParams.m_shiftForStaff.empty()) {
+    if (!justifyY.GetShiftForStaff().empty()) {
         // Adjust cross staff content which is displaced through vertical justification
-        Functor justifyYAdjustCrossStaff(&Object::JustifyYAdjustCrossStaff);
-        JustifyYAdjustCrossStaffParams justifyYAdjustCrossStaffParams(doc);
-        justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
-        this->Process(&justifyYAdjustCrossStaff, &justifyYAdjustCrossStaffParams);
+        JustifyYAdjustCrossStaffFunctor justifyYAdjustCrossStaff(doc);
+        justifyYAdjustCrossStaff.SetShiftForStaff(justifyY.GetShiftForStaff());
+        this->Process(justifyYAdjustCrossStaff);
     }
 }
 
@@ -805,22 +803,6 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     m_pageMarginLeft /= params->m_page->GetPPUFactor();
     m_pageMarginRight /= params->m_page->GetPPUFactor();
     m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::CastOffPagesEnd(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    if (params->m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
-
-    // Otherwise add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
-        params->m_currentPage->AddChild(*iter);
-    }
 
     return FUNCTOR_CONTINUE;
 }

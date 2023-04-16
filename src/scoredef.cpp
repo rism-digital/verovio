@@ -794,50 +794,6 @@ int ScoreDef::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int ScoreDef::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
-
-    // Special case where we use the Relinquish method.
-    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
-    // from the content System because this screws up the iterator. Relinquish gives up
-    // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingElements.push_back(scoreDef);
-    // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
-    // the initial one - for this to be corrected, we would need two parameters, one for the current initial
-    // scoreDef and one for the current that will be the initial one at the next system
-    // Also, the abbr label (width) changes would not be taken into account
-    params->m_currentScoreDefWidth = this->GetDrawingWidth() + params->m_contentSystem->GetDrawingAbbrLabelsWidth();
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int ScoreDef::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
     InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
@@ -918,19 +874,6 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-}
-
-int ScoreDef::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingLabelsWidth > 0) {
-        params->m_measureXRel += m_drawingLabelsWidth;
-        params->m_applySectionRestartShift = false;
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int ScoreDef::Transpose(FunctorParams *functorParams)

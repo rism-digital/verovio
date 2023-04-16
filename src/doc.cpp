@@ -17,6 +17,7 @@
 #include "alignfunctor.h"
 #include "barline.h"
 #include "beatrpt.h"
+#include "castofffunctor.h"
 #include "chord.h"
 #include "comparison.h"
 #include "docselection.h"
@@ -999,18 +1000,14 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
 
     System *leftoverSystem = NULL;
     if (useSb && !usePb && !smart) {
-        CastOffEncodingParams castOffEncodingParams(this, castOffSinglePage, false);
-        Functor castOffEncoding(&Object::CastOffEncoding);
-        unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+        CastOffEncodingFunctor castOffEncoding(this, castOffSinglePage, false);
+        unCastOffPage->Process(castOffEncoding);
     }
     else {
-        CastOffSystemsParams castOffSystemsParams(castOffSinglePage, this, smart);
-        castOffSystemsParams.m_systemWidth = m_drawingPageContentWidth;
-
-        Functor castOffSystems(&Object::CastOffSystems);
-        Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
-        unCastOffPage->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
-        leftoverSystem = castOffSystemsParams.m_leftoverSystem;
+        CastOffSystemsFunctor castOffSystems(castOffSinglePage, this, smart);
+        castOffSystems.SetSystemWidth(m_drawingPageContentWidth);
+        unCastOffPage->Process(castOffSystems);
+        leftoverSystem = castOffSystems.GetLeftoverSystem();
     }
     // We can now detach and delete the old content page
     pages->DetachChild(0);
@@ -1048,7 +1045,7 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     castOffSinglePage->ResetCachedDrawingX();
     castOffSinglePage->LayOutVertically();
 
-    // Detach the contentPage in order to be able call CastOffRunningElements
+    // Detach the contentPage to prepare for CastOffPages
     pages->DetachChild(0);
     assert(castOffSinglePage && !castOffSinglePage->GetParent());
     this->ResetDataPage();
@@ -1058,14 +1055,12 @@ void Doc::CastOffDocBase(bool useSb, bool usePb, bool smart)
     }
 
     Page *castOffFirstPage = new Page();
-    CastOffPagesParams castOffPagesParams(castOffSinglePage, this, castOffFirstPage);
-    castOffPagesParams.m_pageHeight = this->m_drawingPageContentHeight;
-    castOffPagesParams.m_leftoverSystem = leftoverSystem;
+    CastOffPagesFunctor castOffPages(castOffSinglePage, this, castOffFirstPage);
+    castOffPages.SetPageHeight(m_drawingPageContentHeight);
+    castOffPages.SetLeftoverSystem(leftoverSystem);
 
-    Functor castOffPages(&Object::CastOffPages);
-    Functor castOffPagesEnd(&Object::CastOffPagesEnd);
     pages->AddChild(castOffFirstPage);
-    castOffSinglePage->Process(&castOffPages, &castOffPagesParams, &castOffPagesEnd);
+    castOffSinglePage->Process(castOffPages);
     delete castOffSinglePage;
 
     this->ScoreDefSetCurrentDoc(true);
@@ -1087,11 +1082,9 @@ void Doc::UnCastOffDoc(bool resetCache)
     assert(pages);
 
     Page *unCastOffPage = new Page();
-    UnCastOffParams unCastOffParams(unCastOffPage);
-    unCastOffParams.m_resetCache = resetCache;
-
-    Functor unCastOff(&Object::UnCastOff);
-    this->Process(&unCastOff, &unCastOffParams);
+    UnCastOffFunctor unCastOff(unCastOffPage);
+    unCastOff.SetResetCache(resetCache);
+    this->Process(unCastOff);
 
     pages->ClearChildren();
 
@@ -1130,10 +1123,8 @@ void Doc::CastOffEncodingDoc()
     Page *castOffFirstPage = new Page();
     pages->AddChild(castOffFirstPage);
 
-    CastOffEncodingParams castOffEncodingParams(this, castOffFirstPage);
-
-    Functor castOffEncoding(&Object::CastOffEncoding);
-    unCastOffPage->Process(&castOffEncoding, &castOffEncodingParams);
+    CastOffEncodingFunctor castOffEncoding(this, castOffFirstPage);
+    unCastOffPage->Process(castOffEncoding);
     delete unCastOffPage;
 
     // We need to reset the drawing page to NULL
@@ -1186,10 +1177,8 @@ void Doc::InitSelectionDoc(DocSelection &selection, bool resetCache)
     Page *selectionFirstPage = new Page();
     pages->AddChild(selectionFirstPage);
 
-    CastOffToSelectionParams castOffToSelectionParams(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
-    Functor castOffToSelection(&Object::CastOffToSelection);
-
-    unCastOffPage->Process(&castOffToSelection, &castOffToSelectionParams);
+    CastOffToSelectionFunctor castOffToSelection(selectionFirstPage, this, m_selectionStart, m_selectionEnd);
+    unCastOffPage->Process(castOffToSelection);
 
     delete unCastOffPage;
 

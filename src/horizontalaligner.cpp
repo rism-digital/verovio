@@ -1033,47 +1033,4 @@ FunctorCode TimestampAligner::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTimestampAlignerEnd(this);
 }
 
-//----------------------------------------------------------------------------
-// Functors methods
-//----------------------------------------------------------------------------
-
-int MeasureAligner::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    params->m_leftBarLineX = this->GetLeftBarLineAlignment()->GetXRel();
-    params->m_rightBarLineX = this->GetRightBarLineAlignment()->GetXRel();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
-        // Nothing to do for all left scoreDef elements and the left barline
-    }
-    else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        // All elements up to the next barline, move them but also take into account the leftBarlineX
-        this->SetXRel(ceil(
-            (((double)m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio) + params->m_leftBarLineX));
-    }
-    else {
-        //  Now more the right barline and all right scoreDef elements
-        int shift = m_xRel - params->m_rightBarLineX;
-        m_xRel = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX + shift;
-    }
-
-    // Finally, when reaching the end of the measure, update the measureXRel for the next measure
-    if (m_type == ALIGNMENT_MEASURE_END) {
-        params->m_measureXRel += m_xRel;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
