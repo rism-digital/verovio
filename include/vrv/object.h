@@ -718,12 +718,6 @@ public:
     ///@{
 
     /**
-     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
-     * Segment positions occur where a barLine is set on all staves.
-     */
-    virtual int ConvertToCastOffMensural(FunctorParams *functorParams);
-
-    /**
      * Convert cast-off (measure) mensural segments MEI into mensural.
      */
     virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }

@@ -643,24 +643,6 @@ int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    params->m_contentLayer = this;
-
-    params->m_targetLayer = new Layer(*this);
-    params->m_targetLayer->ClearChildren();
-    params->m_targetLayer->CloneReset();
-    // Keep the xml:id of the layer in the first segment
-    params->m_targetLayer->SwapID(this);
-    assert(params->m_targetStaff);
-    params->m_targetStaff->AddChild(params->m_targetLayer);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);

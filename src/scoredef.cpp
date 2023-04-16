@@ -771,17 +771,6 @@ FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreDefEnd(this);
 }
 
-int ScoreDef::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_targetSystem);
-    this->MoveItselfTo(params->m_targetSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
     InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);

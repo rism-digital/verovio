@@ -1802,23 +1802,6 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
     return FUNCTOR_CONTINUE;
 }
 
-int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(m_parent);
-    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
-    if (m_parent->Is(LAYER)) {
-        assert(params->m_targetLayer);
-        this->MoveItselfTo(params->m_targetLayer);
-        // Do not precess children because we move the full sub-tree
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
 {
     GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);

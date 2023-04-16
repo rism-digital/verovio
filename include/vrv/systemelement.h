@@ -50,11 +50,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
 private:
     //
 public:

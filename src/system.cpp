@@ -15,6 +15,7 @@
 
 #include "beamspan.h"
 #include "comparison.h"
+#include "convertfunctor.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -434,18 +435,15 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
     Functor initProcessingLists(&Object::InitProcessingLists);
     this->Process(&initProcessingLists, &initProcessingListsParams);
 
-    // The means no content? Checking just in case
+    // Checking just in case
     if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
-    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
-        doc, targetSystem, &initProcessingListsParams.m_layerTree);
+    ConvertToCastOffMensuralFunctor convertToCastOffMensural(doc, targetSystem, &initProcessingListsParams.m_layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
     for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
-        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+        convertToCastOffMensural.AddStaffN(staves.first);
     }
-
-    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
-    this->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+    this->Process(convertToCastOffMensural);
 }
 
 void System::ConvertToUnCastOffMensuralSystem()
@@ -455,7 +453,7 @@ void System::ConvertToUnCastOffMensuralSystem()
     Functor initProcessingLists(&Object::InitProcessingLists);
     this->Process(&initProcessingLists, &initProcessingListsParams);
 
-    // The means no content? Checking just in case
+    // Checking just in case
     if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
     ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;

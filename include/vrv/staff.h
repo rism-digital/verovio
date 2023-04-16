@@ -196,11 +196,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;

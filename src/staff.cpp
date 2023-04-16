@@ -364,22 +364,6 @@ FunctorCode Staff::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffEnd(this);
 }
 
-int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    params->m_targetStaff = new Staff(*this);
-    params->m_targetStaff->ClearChildren();
-    params->m_targetStaff->CloneReset();
-    // Keep the xml:id of the staff in the first staff segment
-    params->m_targetStaff->SwapID(this);
-    assert(params->m_targetMeasure);
-    params->m_targetMeasure->AddChild(params->m_targetStaff);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);

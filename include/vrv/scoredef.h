@@ -287,11 +287,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;

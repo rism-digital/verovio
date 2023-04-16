@@ -79,15 +79,4 @@ FunctorCode SystemElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemElementEnd(this);
 }
 
-int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_targetSystem);
-    this->MoveItselfTo(params->m_targetSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

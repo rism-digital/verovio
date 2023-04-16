@@ -90,6 +90,14 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Setter for staff @n
+     */
+    ///@{
+    void AddStaffN(int staffN) { m_staffNs.push_back(staffN); }
+    void ClearStaffNs() { m_staffNs.clear(); }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{
