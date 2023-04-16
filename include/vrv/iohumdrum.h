@@ -795,8 +795,8 @@ protected:
     bool isExpressibleDuration(hum::HumNum duration);
     pair<data_DURATION, int> getDurAndDots(hum::HumNum duration);
     void checkForClefStyling(Clef *clef, hum::HTp token);
-    void setClefColorOrEditorial(hum::HTp token, Clef *clef, std::vector<std::string> &elements,
-        std::vector<void *> &pointers, bool append = true);
+    void setClefColorOrEditorial(
+        hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void setClefOctaveDisplacement(Clef *clef, const std::string &token);
     void setClefBasicShape(Clef *clef, const std::string &tok);
     void setClefStaffLine(Clef *clef, const std::string &tok);
@@ -829,6 +829,7 @@ protected:
     void addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters, int staffindex,
         int staffadj, int trackdiff);
     bool hasNoStaves(hum::HumdrumFile &infile);
+    hum::HTp getVisualKeySignature(hum::HTp keysigtok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

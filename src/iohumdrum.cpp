@@ -6722,14 +6722,57 @@ void HumdrumInput::checkMeterSigParameters(MeterSig *msig, hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::getVisualKeySignature -- Get token such as *vk[] within the same timestamp
+//    of the given logical key siganture.
+//
+
+hum::HTp HumdrumInput::getVisualKeySignature(hum::HTp keysigtok)
+{
+    hum::HTp current = keysigtok->getNextToken();
+    while (current && !current->isData()) {
+        if (current->compare(0, 4, "*vk[") == 0) {
+            return current;
+        }
+        current = current->getNextToken();
+    }
+
+    current = keysigtok->getPreviousToken();
+    while (current && !current->isData()) {
+        if (current->compare(0, 4, "*vk[") == 0) {
+            return current;
+        }
+        current = current->getPreviousToken();
+    }
+    return NULL;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
+//    If there is a visual key sig, such as "*vk[f#]" within the same timestamp
+//    (in the same spine), then display that instead with @type="visual-key-signature".
 //
 
 template <class ELEMENT>
 void HumdrumInput::setKeySig(
     int staffindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary)
 {
-    std::string ks = keysig;
+
+    std::string ks;
+    hum::HTp zkeysigtok;
+    hum::HTp vkeysigtok = getVisualKeySignature(keysigtok);
+    bool visualType;
+    if (vkeysigtok) {
+        zkeysigtok = vkeysigtok;
+        ks = *zkeysigtok;
+        visualType = true;
+    }
+    else {
+        zkeysigtok = keysigtok;
+        ks = keysig;
+        visualType = false;
+    }
+
     auto pos = ks.find("]");
     if (pos != std::string::npos) {
         ks = ks.substr(0, pos);
@@ -6797,8 +6840,12 @@ void HumdrumInput::setKeySig(
     if (!vrvkeysig) {
         return;
     }
-    if (keysigtok) {
-        setLocationId(vrvkeysig, keysigtok);
+    if (zkeysigtok) {
+        setLocationId(vrvkeysig, zkeysigtok);
+    }
+
+    if (visualType) {
+        vrvkeysig->SetType("visual-key-signature");
     }
 
     int keyvalue = keynum;
@@ -6820,7 +6867,7 @@ void HumdrumInput::setKeySig(
     }
     else {
         // Non-standard keysignature, so give a NONE style (deal with it later).
-        prepareNonStandardKeySignature(vrvkeysig, ks, keysigtok);
+        prepareNonStandardKeySignature(vrvkeysig, ks, zkeysigtok);
         return;
     }
 
@@ -7086,7 +7133,7 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
     std::vector<std::string> elements;
     std::vector<void *> pointers;
     if (cleftok) {
-        setClefColorOrEditorial(cleftok, vrvclef, elements, pointers, false);
+        setClefColorOrEditorial(cleftok, vrvclef, elements, pointers);
         setLocationId(vrvclef, cleftok);
     }
 }
@@ -19382,6 +19429,18 @@ Clef *HumdrumInput::insertClefElement(
     setClefStaffLine(clef, *token);
     setClefOctaveDisplacement(clef, *token);
     checkForClefStyling(clef, token);
+
+    bool iseditorial = getBooleanParameter(token, "CL", "ed");
+    if (iseditorial) {
+        // Initial clef cannot yet be supplied.
+        Supplied *supplied = new Supplied();
+        appendElement(supplied, clef);
+        appendElement(elements, pointers, supplied);
+    }
+    else {
+        appendElement(elements, pointers, clef);
+    }
+
     return clef;
 }
 
@@ -19442,7 +19501,7 @@ void HumdrumInput::setClefOctaveDisplacement(Clef *clef, const std::string &tok)
 //
 
 void HumdrumInput::setClefColorOrEditorial(
-    hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers, bool append)
+    hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers)
 {
     if (!token) {
         return;
@@ -19455,27 +19514,11 @@ void HumdrumInput::setClefColorOrEditorial(
     std::string color = getStringParameter(token, "CL", "color");
 
     if (iseditorial) {
-        if (append) {
-            // Initial clef cannot yet be supplied.
-            Supplied *supplied = new Supplied();
-            appendElement(supplied, clef);
-            appendElement(elements, pointers, supplied);
-            if (color.empty()) {
-                clef->SetColor("#aaa"); // hard-code to gray by default for now
-            }
-            else {
-                clef->SetColor(color);
-            }
-            appendTypeTag(clef, "editorial");
-        }
+        appendTypeTag(clef, "editorial");
+        clef->SetEnclose(ENCLOSURE_brack);
     }
-    else {
-        if (append) {
-            appendElement(elements, pointers, clef);
-        }
-        if (!color.empty()) {
-            clef->SetColor(color);
-        }
+    if (!color.empty()) {
+        clef->SetColor(color);
     }
 }
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Apr  3 14:44:20 BST 2023
+// Last Modified: Sat Apr 15 11:52:53 PDT 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -61730,6 +61730,9 @@ void Tool_colorgroups::processFile(HumdrumFile& infile) {
 
 Tool_colorthirds::Tool_colorthirds(void) {
 	define("d|double=b", "highlight only doubled notes in triads");
+	define("3|no-thirds=b", "do not color thirds");
+	define("5|no-fifths=b", "do not color fifths");
+	define("T|no-triads=b", "do not color full triads");
 }
 
 
@@ -61785,7 +61788,9 @@ bool Tool_colorthirds::run(HumdrumFile& infile) {
 //
 
 void Tool_colorthirds::initialize(void) {
-	// do nothing
+	m_colorThirds = !getBoolean("no-thirds");
+	m_colorFifths = !getBoolean("no-thirds");
+	m_colorTriads = !getBoolean("no-triads");
 }
 
 
@@ -78361,7 +78366,7 @@ string Tool_extract::reverseFieldString(const string& input, int maxval) {
 			continue;
 		} else {
 			if (!number.empty()) {
-				int value = strtol(number.c_str(), NULL, 10);
+				int value = (int)strtol(number.c_str(), NULL, 10);
 				value = maxval - value + 1;
 				output += to_string(value);
 				output += input[i];
@@ -78370,7 +78375,7 @@ string Tool_extract::reverseFieldString(const string& input, int maxval) {
 		}
 	}
 	if (!number.empty()) {
-		int value = strtol(number.c_str(), NULL, 10);
+		int value = (int)strtol(number.c_str(), NULL, 10);
 		value = maxval - value + 1;
 		output += to_string(value);
 	}
@@ -79409,6 +79414,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "filter") {
 			RUNTOOL(filter, infile, commands[i].second, status);
 		} else if (commands[i].first == "gasparize") {
+			RUNTOOL(grep, infile, commands[i].second, status);
+		} else if (commands[i].first == "grep") {
 			RUNTOOL(gasparize, infile, commands[i].second, status);
 		} else if (commands[i].first == "half") {
 			RUNTOOL(half, infile, commands[i].second, status);
@@ -82044,6 +82051,101 @@ void Tool_gasparize::convertNextNoteToJAccidental(HTp current) {
 	current = current->getNextToken();
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_grep::Tool_grep -- Set the recognized options for the tool.
+//
+
+Tool_grep::Tool_grep(void) {
+	define("v|remove-matching-lines=b", "Remove lines that match regex");
+	define("e|regex|regular-expression=s", "Regular expression to search with");
+}
+
+
+/////////////////////////////////
+//
+// Tool_grep::run -- Do the main work of the tool.
+//
+
+bool Tool_grep::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_grep::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_grep::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_grep::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_grep::initialize --  Initializations that only have to be
+//    done one for all HumdrumFile segments.
+//
+
+void Tool_grep::initialize(void) {
+	m_negateQ = !getBoolean("remove-matching-lines");
+	m_regex = getString("regular-expression");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_grep::processFile --
+//
+
+void Tool_grep::processFile(HumdrumFile& infile) {
+	HumRegex hre;
+	bool match;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		match = hre.search(infile[i], m_regex);
+		if (m_negateQ) {
+			if (match) {
+				continue;
+			}
+		} else {
+			if (!match) {
+				continue;
+			}
+		}
+		m_humdrum_text << infile[i] << "\n";
+	}
+}
 
 
 
@@ -110767,6 +110869,7 @@ void Tool_sic::processFile(HumdrumFile& infile) {
 	if (m_modifiedQ) {
 		infile.createLinesFromTokens();
 	}
+	m_humdrum_text << infile;
 }
 
 
