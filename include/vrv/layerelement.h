@@ -24,6 +24,7 @@ class Beam;
 class BeamElementCoord;
 class FTrem;
 class Layer;
+class Liquescent;
 class Mensur;
 class MeterSig;
 class Staff;
