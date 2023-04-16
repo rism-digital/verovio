@@ -29,7 +29,7 @@ namespace vrv {
 // DivLine
 //----------------------------------------------------------------------------
 
-DivLine::DivLine() : LayerElement("dline-"), AttDivLineLog(), AttColor(), AttVisibility()
+DivLine::DivLine() : LayerElement(DIVLINE, "dline-"), AttDivLineLog(), AttColor(), AttVisibility()
 {
     RegisterAttClass(ATT_DIVLINELOG);
     RegisterAttClass(ATT_COLOR);

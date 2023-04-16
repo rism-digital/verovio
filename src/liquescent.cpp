@@ -9,7 +9,7 @@ namespace vrv {
 // Liquescent
 //----------------------------------------------------------------------------
 
-Liquescent::Liquescent() : LayerElement("liquescent-"), PitchInterface(), PositionInterface(), AttColor()
+Liquescent::Liquescent() : LayerElement(LIQUESCENT, "liquescent-"), PitchInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
