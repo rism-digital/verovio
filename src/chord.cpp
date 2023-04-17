@@ -486,6 +486,9 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
         if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
             margin = overlap;
         }
+        else if ((margin < 0) && (this->m_clusters.size() > 0)) {
+            margin = overlap;
+        }
         if (isInUnison) ++actualElementsInUnison;
     }
 
