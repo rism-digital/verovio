@@ -399,4 +399,44 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ConvertMarkupAnalyticalFunctor
+//----------------------------------------------------------------------------
+
+ConvertMarkupAnalyticalFunctor::ConvertMarkupAnalyticalFunctor(bool permanent)
+{
+    m_currentChord = NULL;
+    m_permanent = permanent;
+}
+
+FunctorCode ConvertMarkupAnalyticalFunctor::VisitChord(Chord *chord)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupAnalyticalFunctor::VisitChordEnd(Chord *chord)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupAnalyticalFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupAnalyticalFunctor::VisitMRest(MRest *mRest)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupAnalyticalFunctor::VisitNote(Note *note)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupAnalyticalFunctor::VisitRest(Rest *rest)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

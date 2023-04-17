@@ -192,6 +192,57 @@ private:
     ArrayOfObjects m_segmentsToDelete;
 };
 
+//----------------------------------------------------------------------------
+// ConvertMarkupAnalyticalFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class converts analytical markup (\@fermata, \@tie) to elements.
+ */
+class ConvertMarkupAnalyticalFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertMarkupAnalyticalFunctor(bool permanent);
+    virtual ~ConvertMarkupAnalyticalFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitChord(Chord *chord) override;
+    FunctorCode VisitChordEnd(Chord *chord) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitMRest(MRest *mRest) override;
+    FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitRest(Rest *rest) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current notes with open ties
+    std::vector<Note *> m_currentNotes;
+    // The current chord (if in a chord)
+    Chord *m_currentChord;
+    // Control events to be added to the measure (at its end)
+    ArrayOfObjects m_controlEvents;
+    // Indicates whether the conversion is permanent
+    bool m_permanent;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CONVERTFUNCTOR_H__
