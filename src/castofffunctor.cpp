@@ -333,9 +333,9 @@ FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
     }
 
     const int systemMaxPerPage = m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
-    const int childCount = m_currentPage->GetChildCount();
-    if ((systemMaxPerPage && (systemMaxPerPage == childCount))
-        || ((childCount > 0) && (system->GetDrawingYRel() - system->GetHeight() - currentShift < 0))) {
+    const int systemChildCount = m_currentPage->GetChildCount(SYSTEM);
+    if ((systemMaxPerPage && (systemMaxPerPage == systemChildCount))
+        || ((systemChildCount > 0) && (system->GetDrawingYRel() - system->GetHeight() - currentShift < 0))) {
         // If this is the last system in the list, it doesn't fit the page and it's a leftover system (has just one
         // measure) => add the system content to the previous system
         Object *nextSystem = m_contentPage->GetNext(system, SYSTEM);
