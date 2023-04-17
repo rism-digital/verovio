@@ -9,10 +9,13 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+#include "resources.h"
+#include "smufl.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -21,25 +24,29 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Trill> s_factory("trill", TRILL);
+
 Trill::Trill()
-    : ControlElement("trill-")
+    : ControlElement(TRILL, "trill-")
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()
+    , AttExtSym()
     , AttLineRend()
     , AttNNumberLike()
     , AttOrnamentAccid()
-    , AttPlacement()
+    , AttPlacementRelStaff()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_EXTENDER);
-    RegisterAttClass(ATT_LINEREND);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTENDER);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_LINEREND);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_ORNAMENTACCID);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
-    Reset();
+    this->Reset();
 }
 
 Trill::~Trill() {}
@@ -48,16 +55,57 @@ void Trill::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetExtender();
-    ResetLineRend();
-    ResetNNumberLike();
-    ResetOrnamentAccid();
-    ResetPlacement();
+    this->ResetColor();
+    this->ResetExtender();
+    this->ResetExtSym();
+    this->ResetLineRend();
+    this->ResetNNumberLike();
+    this->ResetOrnamentAccid();
+    this->ResetPlacementRelStaff();
+}
+
+char32_t Trill::GetTrillGlyph() const
+{
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
+    // If there is glyph.num, return glyph based on it
+    if (this->HasGlyphNum()) {
+        char32_t code = this->GetGlyphNum();
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (this->HasGlyphName()) {
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+
+    // return default glyph for trill
+    return SMUFL_E566_ornamentTrill;
 }
 
 //----------------------------------------------------------------------------
 // Trill functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Trill::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTrill(this);
+}
+
+FunctorCode Trill::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTrill(this);
+}
+
+FunctorCode Trill::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTrillEnd(this);
+}
+
+FunctorCode Trill::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTrillEnd(this);
+}
 
 } // namespace vrv

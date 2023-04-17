@@ -30,57 +30,46 @@ public:
     ///@{
     F();
     virtual ~F();
-    virtual Object *Clone() const { return new F(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "F"; }
-    virtual ClassId GetClassId() const { return FIGURE; }
+    Object *Clone() const override { return new F(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "F"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
     //----------//
 
-    // Because F is a TextElement and not a ControlElement, these methods need to be implemented because
-    // TextElement does not inherit from FloatingObject.
-
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * Interface for class functor visitation
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTimePointing
-     */
-    virtual int PrepareTimePointing(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    virtual int PrepareTimestamps(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

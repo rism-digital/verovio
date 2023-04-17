@@ -29,22 +29,32 @@ public:
     ///@{
     Space();
     virtual ~Space();
-    virtual Object *Clone() const { return new Space(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Space"; }
-    virtual ClassId GetClassId() const { return SPACE; }
+    Object *Clone() const override { return new Space(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Space"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

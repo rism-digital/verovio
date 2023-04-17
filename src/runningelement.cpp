@@ -9,13 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
 #include "editorial.h"
 #include "fig.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "num.h"
 #include "page.h"
@@ -31,20 +32,31 @@ namespace vrv {
 // RunningElement
 //----------------------------------------------------------------------------
 
-RunningElement::RunningElement() : Object("re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement()
+    : Object(RUNNING_ELEMENT, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
 {
-    RegisterAttClass(ATT_HORIZONTALALIGN);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
-RunningElement::RunningElement(const std::string &classid) : Object(classid), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement(ClassId classId)
+    : Object(classId, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
 {
-    RegisterAttClass(ATT_HORIZONTALALIGN);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
+}
+
+RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), AttHorizontalAlign(), AttTyped()
+{
+    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_TYPED);
+
+    this->Reset();
 }
 
 RunningElement::~RunningElement() {}
@@ -52,18 +64,15 @@ RunningElement::~RunningElement() {}
 void RunningElement::Reset()
 {
     Object::Reset();
-    ResetHorizontalAlign();
-    ResetTyped();
+    this->ResetHorizontalAlign();
+    this->ResetTyped();
 
     m_isGenerated = false;
 
     m_drawingPage = NULL;
     m_drawingYRel = 0;
 
-    int i;
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
+    this->ResetDrawingScaling();
 }
 
 bool RunningElement::IsSupportedChild(Object *child)
@@ -80,42 +89,24 @@ bool RunningElement::IsSupportedChild(Object *child)
     return true;
 }
 
-void RunningElement::FilterList(ArrayOfObjects *childList)
+void RunningElement::FilterList(ListOfConstObjects &childList) const
 {
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
+    while (iter != childList.end()) {
         // remove nested rend elements
         if ((*iter)->Is(REND)) {
             if ((*iter)->GetFirstAncestor(REND)) {
-                iter = childList->erase(iter);
+                iter = childList.erase(iter);
                 continue;
             }
         }
         // Also remove anything that is not a fig
         else if (!(*iter)->Is(FIG)) {
-            iter = childList->erase(iter);
+            iter = childList.erase(iter);
             continue;
         }
         ++iter;
-    }
-
-    int i;
-    for (i = 0; i < 9; ++i) {
-        m_cells[i].clear();
-    }
-    for (i = 0; i < 3; ++i) {
-        m_drawingScalingPercent[i] = 100;
-    }
-
-    for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = dynamic_cast<TextElement *>(*iter);
-        assert(text);
-        m_cells[pos].push_back(text);
     }
 }
 
@@ -146,7 +137,7 @@ int RunningElement::GetDrawingY() const
 
 void RunningElement::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -154,19 +145,19 @@ int RunningElement::GetWidth() const
 {
     if (!m_drawingPage) return 0;
 
-    Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
+    Doc *doc = vrv_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
     if (!doc) return 0;
 
-    return (doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight);
+    return (doc->m_drawingPageContentWidth);
     // return m_drawingPage->GetContentWidth();
 }
 
 void RunningElement::SetDrawingPage(Page *page)
 {
 
-    ResetList(this);
+    this->ResetList(this);
 
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingPage = page;
 
     if (page) {
@@ -174,47 +165,64 @@ void RunningElement::SetDrawingPage(Page *page)
     }
 }
 
-int RunningElement::GetTotalHeight()
+void RunningElement::ResetCells()
+{
+    for (int i = 0; i < 9; ++i) {
+        m_cells[i].clear();
+    }
+}
+
+void RunningElement::AppendTextToCell(int index, TextElement *text)
+{
+    assert((index >= 0) && (index < 9));
+    m_cells[index].push_back(text);
+}
+
+void RunningElement::ResetDrawingScaling()
+{
+    for (int i = 0; i < 3; ++i) {
+        m_drawingScalingPercent[i] = 100;
+    }
+}
+
+int RunningElement::GetContentHeight() const
 {
     int height = 0;
-    int i;
-    for (i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         height += this->GetRowHeight(i);
     }
     return height;
 }
 
-int RunningElement::GetRowHeight(int row)
+int RunningElement::GetRowHeight(int row) const
 {
     assert((row >= 0) && (row < 3));
 
-    int i;
     int height = 0;
-    for (i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         height = std::max(height, this->GetCellHeight(row * 3 + i));
     }
     return height;
 }
 
-int RunningElement::GetColHeight(int col)
+int RunningElement::GetColHeight(int col) const
 {
     assert((col >= 0) && (col < 3));
 
-    int i;
     int height = 0;
-    for (i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         height += this->GetCellHeight(i * 3 + col);
     }
     return height;
 }
 
-int RunningElement::GetCellHeight(int cell)
+int RunningElement::GetCellHeight(int cell) const
 {
     assert((cell >= 0) && (cell < 9));
 
     int columnHeight = 0;
-    ArrayOfTextElements *textElements = &m_cells[cell];
-    ArrayOfTextElements::iterator iter;
+    const ArrayOfTextElements *textElements = &m_cells[cell];
+    ArrayOfTextElements::const_iterator iter;
     for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
         if ((*iter)->HasContentBB()) {
             columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
@@ -225,20 +233,18 @@ int RunningElement::GetCellHeight(int cell)
 
 bool RunningElement::AdjustDrawingScaling(int width)
 {
-    int i, j;
     bool scale = false;
     // For each row
-    for (i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         int rowWidth = 0;
         // For each column
-        for (j = 0; j < 3; ++j) {
+        for (int j = 0; j < 3; ++j) {
             ArrayOfTextElements *textElements = &m_cells[i * 3 + j];
-            ArrayOfTextElements::iterator iter;
             int columnWidth = 0;
             // For each object
-            for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
-                if ((*iter)->HasContentBB()) {
-                    int iterWidth = (*iter)->GetContentX2() - (*iter)->GetContentX1();
+            for (TextElement *element : *textElements) {
+                if (element->HasContentBB()) {
+                    int iterWidth = element->GetContentX2() - element->GetContentX1();
                     columnWidth = std::max(columnWidth, iterWidth);
                 }
             }
@@ -254,30 +260,27 @@ bool RunningElement::AdjustDrawingScaling(int width)
 
 bool RunningElement::AdjustRunningElementYPos()
 {
-    int i, j;
-    ArrayOfTextElements::iterator iter;
-
     // First adjust the content of each cell
-    for (i = 0; i < 9; ++i) {
+    for (int i = 0; i < 9; ++i) {
         int cumulatedYRel = 0;
         ArrayOfTextElements *textElements = &m_cells[i];
         // For each object
-        for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
-            if (!(*iter)->HasContentBB()) {
+        for (TextElement *element : *textElements) {
+            if (!element->HasContentBB()) {
                 continue;
             }
-            int yShift = (*iter)->GetContentY2();
-            (*iter)->SetDrawingYRel(cumulatedYRel - yShift);
-            cumulatedYRel += ((*iter)->GetContentY1() - (*iter)->GetContentY2());
+            int yShift = element->GetContentY2();
+            element->SetDrawingYRel(cumulatedYRel - yShift);
+            cumulatedYRel += (element->GetContentY1() - element->GetContentY2());
         }
     }
 
     int rowYRel = 0;
     // For each row
-    for (i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         int currentRowHeigt = this->GetRowHeight(i);
         // For each column
-        for (j = 0; j < 3; ++j) {
+        for (int j = 0; j < 3; ++j) {
             int cell = i * 3 + j;
             int colYShift = 0;
             // middle row - it needs to be middle-aligned so calculate the colYShift accordingly
@@ -290,13 +293,12 @@ bool RunningElement::AdjustRunningElementYPos()
             }
 
             ArrayOfTextElements *textElements = &m_cells[cell];
-            ArrayOfTextElements::iterator iter;
             // For each object - adjust the yRel according to the rowYRel and the colYshift
-            for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
-                if (!(*iter)->HasContentBB()) {
+            for (TextElement *element : *textElements) {
+                if (!element->HasContentBB()) {
                     continue;
                 }
-                (*iter)->SetDrawingYRel((*iter)->GetDrawingYRel() + rowYRel - colYShift);
+                element->SetDrawingYRel(element->GetDrawingYRel() + rowYRel - colYShift);
             }
         }
         rowYRel -= currentRowHeigt;
@@ -305,7 +307,7 @@ bool RunningElement::AdjustRunningElementYPos()
     return true;
 }
 
-int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v)
+int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const
 {
     int pos = 0;
     switch (h) {
@@ -323,32 +325,33 @@ int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALI
     return pos;
 }
 
-void RunningElement::SetCurrentPageNum(Page *currentPage)
+void RunningElement::SetCurrentPageNum(const Page *currentPage)
 {
     assert(currentPage);
 
     int currentNum = currentPage->GetIdx() + 1;
 
-    Num *num = dynamic_cast<Num *>(this->FindDescendantByType(NUM));
+    Num *num = vrv_cast<Num *>(this->FindDescendantByType(NUM));
     if (!num || (num->GetLabel() != "page")) return;
 
-    Text *text = dynamic_cast<Text *>(num->FindDescendantByType(TEXT));
-    if (!text || (text->GetText() != L"#")) return;
+    Text *text = vrv_cast<Text *>(num->FindDescendantByType(TEXT));
+    if (!text || (text->GetText() != U"#")) return;
 
     Text *currentText = num->GetCurrentText();
     assert(currentText);
 
-    currentText->SetText(UTF8to16(StringFormat("%d", currentNum)));
+    currentText->SetText(UTF8to32(StringFormat("%d", currentNum)));
 }
 
-void RunningElement::LoadFooter()
+void RunningElement::LoadFooter(const Doc *doc)
 {
     Fig *fig = new Fig();
     Svg *svg = new Svg();
 
-    std::string footer = Resources::GetPath() + "/footer.svg";
+    const Resources &resources = doc->GetResources();
+    const std::string footerPath = resources.GetPath() + "/footer.svg";
     pugi::xml_document footerDoc;
-    footerDoc.load_file(footer.c_str());
+    footerDoc.load_file(footerPath.c_str());
     svg->Set(footerDoc.first_child());
     fig->AddChild(svg);
     fig->SetHalign(HORIZONTALALIGNMENT_center);
@@ -365,13 +368,13 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
     rend->SetHalign(halign);
     rend->SetValign(valign);
     Text *dash1 = new Text();
-    dash1->SetText(L"– ");
+    dash1->SetText(U"– ");
     Num *num = new Num();
     num->SetLabel("page");
     Text *text = new Text();
-    text->SetText(L"#");
+    text->SetText(U"#");
     Text *dash2 = new Text();
-    dash2->SetText(L" –");
+    dash2->SetText(U" –");
 
     num->AddChild(text);
     rend->AddChild(dash1);
@@ -384,30 +387,44 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 // Functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode RunningElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitRunningElement(this);
+}
+
+FunctorCode RunningElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitRunningElement(this);
+}
+
+FunctorCode RunningElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRunningElementEnd(this);
+}
+
+FunctorCode RunningElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRunningElementEnd(this);
+}
+
 int RunningElement::Save(FunctorParams *functorParams)
 {
-    if (this->IsGenerated())
+    if (this->IsGenerated()) {
         return FUNCTOR_SIBLINGS;
-    else
+    }
+    else {
         return Object::Save(functorParams);
+    }
 }
 
 int RunningElement::SaveEnd(FunctorParams *functorParams)
 {
-    if (this->IsGenerated())
+    if (this->IsGenerated()) {
         return FUNCTOR_SIBLINGS;
-    else
+    }
+    else {
         return Object::SaveEnd(functorParams);
-}
-
-int RunningElement::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    params->m_pageWidth = this->GetWidth();
-
-    return FUNCTOR_CONTINUE;
+    }
 }
 
 } // namespace vrv

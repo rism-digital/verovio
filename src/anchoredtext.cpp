@@ -9,12 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
-#include "controlelement.h"
 #include "editorial.h"
+#include "functor.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -24,11 +24,13 @@ namespace vrv {
 // AnchoredText
 //----------------------------------------------------------------------------
 
-AnchoredText::AnchoredText() : ControlElement("anchtxt-"), TextDirInterface()
-{
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+static const ClassRegistrar<AnchoredText> s_factory("anchoredText", ANCHOREDTEXT);
 
-    Reset();
+AnchoredText::AnchoredText() : ControlElement(ANCHOREDTEXT, "anchtxt-"), TextDirInterface()
+{
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+
+    this->Reset();
 }
 
 AnchoredText::~AnchoredText() {}
@@ -41,7 +43,7 @@ void AnchoredText::Reset()
 
 bool AnchoredText::IsSupportedChild(Object *child)
 {
-    if (child->Is(TEXT)) {
+    if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -51,6 +53,26 @@ bool AnchoredText::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+FunctorCode AnchoredText::Accept(MutableFunctor &functor)
+{
+    return functor.VisitAnchoredText(this);
+}
+
+FunctorCode AnchoredText::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitAnchoredText(this);
+}
+
+FunctorCode AnchoredText::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAnchoredTextEnd(this);
+}
+
+FunctorCode AnchoredText::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAnchoredTextEnd(this);
 }
 
 } // namespace vrv

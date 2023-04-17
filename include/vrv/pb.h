@@ -19,7 +19,7 @@ namespace vrv {
 
 /**
  * This class represents a MEI pb in score-based MEI.
- * In page-based MEI, it remains as is as. Actuall pages are represented by Page objects.
+ * In page-based MEI, it remains as is as. Actual pages are represented by Page objects.
  */
 class Pb : public SystemElement, public AttNNumberLike {
 public:
@@ -30,10 +30,9 @@ public:
     ///@{
     Pb();
     virtual ~Pb();
-    virtual Object *Clone() const { return new Pb(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pb"; }
-    virtual ClassId GetClassId() const { return PB; }
+    Object *Clone() const override { return new Pb(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Pb"; }
     ///@}
 
     //----------//
@@ -41,9 +40,14 @@ public:
     //----------//
 
     /**
-     * See Object::CastOffEncoding
+     * Interface for class functor visitation
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

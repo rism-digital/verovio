@@ -11,11 +11,12 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "neume.h"
 #include "syl.h"
 #include "text.h"
@@ -27,17 +28,19 @@ namespace vrv {
 // Syllable
 //----------------------------------------------------------------------------
 
-Syllable::Syllable() : LayerElement("syllable-"), ObjectListInterface(), AttColor(), AttSlashCount()
+static const ClassRegistrar<Syllable> s_factory("syllable", SYLLABLE);
+
+Syllable::Syllable() : LayerElement(SYLLABLE, "syllable-"), ObjectListInterface(), AttColor(), AttSlashCount()
 {
     Init();
 }
 
 void Syllable::Init()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_SLASHCOUNT);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_SLASHCOUNT);
 
-    Reset();
+    this->Reset();
 }
 
 bool Syllable::IsSupportedChild(Object *child)
@@ -68,8 +71,8 @@ Syllable::~Syllable() {}
 void Syllable::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetSlashCount();
+    this->ResetColor();
+    this->ResetSlashCount();
 }
 
 bool Syllable::MarkupAddSyl()
@@ -88,6 +91,26 @@ bool Syllable::MarkupAddSyl()
         return true;
     }
     return false;
+}
+
+FunctorCode Syllable::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSyllable(this);
+}
+
+FunctorCode Syllable::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSyllable(this);
+}
+
+FunctorCode Syllable::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSyllableEnd(this);
+}
+
+FunctorCode Syllable::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSyllableEnd(this);
 }
 
 } // namespace vrv

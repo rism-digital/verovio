@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -45,12 +45,12 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
     /******************************************************************/
     // Start the Beam graphic and draw the children
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
     // Draw the children
 
-    DrawLayerChildren(dc, syllable, layer, staff, measure);
+    this->DrawLayerChildren(dc, syllable, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -70,13 +70,13 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         wchar_t fontNoLiq[5] = {};
         float xOffset = 0;
         float yOffset = 0;
-        float xOffsetLiq[5] = {0,0,0,0,0};
-        float yOffsetLiq[5] = {0,0,0,0,0};
+        float xOffsetLiq[5] = { 0, 0, 0, 0, 0 };
+        float yOffsetLiq[5] = { 0, 0, 0, 0, 0 };
     };
     std::vector<drawingParams> params;
     params.push_back(drawingParams());
-    
-    dc->StartGraphic(element, "", element->GetUuid());
+
+    dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
 
@@ -86,7 +86,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstAncestor(NEUME));
+    Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
     assert(neume);
     int position = neume->GetChildIndex(element);
 
@@ -115,8 +115,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         //     isFirst = false;
         // }
         int ligCount = neume->GetLigatureCount(position);
-        
-        if (ligCount % 2 == 0){
+
+        if (ligCount % 2 == 0) {
             isFirst = false;
             Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
             assert(lastNc);
@@ -129,10 +129,10 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
             Object *nextSibling = neume->GetChild(position + 1);
             if (nextSibling != NULL) {
                 Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
-                assert(nextNc);     
+                assert(nextNc);
                 pitchDifference = nextNc->PitchDifferenceTo(nc);
-                params.at(0).yOffset = pitchDifference;    
-            }   
+                params.at(0).yOffset = pitchDifference;
+            }
         }
 
         // if (!isFirst) { // still need to get pitchDifference
@@ -160,7 +160,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
             default: break;
         }
     }
-    
+
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
     if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
@@ -171,7 +171,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
 
-    else if (nc->GetCurve() == ncForm_CURVE_c){
+    else if (nc->GetCurve() == ncForm_CURVE_c) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).fontNoLiq[1] = SMUFL_EB92_staffPosRaise3;
         params.at(0).fontNoLiq[2] = SMUFL_E995_chantAuctumDesc;
@@ -181,7 +181,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).yOffsetLiq[0] = -1.5;
         params.at(0).yOffsetLiq[4] = -1.75;
     }
-    else if (nc->GetCurve() == ncForm_CURVE_a){
+    else if (nc->GetCurve() == ncForm_CURVE_a) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).fontNoLiq[1] = SMUFL_EB98_staffPosLower1;
         params.at(0).fontNoLiq[2] = SMUFL_E994_chantAuctumAsc;
@@ -192,8 +192,10 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).yOffsetLiq[4] = 0.75;
     }
 
-    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+    const int noteHeight
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int noteWidth
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     int noteY, noteX;
     int yValue;
     if (nc->HasFacs() && (m_doc->GetType() == Facs)) {
@@ -240,21 +242,21 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
-        if(nc->GetCurve() == ncForm_CURVE_a || nc->GetCurve() == ncForm_CURVE_c){
-            for(int i =0; i< sizeof(params.at(0).fontNoLiq); i++){
-                DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight, it->fontNoLiq[i],
-                staff->m_drawingStaffSize, false, true);
+        if (nc->GetCurve() == ncForm_CURVE_a || nc->GetCurve() == ncForm_CURVE_c) {
+            for (int i = 0; i < sizeof(params.at(0).fontNoLiq); i++) {
+                DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight,
+                    it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
             }
         }
-        else{
+        else {
             DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
-            staff->m_drawingStaffSize, false, true);
+                staff->m_drawingStaffSize, false, true);
         }
     }
 
     // adjust facsimile values of element based on where it is rendered if necessary
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(element);
+        FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(noteX);
         fi->GetZone()->SetUly(ToDeviceContextY(yValue));
         fi->GetZone()->SetLrx(noteX + noteWidth);
@@ -262,7 +264,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     // Draw the children
-    DrawLayerChildren(dc, nc, layer, staff, measure);
+    this->DrawLayerChildren(dc, nc, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
@@ -280,8 +282,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Start the Neume graphic and draw the children
 
-    dc->StartGraphic(element, "", element->GetUuid());
-    DrawLayerChildren(dc, neume, layer, staff, measure);
+    dc->StartGraphic(element, "", element->GetID());
+    this->DrawLayerChildren(dc, neume, layer, staff, measure);
     dc->EndGraphic(element, this);
 }
 

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,13 @@ namespace vrv {
 // Del
 //----------------------------------------------------------------------------
 
-Del::Del() : EditorialElement("del-"), AttSource()
-{
-    RegisterAttClass(ATT_SOURCE);
+static const ClassRegistrar<Del> s_factory("del", DEL);
 
-    Reset();
+Del::Del() : EditorialElement(DEL, "del-"), AttSource()
+{
+    this->RegisterAttClass(ATT_SOURCE);
+
+    this->Reset();
 }
 
 Del::~Del() {}
@@ -33,7 +35,7 @@ Del::~Del() {}
 void Del::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

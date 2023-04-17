@@ -8,6 +8,9 @@
 #ifndef __VRV_IOMUSXML_H__
 #define __VRV_IOMUSXML_H__
 
+#include <map>
+#include <optional>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -15,6 +18,7 @@
 
 #include "attdef.h"
 #include "io.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -24,6 +28,7 @@
 namespace vrv {
 
 class Arpeg;
+class BeamSpan;
 class BracketSpan;
 class Clef;
 class ControlElement;
@@ -35,9 +40,14 @@ class Fb;
 class Gliss;
 class Hairpin;
 class Harm;
+class InstrDef;
+class KeySig;
+class Label;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Measure;
+class MeterSigGrp;
 class Octave;
 class Pedal;
 class Section;
@@ -48,32 +58,40 @@ class Tie;
 class Trill;
 
 //----------------------------------------------------------------------------
-// namespace for local MusicXml classes
+// namespace for local MusicXML classes
 //----------------------------------------------------------------------------
+
+#ifndef NO_MUSICXML_SUPPORT
 
 namespace musicxml {
 
-    class OpenSlur {
-    public:
-        OpenSlur(const int &number) { m_number = number; }
-
-        int m_number;
-    };
-
-    class CloseSlur {
-    public:
-        CloseSlur(const std::string &measureNum, const int &number)
+    struct OpenSlur {
+        OpenSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
             m_number = number;
+            m_curvedir = curvedir;
         }
 
         std::string m_measureNum;
-        int m_number;
+        short int m_number;
+        curvature_CURVEDIR m_curvedir;
     };
 
-    class OpenSpanner {
-    public:
+    struct CloseSlur {
+        CloseSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
+        {
+            m_measureNum = measureNum;
+            m_number = number;
+            m_curvedir = curvedir;
+        }
+
+        std::string m_measureNum;
+        short int m_number;
+        curvature_CURVEDIR m_curvedir;
+    };
+
+    struct OpenSpanner {
         OpenSpanner(const int &dirN, const int &lastMeasureCount)
         {
             m_dirN = dirN;
@@ -84,8 +102,7 @@ namespace musicxml {
         int m_lastMeasureCount;
     };
 
-    class OpenArpeggio {
-    public:
+    struct OpenArpeggio {
         OpenArpeggio(const int &arpegN, const int &timeStamp)
         {
             m_arpegN = arpegN;
@@ -96,8 +113,7 @@ namespace musicxml {
         int m_timeStamp;
     };
 
-    class EndingInfo {
-    public:
+    struct EndingInfo {
         EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
         {
             m_endingNumber = endingNumber;
@@ -110,12 +126,13 @@ namespace musicxml {
         std::string m_endingText;
     };
 
-    class ClefChange {
-    public:
-        ClefChange(const std::string &measureNum, Staff *staff, Clef *clef, const int &scoreOnset, bool afterBarline)
+    struct ClefChange {
+        ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset,
+            bool afterBarline)
         {
             m_measureNum = measureNum;
             m_staff = staff;
+            m_layer = layer;
             m_clef = clef;
             m_scoreOnset = scoreOnset;
             m_afterBarline = afterBarline;
@@ -123,15 +140,14 @@ namespace musicxml {
 
         std::string m_measureNum;
         Staff *m_staff;
+        Layer *m_layer;
         Clef *m_clef;
         int m_scoreOnset; // the score position of clef change
-        bool isFirst = true; // insert clef change at first layer, others use @sameas
         bool m_afterBarline = false; // musicXML attribute
     };
 
-    class OpenDashes {
-    public:
-        OpenDashes(const int &dirN, int &staffNum, const int &measureCount)
+    struct OpenDashes {
+        OpenDashes(const int dirN, int staffNum, const int measureCount)
         {
             m_dirN = dirN;
             m_staffNum = staffNum;
@@ -143,7 +159,33 @@ namespace musicxml {
         int m_measureCount; // measure number of dashes start
     };
 
+    struct OpenTie {
+        OpenTie(Tie *tie, Note *note, int layerNum)
+        {
+            m_tie = tie;
+            m_note = note;
+            m_layerNum = layerNum;
+        }
+
+        Tie *m_tie = NULL;
+        Note *m_note = NULL;
+        int m_layerNum = 0;
+    };
+
+    struct CloseTie {
+        CloseTie(Note *note, int layerNum)
+        {
+            m_note = note;
+            m_layerNum = layerNum;
+        }
+
+        Note *m_note = NULL;
+        int m_layerNum = 0;
+    };
+
 } // namespace musicxml
+
+#endif // NO_MUSICXML_SUPPORT
 
 //----------------------------------------------------------------------------
 // MusicXmlInput
@@ -155,7 +197,8 @@ public:
     MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
-    virtual bool Import(std::string const &musicxml);
+#ifndef NO_MUSICXML_SUPPORT
+    bool Import(const std::string &musicxml) override;
 
 private:
     /*
@@ -169,62 +212,103 @@ private:
     void ReadMusicXmlTitle(pugi::xml_node title);
 
     /*
-     * @name Top level methods for reading MusicXml part and measure elements.
+     * @name Top level methods for reading MusicXML part and measure elements.
      */
     ///@{
-    bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
-    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset);
+    bool ReadMusicXmlPart(pugi::xml_node node, Section *section, short int nbStaves, const short int staffOffset);
+    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, short int nbStaves,
+        const short int staffOffset, int index);
     ///@}
 
     /*
-     * Methods for reading the first MusicXml attributes element as MEI staffDef.
+     * Methods for reading the first MusicXML attributes element as MEI staffDef.
      * Returns the number of staves in the part.
      */
-    int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset);
+    short int ReadMusicXmlPartAttributesAsStaffDef(
+        pugi::xml_node node, StaffGrp *staffGrp, const short int staffOffset);
 
     /*
-     * @name Methods for reading the content of a MusicXml measure.
+     * @name Methods for reading the content of a MusicXML measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, std::string measureNum);
-    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset);
-    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum, int staffOffset, Section *section);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlDirection(
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset);
+    void ReadMusicXmlFigures(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, const std::string &measureNum);
+    void ReadMusicXmlNote(
+        pugi::xml_node, Measure *measure, const std::string &measureNum, const short int staffOffset, Section *section);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
+    bool ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord);
+    void ReadMusicXmlTupletStart(const pugi::xml_node &node, const pugi::xml_node &tupletStart, Layer *layer);
+    void ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi::xml_node &beamStart, Layer *layer);
+    void ReadMusicXMLMeterSig(const pugi::xml_node &node, Object *parent);
+    void ReadMusicXmlTies(const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum);
+    ///@}
+
+    /**
+     * Process all clef change queue and add clefs to corresponding places in the score
+     */
+    void ProcessClefChangeQueue(Section *section);
+
+    /**
+     * Add clef changes to all layers of a given measure, staff, and time stamp
+     */
+    void AddClefs(Measure *measure, const musicxml::ClefChange &clefChange);
+
+    /**
+     * Add clef as layer element to specified layer and #sameas clefs to previous layers, if needed
+     */
+    void InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, int scoreOnSet);
+
+    /*
+     * @name Helper function to insert clef into correct position in layer/other parent based on the insertAfter
+     * variable.
+     */
+    ///@{
+    void InsertClefIntoObject(Object *layerElement, Clef *clef, Layer *layer, int scoreOnset, bool insertAfter);
+    void InsertClefIntoObject(Object *parent, Clef *clef, Object *relevantChild, bool insertAfter);
     ///@}
 
     /*
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
+     * Returns true if the measure was added to the tree (did not exist before)
      */
-    void AddMeasure(Section *section, Measure *measure, int i);
+    bool AddMeasure(Section *section, Measure *measure, int i);
 
     /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
-    void AddLayerElement(Layer *layer, LayerElement *element);
-    void AddLayerElement(Layer *layer, LayerElement *element, int duration);
+    void AddLayerElement(Layer *layer, LayerElement *element, int duration = 0);
 
     /*
-     * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
+     * Returns the appropriate layer for a node looking at its MusicXML staff and voice elements.
      */
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
 
     /*
      * Returns the appropriate first layer of a staff.
      */
-    Layer *SelectLayer(int staffNb, Measure *measure);
+    Layer *SelectLayer(short int staffNb, Measure *measure);
 
     /*
-     * Returns the layer with @n=layerNb on the staff.
+     * Returns the layer with \@n=layerNb on the staff.
      * Creates the layer if not found.
      */
-    Layer *SelectLayer(int layerNb, Staff *staff);
+    Layer *SelectLayer(short int layerNb, Staff *staff);
+
+    /*
+     * @name Methods for converting the content of MusicXML attributes.
+     */
+    ///@{
+    Clef *ConvertClef(const pugi::xml_node &clef);
+    KeySig *ConvertKey(const pugi::xml_node &key);
+    ///@}
 
     /*
      * Remove the last ClassId element on top of m_elementStack.
@@ -233,28 +317,33 @@ private:
      */
     void RemoveLastFromStack(ClassId classId, Layer *layer);
 
+    /**
+     * Check if element of classId type is present on the specified layer
+     */
+    bool IsInStack(ClassId classId, Layer *layer);
+
     /*
      * @name Helper methods for checking presence of values of attributes or elements
      */
     ///@{
-    bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
-    bool IsElement(pugi::xml_node node, std::string name);
-    bool HasContentWithValue(pugi::xml_node node, std::string value);
+    bool HasAttributeWithValue(const pugi::xml_node node, const std::string &attribute, const std::string &value) const;
+    bool IsElement(const pugi::xml_node node, const std::string &name) const;
+    bool HasContentWithValue(const pugi::xml_node node, const std::string &value) const;
     ///@}
 
     /*
-     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     * @name Helper method to check whether an ending measure is already present in m_endingStack.
      */
     ///@{
-    bool NotInEndingStack(std::string const &measureN);
+    bool NotInEndingStack(const Measure *measure) const;
     ///@}
 
     /*
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
-    std::string GetContent(pugi::xml_node node);
-    std::string GetContentOfChild(pugi::xml_node node, std::string child);
+    std::string GetContent(const pugi::xml_node node) const;
+    std::string GetContentOfChild(const pugi::xml_node node, const std::string &child) const;
     ///@}
 
     /*
@@ -264,10 +353,12 @@ private:
      * Slur starts and ends are matched based on its number.
      */
     ///@{
-    void OpenTie(Note *note, Tie *tie);
-    void CloseTie(Note *note);
-    void OpenSlur(Measure *measure, int number, Slur *slur);
-    void CloseSlur(Measure *measure, int number, LayerElement *element);
+    void OpenTie(Note *note, Tie *tie, int layerNum);
+    void CloseTie(Note *note, int layerNum);
+    void OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir);
+    void CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir);
+    void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
+    void MatchTies(bool matchLayers);
     ///@}
 
     /*
@@ -275,7 +366,9 @@ private:
      */
     ///@{
     ///@}
-    void TextRendition(pugi::xpath_node_set words, ControlElement *element);
+    std::string GetWordsOrDynamicsText(const pugi::xml_node node) const;
+    void TextRendition(const pugi::xpath_node_set words, ControlElement *element) const;
+    std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /*
@@ -290,40 +383,103 @@ private:
      */
     ///@{
     ///@}
-    void GenerateUuid(pugi::xml_node node);
+    void GenerateID(pugi::xml_node node);
+
+    /*
+     * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.
+     * Returns total meterCount and meterUnit for the group
+     */
+    ///@{
+    std::pair<std::vector<int>, int> GetMeterSigGrpValues(const pugi::xml_node &node, MeterSigGrp *parent);
+    ///@}
+
+    /*
+     * @name Helper method for multirests. Returns number of measure hidden by MRest before
+     * measure with certain index
+     */
+    ///@{
+    int GetMrestMeasuresCountBeforeIndex(int index) const;
+    ///@}
+
+    /*
+     * @name Helper method for multirests. Checks whether measure should be hidden as part of MRest
+     */
+    ///@{
+    bool IsMultirestMeasure(int index) const;
+    ///@}
 
     /*
      * @name Helper method for styling fermatas
      */
     ///@{
-    ///@}
+    void SetFermataExternalSymbols(Fermata *fermata, const std::string &shape);
     void ShapeFermata(Fermata *fermata, pugi::xml_node node);
+    ///@}
 
     /*
-     * @name Methods for converting MusicXML string values to MEI attributes.
+     * @name Helper method for getting glyph numbers for ornaments based on approach/depart attributes
      */
     ///@{
-    data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(std::string value);
-    data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(float value);
-    data_ARTICULATION ConvertArticulations(std::string value);
-    data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
-    data_BOOLEAN ConvertWordToBool(std::string value);
-    data_DURATION ConvertTypeToDur(std::string value);
-    data_HEADSHAPE ConvertNotehead(std::string value);
-    data_LINESTARTENDSYMBOL ConvertLineEndSymbol(std::string value);
-    data_PITCHNAME ConvertStepToPitchName(std::string value);
-    data_TEXTRENDITION ConvertEnclosure(std::string value);
-    curvature_CURVEDIR InferCurvedir(pugi::xml_node slurOrTie);
-    fermataVis_SHAPE ConvertFermataShape(std::string);
-    pedalLog_DIR ConvertPedalTypeToDir(std::string value);
-    tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
-    std::wstring ConvertTypeToVerovioText(std::string value);
-    std::string ConvertAlterToSymbol(std::string value);
-    std::string ConvertKindToSymbol(std::string value);
-    std::string ConvertKindToText(std::string value);
-    std::string ConvertFigureGlyph(std::string value);
+    std::string GetOrnamentGlyphNumber(int attributes) const;
     ///@}
 
+    /*
+     * @name Helper method for setting \@staff attribute for chords
+     */
+    ///@{
+    void SetChordStaff(Layer *layer);
+    ///@}
+
+    /*
+     * @name Helper method for comparing written/gestural accidental attributes
+     */
+    ///@{
+    static bool IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural);
+    ///@}
+
+    /*
+     * @name Helper for detecting the slur curve direction
+     */
+    static curvature_CURVEDIR CombineCurvedir(curvature_CURVEDIR startDir, curvature_CURVEDIR stopDir);
+
+    /*
+     * @name Methods for converting MusicXML values to MEI attributes.
+     */
+    ///@{
+    static data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(const std::string &value);
+    static data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(const float value);
+    static data_ARTICULATION ConvertArticulations(const std::string &value);
+    static data_BARRENDITION ConvertStyleToRend(const std::string &value, const bool repeat);
+    static data_BOOLEAN ConvertWordToBool(const std::string &value);
+    static data_DURATION ConvertTypeToDur(const std::string &value);
+    static data_HEADSHAPE ConvertNotehead(const std::string &value);
+    static data_LINESTARTENDSYMBOL ConvertLineEndSymbol(const std::string &value);
+    static data_MIDIVALUE ConvertDynamicsToMidiVal(const float dynamics);
+    static data_PITCHNAME ConvertStepToPitchName(const std::string &value);
+    static data_TEXTRENDITION ConvertEnclosure(const std::string &value);
+    static beamRend_FORM ConvertBeamFanToForm(const std::string &value);
+    static curvature_CURVEDIR InferCurvedir(const pugi::xml_node slurOrTie);
+    static fermataVis_SHAPE ConvertFermataShape(const std::string &value);
+    static pedalLog_DIR ConvertPedalTypeToDir(const std::string &value);
+    static tupletVis_NUMFORMAT ConvertTupletNumberValue(const std::string &value);
+    static std::u32string ConvertTypeToVerovioText(const std::string &value);
+    static std::string ConvertAlterToSymbol(const std::string &value, bool plusMinus = false);
+    static std::string ConvertKindToSymbol(const std::string &value);
+    static std::string ConvertKindToText(const std::string &value);
+    static std::string ConvertDegreeToText(const pugi::xml_node harmony);
+    static std::string ConvertFigureGlyph(const std::string &value);
+    ///@}
+
+    /*
+     * @name Methods for converting between MusicXML <pitch> and MIDI note numbers.
+     */
+    ///@{
+    static int PitchToMidi(const std::string &step, int alter, int octave);
+    static void MidiToPitch(int midi, std::string &step, int &alter, int &octave);
+    ///@}
+
+public:
+    //
 private:
     /* octave offset */
     std::vector<int> m_octDis;
@@ -331,44 +487,56 @@ private:
     bool m_mRpt = false;
     /* measure repeats */
     bool m_slash = false;
-    /* measure rests */
-    int m_multiRest = 0;
     /* MIDI ticks */
-    int m_ppq;
+    int m_ppq = -1;
     /* measure time */
     int m_durTotal = 0;
     /* measure time */
     int m_durFb = 0;
     /* meter signature */
-    int m_meterCount = 4;
+    std::vector<int> m_meterCount = { 4 };
     int m_meterUnit = 4;
+    MeterCountSign m_meterSign = MeterCountSign::None;
+    /* part information */
+    Label *m_label = NULL;
+    LabelAbbr *m_labelAbbr = NULL;
+    InstrDef *m_instrdef = NULL;
     /* LastElementID */
     std::string m_ID;
     /* A map of stacks for piling open LayerElements (beams, tuplets, chords, btrem, ftrem) separately per layer */
-    std::map<Layer *, std::vector<LayerElement *> > m_elementStackMap;
+    std::map<Layer *, std::vector<LayerElement *>> m_elementStackMap;
     /* A maps of time stamps (score time) to indicate write pointer of a given layer */
     std::map<Layer *, int> m_layerEndTimes;
+    std::map<Layer *, std::multimap<int, LayerElement *>> m_layerTimes;
     /* To remember layer of last element (note) to handle chords */
     Layer *m_prevLayer = NULL;
+    /* To remember current layer to properly handle layers/staves/cross-staff elements */
+    Layer *m_currentLayer = NULL;
+    bool m_isLayerInitialized = false;
     /* The stack for open slurs */
-    std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
+    std::vector<std::pair<Slur *, musicxml::OpenSlur>> m_slurStack;
     /* The stack for slur stops that might come before the slur has been opened */
-    std::vector<std::pair<LayerElement *, musicxml::CloseSlur> > m_slurStopStack;
+    std::vector<std::pair<LayerElement *, musicxml::CloseSlur>> m_slurStopStack;
     /* The stack for open ties */
-    std::vector<std::pair<Tie *, Note *> > m_tieStack;
+    std::vector<musicxml::OpenTie> m_tieStack;
     /* The stack for tie stops that might come before that tie was opened */
-    std::vector<Note *> m_tieStopStack;
+    std::vector<musicxml::CloseTie> m_tieStopStack;
     /* The stack for hairpins */
-    std::vector<std::pair<Hairpin *, musicxml::OpenSpanner> > m_hairpinStack;
+    std::vector<std::pair<Hairpin *, musicxml::OpenSpanner>> m_hairpinStack;
     /* The stack for hairpin stops that might occur before a hairpin was started staffNumber, tStamp2, (hairpinNumber,
      * measureCount) */
-    std::vector<std::tuple<int, double, musicxml::OpenSpanner> > m_hairpinStopStack;
-    std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner> > m_bracketStack;
-    std::vector<std::pair<Trill *, musicxml::OpenSpanner> > m_trillStack;
+    std::vector<std::tuple<int, double, musicxml::OpenSpanner>> m_hairpinStopStack;
+    /* The stack for the beamspans with numbers of staff/layer where starting element is located*/
+    std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
+    std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
+    std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
+    /* Current ending info for start/stop */
+    std::optional<musicxml::EndingInfo> m_currentEndingStart;
+    std::optional<musicxml::EndingInfo> m_currentEndingStop;
     /* The stack of endings to be inserted at the end of XML import */
-    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo> > m_endingStack;
+    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>> m_endingStack;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
-    std::vector<std::pair<ControlElement *, musicxml::OpenDashes> > m_openDashesStack;
+    std::vector<std::pair<ControlElement *, musicxml::OpenDashes>> m_openDashesStack;
     /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
@@ -381,13 +549,17 @@ private:
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
      */
-    std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
+    std::vector<std::pair<std::string, ControlElement *>> m_controlElements;
     /* stack of clef changes to be inserted to all layers of a given staff */
-    std::vector<musicxml::ClefChange> m_ClefChangeStack;
+    std::queue<musicxml::ClefChange> m_clefChangeQueue;
     /* stack of new arpeggios that get more notes added. */
-    std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio> > m_ArpeggioStack;
+    std::vector<std::pair<Arpeg *, musicxml::OpenArpeggio>> m_ArpeggioStack;
     /* a map for the measure counts storing the index of each measure created */
     std::map<Measure *, int> m_measureCounts;
+    /* measure rests */
+    std::map<int, int> m_multiRests;
+
+#endif // NO_MUSICXML_SUPPORT
 };
 
 } // namespace vrv

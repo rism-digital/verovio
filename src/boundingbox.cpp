@@ -9,18 +9,18 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "devicecontextbase.h"
 #include "doc.h"
+#include "drawinginterface.h"
 #include "floatingobject.h"
 #include "glyph.h"
 #include "vrv.h"
-
-#define BEZIER_APPROXIMATION 50.0
 
 namespace vrv {
 
@@ -39,14 +39,7 @@ BoundingBox::BoundingBox()
     rect2[0] = Point(25, 25);
     rect2[1] = Point(100, 100);
 
-    ResetBoundingBox();
-}
-
-ClassId BoundingBox::GetClassId() const
-{
-    // we should always have the method overridden
-    assert(false);
-    return BOUNDING_BOX;
+    this->ResetBoundingBox();
 }
 
 bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
@@ -61,7 +54,7 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
 
-    int drawingX = GetDrawingX();
+    int drawingX = this->GetDrawingX();
 
     minX -= drawingX;
     maxX -= drawingX;
@@ -70,7 +63,7 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
+    // this->GetClassName().c_str());
 }
 
 void BoundingBox::UpdateContentBBoxY(int y1, int y2)
@@ -80,7 +73,7 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
 
-    int drawingY = GetDrawingY();
+    int drawingY = this->GetDrawingY();
 
     min_y -= drawingY;
     max_y -= drawingY;
@@ -89,7 +82,7 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
+    // this->GetClassName().c_str());
 }
 
 void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
@@ -99,7 +92,7 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
 
-    int drawingX = GetDrawingX();
+    int drawingX = this->GetDrawingX();
 
     minX -= drawingX;
     maxX -= drawingX;
@@ -117,7 +110,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
 
-    int drawingY = GetDrawingY();
+    int drawingY = this->GetDrawingY();
 
     min_y -= drawingY;
     max_y -= drawingY;
@@ -166,7 +159,7 @@ bool BoundingBox::HasEmptyBB() const
 
 bool BoundingBox::HasContentBB() const
 {
-    return (HasContentHorizontalBB() && HasContentVerticalBB());
+    return (this->HasContentHorizontalBB() && this->HasContentVerticalBB());
 }
 
 bool BoundingBox::HasContentHorizontalBB() const
@@ -181,7 +174,7 @@ bool BoundingBox::HasContentVerticalBB() const
 
 bool BoundingBox::HasSelfBB() const
 {
-    return (HasSelfHorizontalBB() && HasSelfVerticalBB());
+    return (this->HasSelfHorizontalBB() && this->HasSelfVerticalBB());
 }
 
 bool BoundingBox::HasSelfHorizontalBB() const
@@ -194,7 +187,7 @@ bool BoundingBox::HasSelfVerticalBB() const
     return ((m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }
 
-void BoundingBox::SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize)
+void BoundingBox::SetBoundingBoxGlyph(char32_t smuflGlyph, int fontSize)
 {
     assert(smuflGlyph);
     m_smuflGlyph = smuflGlyph;
@@ -242,17 +235,16 @@ bool BoundingBox::VerticalSelfOverlap(const BoundingBox *other, int margin) cons
     return true;
 }
 
-int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int margin, int vMargin) const
+int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, const Doc *doc, int margin, int vMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB2rect, doc);
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB2rect, doc->GetResources());
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectLeftOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
         }
     }
@@ -260,17 +252,16 @@ int BoundingBox::HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int m
     return overlap;
 }
 
-int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int margin, int vMargin) const
+int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, const Doc *doc, int margin, int vMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB2rect, doc);
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    anchor1 = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BB2rect, doc->GetResources());
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectRightOverlap(BB1rect[i], BB2rect[j], margin, vMargin));
         }
     }
@@ -278,17 +269,16 @@ int BoundingBox::HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int 
     return overlap;
 }
 
-int BoundingBox::VerticalTopOverlap(const BoundingBox *other, Doc *doc, int margin, int hMargin) const
+int BoundingBox::VerticalTopOverlap(const BoundingBox *other, const Doc *doc, int margin, int hMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB2rect, doc);
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    anchor1 = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB2rect, doc->GetResources());
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectTopOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
         }
     }
@@ -296,17 +286,16 @@ int BoundingBox::VerticalTopOverlap(const BoundingBox *other, Doc *doc, int marg
     return overlap;
 }
 
-int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int margin, int hMargin) const
+int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, const Doc *doc, int margin, int hMargin) const
 {
     Point BB1rect[3][2], BB2rect[3][2];
-    int i, j;
     int anchor1, anchor2;
     int overlap = 0;
 
-    anchor1 = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB1rect, doc);
-    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB2rect, doc);
-    for (i = 0; i < anchor1; ++i) {
-        for (j = 0; j < anchor2; ++j) {
+    anchor1 = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BB1rect, doc->GetResources());
+    anchor2 = other->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BB2rect, doc->GetResources());
+    for (int i = 0; i < anchor1; ++i) {
+        for (int j = 0; j < anchor2; ++j) {
             overlap = std::max(overlap, RectBottomOverlap(BB1rect[i], BB2rect[j], margin, hMargin));
         }
     }
@@ -314,27 +303,27 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int m
     return overlap;
 }
 
-int BoundingBox::GetRectangles(
-    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const
+int BoundingBox::GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2],
+    const Resources &resources) const
 {
-    Glyph *glyph = NULL;
+    const Glyph *glyph = NULL;
 
     bool glyphRect = true;
 
     if (m_smuflGlyph != 0) {
-        glyph = Resources::GetGlyph(m_smuflGlyph);
+        glyph = resources.GetGlyph(m_smuflGlyph);
         assert(glyph);
 
         if (glyph->HasAnchor(anchor1) && glyph->HasAnchor(anchor2)) {
-            glyphRect = this->GetGlyph2PointRectangles(anchor1, anchor2, glyph, rect, doc);
+            glyphRect = this->GetGlyph2PointRectangles(anchor1, anchor2, glyph, rect);
             if (glyphRect) return 3;
         }
         else if (glyph->HasAnchor(anchor1)) {
-            glyphRect = this->GetGlyph1PointRectangles(anchor1, glyph, rect, doc);
+            glyphRect = this->GetGlyph1PointRectangles(anchor1, glyph, rect);
             if (glyphRect) return 2;
         }
         else if (glyph->HasAnchor(anchor2)) {
-            glyphRect = this->GetGlyph1PointRectangles(anchor2, glyph, rect, doc);
+            glyphRect = this->GetGlyph1PointRectangles(anchor2, glyph, rect);
             if (glyphRect) return 2;
         }
     }
@@ -349,7 +338,7 @@ int BoundingBox::GetRectangles(
 }
 
 bool BoundingBox::GetGlyph2PointRectangles(
-    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph, Point rect[3][2], Doc *doc) const
+    const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, const Glyph *glyph, Point rect[3][2]) const
 {
     assert(glyph);
 
@@ -436,8 +425,7 @@ bool BoundingBox::GetGlyph2PointRectangles(
     return true;
 }
 
-bool BoundingBox::GetGlyph1PointRectangles(
-    const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const
+bool BoundingBox::GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, const Glyph *glyph, Point rect[2][2]) const
 {
     assert(glyph);
 
@@ -502,6 +490,74 @@ bool BoundingBox::GetGlyph1PointRectangles(
     return true;
 }
 
+int BoundingBox::GetCutOutTop(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutNE, BBrect, resources);
+    std::vector<int> topValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        topValues.push_back(BBrect[i][0].y);
+    }
+    assert(!topValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (topValues.size() == 1) return topValues[0];
+    std::sort(topValues.begin(), topValues.end(), std::greater<int>());
+    return topValues[1];
+}
+
+int BoundingBox::GetCutOutBottom(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutSW, SMUFL_cutOutSE, BBrect, resources);
+    std::vector<int> bottomValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        bottomValues.push_back(BBrect[i][1].y);
+    }
+    assert(!bottomValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (bottomValues.size() == 1) return bottomValues[0];
+    std::sort(bottomValues.begin(), bottomValues.end());
+    return bottomValues[1];
+}
+
+int BoundingBox::GetCutOutLeft(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNW, SMUFL_cutOutSW, BBrect, resources);
+    std::vector<int> leftValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        leftValues.push_back(BBrect[i][0].x);
+    }
+    assert(!leftValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (leftValues.size() == 1) return leftValues[0];
+    std::sort(leftValues.begin(), leftValues.end());
+    return leftValues[1];
+}
+
+int BoundingBox::GetCutOutRight(const Resources &resources) const
+{
+    Point BBrect[3][2];
+
+    const int rectangleCount = this->GetRectangles(SMUFL_cutOutNE, SMUFL_cutOutSE, BBrect, resources);
+    std::vector<int> rightValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        rightValues.push_back(BBrect[i][1].x);
+    }
+    assert(!rightValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (rightValues.size() == 1) return rightValues[0];
+    std::sort(rightValues.begin(), rightValues.end(), std::greater<int>());
+    return rightValues[1];
+}
+
 bool BoundingBox::Encloses(const Point point) const
 {
     if (this->GetContentRight() < point.x) return false;
@@ -511,11 +567,11 @@ bool BoundingBox::Encloses(const Point point) const
     return true;
 }
 
-int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int margin) const
+int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());
-    assert(curve->GetObject()->Is({ PHRASE, SLUR, TIE }));
+    assert(curve->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
 
     // for lisability
     Point points[4];
@@ -528,7 +584,7 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     if (p1.x > this->GetRightBy(type)) return 0;
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(points, curve->GetThickness(), curve->GetAngle(), topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(points, curve->GetThickness(), topBezier, bottomBezier);
 
     // The curve overflows on both sides
     if ((p1.x < this->GetLeftBy(type)) && p2.x > this->GetRightBy(type)) {
@@ -545,13 +601,12 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
             leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetLeftBy(type)) + margin;
             rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetRightBy(type)) + margin;
             // The box is above the summit of the curve
-            if ((this->GetLeftBy(type) < (p1.x + xMaxY)) && (this->GetRightBy(type) > (p1.x + xMaxY)))
+            if ((this->GetLeftBy(type) < (p1.x + xMaxY)) && (this->GetRightBy(type) > (p1.x + xMaxY))) {
                 return (curve->GetTopBy(type) - this->GetBottomBy(type) + margin);
+            }
             // The content is on the left
-            if (this->GetRightBy(type) < (p1.x + xMaxY))
-                return (rightY - this->GetBottomBy(type));
-            else
-                return (leftY - this->GetBottomBy(type));
+            return (this->GetRightBy(type) < (p1.x + xMaxY)) ? (rightY - this->GetBottomBy(type))
+                                                             : (leftY - this->GetBottomBy(type));
         }
         else {
             // The curve is already above the content
@@ -565,13 +620,12 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
             leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetLeftBy(type)) - margin;
             rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetRightBy(type)) - margin;
             // The box is above the summit of the curve
-            if ((this->GetLeftBy(type) < (p1.x + xMinY)) && (this->GetRightBy(type) > (p1.x + xMinY)))
+            if ((this->GetLeftBy(type) < (p1.x + xMinY)) && (this->GetRightBy(type) > (p1.x + xMinY))) {
                 return (curve->GetBottomBy(type) - this->GetTopBy(type) - margin);
+            }
             // The content is on the left
-            if (this->GetRightBy(type) < (p1.x + xMinY))
-                return (rightY - this->GetTopBy(type));
-            else
-                return (leftY - this->GetTopBy(type));
+            return (this->GetRightBy(type) < (p1.x + xMinY)) ? (rightY - this->GetTopBy(type))
+                                                             : (leftY - this->GetTopBy(type));
         }
     }
     // The curve overflows on the left
@@ -661,26 +715,84 @@ int BoundingBox::Intersects(FloatingCurvePositioner *curve, Accessor type, int m
     return 0;
 }
 
+int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
+{
+    assert(beamInterface);
+    assert(beamInterface->HasCoords());
+
+    const Point beamLeft(
+        beamInterface->m_beamElementCoords.front()->m_x, beamInterface->m_beamElementCoords.front()->m_yBeam);
+    const Point beamRight(
+        beamInterface->m_beamElementCoords.back()->m_x, beamInterface->m_beamElementCoords.back()->m_yBeam);
+
+    const int leftX = this->GetLeftBy(type) - margin;
+    const int rightX = this->GetRightBy(type) + margin;
+
+    Point leftIntersection(0, 0);
+    Point rightIntersection(0, 0);
+    const double beamSlope = BoundingBox::CalcSlope(beamLeft, beamRight);
+    if (leftX <= beamLeft.x) {
+        // BB does not overlap horizontally with beam (left side of the beam)
+        if (rightX < beamLeft.x) {
+            return 0;
+        }
+        // BB overlaps with left side of the beam
+        else if (rightX < beamRight.x) {
+            leftIntersection = beamLeft;
+            rightIntersection.x = rightX;
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+        // BB covers the whole beam
+        else {
+            leftIntersection = beamLeft;
+            rightIntersection = beamRight;
+        }
+    }
+    else {
+        if (rightX > beamRight.x) {
+            // BB overlaps with right side of the beam
+            if (leftX <= beamRight.x) {
+                leftIntersection.x = leftX;
+                leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+                rightIntersection = beamRight;
+            }
+            // BB does not overlap horizontally with beam (right side of the beam)
+            else {
+                return 0;
+            }
+        }
+        // BB is inside of the beam
+        else {
+            leftIntersection.x = leftX;
+            leftIntersection.y = beamLeft.y + beamSlope * (leftIntersection.x - beamLeft.x);
+            rightIntersection.x = rightX;
+            rightIntersection.y = beamLeft.y + beamSlope * (rightIntersection.x - beamLeft.x);
+        }
+    }
+
+    // calculate vertical overlap of the BB with beam section
+    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+        const int topY = std::max(leftIntersection.y, rightIntersection.y);
+        const int shift = topY - this->GetBottomBy(type) + margin;
+        return std::max(shift, 0);
+    }
+    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+        const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
+        const int shift = bottomY - this->GetTopBy(type) - margin;
+        return std::min(shift, 0);
+    }
+
+    return 0;
+}
+
 //----------------------------------------------------------------------------
 // Static methods for BoundingBox
 //----------------------------------------------------------------------------
 
-void BoundingBox::SwapPoints(Point &p1, Point &p2)
-{
-    Point tmp = p1;
-    p1 = p2;
-    p2 = tmp;
-}
-
-void BoundingBox::Swap(int &v1, int &v2)
-{
-    int tmp = v1;
-    v1 = v2;
-    v2 = tmp;
-}
-
 Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point center)
 {
+    if (point == center) return point;
+
     float s = sin(alpha);
     float c = cos(alpha);
 
@@ -698,39 +810,89 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point cen
     return point;
 }
 
-double BoundingBox::CalcSlope(Point const &p1, Point const &p2)
+double BoundingBox::CalcDistance(const Point &p1, const Point &p2)
+{
+    return std::hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+bool BoundingBox::ArePointsClose(const Point &p1, const Point &p2, int margin)
+{
+    return (BoundingBox::CalcDistance(p1, p2) <= margin);
+}
+
+double BoundingBox::CalcSlope(const Point &p1, const Point &p2)
 {
     if ((p1.y == p2.y) || (p1.x == p2.x)) return 0.0;
 
     return (double)(p2.y - p1.y) / (double)(p2.x - p1.x);
 }
 
-/*
-int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x) {
+double BoundingBox::CalcBezierParamAtPosition(const Point bezier[4], int x)
+{
+    // Calculate coefficients of cubic polynomial
+    const double a = -bezier[0].x + 3.0 * bezier[1].x - 3.0 * bezier[2].x + bezier[3].x;
+    const double b = 3.0 * bezier[0].x - 6.0 * bezier[1].x + 3.0 * bezier[2].x;
+    const double c = -3.0 * bezier[0].x + 3.0 * bezier[1].x;
+    const double d = bezier[0].x - x;
 
-    Point P;
-    double t = 0.0;
-    // avoid division by 0
-    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
-    t = std::min(1.0, std::max(0.0, t));
+    // Solve the polynomial
+    const std::set<double> roots = BoundingBox::SolveCubicPolynomial(a, b, c, d);
 
-    P.y = pow((1 - t), 3) * bezier[0].y + 3 * t * pow((1 -t), 2) * bezier[1].y + 3 * (1-t) * pow(t, 2)* bezier[2].y +
-pow (t, 3)* bezier[3].y;
-    LogDebug("%f - %d - %d", t, x, P.y);
-    return P.y;
+    // Return the first root in [0,1]
+    auto iter = std::find_if(roots.begin(), roots.end(), [](double value) {
+        constexpr double eps = 1e-6; // Numerical freedom
+        return ((value >= -eps) && (value <= 1.0 + eps));
+    });
+    double root = 0.0;
+    if (iter != roots.end()) {
+        root = *iter;
+        root = std::max(root, 0.0);
+        root = std::min(root, 1.0);
+    }
+    return root;
 }
-*/
 
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
 {
-    double t = 0.0;
-    // avoid division by 0
-    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
-    t = std::min(1.0, std::max(0.0, t));
+    const double t = BoundingBox::CalcBezierParamAtPosition(bezier, x);
 
     Point p = BoundingBox::CalcDeCasteljau(bezier, t);
 
     return p.y;
+}
+
+void BoundingBox::CalcLinearInterpolation(Point &dest, const Point &a, const Point &b, double t)
+{
+    dest.x = a.x + (b.x - a.x) * t;
+    dest.y = a.y + (b.y - a.y) * t;
+}
+
+Point BoundingBox::CalcPointAtBezier(const Point bezier[4], double t)
+{
+    Point p1, p2, p3, p4, p5;
+    CalcLinearInterpolation(p1, bezier[0], bezier[1], t);
+    CalcLinearInterpolation(p2, bezier[1], bezier[2], t);
+    CalcLinearInterpolation(p3, bezier[2], bezier[3], t);
+    CalcLinearInterpolation(p4, p1, p2, t);
+    CalcLinearInterpolation(p5, p2, p3, t);
+    Point midPoint;
+    CalcLinearInterpolation(midPoint, p4, p5, t); // middle point on the bezier-curve
+    return midPoint;
+}
+
+double BoundingBox::GetBezierThicknessCoefficient(const Point bezier[4], int currentThickness, int penWidth)
+{
+    Point top[4], bottom[4];
+    CalcThickBezier(bezier, currentThickness, top, bottom);
+
+    Point topMidpoint = CalcPointAtBezier(top, 0.5);
+    Point bottomMidpoint = CalcPointAtBezier(bottom, 0.5);
+
+    int actualThickness = sqrt((topMidpoint.x - bottomMidpoint.x) * (topMidpoint.x - bottomMidpoint.x)
+        + (topMidpoint.y - bottomMidpoint.y) * (topMidpoint.y - bottomMidpoint.y));
+    double adjustedThickness = currentThickness - penWidth;
+    if (adjustedThickness < 0) adjustedThickness = 0;
+    return adjustedThickness / actualThickness;
 }
 
 Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
@@ -745,38 +907,102 @@ Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
     return p;
 }
 
-void BoundingBox::CalcThickBezier(
-    const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier)
+std::set<double> BoundingBox::SolveCubicPolynomial(double a, double b, double c, double d)
 {
-    assert(topBezier && bottomBezier); // size should be 4 each
+    // Implementation of Cardano's algorithm
+    // See https://pomax.github.io/bezierinfo/#extremities
 
-    Point c1Rotated = bezier[1];
-    Point c2Rotated = bezier[2];
-    c1Rotated.y += thickness / 2;
-    c2Rotated.y += thickness / 2;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
+    // Check whether we need cubic solving
+    if (abs(a) < 10e-10) {
+        // This is not a cubic curve.
+        if (abs(b) < 10e-10) {
+            // This is not a quadratic curve either.
+            if (abs(c) < 10e-10) {
+                return {};
+            }
+            // Linear solution
+            return { -d / c };
+        }
+        // Quadratic solution
+        const double q = sqrt(c * c - 4.0 * b * d);
+        return { (q - c) / (2.0 * b), (-c - q) / (2.0 * b) };
     }
 
-    topBezier[0] = bezier[0];
-    bottomBezier[0] = topBezier[0];
+    // We know that we need a cubic solution.
+    b /= a;
+    c /= a;
+    d /= a;
 
-    // Points for first bez, they go from xy to x1y1
+    const double p = (3.0 * c - b * b) / 3.0;
+    const double p3 = p / 3.0;
+    const double q = (2.0 * b * b * b - 9.0 * b * c + 27.0 * d) / 27.0;
+    const double q2 = q / 2.0;
+    const double discriminant = q2 * q2 + p3 * p3 * p3;
+
+    if (discriminant < 0.0) {
+        // three possible real roots
+        const double mp3 = -p / 3.0;
+        const double r = sqrt(mp3 * mp3 * mp3);
+        const double t = -q / (2.0 * r);
+        const double cosphi = (t < -1.0) ? -1.0 : ((t > 1.0) ? 1.0 : t);
+        const double phi = acos(cosphi);
+        const double u = 2.0 * cbrt(r);
+        const double root1 = u * cos(phi / 3.0) - b / 3.0;
+        const double root2 = u * cos((phi + 2.0 * M_PI) / 3.0) - b / 3.0;
+        const double root3 = u * cos((phi + 4.0 * M_PI) / 3.0) - b / 3.0;
+        return { root1, root2, root3 };
+    }
+
+    if (discriminant == 0.0) {
+        // three real roots, but two of them are equal
+        const double u = -cbrt(q2);
+        const double root1 = 2.0 * u - b / 3.0;
+        const double root2 = -u - b / 3.0;
+        return { root1, root2 };
+    }
+
+    // one real root, two complex roots
+    const double sd = sqrt(discriminant);
+    const double u = cbrt(sd - q2);
+    const double v = cbrt(sd + q2);
+    return { u - v - b / 3.0 };
+}
+
+void BoundingBox::CalcThickBezier(const Point bezier[4], int thickness, Point topBezier[4], Point bottomBezier[4])
+{
+    // We shift the control point outwards/inwards in the direction of the angle bisector of the polygon P1-C1-C2-P2 at
+    // C1 or C2
+    float slope1 = BoundingBox::CalcSlope(bezier[0], bezier[1]);
+    if (bezier[0].x > bezier[1].x) slope1 *= -1.0;
+    float slope2 = BoundingBox::CalcSlope(bezier[1], bezier[2]);
+    if (bezier[1].x > bezier[2].x) slope2 *= -1.0;
+    float slope3 = BoundingBox::CalcSlope(bezier[2], bezier[3]);
+    if (bezier[2].x > bezier[3].x) slope3 *= -1.0;
+    const float angle1 = (atan(slope1) + atan(slope2)) / 2.0;
+    const float angle2 = (atan(slope2) + atan(slope3)) / 2.0;
+
+    // Calculate top bezier
+    Point c1Rotated = bezier[1];
+    Point c2Rotated = bezier[2];
+    c1Rotated.y += thickness * 0.5;
+    c2Rotated.y += thickness * 0.5;
+    c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle1, bezier[1]);
+    c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle2, bezier[2]);
+
+    topBezier[0] = bezier[0];
     topBezier[1] = c1Rotated;
     topBezier[2] = c2Rotated;
     topBezier[3] = bezier[3];
 
+    // Calculate bottom bezier
     c1Rotated = bezier[1];
     c2Rotated = bezier[2];
-    c1Rotated.y -= thickness / 2;
-    c2Rotated.y -= thickness / 2;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
-    }
+    c1Rotated.y -= thickness * 0.5;
+    c2Rotated.y -= thickness * 0.5;
+    c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle1, bezier[1]);
+    c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle2, bezier[2]);
 
-    // second bez. goes back
+    bottomBezier[0] = bezier[0];
     bottomBezier[1] = c1Rotated;
     bottomBezier[2] = c2Rotated;
     bottomBezier[3] = bezier[3];
@@ -808,8 +1034,7 @@ void BoundingBox::ApproximateBezierBoundingBox(
     todx = dx - cx;
     tody = dy - cy;
     double step = 1.0 / BEZIER_APPROXIMATION;
-    int i;
-    for (i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); ++i) {
+    for (int i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); ++i) {
         double d = i * step;
         px = ax + d * tobx;
         py = ay + d * toby;
@@ -848,6 +1073,33 @@ void BoundingBox::ApproximateBezierBoundingBox(
     height = maxy - miny;
 }
 
+std::pair<double, int> BoundingBox::ApproximateBezierExtrema(
+    const Point bezier[4], bool isMaxExtrema, int approximationSteps)
+{
+    // Implementing Cardano's algorithm should give us proper time points for the min/max extremities on the cubic
+    // curve. However, we do not require such precision at this point, so these time points can be approximate simply by
+    // calculating Y point for T time with certain step
+    std::map<double, int> yCoordinatesAtTime;
+    const double step = 1.0 / approximationSteps;
+    for (int i = 0; i < approximationSteps + 1; ++i) {
+        const double currentTime = i * step;
+        yCoordinatesAtTime.emplace(std::make_pair(currentTime, CalcPointAtBezier(bezier, currentTime).y));
+    }
+
+    if (isMaxExtrema) {
+        return *std::max_element(yCoordinatesAtTime.begin(), yCoordinatesAtTime.end(),
+            [](const std::pair<double, int> &left, const std::pair<double, int> &right) {
+                return left.second < right.second;
+            });
+    }
+    else {
+        return *std::min_element(yCoordinatesAtTime.begin(), yCoordinatesAtTime.end(),
+            [](const std::pair<double, int> &left, const std::pair<double, int> &right) {
+                return left.second < right.second;
+            });
+    }
+}
+
 int BoundingBox::RectLeftOverlap(const Point rect1[2], const Point rect2[2], int margin, int vMargin)
 {
     if ((rect1[0].y < rect2[1].y - vMargin) || (rect1[1].y > rect2[0].y + vMargin)) return 0;
@@ -878,27 +1130,35 @@ int BoundingBox::RectBottomOverlap(const Point rect1[2], const Point rect2[2], i
 
 SegmentedLine::SegmentedLine(int start, int end)
 {
-    if (start > end) {
-        BoundingBox::Swap(start, end);
+    m_increasing = (start <= end);
+    if (!m_increasing) {
+        std::swap(start, end);
     }
-    m_segments.push_back(std::make_pair(start, end));
+    m_segments.push_back({ start, end });
 }
 
-void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
+std::pair<int, int> SegmentedLine::GetStartEnd(int idx) const
 {
     assert(idx >= 0);
-    assert(idx < GetSegmentCount());
+    assert(idx < this->GetSegmentCount());
 
-    start = m_segments.at(idx).first;
-    end = m_segments.at(idx).second;
+    if (m_increasing) {
+        return { m_segments.at(idx).first, m_segments.at(idx).second };
+    }
+    else {
+        // Read the segment array "backwards"
+        idx = this->GetSegmentCount() - 1 - idx;
+        return { m_segments.at(idx).second, m_segments.at(idx).first };
+    }
 }
 
 void SegmentedLine::AddGap(int start, int end)
 {
     assert(start != end);
 
+    // Internally segments always have increasing order and orientation
     if (start > end) {
-        BoundingBox::Swap(start, end);
+        std::swap(start, end);
     }
 
     // nothing to do
@@ -914,7 +1174,7 @@ void SegmentedLine::AddGap(int start, int end)
         }
         // cut the segment because the gap in within it
         if ((iter->first <= start) && (iter->second >= end)) {
-            iter = m_segments.insert(iter, std::make_pair(iter->first, start));
+            iter = m_segments.insert(iter, { iter->first, start });
             ++iter;
             iter->first = end;
             break;

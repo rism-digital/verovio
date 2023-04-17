@@ -9,13 +9,16 @@
 #define __VRV_LINKING_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {
 
-class FunctorParams;
 class Measure;
 class Object;
+class PrepareLinkingFunctor;
+class PrepareStaffCurrentTimeSpanningFunctor;
+class ResetDataFunctor;
 
 //----------------------------------------------------------------------------
 // LinkingInterface
@@ -34,8 +37,8 @@ public:
     ///@{
     LinkingInterface();
     virtual ~LinkingInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_LINKING; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_LINKING; }
     ///@}
 
     /**
@@ -44,9 +47,11 @@ public:
      */
     ///@{
     void SetNextLink(Object *next);
-    Object *GetNextLink() const { return m_next; }
+    Object *GetNextLink() { return m_next; }
+    const Object *GetNextLink() const { return m_next; }
     void SetSameasLink(Object *sameas);
-    Object *GetSameasLink() const { return m_sameas; }
+    Object *GetSameasLink() { return m_sameas; }
+    const Object *GetSameasLink() const { return m_sameas; }
     ///@}
 
     /**
@@ -60,39 +65,37 @@ public:
     /**
      * Return the start measure of the next object (if any, NULL otherwise)
      */
+    ///@{
     Measure *GetNextMeasure();
+    const Measure *GetNextMeasure() const;
+    ///@}
+
+    /**
+     * Set @corresp attribute to the ID (or @corresp) of the object
+     */
+    void AddBackLink(const Object *object);
 
     //-----------------//
     // Pseudo functors //
     //-----------------//
 
     /**
-     * We have functor in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the  Object (implementation) to
-     * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
-
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::PrepareLinking
-     */
-    virtual int InterfacePrepareLinking(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+    ///@{
+    FunctorCode InterfacePrepareLinking(PrepareLinkingFunctor &functor, Object *object);
+    FunctorCode InterfacePrepareStaffCurrentTimeSpanning(
+        PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    ///@}
 
 protected:
     /**
-     * Extract the fragment of the start or end @xml:id if given
+     * Extract the fragment of the start or end \@xml:id if given
      */
-    void SetUuidStr();
+    void SetIDStr();
 
 private:
     //
@@ -100,9 +103,9 @@ public:
     //
 private:
     Object *m_next;
-    std::string m_nextUuid;
+    std::string m_nextID;
     Object *m_sameas;
-    std::string m_sameasUuid;
+    std::string m_sameasID;
 };
 
 } // namespace vrv

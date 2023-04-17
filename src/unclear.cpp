@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,13 @@ namespace vrv {
 // Unclear
 //----------------------------------------------------------------------------
 
-Unclear::Unclear() : EditorialElement("unclear-"), AttSource()
-{
-    RegisterAttClass(ATT_SOURCE);
+static const ClassRegistrar<Unclear> s_factory("unclear", UNCLEAR);
 
-    Reset();
+Unclear::Unclear() : EditorialElement(UNCLEAR, "unclear-"), AttSource()
+{
+    this->RegisterAttClass(ATT_SOURCE);
+
+    this->Reset();
 }
 
 Unclear::~Unclear() {}
@@ -33,7 +35,7 @@ Unclear::~Unclear() {}
 void Unclear::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

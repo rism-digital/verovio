@@ -29,58 +29,66 @@ public:
     ///@{
     Verse();
     virtual ~Verse();
-    virtual Object *Clone() const { return new Verse(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Verse"; }
-    virtual ClassId GetClassId() const { return VERSE; }
+    Object *Clone() const override { return new Verse(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Verse"; }
     ///@}
 
     /**
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
+
+    /**
+     * @name Getter and setter for the labelAbbr
+     */
+    ///@{
+    LabelAbbr *GetDrawingLabelAbbr() { return m_drawingLabelAbbr; }
+    const LabelAbbr *GetDrawingLabelAbbr() const { return m_drawingLabelAbbr; }
+    void SetDrawingLabelAbbr(LabelAbbr *labelAbbr) { m_drawingLabelAbbr = labelAbbr; }
+    ///@}
 
     /**
      * Calculate the adjustment according to the overlap and the free space available before.
      * Will move the verse accordingly.
-     * Called from Verse::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     * Called from AdjustSylSpacingFunctor
      */
-    int AdjustPosition(int &overlap, int freeSpace, Doc *doc);
+    int AdjustPosition(int &overlap, int freeSpace, const Doc *doc);
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::AlignVertically
+     * Interface for class functor visitation
      */
-    virtual int AlignVertically(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
-     * See Object::AdjustSylSpacing
+     * See Object::InitProcessingLists
      */
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
+    int InitProcessingLists(FunctorParams *functorParams) override;
 
     /**
-     * See Object::PrepareProcessingLists
+     * See Object::GenerateMIDI
      */
-    virtual int PrepareProcessingLists(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *) override;
 
 private:
     //
 public:
+    //
+private:
     /**
      *  A pointer to the labelAbbr
      */
     LabelAbbr *m_drawingLabelAbbr;
-
-private:
 };
 
 } // namespace vrv

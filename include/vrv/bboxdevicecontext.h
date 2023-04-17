@@ -31,7 +31,7 @@ class Object;
  * It can be used when doing the layout of the object in order to manage object spacing.
  * The drawing primitives do not draw anything but update the bounding box values of the
  * layout objects currently drawn. The layout objects store their own bounding box and a
- * bounding box of their content. The own bouding box is updated only for the object being
+ * bounding box of their content. The own bounding box is updated only for the object being
  * drawn (the top one on the stack). The content bounding box is updated for all objects
  * on the stack
  */
@@ -43,102 +43,104 @@ public:
     ///@{
     BBoxDeviceContext(View *view, int width, int height, unsigned char update = BBOX_BOTH);
     virtual ~BBoxDeviceContext();
-    virtual ClassId GetClassId() const { return BBOX_DEVICE_CONTEXT; }
     ///@}
 
     /**
      * @name Setters
      */
     ///@{
-    virtual void SetBackground(int colour, int style = AxSOLID);
-    virtual void SetBackgroundImage(void *image, double opacity = 1.0){};
-    virtual void SetBackgroundMode(int mode);
-    virtual void SetTextForeground(int colour);
-    virtual void SetTextBackground(int colour);
-    virtual void SetLogicalOrigin(int x, int y);
-    virtual void SetUserScale(double xScale, double yScale);
+    void SetBackground(int colour, int style = AxSOLID) override;
+    void SetBackgroundImage(void *image, double opacity = 1.0) override{};
+    void SetBackgroundMode(int mode) override;
+    void SetTextForeground(int colour) override;
+    void SetTextBackground(int colour) override;
+    void SetLogicalOrigin(int x, int y) override;
+    void SetUserScale(double xScale, double yScale);
     ///@}
 
     /**
      * @name Getters
      */
     ///@{
-    virtual Point GetLogicalOrigin();
+    Point GetLogicalOrigin() override;
     ///@}
 
     /**
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawSimpleBezierPath(Point bezier[4]);
-    virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]);
-    virtual void DrawCircle(int x, int y, int radius);
-    virtual void DrawEllipse(int x, int y, int width, int height);
-    virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
-    virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, Point points[], int xOffset, int yOffset, int fillStyle = AxODDEVEN_RULE);
-    virtual void DrawRectangle(int x, int y, int width, int height);
-    virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
-    virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
-        int width = VRV_UNSET, int height = VRV_UNSET);
-    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
-    virtual void DrawSpline(int n, Point points[]);
-    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
-    virtual void DrawBackgroundImage(int x = 0, int y = 0){};
+    void DrawQuadBezierPath(Point bezier[3]) override;
+    void DrawCubicBezierPath(Point bezier[4]) override;
+    void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
+    void DrawCircle(int x, int y, int radius) override;
+    void DrawEllipse(int x, int y, int width, int height) override;
+    void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
+    void DrawLine(int x1, int y1, int x2, int y2) override;
+    void DrawPolyline(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawPolygon(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawRectangle(int x, int y, int width, int height) override;
+    void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
+    void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
+    void DrawText(const std::string &text, const std::u32string &wtext = U"", int x = VRV_UNSET, int y = VRV_UNSET,
+        int width = VRV_UNSET, int height = VRV_UNSET) override;
+    void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) override;
+    void DrawSpline(int n, Point points[]) override;
+    void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) override;
+    void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) override;
+    void DrawBackgroundImage(int x = 0, int y = 0) override{};
     ///@}
 
     /**
      * Special method for forcing bounding boxes to be updated
-     * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
+     * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
-    virtual void DrawPlaceholder(int x, int y);
+    void DrawPlaceholder(int x, int y) override;
 
     /**
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left);
-    virtual void EndText();
+    void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left) override;
+    void EndText() override;
 
     /**
      * @name Move a text to the specified position, for example when starting a new line.
      */
     ///@{
-    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
-    virtual void MoveTextVerticallyTo(int y);
+    void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) override;
+    void MoveTextVerticallyTo(int y) override;
     ///@}
 
     /**
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false);
-    virtual void EndGraphic(Object *object, View *view);
+    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+        bool prepend = false) override;
+    void EndGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic(Object *object, std::string gId);
-    virtual void EndResumedGraphic(Object *object, View *view);
+    void ResumeGraphic(Object *object, std::string gId) override;
+    void EndResumedGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for rotating a graphic (clockwise).
      */
     ///@{
-    virtual void RotateGraphic(Point const &orig, double angle);
+    void RotateGraphic(Point const &orig, double angle) override;
     ///@}
 
     /**
      * @name Method for starting and ending page
      */
     ///@{
-    virtual void StartPage();
-    virtual void EndPage();
+    void StartPage() override;
+    void EndPage() override;
     ///@}
 
     bool UpdateHorizontalValues() { return (m_update != BBOX_VERTICAL_ONLY); }
@@ -148,7 +150,7 @@ public:
      * @name Method for adding description element
      */
     ///@{
-    virtual void AddDescription(const std::string &text){};
+    void AddDescription(const std::string &text) override{};
     ///@}
 
 private:
@@ -156,6 +158,11 @@ private:
      *
      */
     void ResetGraphicRotation();
+
+    /**
+     * Get the overlap due to pen width on the left/right
+     */
+    std::pair<int, int> GetPenWidthOverlap() const;
 
 public:
     //
@@ -199,7 +206,7 @@ private:
      */
     View *m_view;
 
-    void UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph = 0);
+    void UpdateBB(int x1, int y1, int x2, int y2, char32_t glyph = 0);
 };
 
 } // namespace vrv

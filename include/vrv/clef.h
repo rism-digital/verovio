@@ -8,8 +8,10 @@
 #ifndef __VRV_CLEF_H__
 #define __VRV_CLEF_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -23,10 +25,16 @@ class ScoreDefInterface;
  * This class models the MEI <clef> element.
  */
 class Clef : public LayerElement,
+             public AttClefLog,
              public AttClefShape,
              public AttColor,
+             public AttEnclosingChars,
+             public AttExtSym,
              public AttLineLoc,
-             public AttOctaveDisplacement {
+             public AttOctave,
+             public AttOctaveDisplacement,
+             public AttStaffIdent,
+             public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -35,32 +43,51 @@ public:
     ///@{
     Clef();
     virtual ~Clef();
-    virtual Object *Clone() const { return new Clef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Clef"; }
-    virtual ClassId GetClassId() const { return CLEF; }
+    Object *Clone() const override { return new Clef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Clef"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since check is required */
-    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /**
      * Return the offset of the clef
      */
     int GetClefLocOffset() const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
     /**
-     * Return a clef id based on the various parameters
+     * Retrieves the appropriate SMuFL code for a data_CLEFSHAPE
      */
-    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
+    char32_t GetClefGlyph(const data_NOTATIONTYPE notationType) const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
+    //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

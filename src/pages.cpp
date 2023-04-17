@@ -9,10 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "page.h"
 #include "score.h"
 #include "vrv.h"
@@ -23,12 +24,12 @@ namespace vrv {
 // Pages
 //----------------------------------------------------------------------------
 
-Pages::Pages() : Object("pages-"), AttLabelled(), AttNNumberLike()
+Pages::Pages() : Object(PAGES, "pages-"), AttLabelled(), AttNNumberLike()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
-    Reset();
+    this->Reset();
 }
 
 Pages::~Pages() {}
@@ -36,8 +37,8 @@ Pages::~Pages() {}
 void Pages::Reset()
 {
     Object::Reset();
-    ResetLabelled();
-    ResetNNumberLike();
+    this->ResetLabelled();
+    this->ResetNNumberLike();
 }
 
 bool Pages::IsSupportedChild(Object *child)
@@ -56,7 +57,7 @@ bool Pages::IsSupportedChild(Object *child)
 
 void Pages::ConvertFrom(Score *score)
 {
-    score->SwapUuid(this);
+    score->SwapID(this);
     this->AttLabelled::operator=(*score);
     this->AttNNumberLike::operator=(*score);
 }
@@ -64,5 +65,25 @@ void Pages::ConvertFrom(Score *score)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Pages::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPages(this);
+}
+
+FunctorCode Pages::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPages(this);
+}
+
+FunctorCode Pages::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPagesEnd(this);
+}
+
+FunctorCode Pages::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPagesEnd(this);
+}
 
 } // namespace vrv

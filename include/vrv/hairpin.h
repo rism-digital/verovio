@@ -27,7 +27,7 @@ class Hairpin : public ControlElement,
                 public AttColor,
                 public AttHairpinLog,
                 public AttHairpinVis,
-                public AttPlacement,
+                public AttPlacementRelStaff,
                 public AttVerticalGroup {
 public:
     /**
@@ -37,18 +37,25 @@ public:
     ///@{
     Hairpin();
     virtual ~Hairpin();
-    virtual Object *Clone() const { return new Hairpin(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Hairpin"; }
-    virtual ClassId GetClassId() const { return HAIRPIN; }
+    Object *Clone() const override { return new Hairpin(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Hairpin"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
@@ -60,8 +67,8 @@ public:
     bool HasDrawingLength() const { return (m_drawingLength > 0); }
     ///@}
 
-    int CalcHeight(
-        Doc *doc, int staffSize, char spanningType, FloatingPositioner *leftHairpin, FloatingPositioner *rightHaipin);
+    int CalcHeight(const Doc *doc, int staffSize, char spanningType, const FloatingPositioner *leftHairpin,
+        const FloatingPositioner *rightHaipin) const;
 
     /**
      * @name Setter and getter for left and right links
@@ -69,23 +76,31 @@ public:
     ///@{
     void SetLeftLink(ControlElement *leftLink);
     ControlElement *GetLeftLink() { return m_leftLink; }
+    const ControlElement *GetLeftLink() const { return m_leftLink; }
     void SetRightLink(ControlElement *rightLink);
     ControlElement *GetRightLink() { return m_rightLink; }
+    const ControlElement *GetRightLink() const { return m_rightLink; }
     ///@}
+
+    /**
+     * Get left/right adjustments that needs to be done to the hairpin with set coordinates (leftX, rightX) for it not
+     * to overlap with parent measure's barlines
+     */
+    std::pair<int, int> GetBarlineOverlapAdjustment(int doubleUnit, int leftX, int rightX, int spanningType) const;
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareFloatingGrps
+     * Interface for class functor visitation
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

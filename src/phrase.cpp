@@ -9,10 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -21,9 +22,11 @@ namespace vrv {
 // Phrase
 //----------------------------------------------------------------------------
 
-Phrase::Phrase() : Slur("phrase-")
+static const ClassRegistrar<Phrase> s_factory("phrase", PHRASE);
+
+Phrase::Phrase() : Slur(PHRASE, "phrase-")
 {
-    Reset();
+    this->Reset();
 }
 
 Phrase::~Phrase() {}
@@ -36,5 +39,25 @@ void Phrase::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode Phrase::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPhrase(this);
+}
+
+FunctorCode Phrase::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPhrase(this);
+}
+
+FunctorCode Phrase::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPhraseEnd(this);
+}
+
+FunctorCode Phrase::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPhraseEnd(this);
+}
 
 } // namespace vrv

@@ -9,10 +9,12 @@
 #define __VRV_SCOREDEF_INTERFACE_H__
 
 #include "atts_analytical.h"
+#include "atts_cmn.h"
 #include "atts_mensural.h"
 #include "atts_midi.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -27,10 +29,15 @@ namespace vrv {
  * It is not an abstract class but should not be instanciated directly.
  */
 class ScoreDefInterface : public Interface,
+                          public AttBarring,
+                          public AttDurationDefault,
                           public AttLyricStyle,
                           public AttMeasureNumbers,
                           public AttMidiTempo,
+                          public AttMmTempo,
                           public AttMultinumMeasures,
+                          public AttPianoPedals,
+                          public AttSpacing,
                           public AttSystems {
 public:
     /**
@@ -40,8 +47,8 @@ public:
     ///@{
     ScoreDefInterface();
     virtual ~ScoreDefInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_SCOREDEF; }
     ///@}
 
 private:

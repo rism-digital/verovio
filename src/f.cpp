@@ -9,11 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -23,12 +24,14 @@ namespace vrv {
 // F (Figure)
 //----------------------------------------------------------------------------
 
-F::F() : TextElement("f-"), TimeSpanningInterface(), AttExtender()
-{
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_EXTENDER);
+static const ClassRegistrar<F> s_factory("f", FIGURE);
 
-    Reset();
+F::F() : TextElement(FIGURE, "f-"), TimeSpanningInterface(), AttExtender()
+{
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_EXTENDER);
+
+    this->Reset();
 }
 
 F::~F() {}
@@ -37,7 +40,7 @@ void F::Reset()
 {
     TextElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetExtender();
+    this->ResetExtender();
 }
 
 bool F::IsSupportedChild(Object *child)
@@ -58,50 +61,24 @@ bool F::IsSupportedChild(Object *child)
 // F functor methods
 //----------------------------------------------------------------------------
 
-int F::PrepareTimePointing(FunctorParams *functorParams)
+FunctorCode F::Accept(MutableFunctor &functor)
 {
-    // At this stage we require <f> to have a @startid - eventually we can
-    // modify this method and set as start the parent <harm> so @startid would not be
-    // required anymore
-
-    // Pass it to the pseudo functor of the interface
-    TimePointInterface *interface = this->GetTimePointInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimePointing(functorParams, this);
+    return functor.VisitF(this);
 }
 
-int F::PrepareTimeSpanning(FunctorParams *functorParams)
+FunctorCode F::Accept(ConstFunctor &functor) const
 {
-    // Pass it to the pseudo functor of the interface
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimeSpanning(functorParams, this);
+    return functor.VisitF(this);
 }
 
-int F::PrepareTimestamps(FunctorParams *functorParams)
+FunctorCode F::AcceptEnd(MutableFunctor &functor)
 {
-    // Using @tstamp on <f> will work only if @staff is also given on <f>
-
-    // Pass it to the pseudo functor of the interface
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimestamps(functorParams, this);
+    return functor.VisitFEnd(this);
 }
 
-int F::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+FunctorCode F::AcceptEnd(ConstFunctor &functor) const
 {
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
-}
-
-int F::ResetDrawing(FunctorParams *functorParams)
-{
-    TextElement::ResetDrawing(functorParams);
-
-    TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfaceResetDrawing(functorParams, this);
+    return functor.VisitFEnd(this);
 }
 
 } // namespace vrv

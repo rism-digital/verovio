@@ -9,13 +9,16 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layerelement.h"
+#include "smufl.h"
+#include "system.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -28,23 +31,27 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Pedal> s_factory("pedal", PEDAL);
+
 Pedal::Pedal()
-    : ControlElement("pedal-")
+    : ControlElement(PEDAL, "pedal-")
     , TimeSpanningInterface()
     , AttColor()
+    , AttExtSym()
     , AttPedalLog()
     , AttPedalVis()
-    , AttPlacement()
+    , AttPlacementRelStaff()
     , AttVerticalGroup()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_PEDALLOG);
-    RegisterAttClass(ATT_PEDALVIS);
-    RegisterAttClass(ATT_PLACEMENT);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_PEDALLOG);
+    this->RegisterAttClass(ATT_PEDALVIS);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Pedal::~Pedal() {}
@@ -53,33 +60,89 @@ void Pedal::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
-    ResetPedalLog();
-    ResetPedalVis();
-    ResetPlacement();
-    ResetVerticalGroup();
+    this->ResetColor();
+    this->ResetExtSym();
+    this->ResetPedalLog();
+    this->ResetPedalVis();
+    this->ResetPlacementRelStaff();
+    this->ResetVerticalGroup();
 
     m_endsWithBounce = false;
+}
+
+char32_t Pedal::GetPedalGlyph() const
+{
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
+    // If there is glyph.num, prioritize it
+    if (this->HasGlyphNum()) {
+        char32_t code = this->GetGlyphNum();
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (this->HasGlyphName()) {
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+
+    return (this->GetFunc() == "sostenuto") ? SMUFL_E659_keyboardPedalSost : SMUFL_E650_keyboardPedalPed;
+}
+
+data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
+{
+    data_PEDALSTYLE style = static_cast<data_PEDALSTYLE>(doc->GetOptions()->m_pedalStyle.GetValue());
+    if (style != PEDALSTYLE_NONE) {
+        return style;
+    }
+    else if (this->HasForm()) {
+        style = this->GetForm();
+    }
+    else if (const ScoreDef *scoreDef = system->GetDrawingScoreDef(); scoreDef && scoreDef->HasPedalStyle()) {
+        style = scoreDef->GetPedalStyle();
+    }
+
+    return style;
 }
 
 //----------------------------------------------------------------------------
 // Pedal functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Pedal::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPedal(this);
+}
+
+FunctorCode Pedal::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPedal(this);
+}
+
+FunctorCode Pedal::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPedalEnd(this);
+}
+
+FunctorCode Pedal::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPedalEnd(this);
+}
+
 int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     // Sameas not taken into account for now
-    if (!HasDir()) return FUNCTOR_CONTINUE;
+    if (!this->HasDir()) return FUNCTOR_CONTINUE;
 
-    double pedalTime = GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    double pedalTime = this->GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
     double starttime = params->m_totalTime + pedalTime;
     int tpq = params->m_midiFile->getTPQ();
 
     // todo: check pedal @func to switch between sustain/soften/damper pedals?
-    switch (GetDir()) {
+    switch (this->GetDir()) {
         case pedalLog_DIR_down:
             params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
             break;
@@ -91,32 +154,6 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
             params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq) + 0.1, params->m_midiChannel);
             break;
         default: return FUNCTOR_CONTINUE;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    if (!this->HasDir()) return FUNCTOR_CONTINUE;
-
-    if (params->m_pedalLine && (this->GetDir() != pedalLog_DIR_down)) {
-        params->m_pedalLine->SetEnd(this->GetStart());
-        if (this->GetDir() == pedalLog_DIR_bounce) {
-            params->m_pedalLine->EndsWithBounce(true);
-        }
-        params->m_pedalLine = NULL;
-    }
-
-    if ((this->GetDir() != pedalLog_DIR_up) && (this->GetForm() == pedalVis_FORM_line)) {
-        params->m_pedalLine = this;
     }
 
     return FUNCTOR_CONTINUE;

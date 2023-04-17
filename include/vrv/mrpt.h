@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "beam.h"
 #include "layerelement.h"
 
@@ -22,7 +23,7 @@ namespace vrv {
 /**
  * This class models the MEI <mRpt> element.
  */
-class MRpt : public LayerElement {
+class MRpt : public LayerElement, public AttColor, public AttNumbered, public AttNumberPlacement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -31,10 +32,9 @@ public:
     ///@{
     MRpt();
     virtual ~MRpt();
-    virtual Object *Clone() const { return new MRpt(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MRpt"; }
-    virtual ClassId GetClassId() const { return MRPT; }
+    Object *Clone() const override { return new MRpt(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MRpt"; }
     ///@}
 
     //----------//
@@ -42,16 +42,21 @@ public:
     //----------//
 
     /**
-     * @name See Object::GenerateMIDI
+     * Interface for class functor visitation
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
     /**
-     * See Object::PrepareRpt
+     * @name See Object::GenerateMIDI
      */
-    virtual int PrepareRpt(FunctorParams *functorParams);
+    ///@{
+    int GenerateMIDI(FunctorParams *functorParams) override;
+    ///@}
 
 private:
     //

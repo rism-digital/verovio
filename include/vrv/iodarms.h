@@ -40,7 +40,7 @@ public:
     DarmsInput(Doc *doc);
     virtual ~DarmsInput();
 
-    virtual bool Import(const std::string &data);
+    bool Import(const std::string &data) override;
 
 private:
     int do_Note(int pos, const char *data, bool rest);
@@ -61,7 +61,11 @@ private:
     unsigned int m_clef_offset;
     bool m_antique_notation; // support square notation
 
-    static pitchmap PitchMap[];
+    //----------------//
+    // Static members //
+    //----------------//
+
+    static const pitchmap PitchMap[];
 };
 
 #endif /* NO_DARMS_SUPPORT */

@@ -28,14 +28,28 @@ public:
     ///@{
     PgFoot();
     virtual ~PgFoot();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PgFoot"; }
-    virtual ClassId GetClassId() const { return PGFOOT; }
+    void Reset() override;
+    std::string GetClassName() const override { return "PgFoot"; }
     ///@}
+
+    /**
+     * Overriden to get the appropriate margin
+     */
+    int GetTotalHeight(const Doc *doc) const override;
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

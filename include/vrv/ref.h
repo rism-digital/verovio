@@ -29,10 +29,9 @@ public:
     ///@{
     Ref();
     virtual ~Ref();
-    virtual Object *Clone() const { return new Ref(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Ref"; }
-    virtual ClassId GetClassId() const { return REF; }
+    Object *Clone() const override { return new Ref(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Ref"; }
     ///@}
 
     //----------//

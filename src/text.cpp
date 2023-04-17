@@ -9,11 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -22,9 +23,9 @@ namespace vrv {
 // Text
 //----------------------------------------------------------------------------
 
-Text::Text() : TextElement("text-")
+Text::Text() : TextElement(TEXT, "text-")
 {
-    Reset();
+    this->Reset();
 }
 
 Text::~Text() {}
@@ -32,6 +33,26 @@ Text::~Text() {}
 void Text::Reset()
 {
     TextElement::Reset();
+}
+
+FunctorCode Text::Accept(MutableFunctor &functor)
+{
+    return functor.VisitText(this);
+}
+
+FunctorCode Text::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitText(this);
+}
+
+FunctorCode Text::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTextEnd(this);
+}
+
+FunctorCode Text::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTextEnd(this);
 }
 
 } // namespace vrv

@@ -9,12 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "text.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -23,9 +23,11 @@ namespace vrv {
 // Num
 //----------------------------------------------------------------------------
 
-Num::Num() : TextElement("num-")
+static const ClassRegistrar<Num> s_factory("num", NUM);
+
+Num::Num() : TextElement(NUM, "num-")
 {
-    Reset();
+    this->Reset();
 }
 
 Num::~Num() {}
@@ -33,7 +35,7 @@ Num::~Num() {}
 void Num::Reset()
 {
     m_currentText.SetParent(this);
-    m_currentText.SetText(L"");
+    m_currentText.SetText(U"");
 }
 
 bool Num::IsSupportedChild(Object *child)
@@ -45,6 +47,26 @@ bool Num::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+FunctorCode Num::Accept(MutableFunctor &functor)
+{
+    return functor.VisitNum(this);
+}
+
+FunctorCode Num::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNum(this);
+}
+
+FunctorCode Num::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitNumEnd(this);
+}
+
+FunctorCode Num::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNumEnd(this);
 }
 
 } // namespace vrv

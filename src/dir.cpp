@@ -9,12 +9,15 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "comparison.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
+#include "symbol.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -25,8 +28,10 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Dir> s_factory("dir", DIR);
+
 Dir::Dir()
-    : ControlElement("dir-")
+    : ControlElement(DIR, "dir-")
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
@@ -35,14 +40,14 @@ Dir::Dir()
     , AttLineRendBase()
     , AttVerticalGroup()
 {
-    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_EXTENDER);
-    RegisterAttClass(ATT_LINERENDBASE);
-    RegisterAttClass(ATT_VERTICALGROUP);
+    this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_EXTENDER);
+    this->RegisterAttClass(ATT_LINERENDBASE);
+    this->RegisterAttClass(ATT_VERTICALGROUP);
 
-    Reset();
+    this->Reset();
 }
 
 Dir::~Dir() {}
@@ -52,15 +57,15 @@ void Dir::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
-    ResetExtender();
-    ResetLang();
-    ResetLineRendBase();
-    ResetVerticalGroup();
+    this->ResetExtender();
+    this->ResetLang();
+    this->ResetLineRendBase();
+    this->ResetVerticalGroup();
 }
 
 bool Dir::IsSupportedChild(Object *child)
 {
-    if (child->Is({ LB, REND, TEXT })) {
+    if (child->Is({ LB, REND, SYMBOL, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -76,13 +81,24 @@ bool Dir::IsSupportedChild(Object *child)
 // Dir functor methods
 //----------------------------------------------------------------------------
 
-int Dir::PrepareFloatingGrps(FunctorParams *)
+FunctorCode Dir::Accept(MutableFunctor &functor)
 {
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
+    return functor.VisitDir(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Dir::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDir(this);
+}
+
+FunctorCode Dir::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitDirEnd(this);
+}
+
+FunctorCode Dir::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDirEnd(this);
 }
 
 } // namespace vrv

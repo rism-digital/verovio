@@ -33,23 +33,23 @@ public:
      */
     ///@{
     RunningElement();
-    RunningElement(const std::string &classid);
+    RunningElement(ClassId classId);
+    RunningElement(ClassId classId, const std::string &classIdStr);
     virtual ~RunningElement();
-    virtual void Reset();
-    virtual ClassId GetClassId() const { return RUNNING_ELEMENT; }
+    void Reset() override;
     ///@}
 
     /**
      * Disable cloning of the running elements (for now?).
      * It does not make sense you carry copying the running element across the systems.
      */
-    virtual Object *Clone() const { return NULL; }
+    Object *Clone() const override { return NULL; }
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -64,8 +64,8 @@ public:
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     int GetWidth() const;
@@ -76,6 +76,7 @@ public:
     ///@{
     void SetDrawingPage(Page *page);
     Page *GetDrawingPage() { return m_drawingPage; }
+    const Page *GetDrawingPage() const { return m_drawingPage; }
     ///@}
 
     /**
@@ -87,16 +88,34 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the text element cells
+     */
+    ///@{
+    void ResetCells();
+    void AppendTextToCell(int index, TextElement *text);
+    ///@}
+
+    /**
+     * @name Setter and getter for the drawing scaling
+     */
+    ///@{
+    void ResetDrawingScaling();
+    ///@}
+
+    /**
      * @name Get the size of row, cols or cells
      */
     ///@{
-    int GetTotalHeight();
+    /** Height including margins */
+    virtual int GetTotalHeight(const Doc *doc) const = 0;
+    /** Content height */
+    int GetContentHeight() const;
     /** Row from 0 to 2 */
-    int GetRowHeight(int row);
+    int GetRowHeight(int row) const;
     /** Col from 0 to 2 */
-    int GetColHeight(int col);
+    int GetColHeight(int col) const;
     /** Row from 0 to 8 */
-    int GetCellHeight(int cell);
+    int GetCellHeight(int cell) const;
     ///@}
 
     /**
@@ -114,12 +133,17 @@ public:
     /**
      * Set the current page number by looking for a <num label="page">#</num> element.
      */
-    void SetCurrentPageNum(Page *currentPage);
+    void SetCurrentPageNum(const Page *currentPage);
 
     /**
      * Load the footer from the resources (footer.svg)
      */
-    void LoadFooter();
+    void LoadFooter(const Doc *doc);
+
+    /**
+     * Calculate the cell position
+     */
+    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
 
     /**
      * Add page numbering to the running element.
@@ -131,18 +155,21 @@ public:
     //----------//
 
     /**
-     * See Object::Save
+     * Interface for class functor visitation
      */
     ///@{
-    virtual int Save(FunctorParams *functorParams);
-    virtual int SaveEnd(FunctorParams *functorParams);
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
     /**
-     * See Object::AlignVertically
+     * See Object::Save
      */
     ///@{
-    virtual int AlignVertically(FunctorParams *functorParams);
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
 protected:
@@ -150,13 +177,10 @@ protected:
      * Filter the list for a specific class.
      * Keep only the top <rend> and <fig>
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    /**
-     *
-     */
-    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v);
+    //
 
 public:
     //

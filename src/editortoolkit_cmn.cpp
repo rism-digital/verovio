@@ -18,6 +18,8 @@
 #include "chord.h"
 #include "clef.h"
 #include "comparison.h"
+#include "dir.h"
+#include "dynam.h"
 #include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
@@ -27,11 +29,8 @@
 #include "rest.h"
 #include "slur.h"
 #include "staff.h"
+#include "tie.h"
 #include "vrv.h"
-
-//--------------------------------------------------------------------------------
-
-#include "jsonxx.h"
 
 //--------------------------------------------------------------------------------
 
@@ -41,7 +40,7 @@ namespace vrv {
 
 std::string EditorToolkitCMN::EditInfo()
 {
-    return m_chainedId;
+    return m_editInfo.json();
 }
 
 bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, bool commitOnly)
@@ -50,7 +49,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON std::string.");
+        LogError("Cannot parse JSON std::string.");
         return false;
     }
 
@@ -62,7 +61,7 @@ bool EditorToolkitCMN::ParseEditorAction(const std::string &json_editorAction, b
 
     // Action without parameter
     if (action == "commit") {
-        m_doc->PrepareDrawing();
+        m_doc->PrepareData();
         return true;
     }
 
@@ -203,9 +202,9 @@ bool EditorToolkitCMN::Chain(jsonxx::Array actions)
 {
     bool status = true;
     m_chainedId = "";
-    for (int i = 0; i < (int)actions.size(); i++) {
+    for (int i = 0; i < (int)actions.size(); ++i) {
         status = this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), !status);
-        m_editInfo = m_chainedId;
+        m_editInfo.import("uuid", m_chainedId);
     }
     return status;
 }
@@ -216,7 +215,7 @@ bool EditorToolkitCMN::Delete(std::string &elementId)
     if (!element) return false;
 
     if (element->Is(NOTE)) {
-        return this->DeleteNote(dynamic_cast<Note *>(element));
+        return this->DeleteNote(vrv_cast<Note *>(element));
     }
     return false;
 }
@@ -228,7 +227,7 @@ bool EditorToolkitCMN::Drag(std::string &elementId, int x, int y)
 
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
-        Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
+        Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname
@@ -266,35 +265,38 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 {
     if (!m_doc->GetDrawingPage()) return false;
 
-    Object *start = m_doc->GetDrawingPage()->FindDescendantByUuid(startid);
-    Object *end = m_doc->GetDrawingPage()->FindDescendantByUuid(endid);
+    Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
+    Object *end = m_doc->GetDrawingPage()->FindDescendantByID(endid);
     // Check if both start and end elements exist
     if (!start || !end) {
-        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
+        LogInfo("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
         return false;
     }
     // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
+        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
     if (!dynamic_cast<LayerElement *>(end)) {
-        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
+        LogInfo("Element '%s' is not supported as end element", start->GetClassName().c_str());
         return false;
     }
 
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
     if (elementType == "slur") {
         element = new Slur();
     }
+    else if (elementType == "tie") {
+        element = new Tie();
+    }
     else if (elementType == "hairpin") {
         element = new Hairpin();
     }
     else {
-        LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
+        LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
 
@@ -302,10 +304,11 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
-    interface->SetStartid(startid);
-    interface->SetEndid(endid);
+    interface->SetStartid("#" + startid);
+    interface->SetEndid("#" + endid);
 
-    this->m_chainedId = element->GetUuid();
+    m_chainedId = element->GetID();
+    m_editInfo.import("uuid", element->GetID());
 
     return true;
 }
@@ -314,10 +317,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
 {
     if (!m_doc->GetDrawingPage()) return false;
 
-    Object *start = m_doc->GetDrawingPage()->FindDescendantByUuid(startid);
+    Object *start = m_doc->GetDrawingPage()->FindDescendantByID(startid);
     // Check if both start and end elements exist
     if (!start) {
-        LogMessage("Element start id '%s' could not be found", startid.c_str());
+        LogInfo("Element start id '%s' could not be found", startid.c_str());
         return false;
     }
     if (elementType == "note") {
@@ -325,23 +328,22 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
     // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
+        LogInfo("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
 
-    /*
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstAncestor(MEASURE));
+    Measure *measure = vrv_cast<Measure *>(start->GetFirstAncestor(MEASURE));
     assert(measure);
 
     ControlElement *element = NULL;
-    if (elementType == "dynam") {
-        element = new Slur();
+    if (elementType == "dir") {
+        element = new Dir();
     }
-    else if (elementType == "hairpin") {
-        element = new Hairpin();
+    else if (elementType == "dynam") {
+        element = new Dynam();
     }
     else {
-        LogMessage("Inserting control event '%s' is not supported", elementType.c_str());
+        LogInfo("Inserting control event '%s' is not supported", elementType.c_str());
         return false;
     }
 
@@ -349,11 +351,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
     measure->AddChild(element);
-    interface->SetStartid(startid);
-    interface->SetEndid(endid);
+    interface->SetStartid("#" + startid);
 
-    this->m_chainedId = element->GetUuid();
-    */
+    m_chainedId = element->GetID();
+    m_editInfo.import("uuid", element->GetID());
 
     return true;
 }
@@ -364,33 +365,33 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
     if (!element) return false;
 
     bool success = false;
-    if (Att::SetAnalytical(element, attribute, value))
+    if (AttModule::SetAnalytical(element, attribute, value))
         success = true;
-    else if (Att::SetCmn(element, attribute, value))
+    else if (AttModule::SetCmn(element, attribute, value))
         success = true;
-    else if (Att::SetCmnornaments(element, attribute, value))
+    else if (AttModule::SetCmnornaments(element, attribute, value))
         success = true;
-    else if (Att::SetCritapp(element, attribute, value))
+    else if (AttModule::SetCritapp(element, attribute, value))
         success = true;
-    else if (Att::SetExternalsymbols(element, attribute, value))
+    else if (AttModule::SetExternalsymbols(element, attribute, value))
         success = true;
-    else if (Att::SetFacsimile(element, attribute, value))
+    else if (AttModule::SetFacsimile(element, attribute, value))
         success = true;
-    else if (Att::SetGestural(element, attribute, value))
+    else if (AttModule::SetGestural(element, attribute, value))
         success = true;
-    else if (Att::SetMei(element, attribute, value))
+    else if (AttModule::SetMei(element, attribute, value))
         success = true;
-    else if (Att::SetMensural(element, attribute, value))
+    else if (AttModule::SetMensural(element, attribute, value))
         success = true;
-    else if (Att::SetMidi(element, attribute, value))
+    else if (AttModule::SetMidi(element, attribute, value))
         success = true;
-    else if (Att::SetNeumes(element, attribute, value))
+    else if (AttModule::SetNeumes(element, attribute, value))
         success = true;
-    else if (Att::SetPagebased(element, attribute, value))
+    else if (AttModule::SetPagebased(element, attribute, value))
         success = true;
-    else if (Att::SetShared(element, attribute, value))
+    else if (AttModule::SetShared(element, attribute, value))
         success = true;
-    else if (Att::SetVisual(element, attribute, value))
+    else if (AttModule::SetVisual(element, attribute, value))
         success = true;
     if (success) {
         return true;
@@ -401,21 +402,21 @@ bool EditorToolkitCMN::Set(std::string &elementId, std::string const &attribute,
 Object *EditorToolkitCMN::GetElement(std::string &elementId)
 {
     if (elementId == CHAINED_ID) {
-        elementId = this->m_chainedId;
+        elementId = m_chainedId;
     }
     else {
-        this->m_chainedId = elementId;
+        m_chainedId = elementId;
     }
 
     Object *element = NULL;
 
     // Try to get the element on the current drawing page
     if (m_doc->GetDrawingPage()) {
-        element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+        element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     }
     // If it wasn't there, try on the whole doc
     if (!element) {
-        element = m_doc->FindDescendantByUuid(elementId);
+        element = m_doc->FindDescendantByID(elementId);
     }
 
     return element;
@@ -426,40 +427,40 @@ bool EditorToolkitCMN::InsertNote(Object *object)
     assert(object);
 
     if (!object->Is({ CHORD, NOTE, REST })) {
-        LogMessage("Inserting a note is possible only in a chord, note or rest");
+        LogInfo("Inserting a note is possible only in a chord, note or rest");
         return false;
     }
 
     if (object->Is(CHORD)) {
-        Chord *currentChord = dynamic_cast<Chord *>(object);
+        Chord *currentChord = vrv_cast<Chord *>(object);
         assert(currentChord);
         Note *note = new Note();
         currentChord->AddChild(note);
-        this->m_chainedId = note->GetUuid();
+        m_chainedId = note->GetID();
         return true;
     }
     else if (object->Is(NOTE)) {
-        Note *currentNote = dynamic_cast<Note *>(object);
+        Note *currentNote = vrv_cast<Note *>(object);
         assert(currentNote);
 
         Chord *currentChord = currentNote->IsChordTone();
         if (currentChord) {
             Note *note = new Note();
             currentChord->AddChild(note);
-            this->m_chainedId = note->GetUuid();
+            m_chainedId = note->GetID();
             return true;
         }
 
         if (currentNote->HasEditorialContent()) {
-            LogMessage("Inserting a note where a note has editorial content is not possible");
+            LogInfo("Inserting a note where a note has editorial content is not possible");
             return false;
         }
 
         ListOfObjects lyric;
         ClassIdsComparison lyricsComparison({ VERSE, SYL });
-        currentNote->FindAllDescendantByComparison(&lyric, &lyricsComparison);
+        currentNote->FindAllDescendantsByComparison(&lyric, &lyricsComparison);
         if (!lyric.empty()) {
-            LogMessage("Inserting a note where a note has lyric content is not possible");
+            LogInfo("Inserting a note where a note has lyric content is not possible");
             return false;
         }
         Chord *chord = new Chord();
@@ -481,19 +482,17 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         Note *note = new Note();
         chord->AddChild(note);
 
-        ListOfObjects artics;
-        ClassIdComparison articComparison(ARTIC);
-        currentNote->FindAllDescendantByComparison(&artics, &articComparison);
-        for (auto &artic : artics) {
+        ListOfObjects artics = currentNote->FindAllDescendantsByType(ARTIC);
+        for (Object *artic : artics) {
             artic->MoveItselfTo(chord);
         }
         currentNote->ClearRelinquishedChildren();
 
-        this->m_chainedId = note->GetUuid();
+        m_chainedId = note->GetID();
         return true;
     }
     else if (object->Is(REST)) {
-        Rest *rest = dynamic_cast<Rest *>(object);
+        Rest *rest = vrv_cast<Rest *>(object);
         assert(rest);
         Note *note = new Note();
         note->DurationInterface::operator=(*rest);
@@ -501,7 +500,7 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         assert(parent);
         parent->ReplaceChild(rest, note);
         delete rest;
-        this->m_chainedId = note->GetUuid();
+        m_chainedId = note->GetID();
         return true;
     }
     return false;
@@ -512,11 +511,11 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
     assert(note);
 
     Chord *chord = note->IsChordTone();
-    Beam *beam = note->IsInBeam();
+    Beam *beam = note->GetAncestorBeam();
 
     if (chord) {
         if (chord->HasEditorialContent()) {
-            LogMessage("Deleting a note in a chord that has editorial content is not possible");
+            LogInfo("Deleting a note in a chord that has editorial content is not possible");
             return false;
         }
         int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
@@ -536,19 +535,17 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             chord->DetachChild(otherNote->GetIdx());
             parent->ReplaceChild(chord, otherNote);
 
-            ListOfObjects artics;
-            ClassIdComparison articComparison(ARTIC);
-            chord->FindAllDescendantByComparison(&artics, &articComparison, 1);
-            for (auto &artic : artics) {
+            ListOfObjects artics = chord->FindAllDescendantsByType(ARTIC, false, 1);
+            for (Object *artic : artics) {
                 artic->MoveItselfTo(otherNote);
             }
-            this->m_chainedId = chord->GetUuid();
+            m_chainedId = chord->GetID();
             delete chord;
             return true;
         }
         else if (count > 2) {
             chord->DeleteChild(note);
-            this->m_chainedId = chord->GetUuid();
+            m_chainedId = chord->GetID();
             return true;
         }
         // Handle cases of chords with one single note
@@ -584,27 +581,27 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             beam->DetachChild(otherElement->GetIdx());
             parent->ReplaceChild(beam, otherElement);
             delete beam;
-            this->m_chainedId = rest->GetUuid();
+            m_chainedId = rest->GetID();
             return true;
         }
-        if (beam->IsFirstInBeam(note)) {
+        if (beam->IsFirstIn(beam, note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();
             assert(parent);
             parent->InsertBefore(beam, rest);
             beam->DeleteChild(note);
-            this->m_chainedId = rest->GetUuid();
+            m_chainedId = rest->GetID();
             return true;
         }
-        else if (beam->IsLastInBeam(note)) {
+        else if (beam->IsLastIn(beam, note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();
             assert(parent);
             parent->InsertAfter(beam, rest);
             beam->DeleteChild(note);
-            this->m_chainedId = rest->GetUuid();
+            m_chainedId = rest->GetID();
             return true;
         }
         else {
@@ -612,7 +609,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             rest->DurationInterface::operator=(*note);
             beam->ReplaceChild(note, rest);
             delete note;
-            this->m_chainedId = rest->GetUuid();
+            m_chainedId = rest->GetID();
             return true;
         }
     }
@@ -623,7 +620,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         assert(parent);
         parent->ReplaceChild(note, rest);
         delete note;
-        this->m_chainedId = rest->GetUuid();
+        m_chainedId = rest->GetID();
         return true;
     }
 }

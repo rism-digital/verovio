@@ -9,34 +9,65 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <algorithm>
+#include <cassert>
+#include <functional>
 #include <iostream>
+#include <numeric>
 
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "comparison.h"
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
+#include "functor.h"
 #include "functorparams.h"
+#include "gracegrp.h"
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "stem.h"
 #include "verse.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
 
+// Helper template function to calculate optiomal dot locations based on note locations in the chord. Takes iterators
+// for the begin/end of the range; reverse iterators should be passed if reverse order is specified
+template <typename Iterator> std::set<int> CalculateDotLocations(Iterator begin, Iterator end, bool isReverseOrder)
+{
+    // location adjustment that should be applied when looking for optimal position
+    std::vector<int> locAdjust{ 0, 1, -1, -2, 2 };
+    if (isReverseOrder) std::transform(locAdjust.begin(), locAdjust.end(), locAdjust.begin(), std::negate<int>());
+    std::set<int> dotLocations;
+    Iterator prev = begin;
+    for (auto iter = begin; iter != end; ++iter) {
+        bool result = false;
+        for (int adjust : locAdjust) {
+            if ((*iter + adjust) % 2 == 0) continue;
+            if ((prev != iter) && (*prev == *iter) && (adjust == -2)) continue;
+            std::tie(std::ignore, result) = dotLocations.insert(*iter + adjust);
+            if (result) break;
+        }
+        prev = iter;
+    }
+    return dotLocations;
+}
+
 //----------------------------------------------------------------------------
 // Chord
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Chord> s_factory("chord", CHORD);
+
 Chord::Chord()
-    : LayerElement("chord-")
+    : LayerElement(CHORD, "chord-")
     , ObjectListInterface()
     , DrawingListInterface()
     , StemmedDrawingInterface()
@@ -49,16 +80,16 @@ Chord::Chord()
     , AttTiePresent()
     , AttVisibility()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
-    RegisterAttClass(ATT_TIEPRESENT);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_GRACED);
+    this->RegisterAttClass(ATT_STEMS);
+    this->RegisterAttClass(ATT_STEMSCMN);
+    this->RegisterAttClass(ATT_TIEPRESENT);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 Chord::~Chord()
@@ -72,13 +103,13 @@ void Chord::Reset()
     DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
-    ResetColor();
-    ResetCue();
-    ResetGraced();
-    ResetStems();
-    ResetStemsCmn();
-    ResetTiePresent();
-    ResetVisibility();
+    this->ResetColor();
+    this->ResetCue();
+    this->ResetGraced();
+    this->ResetStems();
+    this->ResetStemsCmn();
+    this->ResetTiePresent();
+    this->ResetVisibility();
 
     ClearClusters();
 }
@@ -93,6 +124,47 @@ void Chord::ClearClusters() const
         delete *iter;
     }
     m_clusters.clear();
+}
+
+void Chord::CalculateClusters()
+{
+    this->ClearClusters();
+
+    const ListOfObjects &childList = this->GetList(this);
+    ListOfObjects::const_iterator iter = childList.begin();
+
+    Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
+    assert(lastNote);
+    int lastPitch = lastNote->GetDiatonicPitch();
+    ChordCluster *curCluster = NULL;
+
+    ++iter;
+
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    while (iter != childList.end()) {
+        curNote = vrv_cast<Note *>(*iter);
+        assert(curNote);
+        const int curPitch = curNote->GetDiatonicPitch();
+
+        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
+            if (!lastNote->GetCluster()) {
+                curCluster = new ChordCluster();
+                m_clusters.push_back(curCluster);
+                curCluster->push_back(lastNote);
+                lastNote->SetCluster(curCluster, (int)curCluster->size());
+            }
+            assert(curCluster);
+            curCluster->push_back(curNote);
+            curNote->SetCluster(curCluster, (int)curCluster->size());
+        }
+
+        lastNote = curNote;
+        lastPitch = curPitch;
+
+        ++iter;
+    }
 }
 
 bool Chord::IsSupportedChild(Object *child)
@@ -128,80 +200,40 @@ void Chord::AddChild(Object *child)
         return;
     }
 
+    ArrayOfObjects &children = this->GetChildrenForModification();
+
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
     if (child->Is({ DOTS, STEM })) {
-        m_children.insert(m_children.begin(), child);
+        children.insert(children.begin(), child);
     }
     else {
-        m_children.push_back(child);
+        children.push_back(child);
     }
     Modify();
 }
 
-void Chord::FilterList(ArrayOfObjects *childList)
+void Chord::FilterList(ListOfConstObjects &childList) const
 {
     // Retain only note children of chords
-    ArrayOfObjects::iterator iter = childList->begin();
+    ListOfConstObjects::iterator iter = childList.begin();
 
-    while (iter != childList->end()) {
-        if ((*iter)->Is(NOTE))
+    while (iter != childList.end()) {
+        if ((*iter)->Is(NOTE)) {
             ++iter;
-        else
-            iter = childList->erase(iter);
-    }
-
-    std::sort(childList->begin(), childList->end(), DiatonicSort());
-
-    if (childList->empty()) {
-        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
-        Note *rescueNote = new Note();
-        this->AddChild(rescueNote);
-        childList->push_back(rescueNote);
-    }
-
-    iter = childList->begin();
-
-    this->ClearClusters();
-
-    Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
-    assert(lastNote);
-    int curPitch, lastPitch = lastNote->GetDiatonicPitch();
-    ChordCluster *curCluster = NULL;
-
-    ++iter;
-
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
-    while (iter != childList->end()) {
-        curNote = dynamic_cast<Note *>(*iter);
-        assert(curNote);
-        curPitch = curNote->GetDiatonicPitch();
-
-        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
-            if (!lastNote->GetCluster()) {
-                curCluster = new ChordCluster();
-                m_clusters.push_back(curCluster);
-                curCluster->push_back(lastNote);
-                lastNote->SetCluster(curCluster, (int)curCluster->size());
-            }
-            assert(curCluster);
-            curCluster->push_back(curNote);
-            curNote->SetCluster(curCluster, (int)curCluster->size());
         }
-
-        lastNote = curNote;
-        lastPitch = curPitch;
-
-        ++iter;
+        else {
+            iter = childList.erase(iter);
+        }
     }
+
+    childList.sort(DiatonicSort());
 }
 
-int Chord::PositionInChord(Note *note)
+int Chord::PositionInChord(const Note *note) const
 {
-    int size = (int)this->GetList(this)->size();
+    const int size = this->GetListSize(this);
     int position = this->GetListIndex(note);
     assert(position != -1);
     // this is the middle (only if odd)
@@ -210,85 +242,94 @@ int Chord::PositionInChord(Note *note)
     return 1;
 }
 
-void Chord::GetYExtremes(int &yMax, int &yMin)
+void Chord::GetYExtremes(int &yMax, int &yMin) const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-
     // The first note is the bottom
-    yMin = childList->front()->GetDrawingY();
+    yMin = this->GetListFront(this)->GetDrawingY();
     // The last note is the top
-    yMax = childList->back()->GetDrawingY();
+    yMax = this->GetListBack(this)->GetDrawingY();
 }
 
-int Chord::GetYTop()
+int Chord::GetYTop() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-
     // The last note is the top
-    return childList->back()->GetDrawingY();
+    return this->GetListBack(this)->GetDrawingY();
 }
 
-int Chord::GetYBottom()
+int Chord::GetYBottom() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-
     // The first note is the bottom
-    return childList->front()->GetDrawingY();
+    return this->GetListFront(this)->GetDrawingY();
 }
 
 Note *Chord::GetTopNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    return const_cast<Note *>(std::as_const(*this).GetTopNote());
+}
 
-    Note *topNote = dynamic_cast<Note *>(childList->back());
+const Note *Chord::GetTopNote() const
+{
+    const Note *topNote = vrv_cast<const Note *>(this->GetListBack(this));
     assert(topNote);
     return topNote;
 }
 
 Note *Chord::GetBottomNote()
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    return const_cast<Note *>(std::as_const(*this).GetBottomNote());
+}
 
+const Note *Chord::GetBottomNote() const
+{
     // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note *>(childList->front());
+    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront(this));
     assert(bottomNote);
     return bottomNote;
 }
 
-int Chord::GetXMin()
+int Chord::GetXMin() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    assert(childList.size() > 0);
 
     int x = -VRV_UNSET;
-    ArrayOfObjects::const_iterator iter = childList->begin();
-    while (iter != childList->end()) {
+    ListOfConstObjects::const_iterator iter = childList.begin();
+    while (iter != childList.end()) {
         if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
         ++iter;
     }
     return x;
 }
 
-int Chord::GetXMax()
+int Chord::GetXMax() const
 {
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    assert(childList.size() > 0);
 
     int x = VRV_UNSET;
-    ArrayOfObjects::const_iterator iter = childList->begin();
-    while (iter != childList->end()) {
+    ListOfConstObjects::const_iterator iter = childList.begin();
+    while (iter != childList.end()) {
         if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
         ++iter;
     }
     return x;
 }
 
-void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
+void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow, Layer **layerAbove, Layer **layerBelow)
+{
+    const Staff *staffAboveRef = NULL;
+    const Staff *staffBelowRef = NULL;
+    const Layer *layerAboveRef = NULL;
+    const Layer *layerBelowRef = NULL;
+    std::as_const(*this).GetCrossStaffExtremes(staffAboveRef, staffBelowRef, &layerAboveRef, &layerBelowRef);
+    staffAbove = const_cast<Staff *>(staffAboveRef);
+    staffBelow = const_cast<Staff *>(staffBelowRef);
+    if (layerAbove) *layerAbove = const_cast<Layer *>(layerAboveRef);
+    if (layerBelow) *layerBelow = const_cast<Layer *>(layerBelowRef);
+}
+
+void Chord::GetCrossStaffExtremes(
+    const Staff *&staffAbove, const Staff *&staffBelow, const Layer **layerAbove, const Layer **layerBelow) const
 {
     staffAbove = NULL;
     staffBelow = NULL;
@@ -297,99 +338,78 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     if (m_crossStaff) return;
 
     // The first note is the bottom
-    Note *bottomNote = this->GetBottomNote();
+    const Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
+        if (layerBelow) (*layerBelow) = bottomNote->m_crossLayer;
     }
 
     // The last note is the top
-    Note *topNote = this->GetTopNote();
+    const Note *topNote = this->GetTopNote();
     assert(topNote);
     if (topNote->m_crossStaff && topNote->m_crossLayer) {
         staffAbove = topNote->m_crossStaff;
+        if (layerAbove) (*layerAbove) = topNote->m_crossLayer;
     }
 }
 
-void Chord::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow)
-{
-    assert(element);
-    assert(alignment);
-
-    // Only flags and stems need to be skipped
-    if (!element->Is({ FLAG, STEM })) return;
-
-    // Nothing to do if there is not cross-staff
-    if (!this->HasCrossStaff()) return;
-
-    Staff *staff = alignment->GetStaff();
-    assert(staff);
-
-    Staff *staffAbove = NULL;
-    Staff *staffBelow = NULL;
-    this->GetCrossStaffExtremes(staffAbove, staffBelow);
-    if (staffAbove && (staffAbove != staff)) {
-        skipAbove = true;
-    }
-    if (staffBelow && (staffBelow != staff)) {
-        skipBelow = true;
-    }
-}
-
-bool Chord::HasCrossStaff()
+bool Chord::HasCrossStaff() const
 {
     if (m_crossStaff) return true;
 
-    Staff *staffAbove = NULL;
-    Staff *staffBelow = NULL;
+    const Staff *staffAbove = NULL;
+    const Staff *staffBelow = NULL;
 
     this->GetCrossStaffExtremes(staffAbove, staffBelow);
 
     return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
-Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
+Point Chord::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
-    Note *bottomNote = this->GetBottomNote();
+    const Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
     return bottomNote->GetStemUpSE(doc, staffSize, isCueSize);
 }
 
-Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
+Point Chord::GetStemDownNW(const Doc *doc, int staffSize, bool isCueSize) const
 {
-    Note *topNote = this->GetTopNote();
+    const Note *topNote = this->GetTopNote();
     assert(topNote);
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-int Chord::CalcStemLenInThirdUnits(Staff *staff)
+int Chord::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir) const
 {
     assert(staff);
 
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-        Note *topNote = this->GetTopNote();
+    if (stemDir == STEMDIRECTION_up) {
+        const Note *topNote = this->GetTopNote();
         assert(topNote);
-        return topNote->CalcStemLenInThirdUnits(staff);
+        return topNote->CalcStemLenInThirdUnits(staff, stemDir);
+    }
+    else if (stemDir == STEMDIRECTION_down) {
+        const Note *bottomNote = this->GetBottomNote();
+        assert(bottomNote);
+        return bottomNote->CalcStemLenInThirdUnits(staff, stemDir);
     }
     else {
-        Note *bottomNote = this->GetBottomNote();
-        assert(bottomNote);
-        return bottomNote->CalcStemLenInThirdUnits(staff);
+        return 0;
     }
 }
 
-bool Chord::IsVisible()
+bool Chord::IsVisible() const
 {
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
 
-    // if the chord doens't have it, see if all the children are invisible
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
+    // if the chord doesn't have it, see if all the children are invisible
+    const ListOfConstObjects &notes = this->GetList(this);
 
-    for (auto &iter : *notes) {
-        Note *note = dynamic_cast<Note *>(iter);
+    for (const Object *object : notes) {
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
@@ -399,48 +419,150 @@ bool Chord::IsVisible()
     return false;
 }
 
-bool Chord::HasNoteWithDots()
+bool Chord::HasAdjacentNotesInStaff(const Staff *staff) const
 {
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
+    assert(staff);
+    MapOfNoteLocs locations = this->CalcNoteLocations();
 
-    for (auto &iter : *notes) {
-        Note *note = dynamic_cast<Note *>(iter);
+    if (locations[staff].empty() || locations[staff].size() == 1) return false;
+
+    std::vector<int> diff;
+    diff.resize(locations[staff].size());
+    // Find difference between adjacent notes in the chord. Since locations[staff] is multiset, elements are ordered and
+    // represent position of notes in chord. This way we can find whether there are notes with diatonic step difference
+    // of 1.
+    std::adjacent_difference(locations[staff].begin(), locations[staff].end(), diff.begin());
+
+    return (diff.end() != std::find(std::next(diff.begin()), diff.end(), 1));
+}
+
+bool Chord::HasNoteWithDots() const
+{
+    const ListOfConstObjects &notes = this->GetList(this);
+
+    return std::any_of(notes.cbegin(), notes.cend(), [](const Object *object) {
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
-        if (note->GetDots() > 0) {
-            return true;
+        return (note->GetDots() > 0);
+    });
+}
+
+int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements,
+    bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
+{
+    int margin = 0;
+    // get positions of other elements
+    std::set<int> otherElementLocations;
+    for (LayerElement *element : otherElements) {
+        if (element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(element);
+            assert(note);
+            otherElementLocations.insert(note->GetDrawingLoc());
         }
     }
+    const ListOfObjects &notes = this->GetList(this);
+    // get current chord positions
+    std::set<int> chordElementLocations;
+    for (const auto iter : notes) {
+        Note *note = vrv_cast<Note *>(iter);
+        assert(note);
+        chordElementLocations.insert(note->GetDrawingLoc());
+    }
 
-    return false;
+    std::vector<int> locationsInUnison
+        = this->GetElementsInUnison(chordElementLocations, otherElementLocations, this->GetDrawingStemDir());
+
+    const int expectedElementsInUnison = (int)locationsInUnison.size();
+    const bool isLowerPosition = (STEMDIRECTION_down == this->GetDrawingStemDir() && (otherElementLocations.size() > 0)
+        && (*chordElementLocations.begin() >= *otherElementLocations.begin()));
+    int actualElementsInUnison = 0;
+
+    // process each note of the chord separately, storing locations in the set
+    for (Object *object : notes) {
+        Note *note = vrv_cast<Note *>(object);
+        assert(note);
+        auto [overlap, isInUnison] = note->CalcElementHorizontalOverlap(
+            doc, otherElements, areDotsAdjusted, true, isLowerPosition, expectedElementsInUnison > 0);
+        if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
+            margin = overlap;
+        }
+        if (isInUnison) ++actualElementsInUnison;
+    }
+
+    // if there are accidentals that are aligned for the layer separately, we need to have additional margin for them
+    int accidMargin = 0;
+    for (const auto iter : otherElements) {
+        if (!iter->Is(NOTE)) continue;
+        Note *note = vrv_cast<Note *>(iter);
+        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+        if (accid && accid->IsAlignedWithSameLayer()) {
+            accidMargin += accid->GetContentRight() - accid->GetContentLeft();
+        }
+    }
+    if (accidMargin) {
+        // add padding for the accidentals (1.5 unit)
+        accidMargin += 1.5 * doc->GetDrawingUnit(100);
+    }
+
+    if (expectedElementsInUnison && (expectedElementsInUnison == actualElementsInUnison)) {
+        isUnison = true;
+    }
+    else if (margin) {
+        // adjust margin by accidental margin
+        margin -= accidMargin;
+        this->SetDrawingXRel(this->GetDrawingXRel() + margin);
+        return margin;
+    }
+    return 0;
+}
+
+std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc) const
+{
+    const ListOfConstObjects &notes = this->GetList(this);
+
+    std::list<const Note *> adjacentNotes;
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
+        assert(note);
+
+        const Staff *noteStaff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+        if (noteStaff != staff) continue;
+
+        const int locDiff = note->GetDrawingLoc() - loc;
+        if ((std::abs(locDiff) <= 2) && (locDiff != 0)) {
+            adjacentNotes.push_back(note);
+        }
+    }
+    return adjacentNotes;
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
+FunctorCode Chord::Accept(MutableFunctor &functor)
 {
-    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
-    assert(params);
+    return functor.VisitChord(this);
+}
 
-    if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
+FunctorCode Chord::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitChord(this);
+}
 
-    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
-    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitChordEnd(this);
+}
 
-    CalcStemParams calcStemParams(params->m_doc);
-    Functor calcStem(&Object::CalcStem);
-    this->Process(&calcStem, &calcStemParams);
-
-    return FUNCTOR_SIBLINGS;
+FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitChordEnd(this);
 }
 
 int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     assert(!params->m_currentChord);
@@ -450,7 +572,7 @@ int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
     if (this->HasFermata()) {
         Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
     }
 
     return FUNCTOR_CONTINUE;
@@ -458,7 +580,7 @@ int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
 
 int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     if (params->m_permanent) {
@@ -471,247 +593,47 @@ int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::CalcStem(FunctorParams *functorParams)
+MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
-    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
-    assert(params);
+    const ListOfConstObjects &notes = this->GetList(this);
 
-    // Set them to NULL in any case
-    params->m_interface = NULL;
-
-    // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
-    // be processed either
-    if (this->IsInBeam() || this->IsInFTrem()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // if the chord isn't visible, carry on
-    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Stem *stem = this->GetDrawingStem();
-    assert(stem);
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    if (this->m_crossStaff) staff = this->m_crossStaff;
-
-    // Cache the in params to avoid further lookup
-    params->m_staff = staff;
-    params->m_layer = layer;
-    params->m_interface = this;
-    params->m_dur = this->GetActualDur();
-    params->m_isGraceNote = this->IsGraceNote();
-
-    /************ Set the direction ************/
-
-    int yMax, yMin;
-    this->GetYExtremes(yMax, yMin);
-    params->m_chordStemLength = yMin - yMax;
-
-    int staffY = staff->GetDrawingY();
-    int staffSize = staff->m_drawingStaffSize;
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-
-    data_STEMDIRECTION layerStemDir;
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
-    if (stem->HasStemDir()) {
-        stemDir = stem->GetStemDir();
-    }
-    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
-        stemDir = layerStemDir;
-    }
-    else {
-        stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down
-                                                                                       : STEMDIRECTION_up;
-    }
-
-    this->SetDrawingStemDir(stemDir);
-
-    // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up) stem->SetDrawingYRel(yMin - this->GetDrawingY());
-    // And to the top note when down
-    else
-        stem->SetDrawingYRel(yMax - this->GetDrawingY());
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::CalcDots(FunctorParams *functorParams)
-{
-    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // if the chord isn't visible, stop here
-    if (!this->IsVisible()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    // if there aren't dot, stop here but only if no note has a dot
-    if (this->GetDots() < 1) {
-        if (!this->HasNoteWithDots()) {
-            return FUNCTOR_SIBLINGS;
-        }
-        else {
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    Dots *dots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    params->m_chordDots = dots;
-    params->m_chordDrawingX = this->GetDrawingX();
-    params->m_chordStemDir = this->GetDrawingStemDir();
-
-    ArrayOfObjects::const_reverse_iterator rit;
-    const ArrayOfObjects *notes = this->GetList(this);
-    assert(notes);
-
-    assert(this->GetTopNote());
-    assert(this->GetBottomNote());
-
-    for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
-        Note *note = dynamic_cast<Note *>(*rit);
+    MapOfNoteLocs noteLocations;
+    for (const Object *obj : notes) {
+        const Note *note = vrv_cast<const Note *>(obj);
         assert(note);
 
-        if (note->GetDots() == 0) {
-            continue;
+        if (predicate && !predicate(note)) continue;
+
+        const Staff *staff = note->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+
+        noteLocations[staff].insert(note->GetDrawingLoc());
+    }
+    return noteLocations;
+}
+
+MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
+{
+    const bool isUpwardDirection = (this->GetDrawingStemDir() == STEMDIRECTION_up) || (layerCount == 1);
+    const bool useReverseOrder = (isUpwardDirection != primary);
+    MapOfNoteLocs noteLocs = this->CalcNoteLocations([](const Note *note) { return !note->HasDots(); });
+    MapOfDotLocs dotLocs;
+    for (const auto &mapEntry : noteLocs) {
+        if (useReverseOrder) {
+            dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.rbegin(), mapEntry.second.rend(), true);
         }
-
-        Layer *layer = NULL;
-        Staff *staff = note->GetCrossStaff(layer);
-
-        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
-        int loc = note->GetDrawingLoc();
-
-        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-        if ((loc % 2) == 0) {
-            // defaults to the space above the staffline first
-            // if that position is not on the list already, we're good to go
-            if (std::find(dotLocs->begin(), dotLocs->end(), loc + 1) == dotLocs->end()) {
-                loc += 1;
-            }
-            // if it is on the list, we should try the spot a doubleUnit below
-            else if (std::find(dotLocs->begin(), dotLocs->end(), loc - 1) == dotLocs->end()) {
-                loc -= 1;
-            }
-            // otherwise, any other space looks weird so let's not draw it
-            else {
-                continue;
-            }
-        }
-        // similar if it's not on a staff line
         else {
-            // see if the optimal place exists already
-            if (std::find(dotLocs->begin(), dotLocs->end(), loc) == dotLocs->end()) {
-            }
-            // if it does, then look up a space first
-            else if (std::find(dotLocs->begin(), dotLocs->end(), loc + 2) == dotLocs->end()) {
-                loc += 2;
-            }
-            // then look down a space
-            else if (std::find(dotLocs->begin(), dotLocs->end(), loc - 2) == dotLocs->end()) {
-                loc -= 2;
-            }
-            // otherwise let's not draw it
-            else {
-                continue;
-            }
+            dotLocs[mapEntry.first] = CalculateDotLocations(mapEntry.second.begin(), mapEntry.second.end(), false);
         }
-
-        // finally, make sure it's not outside the acceptable extremes of the chord.
-        // however, this does take into account cross-staff chords because it looks only at the top and bottom notes.
-        // when it would be necessary to look at top and bottom for each staff
-        if (!this->HasCrossStaff()) {
-            if (loc > this->GetTopNote()->GetDrawingLoc() + 1) continue;
-            if (loc < this->GetBottomNote()->GetDrawingLoc() - 1) continue;
-        }
-
-        // if it's not, add it to the dots list and go back to DrawChord
-        dotLocs->push_back(loc);
     }
-
-    return FUNCTOR_CONTINUE;
+    return dotLocs;
 }
 
-int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
+int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindDescendantByType(STEM, 1));
-    Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindDescendantByType(FLAG, 1));
-
-    if (!currentStem) {
-        currentStem = new Stem();
-        this->AddChild(currentStem);
-    }
-    currentStem->AttGraced::operator=(*this);
-    currentStem->AttStems::operator=(*this);
-    currentStem->AttStemsCmn::operator=(*this);
-    if (this->GetActualDur() < DUR_2) {
-        currentStem->IsVirtual(true);
-    }
-
-    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsInFTrem()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-
-    SetDrawingStem(currentStem);
-
-    // Also set the drawing stem object (or NULL) to all child notes
-    const ArrayOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ArrayOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
-        assert((*it)->Is(NOTE));
-        Note *note = dynamic_cast<Note *>(*it);
-        assert(note);
-        note->SetDrawingStem(currentStem);
-    }
-
-    /************ dots ***********/
-
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if (this->GetDots() > 0) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
-{
-    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    LayerElement *element = this->ThisOrSameasAsLink();
+    LayerElement *element = this->ThisOrSameasLink();
 
     double incrementScoreTime = element->GetAlignmentDuration(
         params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
@@ -724,13 +646,37 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::ResetDrawing(FunctorParams *functorParams)
+int Chord::GenerateMIDI(FunctorParams *functorParams)
 {
-    // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
 
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
+    // Handle grace chords
+    if (this->IsGraceNote()) {
+        std::set<int> pitches;
+        const ListOfObjects &notes = this->GetList(this);
+        for (Object *obj : notes) {
+            Note *note = vrv_cast<Note *>(obj);
+            assert(note);
+            pitches.insert(note->GetMIDIPitch(params->m_transSemi));
+        }
+
+        double quarterDuration = 0.0;
+        const data_DURATION dur = this->GetDur();
+        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
+            quarterDuration = pow(2.0, (DURATION_4 - dur));
+        }
+
+        params->m_graceNotes.push_back({ pitches, quarterDuration });
+
+        bool accented = (this->GetGrace() == GRACE_acc);
+        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->GetFirstAncestor(GRACEGRP));
+        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
+        params->m_accentedGraceNote = accented;
+
+        return FUNCTOR_SIBLINGS;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

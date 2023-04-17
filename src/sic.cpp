@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,13 @@ namespace vrv {
 // Sic
 //----------------------------------------------------------------------------
 
-Sic::Sic() : EditorialElement("sic-"), AttSource()
-{
-    RegisterAttClass(ATT_SOURCE);
+static const ClassRegistrar<Sic> s_factory("sic", SIC);
 
-    Reset();
+Sic::Sic() : EditorialElement(SIC, "sic-"), AttSource()
+{
+    this->RegisterAttClass(ATT_SOURCE);
+
+    this->Reset();
 }
 
 Sic::~Sic() {}
@@ -33,7 +35,7 @@ Sic::~Sic() {}
 void Sic::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

@@ -1,6 +1,269 @@
 # Changelog
 
 ## [unreleased]
+* Support for delayed turns on chords (@eNote-GmbH)
+* Improve endpoint location for spanning slurs (@eNote-GmbH)
+* Improve layout for inner slurs in cross-staff situations (@eNote-GmbH)
+* Fix validity of MEI output by ensuring correct element order
+* Option --octave-no-spanning-parentheses to prevent () in spanning octave displacements (@eNote-GmbH)
+
+## [3.15.0] - 2023-03-01
+* Improved generation of `xml:id`s (@eNote-GmbH)
+* Improved positioning of accidentals in chords (@eNote-GmbH)
+* Improved MusicXML import (@eNote-GmbH)
+* Improved rendering of brackets (@eNote-GmbH)
+* Improved interaction between slurs and tuplets (@eNote-GmbH)
+* Improved harm annotations in the Humdrum importer (@WolfgangDrescher)
+* Refactoring of LibMEI and integration within the Verovio repository
+* Reduced memory usage of the LibMEI code (@eNote-GmbH)
+* Option to add metadata in the Plaine and Easie importer
+* Option --octave-no-spanning-parentheses for octave brackets without brackets (@eNote-GmbH)
+* Option --load-selected-mdiv-only (@eNote-GmbH)
+* Fix in MIDI tempo calculation with `@mm.dots` (@wergo)
+* Fixes in the MusicXML importer (@eNote-GmbH)
+
+## [3.14.0] - 2022-12-23
+* Support for user defined symbols in `symbolTable/symbolDef` with `svg` or `graphic`
+* Support for `@altsym` for `breath`, `ceasura`, `fermata`, `mordent`, `trill` and `turn`
+* Support for `incip` with MEI and PAE format (with --incip option)
+* Support for single-line Plaine & Easie input
+* Support for `@extender` lines on `tempo` (@eNote-GmbH)
+* Support for `ornam` with text content rendering
+* Improvements to the humdrum importer (@gregchapman-dev)
+* Option --unit changed to decimal
+
+## [3.13.1] - 2022-11-28
+* Fix text music font always falling back to Leipzig
+* Fix missing JSON handling for some methods in the Python binding
+* Fix text size percent not being reset in sibling text elements
+
+## [3.13.0] - 2022-11-23
+* Refactoring of the JSON parameters and returned values as dictionaries for the Python binding
+* Support for text font fallback when a glyph is missing in the selected font
+* Support for Plaine & Easie gross and refined contour feature extraction
+* Support for `dblserpent` barlines (@eNote-GmbH)
+* Support for `@dir.dist` and `@tempo.dist` (@eNote-GmbH)
+* Support for persian accidentals (sori and koron)
+* Support for heavy barlines (@eNote-GmbH)
+* Support for log level selection (warning by default)
+* Support for controlling log in the JS toolkit (@WolfgangDrescher)
+* Option --smuflTextFont for controlling text font embedding or linking CSS fonts
+* Option --lyricElision for selecting elision glyph (regular, wide, narrow or unicode)
+* Option --log-level (-l) for controlling the log level from the command-line tool
+* Method getOption(bool) split as getOptions() and getDefaultOptions()
+* Fixes in the PAE importer (@carlolic)
+
+## [3.12.1] - 2022-10-06
+* Fix `graphic` misssing in ios framework
+* Fix bug when CSS font is not found
+* Fix cmake installation directory
+* Fix `symbol` not allowed in `tempo`
+
+## [3.12.0] - 2022-09-29
+* Support for `symbol` within text elements (with `@glyph.num` or `@glyph.name`)
+* Support for all music fonts within text using css webfont2 (with `rend@fontfam="smufl"`)
+* Support for `graphic` input and output (@wergo)
+* Support for `caesura` (@eNote-GmbH)
+* Support for unicode music symbols (coda, segno, da capo, dal segno)
+* Support for mensural multiple stems (@eNote-GmbH)
+* Option --dynam-single-glyphs to use single glyphs for dynamics (@eNote-GmbH)
+* Option --scale-to-page-size for an output with a fix size independently from the scale factor
+* Replacement of VerovioText font with Leipzig (and other supported music fonts)
+* Compiling option to use the old Plaine & Easie parser (@carlolic)
+
+## [3.11.0] - 2022-07-15
+* Support for MEI-basic output
+* Support for ES6 and improved npm package (@WolfgangDrescher)
+* Support for `@artic.ges` (@eNote-GmbH)
+* Support for transposition of scores without key signature (@eNote-GmbH)
+* Support for `dashedBarlineDashLength` and `dashedBarlineGapLength` in engraving defaults (@eNote-GmbH)
+* Improved MIDI output with tuning, key signature and first verse (@eNote-GmbH)
+* Improved PAE output for measure rests
+* Improved mixed beam rendering (@eNote-GmbH)
+* Option --score-definition-to-staff for moving `clef`, `keySig`, `meterSig` and `meterSigGrp` to `staffDef`
+* Option --beam-mixed-stem-min and --beam-mixed-preserve for controlling mixed beam flipping (@eNote-GmbH)
+* Option --condense-not-last-system for making sure the last system of a score is always shown
+
+## [3.10.0] - 2022-05-25
+* Support for `accid@place` (@eNote-GmbH)
+* Support for `mRpt@num` and `mRpt@num.place` (@eNote-GmbH)
+* Support for `mixed` croff-staff slurs (@eNote-GmbH)
+* Support for `non-arp` arpeggios (@eNote-GmbH)
+* Support for ligatures in Plaine & Easie
+* Function select for specifying a portion of a score for rendering
+* Improved rendering with diamond and slash shaped noteheads (@eNote-GmbH)
+* Improved rendering of slurs (@eNote-GmbH)
+* Improved Plaine & Easie validation
+* Option --beam-french-style for french beam style (@eNote-GmbH)
+* Option --transpose-mdiv for individual transposition of mdivs (@eNote-GmbH)
+* Option --transpose-to-sounding-pitch for transposing to sounding pitches using `@trans.semi`
+* Python Package Index (PyPI) distribution for macOS arm64
+
+## [3.9.0] - 2022-02-22
+* Support for `beatRpt@beatdef`
+* Support for `scoreDef` and `staffDef` `@dur.default` (@eNote-GmbH)
+* Support for MIDI output of grace notes and multi-measure rests (@eNote-GmbH)
+* Support for `@stem.sameas` on notes for orchestra scores
+* Support for MIDI output of arpeggios (@eNote-GmbH)
+* Support for `beamSpan` (@eNote-GmbH)
+* Support for lyrics, tuplets and multiple tunes (`mdiv`) in ABC import (@eNote-GmbH)
+* Improved double stemmed beams (@eNote-GmbH)
+* Improved tablature MIDI output (@paul-bayleaf)
+* Improved PAE importer (nested beams, mensural dots, stemless notes)
+* Improved vertical positioning with half staff spacing above and below the systems
+* Improved justification (@eNote-GmbH)
+* Improved handling of the SMUFL fonts (@eNote-GmbH)
+* Additional parameters to the redoLayout method for faster cached layout redoing
+* Additional parameters to the renderToTimemap method for including rests and measure
+* Additional ids for rests and measure added to the getElementsAtTime methods
+* Option --svg-css for passing an additional CSS to be included in the SVG output
+* Preliminary support for stems and beam for guitar tablature
+* Preliminary support for tablature MusicXML import (@paul-bayleaf)
+* Distribution of the build with humdrum as NPM package
+
+## [3.8.1] - 2022-01-10
+* Fix bug in PAE importer for durations and for key signatures
+
+## [3.8.0] - 2021-12-22
+* Support for figured-bass extenders on `f` without `@tstamp` or `@startid` 
+* Improved page-based MEI output with validation with a customized MEI Schema
+* Improved layout with beams and control events (ornaments, fingering, etc.) (@eNote-GmbH)
+* Improve enharmonic tie overlap with accidentals (@eNote-GmbH)
+* Improved Plaine & Easie validation output with error codes and values
+* Additional parameters to the getMEI method for exporting selected content (@eNote-GmbH)
+* Option --multi-rest-thickness to control the thickness of measure rests (@eNote-GmbH)
+
+## [3.7.0] - 2021-11-22
+* Complete refactoring of the Plaine & Easie parser
+* Support for `multiRest@num.place` (@eNote-GmbH)
+* Support for `meterSig@enclose`, `clef@enclose` and `arpeg@enclose` (@eNote-GmbH)
+* Support for `accid@loc` and `accid@oloc`/`accid@ploc` (@eNote-GmbH)
+* Support for text circle enclosure (@eNote-GmbH)
+* Support for wavy glissandi (@eNote-GmbH)
+* Improved slurs in cross-staff context and with grace notes (@eNote-GmbH)
+* Preliminary support for tablature MIDI output (@paul-bayleaf)
+* Option --fingering-scale to control the size of fingering (@eNote-GmbH)
+* Option --handwritten-font for spcific glyph positioning (@eNote-GmbH)
+* Option --pedal-style (auto|line) to control styling (@eNote-GmbH)
+* Option --slur-margin to control positioning ofr slurs (@eNote-GmbH)
+* Option --show-runtime to display the total runtime on command-line (@eNote-GmbH)
+* Option --svg-additional-attribute to make MEI attributes appear in the SVG (@wergo)
+* Option --tie-min-length to control the minimum length of ties (@eNote-GmbH)
+* Fix MEI output for single page output and page-based MEI output
+
+## [3.6.0] - 2021-08-24
+* Support for `section@restart`
+* Support for rendering multiple `mdiv/score`
+* Support for delayed turns using `@startid`
+* Improved ties between chords (@eNote-GmbH)
+* Improved handling of whole notes with multiple layers (@eNote-GmbH)
+* Improved support for `engravingDefaults` (@eNote-GmbH)
+* Improved logging for Android (@alpha0010)
+* Improved spacing for notes on ledger lines (@eNote-GmbH)
+* Improved placement of beam in order to avoid overlaps (@eNote-GmbH)
+* Function getElementsAtTime includes `chord` elements
+* Function resetXmlIdSeed for resetting the `@xml:id` random generator with a specific value
+* Function getDescriptiveFeatures for basic feature extraction (experimental work)
+* Option --staccato-center to center staccato on notehead and not the stem (new default)
+* Option --xml-id-checksum to have `@xml:id` generated based on the checksum of the input data
+
+## [3.5.0] - 2021-07-22
+* Support for `lv` (@eNote-GmbH)
+* Support for additive meters (@eNote-GmbH)
+* Support for `bTrem` (bowed tremolos) in the MIDI output (@eNote-GmbH)
+* Support for `@enclose` on articulation and fermata (@eNote-GmbH)
+* Improved rendering of cross-staff slurs (@eNote-GmbH)
+* Improved octave line positions with `@endid` (@eNote-GmbH)
+* Improved layout algorithm with nested layer content arrangement
+* Improved rendering to prevent rendering barlines for the invisible measure (@eNote-GmbH)
+* Improved rendering of octave brackets ending (@eNote-GmbH)
+* Function getTimeForElement includes `measure` and `chord` elements (@gitelicious)
+* Option --breaks-no-widow to prevent a single measure on last page (@eNote-GmbH)
+* Option --ligature-as-bracket to render ligatures as bracket instead of original notation
+* Option --lyric-verse-collapse to collapse empty lyric lines
+* Build option NO_MXL_SUPPORT to disable compressed MusicXML file support
+* Making Verovio thread safe (@eNote-GmbH)
+* Switch from XSLT to Python for font generation (@eNote-GmbH)
+* Fix loading/updating of MEI3 files (@rettinghaus)
+* Fix option --octave-alternative-symbols
+
+## [3.4.1] - 2021-05-03
+* Fix bug in font names in the Python distribution
+
+## [3.4.0] - 2021-05-01
+* Support for double treble clefs and additional SMuFL clefs (@rettinghaus)
+* Support for chords with cuesize notes (@eNote-GmbH)
+* Improved horizontal layout with dots and flags (@eNote-GmbH)
+* Improvement of the the positioning of mRest (@eNote-GmbH)
+* Improvement of alignment for dots in different voices (@eNote-GmbH)
+* Improvement of rendering of ties that collide with dots (@eNote-GmbH)
+* Improvement of barLine positioning (@eNote-GmbH)
+* Improvement of MusicXML import of chord symbol `<degree>` (@th-we)
+* Improvement of input format auto-detection (@JRegimbal)
+* Method renderToPAE added to the JS toolkit (@davidrizo)
+* Preliminary support for tablature (experimental work)
+* Option --preserve-analytical-markup to preserve analytical markup (default is now off) (@rettinghaus)
+* Option --mnum-interval for changing frequency of automatically-placed measure numbers (@earboxer)
+* Option --harm-dist to control the minimal distance of harm (@DavidBauer1984)
+* Option --output-format-raw for raw MEI output without indentation and line breaks
+* Option --multi-rest-style for better control over the rendering style of multiple measure rest (@eNote-GmbH) 
+* Option --octave-alternative-symbols to switch to alternate SMuFL glyphs (@eNote-GmbH)
+
+## [3.3.0] - 2021-02-25
+* Support for `@glyph.name`
+* Support for `accid@glyph.num` and `@glyph.name`
+* Support for MusicXML compressed files
+* Improved consistency of logging functions across bindings
+* Improved PyPI packages for Linux (@rettinghaus and @musicEnfanthen)
+* Function loadZipDataBase64 and loadZipDataBuffer (JS) for loading MusicXML compressed files
+* Function enableLog(bool) to enable or disable logging
+* Function enableLogToBuffer(bool) to enable logging to a buffer instead of the stderr or the JS console
+* Option --clef-change-factor for adjusting clef change size (default is .66) (@rettinghaus)
+* Option --svg-format-raw for raw SVG output without indentation and line breaks
+* New clefs, notehead parentheses and slashes glyphs (Leipzig 5.2.50) (@rettinghaus)
+* Fix interpretation of perfecta for smaller note values in mensural notation (@martha-thomae)
+* Fixes in the MusicXML importer (@eNote-GmbH)
+
+## [3.2.0] - 2021-02-08
+* Support for `clef@visible` (@rettinghaus)
+* Support for `artic@glyph.num`
+* Support for arabic accidentals
+* Improved default rest positioning
+* Improved automatic cross staff rest positioning (@eNote-GmbH)
+* Improved cross-staff spacing
+* Improved slurs
+* Improved positioning of ornaments with multiple layers
+* Improved articulations in normal and cross-staff contexts
+* Improved spacing of clef changes
+* Improved timestamp events alignments by avoiding extra-space to be added
+* Improved horizontal alignment of tempo indications (@eNote-GmbH)
+* Embedding of Leland font from MuseScore
+* Method Toolkit::GetTimesForElement for accessing score times (@wergo)
+* Option for sometimes using encoded breaks, at configurable threshold (`--breaks smart` and `--breaks-smart-sb`) (@earboxer)
+* Options --top-margin-artic and --bottom-margin-artic for articulation margins
+* Option --tuplet-num-head for placing tuplet numbers on the side of the notehead
+
+## [3.1.0] - 2021-01-12
+* Support for "old style" multiple measure rests (@rettinghaus)
+* Support for `note@vel` and `dynamics@val` in MusicXML import (@earboxer)
+* Support for `multiRest@loc` (@rettinghaus)
+* Support for `mNum@fontsize` (@rettinghaus)
+* Support for `accidental-mark` in MusicXML import (@rettinghaus)
+* Support for double-stemmed beams (@eNote-GmbH)
+* Improved barline rendition (@rettinghaus)
+* Improved cross-staff notation with multiple layers
+* Python Package Index (PyPI) distribution (@musicEnfanthen and @alastair)
+* Option --footer extended with 'always' value to show footer with --adjust-page-height
+
+## [3.0.2] - 2020-11-17
+* Add missing default footer file
+
+## [3.0.1] - 2020-10-22
+* Fix bug with mensural notation notes
+
+## [3.0.0] - 2020-10-05
+* Support for buzz roll tremolos (@rettinghaus)
+* Support for `Sprechgesang` stems (@rettinghaus)
 * Support for `<phrase>`
 * Support (limited) for preserving XML comments in the MEI output
 * Support for `hairpin@opening` (@rettinghaus)
@@ -8,6 +271,10 @@
 * Support for pedal lines (@rettinghaus)
 * Options for controlling output tabs (--output-indent and --output-indent-tab)
 * Option to remove ids in the MEI output (--remove-ids) to be passed to GetMEI with the JS toolkit
+* Fix tremolo tuplets (@rettinghaus)
+
+## [2.7.2] - 2020-07-23
+* Fix bug with memory in beams (@valeriyvan)
 
 ## [2.7.1] - 2020-05-22
 * Fix bug with mensural clefs not displaying
@@ -30,7 +297,7 @@
 * Fix tremolo beaming (@rettinghaus)
 
 ## [2.6.0] - 2020-03-11
-* Support for Plaine and Easie output (limited features)
+* Support for Plaine & Easie output (limited features)
 * Support for lyrics on chords (@rettinghaus)
 * Support for `scoreDef@system.leftline` (@rettinghaus)
 * Support for reh elements (@rettinghaus)
@@ -50,7 +317,7 @@
 * Option for forcing encoded layout rendering to be condensed (--condense-encoded)
 
 ### Changed
-* Single file buundle for WASM build
+* Single file bundle for WASM build
 * Options --format and --type deprecated (use --from and --to instead)
 
 ## [2.4.0] - 2020-01-15
@@ -150,7 +417,7 @@
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
 * Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
-* Sutomatic positioning of rests within beam (@CCInc)
+* Automatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation
 * Use SMuFL glyphs for mensural signs (@rettinghaus)
 * Barline segmentation with text and dynamic indications overlapping measures
@@ -265,17 +532,17 @@
 * Several bug fixes and code refactoring enhancement
 
 ## [Pre-release versions]
-- [0.9.13](https://github.com/rism-ch/verovio/releases/tag/version-0.9.13)
-- [0.9.12](https://github.com/rism-ch/verovio/releases/tag/version-0.9.12)
-- [0.9.11](https://github.com/rism-ch/verovio/releases/tag/version-0.9.11)
-- [0.9.10](https://github.com/rism-ch/verovio/releases/tag/version-0.9.10)
-- [0.9.9](https://github.com/rism-ch/verovio/releases/tag/version-0.9.9)
-- [0.9.8](https://github.com/rism-ch/verovio/releases/tag/version-0.9.8)
-- [0.9.7](https://github.com/rism-ch/verovio/releases/tag/version-0.9.7)
-- [0.9.6](https://github.com/rism-ch/verovio/releases/tag/version-0.9.6)
-- [0.9.5](https://github.com/rism-ch/verovio/releases/tag/version-0.9.5)
-- [0.9.4](https://github.com/rism-ch/verovio/releases/tag/version-0.9.4)
-- [0.9.3](https://github.com/rism-ch/verovio/releases/tag/version-0.9.3)
-- [0.9.2](https://github.com/rism-ch/verovio/releases/tag/version-0.9.2)
-- [0.9.1](https://github.com/rism-ch/verovio/releases/tag/version-0.9.1)
-- [0.9.0](https://github.com/rism-ch/verovio/releases/tag/version-0.9.0)
+- [0.9.13](https://github.com/rism-digital/verovio/releases/tag/version-0.9.13)
+- [0.9.12](https://github.com/rism-digital/verovio/releases/tag/version-0.9.12)
+- [0.9.11](https://github.com/rism-digital/verovio/releases/tag/version-0.9.11)
+- [0.9.10](https://github.com/rism-digital/verovio/releases/tag/version-0.9.10)
+- [0.9.9](https://github.com/rism-digital/verovio/releases/tag/version-0.9.9)
+- [0.9.8](https://github.com/rism-digital/verovio/releases/tag/version-0.9.8)
+- [0.9.7](https://github.com/rism-digital/verovio/releases/tag/version-0.9.7)
+- [0.9.6](https://github.com/rism-digital/verovio/releases/tag/version-0.9.6)
+- [0.9.5](https://github.com/rism-digital/verovio/releases/tag/version-0.9.5)
+- [0.9.4](https://github.com/rism-digital/verovio/releases/tag/version-0.9.4)
+- [0.9.3](https://github.com/rism-digital/verovio/releases/tag/version-0.9.3)
+- [0.9.2](https://github.com/rism-digital/verovio/releases/tag/version-0.9.2)
+- [0.9.1](https://github.com/rism-digital/verovio/releases/tag/version-0.9.1)
+- [0.9.0](https://github.com/rism-digital/verovio/releases/tag/version-0.9.0)

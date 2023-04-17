@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -23,18 +23,20 @@ namespace vrv {
 // App
 //----------------------------------------------------------------------------
 
-App::App() : EditorialElement("app-")
+static const ClassRegistrar<App> s_factory("app", APP);
+
+App::App() : EditorialElement(APP, "app-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
-    Reset();
+    this->Reset();
 }
 
-App::App(EditorialLevel level) : EditorialElement("app-")
+App::App(EditorialLevel level) : EditorialElement(APP, "app-")
 {
     m_level = level;
 
-    Reset();
+    this->Reset();
 }
 
 void App::Reset()

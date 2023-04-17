@@ -9,13 +9,13 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
 #include "doc.h"
-#include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "note.h"
@@ -28,15 +28,26 @@ namespace vrv {
 // KeyAccid
 //----------------------------------------------------------------------------
 
-KeyAccid::KeyAccid() : LayerElement("keyaccid-"), PitchInterface(), AttAccidental(), AttColor(), AttEnclosingChars()
+static const ClassRegistrar<KeyAccid> s_factory("keyAccid", KEYACCID);
+
+KeyAccid::KeyAccid()
+    : LayerElement(KEYACCID, "keyaccid-")
+    , PitchInterface()
+    , PositionInterface()
+    , AttAccidental()
+    , AttColor()
+    , AttEnclosingChars()
+    , AttExtSym()
 {
 
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTSYM);
 
-    Reset();
+    this->Reset();
 }
 
 KeyAccid::~KeyAccid() {}
@@ -45,56 +56,53 @@ void KeyAccid::Reset()
 {
     LayerElement::Reset();
     PitchInterface::Reset();
-    ResetAccidental();
-    ResetColor();
-    ResetEnclosingChars();
+    PositionInterface::Reset();
+    this->ResetAccidental();
+    this->ResetColor();
+    this->ResetEnclosingChars();
+    this->ResetExtSym();
 }
 
-bool KeySig::IsSupportedChild(Object *child)
+std::u32string KeyAccid::GetSymbolStr(data_NOTATIONTYPE notationType) const
 {
-    if (this->IsAttribute()) {
-        LogError("Adding a child to an attribute is not allowed");
-        assert(false);
-    }
-    else if (child->Is(KEYACCID)) {
-        assert(dynamic_cast<KeyAccid *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
-    else {
-        return false;
-    }
-    return true;
+    return Accid::CreateSymbolStr(this->GetAccid(), this->GetEnclose(), notationType, this->GetDocResources(),
+        this->GetGlyphNum(), this->GetGlyphName());
 }
 
-std::wstring KeyAccid::GetSymbolStr() const
+int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
 {
-    if (!this->HasAccid()) return L"";
-
-    wchar_t symc = Accid::GetAccidGlyph(this->GetAccid());
-    std::wstring symbolStr;
-
-    if (this->HasEnclose()) {
-        if (this->GetEnclose() == ENCLOSURE_brack) {
-            symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-            symbolStr.push_back(symc);
-            symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
-        }
-        else {
-            symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-            symbolStr.push_back(symc);
-            symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
-        }
+    if (this->HasLoc()) {
+        return this->GetLoc();
     }
     else {
-        symbolStr.push_back(symc);
+        const data_ACCIDENTAL_WRITTEN accid = this->GetAccid();
+        const data_PITCHNAME pname = this->GetPname();
+        return PitchInterface::CalcLoc(pname, KeySig::GetOctave(accid, pname, clef), clefLocOffset);
     }
-    return symbolStr;
 }
 
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode KeyAccid::Accept(MutableFunctor &functor)
+{
+    return functor.VisitKeyAccid(this);
+}
+
+FunctorCode KeyAccid::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitKeyAccid(this);
+}
+
+FunctorCode KeyAccid::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitKeyAccidEnd(this);
+}
+
+FunctorCode KeyAccid::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitKeyAccidEnd(this);
+}
 
 } // namespace vrv

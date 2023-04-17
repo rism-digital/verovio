@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,13 @@ namespace vrv {
 // Damage
 //----------------------------------------------------------------------------
 
-Damage::Damage() : EditorialElement("lem-"), AttSource()
-{
-    RegisterAttClass(ATT_SOURCE);
+static const ClassRegistrar<Damage> s_factory("damage", DAMAGE);
 
-    Reset();
+Damage::Damage() : EditorialElement(DAMAGE, "damage-"), AttSource()
+{
+    this->RegisterAttClass(ATT_SOURCE);
+
+    this->Reset();
 }
 
 Damage::~Damage() {}
@@ -33,7 +35,7 @@ Damage::~Damage() {}
 void Damage::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

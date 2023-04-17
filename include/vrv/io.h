@@ -11,6 +11,10 @@
 #include <string>
 #include <vector>
 
+//----------------------------------------------------------------------------
+
+#include "vrvdef.h"
+
 namespace vrv {
 
 class Doc;
@@ -72,7 +76,7 @@ public:
      * Getter for layoutInformation flag that is set to true during import
      * if layout information is found (and not to be ignored).
      */
-    bool HasLayoutInformation() { return m_hasLayoutInformation; }
+    LayoutInformation GetLayoutInformation() { return m_layoutInformation; }
 
 private:
     /**
@@ -87,11 +91,11 @@ protected:
     Doc *m_doc;
 
     /**
-     * Becomes true if layout information is found during the import.
-     * This will be true if the file is page-based MEI or if the MEI
-     * file contains <pb> and <sb>. This will stay wrong with PAE import
+     * Indicates if we have layout information in the file loaded.
+     * The value will be LAYOUT_ENCODED if we have <pb> or <sb> elements and LAYOUT_DONE for page-based MEI.
+     * This value remains LAYOUT_NONE with PAE import
      */
-    bool m_hasLayoutInformation;
+    LayoutInformation m_layoutInformation;
 
     std::string m_outformat = "mei";
 };

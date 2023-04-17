@@ -28,16 +28,30 @@ public:
     ///@{
     PgHead();
     virtual ~PgHead();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PgHead"; }
-    virtual ClassId GetClassId() const { return PGHEAD; }
+    void Reset() override;
+    std::string GetClassName() const override { return "PgHead"; }
     ///@}
 
-    bool GenerateFromMEIHeader(pugi::xml_document &header);
+    /**
+     * Overriden to get the appropriate margin
+     */
+    int GetTotalHeight(const Doc *doc) const override;
+
+    bool GenerateFromMEIHeader(const pugi::xml_document &header);
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

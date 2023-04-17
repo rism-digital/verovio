@@ -9,12 +9,14 @@
 #define __VRV_PEDAL_H__
 
 #include "atts_cmn.h"
+#include "atts_externalsymbols.h"
 #include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
 
+class System;
 //----------------------------------------------------------------------------
 // Pedal
 //----------------------------------------------------------------------------
@@ -25,9 +27,10 @@ namespace vrv {
 class Pedal : public ControlElement,
               public TimeSpanningInterface,
               public AttColor,
+              public AttExtSym,
               public AttPedalLog,
               public AttPedalVis,
-              public AttPlacement,
+              public AttPlacementRelStaff,
               public AttVerticalGroup {
 public:
     /**
@@ -37,18 +40,25 @@ public:
     ///@{
     Pedal();
     virtual ~Pedal();
-    virtual Object *Clone() const { return new Pedal(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pedal"; }
-    virtual ClassId GetClassId() const { return PEDAL; }
+    Object *Clone() const override { return new Pedal(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Pedal"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ////@}
 
     /**
@@ -59,19 +69,34 @@ public:
     void EndsWithBounce(bool endsWithBounce) { m_endsWithBounce = endsWithBounce; }
     ///@}
 
+    /**
+     * Get the SMuFL glyph for the pedal based on function or glyph.num
+     */
+    char32_t GetPedalGlyph() const;
+
+    /**
+     * Get the pedal form based on the options and corresponding attributes from <pedal> and <scoreDef>
+     */
+    data_PEDALSTYLE GetPedalForm(const Doc *doc, const System *system) const;
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareFloatingGrps
+     * Interface for class functor visitation
      */
-    virtual int PrepareFloatingGrps(FunctorParams *);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
 private:
     /**

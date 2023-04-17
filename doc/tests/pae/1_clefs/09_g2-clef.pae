@@ -1,6 +1,6 @@
 @start:clefs
 @clef:g-2
-@keysig:none
+@keysig:
 @key: 
 @timesig:
 @data:,4G

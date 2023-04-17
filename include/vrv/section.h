@@ -9,8 +9,9 @@
 #define __VRV_SECTION_H__
 
 #include "atts_shared.h"
-#include "boundary.h"
+#include "atts_visual.h"
 #include "systemelement.h"
+#include "systemmilestone.h"
 
 namespace vrv {
 
@@ -22,9 +23,9 @@ class Section;
 
 /**
  * This class represents a MEI section.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
+ * It can be both a container (in score-based MEI) and a milestone (in page-based MEI)
  */
-class Section : public SystemElement, public BoundaryStartInterface, public AttNNumberLike {
+class Section : public SystemElement, public SystemMilestoneInterface, public AttNNumberLike, public AttSectionVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -33,43 +34,42 @@ public:
     ///@{
     Section();
     virtual ~Section();
-    virtual Object *Clone() const { return new Section(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Section"; }
-    virtual ClassId GetClassId() const { return SECTION; }
+    Object *Clone() const override { return new Section(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Section"; }
     ///@}
 
     /**
      * Method for adding allowed content
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::ConvertToPageBased
      */
     ///@{
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
+    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
 
     /**
      * See Object::ConvertToUnCastOffMensural
      */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
-
-    /**
-     * See Object::PrepareBoundaries
-     */
-    virtual int PrepareBoundaries(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
 private:
     //

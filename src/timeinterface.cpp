@@ -9,14 +9,15 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "functorparams.h"
+#include "harm.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "staff.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -27,25 +28,25 @@ namespace vrv {
 // TimePointInterface
 //----------------------------------------------------------------------------
 
-TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLogical()
+TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStartId(), AttTimestampLog()
 {
-    RegisterInterfaceAttClass(ATT_STAFFIDENT);
-    RegisterInterfaceAttClass(ATT_STARTID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMPLOGICAL);
+    this->RegisterInterfaceAttClass(ATT_STAFFIDENT);
+    this->RegisterInterfaceAttClass(ATT_STARTID);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMPLOG);
 
-    Reset();
+    this->Reset();
 }
 
 TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
-    ResetStaffIdent();
-    ResetStartId();
-    ResetTimestampLogical();
+    this->ResetStaffIdent();
+    this->ResetStartId();
+    this->ResetTimestampLog();
 
     m_start = NULL;
-    m_startUuid = "";
+    m_startID = "";
 }
 
 void TimePointInterface::SetStart(LayerElement *start)
@@ -56,8 +57,8 @@ void TimePointInterface::SetStart(LayerElement *start)
 
 bool TimePointInterface::SetStartOnly(LayerElement *element)
 {
-    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
-    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
+    // LogDebug("%s - %s - %s", element->GetID().c_str(), m_startID.c_str(), m_endID.c_str() );
+    if (!m_start && !m_startID.empty() && (element->GetID() == m_startID)) {
         this->SetStart(element);
         return true;
     }
@@ -73,57 +74,86 @@ void TimePointInterface::AddStaff(int n)
     }
 }
 
-void TimePointInterface::SetUuidStr()
+void TimePointInterface::SetIDStr()
 {
     if (this->HasStartid()) {
-        m_startUuid = ExtractUuidFragment(this->GetStartid());
+        m_startID = ExtractIDFragment(this->GetStartid());
     }
 }
 
 Measure *TimePointInterface::GetStartMeasure()
 {
-    if (!m_start) return NULL;
-    return dynamic_cast<Measure *>(this->m_start->GetFirstAncestor(MEASURE));
+    return const_cast<Measure *>(std::as_const(*this).GetStartMeasure());
 }
 
-bool TimePointInterface::IsOnStaff(int n)
+const Measure *TimePointInterface::GetStartMeasure() const
+{
+    if (!m_start) return NULL;
+    return vrv_cast<const Measure *>(m_start->GetFirstAncestor(MEASURE));
+}
+
+bool TimePointInterface::IsOnStaff(int n) const
 {
     if (this->HasStaff()) {
         std::vector<int> staffList = this->GetStaff();
-        std::vector<int>::iterator iter;
-        for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
-            if (*iter == n) return true;
+        for (int staffN : staffList) {
+            if (staffN == n) return true;
         }
         return false;
     }
     else if (m_start) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
+        const Staff *staff = m_start->GetAncestorStaff(ANCESTOR_ONLY, false);
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
 }
 
-std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
+std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Object *object)
 {
+    assert(measure);
+    assert(object);
+
     std::vector<Staff *> staves;
-    std::vector<int>::iterator iter;
     std::vector<int> staffList;
-    if (this->HasStaff()) {
-        staffList = this->GetStaff();
+
+    // For <f> within <harm> without @staff we try to get the @staff from the <harm> ancestor
+    if (object->Is(FIGURE) && !this->HasStaff()) {
+        Harm *harm = vrv_cast<Harm *>(object->GetFirstAncestor(HARM));
+        if (harm) {
+            staffList = harm->GetStaff();
+        }
+    }
+    else if (this->HasStaff()) {
+        bool isInBetween = false;
+        // limit between support to some elements?
+        if (object->Is({ DYNAM, DIR, HAIRPIN, TEMPO })) {
+            AttPlacementRelStaff *att = dynamic_cast<AttPlacementRelStaff *>(object);
+            assert(att);
+            isInBetween = (att->GetPlace() == STAFFREL_between);
+        }
+        if (isInBetween) {
+            assert(this->GetStaff().size() > 0);
+            // With @place="between" we use only the first staff value
+            staffList.push_back(this->GetStaff().front());
+        }
+        else {
+            staffList = this->GetStaff();
+        }
     }
     else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstAncestor(STAFF));
-        if (staff) staffList.push_back(staff->GetN());
+        Staff *staff = m_start->GetAncestorStaff();
+        staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
         // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
         staffList.push_back(1);
     }
-    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
-        AttNIntegerComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+
+    for (int staffN : staffList) {
+        AttNIntegerComparison comparison(STAFF, staffN);
+        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
-            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
+            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;
         }
         if (!staff->DrawingIsVisible()) {
@@ -134,16 +164,27 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     return staves;
 }
 
+bool TimePointInterface::VerifyMeasure(const Object *owner) const
+{
+    assert(owner);
+    if (m_start && (owner->GetFirstAncestor(MEASURE) != this->GetStartMeasure())) {
+        LogWarning("%s '%s' is not encoded in the measure of its start '%s'. This may cause improper rendering.",
+            owner->GetClassName().c_str(), owner->GetID().c_str(), m_start->GetID().c_str());
+        return false;
+    }
+    return true;
+}
+
 //----------------------------------------------------------------------------
 // TimeSpanningInterface
 //----------------------------------------------------------------------------
 
-TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartEndId(), AttTimestamp2Logical()
+TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartEndId(), AttTimestamp2Log()
 {
-    RegisterInterfaceAttClass(ATT_STARTENDID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMP2LOGICAL);
+    this->RegisterInterfaceAttClass(ATT_STARTENDID);
+    this->RegisterInterfaceAttClass(ATT_TIMESTAMP2LOG);
 
-    Reset();
+    this->Reset();
 }
 
 TimeSpanningInterface::~TimeSpanningInterface() {}
@@ -151,11 +192,11 @@ TimeSpanningInterface::~TimeSpanningInterface() {}
 void TimeSpanningInterface::Reset()
 {
     TimePointInterface::Reset();
-    ResetStartEndId();
-    ResetTimestamp2Logical();
+    this->ResetStartEndId();
+    this->ResetTimestamp2Log();
 
     m_end = NULL;
-    m_endUuid = "";
+    m_endID = "";
 }
 
 void TimeSpanningInterface::SetEnd(LayerElement *end)
@@ -164,21 +205,21 @@ void TimeSpanningInterface::SetEnd(LayerElement *end)
     m_end = end;
 }
 
-void TimeSpanningInterface::SetUuidStr()
+void TimeSpanningInterface::SetIDStr()
 {
-    TimePointInterface::SetUuidStr();
+    TimePointInterface::SetIDStr();
     if (this->HasEndid()) {
-        m_endUuid = ExtractUuidFragment(this->GetEndid());
+        m_endID = ExtractIDFragment(this->GetEndid());
     }
 }
 
 bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 {
-    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
-    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
+    // LogDebug("%s - %s - %s", element->GetID().c_str(), m_startID.c_str(), m_endID.c_str() );
+    if (!m_start && !m_startID.empty() && (element->GetID() == m_startID)) {
         this->SetStart(element);
     }
-    else if (!m_end && !m_endUuid.empty() && (element->GetUuid() == m_endUuid)) {
+    else if (!m_end && !m_endID.empty() && (element->GetID() == m_endID)) {
         this->SetEnd(element);
     }
     return (m_start && m_end);
@@ -186,47 +227,86 @@ bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 
 Measure *TimeSpanningInterface::GetEndMeasure()
 {
-    if (!m_end) return NULL;
-    return dynamic_cast<Measure *>(this->m_end->GetFirstAncestor(MEASURE));
+    return const_cast<Measure *>(std::as_const(*this).GetEndMeasure());
 }
 
-bool TimeSpanningInterface::IsSpanningMeasures()
+const Measure *TimeSpanningInterface::GetEndMeasure() const
+{
+    if (!m_end) return NULL;
+    return vrv_cast<const Measure *>(m_end->GetFirstAncestor(MEASURE));
+}
+
+bool TimeSpanningInterface::IsSpanningMeasures() const
 {
     if (!this->HasStartAndEnd()) return false;
     return (this->GetStartMeasure() != this->GetEndMeasure());
 }
 
+bool TimeSpanningInterface::IsOrdered() const
+{
+    return this->IsOrdered(m_start, m_end);
+}
+
+bool TimeSpanningInterface::IsOrdered(const LayerElement *start, const LayerElement *end) const
+{
+    if (!start || !end) return true;
+    const Measure *startMeasure = vrv_cast<const Measure *>(start->GetFirstAncestor(MEASURE));
+    const Measure *endMeasure = vrv_cast<const Measure *>(end->GetFirstAncestor(MEASURE));
+
+    if (startMeasure == endMeasure) {
+        if (!start->GetAlignment() || !end->GetAlignment()) return true;
+        return Object::IsPreOrdered(start->GetAlignment(), end->GetAlignment());
+    }
+    else {
+        return (startMeasure->GetIndex() < endMeasure->GetIndex());
+    }
+}
+
 void TimeSpanningInterface::GetCrossStaffOverflows(
-    StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
+    StaffAlignment *alignment, curvature_CURVEDIR curveDir, bool &skipAbove, bool &skipBelow)
 {
     assert(alignment);
 
     if (!this->GetStart() || !this->GetEnd() || !alignment->GetStaff()) return;
+
+    // We cannot have cross-staff slurs only with timestamps
+    if (this->GetStart()->Is(TIMESTAMP_ATTR) && this->GetEnd()->Is(TIMESTAMP_ATTR)) return;
 
     Layer *layer = NULL;
 
     // If the starting point is a chord we need to select the appropriate extreme staff
     Staff *startStaff = NULL;
     if (this->GetStart()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetStart());
+        Chord *chord = vrv_cast<Chord *>(this->GetStart());
         assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        startStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        // First check if the chord itself is cross-staff
+        startStaff = chord->GetCrossStaff(layer);
+        if (!startStaff) {
+            // If not look at its content
+            Staff *staffAbove = NULL;
+            Staff *staffBelow = NULL;
+            chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+            startStaff = (curveDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        }
     }
-    else
+    else {
         startStaff = this->GetStart()->GetCrossStaff(layer);
+    }
 
     // Same for the end point
     Staff *endStaff = NULL;
     if (this->GetEnd()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(this->GetEnd());
+        Chord *chord = vrv_cast<Chord *>(this->GetEnd());
         assert(chord);
-        Staff *staffAbove = NULL;
-        Staff *staffBelow = NULL;
-        chord->GetCrossStaffExtremes(staffAbove, staffBelow);
-        endStaff = (cuvreDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        // First check if the chord itself is cross-staff
+        endStaff = chord->GetCrossStaff(layer);
+        if (!endStaff) {
+            // If not look at its content
+            Staff *staffAbove = NULL;
+            Staff *staffBelow = NULL;
+            chord->GetCrossStaffExtremes(staffAbove, staffBelow);
+            endStaff = (curveDir == curvature_CURVEDIR_above) ? staffAbove : staffBelow;
+        }
     }
     else {
         endStaff = this->GetEnd()->GetCrossStaff(layer);
@@ -234,10 +314,10 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
-        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstAncestor(STAFF));
+        startStaff = this->GetStart()->GetAncestorStaff(ANCESTOR_ONLY, false);
     }
     if (!endStaff) {
-        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstAncestor(STAFF));
+        endStaff = this->GetEnd()->GetAncestorStaff(ANCESTOR_ONLY, false);
     }
 
     // This happens with slurs starting or ending with a timestamp
@@ -260,112 +340,98 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
+FunctorCode TimePointInterface::InterfacePrepareTimePointing(PrepareTimePointingFunctor &functor, Object *object)
 {
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
+    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
 
+    this->SetIDStr();
+    functor.InsertInterfaceIDTuple(object->GetClassId(), this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object)
+{
     // First we check if the object has already a mapped @startid (it should not)
     if (this->HasStart()) {
         if (this->HasTstamp())
             LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
+                object->GetClassName().c_str(), object->GetID().c_str());
         return FUNCTOR_CONTINUE;
     }
-    else if (!HasTstamp()) {
+    else if (!this->HasTstamp()) {
         return FUNCTOR_CONTINUE; // This file is quite likely invalid?
     }
 
     // We set -1 to the data_MEASUREBEAT for @tstamp
-    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(-1, this->GetTstamp())));
+    functor.InsertObjectBeatPair(object, data_MEASUREBEAT(-1, this->GetTstamp()));
 
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+FunctorCode TimePointInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_start = NULL;
-    m_startUuid = "";
+    m_startID = "";
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object)
 {
-    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
-
-    this->SetUuidStr();
-    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->GetClassId()));
-
-    return FUNCTOR_CONTINUE;
-}
-
-int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
-{
-    PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
-    assert(params);
-
     if (!this->HasStartid() && !this->HasEndid()) {
         return FUNCTOR_CONTINUE;
     }
 
-    if (params->m_fillList == false) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStr();
-    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
+    this->SetIDStr();
+    functor.InsertInterfaceOwnerPair(object, this);
 
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object)
 {
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
-
     // First we check if the object has already a mapped @endid (it should not)
     if (this->HasEndid()) {
         if (this->HasTstamp2())
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
-        if (this->GetStartid() == this->GetEndid()) {
+                object->GetClassName().c_str(), object->GetID().c_str());
+        if ((this->GetStartid() == this->GetEndid()) && !object->Is(OCTAVE)) {
             LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
+                object->GetClassName().c_str(), object->GetID().c_str());
         }
-        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
+        return TimePointInterface::InterfacePrepareTimestamps(functor, object);
     }
-    else if (!HasTstamp2()) {
+    else if (!this->HasTstamp2()) {
         // We won't be able to do anything, just try to prepare the tstamp (start)
-        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
+        return TimePointInterface::InterfacePrepareTimestamps(functor, object);
     }
 
     // We can now add the pair to our stack
-    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
-    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
+    functor.InsertInterfaceIDPair(object->GetClassId(), this);
+    functor.InsertObjectBeatPair(object, data_MEASUREBEAT(this->GetTstamp2()));
 
-    return TimePointInterface::InterfacePrepareTimestamps(params, object);
+    return TimePointInterface::InterfacePrepareTimestamps(functor, object);
 }
 
-int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(
+    PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
     if (this->IsSpanningMeasures()) {
-        params->m_timeSpanningElements.push_back(object);
+        functor.InsertTimeSpanningElement(object);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_end = NULL;
-    m_endUuid = "";
+    m_endID = "";
     // Special case where we have interface inheritance
-    return TimePointInterface::InterfaceResetDrawing(functorParams, object);
+    return TimePointInterface::InterfaceResetData(functor, object);
 }
 
 } // namespace vrv

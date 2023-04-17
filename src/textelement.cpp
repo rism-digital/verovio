@@ -9,9 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
+
+#include "functor.h"
 
 namespace vrv {
 
@@ -19,20 +21,29 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement() : Object("te-"), AttLabelled(), AttTyped()
+TextElement::TextElement() : Object(TEXT_ELEMENT, "te-"), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
-TextElement::TextElement(const std::string &classid) : Object(classid), AttLabelled(), AttTyped()
+TextElement::TextElement(ClassId classId) : Object(classId, "te-"), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
+}
+
+TextElement::TextElement(ClassId classId, const std::string &classIdStr)
+    : Object(classId, classIdStr), AttLabelled(), AttTyped()
+{
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_TYPED);
+
+    this->Reset();
 }
 
 TextElement::~TextElement() {}
@@ -40,8 +51,8 @@ TextElement::~TextElement() {}
 void TextElement::Reset()
 {
     Object::Reset();
-    ResetLabelled();
-    ResetTyped();
+    this->ResetLabelled();
+    this->ResetTyped();
 
     m_drawingYRel = 0;
     m_drawingXRel = 0;
@@ -52,13 +63,13 @@ int TextElement::GetDrawingX() const
     // No cache for text elements
 
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
-    Object *textElement = this->GetFirstAncestorInRange(TEXT_ELEMENT, TEXT_ELEMENT_max);
+    const Object *textElement = this->GetFirstAncestorInRange(TEXT_ELEMENT, TEXT_ELEMENT_max);
     if (textElement) {
         return (textElement->GetDrawingX() + this->GetDrawingXRel());
     }
 
     // Otherwise get the running element parent - no cast to RunningElement is necessary
-    Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
+    const Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
     if (runningElement) {
         return (runningElement->GetDrawingX() + this->GetDrawingXRel());
     }
@@ -71,13 +82,13 @@ int TextElement::GetDrawingY() const
     // No cache for text elements
 
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
-    Object *textElement = this->GetFirstAncestorInRange(TEXT_ELEMENT, TEXT_ELEMENT_max);
+    const Object *textElement = this->GetFirstAncestorInRange(TEXT_ELEMENT, TEXT_ELEMENT_max);
     if (textElement) {
         return (textElement->GetDrawingY() + this->GetDrawingYRel());
     }
 
     // Otherwise get the running element parent - no cast to RunningElement is necessary
-    Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
+    const Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
     if (runningElement) {
         return (runningElement->GetDrawingY() + this->GetDrawingYRel());
     }
@@ -88,13 +99,13 @@ int TextElement::GetDrawingY() const
 
 void TextElement::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
 void TextElement::SetDrawingYRel(int drawingYRel)
 {
-    ResetCachedDrawingY();
+    this->ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
 
@@ -102,12 +113,24 @@ void TextElement::SetDrawingYRel(int drawingYRel)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int TextElement::ResetVerticalAlignment(FunctorParams *functorParams)
+FunctorCode TextElement::Accept(MutableFunctor &functor)
 {
-    SetDrawingXRel(0);
-    SetDrawingYRel(0);
+    return functor.VisitTextElement(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode TextElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTextElement(this);
+}
+
+FunctorCode TextElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTextElementEnd(this);
+}
+
+FunctorCode TextElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTextElementEnd(this);
 }
 
 } // namespace vrv

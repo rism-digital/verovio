@@ -26,10 +26,9 @@ public:
     ///@{
     Del();
     virtual ~Del();
-    virtual Object *Clone() const { return new Del(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Del"; }
-    virtual ClassId GetClassId() const { return DEL; }
+    Object *Clone() const override { return new Del(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Del"; }
     ///@}
 
 private:

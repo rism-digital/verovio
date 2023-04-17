@@ -9,14 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -28,19 +28,19 @@ namespace vrv {
 
 PlistInterface::PlistInterface() : Interface(), AttPlist()
 {
-    RegisterInterfaceAttClass(ATT_PLIST);
+    this->RegisterInterfaceAttClass(ATT_PLIST);
 
-    Reset();
+    this->Reset();
 }
 
 PlistInterface::~PlistInterface() {}
 
 void PlistInterface::Reset()
 {
-    ResetPlist();
+    this->ResetPlist();
 }
 
-void PlistInterface::AddRef(std::string ref)
+void PlistInterface::AddRef(const std::string &ref)
 {
     xsdAnyURI_List references = this->GetPlist();
     if (std::find(references.begin(), references.end(), ref) == references.end()) {
@@ -56,7 +56,7 @@ void PlistInterface::AddRefAllowDuplicate(const std::string &ref)
     this->SetPlist(references);
 }
 
-void PlistInterface::SetRef(Object *ref)
+void PlistInterface::SetRef(const Object *ref)
 {
     if (!IsValidRef(ref)) {
         return;
@@ -67,19 +67,26 @@ void PlistInterface::SetRef(Object *ref)
     }
 }
 
-void PlistInterface::SetUuidStrs()
+ArrayOfObjects PlistInterface::GetRefs()
 {
-    assert(m_uuids.empty() && m_references.empty());
+    ArrayOfObjects result;
+    std::transform(m_references.begin(), m_references.end(), std::back_inserter(result),
+        [](const Object *obj) { return const_cast<Object *>(obj); });
+    return result;
+}
+
+void PlistInterface::SetIDStrs()
+{
+    assert(m_ids.empty() && m_references.empty());
 
     xsdAnyURI_List list = this->GetPlist();
-    xsdAnyURI_List::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter) {
-        std::string uuid = ExtractUuidFragment(*iter);
-        if (!uuid.empty()) {
-            m_uuids.push_back(uuid);
+    for (const std::string &uri : list) {
+        std::string id = ExtractIDFragment(uri);
+        if (!id.empty()) {
+            m_ids.push_back(id);
         }
         else {
-            LogError("Cannot parse the anyURI '%s'", (*iter).c_str());
+            LogError("Cannot parse the anyURI '%s'", uri.c_str());
         }
     }
 }
@@ -88,29 +95,26 @@ void PlistInterface::SetUuidStrs()
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *object)
+FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, Object *object)
 {
-    PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);
-    assert(params);
-
     // This should not happen?
-    if (params->m_fillList == false) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStrs();
+    this->SetIDStrs();
 
     std::vector<std::string>::iterator iter;
-    for (iter = m_uuids.begin(); iter != m_uuids.end(); ++iter) {
-        params->m_interfaceUuidPairs.push_back(std::make_pair(this, *iter));
+    for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
+        functor.InsertInterfaceIDTuple(*iter, this);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int PlistInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+FunctorCode PlistInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
-    m_uuids.clear();
+    m_ids.clear();
     m_references.clear();
 
     return FUNCTOR_CONTINUE;

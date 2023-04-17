@@ -8,11 +8,12 @@
 #ifndef __VRV_H__
 #define __VRV_H__
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
 #include <map>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #ifndef _WIN32
@@ -22,10 +23,10 @@
 #endif
 
 #include "atttypes.h"
+#include "toolkitdef.h"
 
 namespace vrv {
 
-class Glyph;
 class Object;
 
 /**
@@ -35,19 +36,20 @@ class Object;
 
 void LogDebug(const char *fmt, ...);
 void LogError(const char *fmt, ...);
-void LogMessage(const char *fmt, ...);
+void LogInfo(const char *fmt, ...);
 void LogWarning(const char *fmt, ...);
-void DisableLog();
 
 /**
- * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
+ * Member and functions specific to logging that uses a vector of string to buffer the logs.
  */
-#ifdef __EMSCRIPTEN__
-enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR, CONSOLE_DEBUG };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(const std::string &s);
-void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
-#endif
+void LogString(std::string message, LogLevel level);
+
+/**
+ * Convert a string to a logLevel
+ */
+LogLevel StrToLogLevel(const std::string &level);
 
 /**
  * Utility for comparing doubles
@@ -55,19 +57,29 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
 bool AreEqual(double dFirstVal, double dSecondVal);
 
 /**
- * Extract the uuid from a any uri string
+ * Utility to check if the string is a valid integer for std::stoi
  */
-std::string ExtractUuidFragment(std::string refUuid);
+bool IsValidInteger(const std::string &value);
 
 /**
- * Utility for converting UTF16 (std::wstring) to UTF-8
+ * Utility to check if the string is valid double for std::stod
  */
-std::string UTF16to8(const std::wstring &in);
+bool IsValidDouble(const std::string &value);
 
 /**
- * Utility for converting UTF-8 to UTF16 (std::wstring)
+ * Extract the ID from any URI
  */
-std::wstring UTF8to16(const std::string &in);
+std::string ExtractIDFragment(std::string refID);
+
+/**
+ * Utility for converting UTF32 (std::u32string) to UTF-8
+ */
+std::string UTF32to8(const std::u32string &in);
+
+/**
+ * Utility for converting UTF-8 to UTF32 (std::u32string)
+ */
+std::u32string UTF8to32(const std::string &in);
 
 /**
  * Format a string using vsnprintf.
@@ -94,9 +106,26 @@ std::string GetFilename(std::string fullpath);
 std::string GetVersion();
 
 /**
+ * Encode the integer value using the specified base (max is 62)
+ * Base 36 uses 0-9 and a-z, base 62 also A-Z.
+ */
+std::string BaseEncodeInt(uint32_t value, uint8_t base);
+
+/**
+ * Convert string from camelCase.
+ */
+std::string FromCamelCase(const std::string &s);
+
+/**
+ * Convert string to camelCase.
+ */
+std::string ToCamelCase(const std::string &s);
+
+/**
  *
  */
-extern bool noLog;
+extern LogLevel logLevel;
+extern bool loggingToBuffer;
 
 /**
  * Functions for logging in milliseconds the elapsed time of an
@@ -113,79 +142,20 @@ extern struct timeval start;
 void LogElapsedTimeStart();
 void LogElapsedTimeEnd(const char *msg = "unspecified operation");
 
-/**
- * Method that simply checks if the Object is not NULL
- * Also asserts it for stopping in debug mode
- */
-bool Check(Object *object);
-
 //----------------------------------------------------------------------------
-// Resources
+// Notation type checks
 //----------------------------------------------------------------------------
 
-/**
- * This class provides static resource values.
- * The default values can be changed by setters.
- */
-
-class Resources {
-public:
-    using StyleAttributes = std::pair<data_FONTWEIGHT, data_FONTSTYLE>;
-    using GlyphMap = std::map<wchar_t, Glyph>;
-    using GlyphTextMap = std::map<StyleAttributes, GlyphMap>;
-    
-    /**
-     * @name Setters and getters for static environment variables
-     */
-    ///@{
-    /** Resource path */
-    static std::string GetPath() { return s_path; }
-    static void SetPath(const std::string &path) { s_path = path; }
-    /** Init the SMufL music and text fonts */
-    static bool InitFonts();
-    /** Init the text font (bounding boxes and ASCII only) */
-    static bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
-    /** Select a particular font */
-    static bool SetFont(const std::string &fontName);
-    /** Returns the glyph (if exists) for the current SMuFL font */
-    static Glyph *GetGlyph(wchar_t smuflCode);
-    /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
-    static Glyph *GetGlyph(const std::string &smuflName);
-    /** Set current text style*/
-    static void SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle);
-    /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
-    static Glyph *GetTextGlyph(wchar_t code);
-
-    static wchar_t GetGlyphCode(const std::string &smuflName);
-    /** Set current text style*/
-    ///@}
-
-private:
-    static bool LoadFont(const std::string &fontName);
-
-private:
-    /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
-    static std::string s_path;
-    /** The loaded SMuFL font */
-    static GlyphMap s_font;
-    /** A text font used for bounding box calculations */
-    static GlyphTextMap s_textFont;
-    static StyleAttributes s_currentStyle;
-    static const StyleAttributes k_defaultStyle;
-    
-    
-    /**
-     * A map of glyph name / code
-     * The map in generated by ./fonts/generate_all.sh into ./src/smufl.cpp
-     */
-    static const std::map<std::string, wchar_t> s_smuflNames;
-};
+bool IsMensuralType(data_NOTATIONTYPE notationType);
+bool IsNeumeType(data_NOTATIONTYPE notationType);
+bool IsTabType(data_NOTATIONTYPE notationType);
 
 //----------------------------------------------------------------------------
 // Base64 code borrowed
 //----------------------------------------------------------------------------
 
-std::string Base64Encode(unsigned char const *, unsigned int len);
+std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int len);
+std::vector<unsigned char> Base64Decode(std::string const &encodedString);
 
 } // namespace vrv
 

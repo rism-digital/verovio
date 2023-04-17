@@ -19,8 +19,13 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "object.h"
+#include "options.h"
 
 //----------------------------------------------------------------------------
+
+class Glyph;
+class Resources;
 
 namespace vrv {
 
@@ -41,26 +46,25 @@ public:
     ///@{
     SvgDeviceContext();
     virtual ~SvgDeviceContext();
-    virtual ClassId GetClassId() const { return SVG_DEVICE_CONTEXT; }
     ///@}
 
     /**
      * @name Setters
      */
     ///@{
-    virtual void SetBackground(int colour, int style = AxSOLID);
-    virtual void SetBackgroundImage(void *image, double opacity = 1.0);
-    virtual void SetBackgroundMode(int mode);
-    virtual void SetTextForeground(int colour);
-    virtual void SetTextBackground(int colour);
-    virtual void SetLogicalOrigin(int x, int y);
+    void SetBackground(int colour, int style = AxSOLID) override;
+    void SetBackgroundImage(void *image, double opacity = 1.0) override;
+    void SetBackgroundMode(int mode) override;
+    void SetTextForeground(int colour) override;
+    void SetTextBackground(int colour) override;
+    void SetLogicalOrigin(int x, int y) override;
     ///@}
 
     /**
      * @name Getters
      */
     ///@{
-    virtual Point GetLogicalOrigin();
+    Point GetLogicalOrigin() override;
     ///}
 
     /**
@@ -73,103 +77,112 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawSimpleBezierPath(Point bezier[4]);
-    virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]);
-    virtual void DrawCircle(int x, int y, int radius);
-    virtual void DrawEllipse(int x, int y, int width, int height);
-    virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
-    virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
-    virtual void DrawRectangle(int x, int y, int width, int height);
-    virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
-    virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
-        int width = VRV_UNSET, int height = VRV_UNSET);
-    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
-    virtual void DrawSpline(int n, Point points[]);
-    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
-    virtual void DrawBackgroundImage(int x = 0, int y = 0);
+    void DrawQuadBezierPath(Point bezier[3]) override;
+    void DrawCubicBezierPath(Point bezier[4]) override;
+    void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) override;
+    void DrawCircle(int x, int y, int radius) override;
+    void DrawEllipse(int x, int y, int width, int height) override;
+    void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
+    void DrawLine(int x1, int y1, int x2, int y2) override;
+    void DrawPolyline(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawPolygon(int n, Point points[], int xOffset, int yOffset) override;
+    void DrawRectangle(int x, int y, int width, int height) override;
+    void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
+    void DrawRoundedRectangle(int x, int y, int width, int height, int radius) override;
+    void DrawText(const std::string &text, const std::u32string &wtext = U"", int x = VRV_UNSET, int y = VRV_UNSET,
+        int width = VRV_UNSET, int height = VRV_UNSET) override;
+    void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) override;
+    void DrawSpline(int n, Point points[]) override;
+    void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) override;
+    void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) override;
+    void DrawBackgroundImage(int x = 0, int y = 0) override;
     ///@}
 
     /**
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left);
-    virtual void EndText();
+    void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left) override;
+    void EndText() override;
 
     /**
      * @name Move a text to the specified position, for example when starting a new line.
      */
     ///@{
-    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
-    virtual void MoveTextVerticallyTo(int y);
+    void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) override;
+    void MoveTextVerticallyTo(int y) override;
     ///@}
 
     /**
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool prepend = false);
-    virtual void EndGraphic(Object *object, View *view);
+    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+        bool prepend = false) override;
+    void EndGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
      */
     ///@{
-    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "");
-    virtual void EndCustomGraphic();
+    void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "") override;
+    void EndCustomGraphic() override;
     ///@}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic(Object *object, std::string gId);
-    virtual void EndResumedGraphic(Object *object, View *view);
+    void ResumeGraphic(Object *object, std::string gId) override;
+    void EndResumedGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for starting and ending a text (<tspan>) text graphic
      */
     ///@{
-    virtual void StartTextGraphic(Object *object, std::string gClass, std::string gId);
-    virtual void EndTextGraphic(Object *object, View *view);
+    void StartTextGraphic(Object *object, std::string gClass, std::string gId) override;
+    void EndTextGraphic(Object *object, View *view) override;
     ///@}
 
     /**
      * @name Method for rotating a graphic (clockwise).
      */
     ///@{
-    virtual void RotateGraphic(Point const &orig, double angle);
+    void RotateGraphic(Point const &orig, double angle) override;
     ///@}
 
     /**
      * @name Method for starting and ending page
      */
     ///@{
-    virtual void StartPage();
-    virtual void EndPage();
+    void StartPage() override;
+    void EndPage() override;
     ///@}
 
     /**
      * @name Method for adding description element
      */
     ///@{
-    virtual void AddDescription(const std::string &text);
+    void AddDescription(const std::string &text) override;
     ///@}
 
     /**
      * Add id, data-id and class attributes
      */
-    void AppendIdAndClass(std::string gId, std::string baseClass, std::string addedClasses, bool primary = true);
+    void AppendIdAndClass(
+        std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID = PRIMARY);
+
+    /**
+     * Append additional attributes, as given in m_svgAdditionalAttributes
+     */
+    void AppendAdditionalAttributes(Object *object);
 
     /**
      * In SVG use global styling but not with mm output (for pdf generation)
      */
-    virtual bool UseGlobalStyling() { return !m_mmOutput; }
+    bool UseGlobalStyling() override { return !m_mmOutput; }
 
     /**
      * Setting mm output flag (false by default)
@@ -199,6 +212,40 @@ public:
      */
     void SetIndent(int indent) { m_indent = indent; }
 
+    /**
+     * Set the SVG to have 'raw' formatting, with no extraneous whitespace or newlines.
+     */
+    void SetFormatRaw(bool rawFormat) { m_formatRaw = rawFormat; }
+
+    /**
+     * Removes the xlink: prefex on href attributes, necessary for some newer browsers.
+     */
+    void SetRemoveXlink(bool removeXlink) { m_removeXlink = removeXlink; }
+
+    /**
+     * Setter for an additional CSS
+     */
+    void SetCss(std::string css) { m_css = css; }
+
+    /**
+     *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
+     * (e.g., "note@pname")
+     */
+    void SetAdditionalAttributes(const std::vector<std::string> &additionalAttributes)
+    {
+        for (std::string s : additionalAttributes) {
+            std::string className = s.substr(0, s.find("@")); // parse <element@attribute>, e.g., "note@pname"
+            std::string attributeName = s.substr(s.find("@") + 1);
+            ClassId classId = ObjectFactory::GetInstance()->GetClassId(className);
+            m_svgAdditionalAttributes.insert({ classId, attributeName });
+        }
+    }
+
+    /**
+     * Setter for a the smufl text font option
+     */
+    void SetSmuflTextFont(option_SMUFLTEXTFONT smuflTextFont) { m_smuflTextFont = smuflTextFont; }
+
 private:
     /**
      * Copy the content of a file to the output stream.
@@ -217,9 +264,19 @@ private:
     void DrawSvgBoundingBoxRectangle(int x, int y, int width, int height);
 
     /**
-     * Change the flag for indicating the use of the VerovioText font
+     * Change the flag for indicating the use of the music font as text font
      */
     void VrvTextFont() { m_vrvTextFont = true; }
+
+    /**
+     * Change the flag for indicating the use of the fallback music font as text font
+     */
+    void VrvTextFontFallback() { m_vrvTextFontFallback = true; }
+
+    /**
+     * Include the smufl text font either embedded or linked depending on m_smuflTextFont
+     */
+    void IncludeTextFont(const std::string &fontname, const Resources *resources);
 
     /**
      * Flush the data to the internal buffer.
@@ -233,15 +290,29 @@ private:
 
     pugi::xml_node AppendChild(std::string name);
 
+    /**
+     * Transform pen properties into stroke attributes
+     */
+    ///@{
+    void AppendStrokeLineCap(pugi::xml_node node, const Pen &pen);
+    void AppendStrokeLineJoin(pugi::xml_node node, const Pen &pen);
+    void AppendStrokeDashArray(pugi::xml_node node, const Pen &pen);
+    ///@}
+
 public:
     //
 private:
     /**
-     * Flag for indicating if the VerovioText font is currently used.
+     * Flag for indicating if the music font is currently used as text font.
      * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in
-     * DeviceContext::VrvTextFont
+     * DeviceContext::VrvTextFont. The font is included as woff2 in Commit()
      */
     bool m_vrvTextFont;
+
+    /**
+     * Flag indicating we need a fallback font for the music Glyphs
+     */
+    bool m_vrvTextFontFallback;
 
     // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of
     // the page
@@ -254,7 +325,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::set<std::string> m_smuflGlyphs;
+    std::set<const Glyph *> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;
@@ -272,8 +343,20 @@ private:
     bool m_svgViewBox;
     // output HTML5 data-* attributes
     bool m_html5;
+    // additional CSS
+    std::string m_css;
+    // copy additional attributes of given elements to the SVG, in the form "note@pname; layer@n"
+    std::multimap<ClassId, std::string> m_svgAdditionalAttributes;
+    // format output as raw, stripping extraneous whitespace and non-content newlines
+    bool m_formatRaw;
+    // remove xlink from href attributes
+    bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;
+    // prefix to be added to font glyphs
+    std::string m_glyphPostfixId;
+    // embedding of the smufl text font
+    option_SMUFLTEXTFONT m_smuflTextFont;
 };
 
 } // namespace vrv

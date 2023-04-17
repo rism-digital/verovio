@@ -9,13 +9,13 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
 #include "facsimile.h"
-#include "object.h"
+#include "graphic.h"
 #include "vrv.h"
 #include "zone.h"
 
@@ -24,23 +24,30 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Surface
 //----------------------------------------------------------------------------
-Surface::Surface() : Object("surface-"), AttTyped(), AttCoordinated()
+
+static const ClassRegistrar<Surface> s_factory("surface", SURFACE);
+
+Surface::Surface() : Object(SURFACE, "surface-"), AttTyped(), AttCoordinated()
 {
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_COORDINATED);
+    this->Reset();
 }
+
 Surface::~Surface() {}
+
 void Surface::Reset()
 {
-    ResetTyped();
-    ResetCoordinated();
+    this->ResetTyped();
+    this->ResetCoordinated();
 }
 
 bool Surface::IsSupportedChild(Object *object)
 {
-    // TODO Add support for graphic tag
-    if (object->Is(ZONE)) {
+    if (object->Is(GRAPHIC)) {
+        assert(dynamic_cast<Graphic *>(object));
+    }
+    else if (object->Is(ZONE)) {
         assert(dynamic_cast<Zone *>(object));
     }
     else {
@@ -50,30 +57,26 @@ bool Surface::IsSupportedChild(Object *object)
     return true;
 }
 
-int Surface::GetMaxX()
+int Surface::GetMaxX() const
 {
-    if (HasLrx()) return GetLrx();
+    if (this->HasLrx()) return this->GetLrx();
     int max = 0;
-    ClassIdComparison ac(ZONE);
-    ListOfObjects zones;
-    FindAllDescendantByComparison(&zones, &ac);
-    for (auto iter = zones.begin(); iter != zones.end(); iter++) {
-        Zone *zone = dynamic_cast<Zone *>(*iter);
+    ListOfConstObjects zones = this->FindAllDescendantsByType(ZONE);
+    for (const Object *object : zones) {
+        const Zone *zone = vrv_cast<const Zone *>(object);
         assert(zone);
         max = (zone->GetLrx() > max) ? zone->GetLrx() : max;
     }
     return max;
 }
 
-int Surface::GetMaxY()
+int Surface::GetMaxY() const
 {
-    if (HasLry()) return GetLry();
+    if (this->HasLry()) return this->GetLry();
     int max = 0;
-    ClassIdComparison ac(ZONE);
-    ListOfObjects zones;
-    FindAllDescendantByComparison(&zones, &ac);
-    for (auto iter = zones.begin(); iter != zones.end(); iter++) {
-        Zone *zone = dynamic_cast<Zone *>(*iter);
+    ListOfConstObjects zones = this->FindAllDescendantsByType(ZONE);
+    for (const Object *object : zones) {
+        const Zone *zone = vrv_cast<const Zone *>(object);
         assert(zone);
         max = (zone->GetLry() > max) ? zone->GetLry() : max;
     }

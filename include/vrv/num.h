@@ -30,21 +30,33 @@ public:
     ///@{
     Num();
     virtual ~Num();
-    virtual Object *Clone() const { return new Num(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Num"; }
-    virtual ClassId GetClassId() const { return NUM; }
+    Object *Clone() const override { return new Num(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Num"; }
     ///@}
 
     /**
      * Add an element (text) to a num.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Return a pointer to the current text object.
      */
+    ///@{
     Text *GetCurrentText() { return &m_currentText; }
+    const Text *GetCurrentText() const { return &m_currentText; }
+    ///@}
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

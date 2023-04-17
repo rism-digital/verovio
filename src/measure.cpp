@@ -10,26 +10,37 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
-#include "boundary.h"
+#include "adjustxoverflowfunctor.h"
 #include "comparison.h"
 #include "controlelement.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "f.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "harm.h"
+#include "multirest.h"
 #include "page.h"
+#include "pages.h"
+#include "pedal.h"
+#include "section.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "syl.h"
 #include "system.h"
+#include "systemmilestone.h"
 #include "tempo.h"
+#include "tie.h"
 #include "timeinterface.h"
+#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -43,23 +54,30 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
+
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-")
+    : Object(MEASURE, "measure-")
     , AttBarring()
+    , AttCoordX1()
+    , AttCoordX2()
     , AttMeasureLog()
     , AttMeterConformanceBar()
     , AttNNumberLike()
     , AttPointing()
     , AttTyped()
 {
-    RegisterAttClass(ATT_BARRING);
-    RegisterAttClass(ATT_MEASURELOG);
-    RegisterAttClass(ATT_METERCONFORMANCEBAR);
-    RegisterAttClass(ATT_NNUMBERLIKE);
-    RegisterAttClass(ATT_POINTING);
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_BARRING);
+    this->RegisterAttClass(ATT_COORDX1);
+    this->RegisterAttClass(ATT_COORDX2);
+    this->RegisterAttClass(ATT_MEASURELOG);
+    this->RegisterAttClass(ATT_METERCONFORMANCEBAR);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_POINTING);
+    this->RegisterAttClass(ATT_TYPED);
 
     m_measuredMusic = measureMusic;
+
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
     // Idem for timestamps
@@ -71,10 +89,11 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 
-    // Make the left barLine a left one...
-    m_leftBarLine.SetLeft();
+    // Set the barline positions
+    m_leftBarLine.SetPosition(BarLinePosition::Left);
+    m_rightBarLine.SetPosition(BarLinePosition::Right);
 
-    Reset();
+    this->Reset();
 
     if (!measureMusic) this->SetRight(BARRENDITION_invis);
 }
@@ -82,7 +101,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
 Measure::~Measure()
 {
     // We need to delete own objects
-    Reset();
+    this->Reset();
 }
 
 void Measure::CloneReset()
@@ -104,21 +123,26 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
-    ResetMeasureLog();
-    ResetMeterConformanceBar();
-    ResetNNumberLike();
-    ResetPointing();
-    ResetTyped();
+    this->ResetCoordX1();
+    this->ResetCoordX2();
+    this->ResetMeasureLog();
+    this->ResetMeterConformanceBar();
+    this->ResetNNumberLike();
+    this->ResetPointing();
+    this->ResetTyped();
 
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
+    m_index = VRV_UNSET;
+
+    this->ResetDrawingScoreDef();
 
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
     m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
+
+    m_cachedXRel = VRV_UNSET;
+    m_cachedOverflow = VRV_UNSET;
+    m_cachedWidth = VRV_UNSET;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -134,7 +158,7 @@ void Measure::Reset()
 
     m_scoreTimeOffset.clear();
     m_realTimeOffsetMilliseconds.clear();
-    m_currentTempo = 120;
+    m_currentTempo = MIDI_TEMPO;
 }
 
 bool Measure::IsSupportedChild(Object *child)
@@ -146,7 +170,7 @@ bool Measure::IsSupportedChild(Object *child)
         assert(dynamic_cast<EditorialElement *>(child));
     }
     else if (child->Is(STAFF)) {
-        Staff *staff = dynamic_cast<Staff *>(child);
+        Staff *staff = vrv_cast<Staff *>(child);
         assert(staff);
         if (staff && (staff->GetN() < 1)) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
@@ -168,16 +192,17 @@ void Measure::AddChildBack(Object *child)
     }
 
     child->SetParent(this);
-    if (m_children.empty()) {
-        m_children.push_back(child);
+    ArrayOfObjects &children = this->GetChildrenForModification();
+    if (children.empty()) {
+        children.push_back(child);
     }
-    else if (m_children.back()->Is(STAFF)) {
-        m_children.push_back(child);
+    else if (children.back()->Is(STAFF)) {
+        children.push_back(child);
     }
     else {
-        for (auto it = m_children.begin(); it != m_children.end(); ++it) {
+        for (auto it = children.begin(); it != children.end(); ++it) {
             if (!(*it)->Is(STAFF)) {
-                m_children.insert(it, child);
+                children.insert(it, child);
                 break;
             }
         }
@@ -188,7 +213,7 @@ void Measure::AddChildBack(Object *child)
 int Measure::GetDrawingX() const
 {
     if (!this->IsMeasuredMusic()) {
-        System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
+        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
         if (system->m_yAbs != VRV_UNSET) {
             return (system->m_systemLeftMar);
@@ -199,17 +224,46 @@ int Measure::GetDrawingX() const
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
-    System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
     assert(system);
     m_cachedDrawingX = system->GetDrawingX() + this->GetDrawingXRel();
     return m_cachedDrawingX;
 }
 
+void Measure::ResetCachedDrawingX() const
+{
+    Object::ResetCachedDrawingX();
+    m_timestampAligner.ResetCachedDrawingX();
+}
+
 void Measure::SetDrawingXRel(int drawingXRel)
 {
-    ResetCachedDrawingX();
-    m_timestampAligner.ResetCachedDrawingX();
+    this->ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
+}
+
+void Measure::CacheXRel(bool restore)
+{
+    if (restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedWidth = this->GetWidth();
+        m_cachedOverflow = this->GetDrawingOverflow();
+        m_cachedXRel = m_drawingXRel;
+    }
+}
+
+bool Measure::IsFirstInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetFirst(MEASURE) == this);
+}
+
+bool Measure::IsLastInSystem() const
+{
+    assert(this->GetParent());
+    return (this->GetParent()->GetLast(MEASURE) == this);
 }
 
 int Measure::GetLeftBarLineXRel() const
@@ -222,7 +276,7 @@ int Measure::GetLeftBarLineXRel() const
 
 int Measure::GetLeftBarLineLeft() const
 {
-    int x = GetLeftBarLineXRel();
+    int x = this->GetLeftBarLineXRel();
     if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX1();
     }
@@ -231,7 +285,7 @@ int Measure::GetLeftBarLineLeft() const
 
 int Measure::GetLeftBarLineRight() const
 {
-    int x = GetLeftBarLineXRel();
+    int x = this->GetLeftBarLineXRel();
     if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX2();
     }
@@ -246,9 +300,41 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
+int Measure::CalculateRightBarLineWidth(const Doc *doc, int staffSize) const
+{
+    const BarLine *barline = this->GetRightBarLine();
+    if (!barline) return 0;
+
+    const int barLineWidth = doc->GetDrawingBarLineWidth(staffSize);
+    const int barLineThickWidth
+        = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_thickBarlineThickness.GetValue();
+    const int barLineSeparation = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_barLineSeparation.GetValue();
+
+    int width = 0;
+    switch (barline->GetForm()) {
+        case BARRENDITION_dbl:
+        case BARRENDITION_dbldashed:
+        case BARRENDITION_dbldotted: {
+            width = barLineSeparation + barLineWidth;
+            break;
+        }
+        case BARRENDITION_rptend:
+        case BARRENDITION_end: {
+            width = barLineSeparation + barLineWidth + barLineThickWidth;
+            break;
+        }
+        case BARRENDITION_rptboth: {
+            width = 2 * barLineSeparation + barLineWidth + barLineThickWidth;
+            break;
+        }
+        default: break;
+    }
+    return width;
+}
+
 int Measure::GetRightBarLineLeft() const
 {
-    int x = GetRightBarLineXRel();
+    int x = this->GetRightBarLineXRel();
     if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX1();
     }
@@ -257,7 +343,7 @@ int Measure::GetRightBarLineLeft() const
 
 int Measure::GetRightBarLineRight() const
 {
-    int x = GetRightBarLineXRel();
+    int x = this->GetRightBarLineXRel();
     if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX2();
     }
@@ -267,17 +353,17 @@ int Measure::GetRightBarLineRight() const
 int Measure::GetWidth() const
 {
     if (!this->IsMeasuredMusic()) {
-        System *system = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
+        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
-        Page *page = dynamic_cast<Page *>(system->GetFirstAncestor(PAGE));
-        assert(page);
         if (system->m_yAbs != VRV_UNSET) {
+            const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
+            assert(page);
             // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
         }
     }
 
-    if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    if (m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -295,26 +381,45 @@ int Measure::GetInnerCenterX() const
 
 int Measure::GetDrawingOverflow()
 {
-    Functor adjustXOverlfow(&Object::AdjustXOverflow);
-    Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams(0);
-    adjustXOverflowParams.m_currentSystem = dynamic_cast<System *>(this->GetFirstAncestor(SYSTEM));
-    assert(adjustXOverflowParams.m_currentSystem);
-    adjustXOverflowParams.m_lastMeasure = this;
-    this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
-    if (!adjustXOverflowParams.m_currentWidest) return 0;
+    AdjustXOverflowFunctor adjustXOverflow(0);
+    System *system = vrv_cast<System *>(this->GetFirstAncestor(SYSTEM));
+    assert(system);
+    adjustXOverflow.SetCurrentSystem(system);
+    adjustXOverflow.SetLastMeasure(this);
+    this->Process(adjustXOverflow);
+
+    FloatingPositioner *widestPositioner = adjustXOverflow.GetWidestPositioner();
+    if (!widestPositioner) return 0;
 
     int measureRightX = this->GetDrawingX() + this->GetWidth();
-    int overflow = adjustXOverflowParams.m_currentWidest->GetContentRight() - measureRightX;
+    int overflow = widestPositioner->GetContentRight() - measureRightX;
     return std::max(0, overflow);
+}
+
+int Measure::GetSectionRestartShift(const Doc *doc) const
+{
+    if (this->IsFirstInSystem()) {
+        return 0;
+    }
+    else {
+        return 5 * doc->GetDrawingDoubleUnit(100);
+    }
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+    assert(!m_drawingScoreDef); // We should always call ResetDrawingScoreDef before
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+}
+
+void Measure::ResetDrawingScoreDef()
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 }
 
 std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
@@ -322,26 +427,23 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     assert(scoreDef);
 
     std::vector<Staff *> staves;
-    std::vector<int>::iterator iter;
-    std::vector<int> staffList;
+    std::set<int> staffList;
 
     // First get all the staffGrps
-    ClassIdComparison matchType(STAFFGRP);
-    ListOfObjects staffGrps;
-    scoreDef->FindAllDescendantByComparison(&staffGrps, &matchType);
+    ListOfObjects staffGrps = scoreDef->FindAllDescendantsByType(STAFFGRP);
 
     // Then the @n of each first staffDef
-    for (auto &staffGrp : staffGrps) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>((staffGrp)->GetFirst(STAFFDEF));
-        if (staffDef) staffList.push_back(staffDef->GetN());
+    for (Object *staffGrp : staffGrps) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>((staffGrp)->FindDescendantByType(STAFFDEF));
+        if (staffDef && (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN)) staffList.insert(staffDef->GetN());
     }
 
     // Get the corresponding staves in the measure
-    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
-        AttNIntegerComparison matchN(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
+    for (int staffN : staffList) {
+        AttNIntegerComparison matchN(STAFF, staffN);
+        Staff *staff = vrv_cast<Staff *>(this->FindDescendantByComparison(&matchN, 1));
         if (!staff) {
-            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
+            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetID().c_str());
             continue;
         }
         staves.push_back(staff);
@@ -352,12 +454,15 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
 Staff *Measure::GetTopVisibleStaff()
 {
-    Staff *staff = NULL;
-    ListOfObjects staves;
-    ClassIdComparison matchType(STAFF);
-    this->FindAllDescendantByComparison(&staves, &matchType, 1);
-    for (auto &child : staves) {
-        staff = dynamic_cast<Staff *>(child);
+    return const_cast<Staff *>(std::as_const(*this).GetTopVisibleStaff());
+}
+
+const Staff *Measure::GetTopVisibleStaff() const
+{
+    const Staff *staff = NULL;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    for (const Object *child : staves) {
+        staff = vrv_cast<const Staff *>(child);
         assert(staff);
         if (staff->DrawingIsVisible()) {
             break;
@@ -367,11 +472,31 @@ Staff *Measure::GetTopVisibleStaff()
     return staff;
 }
 
+Staff *Measure::GetBottomVisibleStaff()
+{
+    return const_cast<Staff *>(std::as_const(*this).GetBottomVisibleStaff());
+}
+
+const Staff *Measure::GetBottomVisibleStaff() const
+{
+    const Staff *bottomStaff = NULL;
+    ListOfConstObjects staves = this->FindAllDescendantsByType(STAFF, false);
+    for (const auto child : staves) {
+        const Staff *staff = vrv_cast<const Staff *>(child);
+        assert(staff);
+        if (!staff->DrawingIsVisible()) {
+            continue;
+        }
+        bottomStaff = staff;
+    }
+    return bottomStaff;
+}
+
 int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
-    int timeDuration = int(
-        m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
+    double timeDuration
+        = m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5;
     std::vector<double>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
@@ -386,7 +511,86 @@ double Measure::GetRealTimeOffsetMilliseconds(int repeat) const
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 
-void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
+data_BARRENDITION Measure::GetDrawingLeftBarLineByStaffN(int staffN) const
+{
+    auto elementIter = m_invisibleStaffBarlines.find(staffN);
+    if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.first;
+    return this->GetDrawingLeftBarLine();
+}
+
+data_BARRENDITION Measure::GetDrawingRightBarLineByStaffN(int staffN) const
+{
+    auto elementIter = m_invisibleStaffBarlines.find(staffN);
+    if (elementIter != m_invisibleStaffBarlines.end()) return elementIter->second.second;
+    return this->GetDrawingRightBarLine();
+}
+
+Measure::BarlineRenditionPair Measure::SelectDrawingBarLines(const Measure *previous) const
+{
+    // Barlines are stored in the map in the following format:
+    // previous measure right -> current measure left -> expected barlines (previous, current)
+    static std::map<data_BARRENDITION, std::map<data_BARRENDITION, BarlineRenditionPair>> drawingLines = {
+        // previous right barline is dotted
+        { BARRENDITION_dotted,
+            { { BARRENDITION_dotted, { BARRENDITION_dotted, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is dashed
+        { BARRENDITION_dashed,
+            { { BARRENDITION_dotted, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dashed, BARRENDITION_dotted } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is single
+        { BARRENDITION_single,
+            { { BARRENDITION_dotted, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_single, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_single, BARRENDITION_dotted } },
+                { BARRENDITION_dbldashed, { BARRENDITION_single, BARRENDITION_dashed } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double dotted
+        { BARRENDITION_dbldotted,
+            { { BARRENDITION_dotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dotted, BARRENDITION_dashed } },
+                { BARRENDITION_single, { BARRENDITION_dotted, BARRENDITION_single } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldotted, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double dashed
+        { BARRENDITION_dbldashed,
+            { { BARRENDITION_dotted, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_dashed, BARRENDITION_single } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbldashed, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+        // previous right barline is double
+        { BARRENDITION_dbl,
+            { { BARRENDITION_dotted, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dashed, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_single, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbldotted, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbldashed, { BARRENDITION_dbl, BARRENDITION_NONE } },
+                { BARRENDITION_dbl, { BARRENDITION_dbl, BARRENDITION_NONE } } } },
+    };
+
+    const BarlineRenditionPair defaultValue = { previous->GetRight(), this->GetLeft() };
+    auto previousRight = drawingLines.find(previous->GetRight());
+    if (previousRight == drawingLines.end()) return defaultValue;
+
+    auto currentLeft = previousRight->second.find(this->GetLeft());
+    if (currentLeft == previousRight->second.end()) return defaultValue;
+
+    return currentLeft->second;
+}
+
+void Measure::SetDrawingBarLines(Measure *previous, int barlineDrawingFlags)
 {
     // First set the right barline. If none then set a single one.
     data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
@@ -396,7 +600,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
     if (!previous) {
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
-    else if (systemBreak) {
+    else if (barlineDrawingFlags & BarlineDrawingFlags::SYSTEM_BREAK) {
         // we have rptboth on one of the two sides, split them (ignore any other value)
         if ((previous->GetRight() == BARRENDITION_rptboth) || (this->GetLeft() == BARRENDITION_rptboth)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptend);
@@ -407,7 +611,9 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             this->SetDrawingLeftBarLine(this->GetLeft());
         }
     }
-    else if (!scoreDefInsert) {
+    else if (!((barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)
+                 || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+                 || (barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS))) {
         // we have rptboth split in the two measures, make them one rptboth
         if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
@@ -429,24 +635,102 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             previous->SetDrawingRightBarLine(BARRENDITION_invis);
             this->SetDrawingLeftBarLine(BARRENDITION_rptboth);
         }
-        // nothing we can do with any other value?
+        // handle other possible barline interactions
         else {
-            this->SetDrawingLeftBarLine(this->GetLeft());
+            auto [right, left] = SelectDrawingBarLines(previous);
+            if (right != left) {
+                previous->SetDrawingRightBarLine(right);
+                this->SetDrawingLeftBarLine(left);
+                if (this->HasInvisibleStaffBarlines()) this->GetLeftBarLine()->SetPosition(BarLinePosition::None);
+            }
         }
     }
     else {
+        if ((barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_PREVIOUS)
+            && !(barlineDrawingFlags & BarlineDrawingFlags::INVISIBLE_MEASURE_CURRENT)
+            && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT)) {
+            if (this->GetLeft() == BARRENDITION_NONE) {
+                this->SetLeft(BARRENDITION_single);
+            }
+            this->GetLeftBarLine()->SetPosition(BarLinePosition::None);
+        }
         // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
+}
+
+void Measure::SetInvisibleStaffBarlines(
+    Measure *previous, ListOfObjects &currentInvisible, ListOfObjects &previousInvisible, int barlineDrawingFlags)
+{
+    if (!previous) return;
+
+    // Process invisible staves in the current measure and set right barline values for previous measure
+    for (const auto object : currentInvisible) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        data_BARRENDITION right = previous->GetRight();
+        if (right == BARRENDITION_NONE) right = BARRENDITION_single;
+        auto [iter, result]
+            = previous->m_invisibleStaffBarlines.insert({ staff->GetN(), { BARRENDITION_NONE, right } });
+        if (!result) iter->second.second = right;
+    }
+    // Then process invisible staves in the previous measure and set left barline values in the current measure
+    for (const auto object : previousInvisible) {
+        Staff *staff = vrv_cast<Staff *>(object);
+        assert(staff);
+        data_BARRENDITION left = this->GetLeft();
+        if ((left == BARRENDITION_NONE) && !(barlineDrawingFlags & BarlineDrawingFlags::SCORE_DEF_INSERT))
+            left = BARRENDITION_single;
+        auto [iter, result] = m_invisibleStaffBarlines.insert({ staff->GetN(), { left, BARRENDITION_NONE } });
+        if (!result) iter->second.first = left;
+    }
+}
+
+std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEndpoints()
+{
+    ListOfObjects children = this->FindAllDescendantsByType(TIE);
+
+    std::vector<std::pair<LayerElement *, LayerElement *>> endpoints;
+    for (Object *object : children) {
+        Tie *tie = vrv_cast<Tie *>(object);
+        // If both start and end points of the tie are not within current measure - skip it
+        LayerElement *start = tie->GetStart();
+        if (!start || (start->GetFirstAncestor(MEASURE) != this)) continue;
+        LayerElement *end = tie->GetEnd();
+        if (!end || (end->GetFirstAncestor(MEASURE) != this)) continue;
+        endpoints.emplace_back(start, end);
+    }
+
+    return endpoints;
 }
 
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Measure::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMeasure(this);
+}
+
+FunctorCode Measure::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMeasure(this);
+}
+
+FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMeasureEnd(this);
+}
+
+FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeasureEnd(this);
+}
+
 int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 {
-    ConvertMarkupAnalyticalParams *params = dynamic_cast<ConvertMarkupAnalyticalParams *>(functorParams);
+    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
     assert(params);
 
     ArrayOfObjects::iterator iter;
@@ -461,18 +745,19 @@ int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
 
 int Measure::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
     // Move itself to the pageBasedSystem - do not process children
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
 
 int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     // We are processing by staff/layer from the call below - we obviously do not want to loop...
@@ -497,7 +782,7 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
     params->m_targetSubSystem->AddChild(measure);
 
-    ArrayOfComparisons filters;
+    Filters filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : params->m_layerTree->child) {
         for (auto const &layers : staves.second.child) {
@@ -525,7 +810,7 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
 
 int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
 
     if (params->m_contentMeasure == NULL) {
@@ -540,72 +825,17 @@ int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
 int Measure::Save(FunctorParams *functorParams)
 {
-    if (this->IsMeasuredMusic())
-        return Object::Save(functorParams);
-    else
-        return FUNCTOR_CONTINUE;
+    return (this->IsMeasuredMusic()) ? Object::Save(functorParams) : FUNCTOR_CONTINUE;
 }
 
 int Measure::SaveEnd(FunctorParams *functorParams)
 {
-    if (this->IsMeasuredMusic())
-        return Object::SaveEnd(functorParams);
-    else
-        return FUNCTOR_CONTINUE;
-}
-
-int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
-{
-    UnsetCurrentScoreDefParams *params = dynamic_cast<UnsetCurrentScoreDefParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    // We also need to remove scoreDef elements in the AlignmentReference objects
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::OptimizeScoreDef(FunctorParams *functorParams)
-{
-    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_doc->GetOptions()->m_condenseTempoPages.GetValue()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    params->m_hasFermata = (this->FindDescendantByType(FERMATA));
-    params->m_hasTempo = (this->FindDescendantByType(TEMPO));
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    SetDrawingXRel(0);
-    if (m_measureAligner.GetLeftAlignment()) {
-        m_measureAligner.GetLeftAlignment()->SetXRel(0);
-    }
-    if (m_measureAligner.GetRightAlignment()) {
-        m_measureAligner.GetRightAlignment()->SetXRel(0);
-    }
-
-    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
-
-    m_hasAlignmentRefWithMultipleLayers = false;
-
-    return FUNCTOR_CONTINUE;
+    return (this->IsMeasuredMusic()) ? Object::SaveEnd(functorParams) : FUNCTOR_CONTINUE;
 }
 
 int Measure::ApplyPPUFactor(FunctorParams *functorParams)
 {
-    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
 
     if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
@@ -614,544 +844,19 @@ int Measure::ApplyPPUFactor(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AlignHorizontally(FunctorParams *functorParams)
+int Measure::InitMIDI(FunctorParams *functorParams)
 {
-    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
+    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
     assert(params);
 
-    // clear the content of the measureAligner
-    m_measureAligner.Reset();
-
-    // point to it
-    params->m_measureAligner = &m_measureAligner;
-    params->m_hasMultipleLayer = false;
-
-    if (m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment())) params->m_hasMultipleLayer = true;
-    if (m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment())) params->m_hasMultipleLayer = true;
-
-    assert(params->m_measureAligner);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
-{
-    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
-    assert(params);
-
-    // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
-    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work
-    // in MEI anyway.
-    m_timestampAligner.Process(params->m_functor, params);
-
-    // Next scoreDef will be INTERMEDIATE_SCOREDEF (See Layer::AlignHorizontally)
-    params->m_isFirstMeasure = false;
-
-    if (params->m_hasMultipleLayer) m_hasAlignmentRefWithMultipleLayers = true;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AlignVertically(FunctorParams *functorParams)
-{
-    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
-
-    // we also need to reset the staffNb
-    params->m_staffIdx = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustArpegEnd(FunctorParams *functorParams)
-{
-    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_alignmentArpegTuples.empty()) {
-        params->m_measureAligner = &m_measureAligner;
-        m_measureAligner.Process(params->m_functor, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-        params->m_alignmentArpegTuples.clear();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustLayers(FunctorParams *functorParams)
-{
-    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
-    assert(params);
-
-    if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
-
-    std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        filters.clear();
-        // Create ad comparison object for each type / @n
-        std::vector<int> ns;
-        // -1 for barline attributes that need to be taken into account each time
-        ns.push_back(-1);
-        ns.push_back(*iter);
-        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
-
-        m_measureAligner.Process(params->m_functor, params, NULL, &filters);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustAccidX(FunctorParams *functorParams)
-{
-    AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    m_measureAligner.PushAlignmentsRight();
-    params->m_rightDefaultAlignment = NULL;
-
-    // We process it backward because we want to get the rightDefaultAlignment
-    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-
-    // We need to process the staves in the reverse order
-    std::vector<int> staffNs = params->m_staffNs;
-    std::vector<int> staffNsReversed;
-    staffNsReversed.resize(staffNs.size());
-    std::reverse_copy(staffNs.begin(), staffNs.end(), staffNsReversed.begin());
-
-    m_measureAligner.PushAlignmentsRight();
-    params->m_rightDefaultAlignment = NULL;
-
-    params->m_staffNs = staffNsReversed;
-    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-
-    // Put params back
-    params->m_staffNs = staffNs;
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustXPos(FunctorParams *functorParams)
-{
-    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    params->m_minPos = 0;
-    params->m_upcomingMinPos = VRV_UNSET;
-    params->m_cumulatedXShift = 0;
-
-    std::vector<int>::iterator iter;
-    ArrayOfComparisons filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
-        params->m_minPos = 0;
-        params->m_upcomingMinPos = VRV_UNSET;
-        params->m_cumulatedXShift = 0;
-        params->m_staffN = (*iter);
-        filters.clear();
-        // Create ad comparison object for each type / @n
-        std::vector<int> ns;
-        // -1 for barline attributes that need to be taken into account each time
-        ns.push_back(-1);
-        ns.push_back(*iter);
-        AttNIntegerAnyComparison matchStaff(ALIGNMENT_REFERENCE, ns);
-        filters.push_back(&matchStaff);
-
-        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
-    }
-
-    // m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
-
-    int minMeasureWidth
-        = params->m_doc->GetOptions()->m_unit.GetValue() * params->m_doc->GetOptions()->m_measureMinWidth.GetValue();
-    // First try to see if we have a double measure length element
-    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
-    Alignment *fullMeasure2
-        = dynamic_cast<Alignment *>(m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-
-    // With a double measure with element (mRpt2, multiRpt)
-    if (fullMeasure2 != NULL) {
-        minMeasureWidth *= 2;
-    }
-    // Nothing if the measure has at least one note or @metcon="false"
-    else if ((this->FindDescendantByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
-        minMeasureWidth = 0;
-    }
-
-    int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
-    if (currentMeasureWidth < minMeasureWidth) {
-        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this->GetLeftBarLine()->GetAlignment(),
-            this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
-        m_measureAligner.AdjustProportionally(boundaries);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustHarmGrpsSpacingParams *params = dynamic_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    // At the end of the measure - pass it along for overlapping verses
-    params->m_previousMeasure = this;
-
-    // Ajust the postion of the alignment according to what we have collected for this harm gpr
-    m_measureAligner.AdjustProportionally(params->m_overlapingHarm);
-    params->m_overlapingHarm.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
-{
-    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
-    assert(params);
-
-    // At the end of the measure - pass it along for overlapping verses
-    params->m_previousMeasure = this;
-
-    // Ajust the postion of the alignment according to what we have collected for this verse
-    m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
-    params->m_overlapingSyl.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::AdjustXOverflow(FunctorParams *functorParams)
-{
-    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    params->m_lastMeasure = this;
-    // For now look only at the content of the last measure, so discard any previous control event.
-    // We need to do this because AdjustXOverflow is run before measures are aligned, so the right
-    // position comparison do not actually tell us which one is the longest. This is not optimal
-    // and can be improved.
-    params->m_currentWidest = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::SetAlignmentXPos(FunctorParams *functorParams)
-{
-    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (params->m_measureXRel > 0) {
-        SetDrawingXRel(params->m_measureXRel);
-    }
-    else {
-        params->m_measureXRel = GetDrawingXRel();
-    }
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    SetDrawingXRel(params->m_shift);
-
-    params->m_shift += this->GetWidth();
-    params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::ResetDrawing(FunctorParams *functorParams)
-{
-    this->m_timestampAligner.Reset();
-    m_drawingEnding = NULL;
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // Check if the measure has some overlfowing control elements
-    int overflow = this->GetDrawingOverflow();
-
-    if (params->m_currentSystem->GetChildCount() > 0) {
-        // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
-        if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
-            Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-            assert(measure);
-            // move as pending since we want it not to be broken with the next measure
-            params->m_pendingObjects.push_back(measure);
-            // continue
-            return FUNCTOR_SIBLINGS;
-        }
-        // Break it if necessary
-        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
-            > params->m_systemWidth) {
-            params->m_currentSystem = new System();
-            params->m_page->AddChild(params->m_currentSystem);
-            params->m_shift = this->m_drawingXRel;
-        }
-    }
-
-    // First add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
-        params->m_currentSystem->AddChild(*iter);
-    }
-    params->m_pendingObjects.clear();
-
-    // Special case where we use the Relinquish method.
-    Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    assert(measure);
-    params->m_currentSystem->AddChild(measure);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
-{
-    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
-    while (iter != params->m_timeSpanningElements.end()) {
-        Measure *endParent = NULL;
-        if ((*iter)->HasInterface(INTERFACE_TIME_SPANNING)) {
-            TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
-            assert(interface);
-            if (interface->GetEnd()) {
-                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstAncestor(MEASURE));
-            }
-        }
-        if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
-            LinkingInterface *interface = (*iter)->GetLinkingInterface();
-            assert(interface);
-            if (interface->GetNextLink()) {
-                // We should have one because we allow only control Event (dir and dynam) to be linked as target
-                TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
-                assert(nextInterface);
-                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstAncestor(MEASURE));
-            }
-        }
-        assert(endParent);
-        // We have reached the end of the spanning - remove it from the list of running elements
-        if (endParent == this) {
-            iter = params->m_timeSpanningElements.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareBoundaries(FunctorParams *functorParams)
-{
-    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
-    assert(params);
-
-    std::vector<BoundaryStartInterface *>::iterator iter;
-    for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); ++iter) {
-        (*iter)->SetMeasure(this);
-    }
-    params->m_startBoundaries.clear();
-
-    if (params->m_currentEnding) {
-        // Set the ending to each measure in between
-        this->m_drawingEnding = params->m_currentEnding;
-    }
-
-    // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
-    params->m_lastMeasure = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareCrossStaff(FunctorParams *functorParams)
-{
-    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_previousEnding) {
-        // We have a measure in between endings and the previous one was group, just reset pointer to NULL
-        params->m_previousEnding = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
-{
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    params->m_dynams.clear();
-
-    std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
-    while (iter != params->m_hairpins.end()) {
-        assert((*iter)->GetEnd());
-        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstAncestor(MEASURE));
-        if (measureEnd == this) {
-            iter = params->m_hairpins.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
-{
-    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_timePointingInterfaces.empty()) {
-        LogWarning("%d time pointing element(s) could not be matched in measure %s",
-            params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
-    }
-
-    ListOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
-    while (iter != params->m_timePointingInterfaces.end()) {
-        iter = params->m_timePointingInterfaces.erase(iter);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
-{
-    PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    ListOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
-    while (iter != params->m_timeSpanningInterfaces.end()) {
-        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
-        // midi output
-        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
-            iter = params->m_timeSpanningInterfaces.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
-{
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
-
-    ListOfObjectBeatPairs::iterator iter = params->m_tstamps.begin();
-    // Loop throught the object/beat pairs and create the TimestampAttr when necessary
-    while (iter != params->m_tstamps.end()) {
-        // -1 means that we have a @tstamp (start) to add to the current measure
-        if ((*iter).second.first == -1) {
-            TimePointInterface *interface = ((*iter).first)->GetTimePointInterface();
-            assert(interface);
-            TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
-            interface->SetStart(timestampAttr);
-            // purge the list of unmatched element is this is a TimeSpanningInterface element
-            if ((*iter).first->HasInterface(INTERFACE_TIME_SPANNING)) {
-                TimeSpanningInterface *tsInterface = ((*iter).first)->GetTimeSpanningInterface();
-                assert(tsInterface);
-                if (tsInterface->HasStartAndEnd()) {
-                    auto item
-                        = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
-                            [tsInterface](std::pair<TimeSpanningInterface *, ClassId> pair) {
-                                return (pair.first == tsInterface);
-                            });
-                    if (item != params->m_timeSpanningInterfaces.end()) {
-                        // LogDebug("Found it!");
-                        params->m_timeSpanningInterfaces.erase(item);
-                    }
-                }
-            }
-            // remove it
-            iter = params->m_tstamps.erase(iter);
-        }
-        // 0 means that we have a @tstamp2 (end) to add to the current measure
-        else if ((*iter).second.first == 0) {
-            TimeSpanningInterface *interface = ((*iter).first)->GetTimeSpanningInterface();
-            assert(interface);
-            TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
-            interface->SetEnd(timestampAttr);
-            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched
-            // elements
-            if (interface->HasStartAndEnd()) {
-                auto item
-                    = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
-                        [interface](
-                            std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == interface); });
-                if (item != params->m_timeSpanningInterfaces.end()) {
-                    // LogDebug("Found it!");
-                    params->m_timeSpanningInterfaces.erase(item);
-                }
-            }
-            iter = params->m_tstamps.erase(iter);
-        }
-        // we have not reached the correct end measure yet
-        else {
-            (*iter).second.first--;
-            ++iter;
-        }
-    }
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }
 
 int Measure::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     // Here we need to update the m_totalTime from the starting time of the measure.
@@ -1167,56 +872,51 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
 
 int Measure::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    // Deal with repeated music later, for now get the last times.
-    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = m_currentTempo;
+    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = this->m_currentTempo;
+
+    params->m_timemap->AddEntry(this, params);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
     m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_maxCurrentScoreTime);
-    params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
-
-    // search for tempo marks in the measure
-    Tempo *tempo = dynamic_cast<Tempo *>(this->FindDescendantByType(TEMPO));
-    if (tempo && tempo->HasMidiBpm()) {
-        params->m_currentTempo = tempo->GetMidiBpm();
-    }
-    else if (tempo && tempo->HasMm()) {
-        int mm = tempo->GetMm();
-        int mmUnit = 4;
-        if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
-            mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
-        }
-        if (tempo->HasMmDots()) {
-            mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
-        }
-        params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
-    }
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
+    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
 
     m_realTimeOffsetMilliseconds.clear();
     // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_maxCurrentRealTimeSeconds * 1000.0);
-    params->m_maxCurrentRealTimeSeconds
-        += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
+    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
 {
-    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
+    assert(params);
+
+    const double scoreTimeIncrement
+        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
+    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
+    params->m_currentScoreTime += scoreTimeIncrement;
+    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
+    params->m_multiRestFactor = 1;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::InitOnsetOffset(FunctorParams *functorParams)
+{
+    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
     assert(params);
 
     params->m_currentTempo = m_currentTempo;

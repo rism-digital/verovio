@@ -9,12 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -25,21 +25,21 @@ namespace vrv {
 
 LinkingInterface::LinkingInterface() : Interface(), AttLinking()
 {
-    RegisterInterfaceAttClass(ATT_LINKING);
+    this->RegisterInterfaceAttClass(ATT_LINKING);
 
-    Reset();
+    this->Reset();
 }
 
 LinkingInterface::~LinkingInterface() {}
 
 void LinkingInterface::Reset()
 {
-    ResetLinking();
+    this->ResetLinking();
 
     m_next = NULL;
-    m_nextUuid = "";
+    m_nextID = "";
     m_sameas = NULL;
-    m_sameasUuid = "";
+    m_sameasID = "";
 }
 
 void LinkingInterface::SetNextLink(Object *next)
@@ -54,54 +54,64 @@ void LinkingInterface::SetSameasLink(Object *sameas)
     m_sameas = sameas;
 }
 
-void LinkingInterface::SetUuidStr()
+void LinkingInterface::SetIDStr()
 {
     if (this->HasNext()) {
-        m_nextUuid = ExtractUuidFragment(this->GetNext());
+        m_nextID = ExtractIDFragment(this->GetNext());
     }
     if (this->HasSameas()) {
-        m_sameasUuid = ExtractUuidFragment(this->GetSameas());
+        m_sameasID = ExtractIDFragment(this->GetSameas());
     }
 }
 
 Measure *LinkingInterface::GetNextMeasure()
 {
+    return const_cast<Measure *>(std::as_const(*this).GetNextMeasure());
+}
+
+const Measure *LinkingInterface::GetNextMeasure() const
+{
     if (!m_next) return NULL;
-    return dynamic_cast<Measure *>(this->m_next->GetFirstAncestor(MEASURE));
+    return vrv_cast<const Measure *>(m_next->GetFirstAncestor(MEASURE));
+}
+
+void LinkingInterface::AddBackLink(const Object *object)
+{
+    const LinkingInterface *linking = object->GetLinkingInterface();
+    std::string corresp = "#" + object->GetID();
+    if (linking && linking->HasCorresp()) {
+        corresp = linking->GetCorresp();
+    }
+    this->SetCorresp(corresp.c_str());
 }
 
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Object *object)
+FunctorCode LinkingInterface::InterfacePrepareLinking(PrepareLinkingFunctor &functor, Object *object)
 {
-    PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);
-    assert(params);
-
     // This should not happen?
-    if (params->m_fillList == false) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 
-    this->SetUuidStr();
+    this->SetIDStr();
 
-    if (!m_nextUuid.empty()) {
-        params->m_nextUuidPairs.insert({ m_nextUuid, this });
+    if (!m_nextID.empty()) {
+        functor.InsertNextIDPair(m_nextID, this);
     }
-    if (!m_sameasUuid.empty()) {
-        params->m_sameasUuidPairs.insert({ m_sameasUuid, this });
+    if (!m_sameasID.empty()) {
+        functor.InsertSameasIDPair(m_sameasID, this);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
+FunctorCode LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(
+    PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
 {
-    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
-    // Only Dir and Dynam can be spanning with @next (extender)
+    // Only dir and dynam can be spanning with @next (extender)
     if (!object->Is({ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
     }
@@ -118,17 +128,17 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
         if (att->GetExtender() != BOOLEAN_true) return FUNCTOR_CONTINUE;
     }
 
-    params->m_timeSpanningElements.push_back(object);
+    functor.InsertTimeSpanningElement(object);
 
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+FunctorCode LinkingInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_next = NULL;
-    m_nextUuid = "";
+    m_nextID = "";
     m_sameas = NULL;
-    m_sameasUuid = "";
+    m_sameasID = "";
     return FUNCTOR_CONTINUE;
 }
 

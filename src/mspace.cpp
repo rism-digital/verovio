@@ -8,10 +8,11 @@
 #include "mspace.h"
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 
 namespace vrv {
@@ -20,9 +21,11 @@ namespace vrv {
 // MSpace
 //----------------------------------------------------------------------------
 
-MSpace::MSpace() : LayerElement("mSpace-")
+static const ClassRegistrar<MSpace> s_factory("mSpace", MSPACE);
+
+MSpace::MSpace() : LayerElement(MSPACE, "mSpace-")
 {
-    Reset();
+    this->Reset();
 }
 
 MSpace::~MSpace() {}
@@ -35,5 +38,25 @@ void MSpace::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+FunctorCode MSpace::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMSpace(this);
+}
+
+FunctorCode MSpace::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMSpace(this);
+}
+
+FunctorCode MSpace::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMSpaceEnd(this);
+}
+
+FunctorCode MSpace::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMSpaceEnd(this);
+}
 
 } // namespace vrv

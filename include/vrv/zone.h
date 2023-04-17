@@ -8,7 +8,7 @@
 #ifndef __VRV_ZONE_H__
 #define __VRV_ZONE_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -35,13 +35,13 @@ public:
     ///@{
     Zone();
     virtual ~Zone();
-    virtual Object *Clone() const { return new Zone(*this); }
-    virtual void Reset();
-    ClassId GetClassId() const { return ZONE; }
+    Object *Clone() const override { return new Zone(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Zone"; }
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
-    int GetLogicalUly();
-    int GetLogicalLry();
+    int GetLogicalUly() const;
+    int GetLogicalLry() const;
 
 protected:
     //

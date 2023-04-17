@@ -32,22 +32,32 @@ public:
     ///@{
     Expansion();
     virtual ~Expansion();
-    virtual Object *Clone() const { return new Expansion(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Expansion"; }
-    virtual ClassId GetClassId() const { return EXPANSION; }
+    Object *Clone() const override { return new Expansion(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Expansion"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
+    PlistInterface *GetPlistInterface() override { return vrv_cast<PlistInterface *>(this); }
+    const PlistInterface *GetPlistInterface() const override { return vrv_cast<const PlistInterface *>(this); }
     ////@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

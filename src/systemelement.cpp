@@ -9,10 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "system.h"
 
@@ -22,18 +23,26 @@ namespace vrv {
 // SystemElement
 //----------------------------------------------------------------------------
 
-SystemElement::SystemElement() : FloatingObject("se"), AttTyped()
+SystemElement::SystemElement() : FloatingObject(SYSTEM_ELEMENT, "se"), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
 }
 
-SystemElement::SystemElement(const std::string &classid) : FloatingObject(classid), AttTyped()
+SystemElement::SystemElement(ClassId classId) : FloatingObject(classId, "se"), AttTyped()
 {
-    RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_TYPED);
 
-    Reset();
+    this->Reset();
+}
+
+SystemElement::SystemElement(ClassId classId, const std::string &classIdStr)
+    : FloatingObject(classId, classIdStr), AttTyped()
+{
+    this->RegisterAttClass(ATT_TYPED);
+
+    this->Reset();
 }
 
 SystemElement::~SystemElement() {}
@@ -41,7 +50,7 @@ SystemElement::~SystemElement() {}
 void SystemElement::Reset()
 {
     FloatingObject::Reset();
-    ResetTyped();
+    this->ResetTyped();
 
     m_visibility = Visible;
 }
@@ -50,51 +59,46 @@ void SystemElement::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode SystemElement::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSystemElement(this);
+}
+
+FunctorCode SystemElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSystemElement(this);
+}
+
+FunctorCode SystemElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSystemElementEnd(this);
+}
+
+FunctorCode SystemElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSystemElementEnd(this);
+}
+
 int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
 
 int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(params->m_targetSystem);
     this->MoveItselfTo(params->m_targetSystem);
 
     return FUNCTOR_CONTINUE;
-}
-
-int SystemElement::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
-
-    // Special case where we use the Relinquish method.
-    SystemElement *element = dynamic_cast<SystemElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingObjects.push_back(element);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int SystemElement::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

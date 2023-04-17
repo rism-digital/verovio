@@ -38,25 +38,29 @@ public:
     ///@{
     MNum();
     virtual ~MNum();
-    virtual Object *Clone() const { return new MNum(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MNum"; }
-    virtual ClassId GetClassId() const { return MNUM; }
+    Object *Clone() const override { return new MNum(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MNum"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a dynam.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * @name Setter and getter of the generated flag
@@ -71,11 +75,21 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::Save
      */
     ///@{
-    virtual int Save(FunctorParams *functorParams);
-    virtual int SaveEnd(FunctorParams *functorParams);
+    int Save(FunctorParams *functorParams) override;
+    int SaveEnd(FunctorParams *functorParams) override;
     ///@}
 
 private:

@@ -9,17 +9,20 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "measure.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -29,13 +32,25 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttVisibility()
-{
-    RegisterAttClass(ATT_BARLINELOG);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_VISIBILITY);
+static const ClassRegistrar<BarLine> s_factory("barLine", BARLINE);
 
-    Reset();
+BarLine::BarLine() : LayerElement(BARLINE, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
+{
+    this->RegisterAttClass(ATT_BARLINELOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_VISIBILITY);
+
+    this->Reset();
+}
+
+BarLine::BarLine(ClassId classId)
+    : LayerElement(classId, "bline-"), AttBarLineLog(), AttColor(), AttNNumberLike(), AttVisibility()
+{
+    this->RegisterAttClass(ATT_BARLINELOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_VISIBILITY);
+
+    this->Reset();
 }
 
 BarLine::~BarLine() {}
@@ -44,9 +59,11 @@ void BarLine::Reset()
 {
     LayerElement::Reset();
 
-    ResetBarLineLog();
-    ResetColor();
-    ResetVisibility();
+    this->ResetBarLineLog();
+    this->ResetColor();
+    this->ResetVisibility();
+
+    m_position = BarLinePosition::None;
 }
 
 bool BarLine::SetAlignment(Alignment *alignment)
@@ -57,30 +74,126 @@ bool BarLine::SetAlignment(Alignment *alignment)
 
 bool BarLine::HasRepetitionDots() const
 {
-    if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
+    if (this->GetForm() == BARRENDITION_rptstart || this->GetForm() == BARRENDITION_rptend
+        || this->GetForm() == BARRENDITION_rptboth) {
         return true;
     }
     return false;
 }
 
-//----------------------------------------------------------------------------
-// BarLineAttr
-//----------------------------------------------------------------------------
-
-BarLineAttr::BarLineAttr() : BarLine()
+bool BarLine::IsDrawnThrough(const StaffGrp *staffGrp) const
 {
-    m_isLeft = false;
+    while (staffGrp) {
+        if (staffGrp->HasBarThru()) {
+            return (staffGrp->GetBarThru() == BOOLEAN_true);
+        }
+        staffGrp = dynamic_cast<const StaffGrp *>(staffGrp->GetParent());
+    }
+    return false;
 }
 
-BarLineAttr::~BarLineAttr() {}
+std::pair<bool, double> BarLine::GetLength(const StaffDef *staffDef) const
+{
+    // First check the parent measure
+    const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
+    if (measure && measure->HasBarLen()) {
+        return { true, measure->GetBarLen() };
+    }
+
+    // Then check the staffDef and its ancestors
+    const Object *object = staffDef;
+    while (object) {
+        if (object->HasAttClass(ATT_BARRING)) {
+            const AttBarring *att = dynamic_cast<const AttBarring *>(object);
+            assert(att);
+            if (att->HasBarLen()) {
+                return { true, att->GetBarLen() };
+            }
+        }
+        if (object->Is(SCOREDEF)) break;
+        object = object->GetParent();
+    }
+
+    return { false, 0.0 };
+}
+
+std::pair<bool, data_BARMETHOD> BarLine::GetMethod(const StaffDef *staffDef) const
+{
+    // First check the parent measure
+    const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
+    if (measure && measure->HasBarMethod()) {
+        return { true, measure->GetBarMethod() };
+    }
+
+    // Then check the staffDef and its ancestors
+    const Object *object = staffDef;
+    while (object) {
+        if (object->HasAttClass(ATT_BARRING)) {
+            const AttBarring *att = dynamic_cast<const AttBarring *>(object);
+            assert(att);
+            if (att->HasBarMethod()) {
+                return { true, att->GetBarMethod() };
+            }
+        }
+        if (object->Is(SCOREDEF)) break;
+        object = object->GetParent();
+    }
+
+    return { false, BARMETHOD_NONE };
+}
+
+std::pair<bool, int> BarLine::GetPlace(const StaffDef *staffDef) const
+{
+    // First check the parent measure
+    const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
+    if (measure && measure->HasBarPlace()) {
+        return { true, measure->GetBarPlace() };
+    }
+
+    // Then check the staffDef and its ancestors
+    const Object *object = staffDef;
+    while (object) {
+        if (object->HasAttClass(ATT_BARRING)) {
+            const AttBarring *att = dynamic_cast<const AttBarring *>(object);
+            assert(att);
+            if (att->HasBarPlace()) {
+                return { true, att->GetBarPlace() };
+            }
+        }
+        if (object->Is(SCOREDEF)) break;
+        object = object->GetParent();
+    }
+
+    return { false, 0 };
+}
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
+FunctorCode BarLine::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBarLine(this);
+}
+
+FunctorCode BarLine::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBarLine(this);
+}
+
+FunctorCode BarLine::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBarLineEnd(this);
+}
+
+FunctorCode BarLine::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBarLineEnd(this);
+}
+
 int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
 
     assert(m_alignment);
@@ -115,7 +228,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
 
     // Make a segment break
-    // First case: new need to add a new measure segment (e.g, first pass)
+    // First case: new need to add a new measure segment (e.g., first pass)
     if (params->m_targetSubSystem->GetChildCount() <= params->m_segmentIdx) {
         params->m_targetMeasure = new Measure(convertToMeasured);
         if (convertToMeasured) {
@@ -133,7 +246,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
         params->m_targetLayer->CloneReset();
         params->m_targetStaff->AddChild(params->m_targetLayer);
     }
-    // Second case: retrieve the approrpiate segment
+    // Second case: retrieve the appropriate segment
     else {
         params->m_targetMeasure = dynamic_cast<Measure *>(params->m_targetSubSystem->GetChild(params->m_segmentIdx));
         // It must be there
@@ -141,7 +254,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 
         // Look if we already have the staff (e.g., with more than one layer)
         AttNIntegerComparison comparisonStaffN(STAFF, params->m_targetStaff->GetN());
-        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
+        Staff *staff = vrv_cast<Staff *>(params->m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
         if (!staff) {
             staff = new Staff(*params->m_targetStaff);
             staff->ClearChildren();

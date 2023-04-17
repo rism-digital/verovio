@@ -28,48 +28,43 @@ public:
     ///@{
     Dot();
     virtual ~Dot();
-    virtual Object *Clone() const { return new Dot(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dot"; }
-    virtual ClassId GetClassId() const { return DOT; }
+    Object *Clone() const override { return new Dot(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dot"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PreparePointersByLayer
+     * Interface for class functor visitation
      */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
 public:
     /**
-     * A pointer to the note the point relates to.
+     * A pointer to the previous LayerElement it relates to.
      */
-    Note *m_drawingNote;
+    LayerElement *m_drawingPreviousElement;
 
     /**
      * A pointer to the next LayerElement (note, barLine, etc.)

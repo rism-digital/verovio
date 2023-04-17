@@ -9,13 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
@@ -30,11 +31,14 @@ namespace vrv {
 // Section
 //----------------------------------------------------------------------------
 
-Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNumberLike()
-{
-    RegisterAttClass(ATT_NNUMBERLIKE);
+static const ClassRegistrar<Section> s_factory("section", SECTION);
 
-    Reset();
+Section::Section() : SystemElement(SECTION, "section-"), SystemMilestoneInterface(), AttNNumberLike(), AttSectionVis()
+{
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_SECTIONVIS);
+
+    this->Reset();
 }
 
 Section::~Section() {}
@@ -42,8 +46,9 @@ Section::~Section() {}
 void Section::Reset()
 {
     SystemElement::Reset();
-    BoundaryStartInterface::Reset();
-    ResetNNumberLike();
+    SystemMilestoneInterface::Reset();
+    this->ResetNNumberLike();
+    this->ResetSectionVis();
 }
 
 bool Section::IsSupportedChild(Object *child)
@@ -70,53 +75,54 @@ bool Section::IsSupportedChild(Object *child)
 // Section functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode Section::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSection(this);
+}
+
+FunctorCode Section::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSection(this);
+}
+
+FunctorCode Section::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSectionEnd(this);
+}
+
+FunctorCode Section::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSectionEnd(this);
+}
+
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    this->MoveItselfTo(params->m_pageBasedSystem);
+    assert(params->m_currentSystem);
+    this->MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
 
 int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 {
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
     assert(params);
 
-    ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+    ConvertToPageBasedMilestone(this, params->m_currentSystem);
 
     return FUNCTOR_CONTINUE;
 }
 
 int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
-    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
 
     params->m_contentMeasure = NULL;
     params->m_contentLayer = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::PrepareBoundaries(FunctorParams *functorParams)
-{
-    if (this->IsBoundary()) {
-        this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::ResetDrawing(FunctorParams *functorParams)
-{
-    FloatingObject::ResetDrawing(functorParams);
-
-    if (this->IsBoundary()) {
-        this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
-    }
 
     return FUNCTOR_CONTINUE;
 }

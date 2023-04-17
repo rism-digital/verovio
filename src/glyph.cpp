@@ -9,8 +9,8 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 
 //----------------------------------------------------------------------------
 
@@ -34,8 +34,9 @@ Glyph::Glyph()
     m_height = 0;
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
-    m_path = "[unset]";
     m_codeStr = "[unset]";
+    m_path = "[unset]";
+    m_isFallback = false;
 }
 
 Glyph::Glyph(std::string path, std::string codeStr)
@@ -46,8 +47,8 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_height = 0;
     m_horizAdvX = 0;
     m_unitsPerEm = 20480;
-    m_path = path;
     m_codeStr = codeStr;
+    m_isFallback = false;
 
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());
@@ -59,7 +60,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
 
     // look at the viewBox attribute for getting the units per em
     if (!root.attribute("viewBox")) {
-        LogMessage("Font file '%s' does not contain a viewBox attribute", path.c_str());
+        LogInfo("Font file '%s' does not contain a viewBox attribute", path.c_str());
         return;
     }
 
@@ -67,7 +68,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     // the viewBox attribute is expected to contain four coordinates: "0 0 2048 2048"
     // we are looking for the last value
     if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3) {
-        LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
+        LogInfo("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
         return;
     }
 
@@ -82,8 +83,8 @@ Glyph::Glyph(int unitsPerEm)
     m_height = 0;
     m_horizAdvX = 0;
     m_unitsPerEm = unitsPerEm * 10;
-    m_path = "[unset]";
     m_codeStr = "[unset]";
+    m_path = "[unset]";
 }
 
 Glyph::~Glyph() {}
@@ -96,7 +97,7 @@ void Glyph::SetBoundingBox(double x, double y, double w, double h)
     m_height = (int)(10.0 * h);
 }
 
-void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h)
+void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h) const
 {
     x = m_x;
     y = m_y;
@@ -107,33 +108,40 @@ void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h)
 void Glyph::SetAnchor(std::string anchorStr, double x, double y)
 {
     SMuFLGlyphAnchor anchorId;
-    if (anchorStr == "stemDownNW")
+    if (anchorStr == "stemDownNW") {
         anchorId = SMUFL_stemDownNW;
-    else if (anchorStr == "stemUpSE")
+    }
+    else if (anchorStr == "stemUpSE") {
         anchorId = SMUFL_stemUpSE;
-    else if (anchorStr == "cutOutNE")
+    }
+    else if (anchorStr == "cutOutNE") {
         anchorId = SMUFL_cutOutNE;
-    else if (anchorStr == "cutOutNW")
+    }
+    else if (anchorStr == "cutOutNW") {
         anchorId = SMUFL_cutOutNW;
-    else if (anchorStr == "cutOutSE")
+    }
+    else if (anchorStr == "cutOutSE") {
         anchorId = SMUFL_cutOutSE;
-    else if (anchorStr == "cutOutSW")
+    }
+    else if (anchorStr == "cutOutSW") {
         anchorId = SMUFL_cutOutSW;
+    }
     // Silently ignore unused anchors
-    else
+    else {
         return;
+    }
     // Anchor points are given as staff spaces (upm / 4)
     m_anchors[anchorId] = Point(x * this->GetUnitsPerEm() / 4, y * this->GetUnitsPerEm() / 4);
 }
 
-bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor)
+bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor) const
 {
     return (m_anchors.count(anchor) == 1);
 }
 
-const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor)
+const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor) const
 {
-    return &m_anchors[anchor];
+    return &m_anchors.at(anchor);
 }
 
 } // namespace vrv
