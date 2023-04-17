@@ -41,7 +41,7 @@ public:
     bool DisplaceClefOctave(std::string elementId, std::string direction);
     bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
-        std::vector<std::pair<std::string, std::string> > attributes);
+        std::vector<std::pair<std::string, std::string>> attributes);
     bool InsertToSyllable(std::string elementId);
     bool Merge(std::vector<std::string> elementIds);
     bool MoveOutsideSyllable(std::string elementId);
@@ -58,7 +58,7 @@ public:
     bool ToggleLigature(std::vector<std::string> elementIds);
     bool ChangeStaff(std::string elementId);
     bool ChangeStaffTo(std::string elementId, std::string staffId);
-    bool ClefMovementHandler(Clef* clef, int x, int y);
+    bool ClefMovementHandler(Clef *clef, int x, int y);
     ///@}
 protected:
     /**
@@ -69,7 +69,7 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-        int *lrx, int *lry, std::vector<std::pair<std::string, std::string> > *attributes);
+        int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
     bool ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId);
@@ -149,7 +149,7 @@ struct ClosestNeume {
             LogError("Neume %s doesn't have neume components.", a->GetID().c_str());
             return true;
         }
-        if(!b->GetFirst(NC)) {
+        if (!b->GetFirst(NC)) {
             LogError("Neume %s doesn't have neume components.", b->GetID().c_str());
             return true;
         }
@@ -164,11 +164,9 @@ struct ClosestNeume {
         Zone *zoneA = a->GetFirst(NC)->GetFacsimileInterface()->GetZone();
         Zone *zoneB = b->GetFirst(NC)->GetFacsimileInterface()->GetZone();
 
-        int distA
-            = std::abs(x - zoneA->GetUlx());
-        int distB
-            = std::abs(x - zoneB->GetUlx());
-        
+        int distA = std::abs(x - zoneA->GetUlx());
+        int distB = std::abs(x - zoneB->GetUlx());
+
         return (distA < distB);
     }
 };
@@ -206,8 +204,8 @@ struct StaffSort {
         // if the x intersection part is smaller than half of length of staffA
         // sort by x coordinate
         if (((aLowest <= bLowest && aLowest >= bHighest) || (aHighest <= bLowest && aHighest >= bHighest)
-            || (bLowest <= aLowest && bLowest >= aHighest) || (bHighest <= aLowest && bHighest >= aHighest))
-            && (zoneA->GetLrx() - zoneB->GetUlx() <= 0.5*(zoneA->GetLrx() - zoneA->GetUlx()))) {
+                || (bLowest <= aLowest && bLowest >= aHighest) || (bHighest <= aLowest && bHighest >= aHighest))
+            && (zoneA->GetLrx() - zoneB->GetUlx() <= 0.5 * (zoneA->GetLrx() - zoneA->GetUlx()))) {
             // sort by x center
             return (zoneA->GetUlx() < zoneB->GetUlx());
         }

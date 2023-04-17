@@ -328,7 +328,8 @@ bool EditorToolkitNeume::Chain(jsonxx::Array actions)
 // from some clef to the clef we're dragging, we need the line of this clef to be the one it is after
 // the drag action. Each of the clef->SetLine() calls are placed so as to accommodate this.
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y) {
+bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
+{
 
     Layer *layer = dynamic_cast<Layer *>(clef->GetFirstAncestor(LAYER));
     if (!layer) return false;
@@ -347,7 +348,7 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y) {
     ListOfObjects withThisClefBefore;
     ListOfObjects withPrecedingClefBefore;
 
-    ClassIdComparison ac(CLEF); 
+    ClassIdComparison ac(CLEF);
     InterfaceComparison ic(INTERFACE_PITCH);
 
     Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
@@ -356,7 +357,7 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y) {
     m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefBefore, &ic, clef,
         (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
     m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
-    
+
     // Adjust facsimile for clef (if it exists)
     if (clef->HasFacs()) {
         Zone *zone = clef->GetZone();
@@ -442,8 +443,7 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y) {
         m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
             (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(
-            &withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
+        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
 
         std::set_difference(withOldPrecedingClefAfter.begin(), withOldPrecedingClefAfter.end(),
             withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
@@ -514,10 +514,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         // clef association is done at the syllable level because of MEI structure
         // also note this will initialize syllable as null in the case of custos
         // which is why all the references to syllable are ternary
-        
-        Object *syllable = ((element->Is(SYLLABLE)
-            ? (element)
-            : element->GetFirstAncestor(SYLLABLE)));
+
+        Object *syllable = ((element->Is(SYLLABLE) ? (element) : element->GetFirstAncestor(SYLLABLE)));
 
         ClassIdComparison ac(CLEF);
         InterfaceComparison facsIC(INTERFACE_FACSIMILE);
@@ -593,18 +591,20 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             return false;
         }
         FacsimileInterface *fi = (*clef).GetFacsimileInterface();
-        assert(fi);      
+        assert(fi);
         // If inside this syllable, moving a clef...
-        // Case 1: BEFORE preceeding syllable(s) -> clef becomes start of this syllable, this syllable reorders before preceeding syllable(s), preceeding and following syllables abide by this clef.
-        // Case 2: INSIDE this syllable -> following neumes and syllables abide by this clef.
-        // Case 3: AFTER this syllable -> clef becomes the end of this syllable, following syllables abide by this clef still.
+        // Case 1: BEFORE preceeding syllable(s) -> clef becomes start of this syllable, this syllable reorders before
+        // preceeding syllable(s), preceeding and following syllables abide by this clef. Case 2: INSIDE this syllable
+        // -> following neumes and syllables abide by this clef. Case 3: AFTER this syllable -> clef becomes the end of
+        // this syllable, following syllables abide by this clef still.
         if (element->GetParent()->Is(SYLLABLE)) {
             Object *parent = clef->GetParent();
             assert(parent);
             Object *lNc;
             if (parent->GetChildCount(NEUME) == 1) {
                 lNc = parent->GetFirst(NEUME)->GetLast();
-            } else {
+            }
+            else {
                 lNc = parent->GetLast(NEUME)->GetLast();
             }
             int xRight = lNc->GetFacsimileInterface()->GetZone()->GetLrx();
@@ -686,7 +686,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             return false;
         }
         FacsimileInterface *fi = (*accid).GetFacsimileInterface();
-        assert(fi);       
+        assert(fi);
         if (fi->GetZone() != NULL) {
             Zone *zone = fi->GetZone();
             assert(zone);
@@ -877,20 +877,20 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             int bboxUly;
             // if staff rotates downward to the right
             if (theta > 0) {
-                int y = (int)( (draw_w - x) * tan(theta * M_PI / 180.0) );
+                int y = (int)((draw_w - x) * tan(theta * M_PI / 180.0));
                 bboxUly = staffUly + draw_h - y;
-            } 
-            // if staff rotates upwards to the right 
+            }
+            // if staff rotates upwards to the right
             else {
-                int y = (int)( x * tan(-theta * M_PI / 180.0) );
-                int h = (int)( draw_w * tan(-theta * M_PI / 180.0) );
+                int y = (int)(x * tan(-theta * M_PI / 180.0));
+                int h = (int)(draw_w * tan(-theta * M_PI / 180.0));
                 bboxUly = staffUly + (draw_h - h) - y;
             }
             // width height and offset can be adjusted
             int bboxWidth = 225;
             int bboxHeight = 175;
             int bboxOffsetX = 50;
-            
+
             sylZone->SetUlx(bboxUlx - bboxOffsetX);
             sylZone->SetUly(bboxUly);
             sylZone->SetLrx(bboxUlx + bboxWidth - bboxOffsetX);
@@ -899,8 +899,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             fi->AttachZone(sylZone);
         }
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
         ulx -= noteWidth / 2;
         // uly -= noteHeight / 2;
         // Set up facsimile
@@ -950,10 +952,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     nc->SetCurve(curve);
                 }
                 nc->AddChild(liquescent);
-
             }
         }
-        
 
         // If inserting grouping, add the remaining nc children to the neume.
         if (contour != "") {
@@ -1093,8 +1093,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         custos->AttachZone(zone);
         layer->AddChild(custos);
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
@@ -1113,7 +1115,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         }
         m_infoObject.import("uuid", custos->GetID());
     }
-    else if (elementType == "accid"){
+    else if (elementType == "accid") {
         Accid *accid = new Accid();
         data_ACCIDENTAL_WRITTEN accidTypeW = ACCIDENTAL_WRITTEN_NONE;
 
@@ -1144,8 +1146,10 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         accid->SetZone(zone);
         layer->AddChild(accid);
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
@@ -1158,22 +1162,25 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
         m_infoObject.import("uuid", accid->GetID());
     }
-    else if(elementType == "divLine"){
+    else if (elementType == "divLine") {
         DivLine *divLine = new DivLine();
         data_DIVLINE divLineTypeW = DIVLINE_NONE;
 
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-            if (it->first == "form"){
-                if (it->second == "maxima"){
+            if (it->first == "form") {
+                if (it->second == "maxima") {
                     divLineTypeW = DIVLINE_maxima;
                     break;
-                } else if (it->second == "maior"){
+                }
+                else if (it->second == "maior") {
                     divLineTypeW = DIVLINE_maior;
                     break;
-                } else if (it->second == "minima"){
+                }
+                else if (it->second == "minima") {
                     divLineTypeW = DIVLINE_minima;
                     break;
-                } else if (it->second == "finalis"){
+                }
+                else if (it->second == "finalis") {
                     divLineTypeW = DIVLINE_finalis;
                     break;
                 }
@@ -1194,9 +1201,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         surface->AddChild(zone);
         divLine->SetZone(zone);
         layer->AddChild(divLine);
-                
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
@@ -1208,7 +1217,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         layer->ReorderByXPos();
 
         m_infoObject.import("uuid", divLine->GetID());
-        
     }
     else {
         delete zone;
@@ -1223,7 +1231,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     return true;
 }
 
-bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
+bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
+{
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -1258,12 +1267,9 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         return false;
     }
     if (!parent->Is(LAYER)) {
-        LogError("The selected %s is not a child of layer.",
-            element->GetClassName().c_str());
+        LogError("The selected %s is not a child of layer.", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message",
-            "The selected " + element->GetClassName()
-                + "is not a child of layer.");
+        m_infoObject.import("message", "The selected " + element->GetClassName() + "is not a child of layer.");
         return false;
     }
 
@@ -1278,7 +1284,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
-        return false;        
+        return false;
     }
 
     Staff *staff = dynamic_cast<Staff *>(element->GetFirstAncestor(STAFF));
@@ -1298,11 +1304,12 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
 
         std::sort(neumesVector.begin(), neumesVector.end(), compN);
         neume = neumesVector.at(0);
-    } 
+    }
     else {
         LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message", "A syllable must exist in the staff to insert a '" + element->GetClassName() + "' into.");
+        m_infoObject.import(
+            "message", "A syllable must exist in the staff to insert a '" + element->GetClassName() + "' into.");
         return false;
     }
 
@@ -1315,10 +1322,8 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
     ClassIdComparison sc(SYLLABLE);
 
     Object *nextSyllable = m_doc->GetDrawingPage()->FindNextChild(&sc, syllable);
-    Clef *clefPrecedingNextSyllableBefore = 
-        (nextSyllable)
-            ? dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, nextSyllable))
-            : NULL;
+    Clef *clefPrecedingNextSyllableBefore
+        = (nextSyllable) ? dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, nextSyllable)) : NULL;
 
     // Move clef inside syllable
     element->MoveItselfTo(syllable);
@@ -1336,7 +1341,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
         // Get elements after inserted clef until another inserted clef or end of syllable
         Object *nextClef = m_doc->GetDrawingPage()->FindNextChild(&cc, clef);
         Object *endElement;
-        if ( (nextClef) && (nextClef->GetParent() == syllable) ) {
+        if ((nextClef) && (nextClef->GetParent() == syllable)) {
             endElement = nextClef;
         }
         else {
@@ -1354,19 +1359,20 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
 
         // In the case of this clef moving before any clefs outside the syllable in mei
         if (nextSyllable) {
-            Clef *clefPrecedingNextSyllableAfter = 
-                (nextSyllable)
-                    ? dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, nextSyllable))
-                    : NULL;
+            Clef *clefPrecedingNextSyllableAfter = (nextSyllable)
+                ? dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, nextSyllable))
+                : NULL;
             // adjust pitches following new clef accordingly
             if (clefPrecedingNextSyllableBefore != clefPrecedingNextSyllableAfter) {
-                Clef *nextClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cc, clefPrecedingNextSyllableAfter));
+                Clef *nextClef
+                    = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cc, clefPrecedingNextSyllableAfter));
                 Object *endElement = (nextClef) ? nextClef : m_doc->GetDrawingPage()->GetLast();
                 ListOfObjects followingElements;
                 m_doc->GetDrawingPage()->FindAllDescendantBetween(&followingElements, &ic, nextSyllable, endElement);
-                
+
                 for (Object *iter : followingElements) {
-                    iter->GetPitchInterface()->AdjustPitchForNewClef(clefPrecedingNextSyllableBefore, clefPrecedingNextSyllableAfter);
+                    iter->GetPitchInterface()->AdjustPitchForNewClef(
+                        clefPrecedingNextSyllableBefore, clefPrecedingNextSyllableAfter);
                 }
             }
         }
@@ -1374,10 +1380,11 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId) {
 
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
-    return true;   
+    return true;
 }
 
-bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
+bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
+{
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         m_infoObject.import("status", "FAILURE");
@@ -1412,12 +1419,9 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
         return false;
     }
     if (!parent->Is(SYLLABLE)) {
-        LogError("The selected %s is not a child of syllable.",
-            element->GetClassName().c_str());
+        LogError("The selected %s is not a child of syllable.", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
-        m_infoObject.import("message",
-            "The selected " + element->GetClassName()
-                + "is not a child of syllable.");
+        m_infoObject.import("message", "The selected " + element->GetClassName() + "is not a child of syllable.");
         return false;
     }
 
@@ -1429,7 +1433,8 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     Object *lNc;
     if (parent->GetChildCount(NEUME) == 1) {
         lNc = parent->GetFirst(NEUME)->GetLast();
-    } else {
+    }
+    else {
         lNc = parent->GetLast(NEUME)->GetLast();
     }
     int xLeft = fNc->GetFacsimileInterface()->GetZone()->GetUlx();
@@ -1461,7 +1466,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
         Object *nextSyllable = m_doc->GetDrawingPage()->FindNextChild(&sc, syllable);
         Object *nextClef = m_doc->GetDrawingPage()->FindNextChild(&cc, clef);
         Object *endElement;
-        if ( (nextClef) && (nextClef->GetParent() == syllable) ) {
+        if ((nextClef) && (nextClef->GetParent() == syllable)) {
             endElement = nextClef;
         }
         else {
@@ -1483,7 +1488,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
     parent->ClearRelinquishedChildren();
     parent->ReorderByXPos();
 
-    if (element->Is(CLEF)) {        
+    if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
         // BEFORE
         if (xElement < xLeft) {
@@ -1498,11 +1503,11 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId) {
 
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
-    return true;   
+    return true;
 }
 
-
-bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string direction) {
+bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string direction)
+{
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         m_infoObject.import("status", "FAILURE");
@@ -1546,14 +1551,18 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
     if (octaveDis == 0) {
         clef->SetDis(OCTAVE_DIS_NONE);
         clef->SetDisPlace(STAFFREL_basic_NONE);
-    } else {
-      data_OCTAVE_DIS displaced = OCTAVE_DIS_NONE;
-      if (octaveDis == 1 || octaveDis == -1) displaced = OCTAVE_DIS_8;
-      else if (octaveDis == 2 || octaveDis == -2) displaced = OCTAVE_DIS_15;
-      else if (octaveDis == 3 || octaveDis == -3) displaced = OCTAVE_DIS_22;
+    }
+    else {
+        data_OCTAVE_DIS displaced = OCTAVE_DIS_NONE;
+        if (octaveDis == 1 || octaveDis == -1)
+            displaced = OCTAVE_DIS_8;
+        else if (octaveDis == 2 || octaveDis == -2)
+            displaced = OCTAVE_DIS_15;
+        else if (octaveDis == 3 || octaveDis == -3)
+            displaced = OCTAVE_DIS_22;
 
-      clef->SetDis(displaced);
-      clef->SetDisPlace(octaveDis > 0 ? STAFFREL_basic_above : STAFFREL_basic_below);
+        clef->SetDis(displaced);
+        clef->SetDisPlace(octaveDis > 0 ? STAFFREL_basic_above : STAFFREL_basic_below);
     }
 
     // Set new octaves for affected neume components
@@ -1573,7 +1582,6 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
     m_infoObject.import("message", "");
     return true;
 }
-
 
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
@@ -2162,7 +2170,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetUlx(lrx);
             zone->SetLrx(ulx);
         }
-        
+
         if (uly < lry) {
             zone->SetUly(uly);
             zone->SetLry(lry);
@@ -2171,7 +2179,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetUly(lry);
             zone->SetLry(uly);
         }
-        
+
         if (!isnan(rotate)) {
             zone->SetRotate(rotate);
         }
@@ -2268,8 +2276,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
 
                 // unlink
-                Set(parSyllable->GetID(),"follows","");
-                Set(linkedID,"precedes","");
+                Set(parSyllable->GetID(), "follows", "");
+                Set(linkedID, "precedes", "");
 
                 // group into two new syllables
                 int idx = std::distance(elementIds.begin(), it);
@@ -2279,25 +2287,27 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // LogMessage("%s", chainArray.get<jsonxx::Object>(0).json().c_str());
                 // for_each(elementIds.begin(), elementIds.begin()+idx,[](std::string s){LogMessage("%s", s.c_str());});
 
-                std::vector<std::string> elementIds0 = {elementIds.begin(), elementIds.begin()+idx};
+                std::vector<std::string> elementIds0 = { elementIds.begin(), elementIds.begin() + idx };
                 Group("neume", elementIds0);
                 if (m_infoObject.get<jsonxx::String>("status") == "FAILURE") {
                     resultId0 = linkedID;
-                } else {
+                }
+                else {
                     resultId0 = m_infoObject.get<jsonxx::String>("uuid");
                 }
 
-                std::vector<std::string> elementIds1 = {elementIds.begin()+idx, elementIds.end()};
+                std::vector<std::string> elementIds1 = { elementIds.begin() + idx, elementIds.end() };
                 Group("neume", elementIds1);
                 if (m_infoObject.get<jsonxx::String>("status") == "FAILURE") {
                     resultId1 = par->GetID();
-                } else {
-                    resultId1= m_infoObject.get<jsonxx::String>("uuid");
+                }
+                else {
+                    resultId1 = m_infoObject.get<jsonxx::String>("uuid");
                     par = m_doc->GetDrawingPage()->FindDescendantByUuid(resultId1);
                 }
 
                 // link resulting syllables
-                Set(resultId0,"precedes","#" + resultId1);
+                Set(resultId0, "precedes", "#" + resultId1);
                 Set(resultId1, "follows", "#" + resultId0);
                 Object *resultSyl1 = dynamic_cast<Object *>(par->FindDescendantByType(SYL));
                 if (resultSyl1 != NULL) {
@@ -2545,7 +2555,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
             Syllable *fullSyllable = new Syllable();
             Syl *fullSyl = NULL;
-            
+
             // construct concatenated string of all the syls
             std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
@@ -2554,7 +2564,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     if (fullSyl == NULL) {
                         fullSyl = syl;
                     }
-                
+
                     Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
                     if (text != NULL) {
                         std::wstring currentString = text->GetText();
@@ -2572,8 +2582,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
                 // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
                 if (descSyl != NULL) {
-                    FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
-                    
+                    FacsimileInterface *facsInter
+                        = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
+
                     if (facsInter != NULL) {
                         if (ulx == -1 || ulx > facsInter->GetDrawingX()) {
                             ulx = facsInter->GetDrawingX();
@@ -2583,14 +2594,14 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                             lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
                         }
 
-                        if (uly == -1 || uly > facsInter->GetDrawingY()){
-                            uly = facsInter->GetDrawingY();                        
+                        if (uly == -1 || uly > facsInter->GetDrawingY()) {
+                            uly = facsInter->GetDrawingY();
                         }
                         if (lry < facsInter->GetHeight() + facsInter->GetDrawingY()) {
                             lry = facsInter->GetHeight() + facsInter->GetDrawingY();
-                        }  
-                    }   
-                }            
+                        }
+                    }
+                }
             }
             assert(fullSyl);
             Text *text = vrv_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
@@ -2598,7 +2609,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             text->SetText(fullString);
             assert(fullSyllable);
             fullSyllable->AddChild(fullSyl);
-            
+
             // Move elements to the new group syllable
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
@@ -2658,7 +2669,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             doubleParent->DeleteChild(obj);
         }
-        else if (obj->GetChildCount() == (obj->GetChildCount(SYL) + obj->GetChildCount(DIVLINE) + obj->GetChildCount(ACCID) + obj->GetChildCount(CLEF))){
+        else if (obj->GetChildCount()
+            == (obj->GetChildCount(SYL) + obj->GetChildCount(DIVLINE) + obj->GetChildCount(ACCID)
+                + obj->GetChildCount(CLEF))) {
             Object *leftover;
             while ((leftover = obj->FindDescendantByType(SYL)) != NULL) {
                 obj->DeleteChild(leftover);
@@ -2684,7 +2697,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             doubleParent->DeleteChild(obj);
         }
-    }    
+    }
 
     m_infoObject.import("uuid", parent->GetID());
     m_infoObject.import("status", status);
@@ -2754,8 +2767,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
                     assert(surface);
 
-                    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-                    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+                    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+                        / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+                    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+                        / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
                     if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
@@ -2849,7 +2864,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             }
         }
         else if (currentParent) {
-            
+
             // if the element is a syl then we want to keep it attached to the first node
             if (el->Is(SYL)) {
                 continue;
@@ -2871,7 +2886,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     firstIsLig = false;
                     continue;
                 }
-                
+
                 if (nc->HasLigated() && nc->GetLigated() == BOOLEAN_true) ligNum++;
             }
 
@@ -2882,7 +2897,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 assert(newParent);
                 newParent->ClearChildren();
             }
-
 
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
@@ -2957,7 +2971,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     // syl->SetFacs(zone->GetID());
                 }
             }
-            
+
             if (ligNum != 1) {
                 // if not 1st nc in ligature, add child
 
@@ -2998,7 +3012,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     return true;
 }
 
-bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId) 
+bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
 {
     // Check if you can get drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -3017,7 +3031,7 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     Object *fparent = m_doc->GetDrawingPage()->FindDescendantByUuid(neumeId);
     assert(fparent);
     uuidArray << fparent->GetID();
-    
+
     // syllable: second parent
     Object *sparent = fparent->GetFirstAncestor(SYLLABLE);
     assert(sparent);
@@ -3032,7 +3046,7 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     }
 
     // get the index of selected nc in the neume
-    int fIdx = fparent->GetChildIndex(elNc); 
+    int fIdx = fparent->GetChildIndex(elNc);
     if (fIdx == -1) {
         LogError("The selected neume component is not a child of the selected neume.");
         m_infoObject.import("status", "FAILURE");
@@ -3040,7 +3054,7 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
         return false;
     }
     // if click on a ligature, ncId point to the second nc in the ligature, thus minus 1
-    if  (elNc->HasAttribute("ligated", "true")) fIdx -= 1;
+    if (elNc->HasAttribute("ligated", "true")) fIdx -= 1;
 
     Object *newParent = fparent->Clone();
     newParent->CloneReset();
@@ -3074,7 +3088,6 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     m_infoObject.import("message", "");
     m_infoObject.import("uuid", uuidArray);
     return true;
-    
 }
 
 bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
@@ -3119,8 +3132,10 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
     Staff *staff = el->GetAncestorStaff();
     Facsimile *facsimile = m_doc->GetFacsimile();
 
-    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+    const int noteHeight
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int noteWidth
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     prevNc = firstChild;
 
     // Iterate throught the contour and build the new grouping.
@@ -3209,7 +3224,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     // check if two ncs are adjacent
     int firstIdx = firstNc->GetIdx();
     int secondIdx = secondNc->GetIdx();
-    if (std::abs(firstIdx-secondIdx) != 1) {
+    if (std::abs(firstIdx - secondIdx) != 1) {
         LogError("The selected ncs are not adjacent.");
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import("message", "The selected ncs are not adjacent.");
@@ -3219,7 +3234,8 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     bool isLigature;
     if (firstNc->HasAttribute("ligated", "true") && secondNc->HasAttribute("ligated", "true")) {
         isLigature = true;
-    } else {
+    }
+    else {
         isLigature = false;
         Set(firstNc->GetID(), "tilt", "");
         Set(secondNc->GetID(), "tilt", "");
@@ -3240,8 +3256,10 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
         assert(staff);
 
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         zone->SetUlx(ligUlx + noteWidth);
         zone->SetUly(ligUly + noteHeight);
@@ -3312,7 +3330,8 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(DIVLINE) || element->Is(ACCID))) {
+    if (!(element->Is(SYLLABLE) || element->Is(CUSTOS) || element->Is(CLEF) || element->Is(DIVLINE)
+            || element->Is(ACCID))) {
         LogError("Element is of type %s, but only Syllables, Custos, Clefs, Divlines, and Accids can change staves.",
             element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
@@ -3352,7 +3371,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     }
 
     Staff *staff = NULL;
-    
+
     // find the nearest staff line
     if (staves.size() > 0) {
         std::sort(staves.begin(), staves.end(), comp);
@@ -3472,15 +3491,15 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         layer->ReorderByXPos();
         parent->ClearRelinquishedChildren();
         parent->ReorderByXPos();
-        if (!(element->Is(ACCID) || element->Is(DIVLINE))){
+        if (!(element->Is(ACCID) || element->Is(DIVLINE))) {
             if (!AdjustPitchFromPosition(element)) {
-                        LogError("Could not adjust pitch of %s", element->GetID().c_str());
-                        m_infoObject.import("status", "FAILURE");
-                        m_infoObject.import("message", "Failed to properly set pitch.");
-                        m_infoObject.import("elementId", element->GetID());
-                        m_infoObject.import("newStaffId", staff->GetID());
-                        return false;
-                    }
+                LogError("Could not adjust pitch of %s", element->GetID().c_str());
+                m_infoObject.import("status", "FAILURE");
+                m_infoObject.import("message", "Failed to properly set pitch.");
+                m_infoObject.import("elementId", element->GetID());
+                m_infoObject.import("newStaffId", staff->GetID());
+                return false;
+            }
         }
     }
 
@@ -3526,8 +3545,8 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
         return false;
     }
 
-    Staff *staff = dynamic_cast<Staff *> (m_doc->GetDrawingPage()->FindDescendantByUuid(staffId));
-    
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(staffId));
+
     if (!staff) {
         LogError("Could not find any staves. This should not happen");
         m_infoObject.import("status", "FAILURE");
@@ -3710,19 +3729,22 @@ bool EditorToolkitNeume::ParseInsertAction(jsonxx::Object param, std::string *el
     return true;
 }
 
-bool EditorToolkitNeume::ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId) {
+bool EditorToolkitNeume::ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId)
+{
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
 
-bool EditorToolkitNeume::ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId) {
+bool EditorToolkitNeume::ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId)
+{
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
 
-bool EditorToolkitNeume::ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction) {
+bool EditorToolkitNeume::ParseDisplaceClefAction(jsonxx::Object param, std::string *elementId, std::string *direction)
+{
     if (!param.has<jsonxx::String>("elementId") || !param.has<jsonxx::String>("direction")) return false;
     *elementId = param.get<jsonxx::String>("elementId");
     *direction = param.get<jsonxx::String>("direction");
@@ -3903,8 +3925,7 @@ bool EditorToolkitNeume::ParseChangeGroupAction(jsonxx::Object param, std::strin
     return true;
 }
 
-bool EditorToolkitNeume::ParseToggleLigatureAction(
-    jsonxx::Object param, std::vector<std::string> *elementIds)
+bool EditorToolkitNeume::ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds)
 {
     if (!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
@@ -3987,7 +4008,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         pi->SetOct(3);
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        
+
         // Use the same pitchDifference equation for both syllables and custos
         const int pitchDifference
             = round((double)(staff->GetDrawingY() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine()))
@@ -4098,4 +4119,4 @@ bool EditorToolkitNeume::AdjustClefLineFromPosition(Clef *clef, Staff *staff)
     return true;
 }
 
-}
+} // namespace vrv

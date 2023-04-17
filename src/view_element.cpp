@@ -616,8 +616,10 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
@@ -746,35 +748,26 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int sym = 0;
 
     switch (divLine->GetForm()) {
-        case DIVLINE_maxima:
-            sym = SMUFL_E8F5_chantDivisioMaxima;
-            break;
-        case DIVLINE_minima:
-            sym = SMUFL_E8F3_chantDivisioMinima;
-            break;
-        case DIVLINE_maior:
-            sym = SMUFL_E8F4_chantDivisioMaior;
-            break;
-        case DIVLINE_finalis:
-            sym = SMUFL_E8F6_chantDivisioFinalis;
-            break;
-        default:
-            break;
+        case DIVLINE_maxima: sym = SMUFL_E8F5_chantDivisioMaxima; break;
+        case DIVLINE_minima: sym = SMUFL_E8F3_chantDivisioMinima; break;
+        case DIVLINE_maior: sym = SMUFL_E8F4_chantDivisioMaior; break;
+        case DIVLINE_finalis: sym = SMUFL_E8F6_chantDivisioFinalis; break;
+        default: break;
     }
-    
-    int x,y;
-    if ((m_doc->GetType() == Facs) && (divLine->HasFacs())){
+
+    int x, y;
+    if ((m_doc->GetType() == Facs) && (divLine->HasFacs())) {
         x = divLine->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
     }
-    else{
+    else {
         x = element->GetDrawingX();
         y = element->GetDrawingY();
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
-    
+
     int rotateOffset;
     if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();

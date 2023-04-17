@@ -28,5 +28,4 @@ void Liquescent::Reset()
     ResetColor();
 }
 
-
-}
+} // namespace vrv

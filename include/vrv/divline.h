@@ -67,7 +67,7 @@ public:
      */
     // virtual int ConvertToCastOffMensural(FunctorParams *params);
     // static wchar_t GetDivLineGlyph(data_DIVISIO);
-    
+
     /**
      * See Object::ResetDrawing
      */
