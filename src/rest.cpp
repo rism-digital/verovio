@@ -290,12 +290,12 @@ bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &i
     auto elements = layer->GetLayerElementsForTimeSpanOf(this, true);
     if (elements.empty()) return false;
 
-    const LayerElement *elem = NULL;
+    const LayerElement *firstElement = NULL;
     std::set<int> layers;
     for (const Object *element : elements) {
         const LayerElement *layerElement = vrv_cast<const LayerElement *>(element);
         layers.insert(layerElement->GetAlignmentLayerN());
-        if (!elem) elem = layerElement;
+        if (!firstElement) firstElement = layerElement;
     }
 
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
@@ -307,8 +307,8 @@ bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &i
             isTopLayer = true;
         }
         else {
-            if (elem && ((*layers.begin()) < 0)) {
-                isTopLayer = staff->GetN() < elem->GetAncestorStaff()->GetN();
+            if (*layers.begin() < 0) {
+                isTopLayer = staff->GetN() < firstElement->GetAncestorStaff()->GetN();
             }
             else {
                 isTopLayer = false;
@@ -321,13 +321,11 @@ bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &i
 
 int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int defaultLocation) const
 {
-    const Layer *parentLayer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
     if (!layer) return defaultLocation;
     bool isTopLayer = false;
     if (!this->DetermineRestPosition(staff, layer, isTopLayer)) return defaultLocation;
 
     // find best rest location relative to elements on other layers
-    const Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
     bool restOverlap = true;
     const auto otherLayerRelativeLocationInfo = this->GetLocationRelativeToOtherLayers(layer, isTopLayer, restOverlap);
     int currentLayerRelativeLocation = this->GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
