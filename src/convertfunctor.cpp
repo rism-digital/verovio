@@ -11,13 +11,17 @@
 
 #include "doc.h"
 #include "ending.h"
+#include "fermata.h"
 #include "layer.h"
 #include "mdiv.h"
+#include "mrest.h"
 #include "page.h"
+#include "rest.h"
 #include "score.h"
 #include "section.h"
 #include "staff.h"
 #include "system.h"
+#include "tie.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -411,32 +415,127 @@ ConvertMarkupAnalyticalFunctor::ConvertMarkupAnalyticalFunctor(bool permanent)
 
 FunctorCode ConvertMarkupAnalyticalFunctor::VisitChord(Chord *chord)
 {
+    assert(!m_currentChord);
+    m_currentChord = chord;
+
+    /****** fermata ******/
+
+    if (chord->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        this->ConvertToFermata(fermata, chord, chord->GetID());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertMarkupAnalyticalFunctor::VisitChordEnd(Chord *chord)
 {
+    if (m_permanent) {
+        chord->ResetTiePresent();
+    }
+
+    assert(m_currentChord);
+    m_currentChord = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertMarkupAnalyticalFunctor::VisitMeasureEnd(Measure *measure)
 {
+    for (Object *object : m_controlEvents) {
+        measure->AddChild(object);
+    }
+
+    m_controlEvents.clear();
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertMarkupAnalyticalFunctor::VisitMRest(MRest *mRest)
 {
+    if (mRest->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        this->ConvertToFermata(fermata, mRest, mRest->GetID());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertMarkupAnalyticalFunctor::VisitNote(Note *note)
 {
+    /****** ties ******/
+
+    AttTiePresent *check = note;
+    // Use the parent chord if there is no @tie on the note
+    if (!note->HasTie() && m_currentChord) {
+        check = m_currentChord;
+    }
+    assert(check);
+
+    std::vector<Note *>::iterator iter = m_currentNotes.begin();
+    while (iter != m_currentNotes.end()) {
+        // same octave and same pitch - this is the one!
+        if ((note->GetOct() == (*iter)->GetOct()) && (note->GetPname() == (*iter)->GetPname())) {
+            // right flag
+            if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
+                Tie *tie = new Tie();
+                if (!m_permanent) {
+                    tie->IsAttribute(true);
+                }
+                tie->SetStartid("#" + (*iter)->GetID());
+                tie->SetEndid("#" + note->GetID());
+                m_controlEvents.push_back(tie);
+            }
+            else {
+                LogWarning("Expected @tie median or terminal in note '%s', skipping it", note->GetID().c_str());
+            }
+            iter = m_currentNotes.erase(iter);
+            // we are done for this note
+            break;
+        }
+        ++iter;
+    }
+
+    if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
+        m_currentNotes.push_back(note);
+    }
+
+    if (m_permanent) {
+        note->ResetTiePresent();
+    }
+
+    /****** fermata ******/
+
+    if (note->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        this->ConvertToFermata(fermata, note, note->GetID());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertMarkupAnalyticalFunctor::VisitRest(Rest *rest)
 {
+    if (rest->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        this->ConvertToFermata(fermata, rest, rest->GetID());
+    }
+
     return FUNCTOR_CONTINUE;
+}
+
+void ConvertMarkupAnalyticalFunctor::ConvertToFermata(
+    Fermata *fermata, AttFermataPresent *fermataPresent, const std::string &id)
+{
+    fermata->SetPlace(Att::StaffrelBasicToStaffrel(fermataPresent->GetFermata()));
+    if (m_permanent) {
+        fermataPresent->ResetFermataPresent();
+    }
+    else {
+        fermata->IsAttribute(true);
+    }
+    fermata->SetStartid("#" + id);
+    m_controlEvents.push_back(fermata);
 }
 
 } // namespace vrv

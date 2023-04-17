@@ -229,7 +229,9 @@ public:
 protected:
     //
 private:
-    //
+    // Helper for converting markup
+    void ConvertToFermata(Fermata *fermata, AttFermataPresent *fermataPresent, const std::string &id);
+
 public:
     //
 private:
