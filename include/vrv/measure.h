@@ -325,11 +325,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Save
      */
     ///@{

@@ -58,20 +58,6 @@ void Fermata::Reset()
     this->ResetPlacementRelStaff();
 }
 
-void Fermata::ConvertFromAnalyticalMarkup(
-    AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params)
-{
-    this->SetPlace(Att::StaffrelBasicToStaffrel(fermataPresent->GetFermata()));
-    if (params->m_permanent) {
-        fermataPresent->ResetFermataPresent();
-    }
-    else {
-        this->IsAttribute(true);
-    }
-    this->SetStartid("#" + id);
-    params->m_controlEvents.push_back(this);
-}
-
 char32_t Fermata::GetFermataGlyph() const
 {
     const Resources *resources = this->GetDocResources();

@@ -718,17 +718,6 @@ public:
     ///@{
 
     /**
-     * Convert analytical markup (\@fermata, \@tie) to elements.
-     * See Doc::ConvertMarkupAnalyticalDoc
-     */
-    virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupAnalytical
-     */
-    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Convert markup of artic@artic multi value into distinct artic elements.
      * See Doc::ConvertMarkupAnalyticalDoc
      */

@@ -563,39 +563,6 @@ FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitChordEnd(this);
 }
 
-int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    assert(!params->m_currentChord);
-    params->m_currentChord = this;
-
-    /****** fermata ******/
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (params->m_permanent) {
-        this->ResetTiePresent();
-    }
-
-    assert(params->m_currentChord);
-    params->m_currentChord = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
     const ListOfConstObjects &notes = this->GetList(this);

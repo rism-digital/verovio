@@ -571,19 +571,6 @@ FunctorCode Rest::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitRestEnd(this);
 }
 
-int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Rest::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

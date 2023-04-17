@@ -728,21 +728,6 @@ FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeasureEnd(this);
 }
 
-int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); ++iter) {
-        this->AddChild(*iter);
-    }
-
-    params->m_controlEvents.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::Save(FunctorParams *functorParams)
 {
     return (this->IsMeasuredMusic()) ? Object::Save(functorParams) : FUNCTOR_CONTINUE;

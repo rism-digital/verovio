@@ -215,6 +215,11 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Get the notes with unresolved open ties
+     */
+    const std::vector<Note *> &GetCurrentNotes() const { return m_currentNotes; }
+
+    /*
      * Functor interface
      */
     ///@{

@@ -1392,20 +1392,14 @@ void Doc::ConvertMarkupDoc(bool permanent)
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
-                ConvertMarkupAnalyticalParams convertMarkupAnalyticalParams(permanent);
-                Functor convertMarkupAnalytical(&Object::ConvertMarkupAnalytical);
-                Functor convertMarkupAnalyticalEnd(&Object::ConvertMarkupAnalyticalEnd);
-                this->Process(
-                    &convertMarkupAnalytical, &convertMarkupAnalyticalParams, &convertMarkupAnalyticalEnd, &filters);
+                ConvertMarkupAnalyticalFunctor convertMarkupAnalytical(permanent);
+                convertMarkupAnalytical.SetFilters(&filters);
+                this->Process(convertMarkupAnalytical);
 
                 // After having processed one layer, we check if we have open ties - if yes, we
                 // must reset them and they will be ignored.
-                if (!convertMarkupAnalyticalParams.m_currentNotes.empty()) {
-                    std::vector<Note *>::iterator iter;
-                    for (iter = convertMarkupAnalyticalParams.m_currentNotes.begin();
-                         iter != convertMarkupAnalyticalParams.m_currentNotes.end(); ++iter) {
-                        LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetID().c_str());
-                    }
+                for (Note *note : convertMarkupAnalytical.GetCurrentNotes()) {
+                    LogWarning("Unable to match @tie of note '%s', skipping it", note->GetID().c_str());
                 }
             }
         }
