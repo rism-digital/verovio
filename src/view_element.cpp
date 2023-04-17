@@ -741,7 +741,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     // int x = divLine->GetDrawingX();
     // int y = divLine->GetDrawingY();
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetID());
 
     int sym = 0;
 

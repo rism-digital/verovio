@@ -1156,7 +1156,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLry(uly + noteHeight);
         layer->ReorderByXPos();
 
-        m_infoObject.import("uuid", accid->GetUuid());
+        m_infoObject.import("uuid", accid->GetID());
     }
     else if(elementType == "divLine"){
         DivLine *divLine = new DivLine();
@@ -1207,7 +1207,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLry(uly + noteHeight);
         layer->ReorderByXPos();
 
-        m_infoObject.import("uuid", divLine->GetUuid());
+        m_infoObject.import("uuid", divLine->GetID());
         
     }
     else {
@@ -2268,7 +2268,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
 
                 // unlink
-                Set(parSyllable->GetUuid(),"follows","");
+                Set(parSyllable->GetID(),"follows","");
                 Set(linkedID,"precedes","");
 
                 // group into two new syllables
@@ -2290,7 +2290,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 std::vector<std::string> elementIds1 = {elementIds.begin()+idx, elementIds.end()};
                 Group("neume", elementIds1);
                 if (m_infoObject.get<jsonxx::String>("status") == "FAILURE") {
-                    resultId1 = par->GetUuid();
+                    resultId1 = par->GetID();
                 } else {
                     resultId1= m_infoObject.get<jsonxx::String>("uuid");
                     par = m_doc->GetDrawingPage()->FindDescendantByUuid(resultId1);
@@ -2301,7 +2301,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 Set(resultId1, "follows", "#" + resultId0);
                 Object *resultSyl1 = dynamic_cast<Object *>(par->FindDescendantByType(SYL));
                 if (resultSyl1 != NULL) {
-                    Remove(resultSyl1->GetUuid());
+                    Remove(resultSyl1->GetID());
                 }
 
                 jsonxx::Array uuidArray;
@@ -2818,7 +2818,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
                 fparent = el->GetFirstAncestor(NEUME);
                 assert(fparent);
-                uuidArray << fparent->GetUuid();
+                uuidArray << fparent->GetID();
                 sparent = fparent->GetFirstAncestor(SYLLABLE);
                 assert(sparent);
                 currentParent = dynamic_cast<Neume *>(fparent);
@@ -2954,14 +2954,14 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     fi->SetZone(zone);
 
                     // syl->ResetFacsimile();
-                    // syl->SetFacs(zone->GetUuid());
+                    // syl->SetFacs(zone->GetID());
                 }
             }
             
             if (ligNum != 1) {
                 // if not 1st nc in ligature, add child
 
-                uuidArray << newParent->GetUuid();
+                uuidArray << newParent->GetID();
 
                 sparent->AddChild(newParent);
                 sparent->ReorderByXPos();
@@ -3016,7 +3016,7 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     // neume: first parent
     Object *fparent = m_doc->GetDrawingPage()->FindDescendantByUuid(neumeId);
     assert(fparent);
-    uuidArray << fparent->GetUuid();
+    uuidArray << fparent->GetID();
     
     // syllable: second parent
     Object *sparent = fparent->GetFirstAncestor(SYLLABLE);
@@ -3221,10 +3221,10 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         isLigature = true;
     } else {
         isLigature = false;
-        Set(firstNc->GetUuid(), "tilt", "");
-        Set(secondNc->GetUuid(), "tilt", "");
-        Set(firstNc->GetUuid(), "curve", "");
-        Set(secondNc->GetUuid(), "curve", "");
+        Set(firstNc->GetID(), "tilt", "");
+        Set(secondNc->GetID(), "tilt", "");
+        Set(firstNc->GetID(), "curve", "");
+        Set(secondNc->GetID(), "curve", "");
     }
 
     Zone *zone = new Zone();
@@ -3445,7 +3445,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
         // Adjust clefline
         if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
-            LogError("Could not adjust clef line of %s", element->GetUuid().c_str());
+            LogError("Could not adjust clef line of %s", element->GetID().c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to set clef line from facsimile.");
             return false;
@@ -3474,11 +3474,11 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         parent->ReorderByXPos();
         if (!(element->Is(ACCID) || element->Is(DIVLINE))){
             if (!AdjustPitchFromPosition(element)) {
-                        LogError("Could not adjust pitch of %s", element->GetUuid().c_str());
+                        LogError("Could not adjust pitch of %s", element->GetID().c_str());
                         m_infoObject.import("status", "FAILURE");
                         m_infoObject.import("message", "Failed to properly set pitch.");
-                        m_infoObject.import("elementId", element->GetUuid());
-                        m_infoObject.import("newStaffId", staff->GetUuid());
+                        m_infoObject.import("elementId", element->GetID());
+                        m_infoObject.import("newStaffId", staff->GetID());
                         return false;
                     }
         }
@@ -3487,7 +3487,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
     m_infoObject.import("elementId", elementId);
-    m_infoObject.import("newStaffId", staff->GetUuid());
+    m_infoObject.import("newStaffId", staff->GetID());
     return true;
 }
 
@@ -3558,7 +3558,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
         m_infoObject.import("status", "WARNING");
         m_infoObject.import("message", "Moving to the same staff as before.");
         m_infoObject.import("elementId", elementId);
-        m_infoObject.import("newStaffId", staff->GetUuid());
+        m_infoObject.import("newStaffId", staff->GetID());
         return true;
     }
 
@@ -3615,7 +3615,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
 
         // Adjust clefline
         if (!AdjustClefLineFromPosition(dynamic_cast<Clef *>(element), staff)) {
-            LogError("Could not adjust clef line of %s", element->GetUuid().c_str());
+            LogError("Could not adjust clef line of %s", element->GetID().c_str());
             m_infoObject.import("status", "FAILURE");
             m_infoObject.import("message", "Failed to set clef line from facsimile.");
             return false;
@@ -4009,7 +4009,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         obj->FindAllDescendantByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
-            LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetUuid().c_str());
+            LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetID().c_str());
             return true;
         }
 
