@@ -370,16 +370,32 @@ void ConvertToUnCastOffMensuralFunctor::ResetContent()
 
 FunctorCode ConvertToUnCastOffMensuralFunctor::VisitLayer(Layer *layer)
 {
-    return FUNCTOR_CONTINUE;
+    if (!m_contentLayer) {
+        m_contentLayer = layer;
+    }
+    else {
+        m_contentLayer->MoveChildrenFrom(layer);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode ConvertToUnCastOffMensuralFunctor::VisitMeasure(Measure *measure)
 {
+    if (!m_contentMeasure) {
+        m_contentMeasure = measure;
+    }
+    else if (m_trackSegmentsToDelete) {
+        m_segmentsToDelete.push_back(measure);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 {
+    this->ResetContent();
+
     return FUNCTOR_CONTINUE;
 }
 
