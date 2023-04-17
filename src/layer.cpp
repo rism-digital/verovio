@@ -643,21 +643,6 @@ int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    if (params->m_contentLayer == NULL) {
-        params->m_contentLayer = this;
-    }
-    else {
-        params->m_contentLayer->MoveChildrenFrom(this);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Layer::InitProcessingLists(FunctorParams *functorParams)
 {
     InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);

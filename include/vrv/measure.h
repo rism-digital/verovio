@@ -330,11 +330,6 @@ public:
     int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ConvertToUnCastOffMensural
-     */
-    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Save
      */
     ///@{

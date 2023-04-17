@@ -718,11 +718,6 @@ public:
     ///@{
 
     /**
-     * Convert cast-off (measure) mensural segments MEI into mensural.
-     */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Convert analytical markup (\@fermata, \@tie) to elements.
      * See Doc::ConvertMarkupAnalyticalDoc
      */

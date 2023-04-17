@@ -456,9 +456,10 @@ void System::ConvertToUnCastOffMensuralSystem()
     // Checking just in case
     if (initProcessingListsParams.m_layerTree.child.empty()) return;
 
-    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
-
     Filters filters;
+    ConvertToUnCastOffMensuralFunctor convertToUnCastOffMensural;
+    convertToUnCastOffMensural.SetFilters(&filters);
+
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
         for (auto const &layers : staves.second.child) {
@@ -467,18 +468,14 @@ void System::ConvertToUnCastOffMensuralSystem()
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters = { &matchStaff, &matchLayer };
 
-            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
-            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
-
-            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
-            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
-
-            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
+            convertToUnCastOffMensural.ResetContent();
+            this->Process(convertToUnCastOffMensural);
+            convertToUnCastOffMensural.TrackSegmentsToDelete(false);
         }
     }
 
     // Detach the contentPage
-    for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+    for (Object *measure : convertToUnCastOffMensural.GetSegmentsToDelete()) {
         this->DeleteChild(measure);
     }
 }

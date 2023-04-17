@@ -190,31 +190,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ConvertToUnCastOffMensuralParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the content / target Measure (NULL at the beginning of a section)
- * member 1: a pointer to the content / target Layer (NULL at the beginning of a section)
- * member 2: a flag indicating if we keep a reference of the measure segments to delete at the end
- * member 3: a list of measure segments to delete at the end (fill in the first pass only)
- **/
-
-class ConvertToUnCastOffMensuralParams : public FunctorParams {
-public:
-    ConvertToUnCastOffMensuralParams()
-    {
-        m_contentMeasure = NULL;
-        m_contentLayer = NULL;
-        m_addSegmentsToDelete = true;
-    }
-    Measure *m_contentMeasure;
-    Layer *m_contentLayer;
-    bool m_addSegmentsToDelete;
-    ArrayOfObjects m_segmentsToDelete;
-};
-
-//----------------------------------------------------------------------------
 // FindLayerIDWithinStaffDefParams
 //----------------------------------------------------------------------------
 

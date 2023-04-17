@@ -743,21 +743,6 @@ int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    if (params->m_contentMeasure == NULL) {
-        params->m_contentMeasure = this;
-    }
-    else if (params->m_addSegmentsToDelete) {
-        params->m_segmentsToDelete.push_back(this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::Save(FunctorParams *functorParams)
 {
     return (this->IsMeasuredMusic()) ? Object::Save(functorParams) : FUNCTOR_CONTINUE;

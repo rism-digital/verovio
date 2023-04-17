@@ -252,11 +252,6 @@ public:
     int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ConvertToUnCastOffMensural
-     */
-    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitProcessingLists
      */
     int InitProcessingLists(FunctorParams *functorParams) override;
