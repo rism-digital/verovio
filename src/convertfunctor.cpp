@@ -352,4 +352,35 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitSystemElement(SystemElement *s
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ConvertToUnCastOffMensuralFunctor
+//----------------------------------------------------------------------------
+
+ConvertToUnCastOffMensuralFunctor::ConvertToUnCastOffMensuralFunctor()
+{
+    this->ResetContent();
+    m_trackSegmentsToDelete = true;
+}
+
+void ConvertToUnCastOffMensuralFunctor::ResetContent()
+{
+    m_contentMeasure = NULL;
+    m_contentLayer = NULL;
+}
+
+FunctorCode ConvertToUnCastOffMensuralFunctor::VisitLayer(Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToUnCastOffMensuralFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

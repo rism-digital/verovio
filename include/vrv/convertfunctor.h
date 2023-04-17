@@ -136,6 +136,62 @@ private:
     IntTree *m_layerTree;
 };
 
+//----------------------------------------------------------------------------
+// ConvertToUnCastOffMensuralFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class converts cast-off (measure) mensural segments MEI into mensural.
+ */
+class ConvertToUnCastOffMensuralFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertToUnCastOffMensuralFunctor();
+    virtual ~ConvertToUnCastOffMensuralFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Getter and setter for various properties
+     */
+    ///@{
+    void ResetContent();
+    void TrackSegmentsToDelete(bool trackSegments) { m_trackSegmentsToDelete = trackSegments; }
+    const ArrayOfObjects &GetSegmentsToDelete() const { return m_segmentsToDelete; }
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitSection(Section *section) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The content/target measure and layer => NULL at the beginning of a section
+    Measure *m_contentMeasure;
+    Layer *m_contentLayer;
+    // Indicates if we keep a reference of the measure segments to delete at the end
+    bool m_trackSegmentsToDelete;
+    // Measure segments to delete at the end (fill in the first pass only)
+    ArrayOfObjects m_segmentsToDelete;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CONVERTFUNCTOR_H__
