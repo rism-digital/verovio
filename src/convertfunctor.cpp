@@ -546,12 +546,51 @@ ConvertMarkupArticFunctor::ConvertMarkupArticFunctor() {}
 
 FunctorCode ConvertMarkupArticFunctor::VisitArtic(Artic *artic)
 {
+    if (artic->GetArtic().size() > 1) m_articsToConvert.emplace_back(artic);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertMarkupArticFunctor::VisitLayerEnd(Layer *layer)
 {
+    for (Artic *artic : m_articsToConvert) {
+        this->SplitMultival(artic);
+    }
+    m_articsToConvert.clear();
+
     return FUNCTOR_CONTINUE;
+}
+
+void ConvertMarkupArticFunctor::SplitMultival(Artic *artic) const
+{
+    Object *parent = artic->GetParent();
+    assert(parent);
+
+    std::vector<data_ARTICULATION> articList = artic->GetArtic();
+    if (articList.empty()) return;
+
+    int idx = artic->GetIdx() + 1;
+    std::vector<data_ARTICULATION>::iterator iter;
+    for (iter = articList.begin() + 1; iter != articList.end(); ++iter) {
+        Artic *articChild = new Artic();
+        articChild->SetArtic({ *iter });
+        articChild->AttColor::operator=(*artic);
+        articChild->AttEnclosingChars::operator=(*artic);
+        articChild->AttExtSym::operator=(*artic);
+        articChild->AttPlacementRelEvent::operator=(*artic);
+        parent->InsertChild(articChild, idx);
+        ++idx;
+    }
+
+    // Only keep the first value in the original element
+    artic->SetArtic({ articList.at(0) });
+
+    // Multiple valued attributes cannot be preserved as such
+    if (artic->IsAttribute()) {
+        artic->IsAttribute(false);
+        LogInfo("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
+            parent->GetID().c_str());
+    }
 }
 
 } // namespace vrv

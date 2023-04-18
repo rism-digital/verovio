@@ -283,12 +283,16 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Split the multi-valued artic attributes into distinct artic elements.
+     */
+    void SplitMultival(Artic *artic) const;
+
 public:
     //
 private:
     // The articulations that need to be converted
-    std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
+    std::vector<Artic *> m_articsToConvert;
 };
 
 } // namespace vrv
