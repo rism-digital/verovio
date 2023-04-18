@@ -295,6 +295,49 @@ private:
     std::vector<Artic *> m_articsToConvert;
 };
 
+//----------------------------------------------------------------------------
+// ConvertMarkupScoreDefFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class moves scoreDef clef, keySig, meterSig and mensur to staffDef.
+ * When a staffDef already has one, it is not replaced.
+ */
+class ConvertMarkupScoreDefFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertMarkupScoreDefFunctor(Doc *doc);
+    virtual ~ConvertMarkupScoreDefFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The scoreDef we are moving the content from
+    ScoreDefElement *m_currentScoreDef;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CONVERTFUNCTOR_H__

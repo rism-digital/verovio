@@ -593,4 +593,28 @@ void ConvertMarkupArticFunctor::SplitMultival(Artic *artic) const
     }
 }
 
+//----------------------------------------------------------------------------
+// ConvertMarkupScoreDefFunctor
+//----------------------------------------------------------------------------
+
+ConvertMarkupScoreDefFunctor::ConvertMarkupScoreDefFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_currentScoreDef = NULL;
+}
+
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
