@@ -1405,11 +1405,8 @@ void Doc::ConvertMarkupDoc(bool permanent)
 
     if (m_markup & MARKUP_SCOREDEF_DEFINITIONS) {
         LogInfo("Converting scoreDef markup...");
-        Functor convertMarkupScoreDef(&Object::ConvertMarkupScoreDef);
-        Functor convertMarkupScoreDefEnd(&Object::ConvertMarkupScoreDefEnd);
-        ConvertMarkupScoreDefParams convertMarkupScoreDefParams(
-            this, &convertMarkupScoreDef, &convertMarkupScoreDefEnd);
-        this->Process(&convertMarkupScoreDef, &convertMarkupScoreDefParams, &convertMarkupScoreDefEnd);
+        ConvertMarkupScoreDefFunctor convertMarkupScoreDef(this);
+        this->Process(convertMarkupScoreDef);
     }
 }
 

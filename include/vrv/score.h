@@ -89,11 +89,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDef(FunctorParams *) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;
