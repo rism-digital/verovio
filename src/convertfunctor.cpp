@@ -604,16 +604,73 @@ ConvertMarkupScoreDefFunctor::ConvertMarkupScoreDefFunctor(Doc *doc) : DocFuncto
 
 FunctorCode ConvertMarkupScoreDefFunctor::VisitScore(Score *score)
 {
+    // Evaluate functor on scoreDef
+    score->GetScoreDef()->Process(*this);
+
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDef(ScoreDef *scoreDef)
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDefElement(ScoreDefElement *scoreDefElement)
 {
+    if (scoreDefElement->Is(SCOREDEF)) {
+        m_currentScoreDef = scoreDefElement;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // This should never be the case
+    if (!scoreDefElement->Is(STAFFDEF) || !m_currentScoreDef) return FUNCTOR_CONTINUE;
+
+    // Copy score definition elements to the staffDef but only if they are not given at the staffDef
+    // This might require more refined merging because we can lose data if some staffDef values are defined
+    // but do not contain all the ones given in the scoreDef (e.g. @key.mode in scoreDef but not in a staffDef with
+    // @key.sig)
+    if (m_currentScoreDef->HasClefInfo() && !scoreDefElement->HasClefInfo()) {
+        scoreDefElement->AddChild(m_currentScoreDef->GetClefCopy());
+    }
+    if (m_currentScoreDef->HasKeySigInfo() && !scoreDefElement->HasKeySigInfo()) {
+        scoreDefElement->AddChild(m_currentScoreDef->GetKeySigCopy());
+    }
+    if (m_currentScoreDef->HasMeterSigGrpInfo() && !scoreDefElement->HasMeterSigGrpInfo()) {
+        scoreDefElement->AddChild(m_currentScoreDef->GetMeterSigGrpCopy());
+    }
+    if (m_currentScoreDef->HasMeterSigInfo() && !scoreDefElement->HasMeterSigInfo()) {
+        scoreDefElement->AddChild(m_currentScoreDef->GetMeterSigCopy());
+    }
+    if (m_currentScoreDef->HasMensurInfo() && !scoreDefElement->HasMensurInfo()) {
+        scoreDefElement->AddChild(m_currentScoreDef->GetMensurCopy());
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDefElementEnd(ScoreDefElement *scoreDefElement)
 {
+    if (!scoreDefElement->Is(SCOREDEF)) return FUNCTOR_CONTINUE;
+
+    // At the end of the scoreDef, remove all score definition elements
+    if (scoreDefElement->HasClefInfo()) {
+        Object *clef = scoreDefElement->FindDescendantByType(CLEF, 1);
+        if (clef) scoreDefElement->DeleteChild(clef);
+    }
+    if (scoreDefElement->HasKeySigInfo()) {
+        Object *keySig = scoreDefElement->FindDescendantByType(KEYSIG, 1);
+        if (keySig) scoreDefElement->DeleteChild(keySig);
+    }
+    if (scoreDefElement->HasMeterSigGrpInfo()) {
+        Object *meterSigGrp = scoreDefElement->FindDescendantByType(METERSIGGRP, 1);
+        if (meterSigGrp) scoreDefElement->DeleteChild(meterSigGrp);
+    }
+    if (scoreDefElement->HasMeterSigInfo()) {
+        Object *meterSig = scoreDefElement->FindDescendantByType(METERSIG, 1);
+        if (meterSig) scoreDefElement->DeleteChild(meterSig);
+    }
+    if (scoreDefElement->HasMensurInfo()) {
+        Object *mensur = scoreDefElement->FindDescendantByType(MENSUR, 1);
+        if (mensur) scoreDefElement->DeleteChild(mensur);
+    }
+
+    m_currentScoreDef = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 

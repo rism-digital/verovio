@@ -323,8 +323,8 @@ public:
      */
     ///@{
     FunctorCode VisitScore(Score *score) override;
-    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
-    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreDefElement(ScoreDefElement *scoreDefElement) override;
+    FunctorCode VisitScoreDefElementEnd(ScoreDefElement *scoreDefElement) override;
     ///@}
 
 protected:
