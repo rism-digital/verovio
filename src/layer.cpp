@@ -630,19 +630,6 @@ FunctorCode Layer::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitLayerEnd(this);
 }
 
-int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
-    assert(params);
-
-    for (auto &[parent, artic] : params->m_articPairsToConvert) {
-        artic->SplitMultival(parent);
-    }
-    params->m_articPairsToConvert.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::InitProcessingLists(FunctorParams *functorParams)
 {
     InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);

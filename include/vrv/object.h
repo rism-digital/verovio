@@ -718,17 +718,6 @@ public:
     ///@{
 
     /**
-     * Convert markup of artic@artic multi value into distinct artic elements.
-     * See Doc::ConvertMarkupAnalyticalDoc
-     */
-    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
      * When a staffDef already has one, it is not replaced.
      */

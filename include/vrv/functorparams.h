@@ -126,20 +126,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// ConvertMarkupArticParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector<Artic *>* that needs to be converted
- **/
-
-class ConvertMarkupArticParams : public FunctorParams {
-public:
-    ConvertMarkupArticParams() {}
-    std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
-};
-
-//----------------------------------------------------------------------------
 // ConvertMarkupScoreDefParams
 //----------------------------------------------------------------------------
 

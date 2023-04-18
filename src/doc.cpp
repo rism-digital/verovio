@@ -1356,10 +1356,8 @@ void Doc::ConvertMarkupDoc(bool permanent)
 
     if (m_markup & MARKUP_ARTIC_MULTIVAL) {
         LogInfo("Converting artic markup...");
-        ConvertMarkupArticParams convertMarkupArticParams;
-        Functor convertMarkupArtic(&Object::ConvertMarkupArtic);
-        Functor convertMarkupArticEnd(&Object::ConvertMarkupArticEnd);
-        this->Process(&convertMarkupArtic, &convertMarkupArticParams, &convertMarkupArticEnd);
+        ConvertMarkupArticFunctor convertMarkupArtic;
+        this->Process(convertMarkupArtic);
     }
 
     if ((m_markup & MARKUP_ANALYTICAL_FERMATA) || (m_markup & MARKUP_ANALYTICAL_TIE)) {

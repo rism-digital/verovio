@@ -247,11 +247,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertMarkupArtic
-     */
-    int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitProcessingLists
      */
     int InitProcessingLists(FunctorParams *functorParams) override;
