@@ -538,4 +538,20 @@ void ConvertMarkupAnalyticalFunctor::ConvertToFermata(
     m_controlEvents.push_back(fermata);
 }
 
+//----------------------------------------------------------------------------
+// ConvertMarkupArticFunctor
+//----------------------------------------------------------------------------
+
+ConvertMarkupArticFunctor::ConvertMarkupArticFunctor() {}
+
+FunctorCode ConvertMarkupArticFunctor::VisitArtic(Artic *artic)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertMarkupArticFunctor::VisitLayerEnd(Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

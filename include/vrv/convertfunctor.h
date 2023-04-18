@@ -250,6 +250,47 @@ private:
     bool m_permanent;
 };
 
+//----------------------------------------------------------------------------
+// ConvertMarkupArticFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class converts markup of artic@artic multi value into distinct artic elements.
+ */
+class ConvertMarkupArticFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertMarkupArticFunctor();
+    virtual ~ConvertMarkupArticFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitArtic(Artic *artic) override;
+    FunctorCode VisitLayerEnd(Layer *layer) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The articulations that need to be converted
+    std::vector<std::pair<Object *, Artic *>> m_articPairsToConvert;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CONVERTFUNCTOR_H__
