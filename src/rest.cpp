@@ -287,7 +287,7 @@ void Rest::UpdateFromTransLoc(const TransPitch &tp)
 
 bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &isTopLayer) const
 {
-    auto elements = layer->GetLayerElementsForTimeSpanOf(this, true);
+    ListOfConstObjects elements = layer->GetLayerElementsForTimeSpanOf(this, true);
     if (elements.empty()) return false;
 
     const LayerElement *firstElement = NULL;

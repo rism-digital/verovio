@@ -164,7 +164,7 @@ private:
      * Find whether there is correct number of rests for automatic placement and determine position of the rest
      * (top/bottom) if there is.
      */
-    bool DetermineRestPosition(const Staff *currentStaff, const Layer *currentLayer, bool &isTopLayer) const;
+    bool DetermineRestPosition(const Staff *staff, const Layer *layer, bool &isTopLayer) const;
 
 public:
     //
