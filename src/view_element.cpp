@@ -665,11 +665,13 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     Note *bottomNote = chord->GetBottomNote();
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int line = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int line = 2 * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const int x = chord->GetDrawingX();
     const int y1 = topNote->GetDrawingY() + unit;
     const int y2 = bottomNote->GetDrawingY() - unit;
     const int width = 2 * topNote->GetDrawingRadius(m_doc);
+
+    dc->StartCustomGraphic("notehead");
 
     if (chord->GetActualDur() < DUR_4) {
         this->DrawNotFilledRectangle(dc, x + line / 2, y1, x + width - line / 2, y2, line, 0);
@@ -677,6 +679,8 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     else {
         this->DrawFilledRectangle(dc, x, y1, x + width, y2);
     }
+
+    dc->EndCustomGraphic();
 
     LayerElement *element = vrv_cast<LayerElement *>(chord->GetFirst(STEM));
     DrawStem(dc, element, layer, staff, measure);
