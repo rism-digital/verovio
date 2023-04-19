@@ -2373,6 +2373,7 @@ void MEIOutput::WriteChord(pugi::xml_node currentNode, Chord *chord)
 
     this->WriteLayerElement(currentNode, chord);
     this->WriteDurationInterface(currentNode, chord);
+    chord->WriteChordVis(currentNode);
     chord->WriteColor(currentNode);
     chord->WriteCue(currentNode);
     chord->WriteGraced(currentNode);
@@ -6259,6 +6260,7 @@ bool MEIInput::ReadChord(Object *parent, pugi::xml_node chord)
     }
 
     this->ReadDurationInterface(chord, vrvChord);
+    vrvChord->ReadChordVis(chord);
     vrvChord->ReadColor(chord);
     vrvChord->ReadCue(chord);
     vrvChord->ReadGraced(chord);
