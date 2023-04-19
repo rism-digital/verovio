@@ -1630,6 +1630,12 @@
 		E7ED8A6929C111CA00735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
 		E7ED8A6A29C111CA00735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
 		E7ED8A6B29C111CB00735875 /* cachehorizontallayoutfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */; };
+		E7F1C36429F033FB007E12C1 /* savefunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F1C36329F033FB007E12C1 /* savefunctor.h */; };
+		E7F1C36529F033FC007E12C1 /* savefunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F1C36329F033FB007E12C1 /* savefunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7F1C36729F0345D007E12C1 /* savefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F1C36629F0345D007E12C1 /* savefunctor.cpp */; };
+		E7F1C36829F0345D007E12C1 /* savefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F1C36629F0345D007E12C1 /* savefunctor.cpp */; };
+		E7F1C36929F03461007E12C1 /* savefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F1C36629F0345D007E12C1 /* savefunctor.cpp */; };
+		E7F1C36A29F03462007E12C1 /* savefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F1C36629F0345D007E12C1 /* savefunctor.cpp */; };
 		E7F39C5E29A62B260055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; };
 		E7F39C5F29A62B270055DBE0 /* adjustclefchangesfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7F39C6129A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */; };
@@ -2212,6 +2218,8 @@
 		E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjusttempofunctor.cpp; path = src/adjusttempofunctor.cpp; sourceTree = "<group>"; };
 		E7ED8A6429C1119000735875 /* cachehorizontallayoutfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cachehorizontallayoutfunctor.h; path = include/vrv/cachehorizontallayoutfunctor.h; sourceTree = "<group>"; };
 		E7ED8A6729C111C300735875 /* cachehorizontallayoutfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cachehorizontallayoutfunctor.cpp; path = src/cachehorizontallayoutfunctor.cpp; sourceTree = "<group>"; };
+		E7F1C36329F033FB007E12C1 /* savefunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = savefunctor.h; path = include/vrv/savefunctor.h; sourceTree = "<group>"; };
+		E7F1C36629F0345D007E12C1 /* savefunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = savefunctor.cpp; path = src/savefunctor.cpp; sourceTree = "<group>"; };
 		E7F39C5D29A62B1F0055DBE0 /* adjustclefchangesfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustclefchangesfunctor.h; path = include/vrv/adjustclefchangesfunctor.h; sourceTree = "<group>"; };
 		E7F39C6029A62B3E0055DBE0 /* adjustclefchangesfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustclefchangesfunctor.cpp; path = src/adjustclefchangesfunctor.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2954,13 +2962,16 @@
 			children = (
 				E786CD09298AA3BC009BAC58 /* horizontal-layout */,
 				E786CD0A298AA3D8009BAC58 /* vertical-layout */,
-				E786CD0B298AA450009BAC58 /* search */,
 				E7908EA12985829F0004C1F9 /* alignfunctor.cpp */,
 				E7908E9E298582090004C1F9 /* alignfunctor.h */,
 				E7265E7029DC700800D11F41 /* castofffunctor.cpp */,
 				E7265E6D29DC6FD200D11F41 /* castofffunctor.h */,
 				E763EF4129E939FB0029E56D /* convertfunctor.cpp */,
 				E763EF3E29E939C00029E56D /* convertfunctor.h */,
+				E74A806028BC9111005274E7 /* findfunctor.cpp */,
+				E74A806528BC97D5005274E7 /* findfunctor.h */,
+				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
+				E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */,
 				E765675B28BC019F00BC6490 /* functor.h */,
 				E74A806828BC9842005274E7 /* functorinterface.cpp */,
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
@@ -2970,6 +2981,8 @@
 				E7C3AED52955018F002DE5AB /* preparedatafunctor.h */,
 				E71EF3C52975ED3800D36264 /* resetfunctor.cpp */,
 				E71EF3C22975E4DC00D36264 /* resetfunctor.h */,
+				E7F1C36629F0345D007E12C1 /* savefunctor.cpp */,
+				E7F1C36329F033FB007E12C1 /* savefunctor.h */,
 				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
 			);
@@ -3052,17 +3065,6 @@
 				E76046BC28D4828200C36204 /* calcledgerlinesfunctor.h */,
 			);
 			name = "vertical-layout";
-			sourceTree = "<group>";
-		};
-		E786CD0B298AA450009BAC58 /* search */ = {
-			isa = PBXGroup;
-			children = (
-				E74A806028BC9111005274E7 /* findfunctor.cpp */,
-				E74A806528BC97D5005274E7 /* findfunctor.h */,
-				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
-				E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */,
-			);
-			name = search;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3163,6 +3165,7 @@
 				4DACCA112990F2E600B55913 /* attalternates.h in Headers */,
 				4DACC98C2990F29A00B55913 /* atts_usersymbols.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
+				E7F1C36429F033FB007E12C1 /* savefunctor.h in Headers */,
 				4DACCA172990F2E600B55913 /* attdef.h in Headers */,
 				4DB3D8EC1F83D18300B5FC2B /* proport.h in Headers */,
 				4DEC4DDE21C8295700D1D273 /* lem.h in Headers */,
@@ -3409,6 +3412,7 @@
 				4D723AF525E8DB0B0062E0A2 /* zip_file.hpp in Headers */,
 				E765675A28BBFBA400BC6490 /* functorinterface.h in Headers */,
 				E722106428F8569F002CD6E9 /* findlayerelementsfunctor.h in Headers */,
+				E7F1C36529F033FC007E12C1 /* savefunctor.h in Headers */,
 				BDC366DB2576AFA400E4D826 /* grpsym.h in Headers */,
 				BB4C4B0622A932C3001F6AF0 /* pgfoot.h in Headers */,
 				BB4C4AFA22A932BC001F6AF0 /* restore.h in Headers */,
@@ -3836,6 +3840,7 @@
 				4DB3D8DE1F83D15200B5FC2B /* btrem.cpp in Sources */,
 				4D1694041E3A44F300569BF4 /* space.cpp in Sources */,
 				4DEC4D8321C804E000D1D273 /* app.cpp in Sources */,
+				E7F1C36929F03461007E12C1 /* savefunctor.cpp in Sources */,
 				4DF092A62497711800239195 /* phrase.cpp in Sources */,
 				4DB3D8D91F83D13C00B5FC2B /* turn.cpp in Sources */,
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
@@ -4278,6 +4283,7 @@
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				4DACC9C02990F29A00B55913 /* atts_cmn.cpp in Sources */,
 				40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */,
+				E7F1C36A29F03462007E12C1 /* savefunctor.cpp in Sources */,
 				E7876F1829C07F16002147DC /* adjustsylspacingfunctor.cpp in Sources */,
 				152886C51C9CA86100B515BB /* ligature.cpp in Sources */,
 				4DEC4D8221C804E000D1D273 /* app.cpp in Sources */,
@@ -4387,6 +4393,7 @@
 				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D79641A26C1522B0026288B /* pageelement.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
+				E7F1C36729F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				4DEC4D8021C804C500D1D273 /* add.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
 				4DF092A72497711800239195 /* phrase.cpp in Sources */,
@@ -4663,6 +4670,7 @@
 				4D79641B26C1522B0026288B /* pageelement.cpp in Sources */,
 				BB4C4B9722A932E5001F6AF0 /* durationinterface.cpp in Sources */,
 				BB4C4B4F22A932D7001F6AF0 /* elementpart.cpp in Sources */,
+				E7F1C36829F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				BB4C4AC122A932B6001F6AF0 /* layer.cpp in Sources */,
 				BB4C4B0522A932C3001F6AF0 /* pgfoot.cpp in Sources */,
 				4DF092A82497711800239195 /* phrase.cpp in Sources */,
