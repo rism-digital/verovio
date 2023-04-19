@@ -4049,6 +4049,37 @@ cutout_CUTOUT AttConverterBase::StrToCutoutCutout(const std::string &value, bool
     return cutout_CUTOUT_NONE;
 }
 
+std::string AttConverterBase::DivLineLogFormToStr(divLineLog_FORM data) const
+{
+    std::string value;
+    switch (data) {
+        case divLineLog_FORM_caesura: value = "caesura"; break;
+        case divLineLog_FORM_finalis: value = "finalis"; break;
+        case divLineLog_FORM_maior: value = "maior"; break;
+        case divLineLog_FORM_maxima: value = "maxima"; break;
+        case divLineLog_FORM_minima: value = "minima"; break;
+        case divLineLog_FORM_virgula: value = "virgula"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.divLine.log@form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+divLineLog_FORM AttConverterBase::StrToDivLineLogForm(const std::string &value, bool logWarning) const
+{
+    if (value == "caesura") return divLineLog_FORM_caesura;
+    if (value == "finalis") return divLineLog_FORM_finalis;
+    if (value == "maior") return divLineLog_FORM_maior;
+    if (value == "maxima") return divLineLog_FORM_maxima;
+    if (value == "minima") return divLineLog_FORM_minima;
+    if (value == "virgula") return divLineLog_FORM_virgula;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.divLine.log@form", value.c_str());
+    return divLineLog_FORM_NONE;
+}
+
 std::string AttConverterBase::DotLogFormToStr(dotLog_FORM data) const
 {
     std::string value;
