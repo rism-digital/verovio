@@ -198,7 +198,9 @@ const LayerElement *Layer::GetAtPos(int x) const
 {
     const Object *first = this->GetFirst();
     if (first->IsEditorialElement()) {
-        first = first->GetFirst();
+        IsEditorialElementComparison cmp;
+        cmp.ReverseComparison();
+        first = this->FindDescendantByComparison(&cmp);
     }
     if (!first || !first->IsLayerElement()) return NULL;
 
