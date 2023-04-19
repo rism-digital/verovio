@@ -3,8 +3,11 @@
 #import <VerovioFramework/beam.h>
 #import <VerovioFramework/calcalignmentxposfunctor.h>
 #import <VerovioFramework/altsyminterface.h>
+#import <VerovioFramework/adjustfloatingpositionerfunctor.h>
 #import <VerovioFramework/timeinterface.h>
+#import <VerovioFramework/calcarticfunctor.h>
 #import <VerovioFramework/chord.h>
+#import <VerovioFramework/adjustarticfunctor.h>
 #import <VerovioFramework/pghead2.h>
 #import <VerovioFramework/areaposinterface.h>
 #import <VerovioFramework/harm.h>
@@ -23,6 +26,7 @@
 #import <VerovioFramework/beatrpt.h>
 #import <VerovioFramework/expansionmap.h>
 #import <VerovioFramework/page.h>
+#import <VerovioFramework/adjustyposfunctor.h>
 #import <VerovioFramework/bracketspan.h>
 #import <VerovioFramework/reg.h>
 #import <VerovioFramework/multirest.h>
@@ -68,6 +72,7 @@
 #import <VerovioFramework/runningelement.h>
 #import <VerovioFramework/setscoredeffunctor.h>
 #import <VerovioFramework/adjusttupletsxfunctor.h>
+#import <VerovioFramework/adjusttupletsyfunctor.h>
 #import <VerovioFramework/expan.h>
 #import <VerovioFramework/gliss.h>
 #import <VerovioFramework/findfunctor.h>
@@ -79,6 +84,7 @@
 #import <VerovioFramework/devicecontextbase.h>
 #import <VerovioFramework/pitchinterface.h>
 #import <VerovioFramework/plistinterface.h>
+#import <VerovioFramework/calcligaturenoteposfunctor.h>
 #import <VerovioFramework/adjustaccidxfunctor.h>
 #import <VerovioFramework/phrase.h>
 #import <VerovioFramework/mrest.h>
@@ -90,6 +96,7 @@
 #import <VerovioFramework/proport.h>
 #import <VerovioFramework/choice.h>
 #import <VerovioFramework/fermata.h>
+#import <VerovioFramework/adjustslursfunctor.h>
 #import <VerovioFramework/facsimile.h>
 #import <VerovioFramework/tabdursym.h>
 #import <VerovioFramework/pgfoot.h>
@@ -114,6 +121,7 @@
 #import <VerovioFramework/trill.h>
 #import <VerovioFramework/docselection.h>
 #import <VerovioFramework/tabgrp.h>
+#import <VerovioFramework/adjustxrelfortranscriptionfunctor.h>
 #import <VerovioFramework/scoredef.h>
 #import <VerovioFramework/view.h>
 #import <VerovioFramework/options.h>
@@ -130,6 +138,7 @@
 #import <VerovioFramework/git_commit.h>
 #import <VerovioFramework/functor.h>
 #import <VerovioFramework/rend.h>
+#import <VerovioFramework/justifyfunctor.h>
 #import <VerovioFramework/pagemilestone.h>
 #import <VerovioFramework/adjustsylspacingfunctor.h>
 #import <VerovioFramework/adjustclefchangesfunctor.h>
@@ -154,7 +163,9 @@
 #import <VerovioFramework/adjustdotsfunctor.h>
 #import <VerovioFramework/metersiggrp.h>
 #import <VerovioFramework/custos.h>
+#import <VerovioFramework/castofffunctor.h>
 #import <VerovioFramework/adjustxposfunctor.h>
+#import <VerovioFramework/calcbboxoverflowsfunctor.h>
 #import <VerovioFramework/mrpt2.h>
 #import <VerovioFramework/adjustlayersfunctor.h>
 #import <VerovioFramework/unclear.h>
@@ -207,6 +218,7 @@
 #import <VerovioFramework/timestamp.h>
 #import <VerovioFramework/glyph.h>
 #import <VerovioFramework/libmei.h>
+#import <VerovioFramework/adjuststaffoverlapfunctor.h>
 #import <VerovioFramework/dir.h>
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/scoredefinterface.h>
@@ -217,6 +229,7 @@
 #import <VerovioFramework/note.h>
 #import <VerovioFramework/positioninterface.h>
 #import <VerovioFramework/halfmrpt.h>
+#import <VerovioFramework/adjustbeamsfunctor.h>
 #import <VerovioFramework/calcchordnoteheadsfunctor.h>
 #import <VerovioFramework/textdirinterface.h>
 #import <VerovioFramework/vrvdef.h>
