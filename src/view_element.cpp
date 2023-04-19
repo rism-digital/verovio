@@ -665,7 +665,6 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     Note *bottomNote = chord->GetBottomNote();
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int line = 2 * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const int x = chord->GetDrawingX();
     const int y1 = topNote->GetDrawingY() + unit;
     const int y2 = bottomNote->GetDrawingY() - unit;
@@ -674,7 +673,8 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     dc->StartCustomGraphic("notehead");
 
     if (chord->GetActualDur() < DUR_4) {
-        this->DrawNotFilledRectangle(dc, x + line / 2, y1, x + width - line / 2, y2, line, 0);
+        const int line = 2 * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        this->DrawNotFilledRectangle(dc, x + line / 2, y1 - line / 2, x + width - line / 2, y2 + line / 2, line, 0);
     }
     else {
         this->DrawFilledRectangle(dc, x, y1, x + width, y2);
