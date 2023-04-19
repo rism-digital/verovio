@@ -536,6 +536,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
+    if (chord->HasCluster()) {
+        DrawCluster(dc, chord, layer, staff, measure);
+        return;
+    }
+
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
     chord->ResetDrawingList();
@@ -646,6 +651,35 @@ void View::DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, char32
     else if (clef->HasEnclose() && (clef->GetEnclose() != ENCLOSURE_none)) {
         LogWarning("Only drawing of enclosing brackets and boxes is supported for clef.");
     }
+}
+
+void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(chord);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Note *topNote = chord->GetTopNote();
+    Note *bottomNote = chord->GetBottomNote();
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int line = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    const int x = chord->GetDrawingX();
+    const int y1 = topNote->GetDrawingY() + unit;
+    const int y2 = bottomNote->GetDrawingY() - unit;
+    const int width = 2 * topNote->GetDrawingRadius(m_doc);
+
+    if (chord->GetActualDur() < DUR_4) {
+        this->DrawNotFilledRectangle(dc, x + line / 2, y1, x + width - line / 2, y2, line, 0);
+    }
+    else {
+        this->DrawFilledRectangle(dc, x, y1, x + width, y2);
+    }
+
+    LayerElement *element = vrv_cast<LayerElement *>(chord->GetFirst(STEM));
+    DrawStem(dc, element, layer, staff, measure);
 }
 
 void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
