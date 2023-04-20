@@ -333,4 +333,21 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
     return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// AddToFlatListFunctor
+//----------------------------------------------------------------------------
+
+AddToFlatListFunctor::AddToFlatListFunctor(ListOfConstObjects *flatList)
+{
+    m_flatList = flatList;
+}
+
+FunctorCode AddToFlatListFunctor::VisitObject(const Object *object)
+{
+    m_flatList->push_back(object);
+    // LogDebug("List %d", m_flatList->size());
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
