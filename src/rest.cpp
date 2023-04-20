@@ -100,7 +100,7 @@ RestOffsets g_defaultRests{
                                 { { DUR_1, -6 }, { DUR_2, -4 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
                                     { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
                                     { DUR_BR, -6 } } } } } } },
-            { RA_x,
+            { RA_n,
                 { { RLP_restOnTopLayer,
                       { { RNP_noteInSpace,
                             { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
