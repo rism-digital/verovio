@@ -896,9 +896,8 @@ void Object::Modify(bool modified) const
 
 void Object::FillFlatList(ListOfConstObjects &flatList) const
 {
-    Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams(&flatList);
-    this->Process(&addToFlatList, &addLayerElementToFlatListParams);
+    AddToFlatListFunctor addToFlatList(&flatList);
+    this->Process(addToFlatList);
 }
 
 ListOfObjects Object::GetAncestors()
@@ -1788,17 +1787,6 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
 //----------------------------------------------------------------------------
 // Object functor methods
 //----------------------------------------------------------------------------
-
-int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
-{
-    AddLayerElementToFlatListParams *params = vrv_params_cast<AddLayerElementToFlatListParams *>(functorParams);
-    assert(params);
-
-    params->m_flatList->push_back(this);
-    // LogDebug("List %d", params->m_flatList->size());
-
-    return FUNCTOR_CONTINUE;
-}
 
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
 {

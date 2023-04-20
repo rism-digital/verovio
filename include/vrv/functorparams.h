@@ -98,20 +98,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AddLayerElementToFlatListParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the ArrayOfObjects
- **/
-
-class AddLayerElementToFlatListParams : public FunctorParams {
-public:
-    AddLayerElementToFlatListParams(ListOfConstObjects *flatList) { m_flatList = flatList; }
-    ListOfConstObjects *m_flatList;
-};
-
-//----------------------------------------------------------------------------
 // ApplyPPUFactorParams
 //----------------------------------------------------------------------------
 

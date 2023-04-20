@@ -688,11 +688,6 @@ public:
     //----------//
 
     /**
-     * Add each LayerElements and its children to a flat list
-     */
-    virtual int AddLayerElementToFlatList(FunctorParams *functorParams) const;
-
-    /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int InitProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
