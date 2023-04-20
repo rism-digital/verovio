@@ -674,7 +674,7 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     dc->StartCustomGraphic("notehead");
 
     if (chord->GetActualDur() < DUR_4) {
-        const int line = 2 * m_doc->GetDrawingStemWidth(staffSize);
+        const int line = unit / 2;
         this->DrawNotFilledRectangle(dc, x + line / 2, y1 - line / 2, x + width - line / 2, y2 + line / 2, line, 0);
     }
     else {
