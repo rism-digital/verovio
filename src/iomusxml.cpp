@@ -2249,7 +2249,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 delete hairpin;
                 return;
             }
-            // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
+            hairpin->SetLform(
+                hairpin->AttLineRendBase::StrToLineform(wedge->node().attribute("line-type").as_string()));
             if (wedge->node().attribute("niente")) {
                 hairpin->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
             }

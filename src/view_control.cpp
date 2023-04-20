@@ -617,7 +617,15 @@ void View::DrawHairpin(
 
     const double hairpinThickness
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
-    dc->SetPen(m_currentColour, hairpinThickness, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_BEVEL);
+
+    int style;
+    switch (hairpin->GetLform()) {
+        case LINEFORM_dashed: style = AxLONG_DASH; break;
+        case LINEFORM_dotted: style = AxDOT; break;
+        default: style = AxSOLID; break;
+    }
+
+    dc->SetPen(m_currentColour, hairpinThickness, style, 0, 0, AxCAP_SQUARE, AxJOIN_BEVEL);
     if (startY == 0) {
         Point p[3];
         p[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
