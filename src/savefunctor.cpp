@@ -9,6 +9,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
+#include "iomei.h"
+#include "mdiv.h"
+#include "mnum.h"
+#include "runningelement.h"
+
 //----------------------------------------------------------------------------
 
 namespace vrv {
@@ -25,62 +31,100 @@ SaveFunctor::SaveFunctor(Output *output, bool basic)
 
 FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
-    return FUNCTOR_CONTINUE;
+    // When writing MEI basic, only visible elements within editorial markup are saved
+    if (m_basic && (editorialElement->m_visibility == Hidden)) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObject(editorialElement);
+    }
 }
 
 FunctorCode SaveFunctor::VisitEditorialElementEnd(EditorialElement *editorialElement)
 {
-    return FUNCTOR_CONTINUE;
+    // Same as above
+    if (m_basic && (editorialElement->m_visibility == Hidden)) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObjectEnd(editorialElement);
+    }
 }
 
 FunctorCode SaveFunctor::VisitMdiv(Mdiv *mdiv)
 {
-    return FUNCTOR_CONTINUE;
+    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
+    if ((mdiv->m_visibility == Hidden) && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
+    }
+    return this->VisitObject(mdiv);
 }
 
 FunctorCode SaveFunctor::VisitMdivEnd(Mdiv *mdiv)
 {
-    return FUNCTOR_CONTINUE;
+    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(m_output);
+    if ((mdiv->m_visibility == Hidden) && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
+    }
+    return this->VisitObjectEnd(mdiv);
 }
 
 FunctorCode SaveFunctor::VisitMeasure(Measure *measure)
 {
-    return FUNCTOR_CONTINUE;
+    return (measure->IsMeasuredMusic()) ? this->VisitObject(measure) : FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitMeasureEnd(Measure *measure)
 {
-    return FUNCTOR_CONTINUE;
+    return (measure->IsMeasuredMusic()) ? this->VisitObjectEnd(measure) : FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitMNum(MNum *mNum)
 {
-    return FUNCTOR_CONTINUE;
+    return (mNum->IsGenerated()) ? FUNCTOR_SIBLINGS : this->VisitObject(mNum);
 }
 
 FunctorCode SaveFunctor::VisitMNumEnd(MNum *mNum)
 {
-    return FUNCTOR_CONTINUE;
+    return (mNum->IsGenerated()) ? FUNCTOR_SIBLINGS : this->VisitObjectEnd(mNum);
 }
 
 FunctorCode SaveFunctor::VisitObject(Object *object)
 {
+    if (!m_output->WriteObject(object)) {
+        return FUNCTOR_STOP;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitObjectEnd(Object *object)
 {
+    if (!m_output->WriteObjectEnd(object)) {
+        return FUNCTOR_STOP;
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitRunningElement(RunningElement *runningElement)
 {
-    return FUNCTOR_CONTINUE;
+    if (runningElement->IsGenerated()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObject(runningElement);
+    }
 }
 
 FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
 {
-    return FUNCTOR_CONTINUE;
+    if (runningElement->IsGenerated()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObjectEnd(runningElement);
+    }
 }
 
 } // namespace vrv
