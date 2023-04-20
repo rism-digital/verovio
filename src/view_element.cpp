@@ -681,6 +681,8 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
         this->DrawFilledRectangle(dc, x, y1, x + width, y2);
     }
 
+    dc->EndCustomGraphic();
+
     if (chord->GetCluster() != CLUSTER_chromatic) {
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
@@ -698,11 +700,14 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
 
         this->DrawSmuflCode(dc, accidX, accidY, accidGlyph, staffSize, true, true);
     }
+    
+    // Draw dots and stem
+    const int dotsX = x + width + unit;
+    DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, false);
+    if ((y1 - y2) > 5 * unit) DrawDotsPart(dc, dotsX, bottomNote->GetDrawingY(), chord->GetDots(), staff, false);
 
-    dc->EndCustomGraphic();
-
-    LayerElement *element = vrv_cast<LayerElement *>(chord->GetFirst(STEM));
-    DrawStem(dc, element, layer, staff, measure);
+    Stem *stem = vrv_cast<Stem *>(chord->GetFirst(STEM));
+    DrawStem(dc, stem, layer, staff, measure);
 }
 
 void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
