@@ -665,6 +665,7 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     Note *bottomNote = chord->GetBottomNote();
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->m_drawingStaffSize;
     const int x = chord->GetDrawingX();
     const int y1 = topNote->GetDrawingY() + unit;
     const int y2 = bottomNote->GetDrawingY() - unit;
@@ -673,11 +674,29 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
     dc->StartCustomGraphic("notehead");
 
     if (chord->GetActualDur() < DUR_4) {
-        const int line = 2 * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        const int line = 2 * m_doc->GetDrawingStemWidth(staffSize);
         this->DrawNotFilledRectangle(dc, x + line / 2, y1 - line / 2, x + width - line / 2, y2 + line / 2, line, 0);
     }
     else {
         this->DrawFilledRectangle(dc, x, y1, x + width, y2);
+    }
+
+    if (chord->GetCluster() != CLUSTER_chromatic) {
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
+        const int accidGlyph
+            = (chord->GetCluster() == CLUSTER_black) ? SMUFL_E260_accidentalFlat : SMUFL_E261_accidentalNatural;
+        const int accidX = x + (width - m_doc->GetGlyphWidth(accidGlyph, staffSize, true)) / 2;
+
+        int accidY;
+        if (chord->GetDrawingStemDir() == STEMDIRECTION_down) {
+            accidY = std::max(staffTop, y1) + unit - m_doc->GetGlyphBottom(accidGlyph, staffSize, true);
+        }
+        else {
+            accidY = std::min(staffBottom, y2) - unit - m_doc->GetGlyphTop(accidGlyph, staffSize, true);
+        }
+
+        this->DrawSmuflCode(dc, accidX, accidY, accidGlyph, staffSize, true, true);
     }
 
     dc->EndCustomGraphic();
