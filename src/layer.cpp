@@ -197,6 +197,11 @@ LayerElement *Layer::GetAtPos(int x)
 const LayerElement *Layer::GetAtPos(int x) const
 {
     const Object *first = this->GetFirst();
+    if (first->IsEditorialElement()) {
+        IsEditorialElementComparison cmp;
+        cmp.ReverseComparison();
+        first = this->FindDescendantByComparison(&cmp);
+    }
     if (!first || !first->IsLayerElement()) return NULL;
 
     const LayerElement *element = vrv_cast<const LayerElement *>(first);
@@ -205,8 +210,19 @@ const LayerElement *Layer::GetAtPos(int x) const
 
     const Object *next;
     while ((next = this->GetNext())) {
-        if (!next->IsLayerElement()) continue;
-        const LayerElement *nextLayerElement = vrv_cast<const LayerElement *>(next);
+        const LayerElement *nextLayerElement = NULL;
+        if (next->IsLayerElement()) {
+            nextLayerElement = vrv_cast<const LayerElement *>(next);
+        }
+        else if (next->IsEditorialElement()) {
+            IsEditorialElementComparison cmp;
+            cmp.ReverseComparison();
+            nextLayerElement = vrv_cast<const LayerElement *>(next->FindDescendantByComparison(&cmp));
+            if (!nextLayerElement) continue;
+        }
+        else {
+            continue;
+        }
         assert(nextLayerElement);
         if (nextLayerElement->GetDrawingX() > x) return element;
         element = nextLayerElement;
