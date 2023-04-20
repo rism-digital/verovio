@@ -1,5 +1,5 @@
 import commonjs from "@rollup/plugin-commonjs";
-import addModuleExports from "./src/rollup-plugin-add-module-exports.js";
+import addModuleExports from "./src/rollup-plugin-add-module-exports.mjs";
 
 export default [
     {
