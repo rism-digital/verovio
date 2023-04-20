@@ -29,6 +29,17 @@ SaveFunctor::SaveFunctor(Output *output, bool basic)
     m_basic = basic;
 }
 
+FunctorCode SaveFunctor::VisitDots(Dots *dots)
+{
+    // Ignore dots during save
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SaveFunctor::VisitDotsEnd(Dots *dots)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode SaveFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
     // When writing MEI basic, only visible elements within editorial markup are saved
@@ -49,6 +60,17 @@ FunctorCode SaveFunctor::VisitEditorialElementEnd(EditorialElement *editorialEle
     else {
         return this->VisitObjectEnd(editorialElement);
     }
+}
+
+FunctorCode SaveFunctor::VisitFlag(Flag *flag)
+{
+    // Ignore flags during save
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SaveFunctor::VisitFlagEnd(Flag *flag)
+{
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitMdiv(Mdiv *mdiv)
@@ -125,6 +147,28 @@ FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
     else {
         return this->VisitObjectEnd(runningElement);
     }
+}
+
+FunctorCode SaveFunctor::VisitTupletBracket(TupletBracket *tupletBracket)
+{
+    // Ignore tuplet brackets during save
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SaveFunctor::VisitTupletBracketEnd(TupletBracket *tupletBracket)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SaveFunctor::VisitTupletNum(TupletNum *tupletNum)
+{
+    // Ignore tuplet numbers during save
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SaveFunctor::VisitTupletNumEnd(TupletNum *tupletNum)
+{
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

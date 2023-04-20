@@ -39,7 +39,6 @@ class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
-class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -621,9 +620,8 @@ public:
 
     /**
      * Saves the object (and its children) using the specified output stream.
-     * Creates functors that will parse the tree.
      */
-    int SaveObject(SaveParams &saveParams);
+    void SaveObject(Output *output, bool basic);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -709,23 +707,6 @@ public:
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
-
-    ///@}
-
-    /**
-     * @name Functors for loading and saving the document
-     */
-    ///@{
-
-    /**
-     * Save the content of any object by calling the appropriate FileOutputStream method.
-     */
-    virtual int Save(FunctorParams *functorParams);
-
-    /**
-     * End Functor for Object::Save
-     */
-    virtual int SaveEnd(FunctorParams *functorParams);
 
     ///@}
 

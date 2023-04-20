@@ -42,6 +42,7 @@
 #include "page.h"
 #include "plistinterface.h"
 #include "resetfunctor.h"
+#include "savefunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -1309,15 +1310,12 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-int Object::SaveObject(SaveParams &saveParams)
+void Object::SaveObject(Output *output, bool basic)
 {
-    Functor save(&Object::Save);
+    SaveFunctor save(output, basic);
     // Special case where we want to process all objects
-    save.m_visibleOnly = false;
-    Functor saveEnd(&Object::SaveEnd);
-    this->Process(&save, &saveParams, &saveEnd);
-
-    return true;
+    save.SetVisibleOnly(false);
+    this->Process(save);
 }
 
 void Object::ReorderByXPos()
@@ -1829,28 +1827,6 @@ int Object::GenerateFeatures(FunctorParams *functorParams)
 
     params->m_extractor->Extract(this, params);
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::Save(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_output->WriteObject(this)) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SaveEnd(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_output->WriteObjectEnd(this)) {
-        return FUNCTOR_STOP;
-    }
     return FUNCTOR_CONTINUE;
 }
 

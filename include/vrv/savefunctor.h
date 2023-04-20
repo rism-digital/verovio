@@ -38,8 +38,12 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDots(Dots *dots) override;
+    FunctorCode VisitDotsEnd(Dots *dots) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEditorialElementEnd(EditorialElement *editorialElement) override;
+    FunctorCode VisitFlag(Flag *flag) override;
+    FunctorCode VisitFlagEnd(Flag *flag) override;
     FunctorCode VisitMdiv(Mdiv *mdiv) override;
     FunctorCode VisitMdivEnd(Mdiv *mdiv) override;
     FunctorCode VisitMeasure(Measure *measure) override;
@@ -50,6 +54,10 @@ public:
     FunctorCode VisitObjectEnd(Object *object) override;
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitRunningElementEnd(RunningElement *runningElement) override;
+    FunctorCode VisitTupletBracket(TupletBracket *tupletBracket) override;
+    FunctorCode VisitTupletBracketEnd(TupletBracket *tupletBracket) override;
+    FunctorCode VisitTupletNum(TupletNum *tupletNum) override;
+    FunctorCode VisitTupletNumEnd(TupletNum *tupletNum) override;
     ///@}
 
 protected:

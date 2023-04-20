@@ -325,14 +325,6 @@ public:
     ///@}
 
     /**
-     * See Object::Save
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override;
-    int SaveEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::ApplyPPUFactor
      */
     int ApplyPPUFactor(FunctorParams *functorParams) override;

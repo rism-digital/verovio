@@ -728,16 +728,6 @@ FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeasureEnd(this);
 }
 
-int Measure::Save(FunctorParams *functorParams)
-{
-    return (this->IsMeasuredMusic()) ? Object::Save(functorParams) : FUNCTOR_CONTINUE;
-}
-
-int Measure::SaveEnd(FunctorParams *functorParams)
-{
-    return (this->IsMeasuredMusic()) ? Object::SaveEnd(functorParams) : FUNCTOR_CONTINUE;
-}
-
 int Measure::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);

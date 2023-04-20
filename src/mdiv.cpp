@@ -96,32 +96,6 @@ FunctorCode Mdiv::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMdivEnd(this);
 }
 
-int Mdiv::Save(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
-    if (m_visibility == Hidden && meiOutput) {
-        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
-    }
-    return Object::Save(functorParams);
-}
-
-int Mdiv::SaveEnd(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
-    if (m_visibility == Hidden && meiOutput) {
-        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
-    }
-    return Object::SaveEnd(functorParams);
-}
-
 int Mdiv::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
