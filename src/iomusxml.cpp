@@ -626,12 +626,13 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : node.children()) {
             if (std::string(xmlDynamPart.name()) == "other-dynamics") {
+                if (xmlDynamPart != node.first_child()) dynamStr += " ";
                 dynamStr += xmlDynamPart.text().as_string();
+                if (xmlDynamPart != node.last_child()) dynamStr += " ";
             }
             else {
                 dynamStr += xmlDynamPart.name();
             }
-            if (xmlDynamPart != node.last_child()) dynamStr += " ";
         }
         return dynamStr;
     }
