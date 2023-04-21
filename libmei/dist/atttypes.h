@@ -1888,6 +1888,20 @@ enum cutout_CUTOUT : int8_t {
 };
 
 /**
+ * MEI att.divLine.log@form
+ */
+enum divLineLog_FORM : int8_t {
+    divLineLog_FORM_NONE = 0,
+    divLineLog_FORM_caesura,
+    divLineLog_FORM_finalis,
+    divLineLog_FORM_maior,
+    divLineLog_FORM_maxima,
+    divLineLog_FORM_minima,
+    divLineLog_FORM_virgula,
+    divLineLog_FORM_MAX
+};
+
+/**
  * MEI att.dot.log@form
  */
 enum dotLog_FORM : int8_t {

@@ -23,6 +23,46 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttDivLineLog
+//----------------------------------------------------------------------------
+
+AttDivLineLog::AttDivLineLog() : Att()
+{
+    ResetDivLineLog();
+}
+
+void AttDivLineLog::ResetDivLineLog()
+{
+    m_form = divLineLog_FORM_NONE;
+}
+
+bool AttDivLineLog::ReadDivLineLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToDivLineLogForm(element.attribute("form").value()));
+        if (removeAttr) element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttDivLineLog::WriteDivLineLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasForm()) {
+        element.append_attribute("form") = DivLineLogFormToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttDivLineLog::HasForm() const
+{
+    return (m_form != divLineLog_FORM_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttNcLog
 //----------------------------------------------------------------------------
 

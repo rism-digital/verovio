@@ -23,6 +23,46 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttAdlibitum
+//----------------------------------------------------------------------------
+
+AttAdlibitum::AttAdlibitum() : Att()
+{
+    ResetAdlibitum();
+}
+
+void AttAdlibitum::ResetAdlibitum()
+{
+    m_adlib = BOOLEAN_NONE;
+}
+
+bool AttAdlibitum::ReadAdlibitum(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("adlib")) {
+        this->SetAdlib(StrToBoolean(element.attribute("adlib").value()));
+        if (removeAttr) element.remove_attribute("adlib");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAdlibitum::WriteAdlibitum(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAdlib()) {
+        element.append_attribute("adlib") = BooleanToStr(this->GetAdlib()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttAdlibitum::HasAdlib() const
+{
+    return (m_adlib != BOOLEAN_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttBifoliumSurfaces
 //----------------------------------------------------------------------------
 
@@ -160,6 +200,86 @@ bool AttFoliumSurfaces::HasRecto() const
 bool AttFoliumSurfaces::HasVerso() const
 {
     return (m_verso != "");
+}
+
+//----------------------------------------------------------------------------
+// AttPerfRes
+//----------------------------------------------------------------------------
+
+AttPerfRes::AttPerfRes() : Att()
+{
+    ResetPerfRes();
+}
+
+void AttPerfRes::ResetPerfRes()
+{
+    m_solo = BOOLEAN_NONE;
+}
+
+bool AttPerfRes::ReadPerfRes(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("solo")) {
+        this->SetSolo(StrToBoolean(element.attribute("solo").value()));
+        if (removeAttr) element.remove_attribute("solo");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPerfRes::WritePerfRes(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSolo()) {
+        element.append_attribute("solo") = BooleanToStr(this->GetSolo()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPerfRes::HasSolo() const
+{
+    return (m_solo != BOOLEAN_NONE);
+}
+
+//----------------------------------------------------------------------------
+// AttPerfResBasic
+//----------------------------------------------------------------------------
+
+AttPerfResBasic::AttPerfResBasic() : Att()
+{
+    ResetPerfResBasic();
+}
+
+void AttPerfResBasic::ResetPerfResBasic()
+{
+    m_count = MEI_UNSET;
+}
+
+bool AttPerfResBasic::ReadPerfResBasic(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("count")) {
+        this->SetCount(StrToInt(element.attribute("count").value()));
+        if (removeAttr) element.remove_attribute("count");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPerfResBasic::WritePerfResBasic(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCount()) {
+        element.append_attribute("count") = IntToStr(this->GetCount()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPerfResBasic::HasCount() const
+{
+    return (m_count != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------
