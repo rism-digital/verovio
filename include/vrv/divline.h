@@ -8,7 +8,7 @@
 #ifndef __VRV_DIVLINE_H__
 #define __VRV_DIVLINE_H__
 
-#include "atts_shared.h"
+#include "atts_neumes.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -56,7 +56,7 @@ public:
     /**
      * @name Method used for drawing divLine on ornaments
      */
-    static wchar_t GetDivLineGlyph(data_DIVLINE);
+    static wchar_t GetDivLineGlyph(divLineLog_FORM);
 
     //----------//
     // Functors //
@@ -103,7 +103,6 @@ public:
     virtual ~DivLineAttr();
     virtual Object *Clone() const { return new DivLineAttr(*this); }
     virtual std::string GetClassName() const { return "DivLineAttr"; }
-    virtual ClassId GetClassId() const { return DIVLINE; }
     ///@}
 
     // void SetLeft() { m_isLeft = true; }

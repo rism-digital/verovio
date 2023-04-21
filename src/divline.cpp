@@ -83,14 +83,17 @@ std::wstring DivLine::GetSymbolStr() const
     return symbolStr;
 }
 
-wchar_t DivLine::GetDivLineGlyph(data_DIVLINE divLine)
+wchar_t DivLine::GetDivLineGlyph(divLineLog_FORM divLine)
 {
     int symc = SMUFL_E8F5_chantDivisioMaxima;
     switch (divLine) {
-        case DIVLINE_minima: symc = SMUFL_E8F3_chantDivisioMinima; break;
-        case DIVLINE_maior: symc = SMUFL_E8F4_chantDivisioMaior; break;
-        case DIVLINE_maxima: symc = SMUFL_E8F5_chantDivisioMaxima; break;
-        case DIVLINE_finalis: symc = SMUFL_E8F6_chantDivisioFinalis; break;
+        case divLineLog_FORM_minima: symc = SMUFL_E8F3_chantDivisioMinima; break;
+        case divLineLog_FORM_maior: symc = SMUFL_E8F4_chantDivisioMaior; break;
+        case divLineLog_FORM_maxima: symc = SMUFL_E8F5_chantDivisioMaxima; break;
+        case divLineLog_FORM_finalis: symc = SMUFL_E8F6_chantDivisioFinalis; break;
+        case divLineLog_FORM_caesura: symc = SMUFL_E8F8_chantCaesura; break;
+        case divLineLog_FORM_virgula: symc = SMUFL_E8F7_chantVirgula; break;
+
         default: break;
     }
     return symc;

@@ -226,13 +226,7 @@ enum data_ARTICULATION : int8_t {
 /**
  * MEI data.BARMETHOD
  */
-enum data_BARMETHOD : int8_t {
-    BARMETHOD_NONE = 0,
-    BARMETHOD_mensur,
-    BARMETHOD_staff,
-    BARMETHOD_takt,
-    BARMETHOD_MAX
-};
+enum data_BARMETHOD : int8_t { BARMETHOD_NONE = 0, BARMETHOD_mensur, BARMETHOD_staff, BARMETHOD_takt, BARMETHOD_MAX };
 
 /**
  * MEI data.BARRENDITION
@@ -260,13 +254,7 @@ enum data_BARRENDITION : int8_t {
 /**
  * MEI data.BEAMPLACE
  */
-enum data_BEAMPLACE : int8_t {
-    BEAMPLACE_NONE = 0,
-    BEAMPLACE_above,
-    BEAMPLACE_below,
-    BEAMPLACE_mixed,
-    BEAMPLACE_MAX
-};
+enum data_BEAMPLACE : int8_t { BEAMPLACE_NONE = 0, BEAMPLACE_above, BEAMPLACE_below, BEAMPLACE_mixed, BEAMPLACE_MAX };
 
 /**
  * MEI data.BETYPE
@@ -292,12 +280,7 @@ enum data_BETYPE : int8_t {
 /**
  * MEI data.BOOLEAN
  */
-enum data_BOOLEAN : int8_t {
-    BOOLEAN_NONE = 0,
-    BOOLEAN_true,
-    BOOLEAN_false,
-    BOOLEAN_MAX
-};
+enum data_BOOLEAN : int8_t { BOOLEAN_NONE = 0, BOOLEAN_true, BOOLEAN_false, BOOLEAN_MAX };
 
 /**
  * MEI data.CERTAINTY
@@ -328,13 +311,7 @@ enum data_CLEFSHAPE : int8_t {
 /**
  * MEI data.CLUSTER
  */
-enum data_CLUSTER : int8_t {
-    CLUSTER_NONE = 0,
-    CLUSTER_white,
-    CLUSTER_black,
-    CLUSTER_chromatic,
-    CLUSTER_MAX
-};
+enum data_CLUSTER : int8_t { CLUSTER_NONE = 0, CLUSTER_white, CLUSTER_black, CLUSTER_chromatic, CLUSTER_MAX };
 
 /**
  * MEI data.COLORNAMES
@@ -717,12 +694,7 @@ enum data_FONTSTYLE : int8_t {
 /**
  * MEI data.FONTWEIGHT
  */
-enum data_FONTWEIGHT : int8_t {
-    FONTWEIGHT_NONE = 0,
-    FONTWEIGHT_bold,
-    FONTWEIGHT_normal,
-    FONTWEIGHT_MAX
-};
+enum data_FONTWEIGHT : int8_t { FONTWEIGHT_NONE = 0, FONTWEIGHT_bold, FONTWEIGHT_normal, FONTWEIGHT_MAX };
 
 /**
  * MEI data.FRBRRELATIONSHIP
@@ -771,24 +743,12 @@ enum data_FRBRRELATIONSHIP : int8_t {
 /**
  * MEI data.GLISSANDO
  */
-enum data_GLISSANDO : int8_t {
-    GLISSANDO_NONE = 0,
-    GLISSANDO_i,
-    GLISSANDO_m,
-    GLISSANDO_t,
-    GLISSANDO_MAX
-};
+enum data_GLISSANDO : int8_t { GLISSANDO_NONE = 0, GLISSANDO_i, GLISSANDO_m, GLISSANDO_t, GLISSANDO_MAX };
 
 /**
  * MEI data.GRACE
  */
-enum data_GRACE : int8_t {
-    GRACE_NONE = 0,
-    GRACE_acc,
-    GRACE_unacc,
-    GRACE_unknown,
-    GRACE_MAX
-};
+enum data_GRACE : int8_t { GRACE_NONE = 0, GRACE_acc, GRACE_unacc, GRACE_unknown, GRACE_MAX };
 
 /**
  * MEI data.HEADSHAPE
@@ -866,12 +826,7 @@ enum data_LAYERSCHEME : int8_t {
 /**
  * MEI data.LIGATUREFORM
  */
-enum data_LIGATUREFORM : int8_t {
-    LIGATUREFORM_NONE = 0,
-    LIGATUREFORM_recta,
-    LIGATUREFORM_obliqua,
-    LIGATUREFORM_MAX
-};
+enum data_LIGATUREFORM : int8_t { LIGATUREFORM_NONE = 0, LIGATUREFORM_recta, LIGATUREFORM_obliqua, LIGATUREFORM_MAX };
 
 /**
  * MEI data.LINEFORM
@@ -999,13 +954,7 @@ enum data_METERFORM : int8_t {
 /**
  * MEI data.METERSIGN
  */
-enum data_METERSIGN : int8_t {
-    METERSIGN_NONE = 0,
-    METERSIGN_common,
-    METERSIGN_cut,
-    METERSIGN_open,
-    METERSIGN_MAX
-};
+enum data_METERSIGN : int8_t { METERSIGN_NONE = 0, METERSIGN_common, METERSIGN_cut, METERSIGN_open, METERSIGN_MAX };
 
 /**
  * MEI data.MIDINAMES
@@ -1218,12 +1167,7 @@ enum data_MODE : int8_t {
 /**
  * MEI data.MODE.cmn
  */
-enum data_MODE_cmn : int8_t {
-    MODE_cmn_NONE = 0,
-    MODE_cmn_major,
-    MODE_cmn_minor,
-    MODE_cmn_MAX
-};
+enum data_MODE_cmn : int8_t { MODE_cmn_NONE = 0, MODE_cmn_major, MODE_cmn_minor, MODE_cmn_MAX };
 
 /**
  * MEI data.MODE.extended
@@ -1777,12 +1721,7 @@ enum data_VERTICALALIGNMENT : int8_t {
 /**
  * MEI att.accid.log@func
  */
-enum accidLog_FUNC : int8_t {
-    accidLog_FUNC_NONE = 0,
-    accidLog_FUNC_caution,
-    accidLog_FUNC_edit,
-    accidLog_FUNC_MAX
-};
+enum accidLog_FUNC : int8_t { accidLog_FUNC_NONE = 0, accidLog_FUNC_caution, accidLog_FUNC_edit, accidLog_FUNC_MAX };
 
 /**
  * MEI att.anchoredText.log@func
@@ -1817,12 +1756,7 @@ enum audience_AUDIENCE : int8_t {
 /**
  * MEI att.bTrem.log@form
  */
-enum bTremLog_FORM : int8_t {
-    bTremLog_FORM_NONE = 0,
-    bTremLog_FORM_meas,
-    bTremLog_FORM_unmeas,
-    bTremLog_FORM_MAX
-};
+enum bTremLog_FORM : int8_t { bTremLog_FORM_NONE = 0, bTremLog_FORM_meas, bTremLog_FORM_unmeas, bTremLog_FORM_MAX };
 
 /**
  * MEI att.beamRend@form
@@ -1872,20 +1806,12 @@ enum curvature_CURVEDIR : int8_t {
 /**
  * MEI att.curve.log@func
  */
-enum curveLog_FUNC : int8_t {
-    curveLog_FUNC_NONE = 0,
-    curveLog_FUNC_unknown,
-    curveLog_FUNC_MAX
-};
+enum curveLog_FUNC : int8_t { curveLog_FUNC_NONE = 0, curveLog_FUNC_unknown, curveLog_FUNC_MAX };
 
 /**
  * MEI att.cutout@cutout
  */
-enum cutout_CUTOUT : int8_t {
-    cutout_CUTOUT_NONE = 0,
-    cutout_CUTOUT_cutout,
-    cutout_CUTOUT_MAX
-};
+enum cutout_CUTOUT : int8_t { cutout_CUTOUT_NONE = 0, cutout_CUTOUT_cutout, cutout_CUTOUT_MAX };
 
 /**
  * MEI att.divLine.log@form
@@ -1904,12 +1830,7 @@ enum divLineLog_FORM : int8_t {
 /**
  * MEI att.dot.log@form
  */
-enum dotLog_FORM : int8_t {
-    dotLog_FORM_NONE = 0,
-    dotLog_FORM_aug,
-    dotLog_FORM_div,
-    dotLog_FORM_MAX
-};
+enum dotLog_FORM : int8_t { dotLog_FORM_NONE = 0, dotLog_FORM_aug, dotLog_FORM_div, dotLog_FORM_MAX };
 
 /**
  * MEI att.endings@ending.rend
@@ -1925,12 +1846,7 @@ enum endings_ENDINGREND : int8_t {
 /**
  * MEI att.episema.vis@form
  */
-enum episemaVis_FORM : int8_t {
-    episemaVis_FORM_NONE = 0,
-    episemaVis_FORM_h,
-    episemaVis_FORM_v,
-    episemaVis_FORM_MAX
-};
+enum episemaVis_FORM : int8_t { episemaVis_FORM_NONE = 0, episemaVis_FORM_h, episemaVis_FORM_v, episemaVis_FORM_MAX };
 
 /**
  * MEI att.evidence@evidence
@@ -1946,21 +1862,12 @@ enum evidence_EVIDENCE : int8_t {
 /**
  * MEI att.extSym@glyph.auth
  */
-enum extSym_GLYPHAUTH : int8_t {
-    extSym_GLYPHAUTH_NONE = 0,
-    extSym_GLYPHAUTH_smufl,
-    extSym_GLYPHAUTH_MAX
-};
+enum extSym_GLYPHAUTH : int8_t { extSym_GLYPHAUTH_NONE = 0, extSym_GLYPHAUTH_smufl, extSym_GLYPHAUTH_MAX };
 
 /**
  * MEI att.fTrem.log@form
  */
-enum fTremLog_FORM : int8_t {
-    fTremLog_FORM_NONE = 0,
-    fTremLog_FORM_meas,
-    fTremLog_FORM_unmeas,
-    fTremLog_FORM_MAX
-};
+enum fTremLog_FORM : int8_t { fTremLog_FORM_NONE = 0, fTremLog_FORM_meas, fTremLog_FORM_unmeas, fTremLog_FORM_MAX };
 
 /**
  * MEI att.fermata.vis@form
@@ -2028,12 +1935,7 @@ enum hairpinLog_FORM : int8_t {
 /**
  * MEI att.harm.anl@form
  */
-enum harmAnl_FORM : int8_t {
-    harmAnl_FORM_NONE = 0,
-    harmAnl_FORM_explicit,
-    harmAnl_FORM_implied,
-    harmAnl_FORM_MAX
-};
+enum harmAnl_FORM : int8_t { harmAnl_FORM_NONE = 0, harmAnl_FORM_explicit, harmAnl_FORM_implied, harmAnl_FORM_MAX };
 
 /**
  * MEI att.harm.vis@rendgrid
@@ -2239,33 +2141,17 @@ enum mordentLog_FORM : int8_t {
 /**
  * MEI att.ncForm@con
  */
-enum ncForm_CON : int8_t {
-    ncForm_CON_NONE = 0,
-    ncForm_CON_g,
-    ncForm_CON_l,
-    ncForm_CON_e,
-    ncForm_CON_MAX
-};
+enum ncForm_CON : int8_t { ncForm_CON_NONE = 0, ncForm_CON_g, ncForm_CON_l, ncForm_CON_e, ncForm_CON_MAX };
 
 /**
  * MEI att.ncForm@curve
  */
-enum ncForm_CURVE : int8_t {
-    ncForm_CURVE_NONE = 0,
-    ncForm_CURVE_a,
-    ncForm_CURVE_c,
-    ncForm_CURVE_MAX
-};
+enum ncForm_CURVE : int8_t { ncForm_CURVE_NONE = 0, ncForm_CURVE_a, ncForm_CURVE_c, ncForm_CURVE_MAX };
 
 /**
  * MEI att.ncForm@rellen
  */
-enum ncForm_RELLEN : int8_t {
-    ncForm_RELLEN_NONE = 0,
-    ncForm_RELLEN_l,
-    ncForm_RELLEN_s,
-    ncForm_RELLEN_MAX
-};
+enum ncForm_RELLEN : int8_t { ncForm_RELLEN_NONE = 0, ncForm_RELLEN_l, ncForm_RELLEN_s, ncForm_RELLEN_MAX };
 
 /**
  * MEI att.note.ges@extremis
@@ -2280,30 +2166,17 @@ enum noteGes_EXTREMIS : int8_t {
 /**
  * MEI att.noteHeads@head.auth
  */
-enum noteHeads_HEADAUTH : int8_t {
-    noteHeads_HEADAUTH_NONE = 0,
-    noteHeads_HEADAUTH_smufl,
-    noteHeads_HEADAUTH_MAX
-};
+enum noteHeads_HEADAUTH : int8_t { noteHeads_HEADAUTH_NONE = 0, noteHeads_HEADAUTH_smufl, noteHeads_HEADAUTH_MAX };
 
 /**
  * MEI att.octave.log@coll
  */
-enum octaveLog_COLL : int8_t {
-    octaveLog_COLL_NONE = 0,
-    octaveLog_COLL_coll,
-    octaveLog_COLL_MAX
-};
+enum octaveLog_COLL : int8_t { octaveLog_COLL_NONE = 0, octaveLog_COLL_coll, octaveLog_COLL_MAX };
 
 /**
  * MEI att.pb.vis@folium
  */
-enum pbVis_FOLIUM : int8_t {
-    pbVis_FOLIUM_NONE = 0,
-    pbVis_FOLIUM_verso,
-    pbVis_FOLIUM_recto,
-    pbVis_FOLIUM_MAX
-};
+enum pbVis_FOLIUM : int8_t { pbVis_FOLIUM_NONE = 0, pbVis_FOLIUM_verso, pbVis_FOLIUM_recto, pbVis_FOLIUM_MAX };
 
 /**
  * MEI att.pedal.log@dir
@@ -2400,11 +2273,7 @@ enum rehearsal_REHENCLOSE : int8_t {
 /**
  * MEI att.sb.vis@form
  */
-enum sbVis_FORM : int8_t {
-    sbVis_FORM_NONE = 0,
-    sbVis_FORM_hash,
-    sbVis_FORM_MAX
-};
+enum sbVis_FORM : int8_t { sbVis_FORM_NONE = 0, sbVis_FORM_hash, sbVis_FORM_MAX };
 
 /**
  * MEI att.staffGroupingSym@symbol
@@ -2483,12 +2352,7 @@ enum tupletVis_NUMFORMAT : int8_t {
 /**
  * MEI att.turn.log@form
  */
-enum turnLog_FORM : int8_t {
-    turnLog_FORM_NONE = 0,
-    turnLog_FORM_lower,
-    turnLog_FORM_upper,
-    turnLog_FORM_MAX
-};
+enum turnLog_FORM : int8_t { turnLog_FORM_NONE = 0, turnLog_FORM_lower, turnLog_FORM_upper, turnLog_FORM_MAX };
 
 /**
  * MEI att.voltaGroupingSym@voltasym
