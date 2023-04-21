@@ -321,7 +321,7 @@ bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &i
 
 int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int defaultLocation) const
 {
-    if (!layer) return defaultLocation;
+    if (!layer || this->HasSameasLink()) return defaultLocation;
     bool isTopLayer = false;
     if (!this->DetermineRestPosition(staff, layer, isTopLayer)) return defaultLocation;
 
