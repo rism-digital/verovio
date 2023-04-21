@@ -1370,6 +1370,12 @@
 		E708AA6629D2B98B001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
 		E708AA6729D2B98B001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
 		E708AA6829D2B98C001F937A /* adjustfloatingpositionerfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */; };
+		E70E2AA029F262A200DB3044 /* miscfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E70E2A9F29F262A200DB3044 /* miscfunctor.h */; };
+		E70E2AA129F262A200DB3044 /* miscfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E70E2A9F29F262A200DB3044 /* miscfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E70E2AA329F262DB00DB3044 /* miscfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */; };
+		E70E2AA429F262DB00DB3044 /* miscfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */; };
+		E70E2AA529F262F800DB3044 /* miscfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */; };
+		E70E2AA629F262F800DB3044 /* miscfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */; };
 		E71EF3C32975E4DC00D36264 /* resetfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E71EF3C22975E4DC00D36264 /* resetfunctor.h */; };
 		E71EF3C42975E4DC00D36264 /* resetfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E71EF3C22975E4DC00D36264 /* resetfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E71EF3C62975ED3800D36264 /* resetfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E71EF3C52975ED3800D36264 /* resetfunctor.cpp */; };
@@ -2131,6 +2137,8 @@
 		BDEF9ECB26725248008A3A47 /* caesura.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = caesura.h; path = include/vrv/caesura.h; sourceTree = "<group>"; };
 		E708AA6129D2B965001F937A /* adjustfloatingpositionerfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustfloatingpositionerfunctor.h; path = include/vrv/adjustfloatingpositionerfunctor.h; sourceTree = "<group>"; };
 		E708AA6429D2B985001F937A /* adjustfloatingpositionerfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustfloatingpositionerfunctor.cpp; path = src/adjustfloatingpositionerfunctor.cpp; sourceTree = "<group>"; };
+		E70E2A9F29F262A200DB3044 /* miscfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = miscfunctor.h; path = include/vrv/miscfunctor.h; sourceTree = "<group>"; };
+		E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = miscfunctor.cpp; path = src/miscfunctor.cpp; sourceTree = "<group>"; };
 		E71EF3C22975E4DC00D36264 /* resetfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resetfunctor.h; path = include/vrv/resetfunctor.h; sourceTree = "<group>"; };
 		E71EF3C52975ED3800D36264 /* resetfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resetfunctor.cpp; path = src/resetfunctor.cpp; sourceTree = "<group>"; };
 		E722106228F8569F002CD6E9 /* findlayerelementsfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findlayerelementsfunctor.h; path = include/vrv/findlayerelementsfunctor.h; sourceTree = "<group>"; };
@@ -2977,6 +2985,8 @@
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
 				E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */,
 				E7BF80E329E3374600EA38F0 /* justifyfunctor.h */,
+				E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */,
+				E70E2A9F29F262A200DB3044 /* miscfunctor.h */,
 				E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */,
 				E7C3AED52955018F002DE5AB /* preparedatafunctor.h */,
 				E71EF3C52975ED3800D36264 /* resetfunctor.cpp */,
@@ -3099,6 +3109,7 @@
 				8F59293818854BF800FE51AD /* beam.h in Headers */,
 				4D6331F31F46D2B400A0D6BF /* arpeg.h in Headers */,
 				4DB3D8D81F83D13900B5FC2B /* trill.h in Headers */,
+				E70E2AA029F262A200DB3044 /* miscfunctor.h in Headers */,
 				4D1BE7801C69434C0086DC0E /* MidiEvent.h in Headers */,
 				4DB3D8C11F83D0E100B5FC2B /* systemelement.h in Headers */,
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
@@ -3469,6 +3480,7 @@
 				4DACC9CF2990F29A00B55913 /* atts_mei.h in Headers */,
 				E79ADDC526BD1AE900527E4B /* runtimeclock.h in Headers */,
 				BB4C4A9722A9328F001F6AF0 /* functorparams.h in Headers */,
+				E70E2AA129F262A200DB3044 /* miscfunctor.h in Headers */,
 				BB4C4B0222A932BC001F6AF0 /* unclear.h in Headers */,
 				BB4C4B2C22A932CF001F6AF0 /* mordent.h in Headers */,
 				4DBDD67A2939E1D1009EC466 /* symboldef.h in Headers */,
@@ -3873,6 +3885,7 @@
 				4DB3D8FC1F83D1FD00B5FC2B /* horizontalaligner.cpp in Sources */,
 				BD2E4D982875880600B04350 /* stem.cpp in Sources */,
 				4D16940E1E3A44F300569BF4 /* view_mensural.cpp in Sources */,
+				E70E2AA529F262F800DB3044 /* miscfunctor.cpp in Sources */,
 				4D16940F1E3A44F300569BF4 /* layer.cpp in Sources */,
 				4D1694101E3A44F300569BF4 /* proport.cpp in Sources */,
 				4DEC4DBF21C828AC00D1D273 /* corr.cpp in Sources */,
@@ -4292,6 +4305,7 @@
 				4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
 				BDC366C72576AF9300E4D826 /* grpsym.cpp in Sources */,
+				E70E2AA629F262F800DB3044 /* miscfunctor.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DACC9802990F29A00B55913 /* atts_edittrans.cpp in Sources */,
 				4DEC4D8E21C81DEE00D1D273 /* damage.cpp in Sources */,
@@ -4426,6 +4440,7 @@
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
 				4DEC4D9C21C81E6600D1D273 /* lem.cpp in Sources */,
 				4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */,
+				E70E2AA329F262DB00DB3044 /* miscfunctor.cpp in Sources */,
 				4DB3D8D31F83D12300B5FC2B /* pedal.cpp in Sources */,
 				8F7DD0571EAF3682001B072A /* fb.cpp in Sources */,
 				BD2E4D972875880500B04350 /* stem.cpp in Sources */,
@@ -4703,6 +4718,7 @@
 				BB4C4B5722A932D7001F6AF0 /* layerelement.cpp in Sources */,
 				BD2E4D962875880500B04350 /* stem.cpp in Sources */,
 				BB4C4ACB22A932B6001F6AF0 /* pb.cpp in Sources */,
+				E70E2AA429F262DB00DB3044 /* miscfunctor.cpp in Sources */,
 				BB4C4BB422A932EB001F6AF0 /* view_text.cpp in Sources */,
 				BB4C4B4522A932D7001F6AF0 /* btrem.cpp in Sources */,
 				BB4C4B6B22A932D7001F6AF0 /* neume.cpp in Sources */,
