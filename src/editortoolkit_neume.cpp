@@ -354,9 +354,9 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
     Clef *precedingClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, clef));
     Clef *nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&ac, clef));
 
-    m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefBefore, &ic, clef,
+    m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withThisClefBefore, &ic, clef,
         (nextClefBefore != layer->GetCurrentClef()) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
-    m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
+    m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withPrecedingClefBefore, &ic, precedingClefBefore, clef);
 
     // Adjust facsimile for clef (if it exists)
     if (clef->HasFacs()) {
@@ -377,9 +377,9 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
         ListOfObjects withThisClefAfter;
         ListOfObjects withPrecedingClefAfter;
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withThisClefAfter, &ic, clef,
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withThisClefAfter, &ic, clef,
             (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withPrecedingClefAfter, &ic, precedingClefBefore, clef);
 
         // moved left
         if (withPrecedingClefBefore.size() > withPrecedingClefAfter.size()) {
@@ -437,13 +437,13 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
         ListOfObjects noLongerWithThisClef;
         ListOfObjects newlyWithThisClef;
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withOldPrecedingClefAfter, &ic, precedingClefBefore,
             (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withNewPrecedingClefBefore, &ic, precedingClefAfter,
             (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&withNewPrecedingClefAfter, &ic, precedingClefAfter, clef);
 
         std::set_difference(withOldPrecedingClefAfter.begin(), withOldPrecedingClefAfter.end(),
             withPrecedingClefBefore.begin(), withPrecedingClefBefore.end(),
@@ -523,7 +523,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         // Check for clefs in syllable
         ListOfObjects clefs;
-        syllable->FindAllDescendantByComparison(&clefs, &ac);
+        syllable->FindAllDescendantsByComparison(&clefs, &ac);
         bool hasClef = (clefs.size() != 0);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
@@ -571,7 +571,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             // if syllable contains clef, adjust individual neumes
             ListOfObjects neumes;
             ClassIdComparison neumeCompare(NEUME);
-            element->FindAllDescendantByComparison(&neumes, &neumeCompare);
+            element->FindAllDescendantsByComparison(&neumes, &neumeCompare);
             for (auto neume = neumes.begin(); neume != neumes.end(); ++neume) {
                 AdjustPitchFromPosition(*neume);
             }
@@ -1246,7 +1246,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         return false;
     }
 
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(element);
     Object *parent = element->GetParent();
     assert(parent);
@@ -1295,7 +1295,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     Object *neume;
     assert(neume);
     ClassIdComparison ac(NEUME);
-    staff->FindAllDescendantByComparison(&neumes, &ac);
+    staff->FindAllDescendantsByComparison(&neumes, &ac);
     std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
     if (neumes.size() > 0) {
         ClosestNeume compN;
@@ -1348,7 +1348,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
             endElement = (nextSyllable) ? nextSyllable : m_doc->GetDrawingPage()->GetLast();
         }
         ListOfObjects targetedElements;
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&targetedElements, &ic, clef, endElement);
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&targetedElements, &ic, clef, endElement);
 
         // Adjust pitches for elements in syllable affected by inserted clef
         Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, clef));
@@ -1368,7 +1368,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
                     = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cc, clefPrecedingNextSyllableAfter));
                 Object *endElement = (nextClef) ? nextClef : m_doc->GetDrawingPage()->GetLast();
                 ListOfObjects followingElements;
-                m_doc->GetDrawingPage()->FindAllDescendantBetween(&followingElements, &ic, nextSyllable, endElement);
+                m_doc->GetDrawingPage()->FindAllDescendantsBetween(&followingElements, &ic, nextSyllable, endElement);
 
                 for (Object *iter : followingElements) {
                     iter->GetPitchInterface()->AdjustPitchForNewClef(
@@ -1398,7 +1398,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
         return false;
     }
 
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(element);
     Object *parent = element->GetParent();
     assert(parent);
@@ -1473,7 +1473,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
             endElement = (nextSyllable) ? nextSyllable : m_doc->GetDrawingPage()->GetLast();
         }
         ListOfObjects targetedElements;
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&targetedElements, &ic, clef, endElement);
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&targetedElements, &ic, clef, endElement);
 
         Clef *precedingClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&cc, clef));
         precedingClef = (precedingClef != NULL) ? precedingClef : layer->GetCurrentClef();
@@ -1523,7 +1523,7 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
     }
 
     Page *page = m_doc->GetDrawingPage();
-    Object *obj = page->FindDescendantByUuid(elementId);
+    Object *obj = page->FindDescendantByID(elementId);
     if (obj == NULL || !obj->Is(CLEF)) {
         LogError("This action can only be done on clefs!");
         m_infoObject.import("status", "FAILURE");
@@ -1571,7 +1571,7 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
 
     ClassIdComparison equalsNcs(NC);
     ListOfObjects ncs;
-    page->FindAllDescendantBetween(&ncs, &equalsNcs, clef, nextClef);
+    page->FindAllDescendantsBetween(&ncs, &equalsNcs, clef, nextClef);
 
     std::for_each(ncs.begin(), ncs.end(), [&](Object *ncObj) {
         Nc *nc = dynamic_cast<Nc *>(ncObj);
@@ -2084,7 +2084,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
                 std::string linkedID = (li->HasPrecedes() ? li->GetPrecedes() : li->GetFollows());
                 if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
                 Syllable *linkedSyllable
-                    = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByUuid(linkedID));
+                    = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(linkedID));
                 if (linkedSyllable != NULL) {
                     if (linkedSyllable->HasPrecedes()) linkedSyllable->SetPrecedes("");
                     if (linkedSyllable->HasFollows()) linkedSyllable->SetFollows("");
@@ -2303,7 +2303,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
                 else {
                     resultId1 = m_infoObject.get<jsonxx::String>("uuid");
-                    par = m_doc->GetDrawingPage()->FindDescendantByUuid(resultId1);
+                    par = m_doc->GetDrawingPage()->FindDescendantByID(resultId1);
                 }
 
                 // link resulting syllables
@@ -2741,7 +2741,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     }
 
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *el = m_doc->GetDrawingPage()->FindDescendantByUuid(*it);
+        Object *el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
 
         // Check for ligatures and toggle them before ungrouping
         // only if the ligature is the entire selection
@@ -3025,10 +3025,10 @@ bool EditorToolkitNeume::SplitNeume(std::string neumeId, std::string ncId)
     jsonxx::Array uuidArray;
 
     // target nc
-    Object *elNc = m_doc->GetDrawingPage()->FindDescendantByUuid(ncId);
+    Object *elNc = m_doc->GetDrawingPage()->FindDescendantByID(ncId);
 
     // neume: first parent
-    Object *fparent = m_doc->GetDrawingPage()->FindDescendantByUuid(neumeId);
+    Object *fparent = m_doc->GetDrawingPage()->FindDescendantByID(neumeId);
     assert(fparent);
     uuidArray << fparent->GetID();
 
@@ -3446,7 +3446,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
 
         nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&oldPitchChildren, &ic, clef,
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&oldPitchChildren, &ic, clef,
             (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
         PitchInterface *pi;
@@ -3477,7 +3477,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
             previousClefAfter = layer->GetCurrentClef();
         }
         Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(
             &newPitchChildren, &ic, clef, (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = newPitchChildren.begin(); it != newPitchChildren.end(); ++it) {
@@ -3526,7 +3526,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
         return false;
     }
 
-    Object *element = m_doc->GetDrawingPage()->FindDescendantByUuid(elementId);
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(element);
     if (element == NULL) {
         LogError("No element exists with ID '%s'.", elementId.c_str());
@@ -3545,7 +3545,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
         return false;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByUuid(staffId));
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindDescendantByID(staffId));
 
     if (!staff) {
         LogError("Could not find any staves. This should not happen");
@@ -3616,7 +3616,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
 
         nextClefBefore = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
 
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(&oldPitchChildren, &ic, clef,
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(&oldPitchChildren, &ic, clef,
             (nextClefBefore != NULL) ? nextClefBefore : m_doc->GetDrawingPage()->GetLast());
 
         PitchInterface *pi;
@@ -3647,7 +3647,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
             previousClefAfter = layer->GetCurrentClef();
         }
         Clef *nextClefAfter = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindNextChild(&cic, element));
-        m_doc->GetDrawingPage()->FindAllDescendantBetween(
+        m_doc->GetDrawingPage()->FindAllDescendantsBetween(
             &newPitchChildren, &ic, clef, (nextClefAfter != NULL) ? nextClefAfter : m_doc->GetDrawingPage()->GetLast());
 
         for (auto it = newPitchChildren.begin(); it != newPitchChildren.end(); ++it) {
@@ -4027,7 +4027,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
-        obj->FindAllDescendantByComparison(&pitchedChildren, &ic);
+        obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
             LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetID().c_str());
