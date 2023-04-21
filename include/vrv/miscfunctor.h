@@ -79,6 +79,19 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Set the classes to exclude
+     */
+    void ExcludeClasses(const std::vector<ClassId> &excludeClasses) { m_excludeClasses = excludeClasses; }
+
+    /*
+     * Get the minimum left and maximum right
+     */
+    ///@{
+    int GetMinLeft() const { return m_minLeft; }
+    int GetMaxRight() const { return m_maxRight; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

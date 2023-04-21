@@ -254,29 +254,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// GetAlignmentLeftRightParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the min left
- * member 1: the max right
- **/
-
-class GetAlignmentLeftRightParams : public FunctorParams {
-public:
-    GetAlignmentLeftRightParams(Functor *functor)
-    {
-        m_minLeft = -VRV_UNSET;
-        m_maxRight = VRV_UNSET;
-        m_functor = functor;
-    }
-    int m_minLeft;
-    int m_maxRight;
-    std::vector<ClassId> m_excludeClasses;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // InitMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 

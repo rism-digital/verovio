@@ -693,19 +693,6 @@ public:
     virtual int InitProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * @name Functors for finding objects
-     */
-    ///@{
-
-    /**
-     * Retrieve the minimum left and maximum right for an alignment.
-     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
-     */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
-
-    ///@}
-
-    /**
      * @name Functors for generating MIDI output.
      */
     ///@{

@@ -1788,26 +1788,6 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
-{
-    GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-
-    if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
-
-    if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
-
-    int refLeft = this->GetSelfLeft();
-    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
-
-    int refRight = this->GetSelfRight();
-    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::GenerateFeatures(FunctorParams *functorParams)
 {
     GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
