@@ -706,18 +706,6 @@ public:
     ///@}
 
     /**
-     * @name Functors for aligning the pages.
-     */
-    ///@{
-
-    /**
-     * Apply the Pixel Per Unit factor of the page to its elements.
-     */
-    virtual int ApplyPPUFactor(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
      * @name Functors for generating MIDI output.
      */
     ///@{

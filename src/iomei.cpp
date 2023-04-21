@@ -54,7 +54,6 @@
 #include "findfunctor.h"
 #include "fing.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "gliss.h"
 #include "gracegrp.h"
 #include "graphic.h"
@@ -80,6 +79,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
+#include "miscfunctor.h"
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -4073,9 +4073,8 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     bool success = this->ReadPageChildren(vrvPage, page);
 
     if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
-        ApplyPPUFactorParams applyPPUFactorParams;
-        Functor applyPPUFactor(&Object::ApplyPPUFactor);
-        vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
+        ApplyPPUFactorFunctor applyPPUFactor;
+        vrvPage->Process(applyPPUFactor);
     }
 
     if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {

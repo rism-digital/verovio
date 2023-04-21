@@ -791,20 +791,4 @@ FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageEnd(this);
 }
 
-int Page::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    params->m_page = this;
-    m_pageWidth /= params->m_page->GetPPUFactor();
-    m_pageHeight /= params->m_page->GetPPUFactor();
-    m_pageMarginBottom /= params->m_page->GetPPUFactor();
-    m_pageMarginLeft /= params->m_page->GetPPUFactor();
-    m_pageMarginRight /= params->m_page->GetPPUFactor();
-    m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

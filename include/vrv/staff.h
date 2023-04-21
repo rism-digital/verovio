@@ -196,11 +196,6 @@ public:
     ///@}
 
     /**
-     * See Object::ApplyPPUFactor
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{

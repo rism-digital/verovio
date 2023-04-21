@@ -1103,18 +1103,6 @@ FunctorCode LayerElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitLayerElementEnd(this);
 }
 
-int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElement *> &otherElements,
     bool areDotsAdjusted, bool &isUnison, bool &stemSameas)
 {

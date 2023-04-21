@@ -728,17 +728,6 @@ FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeasureEnd(this);
 }
 
-int Measure::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-    if (m_xAbs2 != VRV_UNSET) m_xAbs2 /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::InitMIDI(FunctorParams *functorParams)
 {
     InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);

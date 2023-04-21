@@ -165,11 +165,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * Apply the Pixel Per Unit factor of the page to its elements.
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
 private:
     /**
      * Adjust the horizontal position of the syl processing verse by verse

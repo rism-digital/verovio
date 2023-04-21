@@ -504,19 +504,6 @@ FunctorCode System::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemEnd(this);
 }
 
-int System::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-    if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
-    m_systemLeftMar *= params->m_page->GetPPUFactor();
-    m_systemRightMar *= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int System::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
