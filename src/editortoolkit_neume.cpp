@@ -1053,7 +1053,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUly(uly);
         zone->SetLrx(ulx + staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
         zone->SetLry(uly + staffSize / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        clef->SetZone(zone);
+        clef->AttachZone(zone);
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
@@ -1143,7 +1143,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUlx(ulx);
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
-        accid->SetZone(zone);
+        accid->AttachZone(zone);
         layer->AddChild(accid);
 
         const int noteHeight
@@ -1199,7 +1199,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetUlx(ulx);
         Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
         surface->AddChild(zone);
-        divLine->SetZone(zone);
+        divLine->AttachZone(zone);
         layer->AddChild(divLine);
 
         const int noteHeight
@@ -2772,7 +2772,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
                         / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
-                    if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
+                    if (AttModule::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
                     int ligUlx = firstNc->GetZone()->GetUlx();
                     int ligUly = firstNc->GetZone()->GetUly();
@@ -2787,10 +2787,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     Zone *origZoneUuid = secondNc->GetZone();
                     surface->DeleteChild(origZoneUuid);
 
-                    secondNc->SetZone(zone);
+                    secondNc->AttachZone(zone);
                     // secondNc->ResetFacsimile();
 
-                    if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
+                    if (AttModule::SetNeumes(secondNc, "ligated", "false")) success2 = true;
                     if (success1 && success2) {
                         ligCount = 0;
                         firstNc = NULL;
@@ -2965,7 +2965,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     assert(m_doc->GetFacsimile());
                     FacsimileInterface *fi = syl->GetFacsimileInterface();
                     assert(fi);
-                    fi->SetZone(zone);
+                    fi->AttachZone(zone);
 
                     // syl->ResetFacsimile();
                     // syl->SetFacs(zone->GetID());
@@ -3246,7 +3246,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     Zone *zone = new Zone();
     // set ligature to false and update zone of second Nc
     if (isLigature) {
-        if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
+        if (AttModule::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         int ligUlx = firstNc->GetZone()->GetUlx();
         int ligUly = firstNc->GetZone()->GetUly();
@@ -3272,7 +3272,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     }
     // set ligature to true and update zones to be the same
     else if (!isLigature) {
-        if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
+        if (AttModule::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
         zone->SetUly(firstNc->GetZone()->GetUly());
