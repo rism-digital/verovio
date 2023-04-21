@@ -25,6 +25,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
+#include "miscfunctor.h"
 #include "page.h"
 #include "pages.h"
 #include "pedal.h"
@@ -431,16 +432,16 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
     assert(targetSystem);
 
     // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
     // Checking just in case
-    if (initProcessingListsParams.m_layerTree.child.empty()) return;
+    if (layerTree.child.empty()) return;
 
-    ConvertToCastOffMensuralFunctor convertToCastOffMensural(doc, targetSystem, &initProcessingListsParams.m_layerTree);
+    ConvertToCastOffMensuralFunctor convertToCastOffMensural(doc, targetSystem, &layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
-    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
+    for (const auto &staves : layerTree.child) {
         convertToCastOffMensural.AddStaffN(staves.first);
     }
     this->Process(convertToCastOffMensural);
@@ -449,20 +450,20 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
 void System::ConvertToUnCastOffMensuralSystem()
 {
     // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
     // Checking just in case
-    if (initProcessingListsParams.m_layerTree.child.empty()) return;
+    if (layerTree.child.empty()) return;
 
     Filters filters;
     ConvertToUnCastOffMensuralFunctor convertToUnCastOffMensural;
     convertToUnCastOffMensural.SetFilters(&filters);
 
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
-        for (auto const &layers : staves.second.child) {
+    for (const auto &staves : layerTree.child) {
+        for (const auto &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
             AttNIntegerComparison matchLayer(LAYER, layers.first);

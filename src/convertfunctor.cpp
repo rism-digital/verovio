@@ -150,7 +150,8 @@ FunctorCode ConvertToPageBasedFunctor::VisitSystemElement(SystemElement *systemE
 // ConvertToCastOffMensuralFunctor
 //----------------------------------------------------------------------------
 
-ConvertToCastOffMensuralFunctor::ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem, IntTree *layerTree)
+ConvertToCastOffMensuralFunctor::ConvertToCastOffMensuralFunctor(
+    Doc *doc, System *targetSystem, const IntTree *layerTree)
     : DocFunctor(doc)
 {
     m_contentLayer = NULL;

@@ -36,6 +36,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "miscfunctor.h"
 #include "mnum.h"
 #include "mrest.h"
 #include "mrpt.h"
@@ -398,29 +399,25 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     this->Process(&initMIDI, &initMIDIParams);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
-    InitProcessingListsParams initProcessingListsParams;
-    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
-    // StaffN_LayerN_VerseN_t staffLayerVerseTree;
-    // params.push_back(&staffLayerVerseTree);
+    InitProcessingListsFunctor initProcessingLists;
 
-    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
+    IntTree_t::const_iterator staves;
+    IntTree_t::const_iterator layers;
 
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiChannel = 0;
     int midiTrack = 1;
     Filters filters;
-    for (staves = initProcessingListsParams.m_layerTree.child.begin();
-         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
 
         ScoreDef *currentScoreDef = this->GetCurrentScoreDef();
         int transSemi = 0;
@@ -702,29 +699,26 @@ void Doc::PrepareData()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    InitProcessingListsParams initProcessingListsParams;
-    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareData)
-    // StaffN_LayerN_VerseN_t staffLayerVerseTree;
-    // params.push_back(&staffLayerVerseTree);
+    InitProcessingListsFunctor initProcessingLists;
 
     // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
+    const IntTree &verseTree = initProcessingLists.GetVerseTree();
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use an array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
-    IntTree_t::iterator verses;
+    IntTree_t::const_iterator staves;
+    IntTree_t::const_iterator layers;
+    IntTree_t::const_iterator verses;
 
     /************ Resolve some pointers by layer ************/
 
     Filters filters;
-    for (staves = initProcessingListsParams.m_layerTree.child.begin();
-         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.Clear();
             // Create ad comparison object for each type / @n
@@ -746,8 +740,7 @@ void Doc::PrepareData()
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
         prepareDelayedTurns.FillMode(false);
-        for (staves = initProcessingListsParams.m_layerTree.child.begin();
-             staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n
@@ -766,8 +759,7 @@ void Doc::PrepareData()
     /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = initProcessingListsParams.m_verseTree.child.begin();
-         staves != initProcessingListsParams.m_verseTree.child.end(); ++staves) {
+    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
@@ -806,8 +798,7 @@ void Doc::PrepareData()
     /************ Resolve mRpt ************/
 
     // Process by staff for matching mRpt elements and setting the drawing number
-    for (staves = initProcessingListsParams.m_layerTree.child.begin();
-         staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.Clear();
             // Create ad comparison object for each type / @n
@@ -851,32 +842,6 @@ void Doc::PrepareData()
 
     PrepareLayerElementPartsFunctor prepareLayerElementParts;
     this->Process(prepareLayerElementParts);
-
-    /*
-    // Alternate solution with StaffN_LayerN_VerseN_t
-    StaffN_LayerN_VerseN_t::iterator staves;
-    LayerN_VerserN_t::iterator layers;
-    VerseN_t::iterator verses;
-    std::vector<AttComparison*> filters;
-    for (staves = staffLayerVerseTree.begin(); staves != staffLayerVerseTree.end(); ++staves) {
-        for (layers = staves->second.begin(); layers != staves->second.end(); ++layers) {
-            for (verses= layers->second.begin(); verses != layers->second.end(); ++verses) {
-                std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                filters.clear();
-                AttNIntegerComparison matchStaff(&typeid(Staff), staves->first);
-                AttNIntegerComparison matchLayer(&typeid(Layer), layers->first);
-                AttNIntegerComparison matchVerse(&typeid(Verse), verses->first);
-                filters.push_back(&matchStaff);
-                filters.push_back(&matchLayer);
-                filters.push_back(&matchVerse);
-
-                PrepareLyricsFunctor prepareLyrics;
-                prepareLyrics.SetFilters(&filters);
-                this->Process(prepareLyrics);
-            }
-        }
-    }
-    */
 
     /************ Add default syl for syllables (if applicable) ************/
     ListOfObjects syllables = this->FindAllDescendantsByType(SYLLABLE);
@@ -1366,22 +1331,21 @@ void Doc::ConvertMarkupDoc(bool permanent)
 
         // We need to populate processing lists for processing the document by Layer (for matching @tie) and
         // by Verse (for matching syllable connectors)
-        InitProcessingListsParams initProcessingListsParams;
+        InitProcessingListsFunctor initProcessingLists;
 
         // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
-        Functor initProcessingLists(&Object::InitProcessingLists);
-        this->Process(&initProcessingLists, &initProcessingListsParams);
+        this->Process(initProcessingLists);
+        const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-        IntTree_t::iterator staves;
-        IntTree_t::iterator layers;
+        IntTree_t::const_iterator staves;
+        IntTree_t::const_iterator layers;
 
         /************ Resolve ties ************/
 
         // Process by layer for matching @tie attribute - we process notes and chords, looking at
         // GetTie values and pitch and oct for matching notes
         Filters filters;
-        for (staves = initProcessingListsParams.m_layerTree.child.begin();
-             staves != initProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.Clear();
                 // Create ad comparison object for each type / @n

@@ -688,11 +688,6 @@ public:
     //----------//
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
-     */
-    virtual int InitProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * @name Functors for generating MIDI output.
      */
     ///@{

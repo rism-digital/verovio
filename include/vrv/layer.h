@@ -247,11 +247,6 @@ public:
     ///@}
 
     /**
-     * See Object::InitProcessingLists
-     */
-    int InitProcessingLists(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{

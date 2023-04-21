@@ -80,7 +80,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem, IntTree *layerTree);
+    ConvertToCastOffMensuralFunctor(Doc *doc, System *targetSystem, const IntTree *layerTree);
     virtual ~ConvertToCastOffMensuralFunctor() = default;
     ///@}
 
@@ -133,7 +133,7 @@ private:
     // The total number of segments (previous sections)
     int m_segmentTotal;
     // An IntTree for processing by layer
-    IntTree *m_layerTree;
+    const IntTree *m_layerTree;
 };
 
 //----------------------------------------------------------------------------

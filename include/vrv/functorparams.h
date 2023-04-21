@@ -315,22 +315,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// InitProcessingListsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the IntTree* for staff/layer/verse
- * member 1: the IntTree* for staff/layer
- **/
-
-class InitProcessingListsParams : public FunctorParams {
-public:
-    InitProcessingListsParams() {}
-    IntTree m_verseTree;
-    IntTree m_layerTree;
-};
-
-//----------------------------------------------------------------------------
 // InitMIDIParams
 //----------------------------------------------------------------------------
 
