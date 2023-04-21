@@ -125,4 +125,26 @@ FunctorCode InitProcessingListsFunctor::VisitVerse(const Verse *verse)
     return FUNCTOR_SIBLINGS;
 }
 
+//----------------------------------------------------------------------------
+// ReorderByXPosFunctor
+//----------------------------------------------------------------------------
+
+ReorderByXPosFunctor::ReorderByXPosFunctor() {}
+
+FunctorCode ReorderByXPosFunctor::VisitObject(Object *object)
+{
+    if (object->GetFacsimileInterface()) {
+        if (object->GetFacsimileInterface()->HasFacs()) {
+            return FUNCTOR_SIBLINGS; // This would have already been reordered.
+        }
+    }
+
+    ArrayOfObjects &children = object->GetChildrenForModification();
+    std::stable_sort(children.begin(), children.end(), Object::sortByUlx);
+
+    object->Modify();
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

@@ -163,6 +163,45 @@ private:
     IntTree m_verseTree;
 };
 
+//----------------------------------------------------------------------------
+// ReorderByXPosFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class reorders elements by x-position.
+ */
+class ReorderByXPosFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ReorderByXPosFunctor();
+    virtual ~ReorderByXPosFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_MISCFUNCTOR_H__

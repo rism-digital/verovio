@@ -631,7 +631,7 @@ public:
         std::stable_sort(m_children.begin(), m_children.end(), comp);
     }
 
-    virtual void ReorderByXPos();
+    void ReorderByXPos();
 
     Object *FindNextChild(Comparison *comp, Object *start);
 
