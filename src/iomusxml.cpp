@@ -626,12 +626,13 @@ std::string MusicXmlInput::GetWordsOrDynamicsText(const pugi::xml_node node) con
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : node.children()) {
             if (std::string(xmlDynamPart.name()) == "other-dynamics") {
+                if (xmlDynamPart != node.first_child()) dynamStr += " ";
                 dynamStr += xmlDynamPart.text().as_string();
+                if (xmlDynamPart != node.last_child()) dynamStr += " ";
             }
             else {
                 dynamStr += xmlDynamPart.name();
             }
-            if (xmlDynamPart != node.last_child()) dynamStr += " ";
         }
         return dynamStr;
     }
@@ -652,9 +653,6 @@ void MusicXmlInput::TextRendition(const pugi::xpath_node_set words, ControlEleme
         std::string textStr = GetWordsOrDynamicsText(textNode);
         std::string textColor = textNode.attribute("color").as_string();
         Object *textParent = element;
-        if (it != words.begin()) {
-            textParent->AddChild(new Lb());
-        }
         if (textNode.attribute("xml:lang") || textNode.attribute("xml:space") || textNode.attribute("color")
             || textNode.attribute("halign") || textNode.attribute("font-family") || textNode.attribute("font-style")
             || textNode.attribute("font-weight") || textNode.attribute("enclosure")) {
@@ -2248,7 +2246,8 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 delete hairpin;
                 return;
             }
-            // hairpin->SetLform(hairpin->AttLineRendBase::StrToLineform(wedge.node().attribute("line-type").as_string()));
+            hairpin->SetLform(
+                hairpin->AttLineRendBase::StrToLineform(wedge->node().attribute("line-type").as_string()));
             if (wedge->node().attribute("niente")) {
                 hairpin->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
             }
