@@ -700,7 +700,7 @@ void View::DrawCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *sta
 
         this->DrawSmuflCode(dc, accidX, accidY, accidGlyph, staffSize, true, true);
     }
-    
+
     // Draw dots and stem
     const int dotsX = x + width + unit;
     DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, false);
