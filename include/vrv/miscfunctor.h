@@ -112,6 +112,57 @@ private:
     std::vector<ClassId> m_excludeClasses;
 };
 
+//----------------------------------------------------------------------------
+// InitProcessingListsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class builds a tree of ints (IntTree) with the staff/layer/verse numbers.
+ */
+class InitProcessingListsFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    InitProcessingListsFunctor();
+    virtual ~InitProcessingListsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Getter for the int trees
+     */
+    ///@{
+    const IntTree &GetLayerTree() const { return m_layerTree; }
+    const IntTree &GetVerseTree() const { return m_verseTree; }
+    ///@}
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayer(const Layer *layer) override;
+    FunctorCode VisitVerse(const Verse *verse) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The IntTree for staff/layer
+    IntTree m_layerTree;
+    // The IntTree for staff/layer/verse
+    IntTree m_verseTree;
+};
+
 } // namespace vrv
 
 #endif // __VRV_MISCFUNCTOR_H__

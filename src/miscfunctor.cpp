@@ -9,9 +9,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "layer.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "verse.h"
 
 //----------------------------------------------------------------------------
 
@@ -95,6 +97,32 @@ FunctorCode GetAlignmentLeftRightFunctor::VisitObject(const Object *object)
     m_maxRight = std::max(m_maxRight, object->GetSelfRight());
 
     return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// InitProcessingListsFunctor
+//----------------------------------------------------------------------------
+
+InitProcessingListsFunctor::InitProcessingListsFunctor() {}
+
+FunctorCode InitProcessingListsFunctor::VisitLayer(const Layer *layer)
+{
+    const Staff *staff = vrv_cast<const Staff *>(layer->GetFirstAncestor(STAFF));
+    assert(staff);
+    m_layerTree.child[staff->GetN()].child[layer->GetN()];
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitProcessingListsFunctor::VisitVerse(const Verse *verse)
+{
+    const Staff *staff = verse->GetAncestorStaff();
+    const Layer *layer = vrv_cast<const Layer *>(verse->GetFirstAncestor(LAYER));
+    assert(layer);
+
+    m_verseTree.child[staff->GetN()].child[layer->GetN()].child[verse->GetN()];
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
