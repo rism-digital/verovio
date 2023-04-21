@@ -56,6 +56,49 @@ private:
     Page *m_page;
 };
 
+//----------------------------------------------------------------------------
+// GetAlignmentLeftRightFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class retrieves the minimum left and maximum right for an alignment.
+ */
+class GetAlignmentLeftRightFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    GetAlignmentLeftRightFunctor();
+    virtual ~GetAlignmentLeftRightFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The min left and right
+    int m_minLeft;
+    int m_maxRight;
+    // The classes which are ignored
+    std::vector<ClassId> m_excludeClasses;
+};
+
 } // namespace vrv
 
 #endif // __VRV_MISCFUNCTOR_H__

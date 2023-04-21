@@ -73,4 +73,28 @@ FunctorCode ApplyPPUFactorFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// GetAlignmentLeftRightFunctor
+//----------------------------------------------------------------------------
+
+GetAlignmentLeftRightFunctor::GetAlignmentLeftRightFunctor()
+{
+    m_minLeft = -VRV_UNSET;
+    m_maxRight = VRV_UNSET;
+}
+
+FunctorCode GetAlignmentLeftRightFunctor::VisitObject(const Object *object)
+{
+    if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
+
+    if (!object->HasSelfBB() || object->HasEmptyBB()) return FUNCTOR_CONTINUE;
+
+    if (object->Is(m_excludeClasses)) return FUNCTOR_CONTINUE;
+
+    m_minLeft = std::min(m_minLeft, object->GetSelfLeft());
+    m_maxRight = std::max(m_maxRight, object->GetSelfRight());
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
