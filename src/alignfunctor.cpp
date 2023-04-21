@@ -296,6 +296,10 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // The time will be reset to 0.0 when starting a new layer anyway
         if (layerElement->Is(TIMESTAMP_ATTR)) {
             m_time = duration;
+            // When a tstamp is pointing to the end of a measure, then use the right barline alignment
+            if (m_time == this->m_measureAligner->GetRightAlignment()->GetTime()) {
+                type = ALIGNMENT_MEASURE_RIGHT_BARLINE;
+            }
         }
         else {
             m_measureAligner->SetMaxTime(m_time + duration);
