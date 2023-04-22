@@ -318,6 +318,9 @@ public:
     std::string CutoutCutoutToStr(cutout_CUTOUT data) const;
     cutout_CUTOUT StrToCutoutCutout(const std::string &value, bool logWarning = true) const;
 
+    std::string DivLineLogFormToStr(divLineLog_FORM data) const;
+    divLineLog_FORM StrToDivLineLogForm(const std::string &value, bool logWarning = true) const;
+
     std::string DotLogFormToStr(dotLog_FORM data) const;
     dotLog_FORM StrToDotLogForm(const std::string &value, bool logWarning = true) const;
 

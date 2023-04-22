@@ -1591,6 +1591,14 @@ namespace vrv {
 
 bool AttModule::SetHeader(Object *element, const std::string &attrType, const std::string &attrValue)
 {
+    if (element->HasAttClass(ATT_ADLIBITUM)) {
+        AttAdlibitum *att = dynamic_cast<AttAdlibitum *>(element);
+        assert(att);
+        if (attrType == "adlib") {
+            att->SetAdlib(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         AttBifoliumSurfaces *att = dynamic_cast<AttBifoliumSurfaces *>(element);
         assert(att);
@@ -1623,6 +1631,22 @@ bool AttModule::SetHeader(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_PERFRES)) {
+        AttPerfRes *att = dynamic_cast<AttPerfRes *>(element);
+        assert(att);
+        if (attrType == "solo") {
+            att->SetSolo(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRESBASIC)) {
+        AttPerfResBasic *att = dynamic_cast<AttPerfResBasic *>(element);
+        assert(att);
+        if (attrType == "count") {
+            att->SetCount(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
         AttRecordType *att = dynamic_cast<AttRecordType *>(element);
         assert(att);
@@ -1645,6 +1669,13 @@ bool AttModule::SetHeader(Object *element, const std::string &attrType, const st
 
 void AttModule::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_ADLIBITUM)) {
+        const AttAdlibitum *att = dynamic_cast<const AttAdlibitum *>(element);
+        assert(att);
+        if (att->HasAdlib()) {
+            attributes->push_back({ "adlib", att->BooleanToStr(att->GetAdlib()) });
+        }
+    }
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         const AttBifoliumSurfaces *att = dynamic_cast<const AttBifoliumSurfaces *>(element);
         assert(att);
@@ -1669,6 +1700,20 @@ void AttModule::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasVerso()) {
             attributes->push_back({ "verso", att->StrToStr(att->GetVerso()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRES)) {
+        const AttPerfRes *att = dynamic_cast<const AttPerfRes *>(element);
+        assert(att);
+        if (att->HasSolo()) {
+            attributes->push_back({ "solo", att->BooleanToStr(att->GetSolo()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRESBASIC)) {
+        const AttPerfResBasic *att = dynamic_cast<const AttPerfResBasic *>(element);
+        assert(att);
+        if (att->HasCount()) {
+            attributes->push_back({ "count", att->IntToStr(att->GetCount()) });
         }
     }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
@@ -2062,6 +2107,14 @@ namespace vrv {
 
 bool AttModule::SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue)
 {
+    if (element->HasAttClass(ATT_DIVLINELOG)) {
+        AttDivLineLog *att = dynamic_cast<AttDivLineLog *>(element);
+        assert(att);
+        if (attrType == "form") {
+            att->SetForm(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_NCLOG)) {
         AttNcLog *att = dynamic_cast<AttNcLog *>(element);
         assert(att);
@@ -2116,6 +2169,13 @@ bool AttModule::SetNeumes(Object *element, const std::string &attrType, const st
 
 void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_DIVLINELOG)) {
+        const AttDivLineLog *att = dynamic_cast<const AttDivLineLog *>(element);
+        assert(att);
+        if (att->HasForm()) {
+            attributes->push_back({ "form", att->StrToStr(att->GetForm()) });
+        }
+    }
     if (element->HasAttClass(ATT_NCLOG)) {
         const AttNcLog *att = dynamic_cast<const AttNcLog *>(element);
         assert(att);
