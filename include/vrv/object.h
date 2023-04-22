@@ -747,11 +747,6 @@ public:
     ///@}
 
     /**
-     * Reorder elements by x-position.
-     */
-    virtual int ReorderByXPos(FunctorParams *);
-
-    /**
      * Transpose the content.
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }

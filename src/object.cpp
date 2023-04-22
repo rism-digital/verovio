@@ -37,6 +37,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "miscfunctor.h"
 #include "nc.h"
 #include "note.h"
 #include "page.h"
@@ -1319,9 +1320,8 @@ void Object::SaveObject(Output *output, bool basic)
 
 void Object::ReorderByXPos()
 {
-    ReorderByXPosParams params;
-    Functor reorder(&Object::ReorderByXPos);
-    this->Process(&reorder, &params);
+    ReorderByXPosFunctor reorderByXPos;
+    this->Process(reorderByXPos);
 }
 
 Object *Object::FindNextChild(Comparison *comp, Object *start)
@@ -1795,19 +1795,6 @@ int Object::GenerateFeatures(FunctorParams *functorParams)
 
     params->m_extractor->Extract(this, params);
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::ReorderByXPos(FunctorParams *functorParams)
-{
-    if (this->GetFacsimileInterface() != NULL) {
-        if (this->GetFacsimileInterface()->HasFacs()) {
-            return FUNCTOR_SIBLINGS; // This would have already been reordered.
-        }
-    }
-
-    std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
-    this->Modify();
     return FUNCTOR_CONTINUE;
 }
 
