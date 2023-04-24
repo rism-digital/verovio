@@ -1028,7 +1028,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     chord->SetDrawingStem(currentStem);
 
     // Calculate chord clusters
-    chord->CalculateClusters();
+    if (!chord->HasCluster()) chord->CalculateClusters();
 
     // Also set the drawing stem object (or NULL) to all child notes
     const ListOfObjects &childList = chord->GetList(chord);
