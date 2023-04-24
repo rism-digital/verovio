@@ -301,6 +301,14 @@ public:
     double GetRealTimeOffsetMilliseconds(int repeat) const;
 
     /**
+     * Setter and getter for the current tempo
+     */
+    ///@{
+    void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
+    double GetCurrentTempo() const { return m_currentTempo; }
+    ///@}
+
+    /**
      * Return vector with tie endpoints for ties that start and end in current measure
      */
     std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
