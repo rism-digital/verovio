@@ -2772,7 +2772,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
                         / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
-                    if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
+                    if (AttModule::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
                     int ligUlx = firstNc->GetZone()->GetUlx();
                     int ligUly = firstNc->GetZone()->GetUly();
@@ -2790,7 +2790,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     secondNc->AttachZone(zone);
                     // secondNc->ResetFacsimile();
 
-                    if (Att::SetNeumes(secondNc, "ligated", "false")) success2 = true;
+                    if (AttModule::SetNeumes(secondNc, "ligated", "false")) success2 = true;
                     if (success1 && success2) {
                         ligCount = 0;
                         firstNc = NULL;
@@ -3246,7 +3246,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     Zone *zone = new Zone();
     // set ligature to false and update zone of second Nc
     if (isLigature) {
-        if (Att::SetNeumes(firstNc, "ligated", "false")) success1 = true;
+        if (AttModule::SetNeumes(firstNc, "ligated", "false")) success1 = true;
 
         int ligUlx = firstNc->GetZone()->GetUlx();
         int ligUly = firstNc->GetZone()->GetUly();
@@ -3272,7 +3272,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     }
     // set ligature to true and update zones to be the same
     else if (!isLigature) {
-        if (Att::SetNeumes(firstNc, "ligated", "true")) success1 = true;
+        if (AttModule::SetNeumes(firstNc, "ligated", "true")) success1 = true;
 
         zone->SetUlx(firstNc->GetZone()->GetUlx());
         zone->SetUly(firstNc->GetZone()->GetUly());
