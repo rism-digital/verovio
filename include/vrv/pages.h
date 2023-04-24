@@ -32,16 +32,15 @@ public:
     ///@{
     Pages();
     virtual ~Pages();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pages"; }
-    virtual ClassId GetClassId() const { return PAGES; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Pages"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -52,6 +51,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

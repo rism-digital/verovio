@@ -9,6 +9,7 @@
 #define __VRV_TEXT_DIR_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -22,7 +23,7 @@ namespace vrv {
  * as <dir>, <tempo>, or <dynam>
  * It is not an abstract class but should not be instanciated directly.
  */
-class TextDirInterface : public Interface, public AttPlacement {
+class TextDirInterface : public Interface, public AttPlacementRelStaff {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -31,9 +32,19 @@ public:
     ///@{
     TextDirInterface();
     virtual ~TextDirInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TEXT_DIR; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_TEXT_DIR; }
     ///@}
+
+    /**
+     * Return the number of lines in the text object by counting <lb> children
+     */
+    int GetNumberOfLines(const Object *object) const;
+
+    /**
+     * Check whether one of the children has hAlign attribute set to `alignment` value
+     */
+    bool AreChildrenAlignedTo(const Object *object, data_HORIZONTALALIGNMENT alignment) const;
 
 private:
     //

@@ -15,7 +15,6 @@
 
 namespace vrv {
 
-class AdjustSylSpacingParams;
 class Note;
 class TextElement;
 
@@ -26,7 +25,7 @@ class TextElement;
 /**
  * Syl is a TimeSpanningInterface for managing syllable connectors. This means
  * that TimeSpanningInterface attributes will not be read from the MEI but
- * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
+ * pointers will be populated in the PrepareLyricsFunctor.
  */
 
 class Syl : public LayerElement,
@@ -43,28 +42,40 @@ public:
     ///@{
     Syl();
     virtual ~Syl();
-    virtual Object *Clone() const { return new Syl(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Syl"; }
-    virtual ClassId GetClassId() const { return SYL; }
+    Object *Clone() const override { return new Syl(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Syl"; }
     ///@}
 
     /** Override the method since it is align to the staff */
-    virtual bool IsRelativeToStaff() const { return true; }
+    bool IsRelativeToStaff() const override { return true; }
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Calculate the hyphen length using the text font
+     */
+    int CalcHyphenLength(Doc *doc, int staffSize);
 
     /**
      * Calculate the spacing needed depending on the @worpos and @con
@@ -74,24 +85,33 @@ public:
     int GetDrawingWidth() const;
     int GetDrawingHeight() const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Adjust proportionally to the lyric size
+     */
+    static void AdjustToLyricSize(const Doc *doc, int &value);
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareLyrics
+     * Interface for class functor visitation
      */
-    virtual int PrepareLyrics(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
-     * See Object::FillStaffCurrentTimeSpanning
+     * See Object::GenerateMIDI
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
 
     /** Create a default zone for a syl based on syllable. */
     bool CreateDefaultZone(Doc *doc);

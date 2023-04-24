@@ -14,6 +14,9 @@
 
 namespace vrv {
 
+class Layer;
+class Staff;
+
 //----------------------------------------------------------------------------
 // MRest
 //----------------------------------------------------------------------------
@@ -23,6 +26,7 @@ namespace vrv {
  */
 class MRest : public LayerElement,
               public PositionInterface,
+              public AttColor,
               public AttCue,
               public AttFermataPresent,
               public AttVisibility {
@@ -34,37 +38,42 @@ public:
     ///@{
     MRest();
     virtual ~MRest();
-    virtual Object *Clone() const { return new MRest(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MRest"; }
-    virtual ClassId GetClassId() const { return MREST; }
+    Object *Clone() const override { return new MRest(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MRest"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    PositionInterface *GetPositionInterface() override { return vrv_cast<PositionInterface *>(this); }
+    const PositionInterface *GetPositionInterface() const override { return vrv_cast<const PositionInterface *>(this); }
     ///@}
+
+    /**
+     * Get the vertical location for mRest considering other layer elements
+     */
+    int GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const;
 
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::ConvertMarkupAnalytical
      */
-    virtual int ConvertMarkupAnalytical(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
 
 private:
     //

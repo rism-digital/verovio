@@ -5,15 +5,16 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "fig.h"
-
-//----------------------------------------------------------------------------
-
-#include <assert.h>
-
-//----------------------------------------------------------------------------
-
 #include "svg.h"
+
+//----------------------------------------------------------------------------
+
+#include <cassert>
+
+//----------------------------------------------------------------------------
+
+#include "fig.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -22,9 +23,11 @@ namespace vrv {
 // Svg
 //----------------------------------------------------------------------------
 
-Svg::Svg() : Object("fig-")
+static const ClassRegistrar<Svg> s_factory("svg", SVG);
+
+Svg::Svg() : Object(SVG, "svg-")
 {
-    Reset();
+    this->Reset();
 }
 
 Svg::~Svg() {}
@@ -54,6 +57,26 @@ int Svg::GetHeight() const
         return atoi(m_svg.first_child().attribute("height").value()) * DEFINITION_FACTOR;
     }
     return 0;
+}
+
+FunctorCode Svg::Accept(MutableFunctor &functor)
+{
+    return functor.VisitSvg(this);
+}
+
+FunctorCode Svg::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitSvg(this);
+}
+
+FunctorCode Svg::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitSvgEnd(this);
+}
+
+FunctorCode Svg::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitSvgEnd(this);
 }
 
 } // namespace vrv

@@ -41,17 +41,21 @@ public:
     ///@{
     StaffDef();
     virtual ~StaffDef();
-    virtual Object *Clone() const { return new StaffDef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffDef"; }
-    virtual ClassId GetClassId() const { return STAFFDEF; }
+    Object *Clone() const override { return new StaffDef(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "StaffDef"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Return an order for the given ClassId.
+     */
+    int GetInsertOrderFor(ClassId classId) const override;
 
     /**
      * @name Setter and getter of the drawing visible flag
@@ -61,19 +65,34 @@ public:
     void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
     ///@}
 
+    /**
+     * Return true if the label has layerDef with a label
+     */
+    bool HasLayerDefWithLabel() const;
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::ReplaceDrawingValuesInStaffDef
+     * Interface for class functor visitation
      */
-    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
-     * See Object::SetStaffDefRedrawFlags
+     * See Object::GenerateMIDI
      */
-    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
+    int GenerateMIDI(FunctorParams *functorParams) override;
+
+    /**
+     * See Object::Transpose
+     */
+    int Transpose(FunctorParams *functorParams) override;
 
 private:
     //

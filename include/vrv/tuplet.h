@@ -16,6 +16,7 @@
 namespace vrv {
 
 class Note;
+class TupletBracket;
 
 //----------------------------------------------------------------------------
 // Tuplet
@@ -35,89 +36,101 @@ public:
     ///@{
     Tuplet();
     virtual ~Tuplet();
-    virtual Object *Clone() const { return new Tuplet(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Tuplet"; }
-    virtual ClassId GetClassId() const { return TUPLET; }
+    Object *Clone() const override { return new Tuplet(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Tuplet"; }
     ///@}
 
     /**
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /**
      * Overwritten method for tuplet
      */
-    virtual void AddChild(Object *object);
+    void AddChild(Object *object) override;
 
     /**
-     * @name Setter and getter for darwing elements and position
+     * @name Setter and getter for drawing elements and position
      */
     ///@{
     LayerElement *GetDrawingLeft() { return m_drawingLeft; }
+    const LayerElement *GetDrawingLeft() const { return m_drawingLeft; }
     void SetDrawingLeft(LayerElement *drawingLeft) { m_drawingLeft = drawingLeft; }
     LayerElement *GetDrawingRight() { return m_drawingRight; }
+    const LayerElement *GetDrawingRight() const { return m_drawingRight; }
     void SetDrawingRight(LayerElement *drawingRight) { m_drawingRight = drawingRight; }
-    data_STAFFREL_basic GetDrawingBracketPos() { return m_drawingBracketPos; }
-    data_STAFFREL_basic GetDrawingNumPos() { return m_drawingNumPos; }
+    data_STAFFREL_basic GetDrawingBracketPos() const { return m_drawingBracketPos; }
+    void SetDrawingBracketPos(data_STAFFREL_basic bracketPos) { m_drawingBracketPos = bracketPos; }
+    data_STAFFREL_basic GetDrawingNumPos() const { return m_drawingNumPos; }
+    void SetDrawingNumPos(data_STAFFREL_basic numPos) { m_drawingNumPos = numPos; }
     ///@}
 
     /**
-     * @name Getter for the beam with which the bracket and / or the num is aligned.
+     * @name Setter and getter for the beam with which the bracket and / or the num is aligned.
      */
     ///@{
     Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
+    const Beam *GetBracketAlignedBeam() const { return m_bracketAlignedBeam; }
+    void SetBracketAlignedBeam(Beam *alignedBeam) { m_bracketAlignedBeam = alignedBeam; }
     Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
+    const Beam *GetNumAlignedBeam() const { return m_numAlignedBeam; }
+    void SetNumAlignedBeam(Beam *alignedBeam) { m_numAlignedBeam = alignedBeam; }
+    ///@}
+
+    /**
+     * @name Getter and setter for the inner slurs.
+     */
+    ///@{
+    const std::set<const FloatingCurvePositioner *> &GetInnerSlurs() const { return m_innerSlurs; }
+    void AddInnerSlur(const FloatingCurvePositioner *slur) { m_innerSlurs.insert(slur); }
+    void ResetInnerSlurs() { m_innerSlurs.clear(); }
     ///@}
 
     /**
      * Calculate the position of the bracket and the num looking at the stem direction or at the encoded values (if
      * any). Called in View::DrawTuplet the first time it is called (and not trough a dedicated CalcTuplet functor)
      */
-    void CalcDrawingBracketAndNumPos();
+    void CalcDrawingBracketAndNumPos(bool tupletNumHead);
 
     /**
      * Return the maximum and minimum X positions of the notes in the tuplets.
      * Look at flipped noteheads in chords.
      */
-    void GetDrawingLeftRightXRel(int &XRelLeft, int &XRelRight, Doc *doc);
+    void GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const;
+
+    /**
+     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
+     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
+     */
+    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
+
+    /**
+     * Check whether tuplet number has valid positioning staffwise
+     */
+    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareLayerElementParts
+     * Interface for class functor visitation
      */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustTupletsX
-     */
-    virtual int AdjustTupletsX(FunctorParams *);
-
-    /**
-     * See Object::AdjustTupletsY
-     */
-    virtual int AdjustTupletsY(FunctorParams *);
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int ResetDrawing(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     /**
      * Filter the flat list and keep only Note elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
     //
@@ -126,22 +139,24 @@ public:
 private:
     /**
      * The first Chord / Note / Rest in the tuplet.
-     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     * Set in Tuplet::GetDrawingLeftRightXRel from AdjustTupletsXFunctor.
      */
     LayerElement *m_drawingLeft;
     /**
      * The last Chord / Note / Rest in the tuplet.
-     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     * Set in Tuplet::GetDrawingLeftRightXRel from AdjustTupletsXFunctor.
      */
     LayerElement *m_drawingRight;
-    /** The calcultated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
+    /** The calculated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingBracketPos;
-    /** The calcultated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
+    /** The calculated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingNumPos;
-    /** The beam with which the bracket aligns (in any) set in Tuplet::AdjustTupletsX */
+    /** The beam with which the bracket aligns (if any) set in AdjustTupletsXFunctor */
     Beam *m_bracketAlignedBeam;
-    /** The beam with which the num aligns (in any) set in Tuplet::AdjustTupletsX */
+    /** The beam with which the num aligns (if any) set in AdjustTupletsXFunctor */
     Beam *m_numAlignedBeam;
+    /** The slurs avoided by the tuplet, set during drawing */
+    std::set<const FloatingCurvePositioner *> m_innerSlurs;
 };
 
 } // namespace vrv

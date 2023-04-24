@@ -28,14 +28,28 @@ public:
     ///@{
     PgHead2();
     virtual ~PgHead2();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "PgHead2"; }
-    virtual ClassId GetClassId() const { return PGHEAD2; }
+    void Reset() override;
+    std::string GetClassName() const override { return "PgHead2"; }
     ///@}
+
+    /**
+     * Overriden to get the appropriate margin
+     */
+    int GetTotalHeight(const Doc *doc) const override;
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

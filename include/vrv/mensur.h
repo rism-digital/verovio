@@ -29,7 +29,6 @@ class Mensur : public LayerElement,
                public AttCue,
                public AttDurationRatio,
                public AttMensuralShared,
-               public AttMensuralLog,
                public AttMensurVis,
                public AttSlashCount,
                public AttStaffLoc {
@@ -41,40 +40,48 @@ public:
     ///@{
     Mensur();
     virtual ~Mensur();
-    virtual Object *Clone() const { return new Mensur(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Mensur"; }
-    virtual ClassId GetClassId() const { return MENSUR; }
+    Object *Clone() const override { return new Mensur(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Mensur"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since check is required */
-    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::LayerCountInTimeSpan
+     * Interface for class functor visitation
      */
-    virtual int LayerCountInTimeSpan(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
 public:
+    //----------------//
+    // Static members //
+    //----------------//
+
     /**
      * Static member for setting a value from a controller.
      * Used for example in SetValue
      */
-    static int s_num;
+    static const int s_num;
     /**
      * Static member for setting a value from a controller.
      * Used for examle in SetValue.
      */
-    static int s_numBase;
+    static const int s_numBase;
 
 private:
 };

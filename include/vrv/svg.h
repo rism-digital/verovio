@@ -26,9 +26,8 @@ public:
     ///@{
     Svg();
     virtual ~Svg();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Svg"; }
-    virtual ClassId GetClassId() const { return SVG; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Svg"; }
     ///@}
 
     /**
@@ -47,13 +46,23 @@ public:
     int GetHeight() const;
     ///@}
 
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
 private:
     //
 public:
     //
 private:
     /**
-     * Tthe svg stored as pugi::xml_document
+     * The svg stored as pugi::xml_document
      */
     pugi::xml_document m_svg;
 };

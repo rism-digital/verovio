@@ -29,12 +29,12 @@ namespace vrv {
 class EditorToolkitCMN : public EditorToolkit {
 public:
     EditorToolkitCMN(Doc *doc, View *view) : EditorToolkit(doc, view) {}
-    virtual bool ParseEditorAction(const std::string &json_editorAction)
+    bool ParseEditorAction(const std::string &json_editorAction) override
     {
         return ParseEditorAction(json_editorAction, false);
     }
     bool ParseEditorAction(const std::string &json_editorAction, bool commitOnly = false);
-    virtual std::string EditInfo();
+    std::string EditInfo() override;
 
 protected:
     /**

@@ -14,8 +14,9 @@
 namespace vrv {
 
 class DeviceContext;
-class PrepareProcessingListsParams;
+class InitProcessingListsParams;
 class RunningElement;
+class Score;
 class Staff;
 class System;
 
@@ -37,22 +38,21 @@ public:
     ///@{
     Page();
     virtual ~Page();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Page"; }
-    virtual ClassId GetClassId() const { return PAGE; }
+    void Reset() override;
+    std::string GetClassName() const override { return "Page"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
      * Return the number of system (children are System object only)
      */
-    int GetSystemCount() const { return (int)m_children.size(); }
+    int GetSystemCount() const { return (int)GetChildren().size(); }
 
     /**
      * @name Get and set the pixel per unit factor.
@@ -63,23 +63,28 @@ public:
     ///@}
 
     /**
+     * @name Check if the page is the first or last page of a selection
+     */
+    ///@{
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
+    ///@}
+
+    /**
      * @name Getter header and footer.
      * Looks if the page is the first one or not
      */
     ///@{
-    RunningElement *GetHeader() const;
-    RunningElement *GetFooter() const;
+    RunningElement *GetHeader();
+    const RunningElement *GetHeader() const;
+    RunningElement *GetFooter();
+    const RunningElement *GetFooter() const;
     ///@}
 
     /**
      * Return the index position of the page in its document parent
      */
     int GetPageIdx() const { return Object::GetIdx(); }
-
-    /**
-     * Return the position of the staff on the page, from top to bottom
-     */
-    int GetStaffPosOnPage(Staff *staff) const;
 
     /**
      * Do the layout of the page, which means aligning its content horizontally
@@ -100,6 +105,13 @@ public:
     void LayOutHorizontally();
 
     /**
+     * Lay out the measures horizontally using the cached values.
+     * This should be done in preparation of cast-off which is based on measure positioning.
+     * The content of the measures is not laid out and keeps previously cached positioning.
+     */
+    void LayOutHorizontallyWithCache(bool restore = false);
+
+    /**
      * Justifiy the content of the page (measures and their content) horizontally
      */
     void JustifyHorizontally();
@@ -113,6 +125,11 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+
+    /**
+     * Reset and set the horizontal and vertical alignment
+     */
+    void ResetAligners();
 
     /**
      * Lay out the pitch positions and stems (without redoing the entire layout)
@@ -134,45 +151,35 @@ public:
      */
     int GetContentWidth() const;
 
-    /**
-     * Calculate the justification step for a page according.
-     */
-    int CalcJustificationStepSize(bool systemsOnly) const;
-
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-
-    /**
-     * See Object::AlignVertically
-     */
-    ///@{
-    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
-    ///@}
-
-    /**
-     * See Object::AlignSystems
-     */
-    ///@{
-    virtual int AlignSystems(FunctorParams *functorParams);
-    virtual int AlignSystemsEnd(FunctorParams *functorParams);
-    ///@}
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
 private:
     /**
-     * Adjust the horizontal postition of the syl processing verse by verse
+     * Adjust the horizontal position of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
+
+    /**
+     * Check whether vertical justification is required for the current page
+     */
+    bool IsJustificationRequired(const Doc *doc);
 
     //
 public:
@@ -189,7 +196,7 @@ public:
     /** Page top margin (MEI scoredef@page.topmar). Saved if != 0 */
     int m_pageMarginTop;
     /**
-     * Surface (MEI @surface). Saved as facsimile for transciption layout.
+     * Surface (MEI \@surface). Saved as facsimile for transciption layout.
      * For now, the target of the <graphic> element within surface is loaded here.
      */
     std::string m_surface;
@@ -198,9 +205,18 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized by the Object::SetCurrentScoreDef functor.
+     * The value is initialized by the ScoreDefSetCurrentFunctor.
      */
     ScoreDef m_drawingScoreDef;
+
+    /**
+     * @name Pointers to the score at the beginning and end of the page
+     * Set in ScoreDefSetCurrentPageFunctor
+     */
+    ///@{
+    Score *m_score;
+    Score *m_scoreEnd;
+    ///@}
 
     /**
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
@@ -214,14 +230,10 @@ public:
     int m_drawingJustifiableHeight;
 
     /**
-     * The number of systems to justify in the page
+     * the sum of justification factors for each type of spacing in between
+     * systems and staves (staff, brace group, bracket group)
      */
-    int m_drawingJustifiableStaves;
-
-    /**
-     * The numberof staves to justify in the page
-     */
-    int m_drawingJustifiableSystems;
+    double m_justificationSum;
 
 private:
     /**

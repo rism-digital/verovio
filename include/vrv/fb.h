@@ -29,17 +29,26 @@ public:
     ///@{
     Fb();
     virtual ~Fb();
-    virtual Object *Clone() const { return new Fb(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Fb"; }
-    virtual ClassId GetClassId() const { return FB; }
+    Object *Clone() const override { return new Fb(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Fb"; }
     ///@}
 
     /**
      * Add an element (f) to an fb.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

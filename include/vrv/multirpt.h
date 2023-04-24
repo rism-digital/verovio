@@ -31,10 +31,19 @@ public:
     ///@{
     MultiRpt();
     virtual ~MultiRpt();
-    virtual Object *Clone() const { return new MultiRpt(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "MultiRpt"; }
-    virtual ClassId GetClassId() const { return MULTIRPT; }
+    Object *Clone() const override { return new MultiRpt(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "MultiRpt"; }
+    ///@}
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 private:

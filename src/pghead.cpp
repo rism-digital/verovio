@@ -9,10 +9,12 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
+#include "functor.h"
 #include "lb.h"
 #include "rend.h"
 #include "text.h"
@@ -24,9 +26,11 @@ namespace vrv {
 // PgHead
 //----------------------------------------------------------------------------
 
-PgHead::PgHead() : RunningElement("pghead-")
+static const ClassRegistrar<PgHead> s_factory("pgHead", PGHEAD);
+
+PgHead::PgHead() : RunningElement(PGHEAD, "pghead-")
 {
-    Reset();
+    this->Reset();
 }
 
 PgHead::~PgHead() {}
@@ -36,7 +40,19 @@ void PgHead::Reset()
     RunningElement::Reset();
 }
 
-bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
+int PgHead::GetTotalHeight(const Doc *doc) const
+{
+    assert(doc);
+
+    int height = this->GetContentHeight();
+    if (height > 0) {
+        const int unit = doc->GetDrawingUnit(100);
+        height += doc->GetOptions()->m_bottomMarginPgHead.GetValue() * unit;
+    }
+    return height;
+}
+
+bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
 {
     pugi::xpath_node node;
     pugi::xpath_node_set nodeSet;
@@ -61,7 +77,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
                 rend->SetFontsize(fs);
             }
             Text *text = new Text();
-            text->SetText(UTF8to16(titleNode.node().text().as_string()));
+            text->SetText(UTF8to32(titleNode.node().text().as_string()));
             rend->SetLang(titleNode.node().attribute("xml:lang").as_string());
             rend->AddChild(text);
             titleRend->AddChild(rend);
@@ -85,7 +101,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         personRend->SetValign(VERTICALALIGNMENT_bottom);
         personRend->SetLabel(role);
         Text *personText = new Text();
-        personText->SetText(UTF8to16(node.node().text().as_string()));
+        personText->SetText(UTF8to32(node.node().text().as_string()));
         personRend->SetLang(node.node().attribute("xml:lang").as_string());
         personRend->AddChild(personText);
         this->AddChild(personRend);
@@ -97,5 +113,25 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode PgHead::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPgHead(this);
+}
+
+FunctorCode PgHead::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPgHead(this);
+}
+
+FunctorCode PgHead::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPgHeadEnd(this);
+}
+
+FunctorCode PgHead::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPgHeadEnd(this);
+}
 
 } // namespace vrv

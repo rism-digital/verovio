@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontextbase.h"
+#include "resources.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -61,16 +62,46 @@ public:
     ///@{
     DeviceContext()
     {
+        m_classId = DEVICE_CONTEXT;
+        m_resources = NULL;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
         m_width = 0;
         m_height = 0;
+        m_contentHeight = 0;
         m_userScaleX = 1.0;
         m_userScaleY = 1.0;
+        m_baseWidth = 0;
+        m_baseHeight = 0;
+    }
+    DeviceContext(ClassId classId)
+    {
+        m_classId = classId;
+        m_resources = NULL;
+        m_isDeactivatedX = false;
+        m_isDeactivatedY = false;
+        m_width = 0;
+        m_height = 0;
+        m_contentHeight = 0;
+        m_userScaleX = 1.0;
+        m_userScaleY = 1.0;
+        m_baseWidth = 0;
+        m_baseHeight = 0;
     }
     virtual ~DeviceContext(){};
-    virtual ClassId GetClassId() const;
-    bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
+    ClassId GetClassId() const { return m_classId; }
+    bool Is(ClassId classId) const { return (m_classId == classId); }
+    ///@}
+
+    /**
+     * @name Getter and setter for the resources
+     * Resources must be set before drawing
+     */
+    ///@{
+    const Resources *GetResources(bool showWarning = false) const;
+    bool HasResources() const { return (m_resources != NULL); }
+    void SetResources(const Resources *resources) { m_resources = resources; }
+    void ResetResources() { m_resources = NULL; }
     ///@}
 
     /**
@@ -80,15 +111,23 @@ public:
     ///@{
     void SetWidth(int width) { m_width = width; }
     void SetHeight(int height) { m_height = height; }
+    void SetContentHeight(int height) { m_contentHeight = height; }
     void SetUserScale(double scaleX, double scaleY)
     {
         m_userScaleX = scaleX;
         m_userScaleY = scaleY;
     }
-    int GetWidth() { return m_width; }
-    int GetHeight() { return m_height; }
+    void SetBaseSize(int width, int height)
+    {
+        m_baseWidth = width;
+        m_baseHeight = height;
+    }
+    int GetWidth() const { return m_width; }
+    int GetHeight() const { return m_height; }
+    int GetContentHeight() const { return m_contentHeight; }
     double GetUserScaleX() { return m_userScaleX; }
     double GetUserScaleY() { return m_userScaleY; }
+    std::pair<int, int> GetBaseSize() const { return std::make_pair(m_baseWidth, m_baseHeight); }
     ///@}
 
     /**
@@ -97,7 +136,8 @@ public:
      */
     ///@{
     void SetBrush(int colour, int opacity);
-    void SetPen(int colour, int width, int opacity, int dashLength = 0, int lineCap = 0);
+    void SetPen(
+        int colour, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
     void SetFont(FontInfo *font);
     void ResetBrush();
     void ResetPen();
@@ -115,6 +155,7 @@ public:
      */
     ///@{
     FontInfo *GetFont();
+    bool HasFont() const { return !m_fontStack.empty(); }
     ///@}
 
     /**
@@ -122,8 +163,8 @@ public:
      */
     ///@{
     virtual void GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize);
-    virtual void GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize);
-    virtual void GetSmuflTextExtent(const std::wstring &string, TextExtend *extend);
+    virtual void GetTextExtent(const std::u32string &string, TextExtend *extend, bool typeSize);
+    virtual void GetSmuflTextExtent(const std::u32string &string, TextExtend *extend);
 
     /**
      * @name Getters
@@ -136,29 +177,31 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawSimpleBezierPath(Point bezier[4]) = 0;
-    virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]) = 0;
+    virtual void DrawQuadBezierPath(Point bezier[3]) = 0;
+    virtual void DrawCubicBezierPath(Point bezier[4]) = 0;
+    virtual void DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4]) = 0;
     virtual void DrawCircle(int x, int y, int radius) = 0;
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end) = 0;
     virtual void DrawLine(int x1, int y1, int x2, int y2) = 0;
-    virtual void DrawPolygon(int n, Point points[], int xoffset = 0, int yoffset = 0, int fill_style = AxODDEVEN_RULE)
-        = 0;
+    virtual void DrawPolyline(int n, Point points[], int xOffset = 0, int yOffset = 0) = 0;
+    virtual void DrawPolygon(int n, Point points[], int xOffset = 0, int yOffset = 0) = 0;
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, int radius) = 0;
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET,
-        int width = VRV_UNSET, int height = VRV_UNSET)
+    virtual void DrawText(const std::string &text, const std::u32string &wtext = U"", int x = VRV_UNSET,
+        int y = VRV_UNSET, int width = VRV_UNSET, int height = VRV_UNSET)
         = 0;
-    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
+    virtual void DrawMusicText(const std::u32string &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
-    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
+    virtual void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) = 0;
+    virtual void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
 
     /**
      * Special method for forcing bounding boxes to be updated
-     * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
+     * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
     virtual void DrawPlaceholder(int x, int y){};
 
@@ -201,7 +244,7 @@ public:
      */
     ///@{
     virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, bool primary = true, bool preprend = false)
+        Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY, bool preprend = false)
         = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
@@ -252,9 +295,6 @@ public:
     virtual void EndPage() = 0;
     ///@}
 
-    /** Colour conversion method **/
-    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
-
     /**
      * @name Method for adding description element
      */
@@ -269,8 +309,15 @@ public:
      */
     virtual bool UseGlobalStyling() { return false; }
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /** Colour conversion method **/
+    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
+
 private:
-    void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
+    void AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend);
 
 public:
     //
@@ -286,9 +333,22 @@ protected:
     Zone *m_facsimile = NULL;
 
 private:
+    /** The class id representing the actual (derived) class */
+    ClassId m_classId;
+
+    /** The resources (not owned by the device context) */
+    const Resources *m_resources;
+
     /** stores the width and height of the device context */
     int m_width;
     int m_height;
+
+    /** stores base width and height of the device context before application of scale */
+    int m_baseWidth;
+    int m_baseHeight;
+
+    /** stores the height of graphic content */
+    int m_contentHeight;
 
     /** stores the scale as requested by the used */
     double m_userScaleX;

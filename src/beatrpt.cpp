@@ -9,13 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -32,11 +33,14 @@ namespace vrv {
 // BeatRpt
 //----------------------------------------------------------------------------
 
-BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttColor(), AttBeatRptVis()
+static const ClassRegistrar<BeatRpt> s_factory("beatRpt", BEATRPT);
+
+BeatRpt::BeatRpt() : LayerElement(BEATRPT, "beatrpt-"), AttColor(), AttBeatRptLog(), AttBeatRptVis()
 {
-    RegisterAttClass(ATT_BEATRPTVIS);
-    RegisterAttClass(ATT_COLOR);
-    Reset();
+    this->RegisterAttClass(ATT_BEATRPTLOG);
+    this->RegisterAttClass(ATT_BEATRPTVIS);
+    this->RegisterAttClass(ATT_COLOR);
+    this->Reset();
 }
 
 BeatRpt::~BeatRpt() {}
@@ -44,15 +48,18 @@ BeatRpt::~BeatRpt() {}
 void BeatRpt::Reset()
 {
     LayerElement::Reset();
-    ResetBeatRptVis();
-    ResetColor();
+    this->ResetBeatRptLog();
+    this->ResetBeatRptVis();
+    this->ResetColor();
 
     m_scoreTimeOnset = 0.0;
 }
 
 double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 {
-    return DUR_MAX / meterUnit;
+    double dur = DUR_MAX / meterUnit;
+    if (this->HasBeatdef()) dur *= this->GetBeatdef();
+    return dur;
 }
 
 void BeatRpt::SetScoreTimeOnset(double scoreTime)
@@ -60,7 +67,7 @@ void BeatRpt::SetScoreTimeOnset(double scoreTime)
     m_scoreTimeOnset = scoreTime;
 }
 
-double BeatRpt::GetScoreTimeOnset()
+double BeatRpt::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }
@@ -69,9 +76,29 @@ double BeatRpt::GetScoreTimeOnset()
 // BeatRpt functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode BeatRpt::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBeatRpt(this);
+}
+
+FunctorCode BeatRpt::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeatRpt(this);
+}
+
+FunctorCode BeatRpt::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBeatRptEnd(this);
+}
+
+FunctorCode BeatRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeatRptEnd(this);
+}
+
 int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
     // Sameas not taken into account for now
@@ -82,7 +109,7 @@ int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
     // filter last beat and copy all notes
     smf::MidiEvent event;
     int eventcount = params->m_midiFile->getEventCount(params->m_midiTrack);
-    for (int i = 0; i < eventcount; i++) {
+    for (int i = 0; i < eventcount; ++i) {
         event = params->m_midiFile->getEvent(params->m_midiTrack, i);
         if (event.tick > starttime * tpq)
             break;

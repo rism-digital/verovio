@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -28,18 +28,20 @@ namespace vrv {
 // Choice
 //----------------------------------------------------------------------------
 
-Choice::Choice() : EditorialElement("choice-")
+static const ClassRegistrar<Choice> s_factory("choice", CHOICE);
+
+Choice::Choice() : EditorialElement(CHOICE, "choice-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
-    Reset();
+    this->Reset();
 }
 
-Choice::Choice(EditorialLevel level) : EditorialElement("choice-")
+Choice::Choice(EditorialLevel level) : EditorialElement(CHOICE, "choice-")
 {
     m_level = level;
 
-    Reset();
+    this->Reset();
 }
 
 void Choice::Reset()

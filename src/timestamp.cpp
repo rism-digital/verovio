@@ -9,9 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
+
+#include "functor.h"
 
 namespace vrv {
 
@@ -19,9 +21,9 @@ namespace vrv {
 // TimestampAttr
 //----------------------------------------------------------------------------
 
-TimestampAttr::TimestampAttr() : LayerElement("tstp-")
+TimestampAttr::TimestampAttr() : LayerElement(TIMESTAMP_ATTR, "tstp-")
 {
-    Reset();
+    this->Reset();
 }
 
 TimestampAttr::~TimestampAttr() {}
@@ -36,6 +38,26 @@ void TimestampAttr::Reset()
 double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit) const
 {
     return DUR_MAX / meterUnit * m_actualDurPos;
+}
+
+FunctorCode TimestampAttr::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTimestamp(this);
+}
+
+FunctorCode TimestampAttr::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTimestamp(this);
+}
+
+FunctorCode TimestampAttr::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTimestampEnd(this);
+}
+
+FunctorCode TimestampAttr::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTimestampEnd(this);
 }
 
 } // namespace vrv

@@ -9,10 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+#include "functorparams.h"
+#include "layerelement.h"
+#include "smufl.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -21,16 +25,25 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
-Turn::Turn()
-    : ControlElement("turn-"), TimePointInterface(), AttColor(), AttOrnamentAccid(), AttPlacement(), AttTurnLog()
-{
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
-    RegisterAttClass(ATT_TURNLOG);
+static const ClassRegistrar<Turn> s_factory("turn", TURN);
 
-    Reset();
+Turn::Turn()
+    : ControlElement(TURN, "turn-")
+    , TimePointInterface()
+    , AttColor()
+    , AttExtSym()
+    , AttOrnamentAccid()
+    , AttPlacementRelStaff()
+    , AttTurnLog()
+{
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_ORNAMENTACCID);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+    this->RegisterAttClass(ATT_TURNLOG);
+
+    this->Reset();
 }
 
 Turn::~Turn() {}
@@ -39,14 +52,70 @@ void Turn::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
-    ResetColor();
-    ResetOrnamentAccid();
-    ResetPlacement();
-    ResetTurnLog();
+    this->ResetColor();
+    this->ResetExtSym();
+    this->ResetOrnamentAccid();
+    this->ResetPlacementRelStaff();
+    this->ResetTurnLog();
+
+    m_drawingEndElement = NULL;
+}
+
+char32_t Turn::GetTurnGlyph() const
+{
+    const Resources *resources = this->GetDocResources();
+    if (!resources) return 0;
+
+    // If there is glyph.num, prioritize it
+    if (this->HasGlyphNum()) {
+        char32_t code = this->GetGlyphNum();
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+    // If there is glyph.name (second priority)
+    else if (this->HasGlyphName()) {
+        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(code)) return code;
+    }
+
+    return (this->GetForm() == turnLog_FORM_lower) ? SMUFL_E568_ornamentTurnInverted : SMUFL_E567_ornamentTurn;
+}
+
+int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
+{
+    assert(doc);
+
+    char32_t originalGlyph = this->GetTurnGlyph();
+    char32_t referenceGlyph;
+    switch (originalGlyph) {
+        case SMUFL_E569_ornamentTurnSlash: referenceGlyph = SMUFL_E567_ornamentTurn; break;
+        case SMUFL_E56D_ornamentMordent: referenceGlyph = SMUFL_E56C_ornamentShortTrill; break;
+        default: referenceGlyph = originalGlyph;
+    }
+    return doc->GetGlyphHeight(referenceGlyph, staffSize, false);
 }
 
 //----------------------------------------------------------------------------
 // Turn functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Turn::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTurn(this);
+}
+
+FunctorCode Turn::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTurn(this);
+}
+
+FunctorCode Turn::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTurnEnd(this);
+}
+
+FunctorCode Turn::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTurnEnd(this);
+}
 
 } // namespace vrv

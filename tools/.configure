@@ -1,2 +1,14 @@
-rm -rf CMakeFiles CMakeCache.txt Makefile cmake_install.cmake
-cmake ../cmake
+#!/usr/bin/perl
+
+my $target = $ARGV[0];
+
+print "rm -rf CMakeFiles CMakeCache.txt Makefile cmake_install.cmake\n";
+`rm -rf CMakeFiles CMakeCache.txt Makefile cmake_install.cmake`;
+
+if ($target =~ /debug/i) {
+	print "cmake ../cmake -DCMAKE_BUILD_TYPE=Debug\n";
+	`cmake ../cmake -DCMAKE_BUILD_TYPE=Debug`;
+} else {
+	print "cmake ../cmake\n";
+	`cmake ../cmake`;
+}

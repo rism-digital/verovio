@@ -9,7 +9,7 @@
 
 //---------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //---------------------------------------------------------------------------
 
@@ -26,16 +26,16 @@ namespace vrv {
 
 FacsimileInterface::FacsimileInterface() : Interface(), AttFacsimile()
 {
-    RegisterInterfaceAttClass(ATT_FACSIMILE);
-    Reset();
+    this->RegisterInterfaceAttClass(ATT_FACSIMILE);
+    this->Reset();
 }
 
 FacsimileInterface::~FacsimileInterface() {}
 
 void FacsimileInterface::Reset()
 {
-    ResetFacsimile();
-    this->SetZone(NULL);
+    this->ResetFacsimile();
+    this->AttachZone(NULL);
 }
 
 int FacsimileInterface::GetDrawingX() const
@@ -78,7 +78,7 @@ double FacsimileInterface::GetDrawingRotate() const
 int FacsimileInterface::GetSurfaceY() const
 {
     assert(m_zone);
-    Surface *surface = dynamic_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
+    Surface *surface = vrv_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
     assert(surface);
     if (surface->HasLry()) {
         return surface->GetLry();
@@ -88,12 +88,12 @@ int FacsimileInterface::GetSurfaceY() const
     }
 }
 
-void FacsimileInterface::SetZone(Zone *zone)
+void FacsimileInterface::AttachZone(Zone *zone)
 {
     if (m_zone != NULL) {
         Object *parent = m_zone->GetParent();
         if (!parent->DeleteChild(m_zone)) {
-            printf("Failed to delete zone with ID %s\n", m_zone->GetUuid().c_str());
+            printf("Failed to delete zone with ID %s\n", m_zone->GetID().c_str());
         }
     }
     m_zone = zone;
@@ -101,7 +101,7 @@ void FacsimileInterface::SetZone(Zone *zone)
         this->SetFacs("");
     }
     else {
-        this->SetFacs("#" + m_zone->GetUuid());
+        this->SetFacs("#" + m_zone->GetID());
     }
 }
 

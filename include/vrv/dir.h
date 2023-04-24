@@ -39,35 +39,53 @@ public:
     ///@{
     Dir();
     virtual ~Dir();
-    virtual Object *Clone() const { return new Dir(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Dir"; }
-    virtual ClassId GetClassId() const { return DIR; }
+    Object *Clone() const override { return new Dir(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Dir"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TextDirInterface *GetTextDirInterface() override { return vrv_cast<TextDirInterface *>(this); }
+    const TextDirInterface *GetTextDirInterface() const override { return vrv_cast<const TextDirInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a dir.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
+
+    /**
+     * See FloatingObject::IsExtenderElement
+     */
+    bool IsExtenderElement() const override { return GetExtender() == BOOLEAN_true; }
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareFloatingGrps
+     * Interface for class functor visitation
      */
-    virtual int PrepareFloatingGrps(FunctorParams *);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

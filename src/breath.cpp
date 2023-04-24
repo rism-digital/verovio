@@ -9,10 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -21,13 +22,15 @@ namespace vrv {
 // Breath
 //----------------------------------------------------------------------------
 
-Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttPlacement()
-{
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_PLACEMENT);
+static const ClassRegistrar<Breath> s_factory("breath", BREATH);
 
-    Reset();
+Breath::Breath() : ControlElement(BREATH, "breath-"), TimePointInterface(), AttColor(), AttPlacementRelStaff()
+{
+    this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
+
+    this->Reset();
 }
 
 Breath::~Breath() {}
@@ -36,8 +39,28 @@ void Breath::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
-    ResetColor();
-    ResetPlacement();
+    this->ResetColor();
+    this->ResetPlacementRelStaff();
+}
+
+FunctorCode Breath::Accept(MutableFunctor &functor)
+{
+    return functor.VisitBreath(this);
+}
+
+FunctorCode Breath::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBreath(this);
+}
+
+FunctorCode Breath::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitBreathEnd(this);
+}
+
+FunctorCode Breath::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBreathEnd(this);
 }
 
 } // namespace vrv

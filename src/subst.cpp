@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -23,18 +23,20 @@ namespace vrv {
 // Subst
 //----------------------------------------------------------------------------
 
-Subst::Subst() : EditorialElement("subst-")
+static const ClassRegistrar<Subst> s_factory("subst", SUBST);
+
+Subst::Subst() : EditorialElement(SUBST, "subst-")
 {
     m_level = EDITORIAL_UNDEFINED;
 
-    Reset();
+    this->Reset();
 }
 
-Subst::Subst(EditorialLevel level) : EditorialElement("subst-")
+Subst::Subst(EditorialLevel level) : EditorialElement(SUBST, "subst-")
 {
     m_level = level;
 
-    Reset();
+    this->Reset();
 }
 
 void Subst::Reset()

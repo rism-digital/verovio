@@ -9,10 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+#include "functorparams.h"
+#include "iomei.h"
+#include "page.h"
 #include "pages.h"
 #include "score.h"
 #include "vrv.h"
@@ -23,12 +27,14 @@ namespace vrv {
 // Mdiv
 //----------------------------------------------------------------------------
 
-Mdiv::Mdiv() : Object("mdiv-"), AttLabelled(), AttNNumberLike()
-{
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+static const ClassRegistrar<Mdiv> s_factory("mdiv", MDIV);
 
-    Reset();
+Mdiv::Mdiv() : PageElement(MDIV, "mdiv-"), PageMilestoneInterface(), AttLabelled(), AttNNumberLike()
+{
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+
+    this->Reset();
 }
 
 Mdiv::~Mdiv() {}
@@ -36,8 +42,8 @@ Mdiv::~Mdiv() {}
 void Mdiv::Reset()
 {
     Object::Reset();
-    ResetLabelled();
-    ResetNNumberLike();
+    this->ResetLabelled();
+    this->ResetNNumberLike();
 
     m_visibility = Hidden;
 }
@@ -46,9 +52,6 @@ bool Mdiv::IsSupportedChild(Object *child)
 {
     if (child->Is(MDIV)) {
         assert(dynamic_cast<Mdiv *>(child));
-    }
-    else if (child->Is(PAGES)) {
-        assert(dynamic_cast<Pages *>(child));
     }
     else if (child->Is(SCORE)) {
         assert(dynamic_cast<Score *>(child));
@@ -62,8 +65,8 @@ bool Mdiv::IsSupportedChild(Object *child)
 void Mdiv::MakeVisible()
 {
     m_visibility = Visible;
-    if (GetParent() && GetParent()->Is(MDIV)) {
-        Mdiv *parent = dynamic_cast<Mdiv *>(GetParent());
+    if (this->GetParent() && this->GetParent()->Is(MDIV)) {
+        Mdiv *parent = vrv_cast<Mdiv *>(this->GetParent());
         assert(parent);
         parent->MakeVisible();
     }
@@ -72,5 +75,83 @@ void Mdiv::MakeVisible()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Mdiv::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMdiv(this);
+}
+
+FunctorCode Mdiv::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMdiv(this);
+}
+
+FunctorCode Mdiv::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMdivEnd(this);
+}
+
+FunctorCode Mdiv::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMdivEnd(this);
+}
+
+int Mdiv::Save(FunctorParams *functorParams)
+{
+    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
+    assert(params);
+
+    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
+    if (m_visibility == Hidden && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
+    }
+    return Object::Save(functorParams);
+}
+
+int Mdiv::SaveEnd(FunctorParams *functorParams)
+{
+    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
+    assert(params);
+
+    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
+    if (m_visibility == Hidden && meiOutput) {
+        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
+        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
+    }
+    return Object::SaveEnd(functorParams);
+}
+
+int Mdiv::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_page);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Mdiv::Transpose(FunctorParams *functorParams)
+{
+    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
+    assert(params);
+
+    params->m_currentMdivIDs.push_back(this->GetID());
+    params->m_keySigForStaffN.clear();
+    params->m_transposeIntervalForStaffN.clear();
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

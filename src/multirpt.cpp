@@ -9,13 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -28,10 +29,12 @@ namespace vrv {
 // MultiRpt
 //----------------------------------------------------------------------------
 
-MultiRpt::MultiRpt() : LayerElement("multirpt-"), AttNumbered()
+static const ClassRegistrar<MultiRpt> s_factory("multiRpt", MULTIRPT);
+
+MultiRpt::MultiRpt() : LayerElement(MULTIRPT, "multirpt-"), AttNumbered()
 {
-    RegisterAttClass(ATT_NUMBERED);
-    Reset();
+    this->RegisterAttClass(ATT_NUMBERED);
+    this->Reset();
 }
 
 MultiRpt::~MultiRpt() {}
@@ -39,7 +42,27 @@ MultiRpt::~MultiRpt() {}
 void MultiRpt::Reset()
 {
     LayerElement::Reset();
-    ResetNumbered();
+    this->ResetNumbered();
+}
+
+FunctorCode MultiRpt::Accept(MutableFunctor &functor)
+{
+    return functor.VisitMultiRpt(this);
+}
+
+FunctorCode MultiRpt::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMultiRpt(this);
+}
+
+FunctorCode MultiRpt::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMultiRptEnd(this);
+}
+
+FunctorCode MultiRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMultiRptEnd(this);
 }
 
 } // namespace vrv

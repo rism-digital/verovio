@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_cmnornaments.h"
+#include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -25,8 +26,9 @@ namespace vrv {
 class Mordent : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
+                public AttExtSym,
                 public AttOrnamentAccid,
-                public AttPlacement,
+                public AttPlacementRelStaff,
                 public AttMordentLog {
 public:
     /**
@@ -36,22 +38,40 @@ public:
     ///@{
     Mordent();
     virtual ~Mordent();
-    virtual Object *Clone() const { return new Mordent(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Mordent"; }
-    virtual ClassId GetClassId() const { return MORDENT; }
+    Object *Clone() const override { return new Mordent(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Mordent"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
     ///@}
+
+    /**
+     * Get the SMuFL glyph for the mordent based on type, long attribute or glyph.num
+     */
+    char32_t GetMordentGlyph() const;
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

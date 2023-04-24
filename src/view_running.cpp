@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -32,18 +32,18 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
     assert(page);
 
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
-        BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
+        BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) return;
     }
 
     RunningElement *header = page->GetHeader();
     if (header) {
-        DrawPgHeader(dc, header);
+        this->DrawPgHeader(dc, header);
     }
     RunningElement *footer = page->GetFooter();
     if (footer) {
-        DrawPgHeader(dc, footer);
+        this->DrawPgHeader(dc, footer);
     }
 }
 
@@ -52,9 +52,12 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     assert(dc);
     assert(pgHeader);
 
-    dc->StartGraphic(pgHeader, "", pgHeader->GetUuid());
+    dc->StartGraphic(pgHeader, "", pgHeader->GetID());
 
     FontInfo pgHeadTxt;
+    if (!dc->UseGlobalStyling()) {
+        pgHeadTxt.SetFaceName("Times");
+    }
 
     TextDrawingParams params;
 
@@ -71,7 +74,7 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
 
-    DrawRunningChildren(dc, pgHeader, params);
+    this->DrawRunningChildren(dc, pgHeader, params);
 
     dc->ResetFont();
     dc->ResetBrush();

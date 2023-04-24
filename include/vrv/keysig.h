@@ -9,6 +9,10 @@
 #ifndef __VRV_KEYSIG_H__
 #define __VRV_KEYSIG_H__
 
+#include <optional>
+
+//----------------------------------------------------------------------------
+
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
@@ -20,6 +24,17 @@ class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
+// KeyAccidInfo
+//----------------------------------------------------------------------------
+/**
+ * Useful information regarding a KeyAccid child
+ */
+struct KeyAccidInfo {
+    data_ACCIDENTAL_WRITTEN accid;
+    data_PITCHNAME pname;
+};
+
+//----------------------------------------------------------------------------
 // KeySig
 //----------------------------------------------------------------------------
 
@@ -29,6 +44,7 @@ class ScoreDefInterface;
 class KeySig : public LayerElement,
                public ObjectListInterface,
                public AttAccidental,
+               public AttColor,
                public AttPitch,
                public AttKeySigAnl,
                public AttKeySigLog,
@@ -42,79 +58,111 @@ public:
     ///@{
     KeySig();
     virtual ~KeySig();
-    virtual Object *Clone() const { return new KeySig(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "KeySig"; }
-    virtual ClassId GetClassId() const { return KEYSIG; }
+    Object *Clone() const override { return new KeySig(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "KeySig"; }
+    ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /** Override the method since check is required */
-    virtual bool IsScoreDefElement() const { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /**
      * Add an element (a keyAccid) to a keySig.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     /** Accid number getter */
-    int GetAccidCount();
+    int GetAccidCount(bool fromAttribute = false) const;
 
     /** Accid type getter */
-    data_ACCIDENTAL_WRITTEN GetAccidType();
+    data_ACCIDENTAL_WRITTEN GetAccidType() const;
+
+    /**
+     * Generate KeyAccid attribute children
+     */
+    ///@{
+    bool HasNonAttribKeyAccidChildren() const;
+    void GenerateKeyAccidAttribChildren();
+    ///@}
+
+    /**
+     * Try to convert a keySig content (keyAccid) to a @sig value
+     * This can work only if the content represents a standard accidental series
+     * Return an empty @sig when the content cannot be converted
+     */
+    data_KEYSIGNATURE ConvertToSig() const;
 
     /**
      * Fill the map of modified pitches
      */
-    void FillMap(MapOfPitchAccid &mapOfPitchAccid);
+    void FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const;
 
-    /**
-     * Return the string of the alteration at the positon pos.
-     * Looks at keyAccid children if any.
-     * The accid at pos is return in accid and the pname in pname.
-     */
-    std::wstring GetKeyAccidStrAt(int pos, data_ACCIDENTAL_WRITTEN &accid, data_PITCHNAME &pname);
+    int GetFifthsInt() const;
+
+    //----------------//
+    // Static methods //
+    //----------------//
 
     /**
      * Static methods for calculating position;
      */
     static data_PITCHNAME GetAccidPnameAt(data_ACCIDENTAL_WRITTEN alterationType, int pos);
-    static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, Clef *clef);
-
-    int GetFifthsInt();
+    static int GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pitch, const Clef *clef);
 
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::Transpose
      */
-    virtual int Transpose(FunctorParams *);
+    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**
      * Filter the flat list and keep only StaffDef elements.
      */
-    virtual void FilterList(ArrayOfObjects *childList);
+    void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    //
+    /**
+     * Generate key accid information for a given position
+     */
+    std::optional<KeyAccidInfo> GetKeyAccidInfoAt(int pos) const;
+
 public:
-    bool m_mixedChildrenAccidType;
     /**
      * Variables for storing cancellation introduced by the key sig.
-     * The values are StaffDefDrawingInterface::ReplaceKeySig
+     * Values are set in StaffDefDrawingInterface::ReplaceKeySig
      */
+    ///@{
+    bool m_skipCancellation;
     data_ACCIDENTAL_WRITTEN m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
+    ///@}
 
-    static data_PITCHNAME s_pnameForFlats[];
-    static data_PITCHNAME s_pnameForSharps[];
+    //----------------//
+    // Static members //
+    //----------------//
+
+    static const data_PITCHNAME s_pnameForFlats[];
+    static const data_PITCHNAME s_pnameForSharps[];
 
 private:
-    static int octave_map[2][9][7];
+    static const int octave_map[2][9][7];
 };
 
 } // namespace vrv

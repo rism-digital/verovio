@@ -8,7 +8,7 @@
 #ifndef __VRV_NC_H__
 #define __VRV_NC_H__
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -45,10 +45,9 @@ public:
     ///@{
     Nc();
     virtual ~Nc();
-    virtual Object *Clone() const { return new Nc(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Nc"; }
-    virtual ClassId GetClassId() const { return NC; }
+    Object *Clone() const override { return new Nc(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Nc"; }
     ///@}
 
     virtual bool IsSupportedChild(Object *object);
@@ -56,8 +55,20 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    DurationInterface *GetDurationInterface() override { return vrv_cast<DurationInterface *>(this); }
+    const DurationInterface *GetDurationInterface() const override { return vrv_cast<const DurationInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return vrv_cast<PitchInterface *>(this); }
+    const PitchInterface *GetPitchInterface() const override { return vrv_cast<const PitchInterface *>(this); }
+    ///@}
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 private:

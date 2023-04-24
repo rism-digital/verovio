@@ -30,10 +30,9 @@ public:
     ///@{
     Sb();
     virtual ~Sb();
-    virtual Object *Clone() const { return new Sb(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Sb"; }
-    virtual ClassId GetClassId() const { return SB; }
+    Object *Clone() const override { return new Sb(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Sb"; }
     ///@}
 
     //----------//
@@ -41,9 +40,14 @@ public:
     //----------//
 
     /**
-     * See Object::CastOffEncoding
+     * Interface for class functor visitation
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

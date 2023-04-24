@@ -33,6 +33,7 @@ class StaffDef;
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
+              public AttCue,
               public AttNInteger,
               public AttTyped,
               public AttVisibility {
@@ -42,24 +43,23 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Layer(int n = 1);
+    Layer();
     virtual ~Layer();
-    virtual Object *Clone() const { return new Layer(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Layer"; }
-    virtual ClassId GetClassId() const { return LAYER; }
+    Object *Clone() const override { return new Layer(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Layer"; }
     ///@}
 
     /**
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
-    virtual void CloneReset();
+    void CloneReset() override;
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
@@ -68,9 +68,10 @@ public:
      */
     int GetLayerIdx() const { return Object::GetIdx(); }
 
-    LayerElement *GetPrevious(LayerElement *element);
+    LayerElement *GetPrevious(const LayerElement *element);
+    const LayerElement *GetPrevious(const LayerElement *element) const;
     LayerElement *GetAtPos(int x);
-    LayerElement *Insert(LayerElement *element, int x); // return a pointer to the inserted element
+    const LayerElement *GetAtPos(int x) const;
 
     /**
      * Get the current clef for the test element.
@@ -78,20 +79,31 @@ public:
      * This is used when inserting a note by passing a y position because we need
      * to know the clef in order to get the pitch.
      */
-    Clef *GetClef(LayerElement *test);
+    ///@{
+    Clef *GetClef(const LayerElement *test);
+    const Clef *GetClef(const LayerElement *test) const;
+    ///@}
 
     /**
      * Get the current clef based on facsimile for the test element.
      * This goes back by facsimile position until a clef is found.
      * Returns NULL if a clef cannot be found via this method.
      */
-    Clef *GetClefFacs(LayerElement *test);
+    ///@{
+    Clef *GetClefFacs(const LayerElement *test);
+    const Clef *GetClefFacs(const LayerElement *test) const;
+    ///@}
 
     /**
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
-    int GetClefLocOffset(LayerElement *test);
+    int GetClefLocOffset(const LayerElement *test) const;
+
+    /**
+     * Return the clef offset for the position if there are cross-staff clefs on the same layer
+     */
+    int GetCrossStaffClefLocOffset(const LayerElement *element, int locOffset) const;
 
     /**
      * @name Set and get the stem direction of the layer.
@@ -99,121 +111,179 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
-    data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
-    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
+    data_STEMDIRECTION GetDrawingStemDir(const LayerElement *element) const;
+    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords) const;
+    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     ///@}
 
     /**
-     * Get the number of layer used for the duration of an element.
-     * Takes into account cross-staff situations.
+     * @name Get the layers used for the duration of an element.
+     * Takes into account cross-staff situations: cross staff layers have negative N.
      */
-    int GetLayerCountForTimeSpanOf(LayerElement *element);
+    ///@{
+    std::set<int> GetLayersNForTimeSpanOf(const LayerElement *element) const;
+    int GetLayerCountForTimeSpanOf(const LayerElement *element) const;
+    ///@}
 
     /**
-     * Get the number of layer used within a time span.
+     * @name Get the layers used within a time span.
+     * Takes into account cross-staff situations: cross staff layers have negative N.
+     */
+    ///@{
+    std::set<int> GetLayersNInTimeSpan(double time, double duration, const Measure *measure, int staff) const;
+    int GetLayerCountInTimeSpan(double time, double duration, const Measure *measure, int staff) const;
+    ///@}
+
+    /**
+     * Get the list of the layer elements for the duration of an element
+     * Takes into account cross-staff situations.
+     * If excludeCurrent is specified, gets the list of layer elements for all layers except current
+     */
+    ///@{
+    ListOfObjects GetLayerElementsForTimeSpanOf(const LayerElement *element, bool excludeCurrent = false);
+    ListOfConstObjects GetLayerElementsForTimeSpanOf(const LayerElement *element, bool excludeCurrent = false) const;
+    ///@}
+
+    /**
+     * Get the list of the layer elements used within a time span.
      * Takes into account cross-staff situations.
      */
-    int GetLayerCountInTimeSpan(double time, double duration, Measure *measure, int staff);
+    ///@{
+    ListOfObjects GetLayerElementsInTimeSpan(
+        double time, double duration, const Measure *measure, int staff, bool excludeCurrent);
+    ListOfConstObjects GetLayerElementsInTimeSpan(
+        double time, double duration, const Measure *measure, int staff, bool excludeCurrent) const;
+    ///@}
 
-    Clef *GetCurrentClef() const;
-    KeySig *GetCurrentKeySig() const;
-    Mensur *GetCurrentMensur() const;
-    MeterSig *GetCurrentMeterSig() const;
+    /**
+     * Get the current clef, keysig, mensur and meterSig
+     */
+    ///@{
+    Clef *GetCurrentClef();
+    const Clef *GetCurrentClef() const;
+    KeySig *GetCurrentKeySig();
+    const KeySig *GetCurrentKeySig() const;
+    Mensur *GetCurrentMensur();
+    const Mensur *GetCurrentMensur() const;
+    MeterSig *GetCurrentMeterSig();
+    const MeterSig *GetCurrentMeterSig() const;
+    ///@}
 
     void ResetStaffDefObjects();
 
     /**
-     * Set drawing clef, keysig and mensur if necessary and if available.
+     * Set drawing clef, keysig, mensur, metersig, metersiggrp if necessary and if available.
      */
+    ///@{
     void SetDrawingStaffDefValues(StaffDef *currentStaffDef);
 
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
     void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
+
     Clef *GetStaffDefClef() { return m_staffDefClef; }
+    const Clef *GetStaffDefClef() const { return m_staffDefClef; }
     KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
+    const KeySig *GetStaffDefKeySig() const { return m_staffDefKeySig; }
     Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
+    const Mensur *GetStaffDefMensur() const { return m_staffDefMensur; }
     MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
-    bool HasStaffDef() { return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig); }
+    const MeterSig *GetStaffDefMeterSig() const { return m_staffDefMeterSig; }
+    MeterSigGrp *GetStaffDefMeterSigGrp() { return m_staffDefMeterSigGrp; }
+    const MeterSigGrp *GetStaffDefMeterSigGrp() const { return m_staffDefMeterSigGrp; }
+
+    bool HasStaffDef() const
+    {
+        return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig || m_staffDefMeterSigGrp);
+    }
+    ///@}
 
     /**
-     * Set drawing clef, keysig and mensur if necessary and if available.
+     * Set drawing caution clef, keysig, mensur, metersig if necessary and if available.
      */
+    ///@{
     void SetDrawingCautionValues(StaffDef *currentStaffDef);
 
     bool DrawCautionKeySigCancel() const { return m_drawCautionKeySigCancel; }
     void SetDrawCautionKeySigCancel(bool drawCautionKeySig) { m_drawCautionKeySigCancel = drawCautionKeySig; }
+
     Clef *GetCautionStaffDefClef() { return m_cautionStaffDefClef; }
+    const Clef *GetCautionStaffDefClef() const { return m_cautionStaffDefClef; }
     KeySig *GetCautionStaffDefKeySig() { return m_cautionStaffDefKeySig; }
+    const KeySig *GetCautionStaffDefKeySig() const { return m_cautionStaffDefKeySig; }
     Mensur *GetCautionStaffDefMensur() { return m_cautionStaffDefMensur; }
+    const Mensur *GetCautionStaffDefMensur() const { return m_cautionStaffDefMensur; }
     MeterSig *GetCautionStaffDefMeterSig() { return m_cautionStaffDefMeterSig; }
-    bool HasCautionStaffDef()
+    const MeterSig *GetCautionStaffDefMeterSig() const { return m_cautionStaffDefMeterSig; }
+
+    bool HasCautionStaffDef() const
     {
         return (
             m_cautionStaffDefClef || m_cautionStaffDefKeySig || m_cautionStaffDefMensur || m_cautionStaffDefMeterSig);
     }
+    ///@}
+
+    /**
+     * @name Setter and getter for the cross-staff flags
+     */
+    //@{
+    void SetCrossStaffFromAbove(bool crossStaff) { m_crossStaffFromAbove = crossStaff; }
+    bool HasCrossStaffFromAbove() const { return m_crossStaffFromAbove; }
+    void SetCrossStaffFromBelow(bool crossStaff) { m_crossStaffFromBelow = crossStaff; }
+    bool HasCrossStaffFromBelow() const { return m_crossStaffFromBelow; }
+    ///@}
 
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
+     * See Object::ConvertMarkupArtic
+     */
+    int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
+
+    /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToUnCastOffMensural
      */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
 
     /**
-     * See Object::UnsetCurrentScoreDef
+     * See Object::InitProcessingLists
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+    int InitProcessingLists(FunctorParams *functorParams) override;
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
-
-    /**
-     * See Object::AlignHorizontallyEnd
-     */
-    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareProcessingLists
-     */
-    virtual int PrepareProcessingLists(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareRpt
-     */
-    virtual int PrepareRpt(FunctorParams *functorParams);
-
-    /**
-     * See Object::CalcOnsetOffset
+     * See Object::InitOnsetOffset
      */
     ///@{
-    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
 
     /**
-     * See Object::GenerateTimemap
-     * To be added once Layer implements LinkingInterface
+     * @name See Object::GenerateMIDI
      */
-    // virtual int GenerateTimemap(FunctorParams *functorParams);
+    ///@{
+    int GenerateMIDI(FunctorParams *functorParams) override;
+    ///@}
 
     /**
-     * See Object::ResetDrawing
-     * To be added once Layer implements LinkingInterface
+     * See Object::GenerateMIDIEnd
      */
-    // virtual int ResetDrawing(FunctorParams *);
+    int GenerateMIDIEnd(FunctorParams *functorParams) override;
 
 private:
     //
@@ -221,15 +291,22 @@ public:
     //
 private:
     /**
-     *
+     * The drawing stem direction of the layer based on the number of layers in the staff
      */
     data_STEMDIRECTION m_drawingStemDir;
+
+    /**
+     * Two flags indicating when a layer is also used from cross-staff content from below or above
+     */
+    bool m_crossStaffFromBelow;
+    bool m_crossStaffFromAbove;
 
     /** */
     Clef *m_staffDefClef;
     KeySig *m_staffDefKeySig;
     Mensur *m_staffDefMensur;
     MeterSig *m_staffDefMeterSig;
+    MeterSigGrp *m_staffDefMeterSigGrp;
     bool m_drawKeySigCancellation;
 
     /** */

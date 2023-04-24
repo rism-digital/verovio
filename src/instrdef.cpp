@@ -9,10 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "scoredef.h"
 #include "vrv.h"
 
@@ -22,14 +23,17 @@ namespace vrv {
 // InstrDef
 //----------------------------------------------------------------------------
 
-InstrDef::InstrDef() : Object("instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
-{
-    RegisterAttClass(ATT_CHANNELIZED);
-    RegisterAttClass(ATT_LABELLED);
-    RegisterAttClass(ATT_MIDIINSTRUMENT);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+static const ClassRegistrar<InstrDef> s_factory("instrDef", INSTRDEF);
 
-    Reset();
+InstrDef::InstrDef()
+    : Object(INSTRDEF, "instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
+{
+    this->RegisterAttClass(ATT_CHANNELIZED);
+    this->RegisterAttClass(ATT_LABELLED);
+    this->RegisterAttClass(ATT_MIDIINSTRUMENT);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
+
+    this->Reset();
 }
 
 InstrDef::~InstrDef() {}
@@ -37,14 +41,34 @@ InstrDef::~InstrDef() {}
 void InstrDef::Reset()
 {
     Object::Reset();
-    ResetChannelized();
-    ResetLabelled();
-    ResetMidiInstrument();
-    ResetNNumberLike();
+    this->ResetChannelized();
+    this->ResetLabelled();
+    this->ResetMidiInstrument();
+    this->ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode InstrDef::Accept(MutableFunctor &functor)
+{
+    return functor.VisitInstrDef(this);
+}
+
+FunctorCode InstrDef::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitInstrDef(this);
+}
+
+FunctorCode InstrDef::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitInstrDefEnd(this);
+}
+
+FunctorCode InstrDef::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitInstrDefEnd(this);
+}
 
 } // namespace vrv

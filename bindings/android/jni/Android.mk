@@ -14,30 +14,21 @@ LOCAL_SRC_FILES := \
 	$(MIDI_SRC:$(MIDI_SRC)/%=%) \
 	$(ROOT_PATH)/src/pugi/pugixml.cpp \
 	$(ROOT_PATH)/src/json/jsonxx.cc \
-	$(ROOT_PATH)/libmei/attconverter.cpp \
-	$(ROOT_PATH)/libmei/atts_analytical.cpp \
-	$(ROOT_PATH)/libmei/atts_cmn.cpp \
-	$(ROOT_PATH)/libmei/atts_cmnornaments.cpp \
-	$(ROOT_PATH)/libmei/atts_critapp.cpp \
-	$(ROOT_PATH)/libmei/atts_gestural.cpp \
-	$(ROOT_PATH)/libmei/atts_externalsymbols.cpp \
-	$(ROOT_PATH)/libmei/atts_facsimile.cpp \
-	$(ROOT_PATH)/libmei/atts_mei.cpp \
-	$(ROOT_PATH)/libmei/atts_mensural.cpp \
-	$(ROOT_PATH)/libmei/atts_midi.cpp \
-	$(ROOT_PATH)/libmei/atts_neumes.cpp \
-	$(ROOT_PATH)/libmei/atts_pagebased.cpp \
-	$(ROOT_PATH)/libmei/atts_shared.cpp \
-	$(ROOT_PATH)/libmei/atts_visual.cpp
+	$(ROOT_PATH)/libmei/dist/*.cpp \
+	$(ROOT_PATH)/libmei/addons/*.cpp \
+	$(ROOT_PATH)/src/crc/crc.cpp
 	
 LOCAL_C_INCLUDES := \
 	$(ROOT_PATH)/include \
 	$(ROOT_PATH)/include/vrv \
-	$(ROOT_PATH)/libmei \
+	$(ROOT_PATH)/libmei/dist \
+	$(ROOT_PATH)/libmei/addons \
 	$(ROOT_PATH)/include/utf8 \
 	$(ROOT_PATH)/include/pugi \
 	$(ROOT_PATH)/include/hum \
 	$(ROOT_PATH)/include/midi \
-	$(ROOT_PATH)/include/json
+	$(ROOT_PATH)/include/json \
+	$(ROOT_PATH)/include/crc \
+	$(ROOT_PATH)/include/zip
 
 include $(BUILD_SHARED_LIBRARY)

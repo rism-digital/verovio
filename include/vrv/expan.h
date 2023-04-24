@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        expand.h
+// Name:        expan.h
 // Author:      Laurent Pugin
 // Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_EXPAND_H__
-#define __VRV_EXPAND_H__
+#ifndef __VRV_EXPAN_H__
+#define __VRV_EXPAN_H__
 
 #include "atts_shared.h"
 #include "editorial.h"
@@ -26,10 +26,9 @@ public:
     ///@{
     Expan();
     virtual ~Expan();
-    virtual Object *Clone() const { return new Expan(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Expan"; }
-    virtual ClassId GetClassId() const { return EXPAN; }
+    Object *Clone() const override { return new Expan(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Expan"; }
     ///@}
 
 private:

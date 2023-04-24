@@ -29,7 +29,7 @@ namespace vrv {
 // DivLine
 //----------------------------------------------------------------------------
 
-DivLine::DivLine() : LayerElement("dline-"), AttDivLineLog(), AttColor(), AttVisibility()
+DivLine::DivLine() : LayerElement(DIVLINE, "dline-"), AttDivLineLog(), AttColor(), AttVisibility()
 {
     RegisterAttClass(ATT_DIVLINELOG);
     RegisterAttClass(ATT_COLOR);
@@ -77,7 +77,7 @@ std::wstring DivLine::GetSymbolStr() const
     // else {
     //     symbolStr.push_back(symc);
     // }
-    
+
     symbolStr.push_back(symc);
 
     return symbolStr;
@@ -100,13 +100,13 @@ wchar_t DivLine::GetDivLineGlyph(data_DIVLINE divLine)
 // Functors methods
 //----------------------------------------------------------------------------
 
-
 // wchar_t DivLine::GetDivLineGlyph(data_DIVISIO divLine){
 //     int symc = SMUFL_E8F5_chantDivisioMaxima;
 // }
 // bool DivLine::HasRepetitionDots() const
 // {
-//     if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
+//     if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth)
+//     {
 //         return true;
 //     }
 //     return false;

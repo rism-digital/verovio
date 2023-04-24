@@ -30,10 +30,10 @@ public:
      */
     ///@{
     SystemElement();
-    SystemElement(const std::string &classid);
+    SystemElement(ClassId classId);
+    SystemElement(ClassId classId, const std::string &classIdStr);
     virtual ~SystemElement();
-    virtual void Reset();
-    virtual ClassId GetClassId() const { return SYSTEM_ELEMENT; }
+    void Reset() override;
     ///@}
 
     //----------//
@@ -41,24 +41,24 @@ public:
     //----------//
 
     /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
+    /**
      * See Object::ConvertToPageBased
      */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    int ConvertToPageBased(FunctorParams *functorParams) override;
 
     /**
      * See Object::ConvertToCastOffMensural
      */
-    virtual int ConvertToCastOffMensural(FunctorParams *params);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
+    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
 private:
     //

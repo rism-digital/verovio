@@ -2,7 +2,6 @@ import java.io.IOException;
 
 /* import the toolkit */
 import org.rismch.verovio.toolkit;
-import org.rismch.verovio.fileFormat;
 import org.rismch.verovio.NativeUtils;
 
 public class main {
@@ -32,7 +31,7 @@ public class main {
 		s = s + "@end:00000400004625-1.1.1\n";
 		
 		/* set the format to PAE and load the data */
-		vrvToolkit.setFormat(fileFormat.PAE);
+		vrvToolkit.setInputFrom("pae");
 		vrvToolkit.loadData(s);
 
         /* convert it and write it to the standard output */

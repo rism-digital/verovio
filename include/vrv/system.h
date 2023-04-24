@@ -16,11 +16,12 @@
 
 namespace vrv {
 
-class BoundaryEnd;
+class SystemMilestoneEnd;
 class DeviceContext;
 class Ending;
 class Measure;
 class ScoreDef;
+class Slur;
 class Staff;
 
 //----------------------------------------------------------------------------
@@ -41,24 +42,23 @@ public:
     ///@{
     System();
     virtual ~System();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "System"; }
-    virtual ClassId GetClassId() const { return SYSTEM; }
+    void Reset() override;
+    std::string GetClassName() const override { return "System"; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
     ///@}
 
     /**
      * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const;
-    virtual int GetDrawingY() const;
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
     ///@}
 
     /**
@@ -75,16 +75,22 @@ public:
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
-    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
+    int GetDrawingLabelsWidth() const;
     void SetDrawingLabelsWidth(int width);
     int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
+    void ResetDrawingAbbrLabelsWidth() { m_drawingAbbrLabelsWidth = 0; }
     ///@}
 
     /**
      * Return the height of the system
      */
     int GetHeight() const;
+
+    /**
+     * Return the minimus system spacing
+     */
+    int GetMinimumSystemSpacing(const Doc *doc) const;
 
     /**
      * Return the index position of the system in its page parent
@@ -98,15 +104,23 @@ public:
      * @name Setter and getter of the drawing scoreDef
      */
     ///@{
-    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
+    ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
+    const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    void ResetDrawingScoreDef();
     ///@}
 
     /**
      * Check if the notes between the start and end have mixed drawing stem directions.
      * The start and end element are expected to be on the same staff and same layer.
      */
-    bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
+    bool HasMixedDrawingStemDir(const LayerElement *start, const LayerElement *end) const;
+
+    /**
+     * Get preferred curve direction based on the starting and ending point of the slur
+     */
+    curvature_CURVEDIR GetPreferredCurveDirection(
+        const LayerElement *start, const LayerElement *end, const Slur *slur) const;
 
     /**
      * @name Setter and getter of the drawing visible flag
@@ -120,132 +134,60 @@ public:
      * Add an object to the drawing list but only if necessary.
      * Check types but also links (dynam, dir) and extensions (trill).
      */
-    void AddToDrawingListIfNeccessary(Object *object);
+    void AddToDrawingListIfNecessary(Object *object);
+
+    /**
+     * @name Check if the system is the first or last in page or of a selection or of an mdiv by looking at the next
+     * sibling
+     */
+    ///@{
+    bool IsFirstInPage() const;
+    bool IsLastInPage() const;
+    bool IsFirstOfMdiv() const;
+    bool IsLastOfMdiv() const;
+    bool IsFirstOfSelection() const;
+    bool IsLastOfSelection() const;
+    ///@}
+
+    /**
+     * Estimate the justification ratio from the castoff system widths and the desired page width
+     */
+    double EstimateJustificationRatio(const Doc *doc) const;
+
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem);
+
+    /**
+     * Reverse of ConvertToCastOffMensural()
+     */
+    void ConvertToUnCastOffMensuralSystem();
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::UnsetCurrentScoreDef
-     */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
-
-    /**
-     * See Object::OptimizeScoreDef
+     * Interface for class functor visitation
      */
     ///@{
-    virtual int OptimizeScoreDef(FunctorParams *functorParams);
-    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
     /**
      * See Object::ApplyPPUFactor
      */
-    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
     /**
-     * See Object::AlignHorizontally
+     * See Object::Transpose
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustXOverflow
-     */
-    ///@{
-    virtual int AdjustXOverflow(FunctorParams *functorParams);
-    virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
-    ///@}
-
-    /**
-     * See Object::AdjustHarmGrpsSpacing
-     */
-    ///@{
-    virtual int AdjustHarmGrpsSpacing(FunctorParams *functorParams);
-    virtual int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams);
-    ///@}
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    ///@{
-    virtual int AdjustSylSpacing(FunctorParams *functorParams);
-    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
-    ///@}
-
-    /**
-     * See Object::AlignVertically
-     */
-    ///@{
-    virtual int AlignVertically(FunctorParams *functorParams);
-    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
-    ///@}
-
-    /**
-     * See Object::AdjustYPos
-     */
-    virtual int AdjustYPos(FunctorParams *functorParams);
-
-    /**
-     * See Object::AlignSystems
-     */
-    virtual int AlignSystems(FunctorParams *functorParams);
-
-    /**
-     * See Object::AlignMeasures
-     */
-    virtual int AlignMeasures(FunctorParams *functorParams);
-    virtual int AlignMeasuresEnd(FunctorParams *functorParams);
-
-    /**
-     * See Object::JustifyX
-     */
-    virtual int JustifyX(FunctorParams *functorParams);
-
-    /**
-     * See Object::JustifyY
-     */
-    virtual int JustifyY(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustStaffOverlap
-     */
-    virtual int AdjustStaffOverlap(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustFloatingPositioners
-     */
-    virtual int AdjustFloatingPositioners(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustSlurs
-     */
-    virtual int AdjustSlurs(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffPages
-     */
-    virtual int CastOffPages(FunctorParams *functorParams);
-
-    /**
-     * See Object::UnCastOff
-     */
-    virtual int UnCastOff(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystemsEnd
-     */
-    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
+    int Transpose(FunctorParams *functorParams) override;
 
 public:
     SystemAligner m_systemAligner;
@@ -266,11 +208,9 @@ public:
      */
     int m_xAbs;
     /**
-     * The width used by the labels at the left of the system.
+     * The width used by the abbreviated labels at the left of the system.
      * It is used internally when calculating the layout and it is not stored in the file.
      */
-    int m_drawingLabelsWidth;
-    /** The width used by the abbreviated labels */
     int m_drawingAbbrLabelsWidth;
     /**
      * @name The total width of the system.
@@ -279,6 +219,15 @@ public:
     ///@{
     int m_drawingTotalWidth;
     int m_drawingJustifiableWidth;
+    ///@}
+    /**
+     * @name The cast off width of the system.
+     * It is computed during castoff and used for adjusting the horizontal spacing for a given duration.
+     * This technique prevents large justification ratios and improves the horizontal layout.
+     */
+    ///@{
+    int m_castOffTotalWidth;
+    int m_castOffJustifiableWidth;
     ///@}
 
 protected:

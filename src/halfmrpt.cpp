@@ -9,13 +9,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "chord.h"
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -28,9 +29,13 @@ namespace vrv {
 // HalfmRpt
 //----------------------------------------------------------------------------
 
-HalfmRpt::HalfmRpt() : LayerElement("mrpt-")
+static const ClassRegistrar<HalfmRpt> s_factory("halfmRpt", HALFMRPT);
+
+HalfmRpt::HalfmRpt() : LayerElement(HALFMRPT, "mrpt-")
 {
-    Reset();
+    this->RegisterAttClass(ATT_COLOR);
+
+    this->Reset();
 }
 
 HalfmRpt::~HalfmRpt() {}
@@ -38,26 +43,39 @@ HalfmRpt::~HalfmRpt() {}
 void HalfmRpt::Reset()
 {
     LayerElement::Reset();
+    this->ResetColor();
 }
 
 //----------------------------------------------------------------------------
 // HalfmRpt functor methods
 //----------------------------------------------------------------------------
 
+FunctorCode HalfmRpt::Accept(MutableFunctor &functor)
+{
+    return functor.VisitHalfmRpt(this);
+}
+
+FunctorCode HalfmRpt::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitHalfmRpt(this);
+}
+
+FunctorCode HalfmRpt::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHalfmRptEnd(this);
+}
+
+FunctorCode HalfmRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHalfmRptEnd(this);
+}
+
 int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
 {
-    // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
     // assert(params);
 
     LogWarning("HalfmRpt produces empty MIDI output");
-
-    return FUNCTOR_CONTINUE;
-}
-
-int HalfmRpt::PrepareRpt(FunctorParams *functorParams)
-{
-    // PrepareRptParams *params = dynamic_cast<PrepareRptParams *>(functorParams);
-    // assert(params);
 
     return FUNCTOR_CONTINUE;
 }

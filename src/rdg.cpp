@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,13 @@ namespace vrv {
 // Rdg
 //----------------------------------------------------------------------------
 
-Rdg::Rdg() : EditorialElement("rdg-"), AttSource()
-{
-    RegisterAttClass(ATT_SOURCE);
+static const ClassRegistrar<Rdg> s_factory("rdg", RDG);
 
-    Reset();
+Rdg::Rdg() : EditorialElement(RDG, "rdg-"), AttSource()
+{
+    this->RegisterAttClass(ATT_SOURCE);
+
+    this->Reset();
 }
 
 Rdg::~Rdg() {}
@@ -33,7 +35,7 @@ Rdg::~Rdg() {}
 void Rdg::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

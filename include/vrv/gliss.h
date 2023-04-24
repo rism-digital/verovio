@@ -35,23 +35,40 @@ public:
     ///@{
     Gliss();
     virtual ~Gliss();
-    virtual Object *Clone() const { return new Gliss(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Gliss"; }
-    virtual ClassId GetClassId() const { return GLISS; }
+    Object *Clone() const override { return new Gliss(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Gliss"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

@@ -26,10 +26,9 @@ public:
     ///@{
     Restore();
     virtual ~Restore();
-    virtual Object *Clone() const { return new Restore(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Restore"; }
-    virtual ClassId GetClassId() const { return RESTORE; }
+    Object *Clone() const override { return new Restore(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Restore"; }
     ///@}
 
 private:

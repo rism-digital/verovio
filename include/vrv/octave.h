@@ -28,6 +28,7 @@ class Octave : public ControlElement,
                public AttExtender,
                public AttLineRend,
                public AttLineRendBase,
+               public AttNNumberLike,
                public AttOctaveDisplacement {
 public:
     /**
@@ -37,23 +38,67 @@ public:
     ///@{
     Octave();
     virtual ~Octave();
-    virtual Object *Clone() const { return new Octave(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Octave"; }
-    virtual ClassId GetClassId() const { return OCTAVE; }
+    Object *Clone() const override { return new Octave(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Octave"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    TimePointInterface *GetTimePointInterface() override { return vrv_cast<TimePointInterface *>(this); }
+    const TimePointInterface *GetTimePointInterface() const override
+    {
+        return vrv_cast<const TimePointInterface *>(this);
+    }
+    TimeSpanningInterface *GetTimeSpanningInterface() override { return vrv_cast<TimeSpanningInterface *>(this); }
+    const TimeSpanningInterface *GetTimeSpanningInterface() const override
+    {
+        return vrv_cast<const TimeSpanningInterface *>(this);
+    }
     ///@}
+
+    /**
+     * Store the horizontal extender line coordinates
+     */
+    ///@{
+    void ResetDrawingExtenderX();
+    void SetDrawingExtenderX(int left, int right);
+    ///@}
+
+    /**
+     * Get the SMuFL glyph.
+     */
+    char32_t GetOctaveGlyph(bool withAltaBassa) const;
+
+    /**
+     * Calculate the octave line width.
+     */
+    int GetLineWidth(const Doc *doc, int unit) const;
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary (relative to the object position)
+     * and a flag indicating whether refined layout was used.
+     */
+    std::pair<int, bool> GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const override;
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //
@@ -62,7 +107,10 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The left and right X coordinates of the drawn horizontal extender line
+     */
+    std::map<const FloatingPositioner *, std::pair<int, int>> m_drawingExtenderX;
 };
 
 } // namespace vrv

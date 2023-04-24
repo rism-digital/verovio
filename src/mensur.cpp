@@ -5,47 +5,50 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "mensur.h" //----------------------------------------------------------------------------
+#include "mensur.h"
 
-#include <assert.h>
+//----------------------------------------------------------------------------
+
+#include <cassert>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "scoredefinterface.h"
 #include "vrv.h"
 
 namespace vrv {
 
-int Mensur::s_num = 3;
-int Mensur::s_numBase = 2;
+const int Mensur::s_num = 3;
+const int Mensur::s_numBase = 2;
 
 //----------------------------------------------------------------------------
 // Mensur
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Mensur> s_factory("mensur", MENSUR);
+
 Mensur::Mensur()
-    : LayerElement("mensur-")
+    : LayerElement(MENSUR, "mensur-")
     , AttColor()
     , AttCue()
     , AttDurationRatio()
     , AttMensuralShared()
-    , AttMensuralLog()
     , AttMensurVis()
     , AttSlashCount()
     , AttStaffLoc()
 {
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_CUE);
-    RegisterAttClass(ATT_DURATIONRATIO);
-    RegisterAttClass(ATT_MENSURALSHARED);
-    RegisterAttClass(ATT_MENSURALLOG);
-    RegisterAttClass(ATT_MENSURVIS);
-    RegisterAttClass(ATT_SLASHCOUNT);
-    RegisterAttClass(ATT_STAFFLOC);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CUE);
+    this->RegisterAttClass(ATT_DURATIONRATIO);
+    this->RegisterAttClass(ATT_MENSURALSHARED);
+    this->RegisterAttClass(ATT_MENSURVIS);
+    this->RegisterAttClass(ATT_SLASHCOUNT);
+    this->RegisterAttClass(ATT_STAFFLOC);
 
-    Reset();
+    this->Reset();
 }
 
 Mensur::~Mensur() {}
@@ -53,28 +56,37 @@ Mensur::~Mensur() {}
 void Mensur::Reset()
 {
     LayerElement::Reset();
-    ResetColor();
-    ResetCue();
-    ResetDurationRatio();
-    ResetMensuralShared();
-    ResetMensuralLog();
-    ResetMensurVis();
-    ResetSlashCount();
-    ResetStaffLoc();
+    this->ResetColor();
+    this->ResetCue();
+    this->ResetDurationRatio();
+    this->ResetMensuralShared();
+    this->ResetMensurVis();
+    this->ResetSlashCount();
+    this->ResetStaffLoc();
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams)
+FunctorCode Mensur::Accept(MutableFunctor &functor)
 {
-    LayerCountInTimeSpanParams *params = dynamic_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
+    return functor.VisitMensur(this);
+}
 
-    params->m_mensur = this;
+FunctorCode Mensur::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMensur(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Mensur::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitMensurEnd(this);
+}
+
+FunctorCode Mensur::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMensurEnd(this);
 }
 
 } // namespace vrv

@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
@@ -21,11 +21,13 @@ namespace vrv {
 // Restore
 //----------------------------------------------------------------------------
 
-Restore::Restore() : EditorialElement("restore-"), AttSource()
-{
-    RegisterAttClass(ATT_SOURCE);
+static const ClassRegistrar<Restore> s_factory("restore", RESTORE);
 
-    Reset();
+Restore::Restore() : EditorialElement(RESTORE, "restore-"), AttSource()
+{
+    this->RegisterAttClass(ATT_SOURCE);
+
+    this->Reset();
 }
 
 Restore::~Restore() {}
@@ -33,7 +35,7 @@ Restore::~Restore() {}
 void Restore::Reset()
 {
     EditorialElement::Reset();
-    ResetSource();
+    this->ResetSource();
 }
 
 //----------------------------------------------------------------------------

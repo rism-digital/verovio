@@ -32,7 +32,6 @@ public:
     virtual Object *Clone() const { return new DivLine(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "DivLine"; }
-    virtual ClassId GetClassId() const { return DIVLINE; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -68,7 +67,7 @@ public:
      */
     // virtual int ConvertToCastOffMensural(FunctorParams *params);
     // static wchar_t GetDivLineGlyph(data_DIVISIO);
-    
+
     /**
      * See Object::ResetDrawing
      */

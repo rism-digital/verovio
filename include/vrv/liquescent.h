@@ -32,7 +32,6 @@ public:
     virtual Object *Clone() const { return new Liquescent(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Liquescent"; }
-    virtual ClassId GetClassId() const { return LIQUESCENT; }
     ///@}
 
     /**
@@ -44,14 +43,13 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-    
+
 private:
     //
 public:
     //
 private:
 };
-
 
 } // namespace vrv
 

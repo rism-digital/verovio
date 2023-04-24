@@ -29,34 +29,40 @@ public:
     ///@{
     Fig();
     virtual ~Fig();
-    virtual Object *Clone() const { return new Fig(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Fig"; }
-    virtual ClassId GetClassId() const { return FIG; }
+    Object *Clone() const override { return new Fig(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Fig"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual AreaPosInterface *GetAreaPosInterface() { return dynamic_cast<AreaPosInterface *>(this); }
+    AreaPosInterface *GetAreaPosInterface() override { return dynamic_cast<AreaPosInterface *>(this); }
+    const AreaPosInterface *GetAreaPosInterface() const override
+    {
+        return dynamic_cast<const AreaPosInterface *>(this);
+    }
     ///@}
 
     /**
      * Add an element (svg) to an fig.
      * Only supported elements will be actually added to the child list.
      */
-    virtual bool IsSupportedChild(Object *object);
+    bool IsSupportedChild(Object *object) override;
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::AlignVertically
+     * Interface for class functor visitation
      */
     ///@{
-    virtual int AlignVertically(FunctorParams *functorParams);
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 private:

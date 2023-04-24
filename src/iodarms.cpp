@@ -41,7 +41,7 @@ namespace vrv {
 #ifndef NO_DARMS_SUPPORT
 
 // Ok, this is ugly, but since this is static data, why not?
-pitchmap DarmsInput::PitchMap[] = {
+const pitchmap DarmsInput::PitchMap[] = {
     /* 00 */ { 1, PITCHNAME_c },
     { 1, PITCHNAME_d },
     { 1, PITCHNAME_e },
@@ -173,7 +173,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
     }
 
     // See if followed by numerical meter
-    if (isdigit(data[pos])) { // Coupound meter
+    if (isdigit(data[pos])) { // compound meter
         int n1, n2;
         n1 = data[pos] - ASCII_NUMBER_OFFSET; // old school conversion to int
         if (isdigit(data[pos + 1])) {
@@ -461,7 +461,7 @@ bool DarmsInput::Import(const std::string &data_str)
 
     m_doc->Reset();
     m_doc->SetType(Raw);
-    // The mdiv
+    // The mDiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
     m_doc->AddChild(mdiv);
@@ -510,7 +510,7 @@ bool DarmsInput::Import(const std::string &data_str)
         }
         else {
             // if (!isspace(c))
-            // LogMessage("Other %c", c);
+            // LogInfo("Other %c", c);
         }
 
         pos++;
@@ -521,7 +521,7 @@ bool DarmsInput::Import(const std::string &data_str)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffGrp->AddChild(staffDef);
-    m_doc->m_mdivScoreDef.AddChild(staffGrp);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 

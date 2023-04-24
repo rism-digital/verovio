@@ -9,17 +9,17 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
 #include "doc.h"
 #include "elementpart.h"
+#include "functor.h"
 #include "liquescent.h"
 #include "staff.h"
 #include "vrv.h"
-
 
 namespace vrv {
 
@@ -27,8 +27,10 @@ namespace vrv {
 // Nc
 //----------------------------------------------------------------------------
 
+static const ClassRegistrar<Nc> s_factory("nc", NC);
+
 Nc::Nc()
-    : LayerElement("nc-")
+    : LayerElement(NC, "nc-")
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()
@@ -37,14 +39,14 @@ Nc::Nc()
     , AttNcForm()
 
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_INTERVALMELODIC);
-    RegisterAttClass(ATT_NCFORM);
+    this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_INTERVALMELODIC);
+    this->RegisterAttClass(ATT_NCFORM);
 
-    Reset();
+    this->Reset();
 }
 
 Nc::~Nc() {}
@@ -55,9 +57,29 @@ void Nc::Reset()
     DurationInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
-    ResetColor();
-    ResetIntervalMelodic();
-    ResetNcForm();
+    this->ResetColor();
+    this->ResetIntervalMelodic();
+    this->ResetNcForm();
+}
+
+FunctorCode Nc::Accept(MutableFunctor &functor)
+{
+    return functor.VisitNc(this);
+}
+
+FunctorCode Nc::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNc(this);
+}
+
+FunctorCode Nc::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitNcEnd(this);
+}
+
+FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNcEnd(this);
 }
 
 bool Nc::IsSupportedChild(Object *child)

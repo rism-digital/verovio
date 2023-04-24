@@ -7,17 +7,23 @@
 
 #include "proport.h"
 
+//----------------------------------------------------------------------------
+
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
 // Proport
 //----------------------------------------------------------------------------
 
-Proport::Proport() : LayerElement("prop-"), AttDurationRatio()
-{
-    RegisterAttClass(ATT_DURATIONRATIO);
+static const ClassRegistrar<Proport> s_factory("proport", PROPORT);
 
-    Reset();
+Proport::Proport() : LayerElement(PROPORT, "prop-"), AttDurationRatio()
+{
+    this->RegisterAttClass(ATT_DURATIONRATIO);
+
+    this->Reset();
 }
 
 Proport::~Proport() {}
@@ -25,7 +31,27 @@ Proport::~Proport() {}
 void Proport::Reset()
 {
     LayerElement::Reset();
-    ResetDurationRatio();
+    this->ResetDurationRatio();
+}
+
+FunctorCode Proport::Accept(MutableFunctor &functor)
+{
+    return functor.VisitProport(this);
+}
+
+FunctorCode Proport::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitProport(this);
+}
+
+FunctorCode Proport::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitProportEnd(this);
+}
+
+FunctorCode Proport::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitProportEnd(this);
 }
 
 } // namespace vrv

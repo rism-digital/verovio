@@ -9,12 +9,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "object.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -22,17 +21,22 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Zone
 //----------------------------------------------------------------------------
-Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated()
+
+static const ClassRegistrar<Zone> s_factory("zone", ZONE);
+
+Zone::Zone() : Object(ZONE, "zone-"), AttTyped(), AttCoordinated()
 {
-    RegisterAttClass(ATT_TYPED);
-    RegisterAttClass(ATT_COORDINATED);
-    Reset();
+    this->RegisterAttClass(ATT_TYPED);
+    this->RegisterAttClass(ATT_COORDINATED);
+    this->Reset();
 }
+
 Zone::~Zone() {}
+
 void Zone::Reset()
 {
-    ResetTyped();
-    ResetCoordinated();
+    this->ResetTyped();
+    this->ResetCoordinated();
 }
 
 void Zone::ShiftByXY(int xDiff, int yDiff)
@@ -43,12 +47,12 @@ void Zone::ShiftByXY(int xDiff, int yDiff)
     this->SetLry(this->GetLry() + yDiff);
 }
 
-int Zone::GetLogicalUly()
+int Zone::GetLogicalUly() const
 {
     return (this->GetUly());
 }
 
-int Zone::GetLogicalLry()
+int Zone::GetLogicalLry() const
 {
     return (this->GetLry());
 }

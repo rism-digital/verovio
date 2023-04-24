@@ -9,12 +9,14 @@
 #define __VRV_POSITION_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 
 namespace vrv {
 
-class FunctorParams;
 class Layer;
 class LayerElement;
+class ResetDataFunctor;
+class ResetHorizontalAlignmentFunctor;
 
 //----------------------------------------------------------------------------
 // PositionInterface
@@ -34,40 +36,40 @@ public:
     ///@{
     PositionInterface();
     virtual ~PositionInterface();
-    virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_POSITION; }
+    void Reset() override;
+    InterfaceId IsInterface() const override { return INTERFACE_POSITION; }
     ///@}
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the SetAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPosFunctor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
 
-    int CalcDrawingLoc(Layer *layer, LayerElement *element);
+    int CalcDrawingLoc(const Layer *layer, const LayerElement *element);
 
     /**
      * Inteface comparison operator.
      * Checks if the LayerElement has a PositionInterface and compares attributes
      */
-    bool HasIdenticalPositionInterface(PositionInterface *otherPitchInterface);
+    bool HasIdenticalPositionInterface(const PositionInterface *otherPositionInterface) const;
 
     //-----------------//
     // Pseudo functors //
     //-----------------//
 
     /**
-     * See Object::ResetDrawing
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
-    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    FunctorCode InterfaceResetHorizontalAlignment(ResetHorizontalAlignmentFunctor &functor, Object *object);
+    ///@}
 
 private:
     //

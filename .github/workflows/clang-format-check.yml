@@ -1,0 +1,25 @@
+name: Check clang-format
+on: [push, pull_request]
+jobs:
+  formatting-check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - check: "include"
+            exclude: "(hum|crc|midi|json|pugi|utf8|win32|zip)"
+          - check: "src"
+            exclude: "(hum|crc|midi|json|pugi)"
+          - check: "libmei/addons"
+          - check: "tools"
+    
+    name: Check for ${{ matrix.path['check'] }}
+          
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run clang-format style check for C/C++ programs.
+        uses: jidicula/clang-format-action@v4.9.0
+        with:
+          clang-format-version: "15"
+          check-path: ${{ matrix.path['check'] }}
+          exclude-regex: ${{ matrix.path['exclude'] }}
