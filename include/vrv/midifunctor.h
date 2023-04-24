@@ -67,6 +67,58 @@ private:
     double m_currentTempo;
 };
 
+//----------------------------------------------------------------------------
+// InitMaxMeasureDurationFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class calculates the maximum duration of each measure.
+ */
+class InitMaxMeasureDurationFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    InitMaxMeasureDurationFunctor();
+    virtual ~InitMaxMeasureDurationFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitTempo(Tempo *tempo) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current score time
+    double m_currentScoreTime;
+    // The current time in seconds
+    double m_currentRealTimeSeconds;
+    // The current tempo
+    double m_currentTempo;
+    // The tempo adjustment
+    double m_tempoAdjustment;
+    // The factor for multibar rests
+    int m_multiRestFactor;
+};
+
 } // namespace vrv
 
 #endif // __VRV_MIDIFUNCTOR_H__

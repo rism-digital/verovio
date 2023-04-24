@@ -176,4 +176,42 @@ FunctorCode InitOnsetOffsetFunctor::VisitTabGrpEnd(TabGrp *tabGrp)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// InitMaxMeasureDurationFunctor
+//----------------------------------------------------------------------------
+
+InitMaxMeasureDurationFunctor::InitMaxMeasureDurationFunctor()
+{
+    m_currentScoreTime = 0.0;
+    m_currentRealTimeSeconds = 0.0;
+    m_currentTempo = MIDI_TEMPO;
+    m_tempoAdjustment = 1.0;
+    m_multiRestFactor = 1;
+}
+
+FunctorCode InitMaxMeasureDurationFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMaxMeasureDurationFunctor::VisitMeasure(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMaxMeasureDurationFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMaxMeasureDurationFunctor::VisitTempo(Tempo *tempo)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
