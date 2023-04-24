@@ -2567,7 +2567,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
                     Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
                     if (text != NULL) {
-                        std::wstring currentString = text->GetText();
+                        std::u32string currentString = text->GetText();
                         fullString = fullString + currentString;
                     }
                 }
