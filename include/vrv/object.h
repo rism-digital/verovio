@@ -693,16 +693,6 @@ public:
     ///@{
 
     /**
-     * Prepare Note onsets
-     */
-    virtual int InitOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::InitOnsetOffset
-     */
-    virtual int InitOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Calculate the maximum duration of each measure.
      */
     virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }

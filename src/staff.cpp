@@ -364,23 +364,6 @@ FunctorCode Staff::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffEnd(this);
 }
 
-int Staff::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    assert(m_drawingStaffDef);
-
-    if (m_drawingStaffDef->HasNotationtype()) {
-        params->m_notationType = m_drawingStaffDef->GetNotationtype();
-    }
-    else {
-        params->m_notationType = NOTATIONTYPE_cmn;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

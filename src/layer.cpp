@@ -630,20 +630,6 @@ FunctorCode Layer::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitLayerEnd(this);
 }
 
-int Layer::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreTime = 0.0;
-    params->m_currentRealTimeSeconds = 0.0;
-
-    params->m_currentMensur = this->GetCurrentMensur();
-    params->m_currentMeterSig = this->GetCurrentMeterSig();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);

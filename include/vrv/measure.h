@@ -355,11 +355,6 @@ public:
     int InitMaxMeasureDurationEnd(FunctorParams *functorParams) override;
     ///@}
 
-    /**
-     * See Object::InitOnsetOffset
-     */
-    int InitOnsetOffset(FunctorParams *functorParams) override;
-
 public:
     // flags for drawing measure barline based on visibility or other conditions
     enum BarlineDrawingFlags {

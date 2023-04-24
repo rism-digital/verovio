@@ -196,13 +196,6 @@ public:
     ///@}
 
     /**
-     * See Object::InitOnsetOffset
-     */
-    ///@{
-    int InitOnsetOffset(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

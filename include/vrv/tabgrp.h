@@ -72,11 +72,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::InitOnsetOffsetEnd
-     */
-    virtual int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Filter the flat list and keep only Note elements.

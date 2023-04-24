@@ -798,14 +798,4 @@ int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    params->m_currentTempo = m_currentTempo;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

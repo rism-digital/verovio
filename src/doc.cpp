@@ -36,6 +36,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "midifunctor.h"
 #include "miscfunctor.h"
 #include "mnum.h"
 #include "mrest.h"
@@ -358,10 +359,8 @@ void Doc::CalculateTimemap()
     this->Process(&initMaxMeasureDuration, &initMaxMeasureDurationParams, &initMaxMeasureDurationEnd);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
-    InitOnsetOffsetParams initOnsetOffsetParams;
-    Functor initOnsetOffset(&Object::InitOnsetOffset);
-    Functor initOnsetOffsetEnd(&Object::InitOnsetOffsetEnd);
-    this->Process(&initOnsetOffset, &initOnsetOffsetParams, &initOnsetOffsetEnd);
+    InitOnsetOffsetFunctor initOnsetOffset;
+    this->Process(initOnsetOffset);
 
     // Adjust the duration of tied notes
     Functor initTimemapTies(&Object::InitTimemapTies);

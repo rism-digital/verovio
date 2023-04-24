@@ -339,13 +339,6 @@ public:
     ///@}
 
     /**
-     * See Object::InitOnsetOffset
-     */
-    ///@{
-    int InitOnsetOffset(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::InitTimemapTies
      */
     ///@{

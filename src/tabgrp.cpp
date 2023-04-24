@@ -137,22 +137,4 @@ FunctorCode TabGrp::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTabGrpEnd(this);
 }
 
-int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    LayerElement *element = this->ThisOrSameasLink();
-
-    double incrementScoreTime = element->GetAlignmentDuration(
-        params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-    incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
-
-    params->m_currentScoreTime += incrementScoreTime;
-    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
