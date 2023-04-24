@@ -193,14 +193,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    ///@{
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-    int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::InitOnsetOffsetEnd
      */
     int InitOnsetOffsetEnd(FunctorParams *functorParams) override;

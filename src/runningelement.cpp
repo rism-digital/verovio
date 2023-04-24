@@ -407,24 +407,4 @@ FunctorCode RunningElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitRunningElementEnd(this);
 }
 
-int RunningElement::Save(FunctorParams *functorParams)
-{
-    if (this->IsGenerated()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return Object::Save(functorParams);
-    }
-}
-
-int RunningElement::SaveEnd(FunctorParams *functorParams)
-{
-    if (this->IsGenerated()) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return Object::SaveEnd(functorParams);
-    }
-}
-
 } // namespace vrv

@@ -74,12 +74,11 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    SaveParams saveParams(this, false);
-    m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
+    m_doc->GetCurrentScoreDef()->SaveObject(this, false);
 
     m_docScoreDef = false;
 
-    m_doc->SaveObject(saveParams);
+    m_doc->SaveObject(this, false);
 
     output = m_streamStringOutput.str();
 

@@ -66,14 +66,6 @@ public:
     ///@}
 
     /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
      * Set/get methods for the flagShift
      */
     ///@{
@@ -136,14 +128,6 @@ public:
     FunctorCode Accept(ConstFunctor &functor) const override;
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
 private:
@@ -227,14 +211,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    ///@}
-
 private:
     //
 public:
@@ -316,14 +292,6 @@ public:
     FunctorCode Accept(ConstFunctor &functor) const override;
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
 private:

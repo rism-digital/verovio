@@ -15,6 +15,7 @@
 
 #include "beamspan.h"
 #include "comparison.h"
+#include "convertfunctor.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -24,6 +25,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
+#include "miscfunctor.h"
 #include "page.h"
 #include "pages.h"
 #include "pedal.h"
@@ -430,57 +432,51 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
     assert(targetSystem);
 
     // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-    // The means no content? Checking just in case
-    if (initProcessingListsParams.m_layerTree.child.empty()) return;
+    // Checking just in case
+    if (layerTree.child.empty()) return;
 
-    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
-        doc, targetSystem, &initProcessingListsParams.m_layerTree);
+    ConvertToCastOffMensuralFunctor convertToCastOffMensural(doc, targetSystem, &layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
-    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
-        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+    for (const auto &staves : layerTree.child) {
+        convertToCastOffMensural.AddStaffN(staves.first);
     }
-
-    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
-    this->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+    this->Process(convertToCastOffMensural);
 }
 
 void System::ConvertToUnCastOffMensuralSystem()
 {
     // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-    // The means no content? Checking just in case
-    if (initProcessingListsParams.m_layerTree.child.empty()) return;
-
-    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
+    // Checking just in case
+    if (layerTree.child.empty()) return;
 
     Filters filters;
+    ConvertToUnCastOffMensuralFunctor convertToUnCastOffMensural;
+    convertToUnCastOffMensural.SetFilters(&filters);
+
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
-        for (auto const &layers : staves.second.child) {
+    for (const auto &staves : layerTree.child) {
+        for (const auto &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters = { &matchStaff, &matchLayer };
 
-            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
-            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
-
-            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
-            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
-
-            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
+            convertToUnCastOffMensural.ResetContent();
+            this->Process(convertToUnCastOffMensural);
+            convertToUnCastOffMensural.TrackSegmentsToDelete(false);
         }
     }
 
     // Detach the contentPage
-    for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+    for (Object *measure : convertToUnCastOffMensural.GetSegmentsToDelete()) {
         this->DeleteChild(measure);
     }
 }
@@ -507,19 +503,6 @@ FunctorCode System::AcceptEnd(MutableFunctor &functor)
 FunctorCode System::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSystemEnd(this);
-}
-
-int System::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-    if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
-    m_systemLeftMar *= params->m_page->GetPPUFactor();
-    m_systemRightMar *= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
 }
 
 int System::Transpose(FunctorParams *functorParams)

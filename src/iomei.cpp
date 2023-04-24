@@ -54,7 +54,6 @@
 #include "findfunctor.h"
 #include "fing.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "gliss.h"
 #include "gracegrp.h"
 #include "graphic.h"
@@ -80,6 +79,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "metersiggrp.h"
+#include "miscfunctor.h"
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -252,8 +252,7 @@ bool MEIOutput::Export()
         m_doc->ConvertToCastOffMensuralDoc(false);
 
         // this starts the call of all the functors
-        SaveParams saveParams(this, this->GetBasic());
-        m_doc->SaveObject(saveParams);
+        m_doc->SaveObject(this, this->GetBasic());
 
         // Redo the mensural segment cast of if necessary
         m_doc->ConvertToCastOffMensuralDoc(true);
@@ -910,8 +909,7 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         }
         else {
             // Save the main scoreDef
-            SaveParams saveParams(this, this->GetBasic());
-            m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
+            m_doc->GetCurrentScoreDef()->SaveObject(this, this->GetBasic());
         }
     }
 
@@ -1320,13 +1318,11 @@ void MEIOutput::WriteCustomScoreDef()
         }
 
         // Save the adjusted score def and delete it afterwards
-        SaveParams saveParams(this, this->GetBasic());
-        scoreDef->SaveObject(saveParams);
+        scoreDef->SaveObject(this, this->GetBasic());
         delete scoreDef;
     }
     else {
-        SaveParams saveParams(this, this->GetBasic());
-        m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
+        m_doc->GetCurrentScoreDef()->SaveObject(this, this->GetBasic());
     }
 }
 
@@ -4078,9 +4074,8 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     bool success = this->ReadPageChildren(vrvPage, page);
 
     if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
-        ApplyPPUFactorParams applyPPUFactorParams;
-        Functor applyPPUFactor(&Object::ApplyPPUFactor);
-        vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
+        ApplyPPUFactorFunctor applyPPUFactor;
+        vrvPage->Process(applyPPUFactor);
     }
 
     if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {

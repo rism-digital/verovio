@@ -63,23 +63,6 @@ public:
     ///@}
 
     /**
-     * See Object::Save
-     * Invisible Mdiv elements are not saved in page-based MEI
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override;
-    int SaveEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

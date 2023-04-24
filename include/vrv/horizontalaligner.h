@@ -125,13 +125,13 @@ public:
     bool IsOfType(const std::vector<AlignmentType> &types) const;
 
     /**
-     * Retrive the minimum left and maximum right position for the objects in an alignment.
-     * Returns (-)VRV_UNSET in nothing for the staff specified.
-     * Uses Object::GetAlignmentLeftRight
+     * Retrieve the minimum left and maximum right position for the objects in an alignment.
+     * Returns (-)VRV_UNSET if there is nothing for the staff specified.
+     * Internally uses GetAlignmentLeftRightFunctor
      */
-    void GetLeftRight(const std::vector<int> &staffNs, int &minLeft, int &maxRight,
-        const std::vector<ClassId> &m_excludes = {}) const;
-    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {}) const;
+    void GetLeftRight(
+        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &excludes = {}) const;
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &excludes = {}) const;
 
     /**
      * Return all GraceAligners for the Alignment.

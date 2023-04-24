@@ -23,6 +23,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
+#include "miscfunctor.h"
 #include "note.h"
 #include "options.h"
 #include "smufl.h"
@@ -642,40 +643,37 @@ bool Alignment::IsOfType(const std::vector<AlignmentType> &types) const
 }
 
 void Alignment::GetLeftRight(
-    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes) const
+    const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &excludes) const
 {
-    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
-    GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
-
     minLeft = -VRV_UNSET;
     maxRight = VRV_UNSET;
 
     for (int staffN : staffNs) {
         int staffMinLeft, staffMaxRight;
-        this->GetLeftRight(staffN, staffMinLeft, staffMaxRight);
-        if (staffMinLeft < minLeft) minLeft = staffMinLeft;
-        if (staffMaxRight > maxRight) maxRight = staffMaxRight;
+        this->GetLeftRight(staffN, staffMinLeft, staffMaxRight, excludes);
+        minLeft = std::min(minLeft, staffMinLeft);
+        maxRight = std::max(maxRight, staffMaxRight);
     }
 }
 
-void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes) const
+void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &excludes) const
 {
-    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
-    GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
-    getAlignmentLeftRightParams.m_excludeClasses = m_excludes;
+    GetAlignmentLeftRightFunctor getAlignmentLeftRight;
+    getAlignmentLeftRight.ExcludeClasses(excludes);
 
     if (staffN != VRV_UNSET) {
         Filters filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.Add(&matchStaff);
-        this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
+        getAlignmentLeftRight.SetFilters(&filters);
+        this->Process(getAlignmentLeftRight);
     }
     else {
-        this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams);
+        this->Process(getAlignmentLeftRight);
     }
 
-    minLeft = getAlignmentLeftRightParams.m_minLeft;
-    maxRight = getAlignmentLeftRightParams.m_maxRight;
+    minLeft = getAlignmentLeftRight.GetMinLeft();
+    maxRight = getAlignmentLeftRight.GetMaxRight();
 }
 
 GraceAligner *Alignment::GetGraceAligner(int id)
