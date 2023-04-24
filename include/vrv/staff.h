@@ -163,7 +163,7 @@ public:
     ///@}
 
     /**
-     * Used for calculating clustered information/dot position.
+     * Used for calculating note groups information/dot position.
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
     bool IsOnStaffLine(int y, const Doc *doc) const;

@@ -61,30 +61,30 @@ FunctorCode CalcChordNoteHeadsFunctor::VisitNote(Note *note)
         noteheadShift = m_diameter - diameter;
     }
 
-    // Nothing to do for notes that are not in a cluster and without base diameter for the chord
-    const ChordCluster *cluster = note->GetCluster();
-    if ((!m_diameter || (m_alignmentType != note->GetAlignment()->GetType())) && !cluster) return FUNCTOR_SIBLINGS;
+    // Nothing to do for notes that are not in a note group and without base diameter for the chord
+    const ChordNoteGroup *noteGroup = note->GetNoteGroup();
+    if ((!m_diameter || (m_alignmentType != note->GetAlignment()->GetType())) && !noteGroup) return FUNCTOR_SIBLINGS;
 
     /************** notehead direction **************/
 
     bool flippedNotehead = false;
 
-    // if the note is clustered, calculations are different
-    if (cluster) {
-        const int clusterPosition = note->GetClusterPosition();
+    // if the note is in a note group, calculations are different
+    if (noteGroup) {
+        const int noteGroupPosition = note->GetNoteGroupPosition();
         if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-            // stem down/even cluster = noteheads start on left (incorrect side)
-            if (cluster->size() % 2 == 0) {
-                flippedNotehead = (clusterPosition % 2 != 0);
+            // stem down/even note group = noteheads start on left (incorrect side)
+            if (noteGroup->size() % 2 == 0) {
+                flippedNotehead = (noteGroupPosition % 2 != 0);
             }
             // else they start on normal side
             else {
-                flippedNotehead = (clusterPosition % 2 == 0);
+                flippedNotehead = (noteGroupPosition % 2 == 0);
             }
         }
         else {
             // flipped noteheads start on normal side no matter what
-            flippedNotehead = (clusterPosition % 2 == 0);
+            flippedNotehead = (noteGroupPosition % 2 == 0);
         }
     }
 

@@ -117,8 +117,8 @@ void Note::Reset()
     this->ResetTiePresent();
     this->ResetVisibility();
 
-    m_clusterPosition = 0;
-    m_cluster = NULL;
+    m_noteGroupPosition = 0;
+    m_noteGroup = NULL;
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
@@ -249,11 +249,11 @@ int Note::GetDrawingDur() const
     }
 }
 
-bool Note::IsClusterExtreme() const
+bool Note::IsNoteGroupExtreme() const
 {
-    ChordCluster *cluster = m_cluster;
-    if (this == cluster->at(0)) return true;
-    return (this == cluster->at(cluster->size() - 1)) ? true : false;
+    ChordNoteGroup *noteGroup = m_noteGroup;
+    if (this == noteGroup->at(0)) return true;
+    return (this == noteGroup->at(noteGroup->size() - 1)) ? true : false;
 }
 
 TabGrp *Note::IsTabGrpNote()
@@ -341,10 +341,10 @@ bool Note::IsUnisonWith(const Note *note, bool ignoreAccid) const
     return ((this->GetPname() == note->GetPname()) && (this->GetOct() == note->GetOct()));
 }
 
-void Note::SetCluster(ChordCluster *cluster, int position)
+void Note::SetNoteGroup(ChordNoteGroup *noteGroup, int position)
 {
-    m_cluster = cluster;
-    m_clusterPosition = position;
+    m_noteGroup = noteGroup;
+    m_noteGroupPosition = position;
 }
 
 Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
