@@ -748,10 +748,12 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int sym = 0;
 
     switch (divLine->GetForm()) {
-        case DIVLINE_maxima: sym = SMUFL_E8F5_chantDivisioMaxima; break;
-        case DIVLINE_minima: sym = SMUFL_E8F3_chantDivisioMinima; break;
-        case DIVLINE_maior: sym = SMUFL_E8F4_chantDivisioMaior; break;
-        case DIVLINE_finalis: sym = SMUFL_E8F6_chantDivisioFinalis; break;
+        case divLineLog_FORM_minima: sym = SMUFL_E8F3_chantDivisioMinima; break;
+        case divLineLog_FORM_maior: sym = SMUFL_E8F4_chantDivisioMaior; break;
+        case divLineLog_FORM_maxima: sym = SMUFL_E8F5_chantDivisioMaxima; break;
+        case divLineLog_FORM_finalis: sym = SMUFL_E8F6_chantDivisioFinalis; break;
+        case divLineLog_FORM_caesura: sym = SMUFL_E8F8_chantCaesura; break;
+        case divLineLog_FORM_virgula: sym = SMUFL_E8F7_chantVirgula; break;
         default: break;
     }
 

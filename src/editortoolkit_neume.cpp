@@ -1164,29 +1164,37 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     else if (elementType == "divLine") {
         DivLine *divLine = new DivLine();
-        data_DIVLINE divLineTypeW = DIVLINE_NONE;
+        divLineLog_FORM divLineTypeW = divLineLog_FORM_NONE;
 
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "form") {
                 if (it->second == "maxima") {
-                    divLineTypeW = DIVLINE_maxima;
+                    divLineTypeW = divLineLog_FORM_maxima;
                     break;
                 }
                 else if (it->second == "maior") {
-                    divLineTypeW = DIVLINE_maior;
+                    divLineTypeW = divLineLog_FORM_maior;
                     break;
                 }
                 else if (it->second == "minima") {
-                    divLineTypeW = DIVLINE_minima;
+                    divLineTypeW = divLineLog_FORM_minima;
                     break;
                 }
                 else if (it->second == "finalis") {
-                    divLineTypeW = DIVLINE_finalis;
+                    divLineTypeW = divLineLog_FORM_finalis;
+                    break;
+                }
+                else if (it->second == "caesura") {
+                    divLineTypeW = divLineLog_FORM_caesura;
+                    break;
+                }
+                else if (it->second == "virgula") {
+                    divLineTypeW = divLineLog_FORM_virgula;
                     break;
                 }
             }
         }
-        if (divLineTypeW == DIVLINE_NONE) {
+        if (divLineTypeW == divLineLog_FORM_NONE) {
             LogError("A divLine type must be specified.");
             delete divLine;
 

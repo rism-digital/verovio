@@ -56,7 +56,7 @@ public:
     /**
      * @name Method used for drawing divLine on ornaments
      */
-    static wchar_t GetDivLineGlyph(data_DIVLINE);
+    static wchar_t GetDivLineGlyph(divLineLog_FORM);
 
     //----------//
     // Functors //
