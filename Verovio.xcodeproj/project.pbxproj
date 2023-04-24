@@ -1576,6 +1576,12 @@
 		E7ADB3AF29D1923500825D5D /* adjustarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ADB3AD29D1923200825D5D /* adjustarticfunctor.cpp */; };
 		E7ADB3B029D1923600825D5D /* adjustarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ADB3AD29D1923200825D5D /* adjustarticfunctor.cpp */; };
 		E7ADB3B129D1923700825D5D /* adjustarticfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7ADB3AD29D1923200825D5D /* adjustarticfunctor.cpp */; };
+		E7B17DA629F6657B0076E75F /* midifunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7B17DA529F6657B0076E75F /* midifunctor.h */; };
+		E7B17DA729F6657B0076E75F /* midifunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E7B17DA529F6657B0076E75F /* midifunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E7B17DA929F665C50076E75F /* midifunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B17DA829F665C50076E75F /* midifunctor.cpp */; };
+		E7B17DAA29F665C50076E75F /* midifunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B17DA829F665C50076E75F /* midifunctor.cpp */; };
+		E7B17DAB29F665C90076E75F /* midifunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B17DA829F665C50076E75F /* midifunctor.cpp */; };
+		E7B17DAC29F665C90076E75F /* midifunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B17DA829F665C50076E75F /* midifunctor.cpp */; };
 		E7BCFFB5281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB6281297980012513D /* resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BCFFB4281297980012513D /* resources.cpp */; };
 		E7BCFFB8281297C60012513D /* resources.h in Headers */ = {isa = PBXBuildFile; fileRef = E7BCFFB7281297C60012513D /* resources.h */; };
@@ -2206,6 +2212,8 @@
 		E7A3790C29BB41F600E3BA98 /* adjustxposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustxposfunctor.cpp; path = src/adjustxposfunctor.cpp; sourceTree = "<group>"; };
 		E7ADB3AA29D1920D00825D5D /* adjustarticfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustarticfunctor.h; path = include/vrv/adjustarticfunctor.h; sourceTree = "<group>"; };
 		E7ADB3AD29D1923200825D5D /* adjustarticfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustarticfunctor.cpp; path = src/adjustarticfunctor.cpp; sourceTree = "<group>"; };
+		E7B17DA529F6657B0076E75F /* midifunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = midifunctor.h; path = include/vrv/midifunctor.h; sourceTree = "<group>"; };
+		E7B17DA829F665C50076E75F /* midifunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = midifunctor.cpp; path = src/midifunctor.cpp; sourceTree = "<group>"; };
 		E7BCFFB4281297980012513D /* resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = resources.cpp; path = src/resources.cpp; sourceTree = "<group>"; };
 		E7BCFFB7281297C60012513D /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = include/vrv/resources.h; sourceTree = "<group>"; };
 		E7BF80E329E3374600EA38F0 /* justifyfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = justifyfunctor.h; path = include/vrv/justifyfunctor.h; sourceTree = "<group>"; };
@@ -2985,6 +2993,8 @@
 				E765675828BBFBA400BC6490 /* functorinterface.h */,
 				E7BF80E629E3625700EA38F0 /* justifyfunctor.cpp */,
 				E7BF80E329E3374600EA38F0 /* justifyfunctor.h */,
+				E7B17DA829F665C50076E75F /* midifunctor.cpp */,
+				E7B17DA529F6657B0076E75F /* midifunctor.h */,
 				E70E2AA229F262DB00DB3044 /* miscfunctor.cpp */,
 				E70E2A9F29F262A200DB3044 /* miscfunctor.h */,
 				E7C3AED8295501A5002DE5AB /* preparedatafunctor.cpp */,
@@ -3193,6 +3203,7 @@
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
 				4D6331F91F46DBF200A0D6BF /* plistinterface.h in Headers */,
 				4DB3D8CB1F83D10A00B5FC2B /* fermata.h in Headers */,
+				E7B17DA629F6657B0076E75F /* midifunctor.h in Headers */,
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
 				4D79641D26C152400026288B /* pageelement.h in Headers */,
 				4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */,
@@ -3618,6 +3629,7 @@
 				BB4C4A9622A9328F001F6AF0 /* floatingobject.h in Headers */,
 				E7E1698C29A8BA3A00FFF482 /* adjustgracexposfunctor.h in Headers */,
 				BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */,
+				E7B17DA729F6657B0076E75F /* midifunctor.h in Headers */,
 				4DACC9C72990F29A00B55913 /* atts_cmn.h in Headers */,
 				BB4C4A9B22A9328F001F6AF0 /* object.h in Headers */,
 				E7E1698429A8988F00FFF482 /* adjustlayersfunctor.h in Headers */,
@@ -3828,6 +3840,7 @@
 				4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */,
 				4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */,
 				4D766F0020ACAD6D006875D8 /* syllable.cpp in Sources */,
+				E7B17DAB29F665C90076E75F /* midifunctor.cpp in Sources */,
 				4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */,
 				E76046C228D496B300C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E7870358299CF07500156DC4 /* adjustarpegfunctor.cpp in Sources */,
@@ -4122,6 +4135,7 @@
 				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
+				E7B17DAC29F665C90076E75F /* midifunctor.cpp in Sources */,
 				4DACC9D82990F29A00B55913 /* atts_gestural.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4DACC9842990F29A00B55913 /* atts_performance.cpp in Sources */,
@@ -4383,6 +4397,7 @@
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
 				35FDEBD224B6DC5B00AC1696 /* fing.cpp in Sources */,
 				403B0511244F3E2900EE4F71 /* gliss.cpp in Sources */,
+				E7B17DA929F665C50076E75F /* midifunctor.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				4D6122C01F77E1E000FC90A0 /* rend.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
@@ -4661,6 +4676,7 @@
 				BB4C4B2122A932CF001F6AF0 /* dir.cpp in Sources */,
 				BB4C4BAF22A932EB001F6AF0 /* view_mensural.cpp in Sources */,
 				35FDEBD324B6DC5B00AC1696 /* fing.cpp in Sources */,
+				E7B17DAA29F665C50076E75F /* midifunctor.cpp in Sources */,
 				403B0512244F3E2900EE4F71 /* gliss.cpp in Sources */,
 				BB4C4B5D22A932D7001F6AF0 /* metersig.cpp in Sources */,
 				BB4C4BB622A932F6001F6AF0 /* jsonxx.cc in Sources */,
