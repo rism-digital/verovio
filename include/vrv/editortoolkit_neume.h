@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "editortoolkit.h"
 #include "view.h"
+#include "vrv.h"
 #include "zone.h"
 
 #include "jsonxx.h"
