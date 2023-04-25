@@ -339,13 +339,6 @@ public:
     ///@}
 
     /**
-     * See Object::InitTimemapTies
-     */
-    ///@{
-    int InitTimemapTies(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * @name See Object::GenerateMIDI
      */
     ///@{

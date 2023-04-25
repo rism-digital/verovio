@@ -361,8 +361,9 @@ void Doc::CalculateTimemap()
     this->Process(initOnsetOffset);
 
     // Adjust the duration of tied notes
-    Functor initTimemapTies(&Object::InitTimemapTies);
-    this->Process(&initTimemapTies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    InitTimemapTiesFunctor initTimemapTies;
+    initTimemapTies.SetDirection(BACKWARD);
+    this->Process(initTimemapTies);
 
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }

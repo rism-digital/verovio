@@ -693,11 +693,6 @@ public:
     ///@{
 
     /**
-     * Adjust note timings based on ties
-     */
-    virtual int InitTimemapTies(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Initialize the MIDI export
      * Captures information (i.e. from control elements) for MIDI interpretation
      * This information is usually required beforehand in GenerateMIDI

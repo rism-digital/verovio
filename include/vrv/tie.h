@@ -83,13 +83,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * see Object::InitTimemapTies
-     */
-    ///@{
-    int InitTimemapTies(FunctorParams *functorParams) override;
-    ///@}
-
 private:
     // Update tie positioning based overlaps with accidentals in cases with enharmonic ties
     bool AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *curve, Point bezier[4],

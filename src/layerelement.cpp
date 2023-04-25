@@ -1315,11 +1315,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     return { shift, isInUnison };
 }
 
-int LayerElement::InitTimemapTies(FunctorParams *)
-{
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
