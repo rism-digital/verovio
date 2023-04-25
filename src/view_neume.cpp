@@ -287,4 +287,61 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
 
+void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    DivLine *divLine = dynamic_cast<DivLine *>(element);
+    assert(divLine);
+
+    // int x = divLine->GetDrawingX();
+    // int y = divLine->GetDrawingY();
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    int sym = 0;
+
+    switch (divLine->GetForm()) {
+        case divLineLog_FORM_minima: sym = SMUFL_E8F3_chantDivisioMinima; break;
+        case divLineLog_FORM_maior: sym = SMUFL_E8F4_chantDivisioMaior; break;
+        case divLineLog_FORM_maxima: sym = SMUFL_E8F5_chantDivisioMaxima; break;
+        case divLineLog_FORM_finalis: sym = SMUFL_E8F6_chantDivisioFinalis; break;
+        case divLineLog_FORM_caesura: sym = SMUFL_E8F8_chantCaesura; break;
+        case divLineLog_FORM_virgula: sym = SMUFL_E8F7_chantVirgula; break;
+        default: break;
+    }
+
+    int x, y;
+    if ((m_doc->GetType() == Facs) && (divLine->HasFacs())) {
+        x = divLine->GetDrawingX();
+        y = ToLogicalY(staff->GetDrawingY());
+    }
+    else {
+        x = element->GetDrawingX();
+        y = element->GetDrawingY();
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
+
+    int rotateOffset;
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        double deg = staff->GetDrawingRotate();
+        int xDiff = x - staff->GetDrawingX();
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else {
+        rotateOffset = 0;
+    }
+
+    y -= rotateOffset;
+
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
+
+    dc->EndGraphic(element, this);
+}
 } // namespace vrv
