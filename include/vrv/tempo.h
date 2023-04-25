@@ -96,11 +96,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
-
     //----------//
     //  Static  //
     //----------//

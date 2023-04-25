@@ -1352,18 +1352,4 @@ int LayerElement::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    if (this->Is(MULTIREST)) {
-        MultiRest *multiRest = vrv_cast<MultiRest *>(this);
-        assert(multiRest);
-        params->m_multiRestFactor = multiRest->GetNum();
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

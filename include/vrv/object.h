@@ -693,16 +693,6 @@ public:
     ///@{
 
     /**
-     * Calculate the maximum duration of each measure.
-     */
-    virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CalcMaxMeasureDuration
-     */
-    virtual int InitMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Adjust note timings based on ties
      */
     virtual int InitTimemapTies(FunctorParams *) { return FUNCTOR_CONTINUE; }

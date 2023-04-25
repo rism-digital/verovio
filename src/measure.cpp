@@ -768,34 +768,4 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
-
-    m_realTimeOffsetMilliseconds.clear();
-    // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    const double scoreTimeIncrement
-        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
-    params->m_currentScoreTime += scoreTimeIncrement;
-    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
-    params->m_multiRestFactor = 1;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

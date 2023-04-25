@@ -107,21 +107,6 @@ FunctorCode Tempo::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitTempoEnd(this);
 }
 
-int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    if (this->HasMidiBpm()) {
-        params->m_currentTempo = this->GetMidiBpm();
-    }
-    else if (this->HasMm()) {
-        params->m_currentTempo = Tempo::CalcTempo(this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 double Tempo::CalcTempo(const AttMmTempo *attMmTempo)
 {
     double tempo = MIDI_TEMPO;

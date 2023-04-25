@@ -357,14 +357,6 @@ public:
      */
     int GenerateTimemap(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    ///@{
-    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
-    int InitMaxMeasureDurationEnd(FunctorParams *functorParams) override;
-    ///@}
-
 public:
     // flags for drawing measure barline based on visibility or other conditions
     enum BarlineDrawingFlags {

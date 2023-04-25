@@ -90,6 +90,14 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Set the tempo
+     */
+    ///@{
+    void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
+    void SetTempoAdjustment(double adjustment) { m_tempoAdjustment = adjustment; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

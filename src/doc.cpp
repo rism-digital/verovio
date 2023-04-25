@@ -351,12 +351,10 @@ void Doc::CalculateTimemap()
     }
 
     // We first calculate the maximum duration of each measure
-    InitMaxMeasureDurationParams initMaxMeasureDurationParams;
-    initMaxMeasureDurationParams.m_currentTempo = tempo;
-    initMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
-    Functor initMaxMeasureDuration(&Object::InitMaxMeasureDuration);
-    Functor initMaxMeasureDurationEnd(&Object::InitMaxMeasureDurationEnd);
-    this->Process(&initMaxMeasureDuration, &initMaxMeasureDurationParams, &initMaxMeasureDurationEnd);
+    InitMaxMeasureDurationFunctor initMaxMeasureDuration;
+    initMaxMeasureDuration.SetCurrentTempo(tempo);
+    initMaxMeasureDuration.SetTempoAdjustment(m_options->m_midiTempoAdjustment.GetValue());
+    this->Process(initMaxMeasureDuration);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
     InitOnsetOffsetFunctor initOnsetOffset;
