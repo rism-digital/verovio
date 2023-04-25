@@ -127,6 +127,45 @@ private:
     int m_multiRestFactor;
 };
 
+//----------------------------------------------------------------------------
+// InitTimemapTiesFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adjusts note timings based on ties.
+ */
+class InitTimemapTiesFunctor : public MutableFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    InitTimemapTiesFunctor();
+    virtual ~InitTimemapTiesFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitTie(Tie *tie) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
 } // namespace vrv
 
 #endif // __VRV_MIDIFUNCTOR_H__

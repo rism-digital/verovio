@@ -16,6 +16,7 @@
 #include "staff.h"
 #include "tabgrp.h"
 #include "tempo.h"
+#include "tie.h"
 
 //----------------------------------------------------------------------------
 
@@ -247,6 +248,35 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitTempo(Tempo *tempo)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
+// InitTimemapTiesFunctor
+//----------------------------------------------------------------------------
+
+InitTimemapTiesFunctor::InitTimemapTiesFunctor() {}
+
+FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
+{
+    Note *note1 = dynamic_cast<Note *>(tie->GetStart());
+    Note *note2 = dynamic_cast<Note *>(tie->GetEnd());
+
+    if (!note1 || !note2) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    double sttd2 = note2->GetScoreTimeTiedDuration();
+    double std2 = note2->GetScoreTimeDuration();
+
+    if (sttd2 > 0.0) {
+        note1->SetScoreTimeTiedDuration(sttd2 + std2);
+    }
+    else {
+        note1->SetScoreTimeTiedDuration(std2);
+    }
+    note2->SetScoreTimeTiedDuration(-1.0);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
