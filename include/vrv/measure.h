@@ -296,9 +296,24 @@ public:
     int EnclosesTime(int time) const;
 
     /**
+     * Read only access to m_scoreTimeOffset
+     */
+    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
+
+    /**
      * Return the real time offset in millisecond for the repeat (1-based).
      */
     double GetRealTimeOffsetMilliseconds(int repeat) const;
+
+    /**
+     * Setter for the time offset
+     */
+    ///@{
+    void ClearScoreTimeOffset() { m_scoreTimeOffset.clear(); }
+    void AddScoreTimeOffset(double offset) { m_scoreTimeOffset.push_back(offset); }
+    void ClearRealTimeOffset() { m_realTimeOffsetMilliseconds.clear(); }
+    void AddRealTimeOffset(double milliseconds) { m_realTimeOffsetMilliseconds.push_back(milliseconds); }
+    ///@}
 
     /**
      * Setter and getter for the current tempo
@@ -312,11 +327,6 @@ public:
      * Return vector with tie endpoints for ties that start and end in current measure
      */
     std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
-
-    /**
-     * Read only access to m_scoreTimeOffset
-     */
-    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
 
     //----------//
     // Functors //

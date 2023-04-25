@@ -11,9 +11,11 @@
 
 #include "beatrpt.h"
 #include "layer.h"
+#include "multirest.h"
 #include "rest.h"
 #include "staff.h"
 #include "tabgrp.h"
+#include "tempo.h"
 
 //----------------------------------------------------------------------------
 
@@ -191,26 +193,59 @@ InitMaxMeasureDurationFunctor::InitMaxMeasureDurationFunctor()
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    return FUNCTOR_CONTINUE;
+    if (layerElement->Is(MULTIREST)) {
+        MultiRest *multiRest = vrv_cast<MultiRest *>(layerElement);
+        assert(multiRest);
+        m_multiRestFactor = multiRest->GetNum();
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitMeasure(Measure *measure)
 {
+    measure->ClearScoreTimeOffset();
+    measure->AddScoreTimeOffset(m_currentScoreTime);
+
+    measure->ClearRealTimeOffset();
+    measure->AddRealTimeOffset(m_currentRealTimeSeconds * 1000.0);
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
 {
+    const double scoreTimeIncrement
+        = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor * DURATION_4 / DUR_MAX;
+    m_currentTempo = m_currentTempo * m_tempoAdjustment;
+    m_currentScoreTime += scoreTimeIncrement;
+    m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
+    m_multiRestFactor = 1;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitScoreDef(ScoreDef *scoreDef)
 {
+    if (scoreDef->HasMidiBpm()) {
+        m_currentTempo = scoreDef->GetMidiBpm();
+    }
+    else if (scoreDef->HasMm()) {
+        m_currentTempo = Tempo::CalcTempo(scoreDef);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitTempo(Tempo *tempo)
 {
+    if (tempo->HasMidiBpm()) {
+        m_currentTempo = tempo->GetMidiBpm();
+    }
+    else if (tempo->HasMm()) {
+        m_currentTempo = Tempo::CalcTempo(tempo);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
