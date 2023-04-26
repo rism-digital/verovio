@@ -1181,6 +1181,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
 
         // HARDCODED
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
+        params.m_enclosedRend.clear();
         params.m_x = staff->GetDrawingX();
         params.m_y = staff->GetDrawingY() + yOffset;
         if (mnum->HasFontsize()) {
@@ -1208,6 +1209,9 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
         dc->EndText();
 
         dc->ResetFont();
+        dc->ResetBrush();
+
+        this->DrawTextEnclosure(dc, params, staff->m_drawingStaffSize);
 
         dc->EndGraphic(mnum, this);
     }
