@@ -2218,6 +2218,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     if (measureDifference >= 0) {
                         iter->first->SetTstamp2(std::pair<int, double>(measureDifference, timeStamp));
                     }
+                    if (wedge->node().attribute("niente")) {
+                        iter->first->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
+                    }
                     if (wedge->node().attribute("spread")) {
                         data_MEASUREMENTSIGNED opening;
                         opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
