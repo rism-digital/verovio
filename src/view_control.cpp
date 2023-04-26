@@ -533,39 +533,42 @@ void View::DrawHairpin(
     FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
     FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
 
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const hairpinLog_FORM form = hairpin->GetForm();
+    const bool niente = hairpin->GetNiente() == BOOLEAN_true;
+
     int adjustedX1 = x1;
     if (leftLink) {
-        adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        adjustedX1 = leftLink->GetContentRight() + unit / 2;
+        adjustedX1 += (niente && (form == hairpinLog_FORM_cres)) ? unit / 3 : 0;
     }
     int adjustedX2 = x2;
     if (rightLink) {
-        adjustedX2 = rightLink->GetContentLeft() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        adjustedX2 = rightLink->GetContentLeft() - unit / 2;
+        adjustedX2 -= (niente && (form == hairpinLog_FORM_dim)) ? unit / 3 : 0;
     }
 
     // Beginning of a system, very short hairpin needs to be push left
     if (spanningType == SPANNING_END) {
-        if ((adjustedX2 - adjustedX1) < (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2)) {
-            adjustedX1 = adjustedX2 - 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if ((adjustedX2 - adjustedX1) < (unit * 2)) {
+            adjustedX1 = adjustedX2 - 2 * unit;
         }
     }
 
     // In any case, a hairpin should not be shorter than 2 units.
     // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
     // deactivating grp?
-    if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
+    if ((adjustedX2 - adjustedX1) >= unit * 2) {
         x1 = adjustedX1;
         x2 = adjustedX2;
     }
 
     // Store the full drawing length
-    const auto [leftOverlap, rightOverlap] = hairpin->GetBarlineOverlapAdjustment(
-        m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), x1, x2, spanningType);
+    const auto [leftOverlap, rightOverlap] = hairpin->GetBarlineOverlapAdjustment(unit * 2, x1, x2, spanningType);
     x1 += leftOverlap;
     x2 -= rightOverlap;
 
     hairpin->SetDrawingLength(x2 - x1);
-
-    hairpinLog_FORM form = hairpin->GetForm();
 
     // For now we calculate everything based on cresc.
     int startY = 0;
@@ -593,8 +596,7 @@ void View::DrawHairpin(
     // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) std::swap(startY, endY);
 
-    int y1 = hairpin->GetDrawingY();
-    int y2 = y1;
+    int y = hairpin->GetDrawingY();
 
     // Improve alignment with dynamics
     if (hairpin->GetPlace() != STAFFREL_within) {
@@ -602,8 +604,7 @@ void View::DrawHairpin(
         if (hairpin->GetPlace() != STAFFREL_between) {
             shiftY += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
-        y1 += shiftY;
-        y2 += shiftY;
+        y += shiftY;
     }
 
     /************** draw it **************/
@@ -625,28 +626,46 @@ void View::DrawHairpin(
         default: style = AxSOLID; break;
     }
 
-    dc->SetPen(m_currentColour, hairpinThickness, style, 0, 0, AxCAP_SQUARE, AxJOIN_BEVEL);
-    if (startY == 0) {
+    const int cap = (style == AxDOT) ? AxCAP_ROUND : AxCAP_SQUARE;
+
+    dc->SetPen(m_currentColour, hairpinThickness, style, 0, 0, cap, AxJOIN_BEVEL);
+
+    if ((startY == 0) && !niente) {
         Point p[3];
-        p[0] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
-        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y1) };
-        p[2] = { p[0].x, ToDeviceContextY(y2 + endY / 2) };
+        p[0] = { ToDeviceContextX(x2), ToDeviceContextY(y - endY / 2) };
+        p[1] = { ToDeviceContextX(x1), ToDeviceContextY(y) };
+        p[2] = { p[0].x, ToDeviceContextY(y + endY / 2) };
         dc->DrawPolyline(3, p);
     }
-    else if (endY == 0) {
+    else if ((endY == 0) && !niente) {
         Point p[3];
-        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2) };
-        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y2) };
-        p[2] = { p[0].x, ToDeviceContextY(y1 + startY / 2) };
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - startY / 2) };
+        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y) };
+        p[2] = { p[0].x, ToDeviceContextY(y + startY / 2) };
         dc->DrawPolyline(3, p);
     }
     else {
+        if (niente) {
+            dc->SetBrush(m_currentColour, AxTRANSPARENT);
+            if (startY == 0) {
+                dc->DrawCircle(ToDeviceContextX(x1), ToDeviceContextY(y), unit / 2);
+                startY = unit * endY / (x2 - x1) / 2;
+                x1 += unit / 2;
+            }
+            else {
+                dc->DrawCircle(ToDeviceContextX(x2), ToDeviceContextY(y), unit / 2);
+                endY = unit * startY / (x2 - x1) / 2;
+                x2 -= unit / 2;
+            }
+            dc->ResetBrush();
+        }
+
         Point p[2];
-        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2) };
-        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y2 - endY / 2) };
+        p[0] = { ToDeviceContextX(x1), ToDeviceContextY(y - startY / 2) };
+        p[1] = { ToDeviceContextX(x2), ToDeviceContextY(y - endY / 2) };
         dc->DrawPolyline(2, p);
-        p[0].y = ToDeviceContextY(y1 + startY / 2);
-        p[1].y = ToDeviceContextY(y2 + endY / 2);
+        p[0].y = ToDeviceContextY(y + startY / 2);
+        p[1].y = ToDeviceContextY(y + endY / 2);
         dc->DrawPolyline(2, p);
     }
     dc->ResetPen();
