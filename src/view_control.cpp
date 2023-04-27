@@ -646,12 +646,12 @@ void View::DrawHairpin(
     else {
         if (niente) {
             dc->SetBrush(m_currentColour, AxTRANSPARENT);
-            if ((startY == 0) && (spanningType == SPANNING_START)) {
+            if (startY == 0) {
                 dc->DrawCircle(ToDeviceContextX(x1), ToDeviceContextY(y), unit / 2);
                 startY = unit * endY / (x2 - x1) / 2;
                 x1 += unit / 2;
             }
-            else if ((endY == 0) && (spanningType == SPANNING_END)) {
+            else if (endY == 0) {
                 dc->DrawCircle(ToDeviceContextX(x2), ToDeviceContextY(y), unit / 2);
                 endY = unit * startY / (x2 - x1) / 2;
                 x2 -= unit / 2;
