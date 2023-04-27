@@ -166,6 +166,51 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// InitMIDIFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class initializes the MIDI export.
+ * Captures information (i.e. from control elements) for MIDI interpretation
+ * which is required beforehand in GenerateMIDI.
+ */
+class InitMIDIFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    InitMIDIFunctor();
+    virtual ~InitMIDIFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitArpeg(const Arpeg *arpeg) override;
+    FunctorCode VisitMeasure(const Measure *measure) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current tempo
+    double m_currentTempo;
+    // Deferred notes which start slightly later
+    std::map<const Note *, double> m_deferredNotes;
+};
+
 } // namespace vrv
 
 #endif // __VRV_MIDIFUNCTOR_H__

@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
 #include "beatrpt.h"
 #include "layer.h"
 #include "multirest.h"
@@ -277,6 +278,46 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
     note2->SetScoreTimeTiedDuration(-1.0);
 
     return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// InitMidiFunctor
+//----------------------------------------------------------------------------
+
+InitMIDIFunctor::InitMIDIFunctor()
+{
+    m_currentTempo = MIDI_TEMPO;
+}
+
+FunctorCode InitMIDIFunctor::VisitArpeg(const Arpeg *arpeg)
+{
+    // Sort the involved notes by playing order
+    const bool playTopDown = (arpeg->GetOrder() == arpegLog_ORDER_down);
+    std::set<const Note *> notes = arpeg->GetNotes();
+    std::vector<const Note *> sortedNotes;
+    std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
+    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](const Note *note1, const Note *note2) {
+        const int pitch1 = note1->GetMIDIPitch();
+        const int pitch2 = note2->GetMIDIPitch();
+        return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
+    });
+
+    // Defer the notes in playing order
+    double shift = 0.0;
+    const double increment = UNACC_GRACENOTE_DUR * m_currentTempo / 60000.0;
+    for (const Note *note : sortedNotes) {
+        if (shift > 0.0) m_deferredNotes[note] = shift;
+        shift += increment;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
+{
+    m_currentTempo = measure->GetCurrentTempo();
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
