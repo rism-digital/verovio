@@ -627,7 +627,7 @@ void View::DrawHairpin(
 
     const int cap = (style == AxDOT) ? AxCAP_ROUND : AxCAP_SQUARE;
 
-    dc->SetPen(m_currentColour, hairpinThickness, style, 0, 0, cap, AxJOIN_BEVEL);
+    dc->SetPen(m_currentColour, hairpinThickness, style, 0, 0, cap, AxJOIN_MITER);
 
     if ((startY == 0) && !niente) {
         Point p[3];
