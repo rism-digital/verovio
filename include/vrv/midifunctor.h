@@ -191,6 +191,14 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Setter and getter for properties
+     */
+    ///@{
+    void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
+    const std::map<const Note *, double> &GetDeferredNotes() const { return m_deferredNotes; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

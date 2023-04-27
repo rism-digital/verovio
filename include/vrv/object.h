@@ -693,13 +693,6 @@ public:
     ///@{
 
     /**
-     * Initialize the MIDI export
-     * Captures information (i.e. from control elements) for MIDI interpretation
-     * This information is usually required beforehand in GenerateMIDI
-     */
-    virtual int InitMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Export the object to a MidiFile
      */
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }

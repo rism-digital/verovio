@@ -213,7 +213,7 @@ public:
     double m_currentTempo;
     Note *m_lastNote;
     std::map<Note *, MIDINoteSequence> m_expandedNotes;
-    std::map<Note *, double> m_deferredNotes;
+    std::map<const Note *, double> m_deferredNotes;
     MIDIChordSequence m_graceNotes;
     bool m_accentedGraceNote;
     bool m_cueExclusion;
@@ -251,22 +251,6 @@ public:
     bool m_cueExclusion;
     Timemap *m_timemap;
     Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// InitMIDIParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current tempo
- * member 1: deferred notes which start slightly later
- **/
-
-class InitMIDIParams : public FunctorParams {
-public:
-    InitMIDIParams() { m_currentTempo = MIDI_TEMPO; }
-    double m_currentTempo;
-    std::map<Note *, double> m_deferredNotes;
 };
 
 //----------------------------------------------------------------------------

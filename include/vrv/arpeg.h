@@ -113,11 +113,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::InitMIDI
-     */
-    int InitMIDI(FunctorParams *functorParams) override;
-
 protected:
     //
 private:

@@ -343,11 +343,6 @@ public:
     ///@}
 
     /**
-     * See Object::InitMIDI
-     */
-    int InitMIDI(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;

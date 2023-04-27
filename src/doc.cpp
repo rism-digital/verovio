@@ -391,10 +391,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     midiFile->addTempo(0, 0, tempo);
 
     // Capture information for MIDI generation, i.e. from control elements
-    Functor initMIDI(&Object::InitMIDI);
-    InitMIDIParams initMIDIParams;
-    initMIDIParams.m_currentTempo = tempo;
-    this->Process(&initMIDI, &initMIDIParams);
+    InitMIDIFunctor initMIDI;
+    initMIDI.SetCurrentTempo(tempo);
+    this->Process(initMIDI);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     InitProcessingListsFunctor initProcessingLists;
@@ -501,7 +500,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDIParams.m_staffN = staves->first;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
-            generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
+            generateMIDIParams.m_deferredNotes = initMIDI.GetDeferredNotes();
             generateMIDIParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
