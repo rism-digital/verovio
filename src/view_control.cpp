@@ -535,7 +535,7 @@ void View::DrawHairpin(
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const hairpinLog_FORM form = hairpin->GetForm();
-    const bool niente = hairpin->GetNiente() == BOOLEAN_true;
+    const bool niente = (hairpin->GetNiente() == BOOLEAN_true);
 
     int adjustedX1 = x1;
     if (leftLink) {
@@ -602,7 +602,7 @@ void View::DrawHairpin(
     if (hairpin->GetPlace() != STAFFREL_within) {
         int shiftY = -(m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
         if (hairpin->GetPlace() != STAFFREL_between) {
-            shiftY += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            shiftY += unit;
         }
         y += shiftY;
     }
@@ -616,8 +616,7 @@ void View::DrawHairpin(
         dc->StartGraphic(hairpin, "", hairpin->GetID(), SPANNING);
     }
 
-    const double hairpinThickness
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_hairpinThickness.GetValue();
+    const double hairpinThickness = m_options->m_hairpinThickness.GetValue() * unit;
 
     int style;
     switch (hairpin->GetLform()) {
@@ -647,12 +646,12 @@ void View::DrawHairpin(
     else {
         if (niente) {
             dc->SetBrush(m_currentColour, AxTRANSPARENT);
-            if (startY == 0) {
+            if ((startY == 0) && (spanningType == SPANNING_START)) {
                 dc->DrawCircle(ToDeviceContextX(x1), ToDeviceContextY(y), unit / 2);
                 startY = unit * endY / (x2 - x1) / 2;
                 x1 += unit / 2;
             }
-            else {
+            else if ((endY == 0) && (spanningType == SPANNING_END)) {
                 dc->DrawCircle(ToDeviceContextX(x2), ToDeviceContextY(y), unit / 2);
                 endY = unit * startY / (x2 - x1) / 2;
                 x2 -= unit / 2;
