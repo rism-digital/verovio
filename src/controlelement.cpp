@@ -105,6 +105,16 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
         default: break;
     }
 
+    if ((stemDir == STEMDIRECTION_NONE) && start->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(start);
+        assert(note);
+        const Chord *chord = note->IsChordTone();
+        if (chord) {
+            if (start == chord->GetTopNote()) value = STAFFREL_above;
+            if (start == chord->GetBottomNote()) value = STAFFREL_below;
+        }
+    }
+
     return value;
 }
 
