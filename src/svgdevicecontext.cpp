@@ -539,7 +539,12 @@ Point SvgDeviceContext::GetLogicalOrigin()
 pugi::xml_node SvgDeviceContext::AddChild(std::string name)
 {
     pugi::xml_node g = m_currentNode.child("g");
-    return (g) ? m_currentNode.insert_child_before(name.c_str(), g) : m_currentNode.append_child(name.c_str());
+    if (g) {
+        return m_currentNode.insert_child_before(name.c_str(), g);
+    }
+    else {
+        return (m_pushBack) ? m_currentNode.prepend_child(name.c_str()) : m_currentNode.append_child(name.c_str());
+    }
 }
 
 void SvgDeviceContext::AppendStrokeLineCap(pugi::xml_node node, const Pen &pen)

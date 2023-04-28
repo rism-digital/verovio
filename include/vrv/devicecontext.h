@@ -334,6 +334,9 @@ protected:
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
 
+    /** push back mode */
+    bool m_pushBack;
+
     Zone *m_facsimile = NULL;
 
 private:
@@ -357,9 +360,6 @@ private:
     /** stores the scale as requested by the used */
     double m_userScaleX;
     double m_userScaleY;
-    
-    /** push back mode */
-    bool m_pushBack;
 };
 
 } // namespace vrv
