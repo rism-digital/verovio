@@ -535,7 +535,7 @@ void View::DrawHairpin(
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const hairpinLog_FORM form = hairpin->GetForm();
-    const bool niente = (hairpin->GetNiente() == BOOLEAN_true);
+    const bool niente = (hairpin->HasNiente()) ? (hairpin->GetNiente() == BOOLEAN_true) : false;
 
     int adjustedX1 = x1;
     if (leftLink) {
