@@ -9,6 +9,11 @@
 #define __VRV_MIDIFUNCTOR_H__
 
 #include "functor.h"
+#include "functorparams.h"
+
+namespace smf {
+class MidiFile;
+}
 
 namespace vrv {
 
@@ -217,6 +222,89 @@ private:
     double m_currentTempo;
     // Deferred notes which start slightly later
     std::map<const Note *, double> m_deferredNotes;
+};
+
+//----------------------------------------------------------------------------
+// GenerateMIDIFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class performs the export to a MidiFile.
+ */
+class GenerateMIDIFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    GenerateMIDIFunctor(smf::MidiFile *midiFile);
+    virtual ~GenerateMIDIFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitBeatRpt(const BeatRpt *beatRpt) override;
+    FunctorCode VisitBTrem(const BTrem *bTrem) override;
+    FunctorCode VisitChord(const Chord *chord) override;
+    FunctorCode VisitFTrem(const FTrem *fTrem) override;
+    FunctorCode VisitGraceGrpEnd(const GraceGrp *graceGrp) override;
+    FunctorCode VisitHalfmRpt(const HalfmRpt *halfmRpt) override;
+    FunctorCode VisitLayer(const Layer *layer) override;
+    FunctorCode VisitLayerEnd(const Layer *layer) override;
+    FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(const Measure *measure) override;
+    FunctorCode VisitMRpt(const MRpt *mRpt) override;
+    FunctorCode VisitNote(const Note *note) override;
+    FunctorCode VisitPedal(const Pedal *pedal) override;
+    FunctorCode VisitScoreDef(const ScoreDef *scoreDef) override;
+    FunctorCode VisitStaff(const Staff *staff) override;
+    FunctorCode VisitStaffDef(const StaffDef *staffDef) override;
+    FunctorCode VisitSyl(const Syl *syl) override;
+    FunctorCode VisitVerse(const Verse *verse) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The MidiFile we are writing to
+    smf::MidiFile *m_midiFile;
+    // The midi track number
+    int m_midiTrack;
+    // The midi channel number
+    int m_midiChannel;
+    // The score time from the start of the music to the start of the current measure
+    double m_totalTime;
+    // The current staff number
+    int m_staffN;
+    // The semi tone transposition for the current track
+    int m_transSemi;
+    // The current tempo
+    double m_currentTempo;
+    // The last (non grace) note that was performed
+    const Note *m_lastNote;
+    // Expanded notes due to ornaments and tremolandi
+    std::map<const Note *, MIDINoteSequence> m_expandedNotes;
+    // Deferred notes which start slightly later
+    std::map<const Note *, double> m_deferredNotes;
+    // Grace note sequence
+    MIDIChordSequence m_graceNotes;
+    // Indicates whether the last grace note/chord was accented
+    bool m_accentedGraceNote;
+    // Indicates whether cue notes should be included
+    bool m_cueExclusion;
+    // Tablature held notes indexed by (course - 1)
+    std::vector<MIDIHeldNote> m_heldNotes;
 };
 
 } // namespace vrv

@@ -320,4 +320,112 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// GenerateMIDIFunctor
+//----------------------------------------------------------------------------
+
+GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile)
+{
+    m_midiFile = midiFile;
+    m_midiTrack = 1;
+    m_midiChannel = 0;
+    m_totalTime = 0.0;
+    m_staffN = 0;
+    m_transSemi = 0;
+    m_currentTempo = MIDI_TEMPO;
+    m_lastNote = NULL;
+    m_accentedGraceNote = false;
+    m_cueExclusion = false;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitFTrem(const FTrem *fTrem)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitGraceGrpEnd(const GraceGrp *graceGrp)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitHalfmRpt(const HalfmRpt *halfmRpt)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitLayer(const Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitLayerEnd(const Layer *layer)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitLayerElement(const LayerElement *layerElement)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitMRpt(const MRpt *mRpt)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitStaff(const Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateMIDIFunctor::VisitVerse(const Verse *verse)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
