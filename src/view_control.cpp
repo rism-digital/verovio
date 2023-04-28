@@ -2922,6 +2922,8 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
     const int lineThickness = m_options->m_textEnclosureThickness.GetValue() * staffSize;
     const int margin = m_doc->GetDrawingUnit(staffSize);
 
+    dc->SetPushBack();
+
     for (const auto rend : params.m_enclosedRend) {
         int x1 = rend->GetContentLeft() - margin;
         int x2 = rend->GetContentRight() + margin;
@@ -2945,6 +2947,8 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
             this->DrawNotFilledEllipse(dc, x1, y1, x2, y2, lineThickness);
         }
     }
+
+    dc->ResetPushBack();
 }
 
 } // namespace vrv
