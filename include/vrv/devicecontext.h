@@ -73,6 +73,7 @@ public:
         m_userScaleY = 1.0;
         m_baseWidth = 0;
         m_baseHeight = 0;
+        m_pushBack = false;
     }
     DeviceContext(ClassId classId)
     {
@@ -87,6 +88,7 @@ public:
         m_userScaleY = 1.0;
         m_baseWidth = 0;
         m_baseHeight = 0;
+        m_pushBack = false;
     }
     virtual ~DeviceContext(){};
     ClassId GetClassId() const { return m_classId; }
@@ -139,9 +141,11 @@ public:
     void SetPen(
         int colour, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
     void SetFont(FontInfo *font);
+    void SetPushBack() { m_pushBack = true; }
     void ResetBrush();
     void ResetPen();
     void ResetFont();
+    void ResetPushBack() { m_pushBack = false; }
     virtual void SetBackground(int colour, int style = AxSOLID) = 0;
     virtual void SetBackgroundImage(void *image, double opacity = 1.0) = 0;
     virtual void SetBackgroundMode(int mode) = 0;
@@ -353,6 +357,9 @@ private:
     /** stores the scale as requested by the used */
     double m_userScaleX;
     double m_userScaleY;
+    
+    /** push back mode */
+    bool m_pushBack;
 };
 
 } // namespace vrv
