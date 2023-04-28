@@ -2403,6 +2403,11 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
     if (alignment == 0) alignment = HORIZONTALALIGNMENT_center;
 
     std::vector<Staff *> staffList = reh->GetTstampStaves(measure, reh);
+    if (staffList.empty()) {
+        Staff *staff = measure->GetTopVisibleStaff();
+        if (staff) staffList.push_back(staff);
+    }
+
     for (Staff *staff : staffList) {
         if (!system->SetCurrentFloatingPositioner(staff->GetN(), reh, reh->GetStart(), staff)) {
             continue;
