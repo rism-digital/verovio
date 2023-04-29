@@ -1,9 +1,9 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Apr 15 11:52:53 PDT 2023
-// Filename:      humlib.h
-// URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
+// Last Modified: Fri Apr 28 11:52:19 PDT 2023
+// Filename:      min/humlib.h
+// URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
 // vim:           ts=3
 //
@@ -1544,9 +1544,12 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isModernMensurationSymbol (void);
 		bool     isOriginalMensuration     (void) { return isOriginalMensurationSymbol(); }
 		bool     isModernMensuration       (void) { return isModernMensurationSymbol(); }
-		bool     isInstrumentDesignation   (void);
 		bool     isInstrumentName          (void);
 		bool     isInstrumentAbbreviation  (void);
+		bool     isInstrumentDesignation   (void);
+		bool     isInstrumentCode          (void) { return isInstrumentDesignation(); }
+		bool     isInstrumentClass         (void);
+		bool     isInstrumentGroup         (void);
 		bool     isModernInstrumentName    (void);
 		bool     isModernInstrumentAbbreviation(void);
 		bool     isOriginalInstrumentName    (void);
@@ -2310,6 +2313,26 @@ class HumdrumFileBase : public HumHash {
 };
 
 std::ostream& operator<<(std::ostream& out, HumdrumFileBase& infile);
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::initializeArray -- adjust the size of the input array
+//     to the same dimensions as the HumdrumFile, filling in each cell of the
+//     array with the given value as a default.
+//
+
+template <class TYPE>
+void HumdrumFileBase::initializeArray(std::vector<std::vector<TYPE>>& array, TYPE value) {
+	HumdrumFileBase& infile = *this;
+	array.clear();
+	array.resize(infile.getLineCount());
+	for (int i=0; i<infile.getLineCount(); i++) {
+		array[i].resize(infile[i].getFieldCount());
+		fill(array[i].begin(), array[i].end(), value);
+	}
+}
 
 
 
@@ -6223,20 +6246,35 @@ class Tool_colorthirds : public HumTool {
 		void             processFile       (HumdrumFile& infile);
 		std::vector<int> getMidiNotes(std::vector<HTp>& kernNotes);
 		std::vector<int> getChordPositions(std::vector<int>& midiNotes);
+        std::vector<int> getNoteMods(std::vector<int>& midiNotes);
+        std::vector<int> getThirds(std::vector<int>& midiNotes);
+        std::vector<int> getFifths(std::vector<int>& midiNotes);
 		void             labelChordPositions(std::vector<HTp>& kernNotes, std::vector<int>& chordPositions);
+        void             labelThirds(std::vector<HTp>& kernNotes, std::vector<int>& thirdPositions);
+        void             labelFifths(std::vector<HTp>& kernNotes, std::vector<int>& fifthPositions);
+        void             keepOnlyDoubles(std::vector<int>& output);
 
 	private:
 		std::string m_root_marker = "@";
 		std::string m_third_marker = "N";
 		std::string m_fifth_marker = "Z";
+        std::string m_3rd_root_marker = "j";
+        std::string m_3rd_third_marker = "l";
+        std::string m_5th_root_marker = "V";
+        std::string m_5th_fifth_marker = "|";
 
 		std::string m_root_color = "crimson";
 		std::string m_third_color = "limegreen";
 		std::string m_fifth_color = "royalblue";
+        std::string m_3rd_root_color = "darkred";
+        std::string m_3rd_third_color = "green";
+        std::string m_5th_root_color = "darkred";
+        std::string m_5th_fifth_color = "steelblue";
 
 		bool m_colorThirds = true;
 		bool m_colorFifths = true;
 		bool m_colorTriads = true;
+        bool m_doubleQ = false;
 
 };
 
