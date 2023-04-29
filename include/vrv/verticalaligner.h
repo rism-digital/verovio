@@ -261,11 +261,12 @@ public:
     ///@}
 
     /**
-     * @name Set of functions for spacing calculations
+     * @name Getter for spacing
      */
     ///@{
     int GetMinimumSpacing(const Doc *doc) const;
     int CalcMinimumRequiredSpacing(const Doc *doc) const;
+    SystemAligner::SpacingType GetSpacingType() const { return m_spacingType; }
     ///@}
 
     /**
@@ -346,11 +347,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::JustifyY
-     */
-    int JustifyY(FunctorParams *functorParams) override;
 
 private:
     /**

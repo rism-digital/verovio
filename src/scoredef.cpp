@@ -679,78 +679,6 @@ FunctorCode ScoreDefElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreDefElementEnd(this);
 }
 
-int ScoreDefElement::ConvertMarkupScoreDef(FunctorParams *functorParams)
-{
-    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
-    assert(params);
-
-    if (this->Is(SCOREDEF)) {
-        params->m_currentScoreDef = this;
-        return FUNCTOR_CONTINUE;
-    }
-
-    // This should never be the case
-    if (!this->Is(STAFFDEF) || !params->m_currentScoreDef) return FUNCTOR_CONTINUE;
-
-    ScoreDefElement *scoreDef = params->m_currentScoreDef;
-
-    // Copy score definition elements to the staffDef but only if they are not given at the staffDef
-    // This might require more refined merging because we can lose data if some staffDef values are defined
-    // but do not contain all the ones given in the scoreDef (e.g. @key.mode in scoreDef but not in a staffDef with
-    // @key.sig)
-    if (scoreDef->HasClefInfo() && !this->HasClefInfo()) {
-        this->AddChild(scoreDef->GetClefCopy());
-    }
-    if (scoreDef->HasKeySigInfo() && !this->HasKeySigInfo()) {
-        this->AddChild(scoreDef->GetKeySigCopy());
-    }
-    if (scoreDef->HasMeterSigGrpInfo() && !this->HasMeterSigGrpInfo()) {
-        this->AddChild(scoreDef->GetMeterSigGrpCopy());
-    }
-    if (scoreDef->HasMeterSigInfo() && !this->HasMeterSigInfo()) {
-        this->AddChild(scoreDef->GetMeterSigCopy());
-    }
-    if (scoreDef->HasMensurInfo() && !this->HasMensurInfo()) {
-        this->AddChild(scoreDef->GetMensurCopy());
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int ScoreDefElement::ConvertMarkupScoreDefEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
-    assert(params);
-
-    if (!this->Is(SCOREDEF)) return FUNCTOR_CONTINUE;
-
-    // At the end of the scoreDef, remove all score definition elements
-    if (this->HasClefInfo()) {
-        Object *clef = this->FindDescendantByType(CLEF, 1);
-        if (clef) this->DeleteChild(clef);
-    }
-    if (this->HasKeySigInfo()) {
-        Object *keySig = this->FindDescendantByType(KEYSIG, 1);
-        if (keySig) this->DeleteChild(keySig);
-    }
-    if (this->HasMeterSigGrpInfo()) {
-        Object *meterSigGrp = this->FindDescendantByType(METERSIGGRP, 1);
-        if (meterSigGrp) this->DeleteChild(meterSigGrp);
-    }
-    if (this->HasMeterSigInfo()) {
-        Object *meterSig = this->FindDescendantByType(METERSIG, 1);
-        if (meterSig) this->DeleteChild(meterSig);
-    }
-    if (this->HasMensurInfo()) {
-        Object *mensur = this->FindDescendantByType(MENSUR, 1);
-        if (mensur) this->DeleteChild(mensur);
-    }
-
-    params->m_currentScoreDef = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode ScoreDef::Accept(MutableFunctor &functor)
 {
     return functor.VisitScoreDef(this);
@@ -769,73 +697,6 @@ FunctorCode ScoreDef::AcceptEnd(MutableFunctor &functor)
 FunctorCode ScoreDef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitScoreDefEnd(this);
-}
-
-int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    // Move itself to the pageBasedSystem - do not process children
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int ScoreDef::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_targetSystem);
-    this->MoveItselfTo(params->m_targetSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int ScoreDef::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
-
-    // Special case where we use the Relinquish method.
-    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
-    // from the content System because this screws up the iterator. Relinquish gives up
-    // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingElements.push_back(scoreDef);
-    // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
-    // the initial one - for this to be corrected, we would need two parameters, one for the current initial
-    // scoreDef and one for the current that will be the initial one at the next system
-    // Also, the abbr label (width) changes would not be taken into account
-    params->m_currentScoreDefWidth = this->GetDrawingWidth() + params->m_contentSystem->GetDrawingAbbrLabelsWidth();
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int ScoreDef::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int ScoreDef::InitMaxMeasureDuration(FunctorParams *functorParams)
@@ -918,19 +779,6 @@ int ScoreDef::GenerateMIDI(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-}
-
-int ScoreDef::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (m_drawingLabelsWidth > 0) {
-        params->m_measureXRel += m_drawingLabelsWidth;
-        params->m_applySectionRestartShift = false;
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int ScoreDef::Transpose(FunctorParams *functorParams)

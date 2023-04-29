@@ -15,6 +15,7 @@
 
 #include "beamspan.h"
 #include "comparison.h"
+#include "convertfunctor.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -24,6 +25,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
+#include "miscfunctor.h"
 #include "page.h"
 #include "pages.h"
 #include "pedal.h"
@@ -430,57 +432,51 @@ void System::ConvertToCastOffMensuralSystem(Doc *doc, System *targetSystem)
     assert(targetSystem);
 
     // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-    // The means no content? Checking just in case
-    if (initProcessingListsParams.m_layerTree.child.empty()) return;
+    // Checking just in case
+    if (layerTree.child.empty()) return;
 
-    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
-        doc, targetSystem, &initProcessingListsParams.m_layerTree);
+    ConvertToCastOffMensuralFunctor convertToCastOffMensural(doc, targetSystem, &layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
-    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
-        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+    for (const auto &staves : layerTree.child) {
+        convertToCastOffMensural.AddStaffN(staves.first);
     }
-
-    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
-    this->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+    this->Process(convertToCastOffMensural);
 }
 
 void System::ConvertToUnCastOffMensuralSystem()
 {
     // We need to populate processing lists for processing the document by Layer
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
+    const IntTree &layerTree = initProcessingLists.GetLayerTree();
 
-    // The means no content? Checking just in case
-    if (initProcessingListsParams.m_layerTree.child.empty()) return;
-
-    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
+    // Checking just in case
+    if (layerTree.child.empty()) return;
 
     Filters filters;
+    ConvertToUnCastOffMensuralFunctor convertToUnCastOffMensural;
+    convertToUnCastOffMensural.SetFilters(&filters);
+
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const &staves : initProcessingListsParams.m_layerTree.child) {
-        for (auto const &layers : staves.second.child) {
+    for (const auto &staves : layerTree.child) {
+        for (const auto &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters = { &matchStaff, &matchLayer };
 
-            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
-            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
-
-            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
-            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
-
-            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
+            convertToUnCastOffMensural.ResetContent();
+            this->Process(convertToUnCastOffMensural);
+            convertToUnCastOffMensural.TrackSegmentsToDelete(false);
         }
     }
 
     // Detach the contentPage
-    for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+    for (Object *measure : convertToUnCastOffMensural.GetSegmentsToDelete()) {
         this->DeleteChild(measure);
     }
 }
@@ -507,207 +503,6 @@ FunctorCode System::AcceptEnd(MutableFunctor &functor)
 FunctorCode System::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSystemEnd(this);
-}
-
-int System::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-    if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
-    m_systemLeftMar *= params->m_page->GetPPUFactor();
-    m_systemRightMar *= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    params->m_measureXRel = 0;
-    int margins = m_systemLeftMar + m_systemRightMar;
-    int nonJustifiableWidth
-        = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
-    params->m_justifiableRatio
-        = (double)(params->m_systemFullWidth - nonJustifiableWidth) / ((double)m_drawingJustifiableWidth);
-
-    if (params->m_justifiableRatio < 0.8) {
-        // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
-        LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
-        LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
-        LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
-    }
-
-    // Check if we are on the last system of an mdiv.
-    // Do not justify it if the non-justified width is less than a specified percent.
-    if (this->IsLastOfMdiv() || this->IsLastOfSelection()) {
-        double minLastJust = params->m_doc->GetOptions()->m_minLastJustification.GetValue();
-        if ((minLastJust > 0) && (params->m_justifiableRatio > (1 / minLastJust))) {
-            return FUNCTOR_SIBLINGS;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::JustifyY(FunctorParams *functorParams)
-{
-    JustifyYParams *params = vrv_params_cast<JustifyYParams *>(functorParams);
-    assert(params);
-    if (params->m_justificationSum <= 0.0) return FUNCTOR_STOP;
-    if (params->m_spaceToDistribute <= 0) return FUNCTOR_STOP;
-
-    const double systemJustificationFactor = params->m_doc->GetOptions()->m_justificationSystem.GetValue();
-    const double shift = systemJustificationFactor / params->m_justificationSum * params->m_spaceToDistribute;
-
-    if (!this->IsFirstInPage()) {
-        params->m_cumulatedShift += shift;
-    }
-
-    this->SetDrawingYRel(this->GetDrawingY() - params->m_cumulatedShift);
-
-    params->m_relativeShift = 0;
-    m_systemAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int System::CastOffPages(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    int currentShift = params->m_shift;
-    // We use params->m_pageHeadHeight to check if we have passed the first page already
-    if (params->m_pgHeadHeight != VRV_UNSET) {
-        currentShift += params->m_pgHeadHeight + params->m_pgFootHeight;
-    }
-    else {
-        currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
-    }
-
-    const int systemMaxPerPage = params->m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
-    const int childCount = params->m_currentPage->GetChildCount();
-    if ((systemMaxPerPage && systemMaxPerPage == childCount)
-        || (childCount > 0 && (this->m_drawingYRel - this->GetHeight() - currentShift < 0))) {
-        // If this is the last system in the list, it doesn't fit the page and it's leftover system (has just one
-        // measure) => add the system content to the previous system
-        Object *nextSystem = params->m_contentPage->GetNext(this, SYSTEM);
-        Object *lastSystem = params->m_currentPage->GetLast(SYSTEM);
-        if (!nextSystem && lastSystem && (this == params->m_leftoverSystem)) {
-            ArrayOfObjects &children = this->GetChildrenForModification();
-            for (Object *child : children) {
-                child->MoveItselfTo(lastSystem);
-            }
-            return FUNCTOR_SIBLINGS;
-        }
-
-        params->m_currentPage = new Page();
-        // Use VRV_UNSET value as a flag
-        params->m_pgHeadHeight = VRV_UNSET;
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
-    }
-
-    // First add all pending objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
-        params->m_currentPage->AddChild(*iter);
-    }
-    params->m_pendingPageElements.clear();
-
-    // Special case where we use the Relinquish method.
-    // We want to move the system to the currentPage. However, we cannot use DetachChild
-    // from the contentPage because this screws up the iterator. Relinquish gives up
-    // the ownership of the system - the contentPage itself will be deleted afterwards.
-    System *system = vrv_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    assert(system);
-    params->m_currentPage->AddChild(system);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int System::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // We are starting a new system we need to cast off
-    params->m_contentSystem = this;
-    // We also need to create a new target system and add it to the page
-    System *system = new System();
-    params->m_page->AddChild(system);
-    params->m_currentSystem = system;
-
-    params->m_shift = -this->GetDrawingLabelsWidth();
-    params->m_currentScoreDefWidth
-        = params->m_page->m_drawingScoreDef.GetDrawingWidth() + this->GetDrawingAbbrLabelsWidth();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::CastOffSystemsEnd(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    if (params->m_pendingElements.empty()) return FUNCTOR_CONTINUE;
-
-    // Otherwise add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingElements.begin(); iter != params->m_pendingElements.end(); ++iter) {
-        params->m_currentSystem->AddChild(*iter);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    // We are starting a new system we need to cast off
-    params->m_contentSystem = this;
-    // Create the new system but do not add it to the page yet.
-    // It will be added when reaching a pb / sb or at the end of the score in PageMilestoneEnd::CastOffEncoding
-    assert(!params->m_currentSystem);
-    params->m_currentSystem = new System();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    // We are starting a new system we need to cast off
-    params->m_contentSystem = this;
-    // We also need to create a new target system and add it to the page
-    System *system = new System();
-    params->m_page->AddChild(system);
-    params->m_currentSystem = system;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    // Just move all the content of the system to the continuous one (parameter)
-    // Use the MoveChildrenFrom method that moves and relinquishes them
-    // See Object::Relinquish
-    params->m_currentSystem->MoveChildrenFrom(this);
-
-    return FUNCTOR_CONTINUE;
 }
 
 int System::Transpose(FunctorParams *functorParams)

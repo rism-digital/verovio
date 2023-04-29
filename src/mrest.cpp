@@ -78,19 +78,6 @@ FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMRestEnd(this);
 }
 
-int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const
 {
     if (!layer) return defaultLocation;

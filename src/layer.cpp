@@ -197,6 +197,11 @@ LayerElement *Layer::GetAtPos(int x)
 const LayerElement *Layer::GetAtPos(int x) const
 {
     const Object *first = this->GetFirst();
+    if (first->IsEditorialElement()) {
+        IsEditorialElementComparison cmp;
+        cmp.ReverseComparison();
+        first = this->FindDescendantByComparison(&cmp);
+    }
     if (!first || !first->IsLayerElement()) return NULL;
 
     const LayerElement *element = vrv_cast<const LayerElement *>(first);
@@ -205,8 +210,19 @@ const LayerElement *Layer::GetAtPos(int x) const
 
     const Object *next;
     while ((next = this->GetNext())) {
-        if (!next->IsLayerElement()) continue;
-        const LayerElement *nextLayerElement = vrv_cast<const LayerElement *>(next);
+        const LayerElement *nextLayerElement = NULL;
+        if (next->IsLayerElement()) {
+            nextLayerElement = vrv_cast<const LayerElement *>(next);
+        }
+        else if (next->IsEditorialElement()) {
+            IsEditorialElementComparison cmp;
+            cmp.ReverseComparison();
+            nextLayerElement = vrv_cast<const LayerElement *>(next->FindDescendantByComparison(&cmp));
+            if (!nextLayerElement) continue;
+        }
+        else {
+            continue;
+        }
         assert(nextLayerElement);
         if (nextLayerElement->GetDrawingX() > x) return element;
         element = nextLayerElement;
@@ -612,67 +628,6 @@ FunctorCode Layer::AcceptEnd(MutableFunctor &functor)
 FunctorCode Layer::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLayerEnd(this);
-}
-
-int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
-    assert(params);
-
-    for (auto &[parent, artic] : params->m_articPairsToConvert) {
-        artic->SplitMultival(parent);
-    }
-    params->m_articPairsToConvert.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    params->m_contentLayer = this;
-
-    params->m_targetLayer = new Layer(*this);
-    params->m_targetLayer->ClearChildren();
-    params->m_targetLayer->CloneReset();
-    // Keep the xml:id of the layer in the first segment
-    params->m_targetLayer->SwapID(this);
-    assert(params->m_targetStaff);
-    params->m_targetStaff->AddChild(params->m_targetLayer);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    if (params->m_contentLayer == NULL) {
-        params->m_contentLayer = this;
-    }
-    else {
-        params->m_contentLayer->MoveChildrenFrom(this);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Layer::InitProcessingLists(FunctorParams *functorParams)
-{
-    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
-    assert(params);
-
-    // Alternate solution with StaffN_LayerN_VerseN_t
-    // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
-
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-    params->m_layerTree.child[staff->GetN()].child[this->GetN()];
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Layer::InitOnsetOffset(FunctorParams *functorParams)

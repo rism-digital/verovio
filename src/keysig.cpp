@@ -77,6 +77,7 @@ KeySig::KeySig()
     : LayerElement(KEYSIG, "keysig-")
     , ObjectListInterface()
     , AttAccidental()
+    , AttColor()
     , AttPitch()
     , AttKeySigAnl()
     , AttKeySigLog()
@@ -84,6 +85,7 @@ KeySig::KeySig()
     , AttVisibility()
 {
     this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_PITCH);
     this->RegisterAttClass(ATT_KEYSIGANL);
     this->RegisterAttClass(ATT_KEYSIGLOG);
@@ -99,6 +101,7 @@ void KeySig::Reset()
 {
     LayerElement::Reset();
     this->ResetAccidental();
+    this->ResetColor();
     this->ResetPitch();
     this->ResetKeySigAnl();
     this->ResetKeySigLog();

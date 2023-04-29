@@ -39,7 +39,6 @@ class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
-class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -621,9 +620,8 @@ public:
 
     /**
      * Saves the object (and its children) using the specified output stream.
-     * Creates functors that will parse the tree.
      */
-    int SaveObject(SaveParams &saveParams);
+    void SaveObject(Output *output, bool basic);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -633,7 +631,7 @@ public:
         std::stable_sort(m_children.begin(), m_children.end(), comp);
     }
 
-    virtual void ReorderByXPos();
+    void ReorderByXPos();
 
     Object *FindNextChild(Comparison *comp, Object *start);
 
@@ -688,180 +686,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * Add each LayerElements and its children to a flat list
-     */
-    virtual int AddLayerElementToFlatList(FunctorParams *functorParams) const;
-
-    /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
-     */
-    virtual int InitProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * @name Functors for finding objects
-     */
-    ///@{
-
-    /**
-     * Retrieve the minimum left and maximum right for an alignment.
-     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
-     */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
-
-    ///@}
-
-    /**
-     * @name Functors for loading and saving the document
-     */
-    ///@{
-
-    /**
-     * Convert top-level all container (section, endings) and editorial elements to milestone elements.
-     */
-    virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
-     * Segment positions occur where a barLine is set on all staves.
-     */
-    virtual int ConvertToCastOffMensural(FunctorParams *functorParams);
-
-    /**
-     * Convert cast-off (measure) mensural segments MEI into mensural.
-     */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Convert analytical markup (\@fermata, \@tie) to elements.
-     * See Doc::ConvertMarkupAnalyticalDoc
-     */
-    virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupAnalytical
-     */
-    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Convert markup of artic@artic multi value into distinct artic elements.
-     * See Doc::ConvertMarkupAnalyticalDoc
-     */
-    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
-     * When a staffDef already has one, it is not replaced.
-     */
-    virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupScoreDef
-     */
-    virtual int ConvertMarkupScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Save the content of any object by calling the appropriate FileOutputStream method.
-     */
-    virtual int Save(FunctorParams *functorParams);
-
-    /**
-     * End Functor for Object::Save
-     */
-    virtual int SaveEnd(FunctorParams *functorParams);
-
-    ///@}
-
-    /**
-     * @name Functors for aligning the pages.
-     */
-    ///@{
-
-    /**
-     * Apply the Pixel Per Unit factor of the page to its elements.
-     */
-    virtual int ApplyPPUFactor(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
-     * @name Functors for justification.
-     */
-    ///@{
-
-    /**
-     * Justify the X positions
-     */
-    virtual int JustifyX(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Justify the Y positions
-     */
-    virtual int JustifyY(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust cross staff content after vertical justification
-     */
-    virtual int JustifyYAdjustCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
-     * @name Functors for calculating the layout of a document or of a selection.
-     */
-    ///@{
-
-    /**
-     * Fill a page by adding systems with the appropriate length.
-     * At the end, add all the pending objects where reaching the end
-     */
-    virtual int CastOffSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CastOffSystems
-     */
-    virtual int CastOffSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Fill a doc by adding pages with the appropriate length.
-     */
-    virtual int CastOffPages(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CastOffPages
-     */
-    virtual int CastOffPagesEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Cast off the document according to the encoding provided (pb and sb)
-     */
-    virtual int CastOffEncoding(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Undo the cast of both pages and system.
-     * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
-     */
-    virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * CastOff a document to selection.
-     * Move everything before the selection to the first page, the selection to a second page,
-     * and everthing after the selection to a third page.
-     */
-    virtual int CastOffToSelection(FunctorParams *) { return FUNCTOR_CONTINUE; };
-
-    ///@}
 
     /**
      * @name Functors for generating MIDI output.
@@ -921,11 +745,6 @@ public:
     virtual int GenerateFeatures(FunctorParams *functorParams);
 
     ///@}
-
-    /**
-     * Reorder elements by x-position.
-     */
-    virtual int ReorderByXPos(FunctorParams *);
 
     /**
      * Transpose the content.

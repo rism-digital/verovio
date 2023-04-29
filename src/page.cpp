@@ -51,7 +51,9 @@
 #include "doc.h"
 #include "functor.h"
 #include "functorparams.h"
+#include "justifyfunctor.h"
 #include "libmei.h"
+#include "miscfunctor.h"
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
@@ -427,11 +429,10 @@ void Page::LayOutHorizontally()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
 
-    this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
+    this->AdjustSylSpacingByVerse(initProcessingLists.GetVerseTree(), doc);
 
     AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
     this->Process(adjustHarmGrpsSpacing);
@@ -591,10 +592,9 @@ void Page::JustifyHorizontally()
     }
     else {
         // Justify X position
-        Functor justifyX(&Object::JustifyX);
-        JustifyXParams justifyXParams(&justifyX, doc);
-        justifyXParams.m_systemFullWidth = doc->m_drawingPageContentWidth;
-        this->Process(&justifyX, &justifyXParams);
+        JustifyXFunctor justifyX(doc);
+        justifyX.SetSystemFullWidth(doc->m_drawingPageContentWidth);
+        this->Process(justifyX);
     }
 }
 
@@ -621,18 +621,16 @@ void Page::JustifyVertically()
     if (!this->IsJustificationRequired(doc)) return;
 
     // Justify Y position
-    Functor justifyY(&Object::JustifyY);
-    JustifyYParams justifyYParams(&justifyY, doc);
-    justifyYParams.m_justificationSum = m_justificationSum;
-    justifyYParams.m_spaceToDistribute = m_drawingJustifiableHeight;
-    this->Process(&justifyY, &justifyYParams);
+    JustifyYFunctor justifyY(doc);
+    justifyY.SetJustificationSum(m_justificationSum);
+    justifyY.SetSpaceToDistribute(m_drawingJustifiableHeight);
+    this->Process(justifyY);
 
-    if (!justifyYParams.m_shiftForStaff.empty()) {
+    if (!justifyY.GetShiftForStaff().empty()) {
         // Adjust cross staff content which is displaced through vertical justification
-        Functor justifyYAdjustCrossStaff(&Object::JustifyYAdjustCrossStaff);
-        JustifyYAdjustCrossStaffParams justifyYAdjustCrossStaffParams(doc);
-        justifyYAdjustCrossStaffParams.m_shiftForStaff = justifyYParams.m_shiftForStaff;
-        this->Process(&justifyYAdjustCrossStaff, &justifyYAdjustCrossStaffParams);
+        JustifyYAdjustCrossStaffFunctor justifyYAdjustCrossStaff(doc);
+        justifyYAdjustCrossStaff.SetShiftForStaff(justifyY.GetShiftForStaff());
+        this->Process(justifyYAdjustCrossStaff);
     }
 }
 
@@ -741,18 +739,18 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc)
+void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
 {
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
-    IntTree_t::iterator verses;
+    IntTree_t::const_iterator staves;
+    IntTree_t::const_iterator layers;
+    IntTree_t::const_iterator verses;
 
-    if (listsParams.m_verseTree.child.empty()) return;
+    if (verseTree.child.empty()) return;
 
     Filters filters;
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {
+    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // Create ad comparison object for each type / @n
@@ -791,38 +789,6 @@ FunctorCode Page::AcceptEnd(MutableFunctor &functor)
 FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPageEnd(this);
-}
-
-int Page::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    params->m_page = this;
-    m_pageWidth /= params->m_page->GetPPUFactor();
-    m_pageHeight /= params->m_page->GetPPUFactor();
-    m_pageMarginBottom /= params->m_page->GetPPUFactor();
-    m_pageMarginLeft /= params->m_page->GetPPUFactor();
-    m_pageMarginRight /= params->m_page->GetPPUFactor();
-    m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Page::CastOffPagesEnd(FunctorParams *functorParams)
-{
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    if (params->m_pendingPageElements.empty()) return FUNCTOR_CONTINUE;
-
-    // Otherwise add all pendings objects
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingPageElements.begin(); iter != params->m_pendingPageElements.end(); ++iter) {
-        params->m_currentPage->AddChild(*iter);
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

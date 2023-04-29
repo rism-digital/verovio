@@ -247,26 +247,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertMarkupArtic
-     */
-    int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToUnCastOffMensural
-     */
-    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitProcessingLists
-     */
-    int InitProcessingLists(FunctorParams *functorParams) override;
-
-    /**
      * See Object::InitOnsetOffset
      */
     ///@{
