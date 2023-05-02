@@ -242,10 +242,14 @@ void View::DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staf
     const int noteY = nc->GetDrawingY();
 
     const int clefYPosition = noteY - (unit * 2 * (staffLineNumber - clefLine));
-    const int octaveOffset = (nc->GetOct() - 3) * (unit * 7);
+    int octaveOffset = (nc->GetOct() - 3) * (unit * 7);
 
     int pitchOffset = 0;
-    if (clef->GetShape() == CLEFSHAPE_C) {
+    if (!clef->HasShape() || (clef->GetShape() == CLEFSHAPE_G)) {
+        pitchOffset = (nc->GetPname() - 1) * unit;
+        octaveOffset -= (unit * 7);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_C) {
         pitchOffset = (nc->GetPname() - 1) * unit;
     }
     else if (clef->GetShape() == CLEFSHAPE_F) {
