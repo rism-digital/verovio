@@ -710,10 +710,10 @@ double LayerElement::GetAlignmentDuration(
         if (this->Is(NC)) {
             const Neume *neume = vrv_cast<const Neume *>(this->GetFirstAncestor(NEUME));
             if (neume->IsLastInNeume(this)) {
-                return 128;
+                return 256;
             }
             else {
-                return 16;
+                return 64;
             }
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
