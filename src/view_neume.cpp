@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "divline.h"
 #include "doc.h"
 #include "layer.h"
 #include "layerelement.h"
