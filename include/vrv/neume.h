@@ -77,7 +77,6 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
-    virtual int GetPosition(LayerElement *element);
     virtual int GetLigatureCount(int position);
     bool IsLastInNeume(const LayerElement *element) const;
 
