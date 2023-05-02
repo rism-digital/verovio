@@ -523,7 +523,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         // Check for clefs in syllable
         ListOfObjects clefs;
-        syllable->FindAllDescendantByComparison(&clefs, &ac);
+        syllable->FindAllDescendantsByComparison(&clefs, &ac);
         bool hasClef = (clefs.size() != 0);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
@@ -571,7 +571,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             // if syllable contains clef, adjust individual neumes
             ListOfObjects neumes;
             ClassIdComparison neumeCompare(NEUME);
-            element->FindAllDescendantByComparison(&neumes, &neumeCompare);
+            element->FindAllDescendantsByComparison(&neumes, &neumeCompare);
             for (auto neume = neumes.begin(); neume != neumes.end(); ++neume) {
                 AdjustPitchFromPosition(*neume);
             }
@@ -1303,7 +1303,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
     Object *neume;
     assert(neume);
     ClassIdComparison ac(NEUME);
-    staff->FindAllDescendantByComparison(&neumes, &ac);
+    staff->FindAllDescendantsByComparison(&neumes, &ac);
     std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
     if (neumes.size() > 0) {
         ClosestNeume compN;
@@ -4035,7 +4035,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         ListOfObjects pitchedChildren;
         InterfaceComparison ic(INTERFACE_PITCH);
-        obj->FindAllDescendantByComparison(&pitchedChildren, &ic);
+        obj->FindAllDescendantsByComparison(&pitchedChildren, &ic);
 
         if (pitchedChildren.empty()) {
             LogWarning("Syllable/neume had no pitched children to reorder for syllable/neume %s", obj->GetID().c_str());
