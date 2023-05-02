@@ -64,6 +64,11 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     Nc *nc = dynamic_cast<Nc *>(element);
     assert(nc);
 
+    if (m_options->m_neumeAsNote.GetValue()) {
+        DrawNcAsNotehead(dc, nc, layer, staff, measure);
+        return;
+    }
+
     struct drawingParams {
         char32_t fontNo = SMUFL_E990_chantPunctum;
         float xOffset = 0;
@@ -218,6 +223,40 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->StartGraphic(element, "", element->GetID());
     this->DrawLayerChildren(dc, neume, layer, staff, measure);
     dc->EndGraphic(element, this);
+}
+
+void View::DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure)
+{
+    /******************************************************************/
+    // Start the Neume graphic and draw the children
+
+    dc->StartGraphic(nc, "", nc->GetID());
+
+    // Intializing necessary variables
+    Clef *clef = layer->GetClef(nc);
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffLineNumber = staff->m_drawingLines;
+    const int clefLine = clef->GetLine();
+
+    const int noteX = nc->GetDrawingX();
+    const int noteY = nc->GetDrawingY();
+
+    const int clefYPosition = noteY - (unit * 2 * (staffLineNumber - clefLine));
+    const int octaveOffset = (nc->GetOct() - 3) * (unit * 7);
+
+    int pitchOffset = 0;
+    if (clef->GetShape() == CLEFSHAPE_C) {
+        pitchOffset = (nc->GetPname() - 1) * unit;
+    }
+    else if (clef->GetShape() == CLEFSHAPE_F) {
+        pitchOffset = (nc->GetPname() - 4) * unit;
+    }
+    // Calculating proper y offset based on pname, clef, staff, and staff rotate
+    int yValue = clefYPosition + pitchOffset + octaveOffset;
+
+    this->DrawSmuflCode(dc, noteX, yValue, SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, false, true);
+
+    dc->EndGraphic(nc, this);
 }
 
 } // namespace vrv
