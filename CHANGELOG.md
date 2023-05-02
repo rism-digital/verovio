@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for rectangular tone clusters (@eNote-GmbH)
 * Support for delayed turns on chords (@eNote-GmbH)
 * Improve endpoint location for spanning slurs (@eNote-GmbH)
 * Improve layout for inner slurs in cross-staff situations (@eNote-GmbH)

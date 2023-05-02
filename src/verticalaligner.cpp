@@ -513,11 +513,11 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
         if (m_staff->m_drawingStaffDef->HasSpacing()) {
-            if (m_staff->m_drawingStaffDef->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
-                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetPx();
+            if (m_staff->m_drawingStaffDef->GetSpacing().GetType() == MEASUREMENTTYPE_px) {
+                spacing = m_staff->m_drawingStaffDef->GetSpacing().GetPx();
             }
             else {
-                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetVu() * doc->GetDrawingUnit(100);
+                spacing = m_staff->m_drawingStaffDef->GetSpacing().GetVu() * doc->GetDrawingUnit(100);
             }
         }
         else {

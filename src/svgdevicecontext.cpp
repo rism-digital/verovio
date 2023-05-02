@@ -332,7 +332,7 @@ void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, 
 
 void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
-    m_currentNode = AppendChild("tspan");
+    m_currentNode = AddChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, object->GetClassName(), gClass);
     AppendAdditionalAttributes(object);
@@ -536,10 +536,15 @@ Point SvgDeviceContext::GetLogicalOrigin()
     return Point(m_originX, m_originY);
 }
 
-pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
+pugi::xml_node SvgDeviceContext::AddChild(std::string name)
 {
     pugi::xml_node g = m_currentNode.child("g");
-    return (g) ? m_currentNode.insert_child_before(name.c_str(), g) : m_currentNode.append_child(name.c_str());
+    if (g) {
+        return m_currentNode.insert_child_before(name.c_str(), g);
+    }
+    else {
+        return (m_pushBack) ? m_currentNode.prepend_child(name.c_str()) : m_currentNode.append_child(name.c_str());
+    }
 }
 
 void SvgDeviceContext::AppendStrokeLineCap(pugi::xml_node node, const Pen &pen)
@@ -576,7 +581,7 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
 // Drawing methods
 void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d Q%d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
@@ -591,7 +596,7 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
 
 void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y, bezier[3].x, bezier[3].y // Remaining bezier points.
@@ -607,7 +612,7 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 
 void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4])
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
             bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
@@ -639,7 +644,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     int rh = height / 2;
     int rw = width / 2;
 
-    pugi::xml_node ellipseChild = AppendChild("ellipse");
+    pugi::xml_node ellipseChild = AddChild("ellipse");
     ellipseChild.append_attribute("cx") = x + rw;
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
@@ -702,7 +707,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     int fSweep = (fabs(theta2 - theta1) > M_PI) ? 1 : 0;
 
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat(
         "M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
@@ -717,7 +722,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -730,7 +735,7 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
     assert(m_penStack.size());
     const Pen &currentPen = m_penStack.top();
 
-    pugi::xml_node polylineChild = AppendChild("polyline");
+    pugi::xml_node polylineChild = AddChild("polyline");
 
     if (currentPen.GetWidth() > 0) {
         polylineChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
@@ -763,7 +768,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
     const Pen &currentPen = m_penStack.top();
     const Brush &currentBrush = m_brushStack.top();
 
-    pugi::xml_node polygonChild = AppendChild("polygon");
+    pugi::xml_node polygonChild = AddChild("polygon");
 
     if (currentPen.GetWidth() > 0) {
         polygonChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
@@ -797,7 +802,7 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
 
 void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
-    pugi::xml_node rectChild = AppendChild("rect");
+    pugi::xml_node rectChild = AddChild("rect");
 
     if (m_penStack.size()) {
         Pen currentPen = m_penStack.top();
@@ -930,7 +935,7 @@ void SvgDeviceContext::DrawText(
         = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
-    pugi::xml_node textChild = AppendChild("tspan");
+    pugi::xml_node textChild = AddChild("tspan");
     // We still add @xml:space (No: this seems to create problems with Safari)
     // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
@@ -1015,7 +1020,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         m_smuflGlyphs.insert(glyph);
 
         // Write the char in the SVG
-        pugi::xml_node useChild = AppendChild("use");
+        pugi::xml_node useChild = AddChild("use");
         useChild.append_attribute(hrefAttrib.c_str())
             = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
         useChild.append_attribute("x") = x;
@@ -1162,7 +1167,7 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
         x -= width;
     }
 
-    pugi::xml_node rectChild = AppendChild("rect");
+    pugi::xml_node rectChild = AddChild("rect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("height") = height;

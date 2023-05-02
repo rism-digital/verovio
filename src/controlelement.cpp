@@ -105,6 +105,17 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
         default: break;
     }
 
+    // For ornaments pointing to notes in a chord, make the top and bottom one placed above and below respectively
+    if ((stemDir == STEMDIRECTION_NONE) && start->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(start);
+        assert(note);
+        const Chord *chord = note->IsChordTone();
+        if (chord) {
+            if (start == chord->GetTopNote()) value = STAFFREL_above;
+            if (start == chord->GetBottomNote()) value = STAFFREL_below;
+        }
+    }
+
     return value;
 }
 

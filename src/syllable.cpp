@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "divline.h"
 #include "functor.h"
 #include "neume.h"
 #include "syl.h"

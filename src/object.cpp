@@ -37,11 +37,13 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "miscfunctor.h"
 #include "nc.h"
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
 #include "resetfunctor.h"
+#include "savefunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -895,9 +897,8 @@ void Object::Modify(bool modified) const
 
 void Object::FillFlatList(ListOfConstObjects &flatList) const
 {
-    Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams(&flatList);
-    this->Process(&addToFlatList, &addLayerElementToFlatListParams);
+    AddToFlatListFunctor addToFlatList(&flatList);
+    this->Process(addToFlatList);
 }
 
 ListOfObjects Object::GetAncestors()
@@ -1309,22 +1310,18 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-int Object::SaveObject(SaveParams &saveParams)
+void Object::SaveObject(Output *output, bool basic)
 {
-    Functor save(&Object::Save);
+    SaveFunctor save(output, basic);
     // Special case where we want to process all objects
-    save.m_visibleOnly = false;
-    Functor saveEnd(&Object::SaveEnd);
-    this->Process(&save, &saveParams, &saveEnd);
-
-    return true;
+    save.SetVisibleOnly(false);
+    this->Process(save);
 }
 
 void Object::ReorderByXPos()
 {
-    ReorderByXPosParams params;
-    Functor reorder(&Object::ReorderByXPos);
-    this->Process(&reorder, &params);
+    ReorderByXPosFunctor reorderByXPos;
+    this->Process(reorderByXPos);
 }
 
 Object *Object::FindNextChild(Comparison *comp, Object *start)
@@ -1791,54 +1788,6 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
-{
-    AddLayerElementToFlatListParams *params = vrv_params_cast<AddLayerElementToFlatListParams *>(functorParams);
-    assert(params);
-
-    params->m_flatList->push_back(this);
-    // LogDebug("List %d", params->m_flatList->size());
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(m_parent);
-    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
-    if (m_parent->Is(LAYER)) {
-        assert(params->m_targetLayer);
-        this->MoveItselfTo(params->m_targetLayer);
-        // Do not precess children because we move the full sub-tree
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
-{
-    GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-
-    if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
-
-    if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
-
-    int refLeft = this->GetSelfLeft();
-    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
-
-    int refRight = this->GetSelfRight();
-    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::GenerateFeatures(FunctorParams *functorParams)
 {
     GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
@@ -1846,41 +1795,6 @@ int Object::GenerateFeatures(FunctorParams *functorParams)
 
     params->m_extractor->Extract(this, params);
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::Save(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_output->WriteObject(this)) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SaveEnd(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_output->WriteObjectEnd(this)) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::ReorderByXPos(FunctorParams *functorParams)
-{
-    if (this->GetFacsimileInterface() != NULL) {
-        if (this->GetFacsimileInterface()->HasFacs()) {
-            return FUNCTOR_SIBLINGS; // This would have already been reordered.
-        }
-    }
-
-    std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
-    this->Modify();
     return FUNCTOR_CONTINUE;
 }
 

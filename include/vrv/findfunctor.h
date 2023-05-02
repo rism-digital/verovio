@@ -490,6 +490,46 @@ private:
     std::string m_id;
 };
 
+//----------------------------------------------------------------------------
+// AddToFlatListFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adds elements and its children to a flat list.
+ */
+class AddToFlatListFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AddToFlatListFunctor(ListOfConstObjects *flatList);
+    virtual ~AddToFlatListFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The list of elements
+    ListOfConstObjects *m_flatList;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FINDFUNCTOR_H__

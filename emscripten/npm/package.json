@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "rollup --config",
-    "prebundle": "rollup --config rollup.config.prebundle.js"
+    "prebundle": "rollup --config rollup.config.prebundle.mjs"
   },
   "keywords": [
     "music",
@@ -38,10 +38,10 @@
   },
   "homepage": "https://www.verovio.org",
   "engines": {
-    "node": ">= 14.17.0"
+    "node": ">= 14.18.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^22.0.0",
-    "rollup": "^2.75.6"
+    "@rollup/plugin-commonjs": "^24.1.0",
+    "rollup": "^3.20.6"
   }
 }

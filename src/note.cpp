@@ -117,8 +117,8 @@ void Note::Reset()
     this->ResetTiePresent();
     this->ResetVisibility();
 
-    m_clusterPosition = 0;
-    m_cluster = NULL;
+    m_noteGroupPosition = 0;
+    m_noteGroup = NULL;
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
@@ -249,11 +249,11 @@ int Note::GetDrawingDur() const
     }
 }
 
-bool Note::IsClusterExtreme() const
+bool Note::IsNoteGroupExtreme() const
 {
-    ChordCluster *cluster = m_cluster;
-    if (this == cluster->at(0)) return true;
-    return (this == cluster->at(cluster->size() - 1)) ? true : false;
+    ChordNoteGroup *noteGroup = m_noteGroup;
+    if (this == noteGroup->at(0)) return true;
+    return (this == noteGroup->at(noteGroup->size() - 1)) ? true : false;
 }
 
 TabGrp *Note::IsTabGrpNote()
@@ -341,10 +341,10 @@ bool Note::IsUnisonWith(const Note *note, bool ignoreAccid) const
     return ((this->GetPname() == note->GetPname()) && (this->GetOct() == note->GetOct()));
 }
 
-void Note::SetCluster(ChordCluster *cluster, int position)
+void Note::SetNoteGroup(ChordNoteGroup *noteGroup, int position)
 {
-    m_cluster = cluster;
-    m_clusterPosition = position;
+    m_noteGroup = noteGroup;
+    m_noteGroupPosition = position;
 }
 
 Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
@@ -869,62 +869,6 @@ FunctorCode Note::AcceptEnd(MutableFunctor &functor)
 FunctorCode Note::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitNoteEnd(this);
-}
-
-int Note::ConvertMarkupAnalytical(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    /****** ties ******/
-
-    AttTiePresent *check = this;
-    // Use the parent chord if there is no @tie on the note
-    if (!this->HasTie() && params->m_currentChord) {
-        check = params->m_currentChord;
-    }
-    assert(check);
-
-    std::vector<Note *>::iterator iter = params->m_currentNotes.begin();
-    while (iter != params->m_currentNotes.end()) {
-        // same octave and same pitch - this is the one!
-        if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
-            // right flag
-            if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
-                Tie *tie = new Tie();
-                if (!params->m_permanent) {
-                    tie->IsAttribute(true);
-                }
-                tie->SetStartid("#" + (*iter)->GetID());
-                tie->SetEndid("#" + this->GetID());
-                params->m_controlEvents.push_back(tie);
-            }
-            else {
-                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetID().c_str());
-            }
-            iter = params->m_currentNotes.erase(iter);
-            // we are done for this note
-            break;
-        }
-        ++iter;
-    }
-
-    if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
-        params->m_currentNotes.push_back(this);
-    }
-
-    if (params->m_permanent) {
-        this->ResetTiePresent();
-    }
-
-    /****** fermata ******/
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 MapOfNoteLocs Note::CalcNoteLocations(NotePredicate predicate) const

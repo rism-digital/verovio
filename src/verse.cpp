@@ -127,23 +127,6 @@ FunctorCode Verse::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitVerseEnd(this);
 }
 
-int Verse::InitProcessingLists(FunctorParams *functorParams)
-{
-    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
-    assert(params);
-    // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
-
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
-    // Alternate solution with StaffN_LayerN_VerseN_t
-    //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int Verse::GenerateMIDI(FunctorParams *)
 {
     LayerElement *parent = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));

@@ -175,42 +175,6 @@ FunctorCode Score::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreEnd(this);
 }
 
-int Score::ConvertMarkupScoreDef(FunctorParams *functorParams)
-{
-    ConvertMarkupScoreDefParams *params = vrv_params_cast<ConvertMarkupScoreDefParams *>(functorParams);
-    assert(params);
-
-    // Evaluate functor on scoreDef
-    this->GetScoreDef()->Process(params->m_functor, params, params->m_functorEnd);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Score::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(!params->m_currentSystem);
-    this->MoveItselfTo(params->m_page);
-    System *system = new System();
-    params->m_currentSystem = system;
-    params->m_page->AddChild(system);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Score::ConvertToPageBasedEnd(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    ConvertToPageBasedMilestone(this, params->m_page);
-    params->m_currentSystem = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Score::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

@@ -70,20 +70,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::Save
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override;
-    int SaveEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-
 private:
     //
 public:
