@@ -1069,6 +1069,10 @@ Options::Options()
     m_moveScoreDefinitionToStaff.Init(false);
     this->Register(&m_moveScoreDefinitionToStaff, "moveScoreDefinitionToStaff", &m_general);
 
+    m_neumeAsNote.SetInfo("Neume as note", "Render neumes as note heads instead of original notation");
+    m_neumeAsNote.Init(false);
+    this->Register(&m_neumeAsNote, "neumeAsNote", &m_general);
+
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
