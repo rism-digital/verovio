@@ -541,6 +541,10 @@ enum {
     SMUFL_EBCA_luteFrenchFretL = 0xEBCA,
     SMUFL_EBCB_luteFrenchFretM = 0xEBCB,
     SMUFL_EBCC_luteFrenchFretN = 0xEBCC,
+    SMUFL_EBCD_luteFrench7thCourse = 0xEBCD,
+    SMUFL_EBCE_luteFrench8thCourse = 0xEBCE,
+    SMUFL_EBCF_luteFrench9thCourse = 0xEBCF,
+    SMUFL_EBD0_luteFrench10thCourse = 0xEBD0,
     SMUFL_EBE0_luteItalianFret0 = 0xEBE0,
     SMUFL_EBE1_luteItalianFret1 = 0xEBE1,
     SMUFL_EBE2_luteItalianFret2 = 0xEBE2,
@@ -578,7 +582,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 553
+#define SMUFL_COUNT 557
 
 } // namespace vrv
 
