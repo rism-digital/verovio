@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        barline.h
-// Author:      Laurent Pugin
-// Created:     2011
+// Name:        divline.h
+// Author:      Yinan Zhou
+// Created:     2021
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +104,6 @@ public:
     virtual ~DivLineAttr();
     virtual Object *Clone() const { return new DivLineAttr(*this); }
     virtual std::string GetClassName() const { return "DivLineAttr"; }
-    virtual ClassId GetClassId() const { return DIVLINE; }
     ///@}
 
     // void SetLeft() { m_isLeft = true; }
