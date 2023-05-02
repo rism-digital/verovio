@@ -8,6 +8,7 @@
 #ifndef __VRV_DIVLINE_H__
 #define __VRV_DIVLINE_H__
 
+#include "atts_neumes.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 
