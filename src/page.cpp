@@ -53,6 +53,7 @@
 #include "functorparams.h"
 #include "justifyfunctor.h"
 #include "libmei.h"
+#include "miscfunctor.h"
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
@@ -428,11 +429,10 @@ void Page::LayOutHorizontally()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
 
-    this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
+    this->AdjustSylSpacingByVerse(initProcessingLists.GetVerseTree(), doc);
 
     AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
     this->Process(adjustHarmGrpsSpacing);
@@ -739,18 +739,18 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc)
+void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
 {
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
-    IntTree_t::iterator verses;
+    IntTree_t::const_iterator staves;
+    IntTree_t::const_iterator layers;
+    IntTree_t::const_iterator verses;
 
-    if (listsParams.m_verseTree.child.empty()) return;
+    if (verseTree.child.empty()) return;
 
     Filters filters;
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {
+    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // Create ad comparison object for each type / @n
@@ -789,22 +789,6 @@ FunctorCode Page::AcceptEnd(MutableFunctor &functor)
 FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPageEnd(this);
-}
-
-int Page::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    params->m_page = this;
-    m_pageWidth /= params->m_page->GetPPUFactor();
-    m_pageHeight /= params->m_page->GetPPUFactor();
-    m_pageMarginBottom /= params->m_page->GetPPUFactor();
-    m_pageMarginLeft /= params->m_page->GetPPUFactor();
-    m_pageMarginRight /= params->m_page->GetPPUFactor();
-    m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

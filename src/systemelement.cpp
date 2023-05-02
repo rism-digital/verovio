@@ -79,26 +79,4 @@ FunctorCode SystemElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemElementEnd(this);
 }
 
-int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_targetSystem);
-    this->MoveItselfTo(params->m_targetSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

@@ -97,14 +97,4 @@ FunctorCode MNum::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMNumEnd(this);
 }
 
-int MNum::Save(FunctorParams *functorParams)
-{
-    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::Save(functorParams);
-}
-
-int MNum::SaveEnd(FunctorParams *functorParams)
-{
-    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::SaveEnd(functorParams);
-}
-
 } // namespace vrv

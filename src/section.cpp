@@ -95,36 +95,4 @@ FunctorCode Section::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSectionEnd(this);
 }
 
-int Section::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    params->m_contentMeasure = NULL;
-    params->m_contentLayer = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

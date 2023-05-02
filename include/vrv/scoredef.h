@@ -113,16 +113,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDef(FunctorParams *) override;
-
-    /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDefEnd(FunctorParams *) override;
-
 private:
     //
 public:
@@ -285,16 +275,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
 
     /**
      * See Object::CalcMaxMeasureDuration

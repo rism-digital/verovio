@@ -101,37 +101,6 @@ data_ARTICULATION Artic::GetArticFirst() const
     return articList.front();
 }
 
-void Artic::SplitMultival(Object *parent)
-{
-    assert(parent);
-
-    std::vector<data_ARTICULATION> articList = this->GetArtic();
-    if (articList.empty()) return;
-
-    int idx = this->GetIdx() + 1;
-    std::vector<data_ARTICULATION>::iterator iter;
-    for (iter = articList.begin() + 1; iter != articList.end(); ++iter) {
-        Artic *artic = new Artic();
-        artic->SetArtic({ *iter });
-        artic->AttColor::operator=(*this);
-        artic->AttEnclosingChars::operator=(*this);
-        artic->AttExtSym::operator=(*this);
-        artic->AttPlacementRelEvent::operator=(*this);
-        parent->InsertChild(artic, idx);
-        idx++;
-    }
-
-    // The original element only keep the first value
-    this->SetArtic({ articList.at(0) });
-
-    // Multiple valued attributes cannot be preserved as such
-    if (this->IsAttribute()) {
-        this->IsAttribute(false);
-        LogInfo("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
-            parent->GetID().c_str());
-    }
-}
-
 void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
 {
     Object *parentNoteOrChord = this->GetFirstAncestor(CHORD);
@@ -326,17 +295,6 @@ FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
 FunctorCode Artic::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitArticEnd(this);
-}
-
-int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
-{
-    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
-    assert(params);
-
-    if (this->GetArtic().size() > 1)
-        params->m_articPairsToConvert.emplace_back(std::make_pair(this->GetParent(), this));
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

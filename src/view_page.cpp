@@ -1080,7 +1080,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 }
                 // hardcoded offset for the mNum based on the lyric font size
                 const int yOffset = m_doc->GetDrawingLyricFont(60)->GetPointSize();
-                this->DrawMNum(dc, mnum, measure, std::max(symbolOffset, yOffset));
+                this->DrawMNum(dc, mnum, measure, system, std::max(symbolOffset, yOffset));
             }
         }
     }
@@ -1156,7 +1156,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     dc->EndGraphic(meterSigGrp, this);
 }
 
-void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset)
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset)
 {
     assert(dc);
     assert(measure);
@@ -1164,6 +1164,10 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
 
     Staff *staff = measure->GetTopVisibleStaff();
     if (staff) {
+        // Only one FloatingPositioner on the top (visible) staff
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
+            return;
+        }
 
         dc->StartGraphic(mnum, "", mnum->GetID());
 
@@ -1208,6 +1212,9 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
         dc->EndText();
 
         dc->ResetFont();
+        dc->ResetBrush();
+
+        this->DrawTextEnclosure(dc, params, staff->m_drawingStaffSize);
 
         dc->EndGraphic(mnum, this);
     }

@@ -180,11 +180,6 @@ public:
     ///@}
 
     /**
-     * See Object::ApplyPPUFactor
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

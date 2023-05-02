@@ -288,7 +288,7 @@ private:
 
     std::string GetColour(int colour);
 
-    pugi::xml_node AppendChild(std::string name);
+    pugi::xml_node AddChild(std::string name);
 
     /**
      * Transform pen properties into stroke attributes

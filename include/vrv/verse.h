@@ -71,11 +71,6 @@ public:
     ///@}
 
     /**
-     * See Object::InitProcessingLists
-     */
-    int InitProcessingLists(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *) override;

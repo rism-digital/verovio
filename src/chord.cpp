@@ -72,6 +72,7 @@ Chord::Chord()
     , DrawingListInterface()
     , StemmedDrawingInterface()
     , DurationInterface()
+    , AttChordVis()
     , AttColor()
     , AttCue()
     , AttGraced()
@@ -81,6 +82,7 @@ Chord::Chord()
     , AttVisibility()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    this->RegisterAttClass(ATT_CHORDVIS);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
     this->RegisterAttClass(ATT_GRACED);
@@ -94,7 +96,7 @@ Chord::Chord()
 
 Chord::~Chord()
 {
-    ClearClusters();
+    ClearNoteGroups();
 }
 
 void Chord::Reset()
@@ -103,6 +105,7 @@ void Chord::Reset()
     DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
+    this->ResetChordVis();
     this->ResetColor();
     this->ResetCue();
     this->ResetGraced();
@@ -111,24 +114,24 @@ void Chord::Reset()
     this->ResetTiePresent();
     this->ResetVisibility();
 
-    ClearClusters();
+    ClearNoteGroups();
 }
 
-void Chord::ClearClusters() const
+void Chord::ClearNoteGroups() const
 {
-    std::list<ChordCluster *>::iterator iter;
-    for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter) {
+    std::list<ChordNoteGroup *>::iterator iter;
+    for (iter = m_noteGroups.begin(); iter != m_noteGroups.end(); ++iter) {
         for (std::vector<Note *>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter) {
-            (*clIter)->SetCluster(NULL, 0);
+            (*clIter)->SetNoteGroup(NULL, 0);
         }
         delete *iter;
     }
-    m_clusters.clear();
+    m_noteGroups.clear();
 }
 
-void Chord::CalculateClusters()
+void Chord::CalculateNoteGroups()
 {
-    this->ClearClusters();
+    this->ClearNoteGroups();
 
     const ListOfObjects &childList = this->GetList(this);
     ListOfObjects::const_iterator iter = childList.begin();
@@ -136,7 +139,7 @@ void Chord::CalculateClusters()
     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
     assert(lastNote);
     int lastPitch = lastNote->GetDiatonicPitch();
-    ChordCluster *curCluster = NULL;
+    ChordNoteGroup *curGroup = NULL;
 
     ++iter;
 
@@ -149,15 +152,15 @@ void Chord::CalculateClusters()
         const int curPitch = curNote->GetDiatonicPitch();
 
         if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
-            if (!lastNote->GetCluster()) {
-                curCluster = new ChordCluster();
-                m_clusters.push_back(curCluster);
-                curCluster->push_back(lastNote);
-                lastNote->SetCluster(curCluster, (int)curCluster->size());
+            if (!lastNote->GetNoteGroup()) {
+                curGroup = new ChordNoteGroup();
+                m_noteGroups.push_back(curGroup);
+                curGroup->push_back(lastNote);
+                lastNote->SetNoteGroup(curGroup, (int)curGroup->size());
             }
-            assert(curCluster);
-            curCluster->push_back(curNote);
-            curNote->SetCluster(curCluster, (int)curCluster->size());
+            assert(curGroup);
+            curGroup->push_back(curNote);
+            curNote->SetNoteGroup(curGroup, (int)curGroup->size());
         }
 
         lastNote = curNote;
@@ -486,6 +489,9 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
         if (((margin >= 0) && (overlap > margin)) || ((margin <= 0) && (overlap < margin))) {
             margin = overlap;
         }
+        else if ((margin < 0) && (m_noteGroups.size() > 0)) {
+            margin = overlap;
+        }
         if (isInUnison) ++actualElementsInUnison;
     }
 
@@ -558,39 +564,6 @@ FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
 FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitChordEnd(this);
-}
-
-int Chord::ConvertMarkupAnalytical(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    assert(!params->m_currentChord);
-    params->m_currentChord = this;
-
-    /****** fermata ******/
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (params->m_permanent) {
-        this->ResetTiePresent();
-    }
-
-    assert(params->m_currentChord);
-    params->m_currentChord = NULL;
-
-    return FUNCTOR_CONTINUE;
 }
 
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const

@@ -89,19 +89,6 @@ public:
     ///@}
 
     /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDef(FunctorParams *) override;
-
-    /**
      * See Object::Transpose
      */
     int Transpose(FunctorParams *functorParams) override;

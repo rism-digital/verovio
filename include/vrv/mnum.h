@@ -84,14 +84,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::Save
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override;
-    int SaveEnd(FunctorParams *functorParams) override;
-    ///@}
-
 private:
     /**
      * Flag indicating whether or not the element was generated
