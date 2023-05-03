@@ -506,6 +506,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("fing");
         this->WriteFing(m_currentNode, vrv_cast<Fing *>(object));
     }
+    else if (object->Is(GLISS)) {
+        m_currentNode = m_currentNode.append_child("gliss");
+        this->WriteGliss(m_currentNode, vrv_cast<Gliss *>(object));
+    }
     else if (object->Is(HAIRPIN)) {
         m_currentNode = m_currentNode.append_child("hairpin");
         this->WriteHairpin(m_currentNode, vrv_cast<Hairpin *>(object));
@@ -623,10 +627,6 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(FTREM)) {
             m_currentNode = m_currentNode.append_child("fTrem");
             this->WriteFTrem(m_currentNode, vrv_cast<FTrem *>(object));
-        }
-        else if (object->Is(GLISS)) {
-            m_currentNode = m_currentNode.append_child("gliss");
-            this->WriteGliss(m_currentNode, vrv_cast<Gliss *>(object));
         }
         else if (object->Is(GRACEGRP)) {
             m_currentNode = m_currentNode.append_child("graceGrp");
