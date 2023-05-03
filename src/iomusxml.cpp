@@ -1353,6 +1353,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (key) {
                 KeySig *meiKey = ConvertKey(key.node());
                 staffDef->AddChild(meiKey);
+                if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) meiKey->IsAttribute(true);
             }
 
             // staff details
