@@ -273,7 +273,16 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Register deferred notes for MIDI
+     */
+    void DeferMIDINote(const Note *refNote, double shift, bool includeChordSiblings);
+
+    /**
+     * Creates the MIDI output of the grace note sequence
+     */
+    void GenerateGraceNoteMIDI(const Note *refNote, double startTime, int tpq, int channel, int velocity);
+
 public:
     //
 private:
