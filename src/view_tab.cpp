@@ -228,8 +228,10 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
         }
     }
 
-    // Draw children (stems)
-    this->DrawLayerChildren(dc, tabDurSym, layer, staff, measure);
+    // Draw children (stems) for beam or guitar notation
+    if (tabGrp->IsInBeam() || staff->IsTabGuitar()) {
+        this->DrawLayerChildren(dc, tabDurSym, layer, staff, measure);
+    }
 
     dc->EndGraphic(tabDurSym, this);
 }
