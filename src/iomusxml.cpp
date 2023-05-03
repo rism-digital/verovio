@@ -1360,7 +1360,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             xpath = StringFormat("staff-details[@number='%d']", i + 1);
             staffDetails = it->select_node(xpath.c_str());
             if (!staffDetails) {
-                staffDetails = it->select_node("staff-details");
+                staffDetails = it->select_node("staff-details[not(@number)]");
             }
             short int staffLines = staffDetails.node().select_node("staff-lines").node().text().as_int();
             if (staffLines) {
