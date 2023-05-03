@@ -16,6 +16,7 @@
 #include "btrem.h"
 #include "chord.h"
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "note.h"
@@ -275,75 +276,84 @@ void TupletNum::SetAlignedBracket(TupletBracket *alignedBracket)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Dots::ResetData(FunctorParams *functorParams)
+FunctorCode Dots::Accept(MutableFunctor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_dotLocsByStaff.clear();
-    m_isAdjusted = false;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitDots(this);
 }
 
-int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Dots::Accept(ConstFunctor &functor) const
 {
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_dotLocsByStaff.clear();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitDots(this);
 }
 
-int Flag::ResetData(FunctorParams *functorParams)
+FunctorCode Dots::AcceptEnd(MutableFunctor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_drawingNbFlags = 0;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitDotsEnd(this);
 }
 
-int TupletBracket::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Dots::AcceptEnd(ConstFunctor &functor) const
 {
-    // Call parent one too
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_drawingXRelLeft = 0;
-    m_drawingXRelRight = 0;
-    m_alignedNum = NULL;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitDotsEnd(this);
 }
 
-int TupletBracket::ResetVerticalAlignment(FunctorParams *functorParams)
+FunctorCode Flag::Accept(MutableFunctor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetVerticalAlignment(functorParams);
-
-    m_drawingYRelLeft = 0;
-    m_drawingYRelRight = 0;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitFlag(this);
 }
 
-int TupletNum::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Flag::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_alignedBracket = NULL;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitFlag(this);
 }
 
-int TupletNum::ResetVerticalAlignment(FunctorParams *functorParams)
+FunctorCode Flag::AcceptEnd(MutableFunctor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetVerticalAlignment(functorParams);
+    return functor.VisitFlagEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Flag::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitFlagEnd(this);
+}
+
+FunctorCode TupletBracket::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTupletBracket(this);
+}
+
+FunctorCode TupletBracket::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTupletBracket(this);
+}
+
+FunctorCode TupletBracket::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletBracketEnd(this);
+}
+
+FunctorCode TupletBracket::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletBracketEnd(this);
+}
+
+FunctorCode TupletNum::Accept(MutableFunctor &functor)
+{
+    return functor.VisitTupletNum(this);
+}
+
+FunctorCode TupletNum::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTupletNum(this);
+}
+
+FunctorCode TupletNum::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTupletNumEnd(this);
+}
+
+FunctorCode TupletNum::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTupletNumEnd(this);
 }
 
 } // namespace vrv

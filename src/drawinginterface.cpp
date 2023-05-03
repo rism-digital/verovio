@@ -111,9 +111,8 @@ int BeamDrawingInterface::GetTotalBeamWidth() const
 
 void BeamDrawingInterface::ClearCoords()
 {
-    ArrayOfBeamElementCoords::iterator iter;
-    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
-        delete *iter;
+    for (BeamElementCoord *coord : m_beamElementCoords) {
+        delete coord;
     }
     m_beamElementCoords.clear();
 }
@@ -141,8 +140,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     int lastDur, currentDur;
 
     m_beamElementCoords.reserve(childList.size());
-    int i;
-    for (i = 0; i < (int)childList.size(); ++i) {
+    for ([[maybe_unused]] auto child : childList) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
@@ -205,8 +203,8 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
             // Look at the stemDir to see if we have multiple stem Dir
             if (!m_hasMultipleStemDir) {
                 // At this stage, BeamCoord::m_stem is not necessary set, so we need to look at the Note / Chord
-                // original value Example: GetAncestorBeam called in Note::PrepareLayerElementParts when reaching the
-                // first note of the beam
+                // original value. Example: GetAncestorBeam called in PrepareLayerElementPartsFunctor::VisitNote
+                // when reaching the first note of the beam
                 currentStemDir = m_beamElementCoords.at(elementCount)->GetStemDir();
                 if (currentStemDir != STEMDIRECTION_NONE) {
                     if ((m_notesStemDir != STEMDIRECTION_NONE) && (m_notesStemDir != currentStemDir)) {
@@ -281,15 +279,12 @@ bool BeamDrawingInterface::IsHorizontal() const
 
     if (m_drawingPlace == BEAMPLACE_NONE) return true;
 
-    int elementCount = (int)m_beamElementCoords.size();
-
     std::vector<int> items;
     std::vector<data_BEAMPLACE> directions;
     items.reserve(m_beamElementCoords.size());
     directions.reserve(m_beamElementCoords.size());
 
-    for (int i = 0; i < elementCount; ++i) {
-        BeamElementCoord *coord = m_beamElementCoords.at(i);
+    for (BeamElementCoord *coord : m_beamElementCoords) {
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
         items.push_back(coord->m_closestNote->GetDrawingY());
@@ -366,23 +361,25 @@ bool BeamDrawingInterface::IsHorizontalMixedBeam(
     data_STEMDIRECTION outsidePitchDirection = GetNoteDirection(items.front(), items.back());
     std::map<data_STEMDIRECTION, int> beamDirections{ { STEMDIRECTION_NONE, 0 }, { STEMDIRECTION_up, 0 },
         { STEMDIRECTION_down, 0 } };
-    for (int i = 0; i < (int)items.size(); ++i) {
-        if (directions[i] == BEAMPLACE_above) {
+    int i = 0;
+    for (data_BEAMPLACE direction : directions) {
+        if (direction == BEAMPLACE_above) {
             if (previousTop == VRV_UNSET) {
-                previousTop = items[i];
+                previousTop = items.at(i);
             }
             else {
-                ++beamDirections[GetNoteDirection(previousTop, items[i])];
+                ++beamDirections[GetNoteDirection(previousTop, items.at(i))];
             }
         }
-        else if (directions[i] == BEAMPLACE_below) {
+        else if (direction == BEAMPLACE_below) {
             if (previousBottom == VRV_UNSET) {
-                previousBottom = items[i];
+                previousBottom = items.at(i);
             }
             else {
-                ++beamDirections[GetNoteDirection(previousBottom, items[i])];
+                ++beamDirections[GetNoteDirection(previousBottom, items.at(i))];
             }
         }
+        ++i;
     }
     // if direction of beam outside pitches corresponds to majority of the note directions within the beam, beam
     // can be drawn in that direction. Otherwise horizontal beam should be used
@@ -407,9 +404,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
     std::vector<int> items;
     items.reserve(m_beamElementCoords.size());
 
-    int i;
-    for (i = 0; i < elementCount; ++i) {
-        BeamElementCoord *coord = m_beamElementCoords.at(i);
+    for (BeamElementCoord *coord : m_beamElementCoords) {
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
         // Could this be an overflow with 32 bits?
@@ -424,18 +419,16 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
 
     // Find all possible dividers for the sequence (without 1 and its size)
     std::vector<int> dividers;
-    for (i = 2; i <= itemCount / 2; ++i) {
+    for (int i = 2; i <= itemCount / 2; ++i) {
         if (itemCount % i == 0) dividers.push_back(i);
     }
 
     // Correlate a sub-array for each divider until a sequence is found (if any)
-    for (i = 0; i < (int)dividers.size(); ++i) {
-        int divider = dividers.at(i);
-        int j;
+    for (int divider : dividers) {
         bool pattern = true;
         std::vector<int>::iterator iter = items.begin();
         std::vector<int> v1 = std::vector<int>(iter, iter + divider);
-        for (j = 1; j < (itemCount / divider); ++j) {
+        for (int j = 1; j < (itemCount / divider); ++j) {
             std::vector<int> v2 = std::vector<int>(iter + j * divider, iter + (j + 1) * divider);
             if (v1 != v2) {
                 pattern = false;
@@ -457,7 +450,7 @@ bool BeamDrawingInterface::HasOneStepHeight() const
 
     int top = -128;
     int bottom = 128;
-    for (auto coord : m_beamElementCoords) {
+    for (BeamElementCoord *coord : m_beamElementCoords) {
         if (coord->m_closestNote) {
             Note *note = vrv_cast<Note *>(coord->m_closestNote);
             assert(note);

@@ -9,6 +9,7 @@
 #define __VRV_IOMUSXML_H__
 
 #include <map>
+#include <optional>
 #include <queue>
 #include <string>
 #include <vector>
@@ -64,8 +65,7 @@ class Trill;
 
 namespace musicxml {
 
-    class OpenSlur {
-    public:
+    struct OpenSlur {
         OpenSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
@@ -78,8 +78,7 @@ namespace musicxml {
         curvature_CURVEDIR m_curvedir;
     };
 
-    class CloseSlur {
-    public:
+    struct CloseSlur {
         CloseSlur(const std::string &measureNum, short int number, curvature_CURVEDIR curvedir)
         {
             m_measureNum = measureNum;
@@ -92,8 +91,7 @@ namespace musicxml {
         curvature_CURVEDIR m_curvedir;
     };
 
-    class OpenSpanner {
-    public:
+    struct OpenSpanner {
         OpenSpanner(const int &dirN, const int &lastMeasureCount)
         {
             m_dirN = dirN;
@@ -104,8 +102,7 @@ namespace musicxml {
         int m_lastMeasureCount;
     };
 
-    class OpenArpeggio {
-    public:
+    struct OpenArpeggio {
         OpenArpeggio(const int &arpegN, const int &timeStamp)
         {
             m_arpegN = arpegN;
@@ -116,8 +113,7 @@ namespace musicxml {
         int m_timeStamp;
     };
 
-    class EndingInfo {
-    public:
+    struct EndingInfo {
         EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
         {
             m_endingNumber = endingNumber;
@@ -130,8 +126,7 @@ namespace musicxml {
         std::string m_endingText;
     };
 
-    class ClefChange {
-    public:
+    struct ClefChange {
         ClefChange(const std::string &measureNum, Staff *staff, Layer *layer, Clef *clef, const int &scoreOnset,
             bool afterBarline)
         {
@@ -151,8 +146,7 @@ namespace musicxml {
         bool m_afterBarline = false; // musicXML attribute
     };
 
-    class OpenDashes {
-    public:
+    struct OpenDashes {
         OpenDashes(const int dirN, int staffNum, const int measureCount)
         {
             m_dirN = dirN;
@@ -163,6 +157,30 @@ namespace musicxml {
         int m_dirN; // direction number
         int m_staffNum;
         int m_measureCount; // measure number of dashes start
+    };
+
+    struct OpenTie {
+        OpenTie(Tie *tie, Note *note, int layerNum)
+        {
+            m_tie = tie;
+            m_note = note;
+            m_layerNum = layerNum;
+        }
+
+        Tie *m_tie = NULL;
+        Note *m_note = NULL;
+        int m_layerNum = 0;
+    };
+
+    struct CloseTie {
+        CloseTie(Note *note, int layerNum)
+        {
+            m_note = note;
+            m_layerNum = layerNum;
+        }
+
+        Note *m_note = NULL;
+        int m_layerNum = 0;
     };
 
 } // namespace musicxml
@@ -259,8 +277,9 @@ private:
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
+     * Returns true if the measure was added to the tree (did not exist before)
      */
-    void AddMeasure(Section *section, Measure *measure, int i);
+    bool AddMeasure(Section *section, Measure *measure, int i);
 
     /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
@@ -278,7 +297,7 @@ private:
     Layer *SelectLayer(short int staffNb, Measure *measure);
 
     /*
-     * Returns the layer with @n=layerNb on the staff.
+     * Returns the layer with \@n=layerNb on the staff.
      * Creates the layer if not found.
      */
     Layer *SelectLayer(short int layerNb, Staff *staff);
@@ -313,10 +332,10 @@ private:
     ///@}
 
     /*
-     * @name Helper method to check whether a ending measure number is already present in m_endingStack.
+     * @name Helper method to check whether an ending measure is already present in m_endingStack.
      */
     ///@{
-    bool NotInEndingStack(std::string const &measureN);
+    bool NotInEndingStack(const Measure *measure) const;
     ///@}
 
     /*
@@ -334,11 +353,12 @@ private:
      * Slur starts and ends are matched based on its number.
      */
     ///@{
-    void OpenTie(Note *note, Tie *tie);
-    void CloseTie(Note *note);
+    void OpenTie(Note *note, Tie *tie, int layerNum);
+    void CloseTie(Note *note, int layerNum);
     void OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir);
     void CloseSlur(Measure *measure, short int number, LayerElement *element, curvature_CURVEDIR dir);
     void CloseBeamSpan(Staff *staff, Layer *layer, LayerElement *element);
+    void MatchTies(bool matchLayers);
     ///@}
 
     /*
@@ -404,7 +424,7 @@ private:
     ///@}
 
     /*
-     * @name Helper method for setting @staff attribute for chords
+     * @name Helper method for setting \@staff attribute for chords
      */
     ///@{
     void SetChordStaff(Layer *layer);
@@ -457,6 +477,9 @@ private:
     static int PitchToMidi(const std::string &step, int alter, int octave);
     static void MidiToPitch(int midi, std::string &step, int &alter, int &octave);
     ///@}
+
+public:
+    //
 private:
     /* octave offset */
     std::vector<int> m_octDis;
@@ -465,7 +488,7 @@ private:
     /* measure repeats */
     bool m_slash = false;
     /* MIDI ticks */
-    int m_ppq = 1;
+    int m_ppq = -1;
     /* measure time */
     int m_durTotal = 0;
     /* measure time */
@@ -495,9 +518,9 @@ private:
     /* The stack for slur stops that might come before the slur has been opened */
     std::vector<std::pair<LayerElement *, musicxml::CloseSlur>> m_slurStopStack;
     /* The stack for open ties */
-    std::vector<std::pair<Tie *, Note *>> m_tieStack;
+    std::vector<musicxml::OpenTie> m_tieStack;
     /* The stack for tie stops that might come before that tie was opened */
-    std::vector<Note *> m_tieStopStack;
+    std::vector<musicxml::CloseTie> m_tieStopStack;
     /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenSpanner>> m_hairpinStack;
     /* The stack for hairpin stops that might occur before a hairpin was started staffNumber, tStamp2, (hairpinNumber,
@@ -507,6 +530,9 @@ private:
     std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
     std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
+    /* Current ending info for start/stop */
+    std::optional<musicxml::EndingInfo> m_currentEndingStart;
+    std::optional<musicxml::EndingInfo> m_currentEndingStop;
     /* The stack of endings to be inserted at the end of XML import */
     std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>> m_endingStack;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */

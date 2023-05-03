@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
@@ -74,80 +75,24 @@ bool Section::IsSupportedChild(Object *child)
 // Section functor methods
 //----------------------------------------------------------------------------
 
-int Section::ConvertToPageBased(FunctorParams *functorParams)
+FunctorCode Section::Accept(MutableFunctor &functor)
 {
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSection(this);
 }
 
-int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
+FunctorCode Section::Accept(ConstFunctor &functor) const
 {
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSection(this);
 }
 
-int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+FunctorCode Section::AcceptEnd(MutableFunctor &functor)
 {
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    params->m_contentMeasure = NULL;
-    params->m_contentLayer = NULL;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSectionEnd(this);
 }
 
-int Section::PrepareMilestones(FunctorParams *functorParams)
+FunctorCode Section::AcceptEnd(ConstFunctor &functor) const
 {
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::ResetData(FunctorParams *functorParams)
-{
-    FloatingObject::ResetData(functorParams);
-
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::AlignMeasures(FunctorParams *functorParams)
-{
-    AlignMeasuresParams *params = vrv_params_cast<AlignMeasuresParams *>(functorParams);
-    assert(params);
-
-    if (this->GetRestart() == BOOLEAN_true) {
-        params->m_applySectionRestartShift = true;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Section::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = vrv_params_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (this->GetRestart() == BOOLEAN_true) {
-        params->m_applySectionRestartShift = true;
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSectionEnd(this);
 }
 
 } // namespace vrv

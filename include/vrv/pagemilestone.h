@@ -50,29 +50,14 @@ public:
     //----------//
 
     /**
-     * See Object::CastOffSystems
+     * Interface for class functor visitation
      */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffPages
-     */
-    int CastOffPages(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::Transpose

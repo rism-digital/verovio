@@ -126,25 +126,30 @@ public:
     int GetStaffIdx() const { return Object::GetIdx(); }
 
     /**
-     * Calculate the yRel for the staff given a @loc value
+     * Calculate the yRel for the staff given a \@loc value
      */
     int CalcPitchPosYRel(const Doc *doc, int loc) const;
 
     /**
-     * Getter for the StaffAlignment
+     * Getter and setter for the StaffAlignment
      */
     ///@{
     StaffAlignment *GetAlignment() { return m_staffAlignment; }
     const StaffAlignment *GetAlignment() const { return m_staffAlignment; }
+    void SetAlignment(StaffAlignment *alignment) { m_staffAlignment = alignment; }
     ///@}
 
     /**
      * Return the ledger line arrays
      */
     ///@{
+    ArrayOfLedgerLines &GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
     const ArrayOfLedgerLines &GetLedgerLinesAbove() const { return m_ledgerLinesAbove; }
+    ArrayOfLedgerLines &GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
     const ArrayOfLedgerLines &GetLedgerLinesAboveCue() const { return m_ledgerLinesAboveCue; }
+    ArrayOfLedgerLines &GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
     const ArrayOfLedgerLines &GetLedgerLinesBelow() const { return m_ledgerLinesBelow; }
+    ArrayOfLedgerLines &GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
     const ArrayOfLedgerLines &GetLedgerLinesBelowCue() const { return m_ledgerLinesBelowCue; }
     ///@}
 
@@ -158,7 +163,7 @@ public:
     ///@}
 
     /**
-     * Used for calculating clustered information/dot position.
+     * Used for calculating note groups information/dot position.
      * The *Doc is the parent doc but passed as param in order to avoid look-up
      */
     bool IsOnStaffLine(int y, const Doc *doc) const;
@@ -181,64 +186,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertToCastOffMensural
+     * Interface for class functor visitation
      */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ApplyPPUFactor
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignVertically
-     */
-    int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcLedgerLinesEnd
-     */
-    int CalcLedgerLinesEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::InitOnsetOffset
@@ -246,16 +201,6 @@ public:
     ///@{
     int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
@@ -272,12 +217,6 @@ private:
      * Add the ledger line dashes to the legderline array.
      */
     void AddLedgerLines(ArrayOfLedgerLines &lines, int count, int left, int right, int extension);
-
-    /**
-     * Shorten ledger lines which overlap with neighbors
-     */
-    void AdjustLedgerLines(
-        ArrayOfLedgerLines &lines, ArrayOfLedgerLines &cueLines, double cueScaling, int extension, int minExtension);
 
 public:
     /**

@@ -101,15 +101,15 @@ public:
      *
      * @return the version number as a string
      */
-    std::string GetVersion();
+    std::string GetVersion() const;
 
     /**
-     * Reset the seed used to generate MEI xml:id attribute values.
+     * Reset the seed used to generate MEI \@xml:id attribute values
      *
-     * Passing 0 will seed the xml:id generator with a random (time-based) seed value.
+     * Passing 0 will seed the \@xml:id generator with a random (time-based) seed value.
      * This method will have no effect if the --xml-id-checksum option is set.
      *
-     * @param seed The seed value for generating the xml:id values (0 for a time-based random seed)
+     * @param seed The seed value for generating the \@xml:id values (0 for a time-based random seed)
      */
     void ResetXmlIdSeed(int seed);
 
@@ -243,6 +243,16 @@ public:
     void ResetOptions();
 
     /**
+     * Print formatted option usage for specific category (with max/min/default values) to output stream.
+     */
+    void PrintOptionUsage(const std::string &category, std::ostream &output) const;
+
+    /**
+     * Get all usage for all option categories as string.
+     */
+    std::string GetOptionUsageString() const;
+
+    /**
      * Set the scale option.
      *
      * @remark nojs
@@ -352,8 +362,8 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
-     * @param @pageNo The page to render (1-based)
+     * @param filename The output filename
+     * @param pageNo The page to render (1-based)
      * @return True if the file was successfully written
      */
     bool RenderToSVGFile(const std::string &filename, int pageNo = 1);
@@ -370,7 +380,7 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
+     * @param filename The output filename
      * @return True if the file was successfully written
      */
     bool RenderToMIDIFile(const std::string &filename);
@@ -391,7 +401,7 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
+     * @param filename The output filename
      * @return True if the file was successfully written
      */
     bool RenderToPAEFile(const std::string &filename);
@@ -399,21 +409,37 @@ public:
     /**
      * Render a document to a timemap.
      *
-     * @param @jsonOptions A stringified JSON objects with the timemap options
+     * @param jsonOptions A stringified JSON objects with the timemap options
      * @return The timemap as a string
      */
     std::string RenderToTimemap(const std::string &jsonOptions = "");
+
+    /**
+     * Render a document's expansionMap, if existing
+     *
+     * @return The expansionMap as a string
+     */
+    std::string RenderToExpansionMap();
 
     /**
      * Render a document to timemap and save it to the file.
      *
      * @remark nojs
      *
-     * @param @filename The output filename
-     * @param @jsonOptions A stringified JSON objects with the timemap options
+     * @param filename The output filename
+     * @param jsonOptions A stringified JSON objects with the timemap options
      * @return True if the file was successfully written
      */
     bool RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions = "");
+
+    /**
+     * Render a document's expansionMap and save it to a file.
+     *
+     * @remark nojs
+     *
+     * @param filename The output filename
+     */
+    bool RenderToExpansionMapFile(const std::string &filename);
 
     //@}
 
@@ -457,7 +483,7 @@ public:
      *
      * @remark nojs
      *
-     * @param @filename The output filename
+     * @param filename The output filename
      * @return True if the file was successfully written
      */
     bool GetHumdrumFile(const std::string &filename);
@@ -477,7 +503,7 @@ public:
      * @param jsonOptions A stringified JSON object with the output options
      * pageNo: integer; (1-based), all pages if none (or 0) specified;
      * scoreBased: true or false; true by default;
-     * removeIds: true or false; false by default - remove all @xml:id not used in the data;
+     * removeIds: true or false; false by default - remove all \@xml:id not used in the data;
      */
     std::string GetMEI(const std::string &jsonOptions = "");
 
@@ -506,10 +532,10 @@ public:
      *
      * The features are tailored for implementing incipit search.
      *
-     * @param options A stringified JSON object with the feature extraction options
+     * @param jsonOptions A stringified JSON object with the feature extraction options
      * @return A stringified JSON object with the requested features
      */
-    std::string GetDescriptiveFeatures(const std::string &options);
+    std::string GetDescriptiveFeatures(const std::string &jsonOptions);
 
     /**
      * Return array of IDs of elements being currently played.
@@ -520,11 +546,11 @@ public:
     std::string GetElementsAtTime(int millisec);
 
     /**
-     * Return the page on which the element is the ID (xml:id) is rendered.
+     * Return the page on which the element is the ID (\@xml:id) is rendered
      *
      * This takes into account the current layout options.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return the page number (1-based) where the element is (0 if not found)
      */
     int GetPageWithElement(const std::string &xmlId);
@@ -534,7 +560,7 @@ public:
      *
      * The attributes returned include the ones not supported by Verovio.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return A stringified JSON object with all attributes
      */
     std::string GetElementAttr(const std::string &xmlId);
@@ -542,7 +568,7 @@ public:
     /**
      * Return the ID string of the notated (the original) element.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return An ID string
      */
     std::string GetNotatedIdForElement(const std::string &xmlId);
@@ -550,27 +576,27 @@ public:
     /**
      * Return a vector of ID strings of all elements (the notated and the expanded) for a given element.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return A stringified JSON object with all IDs
      */
     std::string GetExpansionIdsForElement(const std::string &xmlId);
 
     /**
-     * Return the time at which the element is the ID (xml:id) is played.
+     * Return the time at which the element is the ID (\@xml:id) is played
      *
      * RenderToMIDI() must be called prior to using this method.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return The time in milliseconds
      */
     int GetTimeForElement(const std::string &xmlId);
 
     /**
-     * Return MIDI values of the element with the ID (xml:id).
+     * Return MIDI values of the element with the ID (\@xml:id)
      *
      * RenderToMIDI() must be called prior to using this method.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return A stringified JSON object with the MIDI values
      */
     std::string GetMIDIValuesForElement(const std::string &xmlId);
@@ -581,7 +607,7 @@ public:
      * Return scoreTimeOnset, scoreTimeOffset, scoreTimeTiedDuration,
      * realTimeOnsetMilliseconds, realTimeOffsetMilliseconds, realTimeTiedDurationMilliseconds.
      *
-     * @param xmlId the ID (xml:id) of the element being looked for
+     * @param xmlId the ID (\@xml:id) of the element being looked for
      * @return A stringified JSON object with the values
      */
     std::string GetTimesForElement(const std::string &xmlId);
@@ -624,13 +650,6 @@ public:
      * @internal They are marked with \@ingroup nodoc
      */
     ///@{
-
-    /**
-     * Skip the layout on load to speed up MIDI or timemap output.
-     *
-     * @ingroup nodoc
-     */
-    void SkipLayoutOnLoad(bool value);
 
     /**
      * Render the page to the deviceContext.
@@ -733,6 +752,11 @@ protected:
     FileFormat IdentifyInputFrom(const std::string &data);
 
     /**
+     * Print formatted option usage for specific option to output stream.
+     */
+    void PrintOptionUsageOutput(const vrv::Option *option, std::ostream &output) const;
+
+    /**
      * Resets the vrv::logBuffer.
      */
     void ResetLogBuffer();
@@ -764,8 +788,6 @@ private:
     FileFormat m_outputTo;
 
     Options *m_options;
-
-    bool m_skipLayoutOnLoad;
 
     /**
      * The C buffer string.

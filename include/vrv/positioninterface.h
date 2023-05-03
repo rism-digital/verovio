@@ -9,12 +9,14 @@
 #define __VRV_POSITION_INTERFACE_H__
 
 #include "atts_shared.h"
+#include "interface.h"
 
 namespace vrv {
 
-class FunctorParams;
 class Layer;
 class LayerElement;
+class ResetDataFunctor;
+class ResetHorizontalAlignmentFunctor;
 
 //----------------------------------------------------------------------------
 // PositionInterface
@@ -40,7 +42,7 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPosFunctor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
@@ -60,14 +62,14 @@ public:
     //-----------------//
 
     /**
-     * See Object::ResetData
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
+    ///@{
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    FunctorCode InterfaceResetHorizontalAlignment(ResetHorizontalAlignmentFunctor &functor, Object *object);
+    ///@}
 
 private:
     //

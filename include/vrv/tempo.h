@@ -69,10 +69,13 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * @name Get the X drawing position
+     * @name Getter and setter for the X drawing position
      */
     ///@{
     int GetDrawingXRelativeToStaff(int staffN) const;
+    void SetDrawingXRelative(int staffN, int drawingX) { m_drawingXRels[staffN] = drawingX; }
+    void ResetDrawingXRelative() { m_drawingXRels.clear(); }
+    ///@}
 
     /**
      * See FloatingObject::IsExtenderElement
@@ -84,19 +87,28 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustTempoX
+     * Interface for class functor visitation
      */
-    int AdjustTempo(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
     int InitMaxMeasureDuration(FunctorParams *functorParams) override;
+
+    //----------//
+    //  Static  //
+    //----------//
+
+    /**
+     * Calculate tempo from attMmTempo (@mm, @mm.unit, @mm.dots)
+     */
+    static double CalcTempo(const AttMmTempo *attMmTempo);
 
 private:
     //

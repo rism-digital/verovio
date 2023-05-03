@@ -61,33 +61,15 @@ public:
     // Functors //
     //----------//
 
-    // Because F is a TextElement and not a ControlElement, these methods need to be implemented because
-    // TextElement does not inherit from FloatingObject.
-
     /**
-     * See Object::PrepareStaffCurrentTimeSpanning
+     * Interface for class functor visitation
      */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimePointing
-     */
-    int PrepareTimePointing(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    int PrepareTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestamps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

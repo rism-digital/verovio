@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "lb.h"
 #include "num.h"
@@ -91,20 +92,24 @@ bool Rend::IsSupportedChild(Object *child)
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Rend::AlignVertically(FunctorParams *functorParams)
+FunctorCode Rend::Accept(MutableFunctor &functor)
 {
-    AlignVerticallyParams *params = vrv_params_cast<AlignVerticallyParams *>(functorParams);
-    assert(params);
+    return functor.VisitRend(this);
+}
 
-    if (this->GetHalign()) {
-        switch (this->GetHalign()) {
-            case (HORIZONTALALIGNMENT_right): this->SetDrawingXRel(params->m_pageWidth); break;
-            case (HORIZONTALALIGNMENT_center): this->SetDrawingXRel(params->m_pageWidth / 2); break;
-            default: break;
-        }
-    }
+FunctorCode Rend::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitRend(this);
+}
 
-    return FUNCTOR_SIBLINGS;
+FunctorCode Rend::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitRendEnd(this);
+}
+
+FunctorCode Rend::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitRendEnd(this);
 }
 
 } // namespace vrv

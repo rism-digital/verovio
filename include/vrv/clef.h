@@ -11,6 +11,7 @@
 #include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -24,11 +25,13 @@ class ScoreDefInterface;
  * This class models the MEI <clef> element.
  */
 class Clef : public LayerElement,
+             public AttClefLog,
              public AttClefShape,
              public AttColor,
              public AttEnclosingChars,
              public AttExtSym,
              public AttLineLoc,
+             public AttOctave,
              public AttOctaveDisplacement,
              public AttStaffIdent,
              public AttVisibility {
@@ -70,19 +73,21 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustBeams
+     * Interface for class functor visitation
      */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
+    //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

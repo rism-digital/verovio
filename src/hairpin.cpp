@@ -17,6 +17,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "dynam.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "measure.h"
 #include "system.h"
@@ -44,6 +45,7 @@ Hairpin::Hairpin()
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_HAIRPINLOG);
     this->RegisterAttClass(ATT_HAIRPINVIS);
+    this->RegisterAttClass(ATT_LINERENDBASE);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_VERTICALGROUP);
 
@@ -59,6 +61,7 @@ void Hairpin::Reset()
     this->ResetColor();
     this->ResetHairpinLog();
     this->ResetHairpinVis();
+    this->ResetLineRendBase();
     this->ResetPlacementRelStaff();
     this->ResetVerticalGroup();
 
@@ -217,53 +220,24 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
 // Hairpin functor methods
 //----------------------------------------------------------------------------
 
-int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
+FunctorCode Hairpin::Accept(MutableFunctor &functor)
 {
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
-
-    // Only try to link them if start and end are resolved
-    if (!this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
-
-    for (auto &dynam : params->m_dynams) {
-        if ((dynam->GetStart() == this->GetStart()) && (dynam->GetStaff() == this->GetStaff())) {
-            if (!m_leftLink) this->SetLeftLink(dynam);
-        }
-        else if ((dynam->GetStart() == this->GetEnd()) && (dynam->GetStaff() == this->GetStaff())) {
-            if (!m_rightLink) this->SetRightLink(dynam);
-        }
-    }
-
-    for (auto &hairpin : params->m_hairpins) {
-        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!m_leftLink) this->SetLeftLink(hairpin);
-            if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
-        }
-        if ((hairpin->GetStart() == this->GetEnd()) && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!hairpin->GetLeftLink()) hairpin->SetLeftLink(this);
-            if (!m_rightLink) this->SetRightLink(hairpin);
-        }
-    }
-
-    params->m_hairpins.push_back(this);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitHairpin(this);
 }
 
-int Hairpin::ResetData(FunctorParams *functorParams)
+FunctorCode Hairpin::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
+    return functor.VisitHairpin(this);
+}
 
-    m_leftLink = NULL;
-    m_rightLink = NULL;
-    m_drawingLength = 0;
+FunctorCode Hairpin::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitHairpinEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Hairpin::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHairpinEnd(this);
 }
 
 } // namespace vrv

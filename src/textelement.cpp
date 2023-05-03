@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -111,12 +113,24 @@ void TextElement::SetDrawingYRel(int drawingYRel)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int TextElement::ResetVerticalAlignment(FunctorParams *functorParams)
+FunctorCode TextElement::Accept(MutableFunctor &functor)
 {
-    this->SetDrawingXRel(0);
-    this->SetDrawingYRel(0);
+    return functor.VisitTextElement(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode TextElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTextElement(this);
+}
+
+FunctorCode TextElement::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitTextElementEnd(this);
+}
+
+FunctorCode TextElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTextElementEnd(this);
 }
 
 } // namespace vrv

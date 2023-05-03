@@ -66,7 +66,7 @@ bool DocSelection::Parse(const std::string &selection)
                 m_selectionRangeEnd = -1;
             }
             else if (m_measureRange.find("-") != std::string::npos) {
-                std::size_t pos = m_measureRange.find("-");
+                int pos = (int)m_measureRange.find("-");
                 std::string startRange = m_measureRange.substr(0, pos);
                 std::string endRange = m_measureRange.substr(pos + 1, std::string::npos);
                 if (startRange == "start") {

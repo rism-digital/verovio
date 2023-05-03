@@ -71,7 +71,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
 
     m_outdata.clear();
 
-    m_glyphPostfixId = Object::GenerateRandID();
+    m_glyphPostfixId = Object::GenerateHashID();
 }
 
 SvgDeviceContext::~SvgDeviceContext() {}
@@ -112,7 +112,7 @@ void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resour
 
     pugi::xml_node css = m_svgNode.append_child("style");
     css.append_attribute("type") = "text/css";
-    css.append_child(pugi::node_pcdata).set_value(cssContent.c_str());
+    css.text().set(cssContent.c_str());
 }
 
 void SvgDeviceContext::Commit(bool xml_declaration)
@@ -171,9 +171,9 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (auto it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
+        for (const Glyph *smuflGlyph : m_smuflGlyphs) {
             // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source((*it)->GetPath());
+            std::ifstream source(smuflGlyph->GetPath());
             sourceDoc.load(source);
 
             // copy all the nodes inside into the master document
@@ -201,8 +201,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
     // add description statement
     pugi::xml_node desc = m_svgNode.prepend_child("desc");
-    desc.append_child(pugi::node_pcdata)
-        .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
+    desc.text().set(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
 
     // save the glyph data to m_outdata
     std::string indent = (m_indent == -1) ? "\t" : std::string(m_indent, ' ');
@@ -272,7 +271,7 @@ void SvgDeviceContext::StartGraphic(
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
             svgTitle.append_attribute("class") = "labelAttr";
-            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+            svgTitle.text().set(att->GetLabel().c_str());
         }
     }
 
@@ -289,11 +288,9 @@ void SvgDeviceContext::StartGraphic(
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
         if (att->HasFontstyle())
-            m_currentNode.append_attribute("font-style")
-                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+            m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
-            m_currentNode.append_attribute("font-weight")
-                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+            m_currentNode.append_attribute("font-weight") = att->FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -335,7 +332,7 @@ void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, 
 
 void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
-    m_currentNode = AppendChild("tspan");
+    m_currentNode = AddChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, object->GetClassName(), gClass);
     AppendAdditionalAttributes(object);
@@ -352,7 +349,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
             svgTitle.append_attribute("class") = "labelAttr";
-            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+            svgTitle.text().set(att->GetLabel().c_str());
         }
     }
 
@@ -369,11 +366,9 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
         if (att->HasFontstyle())
-            m_currentNode.append_attribute("font-style")
-                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+            m_currentNode.append_attribute("font-style") = att->FontstyleToStr(att->GetFontstyle()).c_str();
         if (att->HasFontweight())
-            m_currentNode.append_attribute("font-weight")
-                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+            m_currentNode.append_attribute("font-weight") = att->FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_WHITESPACE)) {
@@ -442,20 +437,19 @@ void SvgDeviceContext::StartPage()
     if (this->UseGlobalStyling()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.append_child(pugi::node_pcdata)
-            .set_value("g.page-margin{font-family:Times;} "
-                       //"g.page-margin{background: pink;} "
-                       //"g.bounding-box{stroke:red; stroke-width:10} "
-                       //"g.content-bounding-box{stroke:blue; stroke-width:10} "
-                       "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
-                       "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
+        m_currentNode.text().set("g.page-margin{font-family:Times,serif;} "
+                                 //"g.page-margin{background: pink;} "
+                                 //"g.bounding-box{stroke:red; stroke-width:10} "
+                                 //"g.content-bounding-box{stroke:blue; stroke-width:10} "
+                                 "g.ending, g.fing, g.reh, g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                                 "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
 
     if (!m_css.empty()) {
         m_currentNode = m_currentNode.append_child("style");
         m_currentNode.append_attribute("type") = "text/css";
-        m_currentNode.append_child(pugi::node_pcdata).set_value(m_css.c_str());
+        m_currentNode.text().set(m_css.c_str());
         m_currentNode = m_svgNodeStack.back();
     }
 
@@ -542,13 +536,15 @@ Point SvgDeviceContext::GetLogicalOrigin()
     return Point(m_originX, m_originY);
 }
 
-pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
+pugi::xml_node SvgDeviceContext::AddChild(std::string name)
 {
     pugi::xml_node g = m_currentNode.child("g");
-    if (g)
+    if (g) {
         return m_currentNode.insert_child_before(name.c_str(), g);
-    else
-        return m_currentNode.append_child(name.c_str());
+    }
+    else {
+        return (m_pushBack) ? m_currentNode.prepend_child(name.c_str()) : m_currentNode.append_child(name.c_str());
+    }
 }
 
 void SvgDeviceContext::AppendStrokeLineCap(pugi::xml_node node, const Pen &pen)
@@ -585,7 +581,7 @@ void SvgDeviceContext::AppendStrokeDashArray(pugi::xml_node node, const Pen &pen
 // Drawing methods
 void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d Q%d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
@@ -600,7 +596,7 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
 
 void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d", // Base string
         bezier[0].x, bezier[0].y, // M Command
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y, bezier[3].x, bezier[3].y // Remaining bezier points.
@@ -616,7 +612,7 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
 
 void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2[4])
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
             bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
@@ -648,7 +644,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     int rh = height / 2;
     int rw = width / 2;
 
-    pugi::xml_node ellipseChild = AppendChild("ellipse");
+    pugi::xml_node ellipseChild = AddChild("ellipse");
     ellipseChild.append_attribute("cx") = x + rw;
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
@@ -706,20 +702,12 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     double theta1 = atan2(ys - yc, xs - xc);
     double theta2 = atan2(ye - yc, xe - xc);
 
-    int fArc;
     // flag for large or small arc 0 means less than 180 degrees
-    if ((theta2 - theta1) > 0)
-        fArc = 1;
-    else
-        fArc = 0;
+    int fArc = ((theta2 - theta1) > 0) ? 1 : 0;
 
-    int fSweep;
-    if (fabs(theta2 - theta1) > M_PI)
-        fSweep = 1;
-    else
-        fSweep = 0;
+    int fSweep = (fabs(theta2 - theta1) > M_PI) ? 1 : 0;
 
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat(
         "M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
@@ -734,7 +722,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    pugi::xml_node pathChild = AppendChild("path");
+    pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -747,7 +735,7 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
     assert(m_penStack.size());
     const Pen &currentPen = m_penStack.top();
 
-    pugi::xml_node polylineChild = AppendChild("polyline");
+    pugi::xml_node polylineChild = AddChild("polyline");
 
     if (currentPen.GetWidth() > 0) {
         polylineChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
@@ -780,7 +768,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
     const Pen &currentPen = m_penStack.top();
     const Brush &currentBrush = m_brushStack.top();
 
-    pugi::xml_node polygonChild = AppendChild("polygon");
+    pugi::xml_node polygonChild = AddChild("polygon");
 
     if (currentPen.GetWidth() > 0) {
         polygonChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
@@ -814,7 +802,7 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
 
 void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, int radius)
 {
-    pugi::xml_node rectChild = AppendChild("rect");
+    pugi::xml_node rectChild = AddChild("rect");
 
     if (m_penStack.size()) {
         Pen currentPen = m_penStack.top();
@@ -947,8 +935,8 @@ void SvgDeviceContext::DrawText(
         = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
-    pugi::xml_node textChild = AppendChild("tspan");
-    // We still add @xml::space (No: this seems to create problems with Safari)
+    pugi::xml_node textChild = AddChild("tspan");
+    // We still add @xml:space (No: this seems to create problems with Safari)
     // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
@@ -982,7 +970,7 @@ void SvgDeviceContext::DrawText(
         }
     }
     textChild.append_attribute("class") = "text";
-    textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
+    textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
         && (width != VRV_UNSET) && (height != VRV_UNSET)) {
@@ -1022,8 +1010,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
     }
 
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); ++i) {
-        char32_t c = text.at(i);
+    for (char32_t c : text) {
         const Glyph *glyph = resources->GetGlyph(c);
         if (!glyph) {
             continue;
@@ -1033,7 +1020,7 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         m_smuflGlyphs.insert(glyph);
 
         // Write the char in the SVG
-        pugi::xml_node useChild = AppendChild("use");
+        pugi::xml_node useChild = AddChild("use");
         useChild.append_attribute(hrefAttrib.c_str())
             = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
         useChild.append_attribute("x") = x;
@@ -1087,7 +1074,7 @@ void SvgDeviceContext::DrawBackgroundImage(int x, int y) {}
 void SvgDeviceContext::AddDescription(const std::string &text)
 {
     pugi::xml_node desc = m_currentNode.append_child("desc");
-    desc.append_child(pugi::node_pcdata).set_value(text.c_str());
+    desc.text().set(text.c_str());
 }
 
 void SvgDeviceContext::AppendIdAndClass(
@@ -1180,7 +1167,7 @@ void SvgDeviceContext::DrawSvgBoundingBoxRectangle(int x, int y, int width, int 
         x -= width;
     }
 
-    pugi::xml_node rectChild = AppendChild("rect");
+    pugi::xml_node rectChild = AddChild("rect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("height") = height;

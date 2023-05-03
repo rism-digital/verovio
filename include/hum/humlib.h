@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Oct 13 21:38:18 PDT 2022
+// Last Modified: Sat Apr 15 11:52:53 PDT 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -98,9 +98,9 @@ using std::vector;
 #include "pugiconfig.hpp"
 #include "pugixml.hpp"
 
-using pugi::xml_node;
 using pugi::xml_attribute;
 using pugi::xml_document;
+using pugi::xml_node;
 using pugi::xpath_node;
 
 namespace hum {
@@ -1619,6 +1619,12 @@ class HumdrumToken : public std::string, public HumHash {
 		HumNum   getDurationToEnd          (void);
 		HumNum   getDurationToEnd          (HumNum scale);
 
+		HumNum   getDurationFromNoteStart  (void);
+		HumNum   getDurationFromNoteStart  (HumNum scale);
+
+		HumNum   getDurationToNoteEnd      (void);
+		HumNum   getDurationToNoteEnd      (HumNum scale);
+
 		HumNum   getDurationFromBarline    (void);
 		HumNum   getDurationFromBarline    (HumNum scale);
 
@@ -1648,6 +1654,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isKernLike                (void) const;
 		bool     isMens                    (void) const;
 		bool     isMensLike                (void) const;
+		bool     isStaffLike               (void) const { return isKernLike() || isMensLike(); }
 		std::string   getSpineInfo         (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
@@ -6201,6 +6208,39 @@ class Tool_colorgroups : public HumTool {
 };
 
 
+class Tool_colorthirds : public HumTool {
+	public:
+		         Tool_colorthirds  (void);
+		        ~Tool_colorthirds  () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void             initialize        (void);
+		void             processFile       (HumdrumFile& infile);
+		std::vector<int> getMidiNotes(std::vector<HTp>& kernNotes);
+		std::vector<int> getChordPositions(std::vector<int>& midiNotes);
+		void             labelChordPositions(std::vector<HTp>& kernNotes, std::vector<int>& chordPositions);
+
+	private:
+		std::string m_root_marker = "@";
+		std::string m_third_marker = "N";
+		std::string m_fifth_marker = "Z";
+
+		std::string m_root_color = "crimson";
+		std::string m_third_color = "limegreen";
+		std::string m_fifth_color = "royalblue";
+
+		bool m_colorThirds = true;
+		bool m_colorFifths = true;
+		bool m_colorTriads = true;
+
+};
+
+
 class Tool_colortriads : public HumTool {
 	public:
 		         Tool_colortriads  (void);
@@ -6571,6 +6611,275 @@ class Tool_compositeold : public HumTool {
 };
 
 
+class Tool_deg : public HumTool {
+
+	///////////////////////////////////////////////////////////////////
+	//
+	// Tool_deg::ScaleDegree --
+	//
+
+	public: // Tool_deg class
+		class ScaleDegree;
+		class ScaleDegree {
+			public:  // ScaleDegree class
+				ScaleDegree (void);
+				~ScaleDegree ();
+
+				void            setLinkedKernToken       (hum::HTp token, const std::string& mode, int b40tonic, bool unpitched = false);
+				hum::HTp        getLinkedKernToken       (void) const;
+				std::string     getDegToken              (void) const;
+
+				hum::HumNum     getTimestamp             (void) const;
+				hum::HumNum     getDuration              (void) const;
+				hum::HumNum     getTiedDuration          (void) const;
+				bool            hasSpines                (void) const;
+				bool            isBarline                (void) const;
+				std::string     getBarline               (void) const;
+				bool            isExclusiveInterpretation(void) const;
+				bool            isManipulator            (void) const;
+				std::string     getManipulator           (void) const;
+				bool            isInterpretation         (void) const;
+				bool            isKeyDesignation         (void) const;
+				bool            isLocalComment           (void) const;
+				bool            isGlobalComment          (void) const;
+				bool            isReferenceRecord        (void) const;
+				bool            isUnpitched              (void) const;
+				bool            isDataToken              (void) const;
+				bool            isNullDataToken          (void) const;
+				bool            isNonNullDataToken       (void) const;
+				bool            isInMajorMode            (void) const;
+				bool            isInMinorMode            (void) const;
+				int             getBase40Tonic           (void) const;
+				int             getSubtokenCount         (void) const;
+
+				// output options:
+				static void     setShowTies    (bool state) { m_showTiesQ = state;  }
+				static void     setShowZeros   (bool state) { m_showZerosQ = state; }
+				static void     setShowOctaves (bool state) { m_octaveQ = state; }
+				static void     setForcedKey   (const string& key) { m_forcedKey = key; }
+
+			protected:  // ScaleDegree class
+				std::string     generateDegDataToken     (void) const;
+				std::string     generateDegDataSubtoken  (int index) const;
+				void            analyzeTokenScaleDegrees (void);
+
+				void            setMajorMode             (int b40tonic);
+				void            setMinorMode             (int b40tonic);
+				void            setDorianMode            (int b40tonic);
+				void            setPhrygianMode          (int b40tonic);
+				void            setLydianMode            (int b40tonic);
+				void            setMixolydianMode        (int b40tonic);
+				void            setAeoleanMode           (int b40tonic);
+				void            setLocrianMode           (int b40tonic);
+				void            setIonianMode            (int b40tonic);
+
+			private:  // ScaleDegree class
+				// m_token: token in **kern data that links to this scale degree
+				HTp m_linkedKernToken = NULL;
+
+				// m_unpitched: true if unpitched (because in a percussion part)
+				bool m_unpitched = false;
+
+				// m_mode: the mode of the current key	(0 = none, 1 = major, 2 = minor)
+				//
+				// modal keys:
+				// 3 = dorian (such as *c:dor)
+				// 4 = phrygian (such as *c:phr)
+				// 5 = lydian (such as *C:lyd)
+				// 6 = mixolydian (such as *C:mix)
+				// 7 = aeolean (such as *c:aeo)
+				// 8 = locrian (such as *c:loc)
+				// 9 = ionian (such as *C:ion)
+				//
+				int m_mode = 0;
+				const int m_unknown_mode = 0;
+				const int m_major_mode   = 1;
+				const int m_minor_mode   = 2;
+				const int m_dor_mode     = 3;
+				const int m_phr_mode     = 4;
+				const int m_lyd_mode     = 5;
+				const int m_mix_mode     = 6;
+				const int m_aeo_mode     = 7;
+				const int m_loc_mode     = 8;
+				const int m_ion_mode     = 9;
+
+				// m_b40tonic: the tonic pitch of the key expressed as base-40
+				int m_b40tonic = 0;
+
+				// m_subtokens: Subtokens (of a chord)
+				std::vector<std::string> m_subtokens;
+
+				// m_degress: integer for scale degree (by subtoken)
+				// 0 = rest; otherwise 1-7
+				std::vector<int> m_degrees;
+
+				// m_alters: chromatic alterations for scale degree
+				std::vector<int> m_alters;
+
+				// m_octaves: the octave number of the note
+				// -1 = rest
+				// 0-9 pitch octave (4 = middle C octave)
+				std::vector<int> m_octaves;
+
+				// Pointers to the next previous note (or chord) with which
+				// to calculate a melodic contour approach or departure.
+				ScaleDegree* m_prevNote = NULL;
+				ScaleDegree* m_nextNote = NULL;
+
+				// Pointers to the next/previous rest if there is a rest
+				// between this note/chord and the next/previous note.
+				// The pointer starts to the first rest if there is more
+				// than one rest between the two notes.
+				ScaleDegree* m_prevRest = NULL;
+				ScaleDegree* m_nextRest = NULL;
+
+				// ScaleDegree rendering options:
+				static bool m_showTiesQ;
+				static bool m_showZerosQ;
+				static bool m_octaveQ;
+				static std::string m_forcedKey;
+		};
+
+
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Tool_deg --
+	//
+
+	public:  // Tool_deg class
+		      Tool_deg         (void);
+		     ~Tool_deg         () {};
+
+		bool  run              (HumdrumFileSet& infiles);
+		bool  run              (HumdrumFile& infile);
+		bool  run              (const std::string& indata, std::ostream& out);
+		bool  run              (HumdrumFile& infile, std::ostream& out);
+
+	protected: // Tool_deg class
+		void            processFile              (HumdrumFile& infile);
+		void            initialize               (void);
+
+		bool            setupSpineInfo           (HumdrumFile& infile);
+		void            prepareDegSpine          (vector<vector<ScaleDegree>>& degspine, HTp kernstart, HumdrumFile& infil);
+		void            printDegScore            (HumdrumFile& infile);
+		void            printDegScoreInterleavedWithInputScore(HumdrumFile& infile);
+		std::string     createOutputHumdrumLine  (HumdrumFile& infile, int lineIndex);
+      std::string     prepareMergerLine        (std::vector<std::vector<std::string>>& merge);
+		void            calculateManipulatorOutputForSpine(std::vector<std::string>& lineout, std::vector<std::string>& linein);
+		std::string     createRecipInterpretation(const std::string& starttok, int refLine);
+		std::string     createDegInterpretation  (const string& degtok, int refLine, bool addPreSpine);
+		std::string     printDegInterpretation   (const string& interp, HumdrumFile& infile, int lineIndex);
+		void            getModeAndTonic          (string& mode, int& b40tonic, const string& token);
+
+		bool            isDegAboveLine           (HumdrumFile& infile, int lineIndex);
+		bool            isDegArrowLine           (HumdrumFile& infile, int lineIndex);
+		bool            isDegBoxLine             (HumdrumFile& infile, int lineIndex);
+		bool            isDegCircleLine          (HumdrumFile& infile, int lineIndex);
+		bool            isDegColorLine           (HumdrumFile& infile, int lineIndex);
+		bool            isDegHatLine             (HumdrumFile& infile, int lineIndex);
+		bool            isDegSolfegeLine         (HumdrumFile& infile, int lineIndex);
+		bool            isKeyDesignationLine     (HumdrumFile& infile, int lineIndex);
+
+		void            checkAboveStatus         (string& value, bool arrowStatus);
+		void            checkArrowStatus         (string& value, bool arrowStatus);
+		void            checkBoxStatus           (string& value, bool arrowStatus);
+		void            checkCircleStatus        (string& value, bool arrowStatus);
+		void            checkColorStatus         (string& value, bool arrowStatus);
+		void            checkHatStatus           (string& value, bool arrowStatus);
+		void            checkSolfegeStatus       (string& value, bool arrowStatus);
+
+		void            checkKeyDesignationStatus(string& value, int keyDesignationStatus);
+
+	private: // Tool_deg class
+
+		// m_degSpine: A three-dimensional list of **deg output spines.
+		// This is a scratch pad to create **deg data for the input **kern
+		//    spines.
+		// First dimension is **kern spine enumeration in the input data,
+		//    from left-to-right.
+		// Second dimension is for the line in the Humdrum file, from top
+		//    to bottom.
+		// Third dimension is for the subspines (not subtokens, which are
+		//    handled by Tool_deg::ScaleDegree class).
+		std::vector<std::vector<std::vector<ScaleDegree>>> m_degSpines;
+
+		// m_kernSpines: list of all **kern spines found in file.
+		std::vector<HTp> m_kernSpines;
+
+		// m_selectedKernSpines: list of only the **kern spines that will be analyzed.
+		std::vector<HTp> m_selectedKernSpines;
+
+		// m_degInsertTrack: the track number in the input file that an
+		//	output **deg spine should be inserted before.  A track of -1 means
+		// append the **deg spine after the last input spine.
+		std::vector<int> m_degInsertTrack;
+
+		// m_insertTracks: matches to m_degSpines first dimension.
+		// It gives the track number for spines before which the corresponding
+		// m_degSpine[x] spine should be inserted.  A -1 value at the last
+		// position in m_insertTracks means append the **deg spine at the 
+		// end of the line.
+		std::vector<int> m_insertTracks;
+
+		bool m_aboveQ          = false;   // used with --above option
+		bool m_arrowQ          = false;   // used with --arrow option
+		bool m_boxQ            = false;   // used with --box option
+		bool m_circleQ         = false;   // used with --circle option
+		bool m_hatQ            = false;   // used with --hat option
+		bool m_colorQ          = false;   // used with --color option
+		std::string  m_color;             // used with --color option
+		bool m_solfegeQ        = false;   // used with --solfege option
+
+		bool m_degOnlyQ        = false;   // used with -I option
+		bool m_recipQ          = false;   // used with -r option
+		bool m_kernQ           = false;   // used with --kern option
+		bool m_degTiesQ        = false;   // used with -t option
+		bool m_forceKeyQ       = false;   // used with -K option
+
+		std::string m_defaultKey  = "";    // used with --default-key option
+		std::string m_forcedKey   = "";    // used with --forced-key option
+		std::string m_kernSuffix  = "dR/"; // used with --kern option (currently hardwired)
+		std::string m_spineTracks = "";    // used with -s option
+		std::string m_kernTracks  = "";    // used with -k option
+
+		std::vector<bool> m_processTrack;  // used with -k and -s option
+
+		class InterleavedPrintVariables {
+			public:
+				bool foundData;
+				bool hasDegSpines;
+				bool foundAboveLine;
+				bool foundArrowLine;
+				bool foundBoxLine;
+				bool foundCircleLine;
+				bool foundColorLine;
+				bool foundHatLine;
+				bool foundKeyDesignationLine;
+				bool foundSolfegeLine;
+
+				InterleavedPrintVariables(void) { clear(); }
+				void clear(void) {
+					foundData       = false;
+					hasDegSpines    = true;
+					foundAboveLine  = false;
+					foundArrowLine  = false;
+					foundBoxLine    = false;
+					foundCircleLine = false;
+					foundColorLine  = false;
+					foundHatLine    = false;
+					foundKeyDesignationLine = false;
+					foundSolfegeLine = false;
+				}
+		};
+		InterleavedPrintVariables m_ipv;
+
+};
+
+std::ostream& operator<<(std::ostream& out, Tool_deg::ScaleDegree& degree);
+std::ostream& operator<<(std::ostream& out, Tool_deg::ScaleDegree* degree);
+
+
+
 class Tool_dissonant : public HumTool {
 	public:
 		         Tool_dissonant    (void);
@@ -6842,8 +7151,8 @@ class Tool_extract : public HumTool {
 
 		bool     run                    (HumdrumFileSet& infiles);
 		bool     run                    (HumdrumFile& infile);
-		bool     run                    (const string& indata, ostream& out);
-		bool     run                    (HumdrumFile& infile, ostream& out);
+		bool     run                    (const std::string& indata, std::ostream& out);
+		bool     run                    (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 
@@ -6852,92 +7161,94 @@ class Tool_extract : public HumTool {
 
 		// function declarations
 		void    processFile             (HumdrumFile& infile);
-		void    excludeFields           (HumdrumFile& infile, vector<int>& field,
-		                                 vector<int>& subfield, vector<int>& model);
-		void    extractFields           (HumdrumFile& infile, vector<int>& field,
-		                                 vector<int>& subfield, vector<int>& model);
-		void    extractTrace            (HumdrumFile& infile, const string& tracefile);
-		void    getInterpretationFields (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, HumdrumFile& infile,
-		                                 string& interps, int state);
-		//void    extractInterpretations  (HumdrumFile& infile, string& interps);
+		void    excludeFields           (HumdrumFile& infile, std::vector<int>& field,
+		                                 std::vector<int>& subfield, std::vector<int>& model);
+		void    extractFields           (HumdrumFile& infile, std::vector<int>& field,
+		                                 std::vector<int>& subfield, std::vector<int>& model);
+		void    extractTrace            (HumdrumFile& infile, const std::string& tracefile);
+		void    getInterpretationFields (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, HumdrumFile& infile,
+		                                 std::string& interps, int state);
+		//void    extractInterpretations  (HumdrumFile& infile, std::string& interps);
 		void    example                 (void);
-		void    usage                   (const string& command);
-		void    fillFieldData           (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, string& fieldstring,
+		void    usage                   (const std::string& command);
+		std::string reverseFieldString(const std::string& input, int maxval);
+		void    fillFieldData           (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, std::string& fieldstring,
 		                                 HumdrumFile& infile);
-		void    processFieldEntry       (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, const string& astring,
+		void    processFieldEntry       (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, const std::string& astring,
 		                                 HumdrumFile& infile);
-		void    removeDollarsFromString (string& buffer, int maxtrack);
-		int     isInList                (int number, vector<int>& listofnum);
-		void    getTraceData            (vector<int>& startline,
-		                                 vector<vector<int> >& fields,
-		                                 const string& tracefile, HumdrumFile& infile);
+		void    removeDollarsFromString (std::string& buffer, int maxtrack);
+		int     isInList                (int number, std::vector<int>& listofnum);
+		void    getTraceData            (std::vector<int>& startline,
+		                                 std::vector<std::vector<int> >& fields,
+		                                 const std::string& tracefile, HumdrumFile& infile);
 		void    printTraceLine          (HumdrumFile& infile, int line,
-		                                 vector<int>& field);
+		                                 std::vector<int>& field);
 		void    dealWithSpineManipulators(HumdrumFile& infile, int line,
-		                                 vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model);
-		void    storeToken              (vector<string>& storage,
-		                                 const string& string);
-		void    storeToken              (vector<string>& storage, int index,
-		                                 const string& string);
-		void    printMultiLines         (vector<int>& vsplit, vector<int>& vserial,
-		                                 vector<string>& tempout);
-		void    reverseSpines           (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, HumdrumFile& infile,
-		                                 const string& exinterp);
-		void    getSearchPat            (string& spat, int target,
-		                                 const string& modifier);
-		void    expandSpines            (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, HumdrumFile& infile,
-		                                 string& interp);
-		void    dealWithSecondarySubspine(vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, int targetindex,
+		                                 std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model);
+		void    storeToken              (std::vector<std::string>& storage,
+		                                 const std::string& string);
+		void    storeToken              (std::vector<std::string>& storage, int index,
+		                                 const std::string& string);
+		void    printMultiLines         (std::vector<int>& vsplit, std::vector<int>& vserial,
+		                                 std::vector<std::string>& tempout);
+		void    reverseSpines           (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, HumdrumFile& infile,
+		                                 const std::string& exinterp);
+		void    getSearchPat            (std::string& spat, int target,
+		                                 const std::string& modifier);
+		void    expandSpines            (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, HumdrumFile& infile,
+		                                 std::string& interp);
+		void    dealWithSecondarySubspine(std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, int targetindex,
 		                                 HumdrumFile& infile, int line, int spine,
 		                                 int submodel);
-		void    dealWithCospine         (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, int targetindex,
+		void    dealWithCospine         (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, int targetindex,
 		                                 HumdrumFile& infile, int line, int cospine,
 		                                 int comodel, int submodel,
-		                                 const string& cointerp);
+		                                 const std::string& cointerp);
 		void    printCotokenInfo        (int& start, HumdrumFile& infile, int line,
-		                                 int spine, vector<string>& cotokens,
-		                                 vector<int>& spineindex,
-		                                 vector<int>& subspineindex);
-		void    fillFieldDataByGrep     (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, const string& grepString,
+		                                 int spine, std::vector<std::string>& cotokens,
+		                                 std::vector<int>& spineindex,
+		                                 std::vector<int>& subspineindex);
+		void    fillFieldDataByGrep     (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, const std::string& grepString,
 		                                 HumdrumFile& infile, int state);
-		vector<int> getNullDataTracks(HumdrumFile& infile);
-		void fillFieldDataByEmpty       (vector<int>& field, vector<int>& subfield,
-				                           vector<int>& model, HumdrumFile& infile, int negate);
-		void fillFieldDataByNoEmpty     (vector<int>& field, vector<int>& subfield,
-				                           vector<int>& model, HumdrumFile& infile, int negate);
-		void fillFieldDataByNoRest      (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, const string& searchstring,
+		std::vector<int> getNullDataTracks(HumdrumFile& infile);
+		void fillFieldDataByEmpty       (std::vector<int>& field, std::vector<int>& subfield,
+				                           std::vector<int>& model, HumdrumFile& infile, int negate);
+		void fillFieldDataByNoEmpty     (std::vector<int>& field, std::vector<int>& subfield,
+				                           std::vector<int>& model, HumdrumFile& infile, int negate);
+		void fillFieldDataByNoRest      (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, const std::string& searchstring,
 		                                 HumdrumFile& infile, int state);
 
 	private:
 
 		// global variables
-		int          excludeQ = 0;        // used with -x option
-		int          expandQ  = 0;        // used with -e option
-		string       expandInterp = "";   // used with -E option
-		int          interpQ  = 0;        // used with -i option
-		string       interps  = "";       // used with -i option
-		int          debugQ   = 0;        // used with --debug option
-		int          kernQ    = 0;        // used with -k option
-		int          fieldQ   = 0;        // used with -f or -p option
-		string       fieldstring = "";    // used with -f or -p option
-		vector<int>  field;               // used with -f or -p option
-		vector<int>  subfield;            // used with -f or -p option
-		vector<int>  model;               // used with -p, or -e options and similar
-		int          countQ   = 0;        // used with -C option
-		int          traceQ   = 0;        // used with -t option
-		string       tracefile = "";      // used with -t option
-		int          reverseQ = 0;        // used with -r option
-		string       reverseInterp = "**kern"; // used with -r and -R options.
+		int         excludeQ = 0;        // used with -x option
+		int         expandQ  = 0;        // used with -e option
+		std::string expandInterp = "";   // used with -E option
+		int         interpQ  = 0;        // used with -i option
+		std::string interps  = "";       // used with -i option
+		int         debugQ   = 0;        // used with --debug option
+		int         kernQ    = 0;        // used with -k option
+		int         rkernQ  = 0;         // used with -K option
+		int         fieldQ   = 0;        // used with -f or -p option
+		std::string fieldstring = "";    // used with -f or -p option
+		std::vector<int> field;               // used with -f or -p option
+		std::vector<int> subfield;            // used with -f or -p option
+		std::vector<int> model;               // used with -p, or -e options and similar
+		int         countQ   = 0;        // used with -C option
+		int         traceQ   = 0;        // used with -t option
+		std::string tracefile = "";      // used with -t option
+		int         reverseQ = 0;        // used with -r option
+		std::string reverseInterp = "**kern"; // used with -r and -R options.
 		// sub-spine "b" expansion model: how to generate data for a secondary
 		// spine if the primary spine is not divided.  Models are:
 		//    'd': duplicate primary spine (or "a" subspine) data (default)
@@ -6945,14 +7256,14 @@ class Tool_extract : public HumTool {
 		//    'r': rest = use a rest instead of a primary spine note (in **kern)
 		//         data.  'n' will be used for non-kern spines when 'r' is used.
 		int          submodel = 'd';       // used with -m option
-		string editorialInterpretation = "yy";
-		string      cointerp = "**kern";   // used with -c option
+		std::string editorialInterpretation = "yy";
+		std::string cointerp = "**kern";   // used with -c option
 		int         comodel  = 0;          // used with -M option
-		string subtokenseparator = " "; // used with a future option
+		std::string subtokenseparator = " "; // used with a future option
 		int         interpstate = 0;       // used -I or with -i
 		int         grepQ       = 0;       // used with -g option
-		string      grepString  = "";      // used with -g option
-		string      blankName   = "**blank"; // used with -n option
+		std::string grepString  = "";      // used with -g option
+		std::string blankName   = "**blank"; // used with -n option
 		int         noEmptyQ    = 0;       // used with --no-empty option
 		int         emptyQ      = 0;       // used with --empty option
 		int         spineListQ  = 0;       // used with --spine option
@@ -6962,37 +7273,88 @@ class Tool_extract : public HumTool {
 
 
 
-class Tool_fb : public HumTool {
+class FiguredBassNumber {
 	public:
-		         Tool_fb           (void);
-		        ~Tool_fb           () {};
+		            FiguredBassNumber(int num, string accid, bool showAccid, int voiceIndex, int lineIndex, bool isAttack, bool intervallsatz);
+		std::string toString(bool nonCompoundIntervalsQ, bool noAccidentalsQ, bool hideThreeQ);
+		int         getNumberWithinOctave(void);
 
-		bool     run               (HumdrumFileSet& infiles);
-		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		int         m_voiceIndex;
+		int         m_lineIndex;
+		int         m_number;
+		std::string m_accidentals;
+		bool        m_showAccidentals; // Force shoing figured base numbers when they need an accidental
+		bool        m_baseOfSustainedNoteDidChange;
+		bool        m_isAttack;
+		bool        m_convert2To9 = false;
+		bool        m_intervallsatz = false;
+
+};
+
+class FiguredBassAbbreviationMapping {
+	public:
+		FiguredBassAbbreviationMapping(string s, vector<int> n);
+
+		const static vector<FiguredBassAbbreviationMapping> s_mappings;
+
+		// String to compare the numbers with
+		// e.g. "6 4 3"
+		// Sorted by size, larger numbers first
+		string m_str; 
+
+		// Figured bass number as int
+		vector<int> m_numbers;
+
+};
+
+class Tool_fb : public HumTool {
+
+	public:
+		     Tool_fb (void);
+		     ~Tool_fb() {};
+
+		bool run     (HumdrumFileSet& infiles);
+		bool run     (HumdrumFile& infile);
+		bool run     (const string& indata, ostream& out);
+		bool run     (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void     processFile       (HumdrumFile& infile);
-		void     initialize        (void);
-		void     processLine       (HumdrumFile& infile, int index);
-		void     setupScoreData    (HumdrumFile& infile);
-		void     getAnalyses       (HumdrumFile& infile);
-		void     getHarmonicIntervals(HumdrumFile& infile);
-		void     calculateIntervals(vector<int>& intervals, vector<HTp>& tokens, int bassIndex);
-		void     printOutput       (HumdrumFile& infile);
-		void     printLineStyle3   (HumdrumFile& infile, int line);
-		std::string getAnalysisTokenStyle3(HumdrumFile& infile, int line, int field);
+		void                       initialize                             (void);
+        void                       processFile                            (HumdrumFile& infile);
+		bool                       hideNumbersForTokenLine                (HTp token, pair<int, HumNum> timeSig);
+		vector<string>             getTrackData                           (const vector<FiguredBassNumber*>& numbers, int lineCount);
+		vector<string>             getTrackDataForVoice                   (int voiceIndex, const vector<FiguredBassNumber*>& numbers, int lineCount);
+		FiguredBassNumber*         createFiguredBassNumber                (int basePitchBase40, int targetPitchBase40, int voiceIndex, int lineIndex, bool isAttack, string keySignature);
+		vector<FiguredBassNumber*> filterNegativeNumbers                  (vector<FiguredBassNumber*> numbers);
+		vector<FiguredBassNumber*> filterFiguredBassNumbersForLine        (vector<FiguredBassNumber*> numbers, int lineIndex);
+		vector<FiguredBassNumber*> filterFiguredBassNumbersForLineAndVoice(vector<FiguredBassNumber*> numbers, int lineIndex, int voiceIndex);
+		string                     formatFiguredBassNumbers               (const vector<FiguredBassNumber*>& numbers);
+		vector<FiguredBassNumber*> analyzeChordNumbers                    (const vector<FiguredBassNumber*>& numbers);
+		vector<FiguredBassNumber*> getAbbreviatedNumbers                  (const vector<FiguredBassNumber*>& numbers);
+		string                     getNumberString                        (vector<FiguredBassNumber*> numbers);
+		string                     getKeySignature                        (HumdrumFile& infile, int lineIndex);
+		int                        getLowestBase40Pitch                   (vector<int> base40Pitches);
+
 
 	private:
-		std::vector<HTp>              m_kernspines;
-		std::vector<int>              m_kerntracks;
-		std::vector<int>              m_track2index;
-		std::vector<std::vector<int>> m_keyaccid;
-		std::vector<std::vector<int>> m_intervals;
-		const int m_rest = -1000;
-		int       m_reference = 0; // currently fixed to bass
-		int       m_debugQ = false;
+		bool   m_compoundQ      = false;
+		bool   m_accidentalsQ   = false;
+		int    m_baseTrackQ     = 1;
+		bool   m_intervallsatzQ = false;
+		bool   m_sortQ          = false;
+		bool   m_lowestQ        = false;
+		bool   m_normalizeQ     = false;
+		bool   m_reduceQ        = false;
+		bool   m_attackQ        = false;
+		bool   m_figuredbassQ   = false;
+		bool   m_hideThreeQ     = false;
+		bool   m_showNegativeQ  = false;
+		bool   m_aboveQ         = false;
+		string m_rateQ          = "";
+
+		string m_spineTracks    = ""; // used with -s option
+		string m_kernTracks     = ""; // used with -k option
+		vector<bool> m_selectedKernSpines;  // used with -k and -s option
 
 };
 
@@ -7134,6 +7496,27 @@ class Tool_gasparize : public HumTool {
 		vector<vector<int>> m_pstates;
 		vector<vector<int>> m_kstates;
 		vector<vector<bool>> m_estates;
+
+};
+
+
+class Tool_grep : public HumTool {
+	public:
+		         Tool_grep         (void);
+		        ~Tool_grep         () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void      processFile         (HumdrumFile& infile);
+		void      initialize          (void);
+
+	private:
+		bool        m_negateQ;    // for the -v option
+		std::string m_regex;      // for the -e option
 
 };
 
@@ -7549,6 +7932,29 @@ class Tool_kern2mens : public HumTool {
 		bool     m_invisibleQ = true;      // used with -I option
 		bool     m_doublebarQ = true;      // used with -D option
 		string   m_clef;                   // used with -c option
+
+};
+
+
+class Tool_kernify : public HumTool {
+	public:
+		         Tool_kernify (void);
+		        ~Tool_kernify () {};
+
+		bool     run          (HumdrumFileSet& infiles);
+		bool     run          (HumdrumFile& infile);
+		bool     run          (const string& indata, ostream& out);
+		bool     run          (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void        initialize             (void);
+		void        processFile            (HumdrumFile& infile);
+		void        generateDummyKernSpine (HumdrumFile& infile);
+		std::string makeNullLine           (HumdrumLine& line);
+		std::string makeReverseLine        (HumdrumLine& line);
+
+	private:
+		bool m_forceQ = false;  // used with -f option
 
 };
 
@@ -8853,25 +9259,36 @@ class Tool_myank : public HumTool {
 		void      printMeasureStart    (HumdrumFile& infile, int line, const string& style);
 		std::string expandMultipliers  (const string& inputstring);
 
+		vector<int> analyzeBarNumbers  (HumdrumFile& infile);
+		int         getBarNumberForLineNumber(int lineNumber);
+		int         getStartLineNumber (void);
+		int         getEndLineNumber   (void);
+		void        printDataLine      (HLp line, bool& startLineHandled, const vector<int>& lastLineResolvedTokenLineIndex, const vector<HumNum>& lastLineDurationsFromNoteStart);
+
 	private:
-		int    debugQ      = 0;             // used with --debug option
-		// int    inputlist   = 0;             // used with --inlist option
-		int    inlistQ     = 0;             // used with --inlist option
-		int    outlistQ    = 0;             // used with --outlist option
-		int    verboseQ    = 0;             // used with -v option
-		int    invisibleQ  = 1;             // used with --visible option
-		int    maxQ        = 0;             // used with --max option
-		int    minQ        = 0;             // used with --min option
-		int    instrumentQ = 0;             // used with -I option
-		int    nolastbarQ  = 0;             // used with -B option
-		int    markQ       = 0;             // used with --mark option
-		int    doubleQ     = 0;             // used with --mdsep option
-		int    barnumtextQ = 0;             // used with -T option
-		int    Section     = 0;             // used with --section option
-		int    sectionCountQ = 0;           // used with --section-count option
-		vector<MeasureInfo> MeasureOutList; // used with -m option
-		vector<MeasureInfo> MeasureInList;  // used with -m option
-		vector<vector<MyCoord> > metstates;
+		int    m_debugQ      = 0;             // used with --debug option
+		// int    inputlist     = 0;             // used with --inlist option
+		int    m_inlistQ     = 0;             // used with --inlist option
+		int    m_outlistQ    = 0;             // used with --outlist option
+		int    m_verboseQ    = 0;             // used with -v option
+		int    m_invisibleQ  = 1;             // used with --visible option
+		int    m_maxQ        = 0;             // used with --max option
+		int    m_minQ        = 0;             // used with --min option
+		int    m_instrumentQ = 0;             // used with -I option
+		int    m_nolastbarQ  = 0;             // used with -B option
+		int    m_markQ       = 0;             // used with --mark option
+		int    m_doubleQ     = 0;             // used with --mdsep option
+		int    m_barnumtextQ = 0;             // used with -T option
+		int    m_section     = 0;             // used with --section option
+		int    m_sectionCountQ = 0;           // used with --section-count option
+		vector<MeasureInfo> m_measureOutList; // used with -m option
+		vector<MeasureInfo> m_measureInList;  // used with -m option
+		vector<vector<MyCoord> > m_metstates;
+
+		string      m_lineRange;              // used with -l option
+		vector<int> m_barNumbersPerLine;      // used with -l option
+		bool m_hideStarting;                  // used with --hide-starting option
+		bool m_hideEnding;                    // used with --hide-ending option
 
 };
 

@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
@@ -216,6 +217,26 @@ PitchInterface *Neume::GetLowestPitch()
         }
     }
     return min;
+}
+
+FunctorCode Neume::Accept(MutableFunctor &functor)
+{
+    return functor.VisitNeume(this);
+}
+
+FunctorCode Neume::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNeume(this);
+}
+
+FunctorCode Neume::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitNeumeEnd(this);
+}
+
+FunctorCode Neume::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNeumeEnd(this);
 }
 
 } // namespace vrv

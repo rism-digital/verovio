@@ -16,8 +16,6 @@
 
 namespace vrv {
 
-class ConvertMarkupAnalyticalParams;
-
 //----------------------------------------------------------------------------
 // Fermata
 //----------------------------------------------------------------------------
@@ -57,12 +55,6 @@ public:
     ///@}
 
     /**
-     * Helper for converting markup (from Note, Chord, Rest, MRest)
-     */
-    void ConvertFromAnalyticalMarkup(
-        AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params);
-
-    /**
      * Get the SMuFL glyph for the fermata based on type, shape or glyph.num
      */
     char32_t GetFermataGlyph() const;
@@ -84,6 +76,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

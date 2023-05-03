@@ -14,6 +14,7 @@
 #include "atts_midi.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
+#include "interface.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -33,6 +34,7 @@ class ScoreDefInterface : public Interface,
                           public AttLyricStyle,
                           public AttMeasureNumbers,
                           public AttMidiTempo,
+                          public AttMmTempo,
                           public AttMultinumMeasures,
                           public AttPianoPedals,
                           public AttSpacing,

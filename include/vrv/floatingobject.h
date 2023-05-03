@@ -37,6 +37,7 @@ public:
     FloatingObject(ClassId classId, const std::string &classIdStr);
     virtual ~FloatingObject();
     void Reset() override;
+    void ResetDrawing();
     ///@}
 
     void UpdateContentBBoxX(int x1, int x2) override;
@@ -82,11 +83,19 @@ public:
 
     /**
      * @name Get and set maximum drawing yRel that is persistent for the floating object across all its floating
-     * positioners, which allows for persisten vertical positioning for some elements
+     * positioners, which allows for persistent vertical positioning for some elements
      */
     ///@{
-    void SetMaxDrawingYRel(int maxDrawingYRel);
+    void ResetMaxDrawingYRel() { m_maxDrawingYRel = VRV_UNSET; }
+    void SetMaxDrawingYRel(int maxDrawingYRel, data_STAFFREL place);
     int GetMaxDrawingYRel() const { return m_maxDrawingYRel; };
+    ///@}
+
+    /**
+     * @name Get and set the drawing object IDs
+     */
+    ///@{
+    void ResetDrawingObjectIDs();
     ///@}
 
     /**
@@ -99,54 +108,28 @@ public:
      */
     virtual bool IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawingPlace) const { return false; }
 
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     * Returns a pair consisting of the boundary (relative to the object position)
+     * and a flag indicating whether refined layout was used.
+     */
+    virtual std::pair<int, bool> GetVerticalContentBoundaryRel(const Doc *doc, const FloatingPositioner *positioner,
+        const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
+     * Interface for class functor visitation
      */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimePointing
-     */
-    int PrepareTimePointing(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    int PrepareTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestamps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
@@ -232,11 +215,6 @@ public:
      */
     char GetSpanningType() const { return m_spanningType; }
 
-    bool CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox);
-
-    int GetSpaceBelow(
-        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlapingBBox) const;
-
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     /**
@@ -249,6 +227,57 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
     ///@}
+
+    /**
+     * @name Get and set the drawing extender width.
+     * Should be nonzero only if the extender line is not included in the bounding box.
+     */
+    ///@{
+    int GetDrawingExtenderWidth() const { return m_drawingExtenderWidth; }
+    void SetDrawingExtenderWidth(int extenderWidth) { m_drawingExtenderWidth = extenderWidth; }
+    ///@}
+
+    /**
+     * Check for horizontal overlap with special consideration for extender lines
+     */
+    bool HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const;
+
+    /**
+     * Return the horizontal margin for overlap with another element
+     * This can be negative, if elements are allowed to slightly overlap
+     */
+    int GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox, int unit) const;
+
+    /**
+     * Update the Y drawing relative position based on collision detection with the overlapping bounding box
+     */
+    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+
+    /**
+     * Align extender elements across systems
+     */
+    void AdjustExtenders();
+
+    /**
+     * Calculate the vertical space below the element and above the bounding box
+     */
+    int GetSpaceBelow(
+        const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox) const;
+
+    /**
+     * Determine the vertical content boundary.
+     * For refined layout this can take the overlapping bbox into account.
+     */
+    ///@{
+    std::pair<int, bool> GetVerticalContentBoundaryRel(
+        const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+    int GetVerticalContentBoundary(const Doc *doc, const BoundingBox *horizOverlappingBBox, bool contentTop) const;
+    ///@}
+
+    /**
+     * Version of Boundary::VerticalContentOverlap which takes refined boundaries into account
+     */
+    bool HasVerticalContentOverlap(const Doc *doc, const BoundingBox *horizOverlappingBBox, int margin) const;
 
 private:
     Object *m_objectX;
@@ -268,6 +297,11 @@ protected:
     int m_drawingYRel;
 
     /**
+     * The horizontal width of the extender line whenever it is not included in the bounding box.
+     */
+    int m_drawingExtenderWidth;
+
+    /**
      * A pointer to the FloatingObject it represents.
      */
     FloatingObject *m_object;
@@ -281,7 +315,7 @@ protected:
 
 public:
     /**
-     * The spanning type of the positionner for spanning control elements
+     * The spanning type of the positioner for spanning control elements
      */
     char m_spanningType;
 };

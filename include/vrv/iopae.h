@@ -92,8 +92,6 @@ public:
     bool WriteObjectEnd(Object *object) override;
 
 private:
-    bool WriteDoc(Doc *doc);
-
     /**
      * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
      */
@@ -177,8 +175,8 @@ private:
     bool m_docScoreDef; // Indicates that we are writing the document scoreDef
     bool m_mensural; // Indicates that the incipit is mensural (initial staffDef)
     bool m_skip; // Processing a staff or a layer to skip
-    int m_layerN; // The @n of the first layer within the first staff
-    int m_staffN; // The @n of the first staff (initial staffDef)
+    int m_layerN; // The \@n of the first layer within the first staff
+    int m_staffN; // The \@n of the first staff (initial staffDef)
     int m_currentOct; // The current octave
     int m_currentDur; // The current duration
     int m_currentDots;
@@ -533,7 +531,7 @@ public:
 
 private:
     /**
-     * Convert the old-style @clef:... @keysig:... @data:... to a JSON input
+     * Convert the old-style \@clef:... \@keysig:... \@data:... to a JSON input
      */
     jsonxx::Object InputKeysToJson(const std::string &inputKeys);
 
@@ -558,6 +556,11 @@ private:
      * The method then performs some additional checks of the content (to be implemented)
      */
     bool Parse();
+
+    /**
+     * Parse the metadata in the \@header json object
+     */
+    void ParseHeader(jsonxx::Object &header);
 
     /**
      * @name Methods that convert pae::Token::m_char to pae::Token::m_objects
@@ -690,7 +693,7 @@ private:
 
     /**
      * A flag indicating the incipit is mensural.
-     * Based on the @clef of the input.
+     * Based on the \@clef of the input.
      */
     bool m_isMensural;
 

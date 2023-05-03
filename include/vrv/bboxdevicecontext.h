@@ -92,7 +92,7 @@ public:
 
     /**
      * Special method for forcing bounding boxes to be updated
-     * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
+     * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
     void DrawPlaceholder(int x, int y) override;
 
@@ -158,6 +158,11 @@ private:
      *
      */
     void ResetGraphicRotation();
+
+    /**
+     * Get the overlap due to pen width on the left/right
+     */
+    std::pair<int, int> GetPenWidthOverlap() const;
 
 public:
     //

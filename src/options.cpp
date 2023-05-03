@@ -12,12 +12,14 @@
 #include <cassert>
 #include <fstream>
 #include <functional>
+#include <iterator>
 #include <sstream>
 
 //----------------------------------------------------------------------------
 
-#include "att.h"
+#include "attconverter.h"
 #include "vrv.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -250,7 +252,16 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue, bool
 
 bool OptionDbl::SetValue(const std::string &value)
 {
-    return this->SetValue(std::stod(value));
+    if (!IsValidDouble(value)) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to double failed", value.c_str(),
+            this->GetKey().c_str());
+        return false;
+    }
+    // Convert string to double
+    double number = std::strtod(value.c_str(), NULL);
+
+    // Check bounds and set the value
+    return this->SetValue(number);
 }
 
 std::string OptionDbl::GetStrValue() const
@@ -326,7 +337,16 @@ bool OptionInt::SetValueDbl(double value)
 
 bool OptionInt::SetValue(const std::string &value)
 {
-    return this->SetValue(std::stoi(value));
+    if (!IsValidInteger(value)) {
+        LogError("Unable to set parameter value %s for '%s'; conversion to integer failed", value.c_str(),
+            this->GetKey().c_str());
+        return false;
+    }
+    // Convert string to int
+    int number = (int)std::strtol(value.c_str(), NULL, 10);
+
+    // Check bounds and set the value
+    return this->SetValue(number);
 }
 
 std::string OptionInt::GetStrValue() const
@@ -437,28 +457,12 @@ bool OptionArray::SetValue(const std::string &value)
 
 std::string OptionArray::GetStrValue() const
 {
-    std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)m_values.size(); ++i) {
-        if (i != 0) {
-            ss << ", ";
-        }
-        ss << "\"" << m_values.at(i) << "\"";
-    }
-    return ss.str();
+    return this->GetStr(m_values);
 }
 
 std::string OptionArray::GetDefaultStrValue() const
 {
-    std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)m_defaultValues.size(); ++i) {
-        if (i != 0) {
-            ss << ", ";
-        }
-        ss << "\"" << m_defaultValues.at(i) << "\"";
-    }
-    return ss.str();
+    return this->GetStr(m_defaultValues);
 }
 
 bool OptionArray::SetValue(std::vector<std::string> const &values)
@@ -477,6 +481,20 @@ void OptionArray::Reset()
 bool OptionArray::IsSet() const
 {
     return !m_values.empty();
+}
+
+std::string OptionArray::GetStr(const std::vector<std::string> &values) const
+{
+    std::stringstream ss;
+    int i = 0;
+    for (std::string const &value : values) {
+        if (i != 0) {
+            ss << ", ";
+        }
+        ss << "\"" << value << "\"";
+        ++i;
+    }
+    return ss.str();
 }
 
 //----------------------------------------------------------------------------
@@ -567,8 +585,7 @@ std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 {
     std::vector<std::string> strValues = this->GetStrValues(withoutDefault);
     std::stringstream ss;
-    int i;
-    for (i = 0; i < (int)strValues.size(); ++i) {
+    for (int i = 0; i < (int)strValues.size(); ++i) {
         if (i != 0) {
             ss << ", ";
         }
@@ -606,7 +623,7 @@ void OptionStaffrel::Init(data_STAFFREL defaultValue)
 
 bool OptionStaffrel::SetValue(const std::string &value)
 {
-    Att converter;
+    AttConverter converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
     if (staffrel == STAFFREL_NONE) {
         LogError("Parameter '%s' not valid", value.c_str());
@@ -618,13 +635,13 @@ bool OptionStaffrel::SetValue(const std::string &value)
 
 std::string OptionStaffrel::GetStrValue() const
 {
-    Att converter;
+    AttConverter converter;
     return converter.StaffrelToStr(m_value);
 }
 
 std::string OptionStaffrel::GetDefaultStrValue() const
 {
-    Att converter;
+    AttConverter converter;
     return converter.StaffrelToStr(m_defaultValue);
 }
 
@@ -819,19 +836,19 @@ OptionJson::JsonPath OptionJson::StringPath2NodePath(
     }
     path.reserve(jsonNodePath.size());
     path.push_back(const_cast<jsonxx::Value &>(obj.get<jsonxx::Value>(jsonNodePath.front())));
-    for (auto iter = jsonNodePath.begin() + 1; iter != jsonNodePath.end(); ++iter) {
+    for (const std::string &jsonNode : jsonNodePath) {
         jsonxx::Value &val = path.back();
-        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(*iter)) {
-            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(*iter));
+        if (val.is<jsonxx::Object>() && val.get<jsonxx::Object>().has<jsonxx::Value>(jsonNode)) {
+            path.push_back(val.get<jsonxx::Object>().get<jsonxx::Value>(jsonNode));
         }
         else if (val.is<jsonxx::Array>()) {
-            try {
-                const int index = std::stoi(*iter);
+            if (IsValidInteger(jsonNode)) {
+                const int index = (int)std::strtol(jsonNode.c_str(), NULL, 10);
                 if (!val.get<jsonxx::Array>().has<jsonxx::Value>(index)) break;
 
                 path.push_back(val.get<jsonxx::Array>().get<jsonxx::Value>(index));
             }
-            catch (const std::logic_error &) {
+            else {
                 // invalid index, leaving
                 break;
             }
@@ -936,8 +953,10 @@ Options::Options()
     m_scale.SetShortOption('s', false);
     m_baseOptions.AddOption(&m_scale);
 
-    m_outputTo.SetInfo(
-        "Output to", "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", or \"midi\"");
+    m_outputTo.SetInfo("Output to",
+        "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
+        "\"expansionmap\", \"humdrum\" or "
+        "\"pae\"");
     m_outputTo.Init("svg");
     m_outputTo.SetKey("outputTo");
     m_outputTo.SetShortOption('t', true);
@@ -996,7 +1015,7 @@ Options::Options()
     m_condenseTempoPages.Init(false);
     this->Register(&m_condenseTempoPages, "condenseTempoPages", &m_general);
 
-    m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
+    m_evenNoteSpacing.SetInfo("Even note spacing", "Align notes and rests without adding duration based space");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
@@ -1024,7 +1043,7 @@ Options::Options()
     m_justifyVertically.Init(false);
     this->Register(&m_justifyVertically, "justifyVertically", &m_general);
 
-    m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
+    m_landscape.SetInfo("Landscape orientation", "Swap the values for page height and page width");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
@@ -1097,7 +1116,7 @@ Options::Options()
     this->Register(&m_pageMarginTop, "pageMarginTop", &m_general);
 
     m_pageWidth.SetInfo("Page width", "The page width");
-    m_pageWidth.Init(2100, 100, 60000, true);
+    m_pageWidth.Init(2100, 100, 100000, true);
     this->Register(&m_pageWidth, "pageWidth", &m_general);
 
     m_pedalStyle.SetInfo("Pedal style", "The global pedal style");
@@ -1216,10 +1235,6 @@ Options::Options()
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
     m_beamMaxSlope.Init(10, 0, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
-
-    m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
-    m_beamMinSlope.Init(0, 0, 0);
-    this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
 
     m_beamMixedPreserve.SetInfo("Preserve mixed beams", "Mixed beams will be drawn even if there is not enough space");
     m_beamMixedPreserve.Init(false);
@@ -1344,10 +1359,6 @@ Options::Options()
     m_lyricElision.Init(ELISION_regular, &Option::s_elision);
     this->Register(&m_lyricElision, "lyricElision", &m_generalLayout);
 
-    m_lyricHyphenLength.SetInfo("Lyric hyphen length", "The lyric hyphen and dash length");
-    m_lyricHyphenLength.Init(1.20, 0.50, 3.00);
-    this->Register(&m_lyricHyphenLength, "lyricHyphenLength", &m_generalLayout);
-
     m_lyricLineThickness.SetInfo("Lyric line thickness", "The lyric extender line thickness");
     m_lyricLineThickness.Init(0.25, 0.10, 0.50);
     this->Register(&m_lyricLineThickness, "lyricLineThickness", &m_generalLayout);
@@ -1384,7 +1395,7 @@ Options::Options()
     m_multiRestStyle.Init(MULTIRESTSTYLE_auto, &Option::s_multiRestStyle);
     this->Register(&m_multiRestStyle, "multiRestStyle", &m_generalLayout);
 
-    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in unit");
+    m_multiRestThickness.SetInfo("Multi rest thickness", "The thickness of the multi rest in MEI units");
     m_multiRestThickness.Init(2.0, 0.50, 6.00);
     this->Register(&m_multiRestThickness, "multiRestThickness", &m_generalLayout);
 
@@ -1395,6 +1406,11 @@ Options::Options()
     m_octaveLineThickness.SetInfo("Octave line thickness", "The thickness of the line used for an octave line");
     m_octaveLineThickness.Init(0.20, 0.10, 1.00);
     this->Register(&m_octaveLineThickness, "octaveLineThickness", &m_generalLayout);
+
+    m_octaveNoSpanningParentheses.SetInfo("No parentheses on spanning octaves",
+        "Do not enclose octaves that are spanning over systems with parentheses.");
+    m_octaveNoSpanningParentheses.Init(false);
+    this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
     m_pedalLineThickness.Init(0.20, 0.10, 1.00);
@@ -1465,10 +1481,10 @@ Options::Options()
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
 
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
-    m_spacingSystem.Init(12, 0, 48);
+    m_spacingSystem.Init(4, 0, 48);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
 
-    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
+    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in MEI units");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
 
@@ -1484,7 +1500,7 @@ Options::Options()
     m_systemDivider.Init(SYSTEMDIVIDER_auto, &Option::s_systemDivider);
     this->Register(&m_systemDivider, "systemDivider", &m_generalLayout);
 
-    m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximun number of systems per page");
+    m_systemMaxPerPage.SetInfo("Max. System per Page", "Maximum number of systems per page");
     m_systemMaxPerPage.Init(0, 0, 24);
     this->Register(&m_systemMaxPerPage, "systemMaxPerPage", &m_generalLayout);
 
@@ -1534,6 +1550,11 @@ Options::Options()
         "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
+
+    m_loadSelectedMdivOnly.SetInfo(
+        "Load selected Mdiv only", "Load only the selected mdiv; the content of the other is skipped");
+    m_loadSelectedMdivOnly.Init(false);
+    this->Register(&m_loadSelectedMdivOnly, "loadSelectedMdivOnly", &m_selectors);
 
     m_mdivAll.SetInfo("Mdiv all", "Load and render all <mdiv> elements in the MEI files");
     m_mdivAll.Init(false);
@@ -1600,6 +1621,10 @@ Options::Options()
     m_bottomMarginHarm.SetInfo("Bottom margin harm", "The margin for harm in MEI units");
     m_bottomMarginHarm.Init(1.0, 0.0, 10.0);
     this->Register(&m_bottomMarginHarm, "bottomMarginHarm", &m_elementMargins);
+
+    m_bottomMarginOctave.SetInfo("Bottom margin octave", "The margin for octave in MEI units");
+    m_bottomMarginOctave.Init(1.0, 0.0, 10.0);
+    this->Register(&m_bottomMarginOctave, "bottomMarginOctave", &m_elementMargins);
 
     m_bottomMarginPgHead.SetInfo("Bottom margin header", "The margin for header in MEI units");
     m_bottomMarginPgHead.Init(2.0, 0.0, 24.0);
@@ -1873,8 +1898,9 @@ void Options::Sync()
         else if (m_engravingDefaults.HasValue({ pair.first })) {
             jsonValue = m_engravingDefaults.GetDblValue({ pair.first });
         }
-        else
+        else {
             continue;
+        }
 
         if (!pair.second->IsSet()) {
             pair.second->SetValueDbl(jsonValue * 2.0); // convert from staff spaces to MEI units
@@ -1908,7 +1934,7 @@ jsonxx::Object Options::GetBaseOptGrp()
     grpBase << "name" << m_baseOptions.GetLabel();
 
     const std::vector<Option *> *options = this->GetBaseOptions();
-    for (auto const &option : *options) {
+    for (Option *option : *options) {
         baseOpts << option->GetKey() << option->ToJson();
     }
 

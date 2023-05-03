@@ -237,49 +237,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertMarkupArtic
+     * Interface for class functor visitation
      */
-    int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToUnCastOffMensural
-     */
-    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontallyEnd
-     */
-    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitProcessingLists
-     */
-    int InitProcessingLists(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::InitOnsetOffset
@@ -287,16 +252,6 @@ public:
     ///@{
     int InitOnsetOffset(FunctorParams *functorParams) override;
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::FindElementInLayerStaffDefsByID
-     */
-    int FindElementInLayerStaffDefsByID(FunctorParams *) const override;
 
     /**
      * @name See Object::GenerateMIDI

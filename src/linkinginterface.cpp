@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -89,34 +89,28 @@ void LinkingInterface::AddBackLink(const Object *object)
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Object *object)
+FunctorCode LinkingInterface::InterfacePrepareLinking(PrepareLinkingFunctor &functor, Object *object)
 {
-    PrepareLinkingParams *params = vrv_params_cast<PrepareLinkingParams *>(functorParams);
-    assert(params);
-
     // This should not happen?
-    if (params->m_fillList == false) {
+    if (!functor.FillMode()) {
         return FUNCTOR_CONTINUE;
     }
 
     this->SetIDStr();
 
     if (!m_nextID.empty()) {
-        params->m_nextIDPairs.insert({ m_nextID, this });
+        functor.InsertNextIDPair(m_nextID, this);
     }
     if (!m_sameasID.empty()) {
-        params->m_sameasIDPairs.insert({ m_sameasID, this });
+        functor.InsertSameasIDPair(m_sameasID, this);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
+FunctorCode LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(
+    PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
 {
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
     // Only dir and dynam can be spanning with @next (extender)
     if (!object->Is({ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
@@ -134,12 +128,12 @@ int LinkingInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *fu
         if (att->GetExtender() != BOOLEAN_true) return FUNCTOR_CONTINUE;
     }
 
-    params->m_timeSpanningElements.push_back(object);
+    functor.InsertTimeSpanningElement(object);
 
     return FUNCTOR_CONTINUE;
 }
 
-int LinkingInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
+FunctorCode LinkingInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_next = NULL;
     m_nextID = "";

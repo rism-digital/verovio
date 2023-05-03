@@ -51,7 +51,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
     this->DrawTextChildren(dc, f, params);
 
     if (f->GetStart() && f->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(f->GetFirstAncestor(SYSTEM));
+        System *currentSystem = vrv_cast<System *>(f->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the end of the system; this will call DrawFConnector
         if (currentSystem) {
             currentSystem->AddToDrawingList(f);
@@ -76,7 +76,7 @@ void View::DrawDirString(DeviceContext *dc, const std::u32string &str, TextDrawi
     std::u32string convertedStr = str;
     // If the current font is a music font, we want to convert Music Unicode glyph to SMuFL
     if (dc->GetFont()->GetSmuflFont()) {
-        for (int i = 0; i < (int)str.size(); i++) {
+        for (int i = 0; i < (int)str.size(); ++i) {
             convertedStr[i] = Resources::GetSmuflGlyphForUnicodeChar(str.at(i));
         }
     }
@@ -154,7 +154,7 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
     int toDcX = ToDeviceContextX(params.m_x);
     int toDcY = ToDeviceContextY(params.m_y);
 
-    std::size_t prevPos = 0, pos;
+    size_t prevPos = 0, pos;
     while ((pos = str.find_first_of(VRV_TEXT_HARM, prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
@@ -349,7 +349,7 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
 
     dc->StartGraphic(fig, "", fig->GetID());
 
-    Svg *svg = dynamic_cast<Svg *>(fig->FindDescendantByType(SVG));
+    Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
@@ -495,7 +495,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {
-        this->DrawDynamString(dc, text->GetText(), params, dynamic_cast<Rend *>(text->GetFirstAncestor(REND)));
+        this->DrawDynamString(dc, text->GetText(), params, vrv_cast<Rend *>(text->GetFirstAncestor(REND)));
     }
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     else if (text->GetFirstAncestor(HARM)) {

@@ -286,6 +286,7 @@ private:
     void UpdateMdivFilter(Object *object);
     bool ProcessScoreBasedFilter(Object *object);
     bool ProcessScoreBasedFilterEnd(Object *object);
+    void PruneAttributes(pugi::xml_node node);
     ///@}
 
     /**
@@ -318,7 +319,7 @@ private:
     void WriteRevisionDesc(pugi::xml_node meiHead);
 
     /**
-     * Write the @xml:id to the currentNode
+     * Write the \@xml:id to the currentNode
      */
     void WriteXmlId(pugi::xml_node currentNode, Object *object);
 

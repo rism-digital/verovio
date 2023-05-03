@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "page.h"
 #include "score.h"
 #include "vrv.h"
@@ -64,5 +65,25 @@ void Pages::ConvertFrom(Score *score)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Pages::Accept(MutableFunctor &functor)
+{
+    return functor.VisitPages(this);
+}
+
+FunctorCode Pages::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPages(this);
+}
+
+FunctorCode Pages::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitPagesEnd(this);
+}
+
+FunctorCode Pages::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPagesEnd(this);
+}
 
 } // namespace vrv

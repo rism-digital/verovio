@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
@@ -103,7 +104,7 @@ void Accid::AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staff
 }
 
 void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::vector<Accid *> &leftAccids,
-    std::vector<Accid *> &adjustedAccids)
+    std::set<Accid *> &adjustedAccids)
 {
     assert(element);
     assert(doc);
@@ -152,7 +153,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
             leftAccids.push_back(accid);
             return;
         }
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), accid) == adjustedAccids.end()) return;
+        if (adjustedAccids.count(accid) == 0) return;
     }
 
     int xRelShift = 0;
@@ -166,15 +167,13 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
     // Move only to the left
     if (xRelShift > 0) {
         this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
-        if (std::find(adjustedAccids.begin(), adjustedAccids.end(), this) == adjustedAccids.end())
-            adjustedAccids.push_back(this);
+        adjustedAccids.insert(this);
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;
-            std::vector<Accid *>::iterator iter;
             // Recursively adjust all accidental that are on the left because enough space was previously available
-            for (iter = leftAccids.begin(); iter != leftAccids.end(); ++iter) {
-                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset, adjustedAccids);
+            for (Accid *accid : leftAccids) {
+                this->AdjustX(accid, doc, staffSize, leftAccidsSubset, adjustedAccids);
             }
         }
     }
@@ -282,25 +281,41 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Accid::ResetData(FunctorParams *functorParams)
+FunctorCode Accid::Accept(MutableFunctor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitAccid(this);
 }
 
-int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Accid::Accept(ConstFunctor &functor) const
 {
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+    return functor.VisitAccid(this);
+}
 
-    m_isDrawingOctave = false;
-    m_drawingOctave = NULL;
-    m_drawingUnison = NULL;
+FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
+{
+    return functor.VisitAccidEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Accid::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitAccidEnd(this);
+}
+
+//----------------------------------------------------------------------------
+// AccidOctaveSort
+//----------------------------------------------------------------------------
+
+std::string AccidOctaveSort::GetOctaveID(const Accid *accid) const
+{
+    const Note *note = vrv_cast<const Note *>(accid->GetFirstAncestor(NOTE));
+    assert(note);
+    const Chord *chord = note->IsChordTone();
+
+    std::string octaveID = chord ? chord->GetID() : note->GetID();
+    octaveID += "-" + std::to_string(accid->GetAccid());
+    octaveID += "-" + std::to_string(note->GetPname());
+
+    return octaveID;
 }
 
 } // namespace vrv

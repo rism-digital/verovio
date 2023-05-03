@@ -59,8 +59,8 @@ int Facsimile::GetMaxX() const
     ListOfConstObjects surfaces = this->FindAllDescendantsByType(SURFACE);
 
     int max = 0;
-    for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
-        const Surface *surface = vrv_cast<const Surface *>(*iter);
+    for (const Object *object : surfaces) {
+        const Surface *surface = vrv_cast<const Surface *>(object);
         assert(surface);
         max = (surface->GetMaxX() > max) ? surface->GetMaxX() : max;
     }
@@ -72,8 +72,8 @@ int Facsimile::GetMaxY() const
     ListOfConstObjects surfaces = this->FindAllDescendantsByType(SURFACE);
 
     int max = 0;
-    for (auto iter = surfaces.begin(); iter != surfaces.end(); ++iter) {
-        const Surface *surface = vrv_cast<const Surface *>(*iter);
+    for (const Object *object : surfaces) {
+        const Surface *surface = vrv_cast<const Surface *>(object);
         assert(surface);
         max = (surface->GetMaxY() > max) ? surface->GetMaxY() : max;
     }

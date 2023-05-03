@@ -77,7 +77,7 @@ public:
      * @name Get a copy of the clef, keysig, mensur and meterSig.
      * These methods create new objects (heap) that will need to be deleted.
      * They also convert attribute value objects to an object. For example,
-     * if a staffDef has a @key.sig, the copy will be a KeySig object.
+     * if a staffDef has a \@key.sig, the copy will be a KeySig object.
      * The conversion from attribute to element is performed in the appropriate
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
@@ -104,14 +104,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertMarkupScoreDef
+     * Interface for class functor visitation
      */
-    int ConvertMarkupScoreDef(FunctorParams *) override;
-
-    /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDefEnd(FunctorParams *) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
@@ -149,7 +149,15 @@ public:
     std::string GetClassName() const override { return "ScoreDef"; }
     ///@}
 
+    /**
+     * Check if a object is allowed as child.
+     */
     bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Return an order for the given ClassId.
+     */
+    int GetInsertOrderFor(ClassId classId) const override;
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.
@@ -192,7 +200,7 @@ public:
     ///@}
 
     /**
-     * Return all the @n values of the staffDef in a scoreDef
+     * Return all the \@n values of the staffDef in a scoreDef
      */
     std::vector<int> GetStaffNs() const;
 
@@ -219,8 +227,14 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    /**
+     * @name Set and get the drawing label width.
+     */
+    ///@{
     int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
+    void ResetDrawingLabelsWidth() { m_drawingLabelsWidth = 0; }
+    ///@}
 
     /**
      * @name Getters for running elements
@@ -253,54 +267,24 @@ public:
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
+     * Interface for class functor visitation
      */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
-     * See Object::ConvertToPageBased
+     * See Object::CalcMaxMeasureDuration
      */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
+    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
 
     /**
      * See Object::GenerateMIDI
      */
     int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
 
     /**
      * See Object::Transpose

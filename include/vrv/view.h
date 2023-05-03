@@ -227,7 +227,7 @@ protected:
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
-    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset);
+    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
@@ -347,6 +347,7 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
+    void DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin = false);
     void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
@@ -544,7 +545,6 @@ protected:
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength = 0, int gapLength = 0);
     void DrawHorizontalLine(
         DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength = 0, int gapLength = 0);
-    void DrawRoundedLine(DeviceContext *dc, int x1, int y1, int x2, int y2, int width);
     void DrawVerticalSegmentedLine(
         DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength = 0, int gapLength = 0);
     void DrawHorizontalSegmentedLine(

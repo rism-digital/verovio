@@ -91,6 +91,7 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     virtual void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
     ///@}
 
     /**
@@ -103,26 +104,14 @@ public:
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArpeg
+     * Interface for class functor visitation
      */
     ///@{
-    int AdjustArpeg(FunctorParams *functorParams) override;
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
     /**
      * See Object::InitMIDI
@@ -138,7 +127,7 @@ public:
 private:
     /**
      * The X drawing relative position of the object.
-     * Arpeg are positionned according to the top note through the FloatingPositioner
+     * Arpeg are positioned according to the top note through the FloatingPositioner
      * (See View::DrawArpeg that sets the FloatingPositioner)
      */
     int m_drawingXRel;

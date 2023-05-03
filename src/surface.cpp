@@ -62,8 +62,8 @@ int Surface::GetMaxX() const
     if (this->HasLrx()) return this->GetLrx();
     int max = 0;
     ListOfConstObjects zones = this->FindAllDescendantsByType(ZONE);
-    for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
-        const Zone *zone = vrv_cast<const Zone *>(*iter);
+    for (const Object *object : zones) {
+        const Zone *zone = vrv_cast<const Zone *>(object);
         assert(zone);
         max = (zone->GetLrx() > max) ? zone->GetLrx() : max;
     }
@@ -75,8 +75,8 @@ int Surface::GetMaxY() const
     if (this->HasLry()) return this->GetLry();
     int max = 0;
     ListOfConstObjects zones = this->FindAllDescendantsByType(ZONE);
-    for (auto iter = zones.begin(); iter != zones.end(); ++iter) {
-        const Zone *zone = vrv_cast<const Zone *>(*iter);
+    for (const Object *object : zones) {
+        const Zone *zone = vrv_cast<const Zone *>(object);
         assert(zone);
         max = (zone->GetLry() > max) ? zone->GetLry() : max;
     }

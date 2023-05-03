@@ -255,7 +255,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
 
         // look at the note position and adjust it if necessary
-        Note *note = dynamic_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
+        Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             const int drawingDur = note->GetDrawingDur();
             int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
@@ -536,6 +536,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
+    if (chord->HasCluster()) {
+        DrawChordCluster(dc, chord, layer, staff, measure);
+        return;
+    }
+
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
     chord->ResetDrawingList();
@@ -543,6 +548,63 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Draw children (notes, accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, chord, layer, staff, measure);
+}
+
+void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(chord);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Note *topNote = chord->GetTopNote();
+    Note *bottomNote = chord->GetBottomNote();
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int x = chord->GetDrawingX();
+    const int y1 = topNote->GetDrawingY() + unit;
+    const int y2 = bottomNote->GetDrawingY() - unit;
+    const int width = 2 * topNote->GetDrawingRadius(m_doc);
+
+    dc->StartCustomGraphic("notehead");
+
+    if (chord->GetActualDur() < DUR_4) {
+        const int line = unit / 2;
+        this->DrawNotFilledRectangle(dc, x + line / 2, y1 - line / 2, x + width - line / 2, y2 + line / 2, line, 0);
+    }
+    else {
+        this->DrawFilledRectangle(dc, x, y1, x + width, y2);
+    }
+
+    dc->EndCustomGraphic();
+
+    if (chord->GetCluster() != CLUSTER_chromatic) {
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
+        const int accidGlyph
+            = (chord->GetCluster() == CLUSTER_black) ? SMUFL_E260_accidentalFlat : SMUFL_E261_accidentalNatural;
+        const int accidX = x + (width - m_doc->GetGlyphWidth(accidGlyph, staffSize, true)) / 2;
+
+        int accidY;
+        if (chord->GetDrawingStemDir() == STEMDIRECTION_down) {
+            accidY = std::max(staffTop, y1) + unit - m_doc->GetGlyphBottom(accidGlyph, staffSize, true);
+        }
+        else {
+            accidY = std::min(staffBottom, y2) - unit - m_doc->GetGlyphTop(accidGlyph, staffSize, true);
+        }
+
+        this->DrawSmuflCode(dc, accidX, accidY, accidGlyph, staffSize, true, true);
+    }
+
+    // Draw dots and stem
+    const int dotsX = x + width + unit;
+    DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, false);
+    if ((y1 - y2) > 5 * unit) DrawDotsPart(dc, dotsX, bottomNote->GetDrawingY(), chord->GetDots(), staff, false);
+
+    Stem *stem = vrv_cast<Stem *>(chord->GetFirst(STEM));
+    DrawStem(dc, stem, layer, staff, measure);
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1506,8 +1568,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // We check if this belongs to a mensural note
     Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
     if (parent && parent->IsMensuralDur()) {
-        if (((parent->GetDrawingDur() > DUR_1) || ((parent->GetStemDir() != STEMDIRECTION_NONE)))
-            && stem->GetVisible() != BOOLEAN_false) {
+        if (parent->GetDrawingDur() > DUR_1) {
             /************** Stem/notehead direction: **************/
             const int staffCenter
                 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
@@ -1646,7 +1707,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     if (syl->HasFontstyle()) {
         currentFont.SetStyle(syl->GetFontstyle());
     }
-    if (syl->GetStart()->GetDrawingCueSize()) {
+    if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
     dc->SetFont(&currentFont);
@@ -1695,7 +1756,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(measure->GetFirstAncestor(SYSTEM));
+        System *currentSystem = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1718,7 +1779,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Verse *verse = vrv_cast<Verse *>(element);
     assert(verse);
 
-    Label *label = dynamic_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
+    Label *label = vrv_cast<Label *>(verse->FindDescendantByType(LABEL, 1));
     LabelAbbr *labelAbbr = verse->GetDrawingLabelAbbr();
 
     if (label || labelAbbr) {
@@ -1792,7 +1853,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
 
     const data_STEMDIRECTION stemDir = stem->GetDrawingStemDir();
     int y = stem->GetDrawingY() - stem->GetDrawingStemLen();
-    Flag *flag = dynamic_cast<Flag *>(stem->GetFirst(FLAG));
+    Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
     if (flag) {
         const char32_t glyph = flag->GetFlagGlyph(stemDir);
         if (glyph) {
@@ -1953,10 +2014,10 @@ int View::GetFYRel(F *f, Staff *staff)
     y -= (alignment->GetStaffHeight() + alignment->GetOverflowBelow());
 
     FloatingPositioner *positioner = alignment->FindFirstFloatingPositioner(HARM);
-    // There is no other harm, we use the bottom line.
-    if (!positioner) return y;
-
-    y = positioner->GetDrawingY();
+    // If there is no other harm, we use the bottom line.
+    if (positioner) {
+        y = positioner->GetDrawingY();
+    }
 
     Object *fb = f->GetFirstAncestor(FB);
     assert(fb);

@@ -183,6 +183,14 @@ public:
     ///@}
 
     /**
+     * Determine the slur's layer/cross staff by only considering the boundary
+     */
+    ///@{
+    std::pair<const Layer *, const LayerElement *> GetBoundaryLayer() const;
+    const Staff *GetBoundaryCrossStaff() const;
+    ///@}
+
+    /**
      * Set the bezier control sides depending on the curve direction
      */
     void InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveDir) const;
@@ -204,31 +212,16 @@ public:
     //----------//
 
     /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcSlurDirection
-     */
-    int CalcSlurDirection(FunctorParams *functorParams) override;
-
-private:
-    /**
-     * Helper for calculating the slur direction
+     * Interface for class functor visitation
      */
     ///@{
-    // Get layer by only considering the slur boundary
-    std::pair<const Layer *, const LayerElement *> GetBoundaryLayer() const;
-    // Get cross staff by only considering the slur boundary
-    const Staff *GetBoundaryCrossStaff() const;
-    // Determine curve direction for the slurs that start at grace note
-    curvature_CURVEDIR GetGraceCurveDirection() const;
-    // Get preferred curve direction based on various conditions
-    curvature_CURVEDIR GetPreferredCurveDirection(
-        data_STEMDIRECTION noteStemDir, bool isAboveStaffCenter, bool isGraceToNoteSlur) const;
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
+private:
     /**
      * Helper for calculating spanned elements
      */
@@ -241,6 +234,8 @@ private:
     // Determine whether a layer element should lie above or below the slur
     bool IsElementBelow(const LayerElement *element, const Staff *startStaff, const Staff *endStaff) const;
     bool IsElementBelow(const FloatingPositioner *positioner, const Staff *startStaff, const Staff *endStaff) const;
+    // Discard tuplets that don't have to be considered for slur adjustment
+    void DiscardTupletElements(FloatingCurvePositioner *curve, int xMin, int xMax);
     ///@}
 
     /**
@@ -250,11 +245,13 @@ private:
     // Calculate the endpoint coordinates depending on the curve direction and spanning type of the slur
     std::pair<Point, Point> CalcEndPoints(const Doc *doc, const Staff *staff, NearEndCollision *nearEndCollision,
         int x1, int x2, curvature_CURVEDIR drawingCurveDir, char spanningType) const;
+    // Consider the melodic direction for the break location?
+    bool ConsiderMelodicDirection() const;
     // Retrieve the start and end note locations of the slur
     std::pair<int, int> GetStartEndLocs(
         const Note *startNote, const Chord *startChord, const Note *endNote, const Chord *endChord) const;
-    // Calculate the break location at system start/end and the pitch difference
-    std::pair<int, int> CalcBrokenLoc(const Staff *staff, int startLoc, int endLoc) const;
+    // Calculate the pitch difference used to adjust for melodic direction
+    int CalcPitchDifference(const Staff *staff, int startLoc, int endLoc) const;
     // Check if the slur resembles portato
     PortatoSlurType IsPortatoSlur(const Doc *doc, const Note *startNote, const Chord *startChord) const;
     // Check if the slur starts or ends on a beam
@@ -322,8 +319,11 @@ private:
      */
     ///@{
     // Shift end points for collisions nearby
-    void ShiftEndPoints(
-        int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility, bool isBelow) const;
+    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility,
+        bool isBelow, char spanningType) const;
+
+    // Calculate the full and partial shift radii
+    std::pair<double, double> CalcShiftRadii(bool forShiftLeft, double flexibility, char spanningType) const;
 
     // Determine a quadratic interpolation function between zero and one and evaluate it
     double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
@@ -342,7 +342,7 @@ public:
 private:
     /**
      * The drawing curve direction
-     * This is calculated in the CalcSlurDirection functor and contains an additional distinction
+     * This is calculated in the CalcSlurDirectionFunctor and contains an additional distinction
      * for s-shaped slurs / mixed direction
      */
     SlurCurveDirection m_drawingCurveDir;

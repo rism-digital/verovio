@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
 #include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
@@ -114,14 +115,21 @@ bool StaffDef::IsSupportedChild(Object *child)
     return true;
 }
 
+int StaffDef::GetInsertOrderFor(ClassId classId) const
+{
+    // Anything else goes at the end
+    static const std::vector s_order({ LABEL, LABELABBR });
+    return this->GetInsertOrderForIn(classId, s_order);
+}
+
 bool StaffDef::HasLayerDefWithLabel() const
 {
     // First get all the staffGrps
     ListOfConstObjects layerDefs = this->FindAllDescendantsByType(LAYERDEF);
 
     // Then the @n of each first staffDef
-    for (auto &item : layerDefs) {
-        if (item->FindDescendantByType(LABEL)) return true;
+    for (const Object *object : layerDefs) {
+        if (object->FindDescendantByType(LABEL)) return true;
     }
     return false;
 }
@@ -130,71 +138,24 @@ bool StaffDef::HasLayerDefWithLabel() const
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
+FunctorCode StaffDef::Accept(MutableFunctor &functor)
 {
-    ReplaceDrawingValuesInStaffDefParams *params
-        = vrv_params_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
-    assert(params);
-
-    if (params->m_clef) {
-        this->SetCurrentClef(params->m_clef);
-    }
-    if (params->m_keySig) {
-        this->SetCurrentKeySig(params->m_keySig);
-    }
-    if (params->m_mensur) {
-        this->SetCurrentMensur(params->m_mensur);
-    }
-    if (params->m_meterSig) {
-        this->SetCurrentMeterSig(params->m_meterSig);
-    }
-    if (params->m_meterSigGrp) {
-        this->SetCurrentMeterSigGrp(params->m_meterSigGrp);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitStaffDef(this);
 }
 
-int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
+FunctorCode StaffDef::Accept(ConstFunctor &functor) const
 {
-    SetStaffDefRedrawFlagsParams *params = vrv_params_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
-    assert(params);
-
-    const bool forceRedraw = params->m_redrawFlags & StaffDefRedrawFlags::FORCE_REDRAW;
-    const bool redrawClef = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_CLEF;
-    if (redrawClef || forceRedraw) {
-        this->SetDrawClef(redrawClef);
-    }
-    const bool redrawKeySig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_KEYSIG;
-    if (redrawKeySig || forceRedraw) {
-        this->SetDrawKeySig(redrawKeySig);
-    }
-    const bool redrawMensur = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_MENSUR;
-    if (redrawMensur || forceRedraw) {
-        this->SetDrawMensur(redrawMensur);
-    }
-    const bool redrawMeterSig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIG;
-    if (redrawMeterSig || forceRedraw) {
-        this->SetDrawMeterSig(redrawMeterSig);
-    }
-    const bool redrawMeterSigGrp = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIGGRP;
-    if (redrawMeterSigGrp || forceRedraw) {
-        this->SetDrawMeterSigGrp(redrawMeterSigGrp);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitStaffDef(this);
 }
 
-int StaffDef::PrepareDuration(FunctorParams *functorParams)
+FunctorCode StaffDef::AcceptEnd(MutableFunctor &functor)
 {
-    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
-    assert(params);
+    return functor.VisitStaffDefEnd(this);
+}
 
-    if (this->HasDurDefault() && this->HasN()) {
-        params->m_durDefaultForStaffN[this->GetN()] = this->GetDurDefault();
-    }
-
-    return FUNCTOR_CONTINUE;
+FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStaffDefEnd(this);
 }
 
 int StaffDef::GenerateMIDI(FunctorParams *functorParams)

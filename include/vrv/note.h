@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_analytical.h"
 #include "atts_externalsymbols.h"
 #include "atts_frettab.h"
 #include "atts_mensural.h"
@@ -30,7 +31,6 @@ namespace vrv {
 class Accid;
 class Chord;
 class Note;
-class PrepareLinkingParams;
 class Slur;
 class TabGrp;
 class Tie;
@@ -54,6 +54,7 @@ class Note : public LayerElement,
              public AttCue,
              public AttExtSym,
              public AttGraced,
+             public AttHarmonicFunction,
              public AttMidiVelocity,
              public AttNoteGesTab,
              public AttNoteHeads,
@@ -124,7 +125,7 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPosFunctor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
@@ -146,7 +147,7 @@ public:
     Chord *IsChordTone();
     const Chord *IsChordTone() const;
     int GetDrawingDur() const;
-    bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
+    bool IsNoteGroupExtreme() const; // used to find if it is the highest or lowest note in a note group
     ///@}
 
     /**
@@ -171,11 +172,12 @@ public:
     bool IsUnisonWith(const Note *note, bool ignoreAccid = false) const;
 
     /**
-     * @name Setter and getter for the chord cluster and the position of the note
+     * @name Setter and getter for the chord note group and the position of the note
      */
     ///@{
-    void SetCluster(ChordCluster *cluster, int position);
-    ChordCluster *GetCluster() { return m_cluster; }
+    void SetNoteGroup(ChordNoteGroup *noteGroup, int position);
+    ChordNoteGroup *GetNoteGroup() { return m_noteGroup; }
+    int GetNoteGroupPosition() const { return m_noteGroupPosition; }
     ///@}
 
     /**
@@ -242,23 +244,18 @@ public:
     ///@}
 
     /**
-     * Getter for stem sameas role
+     * Getter and setter for stem sameas role
      */
+    ///@{
     StemSameasDrawingRole GetStemSameasRole() const { return m_stemSameasRole; }
-
-    /**
-     * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
-     * Called twice from Object::PrepareLinks. Once to fill id / note pairs,
-     * and once to resolve the link. The link is bi-directional, which means
-     * that both notes have their m_stemSameas pointer instanciated.
-     */
-    void ResolveStemSameas(PrepareLinkingParams *params);
+    void SetStemSameasRole(StemSameasDrawingRole stemSameasRole) { m_stemSameasRole = stemSameasRole; }
+    ///@}
 
     /**
      * Calculate the stem direction of the pair of notes.
      * The presence of a StemSameasNote() needs to be check before calling it.
      * Encoded stem direction on the calling note is taken into account.
-     * Called from Note::CalcStem
+     * Called from CalcStemFunctor::VisitNote
      */
     data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
 
@@ -290,59 +287,14 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustArtic
+     * Interface for class functor visitation
      */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcChordNoteHeads
-     */
-    int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcLedgerLines
-     */
-    int CalcLedgerLines(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::GenerateMIDI
@@ -383,12 +335,6 @@ private:
     void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
 
     /**
-     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
-     * as position of the note and position of the dots
-     */
-    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
-
-    /**
      * Register deferred notes for MIDI
      */
     void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
@@ -412,14 +358,14 @@ private:
     bool m_flippedNotehead;
 
     /**
-     * flags for determining clusters in chord (cluster this belongs to)
+     * flags for determining note groups in chord (note group this belongs to)
      */
-    ChordCluster *m_cluster;
+    ChordNoteGroup *m_noteGroup;
 
     /**
-     * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
+     * Position in the note group (1-indexed position in said note group; 0 if does not have position)
      */
-    int m_clusterPosition;
+    int m_noteGroupPosition;
 
     /**
      * A pointer to a note with which the note shares its stem and implementing @stem.sameas.

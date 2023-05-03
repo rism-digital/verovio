@@ -96,34 +96,14 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustBeams
+     * Interface for class functor visitation
      */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::Transpose
@@ -145,7 +125,7 @@ private:
      * Get the rest vertical location relative to location of elements placed on other layers
      */
     std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
-        const ListOfConstObjects &layersList, const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const;
+        const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const;
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers
@@ -174,6 +154,12 @@ private:
      */
     int GetRestOffsetFromOptions(
         RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const;
+
+    /**
+     * Find whether there is correct number of rests for automatic placement and determine position of the rest
+     * (top/bottom) if there is.
+     */
+    bool DetermineRestPosition(const Staff *staff, const Layer *layer, bool &isTopLayer) const;
 
 public:
     //

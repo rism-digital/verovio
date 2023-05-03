@@ -44,6 +44,7 @@ struct KeyAccidInfo {
 class KeySig : public LayerElement,
                public ObjectListInterface,
                public AttAccidental,
+               public AttColor,
                public AttPitch,
                public AttKeySigAnl,
                public AttKeySigLog,
@@ -116,9 +117,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareDataInitialization
+     * Interface for class functor visitation
      */
-    int PrepareDataInitialization(FunctorParams *) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /**
      * See Object::Transpose

@@ -173,6 +173,13 @@ const char *vrvToolkit_getOptions(void *tkPtr)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getOptionUsageString(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetOptionUsageString());
+    return tk->GetCString();
+}
+
 int vrvToolkit_getPageCount(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -239,6 +246,13 @@ const char *vrvToolkit_renderData(void *tkPtr, const char *data, const char *opt
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->RenderData(data, options));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_renderToExpansionMap(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->RenderToExpansionMap());
     return tk->GetCString();
 }
 

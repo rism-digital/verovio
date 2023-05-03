@@ -12,7 +12,6 @@
 
 namespace vrv {
 
-class AdjustFloatingPositionerGrpsParams;
 class AttSpacing;
 class FloatingObject;
 class ScoreDef;
@@ -109,6 +108,20 @@ public:
      */
     void SetSpacing(const ScoreDef *scoreDef);
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
+
 private:
     /**
      * Return above spacing type for passed staff.
@@ -164,7 +177,7 @@ public:
     /**
      * @name Methods for managing verse count with / without the collapse option
      * When setting a value of 0, then 1 is assumed. This occurs
-     * Typically with one single verse and no @n in <verse>
+     * Typically with one single verse and no \@n in <verse>
      * Without the collapse option, the count is the greatest @n
      * With the collapse option, the count is number of verses.
      * The position is calculated from the bottom.
@@ -179,6 +192,11 @@ public:
      * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
      */
     void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY, char spanningType);
+
+    /**
+     * Retrieve all FloatingPositioner.
+     */
+    const ArrayOfFloatingPositioners &GetFloatingPositioners() { return m_floatingPositioners; }
 
     /**
      * Look for the first FloatingPositioner corresponding to the FloatingObject of the ClassId.
@@ -205,7 +223,7 @@ public:
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
-     * Used for accessing the staff @n, the size, etc.
+     * Used for accessing the staff \@n, the size, etc.
      */
     ///@{
     Staff *GetStaff() { return m_staff; }
@@ -243,11 +261,12 @@ public:
     ///@}
 
     /**
-     * @name Set of functions for spacing calculations
+     * @name Getter for spacing
      */
     ///@{
     int GetMinimumSpacing(const Doc *doc) const;
     int CalcMinimumRequiredSpacing(const Doc *doc) const;
+    SystemAligner::SpacingType GetSpacingType() const { return m_spacingType; }
     ///@}
 
     /**
@@ -281,11 +300,17 @@ public:
     ///@}
 
     /**
-     * @name Adds a bounding box to the array of overflowing objects above or below
+     * @name Modify/Get the array of overflowing objects above or below
      */
     ///@{
     void AddBBoxAbove(BoundingBox *box) { m_overflowAboveBBoxes.push_back(box); }
     void AddBBoxBelow(BoundingBox *box) { m_overflowBelowBBoxes.push_back(box); }
+    void ClearBBoxesAbove() { m_overflowAboveBBoxes.clear(); }
+    void ClearBBoxesBelow() { m_overflowBelowBBoxes.clear(); }
+    ArrayOfBoundingBoxes &GetBBoxesAboveForModification() { return m_overflowAboveBBoxes; }
+    ArrayOfBoundingBoxes &GetBBoxesBelowForModification() { return m_overflowBelowBBoxes; }
+    const ArrayOfBoundingBoxes &GetBBoxesAbove() { return m_overflowAboveBBoxes; }
+    const ArrayOfBoundingBoxes &GetBBoxesBelow() { return m_overflowBelowBBoxes; }
     ///@}
 
     /**
@@ -304,9 +329,6 @@ public:
     void FindAllIntersectionPoints(
         SegmentedLine &line, const BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin) const;
 
-    void ReAdjustFloatingPositionersGrps(AdjustFloatingPositionerGrpsParams *params,
-        const ArrayOfFloatingPositioners &positioners, ArrayOfIntPairs &grpIdYRel);
-
     /**
      * Find overflow for the alignments taking bracket group elements into account
      */
@@ -317,44 +339,14 @@ public:
     //----------//
 
     /**
-     * See Object::AlignVertically
+     * Interface for class functor visitation
      */
-    int AlignVerticallyEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustYPos
-     */
-    int AdjustYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustStaffOverlap
-     */
-    int AdjustStaffOverlap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositioners
-     */
-    int AdjustFloatingPositioners(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositionersBetween
-     */
-    int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositionerGrps
-     */
-    int AdjustFloatingPositionerGrps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSlurs
-     */
-    int AdjustSlurs(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::JustifyY
-     */
-    int JustifyY(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     /**
@@ -418,10 +410,10 @@ private:
     ///@}
 
     /**
-     * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)
+     * The list of overflowing bounding boxes (e.g., LayerElement or FloatingPositioner)
      */
-    std::vector<BoundingBox *> m_overflowAboveBBoxes;
-    std::vector<BoundingBox *> m_overflowBelowBBoxes;
+    ArrayOfBoundingBoxes m_overflowAboveBBoxes;
+    ArrayOfBoundingBoxes m_overflowBelowBBoxes;
 };
 
 } // namespace vrv
