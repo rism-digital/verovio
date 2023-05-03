@@ -943,6 +943,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    if (staff->IsTablature()) {
+        // Encoded keySig will not be shown on tablature
+        return;
+    }
+
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
