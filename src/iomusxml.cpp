@@ -1374,7 +1374,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
                 staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
             }
             // Tablature?
-            if (staffDetails.node().child("staff-tuning") || staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) {
+            if (staffDetails.node().child("staff-tuning") || (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar)) {
                 // tablature type.  MusicXML does not support German tablature.
                 if (HasAttributeWithValue(staffDetails.node(), "show-frets", "letters")) {
                     staffDef->SetNotationtype(NOTATIONTYPE_tab_lute_french);
