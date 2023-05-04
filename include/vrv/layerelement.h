@@ -339,13 +339,6 @@ public:
     ///@}
 
     /**
-     * @name See Object::GenerateMIDI
-     */
-    ///@{
-    int GenerateMIDI(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
      * See Object::GenerateTimemap
      */
     int GenerateTimemap(FunctorParams *functorParams) override;

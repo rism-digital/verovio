@@ -96,37 +96,4 @@ FunctorCode BeatRpt::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitBeatRptEnd(this);
 }
 
-int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Sameas not taken into account for now
-    double beatLength = this->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
-    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
-    int tpq = params->m_midiFile->getTPQ();
-
-    // filter last beat and copy all notes
-    smf::MidiEvent event;
-    int eventcount = params->m_midiFile->getEventCount(params->m_midiTrack);
-    for (int i = 0; i < eventcount; ++i) {
-        event = params->m_midiFile->getEvent(params->m_midiTrack, i);
-        if (event.tick > starttime * tpq)
-            break;
-        else if (event.tick >= (starttime - beatLength) * tpq) {
-            if (((event[0] & 0xf0) == 0x80) || ((event[0] & 0xf0) == 0x90)) {
-                params->m_midiFile->addEvent(params->m_midiTrack, event.tick + beatLength * tpq, event);
-            }
-        }
-    }
-
-    for (int i = 0; i < beatLength * tpq; ++i) {
-        // LogWarning("%i", i);
-        // smf::MidiEvent event = params->m_midiFile->getEvent(params->m_midiTrack, starttime * tpq);
-        // event.clearVariables();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

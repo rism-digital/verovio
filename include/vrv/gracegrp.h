@@ -50,13 +50,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * @name See Object::GenerateMIDIEnd
-     */
-    ///@{
-    int GenerateMIDIEnd(FunctorParams *functorParams) override;
-    ///@}
-
 protected:
     //
 private:

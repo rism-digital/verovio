@@ -729,62 +729,6 @@ void Note::UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig)
     }
 }
 
-void Note::DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Recursive call for chords
-    Chord *chord = this->IsChordTone();
-    if (chord && includeChordSiblings) {
-        const ListOfObjects &notes = chord->GetList(chord);
-
-        for (Object *obj : notes) {
-            Note *note = vrv_cast<Note *>(obj);
-            assert(note);
-            note->DeferMIDINote(functorParams, shift, false);
-        }
-        return;
-    }
-
-    // Register the shift
-    if (shift < this->GetScoreTimeDuration() + this->GetScoreTimeTiedDuration()) {
-        params->m_deferredNotes[this] = shift;
-    }
-}
-
-void Note::GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    double graceNoteDur = 0.0;
-    if (params->m_accentedGraceNote && !params->m_graceNotes.empty()) {
-        const double totalDur = this->GetScoreTimeDuration() / 2.0;
-        this->DeferMIDINote(functorParams, totalDur, true);
-        graceNoteDur = totalDur / params->m_graceNotes.size();
-    }
-    else {
-        graceNoteDur = UNACC_GRACENOTE_DUR * params->m_currentTempo / 60000.0;
-        const double totalDur = graceNoteDur * params->m_graceNotes.size();
-        if (startTime >= totalDur) {
-            startTime -= totalDur;
-        }
-        else {
-            this->DeferMIDINote(functorParams, totalDur, true);
-        }
-    }
-
-    for (const MIDIChord &chord : params->m_graceNotes) {
-        const double stopTime = startTime + graceNoteDur;
-        for (int pitch : chord.pitches) {
-            params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
-            params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
-        }
-        startTime = stopTime;
-    }
-}
-
 //----------------//
 // Static methods //
 //----------------//

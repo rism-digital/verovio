@@ -364,16 +364,6 @@ FunctorCode Staff::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffEnd(this);
 }
 
-int Staff::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    params->m_expandedNotes.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Staff::Transpose(FunctorParams *functorParams)
 {
     TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);

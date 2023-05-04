@@ -728,22 +728,6 @@ FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMeasureEnd(this);
 }
 
-int Measure::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Here we need to update the m_totalTime from the starting time of the measure.
-    params->m_totalTime = m_scoreTimeOffset.back();
-
-    if (m_currentTempo != params->m_currentTempo) {
-        params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
-        params->m_currentTempo = m_currentTempo;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);

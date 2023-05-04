@@ -477,12 +477,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         }
 
         // Set initial scoreDef values for tuning
-        Functor generateScoreDefMIDI(&Object::GenerateMIDI);
-        Functor generateScoreDefMIDIEnd(&Object::GenerateMIDIEnd);
-        GenerateMIDIParams generateScoreDefMIDIParams(midiFile, &generateScoreDefMIDI);
-        generateScoreDefMIDIParams.m_midiChannel = midiChannel;
-        generateScoreDefMIDIParams.m_midiTrack = midiTrack;
-        currentScoreDef->Process(&generateScoreDefMIDI, &generateScoreDefMIDIParams, &generateScoreDefMIDIEnd);
+        GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
+        generateScoreDefMIDI.SetChannel(midiChannel);
+        generateScoreDefMIDI.SetTrack(midiTrack);
+        currentScoreDef->Process(generateScoreDefMIDI);
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.Clear();
@@ -492,19 +490,19 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
-            Functor generateMIDI(&Object::GenerateMIDI);
-            Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
-            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
-            generateMIDIParams.m_midiChannel = midiChannel;
-            generateMIDIParams.m_midiTrack = midiTrack;
-            generateMIDIParams.m_staffN = staves->first;
-            generateMIDIParams.m_transSemi = transSemi;
-            generateMIDIParams.m_currentTempo = tempo;
-            generateMIDIParams.m_deferredNotes = initMIDI.GetDeferredNotes();
-            generateMIDIParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
+            GenerateMIDIFunctor generateMIDI(midiFile);
+            generateMIDI.SetFilters(&filters);
+
+            generateMIDI.SetChannel(midiChannel);
+            generateMIDI.SetTrack(midiTrack);
+            generateMIDI.SetStaffN(staves->first);
+            generateMIDI.SetTransSemi(transSemi);
+            generateMIDI.SetCurrentTempo(tempo);
+            generateMIDI.SetDeferredNotes(initMIDI.GetDeferredNotes());
+            generateMIDI.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
-            this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
+            this->Process(generateMIDI);
         }
     }
 }

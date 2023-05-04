@@ -76,14 +76,4 @@ FunctorCode MRpt::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMRptEnd(this);
 }
 
-int MRpt::GenerateMIDI(FunctorParams *functorParams)
-{
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    LogWarning("MRpt produces empty MIDI output");
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

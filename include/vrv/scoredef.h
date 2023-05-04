@@ -277,11 +277,6 @@ public:
     ///@}
 
     /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
      * See Object::Transpose
      */
     ///@{

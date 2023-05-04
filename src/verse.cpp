@@ -127,17 +127,4 @@ FunctorCode Verse::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitVerseEnd(this);
 }
 
-int Verse::GenerateMIDI(FunctorParams *)
-{
-    LayerElement *parent = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
-    if (!parent) parent = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
-    assert(parent);
-
-    Verse *previousVerse = vrv_cast<Verse *>(parent->GetPrevious(this, VERSE));
-
-    if (previousVerse) return FUNCTOR_SIBLINGS;
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

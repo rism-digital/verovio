@@ -297,11 +297,6 @@ public:
     ///@}
 
     /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
      * See Object::GenerateTimemap
      */
     int GenerateTimemap(FunctorParams *functorParams) override;
@@ -333,16 +328,6 @@ private:
     TransPitch GetTransPitch() const;
 
     void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
-
-    /**
-     * Register deferred notes for MIDI
-     */
-    void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
-
-    /**
-     * Create the MIDI output of the grace note sequence stored in params
-     */
-    void GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity);
 
 public:
     //

@@ -9,7 +9,6 @@
 #define __VRV_MIDIFUNCTOR_H__
 
 #include "functor.h"
-#include "functorparams.h"
 
 namespace smf {
 class MidiFile;
@@ -229,6 +228,34 @@ private:
 //----------------------------------------------------------------------------
 
 /**
+ * Helper struct to store note sequences which replace notes in MIDI output due to expanded ornaments and tremolandi
+ */
+struct MIDINote {
+    int pitch;
+    double duration;
+};
+
+using MIDINoteSequence = std::list<MIDINote>;
+
+/**
+ * Helper struct for held notes in tablature
+ */
+struct MIDIHeldNote {
+    int m_pitch = 0;
+    double m_stopTime = 0;
+};
+
+/**
+ * Helper struct to store chord sequences in MIDI output due to grace notes
+ */
+struct MIDIChord {
+    std::set<int> pitches;
+    double duration;
+};
+
+using MIDIChordSequence = std::list<MIDIChord>;
+
+/**
  * This class performs the export to a MidiFile.
  */
 class GenerateMIDIFunctor : public ConstFunctor {
@@ -245,6 +272,19 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Setter for various properties
+     */
+    ///@{
+    void SetChannel(int channel) { m_midiChannel = channel; }
+    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+    void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
+    void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
+    void SetStaffN(int staffN) { m_staffN = staffN; }
+    void SetTrack(int track) { m_midiTrack = track; }
+    void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
+    ///@}
 
     /*
      * Functor interface

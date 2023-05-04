@@ -143,22 +143,4 @@ FunctorCode FTrem::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitFTremEnd(this);
 }
 
-int FTrem::GenerateMIDI(FunctorParams *functorParams)
-{
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    FTrem *fTrem = vrv_cast<FTrem *>(this);
-    assert(fTrem);
-
-    if (!fTrem->HasUnitdur()) {
-        return FUNCTOR_CONTINUE;
-    }
-    else {
-        LogWarning("FTrem produces incorrect MIDI output");
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

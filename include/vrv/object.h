@@ -693,16 +693,6 @@ public:
     ///@{
 
     /**
-     * Export the object to a MidiFile
-     */
-    virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::GenerateMIDI
-     */
-    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Export the object to a JSON timemap file.
      */
     virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }

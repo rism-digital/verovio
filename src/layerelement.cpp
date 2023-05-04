@@ -1315,22 +1315,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     return { shift, isInUnison };
 }
 
-int LayerElement::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Only resolve simple sameas links to avoid infinite recursion
-    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
-    if (sameas && !sameas->HasSameasLink()) {
-        sameas->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int LayerElement::GenerateTimemap(FunctorParams *functorParams)
 {
     GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);

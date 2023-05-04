@@ -70,14 +70,4 @@ FunctorCode HalfmRpt::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitHalfmRptEnd(this);
 }
 
-int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
-{
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    LogWarning("HalfmRpt produces empty MIDI output");
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

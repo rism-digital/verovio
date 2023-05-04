@@ -108,11 +108,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
     /** Create a default zone for a syl based on syllable. */
     bool CreateDefaultZone(Doc *doc);
 
