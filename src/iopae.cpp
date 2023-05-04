@@ -351,7 +351,7 @@ void PAEOutput::WriteKeySig(KeySig *keySig)
 
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetSig().second;
     std::string sig;
-    sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
+    if (accidType != ACCIDENTAL_WRITTEN_n) sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
     for (int i = 0; i < keySig->GetSig().first; ++i) {
         data_PITCHNAME pname = KeySig::GetAccidPnameAt(accidType, i);
         std::string pnameStr = keySig->AttTyped::PitchnameToStr(pname);
