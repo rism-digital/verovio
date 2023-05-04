@@ -349,6 +349,11 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitStaff(Staff *staff)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ConvertToCastOffMensuralFunctor::VisitSyllable(Syllable *syllable)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ConvertToCastOffMensuralFunctor::VisitSystemElement(SystemElement *systemElement)
 {
     assert(m_targetSystem);
