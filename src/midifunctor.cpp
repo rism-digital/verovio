@@ -651,8 +651,9 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
             }
 
             // end all previously held notes that have reached their stoptime
+            // or if the new pitch is already sounding, on any course
             for (auto &held : m_heldNotes) {
-                if ((held.m_pitch > 0) && (held.m_stopTime <= startTime)) {
+                if ((held.m_pitch > 0) && ((held.m_stopTime <= startTime) || (held.m_pitch == pitch))) {
                     m_midiFile->addNoteOff(m_midiTrack, held.m_stopTime * tpq, channel, held.m_pitch);
                     held.m_pitch = 0;
                     held.m_stopTime = 0;
