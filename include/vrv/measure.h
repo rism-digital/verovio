@@ -301,9 +301,12 @@ public:
     double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
 
     /**
-     * Return the real time offset in millisecond for the repeat (1-based).
+     * Return the real time offset in milliseconds
      */
+    ///@{
+    double GetLastRealTimeOffset() const { return m_realTimeOffsetMilliseconds.back(); }
     double GetRealTimeOffsetMilliseconds(int repeat) const;
+    ///@}
 
     /**
      * Setter for the time offset

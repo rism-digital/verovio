@@ -16,6 +16,8 @@ class MidiFile;
 
 namespace vrv {
 
+class Timemap;
+
 //----------------------------------------------------------------------------
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
@@ -354,6 +356,61 @@ private:
     bool m_cueExclusion;
     // Tablature held notes indexed by (course - 1)
     std::vector<MIDIHeldNote> m_heldNotes;
+};
+
+//----------------------------------------------------------------------------
+// GenerateTimemapFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class exports the object to a JSON timemap file.
+ */
+class GenerateTimemapFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    GenerateTimemapFunctor(Timemap *timemap);
+    virtual ~GenerateTimemapFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(const LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(const Measure *measure) override;
+    FunctorCode VisitNote(const Note *note) override;
+    FunctorCode VisitRest(const Rest *rest) override;
+    ///@}
+
+protected:
+    //
+private:
+    /**
+     * Add an entry to the timemap.
+     */
+    void AddTimemapEntry(const Object *object);
+
+public:
+    //
+private:
+    // The score time from the start of the piece to the previous barline in quarter notes
+    double m_scoreTimeOffset;
+    // Real time from the start of the piece to the previous barline in ms
+    double m_realTimeOffsetMilliseconds;
+    // The current tempo
+    double m_currentTempo;
+    // Indicates whether cue notes should be included
+    bool m_cueExclusion;
+    // The timemap
+    Timemap *m_timemap;
 };
 
 } // namespace vrv

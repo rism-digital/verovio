@@ -24,6 +24,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "timemap.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -858,6 +859,130 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
             m_midiFile->addNoteOff(m_midiTrack, stopTime * tpq, channel, pitch);
         }
         startTime = stopTime;
+    }
+}
+
+//----------------------------------------------------------------------------
+// GenerateTimemapFunctor
+//----------------------------------------------------------------------------
+
+GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap)
+{
+    m_scoreTimeOffset = 0.0;
+    m_realTimeOffsetMilliseconds = 0.0;
+    m_currentTempo = MIDI_TEMPO;
+    m_cueExclusion = false;
+    m_timemap = timemap;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitLayerElement(const LayerElement *layerElement)
+{
+    if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
+
+    // Only resolve simple sameas links to avoid infinite recursion
+    const LayerElement *sameas = dynamic_cast<const LayerElement *>(layerElement->GetSameasLink());
+    if (sameas && !sameas->HasSameasLink()) {
+        sameas->Process(*this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitMeasure(const Measure *measure)
+{
+    m_scoreTimeOffset = measure->GetLastTimeOffset();
+    m_realTimeOffsetMilliseconds = measure->GetLastRealTimeOffset();
+    m_currentTempo = measure->GetCurrentTempo();
+
+    this->AddTimemapEntry(measure);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitNote(const Note *note)
+{
+    if (note->HasGrace()) return FUNCTOR_SIBLINGS;
+
+    // Skip cue notes when midiNoCue is activated
+    if ((note->GetCue() == BOOLEAN_true) && m_cueExclusion) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    note = dynamic_cast<const Note *>(note->ThisOrSameasLink());
+    assert(note);
+
+    this->AddTimemapEntry(note);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode GenerateTimemapFunctor::VisitRest(const Rest *rest)
+{
+    this->AddTimemapEntry(rest);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
+{
+    assert(object);
+
+    if (object->Is({ NOTE, REST })) {
+        const DurationInterface *interface = object->GetDurationInterface();
+        assert(interface);
+
+        double realTimeStart = round(m_realTimeOffsetMilliseconds + interface->GetRealTimeOnsetMilliseconds());
+        double scoreTimeStart = m_scoreTimeOffset + interface->GetScoreTimeOnset();
+
+        double realTimeEnd = round(m_realTimeOffsetMilliseconds + interface->GetRealTimeOffsetMilliseconds());
+        double scoreTimeEnd = m_scoreTimeOffset + interface->GetScoreTimeOffset();
+
+        bool isRest = (object->Is(REST));
+
+        /*********** start values ***********/
+
+        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+
+        // Should check if value for realTimeStart already exists and if so, then
+        // ensure that it is equal to scoreTimeStart:
+        startEntry.qstamp = scoreTimeStart;
+
+        // Store the element ID in list to turn on at given time - note or rest
+        if (!isRest) startEntry.notesOn.push_back(object->GetID());
+        if (isRest) startEntry.restsOn.push_back(object->GetID());
+
+        // Also add the tempo
+        startEntry.tempo = m_currentTempo;
+
+        /*********** end values ***********/
+
+        TimemapEntry &endEntry = m_timemap->GetEntry(realTimeEnd);
+
+        // Should check if value for realTimeEnd already exists and if so, then
+        // ensure that it is equal to scoreTimeEnd:
+        endEntry.qstamp = scoreTimeEnd;
+
+        // Store the element ID in list to turn off at given time - notes or rest
+        if (!isRest) endEntry.notesOff.push_back(object->GetID());
+        if (isRest) endEntry.restsOff.push_back(object->GetID());
+    }
+    else if (object->Is(MEASURE)) {
+
+        const Measure *measure = vrv_cast<const Measure *>(object);
+        assert(measure);
+
+        // Deal with repeated music later, for now get the last times.
+        double scoreTimeStart = m_scoreTimeOffset;
+        double realTimeStart = round(m_realTimeOffsetMilliseconds);
+
+        TimemapEntry &startEntry = m_timemap->GetEntry(realTimeStart);
+
+        // Should check if value for realTimeStart already exists and if so, then
+        // ensure that it is equal to scoreTimeStart:
+        startEntry.qstamp = scoreTimeStart;
+
+        // Add the measureOn
+        startEntry.measureOn = measure->GetID();
     }
 }
 

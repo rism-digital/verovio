@@ -64,6 +64,11 @@ public:
     void AddEntry(Object *object, GenerateTimemapParams *params);
 
     /**
+     * Return (and possibly add) an entry for the given time.
+     */
+    TimemapEntry &GetEntry(double time) { return m_map[time]; }
+
+    /**
      * Write the current timemap to a JSON string
      */
     void ToJson(std::string &output, bool includetRests, bool includetMeasures);
