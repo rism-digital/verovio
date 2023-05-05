@@ -623,19 +623,34 @@ bool HumdrumInput::Import(const std::string &content)
             }
         }
 
-        bool result;
-        if (comma <= tab) {
-            result = m_infiles.readString(content);
+        // Check for obvious problems
+        if (content.size() < 2000) {
+            hum::HumRegex hre;
+            if (!hre.search(content, R"(\*\*[A-Za-z0-9_-])")) {
+                std::string dummy = "**kern\n*stria1\n*clefXyy\n1ryy\n*-\n";
+                // bool result = m_infiles.readString(dummy);
+                m_infiles.readString(dummy);
+            }
+            else {
+                // bool result = m_infiles.readString(content);
+                m_infiles.readString(content);
+            }
         }
         else {
-            result = m_infiles.readStringCsv(content);
+            bool result;
+            if (comma <= tab) {
+                result = m_infiles.readString(content);
+            }
+            else {
+                result = m_infiles.readStringCsv(content);
+            }
+            if (!result) {
+                return false;
+            }
         }
 
-        if (!result) {
-            return false;
-        }
-
-        return convertHumdrum();
+        bool result = convertHumdrum();
+        return result;
     }
     catch (char *str) {
         LogError("%s", str);
@@ -5238,8 +5253,11 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
             break;
         }
         kernpart = kernpart->getNextToken();
+        if (!kernpart) {
+            break;
+        }
     }
-    if (!foundtempo) {
+    if (kernpart && !foundtempo) {
         hum::HumdrumFile &infile = *(kernpart->getOwner()->getOwner());
         hum::HumRegex hre;
         hum::HTp omd = NULL;
