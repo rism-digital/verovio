@@ -12,6 +12,7 @@
 #include "arpeg.h"
 #include "beatrpt.h"
 #include "btrem.h"
+#include "featureextractor.h"
 #include "ftrem.h"
 #include "gracegrp.h"
 #include "layer.h"
@@ -984,6 +985,22 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
         // Add the measureOn
         startEntry.measureOn = measure->GetID();
     }
+}
+
+//----------------------------------------------------------------------------
+// GenerateFeaturesFunctor
+//----------------------------------------------------------------------------
+
+GenerateFeaturesFunctor::GenerateFeaturesFunctor(FeatureExtractor *extractor)
+{
+    m_extractor = extractor;
+}
+
+FunctorCode GenerateFeaturesFunctor::VisitObject(const Object *object)
+{
+    m_extractor->Extract(object);
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

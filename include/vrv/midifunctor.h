@@ -16,6 +16,7 @@ class MidiFile;
 
 namespace vrv {
 
+class FeatureExtractor;
 class Timemap;
 
 //----------------------------------------------------------------------------
@@ -416,6 +417,46 @@ private:
     bool m_cueExclusion;
     // The timemap
     Timemap *m_timemap;
+};
+
+//----------------------------------------------------------------------------
+// GenerateFeaturesFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class exports the object to a JSON feature file.
+ */
+class GenerateFeaturesFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    GenerateFeaturesFunctor(FeatureExtractor *extractor);
+    virtual ~GenerateFeaturesFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The FeatureExtractor to which extraction is delegated
+    FeatureExtractor *m_extractor;
 };
 
 } // namespace vrv
