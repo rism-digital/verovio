@@ -449,7 +449,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 
     // Do not render the box or circle if the content is empty
     if (rend->HasContentBB()) {
-        if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
+        if (rend->HasRend()) {
             params.m_enclosedRend.push_back(rend);
             params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
             params.m_explicitPosition = true;
