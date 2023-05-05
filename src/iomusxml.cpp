@@ -425,6 +425,9 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int dur
     else {
         m_elementStackMap.at(layer).back()->AddChild(element);
     }
+    // Recheck if AddChild was successful
+    if (!element->GetParent()) return;
+
     m_layerEndTimes[layer] = m_durTotal + duration;
     if (!element->Is({ BEAM, TUPLET })) {
         m_layerTimes[layer].emplace(m_durTotal + duration, element);
