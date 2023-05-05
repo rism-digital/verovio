@@ -382,6 +382,9 @@ bool MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         }
         else {
             LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
+
+            // Keep the measure alive as ghost. Its content was not transferred, so we cannot delete it.
+            return true;
         }
         contentMeasure = existingMeasure;
     }
