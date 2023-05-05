@@ -1784,18 +1784,4 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
     s_classIdsRegistry[name] = classId;
 }
 
-//----------------------------------------------------------------------------
-// Object functor methods
-//----------------------------------------------------------------------------
-
-int Object::GenerateFeatures(FunctorParams *functorParams)
-{
-    GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
-    assert(params);
-
-    params->m_extractor->Extract(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

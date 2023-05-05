@@ -550,9 +550,8 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
         return false;
     }
     FeatureExtractor extractor(options);
-    Functor generateFeatures(&Object::GenerateFeatures);
-    GenerateFeaturesParams generateFeaturesParams(this, &extractor);
-    this->Process(&generateFeatures, &generateFeaturesParams);
+    GenerateFeaturesFunctor generateFeatures(&extractor);
+    this->Process(generateFeatures);
     extractor.ToJson(output);
 
     return true;

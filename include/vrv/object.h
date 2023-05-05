@@ -688,18 +688,6 @@ public:
     //----------//
 
     /**
-     * @name Functors for generating MIDI output.
-     */
-    ///@{
-
-    /**
-     * Export the object to a JSON feature file.
-     */
-    virtual int GenerateFeatures(FunctorParams *functorParams);
-
-    ///@}
-
-    /**
      * Transpose the content.
      */
     virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
