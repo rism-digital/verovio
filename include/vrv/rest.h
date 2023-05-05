@@ -110,11 +110,6 @@ public:
      */
     int Transpose(FunctorParams *functorParams) override;
 
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
 private:
     /**
      * Helper function to update rest oloc/ploc based on the input TransPitch

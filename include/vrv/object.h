@@ -693,11 +693,6 @@ public:
     ///@{
 
     /**
-     * Export the object to a JSON timemap file.
-     */
-    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Export the object to a JSON feature file.
      */
     virtual int GenerateFeatures(FunctorParams *functorParams);

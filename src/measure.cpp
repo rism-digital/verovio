@@ -40,7 +40,6 @@
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
-#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -726,20 +725,6 @@ FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
 FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMeasureEnd(this);
-}
-
-int Measure::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = this->m_currentTempo;
-
-    params->m_timemap->AddEntry(this, params);
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

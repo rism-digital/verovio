@@ -338,11 +338,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
 protected:
     /**
      * Helper to figure whether two chords are in fully in unison based on the locations of the notes.

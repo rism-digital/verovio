@@ -345,11 +345,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
 public:
     // flags for drawing measure barline based on visibility or other conditions
     enum BarlineDrawingFlags {

@@ -381,6 +381,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Set the cue exclusion flag
+     */
+    void SetCueExclusion(bool cueExclusion) { m_cueExclusion = cueExclusion; }
+
+    /*
      * Functor interface
      */
     ///@{

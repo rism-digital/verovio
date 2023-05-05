@@ -34,7 +34,6 @@
 #include "syl.h"
 #include "tabgrp.h"
 #include "tie.h"
-#include "timemap.h"
 #include "tuning.h"
 #include "verse.h"
 #include "vrv.h"
@@ -846,26 +845,6 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     if (loc % 2 == 0) loc += (shiftUpwards ? 1 : -1);
     dotLocs[staff] = { loc };
     return dotLocs;
-}
-
-int Note::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    if (this->HasGrace()) return FUNCTOR_SIBLINGS;
-
-    // Skip cue notes when midiNoCue is activated
-    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Note *note = vrv_cast<Note *>(this->ThisOrSameasLink());
-    assert(note);
-
-    params->m_timemap->AddEntry(note, params);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 int Note::Transpose(FunctorParams *functorParams)

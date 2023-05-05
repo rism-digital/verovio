@@ -519,10 +519,9 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
         return false;
     }
     Timemap timemap;
-    Functor generateTimemap(&Object::GenerateTimemap);
-    GenerateTimemapParams generateTimemapParams(&timemap, &generateTimemap);
-    generateTimemapParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
-    this->Process(&generateTimemap, &generateTimemapParams);
+    GenerateTimemapFunctor generateTimemap(&timemap);
+    generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
+    this->Process(generateTimemap);
 
     timemap.ToJson(output, includeRests, includeMeasures);
 

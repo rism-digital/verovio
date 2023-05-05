@@ -139,38 +139,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// GenerateTimemapParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: Score time from the start of the piece to previous barline in quarter notes
- * member 1: Real time from the start of the piece to previous barline in ms
- * member 2: Currently active tempo
- * member 3: flag indicating whether cue notes should be included
- * member 4: a pointer to the Timemap
- * member 5: the functor for redirection
- **/
-
-class GenerateTimemapParams : public FunctorParams {
-public:
-    GenerateTimemapParams(Timemap *timemap, Functor *functor)
-    {
-        m_scoreTimeOffset = 0.0;
-        m_realTimeOffsetMilliseconds = 0;
-        m_currentTempo = MIDI_TEMPO;
-        m_cueExclusion = false;
-        m_timemap = timemap;
-        m_functor = functor;
-    }
-    double m_scoreTimeOffset;
-    double m_realTimeOffsetMilliseconds;
-    double m_currentTempo;
-    bool m_cueExclusion;
-    Timemap *m_timemap;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // TransposeParams
 //----------------------------------------------------------------------------
 

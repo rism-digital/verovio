@@ -24,7 +24,6 @@
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
-#include "timemap.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -636,16 +635,6 @@ int Rest::Transpose(FunctorParams *functorParams)
         }
         this->SetLoc(transposedLoc);
     }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Rest::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    params->m_timemap->AddEntry(this, params);
 
     return FUNCTOR_SIBLINGS;
 }

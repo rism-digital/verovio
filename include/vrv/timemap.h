@@ -18,7 +18,6 @@
 namespace vrv {
 
 class Object;
-class GenerateTimemapParams;
 
 //----------------------------------------------------------------------------
 // TimemapEntry
@@ -56,12 +55,6 @@ public:
 
     /** Resets the timemap */
     void Reset();
-
-    /**
-     * Add an entry to the timemap.
-     * Currently support note and rest (duration interfaces) and measure.
-     */
-    void AddEntry(Object *object, GenerateTimemapParams *params);
 
     /**
      * Return (and possibly add) an entry for the given time.
