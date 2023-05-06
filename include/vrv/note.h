@@ -282,6 +282,14 @@ public:
      */
     static int PnameToPclass(data_PITCHNAME pitchName);
 
+    /**
+     * Get and set the pitch for transposition
+     */
+    ///@{
+    TransPitch GetTransPitch() const;
+    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -319,10 +327,6 @@ private:
      * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
      */
     int GetChromaticAlteration() const;
-
-    TransPitch GetTransPitch() const;
-
-    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
 
 public:
     //
