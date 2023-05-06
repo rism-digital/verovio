@@ -300,6 +300,17 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
     }
 
+    if (notationType == NOTATIONTYPE_neume) {
+        int rotateOffset = 0;
+        if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+            double deg = staff->GetDrawingRotate();
+            int xDiff = x - staff->GetDrawingX();
+            rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+        }
+
+        y = ToLogicalY(y) - rotateOffset;
+    }
+
     this->DrawSmuflString(
         dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
