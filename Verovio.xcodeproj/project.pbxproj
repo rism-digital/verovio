@@ -1406,6 +1406,12 @@
 		E738716029CAFA9D00982DE5 /* calcligaturenoteposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */; };
 		E738716129CAFA9D00982DE5 /* calcligaturenoteposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */; };
 		E738716229CAFA9E00982DE5 /* calcligaturenoteposfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */; };
+		E73E86252A069C640089DF74 /* transposefunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E73E86242A069C640089DF74 /* transposefunctor.h */; };
+		E73E86262A069C640089DF74 /* transposefunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E73E86242A069C640089DF74 /* transposefunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E73E86282A069C920089DF74 /* transposefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E73E86272A069C920089DF74 /* transposefunctor.cpp */; };
+		E73E86292A069C920089DF74 /* transposefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E73E86272A069C920089DF74 /* transposefunctor.cpp */; };
+		E73E862A2A069C9C0089DF74 /* transposefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E73E86272A069C920089DF74 /* transposefunctor.cpp */; };
+		E73E862B2A069C9C0089DF74 /* transposefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E73E86272A069C920089DF74 /* transposefunctor.cpp */; };
 		E741ACFF299A3D3400854426 /* calcslurdirectionfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */; };
 		E741AD00299A3D3500854426 /* calcslurdirectionfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E741AD02299A3D5B00854426 /* calcslurdirectionfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */; };
@@ -2155,6 +2161,8 @@
 		E7265E7029DC700800D11F41 /* castofffunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = castofffunctor.cpp; path = src/castofffunctor.cpp; sourceTree = "<group>"; };
 		E738715B29CAFA6700982DE5 /* calcligaturenoteposfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcligaturenoteposfunctor.h; path = include/vrv/calcligaturenoteposfunctor.h; sourceTree = "<group>"; };
 		E738715E29CAFA9500982DE5 /* calcligaturenoteposfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcligaturenoteposfunctor.cpp; path = src/calcligaturenoteposfunctor.cpp; sourceTree = "<group>"; };
+		E73E86242A069C640089DF74 /* transposefunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transposefunctor.h; path = include/vrv/transposefunctor.h; sourceTree = "<group>"; };
+		E73E86272A069C920089DF74 /* transposefunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = transposefunctor.cpp; path = src/transposefunctor.cpp; sourceTree = "<group>"; };
 		E741ACFE299A3D1D00854426 /* calcslurdirectionfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calcslurdirectionfunctor.h; path = include/vrv/calcslurdirectionfunctor.h; sourceTree = "<group>"; };
 		E741AD01299A3D5B00854426 /* calcslurdirectionfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = calcslurdirectionfunctor.cpp; path = src/calcslurdirectionfunctor.cpp; sourceTree = "<group>"; };
 		E74A806028BC9111005274E7 /* findfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findfunctor.cpp; path = src/findfunctor.cpp; sourceTree = "<group>"; };
@@ -3005,6 +3013,8 @@
 				E7F1C36329F033FB007E12C1 /* savefunctor.h */,
 				E7D3389C293E05A800C40B81 /* setscoredeffunctor.cpp */,
 				E7D33899293E057100C40B81 /* setscoredeffunctor.h */,
+				E73E86272A069C920089DF74 /* transposefunctor.cpp */,
+				E73E86242A069C640089DF74 /* transposefunctor.h */,
 			);
 			name = functors;
 			sourceTree = "<group>";
@@ -3332,6 +3342,7 @@
 				E7901659298BCA97008FDB4E /* calcalignmentxposfunctor.h in Headers */,
 				BDEF9ECC26725248008A3A47 /* caesura.h in Headers */,
 				E7ADB3AB29D1921300825D5D /* adjustarticfunctor.h in Headers */,
+				E73E86252A069C640089DF74 /* transposefunctor.h in Headers */,
 				4DEC4DD921C8295700D1D273 /* rdg.h in Headers */,
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
 				4DACC9F02990F29A00B55913 /* atts_critapp.h in Headers */,
@@ -3539,6 +3550,7 @@
 				4DACC9EB2990F29A00B55913 /* attmodule.h in Headers */,
 				BB4C4ABC22A932B6001F6AF0 /* instrdef.h in Headers */,
 				BB4C4B7622A932D7001F6AF0 /* syl.h in Headers */,
+				E73E86262A069C640089DF74 /* transposefunctor.h in Headers */,
 				BB4C4AEA22A932BC001F6AF0 /* del.h in Headers */,
 				BB4C4B3422A932CF001F6AF0 /* tempo.h in Headers */,
 				4DACC9E12990F29A00B55913 /* attconverter.h in Headers */,
@@ -3946,6 +3958,7 @@
 				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
 				4D27E13827F582BB00D64FBD /* docselection.cpp in Sources */,
 				E74A806328BC911D005274E7 /* findfunctor.cpp in Sources */,
+				E73E862A2A069C9C0089DF74 /* transposefunctor.cpp in Sources */,
 				E7908EA4298582DE0004C1F9 /* alignfunctor.cpp in Sources */,
 				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
 				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
@@ -4232,6 +4245,7 @@
 				4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				4DEC4D9221C81E0B00D1D273 /* del.cpp in Sources */,
 				4D1BE76F1C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
+				E73E862B2A069C9C0089DF74 /* transposefunctor.cpp in Sources */,
 				4DA20ED11D0F151900706C4A /* iohumdrum.cpp in Sources */,
 				8F086EFD188539540037FD8E /* rest.cpp in Sources */,
 				4D766EFC20ACAD63006875D8 /* view_neume.cpp in Sources */,
@@ -4503,6 +4517,7 @@
 				E7D3389D293E05A800C40B81 /* setscoredeffunctor.cpp in Sources */,
 				4DA1448B1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */,
+				E73E86282A069C920089DF74 /* transposefunctor.cpp in Sources */,
 				4DB3D8ED1F83D18C00B5FC2B /* space.cpp in Sources */,
 				4D27E13927F582BB00D64FBD /* docselection.cpp in Sources */,
 				E7908EA22985829F0004C1F9 /* alignfunctor.cpp in Sources */,
@@ -4782,6 +4797,7 @@
 				BB4C4B7D22A932D7001F6AF0 /* verse.cpp in Sources */,
 				BB4C4B5122A932D7001F6AF0 /* ftrem.cpp in Sources */,
 				BB4C4AEF22A932BC001F6AF0 /* lem.cpp in Sources */,
+				E73E86292A069C920089DF74 /* transposefunctor.cpp in Sources */,
 				BB4C4AD522A932B6001F6AF0 /* staffgrp.cpp in Sources */,
 				BB4C4B2D22A932CF001F6AF0 /* octave.cpp in Sources */,
 				BB4C4BA922A932EB001F6AF0 /* view.cpp in Sources */,
