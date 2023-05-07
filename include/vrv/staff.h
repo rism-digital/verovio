@@ -195,11 +195,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
-
 private:
     /**
      * Add the ledger line dashes to the legderline array.

@@ -34,7 +34,6 @@ class Note;
 class Slur;
 class TabGrp;
 class Tie;
-class TransPitch;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -303,11 +302,6 @@ public:
     FunctorCode AcceptEnd(MutableFunctor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**

@@ -118,45 +118,6 @@ public:
     std::string m_id;
 };
 
-//----------------------------------------------------------------------------
-// TransposeParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the document
- * member 1: the functor for redirection
- * member 2: the end functor for redirection
- * member 3: a pointer to the transposer
- * member 4: the transposition to be applied
- * member 5: the mdiv selected for transposition
- * member 6: the list of current (nested) mdivs
- * member 7: transpose to sounding pitch by evaluating @trans.semi
- * member 8: current KeySig for staff (ScoreDef key signatures are mapped to -1)
- * member 9: transposition interval for staff
- **/
-
-class TransposeParams : public FunctorParams {
-public:
-    TransposeParams(Doc *doc, Functor *functor, Functor *functorEnd, Transposer *transposer)
-    {
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-        m_transposer = transposer;
-        m_transposeToSoundingPitch = false;
-    }
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-    Transposer *m_transposer;
-    std::string m_transposition;
-    std::string m_selectedMdivID;
-    std::list<std::string> m_currentMdivIDs;
-    bool m_transposeToSoundingPitch;
-    std::map<int, const KeySig *> m_keySigForStaffN;
-    std::map<int, int> m_transposeIntervalForStaffN;
-};
-
 } // namespace vrv
 
 #endif

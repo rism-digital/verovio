@@ -683,20 +683,6 @@ public:
      */
     static bool IsPreOrdered(const Object *left, const Object *right);
 
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * Transpose the content.
-     */
-    virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End functor for Object::Transpose
-     */
-    virtual int TransposeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
 private:
     /**
      * Method for generating the id.

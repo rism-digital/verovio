@@ -847,21 +847,4 @@ MapOfDotLocs Note::CalcDotLocations(int layerCount, bool primary) const
     return dotLocs;
 }
 
-int Note::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasPname()) return FUNCTOR_SIBLINGS;
-
-    TransPitch pitch = this->GetTransPitch();
-    params->m_transposer->Transpose(pitch);
-
-    const int staffN = this->GetAncestorStaff(RESOLVE_CROSS_STAFF)->GetN();
-    const bool hasKeySig = ((params->m_keySigForStaffN.count(staffN) > 0) || (params->m_keySigForStaffN.count(-1) > 0));
-    this->UpdateFromTransPitch(pitch, hasKeySig);
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

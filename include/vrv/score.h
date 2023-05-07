@@ -88,11 +88,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
-
 private:
     /**
      * The score/scoreDef (first child of the score)

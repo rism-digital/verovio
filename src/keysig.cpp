@@ -24,7 +24,6 @@
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
-#include "transposition.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -387,54 +386,6 @@ FunctorCode KeySig::AcceptEnd(MutableFunctor &functor)
 FunctorCode KeySig::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitKeySigEnd(this);
-}
-
-int KeySig::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    // Store current KeySig
-    int staffN = -1;
-    const StaffDef *staffDef = vrv_cast<StaffDef *>(this->GetFirstAncestor(STAFFDEF));
-    if (staffDef) {
-        staffN = staffDef->GetN();
-    }
-    else {
-        const Staff *staff = this->GetAncestorStaff(ANCESTOR_ONLY, false);
-        if (staff) staffN = staff->GetN();
-    }
-    params->m_keySigForStaffN[staffN] = this;
-
-    // Transpose
-    const int sig = this->GetFifthsInt();
-
-    int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
-    intervalClass = params->m_transposer->Transpose(intervalClass);
-    int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
-
-    if (fifths == INVALID_INTERVAL_CLASS) {
-        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
-    }
-    else if (fifths < 0) {
-        this->SetSig({ -fifths, ACCIDENTAL_WRITTEN_f });
-    }
-    else if (fifths > 0) {
-        this->SetSig({ fifths, ACCIDENTAL_WRITTEN_s });
-    }
-    else {
-        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
-    }
-
-    // Also convert pname and accid attributes
-    if (this->HasPname()) {
-        TransPitch pitch = TransPitch(this->GetPname(), ACCIDENTAL_GESTURAL_NONE, this->GetAccid(), 4);
-        params->m_transposer->Transpose(pitch);
-        this->SetPname(pitch.GetPitchName());
-        this->SetAccid(pitch.GetAccidW());
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

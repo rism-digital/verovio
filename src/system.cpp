@@ -505,19 +505,4 @@ FunctorCode System::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitSystemEnd(this);
 }
 
-int System::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    // Check whether we are in the selected mdiv
-    if (!params->m_selectedMdivID.empty()
-        && (std::find(params->m_currentMdivIDs.begin(), params->m_currentMdivIDs.end(), params->m_selectedMdivID)
-            == params->m_currentMdivIDs.end())) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

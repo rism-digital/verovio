@@ -21,7 +21,6 @@
 #include "layerdef.h"
 #include "metersiggrp.h"
 #include "staffgrp.h"
-#include "transposition.h"
 #include "tuning.h"
 #include "vrv.h"
 
@@ -156,41 +155,6 @@ FunctorCode StaffDef::AcceptEnd(MutableFunctor &functor)
 FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitStaffDefEnd(this);
-}
-
-int StaffDef::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (params->m_transposeToSoundingPitch) {
-        // Retrieve the key signature
-        const KeySig *keySig = vrv_cast<const KeySig *>(this->FindDescendantByType(KEYSIG));
-        if (!keySig) {
-            const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(this->GetFirstAncestor(SCOREDEF));
-            keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
-        }
-        // Determine and store the transposition interval (based on keySig)
-        if (keySig && this->HasTransSemi() && this->HasN()) {
-            const int fifths = keySig->GetFifthsInt();
-            int semitones = this->GetTransSemi();
-            // Factor out octave transpositions
-            const int sign = (semitones >= 0) ? +1 : -1;
-            semitones = sign * (std::abs(semitones) % 24);
-            params->m_transposer->SetTransposition(fifths, std::to_string(semitones));
-            params->m_transposeIntervalForStaffN[this->GetN()] = params->m_transposer->GetTranspositionIntervalClass();
-            this->ResetTransposition();
-        }
-        else {
-            int transposeInterval = 0;
-            if (this->HasN() && (params->m_transposeIntervalForStaffN.count(this->GetN()) > 0)) {
-                transposeInterval = params->m_transposeIntervalForStaffN.at(this->GetN());
-            }
-            params->m_transposer->SetTransposition(transposeInterval);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -101,18 +101,6 @@ FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitPageMilestoneEnd(this);
 }
 
-int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(MDIV)) {
-        params->m_currentMdivIDs.pop_back();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------

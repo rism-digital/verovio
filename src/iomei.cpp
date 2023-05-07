@@ -141,7 +141,6 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
-#include "transposition.h"
 #include "trill.h"
 #include "tuning.h"
 #include "tuplet.h"

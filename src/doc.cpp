@@ -68,6 +68,7 @@
 #include "text.h"
 #include "timemap.h"
 #include "timestamp.h"
+#include "transposefunctor.h"
 #include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
@@ -1372,12 +1373,10 @@ void Doc::TransposeDoc()
     Transposer transposer;
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
 
-    Functor transpose(&Object::Transpose);
-    Functor transposeEnd(&Object::TransposeEnd);
-    TransposeParams transposeParams(this, &transpose, &transposeEnd, &transposer);
+    TransposeFunctor transpose(this, &transposer);
 
     if (m_options->m_transposeSelectedOnly.GetValue() == false) {
-        transpose.m_visibleOnly = false;
+        transpose.SetVisibleOnly(false);
     }
 
     if (m_options->m_transpose.IsSet()) {
@@ -1386,26 +1385,26 @@ void Doc::TransposeDoc()
             LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
                 m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
         }
-        transposeParams.m_transposition = m_options->m_transpose.GetValue();
-        this->Process(&transpose, &transposeParams, &transposeEnd);
+        transpose.SetTransposition(m_options->m_transpose.GetValue());
+        this->Process(transpose);
     }
     else if (m_options->m_transposeMdiv.IsSet()) {
         // Transpose mdivs individually
         std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
         for (const std::string &id : ids) {
-            transposeParams.m_selectedMdivID = id;
-            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ id });
-            this->Process(&transpose, &transposeParams, &transposeEnd);
+            transpose.SetSelectedMdivID(id);
+            transpose.SetTransposition(m_options->m_transposeMdiv.GetStrValue({ id }));
+            this->Process(transpose);
         }
     }
 
     if (m_options->m_transposeToSoundingPitch.GetValue()) {
         // Transpose to sounding pitch
-        transposeParams.m_selectedMdivID = "";
-        transposeParams.m_transposition = "";
-        transposeParams.m_transposer->SetTransposition(0);
-        transposeParams.m_transposeToSoundingPitch = true;
-        this->Process(&transpose, &transposeParams, &transposeEnd);
+        transpose.SetSelectedMdivID("");
+        transpose.SetTransposition("");
+        transposer.SetTransposition(0);
+        transpose.SetTransposeToSoundingPitch();
+        this->Process(transpose);
     }
 }
 

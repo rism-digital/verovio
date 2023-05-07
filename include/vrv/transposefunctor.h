@@ -35,6 +35,15 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Setter for various properties
+     */
+    ///@{
+    void SetTransposition(const std::string &transposition) { m_transposition = transposition; }
+    void SetSelectedMdivID(const std::string &selectedID) { m_selectedMdivID = selectedID; }
+    void SetTransposeToSoundingPitch() { m_transposeToSoundingPitch = true; }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{

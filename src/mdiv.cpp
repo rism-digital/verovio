@@ -96,16 +96,4 @@ FunctorCode Mdiv::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitMdivEnd(this);
 }
 
-int Mdiv::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMdivIDs.push_back(this->GetID());
-    params->m_keySigForStaffN.clear();
-    params->m_transposeIntervalForStaffN.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv

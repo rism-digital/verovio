@@ -180,25 +180,4 @@ FunctorCode Harm::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitHarmEnd(this);
 }
 
-int Harm::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    unsigned int position = 0;
-    TransPitch pitch;
-    if (this->GetRootPitch(pitch, position)) {
-        params->m_transposer->Transpose(pitch);
-        this->SetRootPitch(pitch, position);
-    }
-
-    // Transpose bass notes (the "/F#" in "G#m7/F#")
-    if (this->GetBassPitch(pitch)) {
-        params->m_transposer->Transpose(pitch);
-        this->SetBassPitch(pitch);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
 } // namespace vrv

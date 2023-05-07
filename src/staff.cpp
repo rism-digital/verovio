@@ -364,20 +364,4 @@ FunctorCode Staff::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitStaffEnd(this);
 }
 
-int Staff::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (params->m_transposeToSoundingPitch) {
-        int transposeInterval = 0;
-        if (this->HasN() && (params->m_transposeIntervalForStaffN.count(this->GetN()) > 0)) {
-            transposeInterval = params->m_transposeIntervalForStaffN.at(this->GetN());
-        }
-        params->m_transposer->SetTransposition(transposeInterval);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 } // namespace vrv
