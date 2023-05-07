@@ -636,22 +636,16 @@ public:
     Object *FindNextChild(Comparison *comp, Object *start);
 
     Object *FindPreviousChild(Comparison *comp, Object *start);
+
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The Filters class parameter makes is possible to process only objects of a
-     * type that matches the attribute value given in the Comparison object.
-     * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
-     * skipFirst does not call the functor or endFunctor on the first (calling) level
+     * skipFirst does not call the functor on the first (calling) level
      */
     ///@{
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
     void Process(MutableFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
     void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
     ///@}
@@ -935,45 +929,7 @@ private:
 public:
     //
 private:
-};
-
-//----------------------------------------------------------------------------
-// Functor
-//----------------------------------------------------------------------------
-
-class Functor {
-private:
-    int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
-    int (Object::*const_obj_fpt)(FunctorParams *functorParams) const;
-
-public:
-    // constructor - takes pointer to a functor method and stores it
-    Functor();
-    Functor(int (Object::*_obj_fpt)(FunctorParams *));
-    Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const);
-    virtual ~Functor(){};
-
-    // Call the internal functor method
-    void Call(Object *ptr, FunctorParams *functorParams);
-    void Call(const Object *ptr, FunctorParams *functorParams);
-
-private:
     //
-public:
-    /**
-     * The return code of the functor.
-     * FUNCTOR_CONTINUE: continue processing
-     * FUNCTOR_SIBLINGS: process only siblings (do not go deeper)
-     * FUNCTOR_STOP: stop the functor (e.g., when an Object or a value is found)
-     */
-    int m_returnCode;
-    /**
-     * A flag for indicating if only visible Object have to be processed.
-     * The value is true by default.
-     */
-    bool m_visibleOnly;
-
-private:
 };
 
 //----------------------------------------------------------------------------
