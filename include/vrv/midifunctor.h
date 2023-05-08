@@ -26,7 +26,7 @@ class Timemap;
 /**
  * This class prepares Note onsets.
  */
-class InitOnsetOffsetFunctor : public MutableFunctor {
+class InitOnsetOffsetFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -81,7 +81,7 @@ private:
 /**
  * This class calculates the maximum duration of each measure.
  */
-class InitMaxMeasureDurationFunctor : public MutableFunctor {
+class InitMaxMeasureDurationFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -141,7 +141,7 @@ private:
 /**
  * This class adjusts note timings based on ties.
  */
-class InitTimemapTiesFunctor : public MutableFunctor {
+class InitTimemapTiesFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

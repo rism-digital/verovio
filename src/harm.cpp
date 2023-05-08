@@ -159,7 +159,7 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 // Harm functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Harm::Accept(MutableFunctor &functor)
+FunctorCode Harm::Accept(Functor &functor)
 {
     return functor.VisitHarm(this);
 }
@@ -169,7 +169,7 @@ FunctorCode Harm::Accept(ConstFunctor &functor) const
     return functor.VisitHarm(this);
 }
 
-FunctorCode Harm::AcceptEnd(MutableFunctor &functor)
+FunctorCode Harm::AcceptEnd(Functor &functor)
 {
     return functor.VisitHarmEnd(this);
 }

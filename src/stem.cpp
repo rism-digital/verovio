@@ -118,7 +118,7 @@ int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElem
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Stem::Accept(MutableFunctor &functor)
+FunctorCode Stem::Accept(Functor &functor)
 {
     return functor.VisitStem(this);
 }
@@ -128,7 +128,7 @@ FunctorCode Stem::Accept(ConstFunctor &functor) const
     return functor.VisitStem(this);
 }
 
-FunctorCode Stem::AcceptEnd(MutableFunctor &functor)
+FunctorCode Stem::AcceptEnd(Functor &functor)
 {
     return functor.VisitStemEnd(this);
 }

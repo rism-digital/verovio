@@ -55,7 +55,7 @@ bool Fig::IsSupportedChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Fig::Accept(MutableFunctor &functor)
+FunctorCode Fig::Accept(Functor &functor)
 {
     return functor.VisitFig(this);
 }
@@ -65,7 +65,7 @@ FunctorCode Fig::Accept(ConstFunctor &functor) const
     return functor.VisitFig(this);
 }
 
-FunctorCode Fig::AcceptEnd(MutableFunctor &functor)
+FunctorCode Fig::AcceptEnd(Functor &functor)
 {
     return functor.VisitFigEnd(this);
 }

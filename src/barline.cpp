@@ -170,7 +170,7 @@ std::pair<bool, int> BarLine::GetPlace(const StaffDef *staffDef) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode BarLine::Accept(MutableFunctor &functor)
+FunctorCode BarLine::Accept(Functor &functor)
 {
     return functor.VisitBarLine(this);
 }
@@ -180,7 +180,7 @@ FunctorCode BarLine::Accept(ConstFunctor &functor) const
     return functor.VisitBarLine(this);
 }
 
-FunctorCode BarLine::AcceptEnd(MutableFunctor &functor)
+FunctorCode BarLine::AcceptEnd(Functor &functor)
 {
     return functor.VisitBarLineEnd(this);
 }

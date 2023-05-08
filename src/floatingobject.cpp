@@ -183,7 +183,7 @@ std::pair<int, bool> FloatingObject::GetVerticalContentBoundaryRel(const Doc *do
     return { boundary, false };
 }
 
-FunctorCode FloatingObject::Accept(MutableFunctor &functor)
+FunctorCode FloatingObject::Accept(Functor &functor)
 {
     return functor.VisitFloatingObject(this);
 }
@@ -193,7 +193,7 @@ FunctorCode FloatingObject::Accept(ConstFunctor &functor) const
     return functor.VisitFloatingObject(this);
 }
 
-FunctorCode FloatingObject::AcceptEnd(MutableFunctor &functor)
+FunctorCode FloatingObject::AcceptEnd(Functor &functor)
 {
     return functor.VisitFloatingObjectEnd(this);
 }

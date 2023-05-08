@@ -99,7 +99,7 @@ int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 // Turn functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Turn::Accept(MutableFunctor &functor)
+FunctorCode Turn::Accept(Functor &functor)
 {
     return functor.VisitTurn(this);
 }
@@ -109,7 +109,7 @@ FunctorCode Turn::Accept(ConstFunctor &functor) const
     return functor.VisitTurn(this);
 }
 
-FunctorCode Turn::AcceptEnd(MutableFunctor &functor)
+FunctorCode Turn::AcceptEnd(Functor &functor)
 {
     return functor.VisitTurnEnd(this);
 }

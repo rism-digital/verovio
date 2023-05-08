@@ -74,7 +74,7 @@ bool Section::IsSupportedChild(Object *child)
 // Section functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Section::Accept(MutableFunctor &functor)
+FunctorCode Section::Accept(Functor &functor)
 {
     return functor.VisitSection(this);
 }
@@ -84,7 +84,7 @@ FunctorCode Section::Accept(ConstFunctor &functor) const
     return functor.VisitSection(this);
 }
 
-FunctorCode Section::AcceptEnd(MutableFunctor &functor)
+FunctorCode Section::AcceptEnd(Functor &functor)
 {
     return functor.VisitSectionEnd(this);
 }

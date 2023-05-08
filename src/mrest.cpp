@@ -57,7 +57,7 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MRest::Accept(MutableFunctor &functor)
+FunctorCode MRest::Accept(Functor &functor)
 {
     return functor.VisitMRest(this);
 }
@@ -67,7 +67,7 @@ FunctorCode MRest::Accept(ConstFunctor &functor) const
     return functor.VisitMRest(this);
 }
 
-FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
+FunctorCode MRest::AcceptEnd(Functor &functor)
 {
     return functor.VisitMRestEnd(this);
 }

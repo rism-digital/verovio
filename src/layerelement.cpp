@@ -1082,7 +1082,7 @@ int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDot
 // LayerElement functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode LayerElement::Accept(MutableFunctor &functor)
+FunctorCode LayerElement::Accept(Functor &functor)
 {
     return functor.VisitLayerElement(this);
 }
@@ -1092,7 +1092,7 @@ FunctorCode LayerElement::Accept(ConstFunctor &functor) const
     return functor.VisitLayerElement(this);
 }
 
-FunctorCode LayerElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode LayerElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitLayerElementEnd(this);
 }

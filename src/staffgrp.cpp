@@ -260,7 +260,7 @@ void StaffGrp::SetEverythingVisible()
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode StaffGrp::Accept(MutableFunctor &functor)
+FunctorCode StaffGrp::Accept(Functor &functor)
 {
     return functor.VisitStaffGrp(this);
 }
@@ -270,7 +270,7 @@ FunctorCode StaffGrp::Accept(ConstFunctor &functor) const
     return functor.VisitStaffGrp(this);
 }
 
-FunctorCode StaffGrp::AcceptEnd(MutableFunctor &functor)
+FunctorCode StaffGrp::AcceptEnd(Functor &functor)
 {
     return functor.VisitStaffGrpEnd(this);
 }

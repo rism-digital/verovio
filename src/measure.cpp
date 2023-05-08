@@ -706,7 +706,7 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Measure::Accept(MutableFunctor &functor)
+FunctorCode Measure::Accept(Functor &functor)
 {
     return functor.VisitMeasure(this);
 }
@@ -716,7 +716,7 @@ FunctorCode Measure::Accept(ConstFunctor &functor) const
     return functor.VisitMeasure(this);
 }
 
-FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
+FunctorCode Measure::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeasureEnd(this);
 }

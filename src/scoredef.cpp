@@ -658,7 +658,7 @@ bool ScoreDef::HasSystemStartLine() const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode ScoreDefElement::Accept(MutableFunctor &functor)
+FunctorCode ScoreDefElement::Accept(Functor &functor)
 {
     return functor.VisitScoreDefElement(this);
 }
@@ -668,7 +668,7 @@ FunctorCode ScoreDefElement::Accept(ConstFunctor &functor) const
     return functor.VisitScoreDefElement(this);
 }
 
-FunctorCode ScoreDefElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode ScoreDefElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitScoreDefElementEnd(this);
 }
@@ -678,7 +678,7 @@ FunctorCode ScoreDefElement::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitScoreDefElementEnd(this);
 }
 
-FunctorCode ScoreDef::Accept(MutableFunctor &functor)
+FunctorCode ScoreDef::Accept(Functor &functor)
 {
     return functor.VisitScoreDef(this);
 }
@@ -688,7 +688,7 @@ FunctorCode ScoreDef::Accept(ConstFunctor &functor) const
     return functor.VisitScoreDef(this);
 }
 
-FunctorCode ScoreDef::AcceptEnd(MutableFunctor &functor)
+FunctorCode ScoreDef::AcceptEnd(Functor &functor)
 {
     return functor.VisitScoreDefEnd(this);
 }

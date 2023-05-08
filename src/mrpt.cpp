@@ -55,7 +55,7 @@ void MRpt::Reset()
 // MRpt functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode MRpt::Accept(MutableFunctor &functor)
+FunctorCode MRpt::Accept(Functor &functor)
 {
     return functor.VisitMRpt(this);
 }
@@ -65,7 +65,7 @@ FunctorCode MRpt::Accept(ConstFunctor &functor) const
     return functor.VisitMRpt(this);
 }
 
-FunctorCode MRpt::AcceptEnd(MutableFunctor &functor)
+FunctorCode MRpt::AcceptEnd(Functor &functor)
 {
     return functor.VisitMRptEnd(this);
 }

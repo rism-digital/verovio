@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class adjusts the XRel positions taking into account the bounding boxes.
  */
-class AdjustXRelForTranscriptionFunctor : public MutableFunctor {
+class AdjustXRelForTranscriptionFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

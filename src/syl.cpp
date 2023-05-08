@@ -150,7 +150,7 @@ void Syl::AdjustToLyricSize(const Doc *doc, int &value)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Syl::Accept(MutableFunctor &functor)
+FunctorCode Syl::Accept(Functor &functor)
 {
     return functor.VisitSyl(this);
 }
@@ -160,7 +160,7 @@ FunctorCode Syl::Accept(ConstFunctor &functor) const
     return functor.VisitSyl(this);
 }
 
-FunctorCode Syl::AcceptEnd(MutableFunctor &functor)
+FunctorCode Syl::AcceptEnd(Functor &functor)
 {
     return functor.VisitSylEnd(this);
 }

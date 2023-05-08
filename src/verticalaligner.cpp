@@ -250,7 +250,7 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(const StaffDef *
     return spacingType;
 }
 
-FunctorCode SystemAligner::Accept(MutableFunctor &functor)
+FunctorCode SystemAligner::Accept(Functor &functor)
 {
     return functor.VisitSystemAligner(this);
 }
@@ -260,7 +260,7 @@ FunctorCode SystemAligner::Accept(ConstFunctor &functor) const
     return functor.VisitSystemAligner(this);
 }
 
-FunctorCode SystemAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode SystemAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemAlignerEnd(this);
 }
@@ -713,7 +713,7 @@ void StaffAlignment::FindAllIntersectionPoints(
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode StaffAlignment::Accept(MutableFunctor &functor)
+FunctorCode StaffAlignment::Accept(Functor &functor)
 {
     return functor.VisitStaffAlignment(this);
 }
@@ -723,7 +723,7 @@ FunctorCode StaffAlignment::Accept(ConstFunctor &functor) const
     return functor.VisitStaffAlignment(this);
 }
 
-FunctorCode StaffAlignment::AcceptEnd(MutableFunctor &functor)
+FunctorCode StaffAlignment::AcceptEnd(Functor &functor)
 {
     return functor.VisitStaffAlignmentEnd(this);
 }

@@ -343,7 +343,7 @@ void LedgerLine::AddDash(int left, int right, int extension)
 // Staff functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Staff::Accept(MutableFunctor &functor)
+FunctorCode Staff::Accept(Functor &functor)
 {
     return functor.VisitStaff(this);
 }
@@ -353,7 +353,7 @@ FunctorCode Staff::Accept(ConstFunctor &functor) const
     return functor.VisitStaff(this);
 }
 
-FunctorCode Staff::AcceptEnd(MutableFunctor &functor)
+FunctorCode Staff::AcceptEnd(Functor &functor)
 {
     return functor.VisitStaffEnd(this);
 }

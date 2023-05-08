@@ -58,7 +58,7 @@ void SystemElement::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode SystemElement::Accept(MutableFunctor &functor)
+FunctorCode SystemElement::Accept(Functor &functor)
 {
     return functor.VisitSystemElement(this);
 }
@@ -68,7 +68,7 @@ FunctorCode SystemElement::Accept(ConstFunctor &functor) const
     return functor.VisitSystemElement(this);
 }
 
-FunctorCode SystemElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode SystemElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemElementEnd(this);
 }

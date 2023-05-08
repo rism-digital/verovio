@@ -81,7 +81,7 @@ void SystemMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Objec
 // SystemMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode SystemMilestoneEnd::Accept(MutableFunctor &functor)
+FunctorCode SystemMilestoneEnd::Accept(Functor &functor)
 {
     return functor.VisitSystemMilestone(this);
 }
@@ -91,7 +91,7 @@ FunctorCode SystemMilestoneEnd::Accept(ConstFunctor &functor) const
     return functor.VisitSystemMilestone(this);
 }
 
-FunctorCode SystemMilestoneEnd::AcceptEnd(MutableFunctor &functor)
+FunctorCode SystemMilestoneEnd::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemMilestoneEnd(this);
 }

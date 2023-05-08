@@ -1012,7 +1012,7 @@ bool Object::HasNonEditorialContent()
     return (!nonEditorial.empty());
 }
 
-void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
+void Object::Process(Functor &functor, int deepness, bool skipFirst)
 {
     if (functor.GetCode() == FUNCTOR_STOP) {
         return;
@@ -1126,7 +1126,7 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     }
 }
 
-FunctorCode Object::Accept(MutableFunctor &functor)
+FunctorCode Object::Accept(Functor &functor)
 {
     return functor.VisitObject(this);
 }
@@ -1136,7 +1136,7 @@ FunctorCode Object::Accept(ConstFunctor &functor) const
     return functor.VisitObject(this);
 }
 
-FunctorCode Object::AcceptEnd(MutableFunctor &functor)
+FunctorCode Object::AcceptEnd(Functor &functor)
 {
     return functor.VisitObjectEnd(this);
 }

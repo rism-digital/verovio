@@ -79,7 +79,7 @@ int GrpSym::GetDrawingY() const
 // GrpSym functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode GrpSym::Accept(MutableFunctor &functor)
+FunctorCode GrpSym::Accept(Functor &functor)
 {
     return functor.VisitGrpSym(this);
 }
@@ -89,7 +89,7 @@ FunctorCode GrpSym::Accept(ConstFunctor &functor) const
     return functor.VisitGrpSym(this);
 }
 
-FunctorCode GrpSym::AcceptEnd(MutableFunctor &functor)
+FunctorCode GrpSym::AcceptEnd(Functor &functor)
 {
     return functor.VisitGrpSymEnd(this);
 }

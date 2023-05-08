@@ -367,7 +367,7 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode KeySig::Accept(MutableFunctor &functor)
+FunctorCode KeySig::Accept(Functor &functor)
 {
     return functor.VisitKeySig(this);
 }
@@ -377,7 +377,7 @@ FunctorCode KeySig::Accept(ConstFunctor &functor) const
     return functor.VisitKeySig(this);
 }
 
-FunctorCode KeySig::AcceptEnd(MutableFunctor &functor)
+FunctorCode KeySig::AcceptEnd(Functor &functor)
 {
     return functor.VisitKeySigEnd(this);
 }

@@ -219,7 +219,7 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
 // Hairpin functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Hairpin::Accept(MutableFunctor &functor)
+FunctorCode Hairpin::Accept(Functor &functor)
 {
     return functor.VisitHairpin(this);
 }
@@ -229,7 +229,7 @@ FunctorCode Hairpin::Accept(ConstFunctor &functor) const
     return functor.VisitHairpin(this);
 }
 
-FunctorCode Hairpin::AcceptEnd(MutableFunctor &functor)
+FunctorCode Hairpin::AcceptEnd(Functor &functor)
 {
     return functor.VisitHairpinEnd(this);
 }

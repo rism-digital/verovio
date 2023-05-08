@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class saves the content of any object by calling the appropriate FileOutputStream method.
  */
-class SaveFunctor : public MutableFunctor {
+class SaveFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

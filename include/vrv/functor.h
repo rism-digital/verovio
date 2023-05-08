@@ -75,20 +75,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MutableFunctor
+// Functor
 //----------------------------------------------------------------------------
 
 /**
  * This abstract class is the base class for all mutable functors.
  */
-class MutableFunctor : public FunctorBase, public FunctorInterface {
+class Functor : public FunctorBase, public FunctorInterface {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    MutableFunctor(){};
-    virtual ~MutableFunctor() = default;
+    Functor(){};
+    virtual ~Functor() = default;
     ///@}
 
 private:
@@ -131,7 +131,7 @@ private:
 /**
  * This abstract class is the base class for all mutable functors that need access to the document.
  */
-class DocFunctor : public MutableFunctor {
+class DocFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

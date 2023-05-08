@@ -75,7 +75,7 @@ void Mdiv::MakeVisible()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Mdiv::Accept(MutableFunctor &functor)
+FunctorCode Mdiv::Accept(Functor &functor)
 {
     return functor.VisitMdiv(this);
 }
@@ -85,7 +85,7 @@ FunctorCode Mdiv::Accept(ConstFunctor &functor) const
     return functor.VisitMdiv(this);
 }
 
-FunctorCode Mdiv::AcceptEnd(MutableFunctor &functor)
+FunctorCode Mdiv::AcceptEnd(Functor &functor)
 {
     return functor.VisitMdivEnd(this);
 }

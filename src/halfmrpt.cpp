@@ -49,7 +49,7 @@ void HalfmRpt::Reset()
 // HalfmRpt functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode HalfmRpt::Accept(MutableFunctor &functor)
+FunctorCode HalfmRpt::Accept(Functor &functor)
 {
     return functor.VisitHalfmRpt(this);
 }
@@ -59,7 +59,7 @@ FunctorCode HalfmRpt::Accept(ConstFunctor &functor) const
     return functor.VisitHalfmRpt(this);
 }
 
-FunctorCode HalfmRpt::AcceptEnd(MutableFunctor &functor)
+FunctorCode HalfmRpt::AcceptEnd(Functor &functor)
 {
     return functor.VisitHalfmRptEnd(this);
 }

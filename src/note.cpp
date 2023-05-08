@@ -800,7 +800,7 @@ int Note::PnameToPclass(data_PITCHNAME pitchName)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Note::Accept(MutableFunctor &functor)
+FunctorCode Note::Accept(Functor &functor)
 {
     return functor.VisitNote(this);
 }
@@ -810,7 +810,7 @@ FunctorCode Note::Accept(ConstFunctor &functor) const
     return functor.VisitNote(this);
 }
 
-FunctorCode Note::AcceptEnd(MutableFunctor &functor)
+FunctorCode Note::AcceptEnd(Functor &functor)
 {
     return functor.VisitNoteEnd(this);
 }

@@ -86,7 +86,7 @@ int Tempo::GetDrawingXRelativeToStaff(int staffN) const
     return this->GetStart()->GetDrawingX() + m_relativeX;
 }
 
-FunctorCode Tempo::Accept(MutableFunctor &functor)
+FunctorCode Tempo::Accept(Functor &functor)
 {
     return functor.VisitTempo(this);
 }
@@ -96,7 +96,7 @@ FunctorCode Tempo::Accept(ConstFunctor &functor) const
     return functor.VisitTempo(this);
 }
 
-FunctorCode Tempo::AcceptEnd(MutableFunctor &functor)
+FunctorCode Tempo::AcceptEnd(Functor &functor)
 {
     return functor.VisitTempoEnd(this);
 }

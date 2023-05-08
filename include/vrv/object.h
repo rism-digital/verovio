@@ -32,7 +32,7 @@ class Output;
 class Filters;
 class Functor;
 class FunctorParams;
-class MutableFunctor;
+class Functor;
 class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
@@ -646,7 +646,7 @@ public:
      * skipFirst does not call the functor on the first (calling) level
      */
     ///@{
-    void Process(MutableFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
+    void Process(Functor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
     void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
     ///@}
 
@@ -654,9 +654,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    virtual FunctorCode Accept(MutableFunctor &functor);
+    virtual FunctorCode Accept(Functor &functor);
     virtual FunctorCode Accept(ConstFunctor &functor) const;
-    virtual FunctorCode AcceptEnd(MutableFunctor &functor);
+    virtual FunctorCode AcceptEnd(Functor &functor);
     virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 

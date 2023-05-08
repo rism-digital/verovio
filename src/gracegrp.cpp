@@ -79,7 +79,7 @@ bool GraceGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode GraceGrp::Accept(MutableFunctor &functor)
+FunctorCode GraceGrp::Accept(Functor &functor)
 {
     return functor.VisitGraceGrp(this);
 }
@@ -89,7 +89,7 @@ FunctorCode GraceGrp::Accept(ConstFunctor &functor) const
     return functor.VisitGraceGrp(this);
 }
 
-FunctorCode GraceGrp::AcceptEnd(MutableFunctor &functor)
+FunctorCode GraceGrp::AcceptEnd(Functor &functor)
 {
     return functor.VisitGraceGrpEnd(this);
 }

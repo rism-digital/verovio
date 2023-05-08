@@ -51,7 +51,7 @@ void InstrDef::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode InstrDef::Accept(MutableFunctor &functor)
+FunctorCode InstrDef::Accept(Functor &functor)
 {
     return functor.VisitInstrDef(this);
 }
@@ -61,7 +61,7 @@ FunctorCode InstrDef::Accept(ConstFunctor &functor) const
     return functor.VisitInstrDef(this);
 }
 
-FunctorCode InstrDef::AcceptEnd(MutableFunctor &functor)
+FunctorCode InstrDef::AcceptEnd(Functor &functor)
 {
     return functor.VisitInstrDefEnd(this);
 }

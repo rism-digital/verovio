@@ -80,7 +80,7 @@ void PageMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Object 
 // PageMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode PageMilestoneEnd::Accept(MutableFunctor &functor)
+FunctorCode PageMilestoneEnd::Accept(Functor &functor)
 {
     return functor.VisitPageMilestone(this);
 }
@@ -90,7 +90,7 @@ FunctorCode PageMilestoneEnd::Accept(ConstFunctor &functor) const
     return functor.VisitPageMilestone(this);
 }
 
-FunctorCode PageMilestoneEnd::AcceptEnd(MutableFunctor &functor)
+FunctorCode PageMilestoneEnd::AcceptEnd(Functor &functor)
 {
     return functor.VisitPageMilestoneEnd(this);
 }

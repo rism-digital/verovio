@@ -88,7 +88,7 @@ char32_t Trill::GetTrillGlyph() const
 // Trill functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Trill::Accept(MutableFunctor &functor)
+FunctorCode Trill::Accept(Functor &functor)
 {
     return functor.VisitTrill(this);
 }
@@ -98,7 +98,7 @@ FunctorCode Trill::Accept(ConstFunctor &functor) const
     return functor.VisitTrill(this);
 }
 
-FunctorCode Trill::AcceptEnd(MutableFunctor &functor)
+FunctorCode Trill::AcceptEnd(Functor &functor)
 {
     return functor.VisitTrillEnd(this);
 }

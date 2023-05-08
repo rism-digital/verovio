@@ -122,7 +122,7 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode ControlElement::Accept(MutableFunctor &functor)
+FunctorCode ControlElement::Accept(Functor &functor)
 {
     return functor.VisitControlElement(this);
 }
@@ -132,7 +132,7 @@ FunctorCode ControlElement::Accept(ConstFunctor &functor) const
     return functor.VisitControlElement(this);
 }
 
-FunctorCode ControlElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode ControlElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitControlElementEnd(this);
 }

@@ -276,7 +276,7 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Artic::Accept(MutableFunctor &functor)
+FunctorCode Artic::Accept(Functor &functor)
 {
     return functor.VisitArtic(this);
 }
@@ -286,7 +286,7 @@ FunctorCode Artic::Accept(ConstFunctor &functor) const
     return functor.VisitArtic(this);
 }
 
-FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
+FunctorCode Artic::AcceptEnd(Functor &functor)
 {
     return functor.VisitArticEnd(this);
 }

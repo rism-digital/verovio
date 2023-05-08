@@ -84,7 +84,7 @@ int BracketSpan::GetLineWidth(const Doc *doc, int unit) const
 // BracketSpan functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode BracketSpan::Accept(MutableFunctor &functor)
+FunctorCode BracketSpan::Accept(Functor &functor)
 {
     return functor.VisitBracketSpan(this);
 }
@@ -94,7 +94,7 @@ FunctorCode BracketSpan::Accept(ConstFunctor &functor) const
     return functor.VisitBracketSpan(this);
 }
 
-FunctorCode BracketSpan::AcceptEnd(MutableFunctor &functor)
+FunctorCode BracketSpan::AcceptEnd(Functor &functor)
 {
     return functor.VisitBracketSpanEnd(this);
 }

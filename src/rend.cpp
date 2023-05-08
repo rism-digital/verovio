@@ -91,7 +91,7 @@ bool Rend::IsSupportedChild(Object *child)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Rend::Accept(MutableFunctor &functor)
+FunctorCode Rend::Accept(Functor &functor)
 {
     return functor.VisitRend(this);
 }
@@ -101,7 +101,7 @@ FunctorCode Rend::Accept(ConstFunctor &functor) const
     return functor.VisitRend(this);
 }
 
-FunctorCode Rend::AcceptEnd(MutableFunctor &functor)
+FunctorCode Rend::AcceptEnd(Functor &functor)
 {
     return functor.VisitRendEnd(this);
 }

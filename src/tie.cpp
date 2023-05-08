@@ -593,7 +593,7 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
 // Tie functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Tie::Accept(MutableFunctor &functor)
+FunctorCode Tie::Accept(Functor &functor)
 {
     return functor.VisitTie(this);
 }
@@ -603,7 +603,7 @@ FunctorCode Tie::Accept(ConstFunctor &functor) const
     return functor.VisitTie(this);
 }
 
-FunctorCode Tie::AcceptEnd(MutableFunctor &functor)
+FunctorCode Tie::AcceptEnd(Functor &functor)
 {
     return functor.VisitTieEnd(this);
 }

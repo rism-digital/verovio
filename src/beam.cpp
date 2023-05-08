@@ -1736,7 +1736,7 @@ bool Beam::IsTabBeam() const
     return (this->FindDescendantByType(TABGRP));
 }
 
-FunctorCode Beam::Accept(MutableFunctor &functor)
+FunctorCode Beam::Accept(Functor &functor)
 {
     return functor.VisitBeam(this);
 }
@@ -1746,7 +1746,7 @@ FunctorCode Beam::Accept(ConstFunctor &functor) const
     return functor.VisitBeam(this);
 }
 
-FunctorCode Beam::AcceptEnd(MutableFunctor &functor)
+FunctorCode Beam::AcceptEnd(Functor &functor)
 {
     return functor.VisitBeamEnd(this);
 }

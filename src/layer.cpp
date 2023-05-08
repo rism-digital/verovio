@@ -609,7 +609,7 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Layer::Accept(MutableFunctor &functor)
+FunctorCode Layer::Accept(Functor &functor)
 {
     return functor.VisitLayer(this);
 }
@@ -619,7 +619,7 @@ FunctorCode Layer::Accept(ConstFunctor &functor) const
     return functor.VisitLayer(this);
 }
 
-FunctorCode Layer::AcceptEnd(MutableFunctor &functor)
+FunctorCode Layer::AcceptEnd(Functor &functor)
 {
     return functor.VisitLayerEnd(this);
 }

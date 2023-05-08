@@ -20,8 +20,7 @@ namespace vrv {
 // FindAllByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindAllByComparisonFunctor::FindAllByComparisonFunctor(Comparison *comparison, ListOfObjects *elements)
-    : MutableFunctor()
+FindAllByComparisonFunctor::FindAllByComparisonFunctor(Comparison *comparison, ListOfObjects *elements) : Functor()
 {
     m_comparison = comparison;
     m_elements = elements;

@@ -110,7 +110,7 @@ data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
 // Pedal functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Pedal::Accept(MutableFunctor &functor)
+FunctorCode Pedal::Accept(Functor &functor)
 {
     return functor.VisitPedal(this);
 }
@@ -120,7 +120,7 @@ FunctorCode Pedal::Accept(ConstFunctor &functor) const
     return functor.VisitPedal(this);
 }
 
-FunctorCode Pedal::AcceptEnd(MutableFunctor &functor)
+FunctorCode Pedal::AcceptEnd(Functor &functor)
 {
     return functor.VisitPedalEnd(this);
 }

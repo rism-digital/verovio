@@ -154,7 +154,7 @@ bool Score::ScoreDefNeedsOptimization(int optionCondense) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Score::Accept(MutableFunctor &functor)
+FunctorCode Score::Accept(Functor &functor)
 {
     return functor.VisitScore(this);
 }
@@ -164,7 +164,7 @@ FunctorCode Score::Accept(ConstFunctor &functor) const
     return functor.VisitScore(this);
 }
 
-FunctorCode Score::AcceptEnd(MutableFunctor &functor)
+FunctorCode Score::AcceptEnd(Functor &functor)
 {
     return functor.VisitScoreEnd(this);
 }

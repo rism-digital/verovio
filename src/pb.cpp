@@ -48,7 +48,7 @@ void Pb::Reset()
 // Pb functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Pb::Accept(MutableFunctor &functor)
+FunctorCode Pb::Accept(Functor &functor)
 {
     return functor.VisitPb(this);
 }
@@ -58,7 +58,7 @@ FunctorCode Pb::Accept(ConstFunctor &functor) const
     return functor.VisitPb(this);
 }
 
-FunctorCode Pb::AcceptEnd(MutableFunctor &functor)
+FunctorCode Pb::AcceptEnd(Functor &functor)
 {
     return functor.VisitPbEnd(this);
 }

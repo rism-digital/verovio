@@ -116,7 +116,7 @@ const Note *TabGrp::GetBottomNote() const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode TabGrp::Accept(MutableFunctor &functor)
+FunctorCode TabGrp::Accept(Functor &functor)
 {
     return functor.VisitTabGrp(this);
 }
@@ -126,7 +126,7 @@ FunctorCode TabGrp::Accept(ConstFunctor &functor) const
     return functor.VisitTabGrp(this);
 }
 
-FunctorCode TabGrp::AcceptEnd(MutableFunctor &functor)
+FunctorCode TabGrp::AcceptEnd(Functor &functor)
 {
     return functor.VisitTabGrpEnd(this);
 }

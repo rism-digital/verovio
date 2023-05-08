@@ -72,7 +72,7 @@ bool BTrem::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode BTrem::Accept(MutableFunctor &functor)
+FunctorCode BTrem::Accept(Functor &functor)
 {
     return functor.VisitBTrem(this);
 }
@@ -82,7 +82,7 @@ FunctorCode BTrem::Accept(ConstFunctor &functor) const
     return functor.VisitBTrem(this);
 }
 
-FunctorCode BTrem::AcceptEnd(MutableFunctor &functor)
+FunctorCode BTrem::AcceptEnd(Functor &functor)
 {
     return functor.VisitBTremEnd(this);
 }

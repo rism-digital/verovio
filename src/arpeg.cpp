@@ -193,7 +193,7 @@ const Staff *Arpeg::GetCrossStaff() const
 // Arpeg functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Arpeg::Accept(MutableFunctor &functor)
+FunctorCode Arpeg::Accept(Functor &functor)
 {
     return functor.VisitArpeg(this);
 }
@@ -203,7 +203,7 @@ FunctorCode Arpeg::Accept(ConstFunctor &functor) const
     return functor.VisitArpeg(this);
 }
 
-FunctorCode Arpeg::AcceptEnd(MutableFunctor &functor)
+FunctorCode Arpeg::AcceptEnd(Functor &functor)
 {
     return functor.VisitArpegEnd(this);
 }
