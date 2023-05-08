@@ -35,6 +35,7 @@ Rend::Rend()
     , AreaPosInterface()
     , AttColor()
     , AttLang()
+    , AttNNumberLike()
     , AttTextRendition()
     , AttTypography()
     , AttWhitespace()
@@ -42,6 +43,7 @@ Rend::Rend()
     this->RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_LANG);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_TEXTRENDITION);
     this->RegisterAttClass(ATT_TYPOGRAPHY);
     this->RegisterAttClass(ATT_WHITESPACE);
@@ -57,6 +59,7 @@ void Rend::Reset()
     AreaPosInterface::Reset();
     this->ResetColor();
     this->ResetLang();
+    this->ResetNNumberLike();
     this->ResetTextRendition();
     this->ResetTypography();
     this->ResetWhitespace();
