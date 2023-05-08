@@ -25534,7 +25534,7 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
     std::string noteid = getLocationId("note", token, noteIndex);
     turn->SetStartid("#" + noteid);
 
-    turn->SetForm(invertedQ ? turnLog_FORM_lower : turnLog_FORM_lower);
+    turn->SetForm(invertedQ ? turnLog_FORM_lower : turnLog_FORM_upper);
 
     if (m_signifiers.above) {
         if (turnend < (int)token->size() - 1) {
