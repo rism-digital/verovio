@@ -16,7 +16,6 @@
 
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "rend.h"
 #include "smufl.h"

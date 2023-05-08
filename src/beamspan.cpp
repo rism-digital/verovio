@@ -16,7 +16,6 @@
 #include "barline.h"
 #include "comparison.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "staff.h"

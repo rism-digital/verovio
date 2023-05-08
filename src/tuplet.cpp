@@ -22,7 +22,6 @@
 #include "elementpart.h"
 #include "ftrem.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "rest.h"
 #include "space.h"

@@ -24,7 +24,6 @@
 #include "ending.h"
 #include "f.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "multirest.h"

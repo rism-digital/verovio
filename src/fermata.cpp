@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 

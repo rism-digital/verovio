@@ -17,7 +17,6 @@
 #include "editorial.h"
 #include "ending.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "page.h"
 #include "pages.h"

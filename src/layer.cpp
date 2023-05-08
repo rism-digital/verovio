@@ -23,7 +23,6 @@
 #include "editorial.h"
 #include "findlayerelementsfunctor.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keysig.h"
 #include "measure.h"
 #include "mensur.h"

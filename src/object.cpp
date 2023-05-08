@@ -28,7 +28,6 @@
 #include "editorial.h"
 #include "featureextractor.h"
 #include "findfunctor.h"
-#include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"

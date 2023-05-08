@@ -18,7 +18,6 @@
 #include "dot.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "staff.h"
 #include "vrv.h"

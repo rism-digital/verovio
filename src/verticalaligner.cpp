@@ -19,7 +19,6 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredef.h"
 #include "slur.h"
 #include "smufl.h"

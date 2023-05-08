@@ -23,7 +23,6 @@
 #include "findlayerelementsfunctor.h"
 #include "ftrem.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "note.h"

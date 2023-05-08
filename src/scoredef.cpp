@@ -17,7 +17,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "grpsym.h"
 #include "keysig.h"
 #include "label.h"

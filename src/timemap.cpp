@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "jsonxx.h"
 #include "measure.h"
 #include "note.h"
 #include "rest.h"

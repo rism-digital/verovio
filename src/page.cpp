@@ -50,7 +50,6 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "justifyfunctor.h"
 #include "libmei.h"
 #include "miscfunctor.h"

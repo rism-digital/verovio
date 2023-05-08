@@ -13,7 +13,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 
 namespace vrv {
 

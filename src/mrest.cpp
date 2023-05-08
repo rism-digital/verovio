@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "fermata.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "pitchinterface.h"
 #include "rest.h"

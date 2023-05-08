@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredefinterface.h"
 #include "vrv.h"
 

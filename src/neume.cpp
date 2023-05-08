@@ -19,7 +19,6 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
 #include "nc.h"

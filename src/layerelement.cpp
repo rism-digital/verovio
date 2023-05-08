@@ -33,7 +33,6 @@
 #include "elementpart.h"
 #include "ftrem.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "keysig.h"
 #include "layer.h"

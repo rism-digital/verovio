@@ -25,7 +25,6 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"

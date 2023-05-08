@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"

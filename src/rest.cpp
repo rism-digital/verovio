@@ -19,7 +19,6 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "findlayerelementsfunctor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"

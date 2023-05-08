@@ -18,7 +18,6 @@
 #include "doc.h"
 #include "dynam.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "system.h"
 #include "verticalaligner.h"

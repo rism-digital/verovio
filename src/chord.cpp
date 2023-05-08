@@ -24,7 +24,6 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "horizontalaligner.h"
 #include "layer.h"

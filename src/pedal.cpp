@@ -13,10 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layerelement.h"
+#include "resources.h"
 #include "smufl.h"
 #include "system.h"
 #include "vrv.h"

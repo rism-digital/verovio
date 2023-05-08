@@ -17,7 +17,6 @@
 #include "chord.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "note.h"
 #include "smufl.h"

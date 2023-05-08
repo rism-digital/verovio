@@ -16,7 +16,6 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "vrv.h"
 
 namespace vrv {

@@ -17,7 +17,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"

@@ -19,7 +19,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"

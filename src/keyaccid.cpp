@@ -16,7 +16,6 @@
 #include "accid.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keysig.h"
 #include "note.h"
 #include "smufl.h"

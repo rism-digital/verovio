@@ -15,7 +15,6 @@
 
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "tabdursym.h"
 

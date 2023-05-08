@@ -18,7 +18,6 @@
 #include "elementpart.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"

@@ -17,7 +17,6 @@
 #include "editorial.h"
 #include "fig.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "num.h"
 #include "page.h"
 #include "rend.h"

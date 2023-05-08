@@ -15,7 +15,6 @@
 
 #include "comparison.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "staffgrp.h"
 #include "vrv.h"
 

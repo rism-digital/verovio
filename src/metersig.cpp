@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "vrv.h"

@@ -22,7 +22,6 @@
 #include "ending.h"
 #include "findfunctor.h"
 #include "findlayerelementsfunctor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "miscfunctor.h"

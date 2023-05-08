@@ -18,7 +18,6 @@
 #include "f.h"
 #include "fb.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "system.h"
 #include "text.h"

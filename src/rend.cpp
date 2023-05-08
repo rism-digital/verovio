@@ -15,7 +15,6 @@
 
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "lb.h"
 #include "num.h"
 #include "symbol.h"

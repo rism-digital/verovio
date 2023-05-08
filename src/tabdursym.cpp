@@ -13,9 +13,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "elementpart.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "note.h"
 #include "staff.h"

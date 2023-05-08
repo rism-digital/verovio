@@ -25,7 +25,6 @@
 #include "expansion.h"
 #include "featureextractor.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
 #include "iomei.h"

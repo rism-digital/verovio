@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
 #include "measure.h"

@@ -21,7 +21,6 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "gracegrp.h"
 #include "layer.h"

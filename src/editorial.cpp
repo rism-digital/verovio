@@ -17,7 +17,6 @@
 #include "controlelement.h"
 #include "fig.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"

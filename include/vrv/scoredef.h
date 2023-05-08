@@ -207,7 +207,6 @@ public:
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
-     * Apply StaffDefRedrawFlags that are defined in functorparams.h
      */
     void SetRedrawFlags(int redrawFlags);
 

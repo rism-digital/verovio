@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "symbol.h"
 #include "text.h"
 #include "verticalaligner.h"

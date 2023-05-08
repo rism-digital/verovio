@@ -15,9 +15,9 @@
 
 #include "btrem.h"
 #include "chord.h"
+#include "doc.h"
 #include "elementpart.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
