@@ -197,12 +197,13 @@ LayerElement *Layer::GetAtPos(int x)
 const LayerElement *Layer::GetAtPos(int x) const
 {
     const Object *first = this->GetFirst();
+    if (!first || !first->IsLayerElement()) return NULL;
+
     if (first->IsEditorialElement()) {
         IsEditorialElementComparison cmp;
         cmp.ReverseComparison();
         first = this->FindDescendantByComparison(&cmp);
     }
-    if (!first || !first->IsLayerElement()) return NULL;
 
     const LayerElement *element = vrv_cast<const LayerElement *>(first);
     assert(element);
