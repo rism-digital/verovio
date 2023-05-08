@@ -11503,9 +11503,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
 
+            bool notAtStart = isNotAtStartOfMeasure(layerdata, i);
+
             bool forceClefChange = false;
             if (token->isClef() || (*token == "*")) {
-                if (!(token->isMensLike() && token->getDurationFromStart() == 0)) {
+                if (!(token->isMensLike() && notAtStart)) {
                     if (token->getValueBool("auto", "clefChange")) {
                         forceClefChange = true;
                     }
@@ -11532,7 +11534,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     setMensurationSymbol(m_layer, *token, staffindex, token);
                 }
             }
-            else if (forceClefChange || (token->getDurationFromStart() != 0)) {
+            else if (forceClefChange || notAtStart) {
                 if (token->isClef()) {
                     int subtrack = token->getSubtrack();
                     if (subtrack) {
@@ -11543,7 +11545,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     hum::HumNum durFromBarline = token->getDurationFromBarline();
 
                     Clef *clef = NULL;
-                    if ((durFromStart > 0) && (durFromBarline == 0)) {
+                    if ((durFromStart > 0) && (durFromBarline == 0) && !notAtStart) {
                         // This clef will be inserted into a staffDef for the current
                         // staff, which is handled elsewhere.
                     }
@@ -12129,6 +12131,29 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isNotAtStartOfMeasure -- returns whether or not the
+//      token is at the start of the measure which means that there is
+//      some non-null data before it in the layer.
+//
+
+bool HumdrumInput::isNotAtStartOfMeasure(std::vector<hum::HTp> &layerdata, int index)
+{
+    if (layerdata.size() == 0) {
+        return false;
+    }
+    if (layerdata.size() == 1) {
+        return false;
+    }
+    for (int i = index - 1; i >= 0; i--) {
+        if (layerdata[i]->isData()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////

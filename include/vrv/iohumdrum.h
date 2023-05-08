@@ -830,6 +830,7 @@ protected:
         int staffadj, int trackdiff);
     bool hasNoStaves(hum::HumdrumFile &infile);
     hum::HTp getVisualKeySignature(hum::HTp keysigtok);
+    bool isNotAtStartOfMeasure(std::vector<hum::HTp> &layerdata, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
