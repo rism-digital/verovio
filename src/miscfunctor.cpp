@@ -23,7 +23,7 @@ namespace vrv {
 // ApplyPPUFactorFunctor
 //----------------------------------------------------------------------------
 
-ApplyPPUFactorFunctor::ApplyPPUFactorFunctor()
+ApplyPPUFactorFunctor::ApplyPPUFactorFunctor() : Functor()
 {
     m_page = NULL;
 }
@@ -79,7 +79,7 @@ FunctorCode ApplyPPUFactorFunctor::VisitSystem(System *system)
 // GetAlignmentLeftRightFunctor
 //----------------------------------------------------------------------------
 
-GetAlignmentLeftRightFunctor::GetAlignmentLeftRightFunctor()
+GetAlignmentLeftRightFunctor::GetAlignmentLeftRightFunctor() : ConstFunctor()
 {
     m_minLeft = -VRV_UNSET;
     m_maxRight = VRV_UNSET;
@@ -103,7 +103,7 @@ FunctorCode GetAlignmentLeftRightFunctor::VisitObject(const Object *object)
 // InitProcessingListsFunctor
 //----------------------------------------------------------------------------
 
-InitProcessingListsFunctor::InitProcessingListsFunctor() {}
+InitProcessingListsFunctor::InitProcessingListsFunctor() : ConstFunctor() {}
 
 FunctorCode InitProcessingListsFunctor::VisitLayer(const Layer *layer)
 {
@@ -129,7 +129,7 @@ FunctorCode InitProcessingListsFunctor::VisitVerse(const Verse *verse)
 // ReorderByXPosFunctor
 //----------------------------------------------------------------------------
 
-ReorderByXPosFunctor::ReorderByXPosFunctor() {}
+ReorderByXPosFunctor::ReorderByXPosFunctor() : Functor() {}
 
 FunctorCode ReorderByXPosFunctor::VisitObject(Object *object)
 {

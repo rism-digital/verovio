@@ -40,7 +40,7 @@ namespace vrv {
 // InitOnsetOffsetFunctor
 //----------------------------------------------------------------------------
 
-InitOnsetOffsetFunctor::InitOnsetOffsetFunctor()
+InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
 {
     m_currentScoreTime = 0.0;
     m_currentRealTimeSeconds = 0.0;
@@ -197,7 +197,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitTabGrpEnd(TabGrp *tabGrp)
 // InitMaxMeasureDurationFunctor
 //----------------------------------------------------------------------------
 
-InitMaxMeasureDurationFunctor::InitMaxMeasureDurationFunctor()
+InitMaxMeasureDurationFunctor::InitMaxMeasureDurationFunctor() : Functor()
 {
     m_currentScoreTime = 0.0;
     m_currentRealTimeSeconds = 0.0;
@@ -268,7 +268,7 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitTempo(Tempo *tempo)
 // InitTimemapTiesFunctor
 //----------------------------------------------------------------------------
 
-InitTimemapTiesFunctor::InitTimemapTiesFunctor() {}
+InitTimemapTiesFunctor::InitTimemapTiesFunctor() : Functor() {}
 
 FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 {
@@ -297,7 +297,7 @@ FunctorCode InitTimemapTiesFunctor::VisitTie(Tie *tie)
 // InitMidiFunctor
 //----------------------------------------------------------------------------
 
-InitMIDIFunctor::InitMIDIFunctor()
+InitMIDIFunctor::InitMIDIFunctor() : ConstFunctor()
 {
     m_currentTempo = MIDI_TEMPO;
 }
@@ -337,7 +337,7 @@ FunctorCode InitMIDIFunctor::VisitMeasure(const Measure *measure)
 // GenerateMIDIFunctor
 //----------------------------------------------------------------------------
 
-GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile)
+GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor()
 {
     m_midiFile = midiFile;
     m_midiTrack = 1;
@@ -867,7 +867,7 @@ void GenerateMIDIFunctor::GenerateGraceNoteMIDI(
 // GenerateTimemapFunctor
 //----------------------------------------------------------------------------
 
-GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap)
+GenerateTimemapFunctor::GenerateTimemapFunctor(Timemap *timemap) : ConstFunctor()
 {
     m_scoreTimeOffset = 0.0;
     m_realTimeOffsetMilliseconds = 0.0;
@@ -991,7 +991,7 @@ void GenerateTimemapFunctor::AddTimemapEntry(const Object *object)
 // GenerateFeaturesFunctor
 //----------------------------------------------------------------------------
 
-GenerateFeaturesFunctor::GenerateFeaturesFunctor(FeatureExtractor *extractor)
+GenerateFeaturesFunctor::GenerateFeaturesFunctor(FeatureExtractor *extractor) : ConstFunctor()
 {
     m_extractor = extractor;
 }

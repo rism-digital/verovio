@@ -17,7 +17,7 @@ namespace vrv {
 // AdjustXRelForTranscriptionFunctor
 //----------------------------------------------------------------------------
 
-AdjustXRelForTranscriptionFunctor::AdjustXRelForTranscriptionFunctor() {}
+AdjustXRelForTranscriptionFunctor::AdjustXRelForTranscriptionFunctor() : Functor() {}
 
 FunctorCode AdjustXRelForTranscriptionFunctor::VisitLayerElement(LayerElement *layerElement)
 {

@@ -112,7 +112,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 // PrepareCueSizeFunctor
 //----------------------------------------------------------------------------
 
-PrepareCueSizeFunctor::PrepareCueSizeFunctor() {}
+PrepareCueSizeFunctor::PrepareCueSizeFunctor() : Functor() {}
 
 FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
 {
@@ -176,7 +176,7 @@ FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
 // PrepareCrossStaffFunctor
 //----------------------------------------------------------------------------
 
-PrepareCrossStaffFunctor::PrepareCrossStaffFunctor()
+PrepareCrossStaffFunctor::PrepareCrossStaffFunctor() : Functor()
 {
     m_currentMeasure = NULL;
     m_currentCrossStaff = NULL;
@@ -314,7 +314,7 @@ FunctorCode PrepareCrossStaffFunctor::VisitMeasure(Measure *measure)
 // PrepareAltSymFunctor
 //----------------------------------------------------------------------------
 
-PrepareAltSymFunctor::PrepareAltSymFunctor()
+PrepareAltSymFunctor::PrepareAltSymFunctor() : Functor()
 {
     m_symbolTable = NULL;
 }
@@ -340,7 +340,7 @@ FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 // PrepareFacsimileFunctor
 //----------------------------------------------------------------------------
 
-PrepareFacsimileFunctor::PrepareFacsimileFunctor(Facsimile *facsimile)
+PrepareFacsimileFunctor::PrepareFacsimileFunctor(Facsimile *facsimile) : Functor()
 {
     m_facsimile = facsimile;
 }
@@ -371,7 +371,7 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
 // PrepareLinkingFunctor
 //----------------------------------------------------------------------------
 
-PrepareLinkingFunctor::PrepareLinkingFunctor()
+PrepareLinkingFunctor::PrepareLinkingFunctor() : Functor()
 {
     m_fillMode = true;
 }
@@ -470,7 +470,7 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 // PreparePlistFunctor
 //----------------------------------------------------------------------------
 
-PreparePlistFunctor::PreparePlistFunctor()
+PreparePlistFunctor::PreparePlistFunctor() : Functor()
 {
     m_fillMode = true;
 }
@@ -507,7 +507,7 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 // PrepareDurationFunctor
 //----------------------------------------------------------------------------
 
-PrepareDurationFunctor::PrepareDurationFunctor()
+PrepareDurationFunctor::PrepareDurationFunctor() : Functor()
 {
     m_durDefault = DURATION_NONE;
 }
@@ -560,7 +560,7 @@ FunctorCode PrepareDurationFunctor::VisitStaffDef(StaffDef *staffDef)
 // PrepareTimePointingFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimePointingFunctor::PrepareTimePointingFunctor() {}
+PrepareTimePointingFunctor::PrepareTimePointingFunctor() : Functor() {}
 
 void PrepareTimePointingFunctor::InsertInterfaceIDTuple(ClassId classID, TimePointInterface *interface)
 {
@@ -630,7 +630,7 @@ FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor()
+PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor()
 {
     m_fillMode = true;
 }
@@ -708,7 +708,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimestampsFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimestampsFunctor::PrepareTimestampsFunctor() {}
+PrepareTimestampsFunctor::PrepareTimestampsFunctor() : Functor() {}
 
 void PrepareTimestampsFunctor::InsertInterfaceIDPair(ClassId classID, TimeSpanningInterface *interface)
 {
@@ -855,7 +855,7 @@ FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
 // PreparePointersByLayerFunctor
 //----------------------------------------------------------------------------
 
-PreparePointersByLayerFunctor::PreparePointersByLayerFunctor()
+PreparePointersByLayerFunctor::PreparePointersByLayerFunctor() : Functor()
 {
     m_currentElement = NULL;
     m_lastDot = NULL;
@@ -893,7 +893,7 @@ FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layer
 // PrepareLyricsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLyricsFunctor::PrepareLyricsFunctor()
+PrepareLyricsFunctor::PrepareLyricsFunctor() : Functor()
 {
     m_currentSyl = NULL;
     m_lastNoteOrChord = NULL;
@@ -990,7 +990,7 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 // PrepareLayerElementPartsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() {}
+PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() : Functor() {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
@@ -1334,7 +1334,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 // PrepareDelayedTurnsFunctor
 //----------------------------------------------------------------------------
 
-PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor()
+PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor() : Functor()
 {
     m_fillMode = true;
     this->ResetCurrent();
@@ -1400,7 +1400,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitTurn(Turn *turn)
 // PrepareMilestonesFunctor
 //----------------------------------------------------------------------------
 
-PrepareMilestonesFunctor::PrepareMilestonesFunctor()
+PrepareMilestonesFunctor::PrepareMilestonesFunctor() : Functor()
 {
     m_lastMeasure = NULL;
     m_currentEnding = NULL;
@@ -1695,7 +1695,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitSystemMilestone(SystemMilestoneEnd 
 // PrepareStaffCurrentTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareStaffCurrentTimeSpanningFunctor::PrepareStaffCurrentTimeSpanningFunctor() {}
+PrepareStaffCurrentTimeSpanningFunctor::PrepareStaffCurrentTimeSpanningFunctor() : Functor() {}
 
 void PrepareStaffCurrentTimeSpanningFunctor::InsertTimeSpanningElement(Object *element)
 {
@@ -1794,7 +1794,7 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitSyl(Syl *syl)
 // PrepareRehPositionFunctor
 //----------------------------------------------------------------------------
 
-PrepareRehPositionFunctor::PrepareRehPositionFunctor() {}
+PrepareRehPositionFunctor::PrepareRehPositionFunctor() : Functor() {}
 
 FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
 {
@@ -1810,7 +1810,7 @@ FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
 // PrepareBeamSpanElementsFunctor
 //----------------------------------------------------------------------------
 
-PrepareBeamSpanElementsFunctor::PrepareBeamSpanElementsFunctor() {}
+PrepareBeamSpanElementsFunctor::PrepareBeamSpanElementsFunctor() : Functor() {}
 
 FunctorCode PrepareBeamSpanElementsFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 {
