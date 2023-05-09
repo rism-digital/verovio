@@ -8,6 +8,8 @@
 #ifndef __VRV_FUNCTOR_H__
 #define __VRV_FUNCTOR_H__
 
+#include <stack>
+
 #include "comparison.h"
 #include "functorinterface.h"
 #include "vrvdef.h"
@@ -43,13 +45,26 @@ public:
     ///@}
 
     /**
-     * Getters/Setters for the properties
+     * Getters/Setters for the filters
      */
     ///@{
-    Filters *GetFilters() { return m_filters; }
-    void SetFilters(Filters *filters) { m_filters = filters; }
+    Filters *GetFilters() { return m_filters.empty() ? NULL : m_filters.top(); }
+    void PushFilters(Filters *filters) { m_filters.push(filters); }
+    void PopFilters() { m_filters.pop(); }
+    ///@}
+
+    /**
+     * Getters/Setters for the visibility
+     */
+    ///@{
     bool VisibleOnly() const { return m_visibleOnly; }
     void SetVisibleOnly(bool visibleOnly) { m_visibleOnly = visibleOnly; }
+    ///@}
+
+    /**
+     * Getters/Setters for the direction
+     */
+    ///@{
     bool GetDirection() const { return m_direction; }
     void SetDirection(bool direction) { m_direction = direction; }
     ///@}
@@ -66,8 +81,8 @@ public:
 private:
     // The functor code
     FunctorCode m_code = FUNCTOR_CONTINUE;
-    // The filters
-    Filters *m_filters = NULL;
+    // The filter stack
+    std::stack<Filters *> m_filters;
     // Visible only flag
     bool m_visibleOnly = true;
     // Direction

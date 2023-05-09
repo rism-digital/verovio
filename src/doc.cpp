@@ -491,7 +491,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.Add(&matchLayer);
 
             GenerateMIDIFunctor generateMIDI(midiFile);
-            generateMIDI.SetFilters(&filters);
+            generateMIDI.PushFilters(&filters);
 
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
@@ -721,7 +721,7 @@ void Doc::PrepareData()
             filters.Add(&matchLayer);
 
             PreparePointersByLayerFunctor preparePointersByLayer;
-            preparePointersByLayer.SetFilters(&filters);
+            preparePointersByLayer.PushFilters(&filters);
             this->Process(preparePointersByLayer);
         }
     }
@@ -733,6 +733,7 @@ void Doc::PrepareData()
     prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
+        prepareDelayedTurns.PushFilters(&filters);
         for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.Clear();
@@ -742,7 +743,6 @@ void Doc::PrepareData()
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
-                prepareDelayedTurns.SetFilters(&filters);
                 prepareDelayedTurns.ResetCurrent();
                 this->Process(prepareDelayedTurns);
             }
@@ -768,7 +768,7 @@ void Doc::PrepareData()
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
                 PrepareLyricsFunctor prepareLyrics;
-                prepareLyrics.SetFilters(&filters);
+                prepareLyrics.PushFilters(&filters);
                 this->Process(prepareLyrics);
             }
         }
@@ -802,7 +802,7 @@ void Doc::PrepareData()
 
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
             PrepareRptFunctor prepareRpt(this);
-            prepareRpt.SetFilters(&filters);
+            prepareRpt.PushFilters(&filters);
             this->Process(prepareRpt);
         }
     }
@@ -1348,7 +1348,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
                 filters.Add(&matchLayer);
 
                 ConvertMarkupAnalyticalFunctor convertMarkupAnalytical(permanent);
-                convertMarkupAnalytical.SetFilters(&filters);
+                convertMarkupAnalytical.PushFilters(&filters);
                 this->Process(convertMarkupAnalytical);
 
                 // After having processed one layer, we check if we have open ties - if yes, we
