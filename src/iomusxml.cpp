@@ -109,7 +109,13 @@ enum class MetronomeElements { BEAT_UNIT, BEAT_UNIT_DOT, PER_MINUTE, SEPARATOR }
 
 MusicXmlInput::MusicXmlInput(Doc *doc) : Input(doc) {}
 
-MusicXmlInput::~MusicXmlInput() {}
+MusicXmlInput::~MusicXmlInput()
+{
+    // Clean the collected garbage
+    for (Object *object : m_garbage) {
+        delete object;
+    }
+}
 
 #ifndef NO_MUSICXML_SUPPORT
 
@@ -340,7 +346,7 @@ void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *lay
     }
 }
 
-bool MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
+void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
 {
     assert(section);
     assert(i >= 0);
@@ -381,9 +387,13 @@ bool MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
             measure->ClearRelinquishedChildren();
         }
         else {
+            // The measure was not transferred and not added to the tree. Its entire content will be deleted at the end.
             LogError("MusicXML import: Mismatching measure number %s", measure->GetN().c_str());
         }
         contentMeasure = existingMeasure;
+
+        m_measureCounts.erase(measure);
+        m_garbage.push_back(measure);
     }
 
     // Handle endings
@@ -404,8 +414,6 @@ bool MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     }
     m_currentEndingStart.reset();
     m_currentEndingStop.reset();
-
-    return (contentMeasure == measure);
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
@@ -1562,11 +1570,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, shor
             m_measureCounts[measure] = i;
             ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset, i);
             // Add the measure to the system - if already there from a previous part we'll just merge the content
-            if (!AddMeasure(section, measure, i)) {
-                // If content was transferred to existing measure, clean up
-                m_measureCounts.erase(measure);
-                delete measure;
-            }
+            AddMeasure(section, measure, i);
         }
         else {
             // Handle barline parsing for the multirests (where barline would be defined in last measure of the mRest)
