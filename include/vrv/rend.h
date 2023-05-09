@@ -59,6 +59,11 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Check if rend has an enclosing.
+     */
+    bool HasEnclosure() const;
+
     //----------//
     // Functors //
     //----------//
@@ -75,9 +80,6 @@ public:
 
 private:
     //
-public:
-    //
-private:
 };
 
 } // namespace vrv

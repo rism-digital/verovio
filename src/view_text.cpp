@@ -447,11 +447,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
-    const bool isEnclosed = (rend->HasRend())
-        ? (((rend->GetRend() - TEXTRENDITION_box) | (TEXTRENDITION_tbox - rend->GetRend())) >= 0)
-        : false;
     // Do not render enclosings if the content is empty
-    if (rend->HasContentBB() && isEnclosed) {
+    if (rend->HasEnclosure()) {
         params.m_enclosedRend.push_back(rend);
         params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
         params.m_explicitPosition = true;

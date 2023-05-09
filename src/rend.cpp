@@ -91,6 +91,15 @@ bool Rend::IsSupportedChild(Object *child)
     return true;
 }
 
+bool Rend::HasEnclosure() const
+{
+    if (!this->HasRend()) return false;
+
+    const bool hasEnclosure = ((this->GetRend() == TEXTRENDITION_box) || (this->GetRend() == TEXTRENDITION_circle)
+        || (this->GetRend() == TEXTRENDITION_dbox) || (this->GetRend() == TEXTRENDITION_tbox));
+    return hasEnclosure;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
