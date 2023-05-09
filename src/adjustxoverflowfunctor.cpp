@@ -22,7 +22,7 @@ namespace vrv {
 // AdjustXOverflowFunctor
 //----------------------------------------------------------------------------
 
-AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin)
+AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin) : Functor()
 {
     m_currentSystem = NULL;
     m_lastMeasure = NULL;

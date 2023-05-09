@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -137,7 +137,7 @@ data_VERTICALALIGNMENT Fermata::GetVerticalAlignment(char32_t code)
 // Fermata functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Fermata::Accept(MutableFunctor &functor)
+FunctorCode Fermata::Accept(Functor &functor)
 {
     return functor.VisitFermata(this);
 }
@@ -147,7 +147,7 @@ FunctorCode Fermata::Accept(ConstFunctor &functor) const
     return functor.VisitFermata(this);
 }
 
-FunctorCode Fermata::AcceptEnd(MutableFunctor &functor)
+FunctorCode Fermata::AcceptEnd(Functor &functor)
 {
     return functor.VisitFermataEnd(this);
 }

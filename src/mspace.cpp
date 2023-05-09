@@ -13,7 +13,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 
 namespace vrv {
 
@@ -39,7 +38,7 @@ void MSpace::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MSpace::Accept(MutableFunctor &functor)
+FunctorCode MSpace::Accept(Functor &functor)
 {
     return functor.VisitMSpace(this);
 }
@@ -49,7 +48,7 @@ FunctorCode MSpace::Accept(ConstFunctor &functor) const
     return functor.VisitMSpace(this);
 }
 
-FunctorCode MSpace::AcceptEnd(MutableFunctor &functor)
+FunctorCode MSpace::AcceptEnd(Functor &functor)
 {
     return functor.VisitMSpaceEnd(this);
 }

@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredefinterface.h"
 #include "vrv.h"
 
@@ -69,7 +68,7 @@ void Mensur::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Mensur::Accept(MutableFunctor &functor)
+FunctorCode Mensur::Accept(Functor &functor)
 {
     return functor.VisitMensur(this);
 }
@@ -79,7 +78,7 @@ FunctorCode Mensur::Accept(ConstFunctor &functor) const
     return functor.VisitMensur(this);
 }
 
-FunctorCode Mensur::AcceptEnd(MutableFunctor &functor)
+FunctorCode Mensur::AcceptEnd(Functor &functor)
 {
     return functor.VisitMensurEnd(this);
 }

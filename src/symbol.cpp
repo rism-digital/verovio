@@ -70,7 +70,7 @@ char32_t Symbol::GetSymbolGlyph() const
     return 0;
 }
 
-FunctorCode Symbol::Accept(MutableFunctor &functor)
+FunctorCode Symbol::Accept(Functor &functor)
 {
     return functor.VisitSymbol(this);
 }
@@ -80,7 +80,7 @@ FunctorCode Symbol::Accept(ConstFunctor &functor) const
     return functor.VisitSymbol(this);
 }
 
-FunctorCode Symbol::AcceptEnd(MutableFunctor &functor)
+FunctorCode Symbol::AcceptEnd(Functor &functor)
 {
     return functor.VisitSymbolEnd(this);
 }

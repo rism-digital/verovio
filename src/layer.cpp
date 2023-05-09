@@ -23,7 +23,6 @@
 #include "editorial.h"
 #include "findlayerelementsfunctor.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keysig.h"
 #include "measure.h"
 #include "mensur.h"
@@ -610,7 +609,7 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Layer::Accept(MutableFunctor &functor)
+FunctorCode Layer::Accept(Functor &functor)
 {
     return functor.VisitLayer(this);
 }
@@ -620,7 +619,7 @@ FunctorCode Layer::Accept(ConstFunctor &functor) const
     return functor.VisitLayer(this);
 }
 
-FunctorCode Layer::AcceptEnd(MutableFunctor &functor)
+FunctorCode Layer::AcceptEnd(Functor &functor)
 {
     return functor.VisitLayerEnd(this);
 }
@@ -628,48 +627,6 @@ FunctorCode Layer::AcceptEnd(MutableFunctor &functor)
 FunctorCode Layer::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLayerEnd(this);
-}
-
-int Layer::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreTime = 0.0;
-    params->m_currentRealTimeSeconds = 0.0;
-
-    params->m_currentMensur = this->GetCurrentMensur();
-    params->m_currentMeterSig = this->GetCurrentMeterSig();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) return FUNCTOR_SIBLINGS;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::GenerateMIDIEnd(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // stop all previously held notes
-    for (auto &held : params->m_heldNotes) {
-        if (held.m_pitch > 0) {
-            params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * params->m_midiFile->getTPQ(),
-                params->m_midiChannel, held.m_pitch);
-        }
-    }
-
-    params->m_heldNotes.clear();
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

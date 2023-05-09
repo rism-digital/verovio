@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "rend.h"
 #include "system.h"
@@ -123,7 +122,7 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode ControlElement::Accept(MutableFunctor &functor)
+FunctorCode ControlElement::Accept(Functor &functor)
 {
     return functor.VisitControlElement(this);
 }
@@ -133,7 +132,7 @@ FunctorCode ControlElement::Accept(ConstFunctor &functor) const
     return functor.VisitControlElement(this);
 }
 
-FunctorCode ControlElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode ControlElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitControlElementEnd(this);
 }

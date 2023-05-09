@@ -54,7 +54,7 @@ bool Course::IsSupportedChild(Object *child)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Course::Accept(MutableFunctor &functor)
+FunctorCode Course::Accept(Functor &functor)
 {
     return functor.VisitCourse(this);
 }
@@ -64,7 +64,7 @@ FunctorCode Course::Accept(ConstFunctor &functor) const
     return functor.VisitCourse(this);
 }
 
-FunctorCode Course::AcceptEnd(MutableFunctor &functor)
+FunctorCode Course::AcceptEnd(Functor &functor)
 {
     return functor.VisitCourseEnd(this);
 }

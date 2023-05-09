@@ -25,7 +25,6 @@
 #include "expansion.h"
 #include "featureextractor.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "instrdef.h"
 #include "iomei.h"
@@ -36,6 +35,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "midifunctor.h"
 #include "miscfunctor.h"
 #include "mnum.h"
 #include "mrest.h"
@@ -67,6 +67,7 @@
 #include "text.h"
 #include "timemap.h"
 #include "timestamp.h"
+#include "transposefunctor.h"
 #include "transposition.h"
 #include "verse.h"
 #include "vrv.h"
@@ -350,22 +351,19 @@ void Doc::CalculateTimemap()
     }
 
     // We first calculate the maximum duration of each measure
-    InitMaxMeasureDurationParams initMaxMeasureDurationParams;
-    initMaxMeasureDurationParams.m_currentTempo = tempo;
-    initMaxMeasureDurationParams.m_tempoAdjustment = m_options->m_midiTempoAdjustment.GetValue();
-    Functor initMaxMeasureDuration(&Object::InitMaxMeasureDuration);
-    Functor initMaxMeasureDurationEnd(&Object::InitMaxMeasureDurationEnd);
-    this->Process(&initMaxMeasureDuration, &initMaxMeasureDurationParams, &initMaxMeasureDurationEnd);
+    InitMaxMeasureDurationFunctor initMaxMeasureDuration;
+    initMaxMeasureDuration.SetCurrentTempo(tempo);
+    initMaxMeasureDuration.SetTempoAdjustment(m_options->m_midiTempoAdjustment.GetValue());
+    this->Process(initMaxMeasureDuration);
 
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
-    InitOnsetOffsetParams initOnsetOffsetParams;
-    Functor initOnsetOffset(&Object::InitOnsetOffset);
-    Functor initOnsetOffsetEnd(&Object::InitOnsetOffsetEnd);
-    this->Process(&initOnsetOffset, &initOnsetOffsetParams, &initOnsetOffsetEnd);
+    InitOnsetOffsetFunctor initOnsetOffset;
+    this->Process(initOnsetOffset);
 
     // Adjust the duration of tied notes
-    Functor initTimemapTies(&Object::InitTimemapTies);
-    this->Process(&initTimemapTies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    InitTimemapTiesFunctor initTimemapTies;
+    initTimemapTies.SetDirection(BACKWARD);
+    this->Process(initTimemapTies);
 
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
 }
@@ -393,10 +391,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     midiFile->addTempo(0, 0, tempo);
 
     // Capture information for MIDI generation, i.e. from control elements
-    Functor initMIDI(&Object::InitMIDI);
-    InitMIDIParams initMIDIParams;
-    initMIDIParams.m_currentTempo = tempo;
-    this->Process(&initMIDI, &initMIDIParams);
+    InitMIDIFunctor initMIDI;
+    initMIDI.SetCurrentTempo(tempo);
+    this->Process(initMIDI);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     InitProcessingListsFunctor initProcessingLists;
@@ -480,12 +477,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
         }
 
         // Set initial scoreDef values for tuning
-        Functor generateScoreDefMIDI(&Object::GenerateMIDI);
-        Functor generateScoreDefMIDIEnd(&Object::GenerateMIDIEnd);
-        GenerateMIDIParams generateScoreDefMIDIParams(midiFile, &generateScoreDefMIDI);
-        generateScoreDefMIDIParams.m_midiChannel = midiChannel;
-        generateScoreDefMIDIParams.m_midiTrack = midiTrack;
-        currentScoreDef->Process(&generateScoreDefMIDI, &generateScoreDefMIDIParams, &generateScoreDefMIDIEnd);
+        GenerateMIDIFunctor generateScoreDefMIDI(midiFile);
+        generateScoreDefMIDI.SetChannel(midiChannel);
+        generateScoreDefMIDI.SetTrack(midiTrack);
+        currentScoreDef->Process(generateScoreDefMIDI);
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.Clear();
@@ -495,19 +490,19 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.Add(&matchStaff);
             filters.Add(&matchLayer);
 
-            Functor generateMIDI(&Object::GenerateMIDI);
-            Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
-            GenerateMIDIParams generateMIDIParams(midiFile, &generateMIDI);
-            generateMIDIParams.m_midiChannel = midiChannel;
-            generateMIDIParams.m_midiTrack = midiTrack;
-            generateMIDIParams.m_staffN = staves->first;
-            generateMIDIParams.m_transSemi = transSemi;
-            generateMIDIParams.m_currentTempo = tempo;
-            generateMIDIParams.m_deferredNotes = initMIDIParams.m_deferredNotes;
-            generateMIDIParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
+            GenerateMIDIFunctor generateMIDI(midiFile);
+            generateMIDI.SetFilters(&filters);
+
+            generateMIDI.SetChannel(midiChannel);
+            generateMIDI.SetTrack(midiTrack);
+            generateMIDI.SetStaffN(staves->first);
+            generateMIDI.SetTransSemi(transSemi);
+            generateMIDI.SetCurrentTempo(tempo);
+            generateMIDI.SetDeferredNotes(initMIDI.GetDeferredNotes());
+            generateMIDI.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
-            this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
+            this->Process(generateMIDI);
         }
     }
 }
@@ -524,10 +519,9 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
         return false;
     }
     Timemap timemap;
-    Functor generateTimemap(&Object::GenerateTimemap);
-    GenerateTimemapParams generateTimemapParams(&timemap, &generateTimemap);
-    generateTimemapParams.m_cueExclusion = this->GetOptions()->m_midiNoCue.GetValue();
-    this->Process(&generateTimemap, &generateTimemapParams);
+    GenerateTimemapFunctor generateTimemap(&timemap);
+    generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
+    this->Process(generateTimemap);
 
     timemap.ToJson(output, includeRests, includeMeasures);
 
@@ -556,9 +550,8 @@ bool Doc::ExportFeatures(std::string &output, const std::string &options)
         return false;
     }
     FeatureExtractor extractor(options);
-    Functor generateFeatures(&Object::GenerateFeatures);
-    GenerateFeaturesParams generateFeaturesParams(this, &extractor);
-    this->Process(&generateFeatures, &generateFeaturesParams);
+    GenerateFeaturesFunctor generateFeatures(&extractor);
+    this->Process(generateFeatures);
     extractor.ToJson(output);
 
     return true;
@@ -1379,12 +1372,10 @@ void Doc::TransposeDoc()
     Transposer transposer;
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
 
-    Functor transpose(&Object::Transpose);
-    Functor transposeEnd(&Object::TransposeEnd);
-    TransposeParams transposeParams(this, &transpose, &transposeEnd, &transposer);
+    TransposeFunctor transpose(this, &transposer);
 
     if (m_options->m_transposeSelectedOnly.GetValue() == false) {
-        transpose.m_visibleOnly = false;
+        transpose.SetVisibleOnly(false);
     }
 
     if (m_options->m_transpose.IsSet()) {
@@ -1393,26 +1384,26 @@ void Doc::TransposeDoc()
             LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
                 m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
         }
-        transposeParams.m_transposition = m_options->m_transpose.GetValue();
-        this->Process(&transpose, &transposeParams, &transposeEnd);
+        transpose.SetTransposition(m_options->m_transpose.GetValue());
+        this->Process(transpose);
     }
     else if (m_options->m_transposeMdiv.IsSet()) {
         // Transpose mdivs individually
         std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
         for (const std::string &id : ids) {
-            transposeParams.m_selectedMdivID = id;
-            transposeParams.m_transposition = m_options->m_transposeMdiv.GetStrValue({ id });
-            this->Process(&transpose, &transposeParams, &transposeEnd);
+            transpose.SetSelectedMdivID(id);
+            transpose.SetTransposition(m_options->m_transposeMdiv.GetStrValue({ id }));
+            this->Process(transpose);
         }
     }
 
     if (m_options->m_transposeToSoundingPitch.GetValue()) {
         // Transpose to sounding pitch
-        transposeParams.m_selectedMdivID = "";
-        transposeParams.m_transposition = "";
-        transposeParams.m_transposer->SetTransposition(0);
-        transposeParams.m_transposeToSoundingPitch = true;
-        this->Process(&transpose, &transposeParams, &transposeEnd);
+        transpose.SetSelectedMdivID("");
+        transpose.SetTransposition("");
+        transposer.SetTransposition(0);
+        transpose.SetTransposeToSoundingPitch();
+        this->Process(transpose);
     }
 }
 
@@ -2064,7 +2055,7 @@ void Doc::SetCurrentScore(Score *score)
 // Doc functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Doc::Accept(MutableFunctor &functor)
+FunctorCode Doc::Accept(Functor &functor)
 {
     return functor.VisitDoc(this);
 }
@@ -2074,7 +2065,7 @@ FunctorCode Doc::Accept(ConstFunctor &functor) const
     return functor.VisitDoc(this);
 }
 
-FunctorCode Doc::AcceptEnd(MutableFunctor &functor)
+FunctorCode Doc::AcceptEnd(Functor &functor)
 {
     return functor.VisitDocEnd(this);
 }

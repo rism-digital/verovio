@@ -22,7 +22,6 @@
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
 #include "findfunctor.h"
-#include "functorparams.h"
 #include "ioabc.h"
 #include "iodarms.h"
 #include "iohumdrum.h"

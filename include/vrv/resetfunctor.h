@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class resets the drawing values before calling PrepareData after changes.
  */
-class ResetDataFunctor : public MutableFunctor {
+class ResetDataFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -90,7 +90,7 @@ private:
 /**
  * This class resets the horizontal alignment for various types.
  */
-class ResetHorizontalAlignmentFunctor : public MutableFunctor {
+class ResetHorizontalAlignmentFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -147,7 +147,7 @@ private:
 /**
  * This class resets the vertical alignment for various types.
  */
-class ResetVerticalAlignmentFunctor : public MutableFunctor {
+class ResetVerticalAlignmentFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

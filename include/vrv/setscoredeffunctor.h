@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class sets the current drawing clef, key signature, etc. to the StaffDef
  */
-class ReplaceDrawingValuesInStaffDefFunctor : public MutableFunctor {
+class ReplaceDrawingValuesInStaffDefFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -219,7 +219,7 @@ private:
 /**
  * This class sets the cautionary scoreDef wherever needed.
  */
-class SetCautionaryScoreDefFunctor : public MutableFunctor {
+class SetCautionaryScoreDefFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -261,7 +261,7 @@ private:
 /**
  * This class prepares the group symbol starting and ending staffDefs for drawing.
  */
-class ScoreDefSetGrpSymFunctor : public MutableFunctor {
+class ScoreDefSetGrpSymFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -301,7 +301,7 @@ private:
 /**
  * This class unsets the initial scoreDef for each system and measure.
  */
-class ScoreDefUnsetCurrentFunctor : public MutableFunctor {
+class ScoreDefUnsetCurrentFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -358,7 +358,7 @@ enum StaffDefRedrawFlags {
  * This class sets drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
  * to be redrawn. This typically occurs when a new System or a new ScoreDef is encountered.
  */
-class SetStaffDefRedrawFlagsFunctor : public MutableFunctor {
+class SetStaffDefRedrawFlagsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

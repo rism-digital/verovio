@@ -66,7 +66,7 @@ private:
 /**
  * This class sets the drawing cue size for all layer elements.
  */
-class PrepareCueSizeFunctor : public MutableFunctor {
+class PrepareCueSizeFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -105,7 +105,7 @@ private:
 /**
  * This class sets the cross staff and cross layer pointers on layer elements.
  */
-class PrepareCrossStaffFunctor : public MutableFunctor {
+class PrepareCrossStaffFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -151,7 +151,7 @@ private:
 /**
  * This class matches the @altsym element to the corresponding symbolDef.
  */
-class PrepareAltSymFunctor : public MutableFunctor {
+class PrepareAltSymFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -196,7 +196,7 @@ private:
 /**
  * This class associates layer elements with @facs to the appropriate zone.
  */
-class PrepareFacsimileFunctor : public MutableFunctor {
+class PrepareFacsimileFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -243,7 +243,7 @@ private:
 /**
  * This class matches linking elements (e.g, @next).
  */
-class PrepareLinkingFunctor : public MutableFunctor {
+class PrepareLinkingFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -321,7 +321,7 @@ private:
 /**
  * This class matches elements of @plist.
  */
-class PreparePlistFunctor : public MutableFunctor {
+class PreparePlistFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -380,7 +380,7 @@ private:
 /**
  * This class extracts the default duration from scoredef/staffdef.
  */
-class PrepareDurationFunctor : public MutableFunctor {
+class PrepareDurationFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -425,7 +425,7 @@ private:
 /**
  * This class matches the start for TimePointingInterface elements (such as fermata or harm).
  */
-class PrepareTimePointingFunctor : public MutableFunctor {
+class PrepareTimePointingFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -477,7 +477,7 @@ private:
  * If fillMode is set to false, only the remaining elements will be matched.
  * This is used when processing a second time in the other direction.
  */
-class PrepareTimeSpanningFunctor : public MutableFunctor {
+class PrepareTimeSpanningFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -540,7 +540,7 @@ private:
  * It is performed only on TimeSpanningInterface elements without @startid (or @endid).
  * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
  */
-class PrepareTimestampsFunctor : public MutableFunctor {
+class PrepareTimestampsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -595,7 +595,7 @@ private:
  * This class processes by layer and sets drawing pointers.
  * Set Dot::m_drawingNote for Dot elements in mensural mode
  */
-class PreparePointersByLayerFunctor : public MutableFunctor {
+class PreparePointersByLayerFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -640,7 +640,7 @@ private:
  * The functor is processed by staff/layer/verse using Filters.
  * At the end, the functor closes opened syl in VisitDocEnd.
  */
-class PrepareLyricsFunctor : public MutableFunctor {
+class PrepareLyricsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -687,7 +687,7 @@ private:
 /**
  * This class adds LayerElement parts (stem, flag, dots, etc).
  */
-class PrepareLayerElementPartsFunctor : public MutableFunctor {
+class PrepareLayerElementPartsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -776,7 +776,7 @@ private:
  * This class sets Turn::m_drawingEndNote for delayed turns.
  * Needs a first pass to fill the map, processed by staff/layer after that.
  */
-class PrepareDelayedTurnsFunctor : public MutableFunctor {
+class PrepareDelayedTurnsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -843,7 +843,7 @@ private:
 /**
  * This class sets the Measure of Ending.
  */
-class PrepareMilestonesFunctor : public MutableFunctor {
+class PrepareMilestonesFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -958,7 +958,7 @@ private:
  * that is covered. At the end, it removes the TimeSpanningInterface element
  * from the list when the last measure is reached.
  */
-class PrepareStaffCurrentTimeSpanningFunctor : public MutableFunctor {
+class PrepareStaffCurrentTimeSpanningFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -1010,7 +1010,7 @@ private:
 /**
  * This class resolves the Reh time pointing position in case none is set.
  */
-class PrepareRehPositionFunctor : public MutableFunctor {
+class PrepareRehPositionFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -1050,7 +1050,7 @@ private:
  * This class gets the list of referenced elements for the BeamSpan and marks referenced
  * objects as contained in a BeamSpan.
  */
-class PrepareBeamSpanElementsFunctor : public MutableFunctor {
+class PrepareBeamSpanElementsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

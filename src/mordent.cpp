@@ -86,7 +86,7 @@ char32_t Mordent::GetMordentGlyph() const
 // Mordent functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Mordent::Accept(MutableFunctor &functor)
+FunctorCode Mordent::Accept(Functor &functor)
 {
     return functor.VisitMordent(this);
 }
@@ -96,7 +96,7 @@ FunctorCode Mordent::Accept(ConstFunctor &functor) const
     return functor.VisitMordent(this);
 }
 
-FunctorCode Mordent::AcceptEnd(MutableFunctor &functor)
+FunctorCode Mordent::AcceptEnd(Functor &functor)
 {
     return functor.VisitMordentEnd(this);
 }

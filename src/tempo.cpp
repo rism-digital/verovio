@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "staff.h"
 #include "system.h"
@@ -87,7 +86,7 @@ int Tempo::GetDrawingXRelativeToStaff(int staffN) const
     return this->GetStart()->GetDrawingX() + m_relativeX;
 }
 
-FunctorCode Tempo::Accept(MutableFunctor &functor)
+FunctorCode Tempo::Accept(Functor &functor)
 {
     return functor.VisitTempo(this);
 }
@@ -97,7 +96,7 @@ FunctorCode Tempo::Accept(ConstFunctor &functor) const
     return functor.VisitTempo(this);
 }
 
-FunctorCode Tempo::AcceptEnd(MutableFunctor &functor)
+FunctorCode Tempo::AcceptEnd(Functor &functor)
 {
     return functor.VisitTempoEnd(this);
 }
@@ -105,21 +104,6 @@ FunctorCode Tempo::AcceptEnd(MutableFunctor &functor)
 FunctorCode Tempo::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTempoEnd(this);
-}
-
-int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    if (this->HasMidiBpm()) {
-        params->m_currentTempo = this->GetMidiBpm();
-    }
-    else if (this->HasMm()) {
-        params->m_currentTempo = Tempo::CalcTempo(this);
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 double Tempo::CalcTempo(const AttMmTempo *attMmTempo)

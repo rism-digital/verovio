@@ -17,7 +17,6 @@
 
 #include "beam.h"
 #include "chord.h"
-#include "functorparams.h"
 #include "mensur.h"
 #include "note.h"
 #include "vrv.h"

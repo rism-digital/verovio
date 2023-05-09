@@ -23,7 +23,7 @@ namespace vrv {
 // SaveFunctor
 //----------------------------------------------------------------------------
 
-SaveFunctor::SaveFunctor(Output *output, bool basic)
+SaveFunctor::SaveFunctor(Output *output, bool basic) : Functor()
 {
     m_output = output;
     m_basic = basic;

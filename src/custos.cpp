@@ -87,7 +87,7 @@ char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Custos::Accept(MutableFunctor &functor)
+FunctorCode Custos::Accept(Functor &functor)
 {
     return functor.VisitCustos(this);
 }
@@ -97,7 +97,7 @@ FunctorCode Custos::Accept(ConstFunctor &functor) const
     return functor.VisitCustos(this);
 }
 
-FunctorCode Custos::AcceptEnd(MutableFunctor &functor)
+FunctorCode Custos::AcceptEnd(Functor &functor)
 {
     return functor.VisitCustosEnd(this);
 }

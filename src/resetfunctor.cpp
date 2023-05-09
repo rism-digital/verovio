@@ -45,7 +45,7 @@ namespace vrv {
 // ResetDataFunctor
 //----------------------------------------------------------------------------
 
-ResetDataFunctor::ResetDataFunctor() {}
+ResetDataFunctor::ResetDataFunctor() : Functor() {}
 
 FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
 {
@@ -412,7 +412,7 @@ FunctorCode ResetDataFunctor::VisitVerse(Verse *verse)
 // ResetHorizontalAlignmentFunctor
 //----------------------------------------------------------------------------
 
-ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() {}
+ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() : Functor() {}
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitAccid(Accid *accid)
 {
@@ -629,7 +629,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum
 // ResetVerticalAlignmentFunctor
 //----------------------------------------------------------------------------
 
-ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() {}
+ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() : Functor() {}
 
 FunctorCode ResetVerticalAlignmentFunctor::VisitArtic(Artic *artic)
 {

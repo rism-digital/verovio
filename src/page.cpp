@@ -50,7 +50,6 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "justifyfunctor.h"
 #include "libmei.h"
 #include "miscfunctor.h"
@@ -771,7 +770,7 @@ void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Page::Accept(MutableFunctor &functor)
+FunctorCode Page::Accept(Functor &functor)
 {
     return functor.VisitPage(this);
 }
@@ -781,7 +780,7 @@ FunctorCode Page::Accept(ConstFunctor &functor) const
     return functor.VisitPage(this);
 }
 
-FunctorCode Page::AcceptEnd(MutableFunctor &functor)
+FunctorCode Page::AcceptEnd(Functor &functor)
 {
     return functor.VisitPageEnd(this);
 }

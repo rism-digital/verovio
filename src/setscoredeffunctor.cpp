@@ -28,6 +28,7 @@ namespace vrv {
 
 ReplaceDrawingValuesInStaffDefFunctor::ReplaceDrawingValuesInStaffDefFunctor(const Clef *clef, const KeySig *keySig,
     const Mensur *mensur, const MeterSig *meterSig, const MeterSigGrp *meterSigGrp)
+    : Functor()
 {
     m_clef = clef;
     m_keySig = keySig;
@@ -491,7 +492,7 @@ FunctorCode ScoreDefOptimizeFunctor::VisitSystemEnd(System *system)
 // SetCautionaryScoreDefFunctor
 //----------------------------------------------------------------------------
 
-SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef)
+SetCautionaryScoreDefFunctor::SetCautionaryScoreDefFunctor(ScoreDef *currentScoreDef) : Functor()
 {
     m_currentScoreDef = currentScoreDef;
     m_currentStaffDef = NULL;
@@ -524,7 +525,7 @@ FunctorCode SetCautionaryScoreDefFunctor::VisitObject(Object *object)
 // ScoreDefSetGrpSymFunctor
 //----------------------------------------------------------------------------
 
-ScoreDefSetGrpSymFunctor::ScoreDefSetGrpSymFunctor() {}
+ScoreDefSetGrpSymFunctor::ScoreDefSetGrpSymFunctor() : Functor() {}
 
 FunctorCode ScoreDefSetGrpSymFunctor::VisitGrpSym(GrpSym *grpSym)
 {
@@ -591,7 +592,7 @@ FunctorCode ScoreDefSetGrpSymFunctor::VisitSystem(System *system)
 // ScoreDefUnsetCurrentFunctor
 //----------------------------------------------------------------------------
 
-ScoreDefUnsetCurrentFunctor::ScoreDefUnsetCurrentFunctor() {}
+ScoreDefUnsetCurrentFunctor::ScoreDefUnsetCurrentFunctor() : Functor() {}
 
 FunctorCode ScoreDefUnsetCurrentFunctor::VisitAlignmentReference(AlignmentReference *alignmentReference)
 {
@@ -658,7 +659,7 @@ FunctorCode ScoreDefUnsetCurrentFunctor::VisitSystem(System *system)
 // SetStaffDefRedrawFlagsFunctor
 //----------------------------------------------------------------------------
 
-SetStaffDefRedrawFlagsFunctor::SetStaffDefRedrawFlagsFunctor(int redrawFlags)
+SetStaffDefRedrawFlagsFunctor::SetStaffDefRedrawFlagsFunctor(int redrawFlags) : Functor()
 {
     m_redrawFlags = redrawFlags;
 }

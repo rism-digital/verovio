@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "symbol.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -81,7 +80,7 @@ bool Dir::IsSupportedChild(Object *child)
 // Dir functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Dir::Accept(MutableFunctor &functor)
+FunctorCode Dir::Accept(Functor &functor)
 {
     return functor.VisitDir(this);
 }
@@ -91,7 +90,7 @@ FunctorCode Dir::Accept(ConstFunctor &functor) const
     return functor.VisitDir(this);
 }
 
-FunctorCode Dir::AcceptEnd(MutableFunctor &functor)
+FunctorCode Dir::AcceptEnd(Functor &functor)
 {
     return functor.VisitDirEnd(this);
 }

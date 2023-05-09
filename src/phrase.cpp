@@ -40,7 +40,7 @@ void Phrase::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Phrase::Accept(MutableFunctor &functor)
+FunctorCode Phrase::Accept(Functor &functor)
 {
     return functor.VisitPhrase(this);
 }
@@ -50,7 +50,7 @@ FunctorCode Phrase::Accept(ConstFunctor &functor) const
     return functor.VisitPhrase(this);
 }
 
-FunctorCode Phrase::AcceptEnd(MutableFunctor &functor)
+FunctorCode Phrase::AcceptEnd(Functor &functor)
 {
     return functor.VisitPhraseEnd(this);
 }

@@ -22,7 +22,6 @@
 #include "elementpart.h"
 #include "ftrem.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "rest.h"
 #include "space.h"
@@ -325,7 +324,7 @@ void Tuplet::GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *d
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Tuplet::Accept(MutableFunctor &functor)
+FunctorCode Tuplet::Accept(Functor &functor)
 {
     return functor.VisitTuplet(this);
 }
@@ -335,7 +334,7 @@ FunctorCode Tuplet::Accept(ConstFunctor &functor) const
     return functor.VisitTuplet(this);
 }
 
-FunctorCode Tuplet::AcceptEnd(MutableFunctor &functor)
+FunctorCode Tuplet::AcceptEnd(Functor &functor)
 {
     return functor.VisitTupletEnd(this);
 }

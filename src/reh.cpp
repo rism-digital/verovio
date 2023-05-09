@@ -70,7 +70,7 @@ bool Reh::IsSupportedChild(Object *child)
 // Reh functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Reh::Accept(MutableFunctor &functor)
+FunctorCode Reh::Accept(Functor &functor)
 {
     return functor.VisitReh(this);
 }
@@ -80,7 +80,7 @@ FunctorCode Reh::Accept(ConstFunctor &functor) const
     return functor.VisitReh(this);
 }
 
-FunctorCode Reh::AcceptEnd(MutableFunctor &functor)
+FunctorCode Reh::AcceptEnd(Functor &functor)
 {
     return functor.VisitRehEnd(this);
 }

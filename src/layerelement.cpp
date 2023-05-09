@@ -33,7 +33,6 @@
 #include "elementpart.h"
 #include "ftrem.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "keysig.h"
 #include "layer.h"
@@ -1083,7 +1082,7 @@ int LayerElement::GetCollisionCount(const MapOfDotLocs &dotLocs1, const MapOfDot
 // LayerElement functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode LayerElement::Accept(MutableFunctor &functor)
+FunctorCode LayerElement::Accept(Functor &functor)
 {
     return functor.VisitLayerElement(this);
 }
@@ -1093,7 +1092,7 @@ FunctorCode LayerElement::Accept(ConstFunctor &functor) const
     return functor.VisitLayerElement(this);
 }
 
-FunctorCode LayerElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode LayerElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitLayerElementEnd(this);
 }
@@ -1313,152 +1312,6 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
     }
 
     return { shift, isInUnison };
-}
-
-int LayerElement::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    LayerElement *element = this->ThisOrSameasLink();
-
-    double incrementScoreTime;
-
-    if (element->Is(REST) || element->Is(SPACE)) {
-        incrementScoreTime = element->GetAlignmentDuration(
-            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-        // For rests to be possibly added to the timemap
-        if (element->Is(REST)) {
-            Rest *rest = vrv_cast<Rest *>(element);
-            double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
-            rest->SetScoreTimeOnset(params->m_currentScoreTime);
-            rest->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-            rest->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-            rest->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
-        }
-        params->m_currentScoreTime += incrementScoreTime;
-        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
-    }
-    else if (element->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(element);
-        assert(note);
-
-        // For now just ignore grace notes
-        if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
-
-        Chord *chord = note->IsChordTone();
-        TabGrp *tabGrp = note->IsTabGrpNote();
-
-        // If the note has a @dur or a @dur.ges, take it into account
-        // This means that overwriting only @dots or @dots.ges will not be taken into account
-        if (chord && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = chord->GetAlignmentDuration(
-                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        }
-        else if (tabGrp && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = tabGrp->GetAlignmentDuration(
-                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        }
-        else {
-            incrementScoreTime = note->GetAlignmentDuration(
-                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        }
-        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-        double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
-
-        // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-        // note->GetNoteOrChordDur(element), note->GetDiatonicPitch(), *midiTrack);
-        // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
-
-        // When we have a @sameas, do store the onset / offset values of the pointed note in the pointing note
-        Note *storeNote = (this == element) ? note : dynamic_cast<Note *>(this);
-        if (storeNote) {
-            storeNote->SetScoreTimeOnset(params->m_currentScoreTime);
-            storeNote->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
-            storeNote->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
-            storeNote->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
-        }
-
-        // increase the currentTime accordingly, but only if not in a chord or tabGrp - checkit with note->IsChordTone()
-        // or note->IsTabGrpNote()
-        if (!(note->IsChordTone()) && !(note->IsTabGrpNote())) {
-            params->m_currentScoreTime += incrementScoreTime;
-            params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-        }
-    }
-    else if (element->Is(BEATRPT)) {
-        BeatRpt *rpt = vrv_cast<BeatRpt *>(element);
-        assert(rpt);
-
-        incrementScoreTime = rpt->GetAlignmentDuration(
-            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-        rpt->SetScoreTimeOnset(params->m_currentScoreTime);
-        params->m_currentScoreTime += incrementScoreTime;
-        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
-    }
-    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && this->HasSameasLink()) {
-        incrementScoreTime = this->GetSameAsContentAlignmentDuration(
-            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-        params->m_currentScoreTime += incrementScoreTime;
-        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::InitTimemapTies(FunctorParams *)
-{
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Only resolve simple sameas links to avoid infinite recursion
-    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
-    if (sameas && !sameas->HasSameasLink()) {
-        sameas->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    if (this->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
-
-    // Only resolve simple sameas links to avoid infinite recursion
-    LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
-    if (sameas && !sameas->HasSameasLink()) {
-        sameas->Process(params->m_functor, functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    if (this->Is(MULTIREST)) {
-        MultiRest *multiRest = vrv_cast<MultiRest *>(this);
-        assert(multiRest);
-        params->m_multiRestFactor = multiRest->GetNum();
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

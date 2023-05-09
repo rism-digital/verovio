@@ -67,7 +67,7 @@ char32_t Caesura::GetCaesuraGlyph() const
     return SMUFL_E4D1_caesura;
 }
 
-FunctorCode Caesura::Accept(MutableFunctor &functor)
+FunctorCode Caesura::Accept(Functor &functor)
 {
     return functor.VisitCaesura(this);
 }
@@ -77,7 +77,7 @@ FunctorCode Caesura::Accept(ConstFunctor &functor) const
     return functor.VisitCaesura(this);
 }
 
-FunctorCode Caesura::AcceptEnd(MutableFunctor &functor)
+FunctorCode Caesura::AcceptEnd(Functor &functor)
 {
     return functor.VisitCaesuraEnd(this);
 }

@@ -16,7 +16,6 @@
 
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "rend.h"
 #include "smufl.h"
@@ -263,7 +262,7 @@ std::u32string Dynam::GetSymbolStr(const std::u32string &str, const bool singleG
 // Dynam functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Dynam::Accept(MutableFunctor &functor)
+FunctorCode Dynam::Accept(Functor &functor)
 {
     return functor.VisitDynam(this);
 }
@@ -273,7 +272,7 @@ FunctorCode Dynam::Accept(ConstFunctor &functor) const
     return functor.VisitDynam(this);
 }
 
-FunctorCode Dynam::AcceptEnd(MutableFunctor &functor)
+FunctorCode Dynam::AcceptEnd(Functor &functor)
 {
     return functor.VisitDynamEnd(this);
 }
