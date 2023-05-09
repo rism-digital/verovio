@@ -80,6 +80,9 @@ public:
 
 private:
     //
+public:
+    //
+private:
 };
 
 } // namespace vrv
