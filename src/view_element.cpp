@@ -307,11 +307,9 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int xDiff = x - staff->GetDrawingX();
             rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
         }
-        
         if (accid->HasFacs() && (m_doc->GetType() == Facs)) {
             y = ToLogicalY(y);
         }
-        
         y -= rotateOffset;
     }
 
