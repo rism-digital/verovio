@@ -2890,6 +2890,7 @@ void MEIOutput::WriteRend(pugi::xml_node currentNode, Rend *rend)
     this->WriteAreaPosInterface(currentNode, rend);
     rend->WriteColor(currentNode);
     rend->WriteLang(currentNode);
+    rend->WriteNNumberLike(currentNode);
     rend->WriteTextRendition(currentNode);
     rend->WriteTypography(currentNode);
     rend->WriteWhitespace(currentNode);
@@ -6984,6 +6985,7 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
 
     vrvRend->ReadColor(rend);
     vrvRend->ReadLang(rend);
+    vrvRend->ReadNNumberLike(rend);
     vrvRend->ReadTextRendition(rend);
     vrvRend->ReadTypography(rend);
     vrvRend->ReadWhitespace(rend);

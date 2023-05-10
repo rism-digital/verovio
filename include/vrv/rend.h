@@ -25,6 +25,7 @@ class Rend : public TextElement,
              public AreaPosInterface,
              public AttColor,
              public AttLang,
+             public AttNNumberLike,
              public AttTextRendition,
              public AttTypography,
              public AttWhitespace {
@@ -57,6 +58,11 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Check if rend has an enclosing.
+     */
+    bool HasEnclosure() const;
 
     //----------//
     // Functors //

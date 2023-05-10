@@ -447,14 +447,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
-    // Do not render the box or circle if the content is empty
-    if (rend->HasContentBB()) {
-        if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
-            params.m_enclosedRend.push_back(rend);
-            params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
-            params.m_explicitPosition = true;
-            params.m_enclose = rend->GetRend();
-        }
+    // Do not render enclosings if the content is empty
+    if (rend->HasEnclosure()) {
+        params.m_enclosedRend.push_back(rend);
+        params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
+        params.m_explicitPosition = true;
+        params.m_enclose = rend->GetRend();
     }
 
     if (customFont) {
