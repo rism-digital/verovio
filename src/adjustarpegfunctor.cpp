@@ -172,11 +172,10 @@ FunctorCode AdjustArpegFunctor::VisitMeasureEnd(Measure *measure)
 {
     if (!m_alignmentArpegTuples.empty()) {
         m_measureAligner = &measure->m_measureAligner;
-        // Process backwards on measure aligner, then reset to previous direction
-        const bool direction = this->GetDirection();
-        this->SetDirection(BACKWARD);
+        // Process backwards on measure aligner
+        this->PushDirection(BACKWARD);
         m_measureAligner->Process(*this);
-        this->SetDirection(direction);
+        this->PopDirection();
         m_alignmentArpegTuples.clear();
     }
 

@@ -65,8 +65,9 @@ public:
      * Getters/Setters for the direction
      */
     ///@{
-    bool GetDirection() const { return m_direction; }
-    void SetDirection(bool direction) { m_direction = direction; }
+    bool GetDirection() const { return m_direction.empty() ? FORWARD : m_direction.top(); }
+    void PushDirection(bool direction) { m_direction.push(direction); }
+    void PopDirection() { m_direction.pop(); }
     ///@}
 
     /**
@@ -85,8 +86,8 @@ private:
     std::stack<Filters *> m_filters;
     // Visible only flag
     bool m_visibleOnly = true;
-    // Direction
-    bool m_direction = FORWARD;
+    // The direction stack
+    std::stack<bool> m_direction;
 };
 
 //----------------------------------------------------------------------------
