@@ -398,13 +398,13 @@ int Rest::GetLocationRelativeToCurrentLayer(const Staff *currentStaff, const Lay
     const Object *nextElement = NULL;
     // Get previous and next elements from the current layer
     if (currentLayer->GetFirstChildNot(REST)) {
-        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), BACKWARD, false);
+        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), false);
         getRelativeLayerElementBackwards.PushDirection(BACKWARD);
         currentLayer->Process(getRelativeLayerElementBackwards);
         previousElement = getRelativeLayerElementBackwards.GetRelativeElement();
 
         // search in other direction
-        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), FORWARD, false);
+        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), false);
         currentLayer->Process(getRelativeLayerElementForwards);
         nextElement = getRelativeLayerElementForwards.GetRelativeElement();
     }
@@ -470,7 +470,7 @@ int Rest::GetFirstRelativeElementLocation(
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
-    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), !isPrevious, true);
+    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), true);
     getRelativeLayerElement.PushDirection(!isPrevious);
     (*layerIter)->Process(getRelativeLayerElement);
 
