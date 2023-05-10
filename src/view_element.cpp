@@ -249,7 +249,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->HasPlace() || (accid->GetFunc() == accidLog_FUNC_edit)) {
+    if (accid->HasPlace() || accid->HasOnstaff() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
