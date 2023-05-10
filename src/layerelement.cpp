@@ -1000,7 +1000,7 @@ int LayerElement::CalcLayerOverlap(const Doc *doc, int direction, int y1, int y2
             const int currentTop = this->GetDrawingTop(doc, staff->m_drawingStaffSize);
             if (currentTop <= elementBottom) continue;
             const StemmedDrawingInterface *stemInterface = layerElement->GetStemmedDrawingInterface();
-            if (sameDirElement || (stemInterface && (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
+            if (stemInterface && (sameDirElement || (stemInterface->GetDrawingStemDir() == STEMDIRECTION_down))) {
                 if (currentTop - stemInterface->GetDrawingStemLen() > currentTop) continue;
                 leftMargin = unit + y1 - elementTop;
                 rightMargin = unit + y2 - elementTop;
