@@ -2807,28 +2807,20 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // accidental
         pugi::xml_node accidental = node.child("accidental");
+        if (!accidental) {
+            accidental = node.select_node("notations/accidental-mark").node();
+        }
         if (accidental) {
             Accid *accid = new Accid();
             accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
             accid->SetColor(accidental.attribute("color").as_string());
-            bool isAttribute = true;
-            if (HasAttributeWithValue(accidental, "cautionary", "yes")) {
-                accid->SetFunc(accidLog_FUNC_caution);
-                isAttribute = false;
-            }
-            if (HasAttributeWithValue(accidental, "editorial", "yes")) {
-                accid->SetFunc(accidLog_FUNC_edit);
-                isAttribute = false;
-            }
-            if (HasAttributeWithValue(accidental, "bracket", "yes")) {
-                accid->SetEnclose(ENCLOSURE_brack);
-                isAttribute = false;
-            }
-            if (HasAttributeWithValue(accidental, "parentheses", "yes")) {
-                accid->SetEnclose(ENCLOSURE_paren);
-                isAttribute = false;
-            }
-            accid->IsAttribute(isAttribute);
+            accid->SetGlyphName(accidental.attribute("smufl").as_string());
+            accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
+            if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
+            if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
+            if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
+            if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+            if (!strcmp(accidental.name(), "accidental-mark")) accid->SetOnstaff(BOOLEAN_false);
             note->AddChild(accid);
         }
 
