@@ -3169,7 +3169,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 const std::string technicalChildName = technicalChild.name();
 
                 // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
-                if (technicalChildName == "fingering") continue;
+                if ((technicalChildName == "fingering") || (technicalChildName == "thumb-position")) continue;
                 if (technicalChildName == "string") continue; // handled with fret
 
                 if (technicalChildName == "fret") {
@@ -3222,12 +3222,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
                     artics.push_back(ConvertArticulations(articulation.name()));
-                    if (artics.back() == ARTICULATION_NONE) {
-                        delete artic;
-                        continue;
-                    }
-                    artic->SetArtic(artics);
+                    if (artics.back() != ARTICULATION_NONE) artic->SetArtic(artics);
                     artic->SetColor(articulation.attribute("color").as_string());
+                    artic->SetGlyphName(articulation.attribute("smufl").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
                     artic->SetType("technical");
