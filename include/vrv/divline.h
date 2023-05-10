@@ -44,10 +44,6 @@ public:
      */
     bool SetAlignment(Alignment *alignment);
 
-    /*
-     * Return true if the divLine type requires repetition dots to be drawn.
-     */
-    // bool HasRepetitionDots() const;
 
     /**
      * Retrieve SMuFL string for the divLine.
@@ -58,26 +54,6 @@ public:
      * @name Method used for drawing divLine on ornaments
      */
     static wchar_t GetDivLineGlyph(divLineLog_FORM);
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    // virtual int ConvertToCastOffMensural(FunctorParams *params);
-    // static wchar_t GetDivLineGlyph(data_DIVISIO);
-
-    /**
-     * See Object::ResetDrawing
-     */
-    // virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    // virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //
