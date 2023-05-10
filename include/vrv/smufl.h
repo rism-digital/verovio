@@ -494,6 +494,9 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA22_medRenLiquescenceCMN = 0xEA22,
+    SMUFL_EA26_medRenLiquescentAscCMN = 0xEA26,
+    SMUFL_EA27_medRenLiquescentDescCMN = 0xEA27,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
     SMUFL_EA52_figbass2 = 0xEA52,
@@ -531,6 +534,11 @@ enum {
     SMUFL_EB20_elecRewind = 0xEB20,
     SMUFL_EB21_elecSkipForwards = 0xEB21,
     SMUFL_EB22_elecSkipBackwards = 0xEB22,
+    SMUFL_EB90_staffPosRaise1 = 0xEB90,
+    SMUFL_EB91_staffPosRaise2 = 0xEB91,
+    SMUFL_EB92_staffPosRaise3 = 0xEB92,
+    SMUFL_EB98_staffPosLower1 = 0xEB98,
+    SMUFL_EB99_staffPosLower2 = 0xEB99,
     SMUFL_EBA7_luteDurationWhole = 0xEBA7,
     SMUFL_EBA8_luteDurationHalf = 0xEBA8,
     SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
@@ -587,7 +595,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 562
+#define SMUFL_COUNT 570
 
 } // namespace vrv
 
