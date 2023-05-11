@@ -1887,7 +1887,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             measure->SetLeft(BARRENDITION_rptstart);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s.", measure->GetN().c_str());
+            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s", measure->GetN().c_str());
         }
         else {
             measure->SetRight(BARRENDITION_rptend);
@@ -2937,7 +2937,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
             }
             if (!chord) {
-                LogError("MusicXML import: Chord starting point has not been found.");
+                LogError("MusicXML import: Chord starting point has not been found");
                 return;
             }
             // Mark a chord as cue=true if and only if all its child notes are cue.
