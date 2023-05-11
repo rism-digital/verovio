@@ -192,6 +192,45 @@ private:
     //
 };
 
+//----------------------------------------------------------------------------
+// CollectAndProcess
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a mixin for all functors that require two step processing:
+ * (1) Collecing data. (2) Processing data.
+ */
+class CollectAndProcess {
+protected:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CollectAndProcess() = default;
+    ~CollectAndProcess() = default;
+    ///@}
+
+public:
+    /**
+     * Check and switch the current phase.
+     */
+    ///@{
+    bool IsCollectingData() const { return !m_processingData; }
+    bool IsProcessingData() const { return m_processingData; }
+    void SetDataCollectionCompleted() { m_processingData = true; }
+    ///@}
+
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    // Indicates the current phase: collecting vs processing data
+    bool m_processingData = false;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FUNCTOR_H__
