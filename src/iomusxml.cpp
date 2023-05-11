@@ -3255,7 +3255,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         breath->SetPlace(
             breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
-        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.5);
     }
 
     // caesura
@@ -3267,7 +3267,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         caesura->SetPlace(
             caesura->AttPlacementRelStaff::StrToStaffrel(xmlCaesura.node().attribute("placement").as_string()));
         caesura->SetColor(xmlCaesura.node().attribute("color").as_string());
-        caesura->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        caesura->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.5);
     }
 
     // dynamics
