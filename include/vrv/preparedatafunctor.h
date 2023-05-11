@@ -243,7 +243,7 @@ private:
 /**
  * This class matches linking elements (e.g, @next).
  */
-class PrepareLinkingFunctor : public Functor {
+class PrepareLinkingFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -257,14 +257,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter for the interface / id pairs
@@ -310,8 +302,6 @@ private:
     MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
     // Holds the note / id pairs to match for stem.sameas
     MapOfNoteIDPairs m_stemSameasIDPairs;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -321,7 +311,7 @@ private:
 /**
  * This class matches elements of @plist.
  */
-class PreparePlistFunctor : public Functor {
+class PreparePlistFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -335,14 +325,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter and modifier for the interface / id tuples
@@ -369,8 +351,6 @@ public:
 private:
     // Holds the interface / id tuples to match
     ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -477,7 +457,7 @@ private:
  * If fillMode is set to false, only the remaining elements will be matched.
  * This is used when processing a second time in the other direction.
  */
-class PrepareTimeSpanningFunctor : public Functor {
+class PrepareTimeSpanningFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -491,14 +471,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return true; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter and modifier for the interface / owner pairs
@@ -527,8 +499,6 @@ public:
 private:
     // The interface list that holds the current elements to match
     ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -776,7 +746,7 @@ private:
  * This class sets Turn::m_drawingEndNote for delayed turns.
  * Needs a first pass to fill the map, processed by staff/layer after that.
  */
-class PrepareDelayedTurnsFunctor : public Functor {
+class PrepareDelayedTurnsFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -790,14 +760,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter for the map of delayed turns
@@ -832,8 +794,6 @@ private:
     Turn *m_currentTurn;
     // A map of the delayed turns and the layer elements they point to
     std::map<LayerElement *, Turn *> m_delayedTurns;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------

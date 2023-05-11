@@ -371,10 +371,7 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
 // PrepareLinkingFunctor
 //----------------------------------------------------------------------------
 
-PrepareLinkingFunctor::PrepareLinkingFunctor() : Functor()
-{
-    m_fillMode = true;
-}
+PrepareLinkingFunctor::PrepareLinkingFunctor() : Functor(), CollectAndProcess() {}
 
 void PrepareLinkingFunctor::InsertNextIDPair(const std::string &nextID, LinkingInterface *interface)
 {
@@ -388,7 +385,7 @@ void PrepareLinkingFunctor::InsertSameasIDPair(const std::string &sameasID, Link
 
 FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 {
-    if (m_fillMode && object->HasInterface(INTERFACE_LINKING)) {
+    if (this->IsCollectingData() && object->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
         interface->InterfacePrepareLinking(*this, object);
@@ -430,7 +427,7 @@ FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 {
     // First pass we fill m_stemSameasIDPairs
-    if (m_fillMode) {
+    if (this->IsCollectingData()) {
         if (note->HasStemSameas()) {
             std::string idTarget = ExtractIDFragment(note->GetStemSameas());
             m_stemSameasIDPairs[idTarget] = note;
@@ -470,10 +467,7 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 // PreparePlistFunctor
 //----------------------------------------------------------------------------
 
-PreparePlistFunctor::PreparePlistFunctor() : Functor()
-{
-    m_fillMode = true;
-}
+PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
 void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
 {
@@ -482,7 +476,7 @@ void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, P
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
-    if (m_fillMode) {
+    if (this->IsCollectingData()) {
         if (object->HasInterface(INTERFACE_PLIST)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
@@ -630,10 +624,7 @@ FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor()
-{
-    m_fillMode = true;
-}
+PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor(), CollectAndProcess() {}
 
 void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpanningInterface *interface)
 {
@@ -684,7 +675,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
 
 FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 {
-    if (!m_fillMode) {
+    if (this->IsProcessingData()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -1334,9 +1325,8 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 // PrepareDelayedTurnsFunctor
 //----------------------------------------------------------------------------
 
-PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor() : Functor()
+PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor() : Functor(), CollectAndProcess()
 {
-    m_fillMode = true;
     this->ResetCurrent();
 }
 
@@ -1350,7 +1340,7 @@ void PrepareDelayedTurnsFunctor::ResetCurrent()
 FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     // We are initializing the m_delayedTurns map
-    if (m_fillMode) return FUNCTOR_CONTINUE;
+    if (this->IsCollectingData()) return FUNCTOR_CONTINUE;
 
     if (!layerElement->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
@@ -1383,7 +1373,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
 FunctorCode PrepareDelayedTurnsFunctor::VisitTurn(Turn *turn)
 {
     // We already initialized the m_delayedTurns map
-    if (!m_fillMode) return FUNCTOR_CONTINUE;
+    if (this->IsProcessingData()) return FUNCTOR_CONTINUE;
 
     // Map only delayed turns
     if (turn->GetDelayed() != BOOLEAN_true) return FUNCTOR_CONTINUE;

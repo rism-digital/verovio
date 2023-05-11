@@ -583,6 +583,7 @@ void Doc::PrepareData()
     PrepareTimeSpanningFunctor prepareTimeSpanning;
     prepareTimeSpanning.SetDirection(BACKWARD);
     this->Process(prepareTimeSpanning);
+    prepareTimeSpanning.SetDataCollectionCompleted();
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
@@ -591,7 +592,6 @@ void Doc::PrepareData()
     // but this time without filling the list (that is only will the remaining elements)
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
-        prepareTimeSpanning.FillMode(false);
         prepareTimeSpanning.SetDirection(FORWARD);
         this->Process(prepareTimeSpanning);
     }
@@ -634,10 +634,10 @@ void Doc::PrepareData()
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareLinkingFunctor prepareLinking;
     this->Process(prepareLinking);
+    prepareLinking.SetDataCollectionCompleted();
 
     // If we have some left process again backward
     if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
-        prepareLinking.FillMode(false);
         prepareLinking.SetDirection(BACKWARD);
         this->Process(prepareLinking);
     }
@@ -659,10 +659,10 @@ void Doc::PrepareData()
     // Try to match all pointing elements using @plist
     PreparePlistFunctor preparePlist;
     this->Process(preparePlist);
+    preparePlist.SetDataCollectionCompleted();
 
     // Process plist after all pairs have been collected
     if (!preparePlist.GetInterfaceIDTuples().empty()) {
-        preparePlist.FillMode(false);
         this->Process(preparePlist);
 
         for (const auto &[plistInterface, id, objectReference] : preparePlist.GetInterfaceIDTuples()) {
@@ -730,9 +730,9 @@ void Doc::PrepareData()
 
     PrepareDelayedTurnsFunctor prepareDelayedTurns;
     this->Process(prepareDelayedTurns);
+    prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
-        prepareDelayedTurns.FillMode(false);
         for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.Clear();
