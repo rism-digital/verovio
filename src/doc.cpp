@@ -583,6 +583,7 @@ void Doc::PrepareData()
     PrepareTimeSpanningFunctor prepareTimeSpanning;
     prepareTimeSpanning.SetDirection(BACKWARD);
     this->Process(prepareTimeSpanning);
+    prepareTimeSpanning.SetDataCollectionCompleted();
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
@@ -591,7 +592,6 @@ void Doc::PrepareData()
     // but this time without filling the list (that is only will the remaining elements)
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
-        prepareTimeSpanning.FillMode(false);
         prepareTimeSpanning.SetDirection(FORWARD);
         this->Process(prepareTimeSpanning);
     }
