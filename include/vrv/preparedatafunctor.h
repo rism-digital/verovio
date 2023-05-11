@@ -243,7 +243,7 @@ private:
 /**
  * This class matches linking elements (e.g, @next).
  */
-class PrepareLinkingFunctor : public Functor {
+class PrepareLinkingFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -257,14 +257,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter for the interface / id pairs
@@ -310,8 +302,6 @@ private:
     MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
     // Holds the note / id pairs to match for stem.sameas
     MapOfNoteIDPairs m_stemSameasIDPairs;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------

@@ -634,10 +634,10 @@ void Doc::PrepareData()
     // Try to match all pointing elements using @next, @sameas and @stem.sameas
     PrepareLinkingFunctor prepareLinking;
     this->Process(prepareLinking);
+    prepareLinking.SetDataCollectionCompleted();
 
     // If we have some left process again backward
     if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
-        prepareLinking.FillMode(false);
         prepareLinking.SetDirection(BACKWARD);
         this->Process(prepareLinking);
     }

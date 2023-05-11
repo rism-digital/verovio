@@ -371,10 +371,7 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
 // PrepareLinkingFunctor
 //----------------------------------------------------------------------------
 
-PrepareLinkingFunctor::PrepareLinkingFunctor() : Functor()
-{
-    m_fillMode = true;
-}
+PrepareLinkingFunctor::PrepareLinkingFunctor() : Functor(), CollectAndProcess() {}
 
 void PrepareLinkingFunctor::InsertNextIDPair(const std::string &nextID, LinkingInterface *interface)
 {
@@ -388,7 +385,7 @@ void PrepareLinkingFunctor::InsertSameasIDPair(const std::string &sameasID, Link
 
 FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 {
-    if (m_fillMode && object->HasInterface(INTERFACE_LINKING)) {
+    if (this->IsCollectingData() && object->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
         interface->InterfacePrepareLinking(*this, object);
@@ -430,7 +427,7 @@ FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 {
     // First pass we fill m_stemSameasIDPairs
-    if (m_fillMode) {
+    if (this->IsCollectingData()) {
         if (note->HasStemSameas()) {
             std::string idTarget = ExtractIDFragment(note->GetStemSameas());
             m_stemSameasIDPairs[idTarget] = note;
