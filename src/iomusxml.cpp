@@ -1887,7 +1887,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
             measure->SetLeft(BARRENDITION_rptstart);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s.", measure->GetN().c_str());
+            LogWarning("MusicXML import: Unsupported barline location 'middle' in %s", measure->GetN().c_str());
         }
         else {
             measure->SetRight(BARRENDITION_rptend);
@@ -2807,28 +2807,21 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // accidental
         pugi::xml_node accidental = node.child("accidental");
+        if (!accidental) {
+            accidental = node.select_node("notations/accidental-mark").node();
+        }
         if (accidental) {
             Accid *accid = new Accid();
             accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
             accid->SetColor(accidental.attribute("color").as_string());
-            bool isAttribute = true;
-            if (HasAttributeWithValue(accidental, "cautionary", "yes")) {
-                accid->SetFunc(accidLog_FUNC_caution);
-                isAttribute = false;
-            }
-            if (HasAttributeWithValue(accidental, "editorial", "yes")) {
-                accid->SetFunc(accidLog_FUNC_edit);
-                isAttribute = false;
-            }
-            if (HasAttributeWithValue(accidental, "bracket", "yes")) {
-                accid->SetEnclose(ENCLOSURE_brack);
-                isAttribute = false;
-            }
-            if (HasAttributeWithValue(accidental, "parentheses", "yes")) {
-                accid->SetEnclose(ENCLOSURE_paren);
-                isAttribute = false;
-            }
-            accid->IsAttribute(isAttribute);
+            accid->SetGlyphName(accidental.attribute("smufl").as_string());
+            accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
+            if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
+            if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
+            if (HasAttributeWithValue(accidental, "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
+            if (HasAttributeWithValue(accidental, "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
+            if (HasAttributeWithValue(accidental, "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+            if (!strcmp(accidental.name(), "accidental-mark")) accid->SetOnstaff(BOOLEAN_false);
             note->AddChild(accid);
         }
 
@@ -2944,7 +2937,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord = vrv_cast<Chord *>(m_elementStackMap.at(layer).back());
             }
             if (!chord) {
-                LogError("MusicXML import: Chord starting point has not been found.");
+                LogError("MusicXML import: Chord starting point has not been found");
                 return;
             }
             // Mark a chord as cue=true if and only if all its child notes are cue.
@@ -3169,7 +3162,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 const std::string technicalChildName = technicalChild.name();
 
                 // fingering is handled on the same level as breath marks, dynamics, etc. so we skip it here
-                if (technicalChildName == "fingering") continue;
+                if ((technicalChildName == "fingering") || (technicalChildName == "thumb-position")) continue;
                 if (technicalChildName == "string") continue; // handled with fret
 
                 if (technicalChildName == "fret") {
@@ -3222,12 +3215,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                     pugi::xml_node articulation = technicalChild;
                     Artic *artic = new Artic();
                     artics.push_back(ConvertArticulations(articulation.name()));
-                    if (artics.back() == ARTICULATION_NONE) {
-                        delete artic;
-                        continue;
-                    }
-                    artic->SetArtic(artics);
+                    if (artics.back() != ARTICULATION_NONE) artic->SetArtic(artics);
                     artic->SetColor(articulation.attribute("color").as_string());
+                    artic->SetGlyphName(articulation.attribute("smufl").as_string());
                     artic->SetPlace(
                         artic->AttPlacementRelEvent::StrToStaffrel(articulation.attribute("placement").as_string()));
                     artic->SetType("technical");
@@ -3265,7 +3255,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         breath->SetPlace(
             breath->AttPlacementRelStaff::StrToStaffrel(xmlBreath.node().attribute("placement").as_string()));
         breath->SetColor(xmlBreath.node().attribute("color").as_string());
-        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        breath->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.5);
     }
 
     // caesura
@@ -3277,7 +3267,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         caesura->SetPlace(
             caesura->AttPlacementRelStaff::StrToStaffrel(xmlCaesura.node().attribute("placement").as_string()));
         caesura->SetColor(xmlCaesura.node().attribute("color").as_string());
-        caesura->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0);
+        caesura->SetTstamp((double)(m_durTotal) * (double)m_meterUnit / (double)(4 * m_ppq) + 0.5);
     }
 
     // dynamics
@@ -3384,16 +3374,21 @@ void MusicXmlInput::ReadMusicXmlNote(
             mordent->AttPlacementRelStaff::StrToStaffrel(xmlMordent.node().attribute("placement").as_string()));
         // form
         mordent->SetForm(mordentLog_FORM_lower);
-        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
-            if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
-                mordent->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
-            }
-            else if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
-                mordent->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
-            }
-        }
         if (!std::strncmp(xmlMordent.node().name(), "inverted", 7)) {
             mordent->SetForm(mordentLog_FORM_upper);
+        }
+        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
+            const data_ACCIDENTAL_WRITTEN accid = ConvertAccidentalToAccid(xmlAccidMark.text().as_string());
+            if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
+                mordent->SetAccidupper(accid);
+            }
+            else if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
+                mordent->SetAccidlower(accid);
+            }
+            else {
+                if (mordent->GetForm() == mordentLog_FORM_upper) mordent->SetAccidupper(accid);
+                if (mordent->GetForm() == mordentLog_FORM_lower) mordent->SetAccidlower(accid);
+            }
         }
         if (BOOLEAN_true == mordent->GetLong()) {
             int mordentFlags = (mordentLog_FORM_upper == mordent->GetForm()) ? FORM_Inverted : FORM_Normal;
@@ -3457,7 +3452,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             musicxml::OpenSpanner openTrill(1, m_measureCounts.at(measure));
             m_trillStack.push_back({ trill, openTrill });
         }
-        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
+        for (pugi::xml_node xmlAccidMark = xmlTrill.node().next_sibling("accidental-mark"); xmlAccidMark;
+             xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
             if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
                 trill->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
@@ -3494,12 +3490,16 @@ void MusicXmlInput::ReadMusicXmlNote(
         turn->SetColor(xmlTurn.node().attribute("color").as_string());
         turn->SetPlace(turn->AttPlacementRelStaff::StrToStaffrel(xmlTurn.node().attribute("placement").as_string()));
         turn->SetForm(turnLog_FORM_upper);
-        for (pugi::xml_node xmlAccidMark : notations.node().children("accidental-mark")) {
+        for (pugi::xml_node xmlAccidMark = xmlTurn.node().next_sibling("accidental-mark"); xmlAccidMark;
+             xmlAccidMark = xmlAccidMark.next_sibling("accidental-mark")) {
             if (HasAttributeWithValue(xmlAccidMark, "placement", "above")) {
                 turn->SetAccidupper(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
             }
             else if (HasAttributeWithValue(xmlAccidMark, "placement", "below")) {
                 turn->SetAccidlower(ConvertAccidentalToAccid(xmlAccidMark.text().as_string()));
+            }
+            else {
+                LogWarning("MusicXML import: Cannot add an accidental to a turn without placement");
             }
         }
         if (xmlTurn.node().attribute("slash").as_bool()) {
