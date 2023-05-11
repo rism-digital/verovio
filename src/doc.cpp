@@ -659,10 +659,10 @@ void Doc::PrepareData()
     // Try to match all pointing elements using @plist
     PreparePlistFunctor preparePlist;
     this->Process(preparePlist);
+    preparePlist.SetDataCollectionCompleted();
 
     // Process plist after all pairs have been collected
     if (!preparePlist.GetInterfaceIDTuples().empty()) {
-        preparePlist.FillMode(false);
         this->Process(preparePlist);
 
         for (const auto &[plistInterface, id, objectReference] : preparePlist.GetInterfaceIDTuples()) {

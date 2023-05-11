@@ -311,7 +311,7 @@ private:
 /**
  * This class matches elements of @plist.
  */
-class PreparePlistFunctor : public Functor {
+class PreparePlistFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -325,14 +325,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter and modifier for the interface / id tuples
@@ -359,8 +351,6 @@ public:
 private:
     // Holds the interface / id tuples to match
     ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------

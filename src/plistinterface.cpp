@@ -98,7 +98,7 @@ void PlistInterface::SetIDStrs()
 FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, Object *object)
 {
     // This should not happen?
-    if (!functor.FillMode()) {
+    if (functor.IsProcessingData()) {
         return FUNCTOR_CONTINUE;
     }
 

@@ -467,10 +467,7 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 // PreparePlistFunctor
 //----------------------------------------------------------------------------
 
-PreparePlistFunctor::PreparePlistFunctor() : Functor()
-{
-    m_fillMode = true;
-}
+PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
 void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
 {
@@ -479,7 +476,7 @@ void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, P
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
-    if (m_fillMode) {
+    if (this->IsCollectingData()) {
         if (object->HasInterface(INTERFACE_PLIST)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
