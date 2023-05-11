@@ -1325,9 +1325,8 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 // PrepareDelayedTurnsFunctor
 //----------------------------------------------------------------------------
 
-PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor() : Functor()
+PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor() : Functor(), CollectAndProcess()
 {
-    m_fillMode = true;
     this->ResetCurrent();
 }
 
@@ -1341,7 +1340,7 @@ void PrepareDelayedTurnsFunctor::ResetCurrent()
 FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     // We are initializing the m_delayedTurns map
-    if (m_fillMode) return FUNCTOR_CONTINUE;
+    if (this->IsCollectingData()) return FUNCTOR_CONTINUE;
 
     if (!layerElement->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
@@ -1374,7 +1373,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
 FunctorCode PrepareDelayedTurnsFunctor::VisitTurn(Turn *turn)
 {
     // We already initialized the m_delayedTurns map
-    if (!m_fillMode) return FUNCTOR_CONTINUE;
+    if (this->IsProcessingData()) return FUNCTOR_CONTINUE;
 
     // Map only delayed turns
     if (turn->GetDelayed() != BOOLEAN_true) return FUNCTOR_CONTINUE;

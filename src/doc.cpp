@@ -730,9 +730,9 @@ void Doc::PrepareData()
 
     PrepareDelayedTurnsFunctor prepareDelayedTurns;
     this->Process(prepareDelayedTurns);
+    prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
-        prepareDelayedTurns.FillMode(false);
         for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.Clear();

@@ -746,7 +746,7 @@ private:
  * This class sets Turn::m_drawingEndNote for delayed turns.
  * Needs a first pass to fill the map, processed by staff/layer after that.
  */
-class PrepareDelayedTurnsFunctor : public Functor {
+class PrepareDelayedTurnsFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -760,14 +760,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter for the map of delayed turns
@@ -802,8 +794,6 @@ private:
     Turn *m_currentTurn;
     // A map of the delayed turns and the layer elements they point to
     std::map<LayerElement *, Turn *> m_delayedTurns;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
