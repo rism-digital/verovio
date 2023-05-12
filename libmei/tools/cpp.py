@@ -244,6 +244,7 @@ bool {elementNameUpper}::Read({readParam})
 
 bool {elementNameUpper}::Write({writeParam})
 {{
+    element.set_name("{elementNameLower}");
     bool hasAttribute = false;{elementWrite}
     return hasAttribute;
 }}
@@ -1065,10 +1066,9 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                 element_reset.append(f"\n    Reset{att_str}();")
 
             read_param = "pugi::xml_node, bool"
-            write_param = "pugi::xml_node"
             if element_read:
                 read_param = "pugi::xml_node element, bool removeAttr"
-                write_param = "pugi::xml_node element"
+            write_param = "pugi::xml_node element"
 
             consvars = {
                 'elementNameUpper': schema.cc(element),

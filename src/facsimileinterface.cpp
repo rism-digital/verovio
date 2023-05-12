@@ -15,7 +15,6 @@
 
 #include "doc.h"
 #include "facsimile.h"
-#include "functorparams.h"
 #include "surface.h"
 #include "syllable.h"
 #include "view.h"

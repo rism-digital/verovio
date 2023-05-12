@@ -13,9 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layerelement.h"
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -98,7 +99,7 @@ int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 // Turn functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Turn::Accept(MutableFunctor &functor)
+FunctorCode Turn::Accept(Functor &functor)
 {
     return functor.VisitTurn(this);
 }
@@ -108,7 +109,7 @@ FunctorCode Turn::Accept(ConstFunctor &functor) const
     return functor.VisitTurn(this);
 }
 
-FunctorCode Turn::AcceptEnd(MutableFunctor &functor)
+FunctorCode Turn::AcceptEnd(Functor &functor)
 {
     return functor.VisitTurnEnd(this);
 }

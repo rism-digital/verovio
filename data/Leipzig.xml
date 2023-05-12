@@ -585,6 +585,10 @@
   <g c="E946" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagFlared" />
   <g c="E947" x="-120.0" y="0.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemUpFlagExtended" />
   <g c="E948" x="-120.0" y="-760.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemDownFlagExtended" />
+  <g c="EBCD" x="-1.0" y="-6.0" w="280.0" h="203.0" h-a-x="280" n="luteFrench7thCourse" />
+  <g c="EBCE" x="0.0" y="-16.0" w="410.0" h="285.0" h-a-x="410" n="luteFrench8thCourse" />
+  <g c="EBCF" x="0.0" y="-16.0" w="510.0" h="285.0" h-a-x="510" n="luteFrench9thCourse" />
+  <g c="EBD0" x="0.0" y="-16.0" w="610.0" h="285.0" h-a-x="610" n="luteFrench10thCourse" />
   <g c="EC85" x="20.0" y="-319.0" w="402.0" h="637.0" h-a-x="442" n="timeSigCut2" />
   <g c="EC86" x="20.0" y="-319.0" w="372.0" h="637.0" h-a-x="412" n="timeSigCut3" />
   <g c="E903" x="0.0" y="-220.0" w="515.0" h="440.0" h-a-x="515" n="mensuralFclef" />

@@ -24,13 +24,13 @@
 #include "comparison.h"
 #include "devicecontext.h"
 #include "dir.h"
+#include "doc.h"
 #include "dynam.h"
 #include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fing.h"
-#include "functorparams.h"
 #include "gliss.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -2952,13 +2952,17 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
         int x2 = rend->GetContentRight() + margin;
         int y1 = rend->GetContentBottom() - margin / 2;
         int y2 = rend->GetContentTop() + margin;
+        const int width = std::abs(x2 - x1);
+        const int height = std::abs(y2 - y1);
 
         if (params.m_enclose == TEXTRENDITION_box) {
             this->DrawNotFilledRectangle(dc, x1, y1, x2, y2, lineThickness, 0);
         }
+        else if (params.m_enclose == TEXTRENDITION_dbox) {
+            const int yCenter = y1 + (y2 - y1) / 2;
+            this->DrawDiamond(dc, x1 - width / 2, yCenter, height * sqrt(2), width * 2, false, lineThickness);
+        }
         else if (params.m_enclose == TEXTRENDITION_circle) {
-            const int width = std::abs(x2 - x1);
-            const int height = std::abs(y2 - y1);
             if (width > height) {
                 y1 -= (width - height) / 2;
                 y2 += (width - height) / 2;

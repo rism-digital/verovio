@@ -23,12 +23,12 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
+#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "label.h"
@@ -651,9 +651,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
-        dc->StartCustomGraphic("grpSym");
         this->DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
-        dc->EndCustomGraphic();
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);
         return;
     }

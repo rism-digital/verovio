@@ -806,6 +806,10 @@
   <g c="EBCA" x="0.0" y="0.0" w="131.0" h="296.0" h-a-x="131" n="luteFrenchFretL" />
   <g c="EBCB" x="0.0" y="0.0" w="411.0" h="275.0" h-a-x="411" n="luteFrenchFretM" />
   <g c="EBCC" x="0.0" y="0.0" w="321.0" h="302.0" h-a-x="321" n="luteFrenchFretN" />
+  <g c="EBCD" x="0.0" y="0.0" w="276.0" h="242.0" h-a-x="276" n="luteFrench7thCourse" />
+  <g c="EBCE" x="0.0" y="-34.0" w="459.0" h="344.0" h-a-x="459" n="luteFrench8thCourse" />
+  <g c="EBCF" x="0.0" y="-34.0" w="569.0" h="344.0" h-a-x="569" n="luteFrench9thCourse" />
+  <g c="EBD0" x="0.0" y="-34.0" w="679.0" h="344.0" h-a-x="679" n="luteFrench10thCourse" />
   <g c="EBE0" x="24.0" y="-1.0" w="257.0" h="301.0" h-a-x="256" n="luteItalianFret0" />
   <g c="EBE1" x="24.0" y="0.0" w="138.0" h="300.0" h-a-x="138" n="luteItalianFret1" />
   <g c="EBE2" x="24.0" y="-3.0" w="239.0" h="304.0" h-a-x="239" n="luteItalianFret2" />
@@ -957,6 +961,18 @@
   <g c="F44A" x="5.0" y="-259.0" w="127.0" h="517.0" h-a-x="139" n="timeSigCommonLarge" />
   <g c="F44B" x="4.0" y="-314.0" w="128.0" h="627.0" h-a-x="139" n="timeSigCutCommonLarge" />
   <g c="F44C" x="0.0" y="-149.0" w="80.0" h="298.0" h-a-x="80" n="timeSigPlusLarge" />
+  <g c="F44E" x="0.0" y="0.0" w="524.0" h="242.0" h-a-x="524" n="luteFrench7thCourseStrikethru" />
+  <g c="F44F" x="-88.0" y="-100.0" w="450.0" h="342.0" h-a-x="276" n="luteFrench7thCourseUnderline" />
+  <g c="F450" x="0.0" y="0.0" w="276.0" h="242.0" h-a-x="276" n="luteFrench7thCourseRight" />
+  <g c="F451" x="0.0" y="-29.0" w="701.0" h="344.0" h-a-x="701" n="luteFrench8thCourseStrikethru" />
+  <g c="F452" x="0.0" y="-100.0" w="552.0" h="410.0" h-a-x="459" n="luteFrench8thCourseUnderline" />
+  <g c="F453" x="0.0" y="-34.0" w="530.0" h="344.0" h-a-x="530" n="luteFrench8thCourseRight" />
+  <g c="F454" x="0.0" y="-29.0" w="811.0" h="344.0" h-a-x="811" n="luteFrench9thCourseStrikethru" />
+  <g c="F455" x="0.0" y="-100.0" w="662.0" h="410.0" h-a-x="569" n="luteFrench9thCourseUnderline" />
+  <g c="F456" x="0.0" y="-34.0" w="640.0" h="344.0" h-a-x="640" n="luteFrench9thCourseRight" />
+  <g c="F457" x="-1.0" y="-29.0" w="921.0" h="344.0" h-a-x="920" n="luteFrench10thCourseStrikethru" />
+  <g c="F458" x="0.0" y="-100.0" w="762.0" h="410.0" h-a-x="679" n="luteFrench10thCourseUnderline" />
+  <g c="F459" x="0.0" y="-34.0" w="753.0" h="344.0" h-a-x="753" n="luteFrench10thCourseRight" />
   <g c="F45A" x="0.0" y="0.0" w="291.0" h="269.0" h-a-x="291" n="luteFrenchFretCAlt" />
   <g c="F45D" x="20.0" y="-250.0" w="430.0" h="501.0" h-a-x="470" n="timeSig0Small" />
   <g c="F45E" x="20.0" y="-251.0" w="321.0" h="501.0" h-a-x="361" n="timeSig1Small" />

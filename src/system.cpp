@@ -22,7 +22,6 @@
 #include "ending.h"
 #include "findfunctor.h"
 #include "findlayerelementsfunctor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "miscfunctor.h"
@@ -485,7 +484,7 @@ void System::ConvertToUnCastOffMensuralSystem()
 // System functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode System::Accept(MutableFunctor &functor)
+FunctorCode System::Accept(Functor &functor)
 {
     return functor.VisitSystem(this);
 }
@@ -495,7 +494,7 @@ FunctorCode System::Accept(ConstFunctor &functor) const
     return functor.VisitSystem(this);
 }
 
-FunctorCode System::AcceptEnd(MutableFunctor &functor)
+FunctorCode System::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemEnd(this);
 }
@@ -503,21 +502,6 @@ FunctorCode System::AcceptEnd(MutableFunctor &functor)
 FunctorCode System::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSystemEnd(this);
-}
-
-int System::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    // Check whether we are in the selected mdiv
-    if (!params->m_selectedMdivID.empty()
-        && (std::find(params->m_currentMdivIDs.begin(), params->m_currentMdivIDs.end(), params->m_selectedMdivID)
-            == params->m_currentMdivIDs.end())) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

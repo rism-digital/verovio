@@ -16,7 +16,6 @@
 #include "accid.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keysig.h"
 #include "note.h"
 #include "smufl.h"
@@ -85,7 +84,7 @@ int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode KeyAccid::Accept(MutableFunctor &functor)
+FunctorCode KeyAccid::Accept(Functor &functor)
 {
     return functor.VisitKeyAccid(this);
 }
@@ -95,7 +94,7 @@ FunctorCode KeyAccid::Accept(ConstFunctor &functor) const
     return functor.VisitKeyAccid(this);
 }
 
-FunctorCode KeyAccid::AcceptEnd(MutableFunctor &functor)
+FunctorCode KeyAccid::AcceptEnd(Functor &functor)
 {
     return functor.VisitKeyAccidEnd(this);
 }

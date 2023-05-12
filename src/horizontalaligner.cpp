@@ -20,7 +20,6 @@
 #include "elementpart.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "miscfunctor.h"
@@ -93,7 +92,7 @@ void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
     }
 }
 
-FunctorCode HorizontalAligner::Accept(MutableFunctor &functor)
+FunctorCode HorizontalAligner::Accept(Functor &functor)
 {
     return functor.VisitHorizontalAligner(this);
 }
@@ -103,7 +102,7 @@ FunctorCode HorizontalAligner::Accept(ConstFunctor &functor) const
     return functor.VisitHorizontalAligner(this);
 }
 
-FunctorCode HorizontalAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode HorizontalAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitHorizontalAlignerEnd(this);
 }
@@ -324,7 +323,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(const Doc *doc, Alignment *alignment
     }
 }
 
-FunctorCode MeasureAligner::Accept(MutableFunctor &functor)
+FunctorCode MeasureAligner::Accept(Functor &functor)
 {
     return functor.VisitMeasureAligner(this);
 }
@@ -334,7 +333,7 @@ FunctorCode MeasureAligner::Accept(ConstFunctor &functor) const
     return functor.VisitMeasureAligner(this);
 }
 
-FunctorCode MeasureAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode MeasureAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeasureAlignerEnd(this);
 }
@@ -478,7 +477,7 @@ void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
     }
 }
 
-FunctorCode GraceAligner::Accept(MutableFunctor &functor)
+FunctorCode GraceAligner::Accept(Functor &functor)
 {
     return functor.VisitGraceAligner(this);
 }
@@ -488,7 +487,7 @@ FunctorCode GraceAligner::Accept(ConstFunctor &functor) const
     return functor.VisitGraceAligner(this);
 }
 
-FunctorCode GraceAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode GraceAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitGraceAlignerEnd(this);
 }
@@ -758,7 +757,7 @@ int Alignment::HorizontalSpaceForDuration(
     return pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
-FunctorCode Alignment::Accept(MutableFunctor &functor)
+FunctorCode Alignment::Accept(Functor &functor)
 {
     return functor.VisitAlignment(this);
 }
@@ -768,7 +767,7 @@ FunctorCode Alignment::Accept(ConstFunctor &functor) const
     return functor.VisitAlignment(this);
 }
 
-FunctorCode Alignment::AcceptEnd(MutableFunctor &functor)
+FunctorCode Alignment::AcceptEnd(Functor &functor)
 {
     return functor.VisitAlignmentEnd(this);
 }
@@ -931,7 +930,7 @@ void AlignmentReference::SetAccidLayerAlignment()
     }
 }
 
-FunctorCode AlignmentReference::Accept(MutableFunctor &functor)
+FunctorCode AlignmentReference::Accept(Functor &functor)
 {
     return functor.VisitAlignmentReference(this);
 }
@@ -941,7 +940,7 @@ FunctorCode AlignmentReference::Accept(ConstFunctor &functor) const
     return functor.VisitAlignmentReference(this);
 }
 
-FunctorCode AlignmentReference::AcceptEnd(MutableFunctor &functor)
+FunctorCode AlignmentReference::AcceptEnd(Functor &functor)
 {
     return functor.VisitAlignmentReferenceEnd(this);
 }
@@ -1011,7 +1010,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     return timestampAttr;
 }
 
-FunctorCode TimestampAligner::Accept(MutableFunctor &functor)
+FunctorCode TimestampAligner::Accept(Functor &functor)
 {
     return functor.VisitTimestampAligner(this);
 }
@@ -1021,7 +1020,7 @@ FunctorCode TimestampAligner::Accept(ConstFunctor &functor) const
     return functor.VisitTimestampAligner(this);
 }
 
-FunctorCode TimestampAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode TimestampAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitTimestampAlignerEnd(this);
 }

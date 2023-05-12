@@ -53,7 +53,7 @@ bool Fb::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode Fb::Accept(MutableFunctor &functor)
+FunctorCode Fb::Accept(Functor &functor)
 {
     return functor.VisitFb(this);
 }
@@ -63,7 +63,7 @@ FunctorCode Fb::Accept(ConstFunctor &functor) const
     return functor.VisitFb(this);
 }
 
-FunctorCode Fb::AcceptEnd(MutableFunctor &functor)
+FunctorCode Fb::AcceptEnd(Functor &functor)
 {
     return functor.VisitFbEnd(this);
 }

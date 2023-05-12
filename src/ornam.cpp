@@ -97,7 +97,7 @@ char32_t Ornam::GetOrnamGlyph() const
 // Ornam functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Ornam::Accept(MutableFunctor &functor)
+FunctorCode Ornam::Accept(Functor &functor)
 {
     return functor.VisitOrnam(this);
 }
@@ -107,7 +107,7 @@ FunctorCode Ornam::Accept(ConstFunctor &functor) const
     return functor.VisitOrnam(this);
 }
 
-FunctorCode Ornam::AcceptEnd(MutableFunctor &functor)
+FunctorCode Ornam::AcceptEnd(Functor &functor)
 {
     return functor.VisitOrnamEnd(this);
 }

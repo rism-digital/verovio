@@ -34,7 +34,6 @@ class Note;
 class Slur;
 class TabGrp;
 class Tie;
-class TransPitch;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -282,6 +281,14 @@ public:
      */
     static int PnameToPclass(data_PITCHNAME pitchName);
 
+    /**
+     * Get and set the pitch for transposition
+     */
+    ///@{
+    TransPitch GetTransPitch() const;
+    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -290,26 +297,11 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -329,20 +321,6 @@ private:
      * Get the pitch difference in semitones of the accidental (implicit or explicit) for this note.
      */
     int GetChromaticAlteration() const;
-
-    TransPitch GetTransPitch() const;
-
-    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
-
-    /**
-     * Register deferred notes for MIDI
-     */
-    void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
-
-    /**
-     * Create the MIDI output of the grace note sequence stored in params
-     */
-    void GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity);
 
 public:
     //

@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "vrv.h"
@@ -128,7 +127,7 @@ std::pair<char32_t, char32_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) cons
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MeterSig::Accept(MutableFunctor &functor)
+FunctorCode MeterSig::Accept(Functor &functor)
 {
     return functor.VisitMeterSig(this);
 }
@@ -138,7 +137,7 @@ FunctorCode MeterSig::Accept(ConstFunctor &functor) const
     return functor.VisitMeterSig(this);
 }
 
-FunctorCode MeterSig::AcceptEnd(MutableFunctor &functor)
+FunctorCode MeterSig::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeterSigEnd(this);
 }

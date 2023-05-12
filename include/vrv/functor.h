@@ -75,20 +75,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MutableFunctor
+// Functor
 //----------------------------------------------------------------------------
 
 /**
  * This abstract class is the base class for all mutable functors.
  */
-class MutableFunctor : public FunctorBase, public FunctorInterface {
+class Functor : public FunctorBase, public FunctorInterface {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    MutableFunctor(){};
-    virtual ~MutableFunctor() = default;
+    Functor(){};
+    virtual ~Functor() = default;
     ///@}
 
 private:
@@ -131,7 +131,7 @@ private:
 /**
  * This abstract class is the base class for all mutable functors that need access to the document.
  */
-class DocFunctor : public MutableFunctor {
+class DocFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -190,6 +190,45 @@ protected:
 
 private:
     //
+};
+
+//----------------------------------------------------------------------------
+// CollectAndProcess
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a mixin for all functors that require two step processing:
+ * (1) Collecing data. (2) Processing data.
+ */
+class CollectAndProcess {
+protected:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CollectAndProcess() = default;
+    ~CollectAndProcess() = default;
+    ///@}
+
+public:
+    /**
+     * Check and switch the current phase.
+     */
+    ///@{
+    bool IsCollectingData() const { return !m_processingData; }
+    bool IsProcessingData() const { return m_processingData; }
+    void SetDataCollectionCompleted() { m_processingData = true; }
+    ///@}
+
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    // Indicates the current phase: collecting vs processing data
+    bool m_processingData = false;
 };
 
 } // namespace vrv

@@ -23,12 +23,12 @@
 #include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
+#include "doc.h"
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
 #include "f.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "halfmrpt.h"
 #include "keyaccid.h"
 #include "label.h"
@@ -249,7 +249,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->HasPlace() || (accid->GetFunc() == accidLog_FUNC_edit)) {
+    if (accid->HasPlace() || accid->HasOnstaff() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
@@ -942,6 +942,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(layer);
     assert(staff);
     assert(measure);
+
+    if (staff->IsTablature()) {
+        // Encoded keySig will not be shown on tablature
+        return;
+    }
 
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);

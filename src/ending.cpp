@@ -15,7 +15,6 @@
 
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "scoredef.h"
 #include "section.h"
@@ -76,7 +75,7 @@ bool Ending::IsSupportedChild(Object *child)
 // Ending functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Ending::Accept(MutableFunctor &functor)
+FunctorCode Ending::Accept(Functor &functor)
 {
     return functor.VisitEnding(this);
 }
@@ -86,7 +85,7 @@ FunctorCode Ending::Accept(ConstFunctor &functor) const
     return functor.VisitEnding(this);
 }
 
-FunctorCode Ending::AcceptEnd(MutableFunctor &functor)
+FunctorCode Ending::AcceptEnd(Functor &functor)
 {
     return functor.VisitEndingEnd(this);
 }

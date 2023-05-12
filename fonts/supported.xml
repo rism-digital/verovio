@@ -2828,10 +2828,10 @@
         <glyph glyph-code="EBCA" smufl-name="luteFrenchFretL"/>
         <glyph glyph-code="EBCB" smufl-name="luteFrenchFretM"/>
         <glyph glyph-code="EBCC" smufl-name="luteFrenchFretN"/>
-        <!--<glyph glyph-code="EBCD" smufl-name="luteFrench7thCourse" />-->
-        <!--<glyph glyph-code="EBCE" smufl-name="luteFrench8thCourse" />-->
-        <!--<glyph glyph-code="EBCF" smufl-name="luteFrench9thCourse" />-->
-        <!--<glyph glyph-code="EBD0" smufl-name="luteFrench10thCourse" />-->
+        <glyph glyph-code="EBCD" smufl-name="luteFrench7thCourse"/>
+        <glyph glyph-code="EBCE" smufl-name="luteFrench8thCourse"/>
+        <glyph glyph-code="EBCF" smufl-name="luteFrench9thCourse"/>
+        <glyph glyph-code="EBD0" smufl-name="luteFrench10thCourse"/>
         <!--<glyph glyph-code="EBD1" smufl-name="luteFrenchMordentUpper" />-->
         <!--<glyph glyph-code="EBD2" smufl-name="luteFrenchMordentLower" />-->
         <!--<glyph glyph-code="EBD3" smufl-name="luteFrenchMordentInverted" />-->

@@ -249,6 +249,7 @@ FunctorCode FindSpannedLayerElementsFunctor::VisitMeasure(const Measure *measure
 
 GetRelativeLayerElementFunctor::GetRelativeLayerElementFunctor(
     int elementIndex, bool searchDirection, bool anotherLayer)
+    : ConstFunctor()
 {
     m_relativeElement = NULL;
     m_initialElementIndex = elementIndex;

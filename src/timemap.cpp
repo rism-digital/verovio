@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "jsonxx.h"
 #include "measure.h"
 #include "note.h"
 #include "rest.h"
@@ -35,85 +35,6 @@ Timemap::~Timemap() {}
 void Timemap::Reset()
 {
     m_map.clear();
-}
-
-void Timemap::AddEntry(Object *object, GenerateTimemapParams *params)
-{
-    assert(object);
-    assert(params);
-
-    // It is a bit weird to have a timemap parameter, but we need it to call this method from the functor.
-    // Just make sure they are the same because below we use m_map (and not params->m_timemap)
-    assert(params->m_timemap == this);
-
-    TimemapEntry emptyEntry;
-
-    if (object->Is({ NOTE, REST })) {
-        DurationInterface *interface = object->GetDurationInterface();
-        assert(interface);
-
-        double realTimeStart = round(params->m_realTimeOffsetMilliseconds + interface->GetRealTimeOnsetMilliseconds());
-        double scoreTimeStart = params->m_scoreTimeOffset + interface->GetScoreTimeOnset();
-
-        double realTimeEnd = round(params->m_realTimeOffsetMilliseconds + interface->GetRealTimeOffsetMilliseconds());
-        double scoreTimeEnd = params->m_scoreTimeOffset + interface->GetScoreTimeOffset();
-
-        bool isRest = (object->Is(REST));
-
-        /*********** start values ***********/
-
-        if (m_map.count(realTimeStart) == 0) {
-            m_map[realTimeStart] = emptyEntry;
-        }
-        TimemapEntry *startEntry = &m_map.at(realTimeStart);
-
-        // Should check if value for realTimeStart already exists and if so, then
-        // ensure that it is equal to scoreTimeStart:
-        startEntry->qstamp = scoreTimeStart;
-
-        // Store the element ID in list to turn on at given time - note or rest
-        if (!isRest) startEntry->notesOn.push_back(object->GetID());
-        if (isRest) startEntry->restsOn.push_back(object->GetID());
-
-        // Also add the tempo the
-        startEntry->tempo = params->m_currentTempo;
-
-        /*********** end values ***********/
-
-        if (m_map.count(realTimeEnd) == 0) {
-            m_map[realTimeEnd] = emptyEntry;
-        }
-        TimemapEntry *endEntry = &m_map.at(realTimeEnd);
-
-        // Should check if value for realTimeEnd already exists and if so, then
-        // ensure that it is equal to scoreTimeEnd:
-        endEntry->qstamp = scoreTimeEnd;
-
-        // Store the element ID in list to turn off at given time - notes or rest
-        if (!isRest) endEntry->notesOff.push_back(object->GetID());
-        if (isRest) endEntry->restsOff.push_back(object->GetID());
-    }
-    else if (object->Is(MEASURE)) {
-
-        Measure *measure = vrv_cast<Measure *>(object);
-        assert(measure);
-
-        // Deal with repeated music later, for now get the last times.
-        double scoreTimeStart = params->m_scoreTimeOffset;
-        double realTimeStart = round(params->m_realTimeOffsetMilliseconds);
-
-        if (m_map.count(realTimeStart) == 0) {
-            m_map[realTimeStart] = emptyEntry;
-        }
-        TimemapEntry *startEntry = &m_map.at(realTimeStart);
-
-        // Should check if value for realTimeStart already exists and if so, then
-        // ensure that it is equal to scoreTimeStart:
-        startEntry->qstamp = scoreTimeStart;
-
-        // Add the measureOn
-        startEntry->measureOn = measure->GetID();
-    }
 }
 
 void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasures)

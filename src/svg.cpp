@@ -59,7 +59,7 @@ int Svg::GetHeight() const
     return 0;
 }
 
-FunctorCode Svg::Accept(MutableFunctor &functor)
+FunctorCode Svg::Accept(Functor &functor)
 {
     return functor.VisitSvg(this);
 }
@@ -69,7 +69,7 @@ FunctorCode Svg::Accept(ConstFunctor &functor) const
     return functor.VisitSvg(this);
 }
 
-FunctorCode Svg::AcceptEnd(MutableFunctor &functor)
+FunctorCode Svg::AcceptEnd(Functor &functor)
 {
     return functor.VisitSvgEnd(this);
 }
