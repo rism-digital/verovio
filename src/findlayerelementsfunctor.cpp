@@ -260,10 +260,12 @@ FunctorCode GetRelativeLayerElementFunctor::VisitLayerElement(const LayerElement
     // processed (e.g. ignore index children of beams, since they have their own indices irrelevant to the one that
     // has been passed inside this functor)
     if (!m_isInNeighboringLayer && layerElement->GetParent()->Is(LAYER)) {
-        if ((this->GetDirection() == FORWARD) && (layerElement->GetIdx() < m_initialElementIndex))
+        if ((this->GetDirection() == FORWARD) && (layerElement->GetIdx() < m_initialElementIndex)) {
             return FUNCTOR_SIBLINGS;
-        if ((this->GetDirection() == BACKWARD) && (layerElement->GetIdx() > m_initialElementIndex))
+        }
+        if ((this->GetDirection() == BACKWARD) && (layerElement->GetIdx() > m_initialElementIndex)) {
             return FUNCTOR_SIBLINGS;
+        }
     }
 
     if (layerElement->Is({ NOTE, CHORD, FTREM })) {
