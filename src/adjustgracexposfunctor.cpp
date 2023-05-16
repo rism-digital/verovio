@@ -48,11 +48,9 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
         MeasureAligner *measureAligner = vrv_cast<MeasureAligner *>(alignment->GetFirstAncestor(MEASURE_ALIGNER));
         assert(measureAligner);
 
-        bool previousDirection = this->GetDirection();
-        Filters *previousFilters = this->GetFilters();
-        this->SetDirection(BACKWARD);
+        this->PushDirection(BACKWARD);
         Filters filters;
-        this->SetFilters(&filters);
+        this->PushFilters(&filters);
 
         std::vector<int>::iterator iter;
         for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
@@ -110,8 +108,8 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
             }
         }
 
-        this->SetDirection(previousDirection);
-        this->SetFilters(previousFilters);
+        this->PopDirection();
+        this->PopFilters();
 
         // Change the flag back
         m_isGraceAlignment = false;
@@ -143,17 +141,15 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignmentReference(AlignmentReference *
     // Because we are processing grace notes alignment backward (see VisitAlignment) we need
     // to process the children (LayerElement) "by hand" in FORWARD manner
     // (filters can be NULL because filtering was already applied in the parent)
-    bool previousDirection = this->GetDirection();
-    Filters *previousFilters = this->GetFilters();
-    this->SetDirection(FORWARD);
-    this->SetFilters(NULL);
+    this->PushDirection(FORWARD);
+    this->PushFilters(NULL);
 
     for (auto child : alignmentReference->GetChildren()) {
         child->Process(*this);
     }
 
-    this->SetDirection(previousDirection);
-    this->SetFilters(previousFilters);
+    this->PopDirection();
+    this->PopFilters();
 
     return FUNCTOR_SIBLINGS;
 }
@@ -209,8 +205,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitMeasure(Measure *measure)
     m_rightDefaultAlignment = NULL;
 
     // We process it backward because we want to get the rightDefaultAlignment
-    bool previousDirection = this->GetDirection();
-    this->SetDirection(BACKWARD);
+    this->PushDirection(BACKWARD);
     measure->m_measureAligner.Process(*this);
 
     // We need to process the staves in the reverse order
@@ -225,7 +220,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitMeasure(Measure *measure)
     m_staffNs = staffNsReversed;
     m_measureTieEndpoints = measure->GetInternalTieEndpoints();
     measure->m_measureAligner.Process(*this);
-    this->SetDirection(previousDirection);
+    this->PopDirection();
 
     // Put params back
     m_staffNs = staffNs;

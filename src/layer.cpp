@@ -399,7 +399,7 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, const Me
     Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.Add(&matchStaff);
-    layersInTimeSpan.SetFilters(&filters);
+    layersInTimeSpan.PushFilters(&filters);
 
     measure->m_measureAligner.Process(layersInTimeSpan);
 
@@ -481,7 +481,7 @@ ListOfConstObjects Layer::GetLayerElementsInTimeSpan(
     Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.Add(&matchStaff);
-    layerElementsInTimeSpan.SetFilters(&filters);
+    layerElementsInTimeSpan.PushFilters(&filters);
 
     measure->m_measureAligner.Process(layerElementsInTimeSpan);
 
