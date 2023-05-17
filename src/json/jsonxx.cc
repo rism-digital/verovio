@@ -121,8 +121,24 @@ bool parse_string(std::istream& input, String& value) {
                             input.get(ch);
                             ss << std::hex << ch;
                         }
-                        if( input.good() && (ss >> i) )
-                            value.push_back(static_cast<char>(i));
+                        if (input.good() && (ss >> i)) {
+                            // Encode codepoint via utf-8.
+                            if (i < 0x80) {
+                                value.push_back(static_cast<char>(i));
+                            } else if (i < 0x800) {
+                                value.push_back(static_cast<char>((i >> 6) | 0xc0));
+                                value.push_back(static_cast<char>((i & 0x3f) | 0x80));
+                            } else if (i < 0x10000) {
+                                value.push_back(static_cast<char>((i >> 12) | 0xe0));
+                                value.push_back(static_cast<char>(((i >> 6) & 0x3f) | 0x80));
+                                value.push_back(static_cast<char>((i & 0x3f) | 0x80));
+                            } else {
+                                value.push_back(static_cast<char>((i >> 18) | 0xf0));
+                                value.push_back(static_cast<char>(((i >> 12) & 0x3f) | 0x80));
+                                value.push_back(static_cast<char>(((i >> 6) & 0x3f) | 0x80));
+                                value.push_back(static_cast<char>((i & 0x3f) | 0x80));
+                            }
+                        }
                     }
                     break;
                 default:
