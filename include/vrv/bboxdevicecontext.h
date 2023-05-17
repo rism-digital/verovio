@@ -49,11 +49,11 @@ public:
      * @name Setters
      */
     ///@{
-    void SetBackground(int colour, int style = AxSOLID) override;
+    void SetBackground(int color, int style = AxSOLID) override;
     void SetBackgroundImage(void *image, double opacity = 1.0) override{};
     void SetBackgroundMode(int mode) override;
-    void SetTextForeground(int colour) override;
-    void SetTextBackground(int colour) override;
+    void SetTextForeground(int color) override;
+    void SetTextBackground(int color) override;
     void SetLogicalOrigin(int x, int y) override;
     void SetUserScale(double xScale, double yScale);
     ///@}
