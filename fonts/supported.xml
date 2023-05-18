@@ -1355,7 +1355,7 @@
         <!--<glyph glyph-code="E592" smufl-name="ornamentHighLeftConcaveStroke" />-->
         <!--<glyph glyph-code="E593" smufl-name="ornamentHighLeftConvexStroke" />-->
         <!--<glyph glyph-code="E594" smufl-name="ornamentLeftVerticalStroke" />-->
-        <!--<glyph glyph-code="E595" smufl-name="ornamentLeftVerticalStrokeWithCross" />-->
+        <glyph glyph-code="E595" smufl-name="ornamentLeftVerticalStrokeWithCross"/>
         <!--<glyph glyph-code="E596" smufl-name="ornamentLeftShakeT" />-->
         <!--<glyph glyph-code="E597" smufl-name="ornamentLeftPlus" />-->
         <!--<glyph glyph-code="E598" smufl-name="ornamentLowLeftConcaveStroke" />-->
@@ -2799,7 +2799,7 @@
         <!--<glyph glyph-code="EBA3" smufl-name="luteBarlineStartRepeat" />-->
         <!--<glyph glyph-code="EBA4" smufl-name="luteBarlineEndRepeat" />-->
         <!--<glyph glyph-code="EBA5" smufl-name="luteBarlineFinal" />-->
-        <!--<glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole" />-->
+        <glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole"/>
         <glyph glyph-code="EBA7" smufl-name="luteDurationWhole"/>
         <glyph glyph-code="EBA8" smufl-name="luteDurationHalf"/>
         <glyph glyph-code="EBA9" smufl-name="luteDurationQuarter"/>
@@ -2870,42 +2870,42 @@
     </italianAndSpanishRenaissanceLuteTablature>
     <germanRenaissanceLuteTablature>
         <description>German Renaissance lute tablature</description>
-        <!--<glyph glyph-code="EC00" smufl-name="luteGermanALower" />-->
-        <!--<glyph glyph-code="EC01" smufl-name="luteGermanBLower" />-->
-        <!--<glyph glyph-code="EC02" smufl-name="luteGermanCLower" />-->
-        <!--<glyph glyph-code="EC03" smufl-name="luteGermanDLower" />-->
-        <!--<glyph glyph-code="EC04" smufl-name="luteGermanELower" />-->
-        <!--<glyph glyph-code="EC05" smufl-name="luteGermanFLower" />-->
-        <!--<glyph glyph-code="EC06" smufl-name="luteGermanGLower" />-->
-        <!--<glyph glyph-code="EC07" smufl-name="luteGermanHLower" />-->
-        <!--<glyph glyph-code="EC08" smufl-name="luteGermanILower" />-->
-        <!--<glyph glyph-code="EC09" smufl-name="luteGermanKLower" />-->
-        <!--<glyph glyph-code="EC0A" smufl-name="luteGermanLLower" />-->
-        <!--<glyph glyph-code="EC0B" smufl-name="luteGermanMLower" />-->
-        <!--<glyph glyph-code="EC0C" smufl-name="luteGermanNLower" />-->
-        <!--<glyph glyph-code="EC0D" smufl-name="luteGermanOLower" />-->
-        <!--<glyph glyph-code="EC0E" smufl-name="luteGermanPLower" />-->
-        <!--<glyph glyph-code="EC0F" smufl-name="luteGermanQLower" />-->
-        <!--<glyph glyph-code="EC10" smufl-name="luteGermanRLower" />-->
-        <!--<glyph glyph-code="EC11" smufl-name="luteGermanSLower" />-->
-        <!--<glyph glyph-code="EC12" smufl-name="luteGermanTLower" />-->
-        <!--<glyph glyph-code="EC13" smufl-name="luteGermanVLower" />-->
-        <!--<glyph glyph-code="EC14" smufl-name="luteGermanXLower" />-->
-        <!--<glyph glyph-code="EC15" smufl-name="luteGermanYLower" />-->
-        <!--<glyph glyph-code="EC16" smufl-name="luteGermanZLower" />-->
-        <!--<glyph glyph-code="EC17" smufl-name="luteGermanAUpper" />-->
-        <!--<glyph glyph-code="EC18" smufl-name="luteGermanBUpper" />-->
-        <!--<glyph glyph-code="EC19" smufl-name="luteGermanCUpper" />-->
-        <!--<glyph glyph-code="EC1A" smufl-name="luteGermanDUpper" />-->
-        <!--<glyph glyph-code="EC1B" smufl-name="luteGermanEUpper" />-->
-        <!--<glyph glyph-code="EC1C" smufl-name="luteGermanFUpper" />-->
-        <!--<glyph glyph-code="EC1D" smufl-name="luteGermanGUpper" />-->
-        <!--<glyph glyph-code="EC1E" smufl-name="luteGermanHUpper" />-->
-        <!--<glyph glyph-code="EC1F" smufl-name="luteGermanIUpper" />-->
-        <!--<glyph glyph-code="EC20" smufl-name="luteGermanKUpper" />-->
-        <!--<glyph glyph-code="EC21" smufl-name="luteGermanLUpper" />-->
-        <!--<glyph glyph-code="EC22" smufl-name="luteGermanMUpper" />-->
-        <!--<glyph glyph-code="EC23" smufl-name="luteGermanNUpper" />-->
+        <glyph glyph-code="EC00" smufl-name="luteGermanALower"/>
+        <glyph glyph-code="EC01" smufl-name="luteGermanBLower"/>
+        <glyph glyph-code="EC02" smufl-name="luteGermanCLower"/>
+        <glyph glyph-code="EC03" smufl-name="luteGermanDLower"/>
+        <glyph glyph-code="EC04" smufl-name="luteGermanELower"/>
+        <glyph glyph-code="EC05" smufl-name="luteGermanFLower"/>
+        <glyph glyph-code="EC06" smufl-name="luteGermanGLower"/>
+        <glyph glyph-code="EC07" smufl-name="luteGermanHLower"/>
+        <glyph glyph-code="EC08" smufl-name="luteGermanILower"/>
+        <glyph glyph-code="EC09" smufl-name="luteGermanKLower"/>
+        <glyph glyph-code="EC0A" smufl-name="luteGermanLLower"/>
+        <glyph glyph-code="EC0B" smufl-name="luteGermanMLower"/>
+        <glyph glyph-code="EC0C" smufl-name="luteGermanNLower"/>
+        <glyph glyph-code="EC0D" smufl-name="luteGermanOLower"/>
+        <glyph glyph-code="EC0E" smufl-name="luteGermanPLower"/>
+        <glyph glyph-code="EC0F" smufl-name="luteGermanQLower"/>
+        <glyph glyph-code="EC10" smufl-name="luteGermanRLower"/>
+        <glyph glyph-code="EC11" smufl-name="luteGermanSLower"/>
+        <glyph glyph-code="EC12" smufl-name="luteGermanTLower"/>
+        <glyph glyph-code="EC13" smufl-name="luteGermanVLower"/>
+        <glyph glyph-code="EC14" smufl-name="luteGermanXLower"/>
+        <glyph glyph-code="EC15" smufl-name="luteGermanYLower"/>
+        <glyph glyph-code="EC16" smufl-name="luteGermanZLower"/>
+        <glyph glyph-code="EC17" smufl-name="luteGermanAUpper"/>
+        <glyph glyph-code="EC18" smufl-name="luteGermanBUpper"/>
+        <glyph glyph-code="EC19" smufl-name="luteGermanCUpper"/>
+        <glyph glyph-code="EC1A" smufl-name="luteGermanDUpper"/>
+        <glyph glyph-code="EC1B" smufl-name="luteGermanEUpper"/>
+        <glyph glyph-code="EC1C" smufl-name="luteGermanFUpper"/>
+        <glyph glyph-code="EC1D" smufl-name="luteGermanGUpper"/>
+        <glyph glyph-code="EC1E" smufl-name="luteGermanHUpper"/>
+        <glyph glyph-code="EC1F" smufl-name="luteGermanIUpper"/>
+        <glyph glyph-code="EC20" smufl-name="luteGermanKUpper"/>
+        <glyph glyph-code="EC21" smufl-name="luteGermanLUpper"/>
+        <glyph glyph-code="EC22" smufl-name="luteGermanMUpper"/>
+        <glyph glyph-code="EC23" smufl-name="luteGermanNUpper"/>
         <range_end>U+EC2F</range_end>
         <range_start>U+EC00</range_start>
     </germanRenaissanceLuteTablature>

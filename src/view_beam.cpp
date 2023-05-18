@@ -284,7 +284,7 @@ void View::DrawBeamSegment(
     int durRef = DUR_8;
     int durRef2 = DUR_16;
 
-    if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
+    if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian() || staff->IsTabLuteGerman()) {
         durRef = DUR_4;
         durRef2 = DUR_8;
     }
