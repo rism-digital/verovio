@@ -618,6 +618,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
             m_currentNode = m_currentNode.append_child("custos");
             this->WriteCustos(m_currentNode, vrv_cast<Custos *>(object));
         }
+        else if (object->Is(DIVLINE)) {
+            m_currentNode = m_currentNode.append_child("divLine");
+            this->WriteDivLine(m_currentNode, vrv_cast<DivLine *>(object));
+        }
         else if (object->Is(DOT)) {
             m_currentNode = m_currentNode.append_child("dot");
             this->WriteDot(m_currentNode, vrv_cast<Dot *>(object));
