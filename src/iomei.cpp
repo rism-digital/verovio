@@ -2436,8 +2436,8 @@ void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
 {
     assert(divLine);
 
-    WriteLayerElement(currentNode, divLine);
-    WriteFacsimileInterface(currentNode, divLine);
+    this->WriteLayerElement(currentNode, divLine);
+    this->WriteFacsimileInterface(currentNode, divLine);
     divLine->WriteDivLineLog(currentNode);
     divLine->WriteColor(currentNode);
     divLine->WriteVisibility(currentNode);
@@ -6042,7 +6042,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             success = this->ReadCustos(parent, xmlElement);
         }
         else if (elementName == "divLine") {
-            success = ReadDivLine(parent, xmlElement);
+            success = this->ReadDivLine(parent, xmlElement);
         }
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
@@ -6374,15 +6374,15 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
 bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
 {
     DivLine *vrvDivLine = new DivLine();
-    ReadLayerElement(divLine, vrvDivLine);
+    this->ReadLayerElement(divLine, vrvDivLine);
 
-    ReadFacsimileInterface(divLine, vrvDivLine);
+    this->ReadFacsimileInterface(divLine, vrvDivLine);
     vrvDivLine->ReadDivLineLog(divLine);
     vrvDivLine->ReadColor(divLine);
     vrvDivLine->ReadVisibility(divLine);
 
     parent->AddChild(vrvDivLine);
-    ReadUnsupportedAttr(divLine, vrvDivLine);
+    this->ReadUnsupportedAttr(divLine, vrvDivLine);
     return true;
 }
 
