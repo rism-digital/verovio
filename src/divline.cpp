@@ -31,11 +31,11 @@ namespace vrv {
 
 DivLine::DivLine() : LayerElement(DIVLINE, "dline-"), AttDivLineLog(), AttColor(), AttVisibility()
 {
-    RegisterAttClass(ATT_DIVLINELOG);
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_VISIBILITY);
+    this->RegisterAttClass(ATT_DIVLINELOG);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
-    Reset();
+    this->Reset();
 }
 
 DivLine::~DivLine() {}
@@ -45,8 +45,8 @@ void DivLine::Reset()
     LayerElement::Reset();
 
     // Reset();
-    ResetColor();
-    ResetVisibility();
+    this->ResetColor();
+    this->ResetVisibility();
 }
 
 std::wstring DivLine::GetSymbolStr() const
