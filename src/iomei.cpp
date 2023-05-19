@@ -2441,6 +2441,7 @@ void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
     divLine->WriteDivLineLog(currentNode);
     divLine->WriteColor(currentNode);
     divLine->WriteVisibility(currentNode);
+    divLine->WriteExtSym(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -6380,6 +6381,7 @@ bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
     vrvDivLine->ReadDivLineLog(divLine);
     vrvDivLine->ReadColor(divLine);
     vrvDivLine->ReadVisibility(divLine);
+    vrvDivLine->ReadExtSym(divLine);
 
     parent->AddChild(vrvDivLine);
     this->ReadUnsupportedAttr(divLine, vrvDivLine);

@@ -13,14 +13,12 @@
 
 //----------------------------------------------------------------------------
 
-#include "comparison.h"
 #include "doc.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
-#include "measure.h"
+#include "smufl.h"
 #include "staff.h"
-#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -29,10 +27,12 @@ namespace vrv {
 // DivLine
 //----------------------------------------------------------------------------
 
-DivLine::DivLine() : LayerElement(DIVLINE, "dline-"), AttDivLineLog(), AttColor(), AttVisibility()
+DivLine::DivLine()
+    : LayerElement(DIVLINE, "dline-"), AttColor(), AttDivLineLog(), AttExtSym(), AttNNumberLike(), AttVisibility()
 {
-    this->RegisterAttClass(ATT_DIVLINELOG);
     this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_DIVLINELOG);
+    this->RegisterAttClass(ATT_EXTSYM);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
@@ -44,8 +44,9 @@ void DivLine::Reset()
 {
     LayerElement::Reset();
 
-    // Reset();
     this->ResetColor();
+    this->ResetDivLineLog();
+    this->ResetExtSym();
     this->ResetVisibility();
 }
 
