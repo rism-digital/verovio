@@ -152,16 +152,21 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
 
         // Add overline if required
-        // TODO is this the correct way to add an overline?
         if (overline && !fret.empty()) {
-            const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-            const int width = m_doc->GetGlyphWidth(fret.at(0), glyphSize, drawingCueSize);
-            const int x1 = x - width / 2;
-            const int x2 = x + (fret.size() - 1) * width + width * 8 / 10; // trim right hand overhang on last character
-            const int y1 = y + m_doc->GetGlyphHeight(fret.at(0), glyphSize, drawingCueSize) + lineWidth;
+            const int lineThickness
+                = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int widthFront = m_doc->GetGlyphWidth(fret.front(), glyphSize, drawingCueSize);
+            const int widthBack = m_doc->GetGlyphWidth(fret.back(), glyphSize, drawingCueSize);
+            TextExtend extend;
+            dc->GetSmuflTextExtent(fret, &extend);
+
+            const int x1 = x - widthFront / 2;
+            const int x2 = x + extend.m_width - widthBack * 3 / 10; // trim right hand overhang on last character
+
+            const int y1 = y + extend.m_ascent + lineThickness;
             const int y2 = y1;
 
-            dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
+            dc->SetPen(m_currentColour, lineThickness, AxSOLID);
             dc->SetBrush(m_currentColour, AxSOLID);
 
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));

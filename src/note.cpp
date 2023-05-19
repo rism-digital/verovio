@@ -343,7 +343,7 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, bool &over
         const int fret = this->GetTabFret();
         const int course = this->GetTabCourse();
 
-        // SMuFL has glyphs for German lute tablature following Hans Newsider's notation
+        // SMuFL has glyphs for German lute tablature following Hans Newsidler's notation
         // for the 6th course.
         // "German Renaissance lute tablature (U+EC00–U+EC2F)"
         // https://w3c.github.io/smufl/latest/tables/german-renaissance-lute-tablature.html
