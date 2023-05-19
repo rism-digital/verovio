@@ -44,7 +44,6 @@ public:
      */
     bool SetAlignment(Alignment *alignment);
 
-
     /**
      * Retrieve SMuFL string for the divLine.
      */
