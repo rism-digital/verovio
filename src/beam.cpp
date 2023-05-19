@@ -602,8 +602,8 @@ void BeamSegment::CalcBeamInit(
         beamInterface->m_beamWidthBlack /= 2;
         beamInterface->m_beamWidthWhite /= 2;
 
-        // Adjust it further for tab.lute.french, tab.lute.italian and tab.lute.german
-        if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian() || staff->IsTabLuteGerman()) {
+        // Adjust it further for tab.lute.french, tab.lute.german and tab.lute.italian
+        if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()) {
             beamInterface->m_beamWidthBlack = beamInterface->m_beamWidthBlack * 2 / 5;
             beamInterface->m_beamWidthWhite = beamInterface->m_beamWidthWhite * 3 / 5;
         }
