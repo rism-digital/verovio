@@ -25525,7 +25525,7 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
         }
     }
 
-    if (turnstart == turnend) {
+    if (turnstart == -1) {
         return;
     }
     std::string turnstr = tok.substr(turnstart, turnend - turnstart + 1);
