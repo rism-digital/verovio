@@ -660,10 +660,10 @@ public:
 
 protected:
     /**
-     * The colour currently being used when drawing.
+     * The color currently being used when drawing.
      * It can change when drawing the m_currentElement, for example
      */
-    int m_currentColour;
+    int m_currentColor;
 
     /**
      * Control the handling of slurs
