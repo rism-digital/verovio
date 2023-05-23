@@ -2070,20 +2070,20 @@ void View::DrawGliss(DeviceContext *dc, Gliss *gliss, int x1, int x2, Staff *sta
             break;
         }
         case LINEFORM_dashed:
-            dc->SetPen(m_currentColor, lineWidth, AxSHORT_DASH, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetPen(m_currentColor, lineWidth, AxSHORT_DASH, 0, 0, AxCAP_ROUND);
             dc->SetBrush(m_currentColor, AxSOLID);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_dotted:
-            dc->SetPen(m_currentColor, lineWidth * 3 / 2, AxDOT, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetPen(m_currentColor, lineWidth * 3 / 2, AxDOT, 0, 0, AxCAP_ROUND);
             dc->SetBrush(m_currentColor, AxSOLID);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
             break;
         case LINEFORM_solid: [[fallthrough]];
         default: {
-            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_ROUND, AxJOIN_ARCS);
+            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_ROUND);
             dc->SetBrush(m_currentColor, AxSOLID);
             dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
             dc->ResetPen();
