@@ -2828,6 +2828,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             // if the element is a syl we want it to stay attached to the first element
             // we'll still need to initialize all the parents, thus the bool
             if (el->Is(SYL)) {
+                firstIsSyl = true;
                 continue;
             }
             else if (groupType == "nc") {
@@ -2848,7 +2849,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 assert(currentParent);
                 firstIsSyl = false;
             }
-            if (currentParent == NULL) {
+            else if (groupType == "neume") {
                 fparent = el->GetFirstAncestor(SYLLABLE);
                 assert(fparent);
                 uuidArray << fparent->GetID();
@@ -2856,6 +2857,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 assert(sparent);
                 currentParent = vrv_cast<Syllable *>(fparent);
                 assert(currentParent);
+                firstIsSyl = false;
 
                 // Get clef for clef changes
                 oldClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&ac, currentParent));
