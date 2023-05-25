@@ -121,7 +121,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         params.m_pointSize = m_doc->GetDrawingLyricFont(glyphSize)->GetPointSize() * 4 / 5;
         fretTxt.SetPointSize(params.m_pointSize);
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&fretTxt);
 
         params.m_y -= (m_doc->GetTextGlyphHeight(L'0', &fretTxt, drawingCueSize) / 2);
