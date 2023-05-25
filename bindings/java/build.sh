@@ -31,6 +31,7 @@ unamestr=$(uname)
 if [[ "$unamestr" == 'Linux' ]]; then
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/linux " # paths to java libraries
 elif [[ "$unamestr" == 'Darwin' ]]; then
+    #JAVA_HOME="/opt/homebrew/Cellar/openjdk/20.0.1/libexec/openjdk.jdk/Contents/Home"
     JAVA_HOME=$(/usr/libexec/java_home)
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/darwin"
 fi
