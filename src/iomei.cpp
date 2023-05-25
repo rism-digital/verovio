@@ -405,10 +405,6 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("layerDef");
         this->WriteLayerDef(m_currentNode, vrv_cast<LayerDef *>(object));
     }
-    else if (object->Is(METERSIGGRP)) {
-        m_currentNode = m_currentNode.append_child("meterSigGrp");
-        this->WriteMeterSigGrp(m_currentNode, vrv_cast<MeterSigGrp *>(object));
-    }
     else if (object->Is(SCOREDEF)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         this->WriteScoreDef(m_currentNode, vrv_cast<ScoreDef *>(object));
@@ -656,6 +652,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(METERSIG)) {
             if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("meterSig");
             this->WriteMeterSig(m_currentNode, vrv_cast<MeterSig *>(object));
+        }
+        else if (object->Is(METERSIGGRP)) {
+            m_currentNode = m_currentNode.append_child("meterSigGrp");
+            this->WriteMeterSigGrp(m_currentNode, vrv_cast<MeterSigGrp *>(object));
         }
         else if (object->Is(MREST)) {
             m_currentNode = m_currentNode.append_child("mRest");
@@ -1888,11 +1888,9 @@ void MEIOutput::WriteMeterSigGrp(pugi::xml_node currentNode, MeterSigGrp *meterS
     assert(meterSigGrp);
 
     this->WriteXmlId(currentNode, meterSigGrp);
-    this->WriteLinkingInterface(currentNode, meterSigGrp);
+    this->WriteLayerElement(currentNode, meterSigGrp);
     meterSigGrp->WriteBasic(currentNode);
-    meterSigGrp->WriteLabelled(currentNode);
     meterSigGrp->WriteMeterSigGrpLog(currentNode);
-    meterSigGrp->WriteTyped(currentNode);
 }
 
 void MEIOutput::WriteFb(pugi::xml_node currentNode, Fb *fb)
@@ -5361,11 +5359,9 @@ bool MEIInput::ReadMeterSigGrp(Object *parent, pugi::xml_node meterSigGrp)
 
     MeterSigGrp *vrvMeterSigGrp = new MeterSigGrp();
     this->SetMeiID(meterSigGrp, vrvMeterSigGrp);
-    this->ReadLinkingInterface(meterSigGrp, vrvMeterSigGrp);
+    this->ReadLayerElement(meterSigGrp, vrvMeterSigGrp);
     vrvMeterSigGrp->ReadBasic(meterSigGrp);
-    vrvMeterSigGrp->ReadLabelled(meterSigGrp);
     vrvMeterSigGrp->ReadMeterSigGrpLog(meterSigGrp);
-    vrvMeterSigGrp->ReadTyped(meterSigGrp);
 
     parent->AddChild(vrvMeterSigGrp);
     this->ReadUnsupportedAttr(meterSigGrp, vrvMeterSigGrp);
