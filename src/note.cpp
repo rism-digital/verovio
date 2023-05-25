@@ -352,6 +352,18 @@ void Note::SetNoteGroup(ChordNoteGroup *noteGroup, int position)
     m_noteGroupPosition = position;
 }
 
+int Note::GetDiatonicPitch() const
+{
+    if (this->HasOct()) {
+        const int pitch = this->HasPname() ? (this->GetPname() - 1) : 0;
+        return this->GetOct() * 7 + pitch;
+    }
+    else if (this->HasLoc()) {
+        return this->GetLoc();
+    }
+    return 0;
+}
+
 Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;

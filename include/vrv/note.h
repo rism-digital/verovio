@@ -190,7 +190,7 @@ public:
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
+    int GetDiatonicPitch() const;
 
     /**
      * Get the stem up / stem down attachment point.
