@@ -956,12 +956,12 @@ FunctorCode FunctorInterface::VisitMeterSigEnd(MeterSig *meterSig)
 
 FunctorCode FunctorInterface::VisitMeterSigGrp(MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObject(meterSigGrp);
+    return this->VisitLayerElement(meterSigGrp);
 }
 
 FunctorCode FunctorInterface::VisitMeterSigGrpEnd(MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObjectEnd(meterSigGrp);
+    return this->VisitLayerElementEnd(meterSigGrp);
 }
 
 FunctorCode FunctorInterface::VisitMRest(MRest *mRest)
@@ -2230,12 +2230,12 @@ FunctorCode ConstFunctorInterface::VisitMeterSigEnd(const MeterSig *meterSig)
 
 FunctorCode ConstFunctorInterface::VisitMeterSigGrp(const MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObject(meterSigGrp);
+    return this->VisitLayerElement(meterSigGrp);
 }
 
 FunctorCode ConstFunctorInterface::VisitMeterSigGrpEnd(const MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObjectEnd(meterSigGrp);
+    return this->VisitLayerElementEnd(meterSigGrp);
 }
 
 FunctorCode ConstFunctorInterface::VisitMRest(const MRest *mRest)

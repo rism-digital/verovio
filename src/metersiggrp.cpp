@@ -25,19 +25,10 @@ namespace vrv {
 static const ClassRegistrar<MeterSigGrp> s_factory("meterSigGrp", METERSIGGRP);
 
 MeterSigGrp::MeterSigGrp()
-    : Object(METERSIGGRP, "metersiggrp-")
-    , ObjectListInterface()
-    , LinkingInterface()
-    , AttBasic()
-    , AttLabelled()
-    , AttMeterSigGrpLog()
-    , AttTyped()
+    : LayerElement(METERSIGGRP, "metersiggrp-"), ObjectListInterface(), AttBasic(), AttMeterSigGrpLog()
 {
-    this->RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     this->RegisterAttClass(ATT_BASIC);
-    this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_METERSIGGRPLOG);
-    this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
@@ -46,11 +37,8 @@ MeterSigGrp::~MeterSigGrp() {}
 
 void MeterSigGrp::Reset()
 {
-    Object::Reset();
-    LinkingInterface::Reset();
+    LayerElement::Reset();
     this->ResetBasic();
-    this->ResetLabelled();
-    this->ResetTyped();
     this->ResetMeterSigGrpLog();
 }
 
