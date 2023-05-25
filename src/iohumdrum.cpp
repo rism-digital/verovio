@@ -874,6 +874,7 @@ bool HumdrumInput::convertHumdrum()
             m_degree = true;
         }
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
+            analyzeHarmInterpretations(it);
             m_harm = true;
         }
         else if (it->isDataType("**fb")) {
