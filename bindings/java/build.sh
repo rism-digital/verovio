@@ -11,7 +11,7 @@ cd java
 
 swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
 
-SRCFILES=$(\ls ../../src/*.cpp \ls ../../libmei/dist/*.cpp \ls ../../libmei/addons/*.cpp)
+SRCFILES=$(\ls ../../src/*.cpp ../../libmei/dist/*.cpp ../../libmei/addons/*.cpp)
 
 FILES="$SRCFILES \
  ../../src/pugi/pugixml.cpp \
