@@ -877,6 +877,16 @@ bool HumdrumInput::convertHumdrum()
             analyzeHarmInterpretations(it);
             m_harm = true;
         }
+        else if (it->getDataType().compare(0, 7, "**adata") == 0) {
+            // cdata spines, place above the staff by default
+            analyzeHarmInterpretations(it);
+            m_harm = true;
+        }
+        else if (it->getDataType().compare(0, 7, "**bdata") == 0) {
+            // cdata spines, place below the staff by default
+            analyzeHarmInterpretations(it);
+            m_harm = true;
+        }
         else if (it->isDataType("**fb")) {
             m_fb = true;
             if (staffindex >= 0) {
@@ -990,6 +1000,10 @@ bool HumdrumInput::hasNoStaves(hum::HumdrumFile &infile)
 void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 {
     bool aboveQ = false;
+    hum::HumRegex hre;
+    if (hre.search(starttok->getDataType(), "^\\*\\*adata")) {
+        aboveQ = true;
+    }
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
     while (current) {
@@ -8366,8 +8380,12 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 continue;
             }
 
+            hum::HumRegex hre;
             // isCData -- is free-form harmony data.
-            bool isCData = token->getDataType().compare(0, 7, "**cdata") == 0;
+            bool isCData = false;
+            if (hre.search(token->getDataType(), "^\\*\\*[abc]data")) {
+                isCData = true;
+            }
 
             // isDegree -- is degree type data.
             bool isDegree = (token->isDataType("**deg") || token->isDataType("**degree"));
@@ -11292,8 +11310,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         convertMRest(mrest, trest, -1, staffindex);
                     }
                     else {
-                        // Duration of rest does not matches duration of meter so use a rest instead.
-                        // This code currently cannot handle non-power-of-two rests such as
+                        // Duration of rest does not matches duration of meter so use a rest
+                        // instead. This code currently cannot handle non-power-of-two rests such as
                         // a full measure rest of 5/8.
                         if (trest->find("yy") != std::string::npos) {
                             Space *irest = new Space();
@@ -19878,8 +19896,9 @@ void HumdrumInput::analyzeLayerBeams(
     // int beamendindex = -1;
     if (beamstate.size() > 0) {
         if (beamstate.back() > 0) {
-            // Extra beam start(s) at the end of the measure.  Remove all positive numbers at the back of the
-            // beamstate list until a zero is found (for the end of an in-measure beam end).
+            // Extra beam start(s) at the end of the measure.  Remove all positive numbers at the
+            // back of the beamstate list until a zero is found (for the end of an in-measure beam
+            // end).
             for (int i = (int)beamstate.size() - 1; i >= 0; i--) {
                 if (beamstate[i] == 0) {
                     // beamstartindex = i + 1;
