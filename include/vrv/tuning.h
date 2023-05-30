@@ -40,9 +40,18 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * Return the line for a the tuning and a given course and a notation type
+     * Return the line for a note according to tablature type.
+     * Guitar, french and italian tablature: the line is based on the course.
+     * German tablature: the line is based on the note's index in the note list.
+     *
+     * @param[in] course
+     * @param[in] notationType
+     * @param[in] lines
+     * @param[in] listSize
+     * @param[in] index - 0 based from the bottom of the chord
+     * @return position in staff half lines
      */
-    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines) const;
+    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index) const;
 
     /**
      * Calclate the MIDI pitch number for course/fret

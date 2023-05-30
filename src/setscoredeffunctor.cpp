@@ -269,7 +269,10 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitObject(Object *object)
         if (m_currentStaffDef->HasScale()) {
             staff->m_drawingStaffSize = m_currentStaffDef->GetScale();
         }
-        if (staff->IsTablature()) {
+        if (staff->IsTabLuteGerman()) {
+            staff->m_drawingStaffSize *= GERMAN_TAB_STAFF_RATIO;
+        }
+        else if (staff->IsTablature()) {
             staff->m_drawingStaffSize *= TABLATURE_STAFF_RATIO;
         }
         if (MeterSigGrp *metersiggrp = m_currentStaffDef->GetCurrentMeterSigGrp();

@@ -266,12 +266,14 @@ const TabGrp *Note::IsTabGrpNote() const
     return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
+std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, bool &overline) const
 {
+    overline = false;
+
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
         int fret = this->GetTabFret();
-        // Maximum allowed would be 19 (always bindly addind 1 as first figure)
+        // Maximum allowed would be 19 (always bindly adding 1 as first figure)
         if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
         switch (fret % 10) {
             case 0: fretStr.push_back(SMUFL_EBE0_luteItalianFret0); break;
@@ -332,6 +334,66 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType) const
 
             // TODO what if fret > 12?  Some tablatures use fret p.
             if (fret >= 0 && fret < static_cast<int>(sizeof(letter) / sizeof(letter[0]))) fretStr += letter[fret];
+        }
+        return fretStr;
+    }
+    else if (notationType == NOTATIONTYPE_tab_lute_german) {
+        std::u32string fretStr;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
+
+        // SMuFL has glyphs for German lute tablature following Hans Newsidler's notation
+        // for the 6th course.
+        // "German Renaissance lute tablature (U+EC00–U+EC2F)"
+        // https://w3c.github.io/smufl/latest/tables/german-renaissance-lute-tablature.html
+        //
+        // However, some glyphs are missing:
+        //
+        //   Digit 1 with an oblique stroke for the open 6th course.
+        //   "et" for 2nd course 5th fret.
+        //   "con" for 1st course 5th fret.
+        //   Gothic font digits 1-5 for the open courses <= 5.
+        //   Second lowercase alphabet with an overline used for courses <= 5 frets 6 to 10.
+        //
+        // To overcome these omissions I've substituted missing glyphs from other
+        // parts of the SMuFL collection.  Overlines are drawn separately.
+
+        if (course == 6 && fret >= 0 && fret <= 13) {
+            if (fret == 0) {
+                fretStr = SMUFL_E595_ornamentLeftVerticalStrokeWithCross; // substitute for 1 with oblique stroke
+            }
+            else {
+                // The German tablature uppercase letters A-N are contiguous, correctly omitting J
+                static_assert(SMUFL_EC23_luteGermanNUpper == SMUFL_EC17_luteGermanAUpper + 13 - 1);
+                fretStr = SMUFL_EC17_luteGermanAUpper + fret - 1;
+            }
+        }
+        else if (course >= 1 && course <= 5 && fret == 0) {
+            // Substitute for gothic digits
+            static const char32_t digit[] = { SMUFL_EA51_figbass1, SMUFL_EA52_figbass2, SMUFL_EA54_figbass3,
+                SMUFL_EA55_figbass4, SMUFL_EA57_figbass5 };
+            fretStr = digit[5 - course];
+        }
+        else if (course >= 1 && course <= 5 && fret >= 0 && fret <= 10) {
+            const int firstAlphabetFret = fret <= 5 ? fret : fret - 5; // map second alphabet to first
+
+            if (course == 2 && firstAlphabetFret == 5) {
+                fretStr = SMUFL_EA5F_figbass7Raised2; // substitute for "et"
+            }
+            else if (course == 1 && firstAlphabetFret == 5) {
+                fretStr = SMUFL_EA61_figbass9; // substitute for "con"
+            }
+            else {
+                // The German tablature lowercase letters a-z are contiguous, correctly omitting j u w
+                static_assert(SMUFL_EC16_luteGermanZLower == SMUFL_EC00_luteGermanALower + 23 - 1);
+
+                // lowercase letters run 5th to 1st course, frets 1 to 5
+                // and frets 6 to 10 with an overline
+                fretStr = SMUFL_EC00_luteGermanALower + (5 - course) + (firstAlphabetFret - 1) * 5;
+            }
+
+            // second alphabet needs an overline
+            overline = (fret >= 6);
         }
         return fretStr;
     }
