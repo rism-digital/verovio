@@ -352,6 +352,31 @@ void Note::SetNoteGroup(ChordNoteGroup *noteGroup, int position)
     m_noteGroupPosition = position;
 }
 
+int Note::GetDiatonicPitch() const
+{
+    if (this->HasOct()) {
+        const int pitch = this->HasPname() ? (this->GetPname() - 1) : 0;
+        return this->GetOct() * 7 + pitch;
+    }
+    else if (this->HasLoc()) {
+        // WARNING: Getting the correct clef loc offset does not work at an early stage of the processing.
+        // It requires that m_drawingStaffDef is set on staff and that m_crossStaff + m_crossLayer are calculated.
+        // However, in many cases we are only interested in a relative pitch value. Then this is still fine.
+        const Layer *layer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
+        const LayerElement *layerElementY = this;
+        if (m_crossStaff && m_crossLayer) {
+            layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
+            layer = m_crossLayer;
+        }
+        assert(layer);
+
+        const int clefLocOffset = layer->GetClefLocOffset(layerElementY);
+
+        return this->GetLoc() + OCTAVE_OFFSET * 7 - clefLocOffset;
+    }
+    return 0;
+}
+
 Point Note::GetStemUpSE(const Doc *doc, int staffSize, bool isCueSize) const
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;

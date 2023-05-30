@@ -496,8 +496,10 @@ Clef *Layer::GetCurrentClef()
 const Clef *Layer::GetCurrentClef() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
-    return staff->m_drawingStaffDef->GetCurrentClef();
+    if (staff && staff->m_drawingStaffDef) {
+        return staff->m_drawingStaffDef->GetCurrentClef();
+    }
+    return NULL;
 }
 
 KeySig *Layer::GetCurrentKeySig()
