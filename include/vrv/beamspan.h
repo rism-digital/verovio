@@ -89,6 +89,7 @@ public:
      */
     ///@{
     const ArrayOfObjects &GetBeamedElements() const { return m_beamedElements; }
+    void ResetBeamedElements() { m_beamedElements.clear(); }
     void SetBeamedElements(const ArrayOfObjects &beamedElements) { m_beamedElements = beamedElements; }
     ///@}
 

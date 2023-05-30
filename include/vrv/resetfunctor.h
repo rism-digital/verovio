@@ -42,6 +42,7 @@ public:
     FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitArtic(Artic *artic) override;
     FunctorCode VisitBeam(Beam *beam) override;
+    FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitControlElement(ControlElement *controlElement) override;
     FunctorCode VisitCustos(Custos *custos) override;
