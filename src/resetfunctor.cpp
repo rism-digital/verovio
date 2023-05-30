@@ -91,6 +91,20 @@ FunctorCode ResetDataFunctor::VisitBeam(Beam *beam)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitBeamSpan(BeamSpan *beamSpan)
+{
+    // Call parent one too
+    this->VisitControlElement(beamSpan);
+    beamSpan->BeamDrawingInterface::Reset();
+    beamSpan->PlistInterface::InterfaceResetData(*this, beamSpan);
+
+    beamSpan->ResetBeamedElements();
+    beamSpan->ClearBeamSegments();
+    beamSpan->InitBeamSegments();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
