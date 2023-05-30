@@ -20228,6 +20228,11 @@ Beam *HumdrumInput::insertBeam(
     std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *beam = new Beam();
+    if (tg.token->find("yy") != std::string::npos) {
+        // Ignore beam when token is suppressed with yy signifier
+        beam->SetType("invisible");
+        beam->SetColor("transparent");
+    }
     appendElement(elements, pointers, beam);
     elements.push_back("beam");
     pointers.push_back((void *)beam);
