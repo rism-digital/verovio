@@ -26249,6 +26249,10 @@ void HumdrumInput::addTrill(Object *linked, hum::HTp token)
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    // Ignore tie when token is suppressed with yy signifier
+    if (token->find("yy") != std::string::npos) {
+        return;
+    }
     if (token->isMensLike()) {
         return;
     }
