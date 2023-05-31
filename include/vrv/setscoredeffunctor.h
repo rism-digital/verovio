@@ -128,7 +128,18 @@ public:
      * Functor interface
      */
     ///@{
-    FunctorCode VisitObject(Object *object) override;
+    FunctorCode VisitClef(Clef *clef) override;
+    FunctorCode VisitKeySig(KeySig *keySig) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitMensur(Mensur *mensur) override;
+    FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
+    FunctorCode VisitStaffGrp(StaffGrp *staffGrp) override;
+    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:
