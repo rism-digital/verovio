@@ -1587,12 +1587,7 @@ void View::DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *m
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
 
-    TextDrawingParams params;
-
     const int lineCount = interfaceTextDir->GetNumberOfLines(element);
-
-    // If we have not timestamp
-    params.m_x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = element->GetChildRendAlignment();
     // dir are left aligned by default (with both @tstamp and @startid)
@@ -1605,7 +1600,9 @@ void View::DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *m
         }
         const int staffSize = staff->m_drawingStaffSize;
 
-        params.m_enclosedRend.clear();
+        TextDrawingParams params;
+        // If we have not timestamp
+        params.m_x = start->GetDrawingX() + start->GetDrawingRadius(m_doc);
         params.m_y = element->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
@@ -1665,12 +1662,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
 
-    TextDrawingParams params;
-
     const int lineCount = dynam->GetNumberOfLines(dynam);
-
-    // If we have not timestamp
-    params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
     // dynam are left aligned by default;
@@ -1686,9 +1678,12 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         }
         const int staffSize = staff->m_drawingStaffSize;
 
-        params.m_enclosedRend.clear();
+        TextDrawingParams params;
+        // If we have not timestamp
+        params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
         params.m_y = dynam->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
+
         if (dynam->HasEnclose()) {
             params.m_textEnclose = dynam->GetEnclose();
         }
@@ -1924,8 +1919,6 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         fingTxt.SetFaceName("Times");
     }
 
-    TextDrawingParams params;
-    params.m_x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
     // center fingering
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
 
@@ -1936,7 +1929,8 @@ void View::DrawFing(DeviceContext *dc, Fing *fing, Measure *measure, System *sys
         }
         const int staffSize = staff->m_drawingStaffSize;
 
-        params.m_enclosedRend.clear();
+        TextDrawingParams params;
+        params.m_x = fing->GetStart()->GetDrawingX() + fing->GetStart()->GetDrawingRadius(m_doc);
         params.m_y = fing->GetDrawingY();
         params.m_pointSize = m_doc->GetFingeringFont(staffSize)->GetPointSize();
 
@@ -2116,11 +2110,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         harmTxt.SetFaceName("Times");
     }
 
-    TextDrawingParams params;
-
-    // If we have not timestamp
-    params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
-
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // harm are centered aligned by default;
     if (alignment == 0) {
@@ -2135,7 +2124,9 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         }
         const int staffSize = staff->m_drawingStaffSize;
 
-        params.m_enclosedRend.clear();
+        TextDrawingParams params;
+        // If we have not timestamp
+        params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
         params.m_y = harm->GetDrawingY();
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
@@ -2478,7 +2469,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     int lineCount = tempo->GetNumberOfLines(tempo);
 
-    TextDrawingParams params;
     data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
     // Tempo are left aligned by default;
     if (alignment == 0) alignment = HORIZONTALALIGNMENT_left;
@@ -2490,8 +2480,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         }
         const int staffSize = staff->m_drawingStaffSize;
 
+        TextDrawingParams params;
         params.m_x = tempo->GetDrawingXRelativeToStaff(staff->GetN());
-        params.m_enclosedRend.clear();
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont(staffSize)->GetPointSize();
 
