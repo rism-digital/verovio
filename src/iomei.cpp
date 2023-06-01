@@ -2583,6 +2583,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
+    meterSig->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteMRest(pugi::xml_node currentNode, MRest *mRest)
@@ -6503,6 +6504,7 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
+    vrvMeterSig->ReadVisibility(meterSig);
 
     parent->AddChild(vrvMeterSig);
     this->ReadUnsupportedAttr(meterSig, vrvMeterSig);
