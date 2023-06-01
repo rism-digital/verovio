@@ -1049,7 +1049,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetForm() == METERFORM_invis) {
+    if (meterSig->GetVisible() == BOOLEAN_false) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);

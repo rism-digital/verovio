@@ -4662,6 +4662,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
         vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
         vrvMeterSig->SetForm(meterSigDefaultVis.GetMeterForm());
+        vrvMeterSig->SetVisible(meterSigDefaultVis.GetMeterVisible());
         object->AddChild(vrvMeterSig);
     }
 

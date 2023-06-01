@@ -1544,7 +1544,7 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
                 meterSig->SetSym(METERSIGN_open);
             }
             else {
-                meterSig->SetForm(METERFORM_invis);
+                meterSig->SetVisible(BOOLEAN_false);
             }
         }
         parent->AddChild(meterSig);

@@ -1122,7 +1122,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
                         [](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
                         }),
         childList.end());
 
