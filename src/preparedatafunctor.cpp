@@ -1547,7 +1547,13 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
     }
 
     // first harm@n, create a new group
-    harm->SetDrawingGrpObject(harm);
+    // If @n is a digit string, use it as group id - otherwise order them as they appear
+    if (IsDigits(n)) {
+        harm->SetDrawingGrpId((int)std::strtol(n.c_str(), NULL, 10));
+    }
+    else {
+        harm->SetDrawingGrpObject(harm);
+    }
     m_harms.insert({ n, harm });
 
     return FUNCTOR_CONTINUE;
