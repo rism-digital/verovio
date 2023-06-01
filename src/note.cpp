@@ -573,7 +573,7 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
     }
 
     switch (this->GetHeadMod()) {
-        case NOTEHEADMODIFIER_dblwhole: return SMUFL_E0A0_noteheadDoubleWhole;
+        case NOTEHEADMODIFIER_fences: return SMUFL_E0A0_noteheadDoubleWhole;
         default: break;
     }
 
