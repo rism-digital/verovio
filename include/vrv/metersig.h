@@ -23,7 +23,11 @@ class ScoreDefInterface;
 /**
  * This class models the MEI <meterSig> element.
  */
-class MeterSig : public LayerElement, public AttEnclosingChars, public AttMeterSigLog, public AttMeterSigVis {
+class MeterSig : public LayerElement,
+                 public AttEnclosingChars,
+                 public AttMeterSigLog,
+                 public AttMeterSigVis,
+                 public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

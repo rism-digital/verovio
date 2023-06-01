@@ -28,11 +28,13 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
-MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis()
+MeterSig::MeterSig()
+    : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis(), AttVisibility()
 {
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_METERSIGLOG);
     this->RegisterAttClass(ATT_METERSIGVIS);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
 }
@@ -45,6 +47,7 @@ void MeterSig::Reset()
     this->ResetEnclosingChars();
     this->ResetMeterSigLog();
     this->ResetMeterSigVis();
+    this->ResetVisibility();
 }
 
 int MeterSig::GetTotalCount() const

@@ -35,6 +35,8 @@ Clef::Clef()
     , AttClefLog()
     , AttClefShape()
     , AttColor()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttLineLoc()
     , AttOctave()
     , AttOctaveDisplacement()
@@ -45,7 +47,8 @@ Clef::Clef()
     this->RegisterAttClass(ATT_CLEFSHAPE);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_LINELOC);
     this->RegisterAttClass(ATT_OCTAVE);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
@@ -64,7 +67,8 @@ void Clef::Reset()
     this->ResetClefShape();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetLineLoc();
     this->ResetOctave();
     this->ResetOctaveDisplacement();

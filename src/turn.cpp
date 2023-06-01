@@ -32,14 +32,16 @@ Turn::Turn()
     : ControlElement(TURN, "turn-")
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
     , AttTurnLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_TURNLOG);
@@ -54,7 +56,8 @@ void Turn::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
     this->ResetTurnLog();

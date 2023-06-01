@@ -5038,6 +5038,46 @@ bool AttRanging::HasConfidence() const
 }
 
 //----------------------------------------------------------------------------
+// AttRepeatMarkLog
+//----------------------------------------------------------------------------
+
+AttRepeatMarkLog::AttRepeatMarkLog() : Att()
+{
+    ResetRepeatMarkLog();
+}
+
+void AttRepeatMarkLog::ResetRepeatMarkLog()
+{
+    m_func = repeatMarkLog_FUNC_NONE;
+}
+
+bool AttRepeatMarkLog::ReadRepeatMarkLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToRepeatMarkLogFunc(element.attribute("func").value()));
+        if (removeAttr) element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRepeatMarkLog::WriteRepeatMarkLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = RepeatMarkLogFuncToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRepeatMarkLog::HasFunc() const
+{
+    return (m_func != repeatMarkLog_FUNC_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttResponsibility
 //----------------------------------------------------------------------------
 

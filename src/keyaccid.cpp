@@ -36,7 +36,8 @@ KeyAccid::KeyAccid()
     , AttAccidental()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
 {
 
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
@@ -44,7 +45,8 @@ KeyAccid::KeyAccid()
     this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
 
     this->Reset();
 }
@@ -59,7 +61,8 @@ void KeyAccid::Reset()
     this->ResetAccidental();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
 }
 
 std::u32string KeyAccid::GetSymbolStr(data_NOTATIONTYPE notationType) const

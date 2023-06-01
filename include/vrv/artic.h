@@ -24,7 +24,8 @@ class Artic : public LayerElement,
               public AttArticulationGes,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttPlacementRelEvent {
 public:
     /**

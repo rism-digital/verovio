@@ -30,14 +30,16 @@ Fermata::Fermata()
     : ControlElement(FERMATA, "fermata-")
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttFermataVis()
     , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_FERMATAVIS);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
@@ -53,7 +55,8 @@ void Fermata::Reset()
     TimePointInterface::Reset();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetFermataVis();
     this->ResetPlacementRelStaff();
 }

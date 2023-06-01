@@ -75,7 +75,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
         this->ResetCode();
     }
     else if (layer->GetStaffDefMeterSig()) {
-        if (layer->GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
+        if (layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
             this->VisitMeterSig(layer->GetStaffDefMeterSig());
         }
     }

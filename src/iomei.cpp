@@ -1387,7 +1387,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
         ListOfObjects objects = staffDef->FindAllDescendantsByType(METERSIG);
         for (Object *object : objects) {
             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
-            meterSig->SetForm(METERFORM_invis);
+            meterSig->SetVisible(BOOLEAN_false);
         }
     }
 }
@@ -1973,7 +1973,8 @@ void MEIOutput::WriteCaesura(pugi::xml_node currentNode, Caesura *caesura)
     this->WriteControlElement(currentNode, caesura);
     this->WriteTimePointInterface(currentNode, caesura);
     caesura->WriteColor(currentNode);
-    caesura->WriteExtSym(currentNode);
+    caesura->WriteExtSymAuth(currentNode);
+    caesura->WriteExtSymNames(currentNode);
     caesura->WritePlacementRelStaff(currentNode);
 }
 
@@ -2013,7 +2014,8 @@ void MEIOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     this->WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
     fermata->WriteEnclosingChars(currentNode);
-    fermata->WriteExtSym(currentNode);
+    fermata->WriteExtSymAuth(currentNode);
+    fermata->WriteExtSymNames(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacementRelStaff(currentNode);
 }
@@ -2095,7 +2097,8 @@ void MEIOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     this->WriteControlElement(currentNode, mordent);
     this->WriteTimePointInterface(currentNode, mordent);
     mordent->WriteColor(currentNode);
-    mordent->WriteExtSym(currentNode);
+    mordent->WriteExtSymAuth(currentNode);
+    mordent->WriteExtSymNames(currentNode);
     mordent->WriteOrnamentAccid(currentNode);
     mordent->WritePlacementRelStaff(currentNode);
     mordent->WriteMordentLog(currentNode);
@@ -2123,7 +2126,8 @@ void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
     this->WriteTextDirInterface(currentNode, ornam);
     this->WriteTimePointInterface(currentNode, ornam);
     ornam->WriteColor(currentNode);
-    ornam->WriteExtSym(currentNode);
+    ornam->WriteExtSymAuth(currentNode);
+    ornam->WriteExtSymNames(currentNode);
     ornam->WriteOrnamentAccid(currentNode);
 }
 
@@ -2134,7 +2138,8 @@ void MEIOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     this->WriteControlElement(currentNode, pedal);
     this->WriteTimeSpanningInterface(currentNode, pedal);
     pedal->WriteColor(currentNode);
-    pedal->WriteExtSym(currentNode);
+    pedal->WriteExtSymAuth(currentNode);
+    pedal->WriteExtSymNames(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePedalVis(currentNode);
     pedal->WritePlacementRelStaff(currentNode);
@@ -2229,7 +2234,8 @@ void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     this->WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteExtender(currentNode);
-    trill->WriteExtSym(currentNode);
+    trill->WriteExtSymAuth(currentNode);
+    trill->WriteExtSymNames(currentNode);
     trill->WriteLineRend(currentNode);
     trill->WriteNNumberLike(currentNode);
     trill->WriteOrnamentAccid(currentNode);
@@ -2243,7 +2249,8 @@ void MEIOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     this->WriteControlElement(currentNode, turn);
     this->WriteTimePointInterface(currentNode, turn);
     turn->WriteColor(currentNode);
-    turn->WriteExtSym(currentNode);
+    turn->WriteExtSymAuth(currentNode);
+    turn->WriteExtSymNames(currentNode);
     turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacementRelStaff(currentNode);
     turn->WriteTurnLog(currentNode);
@@ -2293,7 +2300,8 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
     accid->WriteEnclosingChars(currentNode);
-    accid->WriteExtSym(currentNode);
+    accid->WriteExtSymAuth(currentNode);
+    accid->WriteExtSymNames(currentNode);
     accid->WritePlacementOnStaff(currentNode);
     accid->WritePlacementRelEvent(currentNode);
 }
@@ -2314,7 +2322,8 @@ void MEIOutput::WriteArtic(pugi::xml_node currentNode, Artic *artic)
     artic->WriteArticulationGes(currentNode);
     artic->WriteColor(currentNode);
     artic->WriteEnclosingChars(currentNode);
-    artic->WriteExtSym(currentNode);
+    artic->WriteExtSymAuth(currentNode);
+    artic->WriteExtSymNames(currentNode);
     artic->WritePlacementRelEvent(currentNode);
 }
 
@@ -2402,7 +2411,8 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
     clef->WriteEnclosingChars(currentNode);
-    clef->WriteExtSym(currentNode);
+    clef->WriteExtSymAuth(currentNode);
+    clef->WriteExtSymNames(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctave(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
@@ -2419,7 +2429,8 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     this->WritePositionInterface(currentNode, custos);
     this->WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
-    custos->WriteExtSym(currentNode);
+    custos->WriteExtSymAuth(currentNode);
+    custos->WriteExtSymNames(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -2469,7 +2480,8 @@ void MEIOutput::WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid)
     keyAccid->WriteAccidental(currentNode);
     keyAccid->WriteColor(currentNode);
     keyAccid->WriteEnclosingChars(currentNode);
-    keyAccid->WriteExtSym(currentNode);
+    keyAccid->WriteExtSymAuth(currentNode);
+    keyAccid->WriteExtSymNames(currentNode);
 }
 
 void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
@@ -2490,7 +2502,7 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
         attKeySigDefaultLog.SetKeySig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
         InstKeySigDefaultVis attKeySigDefaultVis;
-        attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
+        attKeySigDefaultVis.SetKeysigVisible(keySig->GetVisible());
         attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
         attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
         return;
@@ -2571,6 +2583,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
+    meterSig->WriteVisibility(currentNode);
 }
 
 void MEIOutput::WriteMRest(pugi::xml_node currentNode, MRest *mRest)
@@ -2665,7 +2678,8 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteCue(currentNode);
-    note->WriteExtSym(currentNode);
+    note->WriteExtSymAuth(currentNode);
+    note->WriteExtSymNames(currentNode);
     note->WriteGraced(currentNode);
     note->WriteHarmonicFunction(currentNode);
     note->WriteMidiVelocity(currentNode);
@@ -2687,7 +2701,8 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     this->WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteCue(currentNode);
-    rest->WriteExtSym(currentNode);
+    rest->WriteExtSymAuth(currentNode);
+    rest->WriteExtSymNames(currentNode);
     rest->WriteRestVisMensural(currentNode);
 }
 
@@ -2917,7 +2932,8 @@ void MEIOutput::WriteSymbol(pugi::xml_node currentNode, Symbol *symbol)
 
     this->WriteTextElement(currentNode, symbol);
     symbol->WriteColor(currentNode);
-    symbol->WriteExtSym(currentNode);
+    symbol->WriteExtSymAuth(currentNode);
+    symbol->WriteExtSymNames(currentNode);
     symbol->WriteTypography(currentNode);
 }
 
@@ -4567,6 +4583,10 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     object->ReadSystems(element);
     object->ReadTyped(element);
 
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        UpgradeScoreDefElementTo_5_0_0(element);
+    }
+
     InstCleffingLog cleffingLog;
     cleffingLog.ReadCleffingLog(element);
     InstCleffingVis cleffingVis;
@@ -4590,7 +4610,8 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     InstKeySigDefaultVis keySigDefaultVis;
     keySigDefaultVis.ReadKeySigDefaultVis(element);
     if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
-        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigShow() || keySigDefaultVis.HasKeysigShowchange()) {
+        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigVisible()
+        || keySigDefaultVis.HasKeysigShowchange()) {
         KeySig *vrvKeySig = new KeySig();
         vrvKeySig->IsAttribute(true);
         // Broken in MEI 4.0.2 - waiting for a fix
@@ -4598,7 +4619,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
         vrvKeySig->SetPname(keySigDefaultAnl.GetKeyPname());
         vrvKeySig->SetSig(keySigDefaultLog.GetKeySig());
-        vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigShow());
+        vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigVisible());
         vrvKeySig->SetSigShowchange(keySigDefaultVis.GetKeysigShowchange());
         object->AddChild(vrvKeySig);
     }
@@ -4646,6 +4667,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMeterSig->SetSym(meterSigDefaultLog.GetMeterSym());
         vrvMeterSig->SetUnit(meterSigDefaultLog.GetMeterUnit());
         vrvMeterSig->SetForm(meterSigDefaultVis.GetMeterForm());
+        vrvMeterSig->SetVisible(meterSigDefaultVis.GetMeterVisible());
         object->AddChild(vrvMeterSig);
     }
 
@@ -5484,7 +5506,8 @@ bool MEIInput::ReadCaesura(Object *parent, pugi::xml_node caesura)
 
     this->ReadTimePointInterface(caesura, vrvCaesura);
     vrvCaesura->ReadColor(caesura);
-    vrvCaesura->ReadExtSym(caesura);
+    vrvCaesura->ReadExtSymAuth(caesura);
+    vrvCaesura->ReadExtSymNames(caesura);
     vrvCaesura->ReadPlacementRelStaff(caesura);
 
     parent->AddChild(vrvCaesura);
@@ -5536,7 +5559,8 @@ bool MEIInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     this->ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadEnclosingChars(fermata);
-    vrvFermata->ReadExtSym(fermata);
+    vrvFermata->ReadExtSymAuth(fermata);
+    vrvFermata->ReadExtSymNames(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacementRelStaff(fermata);
 
@@ -5649,7 +5673,8 @@ bool MEIInput::ReadMordent(Object *parent, pugi::xml_node mordent)
 
     this->ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
-    vrvMordent->ReadExtSym(mordent);
+    vrvMordent->ReadExtSymAuth(mordent);
+    vrvMordent->ReadExtSymNames(mordent);
     vrvMordent->ReadOrnamentAccid(mordent);
     vrvMordent->ReadPlacementRelStaff(mordent);
     vrvMordent->ReadMordentLog(mordent);
@@ -5685,7 +5710,8 @@ bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
     this->ReadTextDirInterface(ornam, vrvOrnam);
     this->ReadTimePointInterface(ornam, vrvOrnam);
     vrvOrnam->ReadColor(ornam);
-    vrvOrnam->ReadExtSym(ornam);
+    vrvOrnam->ReadExtSymAuth(ornam);
+    vrvOrnam->ReadExtSymNames(ornam);
     vrvOrnam->ReadOrnamentAccid(ornam);
 
     parent->AddChild(vrvOrnam);
@@ -5700,7 +5726,8 @@ bool MEIInput::ReadPedal(Object *parent, pugi::xml_node pedal)
 
     this->ReadTimeSpanningInterface(pedal, vrvPedal);
     vrvPedal->ReadColor(pedal);
-    vrvPedal->ReadExtSym(pedal);
+    vrvPedal->ReadExtSymAuth(pedal);
+    vrvPedal->ReadExtSymNames(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPedalVis(pedal);
     vrvPedal->ReadPlacementRelStaff(pedal);
@@ -5811,7 +5838,8 @@ bool MEIInput::ReadTrill(Object *parent, pugi::xml_node trill)
     this->ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadExtender(trill);
-    vrvTrill->ReadExtSym(trill);
+    vrvTrill->ReadExtSymAuth(trill);
+    vrvTrill->ReadExtSymNames(trill);
     vrvTrill->ReadLineRend(trill);
     vrvTrill->ReadNNumberLike(trill);
     vrvTrill->ReadOrnamentAccid(trill);
@@ -5833,7 +5861,8 @@ bool MEIInput::ReadTurn(Object *parent, pugi::xml_node turn)
 
     this->ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
-    vrvTurn->ReadExtSym(turn);
+    vrvTurn->ReadExtSymAuth(turn);
+    vrvTurn->ReadExtSymNames(turn);
     vrvTurn->ReadOrnamentAccid(turn);
     vrvTurn->ReadPlacementRelStaff(turn);
     vrvTurn->ReadTurnLog(turn);
@@ -6147,7 +6176,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
     vrvAccid->ReadEnclosingChars(accid);
-    vrvAccid->ReadExtSym(accid);
+    vrvAccid->ReadExtSymAuth(accid);
+    vrvAccid->ReadExtSymNames(accid);
     vrvAccid->ReadPlacementOnStaff(accid);
     vrvAccid->ReadPlacementRelEvent(accid);
 
@@ -6165,7 +6195,8 @@ bool MEIInput::ReadArtic(Object *parent, pugi::xml_node artic)
     vrvArtic->ReadArticulationGes(artic);
     vrvArtic->ReadColor(artic);
     vrvArtic->ReadEnclosingChars(artic);
-    vrvArtic->ReadExtSym(artic);
+    vrvArtic->ReadExtSymAuth(artic);
+    vrvArtic->ReadExtSymNames(artic);
     vrvArtic->ReadPlacementRelEvent(artic);
 
     if (vrvArtic->GetArtic().size() > 1) {
@@ -6290,7 +6321,8 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
     vrvClef->ReadEnclosingChars(clef);
-    vrvClef->ReadExtSym(clef);
+    vrvClef->ReadExtSymAuth(clef);
+    vrvClef->ReadExtSymNames(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctave(clef);
     vrvClef->ReadOctaveDisplacement(clef);
@@ -6326,7 +6358,8 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     this->ReadPitchInterface(custos, vrvCustos);
     this->ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
-    vrvCustos->ReadExtSym(custos);
+    vrvCustos->ReadExtSymAuth(custos);
+    vrvCustos->ReadExtSymNames(custos);
 
     this->ReadAccidAttr(custos, vrvCustos);
 
@@ -6402,7 +6435,8 @@ bool MEIInput::ReadKeyAccid(Object *parent, pugi::xml_node keyAccid)
     vrvKeyAccid->ReadAccidental(keyAccid);
     vrvKeyAccid->ReadColor(keyAccid);
     vrvKeyAccid->ReadEnclosingChars(keyAccid);
-    vrvKeyAccid->ReadExtSym(keyAccid);
+    vrvKeyAccid->ReadExtSymAuth(keyAccid);
+    vrvKeyAccid->ReadExtSymNames(keyAccid);
 
     parent->AddChild(vrvKeyAccid);
     this->ReadUnsupportedAttr(keyAccid, vrvKeyAccid);
@@ -6473,9 +6507,14 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     MeterSig *vrvMeterSig = new MeterSig();
     this->ReadLayerElement(meterSig, vrvMeterSig);
 
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        this->UpgradeMeterSigTo_5_0_0(meterSig, vrvMeterSig);
+    }
+
     vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
+    vrvMeterSig->ReadVisibility(meterSig);
 
     parent->AddChild(vrvMeterSig);
     this->ReadUnsupportedAttr(meterSig, vrvMeterSig);
@@ -6626,7 +6665,8 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadCue(note);
-    vrvNote->ReadExtSym(note);
+    vrvNote->ReadExtSymAuth(note);
+    vrvNote->ReadExtSymNames(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadHarmonicFunction(note);
     vrvNote->ReadMidiVelocity(note);
@@ -6677,7 +6717,8 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
     this->ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
     vrvRest->ReadCue(rest);
-    vrvRest->ReadExtSym(rest);
+    vrvRest->ReadExtSymAuth(rest);
+    vrvRest->ReadExtSymNames(rest);
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
@@ -7035,7 +7076,8 @@ bool MEIInput::ReadSymbol(Object *parent, pugi::xml_node symbol)
     this->ReadTextElement(symbol, vrvSymbol);
 
     vrvSymbol->ReadColor(symbol);
-    vrvSymbol->ReadExtSym(symbol);
+    vrvSymbol->ReadExtSymAuth(symbol);
+    vrvSymbol->ReadExtSymNames(symbol);
     vrvSymbol->ReadTypography(symbol);
 
     parent->AddChild(vrvSymbol);
@@ -7946,6 +7988,31 @@ void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
     }
     if (measure.attribute("lrx")) {
         measure.attribute("lrx").set_name("coord.x2");
+    }
+}
+
+void MEIInput::UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig)
+{
+    if (meterSig.attribute("form")) {
+        std::string value = meterSig.attribute("form").value();
+        if (value == "invis") {
+            meterSig.remove_attribute("form");
+            vrvMeterSig->SetVisible(BOOLEAN_false);
+        }
+    }
+}
+
+void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
+{
+    if (scoreDefElement.attribute("meter.form")) {
+        std::string value = scoreDefElement.attribute("meter.form").value();
+        if (value == "invis") {
+            scoreDefElement.remove_attribute("meter.form");
+            scoreDefElement.append_attribute("meter.visible") = "false";
+        }
+    }
+    if (scoreDefElement.attribute("keysig.show")) {
+        scoreDefElement.attribute("keysig.show").set_name("keysig.visible");
     }
 }
 
