@@ -2502,7 +2502,7 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
         attKeySigDefaultLog.SetKeySig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
         InstKeySigDefaultVis attKeySigDefaultVis;
-        attKeySigDefaultVis.SetKeysigShow(keySig->GetVisible());
+        attKeySigDefaultVis.SetKeysigVisible(keySig->GetVisible());
         attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
         attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
         return;
@@ -4610,7 +4610,8 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     InstKeySigDefaultVis keySigDefaultVis;
     keySigDefaultVis.ReadKeySigDefaultVis(element);
     if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
-        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigShow() || keySigDefaultVis.HasKeysigShowchange()) {
+        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigVisible()
+        || keySigDefaultVis.HasKeysigShowchange()) {
         KeySig *vrvKeySig = new KeySig();
         vrvKeySig->IsAttribute(true);
         // Broken in MEI 4.0.2 - waiting for a fix
@@ -4618,7 +4619,7 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
         vrvKeySig->SetPname(keySigDefaultAnl.GetKeyPname());
         vrvKeySig->SetSig(keySigDefaultLog.GetKeySig());
-        vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigShow());
+        vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigVisible());
         vrvKeySig->SetSigShowchange(keySigDefaultVis.GetKeysigShowchange());
         object->AddChild(vrvKeySig);
     }
