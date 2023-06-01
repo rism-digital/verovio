@@ -47,7 +47,7 @@ KeyAccid::KeyAccid()
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
-    
+
     this->Reset();
 }
 
