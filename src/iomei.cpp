@@ -1387,7 +1387,7 @@ void MEIOutput::AdjustStaffDef(StaffDef *staffDef, Measure *measure)
         ListOfObjects objects = staffDef->FindAllDescendantsByType(METERSIG);
         for (Object *object : objects) {
             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
-            meterSig->SetForm(METERFORM_invis);
+            meterSig->SetVisible(BOOLEAN_false);
         }
     }
 }
