@@ -59,7 +59,8 @@ void Trill::Reset()
     TimeSpanningInterface::Reset();
     this->ResetColor();
     this->ResetExtender();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetLineRend();
     this->ResetNNumberLike();
     this->ResetOrnamentAccid();

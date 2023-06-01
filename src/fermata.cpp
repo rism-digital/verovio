@@ -55,7 +55,8 @@ void Fermata::Reset()
     TimePointInterface::Reset();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetFermataVis();
     this->ResetPlacementRelStaff();
 }
