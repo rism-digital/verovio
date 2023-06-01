@@ -8011,6 +8011,9 @@ void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
             scoreDefElement.append_attribute("meter.visible") = "false";
         }
     }
+    if (scoreDefElement.attribute("keysig.show")) {
+        scoreDefElement.attribute("keysig.show").set_name("keysig.visible");
+    }
 }
 
 void MEIInput::UpgradeStaffTo_5_0_0(pugi::xml_node staff)
