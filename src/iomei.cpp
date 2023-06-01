@@ -6656,7 +6656,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColoration(note);
     vrvNote->ReadCue(note);
     vrvNote->ReadExtSymAuth(note);
-    rvNote->ReadExtSymNames(note);
+    vrvNote->ReadExtSymNames(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadHarmonicFunction(note);
     vrvNote->ReadMidiVelocity(note);
