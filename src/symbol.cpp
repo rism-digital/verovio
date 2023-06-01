@@ -26,12 +26,13 @@ namespace vrv {
 
 static const ClassRegistrar<Symbol> s_factory("symbol", SYMBOL);
 
-Symbol::Symbol() : TextElement(SYMBOL, "symbol-"), AttColor(), AttExtSym(), AttTypography()
+Symbol::Symbol() : TextElement(SYMBOL, "symbol-"), AttColor(), AttExtSymAuth(), AttExtSymNames(), AttTypography()
 {
     this->Reset();
 
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_TYPOGRAPHY);
 }
 
@@ -42,7 +43,8 @@ void Symbol::Reset()
     TextElement::Reset();
 
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetTypography();
 }
 

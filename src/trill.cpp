@@ -31,7 +31,8 @@ Trill::Trill()
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttLineRend()
     , AttNNumberLike()
     , AttOrnamentAccid()
@@ -40,7 +41,8 @@ Trill::Trill()
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTENDER);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_LINEREND);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_ORNAMENTACCID);

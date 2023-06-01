@@ -36,7 +36,8 @@ Accid::Accid()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttPlacementOnStaff()
     , AttPlacementRelEvent()
 {
@@ -47,7 +48,8 @@ Accid::Accid()
     this->RegisterAttClass(ATT_ACCIDLOG);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
     this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
@@ -65,7 +67,8 @@ void Accid::Reset()
     this->ResetAccidLog();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetPlacementOnStaff();
     this->ResetPlacementRelEvent();
 

@@ -576,7 +576,8 @@ void ConvertMarkupArticFunctor::SplitMultival(Artic *artic) const
         articChild->SetArtic({ *iter });
         articChild->AttColor::operator=(*artic);
         articChild->AttEnclosingChars::operator=(*artic);
-        articChild->AttExtSym::operator=(*artic);
+        articChild->AttExtSymAuth::operator=(*artic);
+        articChild->AttExtSymNames::operator=(*artic);
         articChild->AttPlacementRelEvent::operator=(*artic);
         parent->InsertChild(articChild, idx);
         ++idx;
