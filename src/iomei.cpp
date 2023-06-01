@@ -4583,6 +4583,10 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     object->ReadSystems(element);
     object->ReadTyped(element);
 
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        UpgradeScoreDefElementTo_5_0_0(element);
+    }
+
     InstCleffingLog cleffingLog;
     cleffingLog.ReadCleffingLog(element);
     InstCleffingVis cleffingVis;
@@ -6502,6 +6506,10 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     MeterSig *vrvMeterSig = new MeterSig();
     this->ReadLayerElement(meterSig, vrvMeterSig);
 
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        this->UpgradeMeterSigTo_5_0_0(meterSig, vrvMeterSig);
+    }
+
     vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
@@ -7979,6 +7987,28 @@ void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
     }
     if (measure.attribute("lrx")) {
         measure.attribute("lrx").set_name("coord.x2");
+    }
+}
+
+void MEIInput::UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig)
+{
+    if (meterSig.attribute("form")) {
+        std::string value = meterSig.attribute("form").value();
+        if (value == "invis") {
+            meterSig.remove_attribute("form");
+            vrvMeterSig->SetVisible(BOOLEAN_false);
+        }
+    }
+}
+
+void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
+{
+    if (scoreDefElement.attribute("meter.form")) {
+        std::string value = scoreDefElement.attribute("meter.form").value();
+        if (value == "invis") {
+            scoreDefElement.remove_attribute("meter.form");
+            scoreDefElement.append_attribute("meter.visible") = "false";
+        }
     }
 }
 
