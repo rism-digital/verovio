@@ -96,7 +96,7 @@ mapped:
         std::string
     data.PGSCALE:
         std::string
-    data.PITCHNAME.GES:
+    data.PITCHNAME.GESTURAL:
         data_PITCHNAME
     data.PITCHCLASS:
         int
