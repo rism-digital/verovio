@@ -29,7 +29,8 @@ class Ornam : public ControlElement,
               public TextDirInterface,
               public TimePointInterface,
               public AttColor,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttOrnamentAccid {
 public:
     /**

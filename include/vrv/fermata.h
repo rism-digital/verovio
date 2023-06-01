@@ -27,7 +27,8 @@ class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
                 public AttEnclosingChars,
-                public AttExtSym,
+                public AttExtSymAuth,
+                public AttExtSymNames,
                 public AttFermataVis,
                 public AttPlacementRelStaff {
 public:
