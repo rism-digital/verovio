@@ -203,7 +203,7 @@ public:
 
 private:
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -926,20 +926,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeysigShow(data_BOOLEAN keysigShow_) { m_keysigShow = keysigShow_; }
-    data_BOOLEAN GetKeysigShow() const { return m_keysigShow; }
-    bool HasKeysigShow() const;
-    //
     void SetKeysigShowchange(data_BOOLEAN keysigShowchange_) { m_keysigShowchange = keysigShowchange_; }
     data_BOOLEAN GetKeysigShowchange() const { return m_keysigShowchange; }
     bool HasKeysigShowchange() const;
+    //
+    void SetKeysigVisible(data_BOOLEAN keysigVisible_) { m_keysigVisible = keysigVisible_; }
+    data_BOOLEAN GetKeysigVisible() const { return m_keysigVisible; }
+    bool HasKeysigVisible() const;
     ///@}
 
 private:
-    /** Indicates whether the key signature should be displayed. **/
-    data_BOOLEAN m_keysigShow;
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
     data_BOOLEAN m_keysigShowchange;
+    /** Determines whether the key signature is to be displayed. **/
+    data_BOOLEAN m_keysigVisible;
 };
 
 //----------------------------------------------------------------------------
@@ -1388,6 +1388,10 @@ public:
     void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; }
     data_BOOLEAN GetMeterShowchange() const { return m_meterShowchange; }
     bool HasMeterShowchange() const;
+    //
+    void SetMeterVisible(data_BOOLEAN meterVisible_) { m_meterVisible = meterVisible_; }
+    data_BOOLEAN GetMeterVisible() const { return m_meterVisible; }
+    bool HasMeterVisible() const;
     ///@}
 
 private:
@@ -1398,6 +1402,8 @@ private:
      * signature changes.
      **/
     data_BOOLEAN m_meterShowchange;
+    /** Determines whether the meter signature is to be displayed. **/
+    data_BOOLEAN m_meterVisible;
 };
 
 //----------------------------------------------------------------------------
@@ -1606,7 +1612,7 @@ private:
     /** Records the position of the piano damper pedal. **/
     data_STEMDIRECTION_basic m_dir;
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -2112,7 +2118,7 @@ private:
     /** Records the position of the stem in relation to the note head(s). **/
     data_STEMPOSITION m_pos;
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/

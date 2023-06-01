@@ -102,6 +102,9 @@ public:
     std::string DivisioToStr(data_DIVISIO data) const;
     data_DIVISIO StrToDivisio(const std::string &value, bool logWarning = true) const;
 
+    std::string DurationGesturalToStr(data_DURATION_GESTURAL data) const;
+    data_DURATION_GESTURAL StrToDurationGestural(const std::string &value, bool logWarning = true) const;
+
     std::string DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const;
     data_DURATIONRESTS_mensural StrToDurationrestsMensural(const std::string &value, bool logWarning = true) const;
 
@@ -318,6 +321,9 @@ public:
     std::string CutoutCutoutToStr(cutout_CUTOUT data) const;
     cutout_CUTOUT StrToCutoutCutout(const std::string &value, bool logWarning = true) const;
 
+    std::string DivLineLogFormToStr(divLineLog_FORM data) const;
+    divLineLog_FORM StrToDivLineLogForm(const std::string &value, bool logWarning = true) const;
+
     std::string DotLogFormToStr(dotLog_FORM data) const;
     dotLog_FORM StrToDotLogForm(const std::string &value, bool logWarning = true) const;
 
@@ -330,8 +336,8 @@ public:
     std::string EvidenceEvidenceToStr(evidence_EVIDENCE data) const;
     evidence_EVIDENCE StrToEvidenceEvidence(const std::string &value, bool logWarning = true) const;
 
-    std::string ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const;
-    extSym_GLYPHAUTH StrToExtSymGlyphauth(const std::string &value, bool logWarning = true) const;
+    std::string ExtSymAuthGlyphauthToStr(extSymAuth_GLYPHAUTH data) const;
+    extSymAuth_GLYPHAUTH StrToExtSymAuthGlyphauth(const std::string &value, bool logWarning = true) const;
 
     std::string FTremLogFormToStr(fTremLog_FORM data) const;
     fTremLog_FORM StrToFTremLogForm(const std::string &value, bool logWarning = true) const;
@@ -449,6 +455,9 @@ public:
 
     std::string RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) const;
     rehearsal_REHENCLOSE StrToRehearsalRehenclose(const std::string &value, bool logWarning = true) const;
+
+    std::string RepeatMarkLogFuncToStr(repeatMarkLog_FUNC data) const;
+    repeatMarkLog_FUNC StrToRepeatMarkLogFunc(const std::string &value, bool logWarning = true) const;
 
     std::string SbVisFormToStr(sbVis_FORM data) const;
     sbVis_FORM StrToSbVisForm(const std::string &value, bool logWarning = true) const;

@@ -153,7 +153,7 @@ AttDurationGes::AttDurationGes() : Att()
 
 void AttDurationGes::ResetDurationGes()
 {
-    m_durGes = DURATION_NONE;
+    m_durGes = DURATION_GESTURAL_NONE;
     m_dotsGes = MEI_UNSET;
     m_durMetrical = 0.0;
     m_durPpq = MEI_UNSET;
@@ -165,7 +165,7 @@ bool AttDurationGes::ReadDurationGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("dur.ges")) {
-        this->SetDurGes(StrToDuration(element.attribute("dur.ges").value()));
+        this->SetDurGes(StrToDurationGestural(element.attribute("dur.ges").value()));
         if (removeAttr) element.remove_attribute("dur.ges");
         hasAttribute = true;
     }
@@ -201,7 +201,7 @@ bool AttDurationGes::WriteDurationGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDurGes()) {
-        element.append_attribute("dur.ges") = DurationToStr(this->GetDurGes()).c_str();
+        element.append_attribute("dur.ges") = DurationGesturalToStr(this->GetDurGes()).c_str();
         wroteAttribute = true;
     }
     if (this->HasDotsGes()) {
@@ -229,7 +229,7 @@ bool AttDurationGes::WriteDurationGes(pugi::xml_node element)
 
 bool AttDurationGes::HasDurGes() const
 {
-    return (m_durGes != DURATION_NONE);
+    return (m_durGes != DURATION_GESTURAL_NONE);
 }
 
 bool AttDurationGes::HasDotsGes() const

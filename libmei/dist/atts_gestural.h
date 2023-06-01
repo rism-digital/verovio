@@ -201,8 +201,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDurGes(data_DURATION durGes_) { m_durGes = durGes_; }
-    data_DURATION GetDurGes() const { return m_durGes; }
+    void SetDurGes(data_DURATION_GESTURAL durGes_) { m_durGes = durGes_; }
+    data_DURATION_GESTURAL GetDurGes() const { return m_durGes; }
     bool HasDurGes() const;
     //
     void SetDotsGes(int dotsGes_) { m_dotsGes = dotsGes_; }
@@ -228,7 +228,7 @@ public:
 
 private:
     /** Records performed duration information that differs from the written duration. **/
-    data_DURATION m_durGes;
+    data_DURATION_GESTURAL m_durGes;
     /**
      * Number of dots required for a gestural duration when different from that of the
      * written duration.
