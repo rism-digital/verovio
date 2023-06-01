@@ -19,7 +19,6 @@
 #include "dot.h"
 #include "elementpart.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "note.h"
 #include "slur.h"
@@ -594,7 +593,7 @@ void Tie::UpdateTiePositioning(const FloatingCurvePositioner *curve, Point bezie
 // Tie functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Tie::Accept(MutableFunctor &functor)
+FunctorCode Tie::Accept(Functor &functor)
 {
     return functor.VisitTie(this);
 }
@@ -604,7 +603,7 @@ FunctorCode Tie::Accept(ConstFunctor &functor) const
     return functor.VisitTie(this);
 }
 
-FunctorCode Tie::AcceptEnd(MutableFunctor &functor)
+FunctorCode Tie::AcceptEnd(Functor &functor)
 {
     return functor.VisitTieEnd(this);
 }
@@ -612,29 +611,6 @@ FunctorCode Tie::AcceptEnd(MutableFunctor &functor)
 FunctorCode Tie::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitTieEnd(this);
-}
-
-int Tie::InitTimemapTies(FunctorParams *)
-{
-    Note *note1 = dynamic_cast<Note *>(this->GetStart());
-    Note *note2 = dynamic_cast<Note *>(this->GetEnd());
-
-    if (!note1 || !note2) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    double sttd2 = note2->GetScoreTimeTiedDuration();
-    double std2 = note2->GetScoreTimeDuration();
-
-    if (sttd2 > 0.0) {
-        note1->SetScoreTimeTiedDuration(sttd2 + std2);
-    }
-    else {
-        note1->SetScoreTimeTiedDuration(std2);
-    }
-    note2->SetScoreTimeTiedDuration(-1.0);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

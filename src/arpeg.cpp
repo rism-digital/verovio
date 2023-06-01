@@ -16,7 +16,6 @@
 #include "chord.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "note.h"
 #include "staff.h"
@@ -194,7 +193,7 @@ const Staff *Arpeg::GetCrossStaff() const
 // Arpeg functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Arpeg::Accept(MutableFunctor &functor)
+FunctorCode Arpeg::Accept(Functor &functor)
 {
     return functor.VisitArpeg(this);
 }
@@ -204,7 +203,7 @@ FunctorCode Arpeg::Accept(ConstFunctor &functor) const
     return functor.VisitArpeg(this);
 }
 
-FunctorCode Arpeg::AcceptEnd(MutableFunctor &functor)
+FunctorCode Arpeg::AcceptEnd(Functor &functor)
 {
     return functor.VisitArpegEnd(this);
 }
@@ -212,33 +211,6 @@ FunctorCode Arpeg::AcceptEnd(MutableFunctor &functor)
 FunctorCode Arpeg::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitArpegEnd(this);
-}
-
-int Arpeg::InitMIDI(FunctorParams *functorParams)
-{
-    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
-    assert(params);
-
-    // Sort the involved notes by playing order
-    const bool playTopDown = (this->GetOrder() == arpegLog_ORDER_down);
-    std::set<Note *> notes = this->GetNotes();
-    std::vector<Note *> sortedNotes;
-    std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
-    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](Note *note1, Note *note2) {
-        const int pitch1 = note1->GetMIDIPitch();
-        const int pitch2 = note2->GetMIDIPitch();
-        return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
-    });
-
-    // Defer the notes in playing order
-    double shift = 0.0;
-    const double increment = UNACC_GRACENOTE_DUR * params->m_currentTempo / 60000.0;
-    for (Note *note : sortedNotes) {
-        if (shift > 0.0) params->m_deferredNotes[note] = shift;
-        shift += increment;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

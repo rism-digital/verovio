@@ -45,7 +45,7 @@ namespace vrv {
 // ResetDataFunctor
 //----------------------------------------------------------------------------
 
-ResetDataFunctor::ResetDataFunctor() {}
+ResetDataFunctor::ResetDataFunctor() : Functor() {}
 
 FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
 {
@@ -87,6 +87,20 @@ FunctorCode ResetDataFunctor::VisitBeam(Beam *beam)
 
     // We want the list of the ObjectListInterface to be regenerated
     beam->Modify();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitBeamSpan(BeamSpan *beamSpan)
+{
+    // Call parent one too
+    this->VisitControlElement(beamSpan);
+    beamSpan->BeamDrawingInterface::Reset();
+    beamSpan->PlistInterface::InterfaceResetData(*this, beamSpan);
+
+    beamSpan->ResetBeamedElements();
+    beamSpan->ClearBeamSegments();
+    beamSpan->InitBeamSegments();
 
     return FUNCTOR_CONTINUE;
 }
@@ -412,7 +426,7 @@ FunctorCode ResetDataFunctor::VisitVerse(Verse *verse)
 // ResetHorizontalAlignmentFunctor
 //----------------------------------------------------------------------------
 
-ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() {}
+ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() : Functor() {}
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitAccid(Accid *accid)
 {
@@ -629,7 +643,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum
 // ResetVerticalAlignmentFunctor
 //----------------------------------------------------------------------------
 
-ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() {}
+ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() : Functor() {}
 
 FunctorCode ResetVerticalAlignmentFunctor::VisitArtic(Artic *artic)
 {

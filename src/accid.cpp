@@ -15,7 +15,6 @@
 
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
@@ -37,7 +36,8 @@ Accid::Accid()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttPlacementOnStaff()
     , AttPlacementRelEvent()
 {
@@ -48,7 +48,8 @@ Accid::Accid()
     this->RegisterAttClass(ATT_ACCIDLOG);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
     this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
@@ -66,7 +67,8 @@ void Accid::Reset()
     this->ResetAccidLog();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetPlacementOnStaff();
     this->ResetPlacementRelEvent();
 
@@ -281,7 +283,7 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Accid::Accept(MutableFunctor &functor)
+FunctorCode Accid::Accept(Functor &functor)
 {
     return functor.VisitAccid(this);
 }
@@ -291,7 +293,7 @@ FunctorCode Accid::Accept(ConstFunctor &functor) const
     return functor.VisitAccid(this);
 }
 
-FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
+FunctorCode Accid::AcceptEnd(Functor &functor)
 {
     return functor.VisitAccidEnd(this);
 }

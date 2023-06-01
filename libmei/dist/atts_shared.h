@@ -5465,6 +5465,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttRepeatMarkLog
+//----------------------------------------------------------------------------
+
+class AttRepeatMarkLog : public Att {
+protected:
+    AttRepeatMarkLog();
+    ~AttRepeatMarkLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetRepeatMarkLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadRepeatMarkLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteRepeatMarkLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(repeatMarkLog_FUNC func_) { m_func = func_; }
+    repeatMarkLog_FUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    repeatMarkLog_FUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstRepeatMarkLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRepeatMarkLog
+ */
+
+class InstRepeatMarkLog : public AttRepeatMarkLog {
+public:
+    InstRepeatMarkLog() = default;
+    virtual ~InstRepeatMarkLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttResponsibility
 //----------------------------------------------------------------------------
 

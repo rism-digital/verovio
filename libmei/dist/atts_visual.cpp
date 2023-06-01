@@ -918,21 +918,21 @@ AttKeySigDefaultVis::AttKeySigDefaultVis() : Att()
 
 void AttKeySigDefaultVis::ResetKeySigDefaultVis()
 {
-    m_keysigShow = BOOLEAN_NONE;
     m_keysigShowchange = BOOLEAN_NONE;
+    m_keysigVisible = BOOLEAN_NONE;
 }
 
 bool AttKeySigDefaultVis::ReadKeySigDefaultVis(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("keysig.show")) {
-        this->SetKeysigShow(StrToBoolean(element.attribute("keysig.show").value()));
-        if (removeAttr) element.remove_attribute("keysig.show");
-        hasAttribute = true;
-    }
     if (element.attribute("keysig.showchange")) {
         this->SetKeysigShowchange(StrToBoolean(element.attribute("keysig.showchange").value()));
         if (removeAttr) element.remove_attribute("keysig.showchange");
+        hasAttribute = true;
+    }
+    if (element.attribute("keysig.visible")) {
+        this->SetKeysigVisible(StrToBoolean(element.attribute("keysig.visible").value()));
+        if (removeAttr) element.remove_attribute("keysig.visible");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -941,25 +941,25 @@ bool AttKeySigDefaultVis::ReadKeySigDefaultVis(pugi::xml_node element, bool remo
 bool AttKeySigDefaultVis::WriteKeySigDefaultVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasKeysigShow()) {
-        element.append_attribute("keysig.show") = BooleanToStr(this->GetKeysigShow()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasKeysigShowchange()) {
         element.append_attribute("keysig.showchange") = BooleanToStr(this->GetKeysigShowchange()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasKeysigVisible()) {
+        element.append_attribute("keysig.visible") = BooleanToStr(this->GetKeysigVisible()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttKeySigDefaultVis::HasKeysigShow() const
-{
-    return (m_keysigShow != BOOLEAN_NONE);
-}
-
 bool AttKeySigDefaultVis::HasKeysigShowchange() const
 {
     return (m_keysigShowchange != BOOLEAN_NONE);
+}
+
+bool AttKeySigDefaultVis::HasKeysigVisible() const
+{
+    return (m_keysigVisible != BOOLEAN_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -1455,6 +1455,7 @@ void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
 {
     m_meterForm = METERFORM_NONE;
     m_meterShowchange = BOOLEAN_NONE;
+    m_meterVisible = BOOLEAN_NONE;
 }
 
 bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element, bool removeAttr)
@@ -1468,6 +1469,11 @@ bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element, bool 
     if (element.attribute("meter.showchange")) {
         this->SetMeterShowchange(StrToBoolean(element.attribute("meter.showchange").value()));
         if (removeAttr) element.remove_attribute("meter.showchange");
+        hasAttribute = true;
+    }
+    if (element.attribute("meter.visible")) {
+        this->SetMeterVisible(StrToBoolean(element.attribute("meter.visible").value()));
+        if (removeAttr) element.remove_attribute("meter.visible");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1484,6 +1490,10 @@ bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element)
         element.append_attribute("meter.showchange") = BooleanToStr(this->GetMeterShowchange()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasMeterVisible()) {
+        element.append_attribute("meter.visible") = BooleanToStr(this->GetMeterVisible()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -1495,6 +1505,11 @@ bool AttMeterSigDefaultVis::HasMeterForm() const
 bool AttMeterSigDefaultVis::HasMeterShowchange() const
 {
     return (m_meterShowchange != BOOLEAN_NONE);
+}
+
+bool AttMeterSigDefaultVis::HasMeterVisible() const
+{
+    return (m_meterVisible != BOOLEAN_NONE);
 }
 
 //----------------------------------------------------------------------------

@@ -49,6 +49,11 @@ public:
      */
     data_STEMMODIFIER GetDrawingStemMod() const override;
 
+    /**
+     * Calculate the duration of an individual note in a measured tremolo
+     */
+    data_DURATION CalcIndividualNoteDuration() const;
+
     //----------//
     // Functors //
     //----------//
@@ -57,26 +62,18 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
 private:
-    /**
-     * Calculate the duration of an individual note in a measured tremolo
-     */
-    data_DURATION CalcIndividualNoteDuration() const;
-
+    //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

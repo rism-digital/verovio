@@ -35,7 +35,7 @@ void Text::Reset()
     TextElement::Reset();
 }
 
-FunctorCode Text::Accept(MutableFunctor &functor)
+FunctorCode Text::Accept(Functor &functor)
 {
     return functor.VisitText(this);
 }
@@ -45,7 +45,7 @@ FunctorCode Text::Accept(ConstFunctor &functor) const
     return functor.VisitText(this);
 }
 
-FunctorCode Text::AcceptEnd(MutableFunctor &functor)
+FunctorCode Text::AcceptEnd(Functor &functor)
 {
     return functor.VisitTextEnd(this);
 }

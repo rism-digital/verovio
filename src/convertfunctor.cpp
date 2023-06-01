@@ -32,7 +32,7 @@ namespace vrv {
 // ConvertToPageBasedFunctor
 //----------------------------------------------------------------------------
 
-ConvertToPageBasedFunctor::ConvertToPageBasedFunctor(Page *page)
+ConvertToPageBasedFunctor::ConvertToPageBasedFunctor(Page *page) : Functor()
 {
     m_currentSystem = NULL;
     m_page = page;
@@ -284,9 +284,8 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
     }
     m_targetSubSystem->AddChild(targetMeasure);
 
-    Filters *previousFilters = this->GetFilters();
     Filters filters;
-    this->SetFilters(&filters);
+    this->PushFilters(&filters);
 
     // Now we can process by layer and move their content to (measure) segments
     for (const auto &staves : m_layerTree->child) {
@@ -303,7 +302,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
         }
     }
 
-    this->SetFilters(previousFilters);
+    this->PopFilters();
 
     m_targetMeasure = NULL;
     m_targetSubSystem = NULL;
@@ -361,7 +360,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitSystemElement(SystemElement *s
 // ConvertToUnCastOffMensuralFunctor
 //----------------------------------------------------------------------------
 
-ConvertToUnCastOffMensuralFunctor::ConvertToUnCastOffMensuralFunctor()
+ConvertToUnCastOffMensuralFunctor::ConvertToUnCastOffMensuralFunctor() : Functor()
 {
     this->ResetContent();
     m_trackSegmentsToDelete = true;
@@ -408,7 +407,7 @@ FunctorCode ConvertToUnCastOffMensuralFunctor::VisitSection(Section *section)
 // ConvertMarkupAnalyticalFunctor
 //----------------------------------------------------------------------------
 
-ConvertMarkupAnalyticalFunctor::ConvertMarkupAnalyticalFunctor(bool permanent)
+ConvertMarkupAnalyticalFunctor::ConvertMarkupAnalyticalFunctor(bool permanent) : Functor()
 {
     m_currentChord = NULL;
     m_permanent = permanent;
@@ -543,7 +542,7 @@ void ConvertMarkupAnalyticalFunctor::ConvertToFermata(
 // ConvertMarkupArticFunctor
 //----------------------------------------------------------------------------
 
-ConvertMarkupArticFunctor::ConvertMarkupArticFunctor() {}
+ConvertMarkupArticFunctor::ConvertMarkupArticFunctor() : Functor() {}
 
 FunctorCode ConvertMarkupArticFunctor::VisitArtic(Artic *artic)
 {
@@ -577,7 +576,8 @@ void ConvertMarkupArticFunctor::SplitMultival(Artic *artic) const
         articChild->SetArtic({ *iter });
         articChild->AttColor::operator=(*artic);
         articChild->AttEnclosingChars::operator=(*artic);
-        articChild->AttExtSym::operator=(*artic);
+        articChild->AttExtSymAuth::operator=(*artic);
+        articChild->AttExtSymNames::operator=(*artic);
         articChild->AttPlacementRelEvent::operator=(*artic);
         parent->InsertChild(articChild, idx);
         ++idx;

@@ -392,12 +392,6 @@ enum {
     SMUFL_E888_tuplet8 = 0xE888,
     SMUFL_E889_tuplet9 = 0xE889,
     SMUFL_E88A_tupletColon = 0xE88A,
-    SMUFL_E8F3_chantDivisioMinima = 0xE8F3,
-    SMUFL_E8F4_chantDivisioMaior = 0xE8F4,
-    SMUFL_E8F5_chantDivisioMaxima = 0xE8F5,
-    SMUFL_E8F6_chantDivisioFinalis = 0xE8F6,
-    SMUFL_E8F7_chantVirgula = 0xE8F7,
-    SMUFL_E8F8_chantCaesura = 0xE8F8,
     SMUFL_E901_mensuralGclefPetrucci = 0xE901,
     SMUFL_E902_chantFclef = 0xE902,
     SMUFL_E903_mensuralFclef = 0xE903,
@@ -494,9 +488,6 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
-    SMUFL_EA22_medRenLiquescenceCMN = 0xEA22,
-    SMUFL_EA26_medRenLiquescentAscCMN = 0xEA26,
-    SMUFL_EA27_medRenLiquescentDescCMN = 0xEA27,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
     SMUFL_EA52_figbass2 = 0xEA52,
@@ -534,11 +525,6 @@ enum {
     SMUFL_EB20_elecRewind = 0xEB20,
     SMUFL_EB21_elecSkipForwards = 0xEB21,
     SMUFL_EB22_elecSkipBackwards = 0xEB22,
-    SMUFL_EB90_staffPosRaise1 = 0xEB90,
-    SMUFL_EB91_staffPosRaise2 = 0xEB91,
-    SMUFL_EB92_staffPosRaise3 = 0xEB92,
-    SMUFL_EB98_staffPosLower1 = 0xEB98,
-    SMUFL_EB99_staffPosLower2 = 0xEB99,
     SMUFL_EBA7_luteDurationWhole = 0xEBA7,
     SMUFL_EBA8_luteDurationHalf = 0xEBA8,
     SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
@@ -558,6 +544,10 @@ enum {
     SMUFL_EBCA_luteFrenchFretL = 0xEBCA,
     SMUFL_EBCB_luteFrenchFretM = 0xEBCB,
     SMUFL_EBCC_luteFrenchFretN = 0xEBCC,
+    SMUFL_EBCD_luteFrench7thCourse = 0xEBCD,
+    SMUFL_EBCE_luteFrench8thCourse = 0xEBCE,
+    SMUFL_EBCF_luteFrench9thCourse = 0xEBCF,
+    SMUFL_EBD0_luteFrench10thCourse = 0xEBD0,
     SMUFL_EBE0_luteItalianFret0 = 0xEBE0,
     SMUFL_EBE1_luteItalianFret1 = 0xEBE1,
     SMUFL_EBE2_luteItalianFret2 = 0xEBE2,
@@ -595,7 +585,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 570
+#define SMUFL_COUNT 560
 
 } // namespace vrv
 

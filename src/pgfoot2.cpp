@@ -52,7 +52,7 @@ int PgFoot2::GetTotalHeight(const Doc *doc) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode PgFoot2::Accept(MutableFunctor &functor)
+FunctorCode PgFoot2::Accept(Functor &functor)
 {
     return functor.VisitPgFoot2(this);
 }
@@ -62,7 +62,7 @@ FunctorCode PgFoot2::Accept(ConstFunctor &functor) const
     return functor.VisitPgFoot2(this);
 }
 
-FunctorCode PgFoot2::AcceptEnd(MutableFunctor &functor)
+FunctorCode PgFoot2::AcceptEnd(Functor &functor)
 {
     return functor.VisitPgFoot2End(this);
 }

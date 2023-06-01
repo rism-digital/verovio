@@ -50,14 +50,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(divLineLog_FORM form_) { m_form = form_; }
-    divLineLog_FORM GetForm() const { return m_form; }
+    void SetForm(std::string form_) { m_form = form_; }
+    std::string GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    divLineLog_FORM m_form;
+    std::string m_form;
 };
 
 //----------------------------------------------------------------------------

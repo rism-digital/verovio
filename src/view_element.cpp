@@ -32,7 +32,6 @@
 #include "elementpart.h"
 #include "f.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "halfmrpt.h"
 #include "keyaccid.h"
 #include "label.h"
@@ -77,13 +76,13 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         return;
     }
 
-    int previousColor = m_currentColour;
+    int previousColor = m_currentColor;
 
     if (element == m_currentElement) {
-        m_currentColour = AxRED;
+        m_currentColor = AxRED;
     }
     else {
-        m_currentColour = AxNONE;
+        m_currentColor = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -221,7 +220,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
 
-    m_currentColour = previousColor;
+    m_currentColor = previousColor;
 }
 
 //----------------------------------------------------------------------------
@@ -256,7 +255,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->HasPlace() || (accid->GetFunc() == accidLog_FUNC_edit)) {
+    if (accid->HasPlace() || accid->HasOnstaff() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
@@ -965,6 +964,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    if (staff->IsTablature()) {
+        // Encoded keySig will not be shown on tablature
+        return;
+    }
+
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
@@ -1066,7 +1070,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetForm() == METERFORM_invis) {
+    if (meterSig->GetVisible() == BOOLEAN_false) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1720,7 +1724,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     if (syl->HasFontweight()) {
@@ -1729,7 +1733,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     if (syl->HasFontstyle()) {
         currentFont.SetStyle(syl->GetFontstyle());
     }
-    if (syl->GetStart()->GetDrawingCueSize()) {
+    if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
     dc->SetFont(&currentFont);
@@ -1832,7 +1836,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
         params.m_pointSize = labelTxt.GetPointSize();
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&labelTxt);
 
         dc->StartGraphic(graphic, "", graphic->GetID());

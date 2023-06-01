@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
@@ -36,6 +35,8 @@ Clef::Clef()
     , AttClefLog()
     , AttClefShape()
     , AttColor()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttLineLoc()
     , AttOctave()
     , AttOctaveDisplacement()
@@ -46,7 +47,8 @@ Clef::Clef()
     this->RegisterAttClass(ATT_CLEFSHAPE);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_LINELOC);
     this->RegisterAttClass(ATT_OCTAVE);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
@@ -65,7 +67,8 @@ void Clef::Reset()
     this->ResetClefShape();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetLineLoc();
     this->ResetOctave();
     this->ResetOctaveDisplacement();
@@ -215,7 +218,7 @@ char32_t Clef::GetClefGlyph(const data_NOTATIONTYPE notationtype) const
 // Clef functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Clef::Accept(MutableFunctor &functor)
+FunctorCode Clef::Accept(Functor &functor)
 {
     return functor.VisitClef(this);
 }
@@ -225,7 +228,7 @@ FunctorCode Clef::Accept(ConstFunctor &functor) const
     return functor.VisitClef(this);
 }
 
-FunctorCode Clef::AcceptEnd(MutableFunctor &functor)
+FunctorCode Clef::AcceptEnd(Functor &functor)
 {
     return functor.VisitClefEnd(this);
 }

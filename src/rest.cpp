@@ -19,12 +19,10 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "findlayerelementsfunctor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
-#include "timemap.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -159,14 +157,16 @@ Rest::Rest()
     , PositionInterface()
     , AttColor()
     , AttCue()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttRestVisMensural()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_RESTVISMENSURAL);
     this->Reset();
 }
@@ -180,7 +180,8 @@ void Rest::Reset()
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetRestVisMensural();
 }
 
@@ -400,13 +401,13 @@ int Rest::GetLocationRelativeToCurrentLayer(const Staff *currentStaff, const Lay
     const Object *nextElement = NULL;
     // Get previous and next elements from the current layer
     if (currentLayer->GetFirstChildNot(REST)) {
-        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), BACKWARD, false);
-        getRelativeLayerElementBackwards.SetDirection(BACKWARD);
+        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), false);
+        getRelativeLayerElementBackwards.PushDirection(BACKWARD);
         currentLayer->Process(getRelativeLayerElementBackwards);
         previousElement = getRelativeLayerElementBackwards.GetRelativeElement();
 
         // search in other direction
-        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), FORWARD, false);
+        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), false);
         currentLayer->Process(getRelativeLayerElementForwards);
         nextElement = getRelativeLayerElementForwards.GetRelativeElement();
     }
@@ -472,8 +473,8 @@ int Rest::GetFirstRelativeElementLocation(
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
-    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), !isPrevious, true);
-    getRelativeLayerElement.SetDirection(!isPrevious);
+    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), true);
+    getRelativeLayerElement.PushDirection(!isPrevious);
     (*layerIter)->Process(getRelativeLayerElement);
 
     const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();
@@ -551,7 +552,7 @@ int Rest::GetRestOffsetFromOptions(
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Rest::Accept(MutableFunctor &functor)
+FunctorCode Rest::Accept(Functor &functor)
 {
     return functor.VisitRest(this);
 }
@@ -561,7 +562,7 @@ FunctorCode Rest::Accept(ConstFunctor &functor) const
     return functor.VisitRest(this);
 }
 
-FunctorCode Rest::AcceptEnd(MutableFunctor &functor)
+FunctorCode Rest::AcceptEnd(Functor &functor)
 {
     return functor.VisitRestEnd(this);
 }
@@ -569,85 +570,6 @@ FunctorCode Rest::AcceptEnd(MutableFunctor &functor)
 FunctorCode Rest::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitRestEnd(this);
-}
-
-int Rest::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) return FUNCTOR_SIBLINGS;
-
-    // Find whether current layer is top, middle (either one if multiple) or bottom
-    Staff *parentStaff = this->GetAncestorStaff();
-    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(parentLayer);
-
-    ListOfObjects objects = parentStaff->FindAllDescendantsByType(LAYER, false);
-    const int layerCount = (int)objects.size();
-
-    Layer *firstLayer = vrv_cast<Layer *>(objects.front());
-    Layer *lastLayer = vrv_cast<Layer *>(objects.back());
-
-    const bool isTopLayer = (firstLayer->GetN() == parentLayer->GetN());
-    const bool isBottomLayer = (lastLayer->GetN() == parentLayer->GetN());
-
-    // transpose based on @oloc and @ploc
-    if (this->HasOloc() && this->HasPloc()) {
-        const TransPitch centralLocation(6, 0, 4); // middle location of the staff
-        TransPitch restLoc(this->GetPloc() - PITCHNAME_c, 0, this->GetOloc());
-        params->m_transposer->Transpose(restLoc);
-        const bool isRestOnSpace = static_cast<bool>((restLoc.m_oct * 7 + restLoc.m_pname) % 2);
-        // on outer layers move rest on odd locations one line further
-        // in middle layers tolerate even locations to not risk collisions
-        if (layerCount > 1) {
-            if (isTopLayer && isRestOnSpace) {
-                restLoc++;
-            }
-            else if (isBottomLayer && isRestOnSpace) {
-                restLoc--;
-            }
-            if ((isTopLayer && (restLoc < centralLocation)) || (isBottomLayer && (restLoc > centralLocation))) {
-                restLoc = centralLocation;
-            }
-        }
-
-        this->UpdateFromTransLoc(restLoc);
-    }
-    // transpose based on @loc
-    else if (this->HasLoc()) {
-        constexpr int centralLocation(4);
-        int transval = params->m_transposer->GetTranspositionIntervalClass();
-        int diatonic;
-        int chromatic;
-        params->m_transposer->IntervalToDiatonicChromatic(diatonic, chromatic, transval);
-        int transposedLoc = this->GetLoc() + diatonic;
-        // on outer layers move rest on odd locations one line further
-        // in middle layers tolerate even locations to not risk collisions
-        if (layerCount > 1) {
-            if (isTopLayer)
-                transposedLoc += abs(transposedLoc % 2);
-            else if (isBottomLayer)
-                transposedLoc -= abs(transposedLoc % 2);
-            if ((isTopLayer && (transposedLoc < centralLocation))
-                || (isBottomLayer && (transposedLoc > centralLocation))) {
-                transposedLoc = centralLocation;
-            }
-        }
-        this->SetLoc(transposedLoc);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Rest::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    params->m_timemap->AddEntry(this, params);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

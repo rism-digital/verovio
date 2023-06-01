@@ -113,7 +113,7 @@ void TextElement::SetDrawingYRel(int drawingYRel)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode TextElement::Accept(MutableFunctor &functor)
+FunctorCode TextElement::Accept(Functor &functor)
 {
     return functor.VisitTextElement(this);
 }
@@ -123,7 +123,7 @@ FunctorCode TextElement::Accept(ConstFunctor &functor) const
     return functor.VisitTextElement(this);
 }
 
-FunctorCode TextElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode TextElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitTextElementEnd(this);
 }

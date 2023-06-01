@@ -18,7 +18,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "note.h"
 #include "tuplet.h"
@@ -73,7 +72,7 @@ bool BTrem::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode BTrem::Accept(MutableFunctor &functor)
+FunctorCode BTrem::Accept(Functor &functor)
 {
     return functor.VisitBTrem(this);
 }
@@ -83,7 +82,7 @@ FunctorCode BTrem::Accept(ConstFunctor &functor) const
     return functor.VisitBTrem(this);
 }
 
-FunctorCode BTrem::AcceptEnd(MutableFunctor &functor)
+FunctorCode BTrem::AcceptEnd(Functor &functor)
 {
     return functor.VisitBTremEnd(this);
 }
@@ -91,64 +90,6 @@ FunctorCode BTrem::AcceptEnd(MutableFunctor &functor)
 FunctorCode BTrem::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitBTremEnd(this);
-}
-
-int BTrem::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Do nothing if the tremolo is unmeasured
-    if (this->GetForm() == bTremLog_FORM_unmeas) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Adjust duration of the bTrem if it's nested within tuplet
-    int num = 0;
-    Tuplet *tuplet = vrv_cast<Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
-    if (tuplet) {
-        num = (tuplet->GetNum() > 0) ? tuplet->GetNum() : 0;
-    }
-    // Get num value if it's set
-    if (this->HasNum()) {
-        num = this->GetNum();
-    }
-
-    // Calculate duration of individual note in tremolo
-    const data_DURATION individualNoteDur = CalcIndividualNoteDuration();
-    if (individualNoteDur == DURATION_NONE) return FUNCTOR_CONTINUE;
-    const double noteInQuarterDur = pow(2.0, (DURATION_4 - individualNoteDur));
-
-    // Define lambda which expands one note into multiple individual notes of the same pitch
-    auto expandNote = [params, noteInQuarterDur, num](Object *obj) {
-        Note *note = vrv_cast<Note *>(obj);
-        assert(note);
-        const int pitch = note->GetMIDIPitch(params->m_transSemi);
-        const double totalInQuarterDur = note->GetScoreTimeDuration() + note->GetScoreTimeTiedDuration();
-        int multiplicity = totalInQuarterDur / noteInQuarterDur;
-        double noteDuration = noteInQuarterDur;
-        // if NUM has been set for the bTrem, override calculated values
-        if (num) {
-            multiplicity = num;
-            noteDuration = totalInQuarterDur / double(num);
-        }
-        (params->m_expandedNotes)[note] = MIDINoteSequence(multiplicity, { pitch, noteDuration });
-    };
-
-    // Apply expansion either to all notes in chord or to first note
-    Chord *chord = vrv_cast<Chord *>(this->FindDescendantByType(CHORD));
-    if (chord) {
-        ListOfObjects notes = chord->FindAllDescendantsByType(NOTE, false);
-        std::for_each(notes.begin(), notes.end(), expandNote);
-    }
-    else {
-        Object *note = this->FindDescendantByType(NOTE);
-        if (note) {
-            expandNote(note);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 data_DURATION BTrem::CalcIndividualNoteDuration() const

@@ -221,7 +221,7 @@ private:
  * This class undoes the cast off for both pages and systems.
  * This is used by Doc::UnCastOffDoc for putting all pages / systems continously.
  */
-class UnCastOffFunctor : public MutableFunctor {
+class UnCastOffFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
