@@ -1294,7 +1294,7 @@ bool AttModule::SetGestural(Object *element, const std::string &attrType, const 
         AttDurationGes *att = dynamic_cast<AttDurationGes *>(element);
         assert(att);
         if (attrType == "dur.ges") {
-            att->SetDurGes(att->StrToDurationGestural(attrValue));
+            att->SetDurGes(att->StrToDuration(attrValue));
             return true;
         }
         if (attrType == "dots.ges") {
@@ -1449,7 +1449,7 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         const AttDurationGes *att = dynamic_cast<const AttDurationGes *>(element);
         assert(att);
         if (att->HasDurGes()) {
-            attributes->push_back({ "dur.ges", att->DurationGesturalToStr(att->GetDurGes()) });
+            attributes->push_back({ "dur.ges", att->DurationToStr(att->GetDurGes()) });
         }
         if (att->HasDotsGes()) {
             attributes->push_back({ "dots.ges", att->IntToStr(att->GetDotsGes()) });

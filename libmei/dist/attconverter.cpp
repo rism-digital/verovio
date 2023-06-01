@@ -1189,69 +1189,6 @@ data_DIVISIO AttConverterBase::StrToDivisio(const std::string &value, bool logWa
     return DIVISIO_NONE;
 }
 
-std::string AttConverterBase::DurationGesturalToStr(data_DURATION_GESTURAL data) const
-{
-    std::string value;
-    switch (data) {
-        case DURATION_GESTURAL_long: value = "long"; break;
-        case DURATION_GESTURAL_breve: value = "breve"; break;
-        case DURATION_GESTURAL_1: value = "1"; break;
-        case DURATION_GESTURAL_2: value = "2"; break;
-        case DURATION_GESTURAL_4: value = "4"; break;
-        case DURATION_GESTURAL_8: value = "8"; break;
-        case DURATION_GESTURAL_16: value = "16"; break;
-        case DURATION_GESTURAL_32: value = "32"; break;
-        case DURATION_GESTURAL_64: value = "64"; break;
-        case DURATION_GESTURAL_128: value = "128"; break;
-        case DURATION_GESTURAL_256: value = "256"; break;
-        case DURATION_GESTURAL_512: value = "512"; break;
-        case DURATION_GESTURAL_1024: value = "1024"; break;
-        case DURATION_GESTURAL_2048: value = "2048"; break;
-        case DURATION_GESTURAL_maxima: value = "maxima"; break;
-        case DURATION_GESTURAL_longa: value = "longa"; break;
-        case DURATION_GESTURAL_brevis: value = "brevis"; break;
-        case DURATION_GESTURAL_semibrevis: value = "semibrevis"; break;
-        case DURATION_GESTURAL_minima: value = "minima"; break;
-        case DURATION_GESTURAL_semiminima: value = "semiminima"; break;
-        case DURATION_GESTURAL_fusa: value = "fusa"; break;
-        case DURATION_GESTURAL_semifusa: value = "semifusa"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.DURATION.GESTURAL", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_DURATION_GESTURAL AttConverterBase::StrToDurationGestural(const std::string &value, bool logWarning) const
-{
-    if (value == "long") return DURATION_GESTURAL_long;
-    if (value == "breve") return DURATION_GESTURAL_breve;
-    if (value == "1") return DURATION_GESTURAL_1;
-    if (value == "2") return DURATION_GESTURAL_2;
-    if (value == "4") return DURATION_GESTURAL_4;
-    if (value == "8") return DURATION_GESTURAL_8;
-    if (value == "16") return DURATION_GESTURAL_16;
-    if (value == "32") return DURATION_GESTURAL_32;
-    if (value == "64") return DURATION_GESTURAL_64;
-    if (value == "128") return DURATION_GESTURAL_128;
-    if (value == "256") return DURATION_GESTURAL_256;
-    if (value == "512") return DURATION_GESTURAL_512;
-    if (value == "1024") return DURATION_GESTURAL_1024;
-    if (value == "2048") return DURATION_GESTURAL_2048;
-    if (value == "maxima") return DURATION_GESTURAL_maxima;
-    if (value == "longa") return DURATION_GESTURAL_longa;
-    if (value == "brevis") return DURATION_GESTURAL_brevis;
-    if (value == "semibrevis") return DURATION_GESTURAL_semibrevis;
-    if (value == "minima") return DURATION_GESTURAL_minima;
-    if (value == "semiminima") return DURATION_GESTURAL_semiminima;
-    if (value == "fusa") return DURATION_GESTURAL_fusa;
-    if (value == "semifusa") return DURATION_GESTURAL_semifusa;
-    if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for data.DURATION.GESTURAL", value.c_str());
-    return DURATION_GESTURAL_NONE;
-}
-
 std::string AttConverterBase::DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const
 {
     std::string value;

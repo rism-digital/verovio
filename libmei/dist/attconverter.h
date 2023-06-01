@@ -102,9 +102,6 @@ public:
     std::string DivisioToStr(data_DIVISIO data) const;
     data_DIVISIO StrToDivisio(const std::string &value, bool logWarning = true) const;
 
-    std::string DurationGesturalToStr(data_DURATION_GESTURAL data) const;
-    data_DURATION_GESTURAL StrToDurationGestural(const std::string &value, bool logWarning = true) const;
-
     std::string DurationrestsMensuralToStr(data_DURATIONRESTS_mensural data) const;
     data_DURATIONRESTS_mensural StrToDurationrestsMensural(const std::string &value, bool logWarning = true) const;
 
