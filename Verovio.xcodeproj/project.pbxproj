@@ -209,6 +209,12 @@
 		4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733D1A1D08CD001E08F6 /* glyph.h */; };
 		4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
 		4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
+		4D1EB6A12A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
+		4D1EB6A22A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
+		4D1EB6A32A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
+		4D1EB6A42A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
+		4D1EB6A62A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; };
+		4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; };
 		4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F622A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
@@ -1761,6 +1767,8 @@
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
+		4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textlayoutelement.cpp; path = src/textlayoutelement.cpp; sourceTree = "<group>"; };
+		4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textlayoutelement.h; path = include/vrv/textlayoutelement.h; sourceTree = "<group>"; };
 		4D2073EF22A3BCB700E0765F /* tabdursym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabdursym.h; path = include/vrv/tabdursym.h; sourceTree = "<group>"; };
 		4D2073F022A3BCB700E0765F /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = include/vrv/tuning.h; sourceTree = "<group>"; };
 		4D2073F122A3BCB700E0765F /* tabgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabgrp.h; path = include/vrv/tabgrp.h; sourceTree = "<group>"; };
@@ -2568,9 +2576,11 @@
 			name = symbolelements;
 			sourceTree = "<group>";
 		};
-		4DC12A761F740089000440E9 /* runningelements */ = {
+		4DC12A761F740089000440E9 /* textlayoutelements */ = {
 			isa = PBXGroup;
 			children = (
+				4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */,
+				4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */,
 				4DC12A771F7400B9000440E9 /* runningelement.cpp */,
 				4DC12A741F73FF92000440E9 /* runningelement.h */,
 				4DC12A7F1F741110000440E9 /* pgfoot.cpp */,
@@ -2582,7 +2592,7 @@
 				4DC12A621F73F898000440E9 /* pghead2.cpp */,
 				4DC12A5C1F73F888000440E9 /* pghead2.h */,
 			);
-			name = runningelements;
+			name = textlayoutelements;
 			sourceTree = "<group>";
 		};
 		4DC34B9E19BC33A0006175CD /* interfaces */ = {
@@ -2725,7 +2735,7 @@
 				8F086F38188539F00037FD8E /* containers */,
 				4D3080F9203DA03600BC44F6 /* editorialelements */,
 				4DA0EABF22BB775F00A7EBEB /* facselements */,
-				4DC12A761F740089000440E9 /* runningelements */,
+				4DC12A761F740089000440E9 /* textlayoutelements */,
 				4D95D4F31D717CD600B2B856 /* systemelements */,
 				4D79641626C151250026288B /* pageelements */,
 				4DF28A011A754DAA00BA9F7D /* controlelements */,
@@ -3330,6 +3340,7 @@
 				4D1BE7791C6942930086DC0E /* pugixml.hpp in Headers */,
 				400FEDD4206FA74A000D3233 /* gracegrp.h in Headers */,
 				4DF440751D39567A00152B7E /* ending.h in Headers */,
+				4D1EB6A62A2A40CB00AF2F98 /* textlayoutelement.h in Headers */,
 				4DE96E3921C4370E00CB85BE /* bracketspan.h in Headers */,
 				E7E1698B29A8BA3900FFF482 /* adjustgracexposfunctor.h in Headers */,
 				E7265E6E29DC6FD300D11F41 /* castofffunctor.h in Headers */,
@@ -3453,6 +3464,7 @@
 				BB4C4B5222A932D7001F6AF0 /* ftrem.h in Headers */,
 				E7E9C11329B0A1E200CFCE2F /* adjustaccidxfunctor.h in Headers */,
 				4D88AD0B289673F50006D7DA /* symbol.h in Headers */,
+				4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */,
 				4D2E759022BC2B71004C51F0 /* course.h in Headers */,
 				BB4C4AA722A932A0001F6AF0 /* bboxdevicecontext.h in Headers */,
 				BB4C4AF822A932BC001F6AF0 /* reg.h in Headers */,
@@ -3879,6 +3891,7 @@
 				4DEC4DAF21C81F0600D1D273 /* sic.cpp in Sources */,
 				E75EA9FE29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */,
 				4D81351F2322C41800F59C01 /* keyaccid.cpp in Sources */,
+				4D1EB6A22A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4D79642226C167100026288B /* pagemilestone.cpp in Sources */,
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
 				E741AD03299A3D6300854426 /* calcslurdirectionfunctor.cpp in Sources */,
@@ -4341,6 +4354,7 @@
 				4D4FCD0C1F5455FF0009C455 /* staffgrp.cpp in Sources */,
 				4DEC4DBE21C828AC00D1D273 /* corr.cpp in Sources */,
 				4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */,
+				4D1EB6A12A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */,
 				4DEC4DA221C81EB300D1D273 /* rdg.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
@@ -4438,6 +4452,7 @@
 				4D1BE7861C6A40A80086DC0E /* pugixml.cpp in Sources */,
 				E75EA9FF29CC3A8B003A97A7 /* calcarticfunctor.cpp in Sources */,
 				400FEDD5206FA74D000D3233 /* gracegrp.cpp in Sources */,
+				4D1EB6A32A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4DA0EAC522BB779400A7EBEB /* surface.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
 				4D79642326C167100026288B /* pagemilestone.cpp in Sources */,
@@ -4718,6 +4733,7 @@
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
 				E75EAA0029CC3A8C003A97A7 /* calcarticfunctor.cpp in Sources */,
 				BB4C4ADB22A932BC001F6AF0 /* abbr.cpp in Sources */,
+				4D1EB6A42A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4D79642426C167100026288B /* pagemilestone.cpp in Sources */,
 				E741AD05299A3D6500854426 /* calcslurdirectionfunctor.cpp in Sources */,
 				BB4C4A9322A9328F001F6AF0 /* doc.cpp in Sources */,

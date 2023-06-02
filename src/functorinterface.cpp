@@ -110,6 +110,7 @@
 #include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
+#include "textlayoutelement.h"
 #include "tie.h"
 #include "timestamp.h"
 #include "trill.h"
@@ -382,6 +383,16 @@ FunctorCode FunctorInterface::VisitPgFoot2(PgFoot2 *pgFoot2)
 FunctorCode FunctorInterface::VisitPgFoot2End(PgFoot2 *pgFoot2)
 {
     return this->VisitRunningElementEnd(pgFoot2);
+}
+
+FunctorCode FunctorInterface::VisitTextLayoutElement(TextLayoutElement *textLayoutElement)
+{
+    return this->VisitObject(textLayoutElement);
+}
+
+FunctorCode FunctorInterface::VisitTextLayoutElementEnd(TextLayoutElement *textLayoutElement)
+{
+    return this->VisitObjectEnd(textLayoutElement);
 }
 
 FunctorCode FunctorInterface::VisitEnding(Ending *ending)
@@ -1656,6 +1667,16 @@ FunctorCode ConstFunctorInterface::VisitPgFoot2(const PgFoot2 *pgFoot2)
 FunctorCode ConstFunctorInterface::VisitPgFoot2End(const PgFoot2 *pgFoot2)
 {
     return this->VisitRunningElementEnd(pgFoot2);
+}
+
+FunctorCode ConstFunctorInterface::VisitTextLayoutElement(const TextLayoutElement *textLayoutElement)
+{
+    return this->VisitObject(textLayoutElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitTextLayoutElementEnd(const TextLayoutElement *textLayoutElement)
+{
+    return this->VisitObjectEnd(textLayoutElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitEnding(const Ending *ending)

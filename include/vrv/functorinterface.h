@@ -130,6 +130,7 @@ class TabGrp;
 class Tempo;
 class Text;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class TimestampAligner;
 class TimestampAttr;
@@ -223,7 +224,7 @@ public:
     ///@}
 
     /**
-     * @name Visit running elements
+     * @name Visit text layout elements
      */
     ///@{
     virtual FunctorCode VisitRunningElement(RunningElement *runningElement);
@@ -236,6 +237,8 @@ public:
     virtual FunctorCode VisitPgHeadEnd(PgHead *pgHead);
     virtual FunctorCode VisitPgHead2(PgHead2 *pgHead2);
     virtual FunctorCode VisitPgHead2End(PgHead2 *pgHead2);
+    virtual FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement);
+    virtual FunctorCode VisitTextLayoutElementEnd(TextLayoutElement *textLayoutElement);
     ///@}
 
     /**
@@ -578,7 +581,7 @@ public:
     ///@}
 
     /**
-     * @name Visit running elements
+     * @name Visit text layout elements
      */
     ///@{
     virtual FunctorCode VisitRunningElement(const RunningElement *runningElement);
@@ -591,6 +594,8 @@ public:
     virtual FunctorCode VisitPgHeadEnd(const PgHead *pgHead);
     virtual FunctorCode VisitPgHead2(const PgHead2 *pgHead2);
     virtual FunctorCode VisitPgHead2End(const PgHead2 *pgHead2);
+    virtual FunctorCode VisitTextLayoutElement(const TextLayoutElement *textLayoutElement);
+    virtual FunctorCode VisitTextLayoutElementEnd(const TextLayoutElement *textLayoutElement);
     ///@}
 
     /**
