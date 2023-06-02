@@ -70,12 +70,12 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
 
     // Default position is above or below the staff
     const int staffBoundary = (bracketPos == STAFFREL_basic_above) ? 0 : -m_doc->GetDrawingStaffSize(staffSize);
-    const Point referencePos(tupletBracket->GetDrawingX(), staff->GetDrawingY() + staffBoundary);
+    const int bracketMidX = (tupletBracket->GetDrawingXLeft() + tupletBracket->GetDrawingXRight()) / 2;
+    const Point referencePos(bracketMidX, staff->GetDrawingY() + staffBoundary);
 
     // Check for overlap with content
-    // Possible issue with beam above the tuplet - not sure this will be noticeable
     ListOfObjects descendants;
-    ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
+    ClassIdsComparison comparison({ ARTIC, ACCID, DOT, FLAG, NOTE, REST, STEM });
     tuplet->FindAllDescendantsByComparison(&descendants, &comparison);
 
     std::list<Point> obstacles;
@@ -87,11 +87,34 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
         obstacles.push_back({ descendant->GetDrawingX(), obstacleY });
     }
 
+    // Calculate the horizontal bracket first
+    const int unit = m_doc->GetDrawingUnit(staffSize);
     const int sign = (bracketPos == STAFFREL_basic_above) ? 1 : -1;
     const int horizontalBracketShift = this->CalcBracketShift(referencePos, 0.0, sign, obstacles);
+    int optimalTilt = 0;
+    int optimalShift = horizontalBracketShift;
 
-    const int bracketVerticalMargin = m_doc->GetDrawingDoubleUnit(staffSize);
-    tupletBracket->SetDrawingYRel(staffBoundary + sign * (horizontalBracketShift + bracketVerticalMargin));
+    // Now try different angles and possibly find a better position
+    const int bracketWidth = tupletBracket->GetDrawingXRight() - tupletBracket->GetDrawingXLeft();
+    for (int tilt : { -4, -2, 2, 4 }) {
+        if (bracketWidth == 0) continue;
+        const double slope = tilt * unit / double(bracketWidth);
+        const int shift = this->CalcBracketShift(referencePos, slope, sign, obstacles);
+        // Drop angled brackets that would go into the staff
+        if (shift < abs(tilt) * unit / 2) continue;
+        // Drop angled brackets where the midpoint is moved only slightly closer to the staff
+        if (shift > horizontalBracketShift - abs(tilt) * unit / 4) continue;
+        // Update the optimal tilt
+        if (shift < optimalShift) {
+            optimalShift = shift;
+            optimalTilt = tilt;
+        }
+    }
+
+    const int verticalMargin = 2 * unit;
+    tupletBracket->SetDrawingYRel(staffBoundary + sign * (optimalShift + verticalMargin));
+    tupletBracket->SetDrawingYRelLeft(-optimalTilt * unit / 2);
+    tupletBracket->SetDrawingYRelRight(optimalTilt * unit / 2);
 }
 
 void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff) const
