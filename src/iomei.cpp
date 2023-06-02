@@ -40,6 +40,7 @@
 #include "damage.h"
 #include "del.h"
 #include "dir.h"
+#include "div.h"
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
@@ -409,6 +410,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(SCOREDEF)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         this->WriteScoreDef(m_currentNode, vrv_cast<ScoreDef *>(object));
+    }
+    else if (object->Is(DIV)) {
+        m_currentNode = m_currentNode.append_child("div");
+        this->WriteDiv(m_currentNode, vrv_cast<Div *>(object));
     }
     else if (object->Is(PGFOOT)) {
         m_currentNode = m_currentNode.append_child("pgFoot");
@@ -1748,6 +1753,13 @@ void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
     grpSym->WriteStaffGroupingSym(currentNode);
     grpSym->WriteStartId(currentNode);
     grpSym->WriteStartEndId(currentNode);
+}
+
+void MEIOutput::WriteDiv(pugi::xml_node currentNode, Div *div)
+{
+    assert(div);
+
+    this->WriteTextLayoutElement(currentNode, div);
 }
 
 void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
@@ -4950,6 +4962,17 @@ bool MEIInput::ReadPgHead2(Object *parent, pugi::xml_node pgHead2)
     parent->AddChild(vrvPgHead2);
     this->ReadUnsupportedAttr(pgHead2, vrvPgHead2);
     return this->ReadRunningChildren(vrvPgHead2, pgHead2, vrvPgHead2);
+}
+
+bool MEIInput::ReadDiv(Object *parent, pugi::xml_node div)
+{
+    Div *vrvDiv = new Div();
+    this->ReadTextLayoutElement(div, vrvDiv);
+
+    parent->AddChild(vrvDiv);
+    this->ReadUnsupportedAttr(div, vrvDiv);
+    // return this->ReadRunningChildren(vrvDiv, pgDiv, vrvDiv);
+    return true;
 }
 
 bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)

@@ -51,6 +51,7 @@ class Damage;
 class Del;
 class Dot;
 class Dir;
+class Div;
 class DurationInterface;
 class Dynam;
 class Ending;
@@ -359,6 +360,7 @@ private:
     void WritePgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2);
     void WritePgHead(pugi::xml_node currentNode, PgHead *pgHead);
     void WritePgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2);
+    void WriteDiv(pugi::xml_node currentNode, Div *div);
     void WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
     void WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef);
@@ -656,6 +658,7 @@ private:
     bool ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2);
     bool ReadPgHead(Object *parent, pugi::xml_node pgHead);
     bool ReadPgHead2(Object *parent, pugi::xml_node pgHead2);
+    bool ReadDiv(Object *parent, pugi::xml_node div);
     bool ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     bool ReadStaffGrp(Object *parent, pugi::xml_node staffGrp);
     bool ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
