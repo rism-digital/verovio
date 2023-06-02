@@ -157,6 +157,7 @@ class Tempo;
 class Text;
 class TextDirInterface;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
@@ -515,6 +516,7 @@ private:
     void WriteControlElement(pugi::xml_node element, ControlElement *object);
     void WriteEditorialElement(pugi::xml_node element, EditorialElement *object);
     void WriteLayerElement(pugi::xml_node element, LayerElement *object);
+    void WriteTextLayoutElement(pugi::xml_node element, TextLayoutElement *object);
     void WriteRunningElement(pugi::xml_node element, RunningElement *object);
     void WriteScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
     void WriteSystemElement(pugi::xml_node element, SystemElement *object);
@@ -812,6 +814,7 @@ private:
     bool ReadControlElement(pugi::xml_node element, ControlElement *object);
     bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
     bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object);
     bool ReadRunningElement(pugi::xml_node element, RunningElement *object);
     bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);

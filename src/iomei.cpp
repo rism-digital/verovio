@@ -140,6 +140,7 @@
 #include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
+#include "textlayoutelement.h"
 #include "tie.h"
 #include "trill.h"
 #include "tuning.h"
@@ -1715,13 +1716,20 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     scoreDef->WriteTuning(currentNode);
 }
 
+void MEIOutput::WriteTextLayoutElement(pugi::xml_node currentNode, TextLayoutElement *textLayoutElement)
+{
+    assert(textLayoutElement);
+
+    this->WriteXmlId(currentNode, textLayoutElement);
+    textLayoutElement->WriteTyped(currentNode);
+}
+
 void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
 {
     assert(runningElement);
 
-    this->WriteXmlId(currentNode, runningElement);
+    this->WriteTextLayoutElement(currentNode, runningElement);
     runningElement->WriteHorizontalAlign(currentNode);
-    runningElement->WriteTyped(currentNode);
 }
 
 void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
@@ -4864,11 +4872,18 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+bool MEIInput::ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object)
 {
     this->SetMeiID(element, object);
-    object->ReadHorizontalAlign(element);
     object->ReadTyped(element);
+
+    return true;
+}
+
+bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+{
+    this->ReadTextLayoutElement(element, object);
+    object->ReadHorizontalAlign(element);
 
     return true;
 }

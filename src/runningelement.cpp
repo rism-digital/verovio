@@ -31,29 +31,24 @@ namespace vrv {
 // RunningElement
 //----------------------------------------------------------------------------
 
-RunningElement::RunningElement()
-    : Object(RUNNING_ELEMENT, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement() : TextLayoutElement(RUNNING_ELEMENT, "re"), AttHorizontalAlign()
 {
     this->RegisterAttClass(ATT_HORIZONTALALIGN);
-    this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
 
-RunningElement::RunningElement(ClassId classId)
-    : Object(classId, "re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement(ClassId classId) : TextLayoutElement(classId, "re"), AttHorizontalAlign()
 {
     this->RegisterAttClass(ATT_HORIZONTALALIGN);
-    this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
 
 RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
-    : Object(classId, classIdStr), AttHorizontalAlign(), AttTyped()
+    : TextLayoutElement(classId, classIdStr), AttHorizontalAlign()
 {
     this->RegisterAttClass(ATT_HORIZONTALALIGN);
-    this->RegisterAttClass(ATT_TYPED);
 
     this->Reset();
 }
@@ -62,9 +57,8 @@ RunningElement::~RunningElement() {}
 
 void RunningElement::Reset()
 {
-    Object::Reset();
+    TextLayoutElement::Reset();
     this->ResetHorizontalAlign();
-    this->ResetTyped();
 
     m_isGenerated = false;
 

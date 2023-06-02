@@ -135,7 +135,7 @@ FunctorCode SaveFunctor::VisitRunningElement(RunningElement *runningElement)
         return FUNCTOR_SIBLINGS;
     }
     else {
-        return this->VisitObject(runningElement);
+        return this->VisitTextLayoutElement(runningElement);
     }
 }
 
@@ -145,7 +145,7 @@ FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
         return FUNCTOR_SIBLINGS;
     }
     else {
-        return this->VisitObjectEnd(runningElement);
+        return this->VisitTextLayoutElementEnd(runningElement);
     }
 }
 

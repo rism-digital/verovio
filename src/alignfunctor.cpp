@@ -549,6 +549,8 @@ FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 
 FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningElement)
 {
+    this->VisitTextLayoutElement(runningElement);
+
     m_pageWidth = runningElement->GetWidth();
 
     return FUNCTOR_CONTINUE;

@@ -9,7 +9,7 @@
 #define __VRV_RUNNING_ELEMENT_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "textlayoutelement.h"
 
 namespace vrv {
 
@@ -25,7 +25,7 @@ class TextElement;
  * This class represents running elements (headers and footers).
  * It is not an abstract class but should not be instanciated directly.
  */
-class RunningElement : public Object, public ObjectListInterface, public AttHorizontalAlign, public AttTyped {
+class RunningElement : public TextLayoutElement, public AttHorizontalAlign {
 public:
     /**
      * @name Constructors, destructors, reset methods

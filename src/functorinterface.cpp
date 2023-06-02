@@ -337,12 +337,12 @@ FunctorCode FunctorInterface::VisitEditorialElementEnd(EditorialElement *editori
 
 FunctorCode FunctorInterface::VisitRunningElement(RunningElement *runningElement)
 {
-    return this->VisitObject(runningElement);
+    return this->VisitTextLayoutElement(runningElement);
 }
 
 FunctorCode FunctorInterface::VisitRunningElementEnd(RunningElement *runningElement)
 {
-    return this->VisitObjectEnd(runningElement);
+    return this->VisitTextLayoutElementEnd(runningElement);
 }
 
 FunctorCode FunctorInterface::VisitPgHead(PgHead *pgHead)
@@ -1621,12 +1621,12 @@ FunctorCode ConstFunctorInterface::VisitEditorialElementEnd(const EditorialEleme
 
 FunctorCode ConstFunctorInterface::VisitRunningElement(const RunningElement *runningElement)
 {
-    return this->VisitObject(runningElement);
+    return this->VisitTextLayoutElement(runningElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitRunningElementEnd(const RunningElement *runningElement)
 {
-    return this->VisitObjectEnd(runningElement);
+    return this->VisitTextLayoutElementEnd(runningElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitPgHead(const PgHead *pgHead)

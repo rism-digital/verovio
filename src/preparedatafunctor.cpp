@@ -83,6 +83,8 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 
 FunctorCode PrepareDataInitializationFunctor::VisitRunningElement(RunningElement *runningElement)
 {
+    this->VisitTextLayoutElement(runningElement);
+
     runningElement->ResetCells();
     runningElement->ResetDrawingScaling();
 
