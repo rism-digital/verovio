@@ -2579,8 +2579,6 @@
 		4DC12A761F740089000440E9 /* textlayoutelements */ = {
 			isa = PBXGroup;
 			children = (
-				4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */,
-				4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */,
 				4DC12A771F7400B9000440E9 /* runningelement.cpp */,
 				4DC12A741F73FF92000440E9 /* runningelement.h */,
 				4DC12A7F1F741110000440E9 /* pgfoot.cpp */,
@@ -2591,6 +2589,8 @@
 				4DC12A561F716E1C000440E9 /* pghead.h */,
 				4DC12A621F73F898000440E9 /* pghead2.cpp */,
 				4DC12A5C1F73F888000440E9 /* pghead2.h */,
+				4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */,
+				4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */,
 			);
 			name = textlayoutelements;
 			sourceTree = "<group>";
