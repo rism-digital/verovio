@@ -983,10 +983,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     x = element->GetDrawingX();
     // HARDCODED
-    int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-    int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int naturalStep = step * TEMP_KEYSIG_NATURAL_STEP;
-    step *= TEMP_KEYSIG_STEP;
+    const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
 
     int clefLocOffset = layer->GetClefLocOffset(element);
 
