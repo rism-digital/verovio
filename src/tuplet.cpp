@@ -267,29 +267,27 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs
-    ListOfObjects::const_iterator iter = tupletChildren.begin();
-    while (iter != tupletChildren.end()) {
-        if ((*iter)->Is(CHORD)) {
-            Chord *currentChord = vrv_cast<Chord *>(*iter);
+    for (Object *child : tupletChildren) {
+        if (child->Is(CHORD)) {
+            Chord *currentChord = vrv_cast<Chord *>(child);
             assert(currentChord);
             if (currentChord->GetDrawingStemDir() == STEMDIRECTION_up) {
-                ups++;
+                ++ups;
             }
             else {
-                downs++;
+                ++downs;
             }
         }
-        else if ((*iter)->Is(NOTE)) {
-            Note *currentNote = vrv_cast<Note *>(*iter);
+        else if (child->Is(NOTE)) {
+            Note *currentNote = vrv_cast<Note *>(child);
             assert(currentNote);
             if (!currentNote->IsChordTone() && (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)) {
-                ups++;
+                ++ups;
             }
             if (!currentNote->IsChordTone() && (currentNote->GetDrawingStemDir() == STEMDIRECTION_down)) {
-                downs++;
+                ++downs;
             }
         }
-        ++iter;
     }
     // true means up
     m_drawingBracketPos = ups > downs ? STAFFREL_basic_above : STAFFREL_basic_below;
@@ -303,8 +301,6 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
     if (m_drawingNumPos == STAFFREL_basic_NONE) {
         m_drawingNumPos = m_drawingBracketPos;
     }
-
-    return;
 }
 
 void Tuplet::GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const
