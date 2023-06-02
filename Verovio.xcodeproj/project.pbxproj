@@ -215,6 +215,12 @@
 		4D1EB6A42A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */; };
 		4D1EB6A62A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; };
 		4D1EB6A72A2A40CB00AF2F98 /* textlayoutelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */; };
+		4D1EB6A92A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
+		4D1EB6AA2A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
+		4D1EB6AB2A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
+		4D1EB6AC2A2A7C5100AF2F98 /* div.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1EB6A82A2A7C5100AF2F98 /* div.cpp */; };
+		4D1EB6AE2A2A7C6400AF2F98 /* div.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6AD2A2A7C6400AF2F98 /* div.h */; };
+		4D1EB6AF2A2A7C6400AF2F98 /* div.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1EB6AD2A2A7C6400AF2F98 /* div.h */; };
 		4D2073F522A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F622A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
 		4D2073F722A3BCE000E0765F /* tuning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D2073F222A3BCDF00E0765F /* tuning.cpp */; };
@@ -1769,6 +1775,8 @@
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
 		4D1EB6A02A2A40B400AF2F98 /* textlayoutelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textlayoutelement.cpp; path = src/textlayoutelement.cpp; sourceTree = "<group>"; };
 		4D1EB6A52A2A40CB00AF2F98 /* textlayoutelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textlayoutelement.h; path = include/vrv/textlayoutelement.h; sourceTree = "<group>"; };
+		4D1EB6A82A2A7C5100AF2F98 /* div.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = div.cpp; path = src/div.cpp; sourceTree = "<group>"; };
+		4D1EB6AD2A2A7C6400AF2F98 /* div.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = div.h; path = include/vrv/div.h; sourceTree = "<group>"; };
 		4D2073EF22A3BCB700E0765F /* tabdursym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabdursym.h; path = include/vrv/tabdursym.h; sourceTree = "<group>"; };
 		4D2073F022A3BCB700E0765F /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuning.h; path = include/vrv/tuning.h; sourceTree = "<group>"; };
 		4D2073F122A3BCB700E0765F /* tabgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tabgrp.h; path = include/vrv/tabgrp.h; sourceTree = "<group>"; };
@@ -2579,6 +2587,8 @@
 		4DC12A761F740089000440E9 /* textlayoutelements */ = {
 			isa = PBXGroup;
 			children = (
+				4D1EB6A82A2A7C5100AF2F98 /* div.cpp */,
+				4D1EB6AD2A2A7C6400AF2F98 /* div.h */,
 				4DC12A771F7400B9000440E9 /* runningelement.cpp */,
 				4DC12A741F73FF92000440E9 /* runningelement.h */,
 				4DC12A7F1F741110000440E9 /* pgfoot.cpp */,
@@ -3284,6 +3294,7 @@
 				4DC12A891F74111E000440E9 /* pgfoot.h in Headers */,
 				4DB3D8C91F83D10300B5FC2B /* dir.h in Headers */,
 				BD05622F2518CD12004057EB /* beamspan.h in Headers */,
+				4D1EB6AE2A2A7C6400AF2F98 /* div.h in Headers */,
 				4DEC4DDA21C8295700D1D273 /* damage.h in Headers */,
 				4DACC9CE2990F29A00B55913 /* atts_mei.h in Headers */,
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
@@ -3410,6 +3421,7 @@
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
 				4DACC9F52990F29A00B55913 /* atts_visual.h in Headers */,
 				BBC19FC322B38C1400100F42 /* VerovioFramework.h in Headers */,
+				4D1EB6AF2A2A7C6400AF2F98 /* div.h in Headers */,
 				BB4C4BC222A9330D001F6AF0 /* pugiconfig.hpp in Headers */,
 				4DACC9F12990F29A00B55913 /* atts_critapp.h in Headers */,
 				4D81351C2322C2CC00F59C01 /* keyaccid.h in Headers */,
@@ -3995,6 +4007,7 @@
 				4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */,
 				4DB3D8E61F83D16A00B5FC2B /* ftrem.cpp in Sources */,
 				4DACCA072990F29A00B55913 /* atts_harmony.cpp in Sources */,
+				4D1EB6AA2A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DACC9A72990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9F92990F29A00B55913 /* atts_figtable.cpp in Sources */,
@@ -4210,6 +4223,7 @@
 				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
 				E7A1640C29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
+				4D1EB6A92A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
 				E7E1698E29A8BA5200FFF482 /* adjustgracexposfunctor.cpp in Sources */,
 				4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */,
@@ -4556,6 +4570,7 @@
 				8F3DD32E18854B250051330C /* layer.cpp in Sources */,
 				8F3DD33018854B250051330C /* measure.cpp in Sources */,
 				4DACCA082990F29A00B55913 /* atts_harmony.cpp in Sources */,
+				4D1EB6AB2A2A7C5100AF2F98 /* div.cpp in Sources */,
 				8F3DD33218854B250051330C /* page.cpp in Sources */,
 				4DACC9A82990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9FA2990F29A00B55913 /* atts_figtable.cpp in Sources */,
@@ -4837,6 +4852,7 @@
 				BB4C4BB122A932EB001F6AF0 /* view_page.cpp in Sources */,
 				4DACCA092990F29A00B55913 /* atts_harmony.cpp in Sources */,
 				BB4C4A9F22A9328F001F6AF0 /* toolkit.cpp in Sources */,
+				4D1EB6AC2A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DACC9A92990F29A00B55913 /* atts_externalsymbols.cpp in Sources */,
 				4DACC9FB2990F29A00B55913 /* atts_figtable.cpp in Sources */,
 				E797C465298EC30800CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,

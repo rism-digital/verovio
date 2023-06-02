@@ -31,6 +31,7 @@ namespace vrv {
 // RunningElement
 //----------------------------------------------------------------------------
 
+/*
 RunningElement::RunningElement() : TextLayoutElement(RUNNING_ELEMENT, "re"), AttHorizontalAlign()
 {
     this->RegisterAttClass(ATT_HORIZONTALALIGN);
@@ -44,6 +45,7 @@ RunningElement::RunningElement(ClassId classId) : TextLayoutElement(classId, "re
 
     this->Reset();
 }
+*/
 
 RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
     : TextLayoutElement(classId, classIdStr), AttHorizontalAlign()

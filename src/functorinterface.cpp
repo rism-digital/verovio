@@ -26,6 +26,7 @@
 #include "course.h"
 #include "custos.h"
 #include "dir.h"
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
@@ -333,6 +334,16 @@ FunctorCode FunctorInterface::VisitEditorialElement(EditorialElement *editorialE
 FunctorCode FunctorInterface::VisitEditorialElementEnd(EditorialElement *editorialElement)
 {
     return this->VisitObjectEnd(editorialElement);
+}
+
+FunctorCode FunctorInterface::VisitDiv(Div *div)
+{
+    return this->VisitTextLayoutElement(div);
+}
+
+FunctorCode FunctorInterface::VisitDivEnd(Div *div)
+{
+    return this->VisitTextLayoutElementEnd(div);
 }
 
 FunctorCode FunctorInterface::VisitRunningElement(RunningElement *runningElement)
@@ -1617,6 +1628,16 @@ FunctorCode ConstFunctorInterface::VisitEditorialElement(const EditorialElement 
 FunctorCode ConstFunctorInterface::VisitEditorialElementEnd(const EditorialElement *editorialElement)
 {
     return this->VisitObjectEnd(editorialElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitDiv(const Div *div)
+{
+    return this->VisitTextLayoutElement(div);
+}
+
+FunctorCode ConstFunctorInterface::VisitDivEnd(const Div *div)
+{
+    return this->VisitTextLayoutElementEnd(div);
 }
 
 FunctorCode ConstFunctorInterface::VisitRunningElement(const RunningElement *runningElement)

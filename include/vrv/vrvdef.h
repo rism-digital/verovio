@@ -153,6 +153,7 @@ enum ClassId : uint16_t {
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
     // Ids for RunningElement child classes
+    DIV,
     RUNNING_ELEMENT,
     PGFOOT,
     PGFOOT2,

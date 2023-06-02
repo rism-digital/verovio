@@ -32,6 +32,7 @@ class ControlElement;
 class Course;
 class Custos;
 class Dir;
+class Div;
 class Dot;
 class Dots;
 class Doc;
@@ -227,6 +228,8 @@ public:
      * @name Visit text layout elements
      */
     ///@{
+    virtual FunctorCode VisitDiv(Div *div);
+    virtual FunctorCode VisitDivEnd(Div *div);
     virtual FunctorCode VisitRunningElement(RunningElement *runningElement);
     virtual FunctorCode VisitRunningElementEnd(RunningElement *runningElement);
     virtual FunctorCode VisitPgFoot(PgFoot *pgFoot);
@@ -584,6 +587,8 @@ public:
      * @name Visit text layout elements
      */
     ///@{
+    virtual FunctorCode VisitDiv(const Div *div);
+    virtual FunctorCode VisitDivEnd(const Div *div);
     virtual FunctorCode VisitRunningElement(const RunningElement *runningElement);
     virtual FunctorCode VisitRunningElementEnd(const RunningElement *runningElement);
     virtual FunctorCode VisitPgFoot(const PgFoot *pgFoot);

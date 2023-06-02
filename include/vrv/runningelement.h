@@ -32,8 +32,8 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    RunningElement();
-    RunningElement(ClassId classId);
+    // RunningElement();
+    // RunningElement(ClassId classId);
     RunningElement(ClassId classId, const std::string &classIdStr);
     virtual ~RunningElement();
     void Reset() override;
