@@ -69,7 +69,8 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
     const data_STAFFREL_basic bracketPos = tuplet->GetDrawingBracketPos();
 
     // Default position is above or below the staff
-    int yRel = (bracketPos == STAFFREL_basic_above) ? 0 : -m_doc->GetDrawingStaffSize(staffSize);
+    const int staffBoundary = (bracketPos == STAFFREL_basic_above) ? 0 : -m_doc->GetDrawingStaffSize(staffSize);
+    const Point referencePos(tupletBracket->GetDrawingX(), staff->GetDrawingY() + staffBoundary);
 
     // Check for overlap with content
     // Possible issue with beam above the tuplet - not sure this will be noticeable
@@ -77,23 +78,20 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
     ClassIdsComparison comparison({ ARTIC, ACCID, BEAM, DOT, FLAG, NOTE, REST, STEM });
     tuplet->FindAllDescendantsByComparison(&descendants, &comparison);
 
-    const int yReference = staff->GetDrawingY();
+    std::list<Point> obstacles;
     for (Object *descendant : descendants) {
         if (!descendant->HasSelfBB()) continue;
         if (vrv_cast<LayerElement *>(descendant)->m_crossStaff) continue;
-        if (bracketPos == STAFFREL_basic_above) {
-            int dist = descendant->GetSelfTop() - yReference;
-            if (yRel < dist) yRel = dist;
-        }
-        else {
-            int dist = descendant->GetSelfBottom() - yReference;
-            if (yRel > dist) yRel = dist;
-        }
+        const int obstacleY
+            = (bracketPos == STAFFREL_basic_above) ? descendant->GetSelfTop() : descendant->GetSelfBottom();
+        obstacles.push_back({ descendant->GetDrawingX(), obstacleY });
     }
 
     const int sign = (bracketPos == STAFFREL_basic_above) ? 1 : -1;
-    const int bracketVerticalMargin = sign * m_doc->GetDrawingDoubleUnit(staffSize);
-    tupletBracket->SetDrawingYRel(tupletBracket->GetDrawingYRel() + yRel + bracketVerticalMargin);
+    const int horizontalBracketShift = this->CalcBracketShift(referencePos, 0.0, sign, obstacles);
+
+    const int bracketVerticalMargin = m_doc->GetDrawingDoubleUnit(staffSize);
+    tupletBracket->SetDrawingYRel(staffBoundary + sign * (horizontalBracketShift + bracketVerticalMargin));
 }
 
 void AdjustTupletsYFunctor::AdjustTupletNumY(Tuplet *tuplet, const Staff *staff) const
@@ -278,6 +276,18 @@ void AdjustTupletsYFunctor::AdjustTupletBracketBeamY(
             bracket->SetDrawingYRelRight(bracket->GetDrawingYRelRight() - doubleUnit / 4);
         }
     }
+}
+
+int AdjustTupletsYFunctor::CalcBracketShift(
+    Point referencePos, double slope, int sign, const std::list<Point> &obstacles) const
+{
+    int shift = 0;
+    for (Point obstacle : obstacles) {
+        const double lineShift = obstacle.y - slope * obstacle.x;
+        const int dist = slope * referencePos.x + lineShift - referencePos.y;
+        shift = std::max(dist * sign, shift);
+    }
+    return shift;
 }
 
 //----------------------------------------------------------------------------
