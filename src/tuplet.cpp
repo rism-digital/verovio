@@ -156,6 +156,27 @@ void Tuplet::FilterList(ListOfConstObjects &childList) const
     }
 }
 
+MelodicDirection Tuplet::GetMelodicDirection() const
+{
+    const LayerElement *leftElement = this->GetDrawingLeft();
+    const Note *leftNote = NULL;
+    if (leftElement->Is(NOTE)) leftNote = vrv_cast<const Note *>(leftElement);
+    if (leftElement->Is(CHORD)) leftNote = vrv_cast<const Chord *>(leftElement)->GetTopNote();
+
+    const LayerElement *rightElement = this->GetDrawingRight();
+    const Note *rightNote = NULL;
+    if (rightElement->Is(NOTE)) rightNote = vrv_cast<const Note *>(rightElement);
+    if (rightElement->Is(CHORD)) rightNote = vrv_cast<const Chord *>(rightElement)->GetTopNote();
+
+    if (leftNote && rightNote) {
+        const int leftPitch = leftNote->GetDiatonicPitch();
+        const int rightPitch = rightNote->GetDiatonicPitch();
+        if (leftPitch < rightPitch) return MelodicDirection::Up;
+        if (leftPitch > rightPitch) return MelodicDirection::Down;
+    }
+    return MelodicDirection::None;
+}
+
 void Tuplet::CalculateTupletNumCrossStaff(LayerElement *layerElement)
 {
     assert(layerElement);

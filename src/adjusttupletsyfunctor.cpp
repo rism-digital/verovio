@@ -96,8 +96,13 @@ void AdjustTupletsYFunctor::AdjustTupletBracketY(Tuplet *tuplet, const Staff *st
 
     // Now try different angles and possibly find a better position
     const int bracketWidth = tupletBracket->GetDrawingXRight() - tupletBracket->GetDrawingXLeft();
+    const MelodicDirection direction = tuplet->GetMelodicDirection();
     for (int tilt : { -4, -2, 2, 4 }) {
         if (bracketWidth == 0) continue;
+        // Drop if angle does not fit to the melodic direction
+        if ((direction == MelodicDirection::Up) && (tilt < 0)) continue;
+        if ((direction == MelodicDirection::Down) && (tilt > 0)) continue;
+        // Calculate the shift for the angle
         const double slope = tilt * unit / double(bracketWidth);
         const int shift = this->CalcBracketShift(referencePos, slope, sign, obstacles);
         // Drop angled brackets that would go into the staff

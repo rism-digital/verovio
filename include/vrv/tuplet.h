@@ -18,6 +18,9 @@ namespace vrv {
 class Note;
 class TupletBracket;
 
+// Helper enum classes
+enum class MelodicDirection { None, Up, Down };
+
 //----------------------------------------------------------------------------
 // Tuplet
 //----------------------------------------------------------------------------
@@ -88,6 +91,11 @@ public:
     void AddInnerSlur(const FloatingCurvePositioner *slur) { m_innerSlurs.insert(slur); }
     void ResetInnerSlurs() { m_innerSlurs.clear(); }
     ///@}
+
+    /**
+     * Determine the melodic direction
+     */
+    MelodicDirection GetMelodicDirection() const;
 
     /**
      * Calculate the position of the bracket and the num looking at the stem direction or at the encoded values (if
