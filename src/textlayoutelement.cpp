@@ -22,8 +22,10 @@ namespace vrv {
 // TextLayoutElement
 //----------------------------------------------------------------------------
 
-TextLayoutElement::TextLayoutElement() : Object()
+TextLayoutElement::TextLayoutElement(ClassId classId, const std::string &classIdStr) : Object(classId, classIdStr), ObjectListInterface(), AttTyped()
 {
+    this->RegisterAttClass(ATT_TYPED);
+    
     this->Reset();
 }
 
@@ -31,6 +33,7 @@ TextLayoutElement::~TextLayoutElement() {}
 
 void TextLayoutElement::Reset()
 {
+    
 }
 
 //----------------------------------------------------------------------------
