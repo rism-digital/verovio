@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "fig.h"
@@ -488,6 +489,13 @@ AlignVerticallyFunctor::AlignVerticallyFunctor(Doc *doc) : DocFunctor(doc)
     m_cumulatedShift = 0;
     m_justificationSum = 0;
     m_pageWidth = 0;
+}
+
+FunctorCode AlignVerticallyFunctor::VisitDiv(Div *div)
+{
+    m_systemAligner->GetBottomAlignment()->SetYRel(-div->GetTotalHeight(m_doc));
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)

@@ -159,6 +159,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitFig(Fig *fig) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPageEnd(Page *page) override;
