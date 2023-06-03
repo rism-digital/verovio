@@ -4344,8 +4344,11 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
+        else if (std::string(current.name()) == "div") {
+            success = this->ReadDiv(parent, current);
+        }
         else if (std::string(current.name()) == "ending") {
-            // we should not endings with unmeasured music ... (?)
+            // we should not have endings with unmeasured music ... (?)
             assert(!unmeasured);
             success = this->ReadEnding(parent, current);
         }

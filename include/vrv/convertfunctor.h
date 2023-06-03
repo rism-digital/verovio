@@ -38,6 +38,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEditorialElementEnd(EditorialElement *editorialElement) override;
     FunctorCode VisitEnding(Ending *ending) override;
