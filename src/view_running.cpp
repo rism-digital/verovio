@@ -15,6 +15,7 @@
 
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
+#include "div.h"
 #include "doc.h"
 #include "page.h"
 #include "pgfoot.h"
@@ -80,6 +81,24 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     dc->ResetBrush();
 
     dc->EndGraphic(pgHeader, this);
+}
+
+void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
+{
+    dc->StartGraphic(div, "", div->GetID());
+
+    dc->SetBrush(m_currentColor, AxSOLID);
+
+    const int x = div->GetDrawingX();
+    const int y = div->GetDrawingY();
+    const int height = div->GetTotalHeight(m_doc);
+    const int width = div->GetTotalWidth(m_doc);
+
+    this->DrawFilledRectangle(dc, x, y, x + width, y - height);
+
+    dc->ResetBrush();
+
+    dc->EndGraphic(div, this);
 }
 
 } // namespace vrv

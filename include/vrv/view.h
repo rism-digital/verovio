@@ -30,6 +30,7 @@ class Chord;
 class ControlElement;
 class DeviceContext;
 class Dir;
+class Div;
 class Doc;
 class Dynam;
 class EditorialElement;
@@ -242,6 +243,7 @@ protected:
      * Defined in view_running.cpp
      */
     ///@{
+    void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
     void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
     void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
