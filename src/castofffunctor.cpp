@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
@@ -29,6 +30,14 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // CastOffSystemsFunctor
 //----------------------------------------------------------------------------
+
+FunctorCode CastOffSystemsFunctor::VisitDiv(Div *div)
+{
+    assert(m_currentSystem);
+    div->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
 
 CastOffSystemsFunctor::CastOffSystemsFunctor(Page *page, Doc *doc, bool smart) : DocFunctor(doc)
 {
@@ -385,6 +394,13 @@ CastOffEncodingFunctor::CastOffEncodingFunctor(Doc *doc, Page *currentPage, bool
     m_usePages = usePages;
 }
 
+FunctorCode CastOffEncodingFunctor::VisitDiv(Div *div)
+{
+    div->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode CastOffEncodingFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
     // Only move editorial elements that are a child of the system
@@ -458,7 +474,7 @@ FunctorCode CastOffEncodingFunctor::VisitSb(Sb *sb)
     // We look if the current system has at least one measure - if yes, we assume that the <sb>
     // is not the one at the beginning of the content (<mdiv>). This is not very robust but at least make it
     // work when rendering a <mdiv> that does not start with a <pb> or a <sb> (which we cannot enforce)
-    if (m_currentSystem->GetChildCount(MEASURE) > 0) {
+    if (m_currentSystem->GetChildCount(MEASURE) > 0 || m_currentSystem->GetChildCount(DIV) > 0) {
         m_currentPage->AddChild(m_currentSystem);
         m_currentSystem = new System();
     }
@@ -587,6 +603,13 @@ CastOffToSelectionFunctor::CastOffToSelectionFunctor(
     m_start = start;
     m_end = end;
     m_isSelection = false;
+}
+
+FunctorCode CastOffToSelectionFunctor::VisitDiv(Div *div)
+{
+    div->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode CastOffToSelectionFunctor::VisitEditorialElement(EditorialElement *editorialElement)
