@@ -37,6 +37,8 @@ public:
      */
     int GetTotalHeight(const Doc *doc) const override;
 
+    int GetTotalWidth(const Doc *doc) const;
+
     //----------//
     // Functors //
     //----------//

@@ -49,6 +49,11 @@ int Div::GetTotalHeight(const Doc *doc) const
     return height;
 }
 
+int Div::GetTotalWidth(const Doc *doc) const
+{
+    return (doc->m_drawingPageContentWidth);
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
