@@ -82,6 +82,7 @@ class Tempo;
 class Text;
 class TextDrawingParams;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class Trill;
 class Turn;
@@ -246,7 +247,7 @@ protected:
     void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
     void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
-    void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
+    void DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement);
     ///@}
 
     /**

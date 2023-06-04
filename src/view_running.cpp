@@ -40,65 +40,52 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
 
     RunningElement *header = page->GetHeader();
     if (header) {
-        this->DrawPgHeader(dc, header);
+        this->DrawTextLayoutElement(dc, header);
     }
     RunningElement *footer = page->GetFooter();
     if (footer) {
-        this->DrawPgHeader(dc, footer);
+        this->DrawTextLayoutElement(dc, footer);
     }
 }
 
-void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
+void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement)
 {
     assert(dc);
-    assert(pgHeader);
+    assert(textLayoutElement);
 
-    dc->StartGraphic(pgHeader, "", pgHeader->GetID());
+    dc->StartGraphic(textLayoutElement, "", textLayoutElement->GetID());
 
-    FontInfo pgHeadTxt;
+    FontInfo textElementFont;
     if (!dc->UseGlobalStyling()) {
-        pgHeadTxt.SetFaceName("Times");
+        textElementFont.SetFaceName("Times");
     }
 
     TextDrawingParams params;
 
     // If we have not timestamp
-    params.m_x = pgHeader->GetDrawingX();
-    params.m_y = pgHeader->GetDrawingY();
-    params.m_width = pgHeader->GetWidth();
+    params.m_x = textLayoutElement->GetDrawingX();
+    params.m_y = textLayoutElement->GetDrawingY();
+    params.m_width = textLayoutElement->GetTotalWidth(m_doc);
     params.m_alignment = HORIZONTALALIGNMENT_NONE;
     params.m_laidOut = true;
     params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
 
-    pgHeadTxt.SetPointSize(params.m_pointSize);
+    textElementFont.SetPointSize(params.m_pointSize);
 
     dc->SetBrush(m_currentColor, AxSOLID);
-    dc->SetFont(&pgHeadTxt);
+    dc->SetFont(&textElementFont);
 
-    this->DrawRunningChildren(dc, pgHeader, params);
+    this->DrawRunningChildren(dc, textLayoutElement, params);
 
     dc->ResetFont();
     dc->ResetBrush();
 
-    dc->EndGraphic(pgHeader, this);
+    dc->EndGraphic(textLayoutElement, this);
 }
 
 void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
 {
-    dc->StartGraphic(div, "", div->GetID());
-
-    dc->SetBrush(m_currentColor, AxSOLID);
-
-    const int x = div->GetDrawingX();
-    const int y = div->GetDrawingY();
-    const int height = div->GetTotalHeight(m_doc);
-    const int width = div->GetTotalWidth(m_doc);
-
-    this->DrawFilledRectangle(dc, x, y, x + width, y - height);
-
-    dc->ResetBrush();
-
-    dc->EndGraphic(div, this);
+    this->DrawTextLayoutElement(dc, div);
 }
 
 } // namespace vrv
