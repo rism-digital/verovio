@@ -189,7 +189,7 @@ private:
     int m_cumulatedShift;
     // The sum of justification factors per page
     int m_justificationSum;
-    // The page width
+    // The page width - used for setting the horizontal position of <rend> withing text layout elements
     int m_pageWidth;
 };
 

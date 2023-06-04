@@ -495,7 +495,9 @@ FunctorCode AlignVerticallyFunctor::VisitDiv(Div *div)
 {
     m_systemAligner->GetBottomAlignment()->SetYRel(-div->GetTotalHeight(m_doc));
 
-    return FUNCTOR_SIBLINGS;
+    m_pageWidth = div->GetTotalWidth(m_doc);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)
@@ -544,6 +546,8 @@ FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
 
 FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 {
+    if (!rend->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max)) return FUNCTOR_SIBLINGS;
+
     if (rend->GetHalign()) {
         switch (rend->GetHalign()) {
             case HORIZONTALALIGNMENT_right: rend->SetDrawingXRel(m_pageWidth); break;
@@ -559,7 +563,7 @@ FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningE
 {
     this->VisitTextLayoutElement(runningElement);
 
-    m_pageWidth = runningElement->GetWidth();
+    m_pageWidth = runningElement->GetTotalWidth(m_doc);
 
     return FUNCTOR_CONTINUE;
 }
