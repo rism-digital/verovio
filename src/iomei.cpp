@@ -4974,8 +4974,7 @@ bool MEIInput::ReadDiv(Object *parent, pugi::xml_node div)
 
     parent->AddChild(vrvDiv);
     this->ReadUnsupportedAttr(div, vrvDiv);
-    // return this->ReadRunningChildren(vrvDiv, pgDiv, vrvDiv);
-    return true;
+    return this->ReadRunningChildren(vrvDiv, div, vrvDiv);
 }
 
 bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
