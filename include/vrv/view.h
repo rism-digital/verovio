@@ -240,13 +240,12 @@ protected:
     ///@}
 
     /**
-     * @name Methods for drawing RunningElements (PgHead, PgFoot, etc.)
-     * Defined in view_running.cpp
+     * @name Methods for drawing TextLayoutElement (Div, PgHead, PgFoot, etc.)
+     * Defined in view_text.cpp
      */
     ///@{
     void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
-    void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
     void DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement);
     ///@}
 
