@@ -13,6 +13,7 @@
 #include "areaposinterface.h"
 #include "beamspan.h"
 #include "dir.h"
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
@@ -81,31 +82,31 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDataInitializationFunctor::VisitRunningElement(RunningElement *runningElement)
-{
-    this->VisitTextLayoutElement(runningElement);
-
-    runningElement->ResetCells();
-    runningElement->ResetDrawingScaling();
-
-    const ListOfObjects &childList = runningElement->GetList(runningElement);
-    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = runningElement->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        runningElement->AppendTextToCell(pos, text);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 {
     // Evaluate functor on scoreDef
     score->GetScoreDef()->Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitTextLayoutElement(TextLayoutElement *textLayoutElement)
+{
+    this->VisitObject(textLayoutElement);
+
+    textLayoutElement->ResetCells();
+    textLayoutElement->ResetDrawingScaling();
+
+    const ListOfObjects &childList = textLayoutElement->GetList(textLayoutElement);
+    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
+        int pos = 0;
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        assert(interface);
+        pos = textLayoutElement->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
+        TextElement *text = vrv_cast<TextElement *>(*iter);
+        assert(text);
+        textLayoutElement->AppendTextToCell(pos, text);
+    }
 
     return FUNCTOR_CONTINUE;
 }
