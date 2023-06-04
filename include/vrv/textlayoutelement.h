@@ -83,6 +83,16 @@ public:
     int GetCellHeight(int cell) const;
     ///@}
 
+    /**
+     *
+     */
+    virtual int GetTotalWidth(const Doc *doc) const = 0;
+
+    /**
+     * Calculate the cell position
+     */
+    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
+
     //----------//
     // Functors //
     //----------//

@@ -42,10 +42,7 @@ int Div::GetTotalHeight(const Doc *doc) const
     assert(doc);
 
     int height = this->GetContentHeight();
-    // if (height > 0) {
-    const int unit = doc->GetDrawingUnit(100);
-    height += 50 * unit;
-    //}
+
     return height;
 }
 

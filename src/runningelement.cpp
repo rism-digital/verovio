@@ -101,15 +101,9 @@ void RunningElement::SetDrawingYRel(int drawingYRel)
     m_drawingYRel = drawingYRel;
 }
 
-int RunningElement::GetWidth() const
+int RunningElement::GetTotalWidth(const Doc *doc) const
 {
-    if (!m_drawingPage) return 0;
-
-    Doc *doc = vrv_cast<Doc *>(m_drawingPage->GetFirstAncestor(DOC));
-    if (!doc) return 0;
-
     return (doc->m_drawingPageContentWidth);
-    // return m_drawingPage->GetContentWidth();
 }
 
 void RunningElement::SetDrawingPage(Page *page)
@@ -123,24 +117,6 @@ void RunningElement::SetDrawingPage(Page *page)
     if (page) {
         this->SetCurrentPageNum(page);
     }
-}
-
-int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const
-{
-    int pos = 0;
-    switch (h) {
-        case (HORIZONTALALIGNMENT_left): break;
-        case (HORIZONTALALIGNMENT_center): pos += POSITION_CENTER; break;
-        case (HORIZONTALALIGNMENT_right): pos += POSITION_RIGHT; break;
-        default: pos += POSITION_LEFT; break;
-    }
-    switch (v) {
-        case (VERTICALALIGNMENT_top): break;
-        case (VERTICALALIGNMENT_middle): pos += POSITION_MIDDLE; break;
-        case (VERTICALALIGNMENT_bottom): pos += POSITION_BOTTOM; break;
-        default: pos += POSITION_MIDDLE; break;
-    }
-    return pos;
 }
 
 void RunningElement::SetCurrentPageNum(const Page *currentPage)

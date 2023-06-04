@@ -218,6 +218,24 @@ bool TextLayoutElement::AdjustRunningElementYPos()
     return true;
 }
 
+int TextLayoutElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const
+{
+    int pos = 0;
+    switch (h) {
+        case (HORIZONTALALIGNMENT_left): break;
+        case (HORIZONTALALIGNMENT_center): pos += POSITION_CENTER; break;
+        case (HORIZONTALALIGNMENT_right): pos += POSITION_RIGHT; break;
+        default: pos += POSITION_LEFT; break;
+    }
+    switch (v) {
+        case (VERTICALALIGNMENT_top): break;
+        case (VERTICALALIGNMENT_middle): pos += POSITION_MIDDLE; break;
+        case (VERTICALALIGNMENT_bottom): pos += POSITION_BOTTOM; break;
+        default: pos += POSITION_MIDDLE; break;
+    }
+    return pos;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------

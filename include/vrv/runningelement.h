@@ -61,7 +61,7 @@ public:
     int GetDrawingY() const override;
     ///@}
 
-    int GetWidth() const;
+    int GetTotalWidth(const Doc *doc) const override;
 
     /*
      * @name Setter and getter for the current drawing page
@@ -89,11 +89,6 @@ public:
      * Load the footer from the resources (footer.svg)
      */
     void LoadFooter(const Doc *doc);
-
-    /**
-     * Calculate the cell position
-     */
-    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
 
     /**
      * Add page numbering to the running element.
