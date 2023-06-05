@@ -33,8 +33,17 @@ namespace vrv {
 
 FunctorCode CastOffSystemsFunctor::VisitDiv(Div *div)
 {
-    assert(m_currentSystem);
+    // If we have a previous a Measure or a Div in the System, add a new one
+    if ((m_currentSystem->GetChildCount(MEASURE) > 0) || (m_currentSystem->GetChildCount(DIV)) > 0) {
+        m_currentSystem = new System();
+        m_page->AddChild(m_currentSystem);
+    }
+
     div->MoveItselfTo(m_currentSystem);
+
+    // Always add a System after an Div
+    m_currentSystem = new System();
+    m_page->AddChild(m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
