@@ -55,6 +55,17 @@ namespace vrv {
 
 PrepareDataInitializationFunctor::PrepareDataInitializationFunctor(Doc *doc) : DocFunctor(doc) {}
 
+FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
+{
+    this->VisitTextLayoutElement(div);
+
+    if (m_doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) {
+        div->SetDrawingInline(true);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
     if (chord->HasEmptyList(chord)) {

@@ -416,6 +416,15 @@ AlignMeasuresFunctor::AlignMeasuresFunctor(Doc *doc) : DocFunctor(doc)
     m_storeCastOffSystemWidths = false;
 }
 
+FunctorCode AlignMeasuresFunctor::VisitDiv(Div *div)
+{
+    if (div->GetDrawingInline()) div->SetDrawingXRel(m_shift);
+
+    m_shift += div->GetContentWidth();
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode AlignMeasuresFunctor::VisitMeasure(Measure *measure)
 {
     if (m_applySectionRestartShift) {

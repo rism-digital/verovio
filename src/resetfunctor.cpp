@@ -12,6 +12,7 @@
 #include "arpeg.h"
 #include "beamspan.h"
 #include "custos.h"
+#include "div.h"
 #include "dot.h"
 #include "editorial.h"
 #include "elementpart.h"
@@ -33,6 +34,7 @@
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
+#include "textlayoutelement.h"
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
@@ -140,6 +142,16 @@ FunctorCode ResetDataFunctor::VisitCustos(Custos *custos)
     // Call parent one too
     this->VisitLayerElement(custos);
     custos->PositionInterface::InterfaceResetData(*this, custos);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitDiv(Div *div)
+{
+    // Call parent one too
+    this->VisitObject(div);
+
+    div->SetDrawingInline(false);
 
     return FUNCTOR_CONTINUE;
 }
@@ -468,6 +480,16 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitCustos(Custos *custos)
     this->VisitLayerElement(custos);
     custos->PositionInterface::InterfaceResetHorizontalAlignment(*this, custos);
 
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetHorizontalAlignmentFunctor::VisitDiv(Div *div)
+{
+    this->VisitTextLayoutElement(div);
+
+    div->SetDrawingXRel(0);
+    div->SetDrawingYRel(0);
+    
     return FUNCTOR_CONTINUE;
 }
 
