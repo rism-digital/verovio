@@ -2954,6 +2954,7 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
         }
         else if (params.m_enclose == TEXTRENDITION_circle) {
             if (height > width) {
+                // in this case draw a perfect circle
                 const int cx = x1 + (x2 - x1) / 2;
                 x1 = cx - height / 2;
                 x2 = cx + height / 2;
