@@ -98,6 +98,15 @@ int TextLayoutElement::GetContentHeight() const
     return height;
 }
 
+int TextLayoutElement::GetContentWidth() const
+{
+    int width = 0;
+    for (int i = 0; i < 3; ++i) {
+        width = std::max(width, this->GetRowWidth(i));
+    }
+    return width;
+}
+
 int TextLayoutElement::GetRowHeight(int row) const
 {
     assert((row >= 0) && (row < 3));
@@ -133,6 +142,49 @@ int TextLayoutElement::GetCellHeight(int cell) const
         }
     }
     return columnHeight;
+}
+
+int TextLayoutElement::GetRowWidth(int row) const
+{
+    assert((row >= 0) && (row < 3));
+
+    const int col0 = (this->GetCellWidth(row * 3) > 0);
+    const int col1 = (this->GetCellWidth(row * 3 + 1) > 0);
+    const int col2 = (this->GetCellWidth(row * 3 + 2) > 0);
+
+    int width = 0;
+    for (int i = 0; i < 3; ++i) {
+        width = std::max(width, this->GetCellWidth(row * 3 + i));
+    }
+    // If we have someting in the middle column, ensure 3 times the max col width
+    // Oterwise the maximum width for the number of columns
+    return (col1 && (col0 || col2)) ? width * 3 : width * (col0 + col1 + col2);
+}
+
+int TextLayoutElement::GetColWidth(int col) const
+{
+    assert((col >= 0) && (col < 3));
+
+    int width = 0;
+    for (int i = 0; i < 3; ++i) {
+        width = std::max(width, this->GetCellWidth(i * 3 + col));
+    }
+    return width;
+}
+
+int TextLayoutElement::GetCellWidth(int cell) const
+{
+    assert((cell >= 0) && (cell < 9));
+
+    int columWidth = 0;
+    const ArrayOfTextElements *textElements = &m_cells[cell];
+    ArrayOfTextElements::const_iterator iter;
+    for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
+        if ((*iter)->HasContentBB()) {
+            columWidth = std::max(columWidth, (*iter)->GetContentX2() - (*iter)->GetContentX1());
+        }
+    }
+    return columWidth;
 }
 
 bool TextLayoutElement::AdjustDrawingScaling(int width)

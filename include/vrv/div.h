@@ -33,6 +33,34 @@ public:
     ///@}
 
     /**
+     * @name Get and set the inline drawing flag
+     */
+    ///@{
+    bool GetDrawingInline() const { return m_drawingInline; }
+    void SetDrawingInline(bool drawingInline) { m_drawingInline = drawingInline; }
+    ///@}
+
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    int GetDrawingX() const override;
+    int GetDrawingY() const override;
+    ///@}
+
+    /**
+     * @name Get and set the X and Y drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
+    int GetDrawingYRel() const { return m_drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
+    void CacheYRel(bool restore = false);
+    ///@}
+
+    /**
      * Overriden to get the appropriate margin
      */
     int GetTotalHeight(const Doc *doc) const override;
@@ -58,7 +86,22 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The Y drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingYRel;
+
+    /**
+     * The X drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingXRel;
+
+    /**
+     * A flag indicating that the div should be displayed inline
+     */
+    bool m_drawingInline;
 };
 
 } // namespace vrv

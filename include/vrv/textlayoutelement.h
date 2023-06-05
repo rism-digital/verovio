@@ -81,12 +81,16 @@ public:
     int GetColHeight(int col) const;
     /** Row from 0 to 8 */
     int GetCellHeight(int cell) const;
-    ///@}
-
-    /**
-     *
-     */
+    // Width including margins */
     virtual int GetTotalWidth(const Doc *doc) const = 0;
+    /** Content width */
+    int GetContentWidth() const;
+    /** Row from 0 to 2 */
+    int GetRowWidth(int col) const;
+    /** Col from 0 to 2 */
+    int GetColWidth(int col) const;
+    /** Row from 0 to 8 */
+    int GetCellWidth(int cell) const;
 
     /**
      * Calculate the cell position

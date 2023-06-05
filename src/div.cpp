@@ -35,6 +35,38 @@ Div::~Div() {}
 void Div::Reset()
 {
     TextLayoutElement::Reset();
+
+    m_drawingInline = false;
+}
+
+int Div::GetDrawingX() const
+{
+    const Object *parent = this->GetParent();
+    assert(parent);
+    if (m_drawingInline && parent) {
+        return parent->GetDrawingX() + this->GetDrawingXRel();
+    }
+    return parent->GetDrawingX();
+}
+
+int Div::GetDrawingY() const
+{
+    const Object *parent = this->GetParent();
+    assert(parent);
+    if (m_drawingInline) {
+        return parent->GetDrawingY() + this->GetDrawingYRel();
+    }
+    return parent->GetDrawingY();
+}
+
+void Div::SetDrawingXRel(int drawingXRel)
+{
+    m_drawingXRel = drawingXRel;
+}
+
+void Div::SetDrawingYRel(int drawingYRel)
+{
+    m_drawingYRel = drawingYRel;
 }
 
 int Div::GetTotalHeight(const Doc *doc) const
@@ -48,7 +80,13 @@ int Div::GetTotalHeight(const Doc *doc) const
 
 int Div::GetTotalWidth(const Doc *doc) const
 {
-    return (doc->m_drawingPageContentWidth);
+    if (!m_drawingInline) {
+        return (doc->m_drawingPageContentWidth);
+    }
+    else {
+        int width = this->GetContentWidth();
+        return width;
+    }
 }
 
 //----------------------------------------------------------------------------
