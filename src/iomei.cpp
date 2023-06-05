@@ -3473,7 +3473,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for any other control element
-    else if (filterParent->IsRunningElement()) {
+    else if (filterParent->IsRunningElement() || filterParent->Is(DIV)) {
         if (element == "fig") {
             return true;
         }
