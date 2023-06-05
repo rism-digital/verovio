@@ -489,7 +489,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitDiv(Div *div)
 
     div->SetDrawingXRel(0);
     div->SetDrawingYRel(0);
-    
+
     return FUNCTOR_CONTINUE;
 }
 
