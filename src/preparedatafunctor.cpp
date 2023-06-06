@@ -469,9 +469,9 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 
 PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
-void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
+void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface)
 {
-    m_interfaceIDTuples.push_back(std::make_tuple(interface, elementID));
+    m_interfaceIDPairs.push_back(std::make_pair(interface, elementID));
 }
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
@@ -487,13 +487,12 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
         if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
 
         const std::string &id = object->GetID();
-        auto i = std::find_if(m_interfaceIDTuples.begin(), m_interfaceIDTuples.end(),
-            [&id](std::tuple<PlistInterface *, std::string> tuple) { return (std::get<1>(tuple) == id); });
-        if (i != m_interfaceIDTuples.end()) {
+        auto iter = std::find_if(m_interfaceIDPairs.begin(), m_interfaceIDPairs.end(),
+            [&id](const std::pair<PlistInterface *, std::string> &pair) { return (pair.second == id); });
+        if (iter != m_interfaceIDPairs.end()) {
             // Set reference for matched tuple and erase it from the list
-            PlistInterface *interface = std::get<0>(*i);
-            interface->SetRef(object);
-            m_interfaceIDTuples.erase(i);
+            iter->first->SetRef(object);
+            m_interfaceIDPairs.erase(iter);
         }
     }
 

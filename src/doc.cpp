@@ -663,14 +663,13 @@ void Doc::PrepareData()
     preparePlist.SetDataCollectionCompleted();
 
     // Process plist after all pairs have been collected
-    if (!preparePlist.GetInterfaceIDTuples().empty()) {
+    if (!preparePlist.GetInterfaceIDPairs().empty()) {
         this->Process(preparePlist);
     }
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!preparePlist.GetInterfaceIDTuples().empty()) {
-        LogWarning(
-            "%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDTuples().size());
+    if (!preparePlist.GetInterfaceIDPairs().empty()) {
+        LogWarning("%d element(s) with a @plist could not match the target", preparePlist.GetInterfaceIDPairs().size());
     }
 
     /************ Resolve cross staff ************/
