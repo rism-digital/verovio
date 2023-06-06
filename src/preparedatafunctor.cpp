@@ -490,7 +490,7 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
         auto iter = std::find_if(m_interfaceIDPairs.begin(), m_interfaceIDPairs.end(),
             [&id](const std::pair<PlistInterface *, std::string> &pair) { return (pair.second == id); });
         if (iter != m_interfaceIDPairs.end()) {
-            // Set reference for matched tuple and erase it from the list
+            // Set reference for matched pair and erase it from the list
             iter->first->SetRef(object);
             m_interfaceIDPairs.erase(iter);
         }
