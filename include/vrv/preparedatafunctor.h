@@ -332,7 +332,6 @@ public:
     ///@{
     const ArrayOfPlistInterfaceIDTuples &GetInterfaceIDTuples() const { return m_interfaceIDTuples; }
     void InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface);
-    void ClearInterfaceIDTuples() { m_interfaceIDTuples.clear(); }
     ///@}
 
     /*

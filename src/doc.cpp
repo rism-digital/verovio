@@ -665,11 +665,6 @@ void Doc::PrepareData()
     // Process plist after all pairs have been collected
     if (!preparePlist.GetInterfaceIDTuples().empty()) {
         this->Process(preparePlist);
-
-        for (const auto &[plistInterface, id, objectReference] : preparePlist.GetInterfaceIDTuples()) {
-            plistInterface->SetRef(objectReference);
-        }
-        preparePlist.ClearInterfaceIDTuples();
     }
 
     // If some are still there, then it is probably an issue in the encoding

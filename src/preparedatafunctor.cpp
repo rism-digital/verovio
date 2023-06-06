@@ -471,7 +471,7 @@ PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
 void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
 {
-    m_interfaceIDTuples.push_back(std::make_tuple(interface, elementID, (Object *)NULL));
+    m_interfaceIDTuples.push_back(std::make_tuple(interface, elementID));
 }
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
@@ -486,11 +486,14 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
     else {
         if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-        std::string id = object->GetID();
+        const std::string &id = object->GetID();
         auto i = std::find_if(m_interfaceIDTuples.begin(), m_interfaceIDTuples.end(),
-            [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
+            [&id](std::tuple<PlistInterface *, std::string> tuple) { return (std::get<1>(tuple) == id); });
         if (i != m_interfaceIDTuples.end()) {
-            std::get<2>(*i) = object;
+            // Set reference for matched tuple and erase it from the list
+            PlistInterface *interface = std::get<0>(*i);
+            interface->SetRef(object);
+            m_interfaceIDTuples.erase(i);
         }
     }
 
