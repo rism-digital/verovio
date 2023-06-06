@@ -2953,13 +2953,15 @@ void View::DrawTextEnclosure(DeviceContext *dc, const TextDrawingParams &params,
             this->DrawDiamond(dc, x1 - width / 2, yCenter, height * sqrt(2), width * 2, false, lineThickness);
         }
         else if (params.m_enclose == TEXTRENDITION_circle) {
-            if (width > height) {
-                y1 -= (width - height) / 2;
-                y2 += (width - height) / 2;
+            if (height > width) {
+                // in this case draw a perfect circle
+                const int cx = x1 + (x2 - x1) / 2;
+                x1 = cx - height / 2;
+                x2 = cx + height / 2;
             }
-            else if (height > width) {
-                x1 -= (height - width) / 2;
-                x2 += (height - width) / 2;
+            else if (height < width) {
+                x1 -= width / 8;
+                x2 += width / 8;
             }
             this->DrawNotFilledEllipse(dc, x1, y1, x2, y2, lineThickness);
         }
