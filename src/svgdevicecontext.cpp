@@ -931,8 +931,8 @@ void SvgDeviceContext::DrawText(
         svgText.replace(svgText.size() - 1, 1, "\xC2\xA0");
     }
 
-    std::string currentFaceName
-        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    pugi::xpath_node fontNode = m_currentNode.select_node("ancestor::*[@font-family][1]");
+    std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AddChild("tspan");
