@@ -958,18 +958,6 @@ void SvgDeviceContext::DrawText(
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
-            textChild.append_attribute("font-style") = "italic";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
-            textChild.append_attribute("font-style") = "normal";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
-            textChild.append_attribute("font-style") = "oblique";
-        }
-    }
-    textChild.append_attribute("class") = "text";
     textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
