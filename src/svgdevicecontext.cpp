@@ -853,8 +853,8 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
 
     m_currentNode = m_currentNode.append_child("text");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("x") = x;
-    m_currentNode.append_attribute("y") = y;
+    if (x) m_currentNode.append_attribute("x") = x;
+    if (y) m_currentNode.append_attribute("y") = y;
     // unless dx, dy have a value they don't need to be set
     // m_currentNode.append_attribute("dx") = 0;
     // m_currentNode.append_attribute("dy") = 0;
