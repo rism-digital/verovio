@@ -634,6 +634,33 @@ data_BOOLEAN AttConverterBase::StrToBoolean(const std::string &value, bool logWa
     return BOOLEAN_NONE;
 }
 
+std::string AttConverterBase::CancelaccidToStr(data_CANCELACCID data) const
+{
+    std::string value;
+    switch (data) {
+        case CANCELACCID_none: value = "none"; break;
+        case CANCELACCID_before: value = "before"; break;
+        case CANCELACCID_after: value = "after"; break;
+        case CANCELACCID_before_bar: value = "before-bar"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.CANCELACCID", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_CANCELACCID AttConverterBase::StrToCancelaccid(const std::string &value, bool logWarning) const
+{
+    if (value == "none") return CANCELACCID_none;
+    if (value == "before") return CANCELACCID_before;
+    if (value == "after") return CANCELACCID_after;
+    if (value == "before-bar") return CANCELACCID_before_bar;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.CANCELACCID", value.c_str());
+    return CANCELACCID_NONE;
+}
+
 std::string AttConverterBase::CertaintyToStr(data_CERTAINTY data) const
 {
     std::string value;

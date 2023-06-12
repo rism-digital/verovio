@@ -75,6 +75,9 @@ public:
     std::string BooleanToStr(data_BOOLEAN data) const;
     data_BOOLEAN StrToBoolean(const std::string &value, bool logWarning = true) const;
 
+    std::string CancelaccidToStr(data_CANCELACCID data) const;
+    data_CANCELACCID StrToCancelaccid(const std::string &value, bool logWarning = true) const;
+
     std::string CertaintyToStr(data_CERTAINTY data) const;
     data_CERTAINTY StrToCertainty(const std::string &value, bool logWarning = true) const;
 
