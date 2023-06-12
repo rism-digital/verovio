@@ -6447,7 +6447,7 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 {
     KeySig *vrvKeySig = new KeySig();
     this->ReadLayerElement(keySig, vrvKeySig);
-    
+
     if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
         UpgradeKeySigTo_5_0_0(keySig);
     }
@@ -7968,7 +7968,7 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
 void MEIInput::UpgradeKeySigTo_5_0_0(pugi::xml_node keySig)
 {
     InstKeySigLog keySigLog;
-    
+
     if (keySig.attribute("key.showchange")) {
         data_BOOLEAN showchange = keySigLog.StrToBoolean(keySig.attribute("key.showchange").value());
         keySig.attribute("key.showchange").set_name("cancelaccid");
@@ -8025,7 +8025,7 @@ void MEIInput::UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMet
 void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
 {
     InstKeySigLog keySigLog;
-    
+
     if (scoreDefElement.attribute("key.sig")) {
         scoreDefElement.attribute("key.sig").set_name("keysig");
     }
@@ -8167,7 +8167,8 @@ void MEIInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, Sc
     }
     if (scoreDefElement.attribute("key.sig.showchange")) {
         if (keySig) {
-            if (keySig->AttKeySigVis::StrToBoolean(scoreDefElement.attribute("key.sig.showchange").value()) == BOOLEAN_true) {
+            if (keySig->AttKeySigVis::StrToBoolean(scoreDefElement.attribute("key.sig.showchange").value())
+                == BOOLEAN_true) {
                 keySig->SetCancelaccid(CANCELACCID_before);
             }
             else {
