@@ -2973,6 +2973,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     zone->SetLry(zone->GetLry() + 200);
 
                     assert(m_doc->GetFacsimile());
+                    m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                     FacsimileInterface *fi = syl->GetFacsimileInterface();
                     assert(fi);
                     fi->AttachZone(zone);
