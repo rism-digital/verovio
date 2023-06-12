@@ -993,12 +993,12 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Show cancellation if showchange is true (false by default) or if C major
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
-        && ((keySig->GetSigShowchange() == BOOLEAN_true) || (keySig->GetAccidCount() == 0))) {
+        && ((keySig->HasCancelaccid() && (keySig->GetCancelaccid() != CANCELACCID_none)) || (keySig->GetAccidCount() == 0))) {
         if (keySig->m_skipCancellation) {
             LogWarning("Cautionary accidentals are skipped if the new or previous KeySig contains KeyAccid children.");
         }
-        // For French style (after) test to add
-        else if (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) {
+        // For French style (after)
+        else if ((keySig->GetCancelaccid() == CANCELACCID_after) && (keySig->GetAccidType() == keySig->m_drawingCancelAccidType)) {
             showCancelAfter = true;
         }
         else {
