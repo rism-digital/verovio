@@ -4801,7 +4801,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
     }
     else {

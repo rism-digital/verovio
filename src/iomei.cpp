@@ -2499,11 +2499,11 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
         InstKeySigDefaultLog attKeySigDefaultLog;
         // If there is no @sig, try to build it from the keyAccid children.
         const data_KEYSIGNATURE sig = (keySig->HasSig()) ? keySig->GetSig() : keySig->ConvertToSig();
-        attKeySigDefaultLog.SetKeySig(sig);
+        attKeySigDefaultLog.SetKeysig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
         InstKeySigDefaultVis attKeySigDefaultVis;
         attKeySigDefaultVis.SetKeysigVisible(keySig->GetVisible());
-        attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
+        attKeySigDefaultVis.SetKeysigCancelaccid(keySig->GetCancelaccid());
         attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
         return;
     }
@@ -4610,17 +4610,17 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     InstKeySigDefaultVis keySigDefaultVis;
     keySigDefaultVis.ReadKeySigDefaultVis(element);
     if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
-        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigVisible()
-        || keySigDefaultVis.HasKeysigShowchange()) {
+        || keySigDefaultLog.HasKeysig() || keySigDefaultVis.HasKeysigVisible()
+        || keySigDefaultVis.HasKeysigCancelaccid()) {
         KeySig *vrvKeySig = new KeySig();
         vrvKeySig->IsAttribute(true);
         // Broken in MEI 4.0.2 - waiting for a fix
         // vrvKeySig->SetAccid(keySigDefaultAnl.GetKeyAccid());
         vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
         vrvKeySig->SetPname(keySigDefaultAnl.GetKeyPname());
-        vrvKeySig->SetSig(keySigDefaultLog.GetKeySig());
+        vrvKeySig->SetSig(keySigDefaultLog.GetKeysig());
         vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigVisible());
-        vrvKeySig->SetSigShowchange(keySigDefaultVis.GetKeysigShowchange());
+        vrvKeySig->SetCancelaccid(keySigDefaultVis.GetKeysigCancelaccid());
         object->AddChild(vrvKeySig);
     }
 
