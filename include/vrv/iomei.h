@@ -880,6 +880,7 @@ private:
      */
     ///@{
     // to MEI 5.0.0
+    void UpgradeKeySigTo_5_0_0(pugi::xml_node keySig);
     void UpgradePageTo_5_0_0(Page *page);
     void UpgradeMeasureTo_5_0_0(pugi::xml_node measure);
     void UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
