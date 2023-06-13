@@ -29,7 +29,8 @@ class RepeatMark : public ControlElement,
                    public TimePointInterface,
                    public AttColor,
                    public AttExtSymAuth,
-                   public AttExtSymNames {
+                   public AttExtSymNames,
+                   public AttRepeatMarkLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

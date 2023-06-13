@@ -112,8 +112,8 @@
 #include "ref.h"
 #include "reg.h"
 #include "reh.h"
-#include "repeatmark.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "restore.h"
 #include "sb.h"
@@ -2188,6 +2188,7 @@ void MEIOutput::WriteRepeatMark(pugi::xml_node currentNode, RepeatMark *repeatMa
     repeatMark->WriteColor(currentNode);
     repeatMark->WriteExtSymAuth(currentNode);
     repeatMark->WriteExtSymNames(currentNode);
+    repeatMark->WriteRepeatMarkLog(currentNode);
 }
 
 void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -5812,6 +5813,7 @@ bool MEIInput::ReadRepeatMark(Object *parent, pugi::xml_node repeatMark)
     vrvRepeatMark->ReadColor(repeatMark);
     vrvRepeatMark->ReadExtSymAuth(repeatMark);
     vrvRepeatMark->ReadExtSymNames(repeatMark);
+    vrvRepeatMark->ReadRepeatMarkLog(repeatMark);
 
     parent->AddChild(vrvRepeatMark);
     this->ReadUnsupportedAttr(repeatMark, vrvRepeatMark);
