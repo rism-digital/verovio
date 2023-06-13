@@ -2462,7 +2462,7 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
     assert(measure);
     assert(repeatMark);
 
-    // Cannot draw a turn that has no start position
+    // Cannot draw a mark that has no start position
     if (!repeatMark->GetStart()) return;
 
     if (repeatMark->GetChildCount() > 0) {
@@ -2477,13 +2477,13 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
         symbolDef = repeatMark->GetAltSymbolDef();
     }
 
-    int x = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
+    const int x = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
 
     // set norm as default
-    int code = repeatMark->GetMarkGlyph();
+    const int code = repeatMark->GetMarkGlyph();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
-    // center the turn only with @startid
+    // center the mark only with @startid
     if (repeatMark->GetStart()->Is(TIMESTAMP_ATTR)) {
         alignment = HORIZONTALALIGNMENT_left;
     }
