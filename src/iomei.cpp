@@ -7969,9 +7969,9 @@ void MEIInput::UpgradeKeySigTo_5_0_0(pugi::xml_node keySig)
 {
     InstKeySigLog keySigLog;
 
-    if (keySig.attribute("key.showchange")) {
-        data_BOOLEAN showchange = keySigLog.StrToBoolean(keySig.attribute("key.showchange").value());
-        keySig.attribute("key.showchange").set_name("cancelaccid");
+    if (keySig.attribute("sig.showchange")) {
+        data_BOOLEAN showchange = keySigLog.StrToBoolean(keySig.attribute("sig.showchange").value());
+        keySig.attribute("sig.showchange").set_name("cancelaccid");
         if (showchange == BOOLEAN_true) {
             keySig.attribute("cancelaccid") = keySigLog.CancelaccidToStr(CANCELACCID_before).c_str();
         }
