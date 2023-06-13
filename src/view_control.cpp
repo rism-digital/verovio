@@ -2500,11 +2500,6 @@ void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *me
 
         const int y = repeatMark->GetDrawingY();
 
-        const int turnHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
-                                           : m_doc->GetGlyphHeight(code, staffSize, false);
-        const int turnWidth = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, false)
-                                          : m_doc->GetGlyphWidth(code, staffSize, false);
-
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
         if (symbolDef) {
