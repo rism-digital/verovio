@@ -92,7 +92,13 @@ char32_t RepeatMark::GetMarkGlyph() const
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
-    return SMUFL_E567_ornamentTurn;
+    switch (this->GetFunc()) {
+        case (repeatMarkLog_FUNC_coda): return SMUFL_E048_coda;
+        case (repeatMarkLog_FUNC_segno): return SMUFL_E047_segno;
+        case (repeatMarkLog_FUNC_daCapo): return SMUFL_E046_daCapo;
+        case (repeatMarkLog_FUNC_dalSegno): return SMUFL_E045_dalSegno;
+        default: return SMUFL_E047_segno;
+    }
 }
 
 //----------------------------------------------------------------------------

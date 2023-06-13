@@ -46,6 +46,7 @@
 #include "pitchinflection.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "score.h"
 #include "slur.h"
 #include "smufl.h"
@@ -99,7 +100,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     else if (element->Is(DIR)) {
         Dir *dir = vrv_cast<Dir *>(element);
         assert(dir);
-        this->DrawDirOrOrnam(dc, dir, measure, system);
+        this->DrawControlElementText(dc, dir, measure, system);
         system->AddToDrawingListIfNecessary(dir);
     }
     else if (element->Is(DYNAM)) {
@@ -131,7 +132,7 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     else if (element->Is(ORNAM)) {
         Ornam *ornam = vrv_cast<Ornam *>(element);
         assert(ornam);
-        this->DrawDirOrOrnam(dc, ornam, measure, system);
+        this->DrawControlElementText(dc, ornam, measure, system);
     }
     else if (element->Is(PEDAL)) {
         Pedal *pedal = vrv_cast<Pedal *>(element);
@@ -143,6 +144,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Reh *reh = vrv_cast<Reh *>(element);
         assert(reh);
         this->DrawReh(dc, reh, measure, system);
+    }
+    else if (element->Is(REPEATMARK)) {
+        RepeatMark *repeatMark = vrv_cast<RepeatMark *>(element);
+        assert(repeatMark);
+        this->DrawRepeatMark(dc, repeatMark, measure, system);
     }
     else if (element->Is(TEMPO)) {
         Tempo *tempo = vrv_cast<Tempo *>(element);
@@ -1561,7 +1567,7 @@ void View::DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, Sy
     dc->EndGraphic(caesura, this);
 }
 
-void View::DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
+void View::DrawControlElementText(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
@@ -2447,6 +2453,71 @@ void View::DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system
     }
 
     dc->EndGraphic(reh, this);
+}
+
+void View::DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(repeatMark);
+
+    // Cannot draw a turn that has no start position
+    if (!repeatMark->GetStart()) return;
+
+    if (repeatMark->GetChildCount() > 0) {
+        this->DrawControlElementText(dc, repeatMark, measure, system);
+        return;
+    }
+
+    dc->StartGraphic(repeatMark, "", repeatMark->GetID());
+
+    SymbolDef *symbolDef = NULL;
+    if (repeatMark->HasAltsym() && repeatMark->HasAltSymbolDef()) {
+        symbolDef = repeatMark->GetAltSymbolDef();
+    }
+
+    int x = repeatMark->GetStart()->GetDrawingX() + repeatMark->GetStart()->GetDrawingRadius(m_doc);
+
+    // set norm as default
+    int code = repeatMark->GetMarkGlyph();
+
+    data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
+    // center the turn only with @startid
+    if (repeatMark->GetStart()->Is(TIMESTAMP_ATTR)) {
+        alignment = HORIZONTALALIGNMENT_left;
+    }
+
+    std::u32string str;
+    str.push_back(code);
+
+    std::vector<Staff *> staffList = repeatMark->GetTstampStaves(measure, repeatMark);
+    for (Staff *staff : staffList) {
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), repeatMark, repeatMark->GetStart(), staff)) {
+            continue;
+        }
+        const int staffSize = staff->m_drawingStaffSize;
+
+        const int y = repeatMark->GetDrawingY();
+
+        const int turnHeight = (symbolDef) ? symbolDef->GetSymbolHeight(m_doc, staffSize, false)
+                                           : m_doc->GetGlyphHeight(code, staffSize, false);
+        const int turnWidth = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, false)
+                                          : m_doc->GetGlyphWidth(code, staffSize, false);
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+
+        if (symbolDef) {
+            this->DrawSymbolDef(dc, repeatMark, symbolDef, x, y, staffSize, false, alignment);
+        }
+        else {
+            this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
+        }
+
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(repeatMark, this);
 }
 
 void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)
