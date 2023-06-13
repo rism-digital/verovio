@@ -88,7 +88,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeat
     // Call parent one too
     this->VisitControlElement(repeatMark);
 
-    if (repeatMark->GetChildCount() == 0) {
+    if (repeatMark->GetChildCount() == 0 && repeatMark->HasFunc() && repeatMark->GetFunc() == repeatMarkLog_FUNC_fine) {
         Text *fine = new Text();
         fine->IsGenerated(true);
         fine->SetText(U"Fine");
