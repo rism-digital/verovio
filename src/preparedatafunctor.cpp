@@ -27,6 +27,7 @@
 #include "pedal.h"
 #include "plistinterface.h"
 #include "reh.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "score.h"
@@ -38,6 +39,7 @@
 #include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
+#include "text.h"
 #include "timestamp.h"
 #include "tuplet.h"
 #include "turn.h"
@@ -77,6 +79,21 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    // Call parent one too
+    this->VisitControlElement(repeatMark);
+
+    if (repeatMark->GetChildCount() == 0) {
+        Text *fine = new Text();
+        fine->IsGenerated(true);
+        fine->SetText(U"Fine");
+        repeatMark->AddChild(fine);
+    }
 
     return FUNCTOR_CONTINUE;
 }

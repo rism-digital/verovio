@@ -45,6 +45,7 @@ public:
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitKeySig(KeySig *keySig) override;
+    FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitScore(Score *score) override;
     ///@}

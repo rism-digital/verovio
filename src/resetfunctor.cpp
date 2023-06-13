@@ -24,6 +24,7 @@
 #include "mrest.h"
 #include "octave.h"
 #include "page.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "section.h"
@@ -306,6 +307,16 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
     note->SetFlippedNotehead(false);
     note->SetStemSameasNote(NULL);
     note->SetStemSameasRole(SAMEAS_NONE);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    // Call parent one too
+    this->VisitControlElement(repeatMark);
+
+    // For now doing nothing, but we should eventually remove generated text when the @func is not 'fine' anymore
 
     return FUNCTOR_CONTINUE;
 }
