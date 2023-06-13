@@ -57,6 +57,9 @@ private:
      */
     void AdjustTupletBracketBeamY(Tuplet *tuplet, TupletBracket *bracket, const Beam *beam, const Staff *staff) const;
 
+    // Calculate the vertical bracket adjustment based on a list of point obstacles
+    int CalcBracketShift(Point referencePos, double slope, int sign, const std::list<Point> &obstacles) const;
+
 public:
     //
 private:

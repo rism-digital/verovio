@@ -2229,10 +2229,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     if (wedge->node().attribute("niente")) {
                         iter->first->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
                     }
-                    if (wedge->node().attribute("spread")) {
-                        data_MEASUREMENTSIGNED opening;
-                        opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
-                        iter->first->SetOpening(opening);
+                    if (iter->first->GetForm() == hairpinLog_FORM_cres) {
+                        if (wedge->node().attribute("spread")) {
+                            data_MEASUREMENTSIGNED opening;
+                            opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
+                            iter->first->SetOpening(opening);
+                        }
                     }
                     matchedWedge = true;
                     m_hairpinStack.erase(iter);
@@ -2252,6 +2254,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             else if (HasAttributeWithValue(wedge->node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
+                if (wedge->node().attribute("spread")) {
+                    data_MEASUREMENTSIGNED opening;
+                    opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
+                    hairpin->SetOpening(opening);
+                }
             }
             else {
                 delete hairpin;

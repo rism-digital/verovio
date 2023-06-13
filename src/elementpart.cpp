@@ -180,7 +180,7 @@ int TupletBracket::GetDrawingYLeft() const
             + m_drawingYRelLeft;
     }
     else {
-        return this->GetDrawingY();
+        return this->GetDrawingY() + m_drawingYRelLeft;
     }
 }
 
@@ -198,7 +198,7 @@ int TupletBracket::GetDrawingYRight() const
             + m_drawingYRelRight;
     }
     else {
-        return this->GetDrawingY();
+        return this->GetDrawingY() + m_drawingYRelRight;
     }
 }
 
