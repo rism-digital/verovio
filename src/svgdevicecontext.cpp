@@ -853,8 +853,8 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
 
     m_currentNode = m_currentNode.append_child("text");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("x") = x;
-    m_currentNode.append_attribute("y") = y;
+    if (x) m_currentNode.append_attribute("x") = x;
+    if (y) m_currentNode.append_attribute("y") = y;
     // unless dx, dy have a value they don't need to be set
     // m_currentNode.append_attribute("dx") = 0;
     // m_currentNode.append_attribute("dy") = 0;
@@ -931,8 +931,8 @@ void SvgDeviceContext::DrawText(
         svgText.replace(svgText.size() - 1, 1, "\xC2\xA0");
     }
 
-    std::string currentFaceName
-        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    pugi::xpath_node fontNode = m_currentNode.select_node("ancestor::*[@font-family][1]");
+    std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AddChild("tspan");
@@ -958,18 +958,6 @@ void SvgDeviceContext::DrawText(
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
-            textChild.append_attribute("font-style") = "italic";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
-            textChild.append_attribute("font-style") = "normal";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
-            textChild.append_attribute("font-style") = "oblique";
-        }
-    }
-    textChild.append_attribute("class") = "text";
     textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
