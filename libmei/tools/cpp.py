@@ -289,6 +289,8 @@ TYPE_GRP_START = """
 #ifndef __LIBMEI_ATT_TYPES_H__
 #define __LIBMEI_ATT_TYPES_H__
 
+#include <cstdint>
+
 //----------------------------------------------------------------------------
 
 namespace {ns} {{
