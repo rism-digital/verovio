@@ -67,6 +67,7 @@ class PgHead2;
 class PitchInflection;
 class Reh;
 class Rend;
+class RepeatMark;
 class RunningElement;
 class Slur;
 class Staff;
@@ -427,7 +428,7 @@ protected:
         char32_t endGlyph, int x, int y, int height, bool cueSize);
     void DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system);
     void DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, System *system);
-    void DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
+    void DrawControlElementText(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::u32string &dynamSymbol,
         data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params);
@@ -437,6 +438,7 @@ protected:
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
     void DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system);
+    void DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *measure, System *system);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);

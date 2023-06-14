@@ -198,6 +198,7 @@ enum ClassId : uint16_t {
     PHRASE,
     PITCHINFLECTION,
     REH,
+    REPEATMARK,
     SLUR,
     TEMPO,
     TIE,

@@ -101,6 +101,7 @@ class Phrase;
 class PitchInflection;
 class Plica;
 class Proport;
+class RepeatMark;
 class Reh;
 class Rend;
 class Rest;
@@ -316,6 +317,8 @@ public:
     virtual FunctorCode VisitPitchInflectionEnd(PitchInflection *pitchInflection);
     virtual FunctorCode VisitReh(Reh *reh);
     virtual FunctorCode VisitRehEnd(Reh *reh);
+    virtual FunctorCode VisitRepeatMark(RepeatMark *repeatMark);
+    virtual FunctorCode VisitRepeatMarkEnd(RepeatMark *repeatMark);
     virtual FunctorCode VisitSlur(Slur *slur);
     virtual FunctorCode VisitSlurEnd(Slur *slur);
     virtual FunctorCode VisitTempo(Tempo *tempo);
@@ -671,6 +674,8 @@ public:
     virtual FunctorCode VisitPitchInflectionEnd(const PitchInflection *pitchInflection);
     virtual FunctorCode VisitReh(const Reh *reh);
     virtual FunctorCode VisitRehEnd(const Reh *reh);
+    virtual FunctorCode VisitRepeatMark(const RepeatMark *repeatMark);
+    virtual FunctorCode VisitRepeatMarkEnd(const RepeatMark *repeatMark);
     virtual FunctorCode VisitSlur(const Slur *slur);
     virtual FunctorCode VisitSlurEnd(const Slur *slur);
     virtual FunctorCode VisitTempo(const Tempo *tempo);

@@ -113,6 +113,7 @@
 #include "reg.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "restore.h"
 #include "sb.h"
@@ -549,6 +550,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     else if (object->Is(REH)) {
         m_currentNode = m_currentNode.append_child("reh");
         this->WriteReh(m_currentNode, vrv_cast<Reh *>(object));
+    }
+    else if (object->Is(REPEATMARK)) {
+        m_currentNode = m_currentNode.append_child("repeatMark");
+        this->WriteRepeatMark(m_currentNode, vrv_cast<RepeatMark *>(object));
     }
     else if (object->Is(SLUR)) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -2173,6 +2178,19 @@ void MEIOutput::WriteReh(pugi::xml_node currentNode, Reh *reh)
     reh->WriteVerticalGroup(currentNode);
 }
 
+void MEIOutput::WriteRepeatMark(pugi::xml_node currentNode, RepeatMark *repeatMark)
+{
+    assert(repeatMark);
+
+    this->WriteControlElement(currentNode, repeatMark);
+    this->WriteTextDirInterface(currentNode, repeatMark);
+    this->WriteTimePointInterface(currentNode, repeatMark);
+    repeatMark->WriteColor(currentNode);
+    repeatMark->WriteExtSymAuth(currentNode);
+    repeatMark->WriteExtSymNames(currentNode);
+    repeatMark->WriteRepeatMarkLog(currentNode);
+}
+
 void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
 {
     assert(slur);
@@ -3363,7 +3381,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for dir or tempo
-    else if (filterParent->Is({ DIR, ORNAM, TEMPO })) {
+    else if (filterParent->Is({ DIR, ORNAM, REPEATMARK, TEMPO })) {
         if (element == "") {
             return true;
         }
@@ -5341,6 +5359,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "reh") {
             success = this->ReadReh(parent, current);
         }
+        else if (currentName == "repeatMark") {
+            success = this->ReadRepeatMark(parent, current);
+        }
         else if (currentName == "slur") {
             success = this->ReadSlur(parent, current);
         }
@@ -5780,6 +5801,23 @@ bool MEIInput::ReadReh(Object *parent, pugi::xml_node reh)
     parent->AddChild(vrvReh);
     this->ReadUnsupportedAttr(reh, vrvReh);
     return this->ReadTextChildren(vrvReh, reh, vrvReh);
+}
+
+bool MEIInput::ReadRepeatMark(Object *parent, pugi::xml_node repeatMark)
+{
+    RepeatMark *vrvRepeatMark = new RepeatMark();
+    this->ReadControlElement(repeatMark, vrvRepeatMark);
+
+    this->ReadTextDirInterface(repeatMark, vrvRepeatMark);
+    this->ReadTimePointInterface(repeatMark, vrvRepeatMark);
+    vrvRepeatMark->ReadColor(repeatMark);
+    vrvRepeatMark->ReadExtSymAuth(repeatMark);
+    vrvRepeatMark->ReadExtSymNames(repeatMark);
+    vrvRepeatMark->ReadRepeatMarkLog(repeatMark);
+
+    parent->AddChild(vrvRepeatMark);
+    this->ReadUnsupportedAttr(repeatMark, vrvRepeatMark);
+    return this->ReadTextChildren(vrvRepeatMark, repeatMark, vrvRepeatMark);
 }
 
 bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)

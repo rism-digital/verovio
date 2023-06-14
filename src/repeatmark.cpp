@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ornam.cpp
+// Name:        repeatmark.cpp
 // Author:      Laurent Pugin
-// Created:     2022
+// Created:     2023
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "ornam.h"
+#include "repeatmark.h"
 
 //----------------------------------------------------------------------------
 
@@ -24,34 +24,34 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Ornam
+// RepeatMark
 //----------------------------------------------------------------------------
 
-static const ClassRegistrar<Ornam> s_factory("ornam", ORNAM);
+static const ClassRegistrar<RepeatMark> s_factory("repeatMark", REPEATMARK);
 
-Ornam::Ornam()
-    : ControlElement(ORNAM, "ornam-")
+RepeatMark::RepeatMark()
+    : ControlElement(REPEATMARK, "repeatMark-")
     , TextListInterface()
     , TextDirInterface()
     , TimePointInterface()
     , AttColor()
     , AttExtSymAuth()
     , AttExtSymNames()
-    , AttOrnamentAccid()
+    , AttRepeatMarkLog()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
-    this->RegisterAttClass(ATT_ORNAMENTACCID);
+    this->RegisterAttClass(ATT_REPEATMARKLOG);
 
     this->Reset();
 }
 
-Ornam::~Ornam() {}
+RepeatMark::~RepeatMark() {}
 
-void Ornam::Reset()
+void RepeatMark::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
@@ -59,10 +59,10 @@ void Ornam::Reset()
     this->ResetColor();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
-    this->ResetOrnamentAccid();
+    this->ResetRepeatMarkLog();
 }
 
-bool Ornam::IsSupportedChild(Object *child)
+bool RepeatMark::IsSupportedChild(Object *child)
 {
     if (child->Is({ LB, REND, SYMBOL, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -76,7 +76,7 @@ bool Ornam::IsSupportedChild(Object *child)
     return true;
 }
 
-char32_t Ornam::GetOrnamGlyph() const
+char32_t RepeatMark::GetMarkGlyph() const
 {
     const Resources *resources = this->GetDocResources();
     if (!resources) return 0;
@@ -92,31 +92,37 @@ char32_t Ornam::GetOrnamGlyph() const
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
-    return SMUFL_E567_ornamentTurn;
+    switch (this->GetFunc()) {
+        case (repeatMarkLog_FUNC_coda): return SMUFL_E048_coda;
+        case (repeatMarkLog_FUNC_segno): return SMUFL_E047_segno;
+        case (repeatMarkLog_FUNC_daCapo): return SMUFL_E046_daCapo;
+        case (repeatMarkLog_FUNC_dalSegno): return SMUFL_E045_dalSegno;
+        default: return SMUFL_E047_segno;
+    }
 }
 
 //----------------------------------------------------------------------------
-// Ornam functor methods
+// RepeatMark functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Ornam::Accept(Functor &functor)
+FunctorCode RepeatMark::Accept(Functor &functor)
 {
-    return functor.VisitOrnam(this);
+    return functor.VisitRepeatMark(this);
 }
 
-FunctorCode Ornam::Accept(ConstFunctor &functor) const
+FunctorCode RepeatMark::Accept(ConstFunctor &functor) const
 {
-    return functor.VisitOrnam(this);
+    return functor.VisitRepeatMark(this);
 }
 
-FunctorCode Ornam::AcceptEnd(Functor &functor)
+FunctorCode RepeatMark::AcceptEnd(Functor &functor)
 {
-    return functor.VisitOrnamEnd(this);
+    return functor.VisitRepeatMarkEnd(this);
 }
 
-FunctorCode Ornam::AcceptEnd(ConstFunctor &functor) const
+FunctorCode RepeatMark::AcceptEnd(ConstFunctor &functor) const
 {
-    return functor.VisitOrnamEnd(this);
+    return functor.VisitRepeatMarkEnd(this);
 }
 
 } // namespace vrv
