@@ -853,6 +853,18 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
     m_accidSpace.push_back(accid);
 }
 
+std::vector<Accid *> AlignmentReference::GetAccidSpace()
+{
+    std::vector<Accid *> accidentals;
+    for (Object *child : this->GetChildren()) {
+        if (child->Is(ACCID)) {
+            Accid *accid = vrv_cast<Accid *>(child);
+            if (accid->HasAccid()) accidentals.push_back(accid);
+        }
+    }
+    return accidentals;
+}
+
 void AlignmentReference::AdjustAccidWithAccidSpace(
     Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids)
 {

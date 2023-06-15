@@ -301,6 +301,11 @@ public:
     void AddToAccidSpace(Accid *accid);
 
     /**
+     * Get the accidentals for spacing
+     */
+    std::vector<Accid *> GetAccidSpace();
+
+    /**
      * See AdjustAccidXFunctor
      */
     void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids);
