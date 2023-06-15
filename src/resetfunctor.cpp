@@ -64,7 +64,9 @@ FunctorCode ResetDataFunctor::VisitArpeg(Arpeg *arpeg)
 
     PlistInterface *interface = arpeg->GetPlistInterface();
     assert(interface);
-    return interface->InterfaceResetData(*this, arpeg);
+    interface->InterfaceResetData(*this, arpeg);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetDataFunctor::VisitArtic(Artic *artic)
@@ -125,12 +127,12 @@ FunctorCode ResetDataFunctor::VisitControlElement(ControlElement *controlElement
     if (controlElement->HasInterface(INTERFACE_ALT_SYM)) {
         AltSymInterface *interface = controlElement->GetAltSymInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, controlElement);
+        interface->InterfaceResetData(*this, controlElement);
     }
     if (controlElement->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = controlElement->GetLinkingInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, controlElement);
+        interface->InterfaceResetData(*this, controlElement);
     }
 
     return FUNCTOR_CONTINUE;
@@ -192,7 +194,9 @@ FunctorCode ResetDataFunctor::VisitF(F *f)
 
     TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
     assert(interface);
-    return interface->InterfaceResetData(*this, f);
+    interface->InterfaceResetData(*this, f);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetDataFunctor::VisitFlag(Flag *flag)
@@ -213,12 +217,12 @@ FunctorCode ResetDataFunctor::VisitFloatingObject(FloatingObject *floatingObject
     if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, floatingObject);
+        interface->InterfaceResetData(*this, floatingObject);
     }
     else if (floatingObject->HasInterface(INTERFACE_TIME_POINT)) {
         TimePointInterface *interface = floatingObject->GetTimePointInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, floatingObject);
+        interface->InterfaceResetData(*this, floatingObject);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -373,11 +377,11 @@ FunctorCode ResetDataFunctor::VisitSyl(Syl *syl)
 {
     // Call parent one too
     this->VisitLayerElement(syl);
+    syl->TimeSpanningInterface::InterfaceResetData(*this, syl);
 
     syl->m_nextWordSyl = NULL;
 
-    // Pass it to the pseudo functor of the interface
-    return syl->TimeSpanningInterface::InterfaceResetData(*this, syl);
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetDataFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
