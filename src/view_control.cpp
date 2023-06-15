@@ -2921,11 +2921,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->GetTextExtent("M", &extend, false);
 
         const int unit = m_doc->GetDrawingUnit(staffSize);
-        if (ending->HasN()) {
+        if (ending->HasN() || ending->HasLabel()) {
+            const std::string endingText = (ending->HasN()) ? ending->GetN() : ending->GetLabel();
             std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks? Or . as a styling options?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << "(";
-            strStream << ending->GetN(); // << ".";
+            strStream << endingText; // << ".";
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << ")";
 
             Text text;
