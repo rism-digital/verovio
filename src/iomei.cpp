@@ -1670,6 +1670,7 @@ void MEIOutput::WriteEnding(pugi::xml_node currentNode, Ending *ending)
     this->WriteSystemElement(currentNode, ending);
     ending->WriteLabelled(currentNode);
     ending->WriteLineRend(currentNode);
+    ending->WriteLineRendBase(currentNode);
     ending->WriteNNumberLike(currentNode);
 }
 
@@ -4413,6 +4414,7 @@ bool MEIInput::ReadEnding(Object *parent, pugi::xml_node ending)
 
     vrvEnding->ReadLabelled(ending);
     vrvEnding->ReadLineRend(ending);
+    vrvEnding->ReadLineRendBase(ending);
     vrvEnding->ReadNNumberLike(ending);
 
     parent->AddChild(vrvEnding);

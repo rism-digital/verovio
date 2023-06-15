@@ -29,10 +29,17 @@ namespace vrv {
 
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
-Ending::Ending() : SystemElement(ENDING, "ending-"), SystemMilestoneInterface(), AttLabelled(), AttLineRend(), AttNNumberLike()
+Ending::Ending()
+    : SystemElement(ENDING, "ending-")
+    , SystemMilestoneInterface()
+    , AttLabelled()
+    , AttLineRend()
+    , AttLineRendBase()
+    , AttNNumberLike()
 {
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_LINEREND);
+    this->RegisterAttClass(ATT_LINERENDBASE);
     this->RegisterAttClass(ATT_NINTEGER);
 
     this->Reset();
@@ -46,6 +53,7 @@ void Ending::Reset()
     SystemMilestoneInterface::Reset();
     this->ResetLabelled();
     this->ResetLineRend();
+    this->ResetLineRendBase();
     this->ResetNNumberLike();
 }
 
