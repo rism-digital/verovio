@@ -2968,21 +2968,25 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             endX -= std::max(lineWidth + unit / 2 - rightBarLineWidth, 0);
         }
 
-        dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_SQUARE, AxJOIN_MITER);
-        Point p[4];
-        p[0] = { ToDeviceContextX(startX), ToDeviceContextY(y1) };
-        p[1] = { ToDeviceContextX(startX), ToDeviceContextY(y2) };
-        p[2] = { ToDeviceContextX(endX), ToDeviceContextY(y2) };
-        p[3] = { ToDeviceContextX(endX), ToDeviceContextY(y1) };
-        if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)
-            || (ending->GetLstartsym() == LINESTARTENDSYMBOL_none)) {
-            p[0] = p[1];
+        int penStyle = AxSOLID;
+        switch (ending->GetLform()) {
+            case (LINEFORM_dashed): penStyle = AxLONG_DASH; break;
+            case (LINEFORM_dotted): penStyle = AxDOT; break;
+            default: penStyle = AxSOLID;
         }
-        if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)
-            || (ending->GetLendsym() == LINESTARTENDSYMBOL_none)) {
-            p[3] = p[2];
+
+        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, AxCAP_ROUND);
+        dc->DrawLine(ToDeviceContextX(startX), ToDeviceContextY(y2), ToDeviceContextX(endX), ToDeviceContextY(y2));
+        if ((spanningType != SPANNING_END) && (spanningType != SPANNING_MIDDLE)
+            && (ending->GetLstartsym() != LINESTARTENDSYMBOL_none)) {
+            dc->DrawLine(
+                ToDeviceContextX(startX), ToDeviceContextY(y2), ToDeviceContextX(startX), ToDeviceContextY(y1));
         }
-        dc->DrawPolyline(4, p);
+        if ((spanningType != SPANNING_START) && (spanningType != SPANNING_MIDDLE)
+            && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
+            dc->DrawLine(ToDeviceContextX(endX), ToDeviceContextY(y2), ToDeviceContextX(endX), ToDeviceContextY(y1));
+        }
+
         dc->ResetPen();
 
         dc->EndCustomGraphic();
