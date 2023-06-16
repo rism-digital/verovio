@@ -735,18 +735,6 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
     return { min, max };
 }
 
-void Alignment::AddToAccidSpace(Accid *accid)
-{
-    assert(accid);
-
-    // Do not added them if no @accid (e.g., @accid.ges only)
-    if (!accid->HasAccid()) return;
-
-    AlignmentReference *reference = this->GetReferenceWithElement(accid);
-    assert(reference);
-    reference->AddToAccidSpace(accid);
-}
-
 int Alignment::HorizontalSpaceForDuration(
     double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
@@ -807,7 +795,6 @@ void AlignmentReference::Reset()
     Object::Reset();
     this->ResetNInteger();
 
-    m_accidSpace.clear();
     m_layerCount = 0;
 }
 
@@ -842,15 +829,6 @@ void AlignmentReference::AddChild(Object *child)
     assert(child->GetParent() && this->IsReferenceObject());
     children.push_back(child);
     Modify();
-}
-
-void AlignmentReference::AddToAccidSpace(Accid *accid)
-{
-    assert(accid);
-
-    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end()) return;
-
-    m_accidSpace.push_back(accid);
 }
 
 std::vector<Accid *> AlignmentReference::GetAccidSpace()

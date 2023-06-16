@@ -169,12 +169,6 @@ public:
     std::pair<int, int> GetAlignmentTopBottom() const;
 
     /**
-     * Add an accidental to the accidSpace of the AlignmentReference holding it.
-     * The Alignment has to have a AlignmentReference holding it.
-     */
-    void AddToAccidSpace(Accid *accid);
-
-    /**
      * Return true if there is vertical overlap with accidentals from another alignment for specific staffN
      */
     bool HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const;
@@ -296,11 +290,6 @@ public:
     void AddChild(Object *object) override;
 
     /**
-     * Add an accidental to the accidSpace of the AlignmentReference.
-     */
-    void AddToAccidSpace(Accid *accid);
-
-    /**
      * Get the accidentals for spacing
      */
     std::vector<Accid *> GetAccidSpace();
@@ -348,11 +337,7 @@ public:
 private:
     //
 public:
-    /**
-     * The accid space of the AlignmentReference.
-     */
-    std::vector<Accid *> m_accidSpace;
-
+    //
 private:
     /**
      *
