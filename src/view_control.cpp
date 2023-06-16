@@ -2969,13 +2969,17 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         }
 
         int penStyle = AxSOLID;
+        int capStyle = AxCAP_SQUARE;
         switch (ending->GetLform()) {
             case (LINEFORM_dashed): penStyle = AxLONG_DASH; break;
-            case (LINEFORM_dotted): penStyle = AxDOT; break;
+            case (LINEFORM_dotted):
+                penStyle = AxDOT;
+                capStyle = AxCAP_ROUND;
+                break;
             default: penStyle = AxSOLID;
         }
 
-        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, AxCAP_ROUND);
+        dc->SetPen(m_currentColor, lineWidth, penStyle, 0, 0, capStyle);
         dc->DrawLine(ToDeviceContextX(startX), ToDeviceContextY(y2), ToDeviceContextX(endX), ToDeviceContextY(y2));
         if ((spanningType != SPANNING_END) && (spanningType != SPANNING_MIDDLE)
             && (ending->GetLstartsym() != LINESTARTENDSYMBOL_none)) {
