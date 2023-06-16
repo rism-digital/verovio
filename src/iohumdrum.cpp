@@ -8752,8 +8752,8 @@ void HumdrumInput::addHarmLabel(
     std::string tempChar;
     for (int i = 0; i < (int)label.size(); i++) {
         switch (label[i]) {
-            case '#': output += output += U"\u266f"; break; // unicode sharp
-            case '-': output += output += U"\u266d"; break; // unicode flat
+            case '#': output += U"\u266f"; break; // unicode sharp
+            case '-': output += U"\u266d"; break; // unicode flat
             default: tempChar = label[i]; output += UTF8to32(tempChar);
         }
     }
