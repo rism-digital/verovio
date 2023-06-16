@@ -46,12 +46,30 @@ public:
 protected:
     //
 private:
-    //
+    /*
+     * Get the accidentals for adjustment
+     */
+    std::vector<Accid *> GetAccidentalsForAdjustment(AlignmentReference *alignmentReference) const;
+
+    /**
+     * Sets whether the accidental should be aligned with all elements of the alignmentReference
+     * or elements from the same layer only.
+     */
+    void SetAccidLayerAlignment(Accid *accid, const AlignmentReference *alignmentReference) const;
+
+    /**
+     * Adjust an accidental horizontally
+     */
+    void AdjustAccidWithSpace(Accid *accid, AlignmentReference *alignmentReference, int staffSize);
+
 public:
     //
 private:
     // The current measure
     Measure *m_currentMeasure;
+
+    // The accidentals that were already adjusted
+    std::set<Accid *> m_adjustedAccids;
 };
 
 } // namespace vrv

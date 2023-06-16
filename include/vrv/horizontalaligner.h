@@ -290,16 +290,6 @@ public:
     void AddChild(Object *object) override;
 
     /**
-     * Get the accidentals for spacing
-     */
-    std::vector<Accid *> GetAccidSpace();
-
-    /**
-     * See AdjustAccidXFunctor
-     */
-    void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids);
-
-    /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
      */
     bool HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const;
@@ -313,12 +303,6 @@ public:
      * Return true if the reference has elements from cross-staff.
      */
     bool HasCrossStaffElements() const;
-
-    /**
-     * Sets whether the accidental should be aligned with all elements of the alignmentReference
-     * or elements from same the layer only.
-     */
-    void SetAccidLayerAlignment(Accid *accid);
 
     //----------//
     // Functors //
