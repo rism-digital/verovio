@@ -910,36 +910,33 @@ bool AlignmentReference::HasCrossStaffElements() const
     return false;
 }
 
-void AlignmentReference::SetAccidLayerAlignment()
+void AlignmentReference::SetAccidLayerAlignment(Accid *accid)
 {
+    if (accid->IsAlignedWithSameLayer()) return;
+
     const ArrayOfObjects &children = this->GetChildren();
-    for (Accid *accid : m_accidSpace) {
-        if (accid->IsAlignedWithSameLayer()) continue;
+    Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
+    const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](Object *object) {
+        if (!object->Is(NOTE)) return false;
+        Note *otherNote = vrv_cast<Note *>(object);
+        // in case notes are in unison but have different accidentals
+        return parentNote && parentNote->IsUnisonWith(otherNote, true) && !parentNote->IsUnisonWith(otherNote, false);
+    });
 
-        Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
-        const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](Object *object) {
-            if (!object->Is(NOTE)) return false;
-            Note *otherNote = vrv_cast<Note *>(object);
-            // in case notes are in unison but have different accidentals
-            return parentNote && parentNote->IsUnisonWith(otherNote, true)
-                && !parentNote->IsUnisonWith(otherNote, false);
-        });
+    if (!hasUnisonOverlap) return;
 
-        if (!hasUnisonOverlap) continue;
-
-        Chord *chord = vrv_cast<Chord *>(accid->GetFirstAncestor(CHORD));
-        // no chord, so align only parent note
-        if (!chord) {
-            accid->IsAlignedWithSameLayer(true);
-            continue;
-        }
-        // we have chord ancestor, so need to align all of its accidentals
-        ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
-        std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
-            Accid *accid = vrv_cast<Accid *>(object);
-            accid->IsAlignedWithSameLayer(true);
-        });
+    Chord *chord = parentNote->IsChordTone();
+    // no chord, so align only parent note
+    if (!chord) {
+        accid->IsAlignedWithSameLayer(true);
+        return;
     }
+    // we have chord ancestor, so need to align all of its accidentals
+    ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
+    std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
+        Accid *accid = vrv_cast<Accid *>(object);
+        accid->IsAlignedWithSameLayer(true);
+    });
 }
 
 FunctorCode AlignmentReference::Accept(Functor &functor)

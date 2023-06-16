@@ -35,7 +35,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignment(Alignment *alignment)
 
 FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *alignmentReference)
 {
-    std::vector<Accid *> &accidSpace = alignmentReference->m_accidSpace;
+    std::vector<Accid *> accidSpace = alignmentReference->GetAccidSpace();
     if (accidSpace.empty()) return FUNCTOR_SIBLINGS;
 
     assert(m_doc);
@@ -44,7 +44,9 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
 
     std::sort(accidSpace.begin(), accidSpace.end(), AccidSpaceSort());
     // process accid layer alignment
-    alignmentReference->SetAccidLayerAlignment();
+    for (Accid *accid : accidSpace) {
+        alignmentReference->SetAccidLayerAlignment(accid);
+    }
 
     // Detect accids which are an octave apart => they will be grouped together in the multiset
     std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;

@@ -326,10 +326,10 @@ public:
     bool HasCrossStaffElements() const;
 
     /**
-     * Set whether accidentals should be aligned with all elements of alignmentReference or elements from same layer
-     * only. Set for each accidental in accidSpace separately
+     * Sets whether the accidental should be aligned with all elements of the alignmentReference
+     * or elements from same the layer only.
      */
-    void SetAccidLayerAlignment();
+    void SetAccidLayerAlignment(Accid *accid);
 
     //----------//
     // Functors //
