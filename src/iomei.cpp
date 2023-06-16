@@ -2517,11 +2517,11 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
         InstKeySigDefaultLog attKeySigDefaultLog;
         // If there is no @sig, try to build it from the keyAccid children.
         const data_KEYSIGNATURE sig = (keySig->HasSig()) ? keySig->GetSig() : keySig->ConvertToSig();
-        attKeySigDefaultLog.SetKeySig(sig);
+        attKeySigDefaultLog.SetKeysig(sig);
         attKeySigDefaultLog.WriteKeySigDefaultLog(currentNode);
         InstKeySigDefaultVis attKeySigDefaultVis;
         attKeySigDefaultVis.SetKeysigVisible(keySig->GetVisible());
-        attKeySigDefaultVis.SetKeysigShowchange(keySig->GetSigShowchange());
+        attKeySigDefaultVis.SetKeysigCancelaccid(keySig->GetCancelaccid());
         attKeySigDefaultVis.WriteKeySigDefaultVis(currentNode);
         return;
     }
@@ -4628,17 +4628,17 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     InstKeySigDefaultVis keySigDefaultVis;
     keySigDefaultVis.ReadKeySigDefaultVis(element);
     if (keySigDefaultAnl.HasKeyAccid() || keySigDefaultAnl.HasKeyMode() || keySigDefaultAnl.HasKeyPname()
-        || keySigDefaultLog.HasKeySig() || keySigDefaultVis.HasKeysigVisible()
-        || keySigDefaultVis.HasKeysigShowchange()) {
+        || keySigDefaultLog.HasKeysig() || keySigDefaultVis.HasKeysigVisible()
+        || keySigDefaultVis.HasKeysigCancelaccid()) {
         KeySig *vrvKeySig = new KeySig();
         vrvKeySig->IsAttribute(true);
         // Broken in MEI 4.0.2 - waiting for a fix
         // vrvKeySig->SetAccid(keySigDefaultAnl.GetKeyAccid());
         vrvKeySig->SetMode(keySigDefaultAnl.GetKeyMode());
         vrvKeySig->SetPname(keySigDefaultAnl.GetKeyPname());
-        vrvKeySig->SetSig(keySigDefaultLog.GetKeySig());
+        vrvKeySig->SetSig(keySigDefaultLog.GetKeysig());
         vrvKeySig->SetVisible(keySigDefaultVis.GetKeysigVisible());
-        vrvKeySig->SetSigShowchange(keySigDefaultVis.GetKeysigShowchange());
+        vrvKeySig->SetCancelaccid(keySigDefaultVis.GetKeysigCancelaccid());
         object->AddChild(vrvKeySig);
     }
 
@@ -6486,6 +6486,10 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
     KeySig *vrvKeySig = new KeySig();
     this->ReadLayerElement(keySig, vrvKeySig);
 
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        UpgradeKeySigTo_5_0_0(keySig);
+    }
+
     vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadPitch(keySig);
     vrvKeySig->ReadKeySigAnl(keySig);
@@ -7999,6 +8003,22 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
     }
 }
 
+void MEIInput::UpgradeKeySigTo_5_0_0(pugi::xml_node keySig)
+{
+    InstKeySigLog keySigLog;
+
+    if (keySig.attribute("sig.showchange")) {
+        data_BOOLEAN showchange = keySigLog.StrToBoolean(keySig.attribute("sig.showchange").value());
+        keySig.attribute("sig.showchange").set_name("cancelaccid");
+        if (showchange == BOOLEAN_true) {
+            keySig.attribute("cancelaccid") = keySigLog.CancelaccidToStr(CANCELACCID_before).c_str();
+        }
+        else {
+            keySig.attribute("cancelaccid") = keySigLog.CancelaccidToStr(CANCELACCID_none).c_str();
+        }
+    }
+}
+
 void MEIInput::UpgradePageTo_5_0_0(Page *page)
 {
     assert(page);
@@ -8042,6 +8062,21 @@ void MEIInput::UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMet
 
 void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
 {
+    InstKeySigLog keySigLog;
+
+    if (scoreDefElement.attribute("key.sig")) {
+        scoreDefElement.attribute("key.sig").set_name("keysig");
+    }
+    if (scoreDefElement.attribute("keysig.showchange")) {
+        data_BOOLEAN showchange = keySigLog.StrToBoolean(scoreDefElement.attribute("keysig.showchange").value());
+        scoreDefElement.attribute("keysig.showchange").set_name("keysig.cancelaccid");
+        if (showchange == BOOLEAN_true) {
+            scoreDefElement.attribute("keysig.cancelaccid") = keySigLog.CancelaccidToStr(CANCELACCID_before).c_str();
+        }
+        else {
+            scoreDefElement.attribute("keysig.cancelaccid") = keySigLog.CancelaccidToStr(CANCELACCID_none).c_str();
+        }
+    }
     if (scoreDefElement.attribute("meter.form")) {
         std::string value = scoreDefElement.attribute("meter.form").value();
         if (value == "invis") {
@@ -8170,8 +8205,13 @@ void MEIInput::UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, Sc
     }
     if (scoreDefElement.attribute("key.sig.showchange")) {
         if (keySig) {
-            keySig->SetSigShowchange(
-                keySig->AttKeySigVis::StrToBoolean(scoreDefElement.attribute("key.sig.showchange").value()));
+            if (keySig->AttKeySigVis::StrToBoolean(scoreDefElement.attribute("key.sig.showchange").value())
+                == BOOLEAN_true) {
+                keySig->SetCancelaccid(CANCELACCID_before);
+            }
+            else {
+                keySig->SetCancelaccid(CANCELACCID_none);
+            }
             scoreDefElement.remove_attribute("key.sig.showchange");
         }
         else {

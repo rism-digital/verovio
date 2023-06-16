@@ -877,14 +877,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSigShowchange(data_BOOLEAN sigShowchange_) { m_sigShowchange = sigShowchange_; }
-    data_BOOLEAN GetSigShowchange() const { return m_sigShowchange; }
-    bool HasSigShowchange() const;
+    void SetCancelaccid(data_CANCELACCID cancelaccid_) { m_cancelaccid = cancelaccid_; }
+    data_CANCELACCID GetCancelaccid() const { return m_cancelaccid; }
+    bool HasCancelaccid() const;
     ///@}
 
 private:
-    /** Determines whether cautionary accidentals should be displayed at a key change. **/
-    data_BOOLEAN m_sigShowchange;
+    /** Determines where cautionary accidentals should be displayed at a key change. **/
+    data_CANCELACCID m_cancelaccid;
 };
 
 //----------------------------------------------------------------------------
@@ -926,9 +926,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeysigShowchange(data_BOOLEAN keysigShowchange_) { m_keysigShowchange = keysigShowchange_; }
-    data_BOOLEAN GetKeysigShowchange() const { return m_keysigShowchange; }
-    bool HasKeysigShowchange() const;
+    void SetKeysigCancelaccid(data_CANCELACCID keysigCancelaccid_) { m_keysigCancelaccid = keysigCancelaccid_; }
+    data_CANCELACCID GetKeysigCancelaccid() const { return m_keysigCancelaccid; }
+    bool HasKeysigCancelaccid() const;
     //
     void SetKeysigVisible(data_BOOLEAN keysigVisible_) { m_keysigVisible = keysigVisible_; }
     data_BOOLEAN GetKeysigVisible() const { return m_keysigVisible; }
@@ -936,8 +936,8 @@ public:
     ///@}
 
 private:
-    /** Determines whether cautionary accidentals should be displayed at a key change. **/
-    data_BOOLEAN m_keysigShowchange;
+    /** Determines where cautionary accidentals should be displayed at a key change. **/
+    data_CANCELACCID m_keysigCancelaccid;
     /** Determines whether the key signature is to be displayed. **/
     data_BOOLEAN m_keysigVisible;
 };

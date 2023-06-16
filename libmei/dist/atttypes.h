@@ -304,6 +304,18 @@ enum data_BOOLEAN : int8_t {
 };
 
 /**
+ * MEI data.CANCELACCID
+ */
+enum data_CANCELACCID : int8_t {
+    CANCELACCID_NONE = 0,
+    CANCELACCID_none,
+    CANCELACCID_before,
+    CANCELACCID_after,
+    CANCELACCID_before_bar,
+    CANCELACCID_MAX
+};
+
+/**
  * MEI data.CERTAINTY
  */
 enum data_CERTAINTY : int8_t {

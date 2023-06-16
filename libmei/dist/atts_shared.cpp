@@ -2368,15 +2368,15 @@ AttKeySigDefaultLog::AttKeySigDefaultLog() : Att()
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
-    m_keySig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+    m_keysig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
 }
 
 bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("key.sig")) {
-        this->SetKeySig(StrToKeysignature(element.attribute("key.sig").value()));
-        if (removeAttr) element.remove_attribute("key.sig");
+    if (element.attribute("keysig")) {
+        this->SetKeysig(StrToKeysignature(element.attribute("keysig").value()));
+        if (removeAttr) element.remove_attribute("keysig");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2385,16 +2385,16 @@ bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element, bool remo
 bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasKeySig()) {
-        element.append_attribute("key.sig") = KeysignatureToStr(this->GetKeySig()).c_str();
+    if (this->HasKeysig()) {
+        element.append_attribute("keysig") = KeysignatureToStr(this->GetKeysig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttKeySigDefaultLog::HasKeySig() const
+bool AttKeySigDefaultLog::HasKeysig() const
 {
-    return (m_keySig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+    return (m_keysig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
 //----------------------------------------------------------------------------

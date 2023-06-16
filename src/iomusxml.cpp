@@ -3929,7 +3929,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
 
         if (key.child("cancel")) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
         if (key.child("mode")) {
             const std::string xmlMode = key.child("mode").text().as_string();
