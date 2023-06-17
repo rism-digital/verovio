@@ -15,6 +15,8 @@
 #ifndef __LIBMEI_ATT_TYPES_H__
 #define __LIBMEI_ATT_TYPES_H__
 
+#include <cstdint>
+
 //----------------------------------------------------------------------------
 
 namespace vrv {
@@ -193,6 +195,8 @@ enum data_ARTICULATION : int8_t {
     ARTICULATION_stacciss,
     ARTICULATION_marc,
     ARTICULATION_spicc,
+    ARTICULATION_stress,
+    ARTICULATION_unstress,
     ARTICULATION_doit,
     ARTICULATION_scoop,
     ARTICULATION_rip,
@@ -297,6 +301,18 @@ enum data_BOOLEAN : int8_t {
     BOOLEAN_true,
     BOOLEAN_false,
     BOOLEAN_MAX
+};
+
+/**
+ * MEI data.CANCELACCID
+ */
+enum data_CANCELACCID : int8_t {
+    CANCELACCID_NONE = 0,
+    CANCELACCID_none,
+    CANCELACCID_before,
+    CANCELACCID_after,
+    CANCELACCID_before_bar,
+    CANCELACCID_MAX
 };
 
 /**
@@ -992,7 +1008,6 @@ enum data_METERFORM : int8_t {
     METERFORM_denomsym,
     METERFORM_norm,
     METERFORM_symplusnorm,
-    METERFORM_invis,
     METERFORM_MAX
 };
 
@@ -1346,7 +1361,7 @@ enum data_NOTEHEADMODIFIER : int8_t {
     NOTEHEADMODIFIER_brack,
     NOTEHEADMODIFIER_box,
     NOTEHEADMODIFIER_circle,
-    NOTEHEADMODIFIER_dblwhole,
+    NOTEHEADMODIFIER_fences,
     NOTEHEADMODIFIER_MAX
 };
 
@@ -1364,7 +1379,7 @@ enum data_NOTEHEADMODIFIER_list : int8_t {
     NOTEHEADMODIFIER_list_brack,
     NOTEHEADMODIFIER_list_box,
     NOTEHEADMODIFIER_list_circle,
-    NOTEHEADMODIFIER_list_dblwhole,
+    NOTEHEADMODIFIER_list_fences,
     NOTEHEADMODIFIER_list_MAX
 };
 
@@ -1888,6 +1903,20 @@ enum cutout_CUTOUT : int8_t {
 };
 
 /**
+ * MEI att.divLine.log@form
+ */
+enum divLineLog_FORM : int8_t {
+    divLineLog_FORM_NONE = 0,
+    divLineLog_FORM_caesura,
+    divLineLog_FORM_finalis,
+    divLineLog_FORM_maior,
+    divLineLog_FORM_maxima,
+    divLineLog_FORM_minima,
+    divLineLog_FORM_virgula,
+    divLineLog_FORM_MAX
+};
+
+/**
  * MEI att.dot.log@form
  */
 enum dotLog_FORM : int8_t {
@@ -1930,12 +1959,12 @@ enum evidence_EVIDENCE : int8_t {
 };
 
 /**
- * MEI att.extSym@glyph.auth
+ * MEI att.extSym.auth@glyph.auth
  */
-enum extSym_GLYPHAUTH : int8_t {
-    extSym_GLYPHAUTH_NONE = 0,
-    extSym_GLYPHAUTH_smufl,
-    extSym_GLYPHAUTH_MAX
+enum extSymAuth_GLYPHAUTH : int8_t {
+    extSymAuth_GLYPHAUTH_NONE = 0,
+    extSymAuth_GLYPHAUTH_smufl,
+    extSymAuth_GLYPHAUTH_MAX
 };
 
 /**
@@ -2381,6 +2410,19 @@ enum rehearsal_REHENCLOSE : int8_t {
     rehearsal_REHENCLOSE_circle,
     rehearsal_REHENCLOSE_none,
     rehearsal_REHENCLOSE_MAX
+};
+
+/**
+ * MEI att.repeatMark.log@func
+ */
+enum repeatMarkLog_FUNC : int8_t {
+    repeatMarkLog_FUNC_NONE = 0,
+    repeatMarkLog_FUNC_coda,
+    repeatMarkLog_FUNC_segno,
+    repeatMarkLog_FUNC_dalSegno,
+    repeatMarkLog_FUNC_daCapo,
+    repeatMarkLog_FUNC_fine,
+    repeatMarkLog_FUNC_MAX
 };
 
 /**

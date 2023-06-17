@@ -33,6 +33,7 @@
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
+#include "repeatmark.h"
 #include "slur.h"
 #include "staff.h"
 #include "tempo.h"
@@ -183,7 +184,7 @@ std::pair<int, bool> FloatingObject::GetVerticalContentBoundaryRel(const Doc *do
     return { boundary, false };
 }
 
-FunctorCode FloatingObject::Accept(MutableFunctor &functor)
+FunctorCode FloatingObject::Accept(Functor &functor)
 {
     return functor.VisitFloatingObject(this);
 }
@@ -193,7 +194,7 @@ FunctorCode FloatingObject::Accept(ConstFunctor &functor) const
     return functor.VisitFloatingObject(this);
 }
 
-FunctorCode FloatingObject::AcceptEnd(MutableFunctor &functor)
+FunctorCode FloatingObject::AcceptEnd(Functor &functor)
 {
     return functor.VisitFloatingObjectEnd(this);
 }
@@ -313,6 +314,13 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(reh);
         // reh above by default
         m_place = (reh->GetPlace() != STAFFREL_NONE) ? reh->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(REPEATMARK)) {
+        RepeatMark *repeatMark = vrv_cast<RepeatMark *>(object);
+        assert(repeatMark);
+        // repeatMark above by default
+        m_place = (repeatMark->GetPlace() != STAFFREL_NONE) ? repeatMark->GetPlace()
+                                                            : repeatMark->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(TEMPO)) {
         Tempo *tempo = vrv_cast<Tempo *>(object);

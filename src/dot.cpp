@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 
 namespace vrv {
@@ -51,7 +50,7 @@ void Dot::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Dot::Accept(MutableFunctor &functor)
+FunctorCode Dot::Accept(Functor &functor)
 {
     return functor.VisitDot(this);
 }
@@ -61,7 +60,7 @@ FunctorCode Dot::Accept(ConstFunctor &functor) const
     return functor.VisitDot(this);
 }
 
-FunctorCode Dot::AcceptEnd(MutableFunctor &functor)
+FunctorCode Dot::AcceptEnd(Functor &functor)
 {
     return functor.VisitDotEnd(this);
 }

@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "vrv.h"
 
@@ -45,7 +44,7 @@ void Space::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Space::Accept(MutableFunctor &functor)
+FunctorCode Space::Accept(Functor &functor)
 {
     return functor.VisitSpace(this);
 }
@@ -55,7 +54,7 @@ FunctorCode Space::Accept(ConstFunctor &functor) const
     return functor.VisitSpace(this);
 }
 
-FunctorCode Space::AcceptEnd(MutableFunctor &functor)
+FunctorCode Space::AcceptEnd(Functor &functor)
 {
     return functor.VisitSpaceEnd(this);
 }

@@ -66,7 +66,7 @@ void Pages::ConvertFrom(Score *score)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Pages::Accept(MutableFunctor &functor)
+FunctorCode Pages::Accept(Functor &functor)
 {
     return functor.VisitPages(this);
 }
@@ -76,7 +76,7 @@ FunctorCode Pages::Accept(ConstFunctor &functor) const
     return functor.VisitPages(this);
 }
 
-FunctorCode Pages::AcceptEnd(MutableFunctor &functor)
+FunctorCode Pages::AcceptEnd(Functor &functor)
 {
     return functor.VisitPagesEnd(this);
 }

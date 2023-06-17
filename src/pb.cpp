@@ -16,7 +16,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "page.h"
 #include "pages.h"
 #include "system.h"
@@ -49,7 +48,7 @@ void Pb::Reset()
 // Pb functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Pb::Accept(MutableFunctor &functor)
+FunctorCode Pb::Accept(Functor &functor)
 {
     return functor.VisitPb(this);
 }
@@ -59,7 +58,7 @@ FunctorCode Pb::Accept(ConstFunctor &functor) const
     return functor.VisitPb(this);
 }
 
-FunctorCode Pb::AcceptEnd(MutableFunctor &functor)
+FunctorCode Pb::AcceptEnd(Functor &functor)
 {
     return functor.VisitPbEnd(this);
 }

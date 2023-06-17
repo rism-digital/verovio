@@ -45,12 +45,20 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter of the generated flag
+     */
+    ///@{
+    bool IsGenerated() const { return m_isGenerated; }
+    void IsGenerated(bool isGenerated) { m_isGenerated = isGenerated; }
+    ///@}
+
+    /**
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -63,6 +71,10 @@ protected:
     std::u32string m_text;
 
 private:
+    /**
+     * Flag indicating whether or not the text content was generated
+     */
+    bool m_isGenerated;
 };
 
 } // namespace vrv

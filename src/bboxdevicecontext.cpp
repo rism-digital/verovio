@@ -92,7 +92,7 @@ void BBoxDeviceContext::StartPage() {}
 
 void BBoxDeviceContext::EndPage() {}
 
-void BBoxDeviceContext::SetBackground(int colour, int style)
+void BBoxDeviceContext::SetBackground(int color, int style)
 {
     // nothing to do, we do not handle Background
 }
@@ -102,9 +102,9 @@ void BBoxDeviceContext::SetBackgroundMode(int mode)
     // nothing to do, we do not handle Background Mode
 }
 
-void BBoxDeviceContext::SetTextForeground(int colour) {}
+void BBoxDeviceContext::SetTextForeground(int color) {}
 
-void BBoxDeviceContext::SetTextBackground(int colour)
+void BBoxDeviceContext::SetTextBackground(int color)
 {
     // nothing to do, we do not handle Text Background Mode
 }

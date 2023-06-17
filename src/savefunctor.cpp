@@ -14,6 +14,7 @@
 #include "mdiv.h"
 #include "mnum.h"
 #include "runningelement.h"
+#include "text.h"
 
 //----------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ namespace vrv {
 // SaveFunctor
 //----------------------------------------------------------------------------
 
-SaveFunctor::SaveFunctor(Output *output, bool basic)
+SaveFunctor::SaveFunctor(Output *output, bool basic) : Functor()
 {
     m_output = output;
     m_basic = basic;
@@ -146,6 +147,26 @@ FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
     }
     else {
         return this->VisitObjectEnd(runningElement);
+    }
+}
+
+FunctorCode SaveFunctor::VisitText(Text *text)
+{
+    if (text->IsGenerated()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObject(text);
+    }
+}
+
+FunctorCode SaveFunctor::VisitTextEnd(Text *text)
+{
+    if (text->IsGenerated()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObjectEnd(text);
     }
 }
 

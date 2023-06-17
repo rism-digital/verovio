@@ -23,12 +23,12 @@
 #include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
+#include "doc.h"
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
 #include "f.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "halfmrpt.h"
 #include "keyaccid.h"
 #include "label.h"
@@ -73,13 +73,13 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         return;
     }
 
-    int previousColor = m_currentColour;
+    int previousColor = m_currentColor;
 
     if (element == m_currentElement) {
-        m_currentColour = AxRED;
+        m_currentColor = AxRED;
     }
     else {
-        m_currentColour = AxNONE;
+        m_currentColor = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -214,7 +214,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
 
-    m_currentColour = previousColor;
+    m_currentColor = previousColor;
 }
 
 //----------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->HasPlace() || (accid->GetFunc() == accidLog_FUNC_edit)) {
+    if (accid->HasPlace() || accid->HasOnstaff() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
@@ -943,6 +943,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    if (staff->IsTablature()) {
+        // Encoded keySig will not be shown on tablature
+        return;
+    }
+
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
@@ -978,42 +983,30 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     x = element->GetDrawingX();
     // HARDCODED
-    int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-    int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int naturalStep = step * TEMP_KEYSIG_NATURAL_STEP;
-    step *= TEMP_KEYSIG_STEP;
+    const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
 
     int clefLocOffset = layer->GetClefLocOffset(element);
 
     dc->StartGraphic(element, "", element->GetID());
 
+    bool showCancelAfter = false;
+
     // Show cancellation if showchange is true (false by default) or if C major
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
-        && ((keySig->GetSigShowchange() == BOOLEAN_true) || (keySig->GetAccidCount() == 0))) {
+        && ((keySig->HasCancelaccid() && (keySig->GetCancelaccid() != CANCELACCID_none))
+            || (keySig->GetAccidCount() == 0))) {
         if (keySig->m_skipCancellation) {
             LogWarning("Cautionary accidentals are skipped if the new or previous KeySig contains KeyAccid children.");
+        }
+        // For French style (after)
+        else if ((keySig->GetCancelaccid() == CANCELACCID_after)
+            && (keySig->GetAccidType() == keySig->m_drawingCancelAccidType)) {
+            showCancelAfter = true;
         }
         else {
             const int beginCancel
                 = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
-            for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                const int loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-                dc->StartCustomGraphic("keyAccid");
-
-                this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-
-                dc->EndCustomGraphic();
-
-                x += naturalGlyphWidth + naturalStep;
-                if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
-                    // Add some extra space after last natural
-                    x += step;
-                }
-            }
+            this->DrawKeySigCancellation(dc, keySig, staff, clef, clefLocOffset, beginCancel, x);
         }
     }
 
@@ -1025,6 +1018,10 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         assert(keyAccid);
         this->DrawKeyAccid(dc, keyAccid, staff, clef, clefLocOffset, x);
         x += step;
+    }
+
+    if (showCancelAfter) {
+        this->DrawKeySigCancellation(dc, keySig, staff, clef, clefLocOffset, keySig->GetAccidCount(), x);
     }
 
     dc->ResetFont();
@@ -1044,7 +1041,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetForm() == METERFORM_invis) {
+    if (meterSig->GetVisible() == BOOLEAN_false) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -1052,6 +1049,28 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
 
     this->DrawMeterSig(dc, meterSig, staff, 0);
+}
+
+void View::DrawKeySigCancellation(
+    DeviceContext *dc, KeySig *keySig, Staff *staff, Clef *clef, int clefLocOffset, int beginCancel, int &x)
+{
+    const int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+    const int naturalStep = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_NATURAL_STEP;
+
+    for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+        data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
+        const int loc = PitchInterface::CalcLoc(
+            pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
+        int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+        dc->StartCustomGraphic("keyAccid");
+
+        this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+
+        dc->EndCustomGraphic();
+
+        x += naturalGlyphWidth + naturalStep;
+    }
 }
 
 void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x)
@@ -1698,7 +1717,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     if (syl->HasFontweight()) {
@@ -1707,7 +1726,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     if (syl->HasFontstyle()) {
         currentFont.SetStyle(syl->GetFontstyle());
     }
-    if (syl->GetStart()->GetDrawingCueSize()) {
+    if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
     dc->SetFont(&currentFont);
@@ -1810,7 +1829,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
         params.m_pointSize = labelTxt.GetPointSize();
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&labelTxt);
 
         dc->StartGraphic(graphic, "", graphic->GetID());

@@ -13,9 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layerelement.h"
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -31,14 +32,16 @@ Turn::Turn()
     : ControlElement(TURN, "turn-")
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
     , AttTurnLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_TURNLOG);
@@ -53,7 +56,8 @@ void Turn::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
     this->ResetTurnLog();
@@ -98,7 +102,7 @@ int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 // Turn functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Turn::Accept(MutableFunctor &functor)
+FunctorCode Turn::Accept(Functor &functor)
 {
     return functor.VisitTurn(this);
 }
@@ -108,7 +112,7 @@ FunctorCode Turn::Accept(ConstFunctor &functor) const
     return functor.VisitTurn(this);
 }
 
-FunctorCode Turn::AcceptEnd(MutableFunctor &functor)
+FunctorCode Turn::AcceptEnd(Functor &functor)
 {
     return functor.VisitTurnEnd(this);
 }

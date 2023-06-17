@@ -6567,7 +6567,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
     if (metertok) {
         if (*metertok == "*met()") {
             // set time signature to be invisible
-            vrvmeter->SetForm(METERFORM_invis);
+            vrvmeter->SetVisible(BOOLEAN_false);
         }
     }
 
@@ -6596,7 +6596,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
         if (bot == 0) {
             if (mensuration) {
                 // hide time signature
-                vrvmeter->SetForm(METERFORM_invis);
+                vrvmeter->SetVisible(BOOLEAN_false);
             }
             vrvmeter->SetCount({ { top * 2 }, MeterCountSign::None });
             vrvmeter->SetUnit(1);
@@ -6605,7 +6605,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
             if (mensuration) {
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
-                vrvmeter->SetForm(METERFORM_invis);
+                vrvmeter->SetVisible(BOOLEAN_false);
                 vrvmeter->SetCount({ { top }, MeterCountSign::None });
                 vrvmeter->SetUnit(bot);
             }
@@ -6682,7 +6682,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
             vrvmetersig->SetUnit(unit);
-            vrvmetersig->SetForm(METERFORM_invis);
+            vrvmetersig->SetVisible(BOOLEAN_false);
         }
         else if (metersig == "3") {
             MeterSig *vrvmetersig = getMeterSig(element);
@@ -6716,7 +6716,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
                 unit = 1;
             }
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetForm(METERFORM_invis);
+            vrvmetersig->SetVisible(BOOLEAN_false);
             vrvmetersig->SetCount({ { count }, MeterCountSign::None });
             vrvmetersig->SetUnit(unit);
         }
@@ -6921,10 +6921,10 @@ void HumdrumInput::setKeySig(
     if (secondary && (keyvalue == 0)) {
         // Force cancellation keysignature when there are no
         // sharps/flats in key signature change.
-        vrvkeysig->SetSigShowchange(BOOLEAN_true);
+        vrvkeysig->SetCancelaccid(CANCELACCID_before);
     }
     else if (m_show_cautionary_keysig) {
-        vrvkeysig->SetSigShowchange(BOOLEAN_true);
+        vrvkeysig->SetCancelaccid(CANCELACCID_before);
     }
 
     if (!keytok) {

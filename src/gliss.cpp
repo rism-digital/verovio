@@ -16,7 +16,6 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -60,7 +59,7 @@ void Gliss::Reset()
 // Gliss functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Gliss::Accept(MutableFunctor &functor)
+FunctorCode Gliss::Accept(Functor &functor)
 {
     return functor.VisitGliss(this);
 }
@@ -70,7 +69,7 @@ FunctorCode Gliss::Accept(ConstFunctor &functor) const
     return functor.VisitGliss(this);
 }
 
-FunctorCode Gliss::AcceptEnd(MutableFunctor &functor)
+FunctorCode Gliss::AcceptEnd(Functor &functor)
 {
     return functor.VisitGlissEnd(this);
 }

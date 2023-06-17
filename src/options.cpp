@@ -1524,6 +1524,10 @@ Options::Options()
     m_tieMinLength.Init(2.0, 0.0, 10.0);
     this->Register(&m_tieMinLength, "tieMinLength", &m_generalLayout);
 
+    m_tupletAngledOnBeams.SetInfo("Tuplet angled on beams", "Tuplet brackets angled on beams only");
+    m_tupletAngledOnBeams.Init(false);
+    this->Register(&m_tupletAngledOnBeams, "tupletAngledOnBeams", &m_generalLayout);
+
     m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);
     this->Register(&m_tupletBracketThickness, "tupletBracketThickness", &m_generalLayout);

@@ -17,7 +17,6 @@
 #include "editorial.h"
 #include "fig.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "num.h"
 #include "page.h"
 #include "rend.h"
@@ -387,7 +386,7 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode RunningElement::Accept(MutableFunctor &functor)
+FunctorCode RunningElement::Accept(Functor &functor)
 {
     return functor.VisitRunningElement(this);
 }
@@ -397,7 +396,7 @@ FunctorCode RunningElement::Accept(ConstFunctor &functor) const
     return functor.VisitRunningElement(this);
 }
 
-FunctorCode RunningElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode RunningElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitRunningElementEnd(this);
 }

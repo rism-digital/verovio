@@ -22,7 +22,7 @@ class Object;
 /**
  * This class finds all elements in the tree by comparison
  */
-class FindAllByComparisonFunctor : public MutableFunctor {
+class FindAllByComparisonFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -403,7 +403,7 @@ private:
 /**
  * This class finds all objects to which another object refers to.
  */
-class FindAllReferencedObjectsFunctor : public MutableFunctor {
+class FindAllReferencedObjectsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

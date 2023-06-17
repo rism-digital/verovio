@@ -15,7 +15,6 @@
 
 #include "ending.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "page.h"
 #include "system.h"
 #include "vrv.h"
@@ -81,7 +80,7 @@ void PageMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Object 
 // PageMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode PageMilestoneEnd::Accept(MutableFunctor &functor)
+FunctorCode PageMilestoneEnd::Accept(Functor &functor)
 {
     return functor.VisitPageMilestone(this);
 }
@@ -91,7 +90,7 @@ FunctorCode PageMilestoneEnd::Accept(ConstFunctor &functor) const
     return functor.VisitPageMilestone(this);
 }
 
-FunctorCode PageMilestoneEnd::AcceptEnd(MutableFunctor &functor)
+FunctorCode PageMilestoneEnd::AcceptEnd(Functor &functor)
 {
     return functor.VisitPageMilestoneEnd(this);
 }
@@ -99,18 +98,6 @@ FunctorCode PageMilestoneEnd::AcceptEnd(MutableFunctor &functor)
 FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPageMilestoneEnd(this);
-}
-
-int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(MDIV)) {
-        params->m_currentMdivIDs.pop_back();
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 //----------------------------------------------------------------------------

@@ -67,6 +67,7 @@ class PgHead2;
 class PitchInflection;
 class Reh;
 class Rend;
+class RepeatMark;
 class RunningElement;
 class Slur;
 class Staff;
@@ -227,7 +228,7 @@ protected:
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
-    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset);
+    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
@@ -350,6 +351,8 @@ protected:
     void DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin = false);
+    void DrawKeySigCancellation(
+        DeviceContext *dc, KeySig *keySig, Staff *staff, Clef *clef, int clefLocOffset, int beginCancel, int &x);
     void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
@@ -427,7 +430,7 @@ protected:
         char32_t endGlyph, int x, int y, int height, bool cueSize);
     void DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system);
     void DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, System *system);
-    void DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
+    void DrawControlElementText(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::u32string &dynamSymbol,
         data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params);
@@ -437,6 +440,7 @@ protected:
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
     void DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system);
+    void DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *measure, System *system);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);
@@ -660,10 +664,10 @@ public:
 
 protected:
     /**
-     * The colour currently being used when drawing.
+     * The color currently being used when drawing.
      * It can change when drawing the m_currentElement, for example
      */
-    int m_currentColour;
+    int m_currentColor;
 
     /**
      * Control the handling of slurs

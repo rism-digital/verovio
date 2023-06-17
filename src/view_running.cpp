@@ -71,7 +71,7 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
 
     pgHeadTxt.SetPointSize(params.m_pointSize);
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(&pgHeadTxt);
 
     this->DrawRunningChildren(dc, pgHeader, params);

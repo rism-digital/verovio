@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "bboxdevicecontext.h"
-#include "functorparams.h"
+#include "doc.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "note.h"

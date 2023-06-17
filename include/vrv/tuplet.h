@@ -18,6 +18,9 @@ namespace vrv {
 class Note;
 class TupletBracket;
 
+// Helper enum classes
+enum class MelodicDirection { None, Up, Down };
+
 //----------------------------------------------------------------------------
 // Tuplet
 //----------------------------------------------------------------------------
@@ -90,6 +93,11 @@ public:
     ///@}
 
     /**
+     * Determine the melodic direction
+     */
+    MelodicDirection GetMelodicDirection() const;
+
+    /**
      * Calculate the position of the bracket and the num looking at the stem direction or at the encoded values (if
      * any). Called in View::DrawTuplet the first time it is called (and not trough a dedicated CalcTuplet functor)
      */
@@ -120,9 +128,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

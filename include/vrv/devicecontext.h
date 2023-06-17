@@ -50,7 +50,7 @@ static inline double RadToDeg(double deg)
  *  MusWxDC - a wrapper to wxDCs with wxWidgets;
  *  SvgDeviceContext - a non-gui file DC;
  *  MusCairoDC - a wrapper to a Cairo surface;
- * The class uses int-based colour encoding (instead of wxColour in wxDC).
+ * The class uses int-based color encoding (instead of wxColor in wxDC).
  * It uses FontInfo (instead of wxFont in wxDC).
  */
 
@@ -73,6 +73,7 @@ public:
         m_userScaleY = 1.0;
         m_baseWidth = 0;
         m_baseHeight = 0;
+        m_pushBack = false;
     }
     DeviceContext(ClassId classId)
     {
@@ -87,6 +88,7 @@ public:
         m_userScaleY = 1.0;
         m_baseWidth = 0;
         m_baseHeight = 0;
+        m_pushBack = false;
     }
     virtual ~DeviceContext(){};
     ClassId GetClassId() const { return m_classId; }
@@ -135,18 +137,20 @@ public:
      * Non-virtual methods cannot be overridden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
-    void SetBrush(int colour, int opacity);
+    void SetBrush(int color, int opacity);
     void SetPen(
-        int colour, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
+        int color, int width, int style, int dashLength = 0, int gapLength = 0, int lineCap = 0, int lineJoin = 0);
     void SetFont(FontInfo *font);
+    void SetPushBack() { m_pushBack = true; }
     void ResetBrush();
     void ResetPen();
     void ResetFont();
-    virtual void SetBackground(int colour, int style = AxSOLID) = 0;
+    void ResetPushBack() { m_pushBack = false; }
+    virtual void SetBackground(int color, int style = AxSOLID) = 0;
     virtual void SetBackgroundImage(void *image, double opacity = 1.0) = 0;
     virtual void SetBackgroundMode(int mode) = 0;
-    virtual void SetTextForeground(int colour) = 0;
-    virtual void SetTextBackground(int colour) = 0;
+    virtual void SetTextForeground(int color) = 0;
+    virtual void SetTextBackground(int color) = 0;
     virtual void SetLogicalOrigin(int x, int y) = 0;
     ///}
 
@@ -313,7 +317,7 @@ public:
     // Static methods //
     //----------------//
 
-    /** Colour conversion method **/
+    /** Color conversion method **/
     static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
 private:
@@ -329,6 +333,9 @@ protected:
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
+
+    /** push back mode */
+    bool m_pushBack;
 
     Zone *m_facsimile = NULL;
 

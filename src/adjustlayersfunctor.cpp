@@ -123,9 +123,8 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
 {
     if (!measure->HasAlignmentRefWithMultipleLayers()) return FUNCTOR_SIBLINGS;
 
-    Filters *previousFilters = this->GetFilters();
     Filters filters;
-    this->SetFilters(&filters);
+    this->PushFilters(&filters);
 
     std::vector<int>::iterator iter;
     for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
@@ -142,7 +141,7 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
         measure->m_measureAligner.Process(*this);
     }
 
-    this->SetFilters(previousFilters);
+    this->PopFilters();
 
     return FUNCTOR_SIBLINGS;
 }

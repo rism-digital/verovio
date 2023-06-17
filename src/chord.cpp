@@ -24,7 +24,6 @@
 #include "elementpart.h"
 #include "fermata.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "horizontalaligner.h"
 #include "layer.h"
@@ -546,7 +545,7 @@ std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Chord::Accept(MutableFunctor &functor)
+FunctorCode Chord::Accept(Functor &functor)
 {
     return functor.VisitChord(this);
 }
@@ -556,7 +555,7 @@ FunctorCode Chord::Accept(ConstFunctor &functor) const
     return functor.VisitChord(this);
 }
 
-FunctorCode Chord::AcceptEnd(MutableFunctor &functor)
+FunctorCode Chord::AcceptEnd(Functor &functor)
 {
     return functor.VisitChordEnd(this);
 }
@@ -599,58 +598,6 @@ MapOfDotLocs Chord::CalcDotLocations(int layerCount, bool primary) const
         }
     }
     return dotLocs;
-}
-
-int Chord::InitOnsetOffsetEnd(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    LayerElement *element = this->ThisOrSameasLink();
-
-    double incrementScoreTime = element->GetAlignmentDuration(
-        params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-    incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
-
-    params->m_currentScoreTime += incrementScoreTime;
-    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Handle grace chords
-    if (this->IsGraceNote()) {
-        std::set<int> pitches;
-        const ListOfObjects &notes = this->GetList(this);
-        for (Object *obj : notes) {
-            Note *note = vrv_cast<Note *>(obj);
-            assert(note);
-            pitches.insert(note->GetMIDIPitch(params->m_transSemi));
-        }
-
-        double quarterDuration = 0.0;
-        const data_DURATION dur = this->GetDur();
-        if ((dur >= DURATION_long) && (dur <= DURATION_1024)) {
-            quarterDuration = pow(2.0, (DURATION_4 - dur));
-        }
-
-        params->m_graceNotes.push_back({ pitches, quarterDuration });
-
-        bool accented = (this->GetGrace() == GRACE_acc);
-        GraceGrp *graceGrp = vrv_cast<GraceGrp *>(this->GetFirstAncestor(GRACEGRP));
-        if (graceGrp && (graceGrp->GetGrace() == GRACE_acc)) accented = true;
-        params->m_accentedGraceNote = accented;
-
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

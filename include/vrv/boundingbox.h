@@ -161,6 +161,9 @@ public:
     int GetCutOutBottom(const Resources &resources) const;
     int GetCutOutLeft(const Resources &resources) const;
     int GetCutOutRight(const Resources &resources) const;
+    // Restricted version which only considers the cutout rectangles from the top or bottom
+    int GetCutOutLeft(const Resources &resources, bool fromTop) const;
+    int GetCutOutRight(const Resources &resources, bool fromTop) const;
     ///@}
 
     /**
@@ -267,13 +270,16 @@ public:
 
 private:
     /**
-     * Get the rectangles covering the inside of a bounding box given two anchors (e.g., NW and NE, or NE and SE)
-     * Looks at the anchors for the smufl glpyh (if any) and return the number of rectangles needed to represent the
+     * Get the rectangles covering the inside of a bounding box given one or two anchors (e.g., NW and NE, or NE and SE)
+     * Looks at the anchors for the smufl glyph (if any) and return the number of rectangles needed to represent the
      * bounding box.
-     * Return 1 with no smufl glyph or no anchor, 2 with on anchor point, and 3 with 2 anchor points.
+     * Return 1 with no smufl glyph or no anchor, 2 with one anchor point, and 3 with 2 anchor points.
      */
+    ///@{
+    int GetRectangles(const SMuFLGlyphAnchor &anchor, Point rect[2][2], const Resources &resources) const;
     int GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2],
         const Resources &resources) const;
+    ///@}
 
     /**
      * Calculate the rectangles with 2 anchor points.

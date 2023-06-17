@@ -125,6 +125,7 @@ class Ref;
 class Reg;
 class Reh;
 class Rend;
+class RepeatMark;
 class Rest;
 class Restore;
 class RunningElement;
@@ -443,6 +444,7 @@ private:
     void WritePhrase(pugi::xml_node currentNode, Phrase *phrase);
     void WritePitchInflection(pugi::xml_node currentNode, PitchInflection *pitchInflection);
     void WriteReh(pugi::xml_node currentNode, Reh *reh);
+    void WriteRepeatMark(pugi::xml_node currentNode, RepeatMark *repeatMark);
     void WriteSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteTie(pugi::xml_node currentNode, Tie *tie);
@@ -752,6 +754,7 @@ private:
     bool ReadPedal(Object *parent, pugi::xml_node pedal);
     bool ReadPhrase(Object *parent, pugi::xml_node phrase);
     bool ReadPitchInflection(Object *parent, pugi::xml_node pitchInflection);
+    bool ReadRepeatMark(Object *parent, pugi::xml_node repeatMark);
     bool ReadReh(Object *parent, pugi::xml_node reh);
     bool ReadSlur(Object *parent, pugi::xml_node slur);
     bool ReadTempo(Object *parent, pugi::xml_node tempo);
@@ -880,8 +883,11 @@ private:
      */
     ///@{
     // to MEI 5.0.0
+    void UpgradeKeySigTo_5_0_0(pugi::xml_node keySig);
     void UpgradePageTo_5_0_0(Page *page);
     void UpgradeMeasureTo_5_0_0(pugi::xml_node measure);
+    void UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
+    void UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement);
     void UpgradeStaffTo_5_0_0(pugi::xml_node staff);
     void UpgradeLayerElementTo_5_0_0(pugi::xml_node element);
     // to MEI 4.0.0

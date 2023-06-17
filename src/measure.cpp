@@ -24,7 +24,6 @@
 #include "ending.h"
 #include "f.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "multirest.h"
@@ -40,7 +39,6 @@
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
-#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -708,7 +706,7 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Measure::Accept(MutableFunctor &functor)
+FunctorCode Measure::Accept(Functor &functor)
 {
     return functor.VisitMeasure(this);
 }
@@ -718,7 +716,7 @@ FunctorCode Measure::Accept(ConstFunctor &functor) const
     return functor.VisitMeasure(this);
 }
 
-FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
+FunctorCode Measure::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeasureEnd(this);
 }
@@ -726,86 +724,6 @@ FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
 FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMeasureEnd(this);
-}
-
-int Measure::InitMIDI(FunctorParams *functorParams)
-{
-    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
-    assert(params);
-
-    params->m_currentTempo = m_currentTempo;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Here we need to update the m_totalTime from the starting time of the measure.
-    params->m_totalTime = m_scoreTimeOffset.back();
-
-    if (m_currentTempo != params->m_currentTempo) {
-        params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
-        params->m_currentTempo = m_currentTempo;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = this->m_currentTempo;
-
-    params->m_timemap->AddEntry(this, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
-
-    m_realTimeOffsetMilliseconds.clear();
-    // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    const double scoreTimeIncrement
-        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
-    params->m_currentScoreTime += scoreTimeIncrement;
-    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
-    params->m_multiRestFactor = 1;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    params->m_currentTempo = m_currentTempo;
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

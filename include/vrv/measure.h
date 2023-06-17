@@ -296,19 +296,40 @@ public:
     int EnclosesTime(int time) const;
 
     /**
-     * Return the real time offset in millisecond for the repeat (1-based).
+     * Read only access to m_scoreTimeOffset
      */
+    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
+
+    /**
+     * Return the real time offset in milliseconds
+     */
+    ///@{
+    double GetLastRealTimeOffset() const { return m_realTimeOffsetMilliseconds.back(); }
     double GetRealTimeOffsetMilliseconds(int repeat) const;
+    ///@}
+
+    /**
+     * Setter for the time offset
+     */
+    ///@{
+    void ClearScoreTimeOffset() { m_scoreTimeOffset.clear(); }
+    void AddScoreTimeOffset(double offset) { m_scoreTimeOffset.push_back(offset); }
+    void ClearRealTimeOffset() { m_realTimeOffsetMilliseconds.clear(); }
+    void AddRealTimeOffset(double milliseconds) { m_realTimeOffsetMilliseconds.push_back(milliseconds); }
+    ///@}
+
+    /**
+     * Setter and getter for the current tempo
+     */
+    ///@{
+    void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
+    double GetCurrentTempo() const { return m_currentTempo; }
+    ///@}
 
     /**
      * Return vector with tie endpoints for ties that start and end in current measure
      */
     std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
-
-    /**
-     * Read only access to m_scoreTimeOffset
-     */
-    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
 
     //----------//
     // Functors //
@@ -318,39 +339,11 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::InitMIDI
-     */
-    int InitMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    ///@{
-    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
-    int InitMaxMeasureDurationEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::InitOnsetOffset
-     */
-    int InitOnsetOffset(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions

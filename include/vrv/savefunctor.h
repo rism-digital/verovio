@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class saves the content of any object by calling the appropriate FileOutputStream method.
  */
-class SaveFunctor : public MutableFunctor {
+class SaveFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -54,6 +54,8 @@ public:
     FunctorCode VisitObjectEnd(Object *object) override;
     FunctorCode VisitRunningElement(RunningElement *runningElement) override;
     FunctorCode VisitRunningElementEnd(RunningElement *runningElement) override;
+    FunctorCode VisitText(Text *text) override;
+    FunctorCode VisitTextEnd(Text *text) override;
     FunctorCode VisitTupletBracket(TupletBracket *tupletBracket) override;
     FunctorCode VisitTupletBracketEnd(TupletBracket *tupletBracket) override;
     FunctorCode VisitTupletNum(TupletNum *tupletNum) override;

@@ -42,7 +42,7 @@ void Expansion::Reset()
 // Expansion functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Expansion::Accept(MutableFunctor &functor)
+FunctorCode Expansion::Accept(Functor &functor)
 {
     return functor.VisitExpansion(this);
 }
@@ -52,7 +52,7 @@ FunctorCode Expansion::Accept(ConstFunctor &functor) const
     return functor.VisitExpansion(this);
 }
 
-FunctorCode Expansion::AcceptEnd(MutableFunctor &functor)
+FunctorCode Expansion::AcceptEnd(Functor &functor)
 {
     return functor.VisitExpansionEnd(this);
 }
