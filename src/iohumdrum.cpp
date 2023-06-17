@@ -1006,6 +1006,11 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
     }
     hum::HTp keydesig = NULL;
     hum::HTp current = starttok;
+    std::string initialLabel = "";
+    if (hre.search(current->getDataType(), "^\\*\\*[ab]data-(.*)")) {
+        initialLabel = hre.getMatch(1);
+    }
+
     while (current) {
         current = current->getNextToken();
         if (!current) {
@@ -1015,9 +1020,18 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
             if (aboveQ) {
                 current->setValue("auto", "above", 1);
             }
-            else if (keydesig) {
-                current->setValue("auto", "keylabel", keydesig->substr(1));
+            if (keydesig && !keydesig->empty()) {
+                std::string label = keydesig->substr(1);
+                if (!label.empty()) {
+                    current->setValue("auto", "keylabel", label);
+                }
                 keydesig = NULL;
+            }
+            else if (!initialLabel.empty()) {
+                std::string label = initialLabel;
+                label += ":";
+                current->setValue("auto", "keylabel", label);
+                initialLabel.clear();
             }
         }
         if (!current->isInterpretation()) {
@@ -8524,7 +8538,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             setPlaceRelStaff(harm, place, false);
 
             // Add key label (for harm/rhrm/deg/degree data)
-            if (isHarm || isDegree) {
+            if (isCData || isHarm || isDegree) {
                 std::string keylabel = token->getValue("auto", "keylabel");
                 if (!keylabel.empty()) {
                     addHarmLabel(tstamp, keylabel, tracktext, place, xstaffindex + 1);
