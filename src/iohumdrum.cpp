@@ -67,6 +67,7 @@ using namespace std;
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
+#include "fing.h"
 #include "ftrem.h"
 #include "gliss.h"
 #include "hairpin.h"
@@ -916,6 +917,10 @@ bool HumdrumInput::convertHumdrum()
         return status;
     }
 
+    if (m_fing) {
+        analyzeFingerings(infile);
+    }
+
     // Reverse the order, since top part is last spine.
     reverse(staffstarts.begin(), staffstarts.end());
     calculateReverseKernIndex();
@@ -967,6 +972,107 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeFingerings -- Analyze stylings for fingering
+//    (not checking spine splits yet).
+//
+
+void HumdrumInput::analyzeFingerings(hum::HumdrumFile &infile)
+{
+    std::vector<hum::HTp> spinestarts;
+    infile.getSpineStartList(spinestarts);
+    for (int i = 0; i < (int)spinestarts.size(); i++) {
+        analyzeFingerings(spinestarts[i]);
+    }
+}
+
+void HumdrumInput::analyzeFingerings(hum::HTp sstart)
+{
+    hum::HTp current = sstart;
+    hum::HumRegex hre;
+    std::string fontsize = "";
+    std::string color = "";
+    bool boldQ = true;
+    bool italicQ = false;
+    while (current) {
+        current = current->getNextToken();
+        if (!current) {
+            break;
+        }
+        if (*current == ".") {
+            continue;
+        }
+        if (*current == "*") {
+            continue;
+        }
+        if (current->isInterpretation()) {
+            if (hre.search(current, "^\\*fs:\\s*(.*?)\\s*$")) {
+                string testfont = hre.getMatch(1);
+                if (testfont == "small") {
+                    fontsize = "x-small"; // -1 size
+                }
+                else if (testfont == "large") {
+                    fontsize = "normal"; // +1 size
+                }
+                else {
+                    fontsize = "";
+                }
+            }
+
+            if (hre.search(current, "^\\*color:\\s*(.*?)\\s*$")) {
+                std::string testcolor = hre.getMatch(1);
+                if (testcolor == "black") {
+                    color = "";
+                }
+                else if (testcolor == "#000000") {
+                    color = "";
+                }
+                else if (testcolor == "#000") {
+                    color = "";
+                }
+                else {
+                    color = testcolor;
+                }
+            }
+
+            if (*current == "*bold") {
+                boldQ = true;
+            }
+            else if (*current == "*Xbold") {
+                boldQ = false;
+            }
+
+            if (*current == "*italic") {
+                italicQ = true;
+            }
+            else if (*current == "*Xitalic") {
+                italicQ = false;
+            }
+            // add enclosure stylings here
+
+            continue;
+        }
+
+        if (!current->isData()) {
+            continue;
+        }
+
+        if (fontsize != "") {
+            current->setValue("auto", "fontsize", fontsize);
+        }
+        if (color != "") {
+            current->setValue("auto", "color", color);
+        }
+        if (!boldQ) {
+            current->setValue("auto", "unbold", 1);
+        }
+        if (italicQ) {
+            current->setValue("auto", "italic", 1);
+        }
+    }
 }
 
 //////////////////////////////
@@ -8146,41 +8252,69 @@ void HumdrumInput::insertFingerNumberInMeasure(
     const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ)
 {
 
-    Dir *dir = new Dir();
+    Fing *fing = new Fing();
     int xstaffindex = 0;
     if (staffindex >= 0) {
         xstaffindex = staffindex;
-        setStaff(dir, staffindex + 1);
+        setStaff(fing, staffindex + 1);
     }
     else {
         // data is not attached to a **kern spine since it comes before
         // any **kern data.  Treat it as attached to the bottom staff.
         // (or the top staff depending on @place="above|below".
         xstaffindex = maxstaff - 1;
-        setStaff(dir, xstaffindex + 1);
+        setStaff(fing, xstaffindex + 1);
     }
 
     Rend *rend = new Rend();
-    data_FONTSIZE fs;
-    fs.SetTerm(FONTSIZETERM_x_small);
-    rend->SetFontsize(fs);
-    rend->SetFontstyle(FONTSTYLE_normal);
     addTextElement(rend, text);
-    dir->AddChild(rend);
-    appendTypeTag(dir, "fingering");
+    fing->AddChild(rend);
+
+    std::string fontsize = token->getValue("auto", "fontsize");
+    if (fontsize == "") {
+        // default fingering size
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_small);
+        rend->SetFontsize(fs);
+    }
+    else if (fontsize == "x-small") {
+        // small fingering size
+        data_FONTSIZE fs;
+        fs.SetTerm(FONTSIZETERM_x_small);
+        rend->SetFontsize(fs);
+    }
+    else if (fontsize == "normal") {
+        // large fingering size (verovio default style)
+    }
+
+    std::string color = token->getValue("auto", "color");
+    if (color != "") {
+        rend->SetColor(color);
+    }
+
+    bool unboldQ = token->getValueBool("auto", "unbold");
+    bool italicQ = token->getValueBool("auto", "italic");
+
+    if (unboldQ) {
+        rend->SetFontweight(FONTWEIGHT_normal);
+    }
+    if (italicQ) {
+        rend->SetFontstyle(FONTSTYLE_italic);
+    }
+
     if (aboveQ) {
-        setPlaceRelStaff(dir, "above", false);
+        setPlaceRelStaff(fing, "above", false);
     }
     else {
-        setPlaceRelStaff(dir, "below", false);
+        setPlaceRelStaff(fing, "below", false);
     }
-    addChildMeasureOrSection(dir);
-    setLocationId(dir, token);
+    addChildMeasureOrSection(fing);
+    setLocationId(fing, token);
 
     // Previously used @tstamp, now use @startid of note/chord;
     // hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
-    // dir->SetTstamp(tstamp.getFloat());
-    linkFingeringToNote(dir, token, xstaffindex);
+    // fing->SetTstamp(tstamp.getFloat());
+    linkFingeringToNote(fing, token, xstaffindex);
 }
 
 //////////////////////////////
@@ -8191,7 +8325,7 @@ void HumdrumInput::insertFingerNumberInMeasure(
 //    use a @tstamp rather than a @startid to place the fingering.
 //
 
-void HumdrumInput::linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex)
+void HumdrumInput::linkFingeringToNote(Fing *fing, hum::HTp token, int xstaffindex)
 {
     // token should be a **fing, so search for the **kern that it
     // matches to the left, and then search for the last non-null
@@ -8226,7 +8360,7 @@ void HumdrumInput::linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex
     if (!linkednote) {
         // use a timestamp to place the fingering
         hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
-        dir->SetTstamp(tstamp.getFloat());
+        fing->SetTstamp(tstamp.getFloat());
     }
     else {
         std::string startid;
@@ -8236,7 +8370,7 @@ void HumdrumInput::linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex
         else {
             startid = getLocationId("note", linkednote);
         }
-        dir->SetStartid("#" + startid);
+        fing->SetStartid("#" + startid);
     }
 }
 
