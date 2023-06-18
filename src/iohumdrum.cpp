@@ -1516,7 +1516,7 @@ void HumdrumInput::analyzeTextInterpretation(hum::HTp starttok)
                 continue;
             }
             std::string text = *current;
-            hre.replaceDestructive(text, "&nbsp;", " ", "g");
+            hre.replaceDestructive(text, "&#160;", " ", "g");
             current->setValue("auto", "text", text);
         }
 
@@ -16783,7 +16783,7 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
         std::string dyntext = getLayoutParameter(dyntok, "DY", "t", "", "");
         if (!dyntext.empty()) {
             hum::HumRegex hre;
-            hre.replaceDestructive(dyntext, dynamic, "%s", "g");
+            hre.replaceDestructive(dyntext, dynamic + " ", "%s", "g");
             dynamic = dyntext;
         }
 
@@ -16936,7 +16936,7 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
             fs.SetTerm(FONTSIZETERM_large);
             rend->SetFontsize(fs);
             // addTextElement(rend, prefix);
-            std::string newtext = dynamic + "&#160;";
+            std::string newtext = dynamic;
             addTextElement(rend, newtext);
             // addTextElement(rend, postfix);
             if (!dcolor.empty()) {
