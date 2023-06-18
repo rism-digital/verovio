@@ -25696,6 +25696,13 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
     if (turnstart == -1) {
         return;
     }
+    bool singleQ = false;
+    if (turnstart == turnend) {
+        LogWarning(
+            "Humdrum: Single turn character on line %d, field, %d\n", token->getLineNumber(), token->getFieldNumber());
+        singleQ = true;
+    }
+
     std::string turnstr = tok.substr(turnstart, turnend - turnstart + 1);
 
     if (turnstr.empty()) {
@@ -25719,6 +25726,9 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
     Turn *turn = new Turn();
     appendElement(m_measure, turn);
     setStaff(turn, staff);
+    if (singleQ) {
+        turn->SetColor("red");
+    }
 
     if (delayedQ) {
         turn->SetDelayed(BOOLEAN_true);
