@@ -735,18 +735,6 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
     return { min, max };
 }
 
-void Alignment::AddToAccidSpace(Accid *accid)
-{
-    assert(accid);
-
-    // Do not added them if no @accid (e.g., @accid.ges only)
-    if (!accid->HasAccid()) return;
-
-    AlignmentReference *reference = this->GetReferenceWithElement(accid);
-    assert(reference);
-    reference->AddToAccidSpace(accid);
-}
-
 int Alignment::HorizontalSpaceForDuration(
     double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
@@ -807,7 +795,6 @@ void AlignmentReference::Reset()
     Object::Reset();
     this->ResetNInteger();
 
-    m_accidSpace.clear();
     m_layerCount = 0;
 }
 
@@ -844,33 +831,6 @@ void AlignmentReference::AddChild(Object *child)
     Modify();
 }
 
-void AlignmentReference::AddToAccidSpace(Accid *accid)
-{
-    assert(accid);
-
-    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end()) return;
-
-    m_accidSpace.push_back(accid);
-}
-
-void AlignmentReference::AdjustAccidWithAccidSpace(
-    Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids)
-{
-    std::vector<Accid *> leftAccids;
-    const ArrayOfObjects &children = this->GetChildren();
-
-    // bottom one
-    for (Object *child : children) {
-        // if accidental has unison overlap, ignore elements on other layers for overlap
-        if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
-            continue;
-        accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
-    }
-
-    // Mark as adjusted (even if position was not altered)
-    adjustedAccids.insert(accid);
-}
-
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
 {
     for (const auto child : this->GetChildren()) {
@@ -896,38 +856,6 @@ bool AlignmentReference::HasCrossStaffElements() const
     }
 
     return false;
-}
-
-void AlignmentReference::SetAccidLayerAlignment()
-{
-    const ArrayOfObjects &children = this->GetChildren();
-    for (Accid *accid : m_accidSpace) {
-        if (accid->IsAlignedWithSameLayer()) continue;
-
-        Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
-        const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](Object *object) {
-            if (!object->Is(NOTE)) return false;
-            Note *otherNote = vrv_cast<Note *>(object);
-            // in case notes are in unison but have different accidentals
-            return parentNote && parentNote->IsUnisonWith(otherNote, true)
-                && !parentNote->IsUnisonWith(otherNote, false);
-        });
-
-        if (!hasUnisonOverlap) continue;
-
-        Chord *chord = vrv_cast<Chord *>(accid->GetFirstAncestor(CHORD));
-        // no chord, so align only parent note
-        if (!chord) {
-            accid->IsAlignedWithSameLayer(true);
-            continue;
-        }
-        // we have chord ancestor, so need to align all of its accidentals
-        ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
-        std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
-            Accid *accid = vrv_cast<Accid *>(object);
-            accid->IsAlignedWithSameLayer(true);
-        });
-    }
 }
 
 FunctorCode AlignmentReference::Accept(Functor &functor)
