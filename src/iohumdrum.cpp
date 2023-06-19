@@ -20439,6 +20439,11 @@ Beam *HumdrumInput::insertBeam(
     std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *beam = new Beam();
+    if (tg.token->find("yy") != std::string::npos) {
+        // Ignore beam when token is suppressed with yy signifier
+        beam->SetType("invisible");
+        beam->SetColor("transparent");
+    }
     appendElement(elements, pointers, beam);
     elements.push_back("beam");
     pointers.push_back((void *)beam);
@@ -20447,13 +20452,18 @@ Beam *HumdrumInput::insertBeam(
 
 //////////////////////////////
 //
-// HumdrumInput::insertGBeam --
+// HumdrumInput::insertGBeam -- insert beam for grace notes
 //
 
 Beam *HumdrumInput::insertGBeam(
     std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *gbeam = new Beam();
+    if (tg.token->find("yy") != std::string::npos) {
+        // Ignore grace note beam when token is suppressed with yy signifier
+        gbeam->SetType("invisible");
+        gbeam->SetColor("transparent");
+    }
     appendElement(elements, pointers, gbeam);
     elements.push_back("gbeam");
     pointers.push_back((void *)gbeam);
@@ -26470,6 +26480,10 @@ void HumdrumInput::addTrill(Object *linked, hum::HTp token)
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    // Ignore tie when token is suppressed with yy signifier
+    if (token->find("yy") != std::string::npos) {
+        return;
+    }
     if (token->isMensLike()) {
         return;
     }
