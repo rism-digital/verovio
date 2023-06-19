@@ -20241,7 +20241,7 @@ Beam *HumdrumInput::insertBeam(
 
 //////////////////////////////
 //
-// HumdrumInput::insertGBeam --
+// HumdrumInput::insertGBeam -- insert beam for grace notes
 //
 
 Beam *HumdrumInput::insertGBeam(
