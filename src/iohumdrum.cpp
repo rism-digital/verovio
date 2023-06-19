@@ -8893,8 +8893,10 @@ void HumdrumInput::addHarmLabel(
     // hardwire style to circle, for now at least:
     // rend2->SetRend(TEXTRENDITION_circle);
     // and hardwire the font to sans-serif, at least for now:
-    rend2->SetColor("darkred");
-    rend2->SetFontname("sans-serif");
+    // rend2->SetColor("darkred");
+    // rend2->SetFontname("sans-serif");
+    // But now use the following line in the Humdrum data to control the style:
+    //    !!!verovio: svgCss g.key-label { fill:darkred; font-family:sans-serif; }
 
     std::u32string output;
     std::string tempChar;
