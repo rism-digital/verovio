@@ -20249,7 +20249,7 @@ Beam *HumdrumInput::insertGBeam(
 {
     Beam *gbeam = new Beam();
     if (tg.token->find("yy") != std::string::npos) {
-        // Ignore beam when token is suppressed with yy signifier
+        // Ignore grace note beam when token is suppressed with yy signifier
         gbeam->SetType("invisible");
         gbeam->SetColor("transparent");
     }
