@@ -951,8 +951,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
 
-    int x, y;
-
     Clef *clef = layer->GetClef(element);
     if (!clef) {
         keySig->SetEmptyBB();
@@ -981,7 +979,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
 
-    x = element->GetDrawingX();
+    int x = element->GetDrawingX();
     // HARDCODED
     const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
 
