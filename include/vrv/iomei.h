@@ -890,6 +890,7 @@ private:
     void UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement);
     void UpgradeStaffTo_5_0_0(pugi::xml_node staff);
     void UpgradeLayerElementTo_5_0_0(pugi::xml_node element);
+    void UpgradeRendTo_5_0_0(pugi::xml_node element);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);

@@ -15522,7 +15522,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         text->SetText(symbol);
         rend->AddChild(text);
         label->AddChild(rend);
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         if (!poststring.empty()) {
             addTextElement(label, poststring);
         }

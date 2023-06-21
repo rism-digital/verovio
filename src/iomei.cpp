@@ -7062,6 +7062,10 @@ bool MEIInput::ReadNum(Object *parent, pugi::xml_node num)
 
 bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
 {
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        UpgradeRendTo_5_0_0(rend);
+    }
+    
     Rend *vrvRend = new Rend();
     this->ReadTextElement(rend, vrvRend);
 
@@ -7082,10 +7086,10 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
         vrvRend->SetValign(VERTICALALIGNMENT_NONE);
     }
     // Previously we would use @fontame="VerovioText"
-    // Now changeto @fontfam="smufl"
+    // Now changeto @glyph.auth="smufl"
     if (vrvRend->HasFontname() && vrvRend->GetFontname() == "VerovioText") {
-        LogWarning("Using rend@fontname with 'VerovioText' is deprecated. Use 'rend@fontfam=\"smufl\"' instead");
-        vrvRend->SetFontfam("smufl");
+        LogWarning("Using rend@fontname with 'VerovioText' is deprecated. Use 'rend@glyph.auth=\"smufl\"' instead");
+        vrvRend->SetGlyphAuth("smufl");
         vrvRend->SetFontname("");
     }
 
@@ -8106,6 +8110,17 @@ void MEIInput::UpgradeLayerElementTo_5_0_0(pugi::xml_node element)
 {
     if (element.attribute("ulx")) {
         element.attribute("ulx").set_name("coord.x1");
+    }
+}
+
+
+void MEIInput::UpgradeRendTo_5_0_0(pugi::xml_node element)
+{
+    if (element.attribute("fontfam")) {
+        std::string value = element.attribute("fontfam").value();
+        if (value == "smufl") {
+            element.attribute("fontfam").set_name("glyph.auth");
+        }
     }
 }
 
