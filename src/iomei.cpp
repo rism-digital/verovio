@@ -7065,7 +7065,7 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
     if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
         UpgradeRendTo_5_0_0(rend);
     }
-    
+
     Rend *vrvRend = new Rend();
     this->ReadTextElement(rend, vrvRend);
 
@@ -8112,7 +8112,6 @@ void MEIInput::UpgradeLayerElementTo_5_0_0(pugi::xml_node element)
         element.attribute("ulx").set_name("coord.x1");
     }
 }
-
 
 void MEIInput::UpgradeRendTo_5_0_0(pugi::xml_node element)
 {
