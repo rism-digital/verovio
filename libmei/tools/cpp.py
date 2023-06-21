@@ -225,7 +225,7 @@ class {elementNameUpper} : public Element{attClasses} {{
 
 public:
     bool Read(pugi::xml_node element, bool removeAttr = false);
-    bool Write(pugi::xml_node element);
+    bool Write(pugi::xml_node element, const std::string &xmlId = "");
     void Reset();
 }};
 """
@@ -238,6 +238,7 @@ ELEMENTCLASS_CPP = """{elementNameUpper}::{elementNameUpper}() :{attClasses}
 
 bool {elementNameUpper}::Read({readParam})
 {{
+    if (element.attribute("xml:id")) m_xmlId = element.attribute("xml:id").value();
     bool hasAttribute = false;{elementRead}
     return hasAttribute;
 }}
@@ -245,6 +246,7 @@ bool {elementNameUpper}::Read({readParam})
 bool {elementNameUpper}::Write({writeParam})
 {{
     element.set_name("{elementNameLower}");
+    if (xmlId.size() > 0) element.append_attribute("xml:id") = xmlId.c_str();
     bool hasAttribute = false;{elementWrite}
     return hasAttribute;
 }}
@@ -1067,10 +1069,10 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                 element_write.append(f"\n    hasAttribute = (Write{att_str}(element) || hasAttribute);")
                 element_reset.append(f"\n    Reset{att_str}();")
 
-            read_param = "pugi::xml_node, bool"
+            read_param = "pugi::xml_node element, bool"
             if element_read:
                 read_param = "pugi::xml_node element, bool removeAttr"
-            write_param = "pugi::xml_node element"
+            write_param = "pugi::xml_node element, const std::string &xmlId"
 
             consvars = {
                 'elementNameUpper': schema.cc(element),
