@@ -1006,7 +1006,7 @@ def create_element_classes(cpp_ns: str, schema, outdir: Path):
                     lg.debug("Skipping attributes within class")
                     continue
 
-                element_att_classes.append(f", public Att{schema.cc(schema.strpatt(attribute))} ")
+                element_att_classes.append(f", public Att{schema.cc(schema.strpatt(attribute))}")
 
                 # figure out includes
                 if attribute in schema.inverse_attribute_group_structure:
