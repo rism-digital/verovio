@@ -950,6 +950,9 @@ void SvgDeviceContext::DrawText(
                 this->VrvTextFont();
                 textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
             }
+            if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+                textChild.append_attribute("font-style") = "normal";
+            }
         }
         else {
             textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
