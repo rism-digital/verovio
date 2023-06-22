@@ -115,11 +115,6 @@ FunctorCode TransposeFunctor::VisitNote(Note *note)
     return FUNCTOR_SIBLINGS;
 }
 
-FunctorCode TransposeFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
-{
-    return FUNCTOR_CONTINUE;
-}
-
 FunctorCode TransposeFunctor::VisitRest(Rest *rest)
 {
     if ((!rest->HasOloc() || !rest->HasPloc()) && !rest->HasLoc()) return FUNCTOR_SIBLINGS;
@@ -236,11 +231,6 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
     // Evaluate functor on scoreDef
     scoreDef->Process(*this);
 
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode TransposeFunctor::VisitSystem(System *system)
-{
     return FUNCTOR_CONTINUE;
 }
 

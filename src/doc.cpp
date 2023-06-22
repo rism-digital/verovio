@@ -1369,15 +1369,14 @@ void Doc::TransposeDoc()
 
     const bool selectedOnly = m_options->m_transposeSelectedOnly.GetValue();
 
-    TransposeFunctor transpose(this, &transposer);
-    transpose.SetVisibleOnly(selectedOnly);
-
     if (m_options->m_transpose.IsSet()) {
         // Transpose the entire document
         if (m_options->m_transposeMdiv.IsSet()) {
             LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
                 m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
         }
+        TransposeFunctor transpose(this, &transposer);
+        transpose.SetVisibleOnly(selectedOnly);
         transpose.SetTransposition(m_options->m_transpose.GetValue());
         this->Process(transpose);
     }
@@ -1385,9 +1384,11 @@ void Doc::TransposeDoc()
         // Transpose mdivs individually
         std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
         for (const std::string &id : ids) {
-            transpose.SetSelectedMdivID(id);
-            transpose.SetTransposition(m_options->m_transposeMdiv.GetStrValue({ id }));
-            this->Process(transpose);
+            TransposeSelectedMdivFunctor transposeSelectedMdiv(this, &transposer);
+            transposeSelectedMdiv.SetVisibleOnly(selectedOnly);
+            transposeSelectedMdiv.SetSelectedMdivID(id);
+            transposeSelectedMdiv.SetTransposition(m_options->m_transposeMdiv.GetStrValue({ id }));
+            this->Process(transposeSelectedMdiv);
         }
     }
 

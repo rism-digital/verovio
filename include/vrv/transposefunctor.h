@@ -35,12 +35,9 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
-     * Setter for various properties
+     * Setter for the transposition
      */
-    ///@{
     void SetTransposition(const std::string &transposition) { m_transposition = transposition; }
-    void SetSelectedMdivID(const std::string &selectedID) { m_selectedMdivID = selectedID; }
-    ///@}
 
     /*
      * Functor interface
@@ -50,10 +47,8 @@ public:
     FunctorCode VisitKeySig(KeySig *keySig) override;
     FunctorCode VisitMdiv(Mdiv *mdiv) override;
     FunctorCode VisitNote(Note *note) override;
-    FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScore(Score *score) override;
-    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:
@@ -71,10 +66,6 @@ protected:
 private:
     // The transposition to be applied
     std::string m_transposition;
-    // The mdiv selected for transposition
-    std::string m_selectedMdivID;
-    // The list of current (nested) mdivs
-    std::list<std::string> m_currentMdivIDs;
 };
 
 //----------------------------------------------------------------------------
