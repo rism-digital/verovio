@@ -96,7 +96,6 @@ FunctorCode TransposeFunctor::VisitKeySig(KeySig *keySig)
 
 FunctorCode TransposeFunctor::VisitMdiv(Mdiv *mdiv)
 {
-    m_currentMdivIDs.push_back(mdiv->GetID());
     m_keySigForStaffN.clear();
 
     return FUNCTOR_CONTINUE;
@@ -118,10 +117,6 @@ FunctorCode TransposeFunctor::VisitNote(Note *note)
 
 FunctorCode TransposeFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
-    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(MDIV)) {
-        m_currentMdivIDs.pop_back();
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -195,12 +190,6 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
 {
     ScoreDef *scoreDef = score->GetScoreDef();
 
-    // Check whether we are in the selected mdiv
-    if (!m_selectedMdivID.empty()
-        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
-        return FUNCTOR_CONTINUE;
-    }
-
     if (m_transposer->IsValidIntervalName(m_transposition)) {
         m_transposer->SetTransposition(m_transposition);
     }
@@ -252,12 +241,6 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
 
 FunctorCode TransposeFunctor::VisitSystem(System *system)
 {
-    // Check whether we are in the selected mdiv
-    if (!m_selectedMdivID.empty()
-        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
-        return FUNCTOR_SIBLINGS;
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -272,21 +255,40 @@ TransposeSelectedMdivFunctor::TransposeSelectedMdivFunctor(Doc *doc, Transposer 
 
 FunctorCode TransposeSelectedMdivFunctor::VisitMdiv(Mdiv *mdiv)
 {
+    TransposeFunctor::VisitMdiv(mdiv);
+
+    m_currentMdivIDs.push_back(mdiv->GetID());
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode TransposeSelectedMdivFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
 {
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(MDIV)) {
+        m_currentMdivIDs.pop_back();
+    }
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode TransposeSelectedMdivFunctor::VisitScore(Score *score)
 {
-    return FUNCTOR_CONTINUE;
+    // Check whether we are in the selected mdiv
+    if (!m_selectedMdivID.empty()
+        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    return TransposeFunctor::VisitScore(score);
 }
 
 FunctorCode TransposeSelectedMdivFunctor::VisitSystem(System *system)
 {
+    // Check whether we are in the selected mdiv
+    if (!m_selectedMdivID.empty()
+        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
