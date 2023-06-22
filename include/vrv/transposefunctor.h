@@ -78,6 +78,56 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// TransposeSelectedMdivFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class transposes the selected mdiv.
+ */
+class TransposeSelectedMdivFunctor : public TransposeFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    TransposeSelectedMdivFunctor(Doc *doc, Transposer *transposer);
+    virtual ~TransposeSelectedMdivFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Setter for the selected Mdiv
+     */
+    void SetSelectedMdivID(const std::string &selectedID) { m_selectedMdivID = selectedID; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitMdiv(Mdiv *mdiv) override;
+    FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The mdiv selected for transposition
+    std::string m_selectedMdivID;
+    // The list of current (nested) mdivs
+    std::list<std::string> m_currentMdivIDs;
+};
+
+//----------------------------------------------------------------------------
 // TransposeToSoundingPitchFunctor
 //----------------------------------------------------------------------------
 

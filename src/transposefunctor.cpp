@@ -262,6 +262,35 @@ FunctorCode TransposeFunctor::VisitSystem(System *system)
 }
 
 //----------------------------------------------------------------------------
+// TransposeSelectedMdivFunctor
+//----------------------------------------------------------------------------
+
+TransposeSelectedMdivFunctor::TransposeSelectedMdivFunctor(Doc *doc, Transposer *transposer)
+    : TransposeFunctor(doc, transposer)
+{
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitMdiv(Mdiv *mdiv)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitSystem(System *system)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // TransposeToSoundingPitchFunctor
 //----------------------------------------------------------------------------
 
