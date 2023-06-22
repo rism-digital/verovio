@@ -29,7 +29,6 @@ namespace vrv {
 TransposeFunctor::TransposeFunctor(Doc *doc, Transposer *transposer) : DocFunctor(doc)
 {
     m_transposer = transposer;
-    m_transposeToSoundingPitch = false;
 }
 
 FunctorCode TransposeFunctor::VisitHarm(Harm *harm)
@@ -99,7 +98,6 @@ FunctorCode TransposeFunctor::VisitMdiv(Mdiv *mdiv)
 {
     m_currentMdivIDs.push_back(mdiv->GetID());
     m_keySigForStaffN.clear();
-    m_transposeIntervalForStaffN.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -249,26 +247,6 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
     // Evaluate functor on scoreDef
     scoreDef->Process(*this);
 
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode TransposeFunctor::VisitScoreDef(ScoreDef *scoreDef)
-{
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode TransposeFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
-{
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode TransposeFunctor::VisitStaff(Staff *staff)
-{
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode TransposeFunctor::VisitStaffDef(StaffDef *staffDef)
-{
     return FUNCTOR_CONTINUE;
 }
 

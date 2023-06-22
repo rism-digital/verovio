@@ -1367,11 +1367,10 @@ void Doc::TransposeDoc()
     Transposer transposer;
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
 
-    TransposeFunctor transpose(this, &transposer);
+    const bool selectedOnly = m_options->m_transposeSelectedOnly.GetValue();
 
-    if (m_options->m_transposeSelectedOnly.GetValue() == false) {
-        transpose.SetVisibleOnly(false);
-    }
+    TransposeFunctor transpose(this, &transposer);
+    transpose.SetVisibleOnly(selectedOnly);
 
     if (m_options->m_transpose.IsSet()) {
         // Transpose the entire document
@@ -1394,11 +1393,9 @@ void Doc::TransposeDoc()
 
     if (m_options->m_transposeToSoundingPitch.GetValue()) {
         // Transpose to sounding pitch
-        transpose.SetSelectedMdivID("");
-        transpose.SetTransposition("");
-        transposer.SetTransposition(0);
-        transpose.SetTransposeToSoundingPitch();
-        this->Process(transpose);
+        TransposeToSoundingPitchFunctor transposeToSoundingPitch(this, &transposer);
+        transposeToSoundingPitch.SetVisibleOnly(selectedOnly);
+        this->Process(transposeToSoundingPitch);
     }
 }
 

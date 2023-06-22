@@ -32,7 +32,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return true; }
+    bool ImplementsEndInterface() const override { return false; }
 
     /*
      * Setter for various properties
@@ -40,7 +40,6 @@ public:
     ///@{
     void SetTransposition(const std::string &transposition) { m_transposition = transposition; }
     void SetSelectedMdivID(const std::string &selectedID) { m_selectedMdivID = selectedID; }
-    void SetTransposeToSoundingPitch() { m_transposeToSoundingPitch = true; }
     ///@}
 
     /*
@@ -54,10 +53,6 @@ public:
     FunctorCode VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitScore(Score *score) override;
-    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
-    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
-    FunctorCode VisitStaff(Staff *staff) override;
-    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}
 
@@ -80,10 +75,6 @@ private:
     std::string m_selectedMdivID;
     // The list of current (nested) mdivs
     std::list<std::string> m_currentMdivIDs;
-    // Transpose to sounding pitch by evaluating @trans.semi ?
-    bool m_transposeToSoundingPitch;
-    // The transposition interval for staffN
-    std::map<int, int> m_transposeIntervalForStaffN;
 };
 
 //----------------------------------------------------------------------------
