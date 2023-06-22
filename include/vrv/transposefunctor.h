@@ -67,9 +67,13 @@ private:
     //
 public:
     //
-private:
+protected:
     // The transposer
     Transposer *m_transposer;
+    // The current KeySig for staffN (ScoreDef key signatures are mapped to -1)
+    std::map<int, const KeySig *> m_keySigForStaffN;
+
+private:
     // The transposition to be applied
     std::string m_transposition;
     // The mdiv selected for transposition
@@ -78,8 +82,6 @@ private:
     std::list<std::string> m_currentMdivIDs;
     // Transpose to sounding pitch by evaluating @trans.semi ?
     bool m_transposeToSoundingPitch;
-    // The current KeySig for staffN (ScoreDef key signatures are mapped to -1)
-    std::map<int, const KeySig *> m_keySigForStaffN;
     // The transposition interval for staffN
     std::map<int, int> m_transposeIntervalForStaffN;
 };
