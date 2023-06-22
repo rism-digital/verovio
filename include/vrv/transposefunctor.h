@@ -84,6 +84,51 @@ private:
     std::map<int, int> m_transposeIntervalForStaffN;
 };
 
+//----------------------------------------------------------------------------
+// TransposeToSoundingPitchFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class transposes the content to sounding pitch (by evaluating @trans.semi).
+ */
+class TransposeToSoundingPitchFunctor : public TransposeFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    TransposeToSoundingPitchFunctor(Doc *doc, Transposer *transposer);
+    virtual ~TransposeToSoundingPitchFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitMdiv(Mdiv *mdiv) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitScoreDefEnd(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The transposition interval for staffN
+    std::map<int, int> m_transposeIntervalForStaffN;
+};
+
 } // namespace vrv
 
 #endif // __VRV_TRANSPOSEFUNCTOR_H__

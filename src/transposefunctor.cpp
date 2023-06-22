@@ -362,4 +362,43 @@ FunctorCode TransposeFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// TransposeToSoundingPitchFunctor
+//----------------------------------------------------------------------------
+
+TransposeToSoundingPitchFunctor::TransposeToSoundingPitchFunctor(Doc *doc, Transposer *transposer)
+    : TransposeFunctor(doc, transposer)
+{
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitMdiv(Mdiv *mdiv)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitScore(Score *score)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitStaff(Staff *staff)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv
