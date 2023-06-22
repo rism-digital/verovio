@@ -356,11 +356,7 @@ FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDefEnd(ScoreDef *scoreDef
 
 FunctorCode TransposeToSoundingPitchFunctor::VisitStaff(Staff *staff)
 {
-    int transposeInterval = 0;
-    if (staff->HasN() && (m_transposeIntervalForStaffN.count(staff->GetN()) > 0)) {
-        transposeInterval = m_transposeIntervalForStaffN.at(staff->GetN());
-    }
-    m_transposer->SetTransposition(transposeInterval);
+    this->UpdateTranspositionFromStaffN(staff);
 
     return FUNCTOR_CONTINUE;
 }
@@ -385,14 +381,19 @@ FunctorCode TransposeToSoundingPitchFunctor::VisitStaffDef(StaffDef *staffDef)
         staffDef->ResetTransposition();
     }
     else {
-        int transposeInterval = 0;
-        if (staffDef->HasN() && (m_transposeIntervalForStaffN.count(staffDef->GetN()) > 0)) {
-            transposeInterval = m_transposeIntervalForStaffN.at(staffDef->GetN());
-        }
-        m_transposer->SetTransposition(transposeInterval);
+        this->UpdateTranspositionFromStaffN(staffDef);
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+void TransposeToSoundingPitchFunctor::UpdateTranspositionFromStaffN(const AttNInteger *staffN)
+{
+    int transposeInterval = 0;
+    if (staffN->HasN() && (m_transposeIntervalForStaffN.count(staffN->GetN()) > 0)) {
+        transposeInterval = m_transposeIntervalForStaffN.at(staffN->GetN());
+    }
+    m_transposer->SetTransposition(transposeInterval);
 }
 
 } // namespace vrv

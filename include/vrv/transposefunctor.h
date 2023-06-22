@@ -123,7 +123,9 @@ public:
 protected:
     //
 private:
-    //
+    // Update the current transposition
+    void UpdateTranspositionFromStaffN(const AttNInteger *staffN);
+
 public:
     //
 private:
