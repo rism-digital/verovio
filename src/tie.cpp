@@ -104,28 +104,29 @@ bool Tie::AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *cu
     }
     if ((startNote->GetDrawingStemDir() == STEMDIRECTION_down) && (drawingCurveDir == curvature_CURVEDIR_below)) {
         bezier[3].x = endNote->GetDrawingX() - drawingUnit / 2;
-        bezier[3].y += overlap / 2;
     }
     else {
         bezier[3].x = endNote->GetDrawingX() + drawingRadius;
     }
 
+    const int endpointShift = overlap * 0.6;
     if (drawingCurveDir == curvature_CURVEDIR_below) {
         if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc()) {
-            bezier[0].y += overlap / 2;
+            bezier[0].y += endpointShift;
             bezier[3].y = bezier[0].y;
         }
         else if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc()) {
-            bezier[3].y += overlap / 2;
+            bezier[3].y += endpointShift;
             bezier[0].y = bezier[3].y;
         }
     }
     else if (drawingCurveDir == curvature_CURVEDIR_above) {
         if (startNote->GetDrawingLoc() > endNote->GetDrawingLoc()) {
+            bezier[0].y += endpointShift;
             bezier[3].y = bezier[0].y;
         }
         else if (startNote->GetDrawingLoc() < endNote->GetDrawingLoc()) {
-            bezier[3].y += overlap / 2;
+            bezier[3].y += endpointShift;
             bezier[0].y = bezier[3].y;
         }
     }
