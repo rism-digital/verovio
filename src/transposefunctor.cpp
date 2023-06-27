@@ -29,7 +29,6 @@ namespace vrv {
 TransposeFunctor::TransposeFunctor(Doc *doc, Transposer *transposer) : DocFunctor(doc)
 {
     m_transposer = transposer;
-    m_transposeToSoundingPitch = false;
 }
 
 FunctorCode TransposeFunctor::VisitHarm(Harm *harm)
@@ -97,9 +96,7 @@ FunctorCode TransposeFunctor::VisitKeySig(KeySig *keySig)
 
 FunctorCode TransposeFunctor::VisitMdiv(Mdiv *mdiv)
 {
-    m_currentMdivIDs.push_back(mdiv->GetID());
     m_keySigForStaffN.clear();
-    m_transposeIntervalForStaffN.clear();
 
     return FUNCTOR_CONTINUE;
 }
@@ -116,15 +113,6 @@ FunctorCode TransposeFunctor::VisitNote(Note *note)
     note->UpdateFromTransPitch(pitch, hasKeySig);
 
     return FUNCTOR_SIBLINGS;
-}
-
-FunctorCode TransposeFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
-{
-    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(MDIV)) {
-        m_currentMdivIDs.pop_back();
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode TransposeFunctor::VisitRest(Rest *rest)
@@ -197,19 +185,6 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
 {
     ScoreDef *scoreDef = score->GetScoreDef();
 
-    // Check whether we transpose to sounding pitch
-    if (m_transposeToSoundingPitch) {
-        // Evaluate functor on scoreDef
-        scoreDef->Process(*this);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Check whether we are in the selected mdiv
-    if (!m_selectedMdivID.empty()
-        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
-        return FUNCTOR_CONTINUE;
-    }
-
     if (m_transposer->IsValidIntervalName(m_transposition)) {
         m_transposer->SetTransposition(m_transposition);
     }
@@ -259,31 +234,103 @@ FunctorCode TransposeFunctor::VisitScore(Score *score)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TransposeFunctor::VisitScoreDef(ScoreDef *scoreDef)
+//----------------------------------------------------------------------------
+// TransposeSelectedMdivFunctor
+//----------------------------------------------------------------------------
+
+TransposeSelectedMdivFunctor::TransposeSelectedMdivFunctor(Doc *doc, Transposer *transposer)
+    : TransposeFunctor(doc, transposer)
 {
-    if (m_transposeToSoundingPitch) {
-        // Set the transposition in order to transpose common key signatures
-        // (i.e. encoded as ScoreDef attributes or direct KeySig children)
-        const std::vector<int> staffNs = scoreDef->GetStaffNs();
-        if (staffNs.empty()) {
-            int transposeInterval = 0;
-            if (!m_transposeIntervalForStaffN.empty()) {
-                transposeInterval = m_transposeIntervalForStaffN.begin()->second;
-            }
-            m_transposer->SetTransposition(transposeInterval);
-        }
-        else {
-            this->VisitStaffDef(scoreDef->GetStaffDef(staffNs.front()));
-        }
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitMdiv(Mdiv *mdiv)
+{
+    TransposeFunctor::VisitMdiv(mdiv);
+
+    m_currentMdivIDs.push_back(mdiv->GetID());
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitPageMilestone(PageMilestoneEnd *pageMilestoneEnd)
+{
+    if (pageMilestoneEnd->GetStart() && pageMilestoneEnd->GetStart()->Is(MDIV)) {
+        m_currentMdivIDs.pop_back();
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitScore(Score *score)
+{
+    // Check whether we are in the selected mdiv
+    if (!m_selectedMdivID.empty()
+        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    return TransposeFunctor::VisitScore(score);
+}
+
+FunctorCode TransposeSelectedMdivFunctor::VisitSystem(System *system)
+{
+    // Check whether we are in the selected mdiv
+    if (!m_selectedMdivID.empty()
+        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
+        return FUNCTOR_SIBLINGS;
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TransposeFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
+//----------------------------------------------------------------------------
+// TransposeToSoundingPitchFunctor
+//----------------------------------------------------------------------------
+
+TransposeToSoundingPitchFunctor::TransposeToSoundingPitchFunctor(Doc *doc, Transposer *transposer)
+    : TransposeFunctor(doc, transposer)
+{
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitMdiv(Mdiv *mdiv)
+{
+    TransposeFunctor::VisitMdiv(mdiv);
+
+    m_transposeIntervalForStaffN.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitScore(Score *score)
+{
+    // Evaluate functor on scoreDef
+    score->GetScoreDef()->Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    // Set the transposition in order to transpose common key signatures
+    // (i.e. encoded as ScoreDef attributes or direct KeySig children)
+    const std::vector<int> staffNs = scoreDef->GetStaffNs();
+    if (staffNs.empty()) {
+        int transposeInterval = 0;
+        if (!m_transposeIntervalForStaffN.empty()) {
+            transposeInterval = m_transposeIntervalForStaffN.begin()->second;
+        }
+        m_transposer->SetTransposition(transposeInterval);
+    }
+    else {
+        this->VisitStaffDef(scoreDef->GetStaffDef(staffNs.front()));
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
 {
     const bool hasScoreDefKeySig = (m_keySigForStaffN.count(-1) > 0);
-    if (m_transposeToSoundingPitch && hasScoreDefKeySig) {
+    if (hasScoreDefKeySig) {
         bool showWarning = false;
         // Check if some staves are untransposed
         const int mapEntryCount = static_cast<int>(m_transposeIntervalForStaffN.size());
@@ -306,60 +353,46 @@ FunctorCode TransposeFunctor::VisitScoreDefEnd(ScoreDef *scoreDef)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TransposeFunctor::VisitStaff(Staff *staff)
+FunctorCode TransposeToSoundingPitchFunctor::VisitStaff(Staff *staff)
 {
-    if (m_transposeToSoundingPitch) {
-        int transposeInterval = 0;
-        if (staff->HasN() && (m_transposeIntervalForStaffN.count(staff->GetN()) > 0)) {
-            transposeInterval = m_transposeIntervalForStaffN.at(staff->GetN());
-        }
-        m_transposer->SetTransposition(transposeInterval);
+    this->UpdateTranspositionFromStaffN(staff);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TransposeToSoundingPitchFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    // Retrieve the key signature
+    const KeySig *keySig = vrv_cast<const KeySig *>(staffDef->FindDescendantByType(KEYSIG));
+    if (!keySig) {
+        const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(staffDef->GetFirstAncestor(SCOREDEF));
+        keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
+    }
+    // Determine and store the transposition interval (based on keySig)
+    if (keySig && staffDef->HasTransSemi() && staffDef->HasN()) {
+        const int fifths = keySig->GetFifthsInt();
+        int semitones = staffDef->GetTransSemi();
+        // Factor out octave transpositions
+        const int sign = (semitones >= 0) ? +1 : -1;
+        semitones = sign * (std::abs(semitones) % 24);
+        m_transposer->SetTransposition(fifths, std::to_string(semitones));
+        m_transposeIntervalForStaffN[staffDef->GetN()] = m_transposer->GetTranspositionIntervalClass();
+        staffDef->ResetTransposition();
+    }
+    else {
+        this->UpdateTranspositionFromStaffN(staffDef);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode TransposeFunctor::VisitStaffDef(StaffDef *staffDef)
+void TransposeToSoundingPitchFunctor::UpdateTranspositionFromStaffN(const AttNInteger *staffN)
 {
-    if (m_transposeToSoundingPitch) {
-        // Retrieve the key signature
-        const KeySig *keySig = vrv_cast<const KeySig *>(staffDef->FindDescendantByType(KEYSIG));
-        if (!keySig) {
-            const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(staffDef->GetFirstAncestor(SCOREDEF));
-            keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
-        }
-        // Determine and store the transposition interval (based on keySig)
-        if (keySig && staffDef->HasTransSemi() && staffDef->HasN()) {
-            const int fifths = keySig->GetFifthsInt();
-            int semitones = staffDef->GetTransSemi();
-            // Factor out octave transpositions
-            const int sign = (semitones >= 0) ? +1 : -1;
-            semitones = sign * (std::abs(semitones) % 24);
-            m_transposer->SetTransposition(fifths, std::to_string(semitones));
-            m_transposeIntervalForStaffN[staffDef->GetN()] = m_transposer->GetTranspositionIntervalClass();
-            staffDef->ResetTransposition();
-        }
-        else {
-            int transposeInterval = 0;
-            if (staffDef->HasN() && (m_transposeIntervalForStaffN.count(staffDef->GetN()) > 0)) {
-                transposeInterval = m_transposeIntervalForStaffN.at(staffDef->GetN());
-            }
-            m_transposer->SetTransposition(transposeInterval);
-        }
+    int transposeInterval = 0;
+    if (staffN->HasN() && (m_transposeIntervalForStaffN.count(staffN->GetN()) > 0)) {
+        transposeInterval = m_transposeIntervalForStaffN.at(staffN->GetN());
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-FunctorCode TransposeFunctor::VisitSystem(System *system)
-{
-    // Check whether we are in the selected mdiv
-    if (!m_selectedMdivID.empty()
-        && (std::find(m_currentMdivIDs.begin(), m_currentMdivIDs.end(), m_selectedMdivID) == m_currentMdivIDs.end())) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
+    m_transposer->SetTransposition(transposeInterval);
 }
 
 } // namespace vrv

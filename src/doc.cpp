@@ -1367,11 +1367,7 @@ void Doc::TransposeDoc()
     Transposer transposer;
     transposer.SetBase600(); // Set extended chromatic alteration mode (allowing more than double sharps/flats)
 
-    TransposeFunctor transpose(this, &transposer);
-
-    if (m_options->m_transposeSelectedOnly.GetValue() == false) {
-        transpose.SetVisibleOnly(false);
-    }
+    const bool selectedOnly = m_options->m_transposeSelectedOnly.GetValue();
 
     if (m_options->m_transpose.IsSet()) {
         // Transpose the entire document
@@ -1379,6 +1375,8 @@ void Doc::TransposeDoc()
             LogWarning("\"%s\" is ignored when \"%s\" is set as well. Please use only one of the two options.",
                 m_options->m_transposeMdiv.GetKey().c_str(), m_options->m_transpose.GetKey().c_str());
         }
+        TransposeFunctor transpose(this, &transposer);
+        transpose.SetVisibleOnly(selectedOnly);
         transpose.SetTransposition(m_options->m_transpose.GetValue());
         this->Process(transpose);
     }
@@ -1386,19 +1384,19 @@ void Doc::TransposeDoc()
         // Transpose mdivs individually
         std::set<std::string> ids = m_options->m_transposeMdiv.GetKeys();
         for (const std::string &id : ids) {
-            transpose.SetSelectedMdivID(id);
-            transpose.SetTransposition(m_options->m_transposeMdiv.GetStrValue({ id }));
-            this->Process(transpose);
+            TransposeSelectedMdivFunctor transposeSelectedMdiv(this, &transposer);
+            transposeSelectedMdiv.SetVisibleOnly(selectedOnly);
+            transposeSelectedMdiv.SetSelectedMdivID(id);
+            transposeSelectedMdiv.SetTransposition(m_options->m_transposeMdiv.GetStrValue({ id }));
+            this->Process(transposeSelectedMdiv);
         }
     }
 
     if (m_options->m_transposeToSoundingPitch.GetValue()) {
         // Transpose to sounding pitch
-        transpose.SetSelectedMdivID("");
-        transpose.SetTransposition("");
-        transposer.SetTransposition(0);
-        transpose.SetTransposeToSoundingPitch();
-        this->Process(transpose);
+        TransposeToSoundingPitchFunctor transposeToSoundingPitch(this, &transposer);
+        transposeToSoundingPitch.SetVisibleOnly(selectedOnly);
+        this->Process(transposeToSoundingPitch);
     }
 }
 
