@@ -400,6 +400,16 @@ bool Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
                 endPoint.x -= r2 + drawingUnit / 2;
             }
         }
+        else {
+            // Prevent collisions with articulations
+            if (startNote && startNote->FindDescendantByType(ARTIC)) {
+                startPoint.x += r1;
+            }
+            if (endNote && endNote->FindDescendantByType(ARTIC)) {
+                endPoint.x -= r2;
+            }
+        }
+        // Prevent collisions with dots
         if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
             if (isShortTie) {
                 startPoint.x += drawingUnit;
@@ -433,6 +443,13 @@ bool Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
                 startPoint.x += 2 * drawingUnit * startParentChord->GetDots();
             }
         }
+        else {
+            // Prevent collisions with articulations
+            if (startNote && startNote->FindDescendantByType(ARTIC)) {
+                startPoint.x += r1;
+            }
+        }
+        // Prevent collisions with dots
         if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
             const Dots *dots = vrv_cast<const Dots *>(startParentChord->FindDescendantByType(DOTS));
             assert(dots);
@@ -456,6 +473,12 @@ bool Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
             }
             else {
                 endPoint.x -= r2 + drawingUnit / 2;
+            }
+        }
+        else {
+            // Prevent collisions with articulations
+            if (endNote && endNote->FindDescendantByType(ARTIC)) {
+                endPoint.x -= r2;
             }
         }
     }
