@@ -213,20 +213,18 @@ bool Tie::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, 
 
     /************** x positions **************/
 
-    this->CalculateXPosition(doc, staff, startParentChord, endParentChord, spanningType, isOuterChordNote, startPoint,
-        endPoint, drawingCurveDir);
+    const bool adjustVertically = this->CalculateXPosition(doc, staff, startParentChord, endParentChord, spanningType,
+        isOuterChordNote, startPoint, endPoint, drawingCurveDir);
 
     /************** y position **************/
 
-    // shortTie correction cannot be applied for chords
-    const bool isShortTie = !startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit);
     const bool isGraceToNoteTie = (note1 && note2) && note1->IsGraceNote() && !note2->IsGraceNote();
 
     const int ySign = (drawingCurveDir == curvature_CURVEDIR_above) ? 1 : -1;
 
     startPoint.y += ySign * drawingUnit / 2;
     endPoint.y += ySign * drawingUnit / 2;
-    if (isShortTie && !isGraceToNoteTie) {
+    if (adjustVertically && !isGraceToNoteTie) {
         startPoint.y += ySign * drawingUnit;
         endPoint.y += ySign * drawingUnit;
     }
@@ -356,22 +354,21 @@ int Tie::CalculateAdjacentChordXOffset(const Doc *doc, const Staff *staff, const
     }
 }
 
-void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *startParentChord,
+bool Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *startParentChord,
     const Chord *endParentChord, int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint,
     curvature_CURVEDIR drawingCurveDir) const
 {
     const Note *startNote = dynamic_cast<const Note *>(this->GetStart());
     const Note *endNote = dynamic_cast<const Note *>(this->GetEnd());
+    const int r1 = startNote ? startNote->GetDrawingRadius(doc) : 0;
+    const int r2 = endNote ? endNote->GetDrawingRadius(doc) : 0;
 
+    // Vertical correction cannot be applied for chords
     const int drawingUnit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    bool isShortTie = false;
-    // shortTie correction cannot be applied for chords
-    if (!startParentChord && !endParentChord && (endPoint.x - startPoint.x < 4 * drawingUnit)) {
-        isShortTie = true;
-    }
+    const double minTieLength = doc->GetOptions()->m_tieMinLength.GetValue();
+    const bool isShortTie = (endPoint.x - startPoint.x < (1 + minTieLength) * drawingUnit + r1 + r2);
+    const bool adjustVertically = !startParentChord && !endParentChord && isShortTie;
 
-    int r1 = 0;
-    int r2 = 0;
     // the normal case
     if (spanningType == SPANNING_START_END) {
         if (startNote) {
@@ -383,9 +380,7 @@ void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
             startPoint.y = endPoint.y;
         }
         // isShort is never true with tstamp1
-        if (!isShortTie) {
-            if (startNote) r1 = startNote->GetDrawingRadius(doc);
-            if (endNote) r2 = endNote->GetDrawingRadius(doc);
+        if (!adjustVertically) {
             // startPoint
             if (startParentChord && startParentChord->HasAdjacentNotesInStaff(staff)) {
                 startPoint.x = this->CalculateAdjacentChordXOffset(
@@ -406,7 +401,7 @@ void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
             }
         }
         if (startParentChord && !isOuterChordNote && (startParentChord->GetDots() > 0)) {
-            if ((endPoint.x - startPoint.x) <= 4 * drawingUnit) {
+            if (isShortTie) {
                 startPoint.x += drawingUnit;
             }
             else {
@@ -422,9 +417,8 @@ void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
         if (startNote) {
             startPoint.y = startNote->GetDrawingY();
             endPoint.y = startPoint.y;
-            r1 = startNote->GetDrawingRadius(doc);
         }
-        if (!isShortTie) {
+        if (!adjustVertically) {
             if (startParentChord && startParentChord->HasAdjacentNotesInStaff(staff)) {
                 startPoint.x = this->CalculateAdjacentChordXOffset(
                     doc, staff, startParentChord, startNote, drawingCurveDir, startPoint.x, true);
@@ -451,9 +445,8 @@ void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
         if (endNote) {
             endPoint.y = endNote->GetDrawingY();
             startPoint.y = endPoint.y;
-            r2 = endNote->GetDrawingRadius(doc);
         }
-        if (!isShortTie) {
+        if (!adjustVertically) {
             // endPoint
             const Staff *endStaff = staff;
             if (endParentChord) endStaff = endParentChord->GetAncestorStaff();
@@ -466,6 +459,8 @@ void Tie::CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *st
             }
         }
     }
+
+    return adjustVertically;
 }
 
 curvature_CURVEDIR Tie::GetPreferredCurveDirection(const Layer *layer, const Note *note, const Chord *startParentChord,
