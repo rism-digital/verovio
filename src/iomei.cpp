@@ -3916,6 +3916,25 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
         }
 
+        // Add child to empty syl in facsimile mode for neume notation
+        if (success && (m_doc->GetType() == Facs) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+            ListOfObjects syls = m_doc->FindAllDescendantsByType(SYL);
+            ListOfObjects::iterator iter = syls.begin();
+            while (iter != syls.end()) {
+                if (!(*iter)->GetChildCount()) {
+                    Syl *syl = vrv_cast<Syl *>(*iter);
+                    assert(syl);
+
+                    Text *text = new Text();
+                    std::u32string str = U"";
+
+                    text->SetText(str);
+                    syl->AddChild(text);
+                }
+                ++iter;
+            }
+        }
+
         if (success && !m_hasScoreDef) {
             LogWarning("No scoreDef provided, trying to generate one...");
             success = m_doc->GenerateDocumentScoreDef();
