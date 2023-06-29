@@ -1408,7 +1408,7 @@ void Doc::ExpandExpansions()
 
     Expansion *start = dynamic_cast<Expansion *>(this->FindDescendantByID(expansionId));
     if (start == NULL) {
-        LogInfo("Import MEI: expansion ID \"%s\" not found.", expansionId.c_str());
+        LogWarning("Expansion ID '%s' not found. Nothing expanded.", expansionId.c_str());
         return;
     }
 
