@@ -129,7 +129,7 @@ const Resources *DeviceContext::GetResources(bool showWarning) const
     return m_resources;
 }
 
-void DeviceContext::SetPen(int colour, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
+void DeviceContext::SetPen(int color, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
 {
     float opacityValue;
 
@@ -154,10 +154,10 @@ void DeviceContext::SetPen(int colour, int width, int style, int dashLength, int
         default: opacityValue = 1.0; // solid brush by default
     }
 
-    m_penStack.push(Pen(colour, width, opacityValue, dashLength, gapLength, lineCap, lineJoin));
+    m_penStack.push(Pen(color, width, opacityValue, dashLength, gapLength, lineCap, lineJoin));
 }
 
-void DeviceContext::SetBrush(int colour, int opacity)
+void DeviceContext::SetBrush(int color, int opacity)
 {
     float opacityValue;
 
@@ -167,7 +167,7 @@ void DeviceContext::SetBrush(int colour, int opacity)
         default: opacityValue = 1.0; // solid brush by default
     }
 
-    m_brushStack.push(Brush(colour, opacityValue));
+    m_brushStack.push(Brush(color, opacityValue));
 }
 
 void DeviceContext::SetFont(FontInfo *font)

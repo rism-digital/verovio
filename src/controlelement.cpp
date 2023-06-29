@@ -82,7 +82,7 @@ data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment() const
 data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 {
     // Do this only for the following elements
-    if (!this->Is({ TRILL, MORDENT, ORNAM, TURN })) return defaultValue;
+    if (!this->Is({ TRILL, MORDENT, ORNAM, REPEATMARK, TURN })) return defaultValue;
 
     const TimePointInterface *interface = this->GetTimePointInterface();
     assert(interface);

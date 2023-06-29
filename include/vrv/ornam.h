@@ -22,14 +22,15 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <turn> element.
+ * This class models the MEI <ornam> element.
  */
 class Ornam : public ControlElement,
               public TextListInterface,
               public TextDirInterface,
               public TimePointInterface,
               public AttColor,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttOrnamentAccid {
 public:
     /**

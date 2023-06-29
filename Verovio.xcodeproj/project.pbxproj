@@ -886,6 +886,12 @@
 		4DFB3E8823ABDFC200D688C7 /* pitchinflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */; };
 		4DFB3E8A23ABDFDA00D688C7 /* pitchinflection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */; };
 		4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DFD82FB2A38398200A3E20B /* repeatmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD82FA2A38398200A3E20B /* repeatmark.cpp */; };
+		4DFD82FC2A38398200A3E20B /* repeatmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD82FA2A38398200A3E20B /* repeatmark.cpp */; };
+		4DFD82FD2A38398200A3E20B /* repeatmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD82FA2A38398200A3E20B /* repeatmark.cpp */; };
+		4DFD82FE2A38398200A3E20B /* repeatmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD82FA2A38398200A3E20B /* repeatmark.cpp */; };
+		4DFD83002A38399C00A3E20B /* repeatmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFD82FF2A38399C00A3E20B /* repeatmark.h */; };
+		4DFD83012A38399C00A3E20B /* repeatmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DFD82FF2A38399C00A3E20B /* repeatmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -2048,6 +2054,8 @@
 		4DF4407C1D511D0200152B7E /* systemmilestone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = systemmilestone.cpp; path = src/systemmilestone.cpp; sourceTree = "<group>"; };
 		4DFB3E8423ABDFC200D688C7 /* pitchinflection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pitchinflection.cpp; path = src/pitchinflection.cpp; sourceTree = "<group>"; };
 		4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pitchinflection.h; path = include/vrv/pitchinflection.h; sourceTree = "<group>"; };
+		4DFD82FA2A38398200A3E20B /* repeatmark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = repeatmark.cpp; path = src/repeatmark.cpp; sourceTree = "<group>"; };
+		4DFD82FF2A38399C00A3E20B /* repeatmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = repeatmark.h; path = include/vrv/repeatmark.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* verticalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = verticalaligner.cpp; path = src/verticalaligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -2410,6 +2418,10 @@
 				4DF440741D39567A00152B7E /* ending.h */,
 				40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */,
 				40ABF1FD1E5DF23B00F32F41 /* expansion.h */,
+				40C2E41B2052A6E00003625F /* pb.cpp */,
+				40C2E41D2052A6E00003625F /* pb.h */,
+				40C2E41A2052A6DF0003625F /* sb.cpp */,
+				40C2E41C2052A6E00003625F /* sb.h */,
 				4D95D4F11D6E042400B2B856 /* section.cpp */,
 				4D95D4F01D6E041E00B2B856 /* section.h */,
 				4D95D4F81D718D4A00B2B856 /* systemelement.cpp */,
@@ -2461,8 +2473,6 @@
 				4DB3D8971F7C2B2900B5FC2B /* lb.h */,
 				4D89F90D201771AE00A4D336 /* num.cpp */,
 				4D89F90B201771A700A4D336 /* num.h */,
-				4026FBE3203C827D0076535E /* mnum.cpp */,
-				4026FBE2203C827D0076535E /* mnum.h */,
 				4D6122BD1F77E1E000FC90A0 /* rend.cpp */,
 				4D6122BB1F77E1B900FC90A0 /* rend.h */,
 				4D89F9112018A93200A4D336 /* svg.cpp */,
@@ -2656,6 +2666,8 @@
 				4D796B5C1D78641200A15238 /* harm.h */,
 				E79C87C2269440570098FE85 /* lv.cpp */,
 				E79C87C1269440420098FE85 /* lv.h */,
+				4026FBE3203C827D0076535E /* mnum.cpp */,
+				4026FBE2203C827D0076535E /* mnum.h */,
 				40910FEA1E42734C00DB1FA5 /* mordent.cpp */,
 				40910FEB1E42734C00DB1FA5 /* mordent.h */,
 				4D55723F1CF3F32A008D06A0 /* octave.cpp */,
@@ -2670,6 +2682,8 @@
 				4DFB3E8923ABDFDA00D688C7 /* pitchinflection.h */,
 				40ACDEA824079F9000F82B8C /* reh.cpp */,
 				40ACDEA524079F5E00F82B8C /* reh.h */,
+				4DFD82FA2A38398200A3E20B /* repeatmark.cpp */,
+				4DFD82FF2A38399C00A3E20B /* repeatmark.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
 				4DB351121C8040B1002DD057 /* tempo.cpp */,
@@ -2831,10 +2845,6 @@
 				8F59292518854BF800FE51AD /* page.h */,
 				4D6413772035F58200BB630E /* pages.cpp */,
 				4D6413752035F57800BB630E /* pages.h */,
-				40C2E41B2052A6E00003625F /* pb.cpp */,
-				40C2E41D2052A6E00003625F /* pb.h */,
-				40C2E41A2052A6DF0003625F /* sb.cpp */,
-				40C2E41C2052A6E00003625F /* sb.h */,
 				8F086ED2188539540037FD8E /* scoredef.cpp */,
 				8F59292918854BF800FE51AD /* scoredef.h */,
 				4D4FCD111F54570E0009C455 /* staffdef.cpp */,
@@ -3273,6 +3283,7 @@
 				4DACC9B22990F29A00B55913 /* atts_cmnornaments.h in Headers */,
 				4DC12A891F74111E000440E9 /* pgfoot.h in Headers */,
 				4DB3D8C91F83D10300B5FC2B /* dir.h in Headers */,
+				4DFD83002A38399C00A3E20B /* repeatmark.h in Headers */,
 				BD05622F2518CD12004057EB /* beamspan.h in Headers */,
 				4DEC4DDA21C8295700D1D273 /* damage.h in Headers */,
 				4DACC9CE2990F29A00B55913 /* atts_mei.h in Headers */,
@@ -3543,6 +3554,7 @@
 				4D79643226C6AA720026288B /* featureextractor.h in Headers */,
 				4DACC9EB2990F29A00B55913 /* attmodule.h in Headers */,
 				BB4C4ABC22A932B6001F6AF0 /* instrdef.h in Headers */,
+				4DFD83012A38399C00A3E20B /* repeatmark.h in Headers */,
 				BB4C4B7622A932D7001F6AF0 /* syl.h in Headers */,
 				E73E86262A069C640089DF74 /* transposefunctor.h in Headers */,
 				BB4C4AEA22A932BC001F6AF0 /* del.h in Headers */,
@@ -4075,6 +4087,7 @@
 				4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */,
 				4D6331F61F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
 				4D674B47255F40B7008AEF4C /* plica.cpp in Sources */,
+				4DFD82FC2A38398200A3E20B /* repeatmark.cpp in Sources */,
 				4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */,
 				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
 				E7876F2329C0A709002147DC /* adjusttupletsxfunctor.cpp in Sources */,
@@ -4135,6 +4148,7 @@
 				4DC12A781F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4DA0EAEE22BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
 				E78F204A29D98D2300CD5910 /* adjustxrelfortranscriptionfunctor.cpp in Sources */,
+				4DFD82FB2A38398200A3E20B /* repeatmark.cpp in Sources */,
 				4DACC9FC2990F29A00B55913 /* atts_fingering.cpp in Sources */,
 				4DC12A631F73F898000440E9 /* pghead2.cpp in Sources */,
 				4DACC9EC2990F29A00B55913 /* atts_shared.cpp in Sources */,
@@ -4634,6 +4648,7 @@
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
 				4D674B48255F40B7008AEF4C /* plica.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
+				4DFD82FD2A38398200A3E20B /* repeatmark.cpp in Sources */,
 				4DC3B9E9239E2AE3007F185E /* transposition.cpp in Sources */,
 				40ACDEAB24079F9000F82B8C /* reh.cpp in Sources */,
 				E7876F2229C0A708002147DC /* adjusttupletsxfunctor.cpp in Sources */,
@@ -4914,6 +4929,7 @@
 				BB4C4AFD22A932BC001F6AF0 /* subst.cpp in Sources */,
 				BB4C4BBE22A932FC001F6AF0 /* MidiFile.cpp in Sources */,
 				4D674B49255F40B7008AEF4C /* plica.cpp in Sources */,
+				4DFD82FE2A38398200A3E20B /* repeatmark.cpp in Sources */,
 				BB4C4A9C22A9328F001F6AF0 /* options.cpp in Sources */,
 				4DC3B9E8239E2AE2007F185E /* transposition.cpp in Sources */,
 				E7876F2129C0A708002147DC /* adjusttupletsxfunctor.cpp in Sources */,

@@ -230,11 +230,13 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
 {
+    const double tempo = this->GetAdjustedTempo();
+    measure->SetCurrentTempo(tempo);
+
     const double scoreTimeIncrement
         = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor * DURATION_4 / DUR_MAX;
-    m_currentTempo = m_currentTempo * m_tempoAdjustment;
     m_currentScoreTime += scoreTimeIncrement;
-    m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
+    m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / tempo;
     m_multiRestFactor = 1;
 
     return FUNCTOR_CONTINUE;

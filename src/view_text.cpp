@@ -397,7 +397,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         // Also pass it to the children
         params.m_pointSize = rendFont.GetPointSize();
     }
-    if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+    if (rend->HasGlyphAuth() && rend->GetGlyphAuth() == "smufl") {
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
         rendFont.SetSmuflWithFallback(false);
@@ -489,7 +489,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     // special case where we want to replace some unicode music points to SMuFL
-    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM)) {
+    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM) || text->GetFirstAncestor(REPEATMARK)) {
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {

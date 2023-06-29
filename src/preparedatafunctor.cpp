@@ -27,6 +27,7 @@
 #include "pedal.h"
 #include "plistinterface.h"
 #include "reh.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "score.h"
@@ -38,6 +39,7 @@
 #include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
+#include "text.h"
 #include "timestamp.h"
 #include "tuplet.h"
 #include "turn.h"
@@ -77,6 +79,21 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    // Call parent one too
+    this->VisitControlElement(repeatMark);
+
+    if (repeatMark->GetChildCount() == 0 && repeatMark->HasFunc() && repeatMark->GetFunc() == repeatMarkLog_FUNC_fine) {
+        Text *fine = new Text();
+        fine->IsGenerated(true);
+        fine->SetText(U"Fine");
+        repeatMark->AddChild(fine);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -469,9 +486,9 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 
 PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
-void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
+void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface)
 {
-    m_interfaceIDTuples.push_back(std::make_tuple(interface, elementID, (Object *)NULL));
+    m_interfaceIDPairs.push_back(std::make_pair(interface, elementID));
 }
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
@@ -486,11 +503,13 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
     else {
         if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-        std::string id = object->GetID();
-        auto i = std::find_if(m_interfaceIDTuples.begin(), m_interfaceIDTuples.end(),
-            [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
-        if (i != m_interfaceIDTuples.end()) {
-            std::get<2>(*i) = object;
+        const std::string &id = object->GetID();
+        auto iter = std::find_if(m_interfaceIDPairs.begin(), m_interfaceIDPairs.end(),
+            [&id](const std::pair<PlistInterface *, std::string> &pair) { return (pair.second == id); });
+        if (iter != m_interfaceIDPairs.end()) {
+            // Set reference for matched pair and erase it from the list
+            iter->first->SetRef(object);
+            m_interfaceIDPairs.erase(iter);
         }
     }
 
@@ -1547,7 +1566,13 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
     }
 
     // first harm@n, create a new group
-    harm->SetDrawingGrpObject(harm);
+    // If @n is a digit string, use it as group id - otherwise order them as they appear
+    if (IsDigits(n)) {
+        harm->SetDrawingGrpId((int)std::strtol(n.c_str(), NULL, 10));
+    }
+    else {
+        harm->SetDrawingGrpObject(harm);
+    }
     m_harms.insert({ n, harm });
 
     return FUNCTOR_CONTINUE;

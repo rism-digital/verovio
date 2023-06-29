@@ -393,8 +393,7 @@ void ScoreDef::ReplaceDrawingValues(const StaffDef *newStaffDef)
             if (newStaffDef->HasMensurInfo()) {
                 // If there is a mensur and the meterSig
                 // is invisible, then print mensur instead
-                data_METERFORM meterForm = meterSig->GetForm();
-                if (meterForm == METERFORM_invis) {
+                if (meterSig->GetVisible() == BOOLEAN_false) {
                     staffDef->SetDrawMeterSig(false);
                     staffDef->SetDrawMensur(true);
                     Mensur *mensur = newStaffDef->GetMensurCopy();

@@ -35,13 +35,15 @@ Ornam::Ornam()
     , TextDirInterface()
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttOrnamentAccid()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
 
     this->Reset();
@@ -55,9 +57,9 @@ void Ornam::Reset()
     TextDirInterface::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
-    this->ResetPlacementRelStaff();
 }
 
 bool Ornam::IsSupportedChild(Object *child)

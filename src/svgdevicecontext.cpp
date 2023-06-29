@@ -319,8 +319,8 @@ void SvgDeviceContext::StartGraphic(
 
     // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
     // %f;",
-    // this->GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(),
-    // this->GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
+    // this->GetColor(currentPen.GetColor()).c_str(), currentPen.GetOpacity(),
+    // this->GetColor(currentBrush.GetColor()).c_str(), currentBrush.GetOpacity()).c_str();
 }
 
 void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
@@ -503,7 +503,7 @@ void SvgDeviceContext::EndPage()
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::SetBackground(int colour, int style)
+void SvgDeviceContext::SetBackground(int color, int style)
 {
     // nothing to do, we do not handle Background
 }
@@ -515,12 +515,12 @@ void SvgDeviceContext::SetBackgroundMode(int mode)
     // nothing to do, we do not handle Background Mode
 }
 
-void SvgDeviceContext::SetTextForeground(int colour)
+void SvgDeviceContext::SetTextForeground(int color)
 {
-    m_brushStack.top().SetColour(colour); // we use the brush colour for text
+    m_brushStack.top().SetColor(color); // we use the brush color for text
 }
 
-void SvgDeviceContext::SetTextBackground(int colour)
+void SvgDeviceContext::SetTextBackground(int color)
 {
     // nothing to do, we do not handle Text Background Mode
 }
@@ -587,7 +587,7 @@ void SvgDeviceContext::DrawQuadBezierPath(Point bezier[3])
         bezier[1].x, bezier[1].y, bezier[2].x, bezier[2].y)
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
+    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -603,7 +603,7 @@ void SvgDeviceContext::DrawCubicBezierPath(Point bezier[4])
         )
                                           .c_str();
     pathChild.append_attribute("fill") = "none";
-    pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
+    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
@@ -621,7 +621,7 @@ void SvgDeviceContext::DrawCubicBezierPathFilled(Point bezier1[4], Point bezier2
               .c_str();
     // pathChild.append_attribute("fill") = "currentColor";
     // pathChild.append_attribute("fill-opacity") = "1";
-    pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
+    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     pathChild.append_attribute("stroke-linecap") = "round";
     pathChild.append_attribute("stroke-linejoin") = "round";
     // pathChild.append_attribute("stroke-opacity") = "1";
@@ -653,7 +653,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     if (currentPen.GetOpacity() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        ellipseChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
+        ellipseChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
 }
 
@@ -716,7 +716,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
+        pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     }
 }
 
@@ -724,7 +724,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AddChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    pathChild.append_attribute("stroke") = this->GetColour(m_penStack.top().GetColour()).c_str();
+    pathChild.append_attribute("stroke") = this->GetColor(m_penStack.top().GetColor()).c_str();
     if (m_penStack.top().GetWidth() > 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
     this->AppendStrokeLineCap(pathChild, m_penStack.top());
     this->AppendStrokeDashArray(pathChild, m_penStack.top());
@@ -738,7 +738,7 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
     pugi::xml_node polylineChild = AddChild("polyline");
 
     if (currentPen.GetWidth() > 0) {
-        polylineChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
+        polylineChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.GetWidth() > 1) {
         polylineChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
@@ -751,7 +751,7 @@ void SvgDeviceContext::DrawPolyline(int n, Point points[], int xOffset, int yOff
     this->AppendStrokeLineJoin(polylineChild, currentPen);
     this->AppendStrokeDashArray(polylineChild, currentPen);
 
-    polylineChild.append_attribute("fill") = "none";
+    if (n > 2) polylineChild.append_attribute("fill") = "none";
 
     std::string pointsString;
     for (int i = 0; i < n; ++i) {
@@ -771,7 +771,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
     pugi::xml_node polygonChild = AddChild("polygon");
 
     if (currentPen.GetWidth() > 0) {
-        polygonChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
+        polygonChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
     }
     if (currentPen.GetWidth() > 1) {
         polygonChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
@@ -783,8 +783,8 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffs
     this->AppendStrokeLineJoin(polygonChild, currentPen);
     this->AppendStrokeDashArray(polygonChild, currentPen);
 
-    if (currentBrush.GetColour() != AxNONE)
-        polygonChild.append_attribute("fill") = this->GetColour(currentBrush.GetColour()).c_str();
+    if (currentBrush.GetColor() != AxNONE)
+        polygonChild.append_attribute("fill") = this->GetColor(currentBrush.GetColor()).c_str();
     if (currentBrush.GetOpacity() != 1.0)
         polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 
@@ -807,7 +807,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     if (m_penStack.size()) {
         Pen currentPen = m_penStack.top();
         if (currentPen.GetWidth() > 0)
-            rectChild.append_attribute("stroke") = this->GetColour(currentPen.GetColour()).c_str();
+            rectChild.append_attribute("stroke") = this->GetColor(currentPen.GetColor()).c_str();
         if (currentPen.GetWidth() > 1)
             rectChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
         if (currentPen.GetOpacity() != 1.0)
@@ -816,8 +816,8 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
     if (m_brushStack.size()) {
         Brush currentBrush = m_brushStack.top();
-        if (currentBrush.GetColour() != AxNONE)
-            rectChild.append_attribute("fill") = this->GetColour(currentBrush.GetColour()).c_str();
+        if (currentBrush.GetColor() != AxNONE)
+            rectChild.append_attribute("fill") = this->GetColor(currentBrush.GetColor()).c_str();
         if (currentBrush.GetOpacity() != 1.0)
             rectChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
     }
@@ -853,8 +853,8 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
 
     m_currentNode = m_currentNode.append_child("text");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("x") = x;
-    m_currentNode.append_attribute("y") = y;
+    if (x) m_currentNode.append_attribute("x") = x;
+    if (y) m_currentNode.append_attribute("y") = y;
     // unless dx, dy have a value they don't need to be set
     // m_currentNode.append_attribute("dx") = 0;
     // m_currentNode.append_attribute("dy") = 0;
@@ -931,8 +931,8 @@ void SvgDeviceContext::DrawText(
         svgText.replace(svgText.size() - 1, 1, "\xC2\xA0");
     }
 
-    std::string currentFaceName
-        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    pugi::xpath_node fontNode = m_currentNode.select_node("ancestor::*[@font-family][1]");
+    std::string currentFaceName = (fontNode) ? fontNode.node().attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AddChild("tspan");
@@ -950,6 +950,9 @@ void SvgDeviceContext::DrawText(
                 this->VrvTextFont();
                 textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
             }
+            if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+                textChild.append_attribute("font-style") = "normal";
+            }
         }
         else {
             textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
@@ -958,18 +961,6 @@ void SvgDeviceContext::DrawText(
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
-            textChild.append_attribute("font-style") = "italic";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
-            textChild.append_attribute("font-style") = "normal";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
-            textChild.append_attribute("font-style") = "oblique";
-        }
-    }
-    textChild.append_attribute("class") = "text";
     textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
@@ -1121,13 +1112,13 @@ void SvgDeviceContext::AppendAdditionalAttributes(Object *object)
     }
 }
 
-std::string SvgDeviceContext::GetColour(int colour)
+std::string SvgDeviceContext::GetColor(int color)
 {
     std::ostringstream ss;
     ss << "#";
     ss << std::hex;
 
-    switch (colour) {
+    switch (color) {
         case (AxNONE): return "currentColor";
         case (AxBLACK): return "#000000";
         case (AxWHITE): return "#FFFFFF";
@@ -1137,9 +1128,9 @@ std::string SvgDeviceContext::GetColour(int colour)
         case (AxCYAN): return "#00FFFF";
         case (AxLIGHT_GREY): return "#777777";
         default:
-            int blue = (colour & 255);
-            int green = (colour >> 8) & 255;
-            int red = (colour >> 16) & 255;
+            int blue = (color & 255);
+            int green = (color >> 8) & 255;
+            int red = (color >> 16) & 255;
             ss << red << green << blue;
             // std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
             return ss.str();

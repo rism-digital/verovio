@@ -771,7 +771,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 }
                 if (!verovioText.empty()) {
                     Rend *rend = new Rend;
-                    rend->SetFontfam("smufl");
+                    rend->SetGlyphAuth("smufl");
                     Text *text = new Text();
                     text->SetText(verovioText);
                     rend->AddChild(text);
@@ -1544,7 +1544,7 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
                 meterSig->SetSym(METERSIGN_open);
             }
             else {
-                meterSig->SetForm(METERFORM_invis);
+                meterSig->SetVisible(BOOLEAN_false);
             }
         }
         parent->AddChild(meterSig);
@@ -2014,7 +2014,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         if (xmlCoda.attribute("id")) dir->SetID(xmlCoda.attribute("id").as_string());
         Rend *rend = new Rend;
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
@@ -2229,10 +2229,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
                     if (wedge->node().attribute("niente")) {
                         iter->first->SetNiente(ConvertWordToBool(wedge->node().attribute("niente").as_string()));
                     }
-                    if (wedge->node().attribute("spread")) {
-                        data_MEASUREMENTSIGNED opening;
-                        opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
-                        iter->first->SetOpening(opening);
+                    if (iter->first->GetForm() == hairpinLog_FORM_cres) {
+                        if (wedge->node().attribute("spread")) {
+                            data_MEASUREMENTSIGNED opening;
+                            opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
+                            iter->first->SetOpening(opening);
+                        }
                     }
                     matchedWedge = true;
                     m_hairpinStack.erase(iter);
@@ -2252,6 +2254,11 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
             else if (HasAttributeWithValue(wedge->node(), "type", "diminuendo")) {
                 hairpin->SetForm(hairpinLog_FORM_dim);
+                if (wedge->node().attribute("spread")) {
+                    data_MEASUREMENTSIGNED opening;
+                    opening.SetVu(wedge->node().attribute("spread").as_double() / 5);
+                    hairpin->SetOpening(opening);
+                }
             }
             else {
                 delete hairpin;
@@ -2452,7 +2459,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         if (xmlSegno.attribute("id")) dir->SetID(xmlSegno.attribute("id").as_string());
         Rend *rend = new Rend;
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
@@ -3922,7 +3929,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         keySig->SetSig(keySig->AttKeySigLog::StrToKeysignature(keySigStr));
 
         if (key.child("cancel")) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
         if (key.child("mode")) {
             const std::string xmlMode = key.child("mode").text().as_string();

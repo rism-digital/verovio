@@ -247,6 +247,12 @@ bool IsValidDouble(const std::string &value)
     return std::regex_match(value, re);
 }
 
+bool IsDigits(const std::string &value)
+{
+    std::regex re(R"(^\d+$)");
+    return std::regex_match(value, re);
+}
+
 std::string ExtractIDFragment(std::string refID)
 {
     size_t pos = refID.find_last_of("#");

@@ -89,6 +89,7 @@
 #include "proport.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -694,6 +695,16 @@ FunctorCode FunctorInterface::VisitRehEnd(Reh *reh)
     return this->VisitControlElementEnd(reh);
 }
 
+FunctorCode FunctorInterface::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    return this->VisitControlElement(repeatMark);
+}
+
+FunctorCode FunctorInterface::VisitRepeatMarkEnd(RepeatMark *repeatMark)
+{
+    return this->VisitControlElementEnd(repeatMark);
+}
+
 FunctorCode FunctorInterface::VisitSlur(Slur *slur)
 {
     return this->VisitControlElement(slur);
@@ -956,12 +967,12 @@ FunctorCode FunctorInterface::VisitMeterSigEnd(MeterSig *meterSig)
 
 FunctorCode FunctorInterface::VisitMeterSigGrp(MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObject(meterSigGrp);
+    return this->VisitLayerElement(meterSigGrp);
 }
 
 FunctorCode FunctorInterface::VisitMeterSigGrpEnd(MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObjectEnd(meterSigGrp);
+    return this->VisitLayerElementEnd(meterSigGrp);
 }
 
 FunctorCode FunctorInterface::VisitMRest(MRest *mRest)
@@ -1968,6 +1979,16 @@ FunctorCode ConstFunctorInterface::VisitRehEnd(const Reh *reh)
     return this->VisitControlElementEnd(reh);
 }
 
+FunctorCode ConstFunctorInterface::VisitRepeatMark(const RepeatMark *repeatMark)
+{
+    return this->VisitControlElement(repeatMark);
+}
+
+FunctorCode ConstFunctorInterface::VisitRepeatMarkEnd(const RepeatMark *repeatMark)
+{
+    return this->VisitControlElementEnd(repeatMark);
+}
+
 FunctorCode ConstFunctorInterface::VisitSlur(const Slur *slur)
 {
     return this->VisitControlElement(slur);
@@ -2230,12 +2251,12 @@ FunctorCode ConstFunctorInterface::VisitMeterSigEnd(const MeterSig *meterSig)
 
 FunctorCode ConstFunctorInterface::VisitMeterSigGrp(const MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObject(meterSigGrp);
+    return this->VisitLayerElement(meterSigGrp);
 }
 
 FunctorCode ConstFunctorInterface::VisitMeterSigGrpEnd(const MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObjectEnd(meterSigGrp);
+    return this->VisitLayerElementEnd(meterSigGrp);
 }
 
 FunctorCode ConstFunctorInterface::VisitMRest(const MRest *mRest)

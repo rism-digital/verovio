@@ -46,22 +46,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     if (layerElement->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(layerElement);
         assert(accid);
-        Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
-        // We should probably also avoid to add editorial accidentals to the accid space
-        // However, since they are placed above by View::DrawNote it works without avoiding it
-        if (note) {
-            if (note->HasGraceAlignment()) {
-                note->GetGraceAlignment()->AddToAccidSpace(accid);
-            }
-            else {
-                accid->GetAlignment()->AddToAccidSpace(accid);
-            }
-        }
-        else if (accid->GetFirstAncestor(CUSTOS)) {
-            accid->GetAlignment()->AddToAccidSpace(
-                accid); // If this is not added, the accidental is drawn an octave below the custos
-        }
-        else {
+        if (!accid->GetFirstAncestor(NOTE) && !accid->GetFirstAncestor(CUSTOS)) {
             // do something for accid that are not children of a note - e.g., mensural?
             accid->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
         }

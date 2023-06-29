@@ -11,7 +11,7 @@ cd java
 
 swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
 
-SRCFILES=$(\ls ../../src/*.cpp)
+SRCFILES=$(\ls ../../src/*.cpp ../../libmei/dist/*.cpp ../../libmei/addons/*.cpp)
 
 FILES="$SRCFILES \
  ../../src/pugi/pugixml.cpp \
@@ -22,32 +22,16 @@ FILES="$SRCFILES \
  ../../src/midi/MidiMessage.cpp \
  ../../src/hum/humlib.cpp \
  ../../src/json/jsonxx.cc \
- ../../src/crc/crc.cpp \
- ../../libmei/attconverter.cpp \
- ../../libmei/atts_analytical.cpp \
- ../../libmei/atts_cmn.cpp \
- ../../libmei/atts_cmnornaments.cpp \
- ../../libmei/atts_critapp.cpp \
- ../../libmei/atts_frettab.cpp \
- ../../libmei/atts_gestural.cpp \
- ../../libmei/atts_externalsymbols.cpp \
- ../../libmei/atts_facsimile.cpp \
-  ../../libmei/atts_frettab.cpp \
- ../../libmei/atts_mei.cpp \
- ../../libmei/atts_mensural.cpp \
- ../../libmei/atts_midi.cpp \
- ../../libmei/atts_neumes.cpp \
- ../../libmei/atts_pagebased.cpp \
- ../../libmei/atts_shared.cpp \
- ../../libmei/atts_visual.cpp"
+ ../../src/crc/crc.cpp"
 
-CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/zip -I../../libmei -I/opt/local/include/ "
+CXXOPTS="-g -fpic -std=c++17 -I../../include -I../../include/vrv -I../../include/json -I../../include/hum -I../../include/crc -I../../include/midi -I../../include/pugi -I../../include/zip -I../../libmei/addons -I../../libmei/dist -I/opt/local/include/ "
 
 PATHS=""
 unamestr=$(uname)
 if [[ "$unamestr" == 'Linux' ]]; then
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/linux " # paths to java libraries
 elif [[ "$unamestr" == 'Darwin' ]]; then
+    #JAVA_HOME="/opt/homebrew/Cellar/openjdk/20.0.1/libexec/openjdk.jdk/Contents/Home"
     JAVA_HOME=$(/usr/libexec/java_home)
     PATHS="-I$JAVA_HOME/include -I$JAVA_HOME/include/darwin"
 fi

@@ -45,6 +45,14 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter of the generated flag
+     */
+    ///@{
+    bool IsGenerated() const { return m_isGenerated; }
+    void IsGenerated(bool isGenerated) { m_isGenerated = isGenerated; }
+    ///@}
+
+    /**
      * Interface for class functor visitation
      */
     ///@{
@@ -63,6 +71,10 @@ protected:
     std::u32string m_text;
 
 private:
+    /**
+     * Flag indicating whether or not the text content was generated
+     */
+    bool m_isGenerated;
 };
 
 } // namespace vrv

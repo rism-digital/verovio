@@ -29,7 +29,8 @@ class KeyAccid : public LayerElement,
                  public AttAccidental,
                  public AttColor,
                  public AttEnclosingChars,
-                 public AttExtSym {
+                 public AttExtSymAuth,
+                 public AttExtSymNames {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
