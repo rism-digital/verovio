@@ -721,6 +721,12 @@
 		4DBDD67A2939E1D1009EC466 /* symboldef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66E2939E19A009EC466 /* symboldef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66D2939E19A009EC466 /* symboltable.h */; };
 		4DBDD67C2939E1D8009EC466 /* symboltable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66D2939E19A009EC466 /* symboltable.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DC07F662A4DBB7200360070 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC07F652A4DBB7200360070 /* liquescent.h */; };
+		4DC07F672A4DBB7200360070 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC07F652A4DBB7200360070 /* liquescent.h */; };
+		4DC07F692A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
+		4DC07F6A2A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
+		4DC07F6B2A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
+		4DC07F6C2A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
 		4DC12A571F716E1C000440E9 /* pghead.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A561F716E1C000440E9 /* pghead.h */; };
 		4DC12A591F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
@@ -1967,6 +1973,8 @@
 		4DBDD66E2939E19A009EC466 /* symboldef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symboldef.h; path = include/vrv/symboldef.h; sourceTree = "<group>"; };
 		4DBDD66F2939E1AE009EC466 /* symboltable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symboltable.cpp; path = src/symboltable.cpp; sourceTree = "<group>"; };
 		4DBDD6702939E1AE009EC466 /* symboldef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symboldef.cpp; path = src/symboldef.cpp; sourceTree = "<group>"; };
+		4DC07F652A4DBB7200360070 /* liquescent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = liquescent.h; path = include/vrv/liquescent.h; sourceTree = "<group>"; };
+		4DC07F682A4DBB8500360070 /* liquescent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = liquescent.cpp; path = src/liquescent.cpp; sourceTree = "<group>"; };
 		4DC12A561F716E1C000440E9 /* pghead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead.h; path = include/vrv/pghead.h; sourceTree = "<group>"; };
 		4DC12A581F716E27000440E9 /* pghead.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pghead.cpp; path = src/pghead.cpp; sourceTree = "<group>"; };
 		4DC12A5C1F73F888000440E9 /* pghead2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead2.h; path = include/vrv/pghead2.h; sourceTree = "<group>"; };
@@ -2923,6 +2931,8 @@
 				8F59291E18854BF800FE51AD /* layerelement.h */,
 				152886C41C9CA86100B515BB /* ligature.cpp */,
 				152886C11C9CA2E000B515BB /* ligature.h */,
+				4DC07F682A4DBB8500360070 /* liquescent.cpp */,
+				4DC07F652A4DBB7200360070 /* liquescent.h */,
 				8F086ECA188539540037FD8E /* mensur.cpp */,
 				8F59292118854BF800FE51AD /* mensur.h */,
 				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
@@ -3293,6 +3303,7 @@
 				BDC366E02576AFA500E4D826 /* grpsym.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
+				4DC07F662A4DBB7200360070 /* liquescent.h in Headers */,
 				E708AA6229D2B96A001F937A /* adjustfloatingpositionerfunctor.h in Headers */,
 				E7D48C7129D21F040031D89D /* adjustyposfunctor.h in Headers */,
 				4DFB3E8A23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
@@ -3478,6 +3489,7 @@
 				BB4C4B2A22A932CF001F6AF0 /* harm.h in Headers */,
 				4DD7C10027A55CFD00B9C017 /* timemap.h in Headers */,
 				BB4C4AAC22A932A0001F6AF0 /* svgdevicecontext.h in Headers */,
+				4DC07F672A4DBB7200360070 /* liquescent.h in Headers */,
 				E788335E2994EC5800D44B01 /* calcchordnoteheadsfunctor.h in Headers */,
 				BB4C4ADE22A932BC001F6AF0 /* add.h in Headers */,
 				BB4C4B4C22A932D7001F6AF0 /* custos.h in Headers */,
@@ -3913,6 +3925,7 @@
 				E7ADB3AF29D1923500825D5D /* adjustarticfunctor.cpp in Sources */,
 				4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */,
 				4D16940D1E3A44F300569BF4 /* hairpin.cpp in Sources */,
+				4DC07F6A2A4DBB8500360070 /* liquescent.cpp in Sources */,
 				4DB3D8FC1F83D1FD00B5FC2B /* horizontalaligner.cpp in Sources */,
 				BD2E4D982875880600B04350 /* stem.cpp in Sources */,
 				4D16940E1E3A44F300569BF4 /* view_mensural.cpp in Sources */,
@@ -4225,6 +4238,7 @@
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				4D6122BE1F77E1E000FC90A0 /* rend.cpp in Sources */,
+				4DC07F692A4DBB8500360070 /* liquescent.cpp in Sources */,
 				403BEFF0206C00B500D022D5 /* multirpt.cpp in Sources */,
 				4D766EFA20ACAD63006875D8 /* syllable.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
@@ -4474,6 +4488,7 @@
 				E7ADB3B029D1923600825D5D /* adjustarticfunctor.cpp in Sources */,
 				4D4C26F01EF7E75E00681770 /* score.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
+				4DC07F6B2A4DBB8500360070 /* liquescent.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
 				4DEC4D9C21C81E6600D1D273 /* lem.cpp in Sources */,
 				4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */,
@@ -4755,6 +4770,7 @@
 				E7ADB3B129D1923700825D5D /* adjustarticfunctor.cpp in Sources */,
 				BB4C4B6922A932D7001F6AF0 /* nc.cpp in Sources */,
 				BB4C4B5F22A932D7001F6AF0 /* mrest.cpp in Sources */,
+				4DC07F6C2A4DBB8500360070 /* liquescent.cpp in Sources */,
 				BB4C4B5722A932D7001F6AF0 /* layerelement.cpp in Sources */,
 				BD2E4D962875880500B04350 /* stem.cpp in Sources */,
 				BB4C4ACB22A932B6001F6AF0 /* pb.cpp in Sources */,
