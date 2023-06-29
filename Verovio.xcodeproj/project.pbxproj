@@ -722,7 +722,7 @@
 		4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66D2939E19A009EC466 /* symboltable.h */; };
 		4DBDD67C2939E1D8009EC466 /* symboltable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBDD66D2939E19A009EC466 /* symboltable.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DC07F662A4DBB7200360070 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC07F652A4DBB7200360070 /* liquescent.h */; };
-		4DC07F672A4DBB7200360070 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC07F652A4DBB7200360070 /* liquescent.h */; };
+		4DC07F672A4DBB7200360070 /* liquescent.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC07F652A4DBB7200360070 /* liquescent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DC07F692A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
 		4DC07F6A2A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
 		4DC07F6B2A4DBB8500360070 /* liquescent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC07F682A4DBB8500360070 /* liquescent.cpp */; };
