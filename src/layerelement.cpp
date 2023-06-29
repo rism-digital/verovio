@@ -614,7 +614,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 {
     assert(doc);
 
-    if (!this->Is({ CHORD, NOTE, REST })) return 0;
+    if (!this->Is({ CHORD, NC, NOTE, REST })) return 0;
 
     char32_t code = 0;
     int dur = DUR_4;
@@ -650,7 +650,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
             code = SMUFL_E0A4_noteheadBlack;
         }
     }
-    else if (this->Is(REST)) {
+    else if (this->Is({ REST, NC })) {
         code = SMUFL_E0A4_noteheadBlack;
     }
 
