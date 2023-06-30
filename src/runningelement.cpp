@@ -48,9 +48,9 @@ RunningElement::RunningElement(ClassId classId) : TextLayoutElement(classId, "re
 */
 
 RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
-    : TextLayoutElement(classId, classIdStr), AttHorizontalAlign()
+    : TextLayoutElement(classId, classIdStr), AttRunningtext()
 {
-    this->RegisterAttClass(ATT_HORIZONTALALIGN);
+    this->RegisterAttClass(ATT_RUNNINGTEXT);
 
     this->Reset();
 }
@@ -60,7 +60,7 @@ RunningElement::~RunningElement() {}
 void RunningElement::Reset()
 {
     TextLayoutElement::Reset();
-    this->ResetHorizontalAlign();
+    this->ResetRunningtext();
 
     m_isGenerated = false;
 
