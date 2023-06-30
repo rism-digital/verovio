@@ -27,7 +27,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 DivLine::DivLine()
-    : LayerElement(DIVLINE, "dline-"), AttColor(), AttDivLineLog(), AttExtSymAuth(), AttExtSymNames(), AttNNumberLike(), AttVisibility()
+    : LayerElement(DIVLINE, "dline-")
+    , AttColor()
+    , AttDivLineLog()
+    , AttExtSymAuth()
+    , AttExtSymNames()
+    , AttNNumberLike()
+    , AttVisibility()
 {
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_DIVLINELOG);
