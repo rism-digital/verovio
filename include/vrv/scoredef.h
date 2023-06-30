@@ -23,9 +23,7 @@ class Mensur;
 class MeterSig;
 class MeterSigGrp;
 class PgFoot;
-class PgFoot2;
 class PgHead;
-class PgHead2;
 class StaffGrp;
 class StaffDef;
 
@@ -239,14 +237,10 @@ public:
      * @name Getters for running elements
      */
     ///@{
-    PgFoot *GetPgFoot();
-    const PgFoot *GetPgFoot() const;
-    PgFoot2 *GetPgFoot2();
-    const PgFoot2 *GetPgFoot2() const;
-    PgHead *GetPgHead();
-    const PgHead *GetPgHead() const;
-    PgHead2 *GetPgHead2();
-    const PgHead2 *GetPgHead2() const;
+    PgFoot *GetPgFoot(data_PGFUNC func);
+    const PgFoot *GetPgFoot(data_PGFUNC func) const;
+    PgHead *GetPgHead(data_PGFUNC func);
+    const PgHead *GetPgHead(data_PGFUNC func) const;
     ///@}
 
     /**
