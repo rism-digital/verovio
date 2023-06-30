@@ -72,6 +72,7 @@
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
+#include "liquescent.h"
 #include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -649,6 +650,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(LIGATURE)) {
             m_currentNode = m_currentNode.append_child("ligature");
             this->WriteLigature(m_currentNode, vrv_cast<Ligature *>(object));
+        }
+        else if (object->Is(LIQUESCENT)) {
+            m_currentNode = m_currentNode.append_child("liquescent");
+            this->WriteLiquescent(m_currentNode, vrv_cast<Liquescent *>(object));
         }
         else if (object->Is(MENSUR)) {
             if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("mensur");
@@ -2546,6 +2551,14 @@ void MEIOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
     ligature->WriteLigatureVis(currentNode);
 }
 
+void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquescent)
+{
+    assert(liquescent);
+
+    WriteLayerElement(currentNode, liquescent);
+    WritePositionInterface(currentNode, liquescent);
+}
+
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
@@ -3649,6 +3662,24 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for neume
+    else if (filterParent->Is(NEUME)) {
+        if (element == "nc") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for nc
+    else if (filterParent->Is(NC)) {
+        if (element == "liquescent") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for note
     else if (filterParent->Is(NOTE)) {
         if (element == "accid") {
@@ -3676,6 +3707,18 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     // filter for rest
     else if (filterParent->Is(REST)) {
         return false;
+    }
+    // filter for syllable
+    else if (filterParent->Is(SYLLABLE)) {
+        if (element == "neume") {
+            return true;
+        }
+        else if (element == "syl") {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     // filter for syl
     else if (filterParent->Is(SYL)) {
@@ -6108,6 +6151,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "ligature") {
             success = this->ReadLigature(parent, xmlElement);
         }
+        else if (elementName == "liquescent") {
+            success = this->ReadLiquescent(parent, xmlElement);
+        }
         else if (elementName == "mensur") {
             success = this->ReadMensur(parent, xmlElement);
         }
@@ -6518,6 +6564,17 @@ bool MEIInput::ReadLigature(Object *parent, pugi::xml_node ligature)
     parent->AddChild(vrvLigature);
     this->ReadUnsupportedAttr(ligature, vrvLigature);
     return this->ReadLayerChildren(vrvLigature, ligature, vrvLigature);
+}
+
+bool MEIInput::ReadLiquescent(Object *parent, pugi::xml_node liquescent)
+{
+    Liquescent *vrvLiquescent = new Liquescent();
+    this->ReadLayerElement(liquescent, vrvLiquescent);
+    this->ReadPositionInterface(liquescent, vrvLiquescent);
+
+    parent->AddChild(vrvLiquescent);
+    this->ReadUnsupportedAttr(liquescent, vrvLiquescent);
+    return true;
 }
 
 bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)

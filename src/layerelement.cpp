@@ -56,6 +56,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
+#include "syllable.h"
 #include "tabgrp.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -69,6 +70,13 @@
 #include "zone.h"
 
 namespace vrv {
+
+// Large spacing between syllables is a quarter note space
+// MAX_DURATION / pow(2.0, (DUR_4 - 2.0))
+#define NEUME_LARGE_SPACE 256
+// Small spacing between neume components is a 16th note space
+// MAX_DURATION / pow(2.0, (DUR_6 - 2.0))
+#define NEUME_SMALL_SPACE 64
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -614,7 +622,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 {
     assert(doc);
 
-    if (!this->Is({ CHORD, NOTE, REST })) return 0;
+    if (!this->Is({ CHORD, NC, NOTE, REST })) return 0;
 
     char32_t code = 0;
     int dur = DUR_4;
@@ -650,7 +658,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
             code = SMUFL_E0A4_noteheadBlack;
         }
     }
-    else if (this->Is(REST)) {
+    else if (this->Is({ REST, NC })) {
         code = SMUFL_E0A4_noteheadBlack;
     }
 
@@ -707,12 +715,16 @@ double LayerElement::GetAlignmentDuration(
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
-            const Neume *neume = vrv_cast<const Neume *>(this->GetFirstAncestor(NEUME));
-            if (neume->IsLastInNeume(this)) {
-                return 128;
+            const Object *neume = this->GetFirstAncestor(NEUME);
+            assert(neume);
+            const Object *syllable = neume->GetFirstAncestor(SYLLABLE);
+            assert(syllable);
+            // Add a gap after the last nc of the last neume in the syllable
+            if ((neume->GetLast() == this) && (syllable->GetLast() == neume)) {
+                return NEUME_LARGE_SPACE;
             }
             else {
-                return 16;
+                return NEUME_SMALL_SPACE;
             }
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);

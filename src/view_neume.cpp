@@ -64,6 +64,11 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     Nc *nc = dynamic_cast<Nc *>(element);
     assert(nc);
 
+    if (m_options->m_neumeAsNote.GetValue()) {
+        DrawNcAsNotehead(dc, nc, layer, staff, measure);
+        return;
+    }
+
     struct drawingParams {
         char32_t fontNo = SMUFL_E990_chantPunctum;
         float xOffset = 0;
@@ -217,7 +222,61 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetID());
     this->DrawLayerChildren(dc, neume, layer, staff, measure);
+
+    if (m_options->m_neumeAsNote.GetValue()) {
+
+        Nc *first = vrv_cast<Nc *>(neume->GetFirst(NC));
+        Nc *last = vrv_cast<Nc *>(neume->GetLast(NC));
+
+        if (first != last) {
+
+            const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int lineWidth = m_doc->GetOptions()->m_octaveLineThickness.GetValue() * unit;
+
+            int x1 = first->GetDrawingX();
+            int x2 = last->GetDrawingX();
+            int y = staff->GetDrawingY();
+
+            const int maxNcY = std::max(first->GetDrawingY(), last->GetDrawingY());
+            y = std::max(y, maxNcY + unit);
+            y += 2 * unit;
+
+            x1 += lineWidth / 2;
+            x2 += 2 * last->GetDrawingRadius(m_doc) - lineWidth / 2;
+
+            dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y + lineWidth / 2), ToDeviceContextX(x1),
+                ToDeviceContextY(y - unit));
+            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y + lineWidth / 2), ToDeviceContextX(x2),
+                ToDeviceContextY(y - unit));
+
+            dc->ResetPen();
+        }
+    }
+
     dc->EndGraphic(element, this);
+}
+
+void View::DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure)
+{
+    /******************************************************************/
+    // Start the Neume graphic and draw the children
+
+    dc->StartGraphic(nc, "", nc->GetID());
+
+    const int noteX = nc->GetDrawingX();
+    const int noteY = nc->GetDrawingY();
+
+    bool cueSize = false;
+    if (nc->FindDescendantByType(LIQUESCENT)) {
+        cueSize = true;
+    }
+
+    this->DrawSmuflCode(dc, noteX, noteY, SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, cueSize, true);
+
+    dc->EndGraphic(nc, this);
 }
 
 } // namespace vrv

@@ -82,6 +82,7 @@ class LayerElement;
 class Lb;
 class Lem;
 class Ligature;
+class Liquescent;
 class Lv;
 class Mdiv;
 class Measure;
@@ -396,6 +397,7 @@ private:
     void WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid);
     void WriteKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
+    void WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquescent);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
     void WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
@@ -705,6 +707,7 @@ private:
     bool ReadKeyAccid(Object *parent, pugi::xml_node keyAccid);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);
+    bool ReadLiquescent(Object *parent, pugi::xml_node liquescent);
     bool ReadMensur(Object *parent, pugi::xml_node mensur);
     bool ReadMeterSig(Object *parent, pugi::xml_node meterSig);
     bool ReadMRest(Object *parent, pugi::xml_node mRest);

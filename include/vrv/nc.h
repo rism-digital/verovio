@@ -50,6 +50,8 @@ public:
     std::string GetClassName() const override { return "Nc"; }
     ///@}
 
+    bool IsSupportedChild(Object *object) override;
+
     /**
      * @name Getter to interfaces
      */

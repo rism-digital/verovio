@@ -225,6 +225,7 @@ enum ClassId : uint16_t {
     KEYSIG,
     KEYACCID,
     LIGATURE,
+    LIQUESCENT,
     MENSUR,
     METERSIG,
     METERSIGGRP,
