@@ -56,6 +56,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
+#include "syllable.h"
 #include "tabgrp.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -707,8 +708,12 @@ double LayerElement::GetAlignmentDuration(
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
-            const Neume *neume = vrv_cast<const Neume *>(this->GetFirstAncestor(NEUME));
-            if (neume->IsLastInNeume(this)) {
+            const Object *neume = this->GetFirstAncestor(NEUME);
+            assert(neume);
+            const Object *syllable = neume->GetFirstAncestor(SYLLABLE);
+            assert(syllable);
+            // Add a gap after the last nc of the last neume in the syllable
+            if ((neume->GetLast() == this) && (syllable->GetLast() == neume)) {
                 return 256;
             }
             else {
