@@ -5619,6 +5619,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttRunningtext
+//----------------------------------------------------------------------------
+
+class AttRunningtext : public Att {
+protected:
+    AttRunningtext();
+    ~AttRunningtext() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetRunningtext();
+
+    /** Read the values for the attribute class **/
+    bool ReadRunningtext(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteRunningtext(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(data_PGFUNC func_) { m_func = func_; }
+    data_PGFUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    data_PGFUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstRunningtext
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRunningtext
+ */
+
+class InstRunningtext : public AttRunningtext {
+public:
+    InstRunningtext() = default;
+    virtual ~InstRunningtext() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttScalable
 //----------------------------------------------------------------------------
 

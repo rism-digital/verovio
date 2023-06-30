@@ -3435,6 +3435,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_RUNNINGTEXT)) {
+        AttRunningtext *att = dynamic_cast<AttRunningtext *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToPgfunc(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_SCALABLE)) {
         AttScalable *att = dynamic_cast<AttScalable *>(element);
         assert(att);
@@ -4872,6 +4880,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasDur()) {
             attributes->push_back({ "dur", att->DurationToStr(att->GetDur()) });
+        }
+    }
+    if (element->HasAttClass(ATT_RUNNINGTEXT)) {
+        const AttRunningtext *att = dynamic_cast<const AttRunningtext *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back({ "func", att->PgfuncToStr(att->GetFunc()) });
         }
     }
     if (element->HasAttClass(ATT_SCALABLE)) {

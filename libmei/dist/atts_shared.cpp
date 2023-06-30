@@ -5158,6 +5158,46 @@ bool AttRestdurationLog::HasDur() const
 }
 
 //----------------------------------------------------------------------------
+// AttRunningtext
+//----------------------------------------------------------------------------
+
+AttRunningtext::AttRunningtext() : Att()
+{
+    ResetRunningtext();
+}
+
+void AttRunningtext::ResetRunningtext()
+{
+    m_func = PGFUNC_NONE;
+}
+
+bool AttRunningtext::ReadRunningtext(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToPgfunc(element.attribute("func").value()));
+        if (removeAttr) element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRunningtext::WriteRunningtext(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = PgfuncToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRunningtext::HasFunc() const
+{
+    return (m_func != PGFUNC_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttScalable
 //----------------------------------------------------------------------------
 

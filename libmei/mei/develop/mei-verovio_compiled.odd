@@ -2829,8 +2829,7 @@
         </rng:data></choice>
     </content>
   </macroSpec><macroSpec rend="add" ident="data.OCTAVE" module="MEI" type="dt">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Oct attribute values. The default values conform to Acoustical Society of America
-      representation. Read, p. 44.</desc>
+    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Octave number. The default values conform to the Scientific Pitch Notation (SPN).</desc>
     <content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <rng:data type="nonNegativeInteger">
         <rng:param name="maxInclusive">9</rng:param>
@@ -5269,7 +5268,7 @@
         <att>tstamp.real</att> attribute, while the ending point may be recorded by either a
         <att>dur</att>, <att>dur.ges</att>, <att>endid</att>, or <att>tstamp2</att> attribute. It is
         a semantic error not to specify one starting and one ending type of attribute.</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="graceGrp" module="MEI.cmn"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A container for a sequence of grace notes.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="graceGrp" module="MEI.cmn"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">grace group</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A container for a sequence of grace notes.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.graceGrp.log"/>
@@ -6027,7 +6026,7 @@
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="model.rdgPart"/>
     </classes>
-  </classSpec><elementSpec rend="add" ident="app" module="MEI.critapp"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(apparatus) – Contains one or more alternative encodings.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  </classSpec><elementSpec rend="add" ident="app" module="MEI.critapp"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">apparatus</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains one or more alternative encodings.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="model.appLike"/>
     </classes><content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -6043,7 +6042,7 @@
         lectio difficilior, usus auctoris, etc.).</p>
     </remarks><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-app.html">app</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="lem" module="MEI.critapp"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(lemma) – Contains the lemma, or base text, of a textual variation.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="lem" module="MEI.critapp"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">lemma</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains the lemma, or base text, of a textual variation.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.crit"/>
       <memberOf key="att.pointing"/>
@@ -6068,7 +6067,7 @@
         should only contain those elements allowed within <gi scheme="MEI">verse</gi>.</p>
     </remarks><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-lem.html">lem</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="rdg" module="MEI.critapp"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(reading) – Contains a single reading within a textual variation.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="rdg" module="MEI.critapp"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">reading</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a single reading within a textual variation.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.crit"/>
       <memberOf key="att.pointing"/>
@@ -7095,7 +7094,7 @@
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="model.controlEventLike"/>
     </classes>
-  </classSpec><elementSpec rend="add" ident="fing" module="MEI.fingering"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">finger – An individual finger in a fingering indication.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  </classSpec><elementSpec rend="add" ident="fing" module="MEI.fingering"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">finger</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">An individual finger in a fingering indication.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.fing.anl"/>
@@ -7120,7 +7119,7 @@
             descendant of fing.</sch:assert>
         </sch:rule>
       </constraint>
-    </constraintSpec></elementSpec><elementSpec rend="add" ident="fingGrp" module="MEI.fingering"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(finger group)– A group of individual fingers in a fingering indication.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    </constraintSpec></elementSpec><elementSpec rend="add" ident="fingGrp" module="MEI.fingering"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">finger group</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">A group of individual fingers in a fingering indication.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.fingGrp.anl"/>
@@ -9362,7 +9361,7 @@
       <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.pLike"/></oneOrMore>
     </content><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-normalization.html">normalization</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="notesStmt" module="MEI.header"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(notes statement)– Collects any notes providing information about a text additional to
+    </remarks></elementSpec><elementSpec rend="add" ident="notesStmt" module="MEI.header"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">notes statement</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Collects any notes providing information about a text additional to
       that recorded in other parts of the bibliographic description.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.bibl"/>
@@ -9489,7 +9488,7 @@
       <p>In the context of a performance resource the attribute <att>adlib</att> marks a resource as optional.</p>
     </remarks><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>To indicate the tuning of an instrument, the attribute <att>trans.diat</att> can be used.</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="perfResList" module="MEI.header"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Several instrumental or vocal resources treated as a group.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="perfResList" module="MEI.header"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">performance resources list</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Several instrumental or vocal resources treated as a group.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.authorized"/>
       <memberOf key="att.bibl"/>
@@ -11055,7 +11054,7 @@
         persName is taken may be recorded using the <att>auth</att> attribute.</p>
     </remarks><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-persname">persname</ref> element of the Encoded Archival Description (EAD).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="postBox" module="MEI.namesdates"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(postal box or post office box) contains a number or other identifier for some postal
+    </remarks></elementSpec><elementSpec rend="add" ident="postBox" module="MEI.namesdates"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">postal box or post office box</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a number or other identifier for some postal
       delivery point other than a street address.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
@@ -11065,7 +11064,7 @@
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/></choice></zeroOrMore>
     </content><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-postBox.html">postBox</ref> element of the Text Encoding Initiative (TEI).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="postCode" module="MEI.namesdates"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(postal code) contains a numerical or alphanumeric code used as part of a postal address
+    </remarks></elementSpec><elementSpec rend="add" ident="postCode" module="MEI.namesdates"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">postal code</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Contains a numerical or alphanumeric code used as part of a postal address
       to simplify sorting or delivery of mail.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
@@ -11423,7 +11422,7 @@
           <valItem ident="virga"/>
           <valItem ident="virgastrata"/>
         </valList>
-      </attDef></attList></elementSpec><elementSpec rend="add" ident="ncGrp" module="MEI.neumes"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Collection of one or more neume components.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+      </attDef></attList></elementSpec><elementSpec rend="add" ident="ncGrp" module="MEI.neumes"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">neume component group</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Collection of one or more neume components.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.ncGrp.anl"/>
@@ -14283,6 +14282,16 @@
         </datatype>
       </attDef>
     </attList>
+  </classSpec><classSpec rend="add" ident="att.runningtext" module="MEI.shared" type="atts">
+    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record the function (i.e., placement) of page running text elements.</desc>
+    <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+      <attDef ident="func" usage="opt">
+        <desc xml:lang="en">Records the function (i.e., placement) of a page header or footer.</desc>
+        <datatype>
+          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.PGFUNC"/>
+        </datatype>
+      </attDef>
+    </attList>
   </classSpec><classSpec rend="add" ident="att.sb.log" module="MEI.shared" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Logical domain attributes.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -17066,17 +17075,13 @@
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.lang"/>
+      <memberOf key="att.runningtext"/>
     </classes><content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textComponentLike"/><ref name="model.textPhraseLike.limited"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/><ref name="model.appLike"/><ref name="anchoredText"/></choice></zeroOrMore>
     </content><attList><attDef xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" ident="halign" usage="opt">
         <desc xml:lang="en">Records horizontal alignment of the page footer.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.HORIZONTALALIGNMENT"/>
-        </datatype>
-      </attDef><attDef xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" ident="func" usage="opt">
-        <desc xml:lang="en">Records the function (i.e., placement) of the page footer.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.PGFUNC"/>
         </datatype>
       </attDef></attList><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>This element is used to capture the textual data that often appears in
@@ -17088,17 +17093,13 @@
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.lang"/>
+      <memberOf key="att.runningtext"/>
     </classes><content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><rng:text xmlns="http://www.tei-c.org/ns/1.0"/><ref name="model.textComponentLike"/><ref name="model.textPhraseLike.limited"/><ref name="model.editLike"/><ref name="model.transcriptionLike"/><ref name="model.appLike"/><ref name="anchoredText"/></choice></zeroOrMore>
     </content><attList><attDef xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" ident="halign" usage="opt">
         <desc xml:lang="en">Records horizontal alignment of the page header.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.HORIZONTALALIGNMENT"/>
-        </datatype>
-      </attDef><attDef xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" ident="func" usage="opt">
-        <desc xml:lang="en">Records the function (i.e., placement) of the page header.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.PGFUNC"/>
         </datatype>
       </attDef></attList><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>This element is used to capture the textual data that often appears in
@@ -18250,8 +18251,7 @@
       <p>Do not confuse this element, used to capture block-level quotations, and <gi scheme="MEI">q</gi>, intended for inline quotations.</p>
     </remarks><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The model of this element is based on the <ref target="https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-quote.html">quote</ref> element of the Text Encoding Initiative (TEI) and the <ref target="https://www.loc.gov/ead/EAD3taglib/EAD3-TL-eng.html#elem-quote">quote</ref> element of the Encoded Archival Description (EAD).</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="seg" module="MEI.text"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">(arbitrary segment) represents any segmentation of text below the "text component"
-      level.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+    </remarks></elementSpec><elementSpec rend="add" ident="seg" module="MEI.text"><gloss xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" versionDate="2023-06-16" xml:lang="en">arbitrary segment</gloss><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">represents any segmentation of text below the "text component" level.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <memberOf key="att.common"/>
       <memberOf key="att.facsimile"/>
       <memberOf key="att.lang"/>
@@ -18611,7 +18611,7 @@
       <memberOf key="att.color"/>
       <memberOf key="att.enclosingChars"/>
       <memberOf key="att.extSym"/>
-       <memberOf key="att.placementOnStaff"/>       
+      <memberOf key="att.placementOnStaff"/>
       <memberOf key="att.placementRelEvent"/>
       <memberOf key="att.staffLoc"/>
       <memberOf key="att.staffLoc.pitched"/>
@@ -19605,7 +19605,6 @@
       <memberOf key="att.staffLoc.pitched"/>
       <memberOf key="att.typography"/>
       <memberOf key="att.visualOffset"/>
-      <memberOf key="att.visibility"/>
       <memberOf key="att.xy"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.mRpt.vis" module="MEI.visual" type="atts">
@@ -19644,6 +19643,7 @@
       <memberOf key="att.staffLoc"/>
       <memberOf key="att.staffLoc.pitched"/>
       <memberOf key="att.typography"/>
+      <memberOf key="att.visibility"/>
       <memberOf key="att.width"/>
     </classes>
     <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -20076,7 +20076,7 @@
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.COLOR"/>
         </datatype>
         <remarks xml:lang="en">
-          <p>The value is structured; that is, it should contain a single color value or have 
+          <p>The value is structured; that is, it should contain a single color value or have
             the same number of space-separated values as the number of lines indicated by the
             lines attribute. The first value then applies to the lowest line of the staff.</p>
           <p>All values from data.COLOR are allowed.</p>
