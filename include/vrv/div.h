@@ -18,6 +18,8 @@ namespace vrv {
 
 /**
  * This class represents an MEI Div.
+ * The current implementation accepts <rend> as child of <div>, which is not valid
+ * See https://github.com/music-encoding/music-encoding/issues/1189
  */
 class Div : public TextLayoutElement {
 public:
