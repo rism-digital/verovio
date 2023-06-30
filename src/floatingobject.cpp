@@ -33,6 +33,7 @@
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
+#include "repeatmark.h"
 #include "slur.h"
 #include "staff.h"
 #include "tempo.h"
@@ -313,6 +314,13 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(reh);
         // reh above by default
         m_place = (reh->GetPlace() != STAFFREL_NONE) ? reh->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(REPEATMARK)) {
+        RepeatMark *repeatMark = vrv_cast<RepeatMark *>(object);
+        assert(repeatMark);
+        // repeatMark above by default
+        m_place = (repeatMark->GetPlace() != STAFFREL_NONE) ? repeatMark->GetPlace()
+                                                            : repeatMark->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(TEMPO)) {
         Tempo *tempo = vrv_cast<Tempo *>(object);
@@ -812,7 +820,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
 
         // For selected types use the cut out boundary
         int boxTopY = boundingBox->GetTopBy(type);
-        if (boundingBox->Is(ACCID)) {
+        if (this->GetObject()->Is({ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
             const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxTopY = boundingBox->GetCutOutTop(*resources);
@@ -849,7 +857,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
 
         // For selected types use the cut out boundary
         int boxBottomY = boundingBox->GetBottomBy(type);
-        if (boundingBox->Is(ACCID)) {
+        if (this->GetObject()->Is({ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
             const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxBottomY = boundingBox->GetCutOutBottom(*resources);

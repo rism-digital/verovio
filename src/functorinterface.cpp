@@ -90,6 +90,7 @@
 #include "proport.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -714,6 +715,16 @@ FunctorCode FunctorInterface::VisitReh(Reh *reh)
 FunctorCode FunctorInterface::VisitRehEnd(Reh *reh)
 {
     return this->VisitControlElementEnd(reh);
+}
+
+FunctorCode FunctorInterface::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    return this->VisitControlElement(repeatMark);
+}
+
+FunctorCode FunctorInterface::VisitRepeatMarkEnd(RepeatMark *repeatMark)
+{
+    return this->VisitControlElementEnd(repeatMark);
 }
 
 FunctorCode FunctorInterface::VisitSlur(Slur *slur)
@@ -2008,6 +2019,16 @@ FunctorCode ConstFunctorInterface::VisitReh(const Reh *reh)
 FunctorCode ConstFunctorInterface::VisitRehEnd(const Reh *reh)
 {
     return this->VisitControlElementEnd(reh);
+}
+
+FunctorCode ConstFunctorInterface::VisitRepeatMark(const RepeatMark *repeatMark)
+{
+    return this->VisitControlElement(repeatMark);
+}
+
+FunctorCode ConstFunctorInterface::VisitRepeatMarkEnd(const RepeatMark *repeatMark)
+{
+    return this->VisitControlElementEnd(repeatMark);
 }
 
 FunctorCode ConstFunctorInterface::VisitSlur(const Slur *slur)

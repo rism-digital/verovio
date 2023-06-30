@@ -2726,14 +2726,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; }
-    data_KEYSIGNATURE GetKeySig() const { return m_keySig; }
-    bool HasKeySig() const;
+    void SetKeysig(data_KEYSIGNATURE keysig_) { m_keysig = keysig_; }
+    data_KEYSIGNATURE GetKeysig() const { return m_keysig; }
+    bool HasKeysig() const;
     ///@}
 
 private:
     /** Written key signature. **/
-    data_KEYSIGNATURE m_keySig;
+    data_KEYSIGNATURE m_keysig;
 };
 
 //----------------------------------------------------------------------------

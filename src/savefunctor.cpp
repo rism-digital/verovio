@@ -14,6 +14,7 @@
 #include "mdiv.h"
 #include "mnum.h"
 #include "runningelement.h"
+#include "text.h"
 
 //----------------------------------------------------------------------------
 
@@ -146,6 +147,26 @@ FunctorCode SaveFunctor::VisitRunningElementEnd(RunningElement *runningElement)
     }
     else {
         return this->VisitTextLayoutElementEnd(runningElement);
+    }
+}
+
+FunctorCode SaveFunctor::VisitText(Text *text)
+{
+    if (text->IsGenerated()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObject(text);
+    }
+}
+
+FunctorCode SaveFunctor::VisitTextEnd(Text *text)
+{
+    if (text->IsGenerated()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    else {
+        return this->VisitObjectEnd(text);
     }
 }
 

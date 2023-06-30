@@ -6874,10 +6874,10 @@ void HumdrumInput::setKeySig(
     if (secondary && (keyvalue == 0)) {
         // Force cancellation keysignature when there are no
         // sharps/flats in key signature change.
-        vrvkeysig->SetSigShowchange(BOOLEAN_true);
+        vrvkeysig->SetCancelaccid(CANCELACCID_before);
     }
     else if (m_show_cautionary_keysig) {
-        vrvkeysig->SetSigShowchange(BOOLEAN_true);
+        vrvkeysig->SetCancelaccid(CANCELACCID_before);
     }
 
     if (!keytok) {
@@ -15522,7 +15522,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         text->SetText(symbol);
         rend->AddChild(text);
         label->AddChild(rend);
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         if (!poststring.empty()) {
             addTextElement(label, poststring);
         }

@@ -1,15 +1,14 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ornam.h
+// Name:        repeatmark.h
 // Author:      Laurent Pugin
-// Created:     2022
+// Created:     2023
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ORNAM_H__
-#define __VRV_ORNAM_H__
+#ifndef __VRV_REPEATMARK_H__
+#define __VRV_REPEATMARK_H__
 
 #include "atts_cmn.h"
-#include "atts_cmnornaments.h"
 #include "atts_externalsymbols.h"
 #include "controlelement.h"
 #include "textdirinterface.h"
@@ -18,31 +17,31 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Ornam
+// RepeatMark
 //----------------------------------------------------------------------------
 
 /**
  * This class models the MEI <ornam> element.
  */
-class Ornam : public ControlElement,
-              public TextListInterface,
-              public TextDirInterface,
-              public TimePointInterface,
-              public AttColor,
-              public AttExtSymAuth,
-              public AttExtSymNames,
-              public AttOrnamentAccid {
+class RepeatMark : public ControlElement,
+                   public TextListInterface,
+                   public TextDirInterface,
+                   public TimePointInterface,
+                   public AttColor,
+                   public AttExtSymAuth,
+                   public AttExtSymNames,
+                   public AttRepeatMarkLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Ornam();
-    virtual ~Ornam();
-    Object *Clone() const override { return new Ornam(*this); }
+    RepeatMark();
+    virtual ~RepeatMark();
+    Object *Clone() const override { return new RepeatMark(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Ornam"; }
+    std::string GetClassName() const override { return "RepeatMark"; }
     ///@}
 
     /**
@@ -65,9 +64,9 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * Get the SMuFL glyph for the ornam based glyph.num
+     * Get the SMuFL glyph for the repeatMark based on func or glyph.num
      */
-    char32_t GetOrnamGlyph() const;
+    char32_t GetMarkGlyph() const;
 
     //----------//
     // Functors //

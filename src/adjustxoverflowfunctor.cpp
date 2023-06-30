@@ -32,7 +32,7 @@ AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin) : Functor()
 
 FunctorCode AdjustXOverflowFunctor::VisitControlElement(ControlElement *controlElement)
 {
-    if (!controlElement->Is({ DIR, DYNAM, ORNAM, TEMPO })) {
+    if (!controlElement->Is({ DIR, DYNAM, ORNAM, REPEATMARK, TEMPO })) {
         return FUNCTOR_SIBLINGS;
     }
 
