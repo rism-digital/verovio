@@ -33,6 +33,8 @@ Text::~Text() {}
 void Text::Reset()
 {
     TextElement::Reset();
+
+    m_isGenerated = false;
 }
 
 FunctorCode Text::Accept(Functor &functor)

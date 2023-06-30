@@ -224,7 +224,7 @@ modules:
             sig:
                 type: data_KEYSIGNATURE
         att.keySigDefault.log:
-            key.sig:
+            keysig:
                 type: data_KEYSIGNATURE
         att.meterSig.log:
             count:

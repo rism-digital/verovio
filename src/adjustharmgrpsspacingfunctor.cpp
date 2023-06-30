@@ -82,12 +82,30 @@ FunctorCode AdjustHarmGrpsSpacingFunctor::VisitHarm(Harm *harm)
         return FUNCTOR_SIBLINGS;
     }
 
+    // If we have more than one harm at the same position, do not adjust them
+    // This situation makes sense when the first of them is right aligned
+    if (m_previousHarmStart && m_previousHarmStart == harm->GetStart()) {
+        m_previousHarmPositioner = harmPositioner;
+        return FUNCTOR_SIBLINGS;
+    }
+
     /************** Calculate the adjustment **************/
 
     assert(harm->GetStart());
     assert(harmPositioner);
 
-    // Not much to do when we hit the first syllable of the system
+    // First harm in the system
+    if (!m_previousMeasure && !m_previousHarmPositioner) {
+        // Check that is it not overflowing the beginning of the measure
+        int overflow = harm->GetStart()->GetDrawingX() + harmPositioner->GetContentX1();
+        Measure *measure = vrv_cast<Measure *>(harm->GetFirstAncestor(MEASURE));
+        if ((overflow < 0) && measure && measure->GetLeftBarLine()) {
+            m_overlappingHarm.push_back(std::make_tuple(
+                measure->GetLeftBarLine()->GetAlignment(), harm->GetStart()->GetAlignment(), -overflow));
+        }
+    }
+
+    // Not much to do when we hit the first harm of the system
     if (m_previousHarmPositioner == NULL) {
         m_previousHarmStart = harm->GetStart();
         m_previousHarmPositioner = harmPositioner;
@@ -110,7 +128,7 @@ FunctorCode AdjustHarmGrpsSpacingFunctor::VisitHarm(Harm *harm)
     overlap += wordSpace;
 
     if (overlap > 0) {
-        // We are adjusting syl in two different measures - move only the right barline of the first measure
+        // We are adjusting harms in two different measures - move only the right barline of the first measure
         if (m_previousMeasure) {
             m_overlappingHarm.push_back(std::make_tuple(
                 m_previousHarmStart->GetAlignment(), m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));

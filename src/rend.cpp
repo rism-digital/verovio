@@ -33,6 +33,7 @@ Rend::Rend()
     : TextElement(REND, "rend-")
     , AreaPosInterface()
     , AttColor()
+    , AttExtSymAuth()
     , AttLang()
     , AttNNumberLike()
     , AttTextRendition()
@@ -41,6 +42,7 @@ Rend::Rend()
 {
     this->RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_LANG);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_TEXTRENDITION);
@@ -57,6 +59,7 @@ void Rend::Reset()
     TextElement::Reset();
     AreaPosInterface::Reset();
     this->ResetColor();
+    this->ResetExtSymAuth();
     this->ResetLang();
     this->ResetNNumberLike();
     this->ResetTextRendition();

@@ -15,6 +15,8 @@
 #ifndef __LIBMEI_ATT_TYPES_H__
 #define __LIBMEI_ATT_TYPES_H__
 
+#include <cstdint>
+
 //----------------------------------------------------------------------------
 
 namespace vrv {
@@ -299,6 +301,18 @@ enum data_BOOLEAN : int8_t {
     BOOLEAN_true,
     BOOLEAN_false,
     BOOLEAN_MAX
+};
+
+/**
+ * MEI data.CANCELACCID
+ */
+enum data_CANCELACCID : int8_t {
+    CANCELACCID_NONE = 0,
+    CANCELACCID_none,
+    CANCELACCID_before,
+    CANCELACCID_after,
+    CANCELACCID_before_bar,
+    CANCELACCID_MAX
 };
 
 /**

@@ -35,26 +35,29 @@ FunctorCode AdjustAccidXFunctor::VisitAlignment(Alignment *alignment)
 
 FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *alignmentReference)
 {
-    std::vector<Accid *> &accidSpace = alignmentReference->m_accidSpace;
-    if (accidSpace.empty()) return FUNCTOR_SIBLINGS;
+    m_adjustedAccids.clear();
+
+    std::vector<Accid *> accids = this->GetAccidentalsForAdjustment(alignmentReference);
+    if (accids.empty()) return FUNCTOR_SIBLINGS;
 
     assert(m_doc);
     StaffDef *staffDef = m_doc->GetCurrentScoreDef()->GetStaffDef(alignmentReference->GetN());
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
-    std::sort(accidSpace.begin(), accidSpace.end(), AccidSpaceSort());
+    std::sort(accids.begin(), accids.end(), AccidSpaceSort());
     // process accid layer alignment
-    alignmentReference->SetAccidLayerAlignment();
+    for (Accid *accid : accids) {
+        this->SetAccidLayerAlignment(accid, alignmentReference);
+    }
 
     // Detect accids which are an octave apart => they will be grouped together in the multiset
     std::multiset<Accid *, AccidOctaveSort> octaveEquivalence;
-    std::copy(accidSpace.begin(), accidSpace.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
+    std::copy(accids.begin(), accids.end(), std::inserter(octaveEquivalence, octaveEquivalence.begin()));
 
-    std::set<Accid *> adjustedAccids;
     // Align the octaves
-    for (Accid *accid : accidSpace) {
+    for (Accid *accid : accids) {
         // Skip any accid that was already adjusted
-        if (adjustedAccids.count(accid) > 0) continue;
+        if (m_adjustedAccids.count(accid) > 0) continue;
         auto range = octaveEquivalence.equal_range(accid);
         // Handle at least two octave accids without unisons
         int octaveAccidCount = 0;
@@ -68,7 +71,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
         // Now adjust the octave accids and store the left most position
         int minDrawingX = -VRV_UNSET;
         for (auto octaveIter = range.first; octaveIter != range.second; ++octaveIter) {
-            alignmentReference->AdjustAccidWithAccidSpace(*octaveIter, m_doc, staffSize, adjustedAccids);
+            this->AdjustAccidWithSpace(*octaveIter, alignmentReference, staffSize);
             minDrawingX = std::min(minDrawingX, (*octaveIter)->GetDrawingX());
         }
         // Finally, align the accidentals whenever the adjustment is not too large
@@ -84,26 +87,26 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     }
 
     // Align accidentals for unison notes if any of them are present
-    for (Accid *accid : accidSpace) {
+    for (Accid *accid : accids) {
         if (accid->GetDrawingUnisonAccid() == NULL) continue;
         accid->SetDrawingXRel(accid->GetDrawingUnisonAccid()->GetDrawingXRel());
     }
 
-    const int count = (int)accidSpace.size();
+    const int count = (int)accids.size();
     const int middle = (count / 2) + (count % 2);
     // Zig-zag processing
     for (int i = 0, j = count - 1; i < middle; ++i, --j) {
         // top one - but skip if already adjusted (i.e. octaves)
-        if (adjustedAccids.count(accidSpace.at(i)) == 0) {
-            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(i), m_doc, staffSize, adjustedAccids);
+        if (m_adjustedAccids.count(accids.at(i)) == 0) {
+            this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
         }
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
         // bottom one - but skip if already adjusted
-        if (adjustedAccids.count(accidSpace.at(j)) == 0) {
-            alignmentReference->AdjustAccidWithAccidSpace(accidSpace.at(j), m_doc, staffSize, adjustedAccids);
+        if (m_adjustedAccids.count(accids.at(j)) == 0) {
+            this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
         }
     }
 
@@ -117,6 +120,64 @@ FunctorCode AdjustAccidXFunctor::VisitMeasure(Measure *measure)
     measure->m_measureAligner.Process(*this);
 
     return FUNCTOR_CONTINUE;
+}
+
+std::vector<Accid *> AdjustAccidXFunctor::GetAccidentalsForAdjustment(AlignmentReference *alignmentReference) const
+{
+    std::vector<Accid *> accidentals;
+    for (Object *child : alignmentReference->GetChildren()) {
+        if (child->Is(ACCID)) {
+            Accid *accid = vrv_cast<Accid *>(child);
+            if (accid->HasAccid()) accidentals.push_back(accid);
+        }
+    }
+    return accidentals;
+}
+
+void AdjustAccidXFunctor::SetAccidLayerAlignment(Accid *accid, const AlignmentReference *alignmentReference) const
+{
+    if (accid->IsAlignedWithSameLayer()) return;
+
+    const ArrayOfConstObjects &children = alignmentReference->GetChildren();
+    Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
+    const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](const Object *object) {
+        if (!object->Is(NOTE)) return false;
+        const Note *otherNote = vrv_cast<const Note *>(object);
+        // in case notes are in unison but have different accidentals
+        return parentNote && parentNote->IsUnisonWith(otherNote, true) && !parentNote->IsUnisonWith(otherNote, false);
+    });
+
+    if (!hasUnisonOverlap) return;
+
+    Chord *chord = parentNote->IsChordTone();
+    // no chord, so align only parent note
+    if (!chord) {
+        accid->IsAlignedWithSameLayer(true);
+        return;
+    }
+    // we have chord ancestor, so need to align all of its accidentals
+    ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
+    std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
+        Accid *accid = vrv_cast<Accid *>(object);
+        accid->IsAlignedWithSameLayer(true);
+    });
+}
+
+void AdjustAccidXFunctor::AdjustAccidWithSpace(Accid *accid, AlignmentReference *alignmentReference, int staffSize)
+{
+    std::vector<Accid *> leftAccids;
+    const ArrayOfObjects &children = alignmentReference->GetChildren();
+
+    // bottom one
+    for (Object *child : children) {
+        // if accidental has unison overlap, ignore elements on other layers for overlap
+        if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
+            continue;
+        accid->AdjustX(dynamic_cast<LayerElement *>(child), m_doc, staffSize, leftAccids, m_adjustedAccids);
+    }
+
+    // Mark as adjusted (even if position was not altered)
+    m_adjustedAccids.insert(accid);
 }
 
 } // namespace vrv

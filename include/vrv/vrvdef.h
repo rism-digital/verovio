@@ -198,6 +198,7 @@ enum ClassId : uint16_t {
     PHRASE,
     PITCHINFLECTION,
     REH,
+    REPEATMARK,
     SLUR,
     TEMPO,
     TIE,
@@ -352,7 +353,7 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceIDTuples;
+typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 

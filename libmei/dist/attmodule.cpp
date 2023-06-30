@@ -2822,8 +2822,8 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog *>(element);
         assert(att);
-        if (attrType == "key.sig") {
-            att->SetKeySig(att->StrToKeysignature(attrValue));
+        if (attrType == "keysig") {
+            att->SetKeysig(att->StrToKeysignature(attrValue));
             return true;
         }
     }
@@ -4366,8 +4366,8 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         const AttKeySigDefaultLog *att = dynamic_cast<const AttKeySigDefaultLog *>(element);
         assert(att);
-        if (att->HasKeySig()) {
-            attributes->push_back({ "key.sig", att->KeysignatureToStr(att->GetKeySig()) });
+        if (att->HasKeysig()) {
+            attributes->push_back({ "keysig", att->KeysignatureToStr(att->GetKeysig()) });
         }
     }
     if (element->HasAttClass(ATT_LABELLED)) {
@@ -5582,16 +5582,16 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         AttKeySigVis *att = dynamic_cast<AttKeySigVis *>(element);
         assert(att);
-        if (attrType == "sig.showchange") {
-            att->SetSigShowchange(att->StrToBoolean(attrValue));
+        if (attrType == "cancelaccid") {
+            att->SetCancelaccid(att->StrToCancelaccid(attrValue));
             return true;
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTVIS)) {
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis *>(element);
         assert(att);
-        if (attrType == "keysig.showchange") {
-            att->SetKeysigShowchange(att->StrToBoolean(attrValue));
+        if (attrType == "keysig.cancelaccid") {
+            att->SetKeysigCancelaccid(att->StrToCancelaccid(attrValue));
             return true;
         }
         if (attrType == "keysig.visible") {
@@ -6055,15 +6055,15 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         const AttKeySigVis *att = dynamic_cast<const AttKeySigVis *>(element);
         assert(att);
-        if (att->HasSigShowchange()) {
-            attributes->push_back({ "sig.showchange", att->BooleanToStr(att->GetSigShowchange()) });
+        if (att->HasCancelaccid()) {
+            attributes->push_back({ "cancelaccid", att->CancelaccidToStr(att->GetCancelaccid()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTVIS)) {
         const AttKeySigDefaultVis *att = dynamic_cast<const AttKeySigDefaultVis *>(element);
         assert(att);
-        if (att->HasKeysigShowchange()) {
-            attributes->push_back({ "keysig.showchange", att->BooleanToStr(att->GetKeysigShowchange()) });
+        if (att->HasKeysigCancelaccid()) {
+            attributes->push_back({ "keysig.cancelaccid", att->CancelaccidToStr(att->GetKeysigCancelaccid()) });
         }
         if (att->HasKeysigVisible()) {
             attributes->push_back({ "keysig.visible", att->BooleanToStr(att->GetKeysigVisible()) });

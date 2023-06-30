@@ -60,7 +60,6 @@ void Ornam::Reset()
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
     this->ResetOrnamentAccid();
-    this->ResetPlacementRelStaff();
 }
 
 bool Ornam::IsSupportedChild(Object *child)
