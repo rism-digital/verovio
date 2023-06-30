@@ -4772,9 +4772,27 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
+            success = this->ReadPgFoot(parent, current);
+        }
+        else if (std::string(current.name()) == "pgFoot2") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
             success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgHead") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
+            success = this->ReadPgHead(parent, current);
+        }
+        else if (std::string(current.name()) == "pgHead2") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
             success = this->ReadPgHead(parent, current);
         }
         // symbolTable
@@ -8037,6 +8055,24 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
+}
+
+void MEIInput::UpgradePgHeadFootTo_5_0_0(pugi::xml_node element)
+{
+    if ((std::string(element.name()) == "pgFoot") && !element.attribute("func")) {
+        element.append_attribute("func") = "first";
+    }
+    else if (std::string(element.name()) == "pgFoot2") {
+        element.set_name("pgFoot");
+        element.append_attribute("func") = "all";
+    }
+    else if ((std::string(element.name()) == "pgHead") && !element.attribute("func")) {
+        element.append_attribute("func") = "first";
+    }
+    else if (std::string(element.name()) == "pgHead2") {
+        element.set_name("pgHead");
+        element.append_attribute("func") = "all";
+    }
 }
 
 void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
