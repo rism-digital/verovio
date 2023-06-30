@@ -81,9 +81,7 @@
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "phrase.h"
 #include "pitchinflection.h"
 #include "plica.h"
@@ -367,16 +365,6 @@ FunctorCode FunctorInterface::VisitPgHeadEnd(PgHead *pgHead)
     return this->VisitRunningElementEnd(pgHead);
 }
 
-FunctorCode FunctorInterface::VisitPgHead2(PgHead2 *pgHead2)
-{
-    return this->VisitRunningElement(pgHead2);
-}
-
-FunctorCode FunctorInterface::VisitPgHead2End(PgHead2 *pgHead2)
-{
-    return this->VisitRunningElementEnd(pgHead2);
-}
-
 FunctorCode FunctorInterface::VisitPgFoot(PgFoot *pgFoot)
 {
     return this->VisitRunningElement(pgFoot);
@@ -385,16 +373,6 @@ FunctorCode FunctorInterface::VisitPgFoot(PgFoot *pgFoot)
 FunctorCode FunctorInterface::VisitPgFootEnd(PgFoot *pgFoot)
 {
     return this->VisitRunningElementEnd(pgFoot);
-}
-
-FunctorCode FunctorInterface::VisitPgFoot2(PgFoot2 *pgFoot2)
-{
-    return this->VisitRunningElement(pgFoot2);
-}
-
-FunctorCode FunctorInterface::VisitPgFoot2End(PgFoot2 *pgFoot2)
-{
-    return this->VisitRunningElementEnd(pgFoot2);
 }
 
 FunctorCode FunctorInterface::VisitTextLayoutElement(TextLayoutElement *textLayoutElement)
@@ -1671,16 +1649,6 @@ FunctorCode ConstFunctorInterface::VisitPgHeadEnd(const PgHead *pgHead)
     return this->VisitRunningElementEnd(pgHead);
 }
 
-FunctorCode ConstFunctorInterface::VisitPgHead2(const PgHead2 *pgHead2)
-{
-    return this->VisitRunningElement(pgHead2);
-}
-
-FunctorCode ConstFunctorInterface::VisitPgHead2End(const PgHead2 *pgHead2)
-{
-    return this->VisitRunningElementEnd(pgHead2);
-}
-
 FunctorCode ConstFunctorInterface::VisitPgFoot(const PgFoot *pgFoot)
 {
     return this->VisitRunningElement(pgFoot);
@@ -1689,16 +1657,6 @@ FunctorCode ConstFunctorInterface::VisitPgFoot(const PgFoot *pgFoot)
 FunctorCode ConstFunctorInterface::VisitPgFootEnd(const PgFoot *pgFoot)
 {
     return this->VisitRunningElementEnd(pgFoot);
-}
-
-FunctorCode ConstFunctorInterface::VisitPgFoot2(const PgFoot2 *pgFoot2)
-{
-    return this->VisitRunningElement(pgFoot2);
-}
-
-FunctorCode ConstFunctorInterface::VisitPgFoot2End(const PgFoot2 *pgFoot2)
-{
-    return this->VisitRunningElementEnd(pgFoot2);
 }
 
 FunctorCode ConstFunctorInterface::VisitTextLayoutElement(const TextLayoutElement *textLayoutElement)

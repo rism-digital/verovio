@@ -95,9 +95,7 @@ class Pages;
 class Pb;
 class Pedal;
 class PgFoot;
-class PgFoot2;
 class PgHead;
-class PgHead2;
 class Phrase;
 class PitchInflection;
 class Plica;
@@ -235,12 +233,8 @@ public:
     virtual FunctorCode VisitRunningElementEnd(RunningElement *runningElement);
     virtual FunctorCode VisitPgFoot(PgFoot *pgFoot);
     virtual FunctorCode VisitPgFootEnd(PgFoot *pgFoot);
-    virtual FunctorCode VisitPgFoot2(PgFoot2 *pgFoot2);
-    virtual FunctorCode VisitPgFoot2End(PgFoot2 *pgFoot2);
     virtual FunctorCode VisitPgHead(PgHead *pgHead);
     virtual FunctorCode VisitPgHeadEnd(PgHead *pgHead);
-    virtual FunctorCode VisitPgHead2(PgHead2 *pgHead2);
-    virtual FunctorCode VisitPgHead2End(PgHead2 *pgHead2);
     virtual FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement);
     virtual FunctorCode VisitTextLayoutElementEnd(TextLayoutElement *textLayoutElement);
     ///@}
@@ -596,12 +590,8 @@ public:
     virtual FunctorCode VisitRunningElementEnd(const RunningElement *runningElement);
     virtual FunctorCode VisitPgFoot(const PgFoot *pgFoot);
     virtual FunctorCode VisitPgFootEnd(const PgFoot *pgFoot);
-    virtual FunctorCode VisitPgFoot2(const PgFoot2 *pgFoot2);
-    virtual FunctorCode VisitPgFoot2End(const PgFoot2 *pgFoot2);
     virtual FunctorCode VisitPgHead(const PgHead *pgHead);
     virtual FunctorCode VisitPgHeadEnd(const PgHead *pgHead);
-    virtual FunctorCode VisitPgHead2(const PgHead2 *pgHead2);
-    virtual FunctorCode VisitPgHead2End(const PgHead2 *pgHead2);
     virtual FunctorCode VisitTextLayoutElement(const TextLayoutElement *textLayoutElement);
     virtual FunctorCode VisitTextLayoutElementEnd(const TextLayoutElement *textLayoutElement);
     ///@}
