@@ -13,6 +13,7 @@
 #include "doc.h"
 #include "layer.h"
 #include "mrest.h"
+#include "nc.h"
 #include "rest.h"
 #include "staff.h"
 #include "tuning.h"
@@ -277,6 +278,17 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             yRel += m_doc->GetDrawingUnit(staffY->m_drawingStaffSize) * spacingRatio;
         }
         layerElement->SetDrawingYRel(yRel);
+    }
+    else if (layerElement->Is(NC) && m_doc->GetOptions()->m_neumeAsNote.GetValue()) {
+        Nc *nc = vrv_cast<Nc *>(layerElement);
+        assert(nc);
+        int loc = 0;
+        if (nc->HasPname() && nc->HasOct()) {
+            loc = PitchInterface::CalcLoc(nc->GetPname(), nc->GetOct(), layerY->GetClefLocOffset(nc));
+        }
+        int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
+        nc->SetDrawingLoc(loc);
+        nc->SetDrawingYRel(yRel);
     }
 
     return FUNCTOR_CONTINUE;

@@ -419,6 +419,15 @@ protected:
     void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
+
+    /**
+     * @name Methods for drawing parts of neume LayerElement child classes.
+     * Defined in view_neumes.cpp
+     */
+    ///@{
+    void DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
+
     /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.

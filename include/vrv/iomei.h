@@ -710,6 +710,7 @@ private:
     bool ReadKeyAccid(Object *parent, pugi::xml_node keyAccid);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);
+    bool ReadLiquescent(Object *parent, pugi::xml_node liquescent);
     bool ReadMensur(Object *parent, pugi::xml_node mensur);
     bool ReadMeterSig(Object *parent, pugi::xml_node meterSig);
     bool ReadMRest(Object *parent, pugi::xml_node mRest);

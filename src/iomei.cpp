@@ -656,6 +656,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
             m_currentNode = m_currentNode.append_child("ligature");
             this->WriteLigature(m_currentNode, vrv_cast<Ligature *>(object));
         }
+        else if (object->Is(LIQUESCENT)) {
+            m_currentNode = m_currentNode.append_child("liquescent");
+            this->WriteLiquescent(m_currentNode, vrv_cast<Liquescent *>(object));
+        }
         else if (object->Is(MENSUR)) {
             if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("mensur");
             this->WriteMensur(m_currentNode, vrv_cast<Mensur *>(object));
@@ -2469,7 +2473,8 @@ void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
     divLine->WriteDivLineLog(currentNode);
     divLine->WriteColor(currentNode);
     divLine->WriteVisibility(currentNode);
-    divLine->WriteExtSym(currentNode);
+    divLine->WriteExtSymAuth(currentNode);
+    divLine->WriteExtSymNames(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -2571,8 +2576,6 @@ void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquesce
 
     WriteLayerElement(currentNode, liquescent);
     WritePositionInterface(currentNode, liquescent);
-    // liquescent->WriteAccidLog(currentNode);
-    // liquescent->WriteEnclosingChars(currentNode);
 }
 
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
@@ -3678,6 +3681,24 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for neume
+    else if (filterParent->Is(NEUME)) {
+        if (element == "nc") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for nc
+    else if (filterParent->Is(NC)) {
+        if (element == "liquescent") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for note
     else if (filterParent->Is(NOTE)) {
         if (element == "accid") {
@@ -3705,6 +3726,18 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     // filter for rest
     else if (filterParent->Is(REST)) {
         return false;
+    }
+    // filter for syllable
+    else if (filterParent->Is(SYLLABLE)) {
+        if (element == "neume") {
+            return true;
+        }
+        else if (element == "syl") {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     // filter for syl
     else if (filterParent->Is(SYL)) {
@@ -6140,6 +6173,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "ligature") {
             success = this->ReadLigature(parent, xmlElement);
         }
+        else if (elementName == "liquescent") {
+            success = this->ReadLiquescent(parent, xmlElement);
+        }
         else if (elementName == "mensur") {
             success = this->ReadMensur(parent, xmlElement);
         }
@@ -6453,7 +6489,8 @@ bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
     vrvDivLine->ReadDivLineLog(divLine);
     vrvDivLine->ReadColor(divLine);
     vrvDivLine->ReadVisibility(divLine);
-    vrvDivLine->ReadExtSym(divLine);
+    vrvDivLine->ReadExtSymAuth(divLine);
+    vrvDivLine->ReadExtSymNames(divLine);
 
     parent->AddChild(vrvDivLine);
     this->ReadUnsupportedAttr(divLine, vrvDivLine);
@@ -6567,6 +6604,17 @@ bool MEIInput::ReadLigature(Object *parent, pugi::xml_node ligature)
     parent->AddChild(vrvLigature);
     this->ReadUnsupportedAttr(ligature, vrvLigature);
     return this->ReadLayerChildren(vrvLigature, ligature, vrvLigature);
+}
+
+bool MEIInput::ReadLiquescent(Object *parent, pugi::xml_node liquescent)
+{
+    Liquescent *vrvLiquescent = new Liquescent();
+    this->ReadLayerElement(liquescent, vrvLiquescent);
+    this->ReadPositionInterface(liquescent, vrvLiquescent);
+
+    parent->AddChild(vrvLiquescent);
+    this->ReadUnsupportedAttr(liquescent, vrvLiquescent);
+    return true;
 }
 
 bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)

@@ -25,7 +25,8 @@ namespace vrv {
 class DivLine : public LayerElement,
                 public AttColor,
                 public AttDivLineLog,
-                public AttExtSym,
+                public AttExtSymAuth,
+                public AttExtSymNames,
                 public AttNNumberLike,
                 public AttVisibility {
 public:

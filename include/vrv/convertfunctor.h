@@ -107,6 +107,7 @@ public:
     FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
     ///@}
 
