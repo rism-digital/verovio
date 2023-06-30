@@ -381,6 +381,32 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttRunningtextComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId and has a @func of value func.
+ */
+class AttRunningtextComparison : public ClassIdComparison {
+
+public:
+    AttRunningtextComparison(ClassId classId, data_PGFUNC func) : ClassIdComparison(classId) { m_func = func; }
+
+    bool operator()(const Object *object) override
+    {
+        if (!MatchesType(object)) return false;
+        // This should not happen, but just in case
+        if (!object->HasAttClass(ATT_RUNNINGTEXT)) return false;
+        const AttRunningtext *element = dynamic_cast<const AttRunningtext *>(object);
+        assert(element);
+        return (element->GetFunc() == m_func);
+    }
+
+private:
+    data_PGFUNC m_func;
+};
+
+//----------------------------------------------------------------------------
 // CrossAlignmentReferenceComparison
 //----------------------------------------------------------------------------
 
