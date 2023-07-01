@@ -4632,7 +4632,7 @@ bool HumdrumInput::prepareFooter(
     // std::string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    AttRunningtextComparison comparison(PGFOOT, PGFUNC_first);
+    AttFormeworkComparison comparison(PGFOOT, PGFUNC_first);
     Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison);
     if (pgfoot == NULL) {
         return false;
@@ -4653,7 +4653,7 @@ bool HumdrumInput::prepareFooter(
 
     m_doc->GetCurrentScoreDef()->AddChild(pgfoot);
 
-    AttRunningtextComparison comparison2(PGFOOT, PGFUNC_all);
+    AttFormeworkComparison comparison2(PGFOOT, PGFUNC_all);
     Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison2);
     if (pgfoot2 == NULL) {
         return true;

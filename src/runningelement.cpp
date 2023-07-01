@@ -48,9 +48,9 @@ RunningElement::RunningElement(ClassId classId) : TextLayoutElement(classId, "re
 */
 
 RunningElement::RunningElement(ClassId classId, const std::string &classIdStr)
-    : TextLayoutElement(classId, classIdStr), AttRunningtext()
+    : TextLayoutElement(classId, classIdStr), AttFormework()
 {
-    this->RegisterAttClass(ATT_RUNNINGTEXT);
+    this->RegisterAttClass(ATT_FORMEWORK);
 
     this->Reset();
 }
@@ -60,7 +60,7 @@ RunningElement::~RunningElement() {}
 void RunningElement::Reset()
 {
     TextLayoutElement::Reset();
-    this->ResetRunningtext();
+    this->ResetFormework();
 
     m_isGenerated = false;
 

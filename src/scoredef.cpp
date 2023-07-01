@@ -583,25 +583,25 @@ void ScoreDef::SetDrawingLabelsWidth(int width)
 
 PgFoot *ScoreDef::GetPgFoot(data_PGFUNC func)
 {
-    AttRunningtextComparison comparison(PGFOOT, func);
+    AttFormeworkComparison comparison(PGFOOT, func);
     return vrv_cast<PgFoot *>(this->FindDescendantByComparison(&comparison));
 }
 
 const PgFoot *ScoreDef::GetPgFoot(data_PGFUNC func) const
 {
-    AttRunningtextComparison comparison(PGFOOT, func);
+    AttFormeworkComparison comparison(PGFOOT, func);
     return vrv_cast<const PgFoot *>(this->FindDescendantByComparison(&comparison));
 }
 
 PgHead *ScoreDef::GetPgHead(data_PGFUNC func)
 {
-    AttRunningtextComparison comparison(PGHEAD, func);
+    AttFormeworkComparison comparison(PGHEAD, func);
     return vrv_cast<PgHead *>(this->FindDescendantByComparison(&comparison));
 }
 
 const PgHead *ScoreDef::GetPgHead(data_PGFUNC func) const
 {
-    AttRunningtextComparison comparison(PGHEAD, func);
+    AttFormeworkComparison comparison(PGHEAD, func);
     return vrv_cast<const PgHead *>(this->FindDescendantByComparison(&comparison));
 }
 

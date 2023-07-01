@@ -25,7 +25,7 @@ class TextElement;
  * This class represents running elements (headers and footers).
  * It is not an abstract class but should not be instanciated directly.
  */
-class RunningElement : public TextLayoutElement, public AttRunningtext {
+class RunningElement : public TextLayoutElement, public AttFormework {
 public:
     /**
      * @name Constructors, destructors, reset methods

@@ -1731,7 +1731,7 @@ void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
     assert(runningElement);
 
     this->WriteTextLayoutElement(currentNode, runningElement);
-    runningElement->WriteRunningtext(currentNode);
+    runningElement->WriteFormework(currentNode);
 }
 
 void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
@@ -4909,7 +4909,7 @@ bool MEIInput::ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *
 bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
 {
     this->ReadTextLayoutElement(element, object);
-    object->ReadRunningtext(element);
+    object->ReadFormework(element);
 
     return true;
 }
