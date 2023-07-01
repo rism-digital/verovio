@@ -2763,6 +2763,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_FORMEWORK)) {
+        AttFormework *att = dynamic_cast<AttFormework *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToPgfunc(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_GRPSYMLOG)) {
         AttGrpSymLog *att = dynamic_cast<AttGrpSymLog *>(element);
         assert(att);
@@ -3432,14 +3440,6 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         assert(att);
         if (attrType == "dur") {
             att->SetDur(att->StrToDuration(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_RUNNINGTEXT)) {
-        AttRunningtext *att = dynamic_cast<AttRunningtext *>(element);
-        assert(att);
-        if (attrType == "func") {
-            att->SetFunc(att->StrToPgfunc(attrValue));
             return true;
         }
     }
@@ -4322,6 +4322,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "nonfiling", att->IntToStr(att->GetNonfiling()) });
         }
     }
+    if (element->HasAttClass(ATT_FORMEWORK)) {
+        const AttFormework *att = dynamic_cast<const AttFormework *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back({ "func", att->PgfuncToStr(att->GetFunc()) });
+        }
+    }
     if (element->HasAttClass(ATT_GRPSYMLOG)) {
         const AttGrpSymLog *att = dynamic_cast<const AttGrpSymLog *>(element);
         assert(att);
@@ -4880,13 +4887,6 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasDur()) {
             attributes->push_back({ "dur", att->DurationToStr(att->GetDur()) });
-        }
-    }
-    if (element->HasAttClass(ATT_RUNNINGTEXT)) {
-        const AttRunningtext *att = dynamic_cast<const AttRunningtext *>(element);
-        assert(att);
-        if (att->HasFunc()) {
-            attributes->push_back({ "func", att->PgfuncToStr(att->GetFunc()) });
         }
     }
     if (element->HasAttClass(ATT_SCALABLE)) {
