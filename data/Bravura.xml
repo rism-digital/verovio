@@ -801,6 +801,14 @@
   <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise6" />
   <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise7" />
   <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
+  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
+  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB9A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower3" />
+  <g c="EB9B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower4" />
+  <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
+  <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
+  <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
+  <g c="EB9F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower8" />
   <g c="EBA7" x="0.0" y="0.0" w="36.0" h="790.0" h-a-x="36" n="luteDurationWhole" />
   <g c="EBA8" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationHalf" />
   <g c="EBA9" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationQuarter" />
