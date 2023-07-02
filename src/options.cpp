@@ -1069,6 +1069,10 @@ Options::Options()
     m_moveScoreDefinitionToStaff.Init(false);
     this->Register(&m_moveScoreDefinitionToStaff, "moveScoreDefinitionToStaff", &m_general);
 
+    m_neumeAsNote.SetInfo("Neume as note", "Render neumes as note heads instead of original notation");
+    m_neumeAsNote.Init(false);
+    this->Register(&m_neumeAsNote, "neumeAsNote", &m_general);
+
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_general);
@@ -1523,6 +1527,10 @@ Options::Options()
     m_tieMinLength.SetInfo("Tie minimum length", "The minimum length of tie in MEI units");
     m_tieMinLength.Init(2.0, 0.0, 10.0);
     this->Register(&m_tieMinLength, "tieMinLength", &m_generalLayout);
+
+    m_tupletAngledOnBeams.SetInfo("Tuplet angled on beams", "Tuplet brackets angled on beams only");
+    m_tupletAngledOnBeams.Init(false);
+    this->Register(&m_tupletAngledOnBeams, "tupletAngledOnBeams", &m_generalLayout);
 
     m_tupletBracketThickness.SetInfo("Tuplet bracket thickness", "The thickness of the tuplet bracket");
     m_tupletBracketThickness.Init(0.2, 0.1, 0.8);

@@ -138,11 +138,11 @@ if __name__ == "__main__":
             timeMap1 = json.load(open(jsonFile1, 'r'))
             timeMap2 = json.load(open(jsonFile2, 'r'))
             if jsondiff(timeMap1, timeMap2) != 1:
-                print(f'{name} produced a changed time map')
+                print(f'::warning title=changes in time map detected::{name} produced a different time map')
 
             diffValue = pngdiff(pngFile1, pngFile2, delete_diff_file=True)
             if (diffValue > (args.threshold / 100.0)):
-                print(f'Img diff: {diffValue}')
+                print(f'::warning title=changes in rendering detected::{name} produced a different rendering')
                 row = etree.SubElement(table, 'tr')
                 col = etree.SubElement(row, 'td')
                 p = etree.SubElement(col, 'p')

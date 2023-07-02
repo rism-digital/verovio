@@ -24,6 +24,7 @@
 #include "mrest.h"
 #include "octave.h"
 #include "page.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "section.h"
@@ -45,7 +46,7 @@ namespace vrv {
 // ResetDataFunctor
 //----------------------------------------------------------------------------
 
-ResetDataFunctor::ResetDataFunctor() {}
+ResetDataFunctor::ResetDataFunctor() : Functor() {}
 
 FunctorCode ResetDataFunctor::VisitAccid(Accid *accid)
 {
@@ -63,7 +64,9 @@ FunctorCode ResetDataFunctor::VisitArpeg(Arpeg *arpeg)
 
     PlistInterface *interface = arpeg->GetPlistInterface();
     assert(interface);
-    return interface->InterfaceResetData(*this, arpeg);
+    interface->InterfaceResetData(*this, arpeg);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetDataFunctor::VisitArtic(Artic *artic)
@@ -91,6 +94,20 @@ FunctorCode ResetDataFunctor::VisitBeam(Beam *beam)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitBeamSpan(BeamSpan *beamSpan)
+{
+    // Call parent one too
+    this->VisitControlElement(beamSpan);
+    beamSpan->BeamDrawingInterface::Reset();
+    beamSpan->PlistInterface::InterfaceResetData(*this, beamSpan);
+
+    beamSpan->ResetBeamedElements();
+    beamSpan->ClearBeamSegments();
+    beamSpan->InitBeamSegments();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
@@ -110,12 +127,12 @@ FunctorCode ResetDataFunctor::VisitControlElement(ControlElement *controlElement
     if (controlElement->HasInterface(INTERFACE_ALT_SYM)) {
         AltSymInterface *interface = controlElement->GetAltSymInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, controlElement);
+        interface->InterfaceResetData(*this, controlElement);
     }
     if (controlElement->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = controlElement->GetLinkingInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, controlElement);
+        interface->InterfaceResetData(*this, controlElement);
     }
 
     return FUNCTOR_CONTINUE;
@@ -177,7 +194,9 @@ FunctorCode ResetDataFunctor::VisitF(F *f)
 
     TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
     assert(interface);
-    return interface->InterfaceResetData(*this, f);
+    interface->InterfaceResetData(*this, f);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetDataFunctor::VisitFlag(Flag *flag)
@@ -198,12 +217,12 @@ FunctorCode ResetDataFunctor::VisitFloatingObject(FloatingObject *floatingObject
     if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, floatingObject);
+        interface->InterfaceResetData(*this, floatingObject);
     }
     else if (floatingObject->HasInterface(INTERFACE_TIME_POINT)) {
         TimePointInterface *interface = floatingObject->GetTimePointInterface();
         assert(interface);
-        return interface->InterfaceResetData(*this, floatingObject);
+        interface->InterfaceResetData(*this, floatingObject);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -296,6 +315,16 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    // Call parent one too
+    this->VisitControlElement(repeatMark);
+
+    // For now doing nothing, but we should eventually remove generated text when the @func is not 'fine' anymore
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitRest(Rest *rest)
 {
     // Call parent one too
@@ -348,11 +377,11 @@ FunctorCode ResetDataFunctor::VisitSyl(Syl *syl)
 {
     // Call parent one too
     this->VisitLayerElement(syl);
+    syl->TimeSpanningInterface::InterfaceResetData(*this, syl);
 
     syl->m_nextWordSyl = NULL;
 
-    // Pass it to the pseudo functor of the interface
-    return syl->TimeSpanningInterface::InterfaceResetData(*this, syl);
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ResetDataFunctor::VisitSystemMilestone(SystemMilestoneEnd *systemMilestoneEnd)
@@ -412,7 +441,7 @@ FunctorCode ResetDataFunctor::VisitVerse(Verse *verse)
 // ResetHorizontalAlignmentFunctor
 //----------------------------------------------------------------------------
 
-ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() {}
+ResetHorizontalAlignmentFunctor::ResetHorizontalAlignmentFunctor() : Functor() {}
 
 FunctorCode ResetHorizontalAlignmentFunctor::VisitAccid(Accid *accid)
 {
@@ -629,7 +658,7 @@ FunctorCode ResetHorizontalAlignmentFunctor::VisitTupletNum(TupletNum *tupletNum
 // ResetVerticalAlignmentFunctor
 //----------------------------------------------------------------------------
 
-ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() {}
+ResetVerticalAlignmentFunctor::ResetVerticalAlignmentFunctor() : Functor() {}
 
 FunctorCode ResetVerticalAlignmentFunctor::VisitArtic(Artic *artic)
 {

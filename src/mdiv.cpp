@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "iomei.h"
 #include "page.h"
 #include "pages.h"
@@ -76,7 +75,7 @@ void Mdiv::MakeVisible()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Mdiv::Accept(MutableFunctor &functor)
+FunctorCode Mdiv::Accept(Functor &functor)
 {
     return functor.VisitMdiv(this);
 }
@@ -86,7 +85,7 @@ FunctorCode Mdiv::Accept(ConstFunctor &functor) const
     return functor.VisitMdiv(this);
 }
 
-FunctorCode Mdiv::AcceptEnd(MutableFunctor &functor)
+FunctorCode Mdiv::AcceptEnd(Functor &functor)
 {
     return functor.VisitMdivEnd(this);
 }
@@ -94,18 +93,6 @@ FunctorCode Mdiv::AcceptEnd(MutableFunctor &functor)
 FunctorCode Mdiv::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMdivEnd(this);
-}
-
-int Mdiv::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMdivIDs.push_back(this->GetID());
-    params->m_keySigForStaffN.clear();
-    params->m_transposeIntervalForStaffN.clear();
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

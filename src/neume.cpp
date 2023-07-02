@@ -19,7 +19,6 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
 #include "nc.h"
@@ -236,7 +235,7 @@ PitchInterface *Neume::GetLowestPitch()
     return min;
 }
 
-FunctorCode Neume::Accept(MutableFunctor &functor)
+FunctorCode Neume::Accept(Functor &functor)
 {
     return functor.VisitNeume(this);
 }
@@ -246,7 +245,7 @@ FunctorCode Neume::Accept(ConstFunctor &functor) const
     return functor.VisitNeume(this);
 }
 
-FunctorCode Neume::AcceptEnd(MutableFunctor &functor)
+FunctorCode Neume::AcceptEnd(Functor &functor)
 {
     return functor.VisitNeumeEnd(this);
 }

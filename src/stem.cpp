@@ -15,9 +15,9 @@
 
 #include "btrem.h"
 #include "chord.h"
+#include "doc.h"
 #include "elementpart.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
@@ -118,7 +118,7 @@ int Stem::CompareToElementPosition(const Doc *doc, const LayerElement *otherElem
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Stem::Accept(MutableFunctor &functor)
+FunctorCode Stem::Accept(Functor &functor)
 {
     return functor.VisitStem(this);
 }
@@ -128,7 +128,7 @@ FunctorCode Stem::Accept(ConstFunctor &functor) const
     return functor.VisitStem(this);
 }
 
-FunctorCode Stem::AcceptEnd(MutableFunctor &functor)
+FunctorCode Stem::AcceptEnd(Functor &functor)
 {
     return functor.VisitStemEnd(this);
 }

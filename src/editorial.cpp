@@ -17,7 +17,6 @@
 #include "controlelement.h"
 #include "fig.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -122,7 +121,7 @@ bool EditorialElement::IsSupportedChild(Object *child)
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode EditorialElement::Accept(MutableFunctor &functor)
+FunctorCode EditorialElement::Accept(Functor &functor)
 {
     return functor.VisitEditorialElement(this);
 }
@@ -132,7 +131,7 @@ FunctorCode EditorialElement::Accept(ConstFunctor &functor) const
     return functor.VisitEditorialElement(this);
 }
 
-FunctorCode EditorialElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode EditorialElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitEditorialElementEnd(this);
 }

@@ -98,7 +98,7 @@ void PlistInterface::SetIDStrs()
 FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, Object *object)
 {
     // This should not happen?
-    if (!functor.FillMode()) {
+    if (functor.IsProcessingData()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -106,7 +106,7 @@ FunctorCode PlistInterface::InterfacePreparePlist(PreparePlistFunctor &functor, 
 
     std::vector<std::string>::iterator iter;
     for (iter = m_ids.begin(); iter != m_ids.end(); ++iter) {
-        functor.InsertInterfaceIDTuple(*iter, this);
+        functor.InsertInterfaceIDPair(*iter, this);
     }
 
     return FUNCTOR_CONTINUE;

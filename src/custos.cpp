@@ -25,12 +25,19 @@ namespace vrv {
 
 static const ClassRegistrar<Custos> s_factory("custos", CUSTOS);
 
-Custos::Custos() : LayerElement(CUSTOS, "custos-"), PitchInterface(), PositionInterface(), AttColor(), AttExtSym()
+Custos::Custos()
+    : LayerElement(CUSTOS, "custos-")
+    , PitchInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttExtSymAuth()
+    , AttExtSymNames()
 {
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
 
     this->Reset();
 }
@@ -43,7 +50,8 @@ void Custos::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
 }
 
 bool Custos::IsSupportedChild(Object *child)
@@ -87,7 +95,7 @@ char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Custos::Accept(MutableFunctor &functor)
+FunctorCode Custos::Accept(Functor &functor)
 {
     return functor.VisitCustos(this);
 }
@@ -97,7 +105,7 @@ FunctorCode Custos::Accept(ConstFunctor &functor) const
     return functor.VisitCustos(this);
 }
 
-FunctorCode Custos::AcceptEnd(MutableFunctor &functor)
+FunctorCode Custos::AcceptEnd(Functor &functor)
 {
     return functor.VisitCustosEnd(this);
 }

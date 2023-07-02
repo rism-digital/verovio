@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class applies the Pixel Per Unit factor of the page to its elements.
  */
-class ApplyPPUFactorFunctor : public MutableFunctor {
+class ApplyPPUFactorFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -170,7 +170,7 @@ private:
 /**
  * This class reorders elements by x-position.
  */
-class ReorderByXPosFunctor : public MutableFunctor {
+class ReorderByXPosFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

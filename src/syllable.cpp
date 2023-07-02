@@ -94,7 +94,7 @@ bool Syllable::MarkupAddSyl()
     return false;
 }
 
-FunctorCode Syllable::Accept(MutableFunctor &functor)
+FunctorCode Syllable::Accept(Functor &functor)
 {
     return functor.VisitSyllable(this);
 }
@@ -104,7 +104,7 @@ FunctorCode Syllable::Accept(ConstFunctor &functor) const
     return functor.VisitSyllable(this);
 }
 
-FunctorCode Syllable::AcceptEnd(MutableFunctor &functor)
+FunctorCode Syllable::AcceptEnd(Functor &functor)
 {
     return functor.VisitSyllableEnd(this);
 }

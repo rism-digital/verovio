@@ -8,6 +8,8 @@
 #ifndef __VRV_FUNCTOR_H__
 #define __VRV_FUNCTOR_H__
 
+#include <stack>
+
 #include "comparison.h"
 #include "functorinterface.h"
 #include "vrvdef.h"
@@ -43,15 +45,29 @@ public:
     ///@}
 
     /**
-     * Getters/Setters for the properties
+     * Getters/Setters for the filters
      */
     ///@{
-    Filters *GetFilters() { return m_filters; }
-    void SetFilters(Filters *filters) { m_filters = filters; }
+    Filters *GetFilters() { return m_filters.empty() ? NULL : m_filters.top(); }
+    void PushFilters(Filters *filters) { m_filters.push(filters); }
+    void PopFilters() { m_filters.pop(); }
+    ///@}
+
+    /**
+     * Getters/Setters for the visibility
+     */
+    ///@{
     bool VisibleOnly() const { return m_visibleOnly; }
     void SetVisibleOnly(bool visibleOnly) { m_visibleOnly = visibleOnly; }
-    bool GetDirection() const { return m_direction; }
-    void SetDirection(bool direction) { m_direction = direction; }
+    ///@}
+
+    /**
+     * Getters/Setters for the direction
+     */
+    ///@{
+    bool GetDirection() const { return m_direction.empty() ? FORWARD : m_direction.top(); }
+    void PushDirection(bool direction) { m_direction.push(direction); }
+    void PopDirection() { m_direction.pop(); }
     ///@}
 
     /**
@@ -66,29 +82,29 @@ public:
 private:
     // The functor code
     FunctorCode m_code = FUNCTOR_CONTINUE;
-    // The filters
-    Filters *m_filters = NULL;
+    // The filter stack
+    std::stack<Filters *> m_filters;
     // Visible only flag
     bool m_visibleOnly = true;
-    // Direction
-    bool m_direction = FORWARD;
+    // The direction stack
+    std::stack<bool> m_direction;
 };
 
 //----------------------------------------------------------------------------
-// MutableFunctor
+// Functor
 //----------------------------------------------------------------------------
 
 /**
  * This abstract class is the base class for all mutable functors.
  */
-class MutableFunctor : public FunctorBase, public FunctorInterface {
+class Functor : public FunctorBase, public FunctorInterface {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    MutableFunctor(){};
-    virtual ~MutableFunctor() = default;
+    Functor(){};
+    virtual ~Functor() = default;
     ///@}
 
 private:
@@ -131,7 +147,7 @@ private:
 /**
  * This abstract class is the base class for all mutable functors that need access to the document.
  */
-class DocFunctor : public MutableFunctor {
+class DocFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -190,6 +206,45 @@ protected:
 
 private:
     //
+};
+
+//----------------------------------------------------------------------------
+// CollectAndProcess
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a mixin for all functors that require two step processing:
+ * (1) Collecing data. (2) Processing data.
+ */
+class CollectAndProcess {
+protected:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CollectAndProcess() = default;
+    ~CollectAndProcess() = default;
+    ///@}
+
+public:
+    /**
+     * Check and switch the current phase.
+     */
+    ///@{
+    bool IsCollectingData() const { return !m_processingData; }
+    bool IsProcessingData() const { return m_processingData; }
+    void SetDataCollectionCompleted() { m_processingData = true; }
+    ///@}
+
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    // Indicates the current phase: collecting vs processing data
+    bool m_processingData = false;
 };
 
 } // namespace vrv

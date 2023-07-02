@@ -31,7 +31,8 @@ Trill::Trill()
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttLineRend()
     , AttNNumberLike()
     , AttOrnamentAccid()
@@ -40,7 +41,8 @@ Trill::Trill()
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_EXTENDER);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_LINEREND);
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
@@ -57,7 +59,8 @@ void Trill::Reset()
     TimeSpanningInterface::Reset();
     this->ResetColor();
     this->ResetExtender();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetLineRend();
     this->ResetNNumberLike();
     this->ResetOrnamentAccid();
@@ -88,7 +91,7 @@ char32_t Trill::GetTrillGlyph() const
 // Trill functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Trill::Accept(MutableFunctor &functor)
+FunctorCode Trill::Accept(Functor &functor)
 {
     return functor.VisitTrill(this);
 }
@@ -98,7 +101,7 @@ FunctorCode Trill::Accept(ConstFunctor &functor) const
     return functor.VisitTrill(this);
 }
 
-FunctorCode Trill::AcceptEnd(MutableFunctor &functor)
+FunctorCode Trill::AcceptEnd(Functor &functor)
 {
     return functor.VisitTrillEnd(this);
 }

@@ -23,12 +23,12 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
+#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "label.h"
@@ -568,7 +568,7 @@ void View::DrawLabels(
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(&labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetID());
@@ -651,9 +651,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
-        dc->StartCustomGraphic("grpSym");
         this->DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
-        dc->EndCustomGraphic();
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);
         return;
     }
@@ -694,8 +692,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, std::max(1, penWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
@@ -1124,7 +1122,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
                         [](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
                         }),
         childList.end());
 
@@ -1204,7 +1202,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *sys
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1300,8 +1298,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     }
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
         // Skewed lines - with Facs (neumes) only for now
@@ -1368,8 +1366,8 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
         = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     for (const LedgerLine &line : lines) {
         for (const std::pair<int, int> &dash : line.m_dashes) {

@@ -47,15 +47,15 @@ void FeatureExtractor::Reset()
     m_previousNotes.clear();
 }
 
-void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
+void FeatureExtractor::Extract(const Object *object)
 {
     if (object->Is(NOTE)) {
-        Note *note = vrv_cast<Note *>(object);
+        const Note *note = vrv_cast<const Note *>(object);
         assert(note);
 
         // Check if the note is part of a chord and return if it is not its top one
-        Chord *chord = note->IsChordTone();
-        if (chord && note != chord->GetTopNote()) return;
+        const Chord *chord = note->IsChordTone();
+        if (chord && (note != chord->GetTopNote())) return;
 
         // Check if the note is tied to a previous one and skip it if yes
         if (note->GetScoreTimeTiedDuration() == -1.0) {
@@ -75,7 +75,7 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);
         pitch << std::string(signCount, octSign);
 
-        Accid *accid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
+        const Accid *accid = vrv_cast<const Accid *>(note->FindDescendantByType(ACCID));
         if (accid) {
             // We need to check both written and gestural accidentals
             std::string accidStrWritten;
@@ -130,7 +130,9 @@ void FeatureExtractor::Extract(Object *object, GenerateFeaturesParams *params)
                 = StringFormat("%d", note->GetDiatonicPitch() - m_previousNotes.front()->GetDiatonicPitch());
             m_intervalsDiatonic << intervalDiatonicStr;
             jsonxx::Array intervalsIds;
-            for (Note *previousNote : m_previousNotes) intervalsIds << previousNote->GetID();
+            for (const Note *previousNote : m_previousNotes) {
+                intervalsIds << previousNote->GetID();
+            }
             intervalsIds << note->GetID();
             m_intervalsIds << jsonxx::Value(intervalsIds);
         }

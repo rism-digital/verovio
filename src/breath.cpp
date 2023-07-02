@@ -43,7 +43,7 @@ void Breath::Reset()
     this->ResetPlacementRelStaff();
 }
 
-FunctorCode Breath::Accept(MutableFunctor &functor)
+FunctorCode Breath::Accept(Functor &functor)
 {
     return functor.VisitBreath(this);
 }
@@ -53,7 +53,7 @@ FunctorCode Breath::Accept(ConstFunctor &functor) const
     return functor.VisitBreath(this);
 }
 
-FunctorCode Breath::AcceptEnd(MutableFunctor &functor)
+FunctorCode Breath::AcceptEnd(Functor &functor)
 {
     return functor.VisitBreathEnd(this);
 }

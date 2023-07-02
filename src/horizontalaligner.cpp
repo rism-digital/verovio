@@ -20,7 +20,6 @@
 #include "elementpart.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "miscfunctor.h"
@@ -93,7 +92,7 @@ void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
     }
 }
 
-FunctorCode HorizontalAligner::Accept(MutableFunctor &functor)
+FunctorCode HorizontalAligner::Accept(Functor &functor)
 {
     return functor.VisitHorizontalAligner(this);
 }
@@ -103,7 +102,7 @@ FunctorCode HorizontalAligner::Accept(ConstFunctor &functor) const
     return functor.VisitHorizontalAligner(this);
 }
 
-FunctorCode HorizontalAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode HorizontalAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitHorizontalAlignerEnd(this);
 }
@@ -324,7 +323,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(const Doc *doc, Alignment *alignment
     }
 }
 
-FunctorCode MeasureAligner::Accept(MutableFunctor &functor)
+FunctorCode MeasureAligner::Accept(Functor &functor)
 {
     return functor.VisitMeasureAligner(this);
 }
@@ -334,7 +333,7 @@ FunctorCode MeasureAligner::Accept(ConstFunctor &functor) const
     return functor.VisitMeasureAligner(this);
 }
 
-FunctorCode MeasureAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode MeasureAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeasureAlignerEnd(this);
 }
@@ -478,7 +477,7 @@ void GraceAligner::SetGraceAlignmentXPos(const Doc *doc)
     }
 }
 
-FunctorCode GraceAligner::Accept(MutableFunctor &functor)
+FunctorCode GraceAligner::Accept(Functor &functor)
 {
     return functor.VisitGraceAligner(this);
 }
@@ -488,7 +487,7 @@ FunctorCode GraceAligner::Accept(ConstFunctor &functor) const
     return functor.VisitGraceAligner(this);
 }
 
-FunctorCode GraceAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode GraceAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitGraceAlignerEnd(this);
 }
@@ -665,7 +664,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
         Filters filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.Add(&matchStaff);
-        getAlignmentLeftRight.SetFilters(&filters);
+        getAlignmentLeftRight.PushFilters(&filters);
         this->Process(getAlignmentLeftRight);
     }
     else {
@@ -736,18 +735,6 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
     return { min, max };
 }
 
-void Alignment::AddToAccidSpace(Accid *accid)
-{
-    assert(accid);
-
-    // Do not added them if no @accid (e.g., @accid.ges only)
-    if (!accid->HasAccid()) return;
-
-    AlignmentReference *reference = this->GetReferenceWithElement(accid);
-    assert(reference);
-    reference->AddToAccidSpace(accid);
-}
-
 int Alignment::HorizontalSpaceForDuration(
     double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
@@ -758,7 +745,7 @@ int Alignment::HorizontalSpaceForDuration(
     return pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
-FunctorCode Alignment::Accept(MutableFunctor &functor)
+FunctorCode Alignment::Accept(Functor &functor)
 {
     return functor.VisitAlignment(this);
 }
@@ -768,7 +755,7 @@ FunctorCode Alignment::Accept(ConstFunctor &functor) const
     return functor.VisitAlignment(this);
 }
 
-FunctorCode Alignment::AcceptEnd(MutableFunctor &functor)
+FunctorCode Alignment::AcceptEnd(Functor &functor)
 {
     return functor.VisitAlignmentEnd(this);
 }
@@ -808,7 +795,6 @@ void AlignmentReference::Reset()
     Object::Reset();
     this->ResetNInteger();
 
-    m_accidSpace.clear();
     m_layerCount = 0;
 }
 
@@ -845,33 +831,6 @@ void AlignmentReference::AddChild(Object *child)
     Modify();
 }
 
-void AlignmentReference::AddToAccidSpace(Accid *accid)
-{
-    assert(accid);
-
-    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end()) return;
-
-    m_accidSpace.push_back(accid);
-}
-
-void AlignmentReference::AdjustAccidWithAccidSpace(
-    Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids)
-{
-    std::vector<Accid *> leftAccids;
-    const ArrayOfObjects &children = this->GetChildren();
-
-    // bottom one
-    for (Object *child : children) {
-        // if accidental has unison overlap, ignore elements on other layers for overlap
-        if (accid->IsAlignedWithSameLayer() && (accid->GetFirstAncestor(LAYER) != child->GetFirstAncestor(LAYER)))
-            continue;
-        accid->AdjustX(dynamic_cast<LayerElement *>(child), doc, staffSize, leftAccids, adjustedAccids);
-    }
-
-    // Mark as adjusted (even if position was not altered)
-    adjustedAccids.insert(accid);
-}
-
 bool AlignmentReference::HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const
 {
     for (const auto child : this->GetChildren()) {
@@ -899,39 +858,7 @@ bool AlignmentReference::HasCrossStaffElements() const
     return false;
 }
 
-void AlignmentReference::SetAccidLayerAlignment()
-{
-    const ArrayOfObjects &children = this->GetChildren();
-    for (Accid *accid : m_accidSpace) {
-        if (accid->IsAlignedWithSameLayer()) continue;
-
-        Note *parentNote = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE));
-        const bool hasUnisonOverlap = std::any_of(children.begin(), children.end(), [parentNote](Object *object) {
-            if (!object->Is(NOTE)) return false;
-            Note *otherNote = vrv_cast<Note *>(object);
-            // in case notes are in unison but have different accidentals
-            return parentNote && parentNote->IsUnisonWith(otherNote, true)
-                && !parentNote->IsUnisonWith(otherNote, false);
-        });
-
-        if (!hasUnisonOverlap) continue;
-
-        Chord *chord = vrv_cast<Chord *>(accid->GetFirstAncestor(CHORD));
-        // no chord, so align only parent note
-        if (!chord) {
-            accid->IsAlignedWithSameLayer(true);
-            continue;
-        }
-        // we have chord ancestor, so need to align all of its accidentals
-        ListOfObjects accidentals = chord->FindAllDescendantsByType(ACCID);
-        std::for_each(accidentals.begin(), accidentals.end(), [](Object *object) {
-            Accid *accid = vrv_cast<Accid *>(object);
-            accid->IsAlignedWithSameLayer(true);
-        });
-    }
-}
-
-FunctorCode AlignmentReference::Accept(MutableFunctor &functor)
+FunctorCode AlignmentReference::Accept(Functor &functor)
 {
     return functor.VisitAlignmentReference(this);
 }
@@ -941,7 +868,7 @@ FunctorCode AlignmentReference::Accept(ConstFunctor &functor) const
     return functor.VisitAlignmentReference(this);
 }
 
-FunctorCode AlignmentReference::AcceptEnd(MutableFunctor &functor)
+FunctorCode AlignmentReference::AcceptEnd(Functor &functor)
 {
     return functor.VisitAlignmentReferenceEnd(this);
 }
@@ -1011,7 +938,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     return timestampAttr;
 }
 
-FunctorCode TimestampAligner::Accept(MutableFunctor &functor)
+FunctorCode TimestampAligner::Accept(Functor &functor)
 {
     return functor.VisitTimestampAligner(this);
 }
@@ -1021,7 +948,7 @@ FunctorCode TimestampAligner::Accept(ConstFunctor &functor) const
     return functor.VisitTimestampAligner(this);
 }
 
-FunctorCode TimestampAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode TimestampAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitTimestampAlignerEnd(this);
 }

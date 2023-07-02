@@ -56,7 +56,7 @@ bool LabelAbbr::IsSupportedChild(Object *child)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode LabelAbbr::Accept(MutableFunctor &functor)
+FunctorCode LabelAbbr::Accept(Functor &functor)
 {
     return functor.VisitLabelAbbr(this);
 }
@@ -66,7 +66,7 @@ FunctorCode LabelAbbr::Accept(ConstFunctor &functor) const
     return functor.VisitLabelAbbr(this);
 }
 
-FunctorCode LabelAbbr::AcceptEnd(MutableFunctor &functor)
+FunctorCode LabelAbbr::AcceptEnd(Functor &functor)
 {
     return functor.VisitLabelAbbrEnd(this);
 }

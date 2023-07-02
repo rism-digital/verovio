@@ -397,7 +397,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         // Also pass it to the children
         params.m_pointSize = rendFont.GetPointSize();
     }
-    if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+    if (rend->HasGlyphAuth() && rend->GetGlyphAuth() == "smufl") {
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
         rendFont.SetSmuflWithFallback(false);
@@ -447,14 +447,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
-    // Do not render the box or circle if the content is empty
-    if (rend->HasContentBB()) {
-        if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
-            params.m_enclosedRend.push_back(rend);
-            params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
-            params.m_explicitPosition = true;
-            params.m_enclose = rend->GetRend();
-        }
+    // Do not render enclosings if the content is empty
+    if (rend->HasEnclosure()) {
+        params.m_enclosedRend.push_back(rend);
+        params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
+        params.m_explicitPosition = true;
+        params.m_enclose = rend->GetRend();
     }
 
     if (customFont) {
@@ -491,7 +489,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     // special case where we want to replace some unicode music points to SMuFL
-    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM)) {
+    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM) || text->GetFirstAncestor(REPEATMARK)) {
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {

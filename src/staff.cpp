@@ -19,7 +19,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
@@ -344,7 +343,7 @@ void LedgerLine::AddDash(int left, int right, int extension)
 // Staff functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Staff::Accept(MutableFunctor &functor)
+FunctorCode Staff::Accept(Functor &functor)
 {
     return functor.VisitStaff(this);
 }
@@ -354,7 +353,7 @@ FunctorCode Staff::Accept(ConstFunctor &functor) const
     return functor.VisitStaff(this);
 }
 
-FunctorCode Staff::AcceptEnd(MutableFunctor &functor)
+FunctorCode Staff::AcceptEnd(Functor &functor)
 {
     return functor.VisitStaffEnd(this);
 }
@@ -362,49 +361,6 @@ FunctorCode Staff::AcceptEnd(MutableFunctor &functor)
 FunctorCode Staff::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitStaffEnd(this);
-}
-
-int Staff::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    assert(m_drawingStaffDef);
-
-    if (m_drawingStaffDef->HasNotationtype()) {
-        params->m_notationType = m_drawingStaffDef->GetNotationtype();
-    }
-    else {
-        params->m_notationType = NOTATIONTYPE_cmn;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    params->m_expandedNotes.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (params->m_transposeToSoundingPitch) {
-        int transposeInterval = 0;
-        if (this->HasN() && (params->m_transposeIntervalForStaffN.count(this->GetN()) > 0)) {
-            transposeInterval = params->m_transposeIntervalForStaffN.at(this->GetN());
-        }
-        params->m_transposer->SetTransposition(transposeInterval);
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -170,12 +170,6 @@ public:
     std::pair<int, int> GetAlignmentTopBottom() const;
 
     /**
-     * Add an accidental to the accidSpace of the AlignmentReference holding it.
-     * The Alignment has to have a AlignmentReference holding it.
-     */
-    void AddToAccidSpace(Accid *accid);
-
-    /**
      * Return true if there is vertical overlap with accidentals from another alignment for specific staffN
      */
     bool HasAccidVerticalOverlap(const Alignment *otherAlignment, int staffN) const;
@@ -220,9 +214,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -297,16 +291,6 @@ public:
     void AddChild(Object *object) override;
 
     /**
-     * Add an accidental to the accidSpace of the AlignmentReference.
-     */
-    void AddToAccidSpace(Accid *accid);
-
-    /**
-     * See AdjustAccidXFunctor
-     */
-    void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids);
-
-    /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
      */
     bool HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const;
@@ -321,12 +305,6 @@ public:
      */
     bool HasCrossStaffElements() const;
 
-    /**
-     * Set whether accidentals should be aligned with all elements of alignmentReference or elements from same layer
-     * only. Set for each accidental in accidSpace separately
-     */
-    void SetAccidLayerAlignment();
-
     //----------//
     // Functors //
     //----------//
@@ -335,20 +313,16 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 private:
     //
 public:
-    /**
-     * The accid space of the AlignmentReference.
-     */
-    std::vector<Accid *> m_accidSpace;
-
+    //
 private:
     /**
      *
@@ -392,9 +366,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -530,9 +504,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -635,9 +609,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -697,9 +671,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

@@ -18,7 +18,6 @@
 #include "elementpart.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
@@ -48,14 +47,16 @@ Artic::Artic()
     , AttArticulationGes()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttPlacementRelEvent()
 {
     this->RegisterAttClass(ATT_ARTICULATION);
     this->RegisterAttClass(ATT_ARTICULATIONGES);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
     this->Reset();
@@ -70,7 +71,8 @@ void Artic::Reset()
     this->ResetArticulationGes();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetPlacementRelEvent();
 
     m_drawingPlace = STAFFREL_NONE;
@@ -277,7 +279,7 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Artic::Accept(MutableFunctor &functor)
+FunctorCode Artic::Accept(Functor &functor)
 {
     return functor.VisitArtic(this);
 }
@@ -287,7 +289,7 @@ FunctorCode Artic::Accept(ConstFunctor &functor) const
     return functor.VisitArtic(this);
 }
 
-FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
+FunctorCode Artic::AcceptEnd(Functor &functor)
 {
     return functor.VisitArticEnd(this);
 }

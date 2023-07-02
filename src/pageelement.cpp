@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "page.h"
 
 namespace vrv {
@@ -56,7 +55,7 @@ void PageElement::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode PageElement::Accept(MutableFunctor &functor)
+FunctorCode PageElement::Accept(Functor &functor)
 {
     return functor.VisitPageElement(this);
 }
@@ -66,7 +65,7 @@ FunctorCode PageElement::Accept(ConstFunctor &functor) const
     return functor.VisitPageElement(this);
 }
 
-FunctorCode PageElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode PageElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitPageElementEnd(this);
 }

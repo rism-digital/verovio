@@ -75,6 +75,9 @@ public:
     std::string BooleanToStr(data_BOOLEAN data) const;
     data_BOOLEAN StrToBoolean(const std::string &value, bool logWarning = true) const;
 
+    std::string CancelaccidToStr(data_CANCELACCID data) const;
+    data_CANCELACCID StrToCancelaccid(const std::string &value, bool logWarning = true) const;
+
     std::string CertaintyToStr(data_CERTAINTY data) const;
     data_CERTAINTY StrToCertainty(const std::string &value, bool logWarning = true) const;
 
@@ -333,8 +336,8 @@ public:
     std::string EvidenceEvidenceToStr(evidence_EVIDENCE data) const;
     evidence_EVIDENCE StrToEvidenceEvidence(const std::string &value, bool logWarning = true) const;
 
-    std::string ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const;
-    extSym_GLYPHAUTH StrToExtSymGlyphauth(const std::string &value, bool logWarning = true) const;
+    std::string ExtSymAuthGlyphauthToStr(extSymAuth_GLYPHAUTH data) const;
+    extSymAuth_GLYPHAUTH StrToExtSymAuthGlyphauth(const std::string &value, bool logWarning = true) const;
 
     std::string FTremLogFormToStr(fTremLog_FORM data) const;
     fTremLog_FORM StrToFTremLogForm(const std::string &value, bool logWarning = true) const;
@@ -452,6 +455,9 @@ public:
 
     std::string RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) const;
     rehearsal_REHENCLOSE StrToRehearsalRehenclose(const std::string &value, bool logWarning = true) const;
+
+    std::string RepeatMarkLogFuncToStr(repeatMarkLog_FUNC data) const;
+    repeatMarkLog_FUNC StrToRepeatMarkLogFunc(const std::string &value, bool logWarning = true) const;
 
     std::string SbVisFormToStr(sbVis_FORM data) const;
     sbVis_FORM StrToSbVisForm(const std::string &value, bool logWarning = true) const;

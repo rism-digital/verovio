@@ -505,7 +505,7 @@ FunctorCode CastOffEncodingFunctor::VisitSystemElement(SystemElement *systemElem
 // UnCastOffFunctor
 //----------------------------------------------------------------------------
 
-UnCastOffFunctor::UnCastOffFunctor(Page *page)
+UnCastOffFunctor::UnCastOffFunctor(Page *page) : Functor()
 {
     m_page = page;
     m_currentSystem = NULL;

@@ -2,7 +2,7 @@ name: Test Suite Evaluation
 
 on:
   pull_request:
-    branches: develop
+    branches: [develop]
   # TODO: run this task only on PR in production; use push event for testing
   #push:
     #branches:

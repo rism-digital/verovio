@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class converts all top-level containers (section, endings) and editorial elements to milestone elements.
  */
-class ConvertToPageBasedFunctor : public MutableFunctor {
+class ConvertToPageBasedFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -107,6 +107,7 @@ public:
     FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
     ///@}
 
@@ -143,7 +144,7 @@ private:
 /**
  * This class converts cast-off (measure) mensural segments MEI into mensural.
  */
-class ConvertToUnCastOffMensuralFunctor : public MutableFunctor {
+class ConvertToUnCastOffMensuralFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -199,7 +200,7 @@ private:
 /**
  * This class converts analytical markup (\@fermata, \@tie) to elements.
  */
-class ConvertMarkupAnalyticalFunctor : public MutableFunctor {
+class ConvertMarkupAnalyticalFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -257,7 +258,7 @@ private:
 /**
  * This class converts markup of artic@artic multi value into distinct artic elements.
  */
-class ConvertMarkupArticFunctor : public MutableFunctor {
+class ConvertMarkupArticFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

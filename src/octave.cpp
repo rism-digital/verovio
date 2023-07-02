@@ -177,7 +177,7 @@ std::pair<int, bool> Octave::GetVerticalContentBoundaryRel(const Doc *doc, const
 // Octave functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Octave::Accept(MutableFunctor &functor)
+FunctorCode Octave::Accept(Functor &functor)
 {
     return functor.VisitOctave(this);
 }
@@ -187,7 +187,7 @@ FunctorCode Octave::Accept(ConstFunctor &functor) const
     return functor.VisitOctave(this);
 }
 
-FunctorCode Octave::AcceptEnd(MutableFunctor &functor)
+FunctorCode Octave::AcceptEnd(Functor &functor)
 {
     return functor.VisitOctaveEnd(this);
 }

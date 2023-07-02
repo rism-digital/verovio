@@ -30,14 +30,16 @@ Mordent::Mordent()
     : ControlElement(MORDENT, "mordent-")
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
     , AttMordentLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_MORDENTLOG);
@@ -52,7 +54,8 @@ void Mordent::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
     this->ResetMordentLog();
@@ -86,7 +89,7 @@ char32_t Mordent::GetMordentGlyph() const
 // Mordent functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Mordent::Accept(MutableFunctor &functor)
+FunctorCode Mordent::Accept(Functor &functor)
 {
     return functor.VisitMordent(this);
 }
@@ -96,7 +99,7 @@ FunctorCode Mordent::Accept(ConstFunctor &functor) const
     return functor.VisitMordent(this);
 }
 
-FunctorCode Mordent::AcceptEnd(MutableFunctor &functor)
+FunctorCode Mordent::AcceptEnd(Functor &functor)
 {
     return functor.VisitMordentEnd(this);
 }

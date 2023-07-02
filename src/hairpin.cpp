@@ -18,7 +18,6 @@
 #include "doc.h"
 #include "dynam.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "system.h"
 #include "verticalaligner.h"
@@ -139,6 +138,8 @@ int Hairpin::CalcHeight(const Doc *doc, int staffSize, char spanningType, const 
 void Hairpin::SetLeftLink(ControlElement *leftLink)
 {
     m_leftLink = leftLink;
+    if (!leftLink) return;
+
     if (this->GetDrawingGrpId() != 0) {
         // LogDebug("Grp id LF already set %d", this->GetDrawingGrpId());
         return;
@@ -154,6 +155,8 @@ void Hairpin::SetLeftLink(ControlElement *leftLink)
 void Hairpin::SetRightLink(ControlElement *rightLink)
 {
     m_rightLink = rightLink;
+    if (!rightLink) return;
+
     int grpId = this->GetDrawingGrpId();
     if (grpId == 0) {
         grpId = this->SetDrawingGrpObject(this);
@@ -220,7 +223,7 @@ std::pair<int, int> Hairpin::GetBarlineOverlapAdjustment(int doubleUnit, int lef
 // Hairpin functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Hairpin::Accept(MutableFunctor &functor)
+FunctorCode Hairpin::Accept(Functor &functor)
 {
     return functor.VisitHairpin(this);
 }
@@ -230,7 +233,7 @@ FunctorCode Hairpin::Accept(ConstFunctor &functor) const
     return functor.VisitHairpin(this);
 }
 
-FunctorCode Hairpin::AcceptEnd(MutableFunctor &functor)
+FunctorCode Hairpin::AcceptEnd(Functor &functor)
 {
     return functor.VisitHairpinEnd(this);
 }

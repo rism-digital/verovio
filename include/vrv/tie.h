@@ -77,17 +77,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * see Object::InitTimemapTies
-     */
-    ///@{
-    int InitTimemapTies(FunctorParams *functorParams) override;
     ///@}
 
 private:
@@ -95,8 +88,8 @@ private:
     bool AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *curve, Point bezier[4],
         const Note *startNote, const Note *endNote, curvature_CURVEDIR drawingCurveDir) const;
 
-    // Calculate initial position X position and return stem direction of the startNote
-    void CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *startParentChord,
+    // Calculate the initial X position and return true if the tie endpoints should be adjusted vertically
+    bool CalculateXPosition(const Doc *doc, const Staff *staff, const Chord *startParentChord,
         const Chord *endParentChord, int spanningType, bool isOuterChordNote, Point &startPoint, Point &endPoint,
         curvature_CURVEDIR drawingCurveDir) const;
 
