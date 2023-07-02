@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20201107 at Tue May 30 11:42:31 2023
- By Klaus Rettinghaus
+Created by FontForge 20220308 at Sun Jul  2 12:29:01 2023
+ By Laurent Pugin
 Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.84
+Version 5.2.85
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="624" >
@@ -2391,5 +2391,33 @@ c-86 21 -119 93 -119 154c0 81 82 162 163 162c34 0 98 -9 138 -83c6 16 37 81 116 8
     <glyph glyph-name="uniEC25" unicode="&#xec25;" horiz-adv-x="237" 
 d="M73 150c-53 0 -73 73 -73 128c0 31 7 72 38 115l37 54c16 22 47 59 87 59c49 0 75 -69 75 -146c0 -99 -40 -228 -119 -337l-29 -40l-9 6l25 45c38 69 82 157 86 215c0 0 -53 -99 -118 -99zM49 313c0 -40 22 -92 65 -92c31 0 64 25 80 65c0 9 -1 34 -3 49
 c-1 6 -16 102 -67 102c-42 0 -75 -68 -75 -124z" />
+    <glyph glyph-name="uniE8F3" unicode="&#xe8f3;" horiz-adv-x="14" 
+d="M0 250v250h14v-250h-14z" />
+    <glyph glyph-name="uniE8F4" unicode="&#xe8f4;" horiz-adv-x="14" 
+d="M0 -250v500h14v-500h-14z" />
+    <glyph glyph-name="uniE8F5" unicode="&#xe8f5;" horiz-adv-x="14" 
+d="M0 375h14v-750h-14v750z" />
+    <glyph glyph-name="uniE8F6" unicode="&#xe8f6;" horiz-adv-x="114" 
+d="M0 375h14v-750h-14v750zM100 375h14v-750h-14v750z" />
+    <glyph glyph-name="uniE8F7" unicode="&#xe8f7;" horiz-adv-x="85" 
+d="M0 277c20 30 42 73 42 110v4c-1 14 -3 28 -8 41s-15 25 -15 38c0 17 16 28 31 28c3 0 35 -2 35 -71c0 -11 -2 -22 -3 -31c-5 -35 -45 -101 -64 -132z" />
+    <glyph glyph-name="uniE8F8" unicode="&#xe8f8;" horiz-adv-x="138" 
+d="M0 270c-2 -5 23 53 48 110c53 121 66 123 80 116c16 -8 19 -16 -54 -130c-34 -53 -67 -107 -64 -102c-10 6 -3 2 -10 6z" />
+    <glyph glyph-name="uniEB90" unicode="&#xeb90;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB91" unicode="&#xeb91;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB92" unicode="&#xeb92;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB93" unicode="&#xeb93;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB94" unicode="&#xeb94;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB95" unicode="&#xeb95;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB96" unicode="&#xeb96;" horiz-adv-x="1000" 
+ />
+    <glyph glyph-name="uniEB97" unicode="&#xeb97;" horiz-adv-x="1000" 
+ />
   </font>
 </defs></svg>

@@ -392,6 +392,12 @@ enum {
     SMUFL_E888_tuplet8 = 0xE888,
     SMUFL_E889_tuplet9 = 0xE889,
     SMUFL_E88A_tupletColon = 0xE88A,
+    SMUFL_E8F3_chantDivisioMinima = 0xE8F3,
+    SMUFL_E8F4_chantDivisioMaior = 0xE8F4,
+    SMUFL_E8F5_chantDivisioMaxima = 0xE8F5,
+    SMUFL_E8F6_chantDivisioFinalis = 0xE8F6,
+    SMUFL_E8F7_chantVirgula = 0xE8F7,
+    SMUFL_E8F8_chantCaesura = 0xE8F8,
     SMUFL_E901_mensuralGclefPetrucci = 0xE901,
     SMUFL_E902_chantFclef = 0xE902,
     SMUFL_E903_mensuralFclef = 0xE903,
@@ -525,6 +531,14 @@ enum {
     SMUFL_EB20_elecRewind = 0xEB20,
     SMUFL_EB21_elecSkipForwards = 0xEB21,
     SMUFL_EB22_elecSkipBackwards = 0xEB22,
+    SMUFL_EB90_staffPosRaise1 = 0xEB90,
+    SMUFL_EB91_staffPosRaise2 = 0xEB91,
+    SMUFL_EB92_staffPosRaise3 = 0xEB92,
+    SMUFL_EB93_staffPosRaise4 = 0xEB93,
+    SMUFL_EB94_staffPosRaise5 = 0xEB94,
+    SMUFL_EB95_staffPosRaise6 = 0xEB95,
+    SMUFL_EB96_staffPosRaise7 = 0xEB96,
+    SMUFL_EB97_staffPosRaise8 = 0xEB97,
     SMUFL_EBA7_luteDurationWhole = 0xEBA7,
     SMUFL_EBA8_luteDurationHalf = 0xEBA8,
     SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
@@ -621,7 +635,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 596
+#define SMUFL_COUNT 610
 
 } // namespace vrv
 

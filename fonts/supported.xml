@@ -2460,12 +2460,12 @@
         <description>Medieval and Renaissance symbols in CMN</description>
         <!--<glyph glyph-code="EA20" smufl-name="ornamentQuilisma" />-->
         <!--<glyph glyph-code="EA21" smufl-name="ornamentOriscus" />-->
-        <glyph glyph-code="EA22" smufl-name="medRenLiquescenceCMN" />
+        <!--<glyph glyph-code="EA22" smufl-name="medRenLiquescenceCMN" />-->
         <!--<glyph glyph-code="EA23" smufl-name="medRenPlicaCMN" />-->
         <!--<glyph glyph-code="EA24" smufl-name="medRenGClefCMN" />-->
         <!--<glyph glyph-code="EA25" smufl-name="medRenPunctumCMN" />-->
-        <glyph glyph-code="EA26" smufl-name="medRenLiquescentAscCMN" />
-        <glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN" />
+        <!--<glyph glyph-code="EA26" smufl-name="medRenLiquescentAscCMN" />-->
+        <!--<glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN" />-->
         <!--<glyph glyph-code="EA28" smufl-name="medRenQuilismaCMN" />-->
         <!--<glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN" />-->
         <!--<glyph glyph-code="EA2A" smufl-name="medRenOriscusCMN" />-->
@@ -2810,13 +2810,13 @@
         <glyph glyph-code="EB90" smufl-name="staffPosRaise1" />
         <glyph glyph-code="EB91" smufl-name="staffPosRaise2" />
         <glyph glyph-code="EB92" smufl-name="staffPosRaise3" />
-        <!--<glyph glyph-code="EB93" smufl-name="staffPosRaise4" />-->
-        <!--<glyph glyph-code="EB94" smufl-name="staffPosRaise5" />-->
-        <!--<glyph glyph-code="EB95" smufl-name="staffPosRaise6" />-->
-        <!--<glyph glyph-code="EB96" smufl-name="staffPosRaise7" />-->
-        <!--<glyph glyph-code="EB97" smufl-name="staffPosRaise8" />-->
-        <glyph glyph-code="EB98" smufl-name="staffPosLower1" />
-        <glyph glyph-code="EB99" smufl-name="staffPosLower2" />
+        <glyph glyph-code="EB93" smufl-name="staffPosRaise4" />
+        <glyph glyph-code="EB94" smufl-name="staffPosRaise5" />
+        <glyph glyph-code="EB95" smufl-name="staffPosRaise6" />
+        <glyph glyph-code="EB96" smufl-name="staffPosRaise7" />
+        <glyph glyph-code="EB97" smufl-name="staffPosRaise8" />
+        <!--<glyph glyph-code="EB98" smufl-name="staffPosLower1" />-->
+        <!--<glyph glyph-code="EB99" smufl-name="staffPosLower2" />-->
         <!--<glyph glyph-code="EB9A" smufl-name="staffPosLower3" />-->
         <!--<glyph glyph-code="EB9B" smufl-name="staffPosLower4" />-->
         <!--<glyph glyph-code="EB9C" smufl-name="staffPosLower5" />-->

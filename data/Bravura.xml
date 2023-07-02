@@ -744,9 +744,6 @@
   <g c="E9F8" x="0.0" y="0.0" w="138.0" h="165.0" h-a-x="138" n="mensuralRestSemifusa" />
   <g c="EA02" x="1.0" y="0.0" w="613.0" h="411.0" h-a-x="615" n="mensuralCustosUp" />
   <g c="EA06" x="0.0" y="-101.0" w="60.0" h="416.0" h-a-x="60" n="chantCustosStemUpPosMiddle" />
-  <g c="EA22" x="0.0" y="-125.0" w="290.0" h="250.0" h-a-x="330" n="medRenLiquescenceCMN" />
-  <g c="EA26" x="0.0" y="-127.0" w="275.0" h="445.0" h-a-x="275" n="medRenLiquescentAscCMN" />
-  <g c="EA27" x="0.0" y="-318.0" w="275.0" h="445.0" h-a-x="275" n="medRenLiquescentDescCMN" />
   <g c="EA50" x="20.0" y="-1.0" w="215.0" h="252.0" h-a-x="255" n="figbass0" />
   <g c="EA51" x="20.0" y="0.0" w="117.0" h="254.0" h-a-x="157" n="figbass1" />
   <g c="EA52" x="20.0" y="-3.0" w="202.0" h="256.0" h-a-x="242" n="figbass2" />
@@ -799,8 +796,11 @@
   <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise1" />
   <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise2" />
   <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise3" />
-  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
-  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB93" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise4" />
+  <g c="EB94" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise5" />
+  <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise6" />
+  <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise7" />
+  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
   <g c="EBA7" x="0.0" y="0.0" w="36.0" h="790.0" h-a-x="36" n="luteDurationWhole" />
   <g c="EBA8" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationHalf" />
   <g c="EBA9" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationQuarter" />
