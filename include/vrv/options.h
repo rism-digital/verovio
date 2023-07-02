@@ -536,7 +536,7 @@ public:
         m_id = id;
     }
     std::string GetLabel() const { return m_label; }
-    std::string GetID() const { return m_id; }
+    std::string GetId() const { return m_id; }
 
     void SetCategory(OptionsCategory category) { m_category = category; }
     OptionsCategory GetCategory() const { return m_category; }

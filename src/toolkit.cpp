@@ -1014,7 +1014,7 @@ std::string Toolkit::GetAvailableOptions() const
         }
 
         grp << "options" << opts;
-        grps << optionGrp->GetID() << grp;
+        grps << optionGrp->GetId() << grp;
     }
 
     o << "groups" << grps;
