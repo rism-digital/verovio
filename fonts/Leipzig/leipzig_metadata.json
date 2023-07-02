@@ -6382,6 +6382,76 @@
                 -0.136
             ]
         },
+        "staffPosLower1": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower2": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower3": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower4": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower5": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower6": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower7": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "staffPosRaise1": {
             "bBoxNE": [
                 0.0,

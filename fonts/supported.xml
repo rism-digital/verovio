@@ -2815,14 +2815,14 @@
         <glyph glyph-code="EB95" smufl-name="staffPosRaise6" />
         <glyph glyph-code="EB96" smufl-name="staffPosRaise7" />
         <glyph glyph-code="EB97" smufl-name="staffPosRaise8" />
-        <!--<glyph glyph-code="EB98" smufl-name="staffPosLower1" />-->
-        <!--<glyph glyph-code="EB99" smufl-name="staffPosLower2" />-->
-        <!--<glyph glyph-code="EB9A" smufl-name="staffPosLower3" />-->
-        <!--<glyph glyph-code="EB9B" smufl-name="staffPosLower4" />-->
-        <!--<glyph glyph-code="EB9C" smufl-name="staffPosLower5" />-->
-        <!--<glyph glyph-code="EB9D" smufl-name="staffPosLower6" />-->
-        <!--<glyph glyph-code="EB9E" smufl-name="staffPosLower7" />-->
-        <!--<glyph glyph-code="EB9F" smufl-name="staffPosLower8" />-->
+        <glyph glyph-code="EB98" smufl-name="staffPosLower1" />
+        <glyph glyph-code="EB99" smufl-name="staffPosLower2" />
+        <glyph glyph-code="EB9A" smufl-name="staffPosLower3" />
+        <glyph glyph-code="EB9B" smufl-name="staffPosLower4" />
+        <glyph glyph-code="EB9C" smufl-name="staffPosLower5" />
+        <glyph glyph-code="EB9D" smufl-name="staffPosLower6" />
+        <glyph glyph-code="EB9E" smufl-name="staffPosLower7" />
+        <glyph glyph-code="EB9F" smufl-name="staffPosLower8" />
         <range_end>U+EB9F</range_end>
         <range_start>U+EB90</range_start>
     </combiningStaffPositions>

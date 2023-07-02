@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20220308 at Sun Jul  2 12:29:01 2023
+Created by FontForge 20220308 at Sun Jul  2 12:58:41 2023
  By Laurent Pugin
 Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
@@ -2417,7 +2417,21 @@ d="M0 270c-2 -5 23 53 48 110c53 121 66 123 80 116c16 -8 19 -16 -54 -130c-34 -53 
  />
     <glyph glyph-name="uniEB96" unicode="&#xeb96;" horiz-adv-x="1000" 
  />
-    <glyph glyph-name="uniEB97" unicode="&#xeb97;" horiz-adv-x="1000" 
+    <glyph glyph-name="uniEB97" unicode="&#xeb97;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB98" unicode="&#xeb98;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB99" unicode="&#xeb99;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB9A" unicode="&#xeb9a;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB9B" unicode="&#xeb9b;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB9C" unicode="&#xeb9c;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB9D" unicode="&#xeb9d;" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="uniEB9E" unicode="&#xeb9e;" horiz-adv-x="0" 
  />
   </font>
 </defs></svg>

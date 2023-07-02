@@ -783,5 +783,12 @@
   <g c="EB94" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise5" />
   <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise6" />
   <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise7" />
-  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise8" />
+  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
+  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
+  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB9A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower3" />
+  <g c="EB9B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower4" />
+  <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
+  <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
+  <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
 </bounding-boxes>
