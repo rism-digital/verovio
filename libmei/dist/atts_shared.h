@@ -477,7 +477,7 @@ public:
 
 private:
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -2345,6 +2345,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttFormework
+//----------------------------------------------------------------------------
+
+class AttFormework : public Att {
+protected:
+    AttFormework();
+    ~AttFormework() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetFormework();
+
+    /** Read the values for the attribute class **/
+    bool ReadFormework(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteFormework(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(data_PGFUNC func_) { m_func = func_; }
+    data_PGFUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    data_PGFUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstFormework
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFormework
+ */
+
+class InstFormework : public AttFormework {
+public:
+    InstFormework() = default;
+    virtual ~InstFormework() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 
@@ -2726,14 +2775,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; }
-    data_KEYSIGNATURE GetKeySig() const { return m_keySig; }
-    bool HasKeySig() const;
+    void SetKeysig(data_KEYSIGNATURE keysig_) { m_keysig = keysig_; }
+    data_KEYSIGNATURE GetKeysig() const { return m_keysig; }
+    bool HasKeysig() const;
     ///@}
 
 private:
     /** Written key signature. **/
-    data_KEYSIGNATURE m_keySig;
+    data_KEYSIGNATURE m_keysig;
 };
 
 //----------------------------------------------------------------------------
@@ -3749,7 +3798,7 @@ private:
      * point of alignment across all the parts.
      * Bar lines within a score are usually controlling; that is, they "line up". Bar
      * lines within parts may or may not be controlling. When applied to measure, this
-     * attribute indicates the nature of the right barline but not the left.
+     * attribute indicates the nature of the right bar line but not the left.
      **/
     data_BOOLEAN m_control;
 };
@@ -5462,6 +5511,55 @@ class InstRanging : public AttRanging {
 public:
     InstRanging() = default;
     virtual ~InstRanging() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttRepeatMarkLog
+//----------------------------------------------------------------------------
+
+class AttRepeatMarkLog : public Att {
+protected:
+    AttRepeatMarkLog();
+    ~AttRepeatMarkLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetRepeatMarkLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadRepeatMarkLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteRepeatMarkLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(repeatMarkLog_FUNC func_) { m_func = func_; }
+    repeatMarkLog_FUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    repeatMarkLog_FUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstRepeatMarkLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRepeatMarkLog
+ */
+
+class InstRepeatMarkLog : public AttRepeatMarkLog {
+public:
+    InstRepeatMarkLog() = default;
+    virtual ~InstRepeatMarkLog() = default;
 };
 
 //----------------------------------------------------------------------------

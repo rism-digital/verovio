@@ -41,17 +41,18 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
-     * @name Getter for the labelAbbr
+     * @name Getter and setter for the labelAbbr
      */
     ///@{
     LabelAbbr *GetDrawingLabelAbbr() { return m_drawingLabelAbbr; }
     const LabelAbbr *GetDrawingLabelAbbr() const { return m_drawingLabelAbbr; }
+    void SetDrawingLabelAbbr(LabelAbbr *labelAbbr) { m_drawingLabelAbbr = labelAbbr; }
     ///@}
 
     /**
      * Calculate the adjustment according to the overlap and the free space available before.
      * Will move the verse accordingly.
-     * Called from Verse::AdjustSylSpacing and System::AdjustSylSpacingEnd
+     * Called from AdjustSylSpacingFunctor
      */
     int AdjustPosition(int &overlap, int freeSpace, const Doc *doc);
 
@@ -60,29 +61,14 @@ public:
     //----------//
 
     /**
-     * See Object::AlignVertically
+     * Interface for class functor visitation
      */
-    int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitProcessingLists
-     */
-    int InitProcessingLists(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

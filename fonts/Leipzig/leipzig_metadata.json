@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.81",
+    "fontVersion": "5.2.86",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1072,6 +1072,16 @@
                 -0.464
             ]
         },
+        "chantCaesura": {
+            "bBoxNE": [
+                0.5493,
+                1.9931
+            ],
+            "bBoxSW": [
+                -0.0005,
+                1.0547
+            ]
+        },
         "chantCclef": {
             "bBoxNE": [
                 0.724,
@@ -1210,6 +1220,46 @@
             "bBoxSW": [
                 -0.224,
                 -0.484
+            ]
+        },
+        "chantDivisioFinalis": {
+            "bBoxNE": [
+                0.456,
+                1.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.5
+            ]
+        },
+        "chantDivisioMaior": {
+            "bBoxNE": [
+                0.056,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "chantDivisioMaxima": {
+            "bBoxNE": [
+                0.056,
+                1.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.5
+            ]
+        },
+        "chantDivisioMinima": {
+            "bBoxNE": [
+                0.056,
+                2.0
+            ],
+            "bBoxSW": [
+                0.0,
+                1.0
             ]
         },
         "chantEntryLineAsc2nd": {
@@ -1440,6 +1490,16 @@
             "bBoxSW": [
                 0.0,
                 -0.324
+            ]
+        },
+        "chantVirgula": {
+            "bBoxNE": [
+                0.34,
+                1.992
+            ],
+            "bBoxSW": [
+                0.0,
+                1.056
             ]
         },
         "clef15": {
@@ -1954,7 +2014,7 @@
         },
         "fermataAbove": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 1.28
             ],
             "bBoxSW": [
@@ -1964,7 +2024,7 @@
         },
         "fermataBelow": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 0.012
             ],
             "bBoxSW": [
@@ -1994,7 +2054,7 @@
         },
         "fermataLongHenzeAbove": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 1.28
             ],
             "bBoxSW": [
@@ -2004,7 +2064,7 @@
         },
         "fermataLongHenzeBelow": {
             "bBoxNE": [
-                2.42,
+                2.4,
                 0.012
             ],
             "bBoxSW": [
@@ -2034,7 +2094,7 @@
         },
         "fermataShortHenzeAbove": {
             "bBoxNE": [
-                1.432,
+                1.42,
                 1.28
             ],
             "bBoxSW": [
@@ -2044,7 +2104,7 @@
         },
         "fermataShortHenzeBelow": {
             "bBoxNE": [
-                1.432,
+                1.42,
                 0.012
             ],
             "bBoxSW": [
@@ -2712,6 +2772,26 @@
                 -4.332
             ]
         },
+        "keyboardPedalHalf2": {
+            "bBoxNE": [
+                1.724,
+                0.836
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "keyboardPedalHalf3": {
+            "bBoxNE": [
+                1.724,
+                1.672
+            ],
+            "bBoxSW": [
+                0.0,
+                0.836
+            ]
+        },
         "keyboardPedalP": {
             "bBoxNE": [
                 1.28,
@@ -2755,11 +2835,11 @@
         "keyboardPedalUp": {
             "bBoxNE": [
                 1.724,
-                1.672
+                1.668
             ],
             "bBoxSW": [
                 0.0,
-                0.0
+                -0.004
             ]
         },
         "leftRepeatSmall": {
@@ -3030,6 +3110,366 @@
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "luteGermanALower": {
+            "bBoxNE": [
+                1.052,
+                1.252
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.008
+            ]
+        },
+        "luteGermanAUpper": {
+            "bBoxNE": [
+                1.944,
+                2.356
+            ],
+            "bBoxSW": [
+                -0.0,
+                0.0
+            ]
+        },
+        "luteGermanBLower": {
+            "bBoxNE": [
+                1.08,
+                2.236
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.012
+            ]
+        },
+        "luteGermanBUpper": {
+            "bBoxNE": [
+                2.396,
+                2.36
+            ],
+            "bBoxSW": [
+                -0.0,
+                -0.008
+            ]
+        },
+        "luteGermanCLower": {
+            "bBoxNE": [
+                0.744,
+                1.184
+            ],
+            "bBoxSW": [
+                0.0,
+                0.04
+            ]
+        },
+        "luteGermanCUpper": {
+            "bBoxNE": [
+                1.812,
+                2.352
+            ],
+            "bBoxSW": [
+                -0.016,
+                -0.004
+            ]
+        },
+        "luteGermanDLower": {
+            "bBoxNE": [
+                1.272,
+                2.372
+            ],
+            "bBoxSW": [
+                0.0,
+                0.024
+            ]
+        },
+        "luteGermanDUpper": {
+            "bBoxNE": [
+                2.304,
+                2.44
+            ],
+            "bBoxSW": [
+                -0.04,
+                -0.004
+            ]
+        },
+        "luteGermanELower": {
+            "bBoxNE": [
+                0.736,
+                1.252
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.012
+            ]
+        },
+        "luteGermanEUpper": {
+            "bBoxNE": [
+                1.796,
+                2.36
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "luteGermanFLower": {
+            "bBoxNE": [
+                0.96,
+                2.24
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.148
+            ]
+        },
+        "luteGermanFUpper": {
+            "bBoxNE": [
+                1.872,
+                2.456
+            ],
+            "bBoxSW": [
+                -0.008,
+                -0.44
+            ]
+        },
+        "luteGermanGLower": {
+            "bBoxNE": [
+                1.416,
+                1.252
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.124
+            ]
+        },
+        "luteGermanGUpper": {
+            "bBoxNE": [
+                2.12,
+                2.344
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.0
+            ]
+        },
+        "luteGermanHLower": {
+            "bBoxNE": [
+                1.184,
+                2.376
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.384
+            ]
+        },
+        "luteGermanHUpper": {
+            "bBoxNE": [
+                2.012,
+                2.328
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.468
+            ]
+        },
+        "luteGermanILower": {
+            "bBoxNE": [
+                0.568,
+                1.808
+            ],
+            "bBoxSW": [
+                0.0,
+                0.016
+            ]
+        },
+        "luteGermanIUpper": {
+            "bBoxNE": [
+                1.592,
+                2.336
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.012
+            ]
+        },
+        "luteGermanKLower": {
+            "bBoxNE": [
+                1.08,
+                2.276
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.092
+            ]
+        },
+        "luteGermanKUpper": {
+            "bBoxNE": [
+                2.068,
+                2.344
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.016
+            ]
+        },
+        "luteGermanLLower": {
+            "bBoxNE": [
+                1.18,
+                2.276
+            ],
+            "bBoxSW": [
+                -0.024,
+                -0.092
+            ]
+        },
+        "luteGermanLUpper": {
+            "bBoxNE": [
+                1.584,
+                2.364
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.004
+            ]
+        },
+        "luteGermanMLower": {
+            "bBoxNE": [
+                1.832,
+                1.204
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.004
+            ]
+        },
+        "luteGermanMUpper": {
+            "bBoxNE": [
+                2.944,
+                2.372
+            ],
+            "bBoxSW": [
+                -0.0,
+                0.0
+            ]
+        },
+        "luteGermanNLower": {
+            "bBoxNE": [
+                1.14,
+                1.208
+            ],
+            "bBoxSW": [
+                -0.004,
+                -0.004
+            ]
+        },
+        "luteGermanNUpper": {
+            "bBoxNE": [
+                2.236,
+                2.312
+            ],
+            "bBoxSW": [
+                -0.0,
+                -0.04
+            ]
+        },
+        "luteGermanOLower": {
+            "bBoxNE": [
+                0.984,
+                1.264
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.024
+            ]
+        },
+        "luteGermanPLower": {
+            "bBoxNE": [
+                1.148,
+                1.228
+            ],
+            "bBoxSW": [
+                -0.016,
+                -0.984
+            ]
+        },
+        "luteGermanQLower": {
+            "bBoxNE": [
+                1.016,
+                1.276
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.984
+            ]
+        },
+        "luteGermanRLower": {
+            "bBoxNE": [
+                0.844,
+                1.164
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "luteGermanSLower": {
+            "bBoxNE": [
+                1.132,
+                1.288
+            ],
+            "bBoxSW": [
+                -0.016,
+                -0.004
+            ]
+        },
+        "luteGermanTLower": {
+            "bBoxNE": [
+                0.916,
+                1.64
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.004
+            ]
+        },
+        "luteGermanVLower": {
+            "bBoxNE": [
+                1.276,
+                1.164
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.196
+            ]
+        },
+        "luteGermanXLower": {
+            "bBoxNE": [
+                1.272,
+                1.208
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.008
+            ]
+        },
+        "luteGermanYLower": {
+            "bBoxNE": [
+                1.064,
+                1.112
+            ],
+            "bBoxSW": [
+                -0.016,
+                -0.692
+            ]
+        },
+        "luteGermanZLower": {
+            "bBoxNE": [
+                0.808,
+                1.348
+            ],
+            "bBoxSW": [
+                -0.016,
+                -0.116
             ]
         },
         "luteItalianFret0": {
@@ -4254,22 +4694,22 @@
         },
         "metNoteDoubleWhole": {
             "bBoxNE": [
-                2.38,
-                0.62
+                2.18,
+                0.68
             ],
             "bBoxSW": [
                 0.0,
-                -0.608
+                -0.68
             ]
         },
         "metNoteDoubleWholeSquare": {
             "bBoxNE": [
-                1.928,
-                0.912
+                1.392,
+                0.68
             ],
             "bBoxSW": [
-                0.008,
-                -0.888
+                0.0,
+                -0.68
             ]
         },
         "metNoteHalfUp": {
@@ -4384,22 +4824,22 @@
         },
         "noteDoubleWhole": {
             "bBoxNE": [
-                2.38,
-                0.62
+                2.18,
+                0.68
             ],
             "bBoxSW": [
                 0.0,
-                -0.608
+                -0.68
             ]
         },
         "noteDoubleWholeSquare": {
             "bBoxNE": [
-                1.936,
-                0.92
+                1.392,
+                0.68
             ],
             "bBoxSW": [
                 0.0,
-                -0.896
+                -0.68
             ]
         },
         "noteHalfUp": {
@@ -4424,12 +4864,12 @@
         },
         "noteWhole": {
             "bBoxNE": [
-                1.668,
-                0.492
+                1.62,
+                0.532
             ],
             "bBoxSW": [
                 0.0,
-                -0.5
+                -0.532
             ]
         },
         "noteheadBlack": {
@@ -4672,6 +5112,46 @@
                 -0.5
             ]
         },
+        "octaveBaselineA": {
+            "bBoxNE": [
+                0.72,
+                0.744
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "octaveBaselineB": {
+            "bBoxNE": [
+                0.588,
+                1.176
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "octaveBaselineM": {
+            "bBoxNE": [
+                1.244,
+                0.732
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.02
+            ]
+        },
+        "octaveBaselineV": {
+            "bBoxNE": [
+                0.744,
+                0.788
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "octaveParensLeft": {
             "bBoxNE": [
                 0.46,
@@ -4690,6 +5170,46 @@
             "bBoxSW": [
                 0.0,
                 -0.1
+            ]
+        },
+        "octaveSuperscriptA": {
+            "bBoxNE": [
+                0.72,
+                1.376
+            ],
+            "bBoxSW": [
+                0.0,
+                0.632
+            ]
+        },
+        "octaveSuperscriptB": {
+            "bBoxNE": [
+                0.588,
+                1.808
+            ],
+            "bBoxSW": [
+                0.0,
+                0.632
+            ]
+        },
+        "octaveSuperscriptM": {
+            "bBoxNE": [
+                1.244,
+                1.364
+            ],
+            "bBoxSW": [
+                0.0,
+                0.612
+            ]
+        },
+        "octaveSuperscriptV": {
+            "bBoxNE": [
+                0.74,
+                1.4
+            ],
+            "bBoxSW": [
+                -0.004,
+                0.612
             ]
         },
         "ornamentHaydn": {
@@ -5372,6 +5892,36 @@
                 0.0
             ]
         },
+        "pluckedDampAll": {
+            "bBoxNE": [
+                1.32,
+                1.32
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedDampOnStem": {
+            "bBoxNE": [
+                1.304,
+                0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedFingernailFlick": {
+            "bBoxNE": [
+                0.568,
+                0.824
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "pluckedLeftHandPizzicato": {
             "bBoxNE": [
                 1.32,
@@ -5396,6 +5946,16 @@
             "bBoxNE": [
                 0.824,
                 1.064
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "pluckedWithFingernails": {
+            "bBoxNE": [
+                0.824,
+                0.572
             ],
             "bBoxSW": [
                 0.0,
@@ -5802,6 +6362,16 @@
                 0.0
             ]
         },
+        "segnoSerpent1": {
+            "bBoxNE": [
+                1.796,
+                4.384
+            ],
+            "bBoxSW": [
+                0.004,
+                -0.38
+            ]
+        },
         "segnoSerpent2": {
             "bBoxNE": [
                 1.8,
@@ -5810,6 +6380,156 @@
             "bBoxSW": [
                 0.0,
                 -0.136
+            ]
+        },
+        "staffPosLower1": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower2": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower3": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower4": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower5": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower6": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower7": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise1": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise2": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise3": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise4": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise5": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise6": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise7": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise8": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "stringsDownBow": {
@@ -7122,14 +7842,6 @@
             "cutOutSE": [
                 1.568,
                 -0.232
-            ],
-            "stemDownNW": [
-                0.0,
-                0.0
-            ],
-            "stemUpSE": [
-                1.62,
-                0.0
             ]
         },
         "noteheadWholeFilled": {

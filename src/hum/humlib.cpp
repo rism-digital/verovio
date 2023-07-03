@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 27 16:47:59 PST 2023
+// Last Modified: Sat Apr 15 11:52:53 PDT 2023
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -61725,6 +61725,278 @@ void Tool_colorgroups::processFile(HumdrumFile& infile) {
 
 /////////////////////////////////
 //
+// Tool_colorthirds::Tool_colorthirds -- Set the recognized options for the tool.
+//
+
+Tool_colorthirds::Tool_colorthirds(void) {
+	define("d|double=b", "highlight only doubled notes in triads");
+	define("3|no-thirds=b", "do not color thirds");
+	define("5|no-fifths=b", "do not color fifths");
+	define("T|no-triads=b", "do not color full triads");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_colorthirds::run -- Do the main work of the tool.
+//
+
+bool Tool_colorthirds::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_colorthirds::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_colorthirds::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_colorthirds::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_colorthirds::initialize -- Setup to do before processing a file.
+//
+
+void Tool_colorthirds::initialize(void) {
+	m_colorThirds = !getBoolean("no-thirds");
+	m_colorFifths = !getBoolean("no-thirds");
+	m_colorTriads = !getBoolean("no-triads");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_colorthirds::processFile -- Analyze an input file.
+//
+
+void Tool_colorthirds::processFile(HumdrumFile& infile) {
+	// Algorithm go line by line in the infile, extracting the notes that are active
+	// check to see if the list of notes form a triad
+	// label the root third and fifth notes of the triad
+
+	vector<HTp> kernNotes;
+	vector<int> midiNotes;
+	vector<int> chordPositions;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) { // if no notes in the line
+			continue;
+		}
+		// iterate along the line looking at each field, and creating a '
+		//     list of tokens that are notes.
+		kernNotes.clear();
+		midiNotes.clear();
+		chordPositions.clear();
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j); // get ptr to cell
+			// if not a **kern token, then skip:
+			if (!token->isKern()) {
+				continue;
+			}
+
+			if (token->isRest()) {
+				continue;
+			}
+
+			HTp resolvedToken = NULL;
+			if (token->isNull()) {
+				resolvedToken = token->resolveNull();
+				if (!resolvedToken || resolvedToken->isRest()) {
+					continue;
+				}
+			}
+			if (resolvedToken) {
+				kernNotes.push_back(resolvedToken);
+			} else {
+				kernNotes.push_back(token);
+			}
+		}
+		midiNotes = getMidiNotes(kernNotes);
+		chordPositions = getChordPositions(midiNotes);
+		labelChordPositions(kernNotes, chordPositions);
+	}
+
+	infile.createLinesFromTokens();
+
+	m_humdrum_text << infile;
+
+	m_humdrum_text << "!!!RDF**kern: " << m_root_marker
+		<< " = marked note, root position, color=\"" << m_root_color << "\"" << endl;
+
+	m_humdrum_text << "!!!RDF**kern: " << m_third_marker
+		<< " = marked note, third position, color=\"" << m_third_color << "\"" << endl;
+
+	m_humdrum_text << "!!!RDF**kern: " << m_fifth_marker
+		<< " = marked note, third position, color=\"" << m_fifth_color << "\"" << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_colorthirds::labelChordPositions -- Mark the scale degree of notes:
+//       0: not in triadic sonority so no label.
+//       1 == @: root (such as C in C major triad)
+//       3 == N third (such as E in C major triad)
+//       5 == Z fifth (such as G in C major triad)
+//
+
+void Tool_colorthirds::labelChordPositions(vector<HTp>& kernNotes, vector<int>& chordPositions) {
+	for (int i=0; i<(int)kernNotes.size(); i++) {
+		int position = chordPositions.at(i);
+		if (position == 0) {
+			continue;
+		}
+		string label;
+		switch (position) {
+			case 1: label = m_root_marker; break;
+			case 3: label = m_third_marker; break;
+			case 5: label = m_fifth_marker; break;
+		}
+		if (label.empty()) {
+			continue;
+		}
+		string text = *kernNotes.at(i);
+		text += label;
+		kernNotes.at(i)->setText(text);
+	}
+}
+
+//////////////////////////////
+//
+// Tool_colorthirds::getChordPositions -- Identify if the sonority is a triad, and if so, place
+//    the position of the note in the chord:
+//       0: not in triadic sonority.
+//       1: root (such as C in C major triad)
+//       3: third (such as E in C major triad)
+//       5: fifth (such as G in C major triad)
+//
+vector<int> Tool_colorthirds::getChordPositions(vector<int>& midiNotes) {
+	vector<int> output(midiNotes.size(), 0);
+	if (midiNotes.empty()) {
+		return output;
+	}
+
+	// create modulo 12 arr
+	vector<int> pitchClasses(12, 0);
+	for (int i = 0; i < (int)midiNotes.size(); i++) {
+		int index = midiNotes.at(i) % 12;
+		pitchClasses.at(index)++; // add one to the pitch
+	}
+
+	vector<int> noteMods;
+
+	for (int i = 0; i < (int)pitchClasses.size(); i++) {
+		if (pitchClasses.at(i) != 0) { // not zero
+			noteMods.push_back(i); // add the index
+		}
+	}
+
+	if (noteMods.size() != 3) { // not a triad
+		return output;
+	}
+
+	int bint = noteMods.at(1) - noteMods.at(0);
+	int tint = noteMods.at(2) - noteMods.at(1);
+
+	int rootClass = -1; // curr uninitialized
+	int thirdClass = -1;
+	int fifthClass = -1;
+
+	// NOTE: right now, noteMods is not in the order that the og notes in the score are in
+	// aka --> these inversions are not correct
+	if ((bint == 3 && tint == 4) || (bint == 4 && tint == 3) || (bint == 3 && tint == 3)) { // root pos
+		rootClass = noteMods.at(0);
+		thirdClass = noteMods.at(1);
+		fifthClass = noteMods.at(2);
+	} else if ((bint == 4 && tint == 5) || (bint == 3 && tint == 5) || (bint == 3 && tint == 6)) { // first inv
+		rootClass = noteMods.at(2);
+		thirdClass = noteMods.at(0);
+		fifthClass = noteMods.at(1);
+	} else if ((bint == 5 && tint == 3) || (bint == 5 && tint == 4) || (bint == 6 && tint == 3)) { // sec inv
+		rootClass = noteMods.at(1);
+		thirdClass = noteMods.at(2);
+		fifthClass = noteMods.at(0);
+	}
+
+	if (rootClass == -1) {
+		return output;
+	}
+
+	for (int i = 0; i < (int)midiNotes.size(); i++) {
+		if (midiNotes.at(i) % 12 == rootClass) {
+			output.at(i) = 1;
+		}
+		else if (midiNotes.at(i) % 12 == thirdClass) {
+			output.at(i) = 3;
+		}
+		else if (midiNotes.at(i) % 12 == fifthClass) {
+			output.at(i) = 5;
+		}
+	}
+
+	return output;
+}
+
+
+//////////////////////////////
+//
+// Tool_colorthirds::getMidiNotes -- Convert kern notes to MIDI note numbers.
+//    If the note is sustaining, then make the MIDI note number negative.
+//
+
+vector<int> Tool_colorthirds::getMidiNotes(vector<HTp>& kernNotes) {
+	vector<int> output(kernNotes.size());
+	if (kernNotes.empty()) {
+		return output;
+	}
+	for (int i=0; i<(int)kernNotes.size(); i++) {
+		int midiNote = kernNotes.at(i)->getMidiPitch();
+		if (midiNote < 0) {
+			// negative values indicate sustained note.
+			midiNote = -midiNote;
+		}
+		output.at(i) = midiNote;
+	}
+	return output;
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_colortriads::Tool_colortriads -- Set the recognized options for the tool.
 //
 
@@ -70606,7 +70878,7 @@ void Tool_deg::ScaleDegree::analyzeTokenScaleDegrees(void) {
 
 	// Only processing non-null data from here.
 	m_subtokens = m_linkedKernToken->getSubtokens();
-	int subtokCount = m_subtokens.size();
+	int subtokCount = (int)m_subtokens.size();
 
 	m_degrees.resize(subtokCount);
 	fill(m_degrees.begin(), m_degrees.end(), -1);
@@ -70868,7 +71140,7 @@ string Tool_deg::ScaleDegree::generateDegDataToken(void) const {
 		return ".";
 	}
 
-	int newCount = nontied.size();
+	int newCount = (int)nontied.size();
 	string output;
 	for (int i=0; i<newCount; i++) {
 		output += nontied[i];
@@ -75999,6 +76271,7 @@ Tool_extract::Tool_extract(void) {
 	define("t|trace=s:", "use a trace file to extract data");
 	define("e|expand=b", "expand spines with subspines");
 	define("k|kern=s", "Extract by kern spine group");
+	define("K|reverse-kern=s", "Extract by kern spine group top to bottom numbering");
 	define("E|expand-interp=s:", "expand subspines limited to exinterp");
 	define("m|model|method=s:d", "method for extracting secondary spines");
 	define("M|cospine-model=s:d", "method for extracting cospines");
@@ -77984,6 +78257,7 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	interpQ     = getBoolean("i");
 	interps     = getString("i");
 	kernQ       = getBoolean("k");
+	rkernQ      = getBoolean("K");
 
 	interpstate = 1;
 	if (!interpQ) {
@@ -78052,6 +78326,10 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	} else if (kernQ) {
 		fieldstring = getString("k");
 		fieldQ = 1;
+	} else if (rkernQ) {
+		fieldstring = getString("K");
+		fieldQ = 1;
+		fieldstring = reverseFieldString(fieldstring, infile.getMaxTrack());
 	}
 
 	spineListQ = getBoolean("spine-list");
@@ -78071,6 +78349,37 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 		}
 	}
 
+}
+
+
+//////////////////////////////
+//
+// Tool_extract::reverseFieldString --  No dollar expansion for now.
+//
+
+string Tool_extract::reverseFieldString(const string& input, int maxval) {
+	string output;
+	string number;
+	for (int i=0; i<(int)input.size(); i++) {
+		if (isdigit(input[i])) {
+			number += input[i];
+			continue;
+		} else {
+			if (!number.empty()) {
+				int value = (int)strtol(number.c_str(), NULL, 10);
+				value = maxval - value + 1;
+				output += to_string(value);
+				output += input[i];
+				number.clear();
+			}
+		}
+	}
+	if (!number.empty()) {
+		int value = (int)strtol(number.c_str(), NULL, 10);
+		value = maxval - value + 1;
+		output += to_string(value);
+	}
+	return output;
 }
 
 
@@ -78433,8 +78742,8 @@ bool Tool_fb::hideNumbersForTokenLine(HTp token, pair<int, HumNum> timeSig) {
 	// Get note duration from --rate option
 	HumNum rateDuration = Convert::recipToDuration(m_rateQ);
 	if (rateDuration.toFloat() != 0) {
-		float timeSigBarDuration = timeSig.first * Convert::recipToDuration(to_string(timeSig.second.getInteger())).toFloat();
-		float durationFromBarline = token->getDurationFromBarline().toFloat();
+		double timeSigBarDuration = timeSig.first * Convert::recipToDuration(to_string(timeSig.second.getInteger())).toFloat();
+		double durationFromBarline = token->getDurationFromBarline().toFloat();
 		// Handle upbeats
 		if (token->getBarlineDuration().toFloat() < timeSigBarDuration) {
 			// Fix durationFromBarline when current bar duration is shorter than
@@ -78714,22 +79023,19 @@ vector<FiguredBassNumber*> Tool_fb::getAbbreviatedNumbers(const vector<FiguredBa
 
 	vector<FiguredBassNumber*> abbreviatedNumbers;
 
-	vector<FiguredBassAbbreviationMapping*> mappings = FiguredBassAbbreviationMapping::s_mappings;
-
 	string numberString = getNumberString(numbers);
 
 	// Check if an abbreviation exists for passed numbers
-	auto it = find_if(mappings.begin(), mappings.end(), [numberString](FiguredBassAbbreviationMapping* abbr) {
-		return abbr->m_str == numberString;
+	auto it = find_if(FiguredBassAbbreviationMapping::s_mappings.begin(), FiguredBassAbbreviationMapping::s_mappings.end(), [&numberString](const FiguredBassAbbreviationMapping& abbr) {
+		return abbr.m_str == numberString;
 	});
 
-	if (it != mappings.end()) {
-		int index = it - mappings.begin();
-		FiguredBassAbbreviationMapping* abbr = mappings[index];
+	if (it != FiguredBassAbbreviationMapping::s_mappings.end()) {
+		const FiguredBassAbbreviationMapping& abbr = *it;
 		bool aQ = m_accidentalsQ;
 		// Store numbers to display by the abbreviation mapping in abbreviatedNumbers
-		copy_if(numbers.begin(), numbers.end(), back_inserter(abbreviatedNumbers), [abbr, aQ](FiguredBassNumber* num) {
-			vector<int> nums = abbr->m_numbers;
+		copy_if(numbers.begin(), numbers.end(), back_inserter(abbreviatedNumbers), [&abbr, aQ](FiguredBassNumber* num) {
+			const vector<int>& nums = abbr.m_numbers;
 			// Show numbers if they are part of the abbreviation mapping or if they have an accidental
 			return (find(nums.begin(), nums.end(), num->getNumberWithinOctave()) != nums.end()) || (num->m_showAccidentals && aQ);
 		});
@@ -78932,21 +79238,21 @@ FiguredBassAbbreviationMapping::FiguredBassAbbreviationMapping(string s, vector<
 // FiguredBassAbbreviationMapping::s_mappings -- Mapping to abbreviate figured bass numbers
 //
 
-vector<FiguredBassAbbreviationMapping*> FiguredBassAbbreviationMapping::s_mappings = {
-	new FiguredBassAbbreviationMapping("3", {}),
-	new FiguredBassAbbreviationMapping("5", {}),
-	new FiguredBassAbbreviationMapping("5 3", {}),
-	new FiguredBassAbbreviationMapping("6 3", {6}),
-	new FiguredBassAbbreviationMapping("5 4", {4}),
-	new FiguredBassAbbreviationMapping("7 5 3", {7}),
-	new FiguredBassAbbreviationMapping("7 3", {7}),
-	new FiguredBassAbbreviationMapping("7 5", {7}),
-	new FiguredBassAbbreviationMapping("6 5 3", {6, 5}),
-	new FiguredBassAbbreviationMapping("6 4 3", {4, 3}),
-	new FiguredBassAbbreviationMapping("6 4 2", {4, 2}),
-	new FiguredBassAbbreviationMapping("9 5 3", {9}),
-	new FiguredBassAbbreviationMapping("9 5", {9}),
-	new FiguredBassAbbreviationMapping("9 3", {9}),
+const vector<FiguredBassAbbreviationMapping> FiguredBassAbbreviationMapping::s_mappings = {
+	FiguredBassAbbreviationMapping("3", {}),
+	FiguredBassAbbreviationMapping("5", {}),
+	FiguredBassAbbreviationMapping("5 3", {}),
+	FiguredBassAbbreviationMapping("6 3", {6}),
+	FiguredBassAbbreviationMapping("5 4", {4}),
+	FiguredBassAbbreviationMapping("7 5 3", {7}),
+	FiguredBassAbbreviationMapping("7 3", {7}),
+	FiguredBassAbbreviationMapping("7 5", {7}),
+	FiguredBassAbbreviationMapping("6 5 3", {6, 5}),
+	FiguredBassAbbreviationMapping("6 4 3", {4, 3}),
+	FiguredBassAbbreviationMapping("6 4 2", {4, 2}),
+	FiguredBassAbbreviationMapping("9 5 3", {9}),
+	FiguredBassAbbreviationMapping("9 5", {9}),
+	FiguredBassAbbreviationMapping("9 3", {9}),
 };
 
 
@@ -79108,6 +79414,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "filter") {
 			RUNTOOL(filter, infile, commands[i].second, status);
 		} else if (commands[i].first == "gasparize") {
+			RUNTOOL(grep, infile, commands[i].second, status);
+		} else if (commands[i].first == "grep") {
 			RUNTOOL(gasparize, infile, commands[i].second, status);
 		} else if (commands[i].first == "half") {
 			RUNTOOL(half, infile, commands[i].second, status);
@@ -79125,6 +79433,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(imitation, infile, commands[i].second, status);
 		} else if (commands[i].first == "kern2mens") {
 			RUNTOOL(kern2mens, infile, commands[i].second, status);
+		} else if (commands[i].first == "kernify") {
+			RUNTOOL(kernify, infile, commands[i].second, status);
 		} else if (commands[i].first == "kernview") {
 			RUNTOOL(kernview, infile, commands[i].second, status);
 		} else if (commands[i].first == "melisma") {
@@ -79187,6 +79497,12 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "colourtriads") {
 			// British spelling
 			RUNTOOL(colortriads, infile, commands[i].second, status);
+
+		} else if (commands[i].first == "colorthirds") {
+			RUNTOOL(colorthirds, infile, commands[i].second, status);
+		} else if (commands[i].first == "colourthirds") {
+			// British spelling
+			RUNTOOL(colorthirds, infile, commands[i].second, status);
 
 		} else if (commands[i].first == "colorgroups") {
 			RUNTOOL(colorgroups, infile, commands[i].second, status);
@@ -81735,6 +82051,101 @@ void Tool_gasparize::convertNextNoteToJAccidental(HTp current) {
 	current = current->getNextToken();
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_grep::Tool_grep -- Set the recognized options for the tool.
+//
+
+Tool_grep::Tool_grep(void) {
+	define("v|remove-matching-lines=b", "Remove lines that match regex");
+	define("e|regex|regular-expression=s", "Regular expression to search with");
+}
+
+
+/////////////////////////////////
+//
+// Tool_grep::run -- Do the main work of the tool.
+//
+
+bool Tool_grep::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_grep::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_grep::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_grep::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_grep::initialize --  Initializations that only have to be
+//    done one for all HumdrumFile segments.
+//
+
+void Tool_grep::initialize(void) {
+	m_negateQ = !getBoolean("remove-matching-lines");
+	m_regex = getString("regular-expression");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_grep::processFile --
+//
+
+void Tool_grep::processFile(HumdrumFile& infile) {
+	HumRegex hre;
+	bool match;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		match = hre.search(infile[i], m_regex);
+		if (m_negateQ) {
+			if (match) {
+				continue;
+			}
+		} else {
+			if (!match) {
+				continue;
+			}
+		}
+		m_humdrum_text << infile[i] << "\n";
+	}
+}
 
 
 
@@ -85949,6 +86360,275 @@ void Tool_kern2mens::printBarline(HumdrumFile& infile, int line) {
 	}
 	m_humdrum_text << "\n";
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_kernify::Tool_kernify -- Set the recognized options for the tool.
+//
+
+Tool_kernify::Tool_kernify(void) {
+	define("f|force=b", "force staff-like spines to be displayed as text");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_kernify::run -- Do the main work of the tool.
+//
+
+bool Tool_kernify::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_kernify::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_kernify::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_kernify::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::initialize -- Setup to do before processing a file.
+//
+
+void Tool_kernify::initialize(void) {
+	if (getBoolean("force")) {
+		m_forceQ = true;
+	}
+	// do nothing
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::processFile -- Analyze an input file.
+//
+
+void Tool_kernify::processFile(HumdrumFile& infile) {
+	generateDummyKernSpine(infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::generateDummyKernSpine --
+//
+
+void Tool_kernify::generateDummyKernSpine(HumdrumFile& infile) {
+	vector<HTp> spineStarts;
+	infile.getSpineStartList(spineStarts);
+	bool hasRecip = false;
+	if (spineStarts.empty()) {
+		// no spines, so nothing to do
+		return;
+	}
+	for (int i=0; i<(int)spineStarts.size(); i++) {
+		if (spineStarts[i]->isStaffLike()) {
+			if (!m_forceQ) {
+				// No need for a dummy kern spine, so do nothing.
+				// later an option can be used to force a dummy
+				// kern spine even if there already exists
+				return;
+			}
+		}
+		if (spineStarts[i]->isDataType("**recip")) {
+			hasRecip = true;
+		}
+	}
+
+	int striaIndex = -1;
+	int clefIndex = -1;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isData()) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (striaIndex < 0) {
+				if (token->compare(0, 6, "*stria") == 0) {
+					striaIndex = i;
+				}
+			}
+			if (clefIndex < 0) {
+				if (token->compare(0, 6, "*clef") == 0) {
+					clefIndex = i;
+				}
+			}
+		}
+	}
+	if (striaIndex == clefIndex) {
+		// Don't show on the same data line.
+		striaIndex = -1;
+	}
+
+	bool hasDuration = infile.getScoreDuration() > 0 ? true : false;
+
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i];
+		} else if (infile[i].isExclusiveInterpretation()) {
+			m_humdrum_text << "**kern";
+			for (int j=infile[i].getFieldCount()-1; j>=0; j--) {
+				HTp token = infile.token(i, j);
+				if (*token == "**recip") {
+					m_humdrum_text << "\t**xrecip";
+				} else if (token->find("**kern") != std::string::npos) {
+					string value = *token;
+					hre.replaceDestructive(value, "nrek", "kern", "g");
+					hre.replaceDestructive(value, "**cdata-", "^\\*\\*");
+					m_humdrum_text << "\t" << value;
+				} else if (token->find("**mens") != std::string::npos) {
+					string value = *token;
+					hre.replaceDestructive(value, "snem", "mens", "g");
+					hre.replaceDestructive(value, "**cdata-", "^\\*\\*");
+					m_humdrum_text << "\t" << value;
+				} else if (token->find("**cdata") == std::string::npos) {
+					string value = token->substr(2);
+					hre.replaceDestructive(value, "nrek", "kern", "g");
+					hre.replaceDestructive(value, "snem", "snem", "g");
+					m_humdrum_text << "\t**cdata-" << value;
+				} else {
+					m_humdrum_text << "\t" << token;
+				}
+			}
+			if (striaIndex < 0) {
+				m_humdrum_text << endl << "*stria0" << "\t" << makeNullLine(infile[i]);
+			}
+			if (clefIndex < 0) {
+				m_humdrum_text << endl << "*clefXyy" << "\t" << makeNullLine(infile[i]);
+			}
+		} else if (infile[i].isManipulator()) {
+			if (*infile[i].token(0) == "*-") {
+				m_humdrum_text << "*-";
+			} else {
+				m_humdrum_text << "*";
+			}
+			m_humdrum_text << "\t" << makeReverseLine(infile[i]);
+		} else if (infile[i].isBarline()) {
+			m_humdrum_text << infile[i].token(0) << "\t" << makeReverseLine(infile[i]);
+		} else if (infile[i].isData()) {
+			if (hasRecip) {
+				for (int j=0; j<infile[i].getFieldCount(); j++) {
+					HTp token = infile.token(i, j);
+					if (!token->isDataType("**recip")) {
+						continue;
+					}
+					m_humdrum_text << token << "ryy\t" << makeReverseLine(infile[i]);
+					break;
+				}
+			} else {
+				if (!hasDuration) {
+					m_humdrum_text << "4ryy" << "\t" << makeReverseLine(infile[i]);
+				} else {
+					HumNum duration = infile[i].getDuration();
+					string recip;
+					if (duration == 0) {
+						recip = "q";
+					} else {
+						recip = Convert::durationToRecip(duration);
+					}
+
+					m_humdrum_text << recip << "ryy\t" << makeReverseLine(infile[i]);
+				}
+			}
+		} else if (infile[i].isCommentLocal()) {
+				m_humdrum_text << "!" << "\t" << makeReverseLine(infile[i]);
+		} else if (infile[i].isInterpretation()) {
+				if (striaIndex == i) {
+					m_humdrum_text << "*stria0" << "\t" << makeReverseLine(infile[i]);
+					striaIndex = -1;
+				} else if (clefIndex == i) {
+					m_humdrum_text << "*clefXyy" << "\t" << makeReverseLine(infile[i]);
+					clefIndex = -1;
+				} else {
+					m_humdrum_text << "*" << "\t" << makeReverseLine(infile[i]);
+				}
+		} else {
+			m_humdrum_text << "!!UNKNONWN LINE TYPE FOR LINE " << i+1 << ":\t" << infile[i];
+		}
+		m_humdrum_text << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::makeNullLine --
+//
+
+string Tool_kernify::makeNullLine(HumdrumLine& line) {
+	string output;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		output += "*";
+		if (i < line.getFieldCount() - 1) {
+			output += "\t";
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::makeReverseLine --
+//
+
+string Tool_kernify::makeReverseLine(HumdrumLine& line) {
+	string output;
+	for (int i=line.getFieldCount() - 1; i>= 0; i--) {
+		output += *line.token(i);
+		if (i > 0) {
+			output += "\t";
+		}
+	}
+	return output;
+}
+
 
 
 
@@ -103243,6 +103923,7 @@ void Tool_myank::printDataLine(HLp line,
 		const vector<int>& lastLineResolvedTokenLineIndex,
 		const vector<HumNum>& lastLineDurationsFromNoteStart) {
 	bool lineChange = false;
+	string recipRegex = R"re(([\d%.]+))re";
 	// Handle cutting the previeous token of a note that hangs into the selected
 	// section
 	if (startLineHandled == false) {
@@ -103255,13 +103936,28 @@ void Tool_myank::printDataLine(HLp line,
 					if (resolvedToken->isNull()) {
 						continue;
 					}
-					string recip = Convert::durationToRecip(token->getDurationToNoteEnd());
-					string pitch;
 					HumRegex hre;
-					if (hre.search(resolvedToken, "([rRA-Ga-gxyXYn#-]+)")) {
-						pitch = hre.getMatch(1);
+					string recip = Convert::durationToRecip(token->getDurationToNoteEnd());
+					vector<string> subtokens = resolvedToken->getSubtokens();
+					string tokenText;
+					for (int i=0; i<(int)subtokens.size(); i++) {
+						if (hre.search(subtokens[i], recipRegex)) {
+							string before = hre.getPrefix();
+							string after = hre.getSuffix();
+							hre.replaceDestructive(after, "", recipRegex, "g");
+							string subtokenText;
+							// Replace the old duration with the clipped one
+							subtokenText += before + recip + after;
+							// Add a tie end if not already in a tie group
+							if (!hre.search(subtokens[i], "[_\\]]")) {
+									subtokenText += "]";
+							}
+							tokenText += subtokenText;
+							if (i < (int)subtokens.size() - 1) {
+								tokenText += " ";
+							}
+						}
 					}
-					string tokenText = recip + pitch + "]";
 					token->setText(tokenText);
 					lineChange = true;
 				}
@@ -103282,19 +103978,27 @@ void Tool_myank::printDataLine(HLp line,
 						continue;
 					}
 					HumNum dur = lastLineDurationsFromNoteStart[i];
-					string recip = Convert::durationToRecip(dur);
-					string pitch;
 					HumRegex hre;
-					if (hre.search(resolvedToken, "([rRA-Ga-gxyXYn#-]+)")) {
-						pitch = hre.getMatch(1);
+					string recip = Convert::durationToRecip(dur);
+					vector<string> subtokens = resolvedToken->getSubtokens();
+					for (int i=0; i<(int)subtokens.size(); i++) {
+						if (hre.search(subtokens[i], recipRegex)) {
+							string before = hre.getPrefix();
+							string after = hre.getSuffix();
+							hre.replaceDestructive(after, "", recipRegex, "g");
+							string subtokenText;
+							if (resolvedToken->getDuration() > dur) {
+								// Add a tie start if not already in a tie group
+								if (!hre.search(subtokens[i], "[_\\[]")) {
+										subtokenText += "[";
+								}
+							}
+							// Replace the old duration with the clipped one
+							subtokenText += before + recip + after;
+							token->replaceSubtoken(i, subtokenText);
+							lineChange = true;
+						}
 					}
-					string tokenText;
-					if (resolvedToken->getDuration() > dur) {
-						tokenText += "[";
-					}
-					tokenText += recip + pitch;
-					token->setText(tokenText);
-					lineChange = true;
 				}
 			}
 		}
@@ -103698,7 +104402,7 @@ void Tool_myank::printEnding(HumdrumFile& infile, int lastline, int adjlin) {
 
 	if (startline >= 0) {
 		for (i=startline; i<infile.getLineCount(); i++) {
-			if (m_hideEnding && (i >= ending)) {
+			if (m_hideEnding && (i > ending)) {
 				if (infile[i].rfind("!!!RDF", 0) == 0) {
 					m_humdrum_text << infile[i] << "\n";
 				}
@@ -110165,6 +110869,7 @@ void Tool_sic::processFile(HumdrumFile& infile) {
 	if (m_modifiedQ) {
 		infile.createLinesFromTokens();
 	}
+	m_humdrum_text << infile;
 }
 
 

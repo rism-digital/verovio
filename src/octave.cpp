@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -176,13 +177,24 @@ std::pair<int, bool> Octave::GetVerticalContentBoundaryRel(const Doc *doc, const
 // Octave functor methods
 //----------------------------------------------------------------------------
 
-int Octave::ResetVerticalAlignment(FunctorParams *functorParams)
+FunctorCode Octave::Accept(Functor &functor)
 {
-    FloatingObject::ResetVerticalAlignment(functorParams);
+    return functor.VisitOctave(this);
+}
 
-    this->ResetDrawingExtenderX();
+FunctorCode Octave::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitOctave(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Octave::AcceptEnd(Functor &functor)
+{
+    return functor.VisitOctaveEnd(this);
+}
+
+FunctorCode Octave::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitOctaveEnd(this);
 }
 
 } // namespace vrv

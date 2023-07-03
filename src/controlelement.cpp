@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "layer.h"
 #include "rend.h"
 #include "system.h"
@@ -82,7 +82,7 @@ data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment() const
 data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 {
     // Do this only for the following elements
-    if (!this->Is({ TRILL, MORDENT, ORNAM, TURN })) return defaultValue;
+    if (!this->Is({ TRILL, MORDENT, ORNAM, REPEATMARK, TURN })) return defaultValue;
 
     const TimePointInterface *interface = this->GetTimePointInterface();
     assert(interface);
@@ -104,6 +104,17 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
         default: break;
     }
 
+    // For ornaments pointing to notes in a chord, make the top and bottom one placed above and below respectively
+    if ((stemDir == STEMDIRECTION_NONE) && start->Is(NOTE)) {
+        const Note *note = vrv_cast<const Note *>(start);
+        assert(note);
+        const Chord *chord = note->IsChordTone();
+        if (chord) {
+            if (start == chord->GetTopNote()) value = STAFFREL_above;
+            if (start == chord->GetBottomNote()) value = STAFFREL_below;
+        }
+    }
+
     return value;
 }
 
@@ -111,61 +122,24 @@ data_STAFFREL ControlElement::GetLayerPlace(data_STAFFREL defaultValue) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
+FunctorCode ControlElement::Accept(Functor &functor)
 {
-    AdjustXOverflowParams *params = vrv_params_cast<AdjustXOverflowParams *>(functorParams);
-    assert(params);
-
-    if (!this->Is({ DIR, DYNAM, ORNAM, TEMPO })) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Right aligned cannot overflow
-    if (this->GetChildRendAlignment() == HORIZONTALALIGNMENT_right) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    assert(params->m_currentSystem);
-
-    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
-    ArrayOfFloatingPositioners positioners;
-    params->m_currentSystem->m_systemAligner.FindAllPositionerPointingTo(&positioners, this);
-
-    // Something is probably not right if nothing found - maybe no @staff
-    if (positioners.empty()) {
-        LogDebug("Something was wrong when searching positioners for %s '%s'", this->GetClassName().c_str(),
-            this->GetID().c_str());
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Keep the one with the highest right position
-    for (auto const &positioner : positioners) {
-        if (!params->m_currentWidest || (params->m_currentWidest->GetContentRight() < positioner->GetContentRight())) {
-            params->m_currentWidest = positioner;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitControlElement(this);
 }
 
-int ControlElement::ResetData(FunctorParams *functorParams)
+FunctorCode ControlElement::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    FloatingObject::ResetData(functorParams);
+    return functor.VisitControlElement(this);
+}
 
-    // Pass it to the pseudo functor of the interface
-    if (this->HasInterface(INTERFACE_ALT_SYM)) {
-        AltSymInterface *interface = this->GetAltSymInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
-    if (this->HasInterface(INTERFACE_LINKING)) {
-        LinkingInterface *interface = this->GetLinkingInterface();
-        assert(interface);
-        return interface->InterfaceResetData(functorParams, this);
-    }
+FunctorCode ControlElement::AcceptEnd(Functor &functor)
+{
+    return functor.VisitControlElementEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode ControlElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitControlElementEnd(this);
 }
 
 } // namespace vrv

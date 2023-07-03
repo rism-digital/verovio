@@ -14,7 +14,6 @@
 namespace vrv {
 
 class DeviceContext;
-class InitProcessingListsParams;
 class RunningElement;
 class Score;
 class Staff;
@@ -156,50 +155,20 @@ public:
     //----------//
 
     /**
-     * See Object::ScoreDefSetCurrentPage
-     */
-    int ScoreDefSetCurrentPageEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * Apply the Pixel Per Unit factor of the page to its elements.
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignVertically
+     * Interface for class functor visitation
      */
     ///@{
-    int AlignVerticallyEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::AlignSystems
-     */
-    ///@{
-    int AlignSystems(FunctorParams *functorParams) override;
-    int AlignSystemsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::CastOffPages
-     */
-    int CastOffPagesEnd(FunctorParams *functorParams) override;
 
 private:
     /**
-     * Adjust the horizontal postition of the syl processing verse by verse
+     * Adjust the horizontal position of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc);
 
     /**
      * Check whether vertical justification is required for the current page
@@ -230,13 +199,13 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized by the Object::ScoreDefSetCurrent functor.
+     * The value is initialized by the ScoreDefSetCurrentFunctor.
      */
     ScoreDef m_drawingScoreDef;
 
     /**
      * @name Pointers to the score at the beginning and end of the page
-     * Set in Page::ScoreDefSetCurrentPageEnd
+     * Set in ScoreDefSetCurrentPageFunctor
      */
     ///@{
     Score *m_score;

@@ -225,10 +225,10 @@ bool ExpansionMap::AddExpandedIDToExpansionMap(const std::string &origXmlId, std
 
 std::vector<std::string> ExpansionMap::GetExpansionIDsForElement(const std::string &xmlId)
 {
-    try {
+    if (m_map.count(xmlId)) {
         return m_map.at(xmlId);
     }
-    catch (std::out_of_range &e) {
+    else {
         std::vector<std::string> ids;
         ids.push_back(xmlId.c_str());
         return ids;
@@ -261,6 +261,18 @@ void ExpansionMap::GeneratePredictableIDs(Object *source, Object *target)
     for (Object *s : sourceObjects) {
         this->GeneratePredictableIDs(s, targetObjects.at(i++));
     }
+}
+
+void ExpansionMap::ToJson(std::string &output)
+{
+    jsonxx::Object expansionmap;
+    for (auto &[id, ids] : m_map) {
+        jsonxx::Array expandedIds;
+        for (auto i : ids) expandedIds << i;
+        expansionmap << id << expandedIds;
+        ;
+    }
+    output = expansionmap.json();
 }
 
 } // namespace vrv

@@ -25,7 +25,6 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -74,12 +73,11 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    SaveParams saveParams(this, false);
-    m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
+    m_doc->GetCurrentScoreDef()->SaveObject(this, false);
 
     m_docScoreDef = false;
 
-    m_doc->SaveObject(saveParams);
+    m_doc->SaveObject(this, false);
 
     output = m_streamStringOutput.str();
 
@@ -352,7 +350,7 @@ void PAEOutput::WriteKeySig(KeySig *keySig)
 
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetSig().second;
     std::string sig;
-    sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
+    if (accidType != ACCIDENTAL_WRITTEN_n) sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
     for (int i = 0; i < keySig->GetSig().first; ++i) {
         data_PITCHNAME pname = KeySig::GetAccidPnameAt(accidType, i);
         std::string pnameStr = keySig->AttTyped::PitchnameToStr(pname);
@@ -3241,27 +3239,19 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
         }
         pugi::xml_node incip = work.append_child("incip");
         if (header.has<jsonxx::String>("role")) {
-            incip.append_child("role")
-                .append_child(pugi::node_pcdata)
-                .set_value(header.get<jsonxx::String>("role").c_str());
+            incip.append_child("role").text().set(header.get<jsonxx::String>("role").c_str());
         }
         if (header.has<jsonxx::String>("scoring") || header.has<jsonxx::String>("voice_intrument")) {
             pugi::xml_node perfResList = incip.append_child("perfResList");
             if (header.has<jsonxx::String>("voice_instrument")) {
-                perfResList.append_child("perfRes")
-                    .append_child(pugi::node_pcdata)
-                    .set_value(header.get<jsonxx::String>("voice_instrument").c_str());
+                perfResList.append_child("perfRes").text().set(header.get<jsonxx::String>("voice_instrument").c_str());
             }
             if (header.has<jsonxx::String>("scoring")) {
-                perfResList.append_child("perfRes")
-                    .append_child(pugi::node_pcdata)
-                    .set_value(header.get<jsonxx::String>("scoring").c_str());
+                perfResList.append_child("perfRes").text().set(header.get<jsonxx::String>("scoring").c_str());
             }
         }
         if (header.has<jsonxx::String>("key_mode")) {
-            incip.append_child("key")
-                .append_child(pugi::node_pcdata)
-                .set_value(header.get<jsonxx::String>("key_mode").c_str());
+            incip.append_child("key").text().set(header.get<jsonxx::String>("key_mode").c_str());
         }
         if (header.has<jsonxx::Array>("text_incipits")) {
             pugi::xml_node incipText = incip.append_child("incipText");
@@ -4811,7 +4801,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
     }
     else {

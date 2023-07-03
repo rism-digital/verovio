@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -66,10 +68,10 @@ int TextElement::GetDrawingX() const
         return (textElement->GetDrawingX() + this->GetDrawingXRel());
     }
 
-    // Otherwise get the running element parent - no cast to RunningElement is necessary
-    const Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
-    if (runningElement) {
-        return (runningElement->GetDrawingX() + this->GetDrawingXRel());
+    // Otherwise get the text layout element parent - no cast to TextLayoutElement is necessary
+    const Object *textLayoutElement = this->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max);
+    if (textLayoutElement) {
+        return (textLayoutElement->GetDrawingX() + this->GetDrawingXRel());
     }
 
     return Object::GetDrawingX();
@@ -85,10 +87,10 @@ int TextElement::GetDrawingY() const
         return (textElement->GetDrawingY() + this->GetDrawingYRel());
     }
 
-    // Otherwise get the running element parent - no cast to RunningElement is necessary
-    const Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
-    if (runningElement) {
-        return (runningElement->GetDrawingY() + this->GetDrawingYRel());
+    // Otherwise get the text layout element parent - no cast to TextLayoutElement is necessary
+    const Object *textLayoutElement = this->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max);
+    if (textLayoutElement) {
+        return (textLayoutElement->GetDrawingY() + this->GetDrawingYRel());
     }
 
     // TextElement not within RunningElement;
@@ -111,12 +113,24 @@ void TextElement::SetDrawingYRel(int drawingYRel)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int TextElement::ResetVerticalAlignment(FunctorParams *functorParams)
+FunctorCode TextElement::Accept(Functor &functor)
 {
-    this->SetDrawingXRel(0);
-    this->SetDrawingYRel(0);
+    return functor.VisitTextElement(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode TextElement::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTextElement(this);
+}
+
+FunctorCode TextElement::AcceptEnd(Functor &functor)
+{
+    return functor.VisitTextElementEnd(this);
+}
+
+FunctorCode TextElement::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTextElementEnd(this);
 }
 
 } // namespace vrv

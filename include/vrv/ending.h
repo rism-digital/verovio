@@ -25,7 +25,12 @@ class Measure;
  * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public SystemMilestoneInterface, public AttLineRend, public AttNNumberLike {
+class Ending : public SystemElement,
+               public SystemMilestoneInterface,
+               public AttLabelled,
+               public AttLineRend,
+               public AttLineRendBase,
+               public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -49,37 +54,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertToPageBased
+     * Interface for class functor visitation
      */
     ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::PrepareMilestones
-     */
-    int PrepareMilestones(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareFloatingGrps
-     */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
 
 private:
     //

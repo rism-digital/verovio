@@ -34,6 +34,7 @@ class Chord : public LayerElement,
               public DrawingListInterface,
               public StemmedDrawingInterface,
               public DurationInterface,
+              public AttChordVis,
               public AttColor,
               public AttCue,
               public AttGraced,
@@ -172,82 +173,24 @@ public:
      */
     std::list<const Note *> GetAdjacentNotesList(const Staff *staff, int loc) const;
 
+    /**
+     * Recalculate the m_noteGroups vector
+     */
+    void CalculateNoteGroups();
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::AdjustCrossStaffYPos
-     */
-    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArtic
-     */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertMarkupAnalytical
+     * Interface for class functor visitation
      */
     ///@{
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-    int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcChordNoteHeads
-     */
-    int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitOnsetOffsetEnd
-     */
-    int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDataInitialization
-     */
-    int PrepareDataInitialization(FunctorParams *) override;
-
-    /**
-     * See Object::JustifyYAdjustCrossStaff
-     */
-    int JustifyYAdjustCrossStaff(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -263,20 +206,9 @@ protected:
     MapOfDotLocs CalcDotLocations(int layerCount, bool primary) const override;
 
     /**
-     * Calculate stem direction based on the position of the notes in chord. Notes are compared in pairs starting from
-     * the top-/bottommost and moving inward towards the center of the chord
+     * Clear the m_noteGroups vector and delete all the objects.
      */
-    data_STEMDIRECTION CalcStemDirection(int verticalCenter) const;
-
-    /**
-     * Clear the m_clusters vector and delete all the objects.
-     */
-    void ClearClusters() const;
-
-    /**
-     * Recalculate the m_clusters vector
-     */
-    void CalculateClusters();
+    void ClearNoteGroups() const;
 
     /**
      * Filter the flat list and keep only Note elements.
@@ -287,9 +219,9 @@ public:
     //
 private:
     /**
-     * The list of chord clusters
+     * The list of chord note groups
      */
-    mutable std::list<ChordCluster *> m_clusters;
+    mutable std::list<ChordNoteGroup *> m_noteGroups;
 };
 
 } // namespace vrv

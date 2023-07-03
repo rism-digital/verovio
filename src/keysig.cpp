@@ -17,13 +17,12 @@
 #include "clef.h"
 #include "comparison.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
-#include "transposition.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -76,6 +75,7 @@ KeySig::KeySig()
     : LayerElement(KEYSIG, "keysig-")
     , ObjectListInterface()
     , AttAccidental()
+    , AttColor()
     , AttPitch()
     , AttKeySigAnl()
     , AttKeySigLog()
@@ -83,6 +83,7 @@ KeySig::KeySig()
     , AttVisibility()
 {
     this->RegisterAttClass(ATT_ACCIDENTAL);
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_PITCH);
     this->RegisterAttClass(ATT_KEYSIGANL);
     this->RegisterAttClass(ATT_KEYSIGLOG);
@@ -98,6 +99,7 @@ void KeySig::Reset()
 {
     LayerElement::Reset();
     this->ResetAccidental();
+    this->ResetColor();
     this->ResetPitch();
     this->ResetKeySigAnl();
     this->ResetKeySigLog();
@@ -365,60 +367,24 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
 // Functors methods
 //----------------------------------------------------------------------------
 
-int KeySig::PrepareDataInitialization(FunctorParams *)
+FunctorCode KeySig::Accept(Functor &functor)
 {
-    // Clear and regenerate attribute children
-    this->GenerateKeyAccidAttribChildren();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitKeySig(this);
 }
 
-int KeySig::Transpose(FunctorParams *functorParams)
+FunctorCode KeySig::Accept(ConstFunctor &functor) const
 {
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
+    return functor.VisitKeySig(this);
+}
 
-    // Store current KeySig
-    int staffN = -1;
-    const StaffDef *staffDef = vrv_cast<StaffDef *>(this->GetFirstAncestor(STAFFDEF));
-    if (staffDef) {
-        staffN = staffDef->GetN();
-    }
-    else {
-        const Staff *staff = this->GetAncestorStaff(ANCESTOR_ONLY, false);
-        if (staff) staffN = staff->GetN();
-    }
-    params->m_keySigForStaffN[staffN] = this;
+FunctorCode KeySig::AcceptEnd(Functor &functor)
+{
+    return functor.VisitKeySigEnd(this);
+}
 
-    // Transpose
-    const int sig = this->GetFifthsInt();
-
-    int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
-    intervalClass = params->m_transposer->Transpose(intervalClass);
-    int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
-
-    if (fifths == INVALID_INTERVAL_CLASS) {
-        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
-    }
-    else if (fifths < 0) {
-        this->SetSig({ -fifths, ACCIDENTAL_WRITTEN_f });
-    }
-    else if (fifths > 0) {
-        this->SetSig({ fifths, ACCIDENTAL_WRITTEN_s });
-    }
-    else {
-        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
-    }
-
-    // Also convert pname and accid attributes
-    if (this->HasPname()) {
-        TransPitch pitch = TransPitch(this->GetPname(), ACCIDENTAL_GESTURAL_NONE, this->GetAccid(), 4);
-        params->m_transposer->Transpose(pitch);
-        this->SetPname(pitch.GetPitchName());
-        this->SetAccid(pitch.GetAccidW());
-    }
-
-    return FUNCTOR_SIBLINGS;
+FunctorCode KeySig::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitKeySigEnd(this);
 }
 
 } // namespace vrv

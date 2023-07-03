@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -42,5 +42,25 @@ void PitchInflection::Reset()
 //----------------------------------------------------------------------------
 // PitchInflection functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode PitchInflection::Accept(Functor &functor)
+{
+    return functor.VisitPitchInflection(this);
+}
+
+FunctorCode PitchInflection::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitPitchInflection(this);
+}
+
+FunctorCode PitchInflection::AcceptEnd(Functor &functor)
+{
+    return functor.VisitPitchInflectionEnd(this);
+}
+
+FunctorCode PitchInflection::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitPitchInflectionEnd(this);
+}
 
 } // namespace vrv

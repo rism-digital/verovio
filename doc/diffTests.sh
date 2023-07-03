@@ -17,7 +17,7 @@ devdir="/Users/laurent/projects/verovio_lpugin"
 shortlist="/Users/laurent/tmp/shortlist.txt"
 
 # The version of python we want to use (we can be more specific here, e.g., python3.8)
-PYTHON=python3.10
+PYTHON=python3
 
 # Store the path where we are
 home=`pwd`

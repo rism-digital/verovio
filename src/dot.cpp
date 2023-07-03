@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "note.h"
 
 namespace vrv {
@@ -50,35 +50,24 @@ void Dot::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Dot::PreparePointersByLayer(FunctorParams *functorParams)
+FunctorCode Dot::Accept(Functor &functor)
 {
-    PreparePointersByLayerParams *params = vrv_params_cast<PreparePointersByLayerParams *>(functorParams);
-    assert(params);
-
-    m_drawingPreviousElement = params->m_currentElement;
-    params->m_lastDot = this;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitDot(this);
 }
 
-int Dot::ResetData(FunctorParams *functorParams)
+FunctorCode Dot::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    m_drawingPreviousElement = NULL;
-    m_drawingNextElement = NULL;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitDot(this);
 }
 
-int Dot::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Dot::AcceptEnd(Functor &functor)
 {
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+    return functor.VisitDotEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Dot::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDotEnd(this);
 }
 
 } // namespace vrv

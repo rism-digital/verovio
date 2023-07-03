@@ -16,7 +16,7 @@
 #include "beam.h"
 #include "chord.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "note.h"
 #include "rest.h"
 #include "space.h"
@@ -79,37 +79,24 @@ bool GraceGrp::IsSupportedChild(Object *child)
     return true;
 }
 
-int GraceGrp::GenerateMIDIEnd(FunctorParams *functorParams)
+FunctorCode GraceGrp::Accept(Functor &functor)
 {
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
+    return functor.VisitGraceGrp(this);
+}
 
-    // Handling of Nachschlag
-    if (!params->m_graceNotes.empty() && (this->GetAttach() == graceGrpLog_ATTACH_pre) && !params->m_accentedGraceNote
-        && params->m_lastNote) {
-        double startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOffset();
-        const double graceNoteDur = UNACC_GRACENOTE_DUR * params->m_currentTempo / 60000.0;
-        const double totalDur = graceNoteDur * params->m_graceNotes.size();
-        startTime -= totalDur;
-        startTime = std::max(startTime, 0.0);
+FunctorCode GraceGrp::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitGraceGrp(this);
+}
 
-        const int channel = params->m_midiChannel;
-        int velocity = MIDI_VELOCITY;
-        if (params->m_lastNote->HasVel()) velocity = params->m_lastNote->GetVel();
-        const int tpq = params->m_midiFile->getTPQ();
+FunctorCode GraceGrp::AcceptEnd(Functor &functor)
+{
+    return functor.VisitGraceGrpEnd(this);
+}
 
-        for (const MIDIChord &chord : params->m_graceNotes) {
-            const double stopTime = startTime + graceNoteDur;
-            for (int pitch : chord.pitches) {
-                params->m_midiFile->addNoteOn(params->m_midiTrack, startTime * tpq, channel, pitch, velocity);
-                params->m_midiFile->addNoteOff(params->m_midiTrack, stopTime * tpq, channel, pitch);
-            }
-            startTime = stopTime;
-        }
-
-        params->m_graceNotes.clear();
-    }
-    return FUNCTOR_CONTINUE;
+FunctorCode GraceGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitGraceGrpEnd(this);
 }
 
 } // namespace vrv

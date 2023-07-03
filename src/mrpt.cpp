@@ -16,7 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
@@ -55,36 +55,24 @@ void MRpt::Reset()
 // MRpt functor methods
 //----------------------------------------------------------------------------
 
-int MRpt::GenerateMIDI(FunctorParams *functorParams)
+FunctorCode MRpt::Accept(Functor &functor)
 {
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    LogWarning("MRpt produces empty MIDI output");
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitMRpt(this);
 }
 
-int MRpt::PrepareRpt(FunctorParams *functorParams)
+FunctorCode MRpt::Accept(ConstFunctor &functor) const
 {
-    PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
-    assert(params);
+    return functor.VisitMRpt(this);
+}
 
-    // If multiNumber is not true, nothing needs to be done
-    if (params->m_multiNumber != BOOLEAN_true) {
-        return FUNCTOR_CONTINUE;
-    }
+FunctorCode MRpt::AcceptEnd(Functor &functor)
+{
+    return functor.VisitMRptEnd(this);
+}
 
-    // If this is the first one, number has to be 2
-    if (params->m_currentMRpt == NULL) {
-        m_drawingMeasureCount = 2;
-    }
-    // Otherwise increment it
-    else {
-        m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
-    }
-    params->m_currentMRpt = this;
-    return FUNCTOR_CONTINUE;
+FunctorCode MRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRptEnd(this);
 }
 
 } // namespace vrv

@@ -21,7 +21,6 @@ class MidiFile;
 
 namespace vrv {
 
-class CastOffPagesParams;
 class DocSelection;
 class FontInfo;
 class Glyph;
@@ -254,6 +253,11 @@ public:
     bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures);
 
     /**
+     *  Extract expansionMap from the document to JSON string.
+     */
+    bool ExportExpansionMap(std::string &output);
+
+    /**
      * Extract music features to JSON string.
      */
     bool ExportFeatures(std::string &output, const std::string &options);
@@ -308,15 +312,6 @@ public:
      * @param smart - true to sometimes use encoded sb and pb.
      */
     void CastOffDocBase(bool useSb, bool usePb, bool smart = false);
-
-    /**
-     * Casts off the running elements (headers and footer)
-     * Called from Doc::CastOffDoc
-     * The doc needs to be empty, the methods adds two empty pages to calculate the
-     * size of the header and footer of the page one and two.
-     * Calcultated sizes are set in the CastOffPagesParams object.
-     */
-    void CastOffRunningElements(CastOffPagesParams *params);
 
     /**
      * Undo the cast off of the entire document.
@@ -462,20 +457,25 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareLyricsEnd
+     * Interface for class functor visitation
      */
-    int PrepareLyricsEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestampsEnd
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     /**
      * Calculates the music font size according to the m_interlDefin reference value.
      */
     int CalcMusicFontSize();
+
+    /**
+     * Generate the measure indices
+     */
+    void PrepareMeasureIndices();
 
 public:
     Page *m_selectionPreceding;
@@ -514,8 +514,6 @@ public:
     int m_drawingPageMarginRight;
     /** The current page top margin */
     int m_drawingPageMarginTop;
-    /** the current beam minimal slope */
-    float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
 
@@ -593,7 +591,7 @@ private:
 
     /**
      * A flag to indicate whether the currentScoreDef has been set or not.
-     * If yes, ScoreDefSetCurrent will not parse the document (again) unless
+     * If yes, ScoreDefSetCurrentDoc will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;

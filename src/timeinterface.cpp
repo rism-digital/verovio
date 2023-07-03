@@ -14,10 +14,10 @@
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
-#include "functorparams.h"
 #include "harm.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "preparedatafunctor.h"
 #include "staff.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -140,13 +140,14 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
             staffList = this->GetStaff();
         }
     }
-    else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
+    else if (m_start && !m_start->Is({ BARLINE, TIMESTAMP_ATTR })) {
         Staff *staff = m_start->GetAncestorStaff();
         staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
-        // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
-        staffList.push_back(1);
+        // If we have no @staff or startid but only one staff child assume it is the first one
+        Staff *staff = vrv_cast<Staff *>(measure->GetFirst(STAFF));
+        staffList.push_back(staff->GetN());
     }
 
     for (int staffN : staffList) {
@@ -258,7 +259,7 @@ bool TimeSpanningInterface::IsOrdered(const LayerElement *start, const LayerElem
         return Object::IsPreOrdered(start->GetAlignment(), end->GetAlignment());
     }
     else {
-        return Object::IsPreOrdered(startMeasure, endMeasure);
+        return (startMeasure->GetIndex() < endMeasure->GetIndex());
     }
 }
 
@@ -340,11 +341,18 @@ void TimeSpanningInterface::GetCrossStaffOverflows(
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
+FunctorCode TimePointInterface::InterfacePrepareTimePointing(PrepareTimePointingFunctor &functor, Object *object)
 {
-    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
+    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
 
+    this->SetIDStr();
+    functor.InsertInterfaceIDTuple(object->GetClassId(), this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode TimePointInterface::InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object)
+{
     // First we check if the object has already a mapped @startid (it should not)
     if (this->HasStart()) {
         if (this->HasTstamp())
@@ -357,55 +365,36 @@ int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams,
     }
 
     // We set -1 to the data_MEASUREBEAT for @tstamp
-    params->m_tstamps.push_back({ object, data_MEASUREBEAT(-1, this->GetTstamp()) });
+    functor.InsertObjectBeatPair(object, data_MEASUREBEAT(-1, this->GetTstamp()));
 
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
+FunctorCode TimePointInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_start = NULL;
     m_startID = "";
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object)
 {
-    PrepareTimePointingParams *params = vrv_params_cast<PrepareTimePointingParams *>(functorParams);
-    assert(params);
-
-    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
-
-    this->SetIDStr();
-    params->m_timePointingInterfaces.push_back({ this, object->GetClassId() });
-
-    return FUNCTOR_CONTINUE;
-}
-
-int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
-{
-    PrepareTimeSpanningParams *params = vrv_params_cast<PrepareTimeSpanningParams *>(functorParams);
-    assert(params);
-
     if (!this->HasStartid() && !this->HasEndid()) {
         return FUNCTOR_CONTINUE;
     }
 
-    if (params->m_fillList == false) {
+    if (functor.IsProcessingData()) {
         return FUNCTOR_CONTINUE;
     }
 
     this->SetIDStr();
-    params->m_timeSpanningInterfaces.push_back({ this, object });
+    functor.InsertInterfaceOwnerPair(object, this);
 
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object)
 {
-    PrepareTimestampsParams *params = vrv_params_cast<PrepareTimestampsParams *>(functorParams);
-    assert(params);
-
     // First we check if the object has already a mapped @endid (it should not)
     if (this->HasEndid()) {
         if (this->HasTstamp2())
@@ -415,38 +404,35 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
             LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
                 object->GetClassName().c_str(), object->GetID().c_str());
         }
-        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
+        return TimePointInterface::InterfacePrepareTimestamps(functor, object);
     }
     else if (!this->HasTstamp2()) {
         // We won't be able to do anything, just try to prepare the tstamp (start)
-        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
+        return TimePointInterface::InterfacePrepareTimestamps(functor, object);
     }
 
     // We can now add the pair to our stack
-    params->m_timeSpanningInterfaces.push_back({ this, object->GetClassId() });
-    params->m_tstamps.push_back({ object, data_MEASUREBEAT(this->GetTstamp2()) });
+    functor.InsertInterfaceIDPair(object->GetClassId(), this);
+    functor.InsertObjectBeatPair(object, data_MEASUREBEAT(this->GetTstamp2()));
 
-    return TimePointInterface::InterfacePrepareTimestamps(params, object);
+    return TimePointInterface::InterfacePrepareTimestamps(functor, object);
 }
 
-int TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(
+    PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object)
 {
-    PrepareStaffCurrentTimeSpanningParams *params
-        = vrv_params_cast<PrepareStaffCurrentTimeSpanningParams *>(functorParams);
-    assert(params);
-
     if (this->IsSpanningMeasures()) {
-        params->m_timeSpanningElements.push_back(object);
+        functor.InsertTimeSpanningElement(object);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfaceResetData(FunctorParams *functorParams, Object *object)
+FunctorCode TimeSpanningInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
 {
     m_end = NULL;
     m_endID = "";
     // Special case where we have interface inheritance
-    return TimePointInterface::InterfaceResetData(functorParams, object);
+    return TimePointInterface::InterfaceResetData(functor, object);
 }
 
 } // namespace vrv

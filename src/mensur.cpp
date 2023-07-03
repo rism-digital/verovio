@@ -14,7 +14,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "scoredefinterface.h"
 #include "vrv.h"
 
@@ -68,14 +68,24 @@ void Mensur::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Mensur::LayerCountInTimeSpan(FunctorParams *functorParams) const
+FunctorCode Mensur::Accept(Functor &functor)
 {
-    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
+    return functor.VisitMensur(this);
+}
 
-    params->m_mensur = this;
+FunctorCode Mensur::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMensur(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Mensur::AcceptEnd(Functor &functor)
+{
+    return functor.VisitMensurEnd(this);
+}
+
+FunctorCode Mensur::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMensurEnd(this);
 }
 
 } // namespace vrv

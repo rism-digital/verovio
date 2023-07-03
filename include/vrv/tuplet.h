@@ -18,6 +18,9 @@ namespace vrv {
 class Note;
 class TupletBracket;
 
+// Helper enum classes
+enum class MelodicDirection { None, Up, Down };
+
 //----------------------------------------------------------------------------
 // Tuplet
 //----------------------------------------------------------------------------
@@ -63,17 +66,21 @@ public:
     const LayerElement *GetDrawingRight() const { return m_drawingRight; }
     void SetDrawingRight(LayerElement *drawingRight) { m_drawingRight = drawingRight; }
     data_STAFFREL_basic GetDrawingBracketPos() const { return m_drawingBracketPos; }
+    void SetDrawingBracketPos(data_STAFFREL_basic bracketPos) { m_drawingBracketPos = bracketPos; }
     data_STAFFREL_basic GetDrawingNumPos() const { return m_drawingNumPos; }
+    void SetDrawingNumPos(data_STAFFREL_basic numPos) { m_drawingNumPos = numPos; }
     ///@}
 
     /**
-     * @name Getter for the beam with which the bracket and / or the num is aligned.
+     * @name Setter and getter for the beam with which the bracket and / or the num is aligned.
      */
     ///@{
     Beam *GetBracketAlignedBeam() { return m_bracketAlignedBeam; }
     const Beam *GetBracketAlignedBeam() const { return m_bracketAlignedBeam; }
+    void SetBracketAlignedBeam(Beam *alignedBeam) { m_bracketAlignedBeam = alignedBeam; }
     Beam *GetNumAlignedBeam() { return m_numAlignedBeam; }
     const Beam *GetNumAlignedBeam() const { return m_numAlignedBeam; }
+    void SetNumAlignedBeam(Beam *alignedBeam) { m_numAlignedBeam = alignedBeam; }
     ///@}
 
     /**
@@ -84,6 +91,11 @@ public:
     void AddInnerSlur(const FloatingCurvePositioner *slur) { m_innerSlurs.insert(slur); }
     void ResetInnerSlurs() { m_innerSlurs.clear(); }
     ///@}
+
+    /**
+     * Determine the melodic direction
+     */
+    MelodicDirection GetMelodicDirection() const;
 
     /**
      * Calculate the position of the bracket and the num looking at the stem direction or at the encoded values (if
@@ -97,44 +109,30 @@ public:
      */
     void GetDrawingLeftRightXRel(int &xRelLeft, int &xRelRight, const Doc *doc) const;
 
+    /**
+     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
+     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
+     */
+    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
+
+    /**
+     * Check whether tuplet number has valid positioning staffwise
+     */
+    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareLayerElementParts
+     * Interface for class functor visitation
      */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustTupletsX
-     */
-    int AdjustTupletsX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustTupletsY
-     */
-    int AdjustTupletsY(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustTupletWithSlurs
-     */
-    int AdjustTupletWithSlurs(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     /**
@@ -143,52 +141,27 @@ protected:
     void FilterList(ListOfConstObjects &childList) const override;
 
 private:
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletBracketY(const Doc *doc, const Staff *staff);
-
-    /**
-     * Adjust tuplet relative positioning for tuplets based on beams
-     */
-    void AdjustTupletBracketBeamY(const Doc *doc, const Staff *staff, TupletBracket *bracket, const Beam *beam);
-
-    /**
-     * Adjust tuplet relative positioning based on possible overlaps
-     */
-    void AdjustTupletNumY(const Doc *doc, const Staff *staff);
-
-    /**
-     * Calculate corresponding cross-staff for the tuplet number if necessary. In case when tuplet is completely
-     * cross-staff nothing will be done, as tuplet number should share staff with tuplet in that case
-     */
-    void CalculateTupletNumCrossStaff(LayerElement *layerElement);
-
-    /**
-     * Check whether tuplet number has valid postioning staffwise
-     */
-    bool HasValidTupletNumPosition(const Staff *preferredStaff, const Staff *otherStaff) const;
-
+    //
 public:
     //
 private:
     /**
      * The first Chord / Note / Rest in the tuplet.
-     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     * Set in Tuplet::GetDrawingLeftRightXRel from AdjustTupletsXFunctor.
      */
     LayerElement *m_drawingLeft;
     /**
      * The last Chord / Note / Rest in the tuplet.
-     * Set in Tuplet::GetDrawingLeftRightXRel from Tuplet::AdjustTupletsX.
+     * Set in Tuplet::GetDrawingLeftRightXRel from AdjustTupletsXFunctor.
      */
     LayerElement *m_drawingRight;
     /** The calculated drawing position of the bracket set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingBracketPos;
     /** The calculated drawing position of the num set in Tuplet::CalcDrawingBracketAndNumPos  */
     data_STAFFREL_basic m_drawingNumPos;
-    /** The beam with which the bracket aligns (in any) set in Tuplet::AdjustTupletsX */
+    /** The beam with which the bracket aligns (if any) set in AdjustTupletsXFunctor */
     Beam *m_bracketAlignedBeam;
-    /** The beam with which the num aligns (in any) set in Tuplet::AdjustTupletsX */
+    /** The beam with which the num aligns (if any) set in AdjustTupletsXFunctor */
     Beam *m_numAlignedBeam;
     /** The slurs avoided by the tuplet, set during drawing */
     std::set<const FloatingCurvePositioner *> m_innerSlurs;

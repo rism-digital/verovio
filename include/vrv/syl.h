@@ -15,7 +15,6 @@
 
 namespace vrv {
 
-class AdjustSylSpacingParams;
 class Note;
 class TextElement;
 
@@ -26,7 +25,7 @@ class TextElement;
 /**
  * Syl is a TimeSpanningInterface for managing syllable connectors. This means
  * that TimeSpanningInterface attributes will not be read from the MEI but
- * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
+ * pointers will be populated in the PrepareLyricsFunctor.
  */
 
 class Syl : public LayerElement,
@@ -74,6 +73,11 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
+     * Calculate the hyphen length using the text font
+     */
+    int CalcHyphenLength(Doc *doc, int staffSize);
+
+    /**
      * Calculate the spacing needed depending on the @worpos and @con
      */
     int CalcConnectorSpacing(Doc *doc, int staffSize);
@@ -81,29 +85,28 @@ public:
     int GetDrawingWidth() const;
     int GetDrawingHeight() const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /**
+     * Adjust proportionally to the lyric size
+     */
+    static void AdjustToLyricSize(const Doc *doc, int &value);
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareLyrics
+     * Interface for class functor visitation
      */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    int PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
     /** Create a default zone for a syl based on syllable. */
     bool CreateDefaultZone(Doc *doc);

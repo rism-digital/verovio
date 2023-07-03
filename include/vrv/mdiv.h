@@ -53,26 +53,14 @@ public:
     //----------//
 
     /**
-     * See Object::Save
-     * Invisible Mdiv elements are not saved in page-based MEI
+     * Interface for class functor visitation
      */
     ///@{
-    int Save(FunctorParams *functorParams) override;
-    int SaveEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
 
 private:
     //

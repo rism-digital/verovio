@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "functor.h"
 #include "smufl.h"
 
 namespace vrv {
@@ -24,12 +25,19 @@ namespace vrv {
 
 static const ClassRegistrar<Custos> s_factory("custos", CUSTOS);
 
-Custos::Custos() : LayerElement(CUSTOS, "custos-"), PitchInterface(), PositionInterface(), AttColor(), AttExtSym()
+Custos::Custos()
+    : LayerElement(CUSTOS, "custos-")
+    , PitchInterface()
+    , PositionInterface()
+    , AttColor()
+    , AttExtSymAuth()
+    , AttExtSymNames()
 {
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
 
     this->Reset();
 }
@@ -42,7 +50,8 @@ void Custos::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
 }
 
 bool Custos::IsSupportedChild(Object *child)
@@ -86,21 +95,24 @@ char32_t Custos::GetCustosGlyph(const data_NOTATIONTYPE notationtype) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Custos::ResetData(FunctorParams *functorParams)
+FunctorCode Custos::Accept(Functor &functor)
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitCustos(this);
 }
 
-int Custos::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Custos::Accept(ConstFunctor &functor) const
 {
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+    return functor.VisitCustos(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Custos::AcceptEnd(Functor &functor)
+{
+    return functor.VisitCustosEnd(this);
+}
+
+FunctorCode Custos::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitCustosEnd(this);
 }
 
 } // namespace vrv

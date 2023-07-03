@@ -237,78 +237,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertMarkupArtic
-     */
-    int ConvertMarkupArticEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToUnCastOffMensural
-     */
-    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontallyEnd
-     */
-    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitProcessingLists
-     */
-    int InitProcessingLists(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitOnsetOffset
+     * Interface for class functor visitation
      */
     ///@{
-    int InitOnsetOffset(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::FindElementInLayerStaffDefsByID
-     */
-    int FindElementInLayerStaffDefsByID(FunctorParams *) const override;
-
-    /**
-     * @name See Object::GenerateMIDI
-     */
-    ///@{
-    int GenerateMIDI(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::GenerateMIDIEnd
-     */
-    int GenerateMIDIEnd(FunctorParams *functorParams) override;
 
 private:
     //

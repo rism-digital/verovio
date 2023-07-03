@@ -31,11 +31,9 @@ namespace vrv {
 class Accid;
 class Chord;
 class Note;
-class PrepareLinkingParams;
 class Slur;
 class TabGrp;
 class Tie;
-class TransPitch;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -53,7 +51,8 @@ class Note : public LayerElement,
              public AttColor,
              public AttColoration,
              public AttCue,
-             public AttExtSym,
+             public AttExtSymAuth,
+             public AttExtSymNames,
              public AttGraced,
              public AttHarmonicFunction,
              public AttMidiVelocity,
@@ -126,7 +125,7 @@ public:
 
     /**
      * @name Setter and getter for the drawing staff loc.
-     * This is set by the CalcAlignmentPitchPos functor.
+     * This is set by the CalcAlignmentPitchPosFunctor.
      */
     ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
@@ -148,7 +147,7 @@ public:
     Chord *IsChordTone();
     const Chord *IsChordTone() const;
     int GetDrawingDur() const;
-    bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
+    bool IsNoteGroupExtreme() const; // used to find if it is the highest or lowest note in a note group
     ///@}
 
     /**
@@ -173,11 +172,12 @@ public:
     bool IsUnisonWith(const Note *note, bool ignoreAccid = false) const;
 
     /**
-     * @name Setter and getter for the chord cluster and the position of the note
+     * @name Setter and getter for the chord note group and the position of the note
      */
     ///@{
-    void SetCluster(ChordCluster *cluster, int position);
-    ChordCluster *GetCluster() { return m_cluster; }
+    void SetNoteGroup(ChordNoteGroup *noteGroup, int position);
+    ChordNoteGroup *GetNoteGroup() { return m_noteGroup; }
+    int GetNoteGroupPosition() const { return m_noteGroupPosition; }
     ///@}
 
     /**
@@ -191,7 +191,7 @@ public:
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
+    int GetDiatonicPitch() const;
 
     /**
      * Get the stem up / stem down attachment point.
@@ -244,23 +244,18 @@ public:
     ///@}
 
     /**
-     * Getter for stem sameas role
+     * Getter and setter for stem sameas role
      */
+    ///@{
     StemSameasDrawingRole GetStemSameasRole() const { return m_stemSameasRole; }
-
-    /**
-     * Resovle @stem.sameas links by instanciating Note::m_stemSameas (*Note).
-     * Called twice from Object::PrepareLinks. Once to fill id / note pairs,
-     * and once to resolve the link. The link is bi-directional, which means
-     * that both notes have their m_stemSameas pointer instanciated.
-     */
-    void ResolveStemSameas(PrepareLinkingParams *params);
+    void SetStemSameasRole(StemSameasDrawingRole stemSameasRole) { m_stemSameasRole = stemSameasRole; }
+    ///@}
 
     /**
      * Calculate the stem direction of the pair of notes.
      * The presence of a StemSameasNote() needs to be check before calling it.
      * Encoded stem direction on the calling note is taken into account.
-     * Called from Note::CalcStem
+     * Called from CalcStemFunctor::VisitNote
      */
     data_STEMDIRECTION CalcStemDirForSameasNote(int verticalCenter);
 
@@ -287,79 +282,27 @@ public:
      */
     static int PnameToPclass(data_PITCHNAME pitchName);
 
+    /**
+     * Get and set the pitch for transposition
+     */
+    ///@{
+    TransPitch GetTransPitch() const;
+    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::AdjustArtic
+     * Interface for class functor visitation
      */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcChordNoteHeads
-     */
-    int CalcChordNoteHeads(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcLedgerLines
-     */
-    int CalcLedgerLines(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLyrics
-     */
-    int PrepareLyrics(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     /**
@@ -380,26 +323,6 @@ private:
      */
     int GetChromaticAlteration() const;
 
-    TransPitch GetTransPitch() const;
-
-    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
-
-    /**
-     * Return whether dots are overlapping with flag. Take into account flag height, its position as well
-     * as position of the note and position of the dots
-     */
-    bool IsDotOverlappingWithFlag(const Doc *doc, const int staffSize, int dotLocShift) const;
-
-    /**
-     * Register deferred notes for MIDI
-     */
-    void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
-
-    /**
-     * Create the MIDI output of the grace note sequence stored in params
-     */
-    void GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity);
-
 public:
     //
 private:
@@ -414,14 +337,14 @@ private:
     bool m_flippedNotehead;
 
     /**
-     * flags for determining clusters in chord (cluster this belongs to)
+     * flags for determining note groups in chord (note group this belongs to)
      */
-    ChordCluster *m_cluster;
+    ChordNoteGroup *m_noteGroup;
 
     /**
-     * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
+     * Position in the note group (1-indexed position in said note group; 0 if does not have position)
      */
-    int m_clusterPosition;
+    int m_noteGroupPosition;
 
     /**
      * A pointer to a note with which the note shares its stem and implementing @stem.sameas.

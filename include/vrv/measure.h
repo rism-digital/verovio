@@ -69,6 +69,14 @@ public:
     bool IsMeasuredMusic() const { return m_measuredMusic; }
 
     /**
+     * Get and set the measure index
+     */
+    ///@{
+    int GetIndex() const { return m_index; }
+    void SetIndex(int index) { m_index = index; }
+    ///@}
+
+    /**
      * Methods for adding allowed content
      */
     bool IsSupportedChild(Object *object) override;
@@ -99,6 +107,9 @@ public:
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
+    void CacheXRel(bool restore = false);
+    int GetCachedXRel() const { return m_cachedXRel; }
+    void ResetCachedXRel() { m_cachedXRel = VRV_UNSET; }
     ///@}
 
     /**
@@ -207,6 +218,16 @@ public:
     int GetInnerCenterX() const;
 
     /**
+     * Return and reset the cached width / overflow
+     */
+    ///@{
+    int GetCachedWidth() const { return m_cachedWidth; }
+    int GetCachedOverflow() const { return m_cachedOverflow; }
+    void ResetCachedWidth() { m_cachedWidth = VRV_UNSET; }
+    void ResetCachedOverflow() { m_cachedOverflow = VRV_UNSET; }
+    ///@}
+
+    /**
      * Return the right overflow of the control events in the measure.
      * Takes into account Dir, Dynam, and Tempo.
      */
@@ -224,6 +245,7 @@ public:
     ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
     const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    void ResetDrawingScoreDef();
     ///@}
 
     /**
@@ -233,6 +255,15 @@ public:
     Ending *GetDrawingEnding() { return m_drawingEnding; }
     const Ending *GetDrawingEnding() const { return m_drawingEnding; }
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
+    ///@}
+
+    /**
+     * @name Setter and getter for the flag indicating if there is an AlignmentReference
+     * with multiple layers
+     */
+    ///@{
+    bool HasAlignmentRefWithMultipleLayers() const { return m_hasAlignmentRefWithMultipleLayers; }
+    void HasAlignmentRefWithMultipleLayers(bool hasRef) { m_hasAlignmentRefWithMultipleLayers = hasRef; }
     ///@}
 
     /*
@@ -265,248 +296,54 @@ public:
     int EnclosesTime(int time) const;
 
     /**
-     * Return the real time offset in millisecond for the repeat (1-based).
+     * Read only access to m_scoreTimeOffset
      */
+    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
+
+    /**
+     * Return the real time offset in milliseconds
+     */
+    ///@{
+    double GetLastRealTimeOffset() const { return m_realTimeOffsetMilliseconds.back(); }
     double GetRealTimeOffsetMilliseconds(int repeat) const;
+    ///@}
+
+    /**
+     * Setter for the time offset
+     */
+    ///@{
+    void ClearScoreTimeOffset() { m_scoreTimeOffset.clear(); }
+    void AddScoreTimeOffset(double offset) { m_scoreTimeOffset.push_back(offset); }
+    void ClearRealTimeOffset() { m_realTimeOffsetMilliseconds.clear(); }
+    void AddRealTimeOffset(double milliseconds) { m_realTimeOffsetMilliseconds.push_back(milliseconds); }
+    ///@}
+
+    /**
+     * Setter and getter for the current tempo
+     */
+    ///@{
+    void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
+    double GetCurrentTempo() const { return m_currentTempo; }
+    ///@}
 
     /**
      * Return vector with tie endpoints for ties that start and end in current measure
      */
     std::vector<std::pair<LayerElement *, LayerElement *>> GetInternalTieEndpoints();
 
-    /**
-     * Read only access to m_scoreTimeOffset
-     */
-    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
-
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::FindSpannedLayerElements
-     */
-    int FindSpannedLayerElements(FunctorParams *functorParams) const override;
-
-    /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalyticalEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToUnCastOffMensural
-     */
-    int ConvertToUnCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Save
+     * Interface for class functor visitation
      */
     ///@{
-    int Save(FunctorParams *functorParams) override;
-    int SaveEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ScoreDefOptimize
-     */
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ApplyPPUFactor
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-    int AlignHorizontallyEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignVertically
-     */
-    int AlignVertically(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcAlignmentXPos
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArpeg
-     */
-    int AdjustArpegEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustClefChanges
-     */
-    int AdjustClefChanges(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustDots
-     */
-    int AdjustDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustLayers
-     */
-    int AdjustLayers(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AjustAccidX
-     */
-    int AdjustAccidX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    int AdjustGraceXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXOverflow
-     */
-    int AdjustXOverflow(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustXPos
-     */
-    int AdjustXPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustHarmGrpsSpacing
-     */
-    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSylSpacing
-     */
-    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanningEnd
-     */
-    int PrepareStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareCrossStaff
-     */
-    int PrepareCrossStaff(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::PrepareFloatingGrps
-     */
-    ///@{
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-    int PrepareFloatingGrpsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::PrepareTimePointingEnd
-     */
-    int PrepareTimePointingEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimeSpanningEnd
-     */
-    int PrepareTimeSpanningEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareMilestones
-     */
-    int PrepareMilestones(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::InitMIDI
-     */
-    int InitMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    ///@{
-    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
-    int InitMaxMeasureDurationEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::InitOnsetOffset
-     */
-    int InitOnsetOffset(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int PrepareTimestampsEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CacheHorizontalLayout
-     */
-    int CacheHorizontalLayout(FunctorParams *functorParams) override;
 
 public:
     // flags for drawing measure barline based on visibility or other conditions
@@ -553,7 +390,15 @@ protected:
     ///@}
 
 private:
+    /**
+     * Indicates measured music (otherwise we have fake measures)
+     */
     bool m_measuredMusic;
+
+    /**
+     * The unique measure index
+     */
+    int m_index;
 
     /**
      * @name The measure barlines (left and right) used when drawing
@@ -571,9 +416,8 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareMilestones and passed to the System drawing
-     * list
-     * in DrawMeasure
+     * A pointer to the ending to which the measure belongs. Set by PrepareMilestonesFunctor
+     * and passed to the System drawing list in DrawMeasure
      */
     Ending *m_drawingEnding;
 

@@ -15,7 +15,7 @@
 
 #include "comparison.h"
 #include "fermata.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "layer.h"
 #include "pitchinterface.h"
 #include "rest.h"
@@ -57,34 +57,24 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
+FunctorCode MRest::Accept(Functor &functor)
 {
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitMRest(this);
 }
 
-int MRest::ResetData(FunctorParams *functorParams)
+FunctorCode MRest::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitMRest(this);
 }
 
-int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode MRest::AcceptEnd(Functor &functor)
 {
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+    return functor.VisitMRestEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRestEnd(this);
 }
 
 int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const
@@ -115,11 +105,14 @@ int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) cons
             int loc = rest->GetDrawingLoc();
             locations.push_back(loc);
         }
+        else if (element->Is(MREST)) {
+            locations.push_back(4);
+        }
     }
     // if there are no other elements - just return default location
     if (locations.empty()) return defaultLocation;
 
-    const int locAdjust = isTopLayer ? 3 : -2;
+    const int locAdjust = isTopLayer ? 4 : -3;
     int extremePoint = isTopLayer ? *std::max_element(locations.begin(), locations.end())
                                   : *std::min_element(locations.begin(), locations.end());
     extremePoint += locAdjust;

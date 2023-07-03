@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "layerelement.h"
 #include "resources.h"
 #include "smufl.h"
@@ -34,13 +35,15 @@ Ornam::Ornam()
     , TextDirInterface()
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttOrnamentAccid()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
 
     this->Reset();
@@ -54,9 +57,9 @@ void Ornam::Reset()
     TextDirInterface::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
-    this->ResetPlacementRelStaff();
 }
 
 bool Ornam::IsSupportedChild(Object *child)
@@ -95,5 +98,25 @@ char32_t Ornam::GetOrnamGlyph() const
 //----------------------------------------------------------------------------
 // Ornam functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode Ornam::Accept(Functor &functor)
+{
+    return functor.VisitOrnam(this);
+}
+
+FunctorCode Ornam::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitOrnam(this);
+}
+
+FunctorCode Ornam::AcceptEnd(Functor &functor)
+{
+    return functor.VisitOrnamEnd(this);
+}
+
+FunctorCode Ornam::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitOrnamEnd(this);
+}
 
 } // namespace vrv

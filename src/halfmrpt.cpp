@@ -16,7 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
@@ -49,22 +49,24 @@ void HalfmRpt::Reset()
 // HalfmRpt functor methods
 //----------------------------------------------------------------------------
 
-int HalfmRpt::GenerateMIDI(FunctorParams *functorParams)
+FunctorCode HalfmRpt::Accept(Functor &functor)
 {
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    LogWarning("HalfmRpt produces empty MIDI output");
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitHalfmRpt(this);
 }
 
-int HalfmRpt::PrepareRpt(FunctorParams *functorParams)
+FunctorCode HalfmRpt::Accept(ConstFunctor &functor) const
 {
-    // PrepareRptParams *params = vrv_params_cast<PrepareRptParams *>(functorParams);
-    // assert(params);
+    return functor.VisitHalfmRpt(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode HalfmRpt::AcceptEnd(Functor &functor)
+{
+    return functor.VisitHalfmRptEnd(this);
+}
+
+FunctorCode HalfmRpt::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHalfmRptEnd(this);
 }
 
 } // namespace vrv

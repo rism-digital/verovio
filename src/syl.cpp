@@ -15,7 +15,7 @@
 
 #include "doc.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "measure.h"
 #include "note.h"
 #include "smufl.h"
@@ -80,6 +80,16 @@ bool Syl::IsSupportedChild(Object *child)
     return true;
 }
 
+int Syl::CalcHyphenLength(Doc *doc, int staffSize)
+{
+    FontInfo *lyricFont = doc->GetDrawingLyricFont(staffSize);
+    int dashLength = doc->GetTextGlyphWidth(L'-', lyricFont, false);
+
+    Syl::AdjustToLyricSize(doc, dashLength);
+
+    return dashLength;
+}
+
 int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 {
     assert(doc);
@@ -91,31 +101,24 @@ int Syl::CalcConnectorSpacing(Doc *doc, int staffSize)
 
     // We have a word connector - the space have to be wide enough
     if ((pos == sylLog_WORDPOS_i) || (pos == sylLog_WORDPOS_m)) {
-        int hyphen = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricHyphenLength.GetValue();
-        // Adjust it proportionally to the lyric size
-        hyphen *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-        spacing = (2 * hyphen);
+        spacing = 2 * this->CalcHyphenLength(doc, staffSize);
     }
     // Elision
     else if (con == sylLog_CON_b) {
         if (doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
             // Equivalent spacing with 0x230F
-            spacing += doc->GetDrawingUnit(staffSize) * 2.2;
+            spacing = doc->GetDrawingUnit(staffSize) * 2.2;
         }
         else {
             // Calculate the elision space with the current music font
-            int elisionSpace = doc->GetGlyphAdvX(doc->GetOptions()->m_lyricElision.GetValue(), staffSize, false);
-            // Adjust it proportionally to the lyric size
-            elisionSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-            spacing = elisionSpace;
+            spacing = doc->GetGlyphAdvX(doc->GetOptions()->m_lyricElision.GetValue(), staffSize, false);
+            Syl::AdjustToLyricSize(doc, spacing);
         }
     }
     // Spacing of words as set in the staff according to the staff and font sizes
     else {
-        int wordSpace = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricWordSpace.GetValue();
-        // Adjust it proportionally to the lyric size
-        wordSpace *= doc->GetOptions()->m_lyricSize.GetValue() / doc->GetOptions()->m_lyricSize.GetDefault();
-        spacing = wordSpace;
+        spacing = doc->GetDrawingUnit(staffSize) * doc->GetOptions()->m_lyricWordSpace.GetValue();
+        Syl::AdjustToLyricSize(doc, spacing);
     }
 
     return spacing;
@@ -137,91 +140,34 @@ int Syl::GetDrawingHeight() const
     return 0;
 }
 
+void Syl::AdjustToLyricSize(const Doc *doc, int &value)
+{
+    const OptionDbl &lyricSize = doc->GetOptions()->m_lyricSize;
+    value *= lyricSize.GetValue() / lyricSize.GetDefault();
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Syl::PrepareLyrics(FunctorParams *functorParams)
+FunctorCode Syl::Accept(Functor &functor)
 {
-    PrepareLyricsParams *params = vrv_params_cast<PrepareLyricsParams *>(functorParams);
-    assert(params);
-
-    Verse *verse = vrv_cast<Verse *>(this->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
-    if (verse) {
-        m_drawingVerse = std::max(verse->GetN(), 1);
-    }
-
-    this->SetStart(vrv_cast<LayerElement *>(this->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
-    // If there isn't an ancestor note, it should be a chord
-    if (!this->GetStart()) {
-        this->SetStart(vrv_cast<LayerElement *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
-    }
-
-    // At this stage currentSyl is actually the previous one that is ending here
-    if (params->m_currentSyl) {
-        // The previous syl was an initial or median -> The note we just parsed is the end
-        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
-            || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            params->m_currentSyl->SetEnd(params->m_lastNoteOrChord);
-            params->m_currentSyl->m_nextWordSyl = this;
-        }
-        // The previous syl was a underscore -> the previous but one was the end
-        else if (params->m_currentSyl->GetCon() == sylLog_CON_u) {
-            if (params->m_currentSyl->GetStart() == params->m_penultimateNoteOrChord) {
-                LogWarning("Syllable with underline extender under one single note '%s'",
-                    params->m_currentSyl->GetStart()->GetID().c_str());
-            }
-            else {
-                params->m_currentSyl->SetEnd(params->m_penultimateNoteOrChord);
-            }
-        }
-    }
-
-    // Now decide what to do with the starting syl and check if it has a forward connector
-    if ((this->GetWordpos() == sylLog_WORDPOS_i) || (this->GetWordpos() == sylLog_WORDPOS_m)) {
-        params->m_currentSyl = this;
-        return FUNCTOR_CONTINUE;
-    }
-    else if (this->GetCon() == sylLog_CON_u) {
-        params->m_currentSyl = this;
-        return FUNCTOR_CONTINUE;
-    }
-    else {
-        params->m_currentSyl = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitSyl(this);
 }
 
-int Syl::PrepareStaffCurrentTimeSpanning(FunctorParams *functorParams)
+FunctorCode Syl::Accept(ConstFunctor &functor) const
 {
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfacePrepareStaffCurrentTimeSpanning(functorParams, this);
+    return functor.VisitSyl(this);
 }
 
-int Syl::GenerateMIDI(FunctorParams *functorParams)
+FunctorCode Syl::AcceptEnd(Functor &functor)
 {
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    const int startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOnset();
-    Text *text = vrv_cast<Text *>(this->GetChild(0, TEXT));
-    const std::string sylText = UTF32to8(text->GetText());
-
-    params->m_midiFile->addLyric(params->m_midiTrack, startTime * params->m_midiFile->getTPQ(), sylText);
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitSylEnd(this);
 }
 
-int Syl::ResetData(FunctorParams *functorParams)
+FunctorCode Syl::AcceptEnd(ConstFunctor &functor) const
 {
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-
-    m_nextWordSyl = NULL;
-
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceResetData(functorParams, this);
+    return functor.VisitSylEnd(this);
 }
 
 bool Syl::CreateDefaultZone(Doc *doc)

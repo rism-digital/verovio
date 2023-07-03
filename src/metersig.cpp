@@ -15,7 +15,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "vrv.h"
@@ -28,11 +28,13 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
-MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis()
+MeterSig::MeterSig()
+    : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis(), AttVisibility()
 {
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_METERSIGLOG);
     this->RegisterAttClass(ATT_METERSIGVIS);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
 }
@@ -45,6 +47,7 @@ void MeterSig::Reset()
     this->ResetEnclosingChars();
     this->ResetMeterSigLog();
     this->ResetMeterSigVis();
+    this->ResetVisibility();
 }
 
 int MeterSig::GetTotalCount() const
@@ -127,14 +130,24 @@ std::pair<char32_t, char32_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) cons
 // Functors methods
 //----------------------------------------------------------------------------
 
-int MeterSig::LayerCountInTimeSpan(FunctorParams *functorParams) const
+FunctorCode MeterSig::Accept(Functor &functor)
 {
-    LayerCountInTimeSpanParams *params = vrv_params_cast<LayerCountInTimeSpanParams *>(functorParams);
-    assert(params);
+    return functor.VisitMeterSig(this);
+}
 
-    params->m_meterSig = this;
+FunctorCode MeterSig::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMeterSig(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode MeterSig::AcceptEnd(Functor &functor)
+{
+    return functor.VisitMeterSigEnd(this);
+}
+
+FunctorCode MeterSig::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMeterSigEnd(this);
 }
 
 } // namespace vrv

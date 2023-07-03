@@ -27,6 +27,7 @@ class Hairpin : public ControlElement,
                 public AttColor,
                 public AttHairpinLog,
                 public AttHairpinVis,
+                public AttLineRendBase,
                 public AttPlacementRelStaff,
                 public AttVerticalGroup {
 public:
@@ -93,14 +94,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareFloatingGrps
+     * Interface for class functor visitation
      */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

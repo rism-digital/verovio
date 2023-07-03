@@ -63,14 +63,14 @@ public:
     //----------//
 
     /**
-     * See Object::InitOnsetOffsetEnd
+     * Interface for class functor visitation
      */
-    virtual int InitOnsetOffsetEnd(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcStem
-     */
-    int CalcStem(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     /**

@@ -21,7 +21,7 @@
 #include "editortoolkit_cmn.h"
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
-#include "functorparams.h"
+#include "findfunctor.h"
 #include "ioabc.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
@@ -160,6 +160,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     }
     else if (outputTo == "timemap") {
         m_outputTo = TIMEMAP;
+    }
+    else if (outputTo == "expansionmap") {
+        m_outputTo = EXPANSIONMAP;
     }
     else if (outputTo == "pae") {
         m_outputTo = PAE;
@@ -310,8 +313,6 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
-    m_doc.m_expansionMap.Reset();
-
     return this->LoadData(content);
 }
 
@@ -348,7 +349,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     fin.seekg(0, std::ios::end);
     std::streamsize wfileSize = (std::streamsize)fin.tellg();
     fin.clear();
-    // Skip the BOM
+
     fin.seekg(0, std::wios::beg);
 
     std::u16string u16data((wfileSize / 2) + 1, '\0');
@@ -363,6 +364,11 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
             std::swap(p[0], p[1]);
             return c;
         });
+    }
+
+    // Skip the BOM
+    if (u16data.at(0) == u'\uFEFF') {
+        u16data.erase(0, 1);
     }
 
     std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
@@ -461,6 +467,8 @@ bool Toolkit::LoadData(const std::string &data)
 {
     std::string newData;
     Input *input = NULL;
+
+    m_doc.m_expansionMap.Reset();
 
     if (m_options->m_xmlIdChecksum.GetValue()) {
         crcInit();
@@ -707,6 +715,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // generate missing measure numbers
+    // TODO better move this to PrepareData()
     m_doc.GenerateMeasureNumbers();
 
     // transpose the content if necessary
@@ -1110,6 +1119,145 @@ void Toolkit::ResetOptions()
     this->SetFont(m_options->m_font.GetValue());
 }
 
+void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &output) const
+{
+    if (!option) return;
+    std::string option_str = " ";
+    if (option->GetShortOption()) {
+        option_str.append("-");
+        option_str.push_back(option->GetShortOption());
+        option_str.append(", ");
+    }
+
+    if (!option->GetKey().empty()) {
+        option_str.append("--");
+        option_str.append(vrv::FromCamelCase(option->GetKey()));
+    }
+
+    const vrv::OptionDbl *optDbl = dynamic_cast<const vrv::OptionDbl *>(option);
+    const vrv::OptionInt *optInt = dynamic_cast<const vrv::OptionInt *>(option);
+    const vrv::OptionIntMap *optIntMap = dynamic_cast<const vrv::OptionIntMap *>(option);
+    const vrv::OptionString *optString = dynamic_cast<const vrv::OptionString *>(option);
+    const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(option);
+    const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(option);
+
+    if (optDbl) {
+        option_str.append(" <f>");
+    }
+    else if (optInt) {
+        option_str.append(" <i>");
+    }
+    else if (optString) {
+        option_str.append(" <s>");
+    }
+    else if (optArray) {
+        option_str.append("* <s>");
+    }
+    else if (!optBool) {
+        option_str.append(" <s>");
+    }
+
+    const int helpTabs = 32;
+    if (option_str.size() < helpTabs) {
+        option_str.insert(option_str.end(), helpTabs - option_str.size(), ' ');
+    }
+    else {
+        option_str.append("\t");
+    }
+
+    output << option_str << option->GetDescription();
+    if (optInt && (optInt->GetMin() != optInt->GetMax())) {
+        output << " (default: " << optInt->GetDefault();
+        output << "; min: " << optInt->GetMin();
+        output << "; max: " << optInt->GetMax() << ")";
+    }
+    if (optDbl && (optDbl->GetMin() != optDbl->GetMax())) {
+        output << std::fixed << " (default: " << optDbl->GetDefault();
+        output << "; min: " << optDbl->GetMin();
+        output << "; max: " << optDbl->GetMax() << ")";
+    }
+    if (optString) {
+        output << " (default: \"" << optString->GetDefault() << "\")";
+    }
+    if (optIntMap) {
+        output << " (default: \"" << optIntMap->GetDefaultStrValue()
+               << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
+    }
+    output << std::endl;
+}
+
+void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
+{
+    // map of all categories and expected string arguments for them
+    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
+        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Layout, "layout" },
+        { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Midi, "midi" },
+        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+
+    output.precision(2);
+    // display_version();
+    output << "Verovio " << this->GetVersion() << std::endl;
+    output << std::endl << "Example usage:" << std::endl << std::endl;
+    output << " verovio [-s scale] [-r resource-path] [-o outfile] infile" << std::endl << std::endl;
+
+    auto it = std::find_if(
+        categories.begin(), categories.end(), [&category](const std::pair<vrv::OptionsCategory, std::string> &value) {
+            return std::equal(value.second.begin(), value.second.end(), category.begin(), category.end(),
+                [](const char a, const char b) { return a == tolower(b); });
+        });
+
+    if (it == categories.end()) {
+        std::string optionStr;
+        output << "Help manual categories: " << std::endl;
+        // Print base group options
+        optionStr.append(" -h ");
+        optionStr.append(categories.at(m_options->m_baseOptions.GetCategory()));
+        optionStr.append("\t");
+        optionStr.append(m_options->m_baseOptions.GetLabel());
+        optionStr.append("\n");
+
+        const std::vector<vrv::OptionGrp *> *grps = m_options->GetGrps();
+        // Print each group one by one
+        for (const auto group : *grps) {
+            optionStr.append(" -h ");
+            optionStr.append(categories.at(group->GetCategory()));
+            optionStr.append("\t");
+            optionStr.append(group->GetLabel());
+            optionStr.append("\n");
+        }
+        optionStr.append(" -h full\tPrint all help manual and exit");
+        output << optionStr << std::endl;
+    }
+    else {
+        output << "Options (marked as * are repeatable)" << std::endl;
+        if ((it->first == vrv::OptionsCategory::Base) || (it->first == vrv::OptionsCategory::Full)) {
+            const std::vector<vrv::Option *> *baseOptions = m_options->GetBaseOptions();
+            for (vrv::Option *option : *baseOptions) {
+                this->PrintOptionUsageOutput(option, output);
+            }
+        }
+        const std::vector<vrv::OptionGrp *> *grps = m_options->GetGrps();
+        for (const auto group : *grps) {
+            if (it->first == group->GetCategory() || (it->first == vrv::OptionsCategory::Full)) {
+                // Options with long forms only
+                output << std::endl << group->GetLabel() << std::endl;
+                const std::vector<vrv::Option *> *options = group->GetOptions();
+
+                for (vrv::Option *option : *options) {
+                    this->PrintOptionUsageOutput(option, output);
+                }
+            }
+        }
+    }
+}
+
+std::string Toolkit::GetOptionUsageString() const
+{
+    std::stringstream ss;
+    this->PrintOptionUsage("full", ss);
+    return ss.str();
+}
+
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
@@ -1126,16 +1274,15 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
-        Functor findByID(&Object::FindElementInLayerStaffDefsByID);
-        FindLayerIDWithinStaffDefParams params(xmlId);
+        FindElementInLayerStaffDefFunctor findElementInLayerStaffDef(xmlId);
         // Check drawing page elements first
         if (m_doc.GetDrawingPage()) {
-            m_doc.GetDrawingPage()->Process(&findByID, &params);
-            element = params.m_object;
+            m_doc.GetDrawingPage()->Process(findElementInLayerStaffDef);
+            element = findElementInLayerStaffDef.GetElement();
         }
         if (!element) {
-            m_doc.Process(&findByID, &params);
-            element = params.m_object;
+            m_doc.Process(findElementInLayerStaffDef);
+            element = findElementInLayerStaffDef.GetElement();
         }
         // If element is found within layer staffdef - check for the linking interface @corresp attribute to find
         // original ID of the element
@@ -1220,7 +1367,7 @@ std::string Toolkit::GetLog()
     return str;
 }
 
-std::string Toolkit::GetVersion()
+std::string Toolkit::GetVersion() const
 {
     return vrv::GetVersion();
 }
@@ -1527,6 +1674,15 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
     return output;
 }
 
+std::string Toolkit::RenderToExpansionMap()
+{
+    this->ResetLogBuffer();
+
+    std::string output;
+    m_doc.ExportExpansionMap(output);
+    return output;
+}
+
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
     this->ResetLogBuffer();
@@ -1606,6 +1762,19 @@ bool Toolkit::RenderToMIDIFile(const std::string &filename)
 bool Toolkit::RenderToTimemapFile(const std::string &filename, const std::string &jsonOptions)
 {
     std::string outputString = this->RenderToTimemap(jsonOptions);
+
+    std::ofstream output(filename.c_str());
+    if (!output.is_open()) {
+        return false;
+    }
+    output << outputString;
+
+    return true;
+}
+
+bool Toolkit::RenderToExpansionMapFile(const std::string &filename)
+{
+    std::string outputString = this->RenderToExpansionMap();
 
     std::ofstream output(filename.c_str());
     if (!output.is_open()) {

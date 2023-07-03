@@ -15,9 +15,13 @@
 namespace vrv {
 
 class Object;
-class FunctorParams;
 class LayerElement;
 class Measure;
+class PrepareStaffCurrentTimeSpanningFunctor;
+class PrepareTimePointingFunctor;
+class PrepareTimeSpanningFunctor;
+class PrepareTimestampsFunctor;
+class ResetDataFunctor;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
@@ -96,26 +100,15 @@ public:
     //-----------------//
 
     /**
-     * We have functor in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the  Object (implementation) to
-     * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::ResetData
-     */
-    virtual int InterfaceResetData(FunctorParams *functorParams, Object *object);
+    ///@{
+    FunctorCode InterfacePrepareTimePointing(PrepareTimePointingFunctor &functor, Object *object);
+    virtual FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object);
+    virtual FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    ///@}
 
 protected:
     /**
@@ -215,31 +208,17 @@ public:
     //-----------------//
 
     /**
-     * We have functors in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the  Object (implementation) to
-     * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingObject::PrepareStaffCurrentTimeSpanning for an example.
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
      */
-
-    /**
-     * See Object::PrepareStaffCurrentTimeSpanning
-     */
-    virtual int InterfacePrepareStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object);
-
-    /**
-     * See Object::PrepareTimestamps
-     */
-    int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int InterfaceResetData(FunctorParams *functorParams, Object *object) override;
+    ///@{
+    FunctorCode InterfacePrepareTimeSpanning(PrepareTimeSpanningFunctor &functor, Object *object);
+    FunctorCode InterfacePrepareTimestamps(PrepareTimestampsFunctor &functor, Object *object) override;
+    FunctorCode InterfacePrepareStaffCurrentTimeSpanning(
+        PrepareStaffCurrentTimeSpanningFunctor &functor, Object *object);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object) override;
+    ///@}
 
 private:
     //

@@ -15,7 +15,7 @@
 
 #include "comparison.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -95,6 +95,13 @@ bool StaffGrp::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+int StaffGrp::GetInsertOrderFor(ClassId classId) const
+{
+    // Anything else goes at the end
+    static const std::vector s_order({ GRPSYM, LABEL, LABELABBR, INSTRDEF });
+    return this->GetInsertOrderForIn(classId, s_order);
 }
 
 void StaffGrp::FilterList(ListOfConstObjects &childList) const
@@ -253,41 +260,24 @@ void StaffGrp::SetEverythingVisible()
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-int StaffGrp::ScoreDefOptimizeEnd(FunctorParams *)
+FunctorCode StaffGrp::Accept(Functor &functor)
 {
-    this->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
+    return functor.VisitStaffGrp(this);
+}
 
-    const Object *instrDef = this->FindDescendantByType(INSTRDEF, 1);
-    if (instrDef) {
-        VisibleStaffDefOrGrpObject visibleStaves;
-        const Object *firstVisible = this->FindDescendantByComparison(&visibleStaves, 1);
-        if (firstVisible) {
-            this->SetEverythingVisible();
-        }
+FunctorCode StaffGrp::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitStaffGrp(this);
+}
 
-        return FUNCTOR_CONTINUE;
-    }
+FunctorCode StaffGrp::AcceptEnd(Functor &functor)
+{
+    return functor.VisitStaffGrpEnd(this);
+}
 
-    for (auto child : this->GetChildren()) {
-        if (child->Is(STAFFDEF)) {
-            StaffDef *staffDef = vrv_cast<StaffDef *>(child);
-            assert(staffDef);
-            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
-                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
-                break;
-            }
-        }
-        else if (child->Is(STAFFGRP)) {
-            StaffGrp *staffGrp = vrv_cast<StaffGrp *>(child);
-            assert(staffGrp);
-            if (staffGrp->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
-                this->SetDrawingVisibility(OPTIMIZATION_SHOW);
-                break;
-            }
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+FunctorCode StaffGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitStaffGrpEnd(this);
 }
 
 } // namespace vrv

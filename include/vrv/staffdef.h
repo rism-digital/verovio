@@ -53,6 +53,11 @@ public:
     bool IsSupportedChild(Object *object) override;
 
     /**
+     * Return an order for the given ClassId.
+     */
+    int GetInsertOrderFor(ClassId classId) const override;
+
+    /**
      * @name Setter and getter of the drawing visible flag
      */
     ///@{
@@ -70,29 +75,14 @@ public:
     //----------//
 
     /**
-     * See Object::ReplaceDrawingValuesInStaffDef
+     * Interface for class functor visitation
      */
-    int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::SetStaffDefRedrawFlags
-     */
-    int SetStaffDefRedrawFlags(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

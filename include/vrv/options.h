@@ -631,6 +631,7 @@ public:
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_moveScoreDefinitionToStaff;
+    OptionBool m_neumeAsNote;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;
@@ -674,7 +675,6 @@ public:
     OptionDbl m_barLineWidth;
     OptionBool m_beamFrenchStyle;
     OptionInt m_beamMaxSlope;
-    OptionInt m_beamMinSlope;
     OptionBool m_beamMixedPreserve;
     OptionDbl m_beamMixedStemMin;
     OptionDbl m_bracketThickness;
@@ -703,7 +703,6 @@ public:
     OptionDbl m_ledgerLineThickness;
     OptionDbl m_ledgerLineExtension;
     OptionIntMap m_lyricElision;
-    OptionDbl m_lyricHyphenLength;
     OptionDbl m_lyricLineThickness;
     OptionBool m_lyricNoStartHyphen;
     OptionDbl m_lyricSize;
@@ -744,6 +743,7 @@ public:
     OptionDbl m_tieEndpointThickness;
     OptionDbl m_tieMidpointThickness;
     OptionDbl m_tieMinLength;
+    OptionBool m_tupletAngledOnBeams;
     OptionDbl m_tupletBracketThickness;
     OptionBool m_tupletNumHead;
 

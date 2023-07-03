@@ -17,7 +17,7 @@
 #include "editorial.h"
 #include "f.h"
 #include "fb.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "measure.h"
 #include "system.h"
 #include "text.h"
@@ -159,157 +159,24 @@ void Harm::SetBassPitch(const TransPitch &pitch)
 // Harm functor methods
 //----------------------------------------------------------------------------
 
-int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
+FunctorCode Harm::Accept(Functor &functor)
 {
-    PrepareFloatingGrpsParams *params = vrv_params_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
-    std::string n = this->GetN();
-    // If there is no @n on harm we use the first @staff value as negative
-    // This will not work if @staff has more than one staff id, but this is probably not going to be used
-    if (n == "" && this->HasStaff()) {
-        n = StringFormat("%d", this->GetStaff().at(0) * -1);
-    }
-
-    for (auto &kv : params->m_harms) {
-        if (kv.first == n) {
-            this->SetDrawingGrpId(kv.second->GetDrawingGrpId());
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    // first harm@n, create a new group
-    this->SetDrawingGrpObject(this);
-    params->m_harms.insert({ n, this });
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitHarm(this);
 }
 
-int Harm::AdjustHarmGrpsSpacing(FunctorParams *functorParams)
+FunctorCode Harm::Accept(ConstFunctor &functor) const
 {
-    AdjustHarmGrpsSpacingParams *params = vrv_params_cast<AdjustHarmGrpsSpacingParams *>(functorParams);
-    assert(params);
-
-    int currentGrpId = this->GetDrawingGrpId();
-
-    // No group ID, nothing to do - should probably never happen
-    if (currentGrpId == 0) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // We are filling the array of grp ids for the system
-    if (params->m_currentGrp == 0) {
-        // Look if we already have this grpId
-        if (std::find(params->m_grpIds.begin(), params->m_grpIds.end(), currentGrpId) == params->m_grpIds.end()) {
-            // if not, then just add to the list of grpIds for the system
-            params->m_grpIds.push_back(currentGrpId);
-        }
-        // This is it for this pass
-        return FUNCTOR_SIBLINGS;
-    }
-    // We are processing harm for a grp Id which is not the current one, skip it
-    else if (currentGrpId != params->m_currentGrp) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    /************** Find the widest positioner **************/
-
-    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
-    ArrayOfFloatingPositioners positioners;
-    params->m_currentSystem->m_systemAligner.FindAllPositionerPointingTo(&positioners, this);
-
-    FloatingPositioner *harmPositioner = NULL;
-    // Something is probably not right if nothing found - maybe no @staff
-    if (positioners.empty()) {
-        LogDebug("Something was wrong when searching positioners for %s '%s'", this->GetClassName().c_str(),
-            this->GetID().c_str());
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Keep the one with the lowest left position (this will also be the widest)
-    for (auto const &positioner : positioners) {
-        if (!harmPositioner || (harmPositioner->GetContentLeft() > positioner->GetContentLeft())) {
-            harmPositioner = positioner;
-        }
-    }
-
-    // If the harm positioner is missing or is empty, do not adjust spacing
-    if (!harmPositioner || !harmPositioner->HasContentBB()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    /************** Calculate the adjustment **************/
-
-    assert(this->GetStart());
-    assert(harmPositioner);
-
-    // Not much to do when we hit the first syllable of the system
-    if (params->m_previousHarmPositioner == NULL) {
-        params->m_previousHarmStart = this->GetStart();
-        params->m_previousHarmPositioner = harmPositioner;
-        params->m_previousMeasure = NULL;
-        return FUNCTOR_SIBLINGS;
-    }
-
-    int xShift = 0;
-
-    // We have a previous harm from the previous measure - we need to add the measure with because the measures are
-    // not aligned yet
-    if (params->m_previousMeasure) {
-        xShift = params->m_previousMeasure->GetWidth();
-    }
-
-    int overlap = params->m_previousHarmPositioner->GetContentRight() - (harmPositioner->GetContentLeft() + xShift);
-    // Two units as default spacing
-    int wordSpace = 2 * params->m_doc->GetDrawingUnit(100);
-
-    // Adjust it proportionally to the lyric size
-    wordSpace
-        *= params->m_doc->GetOptions()->m_lyricSize.GetValue() / params->m_doc->GetOptions()->m_lyricSize.GetDefault();
-    overlap += wordSpace;
-
-    if (overlap > 0) {
-        // We are adjusting syl in two different measures - move only the to right barline of the first measure
-        if (params->m_previousMeasure) {
-            params->m_overlappingHarm.push_back(std::make_tuple(params->m_previousHarmStart->GetAlignment(),
-                params->m_previousMeasure->GetRightBarLine()->GetAlignment(), overlap));
-            // Do it now
-            params->m_previousMeasure->m_measureAligner.AdjustProportionally(params->m_overlappingHarm);
-            params->m_overlappingHarm.clear();
-        }
-        else {
-            // Normal case, both in the same measure
-            params->m_overlappingHarm.push_back(std::make_tuple(
-                params->m_previousHarmStart->GetAlignment(), this->GetStart()->GetAlignment(), overlap));
-        }
-    }
-
-    params->m_previousHarmStart = this->GetStart();
-    params->m_previousHarmPositioner = harmPositioner;
-    params->m_previousMeasure = NULL;
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitHarm(this);
 }
 
-int Harm::Transpose(FunctorParams *functorParams)
+FunctorCode Harm::AcceptEnd(Functor &functor)
 {
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
+    return functor.VisitHarmEnd(this);
+}
 
-    unsigned int position = 0;
-    TransPitch pitch;
-    if (this->GetRootPitch(pitch, position)) {
-        params->m_transposer->Transpose(pitch);
-        this->SetRootPitch(pitch, position);
-    }
-
-    // Transpose bass notes (the "/F#" in "G#m7/F#")
-    if (this->GetBassPitch(pitch)) {
-        params->m_transposer->Transpose(pitch);
-        this->SetBassPitch(pitch);
-    }
-
-    return FUNCTOR_SIBLINGS;
+FunctorCode Harm::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitHarmEnd(this);
 }
 
 } // namespace vrv

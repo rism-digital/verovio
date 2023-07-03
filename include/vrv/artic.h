@@ -24,7 +24,8 @@ class Artic : public LayerElement,
               public AttArticulationGes,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttPlacementRelEvent {
 public:
     /**
@@ -47,12 +48,6 @@ public:
 
     data_ARTICULATION GetArticFirst() const;
 
-    /**
-     * Split the multi-valued artic attributes into distinct artic elements.
-     * Applied by ConvertMarkupArtic functor.
-     */
-    void SplitMultival(Object *parent);
-
     void GetAllArtics(bool direction, std::vector<Artic *> &artics);
 
     /**
@@ -70,7 +65,13 @@ public:
 
     void AddSlurPositioner(FloatingCurvePositioner *positioner, bool start);
 
+    /**
+     * Getter and setter for the drawing place
+     */
+    ///@{
     data_STAFFREL GetDrawingPlace() const { return m_drawingPlace; }
+    void SetDrawingPlace(data_STAFFREL drawingPlace) { m_drawingPlace = drawingPlace; }
+    ///@}
 
     /**
      * Retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
@@ -103,39 +104,17 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertMarkupArtic
+     * Interface for class functor visitation
      */
-    int ConvertMarkupArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcArtic
-     */
-    int CalcArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArtic
-     */
-    int AdjustArtic(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustArticWithSlurs
-     */
-    int AdjustArticWithSlurs(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;
-    // Calculate shift for the articulation based on its type and presence of other articulations
-    int CalculateHorizontalShift(const Doc *doc, const LayerElement *parent, data_STEMDIRECTION stemDir) const;
 
 public:
     std::vector<FloatingCurvePositioner *> m_startSlurPositioners;

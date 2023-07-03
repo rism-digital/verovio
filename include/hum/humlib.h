@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 27 16:47:59 PST 2023
+// Last Modified: Sat Apr 15 11:52:53 PDT 2023
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -98,9 +98,9 @@ using std::vector;
 #include "pugiconfig.hpp"
 #include "pugixml.hpp"
 
-using pugi::xml_node;
 using pugi::xml_attribute;
 using pugi::xml_document;
+using pugi::xml_node;
 using pugi::xpath_node;
 
 namespace hum {
@@ -1654,6 +1654,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isKernLike                (void) const;
 		bool     isMens                    (void) const;
 		bool     isMensLike                (void) const;
+		bool     isStaffLike               (void) const { return isKernLike() || isMensLike(); }
 		std::string   getSpineInfo         (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
@@ -6207,6 +6208,39 @@ class Tool_colorgroups : public HumTool {
 };
 
 
+class Tool_colorthirds : public HumTool {
+	public:
+		         Tool_colorthirds  (void);
+		        ~Tool_colorthirds  () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void             initialize        (void);
+		void             processFile       (HumdrumFile& infile);
+		std::vector<int> getMidiNotes(std::vector<HTp>& kernNotes);
+		std::vector<int> getChordPositions(std::vector<int>& midiNotes);
+		void             labelChordPositions(std::vector<HTp>& kernNotes, std::vector<int>& chordPositions);
+
+	private:
+		std::string m_root_marker = "@";
+		std::string m_third_marker = "N";
+		std::string m_fifth_marker = "Z";
+
+		std::string m_root_color = "crimson";
+		std::string m_third_color = "limegreen";
+		std::string m_fifth_color = "royalblue";
+
+		bool m_colorThirds = true;
+		bool m_colorFifths = true;
+		bool m_colorTriads = true;
+
+};
+
+
 class Tool_colortriads : public HumTool {
 	public:
 		         Tool_colortriads  (void);
@@ -7117,8 +7151,8 @@ class Tool_extract : public HumTool {
 
 		bool     run                    (HumdrumFileSet& infiles);
 		bool     run                    (HumdrumFile& infile);
-		bool     run                    (const string& indata, ostream& out);
-		bool     run                    (HumdrumFile& infile, ostream& out);
+		bool     run                    (const std::string& indata, std::ostream& out);
+		bool     run                    (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 
@@ -7127,92 +7161,94 @@ class Tool_extract : public HumTool {
 
 		// function declarations
 		void    processFile             (HumdrumFile& infile);
-		void    excludeFields           (HumdrumFile& infile, vector<int>& field,
-		                                 vector<int>& subfield, vector<int>& model);
-		void    extractFields           (HumdrumFile& infile, vector<int>& field,
-		                                 vector<int>& subfield, vector<int>& model);
-		void    extractTrace            (HumdrumFile& infile, const string& tracefile);
-		void    getInterpretationFields (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, HumdrumFile& infile,
-		                                 string& interps, int state);
-		//void    extractInterpretations  (HumdrumFile& infile, string& interps);
+		void    excludeFields           (HumdrumFile& infile, std::vector<int>& field,
+		                                 std::vector<int>& subfield, std::vector<int>& model);
+		void    extractFields           (HumdrumFile& infile, std::vector<int>& field,
+		                                 std::vector<int>& subfield, std::vector<int>& model);
+		void    extractTrace            (HumdrumFile& infile, const std::string& tracefile);
+		void    getInterpretationFields (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, HumdrumFile& infile,
+		                                 std::string& interps, int state);
+		//void    extractInterpretations  (HumdrumFile& infile, std::string& interps);
 		void    example                 (void);
-		void    usage                   (const string& command);
-		void    fillFieldData           (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, string& fieldstring,
+		void    usage                   (const std::string& command);
+		std::string reverseFieldString(const std::string& input, int maxval);
+		void    fillFieldData           (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, std::string& fieldstring,
 		                                 HumdrumFile& infile);
-		void    processFieldEntry       (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, const string& astring,
+		void    processFieldEntry       (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, const std::string& astring,
 		                                 HumdrumFile& infile);
-		void    removeDollarsFromString (string& buffer, int maxtrack);
-		int     isInList                (int number, vector<int>& listofnum);
-		void    getTraceData            (vector<int>& startline,
-		                                 vector<vector<int> >& fields,
-		                                 const string& tracefile, HumdrumFile& infile);
+		void    removeDollarsFromString (std::string& buffer, int maxtrack);
+		int     isInList                (int number, std::vector<int>& listofnum);
+		void    getTraceData            (std::vector<int>& startline,
+		                                 std::vector<std::vector<int> >& fields,
+		                                 const std::string& tracefile, HumdrumFile& infile);
 		void    printTraceLine          (HumdrumFile& infile, int line,
-		                                 vector<int>& field);
+		                                 std::vector<int>& field);
 		void    dealWithSpineManipulators(HumdrumFile& infile, int line,
-		                                 vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model);
-		void    storeToken              (vector<string>& storage,
-		                                 const string& string);
-		void    storeToken              (vector<string>& storage, int index,
-		                                 const string& string);
-		void    printMultiLines         (vector<int>& vsplit, vector<int>& vserial,
-		                                 vector<string>& tempout);
-		void    reverseSpines           (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, HumdrumFile& infile,
-		                                 const string& exinterp);
-		void    getSearchPat            (string& spat, int target,
-		                                 const string& modifier);
-		void    expandSpines            (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, HumdrumFile& infile,
-		                                 string& interp);
-		void    dealWithSecondarySubspine(vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, int targetindex,
+		                                 std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model);
+		void    storeToken              (std::vector<std::string>& storage,
+		                                 const std::string& string);
+		void    storeToken              (std::vector<std::string>& storage, int index,
+		                                 const std::string& string);
+		void    printMultiLines         (std::vector<int>& vsplit, std::vector<int>& vserial,
+		                                 std::vector<std::string>& tempout);
+		void    reverseSpines           (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, HumdrumFile& infile,
+		                                 const std::string& exinterp);
+		void    getSearchPat            (std::string& spat, int target,
+		                                 const std::string& modifier);
+		void    expandSpines            (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, HumdrumFile& infile,
+		                                 std::string& interp);
+		void    dealWithSecondarySubspine(std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, int targetindex,
 		                                 HumdrumFile& infile, int line, int spine,
 		                                 int submodel);
-		void    dealWithCospine         (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, int targetindex,
+		void    dealWithCospine         (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, int targetindex,
 		                                 HumdrumFile& infile, int line, int cospine,
 		                                 int comodel, int submodel,
-		                                 const string& cointerp);
+		                                 const std::string& cointerp);
 		void    printCotokenInfo        (int& start, HumdrumFile& infile, int line,
-		                                 int spine, vector<string>& cotokens,
-		                                 vector<int>& spineindex,
-		                                 vector<int>& subspineindex);
-		void    fillFieldDataByGrep     (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, const string& grepString,
+		                                 int spine, std::vector<std::string>& cotokens,
+		                                 std::vector<int>& spineindex,
+		                                 std::vector<int>& subspineindex);
+		void    fillFieldDataByGrep     (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, const std::string& grepString,
 		                                 HumdrumFile& infile, int state);
-		vector<int> getNullDataTracks(HumdrumFile& infile);
-		void fillFieldDataByEmpty       (vector<int>& field, vector<int>& subfield,
-				                           vector<int>& model, HumdrumFile& infile, int negate);
-		void fillFieldDataByNoEmpty     (vector<int>& field, vector<int>& subfield,
-				                           vector<int>& model, HumdrumFile& infile, int negate);
-		void fillFieldDataByNoRest      (vector<int>& field, vector<int>& subfield,
-		                                 vector<int>& model, const string& searchstring,
+		std::vector<int> getNullDataTracks(HumdrumFile& infile);
+		void fillFieldDataByEmpty       (std::vector<int>& field, std::vector<int>& subfield,
+				                           std::vector<int>& model, HumdrumFile& infile, int negate);
+		void fillFieldDataByNoEmpty     (std::vector<int>& field, std::vector<int>& subfield,
+				                           std::vector<int>& model, HumdrumFile& infile, int negate);
+		void fillFieldDataByNoRest      (std::vector<int>& field, std::vector<int>& subfield,
+		                                 std::vector<int>& model, const std::string& searchstring,
 		                                 HumdrumFile& infile, int state);
 
 	private:
 
 		// global variables
-		int          excludeQ = 0;        // used with -x option
-		int          expandQ  = 0;        // used with -e option
-		string       expandInterp = "";   // used with -E option
-		int          interpQ  = 0;        // used with -i option
-		string       interps  = "";       // used with -i option
-		int          debugQ   = 0;        // used with --debug option
-		int          kernQ    = 0;        // used with -k option
-		int          fieldQ   = 0;        // used with -f or -p option
-		string       fieldstring = "";    // used with -f or -p option
-		vector<int>  field;               // used with -f or -p option
-		vector<int>  subfield;            // used with -f or -p option
-		vector<int>  model;               // used with -p, or -e options and similar
-		int          countQ   = 0;        // used with -C option
-		int          traceQ   = 0;        // used with -t option
-		string       tracefile = "";      // used with -t option
-		int          reverseQ = 0;        // used with -r option
-		string       reverseInterp = "**kern"; // used with -r and -R options.
+		int         excludeQ = 0;        // used with -x option
+		int         expandQ  = 0;        // used with -e option
+		std::string expandInterp = "";   // used with -E option
+		int         interpQ  = 0;        // used with -i option
+		std::string interps  = "";       // used with -i option
+		int         debugQ   = 0;        // used with --debug option
+		int         kernQ    = 0;        // used with -k option
+		int         rkernQ  = 0;         // used with -K option
+		int         fieldQ   = 0;        // used with -f or -p option
+		std::string fieldstring = "";    // used with -f or -p option
+		std::vector<int> field;               // used with -f or -p option
+		std::vector<int> subfield;            // used with -f or -p option
+		std::vector<int> model;               // used with -p, or -e options and similar
+		int         countQ   = 0;        // used with -C option
+		int         traceQ   = 0;        // used with -t option
+		std::string tracefile = "";      // used with -t option
+		int         reverseQ = 0;        // used with -r option
+		std::string reverseInterp = "**kern"; // used with -r and -R options.
 		// sub-spine "b" expansion model: how to generate data for a secondary
 		// spine if the primary spine is not divided.  Models are:
 		//    'd': duplicate primary spine (or "a" subspine) data (default)
@@ -7220,14 +7256,14 @@ class Tool_extract : public HumTool {
 		//    'r': rest = use a rest instead of a primary spine note (in **kern)
 		//         data.  'n' will be used for non-kern spines when 'r' is used.
 		int          submodel = 'd';       // used with -m option
-		string editorialInterpretation = "yy";
-		string      cointerp = "**kern";   // used with -c option
+		std::string editorialInterpretation = "yy";
+		std::string cointerp = "**kern";   // used with -c option
 		int         comodel  = 0;          // used with -M option
-		string subtokenseparator = " "; // used with a future option
+		std::string subtokenseparator = " "; // used with a future option
 		int         interpstate = 0;       // used -I or with -i
 		int         grepQ       = 0;       // used with -g option
-		string      grepString  = "";      // used with -g option
-		string      blankName   = "**blank"; // used with -n option
+		std::string grepString  = "";      // used with -g option
+		std::string blankName   = "**blank"; // used with -n option
 		int         noEmptyQ    = 0;       // used with --no-empty option
 		int         emptyQ      = 0;       // used with --empty option
 		int         spineListQ  = 0;       // used with --spine option
@@ -7259,7 +7295,7 @@ class FiguredBassAbbreviationMapping {
 	public:
 		FiguredBassAbbreviationMapping(string s, vector<int> n);
 
-		static vector<FiguredBassAbbreviationMapping*> s_mappings;
+		const static vector<FiguredBassAbbreviationMapping> s_mappings;
 
 		// String to compare the numbers with
 		// e.g. "6 4 3"
@@ -7460,6 +7496,27 @@ class Tool_gasparize : public HumTool {
 		vector<vector<int>> m_pstates;
 		vector<vector<int>> m_kstates;
 		vector<vector<bool>> m_estates;
+
+};
+
+
+class Tool_grep : public HumTool {
+	public:
+		         Tool_grep         (void);
+		        ~Tool_grep         () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void      processFile         (HumdrumFile& infile);
+		void      initialize          (void);
+
+	private:
+		bool        m_negateQ;    // for the -v option
+		std::string m_regex;      // for the -e option
 
 };
 
@@ -7875,6 +7932,29 @@ class Tool_kern2mens : public HumTool {
 		bool     m_invisibleQ = true;      // used with -I option
 		bool     m_doublebarQ = true;      // used with -D option
 		string   m_clef;                   // used with -c option
+
+};
+
+
+class Tool_kernify : public HumTool {
+	public:
+		         Tool_kernify (void);
+		        ~Tool_kernify () {};
+
+		bool     run          (HumdrumFileSet& infiles);
+		bool     run          (HumdrumFile& infile);
+		bool     run          (const string& indata, ostream& out);
+		bool     run          (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void        initialize             (void);
+		void        processFile            (HumdrumFile& infile);
+		void        generateDummyKernSpine (HumdrumFile& infile);
+		std::string makeNullLine           (HumdrumLine& line);
+		std::string makeReverseLine        (HumdrumLine& line);
+
+	private:
+		bool m_forceQ = false;  // used with -f option
 
 };
 

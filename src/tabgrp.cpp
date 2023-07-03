@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "note.h"
 #include "tabdursym.h"
 
@@ -116,33 +116,24 @@ const Note *TabGrp::GetBottomNote() const
 // Functor methods
 //----------------------------------------------------------------------------
 
-int TabGrp::InitOnsetOffsetEnd(FunctorParams *functorParams)
+FunctorCode TabGrp::Accept(Functor &functor)
 {
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    LayerElement *element = this->ThisOrSameasLink();
-
-    double incrementScoreTime = element->GetAlignmentDuration(
-        params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
-    incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
-    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
-
-    params->m_currentScoreTime += incrementScoreTime;
-    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitTabGrp(this);
 }
 
-int TabGrp::CalcStem(FunctorParams *functorParams)
+FunctorCode TabGrp::Accept(ConstFunctor &functor) const
 {
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
+    return functor.VisitTabGrp(this);
+}
 
-    params->m_dur = this->GetActualDur();
-    params->m_tabGrpWithNoNote = (!this->FindDescendantByType(NOTE));
+FunctorCode TabGrp::AcceptEnd(Functor &functor)
+{
+    return functor.VisitTabGrpEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode TabGrp::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTabGrpEnd(this);
 }
 
 } // namespace vrv

@@ -26,6 +26,55 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttDivLineLog
+//----------------------------------------------------------------------------
+
+class AttDivLineLog : public Att {
+protected:
+    AttDivLineLog();
+    ~AttDivLineLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetDivLineLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadDivLineLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteDivLineLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetForm(std::string form_) { m_form = form_; }
+    std::string GetForm() const { return m_form; }
+    bool HasForm() const;
+    ///@}
+
+private:
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    std::string m_form;
+};
+
+//----------------------------------------------------------------------------
+// InstDivLineLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttDivLineLog
+ */
+
+class InstDivLineLog : public AttDivLineLog {
+public:
+    InstDivLineLog() = default;
+    virtual ~InstDivLineLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttNcLog
 //----------------------------------------------------------------------------
 

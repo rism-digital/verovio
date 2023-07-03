@@ -15,7 +15,7 @@
 
 #include "comparison.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "symbol.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -80,13 +80,24 @@ bool Dir::IsSupportedChild(Object *child)
 // Dir functor methods
 //----------------------------------------------------------------------------
 
-int Dir::PrepareFloatingGrps(FunctorParams *)
+FunctorCode Dir::Accept(Functor &functor)
 {
-    if (this->HasVgrp()) {
-        this->SetDrawingGrpId(-this->GetVgrp());
-    }
+    return functor.VisitDir(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Dir::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitDir(this);
+}
+
+FunctorCode Dir::AcceptEnd(Functor &functor)
+{
+    return functor.VisitDirEnd(this);
+}
+
+FunctorCode Dir::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitDirEnd(this);
 }
 
 } // namespace vrv
