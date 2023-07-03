@@ -25,7 +25,6 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -74,12 +73,11 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    SaveParams saveParams(this, false);
-    m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
+    m_doc->GetCurrentScoreDef()->SaveObject(this, false);
 
     m_docScoreDef = false;
 
-    m_doc->SaveObject(saveParams);
+    m_doc->SaveObject(this, false);
 
     output = m_streamStringOutput.str();
 
@@ -89,71 +87,71 @@ bool PAEOutput::Export(std::string &output)
 bool PAEOutput::WriteObject(Object *object)
 {
     if (object->Is(MDIV)) {
-        this->WriteMdiv(dynamic_cast<Mdiv *>(object));
+        this->WriteMdiv(vrv_cast<Mdiv *>(object));
     }
     if (object->Is(SCOREDEF)) {
-        this->WriteScoreDef(dynamic_cast<ScoreDef *>(object));
+        this->WriteScoreDef(vrv_cast<ScoreDef *>(object));
     }
     else if (object->Is(STAFFDEF)) {
-        this->WriteStaffDef(dynamic_cast<StaffDef *>(object));
+        this->WriteStaffDef(vrv_cast<StaffDef *>(object));
     }
     else if (object->Is(MEASURE)) {
-        this->WriteMeasure(dynamic_cast<Measure *>(object));
+        this->WriteMeasure(vrv_cast<Measure *>(object));
     }
     else if (object->Is(STAFF)) {
-        this->WriteStaff(dynamic_cast<Staff *>(object));
+        this->WriteStaff(vrv_cast<Staff *>(object));
     }
     else if (object->Is(LAYER)) {
-        this->WriteLayer(dynamic_cast<Layer *>(object));
+        this->WriteLayer(vrv_cast<Layer *>(object));
     }
 
     // Measure elements
 
     // Layer elements
     else if (object->Is(BARLINE)) {
-        this->WriteBarLine(dynamic_cast<BarLine *>(object));
+        this->WriteBarLine(vrv_cast<BarLine *>(object));
     }
     else if (object->Is(BEAM)) {
-        this->WriteBeam(dynamic_cast<Beam *>(object));
+        this->WriteBeam(vrv_cast<Beam *>(object));
     }
     else if (object->Is(CHORD)) {
-        this->WriteChord(dynamic_cast<Chord *>(object));
+        this->WriteChord(vrv_cast<Chord *>(object));
     }
     else if (object->Is(CLEF)) {
-        this->WriteClef(dynamic_cast<Clef *>(object));
+        this->WriteClef(vrv_cast<Clef *>(object));
     }
     else if (object->Is(GRACEGRP)) {
-        this->WriteGraceGrp(dynamic_cast<GraceGrp *>(object));
+        this->WriteGraceGrp(vrv_cast<GraceGrp *>(object));
     }
     else if (object->Is(KEYACCID)) {
-        this->WriteKeyAccid(dynamic_cast<KeyAccid *>(object));
+        this->WriteKeyAccid(vrv_cast<KeyAccid *>(object));
     }
     else if (object->Is(KEYSIG)) {
-        this->WriteKeySig(dynamic_cast<KeySig *>(object));
+        this->WriteKeySig(vrv_cast<KeySig *>(object));
     }
     else if (object->Is(MENSUR)) {
-        this->WriteMensur(dynamic_cast<Mensur *>(object));
+        this->WriteMensur(vrv_cast<Mensur *>(object));
     }
     else if (object->Is(METERSIG)) {
-        this->WriteMeterSig(dynamic_cast<MeterSig *>(object));
+        this->WriteMeterSig(vrv_cast<MeterSig *>(object));
     }
     else if (object->Is(MREST)) {
-        this->WriteMRest(dynamic_cast<MRest *>(object));
+        this->WriteMRest(vrv_cast<MRest *>(object));
     }
     else if (object->Is(MULTIREST)) {
-        this->WriteMultiRest(dynamic_cast<MultiRest *>(object));
+        this->WriteMultiRest(vrv_cast<MultiRest *>(object));
     }
     else if (object->Is(NOTE)) {
-        this->WriteNote(dynamic_cast<Note *>(object));
+        this->WriteNote(vrv_cast<Note *>(object));
     }
     else if (object->Is(REST)) {
-        this->WriteRest(dynamic_cast<Rest *>(object));
+        this->WriteRest(vrv_cast<Rest *>(object));
     }
     else if (object->Is(SPACE)) {
-        this->WriteSpace(dynamic_cast<Space *>(object));
+        this->WriteSpace(vrv_cast<Space *>(object));
     }
     else if (object->Is(TUPLET)) {
-        this->WriteTuplet(dynamic_cast<Tuplet *>(object));
+        this->WriteTuplet(vrv_cast<Tuplet *>(object));
     }
     else {
         // Log something?
@@ -165,13 +163,13 @@ bool PAEOutput::WriteObject(Object *object)
 bool PAEOutput::WriteObjectEnd(Object *object)
 {
     if (object->Is(MEASURE)) {
-        this->WriteMeasureEnd(dynamic_cast<Measure *>(object));
+        this->WriteMeasureEnd(vrv_cast<Measure *>(object));
     }
     else if (object->Is(BEAM)) {
-        this->WriteBeamEnd(dynamic_cast<Beam *>(object));
+        this->WriteBeamEnd(vrv_cast<Beam *>(object));
     }
     else if (object->Is(TUPLET)) {
-        this->WriteTupletEnd(dynamic_cast<Tuplet *>(object));
+        this->WriteTupletEnd(vrv_cast<Tuplet *>(object));
     }
 
     return true;
@@ -352,7 +350,7 @@ void PAEOutput::WriteKeySig(KeySig *keySig)
 
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetSig().second;
     std::string sig;
-    sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
+    if (accidType != ACCIDENTAL_WRITTEN_n) sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
     for (int i = 0; i < keySig->GetSig().first; ++i) {
         data_PITCHNAME pname = KeySig::GetAccidPnameAt(accidType, i);
         std::string pnameStr = keySig->AttTyped::PitchnameToStr(pname);
@@ -441,7 +439,7 @@ void PAEOutput::WriteNote(Note *note)
         this->WriteGrace(note);
     }
 
-    Accid *noteAccid = dynamic_cast<Accid *>(note->FindDescendantByType(ACCID));
+    Accid *noteAccid = vrv_cast<Accid *>(note->FindDescendantByType(ACCID));
     if (noteAccid) {
         std::string accid;
         switch (noteAccid->GetAccid()) {
@@ -458,7 +456,7 @@ void PAEOutput::WriteNote(Note *note)
 
     PointingToComparison pointingToComparisonFermata(FERMATA, note);
     Fermata *fermata
-        = dynamic_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
     if (fermata) m_streamStringOutput << "(";
 
     std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
@@ -468,11 +466,11 @@ void PAEOutput::WriteNote(Note *note)
     if (fermata) m_streamStringOutput << ")";
 
     PointingToComparison pointingToComparisonTrill(TRILL, note);
-    Trill *trill = dynamic_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
+    Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
     if (trill) m_streamStringOutput << "t";
 
     PointingToComparison pointingToComparisonTie(TIE, note);
-    Tie *tie = dynamic_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
+    Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
     if (tie) m_streamStringOutput << "+";
 }
 
@@ -2034,7 +2032,7 @@ void PAEInput::parseNote(pae::Note *note)
 
     // note in a chord
     if (note->chord && element->Is(NOTE)) {
-        Note *mnote = dynamic_cast<Note *>(element);
+        Note *mnote = vrv_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {
@@ -2783,7 +2781,7 @@ bool PAEInput::Import(const std::string &input)
     pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
     if (projectDesc) {
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.append_child(pugi::node_pcdata).set_value("Converted from Plaine and Easie to MEI");
+        p1.text().set("Converted from Plaine and Easie to MEI");
     }
 
     bool success = true;
@@ -3189,13 +3187,13 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
     if (!title) title = titleStmt.append_child("title");
 
     if (header.has<jsonxx::String>("source_title")) {
-        title.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("source_title").c_str());
+        title.text().set(header.get<jsonxx::String>("source_title").c_str());
     }
 
     if (header.has<jsonxx::String>("title")) {
         pugi::xml_node subTitle = titleStmt.append_child("title");
         subTitle.append_attribute("type") = "subordinate";
-        subTitle.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("title").c_str());
+        subTitle.text().set(header.get<jsonxx::String>("title").c_str());
         if (header.has<jsonxx::String>("movement")) {
             subTitle.append_attribute("label") = header.get<jsonxx::String>("movement").c_str();
         }
@@ -3203,7 +3201,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
 
     if (header.has<jsonxx::String>("composer")) {
         pugi::xml_node composer = titleStmt.append_child("composer");
-        composer.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("composer").c_str());
+        composer.text().set(header.get<jsonxx::String>("composer").c_str());
     }
 
     if (header.has<jsonxx::String>("source_url") || header.has<jsonxx::String>("download_url")) {
@@ -3225,7 +3223,7 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
         jsonxx::Array array = header.get<jsonxx::Array>("notes");
         for (int i = 0; i < (int)array.size(); ++i) {
             pugi::xml_node annot = notesStmt.append_child("annot");
-            annot.append_child(pugi::node_pcdata).set_value(array.get<jsonxx::String>(i).c_str());
+            annot.text().set(array.get<jsonxx::String>(i).c_str());
         }
     }
 
@@ -3237,38 +3235,30 @@ void PAEInput::ParseHeader(jsonxx::Object &header)
         pugi::xml_node work = m_doc->m_header.first_child().append_child("workList").append_child("work");
         pugi::xml_node title = work.append_child("title");
         if (header.has<jsonxx::String>("title")) {
-            title.append_child(pugi::node_pcdata).set_value(header.get<jsonxx::String>("title").c_str());
+            title.text().set(header.get<jsonxx::String>("title").c_str());
         }
         pugi::xml_node incip = work.append_child("incip");
         if (header.has<jsonxx::String>("role")) {
-            incip.append_child("role")
-                .append_child(pugi::node_pcdata)
-                .set_value(header.get<jsonxx::String>("role").c_str());
+            incip.append_child("role").text().set(header.get<jsonxx::String>("role").c_str());
         }
         if (header.has<jsonxx::String>("scoring") || header.has<jsonxx::String>("voice_intrument")) {
             pugi::xml_node perfResList = incip.append_child("perfResList");
             if (header.has<jsonxx::String>("voice_instrument")) {
-                perfResList.append_child("perfRes")
-                    .append_child(pugi::node_pcdata)
-                    .set_value(header.get<jsonxx::String>("voice_instrument").c_str());
+                perfResList.append_child("perfRes").text().set(header.get<jsonxx::String>("voice_instrument").c_str());
             }
             if (header.has<jsonxx::String>("scoring")) {
-                perfResList.append_child("perfRes")
-                    .append_child(pugi::node_pcdata)
-                    .set_value(header.get<jsonxx::String>("scoring").c_str());
+                perfResList.append_child("perfRes").text().set(header.get<jsonxx::String>("scoring").c_str());
             }
         }
         if (header.has<jsonxx::String>("key_mode")) {
-            incip.append_child("key")
-                .append_child(pugi::node_pcdata)
-                .set_value(header.get<jsonxx::String>("key_mode").c_str());
+            incip.append_child("key").text().set(header.get<jsonxx::String>("key_mode").c_str());
         }
         if (header.has<jsonxx::Array>("text_incipits")) {
             pugi::xml_node incipText = incip.append_child("incipText");
             jsonxx::Array array = header.get<jsonxx::Array>("text_incipits");
             for (int i = 0; i < (int)array.size(); ++i) {
                 pugi::xml_node p = incipText.append_child("p");
-                p.append_child(pugi::node_pcdata).set_value(array.get<jsonxx::String>(i).c_str());
+                p.text().set(array.get<jsonxx::String>(i).c_str());
             }
         }
     }
@@ -4811,7 +4801,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
     }
     else {

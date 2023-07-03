@@ -15,7 +15,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "verticalaligner.h"
 #include "vrv.h"
 
@@ -83,5 +83,25 @@ int BracketSpan::GetLineWidth(const Doc *doc, int unit) const
 //----------------------------------------------------------------------------
 // BracketSpan functor methods
 //----------------------------------------------------------------------------
+
+FunctorCode BracketSpan::Accept(Functor &functor)
+{
+    return functor.VisitBracketSpan(this);
+}
+
+FunctorCode BracketSpan::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBracketSpan(this);
+}
+
+FunctorCode BracketSpan::AcceptEnd(Functor &functor)
+{
+    return functor.VisitBracketSpanEnd(this);
+}
+
+FunctorCode BracketSpan::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBracketSpanEnd(this);
+}
 
 } // namespace vrv

@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "iomei.h"
 #include "page.h"
 #include "pages.h"
@@ -75,62 +75,24 @@ void Mdiv::MakeVisible()
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Mdiv::Save(FunctorParams *functorParams)
+FunctorCode Mdiv::Accept(Functor &functor)
 {
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
-    if (m_visibility == Hidden && meiOutput) {
-        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
-    }
-    return Object::Save(functorParams);
+    return functor.VisitMdiv(this);
 }
 
-int Mdiv::SaveEnd(FunctorParams *functorParams)
+FunctorCode Mdiv::Accept(ConstFunctor &functor) const
 {
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    MEIOutput *meiOutput = dynamic_cast<MEIOutput *>(params->m_output);
-    if (m_visibility == Hidden && meiOutput) {
-        // Do not output hidden mdivs in page-based MEI or when saving score-based MEI with filter
-        if (!meiOutput->GetScoreBasedMEI() || meiOutput->HasFilter()) return FUNCTOR_SIBLINGS;
-    }
-    return Object::SaveEnd(functorParams);
+    return functor.VisitMdiv(this);
 }
 
-int Mdiv::ConvertToPageBased(FunctorParams *functorParams)
+FunctorCode Mdiv::AcceptEnd(Functor &functor)
 {
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitMdivEnd(this);
 }
 
-int Mdiv::ConvertToPageBasedEnd(FunctorParams *functorParams)
+FunctorCode Mdiv::AcceptEnd(ConstFunctor &functor) const
 {
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_page);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Mdiv::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMdivIDs.push_back(this->GetID());
-    params->m_keySigForStaffN.clear();
-    params->m_transposeIntervalForStaffN.clear();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitMdivEnd(this);
 }
 
 } // namespace vrv

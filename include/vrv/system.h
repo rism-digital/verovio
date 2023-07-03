@@ -79,6 +79,7 @@ public:
     void SetDrawingLabelsWidth(int width);
     int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
+    void ResetDrawingAbbrLabelsWidth() { m_drawingAbbrLabelsWidth = 0; }
     ///@}
 
     /**
@@ -106,6 +107,7 @@ public:
     ScoreDef *GetDrawingScoreDef() { return m_drawingScoreDef; }
     const ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    void ResetDrawingScoreDef();
     ///@}
 
     /**
@@ -168,170 +170,14 @@ public:
     //----------//
 
     /**
-     * See Object::UnscoreDefSetCurrent
-     */
-    int ScoreDefUnsetCurrent(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::ScoreDefOptimize
+     * Interface for class functor visitation
      */
     ///@{
-    int ScoreDefOptimize(FunctorParams *functorParams) override;
-    int ScoreDefOptimizeEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ScoreDefSetGrpSym
-     */
-    int ScoreDefSetGrpSym(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetVerticalAlignment
-     */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ApplyPPUFactor
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignHorizontally
-     */
-    int AlignHorizontally(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcAlignmentXPos
-     */
-    int CalcAlignmentXPos(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::AdjustXOverflow
-     */
-    ///@{
-    int AdjustXOverflow(FunctorParams *functorParams) override;
-    int AdjustXOverflowEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * @name See Object::AdjustHarmGrpsSpacing
-     */
-    ///@{
-    int AdjustHarmGrpsSpacing(FunctorParams *functorParams) override;
-    int AdjustHarmGrpsSpacingEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * @name See Object::AdjustSylSpacing
-     */
-    ///@{
-    int AdjustSylSpacing(FunctorParams *functorParams) override;
-    int AdjustSylSpacingEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::AdjustTempo
-     */
-    int AdjustTempo(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::AlignVertically
-     */
-    ///@{
-    int AlignVertically(FunctorParams *functorParams) override;
-    int AlignVerticallyEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::AdjustYPos
-     */
-    int AdjustYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AlignSystems
-     */
-    int AlignSystems(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::AlignMeasures
-     */
-    ///@{
-    int AlignMeasures(FunctorParams *functorParams) override;
-    int AlignMeasuresEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::JustifyY
-     */
-    int JustifyY(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustCrossStaffYPos
-     */
-    int AdjustCrossStaffYPos(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustStaffOverlap
-     */
-    int AdjustStaffOverlap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositioners
-     */
-    int AdjustFloatingPositioners(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustFloatingPositionersBetween
-     */
-    int AdjustFloatingPositionersBetween(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::AdjustSlurs
-     */
-    int AdjustSlurs(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffPages
-     */
-    int CastOffPages(FunctorParams *functorParams) override;
-
-    /**
-     * @name See Object::CastOffSystems
-     */
-    ///@{
-    int CastOffSystems(FunctorParams *functorParams) override;
-    int CastOffSystemsEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::UnCastOff
-     */
-    int UnCastOff(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
 
 public:
     SystemAligner m_systemAligner;

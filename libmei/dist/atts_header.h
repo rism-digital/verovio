@@ -26,6 +26,55 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttAdlibitum
+//----------------------------------------------------------------------------
+
+class AttAdlibitum : public Att {
+protected:
+    AttAdlibitum();
+    ~AttAdlibitum() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetAdlibitum();
+
+    /** Read the values for the attribute class **/
+    bool ReadAdlibitum(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteAdlibitum(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAdlib(data_BOOLEAN adlib_) { m_adlib = adlib_; }
+    data_BOOLEAN GetAdlib() const { return m_adlib; }
+    bool HasAdlib() const;
+    ///@}
+
+private:
+    /** Marks a performance resource as ad libitum (optional). **/
+    data_BOOLEAN m_adlib;
+};
+
+//----------------------------------------------------------------------------
+// InstAdlibitum
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAdlibitum
+ */
+
+class InstAdlibitum : public AttAdlibitum {
+public:
+    InstAdlibitum() = default;
+    virtual ~InstAdlibitum() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBifoliumSurfaces
 //----------------------------------------------------------------------------
 
@@ -157,6 +206,107 @@ class InstFoliumSurfaces : public AttFoliumSurfaces {
 public:
     InstFoliumSurfaces() = default;
     virtual ~InstFoliumSurfaces() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttPerfRes
+//----------------------------------------------------------------------------
+
+class AttPerfRes : public Att {
+protected:
+    AttPerfRes();
+    ~AttPerfRes() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetPerfRes();
+
+    /** Read the values for the attribute class **/
+    bool ReadPerfRes(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WritePerfRes(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSolo(data_BOOLEAN solo_) { m_solo = solo_; }
+    data_BOOLEAN GetSolo() const { return m_solo; }
+    bool HasSolo() const;
+    ///@}
+
+private:
+    /**
+     * Use this attribute to identify the performance resource as a soloist especially
+     * in an accompanied work, such as a concerto or vocal solo.
+     **/
+    data_BOOLEAN m_solo;
+};
+
+//----------------------------------------------------------------------------
+// InstPerfRes
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPerfRes
+ */
+
+class InstPerfRes : public AttPerfRes {
+public:
+    InstPerfRes() = default;
+    virtual ~InstPerfRes() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttPerfResBasic
+//----------------------------------------------------------------------------
+
+class AttPerfResBasic : public Att {
+protected:
+    AttPerfResBasic();
+    ~AttPerfResBasic() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetPerfResBasic();
+
+    /** Read the values for the attribute class **/
+    bool ReadPerfResBasic(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WritePerfResBasic(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCount(int count_) { m_count = count_; }
+    int GetCount() const { return m_count; }
+    bool HasCount() const;
+    ///@}
+
+private:
+    /** Indicates the number of performers. **/
+    int m_count;
+};
+
+//----------------------------------------------------------------------------
+// InstPerfResBasic
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttPerfResBasic
+ */
+
+class InstPerfResBasic : public AttPerfResBasic {
+public:
+    InstPerfResBasic() = default;
+    virtual ~InstPerfResBasic() = default;
 };
 
 //----------------------------------------------------------------------------

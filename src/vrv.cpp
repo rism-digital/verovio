@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <locale>
+#include <regex>
 #include <sstream>
 #include <vector>
 
@@ -232,6 +233,26 @@ bool AreEqual(double dFirstVal, double dSecondVal)
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }
 
+bool IsValidInteger(const std::string &value)
+{
+    // Accept "1" " 1 " "+1" "-1" "1." "1.0"
+    std::regex re(R"(^\s*[+-]?\d+\.?\d*\s*$)");
+    return std::regex_match(value, re);
+}
+
+bool IsValidDouble(const std::string &value)
+{
+    // Accept "1.0" " 1.0 " ".0"  "1." "+1.0" "-1.0"
+    std::regex re(R"(^\s*[+-]?(?:\d+\.?\d*|\.\d+)\s*$)");
+    return std::regex_match(value, re);
+}
+
+bool IsDigits(const std::string &value)
+{
+    std::regex re(R"(^\d+$)");
+    return std::regex_match(value, re);
+}
+
 std::string ExtractIDFragment(std::string refID)
 {
     size_t pos = refID.find_last_of("#");
@@ -297,6 +318,35 @@ std::string BaseEncodeInt(uint32_t value, uint8_t base)
 
     reverse(base62.begin(), base62.end());
     return base62;
+}
+
+std::string FromCamelCase(const std::string &s)
+{
+    std::regex regExp1("(.)([A-Z][a-z]+)");
+    std::regex regExp2("([a-z0-9])([A-Z])");
+
+    std::string result = s;
+    result = std::regex_replace(result, regExp1, "$1-$2");
+    result = std::regex_replace(result, regExp2, "$1-$2");
+
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+std::string ToCamelCase(const std::string &s)
+{
+    std::istringstream iss(s);
+    std::string token;
+    std::string result;
+
+    while (getline(iss, token, '-')) {
+        token[0] = toupper(token[0]);
+        result += token;
+    }
+
+    result[0] = tolower(result[0]);
+
+    return result;
 }
 
 //----------------------------------------------------------------------------

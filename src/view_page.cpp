@@ -23,12 +23,13 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
+#include "div.h"
+#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "label.h"
@@ -73,10 +74,10 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
 
     // Set the current score def to the page one
-    // The page one has previously been set by Object::ScoreDefSetCurrent
+    // The page one has previously been set by the ScoreDefSetCurrentFunctor
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    if (m_options->m_shrinkToFit.GetValue()) {
+    if ((m_doc->GetAdjustedDrawingPageHeight() > dc->GetHeight()) && m_options->m_shrinkToFit.GetValue()) {
         dc->SetContentHeight(m_doc->GetAdjustedDrawingPageHeight());
     }
     else {
@@ -192,7 +193,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     dc->StartGraphic(system, "", system->GetID());
 
-    Measure *firstMeasure = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
+    Measure *firstMeasure = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE, 1));
 
     this->DrawSystemDivider(dc, system, firstMeasure);
 
@@ -305,7 +306,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     // we need at least one measure to be able to draw the groups - we need access to the staff elements,
     assert(measure);
 
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP));
+    StaffGrp *staffGrp = vrv_cast<StaffGrp *>(scoreDef->FindDescendantByType(STAFFGRP));
     if (!staffGrp) {
         return;
     }
@@ -345,9 +346,9 @@ void View::DrawStaffGrp(
 
     // Get the corresponding staff looking at the previous (or first) measure
     AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
-    Staff *first = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
+    Staff *first = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
     AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
-    Staff *last = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
+    Staff *last = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
 
     if (!first || !last) {
         LogDebug(
@@ -411,8 +412,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, StaffGrp *sta
         }
 
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
-        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
-        ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
+        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(staffGrp->GetFirstAncestor(SCOREDEF));
 
         if (!staff || !scoreDef) {
             LogDebug("Staff or ScoreDef missing in View::DrawStaffDefLabels");
@@ -446,9 +447,9 @@ void View::DrawGrpSym(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, i
 
     // Get the corresponding staff looking at the previous (or first) measure
     AttNIntegerComparison comparisonFirst(STAFF, groupSymbol->GetStartDef()->GetN());
-    Staff *first = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
+    Staff *first = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparisonFirst, 1));
     AttNIntegerComparison comparisonLast(STAFF, groupSymbol->GetEndDef()->GetN());
-    Staff *last = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
+    Staff *last = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparisonLast, 1));
 
     if (!first || !last) {
         LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp",
@@ -536,8 +537,8 @@ void View::DrawLabels(
     assert(scoreDef);
     assert(object->Is({ LAYERDEF, STAFFDEF, STAFFGRP }));
 
-    Label *label = dynamic_cast<Label *>(object->FindDescendantByType(LABEL, 1));
-    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
+    Label *label = vrv_cast<Label *>(object->FindDescendantByType(LABEL, 1));
+    LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
     std::u32string labelStr = (label) ? label->GetText(label) : U"";
@@ -568,7 +569,7 @@ void View::DrawLabels(
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(&labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetID());
@@ -651,9 +652,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
-        dc->StartCustomGraphic("grpSym");
         this->DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
-        dc->EndCustomGraphic();
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);
         return;
     }
@@ -694,8 +693,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, std::max(1, penWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
@@ -779,7 +778,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Get the corresponding staff
         AttNIntegerComparison comparison(STAFF, staffDef->GetN());
-        Staff *staff = dynamic_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
+        Staff *staff = vrv_cast<Staff *>(measure->FindDescendantByComparison(&comparison, 1));
         if (!staff) {
             LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", staffDef->GetN());
             yBottomPrevious = VRV_UNSET;
@@ -893,7 +892,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
     if (eraseIntersections && !dc->Is(BBOX_DEVICE_CONTEXT)) {
-        System *system = dynamic_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
+        System *system = vrv_cast<System *>(barLine->GetFirstAncestor(SYSTEM));
         if (system) {
             int minX = x - barLineWidth / 2;
             int maxX = x + barLineWidth / 2;
@@ -1054,15 +1053,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
-        MNum *mnum = dynamic_cast<MNum *>(measure->FindDescendantByType(MNUM));
-        Reh *reh = dynamic_cast<Reh *>(measure->FindDescendantByType(REH));
+        MNum *mnum = vrv_cast<MNum *>(measure->FindDescendantByType(MNUM));
+        Reh *reh = vrv_cast<Reh *>(measure->FindDescendantByType(REH));
         const bool hasRehearsal = reh
             && ((reh->HasTstamp() && (reh->GetTstamp() == 0.0))
                 || (reh->GetStart()->Is(BARLINE)
                     && vrv_cast<BarLine *>(reh->GetStart())->GetPosition() == BarLinePosition::Left));
         if (mnum && !hasRehearsal) {
             // this should be an option
-            Measure *systemStart = dynamic_cast<Measure *>(system->FindDescendantByType(MEASURE));
+            Measure *systemStart = vrv_cast<Measure *>(system->FindDescendantByType(MEASURE));
 
             // Draw non-generated measure numbers
             // If mnumInterval is 0, draw system starting measure numbers > 1,
@@ -1080,7 +1079,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 }
                 // hardcoded offset for the mNum based on the lyric font size
                 const int yOffset = m_doc->GetDrawingLyricFont(60)->GetPointSize();
-                this->DrawMNum(dc, mnum, measure, std::max(symbolOffset, yOffset));
+                this->DrawMNum(dc, mnum, measure, system, std::max(symbolOffset, yOffset));
             }
         }
     }
@@ -1124,7 +1123,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
                         [](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
                         }),
         childList.end());
 
@@ -1156,7 +1155,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     dc->EndGraphic(meterSigGrp, this);
 }
 
-void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset)
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset)
 {
     assert(dc);
     assert(measure);
@@ -1164,6 +1163,10 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
 
     Staff *staff = measure->GetTopVisibleStaff();
     if (staff) {
+        // Only one FloatingPositioner on the top (visible) staff
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
+            return;
+        }
 
         dc->StartGraphic(mnum, "", mnum->GetID());
 
@@ -1200,7 +1203,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1208,6 +1211,9 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
         dc->EndText();
 
         dc->ResetFont();
+        dc->ResetBrush();
+
+        this->DrawTextEnclosure(dc, params, staff->m_drawingStaffSize);
 
         dc->EndGraphic(mnum, this);
     }
@@ -1291,8 +1297,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     }
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
         // Skewed lines - with Facs (neumes) only for now
@@ -1359,8 +1365,8 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
         = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     for (const LedgerLine &line : lines) {
         for (const std::pair<int, int> &dash : line.m_dashes) {
@@ -1383,7 +1389,7 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     assert(measure);
 
     // StaffDef information is always in the first layer
-    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
+    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
     if (!layer || !layer->HasStaffDef()) return;
 
     // StaffDef staffDef;
@@ -1416,7 +1422,7 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
     assert(measure);
 
     // StaffDef cautionary information is always in the first layer
-    Layer *layer = dynamic_cast<Layer *>(staff->FindDescendantByType(LAYER));
+    Layer *layer = vrv_cast<Layer *>(staff->FindDescendantByType(LAYER));
     if (!layer || !layer->HasCautionStaffDef()) return;
 
     // StaffDef staffDef;
@@ -1549,7 +1555,7 @@ void View::DrawSystemDivider(DeviceContext *dc, System *system, Measure *firstMe
     if (currentPage) {
         Object *previousSystem = currentPage->GetPrevious(system);
         if (previousSystem) {
-            Measure *previousSystemMeasure = dynamic_cast<Measure *>(previousSystem->FindDescendantByType(MEASURE, 1));
+            Measure *previousSystemMeasure = vrv_cast<Measure *>(previousSystem->FindDescendantByType(MEASURE, 1));
             if (previousSystemMeasure) {
                 Staff *bottomStaff = previousSystemMeasure->GetBottomVisibleStaff();
                 // set Y position to that of lowest (bottom) staff, substact space taken by staff lines and
@@ -1611,7 +1617,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     for (Object *current : parent->GetChildren()) {
         if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
-            this->DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
+            this->DrawMeasure(dc, vrv_cast<Measure *>(current), system);
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is(SCOREDEF)) {
@@ -1619,7 +1625,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             ScoreDef *scoreDef = vrv_cast<ScoreDef *>(current);
             assert(scoreDef);
 
-            Measure *nextMeasure = dynamic_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
+            Measure *nextMeasure = vrv_cast<Measure *>(system->GetNext(scoreDef, MEASURE));
             if (nextMeasure && scoreDef->DrawLabels()) {
                 this->DrawScoreDef(dc, scoreDef, nextMeasure, nextMeasure->GetDrawingX());
             }
@@ -1629,6 +1635,10 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
         else if (current->IsSystemElement()) {
             // cast to SystemElement check in DrawSystemEditorial element
             this->DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
+        }
+        else if (current->Is(DIV)) {
+            // cast to Div check in DrawDiv element
+            this->DrawDiv(dc, dynamic_cast<Div *>(current), system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawSystemEditorial element
@@ -1659,7 +1669,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     for (Object *current : parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
-            this->DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
+            this->DrawStaff(dc, vrv_cast<Staff *>(current), measure, system);
         }
         else if (current->IsControlElement()) {
             // cast to ControlElement check in DrawControlElement
@@ -1686,7 +1696,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
     for (Object *current : parent->GetChildren()) {
         if (current->Is(LAYER)) {
             // cast to Layer check in DrawLayer
-            this->DrawLayer(dc, dynamic_cast<Layer *>(current), staff, measure);
+            this->DrawLayer(dc, vrv_cast<Layer *>(current), staff, measure);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawStaffEditorialElement

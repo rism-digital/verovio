@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "page.h"
 
 namespace vrv {
@@ -55,58 +55,24 @@ void PageElement::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-int PageElement::CastOffSystems(FunctorParams *functorParams)
+FunctorCode PageElement::Accept(Functor &functor)
 {
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_page);
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitPageElement(this);
 }
 
-int PageElement::CastOffPages(FunctorParams *functorParams)
+FunctorCode PageElement::Accept(ConstFunctor &functor) const
 {
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    PageElement *element = dynamic_cast<PageElement *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    assert(element);
-    // move as pending since we want it at the beginning of the page in case of system break coming
-    params->m_pendingPageElements.push_back(element);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitPageElement(this);
 }
 
-int PageElement::CastOffEncoding(FunctorParams *functorParams)
+FunctorCode PageElement::AcceptEnd(Functor &functor)
 {
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentPage);
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitPageElementEnd(this);
 }
 
-int PageElement::CastOffToSelection(FunctorParams *functorParams)
+FunctorCode PageElement::AcceptEnd(ConstFunctor &functor) const
 {
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_page);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int PageElement::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitPageElementEnd(this);
 }
 
 } // namespace vrv

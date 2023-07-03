@@ -19,8 +19,6 @@
   <g c="E0A2" x="0.0" y="-133.0" w="405.0" h="266.0" h-a-x="405" n="noteheadWhole">
     <a n="cutOutNW" x="0.06" y="0.24" />
     <a n="cutOutSE" x="1.57" y="-0.23" />
-    <a n="stemDownNW" x="0.0" y="0.0" />
-    <a n="stemUpSE" x="1.62" y="0.0" />
   </g>
   <g c="E0A4" x="0.0" y="-133.0" w="314.0" h="266.0" h-a-x="314" n="noteheadBlack">
     <a n="cutOutNW" x="0.14" y="0.24" />
@@ -87,8 +85,8 @@
   </g>
   <g c="E26A" x="0.0" y="-250.0" w="163.0" h="500.0" h-a-x="163" n="accidentalParensLeft" />
   <g c="E26B" x="0.0" y="-250.0" w="163.0" h="500.0" h-a-x="163" n="accidentalParensRight" />
-  <g c="E4C0" x="0.0" y="-3.0" w="605.0" h="323.0" h-a-x="605" n="fermataAbove" />
-  <g c="E4C1" x="0.0" y="-320.0" w="605.0" h="323.0" h-a-x="605" n="fermataBelow" />
+  <g c="E4C0" x="0.0" y="-3.0" w="600.0" h="323.0" h-a-x="600" n="fermataAbove" />
+  <g c="E4C1" x="0.0" y="-320.0" w="600.0" h="323.0" h-a-x="600" n="fermataBelow" />
   <g c="E0FA" x="0.0" y="-133.0" w="405.0" h="266.0" h-a-x="405" n="noteheadWholeFilled">
     <a n="cutOutNW" x="0.2" y="0.4" />
     <a n="cutOutSE" x="1.42" y="-0.4" />
@@ -126,12 +124,12 @@
   <g c="E524" x="0.0" y="0.0" w="194.0" h="270.0" h-a-x="194" n="dynamicSforzando" />
   <g c="E525" x="-36.0" y="-16.0" w="296.0" h="265.0" h-a-x="260" n="dynamicZ" />
   <g c="E650" x="0.0" y="0.0" w="695.0" h="514.0" h-a-x="695" n="keyboardPedalPed" />
-  <g c="E655" x="0.0" y="0.0" w="431.0" h="418.0" h-a-x="431" n="keyboardPedalUp" />
+  <g c="E655" x="0.0" y="-1.0" w="431.0" h="418.0" h-a-x="431" n="keyboardPedalUp" />
   <g c="E046" x="0.0" y="-22.0" w="935.0" h="428.0" h-a-x="935" n="daCapo" />
   <g c="E045" x="0.0" y="-14.0" w="860.0" h="418.0" h-a-x="860" n="dalSegno" />
   <g c="E047" x="0.0" y="0.0" w="411.0" h="513.0" h-a-x="411" n="segno" />
   <g c="E048" x="0.0" y="-73.0" w="537.0" h="653.0" h-a-x="537" n="coda" />
-  <g c="E04B" x="0.0" y="-34.0" w="450.0" h="1192.0" h-a-x="477" n="segnoSerpent2" />
+  <g c="E04B" x="0.0" y="-34.0" w="450.0" h="1192.0" h-a-x="450" n="segnoSerpent2" />
   <g c="E500" x="0.0" y="-242.0" w="508.0" h="484.0" h-a-x="508" n="repeat1Bar" />
   <g c="E220" x="-163.0" y="-125.0" w="326.0" h="250.0" h-a-x="163" n="tremolo1" />
   <g c="E222" x="-163.0" y="-300.0" w="326.0" h="600.0" h-a-x="163" n="tremolo3" />
@@ -146,7 +144,7 @@
   <g c="E4A1" x="0.0" y="-236.0" w="347.0" h="236.0" h-a-x="347" n="articAccentBelow" />
   <g c="E4A8" x="0.0" y="0.0" w="153.0" h="224.0" h-a-x="153" n="articStaccatissimoWedgeAbove" />
   <g c="E4A9" x="0.0" y="-224.0" w="153.0" h="224.0" h-a-x="153" n="articStaccatissimoWedgeBelow" />
-  <g c="E4AA" x="0.0" y="0.0" w="33.0" h="240.0" h-a-x="1000" n="articStaccatissimoStrokeAbove" />
+  <g c="E4AA" x="0.0" y="0.0" w="33.0" h="240.0" h-a-x="33" n="articStaccatissimoStrokeAbove" />
   <g c="E4AB" x="0.0" y="-240.0" w="33.0" h="240.0" h-a-x="34" n="articStaccatissimoStrokeBelow" />
   <g c="E568" x="0.0" y="0.0" w="468.0" h="244.0" h-a-x="468" n="ornamentTurnInverted" />
   <g c="E567" x="0.0" y="0.0" w="468.0" h="244.0" h-a-x="468" n="ornamentTurn" />
@@ -246,15 +244,15 @@
   <g c="E94B" x="0.0" y="0.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemUpFlagFusa" />
   <g c="E94A" x="0.0" y="-760.0" w="180.0" h="760.0" h-a-x="186" n="mensuralCombStemDownFlagSemiminima" />
   <g c="E94C" x="0.0" y="-760.0" w="180.0" h="760.0" h-a-x="180" n="mensuralCombStemDownFlagFusa" />
-  <g c="E9F3" x="0.0" y="0.0" w="40.0" h="250.0" h-a-x="1000" n="mensuralRestBrevis" />
-  <g c="E9F2" x="0.0" y="-250.0" w="40.0" h="500.0" h-a-x="1000" n="mensuralRestLongaImperfecta" />
-  <g c="E9F1" x="0.0" y="-500.0" w="40.0" h="1000.0" h-a-x="1000" n="mensuralRestLongaPerfecta" />
-  <g c="E9F0" x="0.0" y="-500.0" w="130.0" h="1000.0" h-a-x="1000" n="mensuralRestMaxima" />
-  <g c="E9F4" x="0.0" y="110.0" w="40.0" h="140.0" h-a-x="1000" n="mensuralRestSemibrevis" />
-  <g c="E9F5" x="0.0" y="0.0" w="40.0" h="140.0" h-a-x="1000" n="mensuralRestMinima" />
-  <g c="E9F6" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="1000" n="mensuralRestSemiminima" />
-  <g c="E9F7" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="1000" n="mensuralRestFusa" />
-  <g c="E9F8" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="1000" n="mensuralRestSemifusa" />
+  <g c="E9F3" x="0.0" y="0.0" w="40.0" h="250.0" h-a-x="40" n="mensuralRestBrevis" />
+  <g c="E9F2" x="0.0" y="-250.0" w="40.0" h="500.0" h-a-x="40" n="mensuralRestLongaImperfecta" />
+  <g c="E9F1" x="0.0" y="-500.0" w="40.0" h="1000.0" h-a-x="40" n="mensuralRestLongaPerfecta" />
+  <g c="E9F0" x="0.0" y="-500.0" w="130.0" h="1000.0" h-a-x="130" n="mensuralRestMaxima" />
+  <g c="E9F4" x="0.0" y="110.0" w="40.0" h="140.0" h-a-x="40" n="mensuralRestSemibrevis" />
+  <g c="E9F5" x="0.0" y="0.0" w="40.0" h="140.0" h-a-x="40" n="mensuralRestMinima" />
+  <g c="E9F6" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="118" n="mensuralRestSemiminima" />
+  <g c="E9F7" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="118" n="mensuralRestFusa" />
+  <g c="E9F8" x="0.0" y="0.0" w="118.0" h="140.0" h-a-x="118" n="mensuralRestSemifusa" />
   <g c="E26C" x="0.0" y="-260.0" w="90.0" h="520.0" h-a-x="90" n="accidentalBracketLeft" />
   <g c="E26D" x="0.0" y="-260.0" w="90.0" h="520.0" h-a-x="90" n="accidentalBracketRight" />
   <g c="E270" x="-43.0" y="-184.0" w="263.0" h="786.0" h-a-x="221" n="accidentalQuarterToneFlatArrowUp">
@@ -463,7 +461,7 @@
   <g c="E4E2" x="0.0" y="0.0" w="125.0" h="250.0" h-a-x="125" n="restDoubleWhole" />
   <g c="E4E1" x="0.0" y="-250.0" w="125.0" h="500.0" h-a-x="125" n="restLonga" />
   <g c="E4E0" x="0.0" y="-250.0" w="375.0" h="500.0" h-a-x="375" n="restMaxima" />
-  <g c="E583" x="0.0" y="0.0" w="26.0" h="330.0" h-a-x="1000" n="ornamentVerticalLine" />
+  <g c="E583" x="0.0" y="0.0" w="26.0" h="330.0" h-a-x="26" n="ornamentVerticalLine" />
   <g c="E440" x="0.0" y="-175.0" w="247.0" h="644.0" h-a-x="247" n="accidentalBuyukMucennebFlat">
     <a n="cutOutNE" x="0.32" y="1.48" />
     <a n="cutOutSE" x="0.63" y="-0.34" />
@@ -585,6 +583,10 @@
   <g c="E946" x="0.0" y="-760.0" w="200.0" h="760.0" h-a-x="200" n="mensuralCombStemDownFlagFlared" />
   <g c="E947" x="-120.0" y="0.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemUpFlagExtended" />
   <g c="E948" x="-120.0" y="-760.0" w="320.0" h="760.0" h-a-x="211" n="mensuralCombStemDownFlagExtended" />
+  <g c="EBCD" x="-1.0" y="-6.0" w="280.0" h="203.0" h-a-x="280" n="luteFrench7thCourse" />
+  <g c="EBCE" x="0.0" y="-16.0" w="410.0" h="285.0" h-a-x="410" n="luteFrench8thCourse" />
+  <g c="EBCF" x="0.0" y="-16.0" w="510.0" h="285.0" h-a-x="510" n="luteFrench9thCourse" />
+  <g c="EBD0" x="0.0" y="-16.0" w="610.0" h="285.0" h-a-x="610" n="luteFrench10thCourse" />
   <g c="EC85" x="20.0" y="-319.0" w="402.0" h="637.0" h-a-x="442" n="timeSigCut2" />
   <g c="EC86" x="20.0" y="-319.0" w="372.0" h="637.0" h-a-x="412" n="timeSigCut3" />
   <g c="E903" x="0.0" y="-220.0" w="515.0" h="440.0" h-a-x="515" n="mensuralFclef" />
@@ -633,9 +635,9 @@
   <g c="266D" x="28.0" y="56.0" w="220.0" h="714.0" h-a-x="269" n="musicFlatSign" />
   <g c="266E" x="28.0" y="-140.0" w="174.0" h="779.0" h-a-x="225" n="musicNaturalSign" />
   <g c="266F" x="28.0" y="-127.0" w="218.0" h="771.0" h-a-x="272" n="musicSharpSign" />
-  <g c="E1D0" x="0.0" y="-152.0" w="595.0" h="307.0" h-a-x="595" n="noteDoubleWhole" />
-  <g c="E1D1" x="0.0" y="-224.0" w="484.0" h="454.0" h-a-x="484" n="noteDoubleWholeSquare" />
-  <g c="E1D2" x="0.0" y="-125.0" w="417.0" h="248.0" h-a-x="417" n="noteWhole" />
+  <g c="E1D0" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="noteDoubleWhole" />
+  <g c="E1D1" x="0.0" y="-170.0" w="348.0" h="340.0" h-a-x="348" n="noteDoubleWholeSquare" />
+  <g c="E1D2" x="0.0" y="-133.0" w="405.0" h="266.0" h-a-x="405" n="noteWhole" />
   <g c="E1D3" x="0.0" y="-132.0" w="310.0" h="971.0" h-a-x="310" n="noteHalfUp" />
   <g c="E1D5" x="0.0" y="-129.0" w="302.0" h="968.0" h-a-x="302" n="noteQuarterUp" />
   <g c="E1D7" x="0.0" y="-125.0" w="502.0" h="1003.0" h-a-x="502" n="note8thUp" />
@@ -675,8 +677,8 @@
   <g c="EA65" x="12.0" y="-0.36" w="97.14" h="434.36" h-a-x="121" n="figbassNatural" />
   <g c="EA66" x="12.87" y="0.29" w="121.89" h="429.41" h-a-x="149" n="figbassSharp" />
   <g c="EA67" x="12.38" y="-0.0" w="159.02" h="148.5" h-a-x="182" n="figbassDoubleSharp" />
-  <g c="ECA0" x="0.0" y="-152.0" w="595.0" h="307.0" h-a-x="595" n="metNoteDoubleWhole" />
-  <g c="ECA1" x="2.0" y="-222.0" w="480.0" h="450.0" h-a-x="484" n="metNoteDoubleWholeSquare" />
+  <g c="ECA0" x="0.0" y="-170.0" w="545.0" h="340.0" h-a-x="545" n="metNoteDoubleWhole" />
+  <g c="ECA1" x="0.0" y="-170.0" w="348.0" h="340.0" h-a-x="348" n="metNoteDoubleWholeSquare" />
   <g c="ECA2" x="2.0" y="-122.0" w="412.0" h="242.0" h-a-x="417" n="metNoteWhole" />
   <g c="ECA3" x="2.0" y="-130.0" w="306.0" h="798.0" h-a-x="310" n="metNoteHalfUp" />
   <g c="ECA5" x="2.0" y="-126.0" w="300.0" h="794.0" h-a-x="302" n="metNoteQuarterUp" />
@@ -729,4 +731,64 @@
   </g>
   <g c="E99F" x="0.0" y="-81.0" w="119.0" h="162.0" h-a-x="119" n="chantStrophicus" />
   <g c="E04A" x="1.0" y="-95.0" w="448.0" h="1191.0" h-a-x="450" n="segnoSerpent1" />
+  <g c="E639" x="0.0" y="0.0" w="330.0" h="330.0" h-a-x="330" n="pluckedDampAll" />
+  <g c="E636" x="0.0" y="0.0" w="206.0" h="143.0" h-a-x="206" n="pluckedWithFingernails" />
+  <g c="E637" x="0.0" y="0.0" w="142.0" h="206.0" h-a-x="142" n="pluckedFingernailFlick" />
+  <g c="EC00" x="0.0" y="-2.0" w="263.0" h="315.0" h-a-x="262" n="luteGermanALower" />
+  <g c="EC01" x="-1.0" y="-3.0" w="271.0" h="562.0" h-a-x="270" n="luteGermanBLower" />
+  <g c="EC02" x="0.0" y="10.0" w="186.0" h="286.0" h-a-x="180" n="luteGermanCLower" />
+  <g c="EC03" x="0.0" y="6.0" w="318.0" h="587.0" h-a-x="318" n="luteGermanDLower" />
+  <g c="EC04" x="-1.0" y="-3.0" w="185.0" h="316.0" h-a-x="184" n="luteGermanELower" />
+  <g c="EC05" x="0.0" y="-287.0" w="240.0" h="847.0" h-a-x="237" n="luteGermanFLower" />
+  <g c="EC06" x="0.0" y="-281.0" w="354.0" h="594.0" h-a-x="354" n="luteGermanGLower" />
+  <g c="EC07" x="0.0" y="-96.0" w="296.0" h="690.0" h-a-x="296" n="luteGermanHLower" />
+  <g c="EC08" x="0.0" y="4.0" w="142.0" h="448.0" h-a-x="142" n="luteGermanILower" />
+  <g c="EC09" x="-1.0" y="-23.0" w="271.0" h="592.0" h-a-x="270" n="luteGermanKLower" />
+  <g c="EC0A" x="-6.0" y="-23.0" w="301.0" h="592.0" h-a-x="295" n="luteGermanLLower" />
+  <g c="EC0B" x="0.0" y="-1.0" w="458.0" h="302.0" h-a-x="455" n="luteGermanMLower" />
+  <g c="EC0C" x="-1.0" y="-1.0" w="286.0" h="303.0" h-a-x="282" n="luteGermanNLower" />
+  <g c="EC0D" x="0.0" y="-6.0" w="246.0" h="322.0" h-a-x="246" n="luteGermanOLower" />
+  <g c="EC0E" x="-4.0" y="-246.0" w="291.0" h="553.0" h-a-x="281" n="luteGermanPLower" />
+  <g c="EC0F" x="0.0" y="-246.0" w="254.0" h="565.0" h-a-x="254" n="luteGermanQLower" />
+  <g c="EC10" x="0.0" y="0.0" w="211.0" h="291.0" h-a-x="211" n="luteGermanRLower" />
+  <g c="EC11" x="-4.0" y="-1.0" w="287.0" h="323.0" h-a-x="283" n="luteGermanSLower" />
+  <g c="EC12" x="0.0" y="-1.0" w="229.0" h="411.0" h-a-x="229" n="luteGermanTLower" />
+  <g c="EC13" x="0.0" y="-49.0" w="319.0" h="340.0" h-a-x="319" n="luteGermanVLower" />
+  <g c="EC14" x="1.0" y="-2.0" w="317.0" h="304.0" h-a-x="314" n="luteGermanXLower" />
+  <g c="EC15" x="-4.0" y="-173.0" w="270.0" h="451.0" h-a-x="266" n="luteGermanYLower" />
+  <g c="EC16" x="-4.0" y="-29.0" w="206.0" h="366.0" h-a-x="201" n="luteGermanZLower" />
+  <g c="EC17" x="0.0" y="0.0" w="486.0" h="589.0" h-a-x="487" n="luteGermanAUpper" />
+  <g c="EC18" x="0.0" y="-2.0" w="599.0" h="592.0" h-a-x="598" n="luteGermanBUpper" />
+  <g c="EC19" x="-4.0" y="-1.0" w="457.0" h="589.0" h-a-x="454" n="luteGermanCUpper" />
+  <g c="EC1A" x="-10.0" y="-1.0" w="586.0" h="611.0" h-a-x="576" n="luteGermanDUpper" />
+  <g c="EC1B" x="0.0" y="0.0" w="449.0" h="590.0" h-a-x="448" n="luteGermanEUpper" />
+  <g c="EC1C" x="-2.0" y="-110.0" w="470.0" h="724.0" h-a-x="456" n="luteGermanFUpper" />
+  <g c="EC1D" x="-1.0" y="0.0" w="531.0" h="586.0" h-a-x="530" n="luteGermanGUpper" />
+  <g c="EC1E" x="0.0" y="-117.0" w="503.0" h="699.0" h-a-x="503" n="luteGermanHUpper" />
+  <g c="EC1F" x="-1.0" y="-3.0" w="399.0" h="587.0" h-a-x="398" n="luteGermanIUpper" />
+  <g c="EC20" x="0.0" y="-4.0" w="517.0" h="590.0" h-a-x="517" n="luteGermanKUpper" />
+  <g c="EC21" x="0.0" y="-1.0" w="396.0" h="592.0" h-a-x="396" n="luteGermanLUpper" />
+  <g c="EC22" x="0.0" y="0.0" w="736.0" h="593.0" h-a-x="734" n="luteGermanMUpper" />
+  <g c="EC23" x="0.0" y="-10.0" w="559.0" h="588.0" h-a-x="558" n="luteGermanNUpper" />
+  <g c="E8F3" x="0.0" y="250.0" w="14.0" h="250.0" h-a-x="14" n="chantDivisioMinima" />
+  <g c="E8F4" x="0.0" y="-250.0" w="14.0" h="500.0" h-a-x="14" n="chantDivisioMaior" />
+  <g c="E8F5" x="0.0" y="-375.0" w="14.0" h="750.0" h-a-x="14" n="chantDivisioMaxima" />
+  <g c="E8F6" x="0.0" y="-375.0" w="114.0" h="750.0" h-a-x="114" n="chantDivisioFinalis" />
+  <g c="E8F7" x="0.0" y="264.0" w="85.0" h="234.0" h-a-x="85" n="chantVirgula" />
+  <g c="E8F8" x="-0.11" y="263.68" w="137.45" h="234.59" h-a-x="138" n="chantCaesura" />
+  <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise1" />
+  <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise2" />
+  <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise3" />
+  <g c="EB93" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise4" />
+  <g c="EB94" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise5" />
+  <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise6" />
+  <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise7" />
+  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
+  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
+  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB9A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower3" />
+  <g c="EB9B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower4" />
+  <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
+  <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
+  <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
 </bounding-boxes>

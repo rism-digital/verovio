@@ -16,7 +16,7 @@
 #include "artic.h"
 #include "controlelement.h"
 #include "fig.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -121,115 +121,24 @@ bool EditorialElement::IsSupportedChild(Object *child)
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::Save(FunctorParams *functorParams)
+FunctorCode EditorialElement::Accept(Functor &functor)
 {
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    // When writing MEI basic, only visible elements within editorial markup a saved
-    if (params->m_basic && this->m_visibility == Hidden) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return Object::Save(functorParams);
-    }
+    return functor.VisitEditorialElement(this);
 }
 
-int EditorialElement::SaveEnd(FunctorParams *functorParams)
+FunctorCode EditorialElement::Accept(ConstFunctor &functor) const
 {
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    // Same as above
-    if (params->m_basic && this->m_visibility == Hidden) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return Object::SaveEnd(functorParams);
-    }
+    return functor.VisitEditorialElement(this);
 }
 
-int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
+FunctorCode EditorialElement::AcceptEnd(Functor &functor)
 {
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitEditorialElementEnd(this);
 }
 
-int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
+FunctorCode EditorialElement::AcceptEnd(ConstFunctor &functor) const
 {
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int EditorialElement::PrepareMilestones(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfacePrepareMilestones(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int EditorialElement::ResetData(FunctorParams *functorParams)
-{
-    if (this->IsSystemMilestone()) {
-        this->SystemMilestoneInterface::InterfaceResetData(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int EditorialElement::CastOffSystems(FunctorParams *functorParams)
-{
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->GetParent()));
-
-    // Special case where we use the Relinquish method.
-    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
-    // from the content System because this screws up the iterator. Relinquish gives up
-    // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement
-        = vrv_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    assert(editorialElement);
-    // move as pending since we want it at the beginning of the system in case of system break coming
-    params->m_pendingElements.push_back(editorialElement);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    // Only move editorial elements that are a child of the system
-    if (this->GetParent() && this->GetParent()->Is(SYSTEM)) {
-        MoveItselfTo(params->m_currentSystem);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int EditorialElement::CastOffToSelection(FunctorParams *functorParams)
-{
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitEditorialElementEnd(this);
 }
 
 } // namespace vrv

@@ -29,8 +29,6 @@
 
 #include "jsonxx.h"
 
-#define HELP_TABS 32
-
 // Some redundant code to get basenames
 // and remove extensions
 // possible that it is not in std??
@@ -49,35 +47,6 @@ std::string removeExtension(std::string const &filename)
     return pivot == filename.rend() ? filename : std::string(filename.begin(), pivot.base() - 1);
 }
 
-std::string fromCamelCase(const std::string &s)
-{
-    std::regex regExp1("(.)([A-Z][a-z]+)");
-    std::regex regExp2("([a-z0-9])([A-Z])");
-
-    std::string result = s;
-    result = std::regex_replace(result, regExp1, "$1-$2");
-    result = std::regex_replace(result, regExp2, "$1-$2");
-
-    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
-    return result;
-}
-
-std::string toCamelCase(const std::string &s)
-{
-    std::istringstream iss(s);
-    std::string token;
-    std::string result;
-
-    while (getline(iss, token, '-')) {
-        token[0] = toupper(token[0]);
-        result += token;
-    }
-
-    result[0] = tolower(result[0]);
-
-    return result;
-}
-
 bool dir_exists(std::string dir)
 {
     struct stat st;
@@ -89,141 +58,9 @@ bool dir_exists(std::string dir)
     }
 }
 
-void display_option(vrv::Option *option)
-{
-    std::string option_str = " ";
-
-    if (option->GetShortOption()) {
-        option_str.append("-");
-        option_str.push_back(option->GetShortOption());
-        option_str.append(", ");
-    }
-
-    if (!option->GetKey().empty()) {
-        option_str.append("--");
-        option_str.append(fromCamelCase(option->GetKey()));
-    }
-
-    const vrv::OptionDbl *optDbl = dynamic_cast<const vrv::OptionDbl *>(option);
-    const vrv::OptionInt *optInt = dynamic_cast<const vrv::OptionInt *>(option);
-    const vrv::OptionIntMap *optIntMap = dynamic_cast<const vrv::OptionIntMap *>(option);
-    const vrv::OptionString *optString = dynamic_cast<const vrv::OptionString *>(option);
-    const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(option);
-    const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(option);
-
-    if (optDbl) {
-        option_str.append(" <f>");
-    }
-    else if (optInt) {
-        option_str.append(" <i>");
-    }
-    else if (optString) {
-        option_str.append(" <s>");
-    }
-    else if (optArray) {
-        option_str.append("* <s>");
-    }
-    else if (!optBool) {
-        option_str.append(" <s>");
-    }
-
-    if (option_str.size() < HELP_TABS) {
-        option_str.insert(option_str.end(), HELP_TABS - option_str.size(), ' ');
-    }
-    else {
-        option_str.append("\t");
-    }
-
-    std::cout << option_str << option->GetDescription();
-
-    if (optInt && (optInt->GetDefault() != optInt->GetMin()) && (optInt->GetDefault() != optInt->GetMax())) {
-        std::cout << " (default: " << optInt->GetDefault();
-        std::cout << "; min: " << optInt->GetMin();
-        std::cout << "; max: " << optInt->GetMax() << ")";
-    }
-    if (optDbl && (optDbl->GetDefault() != optDbl->GetMin()) && (optDbl->GetDefault() != optDbl->GetMax())) {
-        std::cout << std::fixed << " (default: " << optDbl->GetDefault();
-        std::cout << std::fixed << "; min: " << optDbl->GetMin();
-        std::cout << std::fixed << "; max: " << optDbl->GetMax() << ")";
-    }
-    if (optString) {
-        std::cout << " (default: \"" << optString->GetDefault() << "\")";
-    }
-    if (optIntMap) {
-        std::cout << " (default: \"" << optIntMap->GetDefaultStrValue()
-                  << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
-    }
-    std::cout << std::endl;
-}
-
 void display_version()
 {
     std::cout << "Verovio " << vrv::GetVersion() << std::endl;
-}
-
-void display_usage(const vrv::Options *options, const std::string &category)
-{
-    // map of all categories and expected string arguments for them
-    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
-        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Layout, "layout" },
-        { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Midi, "midi" },
-        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
-
-    std::cout.precision(2);
-
-    display_version();
-    std::cout << std::endl << "Example usage:" << std::endl << std::endl;
-    std::cout << " verovio [-s scale] [-r resource-path] [-o outfile] infile" << std::endl << std::endl;
-
-    auto it = std::find_if(
-        categories.begin(), categories.end(), [&category](const std::pair<vrv::OptionsCategory, std::string> &value) {
-            return std::equal(value.second.begin(), value.second.end(), category.begin(), category.end(),
-                [](const char a, const char b) { return a == tolower(b); });
-        });
-
-    if (it == categories.end()) {
-        std::string optionStr;
-        std::cout << "Help manual categories: " << std::endl;
-        // Print base group options
-        optionStr.append(" -h ");
-        optionStr.append(categories.at(options->m_baseOptions.GetCategory()));
-        optionStr.append("\t");
-        optionStr.append(options->m_baseOptions.GetLabel());
-        optionStr.append("\n");
-
-        const std::vector<vrv::OptionGrp *> *grps = options->GetGrps();
-        // Print each group one by one
-        for (const auto group : *grps) {
-            optionStr.append(" -h ");
-            optionStr.append(categories.at(group->GetCategory()));
-            optionStr.append("\t");
-            optionStr.append(group->GetLabel());
-            optionStr.append("\n");
-        }
-        optionStr.append(" -h full\tPrint all help manual and exit");
-        std::cout << optionStr << std::endl;
-    }
-    else {
-        std::cout << "Options (marked as * are repeatable)" << std::endl;
-        if ((it->first == vrv::OptionsCategory::Base) || (it->first == vrv::OptionsCategory::Full)) {
-            const std::vector<vrv::Option *> *baseOptions = options->GetBaseOptions();
-            for (vrv::Option *option : *baseOptions) {
-                display_option(option);
-            }
-        }
-        const std::vector<vrv::OptionGrp *> *grps = options->GetGrps();
-        for (const auto group : *grps) {
-            if (it->first == group->GetCategory() || (it->first == vrv::OptionsCategory::Full)) {
-                // Options with long forms only
-                std::cout << std::endl << group->GetLabel() << std::endl;
-                const std::vector<vrv::Option *> *options = group->GetOptions();
-
-                for (vrv::Option *option : *options) {
-                    display_option(option);
-                }
-            }
-        }
-    }
 }
 
 bool optionExists(const std::string &option, int argc, char **argv, std::string &badOption)
@@ -277,7 +114,7 @@ int main(int argc, char **argv)
 
     if (argc < 2) {
         std::cerr << "Expected one input file but found none." << std::endl << std::endl;
-        display_usage(options, "");
+        toolkit.PrintOptionUsage("", std::cout);
         exit(1);
     }
 
@@ -292,9 +129,9 @@ int main(int argc, char **argv)
     vrv::MapOfStrOptions::const_iterator iter;
     for (iter = params->begin(); iter != params->end(); ++iter) {
         // Double check that back and forth convertion is correct
-        assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
+        assert(vrv::ToCamelCase(vrv::FromCamelCase(iter->first)) == iter->first);
 
-        optNames.push_back(fromCamelCase(iter->first));
+        optNames.push_back(vrv::FromCamelCase(iter->first));
         long_options[i].name = optNames.at(i).c_str();
         vrv::OptionBool *optBool = dynamic_cast<vrv::OptionBool *>(iter->second);
         long_options[i].has_arg = (optBool) ? no_argument : required_argument;
@@ -322,7 +159,7 @@ int main(int argc, char **argv)
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
-                opt = params->at(toCamelCase(key));
+                opt = params->at(vrv::ToCamelCase(key));
                 optBool = dynamic_cast<vrv::OptionBool *>(opt);
                 if (std::string badOption; !optionExists("--" + key, argc, argv, badOption)) {
                     vrv::LogError("Unrecognized option %s has been skipped.", badOption.c_str());
@@ -387,12 +224,12 @@ int main(int argc, char **argv)
                 break;
 
             case 'h':
-                display_usage(options, optarg);
+                toolkit.PrintOptionUsage(optarg, std::cout);
                 exit(0);
                 break;
 
             case '?':
-                display_usage(options, "");
+                toolkit.PrintOptionUsage("", std::cout);
                 exit(1);
                 break;
 
@@ -417,7 +254,7 @@ int main(int argc, char **argv)
     }
     else if (infile != "-") {
         std::cerr << "Incorrect number of arguments: expected one input file but found none." << std::endl << std::endl;
-        display_usage(options, "base");
+        toolkit.PrintOptionUsage("base", std::cout);
         exit(1);
     }
 
@@ -442,10 +279,11 @@ int main(int argc, char **argv)
     }
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
-        && (outformat != "midi") && (outformat != "timemap") && (outformat != "humdrum") && (outformat != "hum")
-        && (outformat != "pae")) {
+        && (outformat != "midi") && (outformat != "timemap") && (outformat != "expansionmap")
+        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")) {
         std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'timemap', 'humdrum' or 'pae'."
+                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'timemap', 'expansionmap', 'humdrum' "
+                     "or 'pae'."
                   << std::endl;
         exit(1);
     }
@@ -469,7 +307,7 @@ int main(int argc, char **argv)
     }
 
     // Skip the layout for MIDI and timemap output by setting --breaks to none
-    if ((outformat == "midi") || (outformat == "timemap")) {
+    if ((outformat == "midi") || (outformat == "timemap") || (outformat == "expansionmap")) {
         toolkit.SetOptions("{'breaks': 'none'}");
     }
 
@@ -595,7 +433,21 @@ int main(int argc, char **argv)
             std::cout << toolkit.RenderToTimemap();
         }
         else if (!toolkit.RenderToTimemapFile(outfile)) {
-            std::cerr << "Unable to write MIDI to " << outfile << "." << std::endl;
+            std::cerr << "Unable to write timemap to " << outfile << "." << std::endl;
+            exit(1);
+        }
+        else {
+            std::cerr << "Output written to " << outfile << "." << std::endl;
+        }
+    }
+    else if (outformat == "expansionmap") {
+        outfile += "-em.json";
+        if (std_output) {
+            std::string output;
+            std::cout << toolkit.RenderToExpansionMap();
+        }
+        else if (!toolkit.RenderToExpansionMapFile(outfile)) {
+            std::cerr << "Unable to write expansionmap to " << outfile << "." << std::endl;
             exit(1);
         }
         else {

@@ -9,6 +9,7 @@
 #define __VRV_REND_H__
 
 #include "areaposinterface.h"
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "textelement.h"
 
@@ -24,7 +25,9 @@ namespace vrv {
 class Rend : public TextElement,
              public AreaPosInterface,
              public AttColor,
+             public AttExtSymAuth,
              public AttLang,
+             public AttNNumberLike,
              public AttTextRendition,
              public AttTypography,
              public AttWhitespace {
@@ -58,15 +61,23 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    /**
+     * Check if rend has an enclosing.
+     */
+    bool HasEnclosure() const;
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::AlignVertically
+     * Interface for class functor visitation
      */
     ///@{
-    int AlignVertically(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 private:

@@ -18,12 +18,11 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "fermata.h"
-#include "functorparams.h"
+#include "findlayerelementsfunctor.h"
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
 #include "system.h"
-#include "timemap.h"
 #include "transposition.h"
 #include "vrv.h"
 
@@ -99,7 +98,7 @@ RestOffsets g_defaultRests{
                                 { { DUR_1, -6 }, { DUR_2, -4 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
                                     { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
                                     { DUR_BR, -6 } } } } } } },
-            { RA_x,
+            { RA_n,
                 { { RLP_restOnTopLayer,
                       { { RNP_noteInSpace,
                             { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
@@ -158,14 +157,16 @@ Rest::Rest()
     , PositionInterface()
     , AttColor()
     , AttCue()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttRestVisMensural()
 {
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CUE);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_RESTVISMENSURAL);
     this->Reset();
 }
@@ -179,7 +180,8 @@ void Rest::Reset()
     PositionInterface::Reset();
     this->ResetColor();
     this->ResetCue();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetRestVisMensural();
 }
 
@@ -284,23 +286,49 @@ void Rest::UpdateFromTransLoc(const TransPitch &tp)
     }
 }
 
+bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &isTopLayer) const
+{
+    ListOfConstObjects elements = layer->GetLayerElementsForTimeSpanOf(this, true);
+    if (elements.empty()) return false;
+
+    const LayerElement *firstElement = NULL;
+    std::set<int> layers;
+    for (const Object *element : elements) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(element);
+        layers.insert(layerElement->GetAlignmentLayerN());
+        if (!firstElement) firstElement = layerElement;
+    }
+
+    // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
+    if (layers.size() == 1) {
+        if (m_crossStaff) {
+            isTopLayer = staff->GetN() < m_crossStaff->GetN();
+        }
+        else if (layer->GetN() < (*layers.begin())) {
+            isTopLayer = true;
+        }
+        else {
+            if (*layers.begin() < 0) {
+                isTopLayer = staff->GetN() < firstElement->GetAncestorStaff()->GetN();
+            }
+            else {
+                isTopLayer = false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int defaultLocation) const
 {
-    const Layer *parentLayer = vrv_cast<const Layer *>(this->GetFirstAncestor(LAYER));
-    if (!layer) return defaultLocation;
-    const std::set<int> layersN = parentLayer->GetLayersNForTimeSpanOf(this);
-    // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
-    if (layersN.size() != 2) return defaultLocation;
-
-    const bool isTopLayer
-        = m_crossStaff ? (staff->GetN() < m_crossStaff->GetN()) : (layer->GetN() == *layersN.cbegin());
+    if (!layer || this->HasSameasLink()) return defaultLocation;
+    bool isTopLayer = false;
+    if (!this->DetermineRestPosition(staff, layer, isTopLayer)) return defaultLocation;
 
     // find best rest location relative to elements on other layers
-    const Staff *realStaff = m_crossStaff ? m_crossStaff : staff;
-    ListOfConstObjects layers = realStaff->FindAllDescendantsByType(LAYER, false);
     bool restOverlap = true;
-    const auto otherLayerRelativeLocationInfo
-        = this->GetLocationRelativeToOtherLayers(layers, layer, isTopLayer, restOverlap);
+    const auto otherLayerRelativeLocationInfo = this->GetLocationRelativeToOtherLayers(layer, isTopLayer, restOverlap);
     int currentLayerRelativeLocation = this->GetLocationRelativeToCurrentLayer(staff, layer, isTopLayer);
     int otherLayerRelativeLocation = otherLayerRelativeLocationInfo.first
         + this->GetRestOffsetFromOptions(RL_otherLayer, otherLayerRelativeLocationInfo, isTopLayer);
@@ -317,7 +345,7 @@ int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int de
             otherLayerRelativeLocation += defaultLocation + 2;
         }
         else {
-            otherLayerRelativeLocation -= defaultLocation + 2;
+            otherLayerRelativeLocation -= 2;
         }
     }
 
@@ -330,25 +358,22 @@ int Rest::GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int de
 }
 
 std::pair<int, RestAccidental> Rest::GetLocationRelativeToOtherLayers(
-    const ListOfConstObjects &layersList, const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const
+    const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const
 {
     if (!currentLayer) return { VRV_UNSET, RA_none };
 
-    // Get iterator to another layer. We're going to find coliding elements there
-    auto layerIter = std::find_if(layersList.begin(), layersList.end(),
-        [&](const Object *foundLayer) { return vrv_cast<const Layer *>(foundLayer)->GetN() != currentLayer->GetN(); });
-    if (layerIter == layersList.end()) {
-        if (!m_crossStaff) return { VRV_UNSET, RA_none };
-        // if we're dealing with cross-staff item, get first/last layer, depending whether rest is on top or bottom
-        layerIter = isTopLayer ? layersList.begin() : std::prev(layersList.end());
-    }
-    auto collidingElementsList = vrv_cast<const Layer *>(*layerIter)->GetLayerElementsForTimeSpanOf(this);
+    auto collidingElementsList = currentLayer->GetLayerElementsForTimeSpanOf(this, true);
+    if (collidingElementsList.empty()) return { VRV_UNSET, RA_none };
 
     std::pair<int, RestAccidental> finalElementInfo = { VRV_UNSET, RA_none };
     // Go through each colliding element and figure out optimal location for the rest
     for (const Object *object : collidingElementsList) {
+        const LayerElement *layerElement = vrv_cast<const LayerElement *>(object);
+        const Layer *objectLayer = layerElement->m_crossLayer
+            ? layerElement->m_crossLayer
+            : vrv_cast<const Layer *>(object->GetFirstAncestor(LAYER));
         if (object->Is(NOTE)) restOverlap = false;
-        auto currentElementInfo = this->GetElementLocation(object, vrv_cast<const Layer *>(*layerIter), isTopLayer);
+        auto currentElementInfo = this->GetElementLocation(object, objectLayer, isTopLayer);
         if (currentElementInfo.first == VRV_UNSET) continue;
         //  If note on other layer is not on the same x position as rest - ignore its accidental
         if (this->GetAlignment()->GetTime() != vrv_cast<const LayerElement *>(object)->GetAlignment()->GetTime()) {
@@ -372,23 +397,19 @@ int Rest::GetLocationRelativeToCurrentLayer(const Staff *currentStaff, const Lay
 {
     if (!currentStaff || !currentLayer) return VRV_UNSET;
 
-    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
-    GetRelativeLayerElementParams getRelativeLayerElementParams(this->GetIdx(), BACKWARD, false);
-
     const Object *previousElement = NULL;
     const Object *nextElement = NULL;
     // Get previous and next elements from the current layer
     if (currentLayer->GetFirstChildNot(REST)) {
-        currentLayer->Process(
-            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-        previousElement = getRelativeLayerElementParams.m_relativeElement;
-        // reset and search in other direction
-        getRelativeLayerElementParams.m_relativeElement = NULL;
-        getRelativeLayerElementParams.m_searchDirection = FORWARD;
-        getRelativeLayerElement.m_returnCode = FUNCTOR_CONTINUE;
-        currentLayer->Process(
-            &getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, FORWARD);
-        nextElement = getRelativeLayerElementParams.m_relativeElement;
+        GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), false);
+        getRelativeLayerElementBackwards.PushDirection(BACKWARD);
+        currentLayer->Process(getRelativeLayerElementBackwards);
+        previousElement = getRelativeLayerElementBackwards.GetRelativeElement();
+
+        // search in other direction
+        GetRelativeLayerElementFunctor getRelativeLayerElementForwards(this->GetIdx(), false);
+        currentLayer->Process(getRelativeLayerElementForwards);
+        nextElement = getRelativeLayerElementForwards.GetRelativeElement();
     }
 
     // For chords we want to get the closest element to opposite layer, hence we pass negative 'isTopLayer' value
@@ -452,12 +473,11 @@ int Rest::GetFirstRelativeElementLocation(
     if (((int)layers.size() != currentStaff->GetChildCount(LAYER)) || (layerIter == layers.end())) return VRV_UNSET;
 
     // Get last element if it's previous layer, get first one otherwise
-    Functor getRelativeLayerElement(&Object::GetRelativeLayerElement);
-    GetRelativeLayerElementParams getRelativeLayerElementParams(this->GetIdx(), !isPrevious, true);
-    (*layerIter)
-        ->Process(&getRelativeLayerElement, &getRelativeLayerElementParams, NULL, NULL, UNLIMITED_DEPTH, !isPrevious);
+    GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), true);
+    getRelativeLayerElement.PushDirection(!isPrevious);
+    (*layerIter)->Process(getRelativeLayerElement);
 
-    const Object *lastLayerElement = getRelativeLayerElementParams.m_relativeElement;
+    const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();
     if (lastLayerElement && lastLayerElement->Is({ NOTE, CHORD, FTREM })) {
         return this->GetElementLocation(lastLayerElement, vrv_cast<const Layer *>(*layerIter), !isTopLayer).first;
     }
@@ -532,256 +552,24 @@ int Rest::GetRestOffsetFromOptions(
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Rest::AdjustBeams(FunctorParams *functorParams)
+FunctorCode Rest::Accept(Functor &functor)
 {
-    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_beam) return FUNCTOR_SIBLINGS;
-
-    // Calculate possible overlap for the rest with beams
-    int leftMargin = 0, rightMargin = 0;
-    const int beams = vrv_cast<Beam *>(params->m_beam)->GetBeamPartDuration(this, false) - DUR_4;
-    const int beamWidth = vrv_cast<Beam *>(params->m_beam)->m_beamWidth;
-    if (params->m_directionBias > 0) {
-        leftMargin = params->m_y1 - beams * beamWidth - this->GetSelfTop();
-        rightMargin = params->m_y2 - beams * beamWidth - this->GetSelfTop();
-    }
-    else {
-        leftMargin = this->GetSelfBottom() - params->m_y1 - beams * beamWidth;
-        rightMargin = this->GetSelfBottom() - params->m_y2 - beams * beamWidth;
-    }
-
-    // Adjust drawing location for the rest based on the overlap with beams.
-    // Adjustment should be an even number, so that the rest is positioned properly
-    const int overlapMargin = std::min(leftMargin, rightMargin);
-    if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
-
-    Staff *staff = this->GetAncestorStaff();
-
-    if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) {
-        // constants
-        const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // calculate new and old locations for the rest
-        const int locAdjust = (params->m_directionBias * (overlapMargin - 2 * unit + 1) / unit);
-        const int oldLoc = this->GetDrawingLoc();
-        const int newLoc = oldLoc + locAdjust - locAdjust % 2;
-        if (staff->GetChildCount(LAYER) == 1) {
-            this->SetDrawingLoc(newLoc);
-            this->SetDrawingYRel(staff->CalcPitchPosYRel(params->m_doc, newLoc));
-            // If there are dots, adjust their location as well
-            if (this->GetDots() > 0) {
-                Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-                if (dots) {
-                    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-                    const int dotLoc = (oldLoc % 2) ? oldLoc : oldLoc + 1;
-                    if (std::find(dotLocs.cbegin(), dotLocs.cend(), dotLoc) != dotLocs.cend()) {
-                        dotLocs.erase(dotLoc);
-                        dotLocs.insert(newLoc);
-                    }
-                }
-            }
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    const int unit = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
-    if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * unit * params->m_directionBias;
-        if (std::abs(adjust) > std::abs(params->m_overlapMargin)) params->m_overlapMargin = adjust;
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitRest(this);
 }
 
-int Rest::ConvertMarkupAnalytical(FunctorParams *functorParams)
+FunctorCode Rest::Accept(ConstFunctor &functor) const
 {
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitRest(this);
 }
 
-int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
+FunctorCode Rest::AcceptEnd(Functor &functor)
 {
-    Dots *currentDots = dynamic_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-
-    if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            this->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*this);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (this->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
-
-    /************ Prepare the drawing cue size ************/
-
-    Functor prepareCueSize(&Object::PrepareCueSize);
-    this->Process(&prepareCueSize, NULL);
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitRestEnd(this);
 }
 
-int Rest::CalcDots(FunctorParams *functorParams)
+FunctorCode Rest::AcceptEnd(ConstFunctor &functor) const
 {
-    CalcDotsParams *params = vrv_params_cast<CalcDotsParams *>(functorParams);
-    assert(params);
-
-    // We currently have no dots object with mensural rests
-    if (this->IsMensuralDur()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    // Nothing to do
-    if ((this->GetDur() <= DUR_BR) || (this->GetDots() < 1)) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Staff *staff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
-    const bool drawingCueSize = this->GetDrawingCueSize();
-    const int staffSize = staff->m_drawingStaffSize;
-
-    // For single rests we need here to set the dot loc
-    Dots *dots = vrv_cast<Dots *>(this->FindDescendantByType(DOTS, 1));
-    assert(dots);
-
-    std::set<int> &dotLocs = dots->ModifyDotLocsForStaff(staff);
-    int loc = this->GetDrawingLoc();
-
-    // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-    if ((loc % 2) == 0) {
-        loc += 1;
-    }
-
-    switch (this->GetActualDur()) {
-        case DUR_32:
-        case DUR_64: loc += 2; break;
-        case DUR_128:
-        case DUR_256: loc += 4; break;
-        case DUR_512: loc += 6; break;
-        case DUR_1024: loc += 8; break;
-        default: break;
-    }
-
-    dotLocs.insert(loc);
-
-    // HARDCODED
-    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;
-    if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
-    if (this->GetDur() > DUR_2) {
-        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
-    }
-    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Rest::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    PositionInterface::InterfaceResetData(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Rest::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Rest::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if ((!this->HasOloc() || !this->HasPloc()) && !this->HasLoc()) return FUNCTOR_SIBLINGS;
-
-    // Find whether current layer is top, middle (either one if multiple) or bottom
-    Staff *parentStaff = this->GetAncestorStaff();
-    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(parentLayer);
-
-    ListOfObjects objects = parentStaff->FindAllDescendantsByType(LAYER, false);
-    const int layerCount = (int)objects.size();
-
-    Layer *firstLayer = vrv_cast<Layer *>(objects.front());
-    Layer *lastLayer = vrv_cast<Layer *>(objects.back());
-
-    const bool isTopLayer = (firstLayer->GetN() == parentLayer->GetN());
-    const bool isBottomLayer = (lastLayer->GetN() == parentLayer->GetN());
-
-    // transpose based on @oloc and @ploc
-    if (this->HasOloc() && this->HasPloc()) {
-        const TransPitch centralLocation(6, 0, 4); // middle location of the staff
-        TransPitch restLoc(this->GetPloc() - PITCHNAME_c, 0, this->GetOloc());
-        params->m_transposer->Transpose(restLoc);
-        const bool isRestOnSpace = static_cast<bool>((restLoc.m_oct * 7 + restLoc.m_pname) % 2);
-        // on outer layers move rest on odd locations one line further
-        // in middle layers tolerate even locations to not risk collisions
-        if (layerCount > 1) {
-            if (isTopLayer && isRestOnSpace) {
-                restLoc++;
-            }
-            else if (isBottomLayer && isRestOnSpace) {
-                restLoc--;
-            }
-            if ((isTopLayer && (restLoc < centralLocation)) || (isBottomLayer && (restLoc > centralLocation))) {
-                restLoc = centralLocation;
-            }
-        }
-
-        this->UpdateFromTransLoc(restLoc);
-    }
-    // transpose based on @loc
-    else if (this->HasLoc()) {
-        constexpr int centralLocation(4);
-        int transval = params->m_transposer->GetTranspositionIntervalClass();
-        int diatonic;
-        int chromatic;
-        params->m_transposer->IntervalToDiatonicChromatic(diatonic, chromatic, transval);
-        int transposedLoc = this->GetLoc() + diatonic;
-        // on outer layers move rest on odd locations one line further
-        // in middle layers tolerate even locations to not risk collisions
-        if (layerCount > 1) {
-            if (isTopLayer)
-                transposedLoc += abs(transposedLoc % 2);
-            else if (isBottomLayer)
-                transposedLoc -= abs(transposedLoc % 2);
-            if ((isTopLayer && (transposedLoc < centralLocation))
-                || (isBottomLayer && (transposedLoc > centralLocation))) {
-                transposedLoc = centralLocation;
-            }
-        }
-        this->SetLoc(transposedLoc);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Rest::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    params->m_timemap->AddEntry(this, params);
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitRestEnd(this);
 }
 
 } // namespace vrv

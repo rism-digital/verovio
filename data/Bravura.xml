@@ -597,7 +597,10 @@
   <g c="E631" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoAbove" />
   <g c="E632" x="0.0" y="0.0" w="300.0" h="200.0" h-a-x="300" n="pluckedBuzzPizzicato" />
   <g c="E633" x="0.0" y="0.0" w="272.0" h="272.0" h-a-x="272" n="pluckedLeftHandPizzicato" />
+  <g c="E636" x="1.0" y="-1.0" w="397.0" h="251.0" h-a-x="398" n="pluckedWithFingernails" />
+  <g c="E637" x="-1.0" y="0.0" w="251.0" h="399.0" h-a-x="250" n="pluckedFingernailFlick" />
   <g c="E638" x="0.0" y="0.0" w="324.0" h="324.0" h-a-x="325" n="pluckedDamp" />
+  <g c="E639" x="0.0" y="0.0" w="346.0" h="345.0" h-a-x="347" n="pluckedDampAll" />
   <g c="E645" x="-161.0" y="-1.0" w="322.0" h="322.0" h-a-x="161" n="vocalSprechgesang" />
   <g c="E650" x="0.0" y="-8.0" w="1019.0" h="563.0" h-a-x="1019" n="keyboardPedalPed" />
   <g c="E651" x="0.0" y="-8.0" w="500.0" h="563.0" h-a-x="493" n="keyboardPedalP" />
@@ -636,6 +639,12 @@
   <g c="E888" x="10.0" y="-8.0" w="313.0" h="383.0" h-a-x="313" n="tuplet8" />
   <g c="E889" x="10.0" y="-8.0" w="303.74" h="383.0" h-a-x="304" n="tuplet9" />
   <g c="E88A" x="10.0" y="58.0" w="111.0" h="210.0" h-a-x="111" n="tupletColon" />
+  <g c="E8F3" x="0.0" y="250.0" w="16.0" h="250.0" h-a-x="16" n="chantDivisioMinima" />
+  <g c="E8F4" x="0.0" y="-250.0" w="16.0" h="500.0" h-a-x="16" n="chantDivisioMaior" />
+  <g c="E8F5" x="0.0" y="-375.0" w="16.0" h="750.0" h-a-x="16" n="chantDivisioMaxima" />
+  <g c="E8F6" x="0.0" y="-375.0" w="120.0" h="750.0" h-a-x="119" n="chantDivisioFinalis" />
+  <g c="E8F7" x="0.0" y="255.0" w="91.0" h="245.0" h-a-x="91" n="chantVirgula" />
+  <g c="E8F8" x="0.0" y="260.0" w="143.0" h="240.0" h-a-x="143" n="chantCaesura" />
   <g c="E901" x="0.0" y="-169.0" w="339.0" h="1091.0" h-a-x="339" n="mensuralGclefPetrucci" />
   <g c="E902" x="0.0" y="-231.0" w="264.0" h="452.0" h-a-x="264" n="chantFclef" />
   <g c="E903" x="0.0" y="-172.0" w="297.0" h="344.0" h-a-x="298" n="mensuralFclef" />
@@ -784,6 +793,22 @@
   <g c="EB20" x="0.0" y="0.0" w="900.0" h="536.0" h-a-x="901" n="elecRewind" />
   <g c="EB21" x="0.0" y="0.0" w="982.0" h="536.0" h-a-x="982" n="elecSkipForwards" />
   <g c="EB22" x="0.0" y="0.0" w="982.0" h="536.0" h-a-x="982" n="elecSkipBackwards" />
+  <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise1" />
+  <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise2" />
+  <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise3" />
+  <g c="EB93" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise4" />
+  <g c="EB94" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise5" />
+  <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise6" />
+  <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise7" />
+  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
+  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
+  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB9A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower3" />
+  <g c="EB9B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower4" />
+  <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
+  <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
+  <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
+  <g c="EB9F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower8" />
   <g c="EBA7" x="0.0" y="0.0" w="36.0" h="790.0" h-a-x="36" n="luteDurationWhole" />
   <g c="EBA8" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationHalf" />
   <g c="EBA9" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationQuarter" />
@@ -803,6 +828,10 @@
   <g c="EBCA" x="0.0" y="0.0" w="131.0" h="296.0" h-a-x="131" n="luteFrenchFretL" />
   <g c="EBCB" x="0.0" y="0.0" w="411.0" h="275.0" h-a-x="411" n="luteFrenchFretM" />
   <g c="EBCC" x="0.0" y="0.0" w="321.0" h="302.0" h-a-x="321" n="luteFrenchFretN" />
+  <g c="EBCD" x="0.0" y="0.0" w="276.0" h="242.0" h-a-x="276" n="luteFrench7thCourse" />
+  <g c="EBCE" x="0.0" y="-34.0" w="459.0" h="344.0" h-a-x="459" n="luteFrench8thCourse" />
+  <g c="EBCF" x="0.0" y="-34.0" w="569.0" h="344.0" h-a-x="569" n="luteFrench9thCourse" />
+  <g c="EBD0" x="0.0" y="-34.0" w="679.0" h="344.0" h-a-x="679" n="luteFrench10thCourse" />
   <g c="EBE0" x="24.0" y="-1.0" w="257.0" h="301.0" h-a-x="256" n="luteItalianFret0" />
   <g c="EBE1" x="24.0" y="0.0" w="138.0" h="300.0" h-a-x="138" n="luteItalianFret1" />
   <g c="EBE2" x="24.0" y="-3.0" w="239.0" h="304.0" h-a-x="239" n="luteItalianFret2" />
@@ -813,6 +842,42 @@
   <g c="EBE7" x="25.0" y="0.0" w="242.0" h="301.0" h-a-x="242" n="luteItalianFret7" />
   <g c="EBE8" x="24.0" y="0.0" w="230.0" h="301.0" h-a-x="230" n="luteItalianFret8" />
   <g c="EBE9" x="24.0" y="0.0" w="235.0" h="300.0" h-a-x="235" n="luteItalianFret9" />
+  <g c="EC00" x="0.0" y="-12.0" w="278.0" h="359.0" h-a-x="278" n="luteGermanALower" />
+  <g c="EC01" x="0.0" y="-11.0" w="298.0" h="520.0" h-a-x="298" n="luteGermanBLower" />
+  <g c="EC02" x="0.0" y="-12.0" w="201.0" h="355.0" h-a-x="201" n="luteGermanCLower" />
+  <g c="EC03" x="0.0" y="-12.0" w="288.0" h="484.0" h-a-x="288" n="luteGermanDLower" />
+  <g c="EC04" x="0.0" y="-12.0" w="213.0" h="355.0" h-a-x="213" n="luteGermanELower" />
+  <g c="EC05" x="0.0" y="-124.0" w="246.0" h="613.0" h-a-x="246" n="luteGermanFLower" />
+  <g c="EC06" x="0.0" y="-140.0" w="345.0" h="499.0" h-a-x="345" n="luteGermanGLower" />
+  <g c="EC07" x="0.0" y="-131.0" w="304.0" h="647.0" h-a-x="304" n="luteGermanHLower" />
+  <g c="EC08" x="0.0" y="-113.0" w="134.0" h="594.0" h-a-x="134" n="luteGermanILower" />
+  <g c="EC09" x="0.0" y="-9.0" w="248.0" h="519.0" h-a-x="248" n="luteGermanKLower" />
+  <g c="EC0A" x="0.0" y="-10.0" w="168.0" h="519.0" h-a-x="168" n="luteGermanLLower" />
+  <g c="EC0B" x="0.0" y="-9.0" w="483.0" h="358.0" h-a-x="483" n="luteGermanMLower" />
+  <g c="EC0C" x="0.0" y="-9.0" w="314.0" h="360.0" h-a-x="314" n="luteGermanNLower" />
+  <g c="EC0D" x="0.0" y="-12.0" w="314.0" h="370.0" h-a-x="314" n="luteGermanOLower" />
+  <g c="EC0E" x="0.0" y="-130.0" w="329.0" h="472.0" h-a-x="329" n="luteGermanPLower" />
+  <g c="EC0F" x="0.0" y="-130.0" w="315.0" h="472.0" h-a-x="315" n="luteGermanQLower" />
+  <g c="EC10" x="0.0" y="-8.0" w="241.0" h="359.0" h-a-x="241" n="luteGermanRLower" />
+  <g c="EC11" x="0.0" y="-124.0" w="246.0" h="613.0" h-a-x="246" n="luteGermanSLower" />
+  <g c="EC12" x="0.0" y="-8.0" w="227.0" h="431.0" h-a-x="227" n="luteGermanTLower" />
+  <g c="EC13" x="0.0" y="-8.0" w="335.0" h="354.0" h-a-x="335" n="luteGermanVLower" />
+  <g c="EC14" x="0.0" y="-118.0" w="257.0" h="478.0" h-a-x="257" n="luteGermanXLower" />
+  <g c="EC15" x="0.0" y="-137.0" w="304.0" h="495.0" h-a-x="304" n="luteGermanYLower" />
+  <g c="EC16" x="0.0" y="-132.0" w="213.0" h="485.0" h-a-x="213" n="luteGermanZLower" />
+  <g c="EC17" x="0.0" y="-9.0" w="479.0" h="523.0" h-a-x="479" n="luteGermanAUpper" />
+  <g c="EC18" x="0.0" y="-9.0" w="561.0" h="526.0" h-a-x="561" n="luteGermanBUpper" />
+  <g c="EC19" x="0.0" y="-13.0" w="413.0" h="525.0" h-a-x="413" n="luteGermanCUpper" />
+  <g c="EC1A" x="1.0" y="-9.0" w="559.0" h="525.0" h-a-x="560" n="luteGermanDUpper" />
+  <g c="EC1B" x="0.0" y="-11.0" w="503.0" h="525.0" h-a-x="503" n="luteGermanEUpper" />
+  <g c="EC1C" x="0.0" y="-123.0" w="402.0" h="642.0" h-a-x="402" n="luteGermanFUpper" />
+  <g c="EC1D" x="0.0" y="-10.0" w="545.0" h="524.0" h-a-x="545" n="luteGermanGUpper" />
+  <g c="EC1E" x="0.0" y="-109.0" w="473.0" h="628.0" h-a-x="473" n="luteGermanHUpper" />
+  <g c="EC1F" x="0.0" y="-125.0" w="525.0" h="646.0" h-a-x="525" n="luteGermanIUpper" />
+  <g c="EC20" x="-2.0" y="-12.0" w="526.0" h="519.0" h-a-x="524" n="luteGermanKUpper" />
+  <g c="EC21" x="0.0" y="-11.0" w="422.0" h="519.0" h-a-x="422" n="luteGermanLUpper" />
+  <g c="EC22" x="0.0" y="-10.0" w="721.0" h="520.0" h-a-x="721" n="luteGermanMUpper" />
+  <g c="EC23" x="0.0" y="-13.0" w="607.0" h="525.0" h-a-x="607" n="luteGermanNUpper" />
   <g c="EC80" x="0.0" y="-622.0" w="118.0" h="1236.0" h-a-x="118" n="timeSigBracketLeft" />
   <g c="EC81" x="0.0" y="-622.0" w="118.0" h="1236.0" h-a-x="118" n="timeSigBracketRight" />
   <g c="EC82" x="0.0" y="-372.0" w="118.0" h="736.0" h-a-x="118" n="timeSigBracketLeftSmall" />
@@ -954,6 +1019,18 @@
   <g c="F44A" x="5.0" y="-259.0" w="127.0" h="517.0" h-a-x="139" n="timeSigCommonLarge" />
   <g c="F44B" x="4.0" y="-314.0" w="128.0" h="627.0" h-a-x="139" n="timeSigCutCommonLarge" />
   <g c="F44C" x="0.0" y="-149.0" w="80.0" h="298.0" h-a-x="80" n="timeSigPlusLarge" />
+  <g c="F44E" x="0.0" y="0.0" w="524.0" h="242.0" h-a-x="524" n="luteFrench7thCourseStrikethru" />
+  <g c="F44F" x="-88.0" y="-100.0" w="450.0" h="342.0" h-a-x="276" n="luteFrench7thCourseUnderline" />
+  <g c="F450" x="0.0" y="0.0" w="276.0" h="242.0" h-a-x="276" n="luteFrench7thCourseRight" />
+  <g c="F451" x="0.0" y="-29.0" w="701.0" h="344.0" h-a-x="701" n="luteFrench8thCourseStrikethru" />
+  <g c="F452" x="0.0" y="-100.0" w="552.0" h="410.0" h-a-x="459" n="luteFrench8thCourseUnderline" />
+  <g c="F453" x="0.0" y="-34.0" w="530.0" h="344.0" h-a-x="530" n="luteFrench8thCourseRight" />
+  <g c="F454" x="0.0" y="-29.0" w="811.0" h="344.0" h-a-x="811" n="luteFrench9thCourseStrikethru" />
+  <g c="F455" x="0.0" y="-100.0" w="662.0" h="410.0" h-a-x="569" n="luteFrench9thCourseUnderline" />
+  <g c="F456" x="0.0" y="-34.0" w="640.0" h="344.0" h-a-x="640" n="luteFrench9thCourseRight" />
+  <g c="F457" x="-1.0" y="-29.0" w="921.0" h="344.0" h-a-x="920" n="luteFrench10thCourseStrikethru" />
+  <g c="F458" x="0.0" y="-100.0" w="762.0" h="410.0" h-a-x="679" n="luteFrench10thCourseUnderline" />
+  <g c="F459" x="0.0" y="-34.0" w="753.0" h="344.0" h-a-x="753" n="luteFrench10thCourseRight" />
   <g c="F45A" x="0.0" y="0.0" w="291.0" h="269.0" h-a-x="291" n="luteFrenchFretCAlt" />
   <g c="F45D" x="20.0" y="-250.0" w="430.0" h="501.0" h-a-x="470" n="timeSig0Small" />
   <g c="F45E" x="20.0" y="-251.0" w="321.0" h="501.0" h-a-x="361" n="timeSig1Small" />

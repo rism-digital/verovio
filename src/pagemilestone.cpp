@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "ending.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "page.h"
 #include "system.h"
 #include "vrv.h"
@@ -80,94 +80,24 @@ void PageMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Object 
 // PageMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-int PageMilestoneEnd::CastOffSystems(FunctorParams *functorParams)
+FunctorCode PageMilestoneEnd::Accept(Functor &functor)
 {
-    CastOffSystemsParams *params = vrv_params_cast<CastOffSystemsParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_page);
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitPageMilestone(this);
 }
 
-int PageMilestoneEnd::CastOffPages(FunctorParams *functorParams)
+FunctorCode PageMilestoneEnd::Accept(ConstFunctor &functor) const
 {
-    CastOffPagesParams *params = vrv_params_cast<CastOffPagesParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentPage);
-
-    PageMilestoneEnd *endMilestone
-        = dynamic_cast<PageMilestoneEnd *>(params->m_contentPage->Relinquish(this->GetIdx()));
-    // End milestones can be added to the page only if the pending list is empty
-    // Otherwise we are going to mess up the order
-    if (params->m_pendingPageElements.empty()) {
-        params->m_currentPage->AddChild(endMilestone);
-    }
-    else {
-        params->m_pendingPageElements.push_back(endMilestone);
-    }
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitPageMilestone(this);
 }
 
-int PageMilestoneEnd::CastOffEncoding(FunctorParams *functorParams)
+FunctorCode PageMilestoneEnd::AcceptEnd(Functor &functor)
 {
-    CastOffEncodingParams *params = vrv_params_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(SCORE)) {
-        // This is the end of a score, which means that the current system has to be added
-        // to the current page
-        assert(params->m_currentSystem);
-        params->m_currentPage->AddChild(params->m_currentSystem);
-        params->m_currentSystem = NULL;
-    }
-
-    MoveItselfTo(params->m_currentPage);
-
-    return FUNCTOR_SIBLINGS;
+    return functor.VisitPageMilestoneEnd(this);
 }
 
-int PageMilestoneEnd::CastOffToSelection(FunctorParams *functorParams)
+FunctorCode PageMilestoneEnd::AcceptEnd(ConstFunctor &functor) const
 {
-    CastOffToSelectionParams *params = vrv_params_cast<CastOffToSelectionParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_page);
-    this->MoveItselfTo(params->m_page);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int PageMilestoneEnd::UnCastOff(FunctorParams *functorParams)
-{
-    UnCastOffParams *params = vrv_params_cast<UnCastOffParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(SCORE)) {
-        // This is the end of a score, which means that nothing else should be added to
-        // the current system and we set it to NULL;
-        assert(params->m_currentSystem);
-        params->m_currentSystem = NULL;
-    }
-
-    MoveItselfTo(params->m_page);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int PageMilestoneEnd::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (this->m_start && this->m_start->Is(MDIV)) {
-        params->m_currentMdivIDs.pop_back();
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitPageMilestoneEnd(this);
 }
 
 //----------------------------------------------------------------------------

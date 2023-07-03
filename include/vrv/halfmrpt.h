@@ -45,16 +45,14 @@ public:
     //----------//
 
     /**
-     * @name See Object::GenerateMIDI
+     * Interface for class functor visitation
      */
     ///@{
-    int GenerateMIDI(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::PrepareRpt
-     */
-    int PrepareRpt(FunctorParams *functorParams) override;
 
 private:
     //

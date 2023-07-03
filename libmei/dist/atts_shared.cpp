@@ -2078,6 +2078,46 @@ bool AttFiling::HasNonfiling() const
 }
 
 //----------------------------------------------------------------------------
+// AttFormework
+//----------------------------------------------------------------------------
+
+AttFormework::AttFormework() : Att()
+{
+    ResetFormework();
+}
+
+void AttFormework::ResetFormework()
+{
+    m_func = PGFUNC_NONE;
+}
+
+bool AttFormework::ReadFormework(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToPgfunc(element.attribute("func").value()));
+        if (removeAttr) element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttFormework::WriteFormework(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = PgfuncToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttFormework::HasFunc() const
+{
+    return (m_func != PGFUNC_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 
@@ -2368,15 +2408,15 @@ AttKeySigDefaultLog::AttKeySigDefaultLog() : Att()
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
-    m_keySig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
+    m_keysig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
 }
 
 bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("key.sig")) {
-        this->SetKeySig(StrToKeysignature(element.attribute("key.sig").value()));
-        if (removeAttr) element.remove_attribute("key.sig");
+    if (element.attribute("keysig")) {
+        this->SetKeysig(StrToKeysignature(element.attribute("keysig").value()));
+        if (removeAttr) element.remove_attribute("keysig");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2385,16 +2425,16 @@ bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element, bool remo
 bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasKeySig()) {
-        element.append_attribute("key.sig") = KeysignatureToStr(this->GetKeySig()).c_str();
+    if (this->HasKeysig()) {
+        element.append_attribute("keysig") = KeysignatureToStr(this->GetKeysig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttKeySigDefaultLog::HasKeySig() const
+bool AttKeySigDefaultLog::HasKeysig() const
 {
-    return (m_keySig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+    return (m_keysig != std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
 }
 
 //----------------------------------------------------------------------------
@@ -5035,6 +5075,46 @@ bool AttRanging::HasMax() const
 bool AttRanging::HasConfidence() const
 {
     return (m_confidence != 0.0);
+}
+
+//----------------------------------------------------------------------------
+// AttRepeatMarkLog
+//----------------------------------------------------------------------------
+
+AttRepeatMarkLog::AttRepeatMarkLog() : Att()
+{
+    ResetRepeatMarkLog();
+}
+
+void AttRepeatMarkLog::ResetRepeatMarkLog()
+{
+    m_func = repeatMarkLog_FUNC_NONE;
+}
+
+bool AttRepeatMarkLog::ReadRepeatMarkLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToRepeatMarkLogFunc(element.attribute("func").value()));
+        if (removeAttr) element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRepeatMarkLog::WriteRepeatMarkLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = RepeatMarkLogFuncToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRepeatMarkLog::HasFunc() const
+{
+    return (m_func != repeatMarkLog_FUNC_NONE);
 }
 
 //----------------------------------------------------------------------------

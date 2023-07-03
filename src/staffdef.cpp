@@ -13,14 +13,13 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "functor.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layerdef.h"
 #include "metersiggrp.h"
 #include "staffgrp.h"
-#include "transposition.h"
 #include "tuning.h"
 #include "vrv.h"
 
@@ -114,6 +113,13 @@ bool StaffDef::IsSupportedChild(Object *child)
     return true;
 }
 
+int StaffDef::GetInsertOrderFor(ClassId classId) const
+{
+    // Anything else goes at the end
+    static const std::vector s_order({ LABEL, LABELABBR });
+    return this->GetInsertOrderForIn(classId, s_order);
+}
+
 bool StaffDef::HasLayerDefWithLabel() const
 {
     // First get all the staffGrps
@@ -130,119 +136,24 @@ bool StaffDef::HasLayerDefWithLabel() const
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
+FunctorCode StaffDef::Accept(Functor &functor)
 {
-    ReplaceDrawingValuesInStaffDefParams *params
-        = vrv_params_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
-    assert(params);
-
-    if (params->m_clef) {
-        this->SetCurrentClef(params->m_clef);
-    }
-    if (params->m_keySig) {
-        this->SetCurrentKeySig(params->m_keySig);
-    }
-    if (params->m_mensur) {
-        this->SetCurrentMensur(params->m_mensur);
-    }
-    if (params->m_meterSig) {
-        this->SetCurrentMeterSig(params->m_meterSig);
-    }
-    if (params->m_meterSigGrp) {
-        this->SetCurrentMeterSigGrp(params->m_meterSigGrp);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitStaffDef(this);
 }
 
-int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
+FunctorCode StaffDef::Accept(ConstFunctor &functor) const
 {
-    SetStaffDefRedrawFlagsParams *params = vrv_params_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
-    assert(params);
-
-    const bool forceRedraw = params->m_redrawFlags & StaffDefRedrawFlags::FORCE_REDRAW;
-    const bool redrawClef = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_CLEF;
-    if (redrawClef || forceRedraw) {
-        this->SetDrawClef(redrawClef);
-    }
-    const bool redrawKeySig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_KEYSIG;
-    if (redrawKeySig || forceRedraw) {
-        this->SetDrawKeySig(redrawKeySig);
-    }
-    const bool redrawMensur = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_MENSUR;
-    if (redrawMensur || forceRedraw) {
-        this->SetDrawMensur(redrawMensur);
-    }
-    const bool redrawMeterSig = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIG;
-    if (redrawMeterSig || forceRedraw) {
-        this->SetDrawMeterSig(redrawMeterSig);
-    }
-    const bool redrawMeterSigGrp = params->m_redrawFlags & StaffDefRedrawFlags::REDRAW_METERSIGGRP;
-    if (redrawMeterSigGrp || forceRedraw) {
-        this->SetDrawMeterSigGrp(redrawMeterSigGrp);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitStaffDef(this);
 }
 
-int StaffDef::PrepareDuration(FunctorParams *functorParams)
+FunctorCode StaffDef::AcceptEnd(Functor &functor)
 {
-    PrepareDurationParams *params = vrv_params_cast<PrepareDurationParams *>(functorParams);
-    assert(params);
-
-    if (this->HasDurDefault() && this->HasN()) {
-        params->m_durDefaultForStaffN[this->GetN()] = this->GetDurDefault();
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitStaffDefEnd(this);
 }
 
-int StaffDef::GenerateMIDI(FunctorParams *functorParams)
+FunctorCode StaffDef::AcceptEnd(ConstFunctor &functor) const
 {
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->GetN() == params->m_staffN) {
-        // Update the semitone transposition
-        if (this->HasTransSemi()) params->m_transSemi = this->GetTransSemi();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int StaffDef::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    if (params->m_transposeToSoundingPitch) {
-        // Retrieve the key signature
-        const KeySig *keySig = vrv_cast<const KeySig *>(this->FindDescendantByType(KEYSIG));
-        if (!keySig) {
-            const ScoreDef *scoreDef = vrv_cast<const ScoreDef *>(this->GetFirstAncestor(SCOREDEF));
-            keySig = vrv_cast<const KeySig *>(scoreDef->FindDescendantByType(KEYSIG));
-        }
-        // Determine and store the transposition interval (based on keySig)
-        if (keySig && this->HasTransSemi() && this->HasN()) {
-            const int fifths = keySig->GetFifthsInt();
-            int semitones = this->GetTransSemi();
-            // Factor out octave transpositions
-            const int sign = (semitones >= 0) ? +1 : -1;
-            semitones = sign * (std::abs(semitones) % 24);
-            params->m_transposer->SetTransposition(fifths, std::to_string(semitones));
-            params->m_transposeIntervalForStaffN[this->GetN()] = params->m_transposer->GetTranspositionIntervalClass();
-            this->ResetTransposition();
-        }
-        else {
-            int transposeInterval = 0;
-            if (this->HasN() && (params->m_transposeIntervalForStaffN.count(this->GetN()) > 0)) {
-                transposeInterval = params->m_transposeIntervalForStaffN.at(this->GetN());
-            }
-            params->m_transposer->SetTransposition(transposeInterval);
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitStaffDefEnd(this);
 }
 
 } // namespace vrv

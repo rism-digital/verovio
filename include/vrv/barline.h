@@ -86,9 +86,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertToCastOffMensural
+     * Interface for class functor visitation
      */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

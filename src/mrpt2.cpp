@@ -16,7 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
@@ -43,6 +43,26 @@ void MRpt2::Reset()
 {
     LayerElement::Reset();
     this->ResetColor();
+}
+
+FunctorCode MRpt2::Accept(Functor &functor)
+{
+    return functor.VisitMRpt2(this);
+}
+
+FunctorCode MRpt2::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitMRpt2(this);
+}
+
+FunctorCode MRpt2::AcceptEnd(Functor &functor)
+{
+    return functor.VisitMRpt2End(this);
+}
+
+FunctorCode MRpt2::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMRpt2End(this);
 }
 
 } // namespace vrv

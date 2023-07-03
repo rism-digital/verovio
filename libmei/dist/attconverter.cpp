@@ -385,6 +385,8 @@ std::string AttConverterBase::ArticulationToStr(data_ARTICULATION data) const
         case ARTICULATION_stacciss: value = "stacciss"; break;
         case ARTICULATION_marc: value = "marc"; break;
         case ARTICULATION_spicc: value = "spicc"; break;
+        case ARTICULATION_stress: value = "stress"; break;
+        case ARTICULATION_unstress: value = "unstress"; break;
         case ARTICULATION_doit: value = "doit"; break;
         case ARTICULATION_scoop: value = "scoop"; break;
         case ARTICULATION_rip: value = "rip"; break;
@@ -431,6 +433,8 @@ data_ARTICULATION AttConverterBase::StrToArticulation(const std::string &value, 
     if (value == "stacciss") return ARTICULATION_stacciss;
     if (value == "marc") return ARTICULATION_marc;
     if (value == "spicc") return ARTICULATION_spicc;
+    if (value == "stress") return ARTICULATION_stress;
+    if (value == "unstress") return ARTICULATION_unstress;
     if (value == "doit") return ARTICULATION_doit;
     if (value == "scoop") return ARTICULATION_scoop;
     if (value == "rip") return ARTICULATION_rip;
@@ -628,6 +632,33 @@ data_BOOLEAN AttConverterBase::StrToBoolean(const std::string &value, bool logWa
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.BOOLEAN", value.c_str());
     return BOOLEAN_NONE;
+}
+
+std::string AttConverterBase::CancelaccidToStr(data_CANCELACCID data) const
+{
+    std::string value;
+    switch (data) {
+        case CANCELACCID_none: value = "none"; break;
+        case CANCELACCID_before: value = "before"; break;
+        case CANCELACCID_after: value = "after"; break;
+        case CANCELACCID_before_bar: value = "before-bar"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.CANCELACCID", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_CANCELACCID AttConverterBase::StrToCancelaccid(const std::string &value, bool logWarning) const
+{
+    if (value == "none") return CANCELACCID_none;
+    if (value == "before") return CANCELACCID_before;
+    if (value == "after") return CANCELACCID_after;
+    if (value == "before-bar") return CANCELACCID_before_bar;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for data.CANCELACCID", value.c_str());
+    return CANCELACCID_NONE;
 }
 
 std::string AttConverterBase::CertaintyToStr(data_CERTAINTY data) const
@@ -2108,7 +2139,6 @@ std::string AttConverterBase::MeterformToStr(data_METERFORM data) const
         case METERFORM_denomsym: value = "denomsym"; break;
         case METERFORM_norm: value = "norm"; break;
         case METERFORM_symplusnorm: value = "sym+norm"; break;
-        case METERFORM_invis: value = "invis"; break;
         default:
             LogWarning("Unknown value '%d' for data.METERFORM", data);
             value = "";
@@ -2123,7 +2153,6 @@ data_METERFORM AttConverterBase::StrToMeterform(const std::string &value, bool l
     if (value == "denomsym") return METERFORM_denomsym;
     if (value == "norm") return METERFORM_norm;
     if (value == "sym+norm") return METERFORM_symplusnorm;
-    if (value == "invis") return METERFORM_invis;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.METERFORM", value.c_str());
     return METERFORM_NONE;
@@ -2847,7 +2876,7 @@ std::string AttConverterBase::NoteheadmodifierToStr(data_NOTEHEADMODIFIER data) 
         case NOTEHEADMODIFIER_brack: value = "brack"; break;
         case NOTEHEADMODIFIER_box: value = "box"; break;
         case NOTEHEADMODIFIER_circle: value = "circle"; break;
-        case NOTEHEADMODIFIER_dblwhole: value = "dblwhole"; break;
+        case NOTEHEADMODIFIER_fences: value = "fences"; break;
         default:
             LogWarning("Unknown value '%d' for data.NOTEHEADMODIFIER", data);
             value = "";
@@ -2867,7 +2896,7 @@ data_NOTEHEADMODIFIER AttConverterBase::StrToNoteheadmodifier(const std::string 
     if (value == "brack") return NOTEHEADMODIFIER_brack;
     if (value == "box") return NOTEHEADMODIFIER_box;
     if (value == "circle") return NOTEHEADMODIFIER_circle;
-    if (value == "dblwhole") return NOTEHEADMODIFIER_dblwhole;
+    if (value == "fences") return NOTEHEADMODIFIER_fences;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER", value.c_str());
     return NOTEHEADMODIFIER_NONE;
@@ -2886,7 +2915,7 @@ std::string AttConverterBase::NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_li
         case NOTEHEADMODIFIER_list_brack: value = "brack"; break;
         case NOTEHEADMODIFIER_list_box: value = "box"; break;
         case NOTEHEADMODIFIER_list_circle: value = "circle"; break;
-        case NOTEHEADMODIFIER_list_dblwhole: value = "dblwhole"; break;
+        case NOTEHEADMODIFIER_list_fences: value = "fences"; break;
         default:
             LogWarning("Unknown value '%d' for data.NOTEHEADMODIFIER.list", data);
             value = "";
@@ -2906,7 +2935,7 @@ data_NOTEHEADMODIFIER_list AttConverterBase::StrToNoteheadmodifierList(const std
     if (value == "brack") return NOTEHEADMODIFIER_list_brack;
     if (value == "box") return NOTEHEADMODIFIER_list_box;
     if (value == "circle") return NOTEHEADMODIFIER_list_circle;
-    if (value == "dblwhole") return NOTEHEADMODIFIER_list_dblwhole;
+    if (value == "fences") return NOTEHEADMODIFIER_list_fences;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER.list", value.c_str());
     return NOTEHEADMODIFIER_list_NONE;
@@ -4049,6 +4078,37 @@ cutout_CUTOUT AttConverterBase::StrToCutoutCutout(const std::string &value, bool
     return cutout_CUTOUT_NONE;
 }
 
+std::string AttConverterBase::DivLineLogFormToStr(divLineLog_FORM data) const
+{
+    std::string value;
+    switch (data) {
+        case divLineLog_FORM_caesura: value = "caesura"; break;
+        case divLineLog_FORM_finalis: value = "finalis"; break;
+        case divLineLog_FORM_maior: value = "maior"; break;
+        case divLineLog_FORM_maxima: value = "maxima"; break;
+        case divLineLog_FORM_minima: value = "minima"; break;
+        case divLineLog_FORM_virgula: value = "virgula"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.divLine.log@form", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+divLineLog_FORM AttConverterBase::StrToDivLineLogForm(const std::string &value, bool logWarning) const
+{
+    if (value == "caesura") return divLineLog_FORM_caesura;
+    if (value == "finalis") return divLineLog_FORM_finalis;
+    if (value == "maior") return divLineLog_FORM_maior;
+    if (value == "maxima") return divLineLog_FORM_maxima;
+    if (value == "minima") return divLineLog_FORM_minima;
+    if (value == "virgula") return divLineLog_FORM_virgula;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.divLine.log@form", value.c_str());
+    return divLineLog_FORM_NONE;
+}
+
 std::string AttConverterBase::DotLogFormToStr(dotLog_FORM data) const
 {
     std::string value;
@@ -4145,25 +4205,25 @@ evidence_EVIDENCE AttConverterBase::StrToEvidenceEvidence(const std::string &val
     return evidence_EVIDENCE_NONE;
 }
 
-std::string AttConverterBase::ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const
+std::string AttConverterBase::ExtSymAuthGlyphauthToStr(extSymAuth_GLYPHAUTH data) const
 {
     std::string value;
     switch (data) {
-        case extSym_GLYPHAUTH_smufl: value = "smufl"; break;
+        case extSymAuth_GLYPHAUTH_smufl: value = "smufl"; break;
         default:
-            LogWarning("Unknown value '%d' for att.extSym@glyph.auth", data);
+            LogWarning("Unknown value '%d' for att.extSym.auth@glyph.auth", data);
             value = "";
             break;
     }
     return value;
 }
 
-extSym_GLYPHAUTH AttConverterBase::StrToExtSymGlyphauth(const std::string &value, bool logWarning) const
+extSymAuth_GLYPHAUTH AttConverterBase::StrToExtSymAuthGlyphauth(const std::string &value, bool logWarning) const
 {
-    if (value == "smufl") return extSym_GLYPHAUTH_smufl;
+    if (value == "smufl") return extSymAuth_GLYPHAUTH_smufl;
     if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.extSym@glyph.auth", value.c_str());
-    return extSym_GLYPHAUTH_NONE;
+        LogWarning("Unsupported value '%s' for att.extSym.auth@glyph.auth", value.c_str());
+    return extSymAuth_GLYPHAUTH_NONE;
 }
 
 std::string AttConverterBase::FTremLogFormToStr(fTremLog_FORM data) const
@@ -5171,6 +5231,35 @@ rehearsal_REHENCLOSE AttConverterBase::StrToRehearsalRehenclose(const std::strin
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.rehearsal@reh.enclose", value.c_str());
     return rehearsal_REHENCLOSE_NONE;
+}
+
+std::string AttConverterBase::RepeatMarkLogFuncToStr(repeatMarkLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case repeatMarkLog_FUNC_coda: value = "coda"; break;
+        case repeatMarkLog_FUNC_segno: value = "segno"; break;
+        case repeatMarkLog_FUNC_dalSegno: value = "dalSegno"; break;
+        case repeatMarkLog_FUNC_daCapo: value = "daCapo"; break;
+        case repeatMarkLog_FUNC_fine: value = "fine"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.repeatMark.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+repeatMarkLog_FUNC AttConverterBase::StrToRepeatMarkLogFunc(const std::string &value, bool logWarning) const
+{
+    if (value == "coda") return repeatMarkLog_FUNC_coda;
+    if (value == "segno") return repeatMarkLog_FUNC_segno;
+    if (value == "dalSegno") return repeatMarkLog_FUNC_dalSegno;
+    if (value == "daCapo") return repeatMarkLog_FUNC_daCapo;
+    if (value == "fine") return repeatMarkLog_FUNC_fine;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.repeatMark.log@func", value.c_str());
+    return repeatMarkLog_FUNC_NONE;
 }
 
 std::string AttConverterBase::SbVisFormToStr(sbVis_FORM data) const

@@ -23,6 +23,7 @@
 #include "dir.h"
 #include "ending.h"
 #include "ftrem.h"
+#include "harm.h"
 #include "io.h"
 #include "keysig.h"
 #include "label.h"
@@ -222,9 +223,14 @@ namespace humaux {
         // add to a note/chord.  The states are:
         // '\' == down stem
         // '/' == up stem
-        // 'x' == no stem
-        // 'X' == no automatic assignments (assignment will be done automatically by verovio).
+        // 'x' == no stem (better to use *Xstem instead)
+        // 'X' == no automatic assignments (assignment will be done automatically by verovio) (better to use *stem
+        // instead to cancel *Xstem)
         std::vector<char> stem_type;
+
+        // stem_visible == keeps track of whether the stem should be made
+        // invisible or not for a staff.
+        std::vector<bool> stem_visible;
 
         // ligature_recta == true if in a recta ligature
         bool ligature_recta = false;
@@ -475,8 +481,8 @@ protected:
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
     void addBreath(hum::HTp token, vrv::Object *parent = NULL);
-    void addTrill(hum::HTp token);
-    void addTurn(vrv::Object *linked, hum::HTp token);
+    void addTrill(vrv::Object *linked, hum::HTp token);
+    void addTurn(hum::HTp token, const string &tok, int noteIndex);
     void addMordent(vrv::Object *linked, hum::HTp token);
     void addOrnaments(vrv::Object *object, hum::HTp token);
     void addArpeggio(vrv::Object *object, hum::HTp token);
@@ -492,7 +498,6 @@ protected:
     void prepareBeamAndTupletGroups(
         std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
     void assignScalingToTupletGroup(std::vector<humaux::HumdrumBeamAndTuplet *> &tggroup);
-
     void printGroupInfo(const std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
         const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
@@ -740,6 +745,7 @@ protected:
     void addPlicaDown(Note *note);
     void setLayoutSlurDirection(Slur *slur, hum::HTp token);
     void setFontStyle(Rend *rend, const string &fontstyle);
+    void setFontWeight(Rend *rend, const std::string &fontweight);
     void importVerovioOptions(Doc *doc);
     void adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<string> &tstrings);
     void adjustChordNoteDuration(Note *note, hum::HumNum hdur, int dur, int dots, hum::HumNum chorddur,
@@ -788,6 +794,42 @@ protected:
     data_DURATION oneOverDenominatorToDur(int denominator);
     bool isExpressibleDuration(hum::HumNum duration);
     pair<data_DURATION, int> getDurAndDots(hum::HumNum duration);
+    void checkForClefStyling(Clef *clef, hum::HTp token);
+    void setClefColorOrEditorial(
+        hum::HTp token, Clef *clef, std::vector<std::string> &elements, std::vector<void *> &pointers);
+    void setClefOctaveDisplacement(Clef *clef, const std::string &token);
+    void setClefBasicShape(Clef *clef, const std::string &tok);
+    void setClefStaffLine(Clef *clef, const std::string &tok);
+    void analyzeHarmInterpretations(hum::HTp starttok);
+    void analyzeDegreeInterpretations(hum::HTp starttok);
+    void analyzeTextInterpretation(hum::HTp starttok);
+    void addHarmLabel(
+        hum::HumNum timestamp, const std::string &label, const std::string &n, const std::string &place, int staffNum);
+    std::u32string getMoveableDoName(hum::HTp token, int degree, int semitones);
+    void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
+    void setFontStyleForHarm(Harm *harm, const std::string &style);
+    std::u32string addSemitoneAdjustmentsToDeg(
+        hum::HTp token, int arrowQ, int accidQ, int solfegeQ, int sharps, int flats);
+    int hasParallelNote(hum::HTp token);
+    void setHarmContent(Rend *rend, hum::HTp token);
+    std::string removeRecipFromHarmContent(const std::string &input);
+    void setMxHarmContent(Rend *rend, const std::string &content);
+    void setDegreeContent(Rend *rend, hum::HTp token, int n = 0);
+    std::u32string cleanStringString(const std::string &content);
+    std::vector<std::u32string> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
+    std::u32string cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
+    std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
+    std::u32string getVisualFBAccidental(int accidental);
+    std::u32string convertFBNumber(const std::string &input, hum::HTp token);
+    void checkForLineContinuations(hum::HTp token);
+    std::u32string convertNumberToWstring(int number);
+    void appendTextToRend(Rend *rend, const std::string &content);
+    void parseMultiVerovioOptions(std::map<std::string, std::string> &parameters, const string &input);
+    void addSforzandoToNote(hum::HTp token, int staffindex);
+    void addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters, int staffindex,
+        int staffadj, int trackdiff);
+    bool hasNoStaves(hum::HumdrumFile &infile);
+    hum::HTp getVisualKeySignature(hum::HTp keysigtok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -874,17 +916,6 @@ protected:
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     static bool replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr);
-    std::u32string cleanHarmString(const std::string &content);
-    std::u32string cleanHarmString2(const std::string &content);
-    std::u32string cleanHarmString3(const std::string &content);
-    std::u32string cleanStringString(const std::string &content);
-    std::vector<std::u32string> cleanFBString(std::vector<std::string> &pieces, hum::HTp token);
-    std::u32string cleanFBString2(std::vector<std::string> &pieces, hum::HTp token);
-    std::vector<std::string> splitFBString(const std::string &content, const std::string &separator = " ");
-    std::u32string getVisualFBAccidental(int accidental);
-    std::u32string convertFBNumber(const std::string &input, hum::HTp token);
-    void checkForLineContinuations(hum::HTp token);
-    std::u32string convertNumberToWstring(int number);
 
 private:
     // m_filename == Filename to read/was read.
@@ -978,9 +1009,14 @@ private:
     int m_measureIndex;
 
     // m_harm == state variable for keeping track of whether or not
-    // the file to convert contains **mxhm spines that should be
+    // the file to convert contains **mxhm or **harm spines that should be
     // converted into <harm> element in the MEI conversion.
     bool m_harm = false;
+
+    // m_degree == state variable for keeping track of whether or not
+    // the file to convert contains **deg or **degree spines that should be
+    // converted into <harm> element in the MEI conversion.
+    bool m_degree = false;
 
     // m_fing == state variable for keeping track of whether or not
     // the file to convert contains **fing spines that should be

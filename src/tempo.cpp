@@ -15,7 +15,7 @@
 
 #include "comparison.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "measure.h"
 #include "staff.h"
 #include "system.h"
@@ -86,67 +86,24 @@ int Tempo::GetDrawingXRelativeToStaff(int staffN) const
     return this->GetStart()->GetDrawingX() + m_relativeX;
 }
 
-int Tempo::AdjustTempo(FunctorParams *functorParams)
+FunctorCode Tempo::Accept(Functor &functor)
 {
-    AdjustTempoParams *params = vrv_params_cast<AdjustTempoParams *>(functorParams);
-    assert(params);
-
-    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
-    ArrayOfFloatingPositioners positioners;
-    params->m_systemAligner->FindAllPositionerPointingTo(&positioners, this);
-
-    if (positioners.empty()) {
-        return FUNCTOR_SIBLINGS;
-    }
-
-    Measure *measure = vrv_cast<Measure *>(this->GetFirstAncestor(MEASURE));
-    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
-    Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindDescendantByComparison(&alignmentComparison, 1));
-
-    for (auto positioner : positioners) {
-        int left, right;
-        int start = this->GetStart()->GetDrawingX();
-        const int staffN = positioner->GetAlignment()->GetStaff()->GetN();
-        if (!this->HasStartid() && (this->GetTstamp() <= 1) && pos) {
-            left = measure->GetDrawingX() + pos->GetXRel();
-        }
-        else {
-            Alignment *align = this->GetStart()->GetAlignment();
-            align->GetLeftRight(staffN, left, right);
-        }
-
-        if (std::abs(left) != std::abs(VRV_UNSET)) {
-            m_drawingXRels[staffN] = left - start;
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitTempo(this);
 }
 
-int Tempo::ResetData(FunctorParams *functorParams)
+FunctorCode Tempo::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    m_drawingXRels.clear();
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitTempo(this);
 }
 
-int Tempo::InitMaxMeasureDuration(FunctorParams *functorParams)
+FunctorCode Tempo::AcceptEnd(Functor &functor)
 {
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
+    return functor.VisitTempoEnd(this);
+}
 
-    if (this->HasMidiBpm()) {
-        params->m_currentTempo = this->GetMidiBpm();
-    }
-    else if (this->HasMm()) {
-        params->m_currentTempo = Tempo::CalcTempo(this);
-    }
-
-    return FUNCTOR_CONTINUE;
+FunctorCode Tempo::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTempoEnd(this);
 }
 
 double Tempo::CalcTempo(const AttMmTempo *attMmTempo)

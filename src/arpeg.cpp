@@ -15,7 +15,7 @@
 
 #include "chord.h"
 #include "doc.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "horizontalaligner.h"
 #include "note.h"
 #include "staff.h"
@@ -97,6 +97,16 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
     // See GetDrawingX
     if (this->GetCurrentFloatingPositioner()) {
         this->GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
+    }
+}
+
+void Arpeg::CacheXRel(bool restore)
+{
+    if (restore) {
+        m_drawingXRel = m_cachedXRel;
+    }
+    else {
+        m_cachedXRel = m_drawingXRel;
     }
 }
 
@@ -183,112 +193,24 @@ const Staff *Arpeg::GetCrossStaff() const
 // Arpeg functor methods
 //----------------------------------------------------------------------------
 
-int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
+FunctorCode Arpeg::Accept(Functor &functor)
 {
-    m_drawingXRel = 0;
-
-    return ControlElement::ResetHorizontalAlignment(functorParams);
+    return functor.VisitArpeg(this);
 }
 
-int Arpeg::AdjustArpeg(FunctorParams *functorParams)
+FunctorCode Arpeg::Accept(ConstFunctor &functor) const
 {
-    AdjustArpegParams *params = vrv_params_cast<AdjustArpegParams *>(functorParams);
-    assert(params);
-
-    Note *topNote = NULL;
-    Note *bottomNote = NULL;
-
-    this->GetDrawingTopBottomNotes(topNote, bottomNote);
-
-    // Nothing to do
-    if (!topNote || !bottomNote) return FUNCTOR_CONTINUE;
-
-    // We should have call DrawArpeg before
-    assert(this->GetCurrentFloatingPositioner());
-
-    Staff *topStaff = topNote->GetAncestorStaff();
-    Staff *bottomStaff = bottomNote->GetAncestorStaff();
-
-    Staff *crossStaff = this->GetCrossStaff();
-    const int staffN = (crossStaff != NULL) ? crossStaff->GetN() : topStaff->GetN();
-
-    int minTopLeft, maxTopRight;
-    topNote->GetAlignment()->GetLeftRight(staffN, minTopLeft, maxTopRight);
-
-    params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, topStaff->GetN(), false));
-
-    if (topStaff != bottomStaff) {
-        int minBottomLeft, maxBottomRight;
-        topNote->GetAlignment()->GetLeftRight(bottomStaff->GetN(), minBottomLeft, maxBottomRight);
-        minTopLeft = std::min(minTopLeft, minBottomLeft);
-
-        params->m_alignmentArpegTuples.push_back(
-            std::make_tuple(topNote->GetAlignment(), this, bottomStaff->GetN(), false));
-    }
-
-    if (minTopLeft != -VRV_UNSET) {
-        int dist = topNote->GetDrawingX() - minTopLeft;
-        // HARDCODED
-        double unitFactor = 1.0;
-        if ((this->GetEnclose() == ENCLOSURE_brack) || (this->GetEnclose() == ENCLOSURE_box)) unitFactor += 0.75;
-        if (this->GetArrow() == BOOLEAN_true) unitFactor += 0.33;
-        dist += unitFactor * params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize);
-        this->SetDrawingXRel(-dist);
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitArpeg(this);
 }
 
-int Arpeg::ResetData(FunctorParams *functorParams)
+FunctorCode Arpeg::AcceptEnd(Functor &functor)
 {
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
-
-    PlistInterface *interface = this->GetPlistInterface();
-    assert(interface);
-    return interface->InterfaceResetData(functorParams, this);
+    return functor.VisitArpegEnd(this);
 }
 
-int Arpeg::CacheHorizontalLayout(FunctorParams *functorParams)
+FunctorCode Arpeg::AcceptEnd(ConstFunctor &functor) const
 {
-    CacheHorizontalLayoutParams *params = vrv_params_cast<CacheHorizontalLayoutParams *>(functorParams);
-    assert(params);
-
-    if (params->m_restore) {
-        m_drawingXRel = m_cachedXRel;
-    }
-    else {
-        m_cachedXRel = m_drawingXRel;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Arpeg::InitMIDI(FunctorParams *functorParams)
-{
-    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
-    assert(params);
-
-    // Sort the involved notes by playing order
-    const bool playTopDown = (this->GetOrder() == arpegLog_ORDER_down);
-    std::set<Note *> notes = this->GetNotes();
-    std::vector<Note *> sortedNotes;
-    std::copy(notes.begin(), notes.end(), std::back_inserter(sortedNotes));
-    std::sort(sortedNotes.begin(), sortedNotes.end(), [playTopDown](Note *note1, Note *note2) {
-        const int pitch1 = note1->GetMIDIPitch();
-        const int pitch2 = note2->GetMIDIPitch();
-        return playTopDown ? (pitch1 > pitch2) : (pitch1 < pitch2);
-    });
-
-    // Defer the notes in playing order
-    double shift = 0.0;
-    const double increment = UNACC_GRACENOTE_DUR * params->m_currentTempo / 60000.0;
-    for (Note *note : sortedNotes) {
-        if (shift > 0.0) params->m_deferredNotes[note] = shift;
-        shift += increment;
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitArpegEnd(this);
 }
 
 } // namespace vrv

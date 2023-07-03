@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -76,14 +77,24 @@ bool MNum::IsSupportedChild(Object *child)
 
 static const ClassRegistrar<MNum> s_factory("mNum", MNUM);
 
-int MNum::Save(FunctorParams *functorParams)
+FunctorCode MNum::Accept(Functor &functor)
 {
-    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::Save(functorParams);
+    return functor.VisitMNum(this);
 }
 
-int MNum::SaveEnd(FunctorParams *functorParams)
+FunctorCode MNum::Accept(ConstFunctor &functor) const
 {
-    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::SaveEnd(functorParams);
+    return functor.VisitMNum(this);
+}
+
+FunctorCode MNum::AcceptEnd(Functor &functor)
+{
+    return functor.VisitMNumEnd(this);
+}
+
+FunctorCode MNum::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitMNumEnd(this);
 }
 
 } // namespace vrv

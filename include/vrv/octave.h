@@ -91,9 +91,14 @@ public:
     //----------//
 
     /**
-     * See Object::ResetVerticalAlignment
+     * Interface for class functor visitation
      */
-    int ResetVerticalAlignment(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

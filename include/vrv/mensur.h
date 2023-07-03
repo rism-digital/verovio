@@ -56,9 +56,14 @@ public:
     //----------//
 
     /**
-     * See Object::LayerCountInTimeSpan
+     * Interface for class functor visitation
      */
-    int LayerCountInTimeSpan(FunctorParams *functorParams) const override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

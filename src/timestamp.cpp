@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "functor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -36,6 +38,26 @@ void TimestampAttr::Reset()
 double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit) const
 {
     return DUR_MAX / meterUnit * m_actualDurPos;
+}
+
+FunctorCode TimestampAttr::Accept(Functor &functor)
+{
+    return functor.VisitTimestamp(this);
+}
+
+FunctorCode TimestampAttr::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitTimestamp(this);
+}
+
+FunctorCode TimestampAttr::AcceptEnd(Functor &functor)
+{
+    return functor.VisitTimestampEnd(this);
+}
+
+FunctorCode TimestampAttr::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTimestampEnd(this);
 }
 
 } // namespace vrv

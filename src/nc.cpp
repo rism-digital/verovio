@@ -16,6 +16,8 @@
 #include "comparison.h"
 #include "doc.h"
 #include "elementpart.h"
+#include "functor.h"
+#include "liquescent.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -58,6 +60,37 @@ void Nc::Reset()
     this->ResetColor();
     this->ResetIntervalMelodic();
     this->ResetNcForm();
+}
+
+FunctorCode Nc::Accept(Functor &functor)
+{
+    return functor.VisitNc(this);
+}
+
+FunctorCode Nc::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNc(this);
+}
+
+FunctorCode Nc::AcceptEnd(Functor &functor)
+{
+    return functor.VisitNcEnd(this);
+}
+
+FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNcEnd(this);
+}
+
+bool Nc::IsSupportedChild(Object *child)
+{
+    if (child->Is(LIQUESCENT)) {
+        assert(dynamic_cast<Liquescent *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 } // namespace vrv

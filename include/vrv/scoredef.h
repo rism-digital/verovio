@@ -23,9 +23,7 @@ class Mensur;
 class MeterSig;
 class MeterSigGrp;
 class PgFoot;
-class PgFoot2;
 class PgHead;
-class PgHead2;
 class StaffGrp;
 class StaffDef;
 
@@ -104,14 +102,14 @@ public:
     //----------//
 
     /**
-     * See Object::ConvertMarkupScoreDef
+     * Interface for class functor visitation
      */
-    int ConvertMarkupScoreDef(FunctorParams *) override;
-
-    /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDefEnd(FunctorParams *) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //
@@ -149,7 +147,15 @@ public:
     std::string GetClassName() const override { return "ScoreDef"; }
     ///@}
 
+    /**
+     * Check if a object is allowed as child.
+     */
     bool IsSupportedChild(Object *object) override;
+
+    /**
+     * Return an order for the given ClassId.
+     */
+    int GetInsertOrderFor(ClassId classId) const override;
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.
@@ -199,7 +205,6 @@ public:
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
-     * Apply StaffDefRedrawFlags that are defined in functorparams.h
      */
     void SetRedrawFlags(int redrawFlags);
 
@@ -219,21 +224,23 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    /**
+     * @name Set and get the drawing label width.
+     */
+    ///@{
     int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
+    void ResetDrawingLabelsWidth() { m_drawingLabelsWidth = 0; }
+    ///@}
 
     /**
      * @name Getters for running elements
      */
     ///@{
-    PgFoot *GetPgFoot();
-    const PgFoot *GetPgFoot() const;
-    PgFoot2 *GetPgFoot2();
-    const PgFoot2 *GetPgFoot2() const;
-    PgHead *GetPgHead();
-    const PgHead *GetPgHead() const;
-    PgHead2 *GetPgHead2();
-    const PgHead2 *GetPgHead2() const;
+    PgFoot *GetPgFoot(data_PGFUNC func);
+    const PgFoot *GetPgFoot(data_PGFUNC func) const;
+    PgHead *GetPgHead(data_PGFUNC func);
+    const PgHead *GetPgHead(data_PGFUNC func) const;
     ///@}
 
     /**
@@ -253,66 +260,13 @@ public:
     //----------//
 
     /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertToCastOffMensural
-     */
-    int ConvertToCastOffMensural(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffSystems
-     */
-    int CastOffSystems(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    int CastOffEncoding(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CastOffToSelection
-     */
-    int CastOffToSelection(FunctorParams *) override;
-
-    /**
-     * See Object::AlignMeasures
-     */
-    int AlignMeasures(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    int InitMaxMeasureDuration(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::JustifyX
-     */
-    int JustifyX(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareDuration
-     */
-    int PrepareDuration(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
+     * Interface for class functor visitation
      */
     ///@{
-    int Transpose(FunctorParams *functorParams) override;
-    int TransposeEnd(FunctorParams *functorParams) override;
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 protected:

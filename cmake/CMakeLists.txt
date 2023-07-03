@@ -20,6 +20,7 @@ option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      O
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 option(NO_RUNTIME               "Disable runtime clock support"                ON)
 option(BUILD_AS_LIBRARY         "Build Verovio as library"                     OFF)
+option(BUILD_AS_ANDROID_LIBRARY "Build Verovio as library for Android"         OFF)
 option(USE_PAE_OLD_PARSER       "Use old PAE parser"                           OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
@@ -172,7 +173,7 @@ set(all_SRC
 # Shared library #
 ##################
 
-if (BUILD_AS_LIBRARY)
+if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
     message(STATUS "***** Building Verovio as shared library *****")
     add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
 
@@ -234,6 +235,11 @@ else()
     message(STATUS "***** Building Verovio as command-line tool *****")
     add_executable(verovio ../tools/main.cpp ${all_SRC})
 
+endif()
+
+if (BUILD_AS_ANDROID_LIBRARY)
+    find_library(log-lib log)
+    target_link_libraries(verovio ${log-lib})
 endif()
 
 install(

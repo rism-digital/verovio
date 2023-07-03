@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <symbol> element.
  */
-class Symbol : public TextElement, public AttColor, public AttExtSym, public AttTypography {
+class Symbol : public TextElement, public AttColor, public AttExtSymAuth, public AttExtSymNames, public AttTypography {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -45,6 +45,16 @@ public:
      * Get the SMuFL glyph for the symbol based on glyph.num or glyph.name
      */
     char32_t GetSymbolGlyph() const;
+
+    /**
+     * Interface for class functor visitation
+     */
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

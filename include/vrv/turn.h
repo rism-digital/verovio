@@ -26,7 +26,8 @@ namespace vrv {
 class Turn : public ControlElement,
              public TimePointInterface,
              public AttColor,
-             public AttExtSym,
+             public AttExtSymAuth,
+             public AttExtSymNames,
              public AttOrnamentAccid,
              public AttPlacementRelStaff,
              public AttTurnLog {
@@ -69,14 +70,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareDelayedTurns
+     * Interface for class functor visitation
      */
-    int PrepareDelayedTurns(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 protected:
     //

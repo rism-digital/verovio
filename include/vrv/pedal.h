@@ -27,7 +27,8 @@ class System;
 class Pedal : public ControlElement,
               public TimeSpanningInterface,
               public AttColor,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttPedalLog,
               public AttPedalVis,
               public AttPlacementRelStaff,
@@ -84,14 +85,14 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareFloatingGrps
+     * Interface for class functor visitation
      */
-    int PrepareFloatingGrps(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     /**

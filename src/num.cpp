@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -46,6 +47,26 @@ bool Num::IsSupportedChild(Object *child)
         return false;
     }
     return true;
+}
+
+FunctorCode Num::Accept(Functor &functor)
+{
+    return functor.VisitNum(this);
+}
+
+FunctorCode Num::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitNum(this);
+}
+
+FunctorCode Num::AcceptEnd(Functor &functor)
+{
+    return functor.VisitNumEnd(this);
+}
+
+FunctorCode Num::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitNumEnd(this);
 }
 
 } // namespace vrv

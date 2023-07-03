@@ -13,8 +13,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
+#include "doc.h"
+#include "functor.h"
 #include "layerelement.h"
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -30,14 +32,16 @@ Turn::Turn()
     : ControlElement(TURN, "turn-")
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttOrnamentAccid()
     , AttPlacementRelStaff()
     , AttTurnLog()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
     this->RegisterAttClass(ATT_TURNLOG);
@@ -52,7 +56,8 @@ void Turn::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
     this->ResetPlacementRelStaff();
     this->ResetTurnLog();
@@ -97,33 +102,24 @@ int Turn::GetTurnHeight(const Doc *doc, int staffSize) const
 // Turn functor methods
 //----------------------------------------------------------------------------
 
-int Turn::PrepareDelayedTurns(FunctorParams *functorParams)
+FunctorCode Turn::Accept(Functor &functor)
 {
-    PrepareDelayedTurnsParams *params = vrv_params_cast<PrepareDelayedTurnsParams *>(functorParams);
-    assert(params);
-
-    // We already initialized the params->m_delayedTurns map
-    if (!params->m_initMap) return FUNCTOR_CONTINUE;
-
-    // Map only delayed turns
-    if (this->GetDelayed() != BOOLEAN_true) return FUNCTOR_CONTINUE;
-
-    // Map only delayed turn pointing to a LayerElement (i.e., not using @tstamp)
-    if (this->GetStart() && !this->GetStart()->Is(TIMESTAMP_ATTR)) {
-        params->m_delayedTurns[this->GetStart()] = this;
-    }
-
-    return FUNCTOR_CONTINUE;
+    return functor.VisitTurn(this);
 }
 
-int Turn::ResetData(FunctorParams *functorParams)
+FunctorCode Turn::Accept(ConstFunctor &functor) const
 {
-    // Call parent one too
-    ControlElement::ResetData(functorParams);
+    return functor.VisitTurn(this);
+}
 
-    m_drawingEndElement = NULL;
+FunctorCode Turn::AcceptEnd(Functor &functor)
+{
+    return functor.VisitTurnEnd(this);
+}
 
-    return FUNCTOR_CONTINUE;
+FunctorCode Turn::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTurnEnd(this);
 }
 
 } // namespace vrv

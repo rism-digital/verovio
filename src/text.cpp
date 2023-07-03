@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functor.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -32,6 +33,28 @@ Text::~Text() {}
 void Text::Reset()
 {
     TextElement::Reset();
+
+    m_isGenerated = false;
+}
+
+FunctorCode Text::Accept(Functor &functor)
+{
+    return functor.VisitText(this);
+}
+
+FunctorCode Text::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitText(this);
+}
+
+FunctorCode Text::AcceptEnd(Functor &functor)
+{
+    return functor.VisitTextEnd(this);
+}
+
+FunctorCode Text::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitTextEnd(this);
 }
 
 } // namespace vrv

@@ -40,9 +40,14 @@ public:
     //----------//
 
     /**
-     * See Object::CastOffEncoding
+     * Interface for class functor visitation
      */
-    int CastOffEncoding(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
     //

@@ -19,7 +19,7 @@
 #include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
-#include "functorparams.h"
+#include "functor.h"
 #include "gracegrp.h"
 #include "layer.h"
 #include "measure.h"
@@ -241,7 +241,8 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             }
         }
 
-        coord->UpdateStemLength(stemmedInterface, y1, y2, stemAdjust);
+        coord->UpdateStemLength(
+            stemmedInterface, y1, y2, stemAdjust, (beamInterface->m_drawingPlace == BEAMPLACE_mixed));
     }
 
     if (doc->GetOptions()->m_beamFrenchStyle.GetValue() && (m_beamElementCoordRefs.size() > 2)) {
@@ -1735,6 +1736,26 @@ bool Beam::IsTabBeam() const
     return (this->FindDescendantByType(TABGRP));
 }
 
+FunctorCode Beam::Accept(Functor &functor)
+{
+    return functor.VisitBeam(this);
+}
+
+FunctorCode Beam::Accept(ConstFunctor &functor) const
+{
+    return functor.VisitBeam(this);
+}
+
+FunctorCode Beam::AcceptEnd(Functor &functor)
+{
+    return functor.VisitBeamEnd(this);
+}
+
+FunctorCode Beam::AcceptEnd(ConstFunctor &functor) const
+{
+    return functor.VisitBeamEnd(this);
+}
+
 //----------------------------------------------------------------------------
 // BeamSpanSegment
 //----------------------------------------------------------------------------
@@ -1811,7 +1832,8 @@ BeamElementCoord::~BeamElementCoord() {}
 data_STEMDIRECTION BeamElementCoord::GetStemDir() const
 {
     // m_stem is not necessary set, so we need to look at the Note / Chord original value
-    // Example: IsInBeam called in Note::PrepareLayerElementParts when reaching the first note of the beam
+    // Example: IsInBeam called in PrepareLayerElementPartsFunctor::VisitNote when reaching
+    // the first note of the beam
     if (m_stem) {
         return m_stem->GetDir();
     }
@@ -2014,7 +2036,8 @@ void BeamElementCoord::SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, boo
     }
 }
 
-void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust)
+void BeamElementCoord::UpdateStemLength(
+    StemmedDrawingInterface *stemmedInterface, int y1, int y2, int stemAdjust, bool inMixedBeam)
 {
     Stem *stem = stemmedInterface->GetDrawingStem();
     // This is the case with fTrem on whole notes
@@ -2028,8 +2051,8 @@ void BeamElementCoord::UpdateStemLength(StemmedDrawingInterface *stemmedInterfac
     stem->SetDrawingStemLen(newStemLen);
     stem->SetDrawingStemAdjust(-stemAdjust);
     const int lenChange = newStemLen - prevStemLen;
-    // If length didn't change -just exit
-    if (!lenChange) return;
+    // If length didn't change or no mixed beam - just exit
+    if (!lenChange || !inMixedBeam) return;
 
     // Adjust existing artic
     ListOfObjects artics = m_element->FindAllDescendantsByType(ARTIC);
@@ -2089,160 +2112,6 @@ int Beam::GetBeamPartDuration(int x, bool includeRests) const
 int Beam::GetBeamPartDuration(const Object *object, bool includeRests) const
 {
     return this->GetBeamPartDuration(object->GetDrawingX(), includeRests);
-}
-
-//----------------------------------------------------------------------------
-// Functors methods
-//----------------------------------------------------------------------------
-
-int Beam::AdjustBeams(FunctorParams *functorParams)
-{
-    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
-    assert(params);
-
-    if (this->IsTabBeam() || this->HasSameas() || !this->GetChildCount()
-        || m_beamSegment.m_beamElementCoordRefs.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // process highest-level beam
-    if (!params->m_beam) {
-        if (m_drawingPlace == BEAMPLACE_mixed) {
-            m_beamSegment.RequestStaffSpace(params->m_doc, this);
-        }
-        else {
-            params->m_beam = this;
-            params->m_y1 = m_beamSegment.m_beamElementCoordRefs.front()->m_yBeam;
-            params->m_y2 = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam;
-            params->m_x1 = m_beamSegment.m_beamElementCoordRefs.front()->m_x;
-            params->m_x2 = m_beamSegment.m_beamElementCoordRefs.back()->m_x;
-            params->m_beamSlope = m_beamSegment.m_beamSlope;
-            params->m_directionBias = (m_drawingPlace == BEAMPLACE_above) ? 1 : -1;
-            params->m_overlapMargin
-                = this->CalcLayerOverlap(params->m_doc, params->m_directionBias, params->m_y1, params->m_y2);
-        }
-        return FUNCTOR_CONTINUE;
-    }
-
-    int leftMargin = 0, rightMargin = 0;
-    Beam *beam = vrv_cast<Beam *>(params->m_beam);
-    const int beamCount = beam->GetBeamPartDuration((*m_beamSegment.m_beamElementCoordRefs.begin())->m_x) - DUR_8;
-    const int currentBeamYLeft
-        = params->m_y1 + params->m_beamSlope * ((*m_beamSegment.m_beamElementCoordRefs.begin())->m_x - params->m_x1);
-    const int currentBeamYRight
-        = params->m_y1 + params->m_beamSlope * (m_beamSegment.m_beamElementCoordRefs.back()->m_x - params->m_x1);
-    leftMargin = (*m_beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - currentBeamYLeft
-        + params->m_directionBias * (beamCount * beam->m_beamWidth + beam->m_beamWidthBlack);
-    rightMargin = m_beamSegment.m_beamElementCoordRefs.back()->m_yBeam - currentBeamYRight
-        + params->m_directionBias * (beamCount * beam->m_beamWidth + beam->m_beamWidthBlack);
-
-    const int overlapMargin = std::max(leftMargin * params->m_directionBias, rightMargin * params->m_directionBias);
-    if (overlapMargin >= params->m_overlapMargin) {
-        Staff *staff = this->GetAncestorStaff();
-        const int staffOffset = params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        params->m_overlapMargin = (overlapMargin + staffOffset) * params->m_directionBias;
-    }
-    return FUNCTOR_SIBLINGS;
-}
-
-int Beam::AdjustBeamsEnd(FunctorParams *functorParams)
-{
-    AdjustBeamParams *params = vrv_params_cast<AdjustBeamParams *>(functorParams);
-    assert(params);
-
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
-
-    if (params->m_beam != this) return FUNCTOR_CONTINUE;
-
-    if (m_drawingPlace == BEAMPLACE_mixed) return FUNCTOR_CONTINUE;
-
-    Layer *parentLayer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    if (parentLayer) {
-        // find elements on the other layers for the duration of the current beam
-        auto otherLayersElements = parentLayer->GetLayerElementsForTimeSpanOf(this, true);
-        if (!otherLayersElements.empty()) {
-            // call AdjustBeams separately for each element to find possible overlaps
-            params->m_isOtherLayer = true;
-            for (const auto element : otherLayersElements) {
-                if (!params->m_beam->HorizontalContentOverlap(element)) continue;
-                element->AdjustBeams(params);
-            }
-            params->m_isOtherLayer = false;
-        }
-    }
-
-    // set overlap margin for each coord in the beam
-    if (params->m_overlapMargin) {
-        std::for_each(m_beamSegment.m_beamElementCoordRefs.begin(), m_beamSegment.m_beamElementCoordRefs.end(),
-            [overlap = params->m_overlapMargin](BeamElementCoord *coord) { coord->m_overlapMargin = overlap; });
-    }
-    params->m_beam = NULL;
-    params->m_overlapMargin = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::CalcStem(FunctorParams *functorParams)
-{
-    CalcStemParams *params = vrv_params_cast<CalcStemParams *>(functorParams);
-    assert(params);
-
-    const ListOfObjects &beamChildren = this->GetList(this);
-
-    // Should we assert this at the beginning?
-    if (beamChildren.empty()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-    Staff *staff = vrv_cast<Staff *>(layer->GetFirstAncestor(STAFF));
-    assert(staff);
-
-    if (!this->HasCoords()) {
-        this->InitCoords(beamChildren, staff, this->GetPlace());
-        const bool isCue = ((this->GetCue() == BOOLEAN_true) || this->GetFirstAncestor(GRACEGRP));
-        this->InitCue(isCue);
-    }
-
-    if (this->IsTabBeam()) return FUNCTOR_CONTINUE;
-
-    m_beamSegment.InitCoordRefs(this->GetElementCoords());
-
-    data_BEAMPLACE initialPlace = this->GetPlace();
-    if (this->HasStemSameasBeam()) m_beamSegment.InitSameasRoles(this->GetStemSameasBeam(), initialPlace);
-
-    m_beamSegment.CalcBeam(layer, staff, params->m_doc, this, initialPlace);
-
-    if (this->HasStemSameasBeam())
-        m_beamSegment.CalcNoteHeadShiftForStemSameas(this->GetStemSameasBeam(), initialPlace);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::ResetHorizontalAlignment(FunctorParams *functorParams)
-{
-    LayerElement::ResetHorizontalAlignment(functorParams);
-
-    m_beamSegment.m_stemSameasRole = SAMEAS_NONE;
-    m_beamSegment.m_stemSameasReverseRole = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Beam::ResetData(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetData(functorParams);
-    BeamDrawingInterface::Reset();
-
-    m_beamSegment.Reset();
-    m_stemSameas = NULL;
-
-    // We want the list of the ObjectListInterface to be re-generated
-    this->Modify();
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -38,7 +38,8 @@ class Rest : public LayerElement,
              public PositionInterface,
              public AttColor,
              public AttCue,
-             public AttExtSym,
+             public AttExtSymAuth,
+             public AttExtSymNames,
              public AttRestVisMensural {
 public:
     /**
@@ -91,61 +92,31 @@ public:
      */
     int GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int defaultLocation) const;
 
+    /**
+     * Update the rest location based on the input TransPitch
+     */
+    void UpdateFromTransLoc(const TransPitch &tp);
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::AdjustBeams
+     * Interface for class functor visitation
      */
-    int AdjustBeams(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::CalcDots
-     */
-    int CalcDots(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::PrepareLayerElementParts
-     */
-    int PrepareLayerElementParts(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetData
-     */
-    int ResetData(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::ResetHorizontalAlignment
-     */
-    int ResetHorizontalAlignment(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
+    ///@{
+    FunctorCode Accept(Functor &functor) override;
+    FunctorCode Accept(ConstFunctor &functor) const override;
+    FunctorCode AcceptEnd(Functor &functor) override;
+    FunctorCode AcceptEnd(ConstFunctor &functor) const override;
+    ///@}
 
 private:
-    /**
-     * Helper function to update rest oloc/ploc based on the input TransPitch
-     */
-    void UpdateFromTransLoc(const TransPitch &tp);
-
     /**
      * Get the rest vertical location relative to location of elements placed on other layers
      */
     std::pair<int, RestAccidental> GetLocationRelativeToOtherLayers(
-        const ListOfConstObjects &layersList, const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const;
+        const Layer *currentLayer, bool isTopLayer, bool &restOverlap) const;
 
     /**
      * Get the rest vertical location relative to location of elements placed on current layers
@@ -174,6 +145,12 @@ private:
      */
     int GetRestOffsetFromOptions(
         RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const;
+
+    /**
+     * Find whether there is correct number of rests for automatic placement and determine position of the rest
+     * (top/bottom) if there is.
+     */
+    bool DetermineRestPosition(const Staff *staff, const Layer *layer, bool &isTopLayer) const;
 
 public:
     //
