@@ -38,6 +38,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitStaffAlignment(StaffAlignment *staffAlignment) override;
     FunctorCode VisitSystem(System *system) override;
     ///@}

@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "ending.h"
 #include "fermata.h"
@@ -37,6 +38,14 @@ ConvertToPageBasedFunctor::ConvertToPageBasedFunctor(Page *page) : Functor()
 {
     m_currentSystem = NULL;
     m_page = page;
+}
+
+FunctorCode ConvertToPageBasedFunctor::VisitDiv(Div *div)
+{
+    assert(m_currentSystem);
+    div->MoveItselfTo(m_currentSystem);
+
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ConvertToPageBasedFunctor::VisitEditorialElement(EditorialElement *editorialElement)

@@ -30,6 +30,7 @@ class Chord;
 class ControlElement;
 class DeviceContext;
 class Dir;
+class Div;
 class Doc;
 class Dynam;
 class EditorialElement;
@@ -61,9 +62,7 @@ class Page;
 class PageElement;
 class Pedal;
 class PgFoot;
-class PgFoot;
 class PgHead;
-class PgHead2;
 class PitchInflection;
 class Reh;
 class Rend;
@@ -82,6 +81,7 @@ class Tempo;
 class Text;
 class TextDrawingParams;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class Trill;
 class Turn;
@@ -239,13 +239,13 @@ protected:
     ///@}
 
     /**
-     * @name Methods for drawing RunningElements (PgHead, PgFoot, etc.)
-     * Defined in view_running.cpp
+     * @name Methods for drawing TextLayoutElement (Div, PgHead, PgFoot, etc.)
+     * Defined in view_text.cpp
      */
     ///@{
+    void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
-    void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
-    void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
+    void DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement);
     ///@}
 
     /**

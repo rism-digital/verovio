@@ -68,10 +68,10 @@ int TextElement::GetDrawingX() const
         return (textElement->GetDrawingX() + this->GetDrawingXRel());
     }
 
-    // Otherwise get the running element parent - no cast to RunningElement is necessary
-    const Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
-    if (runningElement) {
-        return (runningElement->GetDrawingX() + this->GetDrawingXRel());
+    // Otherwise get the text layout element parent - no cast to TextLayoutElement is necessary
+    const Object *textLayoutElement = this->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max);
+    if (textLayoutElement) {
+        return (textLayoutElement->GetDrawingX() + this->GetDrawingXRel());
     }
 
     return Object::GetDrawingX();
@@ -87,10 +87,10 @@ int TextElement::GetDrawingY() const
         return (textElement->GetDrawingY() + this->GetDrawingYRel());
     }
 
-    // Otherwise get the running element parent - no cast to RunningElement is necessary
-    const Object *runningElement = this->GetFirstAncestorInRange(RUNNING_ELEMENT, RUNNING_ELEMENT_max);
-    if (runningElement) {
-        return (runningElement->GetDrawingY() + this->GetDrawingYRel());
+    // Otherwise get the text layout element parent - no cast to TextLayoutElement is necessary
+    const Object *textLayoutElement = this->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max);
+    if (textLayoutElement) {
+        return (textLayoutElement->GetDrawingY() + this->GetDrawingYRel());
     }
 
     // TextElement not within RunningElement;

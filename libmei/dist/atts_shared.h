@@ -2345,6 +2345,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttFormework
+//----------------------------------------------------------------------------
+
+class AttFormework : public Att {
+protected:
+    AttFormework();
+    ~AttFormework() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetFormework();
+
+    /** Read the values for the attribute class **/
+    bool ReadFormework(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteFormework(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(data_PGFUNC func_) { m_func = func_; }
+    data_PGFUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    data_PGFUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstFormework
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFormework
+ */
+
+class InstFormework : public AttFormework {
+public:
+    InstFormework() = default;
+    virtual ~InstFormework() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 

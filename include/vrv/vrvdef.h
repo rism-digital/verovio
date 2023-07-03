@@ -152,13 +152,15 @@ enum ClassId : uint16_t {
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
+    // Ids for TextLayoutElement child classes
+    TEXT_LAYOUT_ELEMENT,
+    DIV,
     // Ids for RunningElement child classes
     RUNNING_ELEMENT,
     PGFOOT,
-    PGFOOT2,
     PGHEAD,
-    PGHEAD2,
     RUNNING_ELEMENT_max,
+    TEXT_LAYOUT_ELEMENT_max,
     // Ids for PageElement child classes
     PAGE_ELEMENT,
     PAGE_MILESTONE_END,

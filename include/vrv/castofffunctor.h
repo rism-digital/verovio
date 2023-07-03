@@ -49,6 +49,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEnding(Ending *ending) override;
     FunctorCode VisitMeasure(Measure *measure) override;
@@ -183,6 +184,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEnding(Ending *ending) override;
     FunctorCode VisitMeasure(Measure *measure) override;
@@ -296,6 +298,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPageElement(PageElement *pageElement) override;
