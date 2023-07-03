@@ -17,7 +17,6 @@
 #include "chord.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
@@ -123,7 +122,7 @@ void FTrem::SetElementShortening(int shortening)
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode FTrem::Accept(MutableFunctor &functor)
+FunctorCode FTrem::Accept(Functor &functor)
 {
     return functor.VisitFTrem(this);
 }
@@ -133,7 +132,7 @@ FunctorCode FTrem::Accept(ConstFunctor &functor) const
     return functor.VisitFTrem(this);
 }
 
-FunctorCode FTrem::AcceptEnd(MutableFunctor &functor)
+FunctorCode FTrem::AcceptEnd(Functor &functor)
 {
     return functor.VisitFTremEnd(this);
 }
@@ -141,24 +140,6 @@ FunctorCode FTrem::AcceptEnd(MutableFunctor &functor)
 FunctorCode FTrem::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitFTremEnd(this);
-}
-
-int FTrem::GenerateMIDI(FunctorParams *functorParams)
-{
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    FTrem *fTrem = vrv_cast<FTrem *>(this);
-    assert(fTrem);
-
-    if (!fTrem->HasUnitdur()) {
-        return FUNCTOR_CONTINUE;
-    }
-    else {
-        LogWarning("FTrem produces incorrect MIDI output");
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

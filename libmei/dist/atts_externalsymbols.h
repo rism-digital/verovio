@@ -26,23 +26,23 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttExtSym
+// AttExtSymAuth
 //----------------------------------------------------------------------------
 
-class AttExtSym : public Att {
+class AttExtSymAuth : public Att {
 protected:
-    AttExtSym();
-    ~AttExtSym() = default;
+    AttExtSymAuth();
+    ~AttExtSymAuth() = default;
 
 public:
     /** Reset the default values for the attribute class **/
-    void ResetExtSym();
+    void ResetExtSymAuth();
 
     /** Read the values for the attribute class **/
-    bool ReadExtSym(pugi::xml_node element, bool removeAttr = true);
+    bool ReadExtSymAuth(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
-    bool WriteExtSym(pugi::xml_node element);
+    bool WriteExtSymAuth(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -54,14 +54,6 @@ public:
     std::string GetGlyphAuth() const { return m_glyphAuth; }
     bool HasGlyphAuth() const;
     //
-    void SetGlyphName(std::string glyphName_) { m_glyphName = glyphName_; }
-    std::string GetGlyphName() const { return m_glyphName; }
-    bool HasGlyphName() const;
-    //
-    void SetGlyphNum(data_HEXNUM glyphNum_) { m_glyphNum = glyphNum_; }
-    data_HEXNUM GetGlyphNum() const { return m_glyphNum; }
-    bool HasGlyphNum() const;
-    //
     void SetGlyphUri(std::string glyphUri_) { m_glyphUri = glyphUri_; }
     std::string GetGlyphUri() const { return m_glyphUri; }
     bool HasGlyphUri() const;
@@ -70,9 +62,65 @@ public:
 private:
     /**
      * A name or label associated with the controlled vocabulary from which the value
-     * of glyph.name or glyph.num is taken.
+     * of glyph.name or glyph.num is taken, or the textual content of the element.
      **/
     std::string m_glyphAuth;
+    /**
+     * The web-accessible location of the controlled vocabulary from which the value of
+     * glyph.name or glyph.num is taken, or the textual content of the element.
+     **/
+    std::string m_glyphUri;
+};
+
+//----------------------------------------------------------------------------
+// InstExtSymAuth
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttExtSymAuth
+ */
+
+class InstExtSymAuth : public AttExtSymAuth {
+public:
+    InstExtSymAuth() = default;
+    virtual ~InstExtSymAuth() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttExtSymNames
+//----------------------------------------------------------------------------
+
+class AttExtSymNames : public Att {
+protected:
+    AttExtSymNames();
+    ~AttExtSymNames() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetExtSymNames();
+
+    /** Read the values for the attribute class **/
+    bool ReadExtSymNames(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteExtSymNames(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetGlyphName(std::string glyphName_) { m_glyphName = glyphName_; }
+    std::string GetGlyphName() const { return m_glyphName; }
+    bool HasGlyphName() const;
+    //
+    void SetGlyphNum(data_HEXNUM glyphNum_) { m_glyphNum = glyphNum_; }
+    data_HEXNUM GetGlyphNum() const { return m_glyphNum; }
+    bool HasGlyphNum() const;
+    ///@}
+
+private:
     /** Glyph name. **/
     std::string m_glyphName;
     /**
@@ -80,25 +128,20 @@ private:
      * N.B. SMuFL version 1.18 uses the range U+E000 - U+ECBF.
      **/
     data_HEXNUM m_glyphNum;
-    /**
-     * The web-accessible location of the controlled vocabulary from which the value of
-     * glyph.name or glyph.num is taken.
-     **/
-    std::string m_glyphUri;
 };
 
 //----------------------------------------------------------------------------
-// InstExtSym
+// InstExtSymNames
 //----------------------------------------------------------------------------
 
 /**
- * Instantiable version of AttExtSym
+ * Instantiable version of AttExtSymNames
  */
 
-class InstExtSym : public AttExtSym {
+class InstExtSymNames : public AttExtSymNames {
 public:
-    InstExtSym() = default;
-    virtual ~InstExtSym() = default;
+    InstExtSymNames() = default;
+    virtual ~InstExtSymNames() = default;
 };
 
 } // namespace vrv

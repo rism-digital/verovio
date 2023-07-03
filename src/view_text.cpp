@@ -16,7 +16,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "bboxdevicecontext.h"
 #include "devicecontext.h"
+#include "div.h"
 #include "doc.h"
 #include "dynam.h"
 #include "f.h"
@@ -26,6 +28,9 @@
 #include "lb.h"
 #include "num.h"
 #include "options.h"
+#include "page.h"
+#include "pgfoot.h"
+#include "pghead.h"
 #include "rend.h"
 #include "smufl.h"
 #include "staff.h"
@@ -397,7 +402,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         // Also pass it to the children
         params.m_pointSize = rendFont.GetPointSize();
     }
-    if (rend->HasFontfam() && rend->GetFontfam() == "smufl") {
+    if (rend->HasGlyphAuth() && rend->GetGlyphAuth() == "smufl") {
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
         rendFont.SetSmuflWithFallback(false);
@@ -447,14 +452,12 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         dc->GetFont()->SetPointSize(dc->GetFont()->GetPointSize() / SUPER_SCRIPT_FACTOR);
     }
 
-    // Do not render the box or circle if the content is empty
-    if (rend->HasContentBB()) {
-        if ((rend->GetRend() == TEXTRENDITION_box) || (rend->GetRend() == TEXTRENDITION_circle)) {
-            params.m_enclosedRend.push_back(rend);
-            params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
-            params.m_explicitPosition = true;
-            params.m_enclose = rend->GetRend();
-        }
+    // Do not render enclosings if the content is empty
+    if (rend->HasEnclosure()) {
+        params.m_enclosedRend.push_back(rend);
+        params.m_x = rend->GetContentRight() + m_doc->GetDrawingUnit(100);
+        params.m_explicitPosition = true;
+        params.m_enclose = rend->GetRend();
     }
 
     if (customFont) {
@@ -491,7 +494,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     // special case where we want to replace some unicode music points to SMuFL
-    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM)) {
+    if (text->GetFirstAncestor(DIR) || text->GetFirstAncestor(ORNAM) || text->GetFirstAncestor(REPEATMARK)) {
         this->DrawDirString(dc, text->GetText(), params);
     }
     else if (text->GetFirstAncestor(DYNAM)) {
@@ -623,6 +626,67 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
     dc->ResetFont();
 
     dc->EndTextGraphic(symbol, this);
+}
+
+void View::DrawRunningElements(DeviceContext *dc, Page *page)
+{
+    assert(dc);
+    assert(page);
+
+    if (dc->Is(BBOX_DEVICE_CONTEXT)) {
+        BBoxDeviceContext *bBoxDC = vrv_cast<BBoxDeviceContext *>(dc);
+        assert(bBoxDC);
+        if (!bBoxDC->UpdateVerticalValues()) return;
+    }
+
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        this->DrawTextLayoutElement(dc, header);
+    }
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        this->DrawTextLayoutElement(dc, footer);
+    }
+}
+
+void View::DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement)
+{
+    assert(dc);
+    assert(textLayoutElement);
+
+    dc->StartGraphic(textLayoutElement, "", textLayoutElement->GetID());
+
+    FontInfo textElementFont;
+    if (!dc->UseGlobalStyling()) {
+        textElementFont.SetFaceName("Times");
+    }
+
+    TextDrawingParams params;
+
+    // If we have not timestamp
+    params.m_x = textLayoutElement->GetDrawingX();
+    params.m_y = textLayoutElement->GetDrawingY();
+    params.m_width = textLayoutElement->GetTotalWidth(m_doc);
+    params.m_alignment = HORIZONTALALIGNMENT_NONE;
+    params.m_laidOut = true;
+    params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
+
+    textElementFont.SetPointSize(params.m_pointSize);
+
+    dc->SetBrush(m_currentColor, AxSOLID);
+    dc->SetFont(&textElementFont);
+
+    this->DrawRunningChildren(dc, textLayoutElement, params);
+
+    dc->ResetFont();
+    dc->ResetBrush();
+
+    dc->EndGraphic(textLayoutElement, this);
+}
+
+void View::DrawDiv(DeviceContext *dc, Div *div, System *system)
+{
+    this->DrawTextLayoutElement(dc, div);
 }
 
 } // namespace vrv

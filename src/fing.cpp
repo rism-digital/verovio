@@ -74,7 +74,7 @@ bool Fing::IsCloserToStaffThan(const FloatingObject *other, data_STAFFREL drawin
     }
 }
 
-FunctorCode Fing::Accept(MutableFunctor &functor)
+FunctorCode Fing::Accept(Functor &functor)
 {
     return functor.VisitFing(this);
 }
@@ -84,7 +84,7 @@ FunctorCode Fing::Accept(ConstFunctor &functor) const
     return functor.VisitFing(this);
 }
 
-FunctorCode Fing::AcceptEnd(MutableFunctor &functor)
+FunctorCode Fing::AcceptEnd(Functor &functor)
 {
     return functor.VisitFingEnd(this);
 }

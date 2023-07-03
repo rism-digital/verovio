@@ -13,10 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layerelement.h"
+#include "resources.h"
 #include "smufl.h"
 #include "system.h"
 #include "vrv.h"
@@ -37,7 +38,8 @@ Pedal::Pedal()
     : ControlElement(PEDAL, "pedal-")
     , TimeSpanningInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttPedalLog()
     , AttPedalVis()
     , AttPlacementRelStaff()
@@ -45,7 +47,8 @@ Pedal::Pedal()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PEDALLOG);
     this->RegisterAttClass(ATT_PEDALVIS);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
@@ -61,7 +64,8 @@ void Pedal::Reset()
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
     this->ResetColor();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetPedalLog();
     this->ResetPedalVis();
     this->ResetPlacementRelStaff();
@@ -109,7 +113,7 @@ data_PEDALSTYLE Pedal::GetPedalForm(const Doc *doc, const System *system) const
 // Pedal functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Pedal::Accept(MutableFunctor &functor)
+FunctorCode Pedal::Accept(Functor &functor)
 {
     return functor.VisitPedal(this);
 }
@@ -119,7 +123,7 @@ FunctorCode Pedal::Accept(ConstFunctor &functor) const
     return functor.VisitPedal(this);
 }
 
-FunctorCode Pedal::AcceptEnd(MutableFunctor &functor)
+FunctorCode Pedal::AcceptEnd(Functor &functor)
 {
     return functor.VisitPedalEnd(this);
 }
@@ -127,36 +131,6 @@ FunctorCode Pedal::AcceptEnd(MutableFunctor &functor)
 FunctorCode Pedal::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPedalEnd(this);
-}
-
-int Pedal::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Sameas not taken into account for now
-    if (!this->HasDir()) return FUNCTOR_CONTINUE;
-
-    double pedalTime = this->GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
-    double starttime = params->m_totalTime + pedalTime;
-    int tpq = params->m_midiFile->getTPQ();
-
-    // todo: check pedal @func to switch between sustain/soften/damper pedals?
-    switch (this->GetDir()) {
-        case pedalLog_DIR_down:
-            params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
-            break;
-        case pedalLog_DIR_up:
-            params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
-            break;
-        case pedalLog_DIR_bounce:
-            params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
-            params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq) + 0.1, params->m_midiChannel);
-            break;
-        default: return FUNCTOR_CONTINUE;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

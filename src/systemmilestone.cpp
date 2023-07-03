@@ -15,7 +15,6 @@
 
 #include "ending.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "preparedatafunctor.h"
 #include "system.h"
 #include "vrv.h"
@@ -82,7 +81,7 @@ void SystemMilestoneInterface::ConvertToPageBasedMilestone(Object *object, Objec
 // SystemMilestoneEnd functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode SystemMilestoneEnd::Accept(MutableFunctor &functor)
+FunctorCode SystemMilestoneEnd::Accept(Functor &functor)
 {
     return functor.VisitSystemMilestone(this);
 }
@@ -92,7 +91,7 @@ FunctorCode SystemMilestoneEnd::Accept(ConstFunctor &functor) const
     return functor.VisitSystemMilestone(this);
 }
 
-FunctorCode SystemMilestoneEnd::AcceptEnd(MutableFunctor &functor)
+FunctorCode SystemMilestoneEnd::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemMilestoneEnd(this);
 }

@@ -75,7 +75,7 @@ bool MultiRest::UseBlockStyle(const Doc *doc) const
     return useBlock;
 }
 
-FunctorCode MultiRest::Accept(MutableFunctor &functor)
+FunctorCode MultiRest::Accept(Functor &functor)
 {
     return functor.VisitMultiRest(this);
 }
@@ -85,7 +85,7 @@ FunctorCode MultiRest::Accept(ConstFunctor &functor) const
     return functor.VisitMultiRest(this);
 }
 
-FunctorCode MultiRest::AcceptEnd(MutableFunctor &functor)
+FunctorCode MultiRest::AcceptEnd(Functor &functor)
 {
     return functor.VisitMultiRestEnd(this);
 }

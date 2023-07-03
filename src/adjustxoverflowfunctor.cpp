@@ -22,7 +22,7 @@ namespace vrv {
 // AdjustXOverflowFunctor
 //----------------------------------------------------------------------------
 
-AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin)
+AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin) : Functor()
 {
     m_currentSystem = NULL;
     m_lastMeasure = NULL;
@@ -32,7 +32,7 @@ AdjustXOverflowFunctor::AdjustXOverflowFunctor(int margin)
 
 FunctorCode AdjustXOverflowFunctor::VisitControlElement(ControlElement *controlElement)
 {
-    if (!controlElement->Is({ DIR, DYNAM, ORNAM, TEMPO })) {
+    if (!controlElement->Is({ DIR, DYNAM, ORNAM, REPEATMARK, TEMPO })) {
         return FUNCTOR_SIBLINGS;
     }
 

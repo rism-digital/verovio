@@ -17,7 +17,6 @@
 #include "chord.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "note.h"
 #include "staff.h"
@@ -56,7 +55,7 @@ void MRpt::Reset()
 // MRpt functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode MRpt::Accept(MutableFunctor &functor)
+FunctorCode MRpt::Accept(Functor &functor)
 {
     return functor.VisitMRpt(this);
 }
@@ -66,7 +65,7 @@ FunctorCode MRpt::Accept(ConstFunctor &functor) const
     return functor.VisitMRpt(this);
 }
 
-FunctorCode MRpt::AcceptEnd(MutableFunctor &functor)
+FunctorCode MRpt::AcceptEnd(Functor &functor)
 {
     return functor.VisitMRptEnd(this);
 }
@@ -74,16 +73,6 @@ FunctorCode MRpt::AcceptEnd(MutableFunctor &functor)
 FunctorCode MRpt::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMRptEnd(this);
-}
-
-int MRpt::GenerateMIDI(FunctorParams *functorParams)
-{
-    // GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    // assert(params);
-
-    LogWarning("MRpt produces empty MIDI output");
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

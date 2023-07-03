@@ -38,7 +38,8 @@ class Rest : public LayerElement,
              public PositionInterface,
              public AttColor,
              public AttCue,
-             public AttExtSym,
+             public AttExtSymAuth,
+             public AttExtSymNames,
              public AttRestVisMensural {
 public:
     /**
@@ -91,6 +92,11 @@ public:
      */
     int GetOptimalLayerLocation(const Staff *staff, const Layer *layer, int defaultLocation) const;
 
+    /**
+     * Update the rest location based on the input TransPitch
+     */
+    void UpdateFromTransLoc(const TransPitch &tp);
+
     //----------//
     // Functors //
     //----------//
@@ -99,28 +105,13 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
 private:
-    /**
-     * Helper function to update rest oloc/ploc based on the input TransPitch
-     */
-    void UpdateFromTransLoc(const TransPitch &tp);
-
     /**
      * Get the rest vertical location relative to location of elements placed on other layers
      */

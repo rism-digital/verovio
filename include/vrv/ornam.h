@@ -22,14 +22,15 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <turn> element.
+ * This class models the MEI <ornam> element.
  */
 class Ornam : public ControlElement,
               public TextListInterface,
               public TextDirInterface,
               public TimePointInterface,
               public AttColor,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttOrnamentAccid {
 public:
     /**
@@ -76,9 +77,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

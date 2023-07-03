@@ -13,6 +13,7 @@
 #include "areaposinterface.h"
 #include "beamspan.h"
 #include "dir.h"
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
@@ -27,6 +28,7 @@
 #include "pedal.h"
 #include "plistinterface.h"
 #include "reh.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "runningelement.h"
 #include "score.h"
@@ -38,6 +40,7 @@
 #include "system.h"
 #include "tabdursym.h"
 #include "tabgrp.h"
+#include "text.h"
 #include "timestamp.h"
 #include "tuplet.h"
 #include "turn.h"
@@ -53,6 +56,17 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 PrepareDataInitializationFunctor::PrepareDataInitializationFunctor(Doc *doc) : DocFunctor(doc) {}
+
+FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
+{
+    this->VisitTextLayoutElement(div);
+
+    if (m_doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) {
+        div->SetDrawingInline(true);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
@@ -81,20 +95,16 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareDataInitializationFunctor::VisitRunningElement(RunningElement *runningElement)
+FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeatMark)
 {
-    runningElement->ResetCells();
-    runningElement->ResetDrawingScaling();
+    // Call parent one too
+    this->VisitControlElement(repeatMark);
 
-    const ListOfObjects &childList = runningElement->GetList(runningElement);
-    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
-        int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
-        assert(interface);
-        pos = runningElement->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
-        assert(text);
-        runningElement->AppendTextToCell(pos, text);
+    if (repeatMark->GetChildCount() == 0 && repeatMark->HasFunc() && repeatMark->GetFunc() == repeatMarkLog_FUNC_fine) {
+        Text *fine = new Text();
+        fine->IsGenerated(true);
+        fine->SetText(U"Fine");
+        repeatMark->AddChild(fine);
     }
 
     return FUNCTOR_CONTINUE;
@@ -108,11 +118,30 @@ FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PrepareDataInitializationFunctor::VisitTextLayoutElement(TextLayoutElement *textLayoutElement)
+{
+    textLayoutElement->ResetCells();
+    textLayoutElement->ResetDrawingScaling();
+
+    const ListOfObjects &childList = textLayoutElement->GetList(textLayoutElement);
+    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
+        int pos = 0;
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        assert(interface);
+        pos = textLayoutElement->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
+        TextElement *text = vrv_cast<TextElement *>(*iter);
+        assert(text);
+        textLayoutElement->AppendTextToCell(pos, text);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 //----------------------------------------------------------------------------
 // PrepareCueSizeFunctor
 //----------------------------------------------------------------------------
 
-PrepareCueSizeFunctor::PrepareCueSizeFunctor() {}
+PrepareCueSizeFunctor::PrepareCueSizeFunctor() : Functor() {}
 
 FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
 {
@@ -176,7 +205,7 @@ FunctorCode PrepareCueSizeFunctor::VisitLayerElement(LayerElement *layerElement)
 // PrepareCrossStaffFunctor
 //----------------------------------------------------------------------------
 
-PrepareCrossStaffFunctor::PrepareCrossStaffFunctor()
+PrepareCrossStaffFunctor::PrepareCrossStaffFunctor() : Functor()
 {
     m_currentMeasure = NULL;
     m_currentCrossStaff = NULL;
@@ -314,7 +343,7 @@ FunctorCode PrepareCrossStaffFunctor::VisitMeasure(Measure *measure)
 // PrepareAltSymFunctor
 //----------------------------------------------------------------------------
 
-PrepareAltSymFunctor::PrepareAltSymFunctor()
+PrepareAltSymFunctor::PrepareAltSymFunctor() : Functor()
 {
     m_symbolTable = NULL;
 }
@@ -340,7 +369,7 @@ FunctorCode PrepareAltSymFunctor::VisitObject(Object *object)
 // PrepareFacsimileFunctor
 //----------------------------------------------------------------------------
 
-PrepareFacsimileFunctor::PrepareFacsimileFunctor(Facsimile *facsimile)
+PrepareFacsimileFunctor::PrepareFacsimileFunctor(Facsimile *facsimile) : Functor()
 {
     m_facsimile = facsimile;
 }
@@ -371,10 +400,7 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
 // PrepareLinkingFunctor
 //----------------------------------------------------------------------------
 
-PrepareLinkingFunctor::PrepareLinkingFunctor()
-{
-    m_fillMode = true;
-}
+PrepareLinkingFunctor::PrepareLinkingFunctor() : Functor(), CollectAndProcess() {}
 
 void PrepareLinkingFunctor::InsertNextIDPair(const std::string &nextID, LinkingInterface *interface)
 {
@@ -388,7 +414,7 @@ void PrepareLinkingFunctor::InsertSameasIDPair(const std::string &sameasID, Link
 
 FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 {
-    if (m_fillMode && object->HasInterface(INTERFACE_LINKING)) {
+    if (this->IsCollectingData() && object->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = object->GetLinkingInterface();
         assert(interface);
         interface->InterfacePrepareLinking(*this, object);
@@ -430,7 +456,7 @@ FunctorCode PrepareLinkingFunctor::VisitObject(Object *object)
 void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 {
     // First pass we fill m_stemSameasIDPairs
-    if (m_fillMode) {
+    if (this->IsCollectingData()) {
         if (note->HasStemSameas()) {
             std::string idTarget = ExtractIDFragment(note->GetStemSameas());
             m_stemSameasIDPairs[idTarget] = note;
@@ -470,19 +496,16 @@ void PrepareLinkingFunctor::ResolveStemSameas(Note *note)
 // PreparePlistFunctor
 //----------------------------------------------------------------------------
 
-PreparePlistFunctor::PreparePlistFunctor()
-{
-    m_fillMode = true;
-}
+PreparePlistFunctor::PreparePlistFunctor() : Functor(), CollectAndProcess() {}
 
-void PreparePlistFunctor::InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface)
+void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface)
 {
-    m_interfaceIDTuples.push_back(std::make_tuple(interface, elementID, (Object *)NULL));
+    m_interfaceIDPairs.push_back(std::make_pair(interface, elementID));
 }
 
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
-    if (m_fillMode) {
+    if (this->IsCollectingData()) {
         if (object->HasInterface(INTERFACE_PLIST)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
@@ -492,11 +515,13 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
     else {
         if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-        std::string id = object->GetID();
-        auto i = std::find_if(m_interfaceIDTuples.begin(), m_interfaceIDTuples.end(),
-            [&id](std::tuple<PlistInterface *, std::string, Object *> tuple) { return (std::get<1>(tuple) == id); });
-        if (i != m_interfaceIDTuples.end()) {
-            std::get<2>(*i) = object;
+        const std::string &id = object->GetID();
+        auto iter = std::find_if(m_interfaceIDPairs.begin(), m_interfaceIDPairs.end(),
+            [&id](const std::pair<PlistInterface *, std::string> &pair) { return (pair.second == id); });
+        if (iter != m_interfaceIDPairs.end()) {
+            // Set reference for matched pair and erase it from the list
+            iter->first->SetRef(object);
+            m_interfaceIDPairs.erase(iter);
         }
     }
 
@@ -507,7 +532,7 @@ FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 // PrepareDurationFunctor
 //----------------------------------------------------------------------------
 
-PrepareDurationFunctor::PrepareDurationFunctor()
+PrepareDurationFunctor::PrepareDurationFunctor() : Functor()
 {
     m_durDefault = DURATION_NONE;
 }
@@ -560,7 +585,7 @@ FunctorCode PrepareDurationFunctor::VisitStaffDef(StaffDef *staffDef)
 // PrepareTimePointingFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimePointingFunctor::PrepareTimePointingFunctor() {}
+PrepareTimePointingFunctor::PrepareTimePointingFunctor() : Functor() {}
 
 void PrepareTimePointingFunctor::InsertInterfaceIDTuple(ClassId classID, TimePointInterface *interface)
 {
@@ -630,10 +655,7 @@ FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor()
-{
-    m_fillMode = true;
-}
+PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor(), CollectAndProcess() {}
 
 void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpanningInterface *interface)
 {
@@ -684,7 +706,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
 
 FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 {
-    if (!m_fillMode) {
+    if (this->IsProcessingData()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -708,7 +730,7 @@ FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimestampsFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimestampsFunctor::PrepareTimestampsFunctor() {}
+PrepareTimestampsFunctor::PrepareTimestampsFunctor() : Functor() {}
 
 void PrepareTimestampsFunctor::InsertInterfaceIDPair(ClassId classID, TimeSpanningInterface *interface)
 {
@@ -855,7 +877,7 @@ FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
 // PreparePointersByLayerFunctor
 //----------------------------------------------------------------------------
 
-PreparePointersByLayerFunctor::PreparePointersByLayerFunctor()
+PreparePointersByLayerFunctor::PreparePointersByLayerFunctor() : Functor()
 {
     m_currentElement = NULL;
     m_lastDot = NULL;
@@ -893,7 +915,7 @@ FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layer
 // PrepareLyricsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLyricsFunctor::PrepareLyricsFunctor()
+PrepareLyricsFunctor::PrepareLyricsFunctor() : Functor()
 {
     m_currentSyl = NULL;
     m_lastNoteOrChord = NULL;
@@ -990,7 +1012,7 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 // PrepareLayerElementPartsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() {}
+PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() : Functor() {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
@@ -1334,9 +1356,8 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
 // PrepareDelayedTurnsFunctor
 //----------------------------------------------------------------------------
 
-PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor()
+PrepareDelayedTurnsFunctor::PrepareDelayedTurnsFunctor() : Functor(), CollectAndProcess()
 {
-    m_fillMode = true;
     this->ResetCurrent();
 }
 
@@ -1350,7 +1371,7 @@ void PrepareDelayedTurnsFunctor::ResetCurrent()
 FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     // We are initializing the m_delayedTurns map
-    if (m_fillMode) return FUNCTOR_CONTINUE;
+    if (this->IsCollectingData()) return FUNCTOR_CONTINUE;
 
     if (!layerElement->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
@@ -1383,7 +1404,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitLayerElement(LayerElement *layerEle
 FunctorCode PrepareDelayedTurnsFunctor::VisitTurn(Turn *turn)
 {
     // We already initialized the m_delayedTurns map
-    if (!m_fillMode) return FUNCTOR_CONTINUE;
+    if (this->IsProcessingData()) return FUNCTOR_CONTINUE;
 
     // Map only delayed turns
     if (turn->GetDelayed() != BOOLEAN_true) return FUNCTOR_CONTINUE;
@@ -1400,7 +1421,7 @@ FunctorCode PrepareDelayedTurnsFunctor::VisitTurn(Turn *turn)
 // PrepareMilestonesFunctor
 //----------------------------------------------------------------------------
 
-PrepareMilestonesFunctor::PrepareMilestonesFunctor()
+PrepareMilestonesFunctor::PrepareMilestonesFunctor() : Functor()
 {
     m_lastMeasure = NULL;
     m_currentEnding = NULL;
@@ -1557,7 +1578,13 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitHarm(Harm *harm)
     }
 
     // first harm@n, create a new group
-    harm->SetDrawingGrpObject(harm);
+    // If @n is a digit string, use it as group id - otherwise order them as they appear
+    if (IsDigits(n)) {
+        harm->SetDrawingGrpId((int)std::strtol(n.c_str(), NULL, 10));
+    }
+    else {
+        harm->SetDrawingGrpObject(harm);
+    }
     m_harms.insert({ n, harm });
 
     return FUNCTOR_CONTINUE;
@@ -1695,7 +1722,7 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitSystemMilestone(SystemMilestoneEnd 
 // PrepareStaffCurrentTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareStaffCurrentTimeSpanningFunctor::PrepareStaffCurrentTimeSpanningFunctor() {}
+PrepareStaffCurrentTimeSpanningFunctor::PrepareStaffCurrentTimeSpanningFunctor() : Functor() {}
 
 void PrepareStaffCurrentTimeSpanningFunctor::InsertTimeSpanningElement(Object *element)
 {
@@ -1794,7 +1821,7 @@ FunctorCode PrepareStaffCurrentTimeSpanningFunctor::VisitSyl(Syl *syl)
 // PrepareRehPositionFunctor
 //----------------------------------------------------------------------------
 
-PrepareRehPositionFunctor::PrepareRehPositionFunctor() {}
+PrepareRehPositionFunctor::PrepareRehPositionFunctor() : Functor() {}
 
 FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
 {
@@ -1810,7 +1837,7 @@ FunctorCode PrepareRehPositionFunctor::VisitReh(Reh *reh)
 // PrepareBeamSpanElementsFunctor
 //----------------------------------------------------------------------------
 
-PrepareBeamSpanElementsFunctor::PrepareBeamSpanElementsFunctor() {}
+PrepareBeamSpanElementsFunctor::PrepareBeamSpanElementsFunctor() : Functor() {}
 
 FunctorCode PrepareBeamSpanElementsFunctor::VisitBeamSpan(BeamSpan *beamSpan)
 {

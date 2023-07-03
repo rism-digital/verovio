@@ -16,7 +16,6 @@
 #include "accid.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keysig.h"
 #include "note.h"
 #include "smufl.h"
@@ -37,7 +36,8 @@ KeyAccid::KeyAccid()
     , AttAccidental()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
 {
 
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
@@ -45,7 +45,8 @@ KeyAccid::KeyAccid()
     this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
 
     this->Reset();
 }
@@ -60,7 +61,8 @@ void KeyAccid::Reset()
     this->ResetAccidental();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
 }
 
 std::u32string KeyAccid::GetSymbolStr(data_NOTATIONTYPE notationType) const
@@ -85,7 +87,7 @@ int KeyAccid::CalcStaffLoc(Clef *clef, int clefLocOffset) const
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode KeyAccid::Accept(MutableFunctor &functor)
+FunctorCode KeyAccid::Accept(Functor &functor)
 {
     return functor.VisitKeyAccid(this);
 }
@@ -95,7 +97,7 @@ FunctorCode KeyAccid::Accept(ConstFunctor &functor) const
     return functor.VisitKeyAccid(this);
 }
 
-FunctorCode KeyAccid::AcceptEnd(MutableFunctor &functor)
+FunctorCode KeyAccid::AcceptEnd(Functor &functor)
 {
     return functor.VisitKeyAccidEnd(this);
 }

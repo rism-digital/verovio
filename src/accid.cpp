@@ -15,7 +15,6 @@
 
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
@@ -37,7 +36,8 @@ Accid::Accid()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttPlacementOnStaff()
     , AttPlacementRelEvent()
 {
@@ -48,7 +48,8 @@ Accid::Accid()
     this->RegisterAttClass(ATT_ACCIDLOG);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTONSTAFF);
     this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
@@ -66,7 +67,8 @@ void Accid::Reset()
     this->ResetAccidLog();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetPlacementOnStaff();
     this->ResetPlacementRelEvent();
 
@@ -89,14 +91,21 @@ void Accid::AdjustToLedgerLines(const Doc *doc, LayerElement *element, int staff
     const int rightMargin = doc->GetRightMargin(ACCID) * unit;
     if (element->Is(NOTE) && chord && chord->HasAdjacentNotesInStaff(staff)) {
         const int horizontalMargin = doc->GetOptions()->m_ledgerLineExtension.GetValue() * unit + 0.5 * rightMargin;
-        const int drawingUnit = doc->GetDrawingUnit(staffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - doc->GetDrawingStaffSize(staffSize);
         if (this->HorizontalContentOverlap(element, 0)) {
-            if (((this->GetContentTop() > staffTop + 2 * drawingUnit) && (this->GetDrawingY() < element->GetDrawingY()))
-                || ((this->GetContentBottom() < staffBottom - 2 * drawingUnit)
+            if (((this->GetContentTop() > staffTop + 2 * unit) && (this->GetDrawingY() < element->GetDrawingY()))
+                || ((this->GetContentBottom() < staffBottom - 2 * unit)
                     && (this->GetDrawingY() > element->GetDrawingY()))) {
-                const int xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
+                int right = this->GetSelfRight();
+                // Special case: Reduce shift for flats intersecting only the first ledger line above the staff
+                if ((this->GetAccid() == ACCIDENTAL_WRITTEN_f) || (this->GetAccid() == ACCIDENTAL_WRITTEN_ff)) {
+                    if ((this->GetContentTop() > staffTop + 2 * unit)
+                        && (this->GetContentTop() < staffTop + 4 * unit)) {
+                        right = this->GetCutOutRight(doc->GetResources(), true);
+                    }
+                }
+                const int xRelShift = right - element->GetSelfLeft() + horizontalMargin;
                 if (xRelShift > 0) this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
             }
         }
@@ -281,7 +290,7 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Accid::Accept(MutableFunctor &functor)
+FunctorCode Accid::Accept(Functor &functor)
 {
     return functor.VisitAccid(this);
 }
@@ -291,7 +300,7 @@ FunctorCode Accid::Accept(ConstFunctor &functor) const
     return functor.VisitAccid(this);
 }
 
-FunctorCode Accid::AcceptEnd(MutableFunctor &functor)
+FunctorCode Accid::AcceptEnd(Functor &functor)
 {
     return functor.VisitAccidEnd(this);
 }

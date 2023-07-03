@@ -32,6 +32,7 @@ class ControlElement;
 class Course;
 class Custos;
 class Dir;
+class Div;
 class Dot;
 class Dots;
 class Doc;
@@ -94,13 +95,12 @@ class Pages;
 class Pb;
 class Pedal;
 class PgFoot;
-class PgFoot2;
 class PgHead;
-class PgHead2;
 class Phrase;
 class PitchInflection;
 class Plica;
 class Proport;
+class RepeatMark;
 class Reh;
 class Rend;
 class Rest;
@@ -130,6 +130,7 @@ class TabGrp;
 class Tempo;
 class Text;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class TimestampAligner;
 class TimestampAttr;
@@ -223,19 +224,19 @@ public:
     ///@}
 
     /**
-     * @name Visit running elements
+     * @name Visit text layout elements
      */
     ///@{
+    virtual FunctorCode VisitDiv(Div *div);
+    virtual FunctorCode VisitDivEnd(Div *div);
     virtual FunctorCode VisitRunningElement(RunningElement *runningElement);
     virtual FunctorCode VisitRunningElementEnd(RunningElement *runningElement);
     virtual FunctorCode VisitPgFoot(PgFoot *pgFoot);
     virtual FunctorCode VisitPgFootEnd(PgFoot *pgFoot);
-    virtual FunctorCode VisitPgFoot2(PgFoot2 *pgFoot2);
-    virtual FunctorCode VisitPgFoot2End(PgFoot2 *pgFoot2);
     virtual FunctorCode VisitPgHead(PgHead *pgHead);
     virtual FunctorCode VisitPgHeadEnd(PgHead *pgHead);
-    virtual FunctorCode VisitPgHead2(PgHead2 *pgHead2);
-    virtual FunctorCode VisitPgHead2End(PgHead2 *pgHead2);
+    virtual FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement);
+    virtual FunctorCode VisitTextLayoutElementEnd(TextLayoutElement *textLayoutElement);
     ///@}
 
     /**
@@ -316,6 +317,8 @@ public:
     virtual FunctorCode VisitPitchInflectionEnd(PitchInflection *pitchInflection);
     virtual FunctorCode VisitReh(Reh *reh);
     virtual FunctorCode VisitRehEnd(Reh *reh);
+    virtual FunctorCode VisitRepeatMark(RepeatMark *repeatMark);
+    virtual FunctorCode VisitRepeatMarkEnd(RepeatMark *repeatMark);
     virtual FunctorCode VisitSlur(Slur *slur);
     virtual FunctorCode VisitSlurEnd(Slur *slur);
     virtual FunctorCode VisitTempo(Tempo *tempo);
@@ -578,19 +581,19 @@ public:
     ///@}
 
     /**
-     * @name Visit running elements
+     * @name Visit text layout elements
      */
     ///@{
+    virtual FunctorCode VisitDiv(const Div *div);
+    virtual FunctorCode VisitDivEnd(const Div *div);
     virtual FunctorCode VisitRunningElement(const RunningElement *runningElement);
     virtual FunctorCode VisitRunningElementEnd(const RunningElement *runningElement);
     virtual FunctorCode VisitPgFoot(const PgFoot *pgFoot);
     virtual FunctorCode VisitPgFootEnd(const PgFoot *pgFoot);
-    virtual FunctorCode VisitPgFoot2(const PgFoot2 *pgFoot2);
-    virtual FunctorCode VisitPgFoot2End(const PgFoot2 *pgFoot2);
     virtual FunctorCode VisitPgHead(const PgHead *pgHead);
     virtual FunctorCode VisitPgHeadEnd(const PgHead *pgHead);
-    virtual FunctorCode VisitPgHead2(const PgHead2 *pgHead2);
-    virtual FunctorCode VisitPgHead2End(const PgHead2 *pgHead2);
+    virtual FunctorCode VisitTextLayoutElement(const TextLayoutElement *textLayoutElement);
+    virtual FunctorCode VisitTextLayoutElementEnd(const TextLayoutElement *textLayoutElement);
     ///@}
 
     /**
@@ -671,6 +674,8 @@ public:
     virtual FunctorCode VisitPitchInflectionEnd(const PitchInflection *pitchInflection);
     virtual FunctorCode VisitReh(const Reh *reh);
     virtual FunctorCode VisitRehEnd(const Reh *reh);
+    virtual FunctorCode VisitRepeatMark(const RepeatMark *repeatMark);
+    virtual FunctorCode VisitRepeatMarkEnd(const RepeatMark *repeatMark);
     virtual FunctorCode VisitSlur(const Slur *slur);
     virtual FunctorCode VisitSlurEnd(const Slur *slur);
     virtual FunctorCode VisitTempo(const Tempo *tempo);

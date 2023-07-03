@@ -34,7 +34,7 @@ void Proport::Reset()
     this->ResetDurationRatio();
 }
 
-FunctorCode Proport::Accept(MutableFunctor &functor)
+FunctorCode Proport::Accept(Functor &functor)
 {
     return functor.VisitProport(this);
 }
@@ -44,7 +44,7 @@ FunctorCode Proport::Accept(ConstFunctor &functor) const
     return functor.VisitProport(this);
 }
 
-FunctorCode Proport::AcceptEnd(MutableFunctor &functor)
+FunctorCode Proport::AcceptEnd(Functor &functor)
 {
     return functor.VisitProportEnd(this);
 }

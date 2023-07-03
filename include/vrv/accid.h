@@ -31,7 +31,8 @@ class Accid : public LayerElement,
               public AttAccidLog,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttPlacementOnStaff,
               public AttPlacementRelEvent {
 public:
@@ -119,9 +120,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

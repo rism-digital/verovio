@@ -32,7 +32,7 @@ class Output;
 class Filters;
 class Functor;
 class FunctorParams;
-class MutableFunctor;
+class Functor;
 class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
@@ -636,23 +636,17 @@ public:
     Object *FindNextChild(Comparison *comp, Object *start);
 
     Object *FindPreviousChild(Comparison *comp, Object *start);
+
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The Filters class parameter makes is possible to process only objects of a
-     * type that matches the attribute value given in the Comparison object.
-     * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
-     * skipFirst does not call the functor or endFunctor on the first (calling) level
+     * skipFirst does not call the functor on the first (calling) level
      */
     ///@{
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
-    void Process(MutableFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
+    void Process(Functor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
     void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
     ///@}
 
@@ -660,9 +654,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    virtual FunctorCode Accept(MutableFunctor &functor);
+    virtual FunctorCode Accept(Functor &functor);
     virtual FunctorCode Accept(ConstFunctor &functor) const;
-    virtual FunctorCode AcceptEnd(MutableFunctor &functor);
+    virtual FunctorCode AcceptEnd(Functor &functor);
     virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 
@@ -682,79 +676,6 @@ public:
      * Return true if left appears before right in preorder traversal
      */
     static bool IsPreOrdered(const Object *left, const Object *right);
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * @name Functors for generating MIDI output.
-     */
-    ///@{
-
-    /**
-     * Prepare Note onsets
-     */
-    virtual int InitOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::InitOnsetOffset
-     */
-    virtual int InitOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Calculate the maximum duration of each measure.
-     */
-    virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CalcMaxMeasureDuration
-     */
-    virtual int InitMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust note timings based on ties
-     */
-    virtual int InitTimemapTies(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Initialize the MIDI export
-     * Captures information (i.e. from control elements) for MIDI interpretation
-     * This information is usually required beforehand in GenerateMIDI
-     */
-    virtual int InitMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Export the object to a MidiFile
-     */
-    virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::GenerateMIDI
-     */
-    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Export the object to a JSON timemap file.
-     */
-    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Export the object to a JSON feature file.
-     */
-    virtual int GenerateFeatures(FunctorParams *functorParams);
-
-    ///@}
-
-    /**
-     * Transpose the content.
-     */
-    virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End functor for Object::Transpose
-     */
-    virtual int TransposeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
 private:
     /**
@@ -1008,45 +929,7 @@ private:
 public:
     //
 private:
-};
-
-//----------------------------------------------------------------------------
-// Functor
-//----------------------------------------------------------------------------
-
-class Functor {
-private:
-    int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
-    int (Object::*const_obj_fpt)(FunctorParams *functorParams) const;
-
-public:
-    // constructor - takes pointer to a functor method and stores it
-    Functor();
-    Functor(int (Object::*_obj_fpt)(FunctorParams *));
-    Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const);
-    virtual ~Functor(){};
-
-    // Call the internal functor method
-    void Call(Object *ptr, FunctorParams *functorParams);
-    void Call(const Object *ptr, FunctorParams *functorParams);
-
-private:
     //
-public:
-    /**
-     * The return code of the functor.
-     * FUNCTOR_CONTINUE: continue processing
-     * FUNCTOR_SIBLINGS: process only siblings (do not go deeper)
-     * FUNCTOR_STOP: stop the functor (e.g., when an Object or a value is found)
-     */
-    int m_returnCode;
-    /**
-     * A flag for indicating if only visible Object have to be processed.
-     * The value is true by default.
-     */
-    bool m_visibleOnly;
-
-private:
 };
 
 //----------------------------------------------------------------------------

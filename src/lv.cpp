@@ -60,7 +60,7 @@ bool Lv::CalculatePosition(const Doc *doc, const Staff *staff, int x1, int x2, i
 // Lv functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Lv::Accept(MutableFunctor &functor)
+FunctorCode Lv::Accept(Functor &functor)
 {
     return functor.VisitLv(this);
 }
@@ -70,7 +70,7 @@ FunctorCode Lv::Accept(ConstFunctor &functor) const
     return functor.VisitLv(this);
 }
 
-FunctorCode Lv::AcceptEnd(MutableFunctor &functor)
+FunctorCode Lv::AcceptEnd(Functor &functor)
 {
     return functor.VisitLvEnd(this);
 }

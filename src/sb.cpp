@@ -16,7 +16,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "page.h"
 #include "system.h"
@@ -49,7 +48,7 @@ void Sb::Reset()
 // Sb functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Sb::Accept(MutableFunctor &functor)
+FunctorCode Sb::Accept(Functor &functor)
 {
     return functor.VisitSb(this);
 }
@@ -59,7 +58,7 @@ FunctorCode Sb::Accept(ConstFunctor &functor) const
     return functor.VisitSb(this);
 }
 
-FunctorCode Sb::AcceptEnd(MutableFunctor &functor)
+FunctorCode Sb::AcceptEnd(Functor &functor)
 {
     return functor.VisitSbEnd(this);
 }

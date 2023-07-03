@@ -631,6 +631,7 @@ public:
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_moveScoreDefinitionToStaff;
+    OptionBool m_neumeAsNote;
     OptionBool m_noJustification;
     OptionBool m_openControlEvents;
     OptionBool m_outputFormatRaw;
@@ -742,6 +743,7 @@ public:
     OptionDbl m_tieEndpointThickness;
     OptionDbl m_tieMidpointThickness;
     OptionDbl m_tieMinLength;
+    OptionBool m_tupletAngledOnBeams;
     OptionDbl m_tupletBracketThickness;
     OptionBool m_tupletNumHead;
 

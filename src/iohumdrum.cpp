@@ -56,6 +56,7 @@ using namespace std;
 #include "btrem.h"
 #include "choice.h"
 #include "chord.h"
+#include "comparison.h"
 #include "custos.h"
 #include "dir.h"
 #include "dot.h"
@@ -4610,13 +4611,13 @@ bool HumdrumInput::prepareFooter(
     std::string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
     meifile += "<meiHead></meiHead>";
     meifile += "<music><body><mdiv><score><scoreDef>\n";
-    meifile += "<pgFoot>\n";
+    meifile += "<pgFoot func=\"first\">\n";
     meifile += footer;
     meifile += "</pgFoot>\n";
     // Always putting footer on all pages for now:
-    meifile += "<pgFoot2>\n";
+    meifile += "<pgFoot func=\"all\">\n";
     meifile += footer;
-    meifile += "</pgFoot2>\n";
+    meifile += "</pgFoot>\n";
     meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
@@ -4631,7 +4632,8 @@ bool HumdrumInput::prepareFooter(
     // std::string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGFOOT);
+    AttFormeworkComparison comparison(PGFOOT, PGFUNC_first);
+    Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison);
     if (pgfoot == NULL) {
         return false;
     }
@@ -4651,7 +4653,8 @@ bool HumdrumInput::prepareFooter(
 
     m_doc->GetCurrentScoreDef()->AddChild(pgfoot);
 
-    Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGFOOT2);
+    AttFormeworkComparison comparison2(PGFOOT, PGFUNC_all);
+    Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison2);
     if (pgfoot2 == NULL) {
         return true;
     }
@@ -4662,7 +4665,7 @@ bool HumdrumInput::prepareFooter(
     }
     detached = pgfoot2->GetParent()->DetachChild(index);
     if (detached != pgfoot2) {
-        std::cerr << "Detached element is not a pgFoot2 element" << std::endl;
+        std::cerr << "Detached element is not a pgFoot element" << std::endl;
         if (detached) {
             delete detached;
         }
@@ -6520,7 +6523,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
     if (metertok) {
         if (*metertok == "*met()") {
             // set time signature to be invisible
-            vrvmeter->SetForm(METERFORM_invis);
+            vrvmeter->SetVisible(BOOLEAN_false);
         }
     }
 
@@ -6549,7 +6552,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
         if (bot == 0) {
             if (mensuration) {
                 // hide time signature
-                vrvmeter->SetForm(METERFORM_invis);
+                vrvmeter->SetVisible(BOOLEAN_false);
             }
             vrvmeter->SetCount({ { top * 2 }, MeterCountSign::None });
             vrvmeter->SetUnit(1);
@@ -6558,7 +6561,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
             if (mensuration) {
                 // Can't add if there is a mensuration; otherwise,
                 // a time signature will be shown.
-                vrvmeter->SetForm(METERFORM_invis);
+                vrvmeter->SetVisible(BOOLEAN_false);
                 vrvmeter->SetCount({ { top }, MeterCountSign::None });
                 vrvmeter->SetUnit(bot);
             }
@@ -6635,7 +6638,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetCount({ { std::stoi(matches[1]) }, MeterCountSign::None });
             vrvmetersig->SetUnit(unit);
-            vrvmetersig->SetForm(METERFORM_invis);
+            vrvmetersig->SetVisible(BOOLEAN_false);
         }
         else if (metersig == "3") {
             MeterSig *vrvmetersig = getMeterSig(element);
@@ -6669,7 +6672,7 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
                 unit = 1;
             }
             MeterSig *vrvmetersig = getMeterSig(element);
-            vrvmetersig->SetForm(METERFORM_invis);
+            vrvmetersig->SetVisible(BOOLEAN_false);
             vrvmetersig->SetCount({ { count }, MeterCountSign::None });
             vrvmetersig->SetUnit(unit);
         }
@@ -6874,10 +6877,10 @@ void HumdrumInput::setKeySig(
     if (secondary && (keyvalue == 0)) {
         // Force cancellation keysignature when there are no
         // sharps/flats in key signature change.
-        vrvkeysig->SetSigShowchange(BOOLEAN_true);
+        vrvkeysig->SetCancelaccid(CANCELACCID_before);
     }
     else if (m_show_cautionary_keysig) {
-        vrvkeysig->SetSigShowchange(BOOLEAN_true);
+        vrvkeysig->SetCancelaccid(CANCELACCID_before);
     }
 
     if (!keytok) {
@@ -15522,7 +15525,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         text->SetText(symbol);
         rend->AddChild(text);
         label->AddChild(rend);
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         if (!poststring.empty()) {
             addTextElement(label, poststring);
         }

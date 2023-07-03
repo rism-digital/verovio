@@ -71,11 +71,11 @@ enum {
 class Pen {
 public:
     Pen()
-        : m_penColour(0), m_penWidth(0), m_dashLength(0), m_gapLength(0), m_lineCap(0), m_lineJoin(0), m_penOpacity(0.0)
+        : m_penColor(0), m_penWidth(0), m_dashLength(0), m_gapLength(0), m_lineCap(0), m_lineJoin(0), m_penOpacity(0.0)
     {
     }
-    Pen(int colour, int width, float opacity, int dashLength, int gapLength, int lineCap, int lineJoin)
-        : m_penColour(colour)
+    Pen(int color, int width, float opacity, int dashLength, int gapLength, int lineCap, int lineJoin)
+        : m_penColor(color)
         , m_penWidth(width)
         , m_dashLength(dashLength)
         , m_gapLength(gapLength)
@@ -85,8 +85,8 @@ public:
     {
     }
 
-    int GetColour() const { return m_penColour; }
-    void SetColour(int colour) { m_penColour = colour; }
+    int GetColor() const { return m_penColor; }
+    void SetColor(int color) { m_penColor = color; }
     int GetWidth() const { return m_penWidth; }
     void SetWidth(int width) { m_penWidth = width; }
     int GetDashLength() const { return m_dashLength; }
@@ -101,22 +101,22 @@ public:
     void SetOpacity(float opacity) { m_penOpacity = opacity; }
 
 private:
-    int m_penColour, m_penWidth, m_dashLength, m_gapLength, m_lineCap, m_lineJoin;
+    int m_penColor, m_penWidth, m_dashLength, m_gapLength, m_lineCap, m_lineJoin;
     float m_penOpacity;
 };
 
 class Brush {
 public:
-    Brush() : m_brushColour(0), m_brushOpacity(0.0) {}
-    Brush(int colour, float opacity) : m_brushColour(colour), m_brushOpacity(opacity) {}
+    Brush() : m_brushColor(0), m_brushOpacity(0.0) {}
+    Brush(int color, float opacity) : m_brushColor(color), m_brushOpacity(opacity) {}
 
-    int GetColour() const { return m_brushColour; }
-    void SetColour(int colour) { m_brushColour = colour; }
+    int GetColor() const { return m_brushColor; }
+    void SetColor(int color) { m_brushColor = color; }
     float GetOpacity() const { return m_brushOpacity; }
     void SetOpacity(float opacity) { m_brushOpacity = opacity; }
 
 private:
-    int m_brushColour;
+    int m_brushColor;
     float m_brushOpacity;
 };
 

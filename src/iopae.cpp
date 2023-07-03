@@ -25,7 +25,6 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -351,7 +350,7 @@ void PAEOutput::WriteKeySig(KeySig *keySig)
 
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetSig().second;
     std::string sig;
-    sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
+    if (accidType != ACCIDENTAL_WRITTEN_n) sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
     for (int i = 0; i < keySig->GetSig().first; ++i) {
         data_PITCHNAME pname = KeySig::GetAccidPnameAt(accidType, i);
         std::string pnameStr = keySig->AttTyped::PitchnameToStr(pname);
@@ -4802,7 +4801,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
     }
     else {

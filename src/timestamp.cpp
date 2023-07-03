@@ -40,7 +40,7 @@ double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit) const
     return DUR_MAX / meterUnit * m_actualDurPos;
 }
 
-FunctorCode TimestampAttr::Accept(MutableFunctor &functor)
+FunctorCode TimestampAttr::Accept(Functor &functor)
 {
     return functor.VisitTimestamp(this);
 }
@@ -50,7 +50,7 @@ FunctorCode TimestampAttr::Accept(ConstFunctor &functor) const
     return functor.VisitTimestamp(this);
 }
 
-FunctorCode TimestampAttr::AcceptEnd(MutableFunctor &functor)
+FunctorCode TimestampAttr::AcceptEnd(Functor &functor)
 {
     return functor.VisitTimestampEnd(this);
 }

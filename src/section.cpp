@@ -13,11 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "page.h"
 #include "pages.h"
@@ -62,6 +62,9 @@ bool Section::IsSupportedChild(Object *child)
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
     }
+    else if (child->Is(DIV)) {
+        assert(dynamic_cast<Div *>(child));
+    }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
@@ -75,7 +78,7 @@ bool Section::IsSupportedChild(Object *child)
 // Section functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Section::Accept(MutableFunctor &functor)
+FunctorCode Section::Accept(Functor &functor)
 {
     return functor.VisitSection(this);
 }
@@ -85,7 +88,7 @@ FunctorCode Section::Accept(ConstFunctor &functor) const
     return functor.VisitSection(this);
 }
 
-FunctorCode Section::AcceptEnd(MutableFunctor &functor)
+FunctorCode Section::AcceptEnd(Functor &functor)
 {
     return functor.VisitSectionEnd(this);
 }

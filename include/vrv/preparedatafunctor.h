@@ -42,11 +42,13 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitKeySig(KeySig *keySig) override;
-    FunctorCode VisitRunningElement(RunningElement *runningElement) override;
+    FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitTextLayoutElement(TextLayoutElement *textLayoutElement) override;
     ///@}
 
 protected:
@@ -66,7 +68,7 @@ private:
 /**
  * This class sets the drawing cue size for all layer elements.
  */
-class PrepareCueSizeFunctor : public MutableFunctor {
+class PrepareCueSizeFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -105,7 +107,7 @@ private:
 /**
  * This class sets the cross staff and cross layer pointers on layer elements.
  */
-class PrepareCrossStaffFunctor : public MutableFunctor {
+class PrepareCrossStaffFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -151,7 +153,7 @@ private:
 /**
  * This class matches the @altsym element to the corresponding symbolDef.
  */
-class PrepareAltSymFunctor : public MutableFunctor {
+class PrepareAltSymFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -196,7 +198,7 @@ private:
 /**
  * This class associates layer elements with @facs to the appropriate zone.
  */
-class PrepareFacsimileFunctor : public MutableFunctor {
+class PrepareFacsimileFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -243,7 +245,7 @@ private:
 /**
  * This class matches linking elements (e.g, @next).
  */
-class PrepareLinkingFunctor : public MutableFunctor {
+class PrepareLinkingFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -257,14 +259,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter for the interface / id pairs
@@ -310,8 +304,6 @@ private:
     MapOfLinkingInterfaceIDPairs m_sameasIDPairs;
     // Holds the note / id pairs to match for stem.sameas
     MapOfNoteIDPairs m_stemSameasIDPairs;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -321,7 +313,7 @@ private:
 /**
  * This class matches elements of @plist.
  */
-class PreparePlistFunctor : public MutableFunctor {
+class PreparePlistFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -337,20 +329,11 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
-     * Getter and setter for the fill mode flag
+     * Getter and modifier for the interface / id pairs
      */
     ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
-
-    /*
-     * Getter and modifier for the interface / id tuples
-     */
-    ///@{
-    const ArrayOfPlistInterfaceIDTuples &GetInterfaceIDTuples() const { return m_interfaceIDTuples; }
-    void InsertInterfaceIDTuple(const std::string &elementID, PlistInterface *interface);
-    void ClearInterfaceIDTuples() { m_interfaceIDTuples.clear(); }
+    const ArrayOfPlistInterfaceIDPairs &GetInterfaceIDPairs() const { return m_interfaceIDPairs; }
+    void InsertInterfaceIDPair(const std::string &elementID, PlistInterface *interface);
     ///@}
 
     /*
@@ -367,10 +350,8 @@ private:
 public:
     //
 private:
-    // Holds the interface / id tuples to match
-    ArrayOfPlistInterfaceIDTuples m_interfaceIDTuples;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
+    // Holds the interface / id pairs to match
+    ArrayOfPlistInterfaceIDPairs m_interfaceIDPairs;
 };
 
 //----------------------------------------------------------------------------
@@ -380,7 +361,7 @@ private:
 /**
  * This class extracts the default duration from scoredef/staffdef.
  */
-class PrepareDurationFunctor : public MutableFunctor {
+class PrepareDurationFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -425,7 +406,7 @@ private:
 /**
  * This class matches the start for TimePointingInterface elements (such as fermata or harm).
  */
-class PrepareTimePointingFunctor : public MutableFunctor {
+class PrepareTimePointingFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -477,7 +458,7 @@ private:
  * If fillMode is set to false, only the remaining elements will be matched.
  * This is used when processing a second time in the other direction.
  */
-class PrepareTimeSpanningFunctor : public MutableFunctor {
+class PrepareTimeSpanningFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -491,14 +472,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return true; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter and modifier for the interface / owner pairs
@@ -527,8 +500,6 @@ public:
 private:
     // The interface list that holds the current elements to match
     ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -540,7 +511,7 @@ private:
  * It is performed only on TimeSpanningInterface elements without @startid (or @endid).
  * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
  */
-class PrepareTimestampsFunctor : public MutableFunctor {
+class PrepareTimestampsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -595,7 +566,7 @@ private:
  * This class processes by layer and sets drawing pointers.
  * Set Dot::m_drawingNote for Dot elements in mensural mode
  */
-class PreparePointersByLayerFunctor : public MutableFunctor {
+class PreparePointersByLayerFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -640,7 +611,7 @@ private:
  * The functor is processed by staff/layer/verse using Filters.
  * At the end, the functor closes opened syl in VisitDocEnd.
  */
-class PrepareLyricsFunctor : public MutableFunctor {
+class PrepareLyricsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -687,7 +658,7 @@ private:
 /**
  * This class adds LayerElement parts (stem, flag, dots, etc).
  */
-class PrepareLayerElementPartsFunctor : public MutableFunctor {
+class PrepareLayerElementPartsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -776,7 +747,7 @@ private:
  * This class sets Turn::m_drawingEndNote for delayed turns.
  * Needs a first pass to fill the map, processed by staff/layer after that.
  */
-class PrepareDelayedTurnsFunctor : public MutableFunctor {
+class PrepareDelayedTurnsFunctor : public Functor, public CollectAndProcess {
 public:
     /**
      * @name Constructors, destructors
@@ -790,14 +761,6 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
-
-    /*
-     * Getter and setter for the fill mode flag
-     */
-    ///@{
-    bool FillMode() const { return m_fillMode; }
-    void FillMode(bool fillMode) { m_fillMode = fillMode; }
-    ///@}
 
     /*
      * Getter for the map of delayed turns
@@ -832,8 +795,6 @@ private:
     Turn *m_currentTurn;
     // A map of the delayed turns and the layer elements they point to
     std::map<LayerElement *, Turn *> m_delayedTurns;
-    // Indicates the current mode: fill vs process
-    bool m_fillMode;
 };
 
 //----------------------------------------------------------------------------
@@ -843,7 +804,7 @@ private:
 /**
  * This class sets the Measure of Ending.
  */
-class PrepareMilestonesFunctor : public MutableFunctor {
+class PrepareMilestonesFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -958,7 +919,7 @@ private:
  * that is covered. At the end, it removes the TimeSpanningInterface element
  * from the list when the last measure is reached.
  */
-class PrepareStaffCurrentTimeSpanningFunctor : public MutableFunctor {
+class PrepareStaffCurrentTimeSpanningFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -1010,7 +971,7 @@ private:
 /**
  * This class resolves the Reh time pointing position in case none is set.
  */
-class PrepareRehPositionFunctor : public MutableFunctor {
+class PrepareRehPositionFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -1050,7 +1011,7 @@ private:
  * This class gets the list of referenced elements for the BeamSpan and marks referenced
  * objects as contained in a BeamSpan.
  */
-class PrepareBeamSpanElementsFunctor : public MutableFunctor {
+class PrepareBeamSpanElementsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

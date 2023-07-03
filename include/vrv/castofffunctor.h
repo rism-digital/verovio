@@ -49,6 +49,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEnding(Ending *ending) override;
     FunctorCode VisitMeasure(Measure *measure) override;
@@ -183,6 +184,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEnding(Ending *ending) override;
     FunctorCode VisitMeasure(Measure *measure) override;
@@ -221,7 +223,7 @@ private:
  * This class undoes the cast off for both pages and systems.
  * This is used by Doc::UnCastOffDoc for putting all pages / systems continously.
  */
-class UnCastOffFunctor : public MutableFunctor {
+class UnCastOffFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -296,6 +298,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPageElement(PageElement *pageElement) override;

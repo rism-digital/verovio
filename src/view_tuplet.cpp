@@ -101,13 +101,13 @@ void View::DrawTupletBracket(DeviceContext *dc, LayerElement *element, Layer *la
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     const int lineWidth
         = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tupletBracketThickness.GetValue();
-    const int xLeft = tuplet->GetDrawingLeft()->GetDrawingX() + tupletBracket->GetDrawingXRelLeft() + lineWidth / 2;
-    const int xRight = tuplet->GetDrawingRight()->GetDrawingX() + tupletBracket->GetDrawingXRelRight() - lineWidth / 2;
+    const int xLeft = tupletBracket->GetDrawingXLeft() + lineWidth / 2;
+    const int xRight = tupletBracket->GetDrawingXRight() - lineWidth / 2;
     const int yLeft = tupletBracket->GetDrawingYLeft();
     const int yRight = tupletBracket->GetDrawingYRight();
     int bracketHeight = (tuplet->GetDrawingBracketPos() == STAFFREL_basic_above) ? -1 : 1;
 
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
+    dc->SetPen(m_currentColor, lineWidth, AxSOLID, 0, 0, AxCAP_BUTT, AxJOIN_MITER);
 
     // Draw a bracket with a gap
     if (tupletBracket->GetAlignedNum() && tupletBracket->GetAlignedNum()->HasSelfBB()) {

@@ -27,11 +27,17 @@ namespace vrv {
 static const ClassRegistrar<Caesura> s_factory("caesura", CAESURA);
 
 Caesura::Caesura()
-    : ControlElement(CAESURA, "caesura-"), TimePointInterface(), AttColor(), AttExtSym(), AttPlacementRelStaff()
+    : ControlElement(CAESURA, "caesura-")
+    , TimePointInterface()
+    , AttColor()
+    , AttExtSymAuth()
+    , AttExtSymNames()
+    , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
     this->Reset();
@@ -67,7 +73,7 @@ char32_t Caesura::GetCaesuraGlyph() const
     return SMUFL_E4D1_caesura;
 }
 
-FunctorCode Caesura::Accept(MutableFunctor &functor)
+FunctorCode Caesura::Accept(Functor &functor)
 {
     return functor.VisitCaesura(this);
 }
@@ -77,7 +83,7 @@ FunctorCode Caesura::Accept(ConstFunctor &functor) const
     return functor.VisitCaesura(this);
 }
 
-FunctorCode Caesura::AcceptEnd(MutableFunctor &functor)
+FunctorCode Caesura::AcceptEnd(Functor &functor)
 {
     return functor.VisitCaesuraEnd(this);
 }

@@ -50,16 +50,13 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "justifyfunctor.h"
 #include "libmei.h"
 #include "miscfunctor.h"
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
@@ -156,10 +153,10 @@ const RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return m_score->GetScoreDef()->GetPgHead();
+        return m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
     }
     else {
-        return m_score->GetScoreDef()->GetPgHead2();
+        return m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
     }
 }
 
@@ -182,10 +179,10 @@ const RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_first);
     }
     else {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot2();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_all);
     }
 }
 
@@ -760,7 +757,7 @@ void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
                 filters = { &matchStaff, &matchLayer, &matchVerse };
 
                 AdjustSylSpacingFunctor adjustSylSpacing(doc);
-                adjustSylSpacing.SetFilters(&filters);
+                adjustSylSpacing.PushFilters(&filters);
                 this->Process(adjustSylSpacing);
             }
         }
@@ -771,7 +768,7 @@ void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Page::Accept(MutableFunctor &functor)
+FunctorCode Page::Accept(Functor &functor)
 {
     return functor.VisitPage(this);
 }
@@ -781,7 +778,7 @@ FunctorCode Page::Accept(ConstFunctor &functor) const
     return functor.VisitPage(this);
 }
 
-FunctorCode Page::AcceptEnd(MutableFunctor &functor)
+FunctorCode Page::AcceptEnd(Functor &functor)
 {
     return functor.VisitPageEnd(this);
 }
