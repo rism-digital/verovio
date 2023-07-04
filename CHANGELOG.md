@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `space` within `beam`
 
 ## [3.16.0] - 2023-07-03
 * Support for rectangular tone clusters (@eNote-GmbH)
