@@ -1033,19 +1033,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
         currentStem->IsVirtual(true);
     }
 
-    if ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
+    const bool shouldHaveFlag = ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
+    currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     chord->SetDrawingStem(currentStem);
 
@@ -1108,20 +1097,9 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     // We don't care about flags or dots in mensural notes
     if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
 
-    if ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem() && !note->IsChordTone()
-        && !note->IsTabGrpNote()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
+    const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
+        && !note->IsChordTone() && !note->IsTabGrpNote());
+    currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     if (!chord) note->SetDrawingStem(currentStem);
 
@@ -1177,19 +1155,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     assert(tabGrp);
 
     // No flag within beam for durations longer than 8th notes
-    if (!tabDurSym->IsInBeam() && tabGrp->GetActualDur() > DUR_4) {
-        // We must have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
+    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DUR_4));
+    currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1276,6 +1243,25 @@ Dots *PrepareLayerElementPartsFunctor::ProcessDots(Dots *dots, Object *parent, b
     }
 
     return dots;
+}
+
+Flag *PrepareLayerElementPartsFunctor::ProcessFlag(Flag *flag, Object *parent, bool shouldExist) const
+{
+    assert(parent);
+
+    if (shouldExist) {
+        if (!flag) {
+            flag = new Flag();
+            parent->AddChild(flag);
+        }
+    }
+    else if (flag) {
+        if (parent->DeleteChild(flag)) {
+            flag = NULL;
+        }
+    }
+
+    return flag;
 }
 
 //----------------------------------------------------------------------------

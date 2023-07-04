@@ -689,6 +689,8 @@ protected:
 private:
     // Create dots if they should exist, otherwise remove them
     Dots *ProcessDots(Dots *dots, Object *parent, bool shouldExist) const;
+    // Create flag if it should exist, otherwise remove it
+    Flag *ProcessFlag(Flag *flag, Object *parent, bool shouldExist) const;
 
 public:
     //
