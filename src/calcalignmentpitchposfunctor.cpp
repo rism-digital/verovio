@@ -212,6 +212,16 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                     }
                 }
 
+                // With a rest or space at the first / last position, use the right / left loc
+                if (restIndex == 0) {
+                    leftLoc = rightLoc;
+                    loc = rightLoc;
+                }
+                else if (restIndex == (int)beamList.size() - 1) {
+                    rightLoc = leftLoc;
+                    loc = leftLoc;
+                }
+
                 // average the left note and right note's locations together to get our rest location
                 const int locAvg = (rightLoc + leftLoc) / 2;
                 if (abs(locAvg - loc) > 3) {
