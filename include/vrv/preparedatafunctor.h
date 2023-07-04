@@ -687,7 +687,9 @@ public:
 protected:
     //
 private:
-    //
+    // Create dots if they should exist, otherwise remove them
+    Dots *ProcessDots(Dots *dots, Object *parent, bool shouldExist) const;
+
 public:
     //
 private:
