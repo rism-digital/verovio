@@ -1790,7 +1790,7 @@ enum data_VERTICALALIGNMENT : int8_t {
 };
 
 /**
- * MEI att.accid.log@func
+ * MEI att.accid.log\@func
  */
 enum accidLog_FUNC : int8_t {
     accidLog_FUNC_NONE = 0,
@@ -1800,7 +1800,7 @@ enum accidLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.anchoredText.log@func
+ * MEI att.anchoredText.log\@func
  */
 enum anchoredTextLog_FUNC : int8_t {
     anchoredTextLog_FUNC_NONE = 0,
@@ -1809,7 +1809,7 @@ enum anchoredTextLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.arpeg.log@order
+ * MEI att.arpeg.log\@order
  */
 enum arpegLog_ORDER : int8_t {
     arpegLog_ORDER_NONE = 0,
@@ -1820,7 +1820,7 @@ enum arpegLog_ORDER : int8_t {
 };
 
 /**
- * MEI att.audience@audience
+ * MEI att.audience\@audience
  */
 enum audience_AUDIENCE : int8_t {
     audience_AUDIENCE_NONE = 0,
@@ -1830,7 +1830,7 @@ enum audience_AUDIENCE : int8_t {
 };
 
 /**
- * MEI att.bTrem.log@form
+ * MEI att.bTrem.log\@form
  */
 enum bTremLog_FORM : int8_t {
     bTremLog_FORM_NONE = 0,
@@ -1840,7 +1840,7 @@ enum bTremLog_FORM : int8_t {
 };
 
 /**
- * MEI att.beamRend@form
+ * MEI att.beamRend\@form
  */
 enum beamRend_FORM : int8_t {
     beamRend_FORM_NONE = 0,
@@ -1852,7 +1852,7 @@ enum beamRend_FORM : int8_t {
 };
 
 /**
- * MEI att.beaming.vis@beam.rend
+ * MEI att.beaming.vis\@beam.rend
  */
 enum beamingVis_BEAMREND : int8_t {
     beamingVis_BEAMREND_NONE = 0,
@@ -1863,7 +1863,7 @@ enum beamingVis_BEAMREND : int8_t {
 };
 
 /**
- * MEI att.bracketSpan.log@func
+ * MEI att.bracketSpan.log\@func
  */
 enum bracketSpanLog_FUNC : int8_t {
     bracketSpanLog_FUNC_NONE = 0,
@@ -1874,7 +1874,7 @@ enum bracketSpanLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.curvature@curvedir
+ * MEI att.curvature\@curvedir
  */
 enum curvature_CURVEDIR : int8_t {
     curvature_CURVEDIR_NONE = 0,
@@ -1885,7 +1885,7 @@ enum curvature_CURVEDIR : int8_t {
 };
 
 /**
- * MEI att.curve.log@func
+ * MEI att.curve.log\@func
  */
 enum curveLog_FUNC : int8_t {
     curveLog_FUNC_NONE = 0,
@@ -1894,7 +1894,7 @@ enum curveLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.cutout@cutout
+ * MEI att.cutout\@cutout
  */
 enum cutout_CUTOUT : int8_t {
     cutout_CUTOUT_NONE = 0,
@@ -1903,7 +1903,7 @@ enum cutout_CUTOUT : int8_t {
 };
 
 /**
- * MEI att.divLine.log@form
+ * MEI att.divLine.log\@form
  */
 enum divLineLog_FORM : int8_t {
     divLineLog_FORM_NONE = 0,
@@ -1917,7 +1917,7 @@ enum divLineLog_FORM : int8_t {
 };
 
 /**
- * MEI att.dot.log@form
+ * MEI att.dot.log\@form
  */
 enum dotLog_FORM : int8_t {
     dotLog_FORM_NONE = 0,
@@ -1927,7 +1927,7 @@ enum dotLog_FORM : int8_t {
 };
 
 /**
- * MEI att.endings@ending.rend
+ * MEI att.endings\@ending.rend
  */
 enum endings_ENDINGREND : int8_t {
     endings_ENDINGREND_NONE = 0,
@@ -1938,7 +1938,7 @@ enum endings_ENDINGREND : int8_t {
 };
 
 /**
- * MEI att.episema.vis@form
+ * MEI att.episema.vis\@form
  */
 enum episemaVis_FORM : int8_t {
     episemaVis_FORM_NONE = 0,
@@ -1948,7 +1948,7 @@ enum episemaVis_FORM : int8_t {
 };
 
 /**
- * MEI att.evidence@evidence
+ * MEI att.evidence\@evidence
  */
 enum evidence_EVIDENCE : int8_t {
     evidence_EVIDENCE_NONE = 0,
@@ -1959,7 +1959,7 @@ enum evidence_EVIDENCE : int8_t {
 };
 
 /**
- * MEI att.extSym.auth@glyph.auth
+ * MEI att.extSym.auth\@glyph.auth
  */
 enum extSymAuth_GLYPHAUTH : int8_t {
     extSymAuth_GLYPHAUTH_NONE = 0,
@@ -1968,7 +1968,7 @@ enum extSymAuth_GLYPHAUTH : int8_t {
 };
 
 /**
- * MEI att.fTrem.log@form
+ * MEI att.fTrem.log\@form
  */
 enum fTremLog_FORM : int8_t {
     fTremLog_FORM_NONE = 0,
@@ -1978,7 +1978,7 @@ enum fTremLog_FORM : int8_t {
 };
 
 /**
- * MEI att.fermata.vis@form
+ * MEI att.fermata.vis\@form
  */
 enum fermataVis_FORM : int8_t {
     fermataVis_FORM_NONE = 0,
@@ -1988,7 +1988,7 @@ enum fermataVis_FORM : int8_t {
 };
 
 /**
- * MEI att.fermata.vis@shape
+ * MEI att.fermata.vis\@shape
  */
 enum fermataVis_SHAPE : int8_t {
     fermataVis_SHAPE_NONE = 0,
@@ -1999,7 +1999,7 @@ enum fermataVis_SHAPE : int8_t {
 };
 
 /**
- * MEI att.fingGrp.log@form
+ * MEI att.fingGrp.log\@form
  */
 enum fingGrpLog_FORM : int8_t {
     fingGrpLog_FORM_NONE = 0,
@@ -2010,7 +2010,7 @@ enum fingGrpLog_FORM : int8_t {
 };
 
 /**
- * MEI att.fingGrp.vis@orient
+ * MEI att.fingGrp.vis\@orient
  */
 enum fingGrpVis_ORIENT : int8_t {
     fingGrpVis_ORIENT_NONE = 0,
@@ -2020,7 +2020,7 @@ enum fingGrpVis_ORIENT : int8_t {
 };
 
 /**
- * MEI att.graceGrp.log@attach
+ * MEI att.graceGrp.log\@attach
  */
 enum graceGrpLog_ATTACH : int8_t {
     graceGrpLog_ATTACH_NONE = 0,
@@ -2031,7 +2031,7 @@ enum graceGrpLog_ATTACH : int8_t {
 };
 
 /**
- * MEI att.hairpin.log@form
+ * MEI att.hairpin.log\@form
  */
 enum hairpinLog_FORM : int8_t {
     hairpinLog_FORM_NONE = 0,
@@ -2041,7 +2041,7 @@ enum hairpinLog_FORM : int8_t {
 };
 
 /**
- * MEI att.harm.anl@form
+ * MEI att.harm.anl\@form
  */
 enum harmAnl_FORM : int8_t {
     harmAnl_FORM_NONE = 0,
@@ -2051,7 +2051,7 @@ enum harmAnl_FORM : int8_t {
 };
 
 /**
- * MEI att.harm.vis@rendgrid
+ * MEI att.harm.vis\@rendgrid
  */
 enum harmVis_RENDGRID : int8_t {
     harmVis_RENDGRID_NONE = 0,
@@ -2062,7 +2062,7 @@ enum harmVis_RENDGRID : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@a
+ * MEI att.harpPedal.log\@a
  */
 enum harpPedalLog_A : int8_t {
     harpPedalLog_A_NONE = 0,
@@ -2073,7 +2073,7 @@ enum harpPedalLog_A : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@b
+ * MEI att.harpPedal.log\@b
  */
 enum harpPedalLog_B : int8_t {
     harpPedalLog_B_NONE = 0,
@@ -2084,7 +2084,7 @@ enum harpPedalLog_B : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@c
+ * MEI att.harpPedal.log\@c
  */
 enum harpPedalLog_C : int8_t {
     harpPedalLog_C_NONE = 0,
@@ -2095,7 +2095,7 @@ enum harpPedalLog_C : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@d
+ * MEI att.harpPedal.log\@d
  */
 enum harpPedalLog_D : int8_t {
     harpPedalLog_D_NONE = 0,
@@ -2106,7 +2106,7 @@ enum harpPedalLog_D : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@e
+ * MEI att.harpPedal.log\@e
  */
 enum harpPedalLog_E : int8_t {
     harpPedalLog_E_NONE = 0,
@@ -2117,7 +2117,7 @@ enum harpPedalLog_E : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@f
+ * MEI att.harpPedal.log\@f
  */
 enum harpPedalLog_F : int8_t {
     harpPedalLog_F_NONE = 0,
@@ -2128,7 +2128,7 @@ enum harpPedalLog_F : int8_t {
 };
 
 /**
- * MEI att.harpPedal.log@g
+ * MEI att.harpPedal.log\@g
  */
 enum harpPedalLog_G : int8_t {
     harpPedalLog_G_NONE = 0,
@@ -2139,7 +2139,7 @@ enum harpPedalLog_G : int8_t {
 };
 
 /**
- * MEI att.line.log@func
+ * MEI att.line.log\@func
  */
 enum lineLog_FUNC : int8_t {
     lineLog_FUNC_NONE = 0,
@@ -2150,7 +2150,7 @@ enum lineLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.liquescent.vis@curve
+ * MEI att.liquescent.vis\@curve
  */
 enum liquescentVis_CURVE : int8_t {
     liquescentVis_CURVE_NONE = 0,
@@ -2160,7 +2160,7 @@ enum liquescentVis_CURVE : int8_t {
 };
 
 /**
- * MEI att.measurement@unit
+ * MEI att.measurement\@unit
  */
 enum measurement_UNIT : int8_t {
     measurement_UNIT_NONE = 0,
@@ -2185,7 +2185,7 @@ enum measurement_UNIT : int8_t {
 };
 
 /**
- * MEI att.meiVersion@meiversion
+ * MEI att.meiVersion\@meiversion
  */
 enum meiVersion_MEIVERSION : int8_t {
     meiVersion_MEIVERSION_NONE = 0,
@@ -2199,7 +2199,7 @@ enum meiVersion_MEIVERSION : int8_t {
 };
 
 /**
- * MEI att.mensur.vis@form
+ * MEI att.mensur.vis\@form
  */
 enum mensurVis_FORM : int8_t {
     mensurVis_FORM_NONE = 0,
@@ -2209,7 +2209,7 @@ enum mensurVis_FORM : int8_t {
 };
 
 /**
- * MEI att.mensural.vis@mensur.form
+ * MEI att.mensural.vis\@mensur.form
  */
 enum mensuralVis_MENSURFORM : int8_t {
     mensuralVis_MENSURFORM_NONE = 0,
@@ -2219,7 +2219,7 @@ enum mensuralVis_MENSURFORM : int8_t {
 };
 
 /**
- * MEI att.meterConformance@metcon
+ * MEI att.meterConformance\@metcon
  */
 enum meterConformance_METCON : int8_t {
     meterConformance_METCON_NONE = 0,
@@ -2230,7 +2230,7 @@ enum meterConformance_METCON : int8_t {
 };
 
 /**
- * MEI att.meterSigGrp.log@func
+ * MEI att.meterSigGrp.log\@func
  */
 enum meterSigGrpLog_FUNC : int8_t {
     meterSigGrpLog_FUNC_NONE = 0,
@@ -2242,7 +2242,7 @@ enum meterSigGrpLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.mordent.log@form
+ * MEI att.mordent.log\@form
  */
 enum mordentLog_FORM : int8_t {
     mordentLog_FORM_NONE = 0,
@@ -2252,7 +2252,7 @@ enum mordentLog_FORM : int8_t {
 };
 
 /**
- * MEI att.ncForm@con
+ * MEI att.ncForm\@con
  */
 enum ncForm_CON : int8_t {
     ncForm_CON_NONE = 0,
@@ -2263,7 +2263,7 @@ enum ncForm_CON : int8_t {
 };
 
 /**
- * MEI att.ncForm@curve
+ * MEI att.ncForm\@curve
  */
 enum ncForm_CURVE : int8_t {
     ncForm_CURVE_NONE = 0,
@@ -2273,7 +2273,7 @@ enum ncForm_CURVE : int8_t {
 };
 
 /**
- * MEI att.ncForm@rellen
+ * MEI att.ncForm\@rellen
  */
 enum ncForm_RELLEN : int8_t {
     ncForm_RELLEN_NONE = 0,
@@ -2283,7 +2283,7 @@ enum ncForm_RELLEN : int8_t {
 };
 
 /**
- * MEI att.note.ges@extremis
+ * MEI att.note.ges\@extremis
  */
 enum noteGes_EXTREMIS : int8_t {
     noteGes_EXTREMIS_NONE = 0,
@@ -2293,7 +2293,7 @@ enum noteGes_EXTREMIS : int8_t {
 };
 
 /**
- * MEI att.noteHeads@head.auth
+ * MEI att.noteHeads\@head.auth
  */
 enum noteHeads_HEADAUTH : int8_t {
     noteHeads_HEADAUTH_NONE = 0,
@@ -2302,7 +2302,7 @@ enum noteHeads_HEADAUTH : int8_t {
 };
 
 /**
- * MEI att.octave.log@coll
+ * MEI att.octave.log\@coll
  */
 enum octaveLog_COLL : int8_t {
     octaveLog_COLL_NONE = 0,
@@ -2311,7 +2311,7 @@ enum octaveLog_COLL : int8_t {
 };
 
 /**
- * MEI att.pb.vis@folium
+ * MEI att.pb.vis\@folium
  */
 enum pbVis_FOLIUM : int8_t {
     pbVis_FOLIUM_NONE = 0,
@@ -2321,7 +2321,7 @@ enum pbVis_FOLIUM : int8_t {
 };
 
 /**
- * MEI att.pedal.log@dir
+ * MEI att.pedal.log\@dir
  */
 enum pedalLog_DIR : int8_t {
     pedalLog_DIR_NONE = 0,
@@ -2333,7 +2333,7 @@ enum pedalLog_DIR : int8_t {
 };
 
 /**
- * MEI att.pedal.log@func
+ * MEI att.pedal.log\@func
  */
 enum pedalLog_FUNC : int8_t {
     pedalLog_FUNC_NONE = 0,
@@ -2345,7 +2345,7 @@ enum pedalLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.pointing@xlink:actuate
+ * MEI att.pointing\@xlink:actuate
  */
 enum pointing_XLINKACTUATE : int8_t {
     pointing_XLINKACTUATE_NONE = 0,
@@ -2357,7 +2357,7 @@ enum pointing_XLINKACTUATE : int8_t {
 };
 
 /**
- * MEI att.pointing@xlink:show
+ * MEI att.pointing\@xlink:show
  */
 enum pointing_XLINKSHOW : int8_t {
     pointing_XLINKSHOW_NONE = 0,
@@ -2370,7 +2370,7 @@ enum pointing_XLINKSHOW : int8_t {
 };
 
 /**
- * MEI att.recordType@recordtype
+ * MEI att.recordType\@recordtype
  */
 enum recordType_RECORDTYPE : int8_t {
     recordType_RECORDTYPE_NONE = 0,
@@ -2392,7 +2392,7 @@ enum recordType_RECORDTYPE : int8_t {
 };
 
 /**
- * MEI att.regularMethod@method
+ * MEI att.regularMethod\@method
  */
 enum regularMethod_METHOD : int8_t {
     regularMethod_METHOD_NONE = 0,
@@ -2402,7 +2402,7 @@ enum regularMethod_METHOD : int8_t {
 };
 
 /**
- * MEI att.rehearsal@reh.enclose
+ * MEI att.rehearsal\@reh.enclose
  */
 enum rehearsal_REHENCLOSE : int8_t {
     rehearsal_REHENCLOSE_NONE = 0,
@@ -2413,7 +2413,7 @@ enum rehearsal_REHENCLOSE : int8_t {
 };
 
 /**
- * MEI att.repeatMark.log@func
+ * MEI att.repeatMark.log\@func
  */
 enum repeatMarkLog_FUNC : int8_t {
     repeatMarkLog_FUNC_NONE = 0,
@@ -2426,7 +2426,7 @@ enum repeatMarkLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.sb.vis@form
+ * MEI att.sb.vis\@form
  */
 enum sbVis_FORM : int8_t {
     sbVis_FORM_NONE = 0,
@@ -2435,7 +2435,7 @@ enum sbVis_FORM : int8_t {
 };
 
 /**
- * MEI att.staffGroupingSym@symbol
+ * MEI att.staffGroupingSym\@symbol
  */
 enum staffGroupingSym_SYMBOL : int8_t {
     staffGroupingSym_SYMBOL_NONE = 0,
@@ -2448,7 +2448,7 @@ enum staffGroupingSym_SYMBOL : int8_t {
 };
 
 /**
- * MEI att.syl.log@con
+ * MEI att.syl.log\@con
  */
 enum sylLog_CON : int8_t {
     sylLog_CON_NONE = 0,
@@ -2464,7 +2464,7 @@ enum sylLog_CON : int8_t {
 };
 
 /**
- * MEI att.syl.log@wordpos
+ * MEI att.syl.log\@wordpos
  */
 enum sylLog_WORDPOS : int8_t {
     sylLog_WORDPOS_NONE = 0,
@@ -2476,7 +2476,7 @@ enum sylLog_WORDPOS : int8_t {
 };
 
 /**
- * MEI att.targetEval@evaluate
+ * MEI att.targetEval\@evaluate
  */
 enum targetEval_EVALUATE : int8_t {
     targetEval_EVALUATE_NONE = 0,
@@ -2487,7 +2487,7 @@ enum targetEval_EVALUATE : int8_t {
 };
 
 /**
- * MEI att.tempo.log@func
+ * MEI att.tempo.log\@func
  */
 enum tempoLog_FUNC : int8_t {
     tempoLog_FUNC_NONE = 0,
@@ -2499,7 +2499,7 @@ enum tempoLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.tuplet.vis@num.format
+ * MEI att.tuplet.vis\@num.format
  */
 enum tupletVis_NUMFORMAT : int8_t {
     tupletVis_NUMFORMAT_NONE = 0,
@@ -2509,7 +2509,7 @@ enum tupletVis_NUMFORMAT : int8_t {
 };
 
 /**
- * MEI att.turn.log@form
+ * MEI att.turn.log\@form
  */
 enum turnLog_FORM : int8_t {
     turnLog_FORM_NONE = 0,
@@ -2519,7 +2519,7 @@ enum turnLog_FORM : int8_t {
 };
 
 /**
- * MEI att.voltaGroupingSym@voltasym
+ * MEI att.voltaGroupingSym\@voltasym
  */
 enum voltaGroupingSym_VOLTASYM : int8_t {
     voltaGroupingSym_VOLTASYM_NONE = 0,
@@ -2532,7 +2532,7 @@ enum voltaGroupingSym_VOLTASYM : int8_t {
 };
 
 /**
- * MEI att.whitespace@xml:space
+ * MEI att.whitespace\@xml:space
  */
 enum whitespace_XMLSPACE : int8_t {
     whitespace_XMLSPACE_NONE = 0,
