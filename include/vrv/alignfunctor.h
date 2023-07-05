@@ -108,6 +108,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitSection(Section *section) override;
@@ -159,6 +160,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitFig(Fig *fig) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPageEnd(Page *page) override;
@@ -188,7 +190,7 @@ private:
     int m_cumulatedShift;
     // The sum of justification factors per page
     int m_justificationSum;
-    // The page width
+    // The page width - used for setting the horizontal position of <rend> withing text layout elements
     int m_pageWidth;
 };
 

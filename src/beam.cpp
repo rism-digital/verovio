@@ -1715,11 +1715,6 @@ void Beam::FilterList(ListOfConstObjects &childList) const
                     continue;
                 }
             }
-            // and spaces
-            else if (element->Is(SPACE)) {
-                iter = childList.erase(iter);
-                continue;
-            }
             ++iter;
         }
     }

@@ -9,7 +9,7 @@
 #define __VRV_RUNNING_ELEMENT_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "textlayoutelement.h"
 
 namespace vrv {
 
@@ -25,15 +25,15 @@ class TextElement;
  * This class represents running elements (headers and footers).
  * It is not an abstract class but should not be instanciated directly.
  */
-class RunningElement : public Object, public ObjectListInterface, public AttHorizontalAlign, public AttTyped {
+class RunningElement : public TextLayoutElement, public AttFormework {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method resets all attribute classes
      */
     ///@{
-    RunningElement();
-    RunningElement(ClassId classId);
+    // RunningElement();
+    // RunningElement(ClassId classId);
     RunningElement(ClassId classId, const std::string &classIdStr);
     virtual ~RunningElement();
     void Reset() override;
@@ -44,13 +44,6 @@ public:
      * It does not make sense you carry copying the running element across the systems.
      */
     Object *Clone() const override { return NULL; }
-
-    /**
-     * @name Methods for adding allowed content
-     */
-    ///@{
-    bool IsSupportedChild(Object *object) override;
-    ///@}
 
     /**
      * @name Setter and getter of the generated flag
@@ -68,7 +61,7 @@ public:
     int GetDrawingY() const override;
     ///@}
 
-    int GetWidth() const;
+    int GetTotalWidth(const Doc *doc) const override;
 
     /*
      * @name Setter and getter for the current drawing page
@@ -88,49 +81,6 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the text element cells
-     */
-    ///@{
-    void ResetCells();
-    void AppendTextToCell(int index, TextElement *text);
-    ///@}
-
-    /**
-     * @name Setter and getter for the drawing scaling
-     */
-    ///@{
-    void ResetDrawingScaling();
-    ///@}
-
-    /**
-     * @name Get the size of row, cols or cells
-     */
-    ///@{
-    /** Height including margins */
-    virtual int GetTotalHeight(const Doc *doc) const = 0;
-    /** Content height */
-    int GetContentHeight() const;
-    /** Row from 0 to 2 */
-    int GetRowHeight(int row) const;
-    /** Col from 0 to 2 */
-    int GetColHeight(int col) const;
-    /** Row from 0 to 8 */
-    int GetCellHeight(int cell) const;
-    ///@}
-
-    /**
-     * Scale the content of the running element.
-     * Currently unused.
-     */
-    bool AdjustDrawingScaling(int width);
-
-    /**
-     * Adjust the postition of the content of the running element.
-     * First adjust the content of each cell, and then the cells themselves.
-     */
-    bool AdjustRunningElementYPos();
-
-    /**
      * Set the current page number by looking for a <num label="page">#</num> element.
      */
     void SetCurrentPageNum(const Page *currentPage);
@@ -139,11 +89,6 @@ public:
      * Load the footer from the resources (footer.svg)
      */
     void LoadFooter(const Doc *doc);
-
-    /**
-     * Calculate the cell position
-     */
-    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v) const;
 
     /**
      * Add page numbering to the running element.
@@ -164,13 +109,6 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
-protected:
-    /**
-     * Filter the list for a specific class.
-     * Keep only the top <rend> and <fig>
-     */
-    void FilterList(ListOfConstObjects &childList) const override;
-
 private:
     //
 
@@ -188,20 +126,9 @@ private:
     int m_drawingYRel;
 
     /**
-     * Stored the top <rend> or <fig> with the 9 possible positioning combinations, from
-     * top-left to bottom-right (going left to right first)
-     */
-    ArrayOfTextElements m_cells[9];
-
-    /**
      * Flag indicating whether or not the element was generated
      */
     bool m_isGenerated;
-
-    /**
-     *
-     */
-    int m_drawingScalingPercent[3];
 };
 
 } // namespace vrv

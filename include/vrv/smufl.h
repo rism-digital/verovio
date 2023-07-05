@@ -547,6 +547,7 @@ enum {
     SMUFL_EB9D_staffPosLower6 = 0xEB9D,
     SMUFL_EB9E_staffPosLower7 = 0xEB9E,
     SMUFL_EB9F_staffPosLower8 = 0xEB9F,
+    SMUFL_EBA6_luteDurationDoubleWhole = 0xEBA6,
     SMUFL_EBA7_luteDurationWhole = 0xEBA7,
     SMUFL_EBA8_luteDurationHalf = 0xEBA8,
     SMUFL_EBA9_luteDurationQuarter = 0xEBA9,
@@ -643,7 +644,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 618
+#define SMUFL_COUNT 619
 
 } // namespace vrv
 

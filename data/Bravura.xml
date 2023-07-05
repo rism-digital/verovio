@@ -809,6 +809,7 @@
   <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
   <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
   <g c="EB9F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower8" />
+  <g c="EBA6" x="0.0" y="0.0" w="148.0" h="786.0" h-a-x="149" n="luteDurationDoubleWhole" />
   <g c="EBA7" x="0.0" y="0.0" w="36.0" h="790.0" h-a-x="36" n="luteDurationWhole" />
   <g c="EBA8" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationHalf" />
   <g c="EBA9" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationQuarter" />

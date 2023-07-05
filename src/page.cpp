@@ -56,9 +56,7 @@
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
@@ -155,10 +153,10 @@ const RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return m_score->GetScoreDef()->GetPgHead();
+        return m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
     }
     else {
-        return m_score->GetScoreDef()->GetPgHead2();
+        return m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
     }
 }
 
@@ -181,10 +179,10 @@ const RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_first);
     }
     else {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot2();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_all);
     }
 }
 

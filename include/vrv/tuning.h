@@ -45,13 +45,13 @@ public:
     int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines) const;
 
     /**
-     * Calclate the MIDI pitch number for course/fret
+     * Calculate the MIDI note number for course/fret
      *
-     * @param[in] course
-     * @param[in] fret
-     * @param[in] notationType, used to default tuning if not otherwise specified
+     * @param[in] course The course number
+     * @param[in] fret The fret number
+     * @param[in] notationType The notationType used to default tuning if not otherwise specified
      *
-     * @return MIDI pitch
+     * @return MIDI note number
      */
     int CalcPitchNumber(int course, int fret, data_NOTATIONTYPE notationType) const;
 
