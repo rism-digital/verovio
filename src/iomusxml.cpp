@@ -3683,14 +3683,14 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(node);
     assert(section);
 
-    if (HasAttributeWithValue(node, "new-system", "yes")) {
-        Sb *sb = new Sb();
-        section->AddChild(sb);
-    }
-
-    if (HasAttributeWithValue(node, "new-page", "yes")) {
+    if (node.attribute("new-page").as_bool()) {
         Pb *pb = new Pb();
         section->AddChild(pb);
+    }
+
+    if (node.attribute("new-system").as_bool()) {
+        Sb *sb = new Sb();
+        section->AddChild(sb);
     }
 }
 
