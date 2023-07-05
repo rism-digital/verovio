@@ -25,9 +25,7 @@
 #include "metersig.h"
 #include "metersiggrp.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "section.h"
 #include "setscoredeffunctor.h"
 #include "staffdef.h"
@@ -298,8 +296,8 @@ bool ScoreDef::IsSupportedChild(Object *child)
 int ScoreDef::GetInsertOrderFor(ClassId classId) const
 {
 
-    static const std::vector s_order({ SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT,
-        PGHEAD2, PGFOOT2, STAFFGRP, GRPSYM });
+    static const std::vector s_order(
+        { SYMBOLTABLE, CLEF, KEYSIG, METERSIGGRP, METERSIG, MENSUR, PGHEAD, PGFOOT, STAFFGRP, GRPSYM });
     return this->GetInsertOrderForIn(classId, s_order);
 }
 
@@ -583,44 +581,28 @@ void ScoreDef::SetDrawingLabelsWidth(int width)
     }
 }
 
-PgFoot *ScoreDef::GetPgFoot()
+PgFoot *ScoreDef::GetPgFoot(data_PGFUNC func)
 {
-    return vrv_cast<PgFoot *>(this->FindDescendantByType(PGFOOT));
+    AttFormeworkComparison comparison(PGFOOT, func);
+    return vrv_cast<PgFoot *>(this->FindDescendantByComparison(&comparison));
 }
 
-const PgFoot *ScoreDef::GetPgFoot() const
+const PgFoot *ScoreDef::GetPgFoot(data_PGFUNC func) const
 {
-    return vrv_cast<const PgFoot *>(this->FindDescendantByType(PGFOOT));
+    AttFormeworkComparison comparison(PGFOOT, func);
+    return vrv_cast<const PgFoot *>(this->FindDescendantByComparison(&comparison));
 }
 
-PgFoot2 *ScoreDef::GetPgFoot2()
+PgHead *ScoreDef::GetPgHead(data_PGFUNC func)
 {
-    return vrv_cast<PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
+    AttFormeworkComparison comparison(PGHEAD, func);
+    return vrv_cast<PgHead *>(this->FindDescendantByComparison(&comparison));
 }
 
-const PgFoot2 *ScoreDef::GetPgFoot2() const
+const PgHead *ScoreDef::GetPgHead(data_PGFUNC func) const
 {
-    return vrv_cast<const PgFoot2 *>(this->FindDescendantByType(PGFOOT2));
-}
-
-PgHead *ScoreDef::GetPgHead()
-{
-    return vrv_cast<PgHead *>(this->FindDescendantByType(PGHEAD));
-}
-
-const PgHead *ScoreDef::GetPgHead() const
-{
-    return vrv_cast<const PgHead *>(this->FindDescendantByType(PGHEAD));
-}
-
-PgHead2 *ScoreDef::GetPgHead2()
-{
-    return vrv_cast<PgHead2 *>(this->FindDescendantByType(PGHEAD2));
-}
-
-const PgHead2 *ScoreDef::GetPgHead2() const
-{
-    return vrv_cast<const PgHead2 *>(this->FindDescendantByType(PGHEAD2));
+    AttFormeworkComparison comparison(PGHEAD, func);
+    return vrv_cast<const PgHead *>(this->FindDescendantByComparison(&comparison));
 }
 
 int ScoreDef::GetMaxStaffSize() const
