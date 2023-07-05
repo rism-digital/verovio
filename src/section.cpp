@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
@@ -60,6 +61,9 @@ bool Section::IsSupportedChild(Object *child)
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
+    }
+    else if (child->Is(DIV)) {
+        assert(dynamic_cast<Div *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

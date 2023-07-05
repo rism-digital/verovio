@@ -40,6 +40,7 @@
 #include "damage.h"
 #include "del.h"
 #include "dir.h"
+#include "div.h"
 #include "divline.h"
 #include "dot.h"
 #include "dynam.h"
@@ -103,9 +104,7 @@
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "phrase.h"
 #include "pitchinflection.h"
 #include "plica.h"
@@ -143,6 +142,7 @@
 #include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
+#include "textlayoutelement.h"
 #include "tie.h"
 #include "trill.h"
 #include "tuning.h"
@@ -412,21 +412,17 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("scoreDef");
         this->WriteScoreDef(m_currentNode, vrv_cast<ScoreDef *>(object));
     }
+    else if (object->Is(DIV)) {
+        m_currentNode = m_currentNode.append_child("div");
+        this->WriteDiv(m_currentNode, vrv_cast<Div *>(object));
+    }
     else if (object->Is(PGFOOT)) {
         m_currentNode = m_currentNode.append_child("pgFoot");
         this->WritePgFoot(m_currentNode, vrv_cast<PgFoot *>(object));
     }
-    else if (object->Is(PGFOOT2)) {
-        m_currentNode = m_currentNode.append_child("pgFoot2");
-        this->WritePgFoot2(m_currentNode, vrv_cast<PgFoot2 *>(object));
-    }
     else if (object->Is(PGHEAD)) {
         m_currentNode = m_currentNode.append_child("pgHead");
         this->WritePgHead(m_currentNode, vrv_cast<PgHead *>(object));
-    }
-    else if (object->Is(PGHEAD2)) {
-        m_currentNode = m_currentNode.append_child("pgHead2");
-        this->WritePgHead2(m_currentNode, vrv_cast<PgHead2 *>(object));
     }
     else if (object->Is(STAFFGRP)) {
         m_currentNode = m_currentNode.append_child("staffGrp");
@@ -1732,13 +1728,20 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     scoreDef->WriteTuning(currentNode);
 }
 
+void MEIOutput::WriteTextLayoutElement(pugi::xml_node currentNode, TextLayoutElement *textLayoutElement)
+{
+    assert(textLayoutElement);
+
+    this->WriteXmlId(currentNode, textLayoutElement);
+    textLayoutElement->WriteTyped(currentNode);
+}
+
 void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
 {
     assert(runningElement);
 
-    this->WriteXmlId(currentNode, runningElement);
-    runningElement->WriteHorizontalAlign(currentNode);
-    runningElement->WriteTyped(currentNode);
+    this->WriteTextLayoutElement(currentNode, runningElement);
+    runningElement->WriteFormework(currentNode);
 }
 
 void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
@@ -1759,6 +1762,13 @@ void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
     grpSym->WriteStartEndId(currentNode);
 }
 
+void MEIOutput::WriteDiv(pugi::xml_node currentNode, Div *div)
+{
+    assert(div);
+
+    this->WriteTextLayoutElement(currentNode, div);
+}
+
 void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
 {
     assert(pgFoot);
@@ -1766,25 +1776,11 @@ void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
     this->WriteRunningElement(currentNode, pgFoot);
 }
 
-void MEIOutput::WritePgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2)
-{
-    assert(pgFoot2);
-
-    this->WriteRunningElement(currentNode, pgFoot2);
-}
-
 void MEIOutput::WritePgHead(pugi::xml_node currentNode, PgHead *pgHead)
 {
     assert(pgHead);
 
     this->WriteRunningElement(currentNode, pgHead);
-}
-
-void MEIOutput::WritePgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2)
-{
-    assert(pgHead2);
-
-    this->WriteRunningElement(currentNode, pgHead2);
 }
 
 void MEIOutput::WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
@@ -3506,7 +3502,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for any other control element
-    else if (filterParent->IsRunningElement()) {
+    else if (filterParent->IsRunningElement() || filterParent->Is(DIV)) {
         if (element == "fig") {
             return true;
         }
@@ -4407,8 +4403,11 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
+        else if (std::string(current.name()) == "div") {
+            success = this->ReadDiv(parent, current);
+        }
         else if (std::string(current.name()) == "ending") {
-            // we should not endings with unmeasured music ... (?)
+            // we should not have endings with unmeasured music ... (?)
             assert(!unmeasured);
             success = this->ReadEnding(parent, current);
         }
@@ -4835,16 +4834,28 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
             success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgFoot2") {
-            success = this->ReadPgFoot2(parent, current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
+            success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgHead") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
             success = this->ReadPgHead(parent, current);
         }
         else if (std::string(current.name()) == "pgHead2") {
-            success = this->ReadPgHead2(parent, current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
+            success = this->ReadPgHead(parent, current);
         }
         // symbolTable
         else if (std::string(current.name()) == "symbolTable") {
@@ -4949,11 +4960,18 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+bool MEIInput::ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object)
 {
     this->SetMeiID(element, object);
-    object->ReadHorizontalAlign(element);
     object->ReadTyped(element);
+
+    return true;
+}
+
+bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+{
+    this->ReadTextLayoutElement(element, object);
+    object->ReadFormework(element);
 
     return true;
 }
@@ -4992,16 +5010,6 @@ bool MEIInput::ReadPgFoot(Object *parent, pugi::xml_node pgFoot)
     return this->ReadRunningChildren(vrvPgFoot, pgFoot, vrvPgFoot);
 }
 
-bool MEIInput::ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2)
-{
-    PgFoot2 *vrvPgFoot2 = new PgFoot2();
-    this->ReadRunningElement(pgFoot2, vrvPgFoot2);
-
-    parent->AddChild(vrvPgFoot2);
-    this->ReadUnsupportedAttr(pgFoot2, vrvPgFoot2);
-    return this->ReadRunningChildren(vrvPgFoot2, pgFoot2, vrvPgFoot2);
-}
-
 bool MEIInput::ReadPgHead(Object *parent, pugi::xml_node pgHead)
 {
     PgHead *vrvPgHead = new PgHead();
@@ -5012,14 +5020,14 @@ bool MEIInput::ReadPgHead(Object *parent, pugi::xml_node pgHead)
     return this->ReadRunningChildren(vrvPgHead, pgHead, vrvPgHead);
 }
 
-bool MEIInput::ReadPgHead2(Object *parent, pugi::xml_node pgHead2)
+bool MEIInput::ReadDiv(Object *parent, pugi::xml_node div)
 {
-    PgHead2 *vrvPgHead2 = new PgHead2();
-    this->ReadRunningElement(pgHead2, vrvPgHead2);
+    Div *vrvDiv = new Div();
+    this->ReadTextLayoutElement(div, vrvDiv);
 
-    parent->AddChild(vrvPgHead2);
-    this->ReadUnsupportedAttr(pgHead2, vrvPgHead2);
-    return this->ReadRunningChildren(vrvPgHead2, pgHead2, vrvPgHead2);
+    parent->AddChild(vrvDiv);
+    this->ReadUnsupportedAttr(div, vrvDiv);
+    return this->ReadRunningChildren(vrvDiv, div, vrvDiv);
 }
 
 bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
@@ -8148,6 +8156,24 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
+}
+
+void MEIInput::UpgradePgHeadFootTo_5_0_0(pugi::xml_node element)
+{
+    if ((std::string(element.name()) == "pgFoot") && !element.attribute("func")) {
+        element.append_attribute("func") = "first";
+    }
+    else if (std::string(element.name()) == "pgFoot2") {
+        element.set_name("pgFoot");
+        element.append_attribute("func") = "all";
+    }
+    else if ((std::string(element.name()) == "pgHead") && !element.attribute("func")) {
+        element.append_attribute("func") = "first";
+    }
+    else if (std::string(element.name()) == "pgHead2") {
+        element.set_name("pgHead");
+        element.append_attribute("func") = "all";
+    }
 }
 
 void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)

@@ -2834,7 +2834,7 @@
         <!--<glyph glyph-code="EBA3" smufl-name="luteBarlineStartRepeat" />-->
         <!--<glyph glyph-code="EBA4" smufl-name="luteBarlineEndRepeat" />-->
         <!--<glyph glyph-code="EBA5" smufl-name="luteBarlineFinal" />-->
-        <!--<glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole" />-->
+        <glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole" />
         <glyph glyph-code="EBA7" smufl-name="luteDurationWhole" />
         <glyph glyph-code="EBA8" smufl-name="luteDurationHalf" />
         <glyph glyph-code="EBA9" smufl-name="luteDurationQuarter" />
