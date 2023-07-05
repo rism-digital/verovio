@@ -853,6 +853,11 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         surface->AddChild(zone);
         zone->SetUlx(ulx);
 
+        Text *text = new Text();
+        std::u32string str = U"";
+        text->SetText(str);
+        syl->AddChild(text);
+
         neume->AddChild(nc);
         syllable->AddChild(neume);
         syllable->AddChild(syl);
@@ -1778,6 +1783,11 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
         Syl *syl = vrv_cast<Syl *>(syllable->GetFirst(SYL));
         if (syl == NULL) {
             syl = new Syl();
+            Text *text = new Text();
+            std::u32string str = U"";
+            text->SetText(str);
+            syl->AddChild(text);
+
             syllable->AddChild(syl);
             Text *textChild = new Text();
             textChild->SetText(wtext);
@@ -2453,6 +2463,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             // Ensure a syl is created so text can be added to syllable
             Syl *syl = new Syl();
             Text *text = new Text();
+            std::u32string str = U"";
+            text->SetText(str);
             syl->AddChild(text);
             parent->AddChild(syl);
 
@@ -2915,6 +2927,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 syllables.push_back(newParent);
                 Syl *syl = new Syl();
                 Text *text = new Text();
+                std::u32string str = U"";
+                text->SetText(str);
                 syl->AddChild(text);
                 newParent->AddChild(syl);
 
@@ -2973,6 +2987,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     zone->SetLry(zone->GetLry() + 200);
 
                     assert(m_doc->GetFacsimile());
+                    m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                     FacsimileInterface *fi = syl->GetFacsimileInterface();
                     assert(fi);
                     fi->AttachZone(zone);
