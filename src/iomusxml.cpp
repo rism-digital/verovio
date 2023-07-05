@@ -2870,6 +2870,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->SetOct(octaveNum);
             }
         }
+        else if (node.child("unpitched")) {
+            pugi::xml_node unpitched = node.child("unpitched");
+            const std::string stepStr = unpitched.child("display-step").text().as_string();
+            const int octaveNum = unpitched.child("display-octave").text().as_int();
+            const int loc = note->CalcLoc(ConvertStepToPitchName(stepStr), octaveNum, -2);
+            note->SetLoc(loc);
+        }
 
         // dynamics (MIDI velocity)
         const float dynamics = node.attribute("dynamics").as_float(-1.0);
