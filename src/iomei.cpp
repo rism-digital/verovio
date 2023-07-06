@@ -3725,7 +3725,16 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for syllable
     else if (filterParent->Is(SYLLABLE)) {
-        if (element == "neume") {
+        if (element == "accid") {
+            return true;
+        }
+        else if (element == "clef") {
+            return true;
+        }
+        else if (element == "divLine") {
+            return true;
+        }
+        else if (element == "neume") {
             return true;
         }
         else if (element == "syl") {
