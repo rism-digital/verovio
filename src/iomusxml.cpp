@@ -2870,6 +2870,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->SetOct(octaveNum);
             }
         }
+        else if (node.child("unpitched")) {
+            pugi::xml_node unpitched = node.child("unpitched");
+            const std::string stepStr = unpitched.child("display-step").text().as_string();
+            const int octaveNum = unpitched.child("display-octave").text().as_int();
+            const int loc = note->CalcLoc(ConvertStepToPitchName(stepStr), octaveNum, -2);
+            note->SetLoc(loc);
+        }
 
         // dynamics (MIDI velocity)
         const float dynamics = node.attribute("dynamics").as_float(-1.0);
@@ -3676,14 +3683,14 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(node);
     assert(section);
 
-    if (HasAttributeWithValue(node, "new-system", "yes")) {
-        Sb *sb = new Sb();
-        section->AddChild(sb);
-    }
-
-    if (HasAttributeWithValue(node, "new-page", "yes")) {
+    if (node.attribute("new-page").as_bool()) {
         Pb *pb = new Pb();
         section->AddChild(pb);
+    }
+
+    if (node.attribute("new-system").as_bool()) {
+        Sb *sb = new Sb();
+        section->AddChild(sb);
     }
 }
 
