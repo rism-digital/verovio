@@ -1108,7 +1108,7 @@ void BeamSegment::CalcAdjustPosition(const Staff *staff, const Doc *doc, const B
         }
     }
 
-    m_beamElementCoordRefs.at(0)->m_yBeam += adjust;
+    m_firstNoteOrChord->m_yBeam += adjust;
 
     this->CalcSetValues();
 }
@@ -1457,8 +1457,8 @@ void BeamSegment::CalcPartialFlagPlace()
 
 void BeamSegment::CalcSetValues()
 {
-    int startingX = m_beamElementCoordRefs.at(0)->m_x;
-    int startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
+    const int startingX = m_firstNoteOrChord->m_x;
+    const int startingY = m_firstNoteOrChord->m_yBeam;
 
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         coord->m_yBeam = startingY + m_beamSlope * (coord->m_x - startingX);
