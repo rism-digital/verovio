@@ -687,6 +687,8 @@ public:
 protected:
     //
 private:
+    // Create stem if it does not exist
+    Stem *EnsureStemExists(Stem *stem, Object *parent) const;
     // Create dots if they should exist, otherwise remove them
     Dots *ProcessDots(Dots *dots, Object *parent, bool shouldExist) const;
     // Create flag if it should exist, otherwise remove it

@@ -1020,11 +1020,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        chord->AddChild(currentStem);
-    }
+    currentStem = this->EnsureStemExists(currentStem, chord);
     currentStem->AttGraced::operator=(*chord);
     currentStem->FillAttributes(*chord);
 
@@ -1073,11 +1069,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!note->IsChordTone() && !note->IsTabGrpNote()) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            currentStem->IsAttribute(true);
-            note->AddChild(currentStem);
-        }
+        currentStem = this->EnsureStemExists(currentStem, note);
         currentStem->AttGraced::operator=(*note);
         currentStem->FillAttributes(*note);
 
@@ -1142,11 +1134,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        tabDurSym->AddChild(currentStem);
-    }
+    currentStem = this->EnsureStemExists(currentStem, tabDurSym);
     tabDurSym->SetDrawingStem(currentStem);
 
     /************ flags ***********/
@@ -1224,6 +1212,18 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
     return FUNCTOR_CONTINUE;
 }
 
+Stem *PrepareLayerElementPartsFunctor::EnsureStemExists(Stem *stem, Object *parent) const
+{
+    assert(parent);
+
+    if (!stem) {
+        stem = new Stem();
+        stem->IsAttribute(true);
+        parent->AddChild(stem);
+    }
+    return stem;
+}
+
 Dots *PrepareLayerElementPartsFunctor::ProcessDots(Dots *dots, Object *parent, bool shouldExist) const
 {
     assert(parent);
@@ -1241,7 +1241,6 @@ Dots *PrepareLayerElementPartsFunctor::ProcessDots(Dots *dots, Object *parent, b
             dots = NULL;
         }
     }
-
     return dots;
 }
 
@@ -1260,7 +1259,6 @@ Flag *PrepareLayerElementPartsFunctor::ProcessFlag(Flag *flag, Object *parent, b
             flag = NULL;
         }
     }
-
     return flag;
 }
 
