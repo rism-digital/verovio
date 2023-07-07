@@ -1020,11 +1020,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        chord->AddChild(currentStem);
-    }
+    currentStem = this->EnsureStemExists(currentStem, chord);
     currentStem->AttGraced::operator=(*chord);
     currentStem->FillAttributes(*chord);
 
@@ -1033,19 +1029,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
         currentStem->IsVirtual(true);
     }
 
-    if ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
+    const bool shouldHaveFlag = ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
+    currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     chord->SetDrawingStem(currentStem);
 
@@ -1065,19 +1050,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 
     Dots *currentDots = vrv_cast<Dots *>(chord->FindDescendantByType(DOTS, 1));
 
-    if (chord->GetDots() > 0) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            chord->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*chord);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (chord->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
+    const bool shouldHaveDots = (chord->GetDots() > 0);
+    currentDots = this->ProcessDots(currentDots, chord, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
 
@@ -1095,11 +1069,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
     if (!note->IsChordTone() && !note->IsTabGrpNote()) {
-        if (!currentStem) {
-            currentStem = new Stem();
-            currentStem->IsAttribute(true);
-            note->AddChild(currentStem);
-        }
+        currentStem = this->EnsureStemExists(currentStem, note);
         currentStem->AttGraced::operator=(*note);
         currentStem->FillAttributes(*note);
 
@@ -1119,44 +1089,23 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     // We don't care about flags or dots in mensural notes
     if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
 
-    if ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem() && !note->IsChordTone()
-        && !note->IsTabGrpNote()) {
-        // We should have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
+    if (currentStem) {
+        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
+            && !note->IsChordTone() && !note->IsTabGrpNote());
+        currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
-    if (!chord) note->SetDrawingStem(currentStem);
+        if (!chord) note->SetDrawingStem(currentStem);
+    }
 
     /************ dots ***********/
 
     Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
 
-    if (note->GetDots() > 0) {
-        if (chord && (chord->GetDots() == note->GetDots())) {
-            LogWarning(
-                "Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
-        }
-        if (!currentDots) {
-            currentDots = new Dots();
-            note->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*note);
+    const bool shouldHaveDots = (note->GetDots() > 0);
+    if (shouldHaveDots && chord && (chord->GetDots() == note->GetDots())) {
+        LogWarning("Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
     }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (note->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
+    currentDots = this->ProcessDots(currentDots, note, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
 
@@ -1170,19 +1119,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
 {
     Dots *currentDots = vrv_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
 
-    if ((rest->GetDur() > DUR_BR) && (rest->GetDots() > 0)) {
-        if (!currentDots) {
-            currentDots = new Dots();
-            rest->AddChild(currentDots);
-        }
-        currentDots->AttAugmentDots::operator=(*rest);
-    }
-    // This will happen only if the duration has changed
-    else if (currentDots) {
-        if (rest->DeleteChild(currentDots)) {
-            currentDots = NULL;
-        }
-    }
+    const bool shouldHaveDots = (rest->GetDur() > DUR_BR) && (rest->GetDots() > 0);
+    currentDots = this->ProcessDots(currentDots, rest, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
 
@@ -1198,11 +1136,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = vrv_cast<Flag *>(currentStem->GetFirst(FLAG));
 
-    if (!currentStem) {
-        currentStem = new Stem();
-        currentStem->IsAttribute(true);
-        tabDurSym->AddChild(currentStem);
-    }
+    currentStem = this->EnsureStemExists(currentStem, tabDurSym);
     tabDurSym->SetDrawingStem(currentStem);
 
     /************ flags ***********/
@@ -1211,19 +1145,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     assert(tabGrp);
 
     // No flag within beam for durations longer than 8th notes
-    if (!tabDurSym->IsInBeam() && tabGrp->GetActualDur() > DUR_4) {
-        // We must have a stem at this stage
-        assert(currentStem);
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            currentStem->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed (no flag required anymore)
-    else if (currentFlag) {
-        assert(currentStem);
-        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
+    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DUR_4));
+    currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -1289,6 +1212,56 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         vrv_cast<LayerElement *>(tuplet->FindDescendantByComparison(&comparison, UNLIMITED_DEPTH, BACKWARD)));
 
     return FUNCTOR_CONTINUE;
+}
+
+Stem *PrepareLayerElementPartsFunctor::EnsureStemExists(Stem *stem, Object *parent) const
+{
+    assert(parent);
+
+    if (!stem) {
+        stem = new Stem();
+        stem->IsAttribute(true);
+        parent->AddChild(stem);
+    }
+    return stem;
+}
+
+Dots *PrepareLayerElementPartsFunctor::ProcessDots(Dots *dots, Object *parent, bool shouldExist) const
+{
+    assert(parent);
+    assert(parent->GetDurationInterface());
+
+    if (shouldExist) {
+        if (!dots) {
+            dots = new Dots();
+            parent->AddChild(dots);
+        }
+        dots->AttAugmentDots::operator=(*parent->GetDurationInterface());
+    }
+    else if (dots) {
+        if (parent->DeleteChild(dots)) {
+            dots = NULL;
+        }
+    }
+    return dots;
+}
+
+Flag *PrepareLayerElementPartsFunctor::ProcessFlag(Flag *flag, Object *parent, bool shouldExist) const
+{
+    assert(parent);
+
+    if (shouldExist) {
+        if (!flag) {
+            flag = new Flag();
+            parent->AddChild(flag);
+        }
+    }
+    else if (flag) {
+        if (parent->DeleteChild(flag)) {
+            flag = NULL;
+        }
+    }
+    return flag;
 }
 
 //----------------------------------------------------------------------------
