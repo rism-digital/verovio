@@ -1089,11 +1089,13 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     // We don't care about flags or dots in mensural notes
     if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
 
-    const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
-        && !note->IsChordTone() && !note->IsTabGrpNote());
-    currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
+    if (currentStem) {
+        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
+            && !note->IsChordTone() && !note->IsTabGrpNote());
+        currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
-    if (!chord) note->SetDrawingStem(currentStem);
+        if (!chord) note->SetDrawingStem(currentStem);
+    }
 
     /************ dots ***********/
 
