@@ -301,18 +301,10 @@ FunctorCode AdjustBeamsFunctor::VisitRest(Rest *rest)
     int leftMargin = 0, rightMargin = 0;
     const int beams = m_outerBeam->GetBeamPartDuration(rest, false) - DUR_4;
     const int beamWidth = m_outerBeam->m_beamWidth;
-    if (m_directionBias > 0) {
-        leftMargin = m_y1 - beams * beamWidth - rest->GetSelfTop();
-        rightMargin = m_y2 - beams * beamWidth - rest->GetSelfTop();
-    }
-    else {
-        leftMargin = rest->GetSelfBottom() - m_y1 - beams * beamWidth;
-        rightMargin = rest->GetSelfBottom() - m_y2 - beams * beamWidth;
-    }
+    const int overlapMargin = rest->Intersects(m_outerBeam, SELF, beams * beamWidth, true) * m_directionBias;
 
     // Adjust drawing location for the rest based on the overlap with beams.
     // Adjustment should be an even number, so that the rest is positioned properly
-    const int overlapMargin = std::min(leftMargin, rightMargin);
     if (overlapMargin >= 0) return FUNCTOR_CONTINUE;
 
     Staff *staff = rest->GetAncestorStaff();
