@@ -298,7 +298,6 @@ FunctorCode AdjustBeamsFunctor::VisitRest(Rest *rest)
     if (!m_outerBeam) return FUNCTOR_SIBLINGS;
 
     // Calculate possible overlap for the rest with beams
-    int leftMargin = 0, rightMargin = 0;
     const int beams = m_outerBeam->GetBeamPartDuration(rest, false) - DUR_4;
     const int beamWidth = m_outerBeam->m_beamWidth;
     const int overlapMargin = rest->Intersects(m_outerBeam, SELF, beams * beamWidth, true) * m_directionBias;
@@ -336,11 +335,9 @@ FunctorCode AdjustBeamsFunctor::VisitRest(Rest *rest)
     }
 
     const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    const int unitChangeNumber = ((std::abs(overlapMargin) + unit / 6) / unit);
-    if (unitChangeNumber > 0) {
-        const int adjust = unitChangeNumber * unit * m_directionBias;
-        if (std::abs(adjust) > std::abs(m_overlapMargin)) m_overlapMargin = adjust;
-    }
+    const int unitChangeNumber = std::abs(overlapMargin) / unit + 1;
+    const int adjust = unitChangeNumber * unit * m_directionBias;
+    if (std::abs(adjust) > std::abs(m_overlapMargin)) m_overlapMargin = adjust;
 
     return FUNCTOR_CONTINUE;
 }
