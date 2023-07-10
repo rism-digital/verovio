@@ -184,6 +184,13 @@ bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
             return this->SplitNeume(elementId, ncId);
         }
     }
+    else if (action == "matchHeight") {
+        std::string elementId;
+        if (this->ParseMatchHeightAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->MatchHeight(elementId);
+        }
+        LogWarning("Could not parse the insert action");
+    }
     else if (action == "merge") {
         std::vector<std::string> elementIds;
         if (this->ParseMergeAction(json.get<jsonxx::Object>("param"), &elementIds)) {
@@ -1589,6 +1596,72 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
         Nc *nc = dynamic_cast<Nc *>(ncObj);
         nc->SetOct(nc->GetOct() + move);
     });
+
+    m_infoObject.import("status", "OK");
+    m_infoObject.import("message", "");
+    return true;
+}
+
+bool EditorToolkitNeume::MatchHeight(std::string elementId)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get drawing page");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Could not get drawing page.");
+        return false;
+    }
+    if (m_doc->GetType() != Facs) {
+        LogError("Drawing page without facsimile");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Drawing page without facsimile is unsupported.");
+        return false;
+    }
+
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
+    assert(element);
+    Object *staffParent = element->GetFirstAncestor(STAFF);
+    if (element == NULL) {
+        LogError("No element exists with ID '%s'.", elementId.c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No element exists with ID" + elementId + ".");
+        return false;
+    }
+    if (!element->Is(SYL)) {
+        LogError("Element is of type %s, but only <syl> element can match height.", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import(
+            "message", "Element is of type " + element->GetClassName() + ", but only <syl> element can match height.");
+        return false;
+    }
+
+    // get the position of the selected bbox
+    int uly;
+    int lry;
+    if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
+        uly = element->GetFacsimileInterface()->GetZone()->GetUly();
+        lry = element->GetFacsimileInterface()->GetZone()->GetLry();
+    }
+    else {
+        LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "Selected '" + element->GetClassName() + "' without facsimile is unsupported.");
+        return false;
+    }
+
+    // find all syls in staff
+    ListOfObjects syls;
+    ClassIdComparison ac(SYL);
+    staffParent->FindAllDescendantsByComparison(&syls, &ac);
+    Syl *syl;
+    Zone *zone;
+
+    for (auto it = syls.begin(); it != syls.end(); ++it) {
+        syl = dynamic_cast<Syl *>(*it);
+        zone = syl->GetFacsimileInterface()->GetZone();
+        assert(zone);
+        zone->SetUly(uly);
+        zone->SetLry(lry);
+    }
 
     m_infoObject.import("status", "OK");
     m_infoObject.import("message", "");
@@ -3773,6 +3846,13 @@ bool EditorToolkitNeume::ParseDisplaceClefAction(jsonxx::Object param, std::stri
     *elementId = param.get<jsonxx::String>("elementId");
     *direction = param.get<jsonxx::String>("direction");
 
+    return true;
+}
+
+bool EditorToolkitNeume::ParseMatchHeightAction(jsonxx::Object param, std::string *elementId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
 
