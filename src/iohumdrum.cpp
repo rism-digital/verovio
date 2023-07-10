@@ -7723,10 +7723,10 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         // dynamics position to centered if there is a slash in the *staff1/2 string.
         // In the future also check *part# to see if there are two staves for a part
         // with no **dynam for the lower staff (infer to be a grand staff).
-        hum::HTp dynamspine = getAssociatedDynamSpine(stafftok);
-        if (dynamspine != NULL) {
-            if (dynamspine->compare(0, 6, "*staff") == 0) {
-                if (dynamspine->find('/') != std::string::npos) {
+        hum::HTp dynamSpine = getAssociatedDynamSpine(stafftok);
+        if (dynamSpine != NULL) {
+            if (dynamSpine->compare(0, 6, "*staff") == 0) {
+                if (dynamSpine->find('/') != std::string::npos) {
                     // the dynamics should be placed between
                     // staves: the current one and the one below it.
                     ss.at(staffindex).m_dynampos = 0;
@@ -7737,14 +7737,14 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         }
     }
     if (parttok) {
-        hum::HTp dynamspine = getAssociatedDynamSpine(parttok);
+        hum::HTp dynamSpine = getAssociatedDynamSpine(parttok);
         int partnum = 0;
         int dpartnum = 0;
         int lpartnum = 0;
         hum::HumRegex hre;
 
-        if (dynamspine) {
-            if (hre.search(dynamspine, "^\\*part(\\d+)")) {
+        if (dynamSpine) {
+            if (hre.search(dynamSpine, "^\\*part(\\d+)")) {
                 dpartnum = hre.getMatchInt(1);
             }
         }
