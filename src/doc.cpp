@@ -685,6 +685,11 @@ void Doc::PrepareData()
     PrepareBeamSpanElementsFunctor prepareBeamSpanElements;
     this->Process(prepareBeamSpanElements);
 
+    /************ Match pedal lines ***********/
+
+    PreparePedalsFunctor preparePedals(this);
+    this->Process(preparePedals);
+
     /************ Prepare processing by staff/layer/verse ************/
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -813,7 +818,7 @@ void Doc::PrepareData()
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
-    PrepareFloatingGrpsFunctor prepareFloatingGrps(this);
+    PrepareFloatingGrpsFunctor prepareFloatingGrps;
     this->Process(prepareFloatingGrps);
 
     /************ Resolve cue size ************/

@@ -565,13 +565,13 @@ private:
 /**
  * This class matches down and up pedal lines.
  */
-class PreparePedalsFunctor : public Functor {
+class PreparePedalsFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    PreparePedalsFunctor();
+    PreparePedalsFunctor(Doc *doc);
     virtual ~PreparePedalsFunctor() = default;
     ///@}
 
@@ -908,13 +908,13 @@ private:
  * This class groups FloatingObjects by drawingGrpId.
  * Also chains the Dynam and Hairpin.
  */
-class PrepareFloatingGrpsFunctor : public DocFunctor {
+class PrepareFloatingGrpsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    PrepareFloatingGrpsFunctor(Doc *doc);
+    PrepareFloatingGrpsFunctor();
     virtual ~PrepareFloatingGrpsFunctor() = default;
     ///@}
 
@@ -953,8 +953,6 @@ private:
     std::vector<Hairpin *> m_hairpins;
     // The map of existing harms (based on @n)
     std::map<std::string, Harm *> m_harms;
-    // The current pedals to be linked / grouped
-    std::list<Pedal *> m_pedalLines;
 };
 
 //----------------------------------------------------------------------------
