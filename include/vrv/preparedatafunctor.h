@@ -559,6 +559,47 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// PreparePedalsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches down and up pedal lines.
+ */
+class PreparePedalsFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PreparePedalsFunctor();
+    virtual ~PreparePedalsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitPedal(Pedal *pedal) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current pedals to be linked / grouped
+    std::list<Pedal *> m_pedalLines;
+};
+
+//----------------------------------------------------------------------------
 // PreparePointersByLayerFunctor
 //----------------------------------------------------------------------------
 

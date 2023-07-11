@@ -874,6 +874,22 @@ FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
 }
 
 //----------------------------------------------------------------------------
+// PreparePedalsFunctor
+//----------------------------------------------------------------------------
+
+PreparePedalsFunctor::PreparePedalsFunctor() : Functor() {}
+
+FunctorCode PreparePedalsFunctor::VisitMeasureEnd(Measure *measure)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PreparePedalsFunctor::VisitPedal(Pedal *pedal)
+{
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // PreparePointersByLayerFunctor
 //----------------------------------------------------------------------------
 
