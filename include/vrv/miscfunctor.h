@@ -52,8 +52,8 @@ private:
 public:
     //
 private:
-    // The current page
-    Page *m_page;
+    // The current PPU factor
+    double m_ppuFactor;
 };
 
 //----------------------------------------------------------------------------
