@@ -1654,11 +1654,25 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     staffParent->FindAllDescendantsByComparison(&syls, &ac);
     Syl *syl;
     Zone *zone;
+    int rightMost = -1;
+    int itUlx;
+    int itLrx;
 
     for (auto it = syls.begin(); it != syls.end(); ++it) {
         syl = dynamic_cast<Syl *>(*it);
         zone = syl->GetFacsimileInterface()->GetZone();
         assert(zone);
+
+        // adjust x-axis first
+        itUlx = zone->GetUlx();
+        itLrx = zone->GetLrx();
+        if (itLrx > rightMost) {
+            // correct overlap
+            if (itUlx < rightMost) zone->SetUlx(rightMost);
+            // Update right most point if needed
+            rightMost = itLrx;
+        }
+
         zone->SetUly(uly);
         zone->SetLry(lry);
     }
