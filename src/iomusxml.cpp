@@ -3955,6 +3955,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
                         ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                    keyAccid->SetGlyphName(keyStep.next_sibling().next_sibling().attribute("smufl").as_string());
                 }
             }
             keySig->AddChild(keyAccid);
@@ -4011,7 +4012,7 @@ curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, c
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::string &value)
 {
-    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid{
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid{ //
         { "sharp", ACCIDENTAL_WRITTEN_s }, //
         { "natural", ACCIDENTAL_WRITTEN_n }, //
         { "flat", ACCIDENTAL_WRITTEN_f }, //
@@ -4030,12 +4031,19 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
         { "natural-up", ACCIDENTAL_WRITTEN_nu }, //
         { "flat-down", ACCIDENTAL_WRITTEN_fd }, //
         { "flat-up", ACCIDENTAL_WRITTEN_fu }, //
+        // { "double-sharp-down",  }, //
+        // { "double-sharp-up",  }, //
+        // { "flat-flat-down",  }, //
+        // { "flat-flat-up",  }, //
         { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, //
         { "triple-flat", ACCIDENTAL_WRITTEN_tf }, //
         { "slash-quarter-sharp", ACCIDENTAL_WRITTEN_bms }, //
         { "slash-sharp", ACCIDENTAL_WRITTEN_ks }, //
         { "slash-flat", ACCIDENTAL_WRITTEN_bf }, //
-        { "double-slash-flat", ACCIDENTAL_WRITTEN_bmf } //
+        { "double-slash-flat", ACCIDENTAL_WRITTEN_bmf }, //
+        { "sori", ACCIDENTAL_WRITTEN_sori }, //
+        { "koron", ACCIDENTAL_WRITTEN_koron }, //
+        { "other", ACCIDENTAL_WRITTEN_NONE }
     };
 
     const auto result = Accidental2Accid.find(value);
@@ -4068,7 +4076,6 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported alter value '%.1f'", value);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 
