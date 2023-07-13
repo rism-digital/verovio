@@ -2987,6 +2987,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
             // if the element is a syl then we want to keep it attached to the first node
             if (el->Is(SYL)) {
+                Zone *zone = dynamic_cast<Zone *>(el->GetFacsimileInterface()->GetZone());
+
+                zone->SetLrx(zone->GetUlx() + 100);
+                zone->SetLry(zone->GetUly() + 200);
                 continue;
             }
 
