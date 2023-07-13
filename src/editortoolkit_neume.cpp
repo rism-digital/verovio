@@ -1635,11 +1635,15 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     }
 
     // get the position of the selected bbox
+    int ulx;
     int uly;
-    int lry;
+    int height;
+    int lrx;
     if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
+        ulx = element->GetFacsimileInterface()->GetZone()->GetUlx();
         uly = element->GetFacsimileInterface()->GetZone()->GetUly();
-        lry = element->GetFacsimileInterface()->GetZone()->GetLry();
+        lrx = element->GetFacsimileInterface()->GetZone()->GetLrx();
+        height = element->GetFacsimileInterface()->GetZone()->GetLry() - uly;
     }
     else {
         LogError("Selected '%s' without facsimile", element->GetClassName().c_str());
@@ -1654,9 +1658,11 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     staffParent->FindAllDescendantsByComparison(&syls, &ac);
     Syl *syl;
     Zone *zone;
-    int rightMost = -1;
     int itUlx;
     int itLrx;
+    int offsetY;
+    int rightMost = -1;
+    double theta = staffParent->GetFacsimileInterface()->GetZone()->GetRotate();
 
     for (auto it = syls.begin(); it != syls.end(); ++it) {
         syl = dynamic_cast<Syl *>(*it);
@@ -1673,8 +1679,14 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
             rightMost = itLrx;
         }
 
-        zone->SetUly(uly);
-        zone->SetLry(lry);
+        offsetY = 0;
+        if (theta) {
+            double factor = 1.3;
+            offsetY = (int)((itUlx - ulx) * tan(theta * M_PI / 180.0) / factor);
+        }
+
+        zone->SetUly(uly + offsetY);
+        zone->SetLry(uly + offsetY + height);
     }
 
     m_infoObject.import("status", "OK");
