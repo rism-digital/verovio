@@ -3957,6 +3957,9 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
                         ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
                     keyAccid->SetGlyphName(keyStep.next_sibling().next_sibling().attribute("smufl").as_string());
                 }
+                else if (!keyAccid->HasAccid()) {
+                    LogWarning("MusicXML import: Could not properly set keyAccid");
+                }
             }
             keySig->AddChild(keyAccid);
         }
