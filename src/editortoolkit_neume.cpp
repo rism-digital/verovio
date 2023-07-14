@@ -2996,12 +2996,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 continue;
             }
 
-            // if (el->Is(DIVLINE) || el->Is(ACCID)) {
-            //     el->MoveItselfTo(sparent);
-            //     fparent->ClearRelinquishedChildren();
-            //     continue;
-            // }
-
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
@@ -3095,15 +3089,11 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                     FacsimileInterface *fi = syl->GetFacsimileInterface();
                     assert(fi);
                     fi->AttachZone(zone);
-
-                    // syl->ResetFacsimile();
-                    // syl->SetFacs(zone->GetID());
                 }
             }
 
             if (ligNum != 1) {
                 // if not 1st nc in ligature, add child
-
                 uuidArray << newParent->GetID();
 
                 sparent->AddChild(newParent);
