@@ -2932,8 +2932,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 sparent->ReorderByXPos();
                 fparent->ClearRelinquishedChildren();
                 fparent->ReorderByXPos();
+                uuidArray << (*it);
+                it = elementIds.erase(it);
+                el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
             }
-            continue;
         }
         if (elementIds.begin() == it || firstIsSyl) {
             // if the element is a syl we want it to stay attached to the first element
