@@ -874,6 +874,55 @@ FunctorCode PrepareTimestampsFunctor::VisitMeasureEnd(Measure *measure)
 }
 
 //----------------------------------------------------------------------------
+// PreparePedalsFunctor
+//----------------------------------------------------------------------------
+
+PreparePedalsFunctor::PreparePedalsFunctor(Doc *doc) : DocFunctor(doc) {}
+
+FunctorCode PreparePedalsFunctor::VisitMeasureEnd(Measure *measure)
+{
+    // Match down and up pedal lines
+    using PedalIter = std::list<Pedal *>::iterator;
+    PedalIter iter = m_pedalLines.begin();
+    while (iter != m_pedalLines.end()) {
+        if ((*iter)->GetDir() != pedalLog_DIR_down) {
+            ++iter;
+            continue;
+        }
+        PedalIter up = std::find_if(m_pedalLines.begin(), m_pedalLines.end(), [&iter](Pedal *pedal) {
+            return (((*iter)->GetStaff() == pedal->GetStaff()) && (pedal->GetDir() != pedalLog_DIR_down));
+        });
+        if (up != m_pedalLines.end()) {
+            (*iter)->SetEnd((*up)->GetStart());
+            if ((*up)->GetDir() == pedalLog_DIR_bounce) {
+                (*iter)->EndsWithBounce(true);
+            }
+            m_pedalLines.erase(up);
+            iter = m_pedalLines.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PreparePedalsFunctor::VisitPedal(Pedal *pedal)
+{
+    if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
+
+    System *system = vrv_cast<System *>(pedal->GetFirstAncestor(SYSTEM));
+    assert(system);
+    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
+    if ((form == PEDALSTYLE_line) || (form == PEDALSTYLE_pedline)) {
+        m_pedalLines.push_back(pedal);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+//----------------------------------------------------------------------------
 // PreparePointersByLayerFunctor
 //----------------------------------------------------------------------------
 
@@ -1476,7 +1525,7 @@ FunctorCode PrepareMilestonesFunctor::VisitSystemMilestone(SystemMilestoneEnd *s
 // PrepareFloatingGrpsFunctor
 //----------------------------------------------------------------------------
 
-PrepareFloatingGrpsFunctor::PrepareFloatingGrpsFunctor(Doc *doc) : DocFunctor(doc)
+PrepareFloatingGrpsFunctor::PrepareFloatingGrpsFunctor()
 {
     m_previousEnding = NULL;
 }
@@ -1628,30 +1677,6 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitMeasureEnd(Measure *measure)
         }
     }
 
-    // Match down and up pedal lines
-    using pedalIter = std::list<Pedal *>::iterator;
-    pedalIter pIter = m_pedalLines.begin();
-    while (pIter != m_pedalLines.end()) {
-        if ((*pIter)->GetDir() != pedalLog_DIR_down) {
-            ++pIter;
-            continue;
-        }
-        pedalIter up = std::find_if(m_pedalLines.begin(), m_pedalLines.end(), [&pIter](Pedal *pedal) {
-            return (((*pIter)->GetStaff() == pedal->GetStaff()) && (pedal->GetDir() != pedalLog_DIR_down));
-        });
-        if (up != m_pedalLines.end()) {
-            (*pIter)->SetEnd((*up)->GetStart());
-            if ((*up)->GetDir() == pedalLog_DIR_bounce) {
-                (*pIter)->EndsWithBounce(true);
-            }
-            m_pedalLines.erase(up);
-            pIter = m_pedalLines.erase(pIter);
-        }
-        else {
-            ++pIter;
-        }
-    }
-
     return FUNCTOR_CONTINUE;
 }
 
@@ -1659,15 +1684,6 @@ FunctorCode PrepareFloatingGrpsFunctor::VisitPedal(Pedal *pedal)
 {
     if (pedal->HasVgrp()) {
         pedal->SetDrawingGrpId(-pedal->GetVgrp());
-    }
-
-    if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
-
-    System *system = vrv_cast<System *>(pedal->GetFirstAncestor(SYSTEM));
-    assert(system);
-    data_PEDALSTYLE form = pedal->GetPedalForm(m_doc, system);
-    if (form == PEDALSTYLE_line || form == PEDALSTYLE_pedline) {
-        m_pedalLines.push_back(pedal);
     }
 
     return FUNCTOR_CONTINUE;
