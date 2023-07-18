@@ -52,6 +52,7 @@ class Del;
 class Dot;
 class Dir;
 class Div;
+class DivLine;
 class DurationInterface;
 class Dynam;
 class Ending;
@@ -389,6 +390,7 @@ private:
     void WriteChord(pugi::xml_node currentNode, Chord *chord);
     void WriteClef(pugi::xml_node currentNode, Clef *clef);
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
+    void WriteDivLine(pugi::xml_node currentNode, DivLine *divLine);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
@@ -699,6 +701,7 @@ private:
     bool ReadChord(Object *parent, pugi::xml_node chord);
     bool ReadClef(Object *parent, pugi::xml_node clef);
     bool ReadCustos(Object *parent, pugi::xml_node custos);
+    bool ReadDivLine(Object *parent, pugi::xml_node divLine);
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);

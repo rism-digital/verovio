@@ -1246,7 +1246,9 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         this->DrawStaffLines(dc, staff, measure, system);
     }
 
-    this->DrawStaffDef(dc, staff, measure);
+    if (staffDef && (staffDef->GetNotationtype() != NOTATIONTYPE_neume) && (m_doc->GetType() != Facs)) {
+        this->DrawStaffDef(dc, staff, measure);
+    }
 
     if (!staff->GetLedgerLinesAbove().empty()) {
         this->DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);

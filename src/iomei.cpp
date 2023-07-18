@@ -41,6 +41,7 @@
 #include "del.h"
 #include "dir.h"
 #include "div.h"
+#include "divline.h"
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
@@ -616,6 +617,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(CUSTOS)) {
             m_currentNode = m_currentNode.append_child("custos");
             this->WriteCustos(m_currentNode, vrv_cast<Custos *>(object));
+        }
+        else if (object->Is(DIVLINE)) {
+            m_currentNode = m_currentNode.append_child("divLine");
+            this->WriteDivLine(m_currentNode, vrv_cast<DivLine *>(object));
         }
         else if (object->Is(DOT)) {
             m_currentNode = m_currentNode.append_child("dot");
@@ -2314,8 +2319,9 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
         return;
     }
 
-    this->WriteLayerElement(currentNode, accid);
-    this->WritePositionInterface(currentNode, accid);
+    WriteLayerElement(currentNode, accid);
+    WriteFacsimileInterface(currentNode, accid);
+    WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
     accid->WriteAccidLog(currentNode);
@@ -2452,6 +2458,19 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     custos->WriteColor(currentNode);
     custos->WriteExtSymAuth(currentNode);
     custos->WriteExtSymNames(currentNode);
+}
+
+void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
+{
+    assert(divLine);
+
+    this->WriteLayerElement(currentNode, divLine);
+    this->WriteFacsimileInterface(currentNode, divLine);
+    divLine->WriteDivLineLog(currentNode);
+    divLine->WriteColor(currentNode);
+    divLine->WriteVisibility(currentNode);
+    divLine->WriteExtSymAuth(currentNode);
+    divLine->WriteExtSymNames(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -3706,7 +3725,16 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for syllable
     else if (filterParent->Is(SYLLABLE)) {
-        if (element == "neume") {
+        if (element == "accid") {
+            return true;
+        }
+        else if (element == "clef") {
+            return true;
+        }
+        else if (element == "divLine") {
+            return true;
+        }
+        else if (element == "neume") {
             return true;
         }
         else if (element == "syl") {
@@ -6132,6 +6160,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "custos") {
             success = this->ReadCustos(parent, xmlElement);
         }
+        else if (elementName == "divLine") {
+            success = this->ReadDivLine(parent, xmlElement);
+        }
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
         }
@@ -6267,7 +6298,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     Accid *vrvAccid = new Accid();
     this->ReadLayerElement(accid, vrvAccid);
 
-    this->ReadPositionInterface(accid, vrvAccid);
+    ReadPositionInterface(accid, vrvAccid);
+    ReadFacsimileInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
@@ -6463,6 +6495,23 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     parent->AddChild(vrvCustos);
     this->ReadUnsupportedAttr(custos, vrvCustos);
     return this->ReadLayerChildren(vrvCustos, custos, vrvCustos);
+}
+
+bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
+{
+    DivLine *vrvDivLine = new DivLine();
+    this->ReadLayerElement(divLine, vrvDivLine);
+
+    this->ReadFacsimileInterface(divLine, vrvDivLine);
+    vrvDivLine->ReadDivLineLog(divLine);
+    vrvDivLine->ReadColor(divLine);
+    vrvDivLine->ReadVisibility(divLine);
+    vrvDivLine->ReadExtSymAuth(divLine);
+    vrvDivLine->ReadExtSymNames(divLine);
+
+    parent->AddChild(vrvDivLine);
+    this->ReadUnsupportedAttr(divLine, vrvDivLine);
+    return true;
 }
 
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
@@ -6890,6 +6939,10 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 
 bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
+    // Add empty text node for empty syl element for invisible bbox in neume notation
+    if (!syl.first_child() && (m_doc->GetType() == Facs) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+        syl.text().set("");
+    }
     Syl *vrvSyl = new Syl();
     this->ReadLayerElement(syl, vrvSyl);
 

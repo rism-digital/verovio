@@ -75,6 +75,7 @@
 #import <VerovioFramework/devicecontextbase.h>
 #import <VerovioFramework/dir.h>
 #import <VerovioFramework/div.h>
+#import <VerovioFramework/divline.h>
 #import <VerovioFramework/doc.h>
 #import <VerovioFramework/docselection.h>
 #import <VerovioFramework/dot.h>

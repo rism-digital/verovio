@@ -2119,7 +2119,7 @@ bool AttModule::SetNeumes(Object *element, const std::string &attrType, const st
         AttDivLineLog *att = dynamic_cast<AttDivLineLog *>(element);
         assert(att);
         if (attrType == "form") {
-            att->SetForm(att->StrToStr(attrValue));
+            att->SetForm(att->StrToDivLineLogForm(attrValue));
             return true;
         }
     }
@@ -2181,7 +2181,7 @@ void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
         const AttDivLineLog *att = dynamic_cast<const AttDivLineLog *>(element);
         assert(att);
         if (att->HasForm()) {
-            attributes->push_back({ "form", att->StrToStr(att->GetForm()) });
+            attributes->push_back({ "form", att->DivLineLogFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_NCLOG)) {
