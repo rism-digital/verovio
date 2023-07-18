@@ -1511,6 +1511,15 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
     return const_cast<Object *>(std::as_const(*this).GetListNext(listElement));
 }
 
+const Object *ObjectListInterface::GetInterfaceOwner() const
+{
+    if (!m_owner) {
+        m_owner = dynamic_cast<const Object *>(this);
+        assert(m_owner);
+    }
+    return m_owner;
+}
+
 //----------------------------------------------------------------------------
 // TextListInterface
 //----------------------------------------------------------------------------

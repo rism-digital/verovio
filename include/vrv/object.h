@@ -816,7 +816,7 @@ public:
     ObjectListInterface(){};
     virtual ~ObjectListInterface(){};
     ObjectListInterface(const ObjectListInterface &listInterface); // copy constructor;
-    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignement;
+    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignment;
 
     /**
      * Look for the Object in the list and return its position (-1 if not found)
@@ -861,6 +861,12 @@ public:
     ///@}
 
     /**
+     * Reset the list of children and call FilterList().
+     * As for GetList, we need to pass the object.
+     */
+    void ResetList(const Object *node) const;
+
+    /**
      * Convenience functions that check if the list is up-to-date
      * If not, the list is updated before returning the result
      */
@@ -873,9 +879,6 @@ public:
     Object *GetListBack(const Object *node);
     ///@}
 
-private:
-    mutable ListOfConstObjects m_list;
-
 protected:
     /**
      * Filter the list for a specific class.
@@ -883,12 +886,19 @@ protected:
      */
     virtual void FilterList(ListOfConstObjects &childList) const {};
 
-public:
+private:
     /**
-     * Reset the list of children and call FilterList().
-     * As for GetList, we need to pass the object.
+     * Retrieve the owner object of the interface.
      */
-    void ResetList(const Object *node) const;
+    const Object *GetInterfaceOwner() const;
+
+public:
+    //
+private:
+    // The flat list of children
+    mutable ListOfConstObjects m_list;
+    // The owner object
+    mutable const Object *m_owner = NULL;
 };
 
 //----------------------------------------------------------------------------
