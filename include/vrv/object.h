@@ -809,6 +809,7 @@ private:
  * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
  * It is not an abstract class but should not be instanciated directly.
+ * It is expected to be used as a base class of element classes derived from Object.
  */
 class ObjectListInterface {
 public:
@@ -862,9 +863,8 @@ public:
 
     /**
      * Reset the list of children and call FilterList().
-     * As for GetList, we need to pass the object.
      */
-    void ResetList(const Object *node) const;
+    void ResetList() const;
 
     /**
      * Convenience functions that check if the list is up-to-date

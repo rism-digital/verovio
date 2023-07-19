@@ -1360,28 +1360,29 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
     return *this;
 }
 
-void ObjectListInterface::ResetList(const Object *node) const
+void ObjectListInterface::ResetList() const
 {
     // nothing to do, the list if up to date
-    if (!node->IsModified()) {
+    const Object *owner = this->GetInterfaceOwner();
+    if (!owner->IsModified()) {
         return;
     }
 
-    node->Modify(false);
+    owner->Modify(false);
     m_list.clear();
-    node->FillFlatList(m_list);
+    owner->FillFlatList(m_list);
     this->FilterList(m_list);
 }
 
 const ListOfConstObjects &ObjectListInterface::GetList(const Object *node) const
 {
-    this->ResetList(node);
+    this->ResetList();
     return m_list;
 }
 
 ListOfObjects ObjectListInterface::GetList(const Object *node)
 {
-    this->ResetList(node);
+    this->ResetList();
     ListOfObjects result;
     std::transform(m_list.begin(), m_list.end(), std::back_inserter(result),
         [](const Object *obj) { return const_cast<Object *>(obj); });
@@ -1390,19 +1391,19 @@ ListOfObjects ObjectListInterface::GetList(const Object *node)
 
 bool ObjectListInterface::HasEmptyList(const Object *node) const
 {
-    this->ResetList(node);
+    this->ResetList();
     return m_list.empty();
 }
 
 int ObjectListInterface::GetListSize(const Object *node) const
 {
-    this->ResetList(node);
+    this->ResetList();
     return static_cast<int>(m_list.size());
 }
 
 const Object *ObjectListInterface::GetListFront(const Object *node) const
 {
-    this->ResetList(node);
+    this->ResetList();
     assert(!m_list.empty());
     return m_list.front();
 }
@@ -1414,7 +1415,7 @@ Object *ObjectListInterface::GetListFront(const Object *node)
 
 const Object *ObjectListInterface::GetListBack(const Object *node) const
 {
-    this->ResetList(node);
+    this->ResetList();
     assert(!m_list.empty());
     return m_list.back();
 }

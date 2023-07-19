@@ -183,7 +183,7 @@ LayerElement *Layer::GetPrevious(const LayerElement *element)
 
 const LayerElement *Layer::GetPrevious(const LayerElement *element) const
 {
-    this->ResetList(this);
+    this->ResetList();
     if (!element || this->HasEmptyList(this)) return NULL;
 
     return dynamic_cast<const LayerElement *>(this->GetListPrevious(element));
@@ -247,7 +247,7 @@ const Clef *Layer::GetClef(const LayerElement *test) const
     }
 
     // make sure list is set
-    this->ResetList(this);
+    this->ResetList();
     if (!test->Is(CLEF)) {
         testObject = this->GetListFirstBackward(testObject, CLEF);
     }
@@ -294,7 +294,7 @@ int Layer::GetClefLocOffset(const LayerElement *test) const
 int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
 {
     if (element->m_crossStaff) {
-        ResetList(this);
+        this->ResetList();
         if (!element->Is(CLEF)) {
             const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
             if (clef && clef->m_crossStaff) {
