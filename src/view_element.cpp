@@ -1031,7 +1031,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    ListOfObjects childList = keySig->GetList(keySig);
+    ListOfObjects childList = keySig->GetList();
     for (Object *child : childList) {
         KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
         assert(keyAccid);

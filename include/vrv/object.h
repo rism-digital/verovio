@@ -854,11 +854,10 @@ public:
      * Return the list.
      * Before returning the list, it checks that the list is up-to-date with Object::IsModified
      * If not, it updates the list and also calls FilterList.
-     * Because this is an interface, we need to pass the object - not the best design.
      */
     ///@{
-    const ListOfConstObjects &GetList(const Object *node) const;
-    ListOfObjects GetList(const Object *node);
+    const ListOfConstObjects &GetList() const;
+    ListOfObjects GetList();
     ///@}
 
     /**

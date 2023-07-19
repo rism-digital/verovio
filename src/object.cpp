@@ -1374,13 +1374,13 @@ void ObjectListInterface::ResetList() const
     this->FilterList(m_list);
 }
 
-const ListOfConstObjects &ObjectListInterface::GetList(const Object *node) const
+const ListOfConstObjects &ObjectListInterface::GetList() const
 {
     this->ResetList();
     return m_list;
 }
 
-ListOfObjects ObjectListInterface::GetList(const Object *node)
+ListOfObjects ObjectListInterface::GetList()
 {
     this->ResetList();
     ListOfObjects result;
@@ -1529,12 +1529,12 @@ std::u32string TextListInterface::GetText(const Object *node) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
-    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        if ((*it)->Is(LB)) {
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
+    for (const Object *child : childList) {
+        if (child->Is(LB)) {
             continue;
         }
-        const Text *text = vrv_cast<const Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(child);
         assert(text);
         concatText += text->GetText();
     }
@@ -1545,14 +1545,14 @@ void TextListInterface::GetTextLines(const Object *node, std::vector<std::u32str
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
-    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        if ((*it)->Is(LB) && !concatText.empty()) {
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
+    for (const Object *child : childList) {
+        if (child->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
             continue;
         }
-        const Text *text = vrv_cast<const Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(child);
         assert(text);
         concatText += text->GetText();
     }

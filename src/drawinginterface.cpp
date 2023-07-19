@@ -465,7 +465,7 @@ bool BeamDrawingInterface::HasOneStepHeight() const
 
 bool BeamDrawingInterface::IsFirstIn(const Object *object, const LayerElement *element) const
 {
-    this->GetList(object);
+    this->GetList();
     int position = this->GetPosition(object, element);
     // This method should be called only if the note is part of a fTrem
     assert(position != -1);
@@ -487,7 +487,7 @@ bool BeamDrawingInterface::IsLastIn(const Object *object, const LayerElement *el
 
 int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *element) const
 {
-    this->GetList(object);
+    this->GetList();
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
     if ((position == -1) && (element->Is(NOTE))) {

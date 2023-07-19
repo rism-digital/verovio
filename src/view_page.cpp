@@ -135,9 +135,9 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    const ListOfObjects &scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList.begin(); it != scoreDefList.end(); ++it) {
-        StaffDef *staffDef = vrv_cast<StaffDef *>(*it);
+    const ListOfObjects &childList = scoreDef->GetList(); // make sure it's initialized
+    for (Object *child : childList) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(child);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
         KeySig *keySig = staffDef->GetKeySig();
@@ -1116,7 +1116,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    ListOfObjects childList = meterSigGrp->GetList(meterSigGrp);
+    ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),

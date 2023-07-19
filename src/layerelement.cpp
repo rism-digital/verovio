@@ -250,7 +250,7 @@ const Beam *LayerElement::GetAncestorBeam() const
             assert(graceElement);
         }
         // Make sure the object list is set
-        beamParent->GetList(beamParent);
+        beamParent->GetList();
         // If the note is part of the beam parent, this means we have a beam of graced notes
         if (beamParent->GetListIndex(graceElement) > -1) {
             return beamParent;

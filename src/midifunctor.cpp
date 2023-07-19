@@ -443,7 +443,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
     // Handle grace chords
     if (chord->IsGraceNote()) {
         std::set<int> pitches;
-        const ListOfConstObjects &notes = chord->GetList(chord);
+        const ListOfConstObjects &notes = chord->GetList();
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);
             assert(note);
@@ -819,7 +819,7 @@ void GenerateMIDIFunctor::DeferMIDINote(const Note *refNote, double shift, bool 
     // Recursive call for chords
     const Chord *chord = refNote->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ListOfConstObjects &notes = chord->GetList(chord);
+        const ListOfConstObjects &notes = chord->GetList();
 
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);

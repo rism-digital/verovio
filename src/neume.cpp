@@ -71,9 +71,8 @@ bool Neume::IsSupportedChild(Object *child)
 
 int Neume::GetPosition(const LayerElement *element) const
 {
-    this->GetList(this);
-    int position = this->GetListIndex(element);
-    return position;
+    this->GetList();
+    return this->GetListIndex(element);
 }
 
 int Neume::GetLigatureCount(int position)

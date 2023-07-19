@@ -165,7 +165,7 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 
 bool KeySig::HasNonAttribKeyAccidChildren() const
 {
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
     return std::any_of(childList.begin(), childList.end(), [](const Object *child) { return !child->IsAttribute(); });
 }
 
@@ -196,7 +196,7 @@ void KeySig::FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
-    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
     if (!childList.empty()) {
         for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
@@ -249,7 +249,7 @@ int KeySig::GetFifthsInt() const
 data_KEYSIGNATURE KeySig::ConvertToSig() const
 {
     data_KEYSIGNATURE sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
     if (childList.size() > 1) {
         data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_NONE;
         bool isCommon = true;
