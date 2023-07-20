@@ -1922,13 +1922,13 @@ bool Slur::HasBoundaryOnBeam(bool isStart) const
     const LayerElement *boundary = isStart ? this->GetStart() : this->GetEnd();
     // Check for Beam
     if (const Beam *parentBeam = boundary->GetAncestorBeam(); parentBeam) {
-        if (isStart && !parentBeam->IsLastIn(parentBeam, boundary)) return true;
-        if (!isStart && !parentBeam->IsFirstIn(parentBeam, boundary)) return true;
+        if (isStart && !parentBeam->IsLastIn(boundary)) return true;
+        if (!isStart && !parentBeam->IsFirstIn(boundary)) return true;
     }
     // Check for FTrem
     if (const FTrem *parentFTrem = boundary->GetAncestorFTrem(); parentFTrem) {
-        if (isStart && !parentFTrem->IsLastIn(parentFTrem, boundary)) return true;
-        if (!isStart && !parentFTrem->IsFirstIn(parentFTrem, boundary)) return true;
+        if (isStart && !parentFTrem->IsLastIn(boundary)) return true;
+        if (!isStart && !parentFTrem->IsFirstIn(boundary)) return true;
     }
     // Check for BeamSpan
     if (boundary->GetIsInBeamSpan()) {

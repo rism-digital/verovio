@@ -463,29 +463,27 @@ bool BeamDrawingInterface::HasOneStepHeight() const
     return (abs(top - bottom) <= 1);
 }
 
-bool BeamDrawingInterface::IsFirstIn(const Object *object, const LayerElement *element) const
+bool BeamDrawingInterface::IsFirstIn(const LayerElement *element) const
 {
     this->GetList();
-    int position = this->GetPosition(object, element);
+    const int position = this->GetPosition(element);
     // This method should be called only if the note is part of a fTrem
     assert(position != -1);
     // this is the first one
-    if (position == 0) return true;
-    return false;
+    return (position == 0);
 }
 
-bool BeamDrawingInterface::IsLastIn(const Object *object, const LayerElement *element) const
+bool BeamDrawingInterface::IsLastIn(const LayerElement *element) const
 {
     const int size = this->GetListSize();
-    int position = this->GetPosition(object, element);
+    const int position = this->GetPosition(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
     // this is the last one
-    if (position == (size - 1)) return true;
-    return false;
+    return (position == size - 1);
 }
 
-int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *element) const
+int BeamDrawingInterface::GetPosition(const LayerElement *element) const
 {
     this->GetList();
     int position = this->GetListIndex(element);
