@@ -1401,28 +1401,28 @@ int ObjectListInterface::GetListSize() const
     return static_cast<int>(m_list.size());
 }
 
-const Object *ObjectListInterface::GetListFront(const Object *node) const
+const Object *ObjectListInterface::GetListFront() const
 {
     this->ResetList();
     assert(!m_list.empty());
     return m_list.front();
 }
 
-Object *ObjectListInterface::GetListFront(const Object *node)
+Object *ObjectListInterface::GetListFront()
 {
-    return const_cast<Object *>(std::as_const(*this).GetListFront(node));
+    return const_cast<Object *>(std::as_const(*this).GetListFront());
 }
 
-const Object *ObjectListInterface::GetListBack(const Object *node) const
+const Object *ObjectListInterface::GetListBack() const
 {
     this->ResetList();
     assert(!m_list.empty());
     return m_list.back();
 }
 
-Object *ObjectListInterface::GetListBack(const Object *node)
+Object *ObjectListInterface::GetListBack()
 {
-    return const_cast<Object *>(std::as_const(*this).GetListBack(node));
+    return const_cast<Object *>(std::as_const(*this).GetListBack());
 }
 
 int ObjectListInterface::GetListIndex(const Object *listElement) const

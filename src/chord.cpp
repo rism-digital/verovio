@@ -247,21 +247,21 @@ int Chord::PositionInChord(const Note *note) const
 void Chord::GetYExtremes(int &yMax, int &yMin) const
 {
     // The first note is the bottom
-    yMin = this->GetListFront(this)->GetDrawingY();
+    yMin = this->GetListFront()->GetDrawingY();
     // The last note is the top
-    yMax = this->GetListBack(this)->GetDrawingY();
+    yMax = this->GetListBack()->GetDrawingY();
 }
 
 int Chord::GetYTop() const
 {
     // The last note is the top
-    return this->GetListBack(this)->GetDrawingY();
+    return this->GetListBack()->GetDrawingY();
 }
 
 int Chord::GetYBottom() const
 {
     // The first note is the bottom
-    return this->GetListFront(this)->GetDrawingY();
+    return this->GetListFront()->GetDrawingY();
 }
 
 Note *Chord::GetTopNote()
@@ -271,7 +271,7 @@ Note *Chord::GetTopNote()
 
 const Note *Chord::GetTopNote() const
 {
-    const Note *topNote = vrv_cast<const Note *>(this->GetListBack(this));
+    const Note *topNote = vrv_cast<const Note *>(this->GetListBack());
     assert(topNote);
     return topNote;
 }
@@ -284,7 +284,7 @@ Note *Chord::GetBottomNote()
 const Note *Chord::GetBottomNote() const
 {
     // The first note is the bottom
-    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront(this));
+    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront());
     assert(bottomNote);
     return bottomNote;
 }

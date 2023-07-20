@@ -441,8 +441,8 @@ ListOfConstObjects Layer::GetLayerElementsForTimeSpanOf(const LayerElement *elem
     else if (element->Is(BEAM)) {
         const Beam *beam = vrv_cast<const Beam *>(element);
 
-        const LayerElement *first = vrv_cast<const LayerElement *>(beam->GetListFront(beam));
-        const LayerElement *last = vrv_cast<const LayerElement *>(beam->GetListBack(beam));
+        const LayerElement *first = vrv_cast<const LayerElement *>(beam->GetListFront());
+        const LayerElement *last = vrv_cast<const LayerElement *>(beam->GetListBack());
 
         if (!first || !last) return {};
 

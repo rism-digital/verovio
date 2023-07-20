@@ -872,10 +872,10 @@ public:
     ///@{
     bool HasEmptyList() const;
     int GetListSize() const;
-    const Object *GetListFront(const Object *node) const;
-    Object *GetListFront(const Object *node);
-    const Object *GetListBack(const Object *node) const;
-    Object *GetListBack(const Object *node);
+    const Object *GetListFront() const;
+    Object *GetListFront();
+    const Object *GetListBack() const;
+    Object *GetListBack();
     ///@}
 
 protected:

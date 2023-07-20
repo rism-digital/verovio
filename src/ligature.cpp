@@ -69,7 +69,7 @@ Note *Ligature::GetFirstNote()
 
 const Note *Ligature::GetFirstNote() const
 {
-    const Note *firstNote = vrv_cast<const Note *>(this->GetListFront(this));
+    const Note *firstNote = vrv_cast<const Note *>(this->GetListFront());
     assert(firstNote);
     return firstNote;
 }
@@ -82,7 +82,7 @@ Note *Ligature::GetLastNote()
 const Note *Ligature::GetLastNote() const
 {
     // The first note is the bottom
-    const Note *lastNote = vrv_cast<const Note *>(this->GetListBack(this));
+    const Note *lastNote = vrv_cast<const Note *>(this->GetListBack());
     assert(lastNote);
     return lastNote;
 }
