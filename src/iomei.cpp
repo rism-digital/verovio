@@ -1415,7 +1415,7 @@ bool MEIOutput::AdjustLabel(Label *label)
     if (abbr && (label->GetChildCount(TEXT) == 1)) {
         Text *text = vrv_cast<Text *>(label->GetChild(0, TEXT));
         if (text) {
-            text->SetText(abbr->GetText(abbr));
+            text->SetText(abbr->GetText());
             return true;
         }
     }

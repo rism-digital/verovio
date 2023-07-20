@@ -541,8 +541,8 @@ void View::DrawLabels(
     LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
-    std::u32string labelStr = (label) ? label->GetText(label) : U"";
-    std::u32string labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : U"";
+    std::u32string labelStr = label ? label->GetText() : U"";
+    std::u32string labelAbbrStr = labelAbbr ? labelAbbr->GetText() : U"";
 
     if (abbreviations) {
         labelStr = labelAbbrStr;
@@ -586,7 +586,7 @@ void View::DrawLabels(
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
         std::vector<std::u32string> lines;
-        labelAbbr->GetTextLines(labelAbbr, lines);
+        labelAbbr->GetTextLines(lines);
         int maxLength = 0;
         for (std::u32string &line : lines) {
             dc->GetTextExtent(line, &extend, true);
@@ -1975,7 +1975,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF32to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText()));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

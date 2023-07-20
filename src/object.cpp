@@ -1525,7 +1525,7 @@ const Object *ObjectListInterface::GetInterfaceOwner() const
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::u32string TextListInterface::GetText(const Object *node) const
+std::u32string TextListInterface::GetText() const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
@@ -1541,7 +1541,7 @@ std::u32string TextListInterface::GetText(const Object *node) const
     return concatText;
 }
 
-void TextListInterface::GetTextLines(const Object *node, std::vector<std::u32string> &lines) const
+void TextListInterface::GetTextLines(std::vector<std::u32string> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;

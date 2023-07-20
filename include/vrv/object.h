@@ -919,12 +919,12 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::u32string GetText(const Object *node) const;
+    std::u32string GetText() const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(const Object *node, std::vector<std::u32string> &lines) const;
+    void GetTextLines(std::vector<std::u32string> &lines) const;
 
 protected:
     /**
