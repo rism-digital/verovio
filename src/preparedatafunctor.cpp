@@ -70,7 +70,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
-    if (chord->HasEmptyList(chord)) {
+    if (chord->HasEmptyList()) {
         LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
         Note *rescueNote = new Note();
         chord->AddChild(rescueNote);

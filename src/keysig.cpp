@@ -149,7 +149,7 @@ int KeySig::GetAccidCount(bool fromAttribute) const
         return this->HasSig() ? (this->GetSig().first) : 0;
     }
     else {
-        return this->GetListSize(this);
+        return this->GetListSize();
     }
 }
 
@@ -174,7 +174,7 @@ void KeySig::GenerateKeyAccidAttribChildren()
     IsAttributeComparison isAttribute(KEYACCID);
     this->DeleteChildrenByComparison(&isAttribute);
 
-    if (this->HasEmptyList(this)) {
+    if (this->HasEmptyList()) {
         for (int i = 0; i < this->GetAccidCount(true); ++i) {
             std::optional<KeyAccidInfo> info = this->GetKeyAccidInfoAt(i);
             if (info) {

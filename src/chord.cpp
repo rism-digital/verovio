@@ -235,7 +235,7 @@ void Chord::FilterList(ListOfConstObjects &childList) const
 
 int Chord::PositionInChord(const Note *note) const
 {
-    const int size = this->GetListSize(this);
+    const int size = this->GetListSize();
     int position = this->GetListIndex(note);
     assert(position != -1);
     // this is the middle (only if odd)

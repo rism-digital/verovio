@@ -1389,13 +1389,13 @@ ListOfObjects ObjectListInterface::GetList()
     return result;
 }
 
-bool ObjectListInterface::HasEmptyList(const Object *node) const
+bool ObjectListInterface::HasEmptyList() const
 {
     this->ResetList();
     return m_list.empty();
 }
 
-int ObjectListInterface::GetListSize(const Object *node) const
+int ObjectListInterface::GetListSize() const
 {
     this->ResetList();
     return static_cast<int>(m_list.size());

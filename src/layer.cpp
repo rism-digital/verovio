@@ -184,7 +184,7 @@ LayerElement *Layer::GetPrevious(const LayerElement *element)
 const LayerElement *Layer::GetPrevious(const LayerElement *element) const
 {
     this->ResetList();
-    if (!element || this->HasEmptyList(this)) return NULL;
+    if (!element || this->HasEmptyList()) return NULL;
 
     return dynamic_cast<const LayerElement *>(this->GetListPrevious(element));
 }

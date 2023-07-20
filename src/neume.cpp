@@ -94,7 +94,7 @@ int Neume::GetLigatureCount(int position)
 
 bool Neume::IsLastInNeume(const LayerElement *element) const
 {
-    const int size = this->GetListSize(this);
+    const int size = this->GetListSize();
     int position = this->GetPosition(element);
 
     // This method should be called only if the note is part of a neume

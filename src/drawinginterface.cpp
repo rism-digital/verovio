@@ -476,7 +476,7 @@ bool BeamDrawingInterface::IsFirstIn(const Object *object, const LayerElement *e
 
 bool BeamDrawingInterface::IsLastIn(const Object *object, const LayerElement *element) const
 {
-    const int size = this->GetListSize(object);
+    const int size = this->GetListSize();
     int position = this->GetPosition(object, element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
@@ -623,7 +623,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSigGrp(const MeterSigGrp *meterSig
 bool StaffDefDrawingInterface::DrawMeterSigGrp() const
 {
     if (m_drawMeterSigGrp) {
-        const int childListSize = m_currentMeterSigGrp.GetListSize(&m_currentMeterSigGrp);
+        const int childListSize = m_currentMeterSigGrp.GetListSize();
         if (childListSize > 1) return true;
     }
     return false;

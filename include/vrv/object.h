@@ -870,8 +870,8 @@ public:
      * If not, the list is updated before returning the result
      */
     ///@{
-    bool HasEmptyList(const Object *node) const;
-    int GetListSize(const Object *node) const;
+    bool HasEmptyList() const;
+    int GetListSize() const;
     const Object *GetListFront(const Object *node) const;
     Object *GetListFront(const Object *node);
     const Object *GetListBack(const Object *node) const;
