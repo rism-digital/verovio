@@ -78,7 +78,7 @@ int Neume::GetPosition(const LayerElement *element) const
 int Neume::GetLigatureCount(int position)
 {
     int ligCount = 0;
-    this->GetList(this);
+    this->GetList();
     for (int pos = 0; pos <= position; pos++) {
         Object *posObj = this->GetChild(pos);
         if (posObj != NULL) {
