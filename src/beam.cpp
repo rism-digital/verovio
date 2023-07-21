@@ -71,7 +71,7 @@ void BeamSegment::Reset()
 
 const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs()
 {
-    // this->GetList(this);
+    // this->GetList();
     return &m_beamElementCoordRefs;
 }
 
@@ -1722,7 +1722,7 @@ void Beam::FilterList(ListOfConstObjects &childList) const
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 {
-    this->GetList(this);
+    this->GetList();
     return &m_beamElementCoords;
 }
 

@@ -70,7 +70,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
-    if (chord->HasEmptyList(chord)) {
+    if (chord->HasEmptyList()) {
         LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
         Note *rescueNote = new Note();
         chord->AddChild(rescueNote);
@@ -123,13 +123,13 @@ FunctorCode PrepareDataInitializationFunctor::VisitTextLayoutElement(TextLayoutE
     textLayoutElement->ResetCells();
     textLayoutElement->ResetDrawingScaling();
 
-    const ListOfObjects &childList = textLayoutElement->GetList(textLayoutElement);
-    for (ListOfObjects::const_iterator iter = childList.begin(); iter != childList.end(); ++iter) {
+    const ListOfObjects &childList = textLayoutElement->GetList();
+    for (Object *child : childList) {
         int pos = 0;
-        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(child);
         assert(interface);
         pos = textLayoutElement->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
-        TextElement *text = vrv_cast<TextElement *>(*iter);
+        TextElement *text = vrv_cast<TextElement *>(child);
         assert(text);
         textLayoutElement->AppendTextToCell(pos, text);
     }
@@ -1087,10 +1087,10 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     if (!chord->HasCluster()) chord->CalculateNoteGroups();
 
     // Also set the drawing stem object (or NULL) to all child notes
-    const ListOfObjects &childList = chord->GetList(chord);
-    for (ListOfObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        assert((*it)->Is(NOTE));
-        Note *note = vrv_cast<Note *>(*it);
+    const ListOfObjects &childList = chord->GetList();
+    for (Object *child : childList) {
+        assert(child->Is(NOTE));
+        Note *note = vrv_cast<Note *>(child);
         assert(note);
         note->SetDrawingStem(currentStem);
     }

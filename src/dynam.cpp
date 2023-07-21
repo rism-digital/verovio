@@ -89,7 +89,7 @@ bool Dynam::IsSupportedChild(Object *child)
 bool Dynam::IsSymbolOnly() const
 {
     m_symbolStr = U"";
-    std::u32string str = this->GetText(this);
+    std::u32string str = this->GetText();
     if (Dynam::IsSymbolOnly(str)) {
         m_symbolStr = str;
         return true;

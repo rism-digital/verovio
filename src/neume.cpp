@@ -71,15 +71,14 @@ bool Neume::IsSupportedChild(Object *child)
 
 int Neume::GetPosition(const LayerElement *element) const
 {
-    this->GetList(this);
-    int position = this->GetListIndex(element);
-    return position;
+    this->GetList();
+    return this->GetListIndex(element);
 }
 
 int Neume::GetLigatureCount(int position)
 {
     int ligCount = 0;
-    this->GetList(this);
+    this->GetList();
     for (int pos = 0; pos <= position; pos++) {
         Object *posObj = this->GetChild(pos);
         if (posObj != NULL) {
@@ -95,7 +94,7 @@ int Neume::GetLigatureCount(int position)
 
 bool Neume::IsLastInNeume(const LayerElement *element) const
 {
-    const int size = this->GetListSize(this);
+    const int size = this->GetListSize();
     int position = this->GetPosition(element);
 
     // This method should be called only if the note is part of a neume

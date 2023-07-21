@@ -163,9 +163,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
             Beam *beam = vrv_cast<Beam *>(layerElement->GetFirstAncestor(BEAM, 1));
             if (beam) {
-                beam->ResetList(beam);
-
-                const ListOfObjects &beamList = beam->GetList(beam);
+                const ListOfObjects &beamList = beam->GetList();
                 const int restIndex = beam->GetListIndex(layerElement);
                 assert(restIndex >= 0);
 

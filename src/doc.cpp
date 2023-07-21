@@ -457,7 +457,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 label = vrv_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
             }
             if (label) {
-                std::string trackName = UTF32to8(label->GetText(label)).c_str();
+                std::string trackName = UTF32to8(label->GetText()).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
             // set MIDI key signature
