@@ -1807,6 +1807,7 @@ void MEIOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteStaffDefVis(currentNode);
     staffDef->WriteTimeBase(currentNode);
     staffDef->WriteTransposition(currentNode);
+    staffDef->WriteVerticalAlign(currentNode);
 }
 
 void MEIOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
@@ -2774,6 +2775,7 @@ void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
 
     this->WriteLayerElement(currentNode, tabDurSym);
     tabDurSym->WriteNNumberLike(currentNode);
+    tabDurSym->WriteStaffLoc(currentNode);
 }
 
 void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
@@ -5073,6 +5075,7 @@ bool MEIInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadStaffDefVis(staffDef);
     vrvStaffDef->ReadTimeBase(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
+    vrvStaffDef->ReadVerticalAlign(staffDef);
 
     if (!vrvStaffDef->HasN()) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");
@@ -6922,6 +6925,7 @@ bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
     this->ReadLayerElement(tabRhyhtm, vrvTabDurSym);
 
     vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
+    vrvTabDurSym->ReadStaffLoc(tabRhyhtm);
 
     parent->AddChild(vrvTabDurSym);
     this->ReadUnsupportedAttr(tabRhyhtm, vrvTabDurSym);

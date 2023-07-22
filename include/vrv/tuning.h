@@ -42,16 +42,20 @@ public:
     /**
      * Return the line for a note according to tablature type.
      * Guitar, french and italian tablature: the line is based on the course.
-     * German tablature: the line is based on the note's index in the note list.
+     * German tablature: the line is based on the note's index in the note list
+     * or by explicit @loc.
      *
      * @param[in] course
      * @param[in] notationType
      * @param[in] lines
      * @param[in] listSize
      * @param[in] index - 0 based from the bottom of the chord
+     * @param[in] loc - German tablature: note@loc if specified, 0 at the bottom
+     * @param[in] topAlign - German tablature: true => align at the top, false => align at the bottom
      * @return position in staff half lines
      */
-    int CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index) const;
+    int CalcPitchPos(
+        int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc, bool topAlign) const;
 
     /**
      * Calclate the MIDI pitch number for course/fret

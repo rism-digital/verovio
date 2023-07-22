@@ -267,9 +267,11 @@ const TabGrp *Note::IsTabGrpNote() const
     return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, bool &overline) const
+std::u32string Note::GetTabFretString(
+    data_NOTATIONTYPE notationType, const std::string &notationSubtype, int &overline, int &strike) const
 {
-    overline = false;
+    overline = 0;
+    strike = 0;
 
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
@@ -350,23 +352,38 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, bool &over
         //
         // However, some glyphs are missing:
         //
-        //   Digit 1 with an oblique stroke for the open 6th course.
+        //   Digit 1 with a strike through for the open 6th course.
+        //   Digit 1 with two strike throughs for the open 7th course.
+        //   Digit 1 with three strike throughs for the open 8th course.
         //   "et" for 2nd course 5th fret.
         //   "con" for 1st course 5th fret.
         //   Gothic font digits 1-5 for the open courses <= 5.
         //   Second lowercase alphabet with an overline used for courses <= 5 frets 6 to 10.
         //
         // To overcome these omissions I've substituted missing glyphs from other
-        // parts of the SMuFL collection.  Overlines are drawn separately.
+        // parts of the SMuFL collection.  Overlines and strike throughs are drawn separately.
 
-        if (course == 6 && fret >= 0 && fret <= 13) {
-            if (fret == 0) {
-                fretStr = SMUFL_E595_ornamentLeftVerticalStrokeWithCross; // substitute for 1 with oblique stroke
-            }
-            else {
+        if (course >= 6 && fret >= 0 && fret <= 13) {
+            // TODO more GLT subtypes needed, is this subtype too specific?
+            if (notationSubtype == "judenkunig_1523") {
+                // A B C D ...
                 // The German tablature uppercase letters A-N are contiguous, correctly omitting J
                 static_assert(SMUFL_EC23_luteGermanNUpper == SMUFL_EC17_luteGermanAUpper + 13 - 1);
-                fretStr = SMUFL_EC17_luteGermanAUpper + fret - 1;
+                fretStr = SMUFL_EC17_luteGermanAUpper + fret;
+                overline = course - 6; // 6 course 0 overline, 7 course 1 overline, ...
+            }
+            else {
+                // + A B C D ...
+                if (fret == 0) {
+                    fretStr = SMUFL_EA51_figbass1; // substitute for 1 with oblique stroke
+                    strike = course - 5; // 6 course 1 strike, 7 course 2 strikes, ...
+                }
+                else {
+                    // The German tablature uppercase letters A-N are contiguous, correctly omitting J
+                    static_assert(SMUFL_EC23_luteGermanNUpper == SMUFL_EC17_luteGermanAUpper + 13 - 1);
+                    fretStr = SMUFL_EC17_luteGermanAUpper + fret - 1;
+                    overline = course - 6; // 6 course 0 overline, 7 course 1 overline, ...
+                }
             }
         }
         else if (course >= 1 && course <= 5 && fret == 0) {
@@ -394,7 +411,7 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, bool &over
             }
 
             // second alphabet needs an overline
-            overline = (fret >= 6);
+            overline = (fret >= 6) ? 1 : 0;
         }
         return fretStr;
     }
