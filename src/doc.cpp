@@ -364,7 +364,7 @@ void Doc::CalculateTimemap()
 
     // Adjust the duration of tied notes
     InitTimemapTiesFunctor initTimemapTies;
-    initTimemapTies.PushDirection(BACKWARD);
+    initTimemapTies.SetDirection(BACKWARD);
     this->Process(initTimemapTies);
 
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
@@ -583,9 +583,8 @@ void Doc::PrepareData()
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningFunctor prepareTimeSpanning;
-    prepareTimeSpanning.PushDirection(BACKWARD);
+    prepareTimeSpanning.SetDirection(BACKWARD);
     this->Process(prepareTimeSpanning);
-    prepareTimeSpanning.PopDirection();
     prepareTimeSpanning.SetDataCollectionCompleted();
 
     // First we try backwards because normally the spanning elements are at the end of
@@ -595,6 +594,7 @@ void Doc::PrepareData()
     // but this time without filling the list (that is only will the remaining elements)
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
+        prepareTimeSpanning.SetDirection(FORWARD);
         this->Process(prepareTimeSpanning);
     }
 
@@ -616,7 +616,7 @@ void Doc::PrepareData()
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingFunctor prepareTimePointing;
-    prepareTimePointing.PushDirection(BACKWARD);
+    prepareTimePointing.SetDirection(BACKWARD);
     this->Process(prepareTimePointing);
 
     /************ Resolve @tstamp / tstamp2 ************/
@@ -640,9 +640,8 @@ void Doc::PrepareData()
 
     // If we have some left process again backward
     if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
-        prepareLinking.PushDirection(BACKWARD);
+        prepareLinking.SetDirection(BACKWARD);
         this->Process(prepareLinking);
-        prepareLinking.PopDirection();
     }
 
     // If some are still there, then it is probably an issue in the encoding
@@ -881,10 +880,10 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     // First we need to set Page::m_score and Page::m_scoreEnd
     // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
     ScoreDefSetCurrentPageFunctor scoreDefSetCurrentPage(this);
-    scoreDefSetCurrentPage.PushDirection(BACKWARD);
+    scoreDefSetCurrentPage.SetDirection(BACKWARD);
     this->Process(scoreDefSetCurrentPage, 3);
-    scoreDefSetCurrentPage.PopDirection();
     // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
+    scoreDefSetCurrentPage.SetDirection(FORWARD);
     this->Process(scoreDefSetCurrentPage, 3);
 
     ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
