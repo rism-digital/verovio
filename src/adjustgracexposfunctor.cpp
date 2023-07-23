@@ -49,9 +49,10 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
         assert(measureAligner);
 
         bool previousDirection = this->GetDirection();
+        Filters *previousFilters = this->GetFilters();
         this->SetDirection(BACKWARD);
         Filters filters;
-        this->PushFilters(&filters);
+        this->SetFilters(&filters);
 
         std::vector<int>::iterator iter;
         for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
@@ -110,7 +111,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignment(Alignment *alignment)
         }
 
         this->SetDirection(previousDirection);
-        this->PopFilters();
+        this->SetFilters(previousFilters);
 
         // Change the flag back
         m_isGraceAlignment = false;
@@ -143,15 +144,16 @@ FunctorCode AdjustGraceXPosFunctor::VisitAlignmentReference(AlignmentReference *
     // to process the children (LayerElement) "by hand" in FORWARD manner
     // (filters can be NULL because filtering was already applied in the parent)
     bool previousDirection = this->GetDirection();
+    Filters *previousFilters = this->GetFilters();
     this->SetDirection(FORWARD);
-    this->PushFilters(NULL);
+    this->SetFilters(NULL);
 
     for (auto child : alignmentReference->GetChildren()) {
         child->Process(*this);
     }
 
     this->SetDirection(previousDirection);
-    this->PopFilters();
+    this->SetFilters(previousFilters);
 
     return FUNCTOR_SIBLINGS;
 }
