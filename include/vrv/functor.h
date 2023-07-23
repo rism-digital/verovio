@@ -29,7 +29,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FunctorBase(){};
+    FunctorBase() {}
     virtual ~FunctorBase() = default;
     ///@}
 
@@ -43,15 +43,32 @@ public:
     ///@}
 
     /**
-     * Getters/Setters for the properties
+     * Getter/Setter for the visibility
      */
     ///@{
-    Filters *GetFilters() { return m_filters; }
-    void SetFilters(Filters *filters) { m_filters = filters; }
     bool VisibleOnly() const { return m_visibleOnly; }
     void SetVisibleOnly(bool visibleOnly) { m_visibleOnly = visibleOnly; }
+    ///@}
+
+    /**
+     * Getters/Setters for the filters and direction
+     * Here setters return the previous value
+     */
+    ///@{
+    Filters *GetFilters() const { return m_filters; }
+    Filters *SetFilters(Filters *filters)
+    {
+        Filters *previous = m_filters;
+        m_filters = filters;
+        return previous;
+    }
     bool GetDirection() const { return m_direction; }
-    void SetDirection(bool direction) { m_direction = direction; }
+    bool SetDirection(bool direction)
+    {
+        bool previous = m_direction;
+        m_direction = direction;
+        return previous;
+    }
     ///@}
 
     /**
@@ -87,7 +104,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    Functor(){};
+    Functor() {}
     virtual ~Functor() = default;
     ///@}
 
@@ -112,7 +129,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConstFunctor(){};
+    ConstFunctor() {}
     virtual ~ConstFunctor() = default;
     ///@}
 

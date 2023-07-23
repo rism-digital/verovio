@@ -214,9 +214,8 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
 
     const bool hasSystemStartLine = measure->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
 
-    Filters *previousFilters = this->GetFilters();
     Filters filters;
-    this->SetFilters(&filters);
+    Filters *previousFilters = this->SetFilters(&filters);
 
     for (auto staffN : m_staffNs) {
         m_minPos = 0;

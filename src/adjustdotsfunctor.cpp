@@ -100,9 +100,8 @@ FunctorCode AdjustDotsFunctor::VisitMeasure(Measure *measure)
 {
     if (!measure->HasAlignmentRefWithMultipleLayers()) return FUNCTOR_SIBLINGS;
 
-    Filters *previousFilters = this->GetFilters();
     Filters filters;
-    this->SetFilters(&filters);
+    Filters *previousFilters = this->SetFilters(&filters);
 
     std::vector<int>::iterator iter;
     for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
