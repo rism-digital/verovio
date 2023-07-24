@@ -2950,7 +2950,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
                 if (nc->HasLigated() && nc->GetLigated() == BOOLEAN_true) {
-                    // ligNum++;
                     firstIsLig = true;
                 }
 
@@ -3003,7 +3002,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
-                // if (nc->HasLigated()) continue;
 
                 if (firstIsLig) {
                     // if 1st is ligature, neglect 2nd, go to the next nc
