@@ -1263,8 +1263,8 @@ public:
     /** Getter for reference (for alternate type only) */
     data_FONTSIZE *GetMensurSizeAlternate() { return &m_mensurSize; }
     //
-    void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; }
-    int GetMensurSlash() const { return m_mensurSlash; }
+    void SetMensurSlash(char mensurSlash_) { m_mensurSlash = mensurSlash_; }
+    char GetMensurSlash() const { return m_mensurSlash; }
     bool HasMensurSlash() const;
     ///@}
 
@@ -1290,7 +1290,7 @@ private:
      * Indicates the number lines added to the mensuration sign.
      * For example, one slash is added for what we now call 'alla breve'.
      **/
-    int m_mensurSlash;
+    char m_mensurSlash;
 };
 
 //----------------------------------------------------------------------------

@@ -258,3 +258,9 @@ modules:
             tab.fret:
                 type: int
                 default: -1
+    
+    visual:
+        att.mensural.vis:
+            mensur.slash:
+                type: char
+                default: 0

@@ -1275,7 +1275,7 @@ void AttMensuralVis::ResetMensuralVis()
     m_mensurOrient = ORIENTATION_NONE;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSize = data_FONTSIZE();
-    m_mensurSlash = MEI_UNSET;
+    m_mensurSlash = 0;
 }
 
 bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element, bool removeAttr)
@@ -1399,7 +1399,7 @@ bool AttMensuralVis::HasMensurSize() const
 
 bool AttMensuralVis::HasMensurSlash() const
 {
-    return (m_mensurSlash != MEI_UNSET);
+    return (m_mensurSlash != 0);
 }
 
 //----------------------------------------------------------------------------
