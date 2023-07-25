@@ -1660,9 +1660,9 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     Syl *syl;
     Zone *zone;
     int itUlx;
-    int itLrx;
+    // int itLrx;
     int offsetY;
-    int rightMost = -1;
+    // int rightMost = -1;
     double theta = staffParent->GetFacsimileInterface()->GetZone()->GetRotate();
 
     for (auto it = syls.begin(); it != syls.end(); ++it) {
@@ -1670,17 +1670,18 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         zone = syl->GetFacsimileInterface()->GetZone();
         assert(zone);
 
-        // adjust x-axis first
-        itUlx = zone->GetUlx();
-        itLrx = zone->GetLrx();
-        if (itLrx > rightMost) {
-            // correct overlap
-            if (itUlx < rightMost) zone->SetUlx(rightMost);
-            // Update right most point if needed
-            rightMost = itLrx;
-        }
+        // // adjust x-axis first
+        // itUlx = zone->GetUlx();
+        // itLrx = zone->GetLrx();
+        // if (itLrx > rightMost) {
+        //     // correct overlap
+        //     if (itUlx < rightMost) zone->SetUlx(rightMost);
+        //     // Update right most point if needed
+        //     rightMost = itLrx;
+        // }
 
         offsetY = 0;
+        itUlx = zone->GetUlx();
         if (theta) {
             double factor = 1.3;
             offsetY = (int)((itUlx - ulx) * tan(theta * M_PI / 180.0) / factor);
