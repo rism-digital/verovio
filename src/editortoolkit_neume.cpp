@@ -2845,6 +2845,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     int ligNum = 0; // for ligature in ungroupNcs
     int firstIsLig = false;
     bool firstIsSyl = false;
+    Zone *oldSylZone = NULL;
     Clef *oldClef = NULL;
     ClassIdComparison ac(CLEF);
     ListOfObjects syllables; // List of syllables used. groupType=neume only.
@@ -2932,8 +2933,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 sparent->ReorderByXPos();
                 fparent->ClearRelinquishedChildren();
                 fparent->ReorderByXPos();
+                uuidArray << (*it);
+                it = elementIds.erase(it);
+                el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
             }
-            continue;
         }
         if (elementIds.begin() == it || firstIsSyl) {
             // if the element is a syl we want it to stay attached to the first element
@@ -2947,7 +2950,6 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
                 if (nc->HasLigated() && nc->GetLigated() == BOOLEAN_true) {
-                    // ligNum++;
                     firstIsLig = true;
                 }
 
@@ -2975,6 +2977,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 if (oldClef == NULL) {
                     oldClef = dynamic_cast<Layer *>(sparent)->GetCurrentClef();
                 }
+
+                // Get orginal syl zone
+                oldSylZone = dynamic_cast<Zone *>(currentParent->GetFirst(SYL)->GetFacsimileInterface()->GetZone());
             }
 
             else {
@@ -2988,19 +2993,15 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
 
             // if the element is a syl then we want to keep it attached to the first node
             if (el->Is(SYL)) {
+                if (oldSylZone) {
+                    oldSylZone->SetLrx(oldSylZone->GetUlx() + 100);
+                }
                 continue;
             }
-
-            // if (el->Is(DIVLINE) || el->Is(ACCID)) {
-            //     el->MoveItselfTo(sparent);
-            //     fparent->ClearRelinquishedChildren();
-            //     continue;
-            // }
 
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc *>(el);
                 assert(nc);
-                // if (nc->HasLigated()) continue;
 
                 if (firstIsLig) {
                     // if 1st is ligature, neglect 2nd, go to the next nc
@@ -3035,70 +3036,26 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 if (m_doc->GetType() == Facs) {
                     Zone *zone = new Zone();
 
-                    // Use syllable parent positions if possible
-                    FacsimileInterface *syllableFi = NULL;
-                    if (syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
-                        syllableFi = syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface();
-                        Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
-                        zone->SetUlx(tempZone->GetUlx());
-                        zone->SetUly(tempZone->GetUly());
-                        zone->SetLrx(tempZone->GetLrx());
-                        zone->SetLry(tempZone->GetLry());
-                    }
-                    // otherwise get a boundingbox that comprises all the neumes in the syllable
-                    else {
-                        ListOfObjects children;
-                        InterfaceComparison comp(INTERFACE_FACSIMILE);
-                        syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantsByComparison(&children, &comp);
-                        for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
-                            FacsimileInterface *temp = (*iter2)->GetFacsimileInterface();
-                            assert(temp);
-                            Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
-                            assert(tempZone);
-                            if (temp->HasFacs()) {
-                                if (syllableFi == NULL) {
-                                    zone->SetUlx(tempZone->GetUlx());
-                                    zone->SetUly(tempZone->GetUly());
-                                    zone->SetLrx(tempZone->GetLrx());
-                                    zone->SetLry(tempZone->GetLry());
-                                }
-                                else {
-                                    if (tempZone->GetUlx() < zone->GetUlx()) {
-                                        zone->SetUlx(tempZone->GetUlx());
-                                    }
-                                    if (tempZone->GetUly() < zone->GetUly()) {
-                                        zone->SetUly(tempZone->GetUly());
-                                    }
-                                    if (tempZone->GetLrx() > zone->GetLrx()) {
-                                        zone->SetLrx(tempZone->GetLrx());
-                                    }
-                                    if (tempZone->GetLry() > zone->GetLry()) {
-                                        zone->SetLry(tempZone->GetLry());
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    zone->SetUlx(el->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
+                    zone->SetUly(oldSylZone->GetUly());
+                    zone->SetLrx(el->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
+                    zone->SetLry(oldSylZone->GetLry());
 
-                    // make the bounding box a little bigger and lower so it's easier to edit
-                    zone->SetUly(zone->GetUly() + 100);
-                    zone->SetLrx(zone->GetLrx() + 100);
-                    zone->SetLry(zone->GetLry() + 200);
+                    // Make bbox larger if it has less than 2 ncs
+                    if (newParent->GetChildCount(NC, 2) <= 2) {
+                        zone->SetLrx(zone->GetLrx() + 50);
+                    }
 
                     assert(m_doc->GetFacsimile());
                     m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
                     FacsimileInterface *fi = syl->GetFacsimileInterface();
                     assert(fi);
                     fi->AttachZone(zone);
-
-                    // syl->ResetFacsimile();
-                    // syl->SetFacs(zone->GetID());
                 }
             }
 
             if (ligNum != 1) {
                 // if not 1st nc in ligature, add child
-
                 uuidArray << newParent->GetID();
 
                 sparent->AddChild(newParent);
