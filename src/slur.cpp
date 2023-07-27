@@ -62,8 +62,8 @@ Slur::Slur(ClassId classId)
     , TimeSpanningInterface()
     , AttColor()
     , AttCurvature()
-    , AttLineRendBase()
     , AttLayerIdent()
+    , AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
@@ -79,8 +79,8 @@ Slur::Slur(ClassId classId, const std::string &classIdStr)
     , TimeSpanningInterface()
     , AttColor()
     , AttCurvature()
-    , AttLineRendBase()
     , AttLayerIdent()
+    , AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
