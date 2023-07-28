@@ -875,8 +875,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (m_doc->GetType() == Facs) {
             FacsimileInterface *fi = vrv_cast<FacsimileInterface *>(syl->GetFacsimileInterface());
             assert(fi);
-            Text *text = new Text();
-            syl->AddChild(text);
             Zone *sylZone = new Zone();
 
             // calculate bboxUlx and bboxUly wrt rotation using sine rule
