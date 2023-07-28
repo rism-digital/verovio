@@ -2944,6 +2944,10 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
             // we'll still need to initialize all the parents, thus the bool
             if (el->Is(SYL)) {
                 firstIsSyl = true;
+                oldSylZone = dynamic_cast<Zone *>(el->GetFacsimileInterface()->GetZone());
+                if (oldSylZone) {
+                    oldSylZone->SetLrx(oldSylZone->GetUlx() + 100);
+                }
                 continue;
             }
             else if (groupType == "nc") {
@@ -2980,7 +2984,9 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 }
 
                 // Get orginal syl zone
-                oldSylZone = dynamic_cast<Zone *>(currentParent->GetFirst(SYL)->GetFacsimileInterface()->GetZone());
+                if (!oldSylZone) {
+                    oldSylZone = dynamic_cast<Zone *>(currentParent->GetFirst(SYL)->GetFacsimileInterface()->GetZone());
+                }
             }
 
             else {
