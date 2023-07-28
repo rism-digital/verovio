@@ -124,6 +124,58 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttAttacking
+//----------------------------------------------------------------------------
+
+class AttAttacking : public Att {
+protected:
+    AttAttacking();
+    ~AttAttacking() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetAttacking();
+
+    /** Read the values for the attribute class **/
+    bool ReadAttacking(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteAttacking(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAttacca(data_BOOLEAN attacca_) { m_attacca = attacca_; }
+    data_BOOLEAN GetAttacca() const { return m_attacca; }
+    bool HasAttacca() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that the performance of the next musical division should begin
+     * immediately following this one.
+     **/
+    data_BOOLEAN m_attacca;
+};
+
+//----------------------------------------------------------------------------
+// InstAttacking
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttAttacking
+ */
+
+class InstAttacking : public AttAttacking {
+public:
+    InstAttacking() = default;
+    virtual ~InstAttacking() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttBendGes
 //----------------------------------------------------------------------------
 
@@ -262,119 +314,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttMdivGes
-//----------------------------------------------------------------------------
-
-class AttMdivGes : public Att {
-protected:
-    AttMdivGes();
-    ~AttMdivGes() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetMdivGes();
-
-    /** Read the values for the attribute class **/
-    bool ReadMdivGes(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteMdivGes(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetAttacca(data_BOOLEAN attacca_) { m_attacca = attacca_; }
-    data_BOOLEAN GetAttacca() const { return m_attacca; }
-    bool HasAttacca() const;
-    ///@}
-
-private:
-    /**
-     * Indicates that the performance of the next musical division should begin
-     * immediately following this one.
-     **/
-    data_BOOLEAN m_attacca;
-};
-
-//----------------------------------------------------------------------------
-// InstMdivGes
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttMdivGes
- */
-
-class InstMdivGes : public AttMdivGes {
-public:
-    InstMdivGes() = default;
-    virtual ~InstMdivGes() = default;
-};
-
-//----------------------------------------------------------------------------
-// AttNcGes
-//----------------------------------------------------------------------------
-
-class AttNcGes : public Att {
-protected:
-    AttNcGes();
-    ~AttNcGes() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetNcGes();
-
-    /** Read the values for the attribute class **/
-    bool ReadNcGes(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteNcGes(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetOctGes(data_OCTAVE octGes_) { m_octGes = octGes_; }
-    data_OCTAVE GetOctGes() const { return m_octGes; }
-    bool HasOctGes() const;
-    //
-    void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; }
-    data_PITCHNAME GetPnameGes() const { return m_pnameGes; }
-    bool HasPnameGes() const;
-    //
-    void SetPnum(int pnum_) { m_pnum = pnum_; }
-    int GetPnum() const { return m_pnum; }
-    bool HasPnum() const;
-    ///@}
-
-private:
-    /** Records performed octave information that differs from the written value. **/
-    data_OCTAVE m_octGes;
-    /** Contains a performed pitch name that differs from the written value. **/
-    data_PITCHNAME m_pnameGes;
-    /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
-    int m_pnum;
-};
-
-//----------------------------------------------------------------------------
-// InstNcGes
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttNcGes
- */
-
-class InstNcGes : public AttNcGes {
-public:
-    InstNcGes() = default;
-    virtual ~InstNcGes() = default;
-};
-
-//----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
 
@@ -402,29 +341,11 @@ public:
     void SetExtremis(noteGes_EXTREMIS extremis_) { m_extremis = extremis_; }
     noteGes_EXTREMIS GetExtremis() const { return m_extremis; }
     bool HasExtremis() const;
-    //
-    void SetOctGes(data_OCTAVE octGes_) { m_octGes = octGes_; }
-    data_OCTAVE GetOctGes() const { return m_octGes; }
-    bool HasOctGes() const;
-    //
-    void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; }
-    data_PITCHNAME GetPnameGes() const { return m_pnameGes; }
-    bool HasPnameGes() const;
-    //
-    void SetPnum(int pnum_) { m_pnum = pnum_; }
-    int GetPnum() const { return m_pnum; }
-    bool HasPnum() const;
     ///@}
 
 private:
     /** Indicates an extreme, indefinite performed pitch. **/
     noteGes_EXTREMIS m_extremis;
-    /** Records performed octave information that differs from the written value. **/
-    data_OCTAVE m_octGes;
-    /** Contains a performed pitch name that differs from the written value. **/
-    data_PITCHNAME m_pnameGes;
-    /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
-    int m_pnum;
 };
 
 //----------------------------------------------------------------------------
@@ -497,23 +418,23 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttSectionGes
+// AttPitchGes
 //----------------------------------------------------------------------------
 
-class AttSectionGes : public Att {
+class AttPitchGes : public Att {
 protected:
-    AttSectionGes();
-    ~AttSectionGes() = default;
+    AttPitchGes();
+    ~AttPitchGes() = default;
 
 public:
     /** Reset the default values for the attribute class **/
-    void ResetSectionGes();
+    void ResetPitchGes();
 
     /** Read the values for the attribute class **/
-    bool ReadSectionGes(pugi::xml_node element, bool removeAttr = true);
+    bool ReadPitchGes(pugi::xml_node element, bool removeAttr = true);
 
     /** Write the values for the attribute class **/
-    bool WriteSectionGes(pugi::xml_node element);
+    bool WritePitchGes(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -521,31 +442,40 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAttacca(data_BOOLEAN attacca_) { m_attacca = attacca_; }
-    data_BOOLEAN GetAttacca() const { return m_attacca; }
-    bool HasAttacca() const;
+    void SetOctGes(data_OCTAVE octGes_) { m_octGes = octGes_; }
+    data_OCTAVE GetOctGes() const { return m_octGes; }
+    bool HasOctGes() const;
+    //
+    void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; }
+    data_PITCHNAME GetPnameGes() const { return m_pnameGes; }
+    bool HasPnameGes() const;
+    //
+    void SetPnum(int pnum_) { m_pnum = pnum_; }
+    int GetPnum() const { return m_pnum; }
+    bool HasPnum() const;
     ///@}
 
 private:
-    /**
-     * Indicates that the performance of the next musical division should begin
-     * immediately following this one.
-     **/
-    data_BOOLEAN m_attacca;
+    /** Records performed octave information that differs from the written value. **/
+    data_OCTAVE m_octGes;
+    /** Contains a performed pitch name that differs from the written value. **/
+    data_PITCHNAME m_pnameGes;
+    /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
+    int m_pnum;
 };
 
 //----------------------------------------------------------------------------
-// InstSectionGes
+// InstPitchGes
 //----------------------------------------------------------------------------
 
 /**
- * Instantiable version of AttSectionGes
+ * Instantiable version of AttPitchGes
  */
 
-class InstSectionGes : public AttSectionGes {
+class InstPitchGes : public AttPitchGes {
 public:
-    InstSectionGes() = default;
-    virtual ~InstSectionGes() = default;
+    InstPitchGes() = default;
+    virtual ~InstPitchGes() = default;
 };
 
 //----------------------------------------------------------------------------
