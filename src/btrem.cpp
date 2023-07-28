@@ -31,11 +31,11 @@ namespace vrv {
 
 static const ClassRegistrar<BTrem> s_factory("btrem", BTREM);
 
-BTrem::BTrem() : LayerElement(BTREM, "btrem-"), AttBTremLog(), AttNumbered(), AttNumberPlacement(), AttTremMeasured()
+BTrem::BTrem() : LayerElement(BTREM, "btrem-"), AttNumbered(), AttNumberPlacement(), AttTremForm(), AttTremMeasured()
 {
-    this->RegisterAttClass(ATT_BTREMLOG);
     this->RegisterAttClass(ATT_NUMBERED);
     this->RegisterAttClass(ATT_NUMBERPLACEMENT);
+    this->RegisterAttClass(ATT_TREMFORM);
     this->RegisterAttClass(ATT_TREMMEASURED);
 
     this->Reset();
@@ -46,9 +46,9 @@ BTrem::~BTrem() {}
 void BTrem::Reset()
 {
     LayerElement::Reset();
-    this->ResetBTremLog();
     this->ResetNumbered();
     this->ResetNumberPlacement();
+    this->ResetTremForm();
     this->ResetTremMeasured();
 }
 

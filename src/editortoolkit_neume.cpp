@@ -947,13 +947,13 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             }
             else if (it->first == "curve") {
                 Liquescent *liquescent = new Liquescent();
-                ncForm_CURVE curve = ncForm_CURVE_NONE;
+                curvatureDirection_CURVE curve = curvatureDirection_CURVE_NONE;
                 if (it->second == "a") {
-                    curve = ncForm_CURVE_a;
+                    curve = curvatureDirection_CURVE_a;
                     nc->SetCurve(curve);
                 }
                 else if (it->second == "c") {
-                    curve = ncForm_CURVE_c;
+                    curve = curvatureDirection_CURVE_c;
                     nc->SetCurve(curve);
                 }
                 nc->AddChild(liquescent);

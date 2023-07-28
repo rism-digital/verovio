@@ -31,6 +31,7 @@ Surface::Surface() : Object(SURFACE, "surface-"), AttTyped(), AttCoordinated()
 {
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterAttClass(ATT_COORDINATED);
+    this->RegisterAttClass(ATT_COORDINATEDUL);
     this->Reset();
 }
 
@@ -40,6 +41,7 @@ void Surface::Reset()
 {
     this->ResetTyped();
     this->ResetCoordinated();
+    this->ResetCoordinatedUl();
 }
 
 bool Surface::IsSupportedChild(Object *object)

@@ -2364,13 +2364,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             if (pedalLine) pedal->SetForm(PEDALSTYLE_line);
             if (xmlPedal.attribute("abbreviated")) {
-                AttModule::SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                pedal->SetGlyphAuth("smufl");
                 AttModule::SetExternalsymbols(pedal, "glyph.num", "U+E651");
             }
             if (pedalType == "sostenuto") {
                 pedal->SetFunc("sostenuto");
                 if (xmlPedal.attribute("abbreviated")) {
-                    AttModule::SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                    pedal->SetGlyphAuth("smufl");
                     AttModule::SetExternalsymbols(pedal, "glyph.num", "U+E65A");
                 }
             }
@@ -2696,11 +2696,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                 AddLayerElement(layer, bTrem);
                 m_elementStackMap.at(layer).push_back(bTrem);
                 if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) {
-                    bTrem->SetForm(bTremLog_FORM_unmeas);
+                    bTrem->SetForm(tremForm_FORM_unmeas);
                     tremSlashNum = 0;
                 }
                 else {
-                    bTrem->SetForm(bTremLog_FORM_meas);
+                    bTrem->SetForm(tremForm_FORM_meas);
                 }
             }
         }
@@ -2890,6 +2890,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetHeadColor(notehead.attribute("color").as_string());
             note->SetHeadShape(ConvertNotehead(notehead.text().as_string()));
             if (notehead.attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
+            note->SetGlyphName(notehead.attribute("smufl").as_string());
             auto noteHeadFill = notehead.attribute("filled");
             if (noteHeadFill) note->SetHeadFill(noteHeadFill.as_bool() ? FILL_solid : FILL_void);
             if (!std::strncmp(notehead.text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
@@ -2922,6 +2923,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord->SetDurPpq(duration);
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
+                if (!strcmp(notehead.text().as_string(), "cluster")) chord->SetCluster(CLUSTER_white);
                 if (stemText == "none") chord->SetStemVisible(BOOLEAN_false);
                 if (tremSlashNum > 0) {
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
@@ -3941,7 +3943,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         if (key.child("mode")) {
             const std::string xmlMode = key.child("mode").text().as_string();
             if (std::strncmp(xmlMode.c_str(), "none", 4)) {
-                keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
+                keySig->SetMode(keySig->AttKeyMode::StrToMode(xmlMode));
             }
         }
     }

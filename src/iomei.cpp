@@ -2391,9 +2391,9 @@ void MEIOutput::WriteBTrem(pugi::xml_node currentNode, BTrem *bTrem)
     assert(bTrem);
 
     this->WriteLayerElement(currentNode, bTrem);
-    bTrem->WriteBTremLog(currentNode);
     bTrem->WriteNumbered(currentNode);
     bTrem->WriteNumberPlacement(currentNode);
+    bTrem->WriteTremForm(currentNode);
     bTrem->WriteTremMeasured(currentNode);
 }
 
@@ -2550,11 +2550,11 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 
     this->WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
-    keySig->WritePitch(currentNode);
-    keySig->WriteKeySigAnl(currentNode);
     keySig->WriteColor(currentNode);
+    keySig->WriteKeyMode(currentNode);
     keySig->WriteKeySigLog(currentNode);
     keySig->WriteKeySigVis(currentNode);
+    keySig->WritePitch(currentNode);
     keySig->WriteVisibility(currentNode);
 }
 
@@ -3056,6 +3056,7 @@ void MEIOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
+    interface->WritePitchGes(element);
 }
 
 void MEIOutput::WritePlistInterface(pugi::xml_node element, PlistInterface *interface)
@@ -6390,7 +6391,7 @@ bool MEIInput::ReadBTrem(Object *parent, pugi::xml_node bTrem)
     BTrem *vrvBTrem = new BTrem();
     this->ReadLayerElement(bTrem, vrvBTrem);
 
-    vrvBTrem->ReadBTremLog(bTrem);
+    vrvBTrem->ReadTremForm(bTrem);
     vrvBTrem->ReadNumbered(bTrem);
     vrvBTrem->ReadNumberPlacement(bTrem);
     vrvBTrem->ReadTremMeasured(bTrem);
@@ -6599,11 +6600,11 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
     }
 
     vrvKeySig->ReadAccidental(keySig);
-    vrvKeySig->ReadPitch(keySig);
-    vrvKeySig->ReadKeySigAnl(keySig);
     vrvKeySig->ReadColor(keySig);
+    vrvKeySig->ReadKeyMode(keySig);
     vrvKeySig->ReadKeySigLog(keySig);
     vrvKeySig->ReadKeySigVis(keySig);
+    vrvKeySig->ReadPitch(keySig);
     vrvKeySig->ReadVisibility(keySig);
 
     parent->AddChild(vrvKeySig);
@@ -7332,6 +7333,7 @@ bool MEIInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
     interface->ReadNoteGes(element);
     interface->ReadOctave(element);
     interface->ReadPitch(element);
+    interface->ReadPitchGes(element);
     return true;
 }
 
