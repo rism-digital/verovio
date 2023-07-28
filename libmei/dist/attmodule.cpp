@@ -2954,6 +2954,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_MENSURLOG)) {
+        AttMensurLog *att = dynamic_cast<AttMensurLog *>(element);
+        assert(att);
+        if (attrType == "level") {
+            att->SetLevel(att->StrToDuration(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
         AttMetadataPointing *att = dynamic_cast<AttMetadataPointing *>(element);
         assert(att);
@@ -4471,6 +4479,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "meiversion", att->MeiVersionMeiversionToStr(att->GetMeiversion()) });
         }
     }
+    if (element->HasAttClass(ATT_MENSURLOG)) {
+        const AttMensurLog *att = dynamic_cast<const AttMensurLog *>(element);
+        assert(att);
+        if (att->HasLevel()) {
+            attributes->push_back({ "level", att->DurationToStr(att->GetLevel()) });
+        }
+    }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
         const AttMetadataPointing *att = dynamic_cast<const AttMetadataPointing *>(element);
         assert(att);
@@ -5365,14 +5380,6 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
             att->SetArrowFillcolor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "line.form") {
-            att->SetLineForm(att->StrToLineform(attrValue));
-            return true;
-        }
-        if (attrType == "line.width") {
-            att->SetLineWidth(att->StrToLinewidth(attrValue));
-            return true;
-        }
     }
     if (element->HasAttClass(ATT_BARLINEVIS)) {
         AttBarLineVis *att = dynamic_cast<AttBarLineVis *>(element);
@@ -5872,12 +5879,6 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasArrowFillcolor()) {
             attributes->push_back({ "arrow.fillcolor", att->StrToStr(att->GetArrowFillcolor()) });
-        }
-        if (att->HasLineForm()) {
-            attributes->push_back({ "line.form", att->LineformToStr(att->GetLineForm()) });
-        }
-        if (att->HasLineWidth()) {
-            attributes->push_back({ "line.width", att->LinewidthToStr(att->GetLineWidth()) });
         }
     }
     if (element->HasAttClass(ATT_BARLINEVIS)) {

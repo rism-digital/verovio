@@ -3308,6 +3308,46 @@ bool AttMeiVersion::HasMeiversion() const
 }
 
 //----------------------------------------------------------------------------
+// AttMensurLog
+//----------------------------------------------------------------------------
+
+AttMensurLog::AttMensurLog() : Att()
+{
+    ResetMensurLog();
+}
+
+void AttMensurLog::ResetMensurLog()
+{
+    m_level = DURATION_NONE;
+}
+
+bool AttMensurLog::ReadMensurLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("level")) {
+        this->SetLevel(StrToDuration(element.attribute("level").value()));
+        if (removeAttr) element.remove_attribute("level");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMensurLog::WriteMensurLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasLevel()) {
+        element.append_attribute("level") = DurationToStr(this->GetLevel()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMensurLog::HasLevel() const
+{
+    return (m_level != DURATION_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 

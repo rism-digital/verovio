@@ -3684,6 +3684,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttMensurLog
+//----------------------------------------------------------------------------
+
+class AttMensurLog : public Att {
+protected:
+    AttMensurLog();
+    ~AttMensurLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetMensurLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadMensurLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteMensurLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLevel(data_DURATION level_) { m_level = level_; }
+    data_DURATION GetLevel() const { return m_level; }
+    bool HasLevel() const;
+    ///@}
+
+private:
+    /** Indicates the nesting level of staff grouping symbols. **/
+    data_DURATION m_level;
+};
+
+//----------------------------------------------------------------------------
+// InstMensurLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMensurLog
+ */
+
+class InstMensurLog : public AttMensurLog {
+public:
+    InstMensurLog() = default;
+    virtual ~InstMensurLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 

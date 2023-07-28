@@ -120,16 +120,6 @@ public:
     void SetArrowFillcolor(std::string arrowFillcolor_) { m_arrowFillcolor = arrowFillcolor_; }
     std::string GetArrowFillcolor() const { return m_arrowFillcolor; }
     bool HasArrowFillcolor() const;
-    //
-    void SetLineForm(data_LINEFORM lineForm_) { m_lineForm = lineForm_; }
-    data_LINEFORM GetLineForm() const { return m_lineForm; }
-    bool HasLineForm() const;
-    //
-    void SetLineWidth(data_LINEWIDTH lineWidth_) { m_lineWidth = lineWidth_; }
-    data_LINEWIDTH GetLineWidth() const { return m_lineWidth; }
-    bool HasLineWidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetLineWidthAlternate() { return &m_lineWidth; }
     ///@}
 
 private:
@@ -143,10 +133,6 @@ private:
     std::string m_arrowColor;
     /** Captures the fill color of the arrow if different from the line color. **/
     std::string m_arrowFillcolor;
-    /** Visual form of the line. **/
-    data_LINEFORM m_lineForm;
-    /** Width of the line. **/
-    data_LINEWIDTH m_lineWidth;
 };
 
 //----------------------------------------------------------------------------

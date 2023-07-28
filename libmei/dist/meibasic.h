@@ -12,7 +12,7 @@ public:
     // clang-format off
     
     inline static std::map<std::string, std::vector<std::string>> map = {
-        {"arpeg", {"label", "type", "order", "layer", "plist", "staff", "tstamp", "startid", "arrow", "arrow.shape", "arrow.size", "arrow.color", "arrow.fillcolor", "line.form", "line.width", "glyph.auth", "glyph.uri", "glyph.name", "glyph.num", "fontfam", "fontname", "fontsize", "fontstyle", "fontweight", "letterspacing", "lineheight", "ho", "vo"}},
+        {"arpeg", {"label", "type", "order", "layer", "plist", "staff", "tstamp", "startid", "arrow", "arrow.shape", "arrow.size", "arrow.color", "arrow.fillcolor", "glyph.auth", "glyph.uri", "glyph.name", "glyph.num", "lform", "lwidth", "lsegs", "fontfam", "fontname", "fontsize", "fontstyle", "fontweight", "letterspacing", "lineheight", "ho", "vo"}},
         {"beam", {"label", "type", "layer", "staff", "cue"}},
         {"beatRpt", {"label", "type", "beatdef", "layer", "staff", "slash", "expand", "glyph.auth", "glyph.uri", "glyph.name", "glyph.num", "plist"}},
         {"breath", {"label", "type", "layer", "staff", "startid", "tstamp", "glyph.auth", "glyph.uri", "glyph.name", "glyph.num", "ho", "vo"}},
