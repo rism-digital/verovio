@@ -249,7 +249,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     for (auto it = params.begin(); it != params.end(); it++) {
         if (nc->GetCurve() == ncForm_CURVE_a || nc->GetCurve() == ncForm_CURVE_c) {
-            for (int i = 0; i < sizeof(params.at(0).fontNoLiq); i++) {
+            for (int i = 0; i < static_cast<int>(sizeof(params.at(0).fontNoLiq)); i++) {
                 DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight,
                     it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
             }

@@ -2298,7 +2298,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 Set(linkedID, "precedes", "");
 
                 // group into two new syllables
-                int idx = std::distance(elementIds.begin(), it);
+                int idx = static_cast<int>(std::distance(elementIds.begin(), it));
                 std::string resultId0;
                 std::string resultId1;
 
