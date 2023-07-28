@@ -2088,7 +2088,7 @@ void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
     this->WriteTimeSpanningInterface(currentNode, lv);
     lv->WriteColor(currentNode);
     lv->WriteCurvature(currentNode);
-    lv->WriteCurveRend(currentNode);
+    lv->WriteLineRendBase(currentNode);
 }
 
 void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
@@ -2207,8 +2207,8 @@ void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     this->WriteTimeSpanningInterface(currentNode, slur);
     slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
-    slur->WriteCurveRend(currentNode);
     slur->WriteLayerIdent(currentNode);
+    slur->WriteLineRendBase(currentNode);
 }
 
 void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
@@ -2249,7 +2249,7 @@ void MEIOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
     this->WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
-    tie->WriteCurveRend(currentNode);
+    tie->WriteLineRendBase(currentNode);
 }
 
 void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
@@ -5745,7 +5745,7 @@ bool MEIInput::ReadLv(Object *parent, pugi::xml_node lv)
     this->ReadTimeSpanningInterface(lv, vrvLv);
     vrvLv->ReadColor(lv);
     vrvLv->ReadCurvature(lv);
-    vrvLv->ReadCurveRend(lv);
+    vrvLv->ReadLineRendBase(lv);
 
     parent->AddChild(vrvLv);
     this->ReadUnsupportedAttr(lv, vrvLv);
@@ -5851,8 +5851,8 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
     this->ReadTimeSpanningInterface(phrase, vrvPhrase);
     vrvPhrase->ReadColor(phrase);
     vrvPhrase->ReadCurvature(phrase);
-    vrvPhrase->ReadCurveRend(phrase);
     vrvPhrase->ReadLayerIdent(phrase);
+    vrvPhrase->ReadLineRendBase(phrase);
 
     parent->AddChild(vrvPhrase);
     this->ReadUnsupportedAttr(phrase, vrvPhrase);
@@ -5912,8 +5912,8 @@ bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)
     this->ReadTimeSpanningInterface(slur, vrvSlur);
     vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
-    vrvSlur->ReadCurveRend(slur);
     vrvSlur->ReadLayerIdent(slur);
+    vrvSlur->ReadLineRendBase(slur);
 
     parent->AddChild(vrvSlur);
     this->ReadUnsupportedAttr(slur, vrvSlur);
@@ -5945,7 +5945,7 @@ bool MEIInput::ReadTie(Object *parent, pugi::xml_node tie)
     this->ReadTimeSpanningInterface(tie, vrvTie);
     vrvTie->ReadColor(tie);
     vrvTie->ReadCurvature(tie);
-    vrvTie->ReadCurveRend(tie);
+    vrvTie->ReadLineRendBase(tie);
 
     parent->AddChild(vrvTie);
     this->ReadUnsupportedAttr(tie, vrvTie);

@@ -3128,7 +3128,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // color
                 meiSlur->SetColor(slur.attribute("color").as_string());
                 // lineform
-                meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
+                meiSlur->SetLform(meiSlur->AttLineRendBase::StrToLineform(slur.attribute("line-type").as_string()));
                 if (slur.attribute("id")) meiSlur->SetID(slur.attribute("id").as_string());
                 meiSlur->SetStartid("#" + note->GetID());
                 // add it to the stack
@@ -3835,7 +3835,7 @@ void MusicXmlInput::ReadMusicXmlTies(
             tie->SetColor(xmlTie.attribute("color").as_string());
             // placement and orientation
             tie->SetCurvedir(InferCurvedir(xmlTie));
-            tie->SetLform(tie->AttCurveRend::StrToLineform(xmlTie.attribute("line-type").as_string()));
+            tie->SetLform(tie->AttLineRendBase::StrToLineform(xmlTie.attribute("line-type").as_string()));
             if (xmlTie.attribute("id")) tie->SetID(xmlTie.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back({ measureNum, tie });
@@ -3848,7 +3848,7 @@ void MusicXmlInput::ReadMusicXmlTies(
             lv->SetColor(xmlTie.attribute("color").as_string());
             // placement and orientation
             lv->SetCurvedir(InferCurvedir(xmlTie));
-            lv->SetLform(lv->AttCurveRend::StrToLineform(xmlTie.attribute("line-type").as_string()));
+            lv->SetLform(lv->AttLineRendBase::StrToLineform(xmlTie.attribute("line-type").as_string()));
             if (xmlTie.attribute("id")) lv->SetID(xmlTie.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back({ measureNum, lv });
