@@ -2458,13 +2458,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 return false;
             }
         }
-        auto possibleEntry = parents.find(el->GetParent());
-        if (possibleEntry == parents.end()) {
-            parents.emplace(el->GetParent(), 1);
-        }
-        else {
-            possibleEntry->second += 1;
-        }
+        parents[par]++;
         elements.insert(el);
     }
 
