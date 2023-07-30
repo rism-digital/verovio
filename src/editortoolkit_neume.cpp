@@ -2316,8 +2316,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 {
     Object *parent = NULL, *secondParent = NULL;
     std::map<Object *, int> parents;
-    std::set<Object *> elements;
-    std::vector<Object *> sortedElements;
+    ListOfObjects elements;
     std::vector<Object *> fullParents;
     std::map<Syllable *, Clef *> clefsBefore;
 
@@ -2459,7 +2458,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         parents[par]++;
-        elements.insert(el);
+        elements.push_back(el);
     }
 
     if (parents.size() == 0) {
@@ -2475,34 +2474,29 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         return false;
     }
 
-    std::copy(elements.begin(), elements.end(), std::back_inserter(sortedElements));
-    std::stable_sort(sortedElements.begin(), sortedElements.end(), Object::sortByUlx);
-
     ListOfObjects clefs;
-    std::set<Object *> syllables;
-    ListOfObjects sortedSyllables;
+    ListOfObjects syllables;
     ClassIdComparison clefComp(CLEF);
     InterfaceComparison pitchComp(INTERFACE_PITCH);
     Clef *newClef = NULL;
 
-    m_doc->GetDrawingPage()->FindAllDescendantsBetween(&clefs, &clefComp,
-        sortedElements.front()->GetFirstAncestor(SYLLABLE), sortedElements.back()->GetFirstAncestor(SYLLABLE));
+    m_doc->GetDrawingPage()->FindAllDescendantsBetween(
+        &clefs, &clefComp, elements.front()->GetFirstAncestor(SYLLABLE), elements.back()->GetFirstAncestor(SYLLABLE));
 
     // if there are clefs between the elements getting grouped
     // some elements will need their pitch adjusted for the new clef
     // clefsBefore maps the syllable parent to its clef before the group
     // so we can reassociate any pitched children from their old clef to the new one
     if (clefs.size() != 0) {
-        for (auto it = sortedElements.begin(); it != sortedElements.end(); ++it) {
+        for (auto it = elements.begin(); it != elements.end(); ++it) {
             if ((*it)->Is(SYLLABLE)) {
-                syllables.insert(dynamic_cast<Object *>(*it));
+                syllables.push_back(dynamic_cast<Object *>(*it));
             }
             else {
-                syllables.insert((*it)->GetFirstAncestor(SYLLABLE));
+                syllables.push_back((*it)->GetFirstAncestor(SYLLABLE));
             }
         }
-        std::copy(syllables.begin(), syllables.end(), std::back_inserter(sortedSyllables));
-        for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
+        for (auto it = syllables.begin(); it != syllables.end(); ++it) {
             Clef *tempClef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindPreviousChild(&clefComp, (*it)));
             if (tempClef == NULL) {
                 Layer *layer = vrv_cast<Layer *>((*it)->GetFirstAncestor(LAYER));
@@ -2510,7 +2504,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             clefsBefore.insert(std::pair<Syllable *, Clef *>(dynamic_cast<Syllable *>(*it), tempClef));
         }
-        newClef = clefsBefore[dynamic_cast<Syllable *>(sortedSyllables.front())];
+        newClef = clefsBefore[dynamic_cast<Syllable *>(syllables.front())];
     }
 
     // find parents where all of their children are being grouped
@@ -2746,8 +2740,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // change the pitch of any pitched elements whose clef may have changed
     assert(newClef);
     ListOfObjects pitchedChildren;
-    if (sortedSyllables.size()) {
-        for (auto it = sortedSyllables.begin(); it != sortedSyllables.end(); ++it) {
+    if (syllables.size()) {
+        for (auto it = syllables.begin(); it != syllables.end(); ++it) {
             Syllable *syllable = dynamic_cast<Syllable *>(*it);
             if (clefsBefore[syllable] != newClef) {
                 syllable->FindAllDescendantsByComparison(&pitchedChildren, &pitchComp);
