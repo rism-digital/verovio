@@ -177,7 +177,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
 
-    else if (nc->GetCurve() == ncForm_CURVE_c) {
+    else if (nc->GetCurve() == curvatureDirection_CURVE_c) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).fontNoLiq[1] = SMUFL_EB92_staffPosRaise3;
         params.at(0).fontNoLiq[2] = SMUFL_E995_chantAuctumDesc;
@@ -187,7 +187,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).yOffsetLiq[0] = -1.5;
         params.at(0).yOffsetLiq[4] = -1.75;
     }
-    else if (nc->GetCurve() == ncForm_CURVE_a) {
+    else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).fontNoLiq[1] = SMUFL_EB98_staffPosLower1;
         params.at(0).fontNoLiq[2] = SMUFL_E994_chantAuctumAsc;
@@ -248,8 +248,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
-        if (nc->GetCurve() == ncForm_CURVE_a || nc->GetCurve() == ncForm_CURVE_c) {
-            for (int i = 0; i < sizeof(params.at(0).fontNoLiq); i++) {
+        if (nc->GetCurve() == curvatureDirection_CURVE_a || nc->GetCurve() == curvatureDirection_CURVE_c) {
+            for (int i = 0; i < static_cast<int>(sizeof(params.at(0).fontNoLiq)); i++) {
                 DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight,
                     it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
             }
