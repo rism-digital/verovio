@@ -2314,7 +2314,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
 
 bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> elementIds)
 {
-    Object *parent = NULL, *doubleParent = NULL;
+    Object *parent = NULL, *secondParent = NULL;
     std::map<Object *, int> parents;
     std::set<Object *> elements;
     std::vector<Object *> sortedElements;
@@ -2441,9 +2441,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
 
-        if (doubleParent == NULL) {
-            doubleParent = par->GetParent();
-            if (doubleParent == NULL) {
+        if (secondParent == NULL) {
+            secondParent = par->GetParent();
+            if (secondParent == NULL) {
                 LogError("No second level parent!");
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "No second level parent.");
@@ -2451,7 +2451,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
         else {
-            if (par->GetParent() != doubleParent) {
+            if (par->GetParent() != secondParent) {
                 LogError("No shared second level parent!");
                 m_infoObject.import("status", "FAILURE");
                 m_infoObject.import("message", "No shared second level parent.");
@@ -2620,10 +2620,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
 
         parent->ReorderByXPos();
-        if (doubleParent == NULL) {
+        if (secondParent == NULL) {
             return false;
         }
-        doubleParent->AddChild(parent);
+        secondParent->AddChild(parent);
 
         Layer *layer = vrv_cast<Layer *>(parent->GetFirstAncestor(LAYER));
         assert(layer);
@@ -2655,7 +2655,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                     parent->ReorderByXPos();
                 }
             }
-            doubleParent->AddChild(parent);
+            secondParent->AddChild(parent);
 
             Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
             if (!layer) {
@@ -2733,11 +2733,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
             }
 
-            if (doubleParent == NULL) {
+            if (secondParent == NULL) {
                 LogError("No second level parent!");
                 return false;
             }
-            doubleParent->AddChild(fullSyllable);
+            secondParent->AddChild(fullSyllable);
             Layer *layer = vrv_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
             assert(layer);
             if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
@@ -2779,11 +2779,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *obj = (*it).first;
         obj->ClearRelinquishedChildren();
         if (obj->GetChildCount() == 0) {
-            if (doubleParent == NULL) {
+            if (secondParent == NULL) {
                 LogError("No second level parent!");
                 return false;
             }
-            doubleParent->DeleteChild(obj);
+            secondParent->DeleteChild(obj);
         }
         else if (obj->GetChildCount()
             == (obj->GetChildCount(SYL) + obj->GetChildCount(DIVLINE) + obj->GetChildCount(ACCID)
@@ -2807,11 +2807,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 parent->ReorderByXPos();
                 obj->ClearRelinquishedChildren();
             }
-            if (doubleParent == NULL) {
+            if (secondParent == NULL) {
                 LogError("No second level parent!");
                 return false;
             }
-            doubleParent->DeleteChild(obj);
+            secondParent->DeleteChild(obj);
         }
     }
 
