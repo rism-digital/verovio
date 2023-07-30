@@ -2648,16 +2648,14 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
     // also in this case we need to make sure that the facsimile of the resulting syl is correct
     else {
         if (elementClass == NC) {
-            if (doubleParent) {
-                parent = new Neume();
-                for (auto it = elements.begin(); it != elements.end(); ++it) {
-                    if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                        (*it)->MoveItselfTo(parent);
-                        parent->ReorderByXPos();
-                    }
+            parent = new Neume();
+            for (auto it = elements.begin(); it != elements.end(); ++it) {
+                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                    (*it)->MoveItselfTo(parent);
+                    parent->ReorderByXPos();
                 }
-                doubleParent->AddChild(parent);
             }
+            doubleParent->AddChild(parent);
 
             Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
             if (!layer) {
