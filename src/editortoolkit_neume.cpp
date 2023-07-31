@@ -2571,12 +2571,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
 
-        parent->ReorderByXPos();
         secondParent->AddChild(parent);
-
-        Layer *layer = vrv_cast<Layer *>(parent->GetFirstAncestor(LAYER));
-        assert(layer);
-        layer->ReorderByXPos();
     }
 
     // if there's only one full parent we just add the other elements to it
@@ -2589,7 +2584,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 (*it)->MoveItselfTo(parent);
             }
         }
-        parent->ReorderByXPos();
     }
 
     // if there is more than 1 full parent we need to concat syl's
@@ -2601,20 +2595,9 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
                     (*it)->MoveItselfTo(parent);
-                    parent->ReorderByXPos();
                 }
             }
             secondParent->AddChild(parent);
-
-            Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
-            if (!layer) {
-                LogError("Elements does not have Layer parent. This should not happen.");
-                m_infoObject.import("status", "FAILURE");
-                m_infoObject.import("message", "Elements does not have Layer parent.");
-                return false;
-            }
-
-            layer->ReorderByXPos();
         }
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
@@ -2687,8 +2670,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 return false;
             }
             secondParent->AddChild(fullSyllable);
-            Layer *layer = vrv_cast<Layer *>(fullSyllable->GetFirstAncestor(LAYER));
-            assert(layer);
             if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
                 FacsimileInterface *facsInter = vrv_cast<FacsimileInterface *>(fullSyl->GetFacsimileInterface());
                 assert(facsInter);
@@ -2703,7 +2684,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 assert(lry >= 0);
                 zone->SetLry(lry);
             }
-            layer->ReorderByXPos();
             parent = fullSyllable;
         }
     }
@@ -2763,6 +2743,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             secondParent->DeleteChild(obj);
         }
     }
+
+    Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
+    assert(layer);
+    layer->ReorderByXPos();
 
     m_infoObject.import("uuid", parent->GetID());
     m_infoObject.import("status", status);
