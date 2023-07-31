@@ -2601,7 +2601,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
         else {
             std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
-            Syllable *fullSyllable = new Syllable();
+            Syllable *parent = new Syllable();
             Syl *fullSyl = NULL;
 
             // construct concatenated string of all the syls
@@ -2655,13 +2655,13 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             Text *text = vrv_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
             assert(text);
             text->SetText(fullString);
-            assert(fullSyllable);
-            fullSyllable->AddChild(fullSyl);
+            assert(parent);
+            parent->AddChild(fullSyl);
 
             // Move elements to the new group syllable
             for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != fullSyllable && !(*it)->Is(SYL)) {
-                    (*it)->MoveItselfTo(fullSyllable);
+                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
+                    (*it)->MoveItselfTo(parent);
                 }
             }
 
@@ -2669,7 +2669,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 LogError("No second level parent!");
                 return false;
             }
-            secondParent->AddChild(fullSyllable);
+            secondParent->AddChild(parent);
             if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
                 FacsimileInterface *facsInter = vrv_cast<FacsimileInterface *>(fullSyl->GetFacsimileInterface());
                 assert(facsInter);
@@ -2684,7 +2684,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 assert(lry >= 0);
                 zone->SetLry(lry);
             }
-            parent = fullSyllable;
         }
     }
 
