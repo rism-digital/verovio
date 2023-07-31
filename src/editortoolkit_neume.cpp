@@ -2518,6 +2518,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             fullParents.push_back(parentPair.first);
         }
     }
+
     // if there are no full parents we need to make a new one to attach everything to
     if (fullParents.empty()) {
         if (elementClass == NC) {
@@ -2525,10 +2526,18 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
+            int lry;
+            int uly;
 
             for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
-                    (*it)->MoveItselfTo(parent);
+                if ((*it)->GetParent() != parent) {
+                    if (!(*it)->Is(SYL)) {
+                        (*it)->MoveItselfTo(parent);
+                    }
+                    else {
+                        lry = (*it)->GetFacsimileInterface()->GetZone()->GetLry();
+                        uly = (*it)->GetFacsimileInterface()->GetZone()->GetUly();
+                    }
                 }
             }
 
@@ -2544,43 +2553,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             if (m_doc->GetType() == Facs) {
                 Zone *zone = new Zone();
 
-                // if it's syllable parent has position values just use those
-                FacsimileInterface *syllableFi = NULL;
-                if (syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface()->HasFacs()) {
-                    syllableFi = syl->GetFirstAncestor(SYLLABLE)->GetFacsimileInterface();
-                    Zone *tempZone = dynamic_cast<Zone *>(syllableFi->GetZone());
-                    zone->SetUlx(tempZone->GetUlx());
-                    zone->SetUly(tempZone->GetUly());
-                    zone->SetLrx(tempZone->GetLrx());
-                    zone->SetLry(tempZone->GetLry());
-                }
-                // otherwise get a boundingbox that comprises all the neumes in the syllable
-                else {
-                    ListOfObjects children;
-                    InterfaceComparison comp(INTERFACE_FACSIMILE);
-                    syl->GetFirstAncestor(SYLLABLE)->FindAllDescendantsByComparison(&children, &comp);
-                    for (auto iter2 = children.begin(); iter2 != children.end(); ++iter2) {
-                        FacsimileInterface *temp = (*iter2)->GetFacsimileInterface();
-                        assert(temp);
-                        Zone *tempZone = vrv_cast<Zone *>(temp->GetZone());
-                        assert(tempZone);
-                        if (temp->HasFacs()) {
-                            zone->SetUlx(tempZone->GetUlx());
-                            zone->SetUly(tempZone->GetUly());
-                            zone->SetLrx(tempZone->GetLrx());
-                            zone->SetLry(tempZone->GetLry());
-                        }
-                    }
-                }
+                zone->SetUlx(parent->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
+                zone->SetUly(uly);
+                zone->SetLrx(parent->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
+                zone->SetLry(lry);
 
-                // make the bounding box a little bigger and lower so it's easier to edit
-                const int offSetUly = 100;
-                const int offSetLrx = 100;
-                const int offSetLry = 200;
-
-                zone->SetUly(zone->GetUly() + offSetUly);
-                zone->SetLrx(zone->GetLrx() + offSetLrx);
-                zone->SetLry(zone->GetLry() + offSetLry);
+                // Make bbox larger if it has less than 2 ncs
+                if (parent->GetChildCount(NC, 2) <= 2) {
+                    zone->SetLrx(zone->GetLrx() + 50);
+                }
 
                 assert(m_doc->GetFacsimile());
                 m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
