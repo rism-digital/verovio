@@ -2440,23 +2440,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
 
-        if (secondParent == NULL) {
-            secondParent = par->GetParent();
-            if (secondParent == NULL) {
-                LogError("No second level parent!");
-                m_infoObject.import("status", "FAILURE");
-                m_infoObject.import("message", "No second level parent.");
-                return false;
-            }
-        }
-        else {
-            if (par->GetParent() != secondParent) {
-                LogError("No shared second level parent!");
-                m_infoObject.import("status", "FAILURE");
-                m_infoObject.import("message", "No shared second level parent.");
-                return false;
-            }
-        }
         parents[par]++;
         elements.push_back(el);
     }
@@ -2507,11 +2490,25 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         newClef = clefsBefore[dynamic_cast<Syllable *>(syllables.front())];
     }
 
+    // check if share second level parent
+    secondParent = (*parents.begin()).first->GetParent();
+    if (secondParent == NULL) {
+        LogError("No second level parent!");
+        m_infoObject.import("status", "FAILURE");
+        m_infoObject.import("message", "No second level parent.");
+        return false;
+    }
     // find parents where all of their children are being grouped
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         auto parentPair = *it;
         Object *par = parentPair.first;
         int expected;
+        if (par->GetParent() != secondParent) {
+            LogError("No shared second level parent!");
+            m_infoObject.import("status", "FAILURE");
+            m_infoObject.import("message", "No shared second level parent.");
+            return false;
+        }
         if (par->GetClassId() == SYLLABLE) {
             expected = par->GetChildCount(NEUME);
         }
