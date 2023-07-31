@@ -2587,9 +2587,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 FacsimileInterface *fi = vrv_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
                 assert(fi);
                 fi->AttachZone(zone);
-
-                // syl->ResetFacsimile();
-                // syl->SetFacs(zone->GetID());
             }
         }
 
