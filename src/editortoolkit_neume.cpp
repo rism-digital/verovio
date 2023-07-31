@@ -2591,9 +2591,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
 
         parent->ReorderByXPos();
-        if (secondParent == NULL) {
-            return false;
-        }
         secondParent->AddChild(parent);
 
         Layer *layer = vrv_cast<Layer *>(parent->GetFirstAncestor(LAYER));
