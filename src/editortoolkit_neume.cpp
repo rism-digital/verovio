@@ -2667,10 +2667,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         Object *obj = (*it).first;
         obj->ClearRelinquishedChildren();
         if (obj->GetChildCount() == 0) {
-            if (secondParent == NULL) {
-                LogError("No second level parent!");
-                return false;
-            }
             secondParent->DeleteChild(obj);
         }
         else if (obj->GetChildCount()
@@ -2682,22 +2678,15 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
             while ((leftover = obj->FindDescendantByType(DIVLINE)) != NULL) {
                 leftover->MoveItselfTo(parent);
-                parent->ReorderByXPos();
                 obj->ClearRelinquishedChildren();
             }
             while ((leftover = obj->FindDescendantByType(ACCID)) != NULL) {
                 leftover->MoveItselfTo(parent);
-                parent->ReorderByXPos();
                 obj->ClearRelinquishedChildren();
             }
             while ((leftover = obj->FindDescendantByType(CLEF)) != NULL) {
                 leftover->MoveItselfTo(parent);
-                parent->ReorderByXPos();
                 obj->ClearRelinquishedChildren();
-            }
-            if (secondParent == NULL) {
-                LogError("No second level parent!");
-                return false;
             }
             secondParent->DeleteChild(obj);
         }
