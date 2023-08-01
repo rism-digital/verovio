@@ -1637,11 +1637,9 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
     int ulx;
     int uly;
     int height;
-    int lrx;
     if (dynamic_cast<FacsimileInterface *>(element)->HasFacs()) {
         ulx = element->GetFacsimileInterface()->GetZone()->GetUlx();
         uly = element->GetFacsimileInterface()->GetZone()->GetUly();
-        lrx = element->GetFacsimileInterface()->GetZone()->GetLrx();
         height = element->GetFacsimileInterface()->GetZone()->GetLry() - uly;
     }
     else {
