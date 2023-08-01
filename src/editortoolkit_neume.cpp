@@ -2600,17 +2600,23 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             secondParent->AddChild(parent);
         }
         else {
-            std::sort(fullParents.begin(), fullParents.end(), Object::sortByUlx);
             Syllable *parent = new Syllable();
             Syl *fullSyl = NULL;
+            int ulx, uly, lrx, lry;
 
             // construct concatenated string of all the syls
             std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (syl != NULL) {
+                if (syl != NULL && m_doc->GetType() == Facs) {
+                    Zone *zone = dynamic_cast<Zone *>(syl->GetFacsimileInterface()->GetZone());
+
                     if (fullSyl == NULL) {
                         fullSyl = syl;
+                        ulx = zone->GetUlx();
+                        uly = zone->GetUly();
+                        lrx = zone->GetLrx();
+                        lry = zone->GetLry();
                     }
 
                     Text *text = dynamic_cast<Text *>(syl->FindDescendantByType(TEXT));
@@ -2618,46 +2624,13 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                         std::u32string currentString = text->GetText();
                         fullString = fullString + currentString;
                     }
+
+                    ulx = zone->GetUlx() < ulx ? zone->GetUlx() : ulx;
+                    uly = zone->GetUly() < uly ? zone->GetUly() : uly;
+                    lrx = zone->GetLrx() > lrx ? zone->GetLrx() : lrx;
+                    lry = zone->GetLry() > lry ? zone->GetLry() : lry;
                 }
             }
-            // find the new boundingbox comprising all of the text
-            int ulx = -1, uly = -1, lrx = -1, lry = -1;
-            for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
-                Object *par = vrv_cast<Object *>(*it);
-                assert(par);
-                Syl *descSyl = vrv_cast<Syl *>(par->FindDescendantByType(SYL));
-                assert(descSyl);
-                // FacsimileInterface *facsInter = dynamic_cast<FacsimileInterface *>
-                // ((*it)->FindDescendantByType(SYL)->GetFacsimileInterface());
-                if (descSyl != NULL) {
-                    FacsimileInterface *facsInter
-                        = dynamic_cast<FacsimileInterface *>(descSyl->GetFacsimileInterface());
-
-                    if (facsInter != NULL) {
-                        if (ulx == -1 || ulx > facsInter->GetDrawingX()) {
-                            ulx = facsInter->GetDrawingX();
-                        }
-
-                        if (lrx < facsInter->GetWidth() + facsInter->GetDrawingX()) {
-                            lrx = facsInter->GetWidth() + facsInter->GetDrawingX();
-                        }
-
-                        if (uly == -1 || uly > facsInter->GetDrawingY()) {
-                            uly = facsInter->GetDrawingY();
-                        }
-                        if (lry < facsInter->GetHeight() + facsInter->GetDrawingY()) {
-                            lry = facsInter->GetHeight() + facsInter->GetDrawingY();
-                        }
-                    }
-                }
-            }
-            assert(fullSyl);
-            Text *text = vrv_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
-            assert(text);
-            text->SetText(fullString);
-            assert(parent);
-            parent->AddChild(fullSyl);
-
             // Move elements to the new group syllable
             for (auto it = elements.begin(); it != elements.end(); ++it) {
                 if ((*it)->GetParent() != parent && !(*it)->Is(SYL)) {
@@ -2665,25 +2638,19 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 }
             }
 
-            if (secondParent == NULL) {
-                LogError("No second level parent!");
-                return false;
-            }
-            secondParent->AddChild(parent);
-            if (ulx >= 0 && uly >= 0 && lrx >= 0 && lry >= 0) {
-                FacsimileInterface *facsInter = vrv_cast<FacsimileInterface *>(fullSyl->GetFacsimileInterface());
-                assert(facsInter);
-                Zone *zone = vrv_cast<Zone *>(facsInter->GetZone());
-                assert(zone);
-                assert(ulx >= 0);
+            Text *fullText = dynamic_cast<Text *>(fullSyl->FindDescendantByType(TEXT));
+            fullText->SetText(fullString);
+            parent->AddChild(fullSyl);
+
+            if (m_doc->GetType() == Facs) {
+                Zone *zone = dynamic_cast<Zone *>(fullSyl->GetFacsimileInterface()->GetZone());
                 zone->SetUlx(ulx);
-                assert(uly >= 0);
                 zone->SetUly(uly);
-                assert(lrx >= 0);
                 zone->SetLrx(lrx);
-                assert(lry >= 0);
                 zone->SetLry(lry);
             }
+
+            secondParent->AddChild(parent);
         }
     }
 
@@ -2743,9 +2710,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    Layer *layer = dynamic_cast<Layer *>(parent->GetFirstAncestor(LAYER));
-    assert(layer);
-    layer->ReorderByXPos();
+    secondParent->ReorderByXPos();
 
     m_infoObject.import("uuid", parent->GetID());
     m_infoObject.import("status", status);
