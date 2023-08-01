@@ -2526,18 +2526,11 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
         else if (elementClass == NEUME) {
             parent = new Syllable();
-            int lry;
-            int uly;
+            Object *oldSyl = (*elements.begin())->GetFirstAncestor(SYLLABLE)->GetFirst(SYL);
 
             for (auto it = elements.begin(); it != elements.end(); ++it) {
-                if ((*it)->GetParent() != parent) {
-                    if (!(*it)->Is(SYL)) {
-                        (*it)->MoveItselfTo(parent);
-                    }
-                    else {
-                        lry = (*it)->GetFacsimileInterface()->GetZone()->GetLry();
-                        uly = (*it)->GetFacsimileInterface()->GetZone()->GetUly();
-                    }
+                if (!(*it)->Is(SYL)) {
+                    (*it)->MoveItselfTo(parent);
                 }
             }
 
@@ -2553,10 +2546,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             if (m_doc->GetType() == Facs) {
                 Zone *zone = new Zone();
 
-                zone->SetUlx(parent->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
-                zone->SetUly(uly);
-                zone->SetLrx(parent->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
-                zone->SetLry(lry);
+                zone->SetUlx(parent->GetFirst(NEUME)->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
+                zone->SetUly(oldSyl->GetFacsimileInterface()->GetZone()->GetUly());
+                zone->SetLrx(parent->GetLast(NEUME)->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
+                zone->SetLry(oldSyl->GetFacsimileInterface()->GetZone()->GetLry());
 
                 // Make bbox larger if it has less than 2 ncs
                 if (parent->GetChildCount(NC, 2) <= 2) {
@@ -2565,7 +2558,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
                 assert(m_doc->GetFacsimile());
                 m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
-                FacsimileInterface *fi = vrv_cast<FacsimileInterface *>((*syl).GetFacsimileInterface());
+                FacsimileInterface *fi = syl->GetFacsimileInterface();
                 assert(fi);
                 fi->AttachZone(zone);
             }
