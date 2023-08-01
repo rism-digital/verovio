@@ -4036,10 +4036,10 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
         { "natural-up", ACCIDENTAL_WRITTEN_nu }, //
         { "flat-down", ACCIDENTAL_WRITTEN_fd }, //
         { "flat-up", ACCIDENTAL_WRITTEN_fu }, //
-        // { "double-sharp-down",  }, //
-        // { "double-sharp-up",  }, //
-        // { "flat-flat-down",  }, //
-        // { "flat-flat-up",  }, //
+        { "double-sharp-down", ACCIDENTAL_WRITTEN_xd }, //
+        { "double-sharp-up", ACCIDENTAL_WRITTEN_xu }, //
+        { "flat-flat-down", ACCIDENTAL_WRITTEN_ffd }, //
+        { "flat-flat-up", ACCIDENTAL_WRITTEN_ffu }, //
         { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, //
         { "triple-flat", ACCIDENTAL_WRITTEN_tf }, //
         { "slash-quarter-sharp", ACCIDENTAL_WRITTEN_bms }, //
@@ -4064,6 +4064,7 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 {
     static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid{
         { -3, ACCIDENTAL_GESTURAL_tf }, //
+        { -2.5, ACCIDENTAL_GESTURAL_ffd }, //
         { -2, ACCIDENTAL_GESTURAL_ff }, //
         { -1.5, ACCIDENTAL_GESTURAL_fd }, //
         { -1, ACCIDENTAL_GESTURAL_f }, //
@@ -4073,6 +4074,7 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
         { 1, ACCIDENTAL_GESTURAL_s }, //
         { 1.5, ACCIDENTAL_GESTURAL_su }, //
         { 2, ACCIDENTAL_GESTURAL_ss }, //
+        { 2.5, ACCIDENTAL_GESTURAL_xu }, //
         { 2, ACCIDENTAL_GESTURAL_ts } //
     };
 
