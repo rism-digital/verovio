@@ -1298,7 +1298,10 @@ bool Object::sortByUlx(Object *a, Object *b)
     if (a->Is(NC) && b->Is(NC)) {
         Nc *nca = dynamic_cast<Nc *>(a);
         Nc *ncb = dynamic_cast<Nc *>(b);
-        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+        Zone *zonea = dynamic_cast<Zone *>(nca->GetFacsimileInterface()->GetZone());
+        Zone *zoneb = dynamic_cast<Zone *>(ncb->GetFacsimileInterface()->GetZone());
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())
+            && (zonea->GetUlx() == zoneb->GetUly())) {
             Object *parent = a->GetParent();
             assert(parent);
             if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {
