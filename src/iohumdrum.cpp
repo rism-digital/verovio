@@ -16765,7 +16765,8 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
         }
         else {
             defaultBelowQ = true;
-            staffadj2 = 1;
+            // Why is this here?:
+            // staffadj2 = 1;
         }
     }
 
