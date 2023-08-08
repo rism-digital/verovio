@@ -639,6 +639,12 @@
   <g c="E888" x="10.0" y="-8.0" w="313.0" h="383.0" h-a-x="313" n="tuplet8" />
   <g c="E889" x="10.0" y="-8.0" w="303.74" h="383.0" h-a-x="304" n="tuplet9" />
   <g c="E88A" x="10.0" y="58.0" w="111.0" h="210.0" h-a-x="111" n="tupletColon" />
+  <g c="E8F3" x="0.0" y="250.0" w="16.0" h="250.0" h-a-x="16" n="chantDivisioMinima" />
+  <g c="E8F4" x="0.0" y="-250.0" w="16.0" h="500.0" h-a-x="16" n="chantDivisioMaior" />
+  <g c="E8F5" x="0.0" y="-375.0" w="16.0" h="750.0" h-a-x="16" n="chantDivisioMaxima" />
+  <g c="E8F6" x="0.0" y="-375.0" w="120.0" h="750.0" h-a-x="119" n="chantDivisioFinalis" />
+  <g c="E8F7" x="0.0" y="255.0" w="91.0" h="245.0" h-a-x="91" n="chantVirgula" />
+  <g c="E8F8" x="0.0" y="260.0" w="143.0" h="240.0" h-a-x="143" n="chantCaesura" />
   <g c="E901" x="0.0" y="-169.0" w="339.0" h="1091.0" h-a-x="339" n="mensuralGclefPetrucci" />
   <g c="E902" x="0.0" y="-231.0" w="264.0" h="452.0" h-a-x="264" n="chantFclef" />
   <g c="E903" x="0.0" y="-172.0" w="297.0" h="344.0" h-a-x="298" n="mensuralFclef" />
@@ -787,6 +793,23 @@
   <g c="EB20" x="0.0" y="0.0" w="900.0" h="536.0" h-a-x="901" n="elecRewind" />
   <g c="EB21" x="0.0" y="0.0" w="982.0" h="536.0" h-a-x="982" n="elecSkipForwards" />
   <g c="EB22" x="0.0" y="0.0" w="982.0" h="536.0" h-a-x="982" n="elecSkipBackwards" />
+  <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise1" />
+  <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise2" />
+  <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise3" />
+  <g c="EB93" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise4" />
+  <g c="EB94" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise5" />
+  <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise6" />
+  <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise7" />
+  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
+  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
+  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB9A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower3" />
+  <g c="EB9B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower4" />
+  <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
+  <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
+  <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
+  <g c="EB9F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower8" />
+  <g c="EBA6" x="0.0" y="0.0" w="148.0" h="786.0" h-a-x="149" n="luteDurationDoubleWhole" />
   <g c="EBA7" x="0.0" y="0.0" w="36.0" h="790.0" h-a-x="36" n="luteDurationWhole" />
   <g c="EBA8" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationHalf" />
   <g c="EBA9" x="0.0" y="0.0" w="228.0" h="786.0" h-a-x="228" n="luteDurationQuarter" />

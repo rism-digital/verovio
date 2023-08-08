@@ -778,7 +778,8 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
     return 0;
 }
 
-int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
+int BoundingBox::Intersects(
+    const BeamDrawingInterface *beamInterface, Accessor type, int margin, bool fromBeamContentSide) const
 {
     assert(beamInterface);
     assert(beamInterface->HasCoords());
@@ -834,12 +835,15 @@ int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor 
     }
 
     // calculate vertical overlap of the BB with beam section
-    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+    const bool beamAbove = (beamInterface->m_drawingPlace == BEAMPLACE_above);
+    const bool beamBelow = (beamInterface->m_drawingPlace == BEAMPLACE_below);
+
+    if ((beamAbove && !fromBeamContentSide) || (beamBelow && fromBeamContentSide)) {
         const int topY = std::max(leftIntersection.y, rightIntersection.y);
         const int shift = topY - this->GetBottomBy(type) + margin;
         return std::max(shift, 0);
     }
-    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+    else if ((beamBelow && !fromBeamContentSide) || (beamAbove && fromBeamContentSide)) {
         const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
         const int shift = bottomY - this->GetTopBy(type) - margin;
         return std::min(shift, 0);

@@ -56,6 +56,7 @@ using namespace std;
 #include "btrem.h"
 #include "choice.h"
 #include "chord.h"
+#include "comparison.h"
 #include "custos.h"
 #include "dir.h"
 #include "dot.h"
@@ -4760,13 +4761,13 @@ bool HumdrumInput::prepareFooter(
     std::string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
     meifile += "<meiHead></meiHead>";
     meifile += "<music><body><mdiv><score><scoreDef>\n";
-    meifile += "<pgFoot>\n";
+    meifile += "<pgFoot func=\"first\">\n";
     meifile += footer;
     meifile += "</pgFoot>\n";
     // Always putting footer on all pages for now:
-    meifile += "<pgFoot2>\n";
+    meifile += "<pgFoot func=\"all\">\n";
     meifile += footer;
-    meifile += "</pgFoot2>\n";
+    meifile += "</pgFoot>\n";
     meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
@@ -4781,7 +4782,8 @@ bool HumdrumInput::prepareFooter(
     // std::string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGFOOT);
+    AttFormeworkComparison comparison(PGFOOT, PGFUNC_first);
+    Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison);
     if (pgfoot == NULL) {
         return false;
     }
@@ -4801,7 +4803,8 @@ bool HumdrumInput::prepareFooter(
 
     m_doc->GetCurrentScoreDef()->AddChild(pgfoot);
 
-    Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGFOOT2);
+    AttFormeworkComparison comparison2(PGFOOT, PGFUNC_all);
+    Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison2);
     if (pgfoot2 == NULL) {
         return true;
     }
@@ -4812,7 +4815,7 @@ bool HumdrumInput::prepareFooter(
     }
     detached = pgfoot2->GetParent()->DetachChild(index);
     if (detached != pgfoot2) {
-        std::cerr << "Detached element is not a pgFoot2 element" << std::endl;
+        std::cerr << "Detached element is not a pgFoot element" << std::endl;
         if (detached) {
             delete detached;
         }
@@ -15734,7 +15737,7 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         text->SetText(symbol);
         rend->AddChild(text);
         label->AddChild(rend);
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         if (!poststring.empty()) {
             addTextElement(label, poststring);
         }

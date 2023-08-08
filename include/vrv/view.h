@@ -30,6 +30,8 @@ class Chord;
 class ControlElement;
 class DeviceContext;
 class Dir;
+class Div;
+class DivLine;
 class Doc;
 class Dynam;
 class EditorialElement;
@@ -48,6 +50,7 @@ class KeyAccid;
 class Layer;
 class LayerElement;
 class Lb;
+class Liquescent;
 class Measure;
 class MNum;
 class Mordent;
@@ -61,9 +64,7 @@ class Page;
 class PageElement;
 class Pedal;
 class PgFoot;
-class PgFoot;
 class PgHead;
-class PgHead2;
 class PitchInflection;
 class Reh;
 class Rend;
@@ -82,6 +83,7 @@ class Tempo;
 class Text;
 class TextDrawingParams;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class Trill;
 class Turn;
@@ -239,13 +241,13 @@ protected:
     ///@}
 
     /**
-     * @name Methods for drawing RunningElements (PgHead, PgFoot, etc.)
-     * Defined in view_running.cpp
+     * @name Methods for drawing TextLayoutElement (Div, PgHead, PgFoot, etc.)
+     * Defined in view_text.cpp
      */
     ///@{
+    void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
-    void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
-    void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
+    void DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement);
     ///@}
 
     /**
@@ -412,10 +414,20 @@ protected:
      * Defined in view_neume.cpp
      */
     ///@{
+    void DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
+
+    /**
+     * @name Methods for drawing parts of neume LayerElement child classes.
+     * Defined in view_neumes.cpp
+     */
+    ///@{
+    void DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
+
     /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.

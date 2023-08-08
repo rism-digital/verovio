@@ -51,6 +51,8 @@ class Damage;
 class Del;
 class Dot;
 class Dir;
+class Div;
+class DivLine;
 class DurationInterface;
 class Dynam;
 class Ending;
@@ -82,6 +84,7 @@ class LayerElement;
 class Lb;
 class Lem;
 class Ligature;
+class Liquescent;
 class Lv;
 class Mdiv;
 class Measure;
@@ -110,9 +113,7 @@ class Pages;
 class Pb;
 class Pedal;
 class PgFoot;
-class PgFoot2;
 class PgHead;
-class PgHead2;
 class Phrase;
 class PitchInflection;
 class PitchInterface;
@@ -158,6 +159,7 @@ class Tempo;
 class Text;
 class TextDirInterface;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
@@ -356,9 +358,8 @@ private:
     void WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteGrpSym(pugi::xml_node currentNode, GrpSym *grmSym);
     void WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot);
-    void WritePgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2);
     void WritePgHead(pugi::xml_node currentNode, PgHead *pgHead);
-    void WritePgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2);
+    void WriteDiv(pugi::xml_node currentNode, Div *div);
     void WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
     void WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef);
@@ -389,6 +390,7 @@ private:
     void WriteChord(pugi::xml_node currentNode, Chord *chord);
     void WriteClef(pugi::xml_node currentNode, Clef *clef);
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
+    void WriteDivLine(pugi::xml_node currentNode, DivLine *divLine);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
@@ -396,6 +398,7 @@ private:
     void WriteKeyAccid(pugi::xml_node currentNode, KeyAccid *keyAccid);
     void WriteKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
+    void WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquescent);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
     void WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
@@ -517,6 +520,7 @@ private:
     void WriteControlElement(pugi::xml_node element, ControlElement *object);
     void WriteEditorialElement(pugi::xml_node element, EditorialElement *object);
     void WriteLayerElement(pugi::xml_node element, LayerElement *object);
+    void WriteTextLayoutElement(pugi::xml_node element, TextLayoutElement *object);
     void WriteRunningElement(pugi::xml_node element, RunningElement *object);
     void WriteScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
     void WriteSystemElement(pugi::xml_node element, SystemElement *object);
@@ -653,9 +657,8 @@ private:
     bool ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadGrpSym(Object *parent, pugi::xml_node grpSym);
     bool ReadPgFoot(Object *parent, pugi::xml_node pgFoot);
-    bool ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2);
     bool ReadPgHead(Object *parent, pugi::xml_node pgHead);
-    bool ReadPgHead2(Object *parent, pugi::xml_node pgHead2);
+    bool ReadDiv(Object *parent, pugi::xml_node div);
     bool ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     bool ReadStaffGrp(Object *parent, pugi::xml_node staffGrp);
     bool ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
@@ -698,6 +701,7 @@ private:
     bool ReadChord(Object *parent, pugi::xml_node chord);
     bool ReadClef(Object *parent, pugi::xml_node clef);
     bool ReadCustos(Object *parent, pugi::xml_node custos);
+    bool ReadDivLine(Object *parent, pugi::xml_node divLine);
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);
@@ -705,6 +709,7 @@ private:
     bool ReadKeyAccid(Object *parent, pugi::xml_node keyAccid);
     bool ReadKeySig(Object *parent, pugi::xml_node keySig);
     bool ReadLigature(Object *parent, pugi::xml_node ligature);
+    bool ReadLiquescent(Object *parent, pugi::xml_node liquescent);
     bool ReadMensur(Object *parent, pugi::xml_node mensur);
     bool ReadMeterSig(Object *parent, pugi::xml_node meterSig);
     bool ReadMRest(Object *parent, pugi::xml_node mRest);
@@ -815,6 +820,7 @@ private:
     bool ReadControlElement(pugi::xml_node element, ControlElement *object);
     bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
     bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object);
     bool ReadRunningElement(pugi::xml_node element, RunningElement *object);
     bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
@@ -885,11 +891,13 @@ private:
     // to MEI 5.0.0
     void UpgradeKeySigTo_5_0_0(pugi::xml_node keySig);
     void UpgradePageTo_5_0_0(Page *page);
+    void UpgradePgHeadFootTo_5_0_0(pugi::xml_node element);
     void UpgradeMeasureTo_5_0_0(pugi::xml_node measure);
     void UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
     void UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement);
     void UpgradeStaffTo_5_0_0(pugi::xml_node staff);
     void UpgradeLayerElementTo_5_0_0(pugi::xml_node element);
+    void UpgradeRendTo_5_0_0(pugi::xml_node element);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);

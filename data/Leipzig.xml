@@ -572,6 +572,7 @@
   <g c="E049" x="0.0" y="-73.0" w="537.0" h="653.0" h-a-x="537" n="codaSquare" />
   <g c="E503" x="0.0" y="73.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarUpperDot" />
   <g c="E505" x="0.0" y="-166.0" w="95.0" h="94.0" h-a-x="95" n="repeatBarLowerDot" />
+  <g c="EBA6" x="-82.0" y="0.0" w="174.0" h="791.0" h-a-x="92" n="luteDurationDoubleWhole" />
   <g c="E0A5" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="314" n="noteheadNull" />
   <g c="E940" x="-209.0" y="-209.0" w="418.0" h="418.0" h-a-x="0" n="mensuralCombStemDiagonal" />
   <g c="E905" x="0.0" y="-500.0" w="526.0" h="1000.0" h-a-x="526" n="mensuralCclef" />
@@ -770,4 +771,25 @@
   <g c="EC21" x="0.0" y="-1.0" w="396.0" h="592.0" h-a-x="396" n="luteGermanLUpper" />
   <g c="EC22" x="0.0" y="0.0" w="736.0" h="593.0" h-a-x="734" n="luteGermanMUpper" />
   <g c="EC23" x="0.0" y="-10.0" w="559.0" h="588.0" h-a-x="558" n="luteGermanNUpper" />
+  <g c="E8F3" x="0.0" y="250.0" w="14.0" h="250.0" h-a-x="14" n="chantDivisioMinima" />
+  <g c="E8F4" x="0.0" y="-250.0" w="14.0" h="500.0" h-a-x="14" n="chantDivisioMaior" />
+  <g c="E8F5" x="0.0" y="-375.0" w="14.0" h="750.0" h-a-x="14" n="chantDivisioMaxima" />
+  <g c="E8F6" x="0.0" y="-375.0" w="114.0" h="750.0" h-a-x="114" n="chantDivisioFinalis" />
+  <g c="E8F7" x="0.0" y="264.0" w="85.0" h="234.0" h-a-x="85" n="chantVirgula" />
+  <g c="E8F8" x="-0.11" y="263.68" w="137.45" h="234.59" h-a-x="138" n="chantCaesura" />
+  <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise1" />
+  <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise2" />
+  <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise3" />
+  <g c="EB93" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise4" />
+  <g c="EB94" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise5" />
+  <g c="EB95" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise6" />
+  <g c="EB96" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise7" />
+  <g c="EB97" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosRaise8" />
+  <g c="EB98" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower1" />
+  <g c="EB99" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower2" />
+  <g c="EB9A" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower3" />
+  <g c="EB9B" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower4" />
+  <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
+  <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
+  <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
 </bounding-boxes>

@@ -80,8 +80,8 @@ class Slur : public ControlElement,
              public TimeSpanningInterface,
              public AttColor,
              public AttCurvature,
-             public AttCurveRend,
-             public AttLayerIdent {
+             public AttLayerIdent,
+             public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

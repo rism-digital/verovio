@@ -118,7 +118,9 @@ public:
 protected:
     //
 private:
-    //
+    // Returns the current tempo with adjustment
+    double GetAdjustedTempo() const { return m_currentTempo * m_tempoAdjustment; }
+
 public:
     //
 private:

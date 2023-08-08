@@ -2186,12 +2186,12 @@
         <!--<glyph glyph-code="E8F0" smufl-name="chantStaff" />-->
         <!--<glyph glyph-code="E8F1" smufl-name="chantStaffWide" />-->
         <!--<glyph glyph-code="E8F2" smufl-name="chantStaffNarrow" />-->
-        <!--<glyph glyph-code="E8F3" smufl-name="chantDivisioMinima" />-->
-        <!--<glyph glyph-code="E8F4" smufl-name="chantDivisioMaior" />-->
-        <!--<glyph glyph-code="E8F5" smufl-name="chantDivisioMaxima" />-->
-        <!--<glyph glyph-code="E8F6" smufl-name="chantDivisioFinalis" />-->
-        <!--<glyph glyph-code="E8F7" smufl-name="chantVirgula" />-->
-        <!--<glyph glyph-code="E8F8" smufl-name="chantCaesura" />-->
+        <glyph glyph-code="E8F3" smufl-name="chantDivisioMinima" />
+        <glyph glyph-code="E8F4" smufl-name="chantDivisioMaior" />
+        <glyph glyph-code="E8F5" smufl-name="chantDivisioMaxima" />
+        <glyph glyph-code="E8F6" smufl-name="chantDivisioFinalis" />
+        <glyph glyph-code="E8F7" smufl-name="chantVirgula" />
+        <glyph glyph-code="E8F8" smufl-name="chantCaesura" />
         <range_end>U+E8FF</range_end>
         <range_start>U+E8F0</range_start>
     </medievalAndRenaissanceStaves>
@@ -2807,22 +2807,22 @@
     </arrowsAndArrowheads>
     <combiningStaffPositions>
         <description>Combining staff positions</description>
-        <!--<glyph glyph-code="EB90" smufl-name="staffPosRaise1" />-->
-        <!--<glyph glyph-code="EB91" smufl-name="staffPosRaise2" />-->
-        <!--<glyph glyph-code="EB92" smufl-name="staffPosRaise3" />-->
-        <!--<glyph glyph-code="EB93" smufl-name="staffPosRaise4" />-->
-        <!--<glyph glyph-code="EB94" smufl-name="staffPosRaise5" />-->
-        <!--<glyph glyph-code="EB95" smufl-name="staffPosRaise6" />-->
-        <!--<glyph glyph-code="EB96" smufl-name="staffPosRaise7" />-->
-        <!--<glyph glyph-code="EB97" smufl-name="staffPosRaise8" />-->
-        <!--<glyph glyph-code="EB98" smufl-name="staffPosLower1" />-->
-        <!--<glyph glyph-code="EB99" smufl-name="staffPosLower2" />-->
-        <!--<glyph glyph-code="EB9A" smufl-name="staffPosLower3" />-->
-        <!--<glyph glyph-code="EB9B" smufl-name="staffPosLower4" />-->
-        <!--<glyph glyph-code="EB9C" smufl-name="staffPosLower5" />-->
-        <!--<glyph glyph-code="EB9D" smufl-name="staffPosLower6" />-->
-        <!--<glyph glyph-code="EB9E" smufl-name="staffPosLower7" />-->
-        <!--<glyph glyph-code="EB9F" smufl-name="staffPosLower8" />-->
+        <glyph glyph-code="EB90" smufl-name="staffPosRaise1" />
+        <glyph glyph-code="EB91" smufl-name="staffPosRaise2" />
+        <glyph glyph-code="EB92" smufl-name="staffPosRaise3" />
+        <glyph glyph-code="EB93" smufl-name="staffPosRaise4" />
+        <glyph glyph-code="EB94" smufl-name="staffPosRaise5" />
+        <glyph glyph-code="EB95" smufl-name="staffPosRaise6" />
+        <glyph glyph-code="EB96" smufl-name="staffPosRaise7" />
+        <glyph glyph-code="EB97" smufl-name="staffPosRaise8" />
+        <glyph glyph-code="EB98" smufl-name="staffPosLower1" />
+        <glyph glyph-code="EB99" smufl-name="staffPosLower2" />
+        <glyph glyph-code="EB9A" smufl-name="staffPosLower3" />
+        <glyph glyph-code="EB9B" smufl-name="staffPosLower4" />
+        <glyph glyph-code="EB9C" smufl-name="staffPosLower5" />
+        <glyph glyph-code="EB9D" smufl-name="staffPosLower6" />
+        <glyph glyph-code="EB9E" smufl-name="staffPosLower7" />
+        <glyph glyph-code="EB9F" smufl-name="staffPosLower8" />
         <range_end>U+EB9F</range_end>
         <range_start>U+EB90</range_start>
     </combiningStaffPositions>
@@ -2834,7 +2834,7 @@
         <!--<glyph glyph-code="EBA3" smufl-name="luteBarlineStartRepeat" />-->
         <!--<glyph glyph-code="EBA4" smufl-name="luteBarlineEndRepeat" />-->
         <!--<glyph glyph-code="EBA5" smufl-name="luteBarlineFinal" />-->
-        <!--<glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole" />-->
+        <glyph glyph-code="EBA6" smufl-name="luteDurationDoubleWhole" />
         <glyph glyph-code="EBA7" smufl-name="luteDurationWhole" />
         <glyph glyph-code="EBA8" smufl-name="luteDurationHalf" />
         <glyph glyph-code="EBA9" smufl-name="luteDurationQuarter" />

@@ -771,7 +771,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
                 }
                 if (!verovioText.empty()) {
                     Rend *rend = new Rend;
-                    rend->SetFontfam("smufl");
+                    rend->SetGlyphAuth("smufl");
                     Text *text = new Text();
                     text->SetText(verovioText);
                     rend->AddChild(text);
@@ -2014,7 +2014,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         if (xmlCoda.attribute("id")) dir->SetID(xmlCoda.attribute("id").as_string());
         Rend *rend = new Rend;
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
@@ -2364,13 +2364,13 @@ void MusicXmlInput::ReadMusicXmlDirection(
             pedal->SetDir(ConvertPedalTypeToDir(pedalType));
             if (pedalLine) pedal->SetForm(PEDALSTYLE_line);
             if (xmlPedal.attribute("abbreviated")) {
-                AttModule::SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                pedal->SetGlyphAuth("smufl");
                 AttModule::SetExternalsymbols(pedal, "glyph.num", "U+E651");
             }
             if (pedalType == "sostenuto") {
                 pedal->SetFunc("sostenuto");
                 if (xmlPedal.attribute("abbreviated")) {
-                    AttModule::SetExternalsymbols(pedal, "glyph.auth", "smufl");
+                    pedal->SetGlyphAuth("smufl");
                     AttModule::SetExternalsymbols(pedal, "glyph.num", "U+E65A");
                 }
             }
@@ -2459,7 +2459,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
         dir->SetStaff(dir->AttStaffIdent::StrToXsdPositiveIntegerList("1"));
         if (xmlSegno.attribute("id")) dir->SetID(xmlSegno.attribute("id").as_string());
         Rend *rend = new Rend;
-        rend->SetFontfam("smufl");
+        rend->SetGlyphAuth("smufl");
         rend->SetFontstyle(FONTSTYLE_normal);
         rend->SetHalign(HORIZONTALALIGNMENT_center);
         Text *text = new Text();
@@ -2696,11 +2696,11 @@ void MusicXmlInput::ReadMusicXmlNote(
                 AddLayerElement(layer, bTrem);
                 m_elementStackMap.at(layer).push_back(bTrem);
                 if (HasAttributeWithValue(tremolo.node(), "type", "unmeasured")) {
-                    bTrem->SetForm(bTremLog_FORM_unmeas);
+                    bTrem->SetForm(tremForm_FORM_unmeas);
                     tremSlashNum = 0;
                 }
                 else {
-                    bTrem->SetForm(bTremLog_FORM_meas);
+                    bTrem->SetForm(tremForm_FORM_meas);
                 }
             }
         }
@@ -2870,6 +2870,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->SetOct(octaveNum);
             }
         }
+        else if (node.child("unpitched")) {
+            pugi::xml_node unpitched = node.child("unpitched");
+            const std::string stepStr = unpitched.child("display-step").text().as_string();
+            const int octaveNum = unpitched.child("display-octave").text().as_int();
+            const int loc = note->CalcLoc(ConvertStepToPitchName(stepStr), octaveNum, -2);
+            note->SetLoc(loc);
+        }
 
         // dynamics (MIDI velocity)
         const float dynamics = node.attribute("dynamics").as_float(-1.0);
@@ -2883,6 +2890,7 @@ void MusicXmlInput::ReadMusicXmlNote(
             note->SetHeadColor(notehead.attribute("color").as_string());
             note->SetHeadShape(ConvertNotehead(notehead.text().as_string()));
             if (notehead.attribute("parentheses").as_bool()) note->SetHeadMod(NOTEHEADMODIFIER_paren);
+            note->SetGlyphName(notehead.attribute("smufl").as_string());
             auto noteHeadFill = notehead.attribute("filled");
             if (noteHeadFill) note->SetHeadFill(noteHeadFill.as_bool() ? FILL_solid : FILL_void);
             if (!std::strncmp(notehead.text().as_string(), "none", 4)) note->SetHeadVisible(BOOLEAN_false);
@@ -2915,6 +2923,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 chord->SetDurPpq(duration);
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
+                if (!strcmp(notehead.text().as_string(), "cluster")) chord->SetCluster(CLUSTER_white);
                 if (stemText == "none") chord->SetStemVisible(BOOLEAN_false);
                 if (tremSlashNum > 0) {
                     chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
@@ -3121,7 +3130,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 // color
                 meiSlur->SetColor(slur.attribute("color").as_string());
                 // lineform
-                meiSlur->SetLform(meiSlur->AttCurveRend::StrToLineform(slur.attribute("line-type").as_string()));
+                meiSlur->SetLform(meiSlur->AttLineRendBase::StrToLineform(slur.attribute("line-type").as_string()));
                 if (slur.attribute("id")) meiSlur->SetID(slur.attribute("id").as_string());
                 meiSlur->SetStartid("#" + note->GetID());
                 // add it to the stack
@@ -3676,14 +3685,14 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(node);
     assert(section);
 
-    if (HasAttributeWithValue(node, "new-system", "yes")) {
-        Sb *sb = new Sb();
-        section->AddChild(sb);
-    }
-
-    if (HasAttributeWithValue(node, "new-page", "yes")) {
+    if (node.attribute("new-page").as_bool()) {
         Pb *pb = new Pb();
         section->AddChild(pb);
+    }
+
+    if (node.attribute("new-system").as_bool()) {
+        Sb *sb = new Sb();
+        section->AddChild(sb);
     }
 }
 
@@ -3828,7 +3837,7 @@ void MusicXmlInput::ReadMusicXmlTies(
             tie->SetColor(xmlTie.attribute("color").as_string());
             // placement and orientation
             tie->SetCurvedir(InferCurvedir(xmlTie));
-            tie->SetLform(tie->AttCurveRend::StrToLineform(xmlTie.attribute("line-type").as_string()));
+            tie->SetLform(tie->AttLineRendBase::StrToLineform(xmlTie.attribute("line-type").as_string()));
             if (xmlTie.attribute("id")) tie->SetID(xmlTie.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back({ measureNum, tie });
@@ -3841,7 +3850,7 @@ void MusicXmlInput::ReadMusicXmlTies(
             lv->SetColor(xmlTie.attribute("color").as_string());
             // placement and orientation
             lv->SetCurvedir(InferCurvedir(xmlTie));
-            lv->SetLform(lv->AttCurveRend::StrToLineform(xmlTie.attribute("line-type").as_string()));
+            lv->SetLform(lv->AttLineRendBase::StrToLineform(xmlTie.attribute("line-type").as_string()));
             if (xmlTie.attribute("id")) lv->SetID(xmlTie.attribute("id").as_string());
             // add it to the stack
             m_controlElements.push_back({ measureNum, lv });
@@ -3934,7 +3943,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         if (key.child("mode")) {
             const std::string xmlMode = key.child("mode").text().as_string();
             if (std::strncmp(xmlMode.c_str(), "none", 4)) {
-                keySig->SetMode(keySig->AttKeySigLog::StrToMode(xmlMode));
+                keySig->SetMode(keySig->AttKeyMode::StrToMode(xmlMode));
             }
         }
     }
@@ -3948,6 +3957,10 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
                         ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
+                    keyAccid->SetGlyphName(keyStep.next_sibling().next_sibling().attribute("smufl").as_string());
+                }
+                else if (!keyAccid->HasAccid()) {
+                    LogWarning("MusicXML import: Could not properly set keyAccid");
                 }
             }
             keySig->AddChild(keyAccid);
@@ -4004,7 +4017,7 @@ curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, c
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::string &value)
 {
-    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid{
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> Accidental2Accid{ //
         { "sharp", ACCIDENTAL_WRITTEN_s }, //
         { "natural", ACCIDENTAL_WRITTEN_n }, //
         { "flat", ACCIDENTAL_WRITTEN_f }, //
@@ -4023,12 +4036,19 @@ data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::strin
         { "natural-up", ACCIDENTAL_WRITTEN_nu }, //
         { "flat-down", ACCIDENTAL_WRITTEN_fd }, //
         { "flat-up", ACCIDENTAL_WRITTEN_fu }, //
+        { "double-sharp-down", ACCIDENTAL_WRITTEN_xd }, //
+        { "double-sharp-up", ACCIDENTAL_WRITTEN_xu }, //
+        { "flat-flat-down", ACCIDENTAL_WRITTEN_ffd }, //
+        { "flat-flat-up", ACCIDENTAL_WRITTEN_ffu }, //
         { "triple-sharp", ACCIDENTAL_WRITTEN_ts }, //
         { "triple-flat", ACCIDENTAL_WRITTEN_tf }, //
         { "slash-quarter-sharp", ACCIDENTAL_WRITTEN_bms }, //
         { "slash-sharp", ACCIDENTAL_WRITTEN_ks }, //
         { "slash-flat", ACCIDENTAL_WRITTEN_bf }, //
-        { "double-slash-flat", ACCIDENTAL_WRITTEN_bmf } //
+        { "double-slash-flat", ACCIDENTAL_WRITTEN_bmf }, //
+        { "sori", ACCIDENTAL_WRITTEN_sori }, //
+        { "koron", ACCIDENTAL_WRITTEN_koron }, //
+        { "other", ACCIDENTAL_WRITTEN_NONE }
     };
 
     const auto result = Accidental2Accid.find(value);
@@ -4044,6 +4064,7 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
 {
     static const std::map<float, data_ACCIDENTAL_GESTURAL> Alter2Accid{
         { -3, ACCIDENTAL_GESTURAL_tf }, //
+        { -2.5, ACCIDENTAL_GESTURAL_ffd }, //
         { -2, ACCIDENTAL_GESTURAL_ff }, //
         { -1.5, ACCIDENTAL_GESTURAL_fd }, //
         { -1, ACCIDENTAL_GESTURAL_f }, //
@@ -4053,6 +4074,7 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
         { 1, ACCIDENTAL_GESTURAL_s }, //
         { 1.5, ACCIDENTAL_GESTURAL_su }, //
         { 2, ACCIDENTAL_GESTURAL_ss }, //
+        { 2.5, ACCIDENTAL_GESTURAL_xu }, //
         { 2, ACCIDENTAL_GESTURAL_ts } //
     };
 
@@ -4061,7 +4083,6 @@ data_ACCIDENTAL_GESTURAL MusicXmlInput::ConvertAlterToAccid(const float value)
         return result->second;
     }
 
-    LogWarning("MusicXML import: Unsupported alter value '%.1f'", value);
     return ACCIDENTAL_GESTURAL_NONE;
 }
 

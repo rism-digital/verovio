@@ -197,7 +197,14 @@ public:
     MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
+private:
+    /*
+     * Objects that were not successfully added and should be destroyed at the end of the import
+     */
+    ListOfObjects m_garbage;
+
 #ifndef NO_MUSICXML_SUPPORT
+public:
     bool Import(const std::string &musicxml) override;
 
 private:
@@ -557,11 +564,6 @@ private:
     std::map<Measure *, int> m_measureCounts;
     /* measure rests */
     std::map<int, int> m_multiRests;
-
-    /*
-     * Objects that were not successfully added and should be destroyed at the end of the import
-     */
-    ListOfObjects m_garbage;
 
 #endif // NO_MUSICXML_SUPPORT
 };

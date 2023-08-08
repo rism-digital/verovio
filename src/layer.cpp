@@ -19,6 +19,7 @@
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
+#include "divline.h"
 #include "doc.h"
 #include "editorial.h"
 #include "findlayerelementsfunctor.h"
@@ -182,8 +183,8 @@ LayerElement *Layer::GetPrevious(const LayerElement *element)
 
 const LayerElement *Layer::GetPrevious(const LayerElement *element) const
 {
-    this->ResetList(this);
-    if (!element || this->HasEmptyList(this)) return NULL;
+    this->ResetList();
+    if (!element || this->HasEmptyList()) return NULL;
 
     return dynamic_cast<const LayerElement *>(this->GetListPrevious(element));
 }
@@ -246,7 +247,7 @@ const Clef *Layer::GetClef(const LayerElement *test) const
     }
 
     // make sure list is set
-    this->ResetList(this);
+    this->ResetList();
     if (!test->Is(CLEF)) {
         testObject = this->GetListFirstBackward(testObject, CLEF);
     }
@@ -293,7 +294,7 @@ int Layer::GetClefLocOffset(const LayerElement *test) const
 int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
 {
     if (element->m_crossStaff) {
-        ResetList(this);
+        this->ResetList();
         if (!element->Is(CLEF)) {
             const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
             if (clef && clef->m_crossStaff) {
@@ -399,7 +400,7 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, const Me
     Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.Add(&matchStaff);
-    layersInTimeSpan.PushFilters(&filters);
+    layersInTimeSpan.SetFilters(&filters);
 
     measure->m_measureAligner.Process(layersInTimeSpan);
 
@@ -440,8 +441,8 @@ ListOfConstObjects Layer::GetLayerElementsForTimeSpanOf(const LayerElement *elem
     else if (element->Is(BEAM)) {
         const Beam *beam = vrv_cast<const Beam *>(element);
 
-        const LayerElement *first = vrv_cast<const LayerElement *>(beam->GetListFront(beam));
-        const LayerElement *last = vrv_cast<const LayerElement *>(beam->GetListBack(beam));
+        const LayerElement *first = vrv_cast<const LayerElement *>(beam->GetListFront());
+        const LayerElement *last = vrv_cast<const LayerElement *>(beam->GetListBack());
 
         if (!first || !last) return {};
 
@@ -481,7 +482,7 @@ ListOfConstObjects Layer::GetLayerElementsInTimeSpan(
     Filters filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.Add(&matchStaff);
-    layerElementsInTimeSpan.PushFilters(&filters);
+    layerElementsInTimeSpan.SetFilters(&filters);
 
     measure->m_measureAligner.Process(layerElementsInTimeSpan);
 

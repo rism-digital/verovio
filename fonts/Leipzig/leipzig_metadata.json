@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.84",
+    "fontVersion": "5.2.86",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1072,6 +1072,16 @@
                 -0.464
             ]
         },
+        "chantCaesura": {
+            "bBoxNE": [
+                0.5493,
+                1.9931
+            ],
+            "bBoxSW": [
+                -0.0005,
+                1.0547
+            ]
+        },
         "chantCclef": {
             "bBoxNE": [
                 0.724,
@@ -1210,6 +1220,46 @@
             "bBoxSW": [
                 -0.224,
                 -0.484
+            ]
+        },
+        "chantDivisioFinalis": {
+            "bBoxNE": [
+                0.456,
+                1.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.5
+            ]
+        },
+        "chantDivisioMaior": {
+            "bBoxNE": [
+                0.056,
+                1.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.0
+            ]
+        },
+        "chantDivisioMaxima": {
+            "bBoxNE": [
+                0.056,
+                1.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.5
+            ]
+        },
+        "chantDivisioMinima": {
+            "bBoxNE": [
+                0.056,
+                2.0
+            ],
+            "bBoxSW": [
+                0.0,
+                1.0
             ]
         },
         "chantEntryLineAsc2nd": {
@@ -1440,6 +1490,16 @@
             "bBoxSW": [
                 0.0,
                 -0.324
+            ]
+        },
+        "chantVirgula": {
+            "bBoxNE": [
+                0.34,
+                1.992
+            ],
+            "bBoxSW": [
+                0.0,
+                1.056
             ]
         },
         "clef15": {
@@ -6320,6 +6380,156 @@
             "bBoxSW": [
                 0.0,
                 -0.136
+            ]
+        },
+        "staffPosLower1": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower2": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower3": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower4": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower5": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower6": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosLower7": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise1": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise2": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise3": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise4": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise5": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise6": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise7": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "staffPosRaise8": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "stringsDownBow": {

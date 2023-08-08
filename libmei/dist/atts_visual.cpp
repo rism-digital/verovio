@@ -78,8 +78,6 @@ void AttArpegVis::ResetArpegVis()
     m_arrowSize = MEI_UNSET;
     m_arrowColor = "";
     m_arrowFillcolor = "";
-    m_lineForm = LINEFORM_NONE;
-    m_lineWidth = data_LINEWIDTH();
 }
 
 bool AttArpegVis::ReadArpegVis(pugi::xml_node element, bool removeAttr)
@@ -110,16 +108,6 @@ bool AttArpegVis::ReadArpegVis(pugi::xml_node element, bool removeAttr)
         if (removeAttr) element.remove_attribute("arrow.fillcolor");
         hasAttribute = true;
     }
-    if (element.attribute("line.form")) {
-        this->SetLineForm(StrToLineform(element.attribute("line.form").value()));
-        if (removeAttr) element.remove_attribute("line.form");
-        hasAttribute = true;
-    }
-    if (element.attribute("line.width")) {
-        this->SetLineWidth(StrToLinewidth(element.attribute("line.width").value()));
-        if (removeAttr) element.remove_attribute("line.width");
-        hasAttribute = true;
-    }
     return hasAttribute;
 }
 
@@ -144,14 +132,6 @@ bool AttArpegVis::WriteArpegVis(pugi::xml_node element)
     }
     if (this->HasArrowFillcolor()) {
         element.append_attribute("arrow.fillcolor") = StrToStr(this->GetArrowFillcolor()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasLineForm()) {
-        element.append_attribute("line.form") = LineformToStr(this->GetLineForm()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasLineWidth()) {
-        element.append_attribute("line.width") = LinewidthToStr(this->GetLineWidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -180,16 +160,6 @@ bool AttArpegVis::HasArrowColor() const
 bool AttArpegVis::HasArrowFillcolor() const
 {
     return (m_arrowFillcolor != "");
-}
-
-bool AttArpegVis::HasLineForm() const
-{
-    return (m_lineForm != LINEFORM_NONE);
-}
-
-bool AttArpegVis::HasLineWidth() const
-{
-    return (m_lineWidth.HasValue());
 }
 
 //----------------------------------------------------------------------------
@@ -468,6 +438,46 @@ bool AttCleffingVis::HasClefVisible() const
 }
 
 //----------------------------------------------------------------------------
+// AttCurvatureDirection
+//----------------------------------------------------------------------------
+
+AttCurvatureDirection::AttCurvatureDirection() : Att()
+{
+    ResetCurvatureDirection();
+}
+
+void AttCurvatureDirection::ResetCurvatureDirection()
+{
+    m_curve = curvatureDirection_CURVE_NONE;
+}
+
+bool AttCurvatureDirection::ReadCurvatureDirection(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("curve")) {
+        this->SetCurve(StrToCurvatureDirectionCurve(element.attribute("curve").value()));
+        if (removeAttr) element.remove_attribute("curve");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCurvatureDirection::WriteCurvatureDirection(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCurve()) {
+        element.append_attribute("curve") = CurvatureDirectionCurveToStr(this->GetCurve()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCurvatureDirection::HasCurve() const
+{
+    return (m_curve != curvatureDirection_CURVE_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttEpisemaVis
 //----------------------------------------------------------------------------
 
@@ -685,6 +695,46 @@ bool AttFingGrpVis::WriteFingGrpVis(pugi::xml_node element)
 bool AttFingGrpVis::HasOrient() const
 {
     return (m_orient != fingGrpVis_ORIENT_NONE);
+}
+
+//----------------------------------------------------------------------------
+// AttGuitarGridVis
+//----------------------------------------------------------------------------
+
+AttGuitarGridVis::AttGuitarGridVis() : Att()
+{
+    ResetGuitarGridVis();
+}
+
+void AttGuitarGridVis::ResetGuitarGridVis()
+{
+    m_gridShow = BOOLEAN_NONE;
+}
+
+bool AttGuitarGridVis::ReadGuitarGridVis(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("grid.show")) {
+        this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
+        if (removeAttr) element.remove_attribute("grid.show");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttGuitarGridVis::WriteGuitarGridVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasGridShow()) {
+        element.append_attribute("grid.show") = BooleanToStr(this->GetGridShow()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttGuitarGridVis::HasGridShow() const
+{
+    return (m_gridShow != BOOLEAN_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -1128,18 +1178,12 @@ AttLiquescentVis::AttLiquescentVis() : Att()
 
 void AttLiquescentVis::ResetLiquescentVis()
 {
-    m_curve = liquescentVis_CURVE_NONE;
     m_looped = BOOLEAN_NONE;
 }
 
 bool AttLiquescentVis::ReadLiquescentVis(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("curve")) {
-        this->SetCurve(StrToLiquescentVisCurve(element.attribute("curve").value()));
-        if (removeAttr) element.remove_attribute("curve");
-        hasAttribute = true;
-    }
     if (element.attribute("looped")) {
         this->SetLooped(StrToBoolean(element.attribute("looped").value()));
         if (removeAttr) element.remove_attribute("looped");
@@ -1151,20 +1195,11 @@ bool AttLiquescentVis::ReadLiquescentVis(pugi::xml_node element, bool removeAttr
 bool AttLiquescentVis::WriteLiquescentVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasCurve()) {
-        element.append_attribute("curve") = LiquescentVisCurveToStr(this->GetCurve()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasLooped()) {
         element.append_attribute("looped") = BooleanToStr(this->GetLooped()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
-}
-
-bool AttLiquescentVis::HasCurve() const
-{
-    return (m_curve != liquescentVis_CURVE_NONE);
 }
 
 bool AttLiquescentVis::HasLooped() const
@@ -1275,7 +1310,7 @@ void AttMensuralVis::ResetMensuralVis()
     m_mensurOrient = ORIENTATION_NONE;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSize = data_FONTSIZE();
-    m_mensurSlash = MEI_UNSET;
+    m_mensurSlash = 0;
 }
 
 bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element, bool removeAttr)
@@ -1399,7 +1434,7 @@ bool AttMensuralVis::HasMensurSize() const
 
 bool AttMensuralVis::HasMensurSlash() const
 {
-    return (m_mensurSlash != MEI_UNSET);
+    return (m_mensurSlash != 0);
 }
 
 //----------------------------------------------------------------------------
@@ -1938,7 +1973,6 @@ AttStaffDefVis::AttStaffDefVis() : Att()
 
 void AttStaffDefVis::ResetStaffDefVis()
 {
-    m_gridShow = BOOLEAN_NONE;
     m_layerscheme = LAYERSCHEME_NONE;
     m_linesColor = "";
     m_linesVisible = BOOLEAN_NONE;
@@ -1948,11 +1982,6 @@ void AttStaffDefVis::ResetStaffDefVis()
 bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("grid.show")) {
-        this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
-        if (removeAttr) element.remove_attribute("grid.show");
-        hasAttribute = true;
-    }
     if (element.attribute("layerscheme")) {
         this->SetLayerscheme(StrToLayerscheme(element.attribute("layerscheme").value()));
         if (removeAttr) element.remove_attribute("layerscheme");
@@ -1979,10 +2008,6 @@ bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element, bool removeAttr)
 bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasGridShow()) {
-        element.append_attribute("grid.show") = BooleanToStr(this->GetGridShow()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasLayerscheme()) {
         element.append_attribute("layerscheme") = LayerschemeToStr(this->GetLayerscheme()).c_str();
         wroteAttribute = true;
@@ -2000,11 +2025,6 @@ bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     return wroteAttribute;
-}
-
-bool AttStaffDefVis::HasGridShow() const
-{
-    return (m_gridShow != BOOLEAN_NONE);
 }
 
 bool AttStaffDefVis::HasLayerscheme() const

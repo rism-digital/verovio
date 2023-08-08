@@ -402,7 +402,7 @@ int Rest::GetLocationRelativeToCurrentLayer(const Staff *currentStaff, const Lay
     // Get previous and next elements from the current layer
     if (currentLayer->GetFirstChildNot(REST)) {
         GetRelativeLayerElementFunctor getRelativeLayerElementBackwards(this->GetIdx(), false);
-        getRelativeLayerElementBackwards.PushDirection(BACKWARD);
+        getRelativeLayerElementBackwards.SetDirection(BACKWARD);
         currentLayer->Process(getRelativeLayerElementBackwards);
         previousElement = getRelativeLayerElementBackwards.GetRelativeElement();
 
@@ -474,7 +474,7 @@ int Rest::GetFirstRelativeElementLocation(
 
     // Get last element if it's previous layer, get first one otherwise
     GetRelativeLayerElementFunctor getRelativeLayerElement(this->GetIdx(), true);
-    getRelativeLayerElement.PushDirection(!isPrevious);
+    getRelativeLayerElement.SetDirection(!isPrevious);
     (*layerIter)->Process(getRelativeLayerElement);
 
     const Object *lastLayerElement = getRelativeLayerElement.GetRelativeElement();

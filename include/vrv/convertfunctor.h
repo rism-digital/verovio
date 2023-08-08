@@ -38,6 +38,7 @@ public:
      * Functor interface
      */
     ///@{
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
     FunctorCode VisitEditorialElementEnd(EditorialElement *editorialElement) override;
     FunctorCode VisitEnding(Ending *ending) override;
@@ -107,6 +108,7 @@ public:
     FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSyllable(Syllable *syllable) override;
     FunctorCode VisitSystemElement(SystemElement *systemElement) override;
     ///@}
 

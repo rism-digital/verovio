@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "fig.h"
@@ -159,7 +160,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // Ligature notes are all aligned with the first note
         Note *note = vrv_cast<Note *>(layerElement);
         assert(note);
-        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront(ligatureParent));
+        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront());
         if (firstNote && (firstNote != note)) {
             Alignment *alignment = firstNote->GetAlignment();
             layerElement->SetAlignment(alignment);
@@ -415,6 +416,15 @@ AlignMeasuresFunctor::AlignMeasuresFunctor(Doc *doc) : DocFunctor(doc)
     m_storeCastOffSystemWidths = false;
 }
 
+FunctorCode AlignMeasuresFunctor::VisitDiv(Div *div)
+{
+    if (div->GetDrawingInline()) div->SetDrawingXRel(m_shift);
+
+    m_shift += div->GetContentWidth();
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode AlignMeasuresFunctor::VisitMeasure(Measure *measure)
 {
     if (m_applySectionRestartShift) {
@@ -490,6 +500,15 @@ AlignVerticallyFunctor::AlignVerticallyFunctor(Doc *doc) : DocFunctor(doc)
     m_pageWidth = 0;
 }
 
+FunctorCode AlignVerticallyFunctor::VisitDiv(Div *div)
+{
+    m_systemAligner->GetBottomAlignment()->SetYRel(-div->GetTotalHeight(m_doc));
+
+    m_pageWidth = div->GetTotalWidth(m_doc);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)
 {
     Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
@@ -536,6 +555,8 @@ FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
 
 FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 {
+    if (!rend->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max)) return FUNCTOR_SIBLINGS;
+
     if (rend->GetHalign()) {
         switch (rend->GetHalign()) {
             case HORIZONTALALIGNMENT_right: rend->SetDrawingXRel(m_pageWidth); break;
@@ -549,7 +570,9 @@ FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 
 FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningElement)
 {
-    m_pageWidth = runningElement->GetWidth();
+    this->VisitTextLayoutElement(runningElement);
+
+    m_pageWidth = runningElement->GetTotalWidth(m_doc);
 
     return FUNCTOR_CONTINUE;
 }

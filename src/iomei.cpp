@@ -40,6 +40,8 @@
 #include "damage.h"
 #include "del.h"
 #include "dir.h"
+#include "div.h"
+#include "divline.h"
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
@@ -72,6 +74,7 @@
 #include "lb.h"
 #include "lem.h"
 #include "ligature.h"
+#include "liquescent.h"
 #include "lv.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -101,9 +104,7 @@
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "phrase.h"
 #include "pitchinflection.h"
 #include "plica.h"
@@ -141,6 +142,7 @@
 #include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
+#include "textlayoutelement.h"
 #include "tie.h"
 #include "trill.h"
 #include "tuning.h"
@@ -410,21 +412,17 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         m_currentNode = m_currentNode.append_child("scoreDef");
         this->WriteScoreDef(m_currentNode, vrv_cast<ScoreDef *>(object));
     }
+    else if (object->Is(DIV)) {
+        m_currentNode = m_currentNode.append_child("div");
+        this->WriteDiv(m_currentNode, vrv_cast<Div *>(object));
+    }
     else if (object->Is(PGFOOT)) {
         m_currentNode = m_currentNode.append_child("pgFoot");
         this->WritePgFoot(m_currentNode, vrv_cast<PgFoot *>(object));
     }
-    else if (object->Is(PGFOOT2)) {
-        m_currentNode = m_currentNode.append_child("pgFoot2");
-        this->WritePgFoot2(m_currentNode, vrv_cast<PgFoot2 *>(object));
-    }
     else if (object->Is(PGHEAD)) {
         m_currentNode = m_currentNode.append_child("pgHead");
         this->WritePgHead(m_currentNode, vrv_cast<PgHead *>(object));
-    }
-    else if (object->Is(PGHEAD2)) {
-        m_currentNode = m_currentNode.append_child("pgHead2");
-        this->WritePgHead2(m_currentNode, vrv_cast<PgHead2 *>(object));
     }
     else if (object->Is(STAFFGRP)) {
         m_currentNode = m_currentNode.append_child("staffGrp");
@@ -620,6 +618,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
             m_currentNode = m_currentNode.append_child("custos");
             this->WriteCustos(m_currentNode, vrv_cast<Custos *>(object));
         }
+        else if (object->Is(DIVLINE)) {
+            m_currentNode = m_currentNode.append_child("divLine");
+            this->WriteDivLine(m_currentNode, vrv_cast<DivLine *>(object));
+        }
         else if (object->Is(DOT)) {
             m_currentNode = m_currentNode.append_child("dot");
             this->WriteDot(m_currentNode, vrv_cast<Dot *>(object));
@@ -649,6 +651,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(LIGATURE)) {
             m_currentNode = m_currentNode.append_child("ligature");
             this->WriteLigature(m_currentNode, vrv_cast<Ligature *>(object));
+        }
+        else if (object->Is(LIQUESCENT)) {
+            m_currentNode = m_currentNode.append_child("liquescent");
+            this->WriteLiquescent(m_currentNode, vrv_cast<Liquescent *>(object));
         }
         else if (object->Is(MENSUR)) {
             if (this->IsTreeObject(object)) m_currentNode = m_currentNode.append_child("mensur");
@@ -1409,7 +1415,7 @@ bool MEIOutput::AdjustLabel(Label *label)
     if (abbr && (label->GetChildCount(TEXT) == 1)) {
         Text *text = vrv_cast<Text *>(label->GetChild(0, TEXT));
         if (text) {
-            text->SetText(abbr->GetText(abbr));
+            text->SetText(abbr->GetText());
             return true;
         }
     }
@@ -1722,13 +1728,20 @@ void MEIOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     scoreDef->WriteTuning(currentNode);
 }
 
+void MEIOutput::WriteTextLayoutElement(pugi::xml_node currentNode, TextLayoutElement *textLayoutElement)
+{
+    assert(textLayoutElement);
+
+    this->WriteXmlId(currentNode, textLayoutElement);
+    textLayoutElement->WriteTyped(currentNode);
+}
+
 void MEIOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
 {
     assert(runningElement);
 
-    this->WriteXmlId(currentNode, runningElement);
-    runningElement->WriteHorizontalAlign(currentNode);
-    runningElement->WriteTyped(currentNode);
+    this->WriteTextLayoutElement(currentNode, runningElement);
+    runningElement->WriteFormework(currentNode);
 }
 
 void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
@@ -1749,6 +1762,13 @@ void MEIOutput::WriteGrpSym(pugi::xml_node currentNode, GrpSym *grpSym)
     grpSym->WriteStartEndId(currentNode);
 }
 
+void MEIOutput::WriteDiv(pugi::xml_node currentNode, Div *div)
+{
+    assert(div);
+
+    this->WriteTextLayoutElement(currentNode, div);
+}
+
 void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
 {
     assert(pgFoot);
@@ -1756,25 +1776,11 @@ void MEIOutput::WritePgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
     this->WriteRunningElement(currentNode, pgFoot);
 }
 
-void MEIOutput::WritePgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2)
-{
-    assert(pgFoot2);
-
-    this->WriteRunningElement(currentNode, pgFoot2);
-}
-
 void MEIOutput::WritePgHead(pugi::xml_node currentNode, PgHead *pgHead)
 {
     assert(pgHead);
 
     this->WriteRunningElement(currentNode, pgHead);
-}
-
-void MEIOutput::WritePgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2)
-{
-    assert(pgHead2);
-
-    this->WriteRunningElement(currentNode, pgHead2);
 }
 
 void MEIOutput::WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
@@ -2082,7 +2088,7 @@ void MEIOutput::WriteLv(pugi::xml_node currentNode, Lv *lv)
     this->WriteTimeSpanningInterface(currentNode, lv);
     lv->WriteColor(currentNode);
     lv->WriteCurvature(currentNode);
-    lv->WriteCurveRend(currentNode);
+    lv->WriteLineRendBase(currentNode);
 }
 
 void MEIOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
@@ -2201,8 +2207,8 @@ void MEIOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     this->WriteTimeSpanningInterface(currentNode, slur);
     slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
-    slur->WriteCurveRend(currentNode);
     slur->WriteLayerIdent(currentNode);
+    slur->WriteLineRendBase(currentNode);
 }
 
 void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
@@ -2243,7 +2249,7 @@ void MEIOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
     this->WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
-    tie->WriteCurveRend(currentNode);
+    tie->WriteLineRendBase(currentNode);
 }
 
 void MEIOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
@@ -2313,8 +2319,9 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
         return;
     }
 
-    this->WriteLayerElement(currentNode, accid);
-    this->WritePositionInterface(currentNode, accid);
+    WriteLayerElement(currentNode, accid);
+    WriteFacsimileInterface(currentNode, accid);
+    WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
     accid->WriteAccidLog(currentNode);
@@ -2384,9 +2391,9 @@ void MEIOutput::WriteBTrem(pugi::xml_node currentNode, BTrem *bTrem)
     assert(bTrem);
 
     this->WriteLayerElement(currentNode, bTrem);
-    bTrem->WriteBTremLog(currentNode);
     bTrem->WriteNumbered(currentNode);
     bTrem->WriteNumberPlacement(currentNode);
+    bTrem->WriteTremForm(currentNode);
     bTrem->WriteTremMeasured(currentNode);
 }
 
@@ -2451,6 +2458,19 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     custos->WriteColor(currentNode);
     custos->WriteExtSymAuth(currentNode);
     custos->WriteExtSymNames(currentNode);
+}
+
+void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
+{
+    assert(divLine);
+
+    this->WriteLayerElement(currentNode, divLine);
+    this->WriteFacsimileInterface(currentNode, divLine);
+    divLine->WriteDivLineLog(currentNode);
+    divLine->WriteColor(currentNode);
+    divLine->WriteVisibility(currentNode);
+    divLine->WriteExtSymAuth(currentNode);
+    divLine->WriteExtSymNames(currentNode);
 }
 
 void MEIOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -2530,11 +2550,11 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
 
     this->WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
-    keySig->WritePitch(currentNode);
-    keySig->WriteKeySigAnl(currentNode);
     keySig->WriteColor(currentNode);
+    keySig->WriteKeyMode(currentNode);
     keySig->WriteKeySigLog(currentNode);
     keySig->WriteKeySigVis(currentNode);
+    keySig->WritePitch(currentNode);
     keySig->WriteVisibility(currentNode);
 }
 
@@ -2544,6 +2564,14 @@ void MEIOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
 
     this->WriteLayerElement(currentNode, ligature);
     ligature->WriteLigatureVis(currentNode);
+}
+
+void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquescent)
+{
+    assert(liquescent);
+
+    WriteLayerElement(currentNode, liquescent);
+    WritePositionInterface(currentNode, liquescent);
 }
 
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
@@ -2922,6 +2950,7 @@ void MEIOutput::WriteRend(pugi::xml_node currentNode, Rend *rend)
     this->WriteTextElement(currentNode, rend);
     this->WriteAreaPosInterface(currentNode, rend);
     rend->WriteColor(currentNode);
+    rend->WriteExtSymAuth(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteNNumberLike(currentNode);
     rend->WriteTextRendition(currentNode);
@@ -3027,6 +3056,7 @@ void MEIOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
+    interface->WritePitchGes(element);
 }
 
 void MEIOutput::WritePlistInterface(pugi::xml_node element, PlistInterface *interface)
@@ -3473,7 +3503,7 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for any other control element
-    else if (filterParent->IsRunningElement()) {
+    else if (filterParent->IsRunningElement() || filterParent->Is(DIV)) {
         if (element == "fig") {
             return true;
         }
@@ -3648,6 +3678,24 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for neume
+    else if (filterParent->Is(NEUME)) {
+        if (element == "nc") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for nc
+    else if (filterParent->Is(NC)) {
+        if (element == "liquescent") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for note
     else if (filterParent->Is(NOTE)) {
         if (element == "accid") {
@@ -3675,6 +3723,27 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     // filter for rest
     else if (filterParent->Is(REST)) {
         return false;
+    }
+    // filter for syllable
+    else if (filterParent->Is(SYLLABLE)) {
+        if (element == "accid") {
+            return true;
+        }
+        else if (element == "clef") {
+            return true;
+        }
+        else if (element == "divLine") {
+            return true;
+        }
+        else if (element == "neume") {
+            return true;
+        }
+        else if (element == "syl") {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     // filter for syl
     else if (filterParent->Is(SYL)) {
@@ -4344,8 +4413,11 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = this->ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
         }
         // content
+        else if (std::string(current.name()) == "div") {
+            success = this->ReadDiv(parent, current);
+        }
         else if (std::string(current.name()) == "ending") {
-            // we should not endings with unmeasured music ... (?)
+            // we should not have endings with unmeasured music ... (?)
             assert(!unmeasured);
             success = this->ReadEnding(parent, current);
         }
@@ -4772,16 +4844,28 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
             success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgFoot2") {
-            success = this->ReadPgFoot2(parent, current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
+            success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgHead") {
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
             success = this->ReadPgHead(parent, current);
         }
         else if (std::string(current.name()) == "pgHead2") {
-            success = this->ReadPgHead2(parent, current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+                UpgradePgHeadFootTo_5_0_0(current);
+            }
+            success = this->ReadPgHead(parent, current);
         }
         // symbolTable
         else if (std::string(current.name()) == "symbolTable") {
@@ -4886,11 +4970,18 @@ bool MEIInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
     return success;
 }
 
-bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+bool MEIInput::ReadTextLayoutElement(pugi::xml_node element, TextLayoutElement *object)
 {
     this->SetMeiID(element, object);
-    object->ReadHorizontalAlign(element);
     object->ReadTyped(element);
+
+    return true;
+}
+
+bool MEIInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+{
+    this->ReadTextLayoutElement(element, object);
+    object->ReadFormework(element);
 
     return true;
 }
@@ -4929,16 +5020,6 @@ bool MEIInput::ReadPgFoot(Object *parent, pugi::xml_node pgFoot)
     return this->ReadRunningChildren(vrvPgFoot, pgFoot, vrvPgFoot);
 }
 
-bool MEIInput::ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2)
-{
-    PgFoot2 *vrvPgFoot2 = new PgFoot2();
-    this->ReadRunningElement(pgFoot2, vrvPgFoot2);
-
-    parent->AddChild(vrvPgFoot2);
-    this->ReadUnsupportedAttr(pgFoot2, vrvPgFoot2);
-    return this->ReadRunningChildren(vrvPgFoot2, pgFoot2, vrvPgFoot2);
-}
-
 bool MEIInput::ReadPgHead(Object *parent, pugi::xml_node pgHead)
 {
     PgHead *vrvPgHead = new PgHead();
@@ -4949,14 +5030,14 @@ bool MEIInput::ReadPgHead(Object *parent, pugi::xml_node pgHead)
     return this->ReadRunningChildren(vrvPgHead, pgHead, vrvPgHead);
 }
 
-bool MEIInput::ReadPgHead2(Object *parent, pugi::xml_node pgHead2)
+bool MEIInput::ReadDiv(Object *parent, pugi::xml_node div)
 {
-    PgHead2 *vrvPgHead2 = new PgHead2();
-    this->ReadRunningElement(pgHead2, vrvPgHead2);
+    Div *vrvDiv = new Div();
+    this->ReadTextLayoutElement(div, vrvDiv);
 
-    parent->AddChild(vrvPgHead2);
-    this->ReadUnsupportedAttr(pgHead2, vrvPgHead2);
-    return this->ReadRunningChildren(vrvPgHead2, pgHead2, vrvPgHead2);
+    parent->AddChild(vrvDiv);
+    this->ReadUnsupportedAttr(div, vrvDiv);
+    return this->ReadRunningChildren(vrvDiv, div, vrvDiv);
 }
 
 bool MEIInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
@@ -5665,7 +5746,7 @@ bool MEIInput::ReadLv(Object *parent, pugi::xml_node lv)
     this->ReadTimeSpanningInterface(lv, vrvLv);
     vrvLv->ReadColor(lv);
     vrvLv->ReadCurvature(lv);
-    vrvLv->ReadCurveRend(lv);
+    vrvLv->ReadLineRendBase(lv);
 
     parent->AddChild(vrvLv);
     this->ReadUnsupportedAttr(lv, vrvLv);
@@ -5771,8 +5852,8 @@ bool MEIInput::ReadPhrase(Object *parent, pugi::xml_node phrase)
     this->ReadTimeSpanningInterface(phrase, vrvPhrase);
     vrvPhrase->ReadColor(phrase);
     vrvPhrase->ReadCurvature(phrase);
-    vrvPhrase->ReadCurveRend(phrase);
     vrvPhrase->ReadLayerIdent(phrase);
+    vrvPhrase->ReadLineRendBase(phrase);
 
     parent->AddChild(vrvPhrase);
     this->ReadUnsupportedAttr(phrase, vrvPhrase);
@@ -5832,8 +5913,8 @@ bool MEIInput::ReadSlur(Object *parent, pugi::xml_node slur)
     this->ReadTimeSpanningInterface(slur, vrvSlur);
     vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
-    vrvSlur->ReadCurveRend(slur);
     vrvSlur->ReadLayerIdent(slur);
+    vrvSlur->ReadLineRendBase(slur);
 
     parent->AddChild(vrvSlur);
     this->ReadUnsupportedAttr(slur, vrvSlur);
@@ -5865,7 +5946,7 @@ bool MEIInput::ReadTie(Object *parent, pugi::xml_node tie)
     this->ReadTimeSpanningInterface(tie, vrvTie);
     vrvTie->ReadColor(tie);
     vrvTie->ReadCurvature(tie);
-    vrvTie->ReadCurveRend(tie);
+    vrvTie->ReadLineRendBase(tie);
 
     parent->AddChild(vrvTie);
     this->ReadUnsupportedAttr(tie, vrvTie);
@@ -6080,6 +6161,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "custos") {
             success = this->ReadCustos(parent, xmlElement);
         }
+        else if (elementName == "divLine") {
+            success = this->ReadDivLine(parent, xmlElement);
+        }
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
         }
@@ -6106,6 +6190,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "ligature") {
             success = this->ReadLigature(parent, xmlElement);
+        }
+        else if (elementName == "liquescent") {
+            success = this->ReadLiquescent(parent, xmlElement);
         }
         else if (elementName == "mensur") {
             success = this->ReadMensur(parent, xmlElement);
@@ -6212,7 +6299,8 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     Accid *vrvAccid = new Accid();
     this->ReadLayerElement(accid, vrvAccid);
 
-    this->ReadPositionInterface(accid, vrvAccid);
+    ReadPositionInterface(accid, vrvAccid);
+    ReadFacsimileInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
@@ -6303,7 +6391,7 @@ bool MEIInput::ReadBTrem(Object *parent, pugi::xml_node bTrem)
     BTrem *vrvBTrem = new BTrem();
     this->ReadLayerElement(bTrem, vrvBTrem);
 
-    vrvBTrem->ReadBTremLog(bTrem);
+    vrvBTrem->ReadTremForm(bTrem);
     vrvBTrem->ReadNumbered(bTrem);
     vrvBTrem->ReadNumberPlacement(bTrem);
     vrvBTrem->ReadTremMeasured(bTrem);
@@ -6410,6 +6498,23 @@ bool MEIInput::ReadCustos(Object *parent, pugi::xml_node custos)
     return this->ReadLayerChildren(vrvCustos, custos, vrvCustos);
 }
 
+bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
+{
+    DivLine *vrvDivLine = new DivLine();
+    this->ReadLayerElement(divLine, vrvDivLine);
+
+    this->ReadFacsimileInterface(divLine, vrvDivLine);
+    vrvDivLine->ReadDivLineLog(divLine);
+    vrvDivLine->ReadColor(divLine);
+    vrvDivLine->ReadVisibility(divLine);
+    vrvDivLine->ReadExtSymAuth(divLine);
+    vrvDivLine->ReadExtSymNames(divLine);
+
+    parent->AddChild(vrvDivLine);
+    this->ReadUnsupportedAttr(divLine, vrvDivLine);
+    return true;
+}
+
 bool MEIInput::ReadDot(Object *parent, pugi::xml_node dot)
 {
     Dot *vrvDot = new Dot();
@@ -6495,11 +6600,11 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
     }
 
     vrvKeySig->ReadAccidental(keySig);
-    vrvKeySig->ReadPitch(keySig);
-    vrvKeySig->ReadKeySigAnl(keySig);
     vrvKeySig->ReadColor(keySig);
+    vrvKeySig->ReadKeyMode(keySig);
     vrvKeySig->ReadKeySigLog(keySig);
     vrvKeySig->ReadKeySigVis(keySig);
+    vrvKeySig->ReadPitch(keySig);
     vrvKeySig->ReadVisibility(keySig);
 
     parent->AddChild(vrvKeySig);
@@ -6517,6 +6622,17 @@ bool MEIInput::ReadLigature(Object *parent, pugi::xml_node ligature)
     parent->AddChild(vrvLigature);
     this->ReadUnsupportedAttr(ligature, vrvLigature);
     return this->ReadLayerChildren(vrvLigature, ligature, vrvLigature);
+}
+
+bool MEIInput::ReadLiquescent(Object *parent, pugi::xml_node liquescent)
+{
+    Liquescent *vrvLiquescent = new Liquescent();
+    this->ReadLayerElement(liquescent, vrvLiquescent);
+    this->ReadPositionInterface(liquescent, vrvLiquescent);
+
+    parent->AddChild(vrvLiquescent);
+    this->ReadUnsupportedAttr(liquescent, vrvLiquescent);
+    return true;
 }
 
 bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
@@ -6824,6 +6940,10 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 
 bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
+    // Add empty text node for empty syl element for invisible bbox in neume notation
+    if (!syl.first_child() && (m_doc->GetType() == Facs) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+        syl.text().set("");
+    }
     Syl *vrvSyl = new Syl();
     this->ReadLayerElement(syl, vrvSyl);
 
@@ -7061,12 +7181,17 @@ bool MEIInput::ReadNum(Object *parent, pugi::xml_node num)
 
 bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
 {
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
+        UpgradeRendTo_5_0_0(rend);
+    }
+
     Rend *vrvRend = new Rend();
     this->ReadTextElement(rend, vrvRend);
 
     this->ReadAreaPosInterface(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
+    vrvRend->ReadExtSymAuth(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadNNumberLike(rend);
     vrvRend->ReadTextRendition(rend);
@@ -7080,10 +7205,10 @@ bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
         vrvRend->SetValign(VERTICALALIGNMENT_NONE);
     }
     // Previously we would use @fontame="VerovioText"
-    // Now changeto @fontfam="smufl"
+    // Now changeto @glyph.auth="smufl"
     if (vrvRend->HasFontname() && vrvRend->GetFontname() == "VerovioText") {
-        LogWarning("Using rend@fontname with 'VerovioText' is deprecated. Use 'rend@fontfam=\"smufl\"' instead");
-        vrvRend->SetFontfam("smufl");
+        LogWarning("Using rend@fontname with 'VerovioText' is deprecated. Use 'rend@glyph.auth=\"smufl\"' instead");
+        vrvRend->SetGlyphAuth("smufl");
         vrvRend->SetFontname("");
     }
 
@@ -7208,6 +7333,7 @@ bool MEIInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
     interface->ReadNoteGes(element);
     interface->ReadOctave(element);
     interface->ReadPitch(element);
+    interface->ReadPitchGes(element);
     return true;
 }
 
@@ -8043,6 +8169,24 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     page->AddChild(mdivEnd);
 }
 
+void MEIInput::UpgradePgHeadFootTo_5_0_0(pugi::xml_node element)
+{
+    if ((std::string(element.name()) == "pgFoot") && !element.attribute("func")) {
+        element.append_attribute("func") = "first";
+    }
+    else if (std::string(element.name()) == "pgFoot2") {
+        element.set_name("pgFoot");
+        element.append_attribute("func") = "all";
+    }
+    else if ((std::string(element.name()) == "pgHead") && !element.attribute("func")) {
+        element.append_attribute("func") = "first";
+    }
+    else if (std::string(element.name()) == "pgHead2") {
+        element.set_name("pgHead");
+        element.append_attribute("func") = "all";
+    }
+}
+
 void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
 {
     if (measure.attribute("ulx")) {
@@ -8104,6 +8248,16 @@ void MEIInput::UpgradeLayerElementTo_5_0_0(pugi::xml_node element)
 {
     if (element.attribute("ulx")) {
         element.attribute("ulx").set_name("coord.x1");
+    }
+}
+
+void MEIInput::UpgradeRendTo_5_0_0(pugi::xml_node element)
+{
+    if (element.attribute("fontfam")) {
+        std::string value = element.attribute("fontfam").value();
+        if (value == "smufl") {
+            element.attribute("fontfam").set_name("glyph.auth");
+        }
     }
 }
 

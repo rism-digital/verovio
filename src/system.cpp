@@ -17,6 +17,7 @@
 #include "comparison.h"
 #include "convertfunctor.h"
 #include "dir.h"
+#include "div.h"
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
@@ -95,6 +96,9 @@ bool System::IsSupportedChild(Object *child)
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
+    }
+    else if (child->Is(DIV)) {
+        assert(dynamic_cast<Div *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -458,7 +462,7 @@ void System::ConvertToUnCastOffMensuralSystem()
 
     Filters filters;
     ConvertToUnCastOffMensuralFunctor convertToUnCastOffMensural;
-    convertToUnCastOffMensural.PushFilters(&filters);
+    convertToUnCastOffMensural.SetFilters(&filters);
 
     // Now we can process by layer and move their content to (measure) segments
     for (const auto &staves : layerTree.child) {

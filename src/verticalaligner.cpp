@@ -176,7 +176,7 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
 
     m_spacingTypes.clear();
 
-    const ListOfConstObjects &childList = scoreDef->GetList(scoreDef);
+    const ListOfConstObjects &childList = scoreDef->GetList();
     for (const Object *object : childList) {
         // It should be staffDef only, but double check.
         if (!object->Is(STAFFDEF)) continue;
@@ -423,7 +423,8 @@ int StaffAlignment::GetVerseCount(bool collapse) const
 int StaffAlignment::GetVersePosition(int verseN, bool collapse) const
 {
     if (m_verseNs.empty()) {
-        return 0;
+        // Syl in neumatic notation - since verse count will be 0, position is -1
+        return -1;
     }
     else if (collapse) {
         auto it = std::find(m_verseNs.rbegin(), m_verseNs.rend(), verseN);
