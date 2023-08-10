@@ -50,7 +50,29 @@ public:
 protected:
     //
 private:
-    //
+    /**
+     * Low level helper functions
+     */
+    ///@{
+    // Shift end points for collisions nearby
+    void ShiftEndPoints(const Slur *slur, int &shiftLeft, int &shiftRight, double ratio, int intersection,
+        double flexibility, bool isBelow, char spanningType) const;
+
+    // Calculate the full and partial shift radii
+    std::pair<double, double> CalcShiftRadii(bool forShiftLeft, double flexibility, char spanningType) const;
+
+    // Determine a quadratic interpolation function between zero and one and evaluate it
+    double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
+
+    // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
+    // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
+    // tan(atan(doublingBound) + degrees * PI / 180.0) ≈ 2.0 * doublingBound
+    double RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const;
+
+    // Calculate the minimal angle <)C1P1P2 or <)P1P2C2
+    float GetMinControlPointAngle(const BezierCurve &bezierCurve, float angle, int unit) const;
+    ///@}
+
 public:
     //
 private:

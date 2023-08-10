@@ -117,4 +117,97 @@ FunctorCode AdjustSlursFunctor::VisitSystem(System *system)
     return FUNCTOR_SIBLINGS;
 }
 
+void AdjustSlursFunctor::ShiftEndPoints(const Slur *slur, int &shiftLeft, int &shiftRight, double ratio,
+    int intersection, double flexibility, bool isBelow, char spanningType) const
+{
+    // Filter collisions near the endpoints
+    // Collisions with ratio beyond the partialShiftRadius do not contribute to shifts
+    // They are compensated later by shifting the control points
+    double fullShiftRadius = 0.0;
+    double partialShiftRadius = 0.0;
+    std::tie(fullShiftRadius, partialShiftRadius) = this->CalcShiftRadii(true, flexibility, spanningType);
+
+    if ((ratio < partialShiftRadius) && (slur->HasEndpointAboveStart() == isBelow)) {
+        if (ratio > fullShiftRadius) {
+            // Collisions here only partially contribute to shifts
+            // We multiply with a function that interpolates between 1 and 0
+            intersection *= this->CalcQuadraticInterpolation(partialShiftRadius, fullShiftRadius, ratio);
+        }
+        shiftLeft = std::max(shiftLeft, intersection);
+    }
+
+    std::tie(fullShiftRadius, partialShiftRadius) = this->CalcShiftRadii(false, flexibility, spanningType);
+
+    if ((ratio > 1.0 - partialShiftRadius) && (slur->HasEndpointAboveEnd() == isBelow)) {
+        if (ratio < 1.0 - fullShiftRadius) {
+            // Collisions here only partially contribute to shifts
+            // We multiply with a function that interpolates between 0 and 1
+            intersection *= this->CalcQuadraticInterpolation(1.0 - partialShiftRadius, 1.0 - fullShiftRadius, ratio);
+        }
+        shiftRight = std::max(shiftRight, intersection);
+    }
+}
+
+std::pair<double, double> AdjustSlursFunctor::CalcShiftRadii(
+    bool forShiftLeft, double flexibility, char spanningType) const
+{
+    // Use full flexibility for broken slur endpoints
+    if (forShiftLeft) {
+        if ((spanningType == SPANNING_MIDDLE) || (spanningType == SPANNING_END)) {
+            flexibility = 1.0;
+        }
+    }
+    else {
+        if ((spanningType == SPANNING_START) || (spanningType == SPANNING_MIDDLE)) {
+            flexibility = 1.0;
+        }
+    }
+
+    const double fullShiftRadius = 0.05 + flexibility * 0.15;
+    const double partialShiftRadius = fullShiftRadius * 3.0;
+
+    return { fullShiftRadius, partialShiftRadius };
+}
+
+double AdjustSlursFunctor::CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const
+{
+    assert(zeroAt != oneAt);
+    const double a = 1.0 / (oneAt - zeroAt);
+    const double b = zeroAt / (zeroAt - oneAt);
+    return pow(a * arg + b, 2.0);
+}
+
+double AdjustSlursFunctor::RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const
+{
+    assert(degrees >= 0.0);
+    assert(doublingBound >= 0.0);
+
+    if (upwards && (slope >= doublingBound)) return slope * 2.0;
+    if (!upwards && (slope <= -doublingBound)) return slope * 2.0;
+    const int sign = upwards ? 1 : -1;
+    return tan(atan(slope) + sign * M_PI * degrees / 180.0);
+}
+
+float AdjustSlursFunctor::GetMinControlPointAngle(const BezierCurve &bezierCurve, float angle, int unit) const
+{
+    angle = abs(angle);
+    const double distance = double(bezierCurve.p2.x - bezierCurve.p1.x) / unit;
+
+    // Increase min angle for short and angled slurs
+    double angleIncrement = std::min(angle / 4.0, 15.0); // values in [0.0, 15.0]
+    double factor = 1.0 - (distance - 8.0) / 8.0;
+    factor = std::min(factor, 1.0);
+    factor = std::max(factor, 0.0); // values in [0.0, 1.0]
+
+    // not if control points are horizontally in a degenerated position
+    if ((bezierCurve.c1.x < bezierCurve.p1.x) || (2.0 * bezierCurve.c1.x > bezierCurve.p1.x + bezierCurve.p2.x)) {
+        angleIncrement = 0.0;
+    }
+    if ((bezierCurve.c2.x > bezierCurve.p2.x) || (2.0 * bezierCurve.c2.x < bezierCurve.p1.x + bezierCurve.p2.x)) {
+        angleIncrement = 0.0;
+    }
+
+    return 30.0 + angleIncrement * factor;
+}
+
 } // namespace vrv
