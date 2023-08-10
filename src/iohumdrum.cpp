@@ -15452,6 +15452,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     if (problemQ) {
         italic = false;
         bold = false;
+        text = "&#9888;";
+    }
+    if (sicQ) {
+        text = "&#9888;";
     }
 
     bool plain = !(italic || bold);
