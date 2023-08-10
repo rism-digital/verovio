@@ -16797,7 +16797,15 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
             dynamic = dyntext;
         }
 
-        bool aboveQ = hasAboveParameter(dyntok, "DY", staffadj);
+        bool aboveQ = false;
+
+        if (hasAboveParameter(dyntok, "DY", staffadj)) {
+            aboveQ = true;
+        }
+        else if (ss[si].verse) {
+            aboveQ = true;
+        }
+
         bool belowQ = false;
         bool showplace = aboveQ;
         if (!aboveQ) {
