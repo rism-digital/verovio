@@ -10757,6 +10757,15 @@ bool HumdrumInput::checkForTremolo(
     notes[lasti]->setValue("auto", "tremoloAux", "1");
     notes[lasti]->setValue("auto", "recip", recip);
 
+    // Migrate visual accidental of second note of tremolo to the last note of fTrem:
+    // Only dealing with a single note for now (deal with chords later).
+    if (lasti > 1) {
+        std::string visacc = notes[1]->getValue("auto", "0", "visualAccidental");
+        if (visacc == "true") {
+            notes[lasti]->setValue("auto", "0", "visualAccidental", "true");
+        }
+    }
+
     for (int i = 1; i < (int)notes.size(); ++i) {
         notes[i]->setValue("auto", "suppress", "1");
     }
