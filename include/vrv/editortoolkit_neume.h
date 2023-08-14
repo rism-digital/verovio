@@ -31,8 +31,8 @@ namespace vrv {
 class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc *doc, View *view) : EditorToolkit(doc, view) {}
-    bool ParseEditorAction(const std::string &json_editorAction);
-    virtual std::string EditInfo() { return m_infoObject.json(); };
+    bool ParseEditorAction(const std::string &json_editorAction) override;
+    std::string EditInfo() override;
 
     /**
      * Experimental editor functions.
@@ -100,9 +100,6 @@ protected:
     bool AdjustPitchFromPosition(Object *obj, Clef *clef = NULL);
     bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
-
-private:
-    jsonxx::Object m_infoObject;
 };
 
 //--------------------------------------------------------------------------------
