@@ -2400,9 +2400,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 std::string resultId0;
                 std::string resultId1;
 
-                // LogMessage("%s", chainArray.get<jsonxx::Object>(0).json().c_str());
-                // for_each(elementIds.begin(), elementIds.begin()+idx,[](std::string s){LogMessage("%s", s.c_str());});
-
                 std::vector<std::string> elementIds0 = { elementIds.begin(), elementIds.begin() + idx };
                 Group("neume", elementIds0);
                 if (m_editInfo.get<jsonxx::String>("status") == "FAILURE") {
