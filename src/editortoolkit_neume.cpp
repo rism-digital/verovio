@@ -2595,7 +2595,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             secondParent->AddChild(parent);
         }
         else {
-            Syllable *parent = new Syllable();
+            parent = new Syllable();
             Syl *fullSyl = NULL;
             int ulx, uly, lrx, lry;
 
