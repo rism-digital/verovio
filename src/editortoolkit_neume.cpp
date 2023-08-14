@@ -2810,6 +2810,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 fparent->ReorderByXPos();
                 uuidArray << (*it);
                 it = elementIds.erase(it);
+                if (it == elementIds.end()) break;
                 el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
             }
         }
