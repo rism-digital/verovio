@@ -14,6 +14,32 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// ControlPointConstraint
+//----------------------------------------------------------------------------
+/**
+ * This represents a constraint ax + by >= c where x and y are
+ * vertical control point adjustments
+ */
+struct ControlPointConstraint {
+    double a;
+    double b;
+    double c;
+};
+
+//----------------------------------------------------------------------------
+// ControlPointAdjustment
+//----------------------------------------------------------------------------
+/**
+ * A vertical adjustment of bezier control points
+ */
+struct ControlPointAdjustment {
+    int leftShift;
+    int rightShift;
+    bool moveUpwards;
+    int requestedStaffSpace;
+};
+
+//----------------------------------------------------------------------------
 // AdjustSlursFunctor
 //----------------------------------------------------------------------------
 
