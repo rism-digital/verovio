@@ -9,6 +9,7 @@
 #define __VRV_ADJUSTSLURSFUNCTOR_H__
 
 #include "functor.h"
+#include "slur.h"
 
 namespace vrv {
 
@@ -50,6 +51,73 @@ public:
 protected:
     //
 private:
+    /**
+     * High level helper functions
+     */
+    ///@{
+    void AdjustSlur(const Doc *doc, Slur *slur, FloatingCurvePositioner *curve, int unit) const;
+
+    void AdjustOuterSlur(const Doc *doc, const Slur *slur, FloatingCurvePositioner *curve,
+        const ArrayOfFloatingCurvePositioners &innerCurves, int unit) const;
+    ///@}
+
+    /**
+     * Intermediate level helper functions
+     */
+    ///@{
+    // Discard certain spanned elements
+    void FilterSpannedElements(
+        const Slur *slur, FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin) const;
+
+    // Detect collisions near the endpoints
+    NearEndCollision DetectCollisionsNearEnd(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin) const;
+
+    // Calculate the vertical shift of the slur end points
+    std::pair<int, int> CalcEndPointShift(const Slur *slur, FloatingCurvePositioner *curve,
+        const BezierCurve &bezierCurve, double flexibility, int margin) const;
+
+    // Apply the vertical shift of the slur end points
+    void ApplyEndPointShift(
+        FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int endPointShiftLeft, int endPointShiftRight) const;
+
+    // Calculate slur from bulge values
+    void AdjustSlurFromBulge(
+        const Slur *slur, FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit) const;
+
+    // Check whether control points should be adjusted horizontally
+    bool AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const;
+
+    // Calculate the horizontal control point offset
+    std::tuple<bool, int, int> CalcControlPointOffset(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin) const;
+
+    // Calculate the vertical control point shift
+    ControlPointAdjustment CalcControlPointVerticalShift(
+        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin) const;
+
+    // Solve the constraints for vertical control point adjustment
+    std::pair<int, int> SolveControlPointConstraints(
+        const std::list<ControlPointConstraint> &constraints, double symmetry = 0.0) const;
+
+    // Improve the slur shape by adjusting the control point heights
+    void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit) const;
+    ///@}
+
+    /**
+     * Intermediate level helper functions for adjustment w.r.t. inner slurs
+     */
+    ///@{
+    // Calculate the vertical control point shift
+    ControlPointAdjustment CalcControlPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
+        const ArrayOfFloatingCurvePositioners &innerCurves, double symmetry, int margin) const;
+
+    // Calculate the vertical shift of the slur end points
+    std::pair<int, int> CalcEndPointShift(const Slur *slur, FloatingCurvePositioner *curve,
+        const BezierCurve &bezierCurve, const ArrayOfFloatingCurvePositioners &innerCurves, double flexibility,
+        int margin) const;
+    ///@}
+
     /**
      * Low level helper functions
      */

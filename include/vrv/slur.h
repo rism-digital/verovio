@@ -203,8 +203,6 @@ public:
 
     void AdjustOuterSlur(
         const Doc *doc, FloatingCurvePositioner *curve, const ArrayOfFloatingCurvePositioners &innerCurves, int unit);
-
-    float GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir) const;
     ///@}
 
     //----------//
@@ -258,6 +256,8 @@ private:
     bool StartsOnBeam() const { return this->HasBoundaryOnBeam(true); }
     bool EndsOnBeam() const { return this->HasBoundaryOnBeam(false); }
     bool HasBoundaryOnBeam(bool isStart) const;
+    // Angle adjustment
+    float GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir) const;
     ///@}
 
     /**
