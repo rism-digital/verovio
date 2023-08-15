@@ -49,7 +49,7 @@ std::string EditorToolkitNeume::EditInfo()
 bool EditorToolkitNeume::ParseEditorAction(const std::string &json_editorAction)
 {
     jsonxx::Object json;
-    // m_editInfo.reset();
+    m_editInfo.reset();
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
