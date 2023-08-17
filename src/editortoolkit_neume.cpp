@@ -857,12 +857,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Syl *syl = new Syl();
         Neume *neume = new Neume();
         Nc *nc = new Nc();
+        Zone *sylZone;
         std::string contour = "";
         nc->AttachZone(zone);
 
         Surface *surface = vrv_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
         surface->AddChild(zone);
-        zone->SetUlx(ulx);
 
         Text *text = new Text();
         std::u32string str = U"";
@@ -874,56 +874,47 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         syllable->AddChild(syl);
         layer->AddChild(syllable);
 
-        // add syl bounding box if Facs
-        if (m_doc->GetType() == Facs) {
-            FacsimileInterface *fi = vrv_cast<FacsimileInterface *>(syl->GetFacsimileInterface());
-            assert(fi);
-            Zone *sylZone = new Zone();
-
-            // calculate bboxUlx and bboxUly wrt rotation using sine rule
-            int draw_w = staff->GetWidth();
-            int draw_h = staff->GetHeight();
-            double theta = staff->GetDrawingRotate();
-            int staffUly = staff->GetDrawingY();
-            int x = ulx - staff->GetDrawingX();
-
-            int bboxUlx = ulx;
-            int bboxUly;
-            // if staff rotates downward to the right
-            if (theta > 0) {
-                int y = (int)((draw_w - x) * tan(theta * M_PI / 180.0));
-                bboxUly = staffUly + draw_h - y;
-            }
-            // if staff rotates upwards to the right
-            else {
-                int y = (int)(x * tan(-theta * M_PI / 180.0));
-                int h = (int)(draw_w * tan(-theta * M_PI / 180.0));
-                bboxUly = staffUly + (draw_h - h) - y;
-            }
-            // width height and offset can be adjusted
-            int bboxWidth = 225;
-            int bboxHeight = 175;
-            int bboxOffsetX = 50;
-
-            sylZone->SetUlx(bboxUlx - bboxOffsetX);
-            sylZone->SetUly(bboxUly);
-            sylZone->SetLrx(bboxUlx + bboxWidth - bboxOffsetX);
-            sylZone->SetLry(bboxUly + bboxHeight);
-            surface->AddChild(sylZone);
-            fi->AttachZone(sylZone);
-        }
-
         const int noteHeight
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
         ulx -= noteWidth / 2;
-        // uly -= noteHeight / 2;
+
+        // calculate staff rotation offset
+        double theta = staff->GetDrawingRotate();
+        int offsetY = 0;
+        if (theta) {
+            double factor = 1.3;
+            offsetY = (int)((ulx - staff->GetFacsimileInterface()->GetZone()->GetUlx()) * tan(theta * M_PI / 180.0)
+                / factor);
+        }
+
         // Set up facsimile
         zone->SetUlx(ulx);
-        zone->SetUly(uly);
+        zone->SetUly(uly + offsetY);
         zone->SetLrx(ulx + noteWidth);
-        zone->SetLry(uly + noteHeight);
+        zone->SetLry(uly + offsetY + noteHeight);
+
+        // add syl bounding box if Facs
+        if (m_doc->GetType() == Facs) {
+            FacsimileInterface *fi = vrv_cast<FacsimileInterface *>(syl->GetFacsimileInterface());
+            assert(fi);
+            sylZone = new Zone();
+
+            int draw_h = staff->GetHeight();
+            int staffUly = staff->GetDrawingY();
+
+            // width height and offset can be adjusted
+            int bboxHeight = 175;
+            int bboxOffsetX = 50;
+
+            sylZone->SetUlx(ulx);
+            sylZone->SetUly(staffUly + draw_h + offsetY);
+            sylZone->SetLrx(ulx + noteWidth + bboxOffsetX);
+            sylZone->SetLry(staffUly + draw_h + offsetY + bboxHeight);
+            surface->AddChild(sylZone);
+            fi->AttachZone(sylZone);
+        }
 
         layer->ReorderByXPos();
 
@@ -1005,11 +996,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 newUly += (newUlx - ulx) * tan(-staff->GetDrawingRotate() * M_PI / 180.0);
                 newZone->SetUlx(newUlx);
                 newZone->SetUly(newUly);
-                ;
                 newZone->SetLrx(newUlx + noteWidth);
                 newZone->SetLry(newUly + noteHeight);
 
                 newNc->AttachZone(newZone);
+
+                if (sylZone) sylZone->SetLrx(newUlx + noteWidth);
 
                 assert(surface);
                 surface->AddChild(newZone);
