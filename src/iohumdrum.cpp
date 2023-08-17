@@ -922,8 +922,12 @@ bool HumdrumInput::convertHumdrum()
         analyzeFingerings(infile);
     }
 
+    bool needSpineReverse = checkIfReversedSpineOrder(staffstarts);
+
     // Reverse the order, since top part is last spine.
-    reverse(staffstarts.begin(), staffstarts.end());
+    if (needSpineReverse) {
+        reverse(staffstarts.begin(), staffstarts.end());
+    }
     calculateReverseKernIndex();
 
     m_staffstates.resize(staffstarts.size());
@@ -973,6 +977,76 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkIfReversedSpineOrder -- Return true of the lowest staff maps to the
+//     left-most staff-like spine in the data. False if there are *staff# in the header
+//     that increase to the right.
+//
+
+bool HumdrumInput::checkIfReversedSpineOrder(std::vector<hum::HTp> staffstarts)
+{
+    std::vector<int> staffnums(staffstarts.size(), -1000);
+    for (int i = 0; i < (int)staffstarts.size(); i++) {
+        if (staffstarts[i]->isStaffLike()) {
+            staffnums[i] = getStaffNumForSpine(staffstarts[i]);
+        }
+    }
+    int minstaff = -1000;
+    for (int i = 0; i < (int)staffnums.size(); i++) {
+        if (staffnums[i] > 0) {
+            if ((minstaff < 0) || (minstaff > staffnums[i])) {
+                minstaff = staffnums[i];
+            }
+        }
+    }
+    int lastnum = -1000;
+    int counter = 0;
+    for (int i = 0; i < (int)staffnums.size(); i++) {
+        if (staffnums[i] < 0) {
+            continue;
+        }
+        counter++;
+        if (lastnum < 0) {
+            lastnum = staffnums[i];
+            continue;
+        }
+        if (lastnum > staffnums[i]) {
+            return true;
+        }
+        lastnum = staffnums[i];
+    }
+
+    if (counter == 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getStaffNumForSpine -- Return the # of *staff# tandem interpretations.
+//     # should be 1 or greater (but for now 0 is allowed). Returns -1000 if no staff
+//     number found in spine header.
+//
+
+int HumdrumInput::getStaffNumForSpine(hum::HTp token)
+{
+    hum::HTp current = token;
+    hum::HumRegex hre;
+    while (current && !current->isData()) {
+        if (current->isInterpretation()) {
+            if (hre.search(current, "^\\*staff(\\d+)")) {
+                return hre.getMatchInt(1);
+            }
+        }
+        current = current->getNextToken();
+    }
+    return -1000;
 }
 
 //////////////////////////////
