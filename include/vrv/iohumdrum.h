@@ -834,6 +834,9 @@ protected:
     bool isNotAtStartOfMeasure(std::vector<hum::HTp> &layerdata, int index);
     void analyzeFingerings(hum::HumdrumFile &infile);
     void analyzeFingerings(hum::HTp sstart);
+    void insertMidMeasureKeySignature(
+        int staffindex, std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token);
+    int getKeySignatureNumber(const std::string &humkeysig);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

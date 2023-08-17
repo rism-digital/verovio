@@ -6904,30 +6904,12 @@ hum::HTp HumdrumInput::getVisualKeySignature(hum::HTp keysigtok)
 
 //////////////////////////////
 //
-// HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
-//    If there is a visual key sig, such as "*vk[f#]" within the same timestamp
-//    (in the same spine), then display that instead with @type="visual-key-signature".
+// HumdrumInput::getKeySignatureNumber -- Example *k[f#c#] => +2
 //
 
-template <class ELEMENT>
-void HumdrumInput::setKeySig(
-    int staffindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary)
+int HumdrumInput::getKeySignatureNumber(const std::string &humkeysig)
 {
-
-    std::string ks;
-    hum::HTp zkeysigtok;
-    hum::HTp vkeysigtok = getVisualKeySignature(keysigtok);
-    bool visualType;
-    if (vkeysigtok) {
-        zkeysigtok = vkeysigtok;
-        ks = *zkeysigtok;
-        visualType = true;
-    }
-    else {
-        zkeysigtok = keysigtok;
-        ks = keysig;
-        visualType = false;
-    }
+    std::string ks = humkeysig;
 
     auto pos = ks.find("]");
     if (pos != std::string::npos) {
@@ -6984,6 +6966,89 @@ void HumdrumInput::setKeySig(
     else if (ks == "f#c#g#d#a#e#b#") {
         keynum = +7;
     }
+
+    return keynum;
+}
+
+//////////////////////////////
+//
+// insertMidMeasureKeySignature --
+//
+
+void HumdrumInput::insertMidMeasureKeySignature(
+    int staffindex, std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token)
+{
+    KeySig *keysig = new KeySig();
+    appendElement(elements, pointers, keysig);
+    setLocationId(keysig, token);
+    keysig->SetType("mid-measure");
+
+    int keynum = getKeySignatureNumber(*token);
+    int fifthsAdjust = 0;
+    if (staffindex >= 0) {
+        fifthsAdjust = hum::Convert::base40IntervalToLineOfFifths(m_transpose[staffindex]);
+    }
+    keynum += fifthsAdjust;
+    int keyvalue = keynum;
+
+    if ((keyvalue >= -7) && (keyvalue <= +7)) {
+        // standard key signature
+        if (keyvalue < 0) {
+            keysig->SetSig(std::make_pair(-keyvalue, ACCIDENTAL_WRITTEN_f));
+        }
+        else if (keyvalue > 0) {
+            keysig->SetSig(std::make_pair(keyvalue, ACCIDENTAL_WRITTEN_s));
+        }
+        else if (keyvalue == 0) {
+            keysig->SetSig(std::make_pair(keyvalue, ACCIDENTAL_WRITTEN_NONE));
+        }
+        else {
+            keysig->SetSig(std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE));
+        }
+    }
+    else {
+        // Non-standard keysignature, so give a NONE style (deal with it later).
+    }
+
+    bool secondary = true;
+    if (secondary && (keyvalue == 0)) {
+        // Force cancellation keysignature when there are no
+        // sharps/flats in key signature change.
+        keysig->SetCancelaccid(CANCELACCID_before);
+    }
+    else if (m_show_cautionary_keysig) {
+        keysig->SetCancelaccid(CANCELACCID_before);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
+//    If there is a visual key sig, such as "*vk[f#]" within the same timestamp
+//    (in the same spine), then display that instead with @type="visual-key-signature".
+//
+
+template <class ELEMENT>
+void HumdrumInput::setKeySig(
+    int staffindex, ELEMENT element, const std::string &keysig, hum::HTp keysigtok, hum::HTp keytok, bool secondary)
+{
+
+    std::string ks;
+    hum::HTp zkeysigtok;
+    hum::HTp vkeysigtok = getVisualKeySignature(keysigtok);
+    bool visualType;
+    if (vkeysigtok) {
+        zkeysigtok = vkeysigtok;
+        ks = *zkeysigtok;
+        visualType = true;
+    }
+    else {
+        zkeysigtok = keysigtok;
+        ks = keysig;
+        visualType = false;
+    }
+
+    int keynum = getKeySignatureNumber(ks);
 
     int fifthsAdjust = 0;
     if (staffindex >= 0) {
@@ -7780,12 +7845,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             lt[staffindex][layerindex].push_back(token);
 
             if ((layerindex == 0) && (token->isClef())) {
-
                 int layercount = getCurrentLayerCount(token);
-
                 // Duplicate clef in all layers (needed for cases when
                 // a secondary layer ends before the end of a measure.
-
                 for (int k = layercount; k < (int)lt[staffindex].size(); k++) {
                     lt[staffindex][k].push_back(token);
                 }
@@ -11685,6 +11747,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
 
             bool notAtStart = isNotAtStartOfMeasure(layerdata, i);
+
+            bool isKeySignature = layerdata[i]->isKeySignature();
+            if (notAtStart && isKeySignature) {
+                insertMidMeasureKeySignature(staffindex, elements, pointers, token);
+            }
 
             bool forceClefChange = false;
             if (token->isClef() || (*token == "*")) {
