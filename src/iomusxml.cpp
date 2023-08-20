@@ -2103,6 +2103,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
     if (containsWords && !containsTempo && !containsDynamics) {
         pugi::xpath_node_set words = node.select_nodes("direction-type/*[self::words or self::coda or self::segno]");
         defaultY = words.first().node().attribute("default-y").as_int();
+        defaultY = (defaultY * 10) + words.first().node().attribute("relative-y").as_int();
         std::string wordStr = words.first().node().text().as_string();
         if (wordStr.rfind("cresc", 0) == 0 || wordStr.rfind("dim", 0) == 0 || wordStr.rfind("decresc", 0) == 0) {
             containsDynamics = true;
@@ -2128,7 +2129,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
             }
 
             TextRendition(words, dir);
-            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 2000;
             dir->SetVgrp(defaultY);
             m_controlElements.push_back({ measureNum, dir });
             m_dirStack.push_back(dir);
@@ -2183,9 +2184,12 @@ void MusicXmlInput::ReadMusicXmlDirection(
         }
 
         TextRendition(dynamics, dynam);
-        if (defaultY == 0) defaultY = dynamics.first().node().attribute("default-y").as_int();
+        if (defaultY == 0) {
+            defaultY = dynamics.first().node().attribute("default-y").as_int();
+            defaultY = (defaultY * 10) + dynamics.first().node().attribute("relative-y").as_int();
+        }
         // parse the default_y attribute and transform to vgrp value, to vertically align dynamics and directives
-        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 2000;
         dynam->SetVgrp(defaultY);
         m_controlElements.push_back({ measureNum, dynam });
         m_dynamStack.push_back(dynam);
@@ -2285,8 +2289,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
                 hairpin->SetStaff(hairpin->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(1 + staffOffset)));
             }
             int defaultY = wedge->node().attribute("default-y").as_int();
+            defaultY = (defaultY * 10) + wedge->node().attribute("relative-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align hairpins
-            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 2000;
             hairpin->SetVgrp(defaultY);
             // match new hairpin to existing hairpin stop
             for (auto iter = m_hairpinStopStack.begin(); iter != m_hairpinStopStack.end(); ++iter) {
@@ -2388,8 +2393,9 @@ void MusicXmlInput::ReadMusicXmlDirection(
             pedal->SetTstamp(timeStamp);
             if (pedalType == "stop") pedal->SetTstamp(timeStamp - 0.1);
             int defaultY = xmlPedal.attribute("default-y").as_int();
+            defaultY = (defaultY * 10) + xmlPedal.attribute("relative-y").as_int();
             // parse the default_y attribute and transform to vgrp value, to vertically align pedal starts and stops
-            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+            defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 2000;
             pedal->SetVgrp(defaultY);
             m_controlElements.push_back({ measureNum, pedal });
             m_pedalStack.push_back(pedal);
@@ -3297,7 +3303,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         // place
         dynam->SetPlace(dynam->AttPlacementRelStaff::StrToStaffrel(xmlDynam.attribute("placement").as_string()));
         int defaultY = xmlDynam.attribute("default-y").as_int();
-        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 200;
+        defaultY = (defaultY * 10) + xmlDynam.attribute("relative-y").as_int();
+        defaultY = (defaultY < 0) ? std::abs(defaultY) : defaultY + 2000;
         dynam->SetVgrp(defaultY);
         std::string dynamStr;
         for (pugi::xml_node xmlDynamPart : xmlDynam.children()) {
