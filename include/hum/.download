@@ -1,2 +1,2 @@
-wget https://raw.githubusercontent.com/craigsapp/humlib/master/include/humlib.h -O humlib.h
+wget https://raw.githubusercontent.com/craigsapp/humlib/master/min/humlib.h -O humlib.h
 
