@@ -24658,7 +24658,13 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             hre.replaceDestructive(value, "&#xFC;", "u2", "g"); // u-umlaut
             hre.replaceDestructive(value, "&#xE4;", "a2", "g"); // a-umlaut
             hre.replaceDestructive(value, "&#xF6;", "o2", "g"); // o-umlaut
-            vtexts.push_back(value);
+            hre.replaceDestructive(value, "\\s+$", ""); // trailing spaces
+            hre.replaceDestructive(value, "^\\s+", ""); // leading spaces
+            hre.replaceDestructive(value, "-", "\\s+-$"); // trailing space before hyphen
+            hre.replaceDestructive(value, "-", "^-\\s+"); // leaning spaces after hyphen
+            if (!value.empty()) {
+                vtexts.push_back(value);
+            }
         }
         else {
             vtoks.push_back(token);
@@ -24666,7 +24672,13 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
             if (value.empty()) {
                 value = *token;
             }
-            vtexts.push_back(value);
+            hre.replaceDestructive(value, "", "\\s+$"); // trailing spaces
+            hre.replaceDestructive(value, "", "^\\s+"); // leading spaces
+            hre.replaceDestructive(value, "-", "\\s+-$"); // trailing space before hyphen
+            hre.replaceDestructive(value, "-", "^-\\s+"); // leaning spaces after hyphen
+            if (!value.empty()) {
+                vtexts.push_back(value);
+            }
         }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
