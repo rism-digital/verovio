@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:base="file:/opt/docker-mei/music-encoding/customizations/mei-basic.xml"><?TEIVERSION Version 5.0.0?>
+<?xml version="1.0" encoding="utf-8"?><TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:base="file:/Users/laurent/libs/mei_official/customizations/mei-basic.xml"><?TEIVERSION Version 5.0?>
     <teiHeader>
         <fileDesc>
             <titleStmt>
@@ -40,7 +40,7 @@
     </teiHeader>
     <text>
         <body>
-            <schemaSpec ident="mei" start="mei" prefix="mei_" ns="http://www.music-encoding.org/ns/mei" source="/opt/docker-mei/music-encoding/build/mei-source_canonicalized.xml"><macroSpec rend="add" ident="data.ACCIDENTAL.WRITTEN" module="MEI" type="dt">
+            <schemaSpec ident="mei" start="mei" prefix="mei_" ns="http://www.music-encoding.org/ns/mei" source="/Users/laurent/libs/mei_official/build/mei-source_canonicalized.xml"><macroSpec rend="add" ident="data.ACCIDENTAL.WRITTEN" module="MEI" type="dt">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Written accidental values.</desc>
     <content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <alternate minOccurs="1" maxOccurs="1"><macroRef key="data.ACCIDENTAL.WRITTEN.basic"/><macroRef key="data.ACCIDENTAL.WRITTEN.extended"/><macroRef key="data.ACCIDENTAL.aeu"/><macroRef key="data.ACCIDENTAL.persian"/></alternate>
@@ -5136,23 +5136,7 @@
       <p>The <gi scheme="MEI">lb</gi> element is allowed here in order to facilitate karaoke
         applications. The <att>func</att> attribute on <gi scheme="MEI">lb</gi> may be used to
         distinguish true line endings from those of line groups for these applications.</p>
-    </remarks></elementSpec><elementSpec rend="add" ident="verse" module="MEI.lyrics"><desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Division of a poem or song lyrics, sometimes having a fixed length, meter or rhyme scheme;
-      a stanza.</desc><classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.common"/>
-      
-      <memberOf key="att.lang"/>
-      
-      <memberOf key="att.verse.vis"/>
-      
-      
-      <memberOf key="model.verseLike"/>
-    </classes><content xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="label"/></zeroOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="labelAbbr"/></zeroOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="dir"/><ref name="dynam"/><ref name="tempo"/><ref name="space"/></choice></zeroOrMore>
-      <oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="volta"/><ref name="model.sylLike"/><ref name="model.appLike"/><ref name="model.editLike"/></choice></oneOrMore>
-      <zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="model.lbLike"/></zeroOrMore>
-    </content><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
+    </remarks></elementSpec><elementSpec rend="add" ident="verse" module="MEI.lyrics"><desc rend="replace" xml:lang="en">Division of a poem or song lyrics, sometimes having a fixed length, meter or rhyme scheme; a stanza.</desc><classes><memberOf key="att.common"/><memberOf key="att.verse.vis"/><memberOf key="model.verseLike"/><memberOf key="att.nNumberLike" mode="add"/></classes><content><zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="label"/></zeroOrMore><zeroOrMore xmlns="http://relaxng.org/ns/structure/1.0"><ref name="labelAbbr"/></zeroOrMore><oneOrMore xmlns="http://relaxng.org/ns/structure/1.0"><choice><ref name="volta"/><ref name="model.sylLike"/></choice></oneOrMore></content><attList/><remarks xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">
       <p>The <gi scheme="MEI">lb</gi> element is allowed here in order to facilitate karaoke
         applications. The <att>func</att> attribute on <gi scheme="MEI">lb</gi> may be used to
         distinguish true line endings from those of line groups for these applications.</p>
@@ -5709,23 +5693,7 @@
                             </valList>
                         </attDef>
                     </attList>
-                </classSpec><classSpec rend="add" ident="att.curveRend" module="MEI.shared" type="atts">
-    <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record the visual rendition of curves.</desc>
-    <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <attDef ident="lform" usage="opt">
-        <desc xml:lang="en">Describes the line style of a curve.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.LINEFORM"/>
-        </datatype>
-      </attDef>
-      <attDef ident="lwidth" usage="opt">
-        <desc xml:lang="en">Width of a curved line.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.LINEWIDTH"/>
-        </datatype>
-      </attDef>
-    </attList>
-  </classSpec><classSpec rend="add" ident="att.datable" module="MEI.shared" type="atts">
+                </classSpec><classSpec rend="add" ident="att.datable" module="MEI.shared" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes common to dates.</desc>
     <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       <attDef ident="enddate" usage="opt">
@@ -6002,12 +5970,21 @@
     </attList>
   </classSpec><classSpec rend="add" ident="att.lineRend.base" module="MEI.shared" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Attributes that record the basic visual rendition of lines.</desc>
-    <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <memberOf key="att.curveRend"/>
-    </classes>
     <attList xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       
-      <attDef ident="lsegs" usage="opt">
+        <attDef ident="lform" usage="opt">
+          <desc xml:lang="en">Describes the style of a line.</desc>
+          <datatype>
+            <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.LINEFORM"/>
+          </datatype>
+        </attDef>
+        <attDef ident="lwidth" usage="opt">
+          <desc xml:lang="en">Width of a line.</desc>
+          <datatype>
+            <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.LINEWIDTH"/>
+          </datatype>
+        </attDef>
+        <attDef ident="lsegs" usage="opt">
         <desc xml:lang="en">Describes the number of segments into which a dashed or dotted line may be divided, or
           the number of "peaks" of a wavy line; a pair of space-separated values (minimum and
           maximum, respectively) provides a range between which a rendering system-supplied value
@@ -6035,7 +6012,7 @@
                         <attDef ident="meiversion" usage="req">
                             <desc>Specifies a generic MEI version label.</desc>
                             <valList type="closed">
-                                <valItem ident="5.0.0-dev+basic">
+                                <valItem ident="5.0-dev+basic">
                                     <desc>This version of MEI.</desc>
                                 </valItem>
                             </valList>
@@ -8112,6 +8089,7 @@
       
       
       <memberOf key="att.extSym"/>
+      <memberOf key="att.lineRend.base"/>
       <memberOf key="att.typography"/>
       <memberOf key="att.visualOffset"/>
       
@@ -8145,18 +8123,6 @@
         <desc xml:lang="en">Captures the fill color of the arrow if different from the line color.</desc>
         <datatype>
           <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.COLOR"/>
-        </datatype>
-      </attDef>
-      <attDef ident="line.form" usage="opt">
-        <desc xml:lang="en">Visual form of the line.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.LINEFORM"/>
-        </datatype>
-      </attDef>
-      <attDef ident="line.width" usage="opt">
-        <desc xml:lang="en">Width of the line.</desc>
-        <datatype>
-          <ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.LINEWIDTH"/>
         </datatype>
       </attDef>
     </attList>
@@ -8394,12 +8360,12 @@
       beats.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       
+      <memberOf key="att.curvature"/>
+      <memberOf key="att.lineRend.base"/>
       <memberOf key="att.visualOffset"/>
       <memberOf key="att.visualOffset2"/>
       
       
-      <memberOf key="att.curvature"/>
-      <memberOf key="att.curveRend"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.mNum.vis" module="MEI.visual" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
@@ -8619,12 +8585,12 @@
       normal position) of the entire rendered slur/phrase mark.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       
+      <memberOf key="att.curvature"/>
+      <memberOf key="att.lineRend.base"/>
       <memberOf key="att.visualOffset"/>
       <memberOf key="att.visualOffset2"/>
       
       
-      <memberOf key="att.curvature"/>
-      <memberOf key="att.curveRend"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.space.vis" module="MEI.visual" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
@@ -8697,12 +8663,12 @@
       beats.</desc>
     <classes xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
       
+      <memberOf key="att.curvature"/>
+      <memberOf key="att.lineRend.base"/>
       <memberOf key="att.visualOffset"/>
       <memberOf key="att.visualOffset2"/>
       
       
-      <memberOf key="att.curvature"/>
-      <memberOf key="att.curveRend"/>
     </classes>
   </classSpec><classSpec rend="add" ident="att.trill.vis" module="MEI.visual" type="atts">
     <desc xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en">Visual domain attributes.</desc>
