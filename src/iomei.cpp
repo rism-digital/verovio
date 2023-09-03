@@ -2139,8 +2139,6 @@ void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
     this->WriteTextDirInterface(currentNode, ornam);
     this->WriteTimePointInterface(currentNode, ornam);
     ornam->WriteColor(currentNode);
-    ornam->WriteExtSymAuth(currentNode);
-    ornam->WriteExtSymNames(currentNode);
     ornam->WriteOrnamentAccid(currentNode);
 }
 
@@ -5815,8 +5813,6 @@ bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
     this->ReadTextDirInterface(ornam, vrvOrnam);
     this->ReadTimePointInterface(ornam, vrvOrnam);
     vrvOrnam->ReadColor(ornam);
-    vrvOrnam->ReadExtSymAuth(ornam);
-    vrvOrnam->ReadExtSymNames(ornam);
     vrvOrnam->ReadOrnamentAccid(ornam);
 
     parent->AddChild(vrvOrnam);
