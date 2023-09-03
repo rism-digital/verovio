@@ -76,18 +76,18 @@ KeySig::KeySig()
     , ObjectListInterface()
     , AttAccidental()
     , AttColor()
-    , AttPitch()
-    , AttKeySigAnl()
+    , AttKeyMode()
     , AttKeySigLog()
     , AttKeySigVis()
+    , AttPitch()
     , AttVisibility()
 {
     this->RegisterAttClass(ATT_ACCIDENTAL);
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_PITCH);
-    this->RegisterAttClass(ATT_KEYSIGANL);
+    this->RegisterAttClass(ATT_KEYMODE);
     this->RegisterAttClass(ATT_KEYSIGLOG);
     this->RegisterAttClass(ATT_KEYSIGVIS);
+    this->RegisterAttClass(ATT_PITCH);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
@@ -100,10 +100,10 @@ void KeySig::Reset()
     LayerElement::Reset();
     this->ResetAccidental();
     this->ResetColor();
-    this->ResetPitch();
-    this->ResetKeySigAnl();
+    this->ResetKeyMode();
     this->ResetKeySigLog();
     this->ResetKeySigVis();
+    this->ResetPitch();
     this->ResetVisibility();
 
     // key change drawing values

@@ -21,9 +21,9 @@ namespace vrv {
  * This class models the MEI <bTrem> element.
  */
 class BTrem : public LayerElement,
-              public AttBTremLog,
               public AttNumbered,
               public AttNumberPlacement,
+              public AttTremForm,
               public AttTremMeasured {
 public:
     /**

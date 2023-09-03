@@ -8,8 +8,6 @@
 #ifndef __VRV_FUNCTOR_H__
 #define __VRV_FUNCTOR_H__
 
-#include <stack>
-
 #include "comparison.h"
 #include "functorinterface.h"
 #include "vrvdef.h"
@@ -31,7 +29,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FunctorBase(){};
+    FunctorBase() {}
     virtual ~FunctorBase() = default;
     ///@}
 
@@ -45,16 +43,7 @@ public:
     ///@}
 
     /**
-     * Getters/Setters for the filters
-     */
-    ///@{
-    Filters *GetFilters() { return m_filters.empty() ? NULL : m_filters.top(); }
-    void PushFilters(Filters *filters) { m_filters.push(filters); }
-    void PopFilters() { m_filters.pop(); }
-    ///@}
-
-    /**
-     * Getters/Setters for the visibility
+     * Getter/Setter for the visibility
      */
     ///@{
     bool VisibleOnly() const { return m_visibleOnly; }
@@ -62,12 +51,24 @@ public:
     ///@}
 
     /**
-     * Getters/Setters for the direction
+     * Getters/Setters for the filters and direction
+     * Here setters return the previous value
      */
     ///@{
-    bool GetDirection() const { return m_direction.empty() ? FORWARD : m_direction.top(); }
-    void PushDirection(bool direction) { m_direction.push(direction); }
-    void PopDirection() { m_direction.pop(); }
+    Filters *GetFilters() const { return m_filters; }
+    Filters *SetFilters(Filters *filters)
+    {
+        Filters *previous = m_filters;
+        m_filters = filters;
+        return previous;
+    }
+    bool GetDirection() const { return m_direction; }
+    bool SetDirection(bool direction)
+    {
+        bool previous = m_direction;
+        m_direction = direction;
+        return previous;
+    }
     ///@}
 
     /**
@@ -82,12 +83,12 @@ public:
 private:
     // The functor code
     FunctorCode m_code = FUNCTOR_CONTINUE;
-    // The filter stack
-    std::stack<Filters *> m_filters;
+    // The filters
+    Filters *m_filters = NULL;
     // Visible only flag
     bool m_visibleOnly = true;
-    // The direction stack
-    std::stack<bool> m_direction;
+    // Direction
+    bool m_direction = FORWARD;
 };
 
 //----------------------------------------------------------------------------
@@ -103,7 +104,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    Functor(){};
+    Functor() {}
     virtual ~Functor() = default;
     ///@}
 
@@ -128,7 +129,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConstFunctor(){};
+    ConstFunctor() {}
     virtual ~ConstFunctor() = default;
     ///@}
 

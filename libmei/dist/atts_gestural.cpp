@@ -103,6 +103,46 @@ bool AttArticulationGes::HasArticGes() const
 }
 
 //----------------------------------------------------------------------------
+// AttAttacking
+//----------------------------------------------------------------------------
+
+AttAttacking::AttAttacking() : Att()
+{
+    ResetAttacking();
+}
+
+void AttAttacking::ResetAttacking()
+{
+    m_attacca = BOOLEAN_NONE;
+}
+
+bool AttAttacking::ReadAttacking(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("attacca")) {
+        this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
+        if (removeAttr) element.remove_attribute("attacca");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAttacking::WriteAttacking(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAttacca()) {
+        element.append_attribute("attacca") = BooleanToStr(this->GetAttacca()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttAttacking::HasAttacca() const
+{
+    return (m_attacca != BOOLEAN_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttBendGes
 //----------------------------------------------------------------------------
 
@@ -258,116 +298,6 @@ bool AttDurationGes::HasDurRecip() const
 }
 
 //----------------------------------------------------------------------------
-// AttMdivGes
-//----------------------------------------------------------------------------
-
-AttMdivGes::AttMdivGes() : Att()
-{
-    ResetMdivGes();
-}
-
-void AttMdivGes::ResetMdivGes()
-{
-    m_attacca = BOOLEAN_NONE;
-}
-
-bool AttMdivGes::ReadMdivGes(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("attacca")) {
-        this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
-        if (removeAttr) element.remove_attribute("attacca");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttMdivGes::WriteMdivGes(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasAttacca()) {
-        element.append_attribute("attacca") = BooleanToStr(this->GetAttacca()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttMdivGes::HasAttacca() const
-{
-    return (m_attacca != BOOLEAN_NONE);
-}
-
-//----------------------------------------------------------------------------
-// AttNcGes
-//----------------------------------------------------------------------------
-
-AttNcGes::AttNcGes() : Att()
-{
-    ResetNcGes();
-}
-
-void AttNcGes::ResetNcGes()
-{
-    m_octGes = -127;
-    m_pnameGes = PITCHNAME_NONE;
-    m_pnum = MEI_UNSET;
-}
-
-bool AttNcGes::ReadNcGes(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("oct.ges")) {
-        this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
-        if (removeAttr) element.remove_attribute("oct.ges");
-        hasAttribute = true;
-    }
-    if (element.attribute("pname.ges")) {
-        this->SetPnameGes(StrToPitchname(element.attribute("pname.ges").value()));
-        if (removeAttr) element.remove_attribute("pname.ges");
-        hasAttribute = true;
-    }
-    if (element.attribute("pnum")) {
-        this->SetPnum(StrToInt(element.attribute("pnum").value()));
-        if (removeAttr) element.remove_attribute("pnum");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttNcGes::WriteNcGes(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasOctGes()) {
-        element.append_attribute("oct.ges") = OctaveToStr(this->GetOctGes()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPnameGes()) {
-        element.append_attribute("pname.ges") = PitchnameToStr(this->GetPnameGes()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPnum()) {
-        element.append_attribute("pnum") = IntToStr(this->GetPnum()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttNcGes::HasOctGes() const
-{
-    return (m_octGes != -127);
-}
-
-bool AttNcGes::HasPnameGes() const
-{
-    return (m_pnameGes != PITCHNAME_NONE);
-}
-
-bool AttNcGes::HasPnum() const
-{
-    return (m_pnum != MEI_UNSET);
-}
-
-//----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
 
@@ -379,9 +309,6 @@ AttNoteGes::AttNoteGes() : Att()
 void AttNoteGes::ResetNoteGes()
 {
     m_extremis = noteGes_EXTREMIS_NONE;
-    m_octGes = -127;
-    m_pnameGes = PITCHNAME_NONE;
-    m_pnum = MEI_UNSET;
 }
 
 bool AttNoteGes::ReadNoteGes(pugi::xml_node element, bool removeAttr)
@@ -390,21 +317,6 @@ bool AttNoteGes::ReadNoteGes(pugi::xml_node element, bool removeAttr)
     if (element.attribute("extremis")) {
         this->SetExtremis(StrToNoteGesExtremis(element.attribute("extremis").value()));
         if (removeAttr) element.remove_attribute("extremis");
-        hasAttribute = true;
-    }
-    if (element.attribute("oct.ges")) {
-        this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
-        if (removeAttr) element.remove_attribute("oct.ges");
-        hasAttribute = true;
-    }
-    if (element.attribute("pname.ges")) {
-        this->SetPnameGes(StrToPitchname(element.attribute("pname.ges").value()));
-        if (removeAttr) element.remove_attribute("pname.ges");
-        hasAttribute = true;
-    }
-    if (element.attribute("pnum")) {
-        this->SetPnum(StrToInt(element.attribute("pnum").value()));
-        if (removeAttr) element.remove_attribute("pnum");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -417,39 +329,12 @@ bool AttNoteGes::WriteNoteGes(pugi::xml_node element)
         element.append_attribute("extremis") = NoteGesExtremisToStr(this->GetExtremis()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasOctGes()) {
-        element.append_attribute("oct.ges") = OctaveToStr(this->GetOctGes()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPnameGes()) {
-        element.append_attribute("pname.ges") = PitchnameToStr(this->GetPnameGes()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPnum()) {
-        element.append_attribute("pnum") = IntToStr(this->GetPnum()).c_str();
-        wroteAttribute = true;
-    }
     return wroteAttribute;
 }
 
 bool AttNoteGes::HasExtremis() const
 {
     return (m_extremis != noteGes_EXTREMIS_NONE);
-}
-
-bool AttNoteGes::HasOctGes() const
-{
-    return (m_octGes != -127);
-}
-
-bool AttNoteGes::HasPnameGes() const
-{
-    return (m_pnameGes != PITCHNAME_NONE);
-}
-
-bool AttNoteGes::HasPnum() const
-{
-    return (m_pnum != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------
@@ -508,43 +393,73 @@ bool AttOrnamentAccidGes::HasAccidlowerGes() const
 }
 
 //----------------------------------------------------------------------------
-// AttSectionGes
+// AttPitchGes
 //----------------------------------------------------------------------------
 
-AttSectionGes::AttSectionGes() : Att()
+AttPitchGes::AttPitchGes() : Att()
 {
-    ResetSectionGes();
+    ResetPitchGes();
 }
 
-void AttSectionGes::ResetSectionGes()
+void AttPitchGes::ResetPitchGes()
 {
-    m_attacca = BOOLEAN_NONE;
+    m_octGes = -127;
+    m_pnameGes = PITCHNAME_NONE;
+    m_pnum = MEI_UNSET;
 }
 
-bool AttSectionGes::ReadSectionGes(pugi::xml_node element, bool removeAttr)
+bool AttPitchGes::ReadPitchGes(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("attacca")) {
-        this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
-        if (removeAttr) element.remove_attribute("attacca");
+    if (element.attribute("oct.ges")) {
+        this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
+        if (removeAttr) element.remove_attribute("oct.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("pname.ges")) {
+        this->SetPnameGes(StrToPitchname(element.attribute("pname.ges").value()));
+        if (removeAttr) element.remove_attribute("pname.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("pnum")) {
+        this->SetPnum(StrToInt(element.attribute("pnum").value()));
+        if (removeAttr) element.remove_attribute("pnum");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttSectionGes::WriteSectionGes(pugi::xml_node element)
+bool AttPitchGes::WritePitchGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasAttacca()) {
-        element.append_attribute("attacca") = BooleanToStr(this->GetAttacca()).c_str();
+    if (this->HasOctGes()) {
+        element.append_attribute("oct.ges") = OctaveToStr(this->GetOctGes()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPnameGes()) {
+        element.append_attribute("pname.ges") = PitchnameToStr(this->GetPnameGes()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPnum()) {
+        element.append_attribute("pnum") = IntToStr(this->GetPnum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttSectionGes::HasAttacca() const
+bool AttPitchGes::HasOctGes() const
 {
-    return (m_attacca != BOOLEAN_NONE);
+    return (m_octGes != -127);
+}
+
+bool AttPitchGes::HasPnameGes() const
+{
+    return (m_pnameGes != PITCHNAME_NONE);
+}
+
+bool AttPitchGes::HasPnum() const
+{
+    return (m_pnum != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------

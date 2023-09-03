@@ -37,6 +37,8 @@ enum data_ACCIDENTAL_GESTURAL : int8_t {
     ACCIDENTAL_GESTURAL_sd,
     ACCIDENTAL_GESTURAL_fu,
     ACCIDENTAL_GESTURAL_fd,
+    ACCIDENTAL_GESTURAL_xu,
+    ACCIDENTAL_GESTURAL_ffd,
     ACCIDENTAL_GESTURAL_bms,
     ACCIDENTAL_GESTURAL_kms,
     ACCIDENTAL_GESTURAL_bs,
@@ -74,6 +76,8 @@ enum data_ACCIDENTAL_GESTURAL_extended : int8_t {
     ACCIDENTAL_GESTURAL_extended_sd,
     ACCIDENTAL_GESTURAL_extended_fu,
     ACCIDENTAL_GESTURAL_extended_fd,
+    ACCIDENTAL_GESTURAL_extended_xu,
+    ACCIDENTAL_GESTURAL_extended_ffd,
     ACCIDENTAL_GESTURAL_extended_MAX
 };
 
@@ -100,6 +104,10 @@ enum data_ACCIDENTAL_WRITTEN : int8_t {
     ACCIDENTAL_WRITTEN_fd,
     ACCIDENTAL_WRITTEN_nu,
     ACCIDENTAL_WRITTEN_nd,
+    ACCIDENTAL_WRITTEN_xu,
+    ACCIDENTAL_WRITTEN_xd,
+    ACCIDENTAL_WRITTEN_ffu,
+    ACCIDENTAL_WRITTEN_ffd,
     ACCIDENTAL_WRITTEN_1qf,
     ACCIDENTAL_WRITTEN_3qf,
     ACCIDENTAL_WRITTEN_1qs,
@@ -148,6 +156,10 @@ enum data_ACCIDENTAL_WRITTEN_extended : int8_t {
     ACCIDENTAL_WRITTEN_extended_fd,
     ACCIDENTAL_WRITTEN_extended_nu,
     ACCIDENTAL_WRITTEN_extended_nd,
+    ACCIDENTAL_WRITTEN_extended_xu,
+    ACCIDENTAL_WRITTEN_extended_xd,
+    ACCIDENTAL_WRITTEN_extended_ffu,
+    ACCIDENTAL_WRITTEN_extended_ffd,
     ACCIDENTAL_WRITTEN_extended_1qf,
     ACCIDENTAL_WRITTEN_extended_3qf,
     ACCIDENTAL_WRITTEN_extended_1qs,
@@ -1830,16 +1842,6 @@ enum audience_AUDIENCE : int8_t {
 };
 
 /**
- * MEI att.bTrem.log\@form
- */
-enum bTremLog_FORM : int8_t {
-    bTremLog_FORM_NONE = 0,
-    bTremLog_FORM_meas,
-    bTremLog_FORM_unmeas,
-    bTremLog_FORM_MAX
-};
-
-/**
  * MEI att.beamRend\@form
  */
 enum beamRend_FORM : int8_t {
@@ -1882,6 +1884,16 @@ enum curvature_CURVEDIR : int8_t {
     curvature_CURVEDIR_below,
     curvature_CURVEDIR_mixed,
     curvature_CURVEDIR_MAX
+};
+
+/**
+ * MEI att.curvatureDirection\@curve
+ */
+enum curvatureDirection_CURVE : int8_t {
+    curvatureDirection_CURVE_NONE = 0,
+    curvatureDirection_CURVE_a,
+    curvatureDirection_CURVE_c,
+    curvatureDirection_CURVE_MAX
 };
 
 /**
@@ -1965,16 +1977,6 @@ enum extSymAuth_GLYPHAUTH : int8_t {
     extSymAuth_GLYPHAUTH_NONE = 0,
     extSymAuth_GLYPHAUTH_smufl,
     extSymAuth_GLYPHAUTH_MAX
-};
-
-/**
- * MEI att.fTrem.log\@form
- */
-enum fTremLog_FORM : int8_t {
-    fTremLog_FORM_NONE = 0,
-    fTremLog_FORM_meas,
-    fTremLog_FORM_unmeas,
-    fTremLog_FORM_MAX
 };
 
 /**
@@ -2150,16 +2152,6 @@ enum lineLog_FUNC : int8_t {
 };
 
 /**
- * MEI att.liquescent.vis\@curve
- */
-enum liquescentVis_CURVE : int8_t {
-    liquescentVis_CURVE_NONE = 0,
-    liquescentVis_CURVE_a,
-    liquescentVis_CURVE_c,
-    liquescentVis_CURVE_MAX
-};
-
-/**
  * MEI att.measurement\@unit
  */
 enum measurement_UNIT : int8_t {
@@ -2263,16 +2255,6 @@ enum ncForm_CON : int8_t {
 };
 
 /**
- * MEI att.ncForm\@curve
- */
-enum ncForm_CURVE : int8_t {
-    ncForm_CURVE_NONE = 0,
-    ncForm_CURVE_a,
-    ncForm_CURVE_c,
-    ncForm_CURVE_MAX
-};
-
-/**
  * MEI att.ncForm\@rellen
  */
 enum ncForm_RELLEN : int8_t {
@@ -2280,6 +2262,34 @@ enum ncForm_RELLEN : int8_t {
     ncForm_RELLEN_l,
     ncForm_RELLEN_s,
     ncForm_RELLEN_MAX
+};
+
+/**
+ * MEI att.neumeType\@type
+ */
+enum neumeType_TYPE : int8_t {
+    neumeType_TYPE_NONE = 0,
+    neumeType_TYPE_apostropha,
+    neumeType_TYPE_bistropha,
+    neumeType_TYPE_climacus,
+    neumeType_TYPE_clivis,
+    neumeType_TYPE_oriscus,
+    neumeType_TYPE_pes,
+    neumeType_TYPE_pessubpunctis,
+    neumeType_TYPE_porrectus,
+    neumeType_TYPE_porrectusflexus,
+    neumeType_TYPE_pressusmaior,
+    neumeType_TYPE_pressusminor,
+    neumeType_TYPE_punctum,
+    neumeType_TYPE_quilisma,
+    neumeType_TYPE_scandicus,
+    neumeType_TYPE_strophicus,
+    neumeType_TYPE_torculus,
+    neumeType_TYPE_torculusresupinus,
+    neumeType_TYPE_tristropha,
+    neumeType_TYPE_virga,
+    neumeType_TYPE_virgastrata,
+    neumeType_TYPE_MAX
 };
 
 /**
@@ -2496,6 +2506,16 @@ enum tempoLog_FUNC : int8_t {
     tempoLog_FUNC_metricmod,
     tempoLog_FUNC_precedente,
     tempoLog_FUNC_MAX
+};
+
+/**
+ * MEI att.tremForm\@form
+ */
+enum tremForm_FORM : int8_t {
+    tremForm_FORM_NONE = 0,
+    tremForm_FORM_meas,
+    tremForm_FORM_unmeas,
+    tremForm_FORM_MAX
 };
 
 /**

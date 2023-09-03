@@ -462,7 +462,7 @@ void System::ConvertToUnCastOffMensuralSystem()
 
     Filters filters;
     ConvertToUnCastOffMensuralFunctor convertToUnCastOffMensural;
-    convertToUnCastOffMensural.PushFilters(&filters);
+    convertToUnCastOffMensural.SetFilters(&filters);
 
     // Now we can process by layer and move their content to (measure) segments
     for (const auto &staves : layerTree.child) {

@@ -590,7 +590,7 @@ Object *Object::FindDescendantByID(const std::string &id, int deepness, bool dir
 const Object *Object::FindDescendantByID(const std::string &id, int deepness, bool direction) const
 {
     FindByIDFunctor findByID(id);
-    findByID.PushDirection(direction);
+    findByID.SetDirection(direction);
     this->Process(findByID, deepness, true);
     return findByID.GetElement();
 }
@@ -614,7 +614,7 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 const Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     FindByComparisonFunctor findByComparison(comparison);
-    findByComparison.PushDirection(direction);
+    findByComparison.SetDirection(direction);
     this->Process(findByComparison, deepness, true);
     return findByComparison.GetElement();
 }
@@ -628,7 +628,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     FindExtremeByComparisonFunctor findExtremeByComparison(comparison);
-    findExtremeByComparison.PushDirection(direction);
+    findExtremeByComparison.SetDirection(direction);
     this->Process(findExtremeByComparison, deepness, true);
     return findExtremeByComparison.GetElement();
 }
@@ -661,7 +661,7 @@ void Object::FindAllDescendantsByComparison(
     if (clear) objects->clear();
 
     FindAllByComparisonFunctor findAllByComparison(comparison, objects);
-    findAllByComparison.PushDirection(direction);
+    findAllByComparison.SetDirection(direction);
     this->Process(findAllByComparison, deepness, true);
 }
 
@@ -672,7 +672,7 @@ void Object::FindAllDescendantsByComparison(
     if (clear) objects->clear();
 
     FindAllConstByComparisonFunctor findAllConstByComparison(comparison, objects);
-    findAllConstByComparison.PushDirection(direction);
+    findAllConstByComparison.SetDirection(direction);
     this->Process(findAllConstByComparison, deepness, true);
 }
 

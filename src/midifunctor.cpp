@@ -386,7 +386,7 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
 FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 {
     // Do nothing if the tremolo is unmeasured
-    if (bTrem->GetForm() == bTremLog_FORM_unmeas) {
+    if (bTrem->GetForm() == tremForm_FORM_unmeas) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -758,8 +758,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasKeySigInfo()) {
         const KeySig *keySig = vrv_cast<const KeySig *>(scoreDef->GetKeySig());
         if (keySig && keySig->HasSig()) {
-            m_midiFile->addKeySignature(
-                m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+            // m_midiFile->addKeySignature(
+            //     m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
         }
     }
     // set MIDI time signature

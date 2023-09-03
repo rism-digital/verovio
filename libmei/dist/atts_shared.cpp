@@ -1003,8 +1003,6 @@ AttCoordinated::AttCoordinated() : Att()
 
 void AttCoordinated::ResetCoordinated()
 {
-    m_ulx = MEI_UNSET;
-    m_uly = MEI_UNSET;
     m_lrx = MEI_UNSET;
     m_lry = MEI_UNSET;
     m_rotate = 0.0;
@@ -1013,16 +1011,6 @@ void AttCoordinated::ResetCoordinated()
 bool AttCoordinated::ReadCoordinated(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
-    if (element.attribute("ulx")) {
-        this->SetUlx(StrToInt(element.attribute("ulx").value()));
-        if (removeAttr) element.remove_attribute("ulx");
-        hasAttribute = true;
-    }
-    if (element.attribute("uly")) {
-        this->SetUly(StrToInt(element.attribute("uly").value()));
-        if (removeAttr) element.remove_attribute("uly");
-        hasAttribute = true;
-    }
     if (element.attribute("lrx")) {
         this->SetLrx(StrToInt(element.attribute("lrx").value()));
         if (removeAttr) element.remove_attribute("lrx");
@@ -1044,14 +1032,6 @@ bool AttCoordinated::ReadCoordinated(pugi::xml_node element, bool removeAttr)
 bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasUlx()) {
-        element.append_attribute("ulx") = IntToStr(this->GetUlx()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasUly()) {
-        element.append_attribute("uly") = IntToStr(this->GetUly()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasLrx()) {
         element.append_attribute("lrx") = IntToStr(this->GetLrx()).c_str();
         wroteAttribute = true;
@@ -1067,16 +1047,6 @@ bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttCoordinated::HasUlx() const
-{
-    return (m_ulx != MEI_UNSET);
-}
-
-bool AttCoordinated::HasUly() const
-{
-    return (m_uly != MEI_UNSET);
-}
-
 bool AttCoordinated::HasLrx() const
 {
     return (m_lrx != MEI_UNSET);
@@ -1090,6 +1060,61 @@ bool AttCoordinated::HasLry() const
 bool AttCoordinated::HasRotate() const
 {
     return (m_rotate != 0.0);
+}
+
+//----------------------------------------------------------------------------
+// AttCoordinatedUl
+//----------------------------------------------------------------------------
+
+AttCoordinatedUl::AttCoordinatedUl() : Att()
+{
+    ResetCoordinatedUl();
+}
+
+void AttCoordinatedUl::ResetCoordinatedUl()
+{
+    m_ulx = MEI_UNSET;
+    m_uly = MEI_UNSET;
+}
+
+bool AttCoordinatedUl::ReadCoordinatedUl(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("ulx")) {
+        this->SetUlx(StrToInt(element.attribute("ulx").value()));
+        if (removeAttr) element.remove_attribute("ulx");
+        hasAttribute = true;
+    }
+    if (element.attribute("uly")) {
+        this->SetUly(StrToInt(element.attribute("uly").value()));
+        if (removeAttr) element.remove_attribute("uly");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCoordinatedUl::WriteCoordinatedUl(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasUlx()) {
+        element.append_attribute("ulx") = IntToStr(this->GetUlx()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasUly()) {
+        element.append_attribute("uly") = IntToStr(this->GetUly()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCoordinatedUl::HasUlx() const
+{
+    return (m_ulx != MEI_UNSET);
+}
+
+bool AttCoordinatedUl::HasUly() const
+{
+    return (m_uly != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------
@@ -1200,61 +1225,6 @@ bool AttCurvature::HasBulge() const
 bool AttCurvature::HasCurvedir() const
 {
     return (m_curvedir != curvature_CURVEDIR_NONE);
-}
-
-//----------------------------------------------------------------------------
-// AttCurveRend
-//----------------------------------------------------------------------------
-
-AttCurveRend::AttCurveRend() : Att()
-{
-    ResetCurveRend();
-}
-
-void AttCurveRend::ResetCurveRend()
-{
-    m_lform = LINEFORM_NONE;
-    m_lwidth = data_LINEWIDTH();
-}
-
-bool AttCurveRend::ReadCurveRend(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("lform")) {
-        this->SetLform(StrToLineform(element.attribute("lform").value()));
-        if (removeAttr) element.remove_attribute("lform");
-        hasAttribute = true;
-    }
-    if (element.attribute("lwidth")) {
-        this->SetLwidth(StrToLinewidth(element.attribute("lwidth").value()));
-        if (removeAttr) element.remove_attribute("lwidth");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttCurveRend::WriteCurveRend(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasLform()) {
-        element.append_attribute("lform") = LineformToStr(this->GetLform()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasLwidth()) {
-        element.append_attribute("lwidth") = LinewidthToStr(this->GetLwidth()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttCurveRend::HasLform() const
-{
-    return (m_lform != LINEFORM_NONE);
-}
-
-bool AttCurveRend::HasLwidth() const
-{
-    return (m_lwidth.HasValue());
 }
 
 //----------------------------------------------------------------------------
@@ -2358,6 +2328,46 @@ bool AttJoined::HasJoin() const
 }
 
 //----------------------------------------------------------------------------
+// AttKeyMode
+//----------------------------------------------------------------------------
+
+AttKeyMode::AttKeyMode() : Att()
+{
+    ResetKeyMode();
+}
+
+void AttKeyMode::ResetKeyMode()
+{
+    m_mode = MODE_NONE;
+}
+
+bool AttKeyMode::ReadKeyMode(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("mode")) {
+        this->SetMode(StrToMode(element.attribute("mode").value()));
+        if (removeAttr) element.remove_attribute("mode");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttKeyMode::WriteKeyMode(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasMode()) {
+        element.append_attribute("mode") = ModeToStr(this->GetMode()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttKeyMode::HasMode() const
+{
+    return (m_mode != MODE_NONE);
+}
+
+//----------------------------------------------------------------------------
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
@@ -2749,8 +2759,8 @@ AttLineRendBase::AttLineRendBase() : Att()
 void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
-    m_lsegs = MEI_UNSET;
     m_lwidth = data_LINEWIDTH();
+    m_lsegs = MEI_UNSET;
 }
 
 bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element, bool removeAttr)
@@ -2761,14 +2771,14 @@ bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element, bool removeAttr)
         if (removeAttr) element.remove_attribute("lform");
         hasAttribute = true;
     }
-    if (element.attribute("lsegs")) {
-        this->SetLsegs(StrToInt(element.attribute("lsegs").value()));
-        if (removeAttr) element.remove_attribute("lsegs");
-        hasAttribute = true;
-    }
     if (element.attribute("lwidth")) {
         this->SetLwidth(StrToLinewidth(element.attribute("lwidth").value()));
         if (removeAttr) element.remove_attribute("lwidth");
+        hasAttribute = true;
+    }
+    if (element.attribute("lsegs")) {
+        this->SetLsegs(StrToInt(element.attribute("lsegs").value()));
+        if (removeAttr) element.remove_attribute("lsegs");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2781,12 +2791,12 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
         element.append_attribute("lform") = LineformToStr(this->GetLform()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasLsegs()) {
-        element.append_attribute("lsegs") = IntToStr(this->GetLsegs()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasLwidth()) {
         element.append_attribute("lwidth") = LinewidthToStr(this->GetLwidth()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLsegs()) {
+        element.append_attribute("lsegs") = IntToStr(this->GetLsegs()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2797,14 +2807,14 @@ bool AttLineRendBase::HasLform() const
     return (m_lform != LINEFORM_NONE);
 }
 
-bool AttLineRendBase::HasLsegs() const
-{
-    return (m_lsegs != MEI_UNSET);
-}
-
 bool AttLineRendBase::HasLwidth() const
 {
     return (m_lwidth.HasValue());
+}
+
+bool AttLineRendBase::HasLsegs() const
+{
+    return (m_lsegs != MEI_UNSET);
 }
 
 //----------------------------------------------------------------------------
@@ -3295,6 +3305,46 @@ bool AttMeiVersion::WriteMeiVersion(pugi::xml_node element)
 bool AttMeiVersion::HasMeiversion() const
 {
     return (m_meiversion != meiVersion_MEIVERSION_NONE);
+}
+
+//----------------------------------------------------------------------------
+// AttMensurLog
+//----------------------------------------------------------------------------
+
+AttMensurLog::AttMensurLog() : Att()
+{
+    ResetMensurLog();
+}
+
+void AttMensurLog::ResetMensurLog()
+{
+    m_level = DURATION_NONE;
+}
+
+bool AttMensurLog::ReadMensurLog(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("level")) {
+        this->SetLevel(StrToDuration(element.attribute("level").value()));
+        if (removeAttr) element.remove_attribute("level");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMensurLog::WriteMensurLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasLevel()) {
+        element.append_attribute("level") = DurationToStr(this->GetLevel()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMensurLog::HasLevel() const
+{
+    return (m_level != DURATION_NONE);
 }
 
 //----------------------------------------------------------------------------
