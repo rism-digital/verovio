@@ -33,14 +33,14 @@ AttDivLineLog::AttDivLineLog() : Att()
 
 void AttDivLineLog::ResetDivLineLog()
 {
-    m_form = "";
+    m_form = divLineLog_FORM_NONE;
 }
 
 bool AttDivLineLog::ReadDivLineLog(pugi::xml_node element, bool removeAttr)
 {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToStr(element.attribute("form").value()));
+        this->SetForm(StrToDivLineLogForm(element.attribute("form").value()));
         if (removeAttr) element.remove_attribute("form");
         hasAttribute = true;
     }
@@ -51,7 +51,7 @@ bool AttDivLineLog::WriteDivLineLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = DivLineLogFormToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -59,7 +59,7 @@ bool AttDivLineLog::WriteDivLineLog(pugi::xml_node element)
 
 bool AttDivLineLog::HasForm() const
 {
-    return (m_form != "");
+    return (m_form != divLineLog_FORM_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -130,7 +130,6 @@ void AttNcForm::ResetNcForm()
 {
     m_angled = BOOLEAN_NONE;
     m_con = ncForm_CON_NONE;
-    m_curve = ncForm_CURVE_NONE;
     m_hooked = BOOLEAN_NONE;
     m_ligated = BOOLEAN_NONE;
     m_rellen = ncForm_RELLEN_NONE;
@@ -149,11 +148,6 @@ bool AttNcForm::ReadNcForm(pugi::xml_node element, bool removeAttr)
     if (element.attribute("con")) {
         this->SetCon(StrToNcFormCon(element.attribute("con").value()));
         if (removeAttr) element.remove_attribute("con");
-        hasAttribute = true;
-    }
-    if (element.attribute("curve")) {
-        this->SetCurve(StrToNcFormCurve(element.attribute("curve").value()));
-        if (removeAttr) element.remove_attribute("curve");
         hasAttribute = true;
     }
     if (element.attribute("hooked")) {
@@ -195,10 +189,6 @@ bool AttNcForm::WriteNcForm(pugi::xml_node element)
         element.append_attribute("con") = NcFormConToStr(this->GetCon()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasCurve()) {
-        element.append_attribute("curve") = NcFormCurveToStr(this->GetCurve()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasHooked()) {
         element.append_attribute("hooked") = BooleanToStr(this->GetHooked()).c_str();
         wroteAttribute = true;
@@ -232,11 +222,6 @@ bool AttNcForm::HasCon() const
     return (m_con != ncForm_CON_NONE);
 }
 
-bool AttNcForm::HasCurve() const
-{
-    return (m_curve != ncForm_CURVE_NONE);
-}
-
 bool AttNcForm::HasHooked() const
 {
     return (m_hooked != BOOLEAN_NONE);
@@ -260,6 +245,46 @@ bool AttNcForm::HasSShape() const
 bool AttNcForm::HasTilt() const
 {
     return (m_tilt != data_COMPASSDIRECTION());
+}
+
+//----------------------------------------------------------------------------
+// AttNeumeType
+//----------------------------------------------------------------------------
+
+AttNeumeType::AttNeumeType() : Att()
+{
+    ResetNeumeType();
+}
+
+void AttNeumeType::ResetNeumeType()
+{
+    m_type = "";
+}
+
+bool AttNeumeType::ReadNeumeType(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("type")) {
+        this->SetType(StrToStr(element.attribute("type").value()));
+        if (removeAttr) element.remove_attribute("type");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttNeumeType::WriteNeumeType(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasType()) {
+        element.append_attribute("type") = StrToStr(this->GetType()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttNeumeType::HasType() const
+{
+    return (m_type != "");
 }
 
 } // namespace vrv

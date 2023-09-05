@@ -280,7 +280,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     // Render a bracket for the ligature
     if (m_options->m_ligatureAsBracket.GetValue()) {
-        const ListOfObjects &notes = ligature->GetList(ligature);
+        const ListOfObjects &notes = ligature->GetList();
 
         if (notes.size() > 0) {
             int y = staff->GetDrawingY();

@@ -364,7 +364,7 @@ void Doc::CalculateTimemap()
 
     // Adjust the duration of tied notes
     InitTimemapTiesFunctor initTimemapTies;
-    initTimemapTies.PushDirection(BACKWARD);
+    initTimemapTies.SetDirection(BACKWARD);
     this->Process(initTimemapTies);
 
     m_timemapTempo = m_options->m_midiTempoAdjustment.GetValue();
@@ -457,7 +457,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 label = vrv_cast<Label *>(staffGrp->FindDescendantByType(LABEL, 1));
             }
             if (label) {
-                std::string trackName = UTF32to8(label->GetText(label)).c_str();
+                std::string trackName = UTF32to8(label->GetText()).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
             }
             // set MIDI key signature
@@ -493,7 +493,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             filters.Add(&matchLayer);
 
             GenerateMIDIFunctor generateMIDI(midiFile);
-            generateMIDI.PushFilters(&filters);
+            generateMIDI.SetFilters(&filters);
 
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
@@ -583,9 +583,8 @@ void Doc::PrepareData()
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningFunctor prepareTimeSpanning;
-    prepareTimeSpanning.PushDirection(BACKWARD);
+    prepareTimeSpanning.SetDirection(BACKWARD);
     this->Process(prepareTimeSpanning);
-    prepareTimeSpanning.PopDirection();
     prepareTimeSpanning.SetDataCollectionCompleted();
 
     // First we try backwards because normally the spanning elements are at the end of
@@ -595,6 +594,7 @@ void Doc::PrepareData()
     // but this time without filling the list (that is only will the remaining elements)
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
+        prepareTimeSpanning.SetDirection(FORWARD);
         this->Process(prepareTimeSpanning);
     }
 
@@ -616,7 +616,7 @@ void Doc::PrepareData()
 
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingFunctor prepareTimePointing;
-    prepareTimePointing.PushDirection(BACKWARD);
+    prepareTimePointing.SetDirection(BACKWARD);
     this->Process(prepareTimePointing);
 
     /************ Resolve @tstamp / tstamp2 ************/
@@ -640,9 +640,8 @@ void Doc::PrepareData()
 
     // If we have some left process again backward
     if (!prepareLinking.GetSameasIDPairs().empty() || !prepareLinking.GetStemSameasIDPairs().empty()) {
-        prepareLinking.PushDirection(BACKWARD);
+        prepareLinking.SetDirection(BACKWARD);
         this->Process(prepareLinking);
-        prepareLinking.PopDirection();
     }
 
     // If some are still there, then it is probably an issue in the encoding
@@ -685,6 +684,11 @@ void Doc::PrepareData()
     PrepareBeamSpanElementsFunctor prepareBeamSpanElements;
     this->Process(prepareBeamSpanElements);
 
+    /************ Match pedal lines ***********/
+
+    PreparePedalsFunctor preparePedals(this);
+    this->Process(preparePedals);
+
     /************ Prepare processing by staff/layer/verse ************/
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -718,7 +722,7 @@ void Doc::PrepareData()
             filters.Add(&matchLayer);
 
             PreparePointersByLayerFunctor preparePointersByLayer;
-            preparePointersByLayer.PushFilters(&filters);
+            preparePointersByLayer.SetFilters(&filters);
             this->Process(preparePointersByLayer);
         }
     }
@@ -730,7 +734,6 @@ void Doc::PrepareData()
     prepareDelayedTurns.SetDataCollectionCompleted();
 
     if (!prepareDelayedTurns.GetDelayedTurns().empty()) {
-        prepareDelayedTurns.PushFilters(&filters);
         for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
             for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
                 filters.Clear();
@@ -740,6 +743,7 @@ void Doc::PrepareData()
                 filters.Add(&matchStaff);
                 filters.Add(&matchLayer);
 
+                prepareDelayedTurns.SetFilters(&filters);
                 prepareDelayedTurns.ResetCurrent();
                 this->Process(prepareDelayedTurns);
             }
@@ -765,7 +769,7 @@ void Doc::PrepareData()
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
                 PrepareLyricsFunctor prepareLyrics;
-                prepareLyrics.PushFilters(&filters);
+                prepareLyrics.SetFilters(&filters);
                 this->Process(prepareLyrics);
             }
         }
@@ -799,7 +803,7 @@ void Doc::PrepareData()
 
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
             PrepareRptFunctor prepareRpt(this);
-            prepareRpt.PushFilters(&filters);
+            prepareRpt.SetFilters(&filters);
             this->Process(prepareRpt);
         }
     }
@@ -813,7 +817,7 @@ void Doc::PrepareData()
     /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
-    PrepareFloatingGrpsFunctor prepareFloatingGrps(this);
+    PrepareFloatingGrpsFunctor prepareFloatingGrps;
     this->Process(prepareFloatingGrps);
 
     /************ Resolve cue size ************/
@@ -876,10 +880,10 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     // First we need to set Page::m_score and Page::m_scoreEnd
     // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
     ScoreDefSetCurrentPageFunctor scoreDefSetCurrentPage(this);
-    scoreDefSetCurrentPage.PushDirection(BACKWARD);
+    scoreDefSetCurrentPage.SetDirection(BACKWARD);
     this->Process(scoreDefSetCurrentPage, 3);
-    scoreDefSetCurrentPage.PopDirection();
     // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
+    scoreDefSetCurrentPage.SetDirection(FORWARD);
     this->Process(scoreDefSetCurrentPage, 3);
 
     ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
@@ -1345,7 +1349,7 @@ void Doc::ConvertMarkupDoc(bool permanent)
                 filters.Add(&matchLayer);
 
                 ConvertMarkupAnalyticalFunctor convertMarkupAnalytical(permanent);
-                convertMarkupAnalytical.PushFilters(&filters);
+                convertMarkupAnalytical.SetFilters(&filters);
                 this->Process(convertMarkupAnalytical);
 
                 // After having processed one layer, we check if we have open ties - if yes, we

@@ -215,7 +215,7 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
     const bool hasSystemStartLine = measure->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
 
     Filters filters;
-    this->PushFilters(&filters);
+    Filters *previousFilters = this->SetFilters(&filters);
 
     for (auto staffN : m_staffNs) {
         m_minPos = 0;
@@ -247,7 +247,7 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
         measure->m_measureAligner.Process(*this);
     }
 
-    this->PopFilters();
+    this->SetFilters(previousFilters);
 
     int minMeasureWidth = m_doc->GetOptions()->m_unit.GetValue() * m_doc->GetOptions()->m_measureMinWidth.GetValue();
     // First try to see if we have a double measure length element

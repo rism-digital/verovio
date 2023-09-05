@@ -121,7 +121,7 @@ void StaffGrp::FilterList(ListOfConstObjects &childList) const
 
 int StaffGrp::GetMaxStaffSize() const
 {
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
 
     if (childList.empty()) return 100;
 
@@ -150,7 +150,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 
 std::pair<const StaffDef *, const StaffDef *> StaffGrp::GetFirstLastStaffDef() const
 {
-    const ListOfConstObjects &staffDefs = this->GetList(this);
+    const ListOfConstObjects &staffDefs = this->GetList();
     if (staffDefs.empty()) {
         return { NULL, NULL };
     }

@@ -208,6 +208,11 @@ modules:
                 type: double
                 default: -1.0
 
+    neumes:
+        att.divLine.log:
+            form:
+                type: divLineLog_FORM
+
     shared:
         att.articulation:
             artic:
@@ -253,3 +258,9 @@ modules:
             tab.fret:
                 type: int
                 default: -1
+    
+    visual:
+        att.mensural.vis:
+            mensur.slash:
+                type: char
+                default: 0

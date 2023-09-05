@@ -1,6 +1,11 @@
 # Changelog
 
-## [unreleased]
+## [4.0.1] - 2023-09-05
+* Fix MEI version in output
+
+## [4.0.0] - 2023-09-05
+* Update schemas to MEI 5.0 and corresponding adjustments
+* Support for `space` within `beam`
 
 ## [3.16.0] - 2023-07-03
 * Support for rectangular tone clusters (@eNote-GmbH)

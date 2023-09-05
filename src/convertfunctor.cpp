@@ -295,7 +295,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
     m_targetSubSystem->AddChild(targetMeasure);
 
     Filters filters;
-    this->PushFilters(&filters);
+    Filters *previousFilters = this->SetFilters(&filters);
 
     // Now we can process by layer and move their content to (measure) segments
     for (const auto &staves : m_layerTree->child) {
@@ -312,7 +312,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
         }
     }
 
-    this->PopFilters();
+    this->SetFilters(previousFilters);
 
     m_targetMeasure = NULL;
     m_targetSubSystem = NULL;

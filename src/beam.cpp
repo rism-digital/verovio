@@ -71,7 +71,7 @@ void BeamSegment::Reset()
 
 const ArrayOfBeamElementCoords *BeamSegment::GetElementCoordRefs()
 {
-    // this->GetList(this);
+    // this->GetList();
     return &m_beamElementCoordRefs;
 }
 
@@ -1108,7 +1108,7 @@ void BeamSegment::CalcAdjustPosition(const Staff *staff, const Doc *doc, const B
         }
     }
 
-    m_beamElementCoordRefs.at(0)->m_yBeam += adjust;
+    m_firstNoteOrChord->m_yBeam += adjust;
 
     this->CalcSetValues();
 }
@@ -1457,8 +1457,8 @@ void BeamSegment::CalcPartialFlagPlace()
 
 void BeamSegment::CalcSetValues()
 {
-    int startingX = m_beamElementCoordRefs.at(0)->m_x;
-    int startingY = m_beamElementCoordRefs.at(0)->m_yBeam;
+    const int startingX = m_firstNoteOrChord->m_x;
+    const int startingY = m_firstNoteOrChord->m_yBeam;
 
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
         coord->m_yBeam = startingY + m_beamSlope * (coord->m_x - startingX);
@@ -1715,11 +1715,6 @@ void Beam::FilterList(ListOfConstObjects &childList) const
                     continue;
                 }
             }
-            // and spaces
-            else if (element->Is(SPACE)) {
-                iter = childList.erase(iter);
-                continue;
-            }
             ++iter;
         }
     }
@@ -1727,7 +1722,7 @@ void Beam::FilterList(ListOfConstObjects &childList) const
 
 const ArrayOfBeamElementCoords *Beam::GetElementCoords()
 {
-    this->GetList(this);
+    this->GetList();
     return &m_beamElementCoords;
 }
 

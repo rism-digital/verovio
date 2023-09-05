@@ -52,6 +52,7 @@ class Del;
 class Dot;
 class Dir;
 class Div;
+class DivLine;
 class DurationInterface;
 class Dynam;
 class Ending;
@@ -389,6 +390,7 @@ private:
     void WriteChord(pugi::xml_node currentNode, Chord *chord);
     void WriteClef(pugi::xml_node currentNode, Clef *clef);
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
+    void WriteDivLine(pugi::xml_node currentNode, DivLine *divLine);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
@@ -699,6 +701,7 @@ private:
     bool ReadChord(Object *parent, pugi::xml_node chord);
     bool ReadClef(Object *parent, pugi::xml_node clef);
     bool ReadCustos(Object *parent, pugi::xml_node custos);
+    bool ReadDivLine(Object *parent, pugi::xml_node divLine);
     bool ReadDot(Object *parent, pugi::xml_node dot);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);
@@ -886,20 +889,20 @@ private:
      */
     ///@{
     // to MEI 5.0.0
-    void UpgradeKeySigTo_5_0_0(pugi::xml_node keySig);
-    void UpgradePageTo_5_0_0(Page *page);
-    void UpgradePgHeadFootTo_5_0_0(pugi::xml_node element);
-    void UpgradeMeasureTo_5_0_0(pugi::xml_node measure);
-    void UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
-    void UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement);
-    void UpgradeStaffTo_5_0_0(pugi::xml_node staff);
-    void UpgradeLayerElementTo_5_0_0(pugi::xml_node element);
-    void UpgradeRendTo_5_0_0(pugi::xml_node element);
+    void UpgradeKeySigTo_5_0(pugi::xml_node keySig);
+    void UpgradePageTo_5_0(Page *page);
+    void UpgradePgHeadFootTo_5_0(pugi::xml_node element);
+    void UpgradeMeasureTo_5_0(pugi::xml_node measure);
+    void UpgradeMeterSigTo_5_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
+    void UpgradeScoreDefElementTo_5_0(pugi::xml_node scoreDefElement);
+    void UpgradeStaffTo_5_0(pugi::xml_node staff);
+    void UpgradeLayerElementTo_5_0(pugi::xml_node element);
+    void UpgradeRendTo_5_0(pugi::xml_node element);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
-    void UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur);
+    void UpgradeMensurTo_5_0(pugi::xml_node mensur, Mensur *vrvMensur);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);

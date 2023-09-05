@@ -559,6 +559,47 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// PreparePedalsFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class matches down and up pedal lines.
+ */
+class PreparePedalsFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    PreparePedalsFunctor(Doc *doc);
+    virtual ~PreparePedalsFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
+    FunctorCode VisitPedal(Pedal *pedal) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The current pedals to be linked / grouped
+    std::list<Pedal *> m_pedalLines;
+};
+
+//----------------------------------------------------------------------------
 // PreparePointersByLayerFunctor
 //----------------------------------------------------------------------------
 
@@ -687,7 +728,13 @@ public:
 protected:
     //
 private:
-    //
+    // Create stem if it does not exist
+    Stem *EnsureStemExists(Stem *stem, Object *parent) const;
+    // Create dots if they should exist, otherwise remove them
+    Dots *ProcessDots(Dots *dots, Object *parent, bool shouldExist) const;
+    // Create flag if it should exist, otherwise remove it
+    Flag *ProcessFlag(Flag *flag, Object *parent, bool shouldExist) const;
+
 public:
     //
 private:
@@ -861,13 +908,13 @@ private:
  * This class groups FloatingObjects by drawingGrpId.
  * Also chains the Dynam and Hairpin.
  */
-class PrepareFloatingGrpsFunctor : public DocFunctor {
+class PrepareFloatingGrpsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    PrepareFloatingGrpsFunctor(Doc *doc);
+    PrepareFloatingGrpsFunctor();
     virtual ~PrepareFloatingGrpsFunctor() = default;
     ///@}
 
@@ -906,8 +953,6 @@ private:
     std::vector<Hairpin *> m_hairpins;
     // The map of existing harms (based on @n)
     std::map<std::string, Harm *> m_harms;
-    // The current pedals to be linked / grouped
-    std::list<Pedal *> m_pedalLines;
 };
 
 //----------------------------------------------------------------------------

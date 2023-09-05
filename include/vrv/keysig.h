@@ -45,10 +45,10 @@ class KeySig : public LayerElement,
                public ObjectListInterface,
                public AttAccidental,
                public AttColor,
-               public AttPitch,
-               public AttKeySigAnl,
+               public AttKeyMode,
                public AttKeySigLog,
                public AttKeySigVis,
+               public AttPitch,
                public AttVisibility {
 public:
     /**

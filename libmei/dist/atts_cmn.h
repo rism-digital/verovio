@@ -75,55 +75,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttBTremLog
-//----------------------------------------------------------------------------
-
-class AttBTremLog : public Att {
-protected:
-    AttBTremLog();
-    ~AttBTremLog() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetBTremLog();
-
-    /** Read the values for the attribute class **/
-    bool ReadBTremLog(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteBTremLog(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetForm(bTremLog_FORM form_) { m_form = form_; }
-    bTremLog_FORM GetForm() const { return m_form; }
-    bool HasForm() const;
-    ///@}
-
-private:
-    /** Indicates to what degree the harmonic label is supported by the notation. **/
-    bTremLog_FORM m_form;
-};
-
-//----------------------------------------------------------------------------
-// InstBTremLog
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttBTremLog
- */
-
-class InstBTremLog : public AttBTremLog {
-public:
-    InstBTremLog() = default;
-    virtual ~InstBTremLog() = default;
-};
-
-//----------------------------------------------------------------------------
 // AttBeamPresent
 //----------------------------------------------------------------------------
 
@@ -609,55 +560,6 @@ class InstExpandable : public AttExpandable {
 public:
     InstExpandable() = default;
     virtual ~InstExpandable() = default;
-};
-
-//----------------------------------------------------------------------------
-// AttFTremLog
-//----------------------------------------------------------------------------
-
-class AttFTremLog : public Att {
-protected:
-    AttFTremLog();
-    ~AttFTremLog() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetFTremLog();
-
-    /** Read the values for the attribute class **/
-    bool ReadFTremLog(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteFTremLog(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetForm(fTremLog_FORM form_) { m_form = form_; }
-    fTremLog_FORM GetForm() const { return m_form; }
-    bool HasForm() const;
-    ///@}
-
-private:
-    /** Indicates to what degree the harmonic label is supported by the notation. **/
-    fTremLog_FORM m_form;
-};
-
-//----------------------------------------------------------------------------
-// InstFTremLog
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttFTremLog
- */
-
-class InstFTremLog : public AttFTremLog {
-public:
-    InstFTremLog() = default;
-    virtual ~InstFTremLog() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1441,55 +1343,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttScoreDefVisCmn
-//----------------------------------------------------------------------------
-
-class AttScoreDefVisCmn : public Att {
-protected:
-    AttScoreDefVisCmn();
-    ~AttScoreDefVisCmn() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetScoreDefVisCmn();
-
-    /** Read the values for the attribute class **/
-    bool ReadScoreDefVisCmn(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteScoreDefVisCmn(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; }
-    data_BOOLEAN GetGridShow() const { return m_gridShow; }
-    bool HasGridShow() const;
-    ///@}
-
-private:
-    /** Determines whether to display guitar chord grids. **/
-    data_BOOLEAN m_gridShow;
-};
-
-//----------------------------------------------------------------------------
-// InstScoreDefVisCmn
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttScoreDefVisCmn
- */
-
-class InstScoreDefVisCmn : public AttScoreDefVisCmn {
-public:
-    InstScoreDefVisCmn() = default;
-    virtual ~InstScoreDefVisCmn() = default;
-};
-
-//----------------------------------------------------------------------------
 // AttSlurRend
 //----------------------------------------------------------------------------
 
@@ -1654,6 +1507,55 @@ class InstTieRend : public AttTieRend {
 public:
     InstTieRend() = default;
     virtual ~InstTieRend() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttTremForm
+//----------------------------------------------------------------------------
+
+class AttTremForm : public Att {
+protected:
+    AttTremForm();
+    ~AttTremForm() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetTremForm();
+
+    /** Read the values for the attribute class **/
+    bool ReadTremForm(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteTremForm(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetForm(tremForm_FORM form_) { m_form = form_; }
+    tremForm_FORM GetForm() const { return m_form; }
+    bool HasForm() const;
+    ///@}
+
+private:
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    tremForm_FORM m_form;
+};
+
+//----------------------------------------------------------------------------
+// InstTremForm
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttTremForm
+ */
+
+class InstTremForm : public AttTremForm {
+public:
+    InstTremForm() = default;
+    virtual ~InstTremForm() = default;
 };
 
 //----------------------------------------------------------------------------

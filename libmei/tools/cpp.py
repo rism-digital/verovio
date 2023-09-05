@@ -926,7 +926,7 @@ def create_att_datatypes(cpp_ns: str, schema, outdir: Path):
 
         val_prefix = vrv_getformattedvallist(list_type.rsplit('@')[0], list_type.rsplit('@')[1])
         type_start_fmt = {
-            "meitype": list_type,
+            "meitype": list_type.replace("@", "\@"),
             "vrvtype": val_prefix,
             "enumtype": " : int8_t" if len(values) < 64 else "",
             "val_prefix":  val_prefix
