@@ -1,5 +1,8 @@
 # Changelog
 
+## [4.0.1] - 2023-09-05
+* Fix MEI version in output
+
 ## [4.0.0] - 2023-09-05
 * Update schemas to MEI 5.0 and corresponding adjustments
 * Support for `space` within `beam`
