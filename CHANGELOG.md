@@ -1,5 +1,8 @@
 # Changelog
 
+## [4.0.0] - 2023-09-05
+* Update schemas to MEI 5.0 and corresponding adjustments
+
 ## [3.16.0] - 2023-07-03
 * Support for rectangular tone clusters (@eNote-GmbH)
 * Support for delayed turns on chords (@eNote-GmbH)
