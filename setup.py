@@ -33,7 +33,7 @@ def get_commit():
     """Call tools/get_git_commit.sh on any platform."""
     if os.path.exists('./tools'):
         print('running tools/get_git_commit.sh')
-        os.system('bash -c "cd tools; ./get_git_commit.sh"')
+        os.system('sh -c "cd tools; ./get_git_commit.sh"')
     else:
         print('tools directory is missing')
 
