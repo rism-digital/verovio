@@ -8302,7 +8302,12 @@ void MEIInput::UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *
         }
         else if (durGes.back() == 's') {
             durGes.pop_back();
-            interface->SetDurReal(std::stof(durGes));
+            try {
+                interface->SetDurReal(std::stof(durGes));
+            }
+            catch (const std::invalid_argument &ia) {
+                LogError("Upgrading to 4.0.0: %s", ia.what());
+            }
         }
         element.remove_attribute("dur.ges");
     }
