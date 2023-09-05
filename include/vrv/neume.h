@@ -77,6 +77,7 @@ public:
      */
     bool IsSupportedChild(Object *object) override;
 
+    int GetLigatureCount(int position);
     bool IsLastInNeume(const LayerElement *element) const;
 
     bool GenerateChildMelodic();

@@ -42,32 +42,6 @@ struct NearEndCollision {
     bool endPointsAdjusted;
 };
 
-//----------------------------------------------------------------------------
-// ControlPointConstraint
-//----------------------------------------------------------------------------
-/**
- * This represents a constraint ax + by >= c where x and y are
- * vertical control point adjustments
- */
-struct ControlPointConstraint {
-    double a;
-    double b;
-    double c;
-};
-
-//----------------------------------------------------------------------------
-// ControlPointAdjustment
-//----------------------------------------------------------------------------
-/**
- * A vertical adjustment of bezier control points
- */
-struct ControlPointAdjustment {
-    int leftShift;
-    int rightShift;
-    bool moveUpwards;
-    int requestedStaffSpace;
-};
-
 // Helper enum classes
 enum class SlurCurveDirection { None, Above, Below, AboveBelow, BelowAbove };
 enum class PortatoSlurType { None, StemSide, Centered };
@@ -80,8 +54,8 @@ class Slur : public ControlElement,
              public TimeSpanningInterface,
              public AttColor,
              public AttCurvature,
-             public AttCurveRend,
-             public AttLayerIdent {
+             public AttLayerIdent,
+             public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -195,18 +169,6 @@ public:
      */
     void InitBezierControlSides(BezierCurve &bezier, curvature_CURVEDIR curveDir) const;
 
-    /**
-     * Slur adjustment
-     */
-    ///@{
-    void AdjustSlur(const Doc *doc, FloatingCurvePositioner *curve, int unit);
-
-    void AdjustOuterSlur(
-        const Doc *doc, FloatingCurvePositioner *curve, const ArrayOfFloatingCurvePositioners &innerCurves, int unit);
-
-    float GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir) const;
-    ///@}
-
     //----------//
     // Functors //
     //----------//
@@ -258,83 +220,8 @@ private:
     bool StartsOnBeam() const { return this->HasBoundaryOnBeam(true); }
     bool EndsOnBeam() const { return this->HasBoundaryOnBeam(false); }
     bool HasBoundaryOnBeam(bool isStart) const;
-    ///@}
-
-    /**
-     * Adjust slur position based on overlapping objects within its spanning elements
-     */
-    ///@{
-    // Discard certain spanned elements
-    void FilterSpannedElements(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
-
-    // Detect collisions near the endpoints
-    NearEndCollision DetectCollisionsNearEnd(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
-
-    // Calculate the vertical shift of the slur end points
-    std::pair<int, int> CalcEndPointShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double flexibility, int margin);
-
-    // Apply the vertical shift of the slur end points
-    void ApplyEndPointShift(
-        FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int endPointShiftLeft, int endPointShiftRight);
-
-    // Calculate slur from bulge values
-    void AdjustSlurFromBulge(FloatingCurvePositioner *curve, BezierCurve &bezierCurve, int unit);
-
-    // Check whether control points should be adjusted horizontally
-    bool AllowControlOffsetAdjustment(const BezierCurve &bezierCurve, double symmetry, int unit) const;
-
-    // Calculate the horizontal control point offset
-    std::tuple<bool, int, int> CalcControlPointOffset(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, int margin);
-
-    // Calculate the vertical control point shift
-    ControlPointAdjustment CalcControlPointVerticalShift(
-        FloatingCurvePositioner *curve, const BezierCurve &bezierCurve, double symmetry, int margin);
-
-    // Solve the constraints for vertical control point adjustment
-    std::pair<int, int> SolveControlPointConstraints(
-        const std::list<ControlPointConstraint> &constraints, double symmetry = 0.0) const;
-
-    // Improve the slur shape by adjusting the control point heights
-    void AdjustSlurShape(BezierCurve &bezierCurve, curvature_CURVEDIR dir, int unit);
-    ///@}
-
-    /**
-     * Adjust slur position based on inner slurs
-     */
-    ///@{
-    // Calculate the vertical control point shift
-    ControlPointAdjustment CalcControlPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
-        const ArrayOfFloatingCurvePositioners &innerCurves, double symmetry, int margin);
-
-    // Calculate the vertical shift of the slur end points
-    std::pair<int, int> CalcEndPointShift(FloatingCurvePositioner *curve, const BezierCurve &bezierCurve,
-        const ArrayOfFloatingCurvePositioners &innerCurves, double flexibility, int margin);
-    ///@}
-
-    /**
-     * Low level helper functions for slur adjustment
-     */
-    ///@{
-    // Shift end points for collisions nearby
-    void ShiftEndPoints(int &shiftLeft, int &shiftRight, double ratio, int intersection, double flexibility,
-        bool isBelow, char spanningType) const;
-
-    // Calculate the full and partial shift radii
-    std::pair<double, double> CalcShiftRadii(bool forShiftLeft, double flexibility, char spanningType) const;
-
-    // Determine a quadratic interpolation function between zero and one and evaluate it
-    double CalcQuadraticInterpolation(double zeroAt, double oneAt, double arg) const;
-
-    // Rotate the slope by a given number of degrees, but choose smaller angles if already close to the vertical axis
-    // Choose doublingBound as the positive slope value where doubling has the same effect as rotating:
-    // tan(atan(doublingBound) + degrees * PI / 180.0) ≈ 2.0 * doublingBound
-    double RotateSlope(double slope, double degrees, double doublingBound, bool upwards) const;
-
-    // Calculate the minimal angle <)C1P1P2 or <)P1P2C2
-    float GetMinControlPointAngle(const BezierCurve &bezierCurve, float angle, int unit) const;
+    // Angle adjustment
+    float GetAdjustedSlurAngle(const Doc *doc, Point &p1, Point &p2, curvature_CURVEDIR curveDir) const;
     ///@}
 
 public:

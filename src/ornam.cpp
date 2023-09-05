@@ -35,15 +35,11 @@ Ornam::Ornam()
     , TextDirInterface()
     , TimePointInterface()
     , AttColor()
-    , AttExtSymAuth()
-    , AttExtSymNames()
     , AttOrnamentAccid()
 {
     this->RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
-    this->RegisterAttClass(ATT_EXTSYMAUTH);
-    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_ORNAMENTACCID);
 
     this->Reset();
@@ -57,8 +53,6 @@ void Ornam::Reset()
     TextDirInterface::Reset();
     TimePointInterface::Reset();
     this->ResetColor();
-    this->ResetExtSymAuth();
-    this->ResetExtSymNames();
     this->ResetOrnamentAccid();
 }
 
@@ -74,25 +68,6 @@ bool Ornam::IsSupportedChild(Object *child)
         return false;
     }
     return true;
-}
-
-char32_t Ornam::GetOrnamGlyph() const
-{
-    const Resources *resources = this->GetDocResources();
-    if (!resources) return 0;
-
-    // If there is glyph.num, prioritize it
-    if (this->HasGlyphNum()) {
-        char32_t code = this->GetGlyphNum();
-        if (NULL != resources->GetGlyph(code)) return code;
-    }
-    // If there is glyph.name (second priority)
-    else if (this->HasGlyphName()) {
-        char32_t code = resources->GetGlyphCode(this->GetGlyphName());
-        if (NULL != resources->GetGlyph(code)) return code;
-    }
-
-    return SMUFL_E567_ornamentTurn;
 }
 
 //----------------------------------------------------------------------------

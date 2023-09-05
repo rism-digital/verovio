@@ -108,8 +108,7 @@ int RunningElement::GetTotalWidth(const Doc *doc) const
 
 void RunningElement::SetDrawingPage(Page *page)
 {
-
-    this->ResetList(this);
+    this->ResetList();
 
     this->ResetCachedDrawingX();
     m_drawingPage = page;

@@ -5,4 +5,4 @@ addons_dir: "./addons"
 elements: false
 namespace: "vrv"
 datatypes: "./datatypes.yml"
-basic_odd: "./mei/develop/mei-basic_compiled.odd"
+basic_odd: "./mei/mei-basic_compiled.odd"

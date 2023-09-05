@@ -63,46 +63,6 @@ bool AttArpegLog::HasOrder() const
 }
 
 //----------------------------------------------------------------------------
-// AttBTremLog
-//----------------------------------------------------------------------------
-
-AttBTremLog::AttBTremLog() : Att()
-{
-    ResetBTremLog();
-}
-
-void AttBTremLog::ResetBTremLog()
-{
-    m_form = bTremLog_FORM_NONE;
-}
-
-bool AttBTremLog::ReadBTremLog(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("form")) {
-        this->SetForm(StrToBTremLogForm(element.attribute("form").value()));
-        if (removeAttr) element.remove_attribute("form");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttBTremLog::WriteBTremLog(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasForm()) {
-        element.append_attribute("form") = BTremLogFormToStr(this->GetForm()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttBTremLog::HasForm() const
-{
-    return (m_form != bTremLog_FORM_NONE);
-}
-
-//----------------------------------------------------------------------------
 // AttBeamPresent
 //----------------------------------------------------------------------------
 
@@ -520,46 +480,6 @@ bool AttExpandable::WriteExpandable(pugi::xml_node element)
 bool AttExpandable::HasExpand() const
 {
     return (m_expand != BOOLEAN_NONE);
-}
-
-//----------------------------------------------------------------------------
-// AttFTremLog
-//----------------------------------------------------------------------------
-
-AttFTremLog::AttFTremLog() : Att()
-{
-    ResetFTremLog();
-}
-
-void AttFTremLog::ResetFTremLog()
-{
-    m_form = fTremLog_FORM_NONE;
-}
-
-bool AttFTremLog::ReadFTremLog(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("form")) {
-        this->SetForm(StrToFTremLogForm(element.attribute("form").value()));
-        if (removeAttr) element.remove_attribute("form");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttFTremLog::WriteFTremLog(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasForm()) {
-        element.append_attribute("form") = FTremLogFormToStr(this->GetForm()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttFTremLog::HasForm() const
-{
-    return (m_form != fTremLog_FORM_NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -1288,46 +1208,6 @@ bool AttRehearsal::HasRehEnclose() const
 }
 
 //----------------------------------------------------------------------------
-// AttScoreDefVisCmn
-//----------------------------------------------------------------------------
-
-AttScoreDefVisCmn::AttScoreDefVisCmn() : Att()
-{
-    ResetScoreDefVisCmn();
-}
-
-void AttScoreDefVisCmn::ResetScoreDefVisCmn()
-{
-    m_gridShow = BOOLEAN_NONE;
-}
-
-bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("grid.show")) {
-        this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
-        if (removeAttr) element.remove_attribute("grid.show");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttScoreDefVisCmn::WriteScoreDefVisCmn(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasGridShow()) {
-        element.append_attribute("grid.show") = BooleanToStr(this->GetGridShow()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttScoreDefVisCmn::HasGridShow() const
-{
-    return (m_gridShow != BOOLEAN_NONE);
-}
-
-//----------------------------------------------------------------------------
 // AttSlurRend
 //----------------------------------------------------------------------------
 
@@ -1475,6 +1355,46 @@ bool AttTieRend::HasTieLform() const
 bool AttTieRend::HasTieLwidth() const
 {
     return (m_tieLwidth.HasValue());
+}
+
+//----------------------------------------------------------------------------
+// AttTremForm
+//----------------------------------------------------------------------------
+
+AttTremForm::AttTremForm() : Att()
+{
+    ResetTremForm();
+}
+
+void AttTremForm::ResetTremForm()
+{
+    m_form = tremForm_FORM_NONE;
+}
+
+bool AttTremForm::ReadTremForm(pugi::xml_node element, bool removeAttr)
+{
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToTremFormForm(element.attribute("form").value()));
+        if (removeAttr) element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttTremForm::WriteTremForm(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasForm()) {
+        element.append_attribute("form") = TremFormFormToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttTremForm::HasForm() const
+{
+    return (m_form != tremForm_FORM_NONE);
 }
 
 //----------------------------------------------------------------------------

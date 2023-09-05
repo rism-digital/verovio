@@ -133,33 +133,38 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         mRest->SetDrawingLoc(loc);
         mRest->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, loc));
     }
-    else if (layerElement->Is(REST)) {
-        Rest *rest = vrv_cast<Rest *>(layerElement);
-        assert(rest);
-        int loc = 0;
-        if (rest->HasPloc() && rest->HasOloc()) {
-            loc = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-        }
-        else if (rest->HasLoc()) {
-            loc = rest->GetLoc();
+    else if (layerElement->Is({ REST, SPACE })) {
+        DurationInterface *durInterface = layerElement->GetDurationInterface();
+        assert(durInterface);
+        Rest *rest = NULL;
+        int loc = VRV_UNSET;
+        if (layerElement->Is(REST)) {
+            rest = vrv_cast<Rest *>(layerElement);
+            assert(rest);
+            if (rest->HasPloc() && rest->HasOloc()) {
+                loc = PitchInterface::CalcLoc(
+                    rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+            }
+            else if (rest->HasLoc()) {
+                loc = rest->GetLoc();
+            }
         }
         // Automatically calculate rest position
-        else {
+        if (loc == VRV_UNSET) {
+            loc = 0;
             // set default location to the middle of the staff
-            Staff *staff = rest->GetAncestorStaff();
+            Staff *staff = layerElement->GetAncestorStaff();
             loc = staff->m_drawingLines - 1;
-            if ((rest->GetDur() < DUR_4) && (loc % 2 != 0)) --loc;
+            if ((durInterface->GetDur() < DUR_4) && (loc % 2 != 0)) --loc;
             // Adjust special cases
-            if ((rest->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
-            if ((rest->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
+            if ((durInterface->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
+            if ((durInterface->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
 
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
-            Beam *beam = vrv_cast<Beam *>(rest->GetFirstAncestor(BEAM, 1));
+            Beam *beam = vrv_cast<Beam *>(layerElement->GetFirstAncestor(BEAM, 1));
             if (beam) {
-                beam->ResetList(beam);
-
-                const ListOfObjects &beamList = beam->GetList(beam);
-                const int restIndex = beam->GetListIndex(rest);
+                const ListOfObjects &beamList = beam->GetList();
+                const int restIndex = beam->GetListIndex(layerElement);
                 assert(restIndex >= 0);
 
                 int leftLoc = loc;
@@ -205,6 +210,16 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                     }
                 }
 
+                // With a rest or space at the first / last position, use the right / left loc
+                if (restIndex == 0) {
+                    leftLoc = rightLoc;
+                    loc = rightLoc;
+                }
+                else if (restIndex == (int)beamList.size() - 1) {
+                    rightLoc = leftLoc;
+                    loc = leftLoc;
+                }
+
                 // average the left note and right note's locations together to get our rest location
                 const int locAvg = (rightLoc + leftLoc) / 2;
                 if (abs(locAvg - loc) > 3) {
@@ -226,13 +241,13 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
                 int bottomAlignedLoc = loc;
                 // 8th note rests are aligned with the top of a 16th note rest, so to bottom align we have to push it
                 // down 2
-                if (rest->GetActualDur() == DURATION_8) bottomAlignedLoc -= 2;
+                if (durInterface->GetActualDur() == DURATION_8) bottomAlignedLoc -= 2;
                 // for durations smaller than 32nd, bottomAlignedLoc will need to decrease by 2 every iteration greater
                 // than from 32 so 32 will be -0, 64 is -2, 128 is -4 (currently not implemented)
 
                 // topAlignedLoc is the location where all of the top of the rests align to form a straight line
                 int topAlignedLoc = loc;
-                if (rest->GetActualDur() == DURATION_32) topAlignedLoc += 2;
+                if (durInterface->GetActualDur() == DURATION_32) topAlignedLoc += 2;
                 // for smaller durations, topAlignedLoc offset will increase by 2 every iteration greater than from 32
                 // so 32 will need to be +2, 64 is +4, 128 is +6, etc.
                 // (currently only implemented for 32nds)
@@ -266,10 +281,14 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             }
 
             Layer *layer = vrv_cast<Layer *>(layerElement->GetFirstAncestor(LAYER));
-            loc = rest->GetOptimalLayerLocation(staff, layer, loc);
+            if (rest) {
+                loc = rest->GetOptimalLayerLocation(staff, layer, loc);
+            }
         }
-        rest->SetDrawingLoc(loc);
-        rest->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, loc));
+        if (rest) {
+            rest->SetDrawingLoc(loc);
+        }
+        layerElement->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, loc));
     }
     else if (layerElement->Is(TABDURSYM)) {
         int yRel = 0;

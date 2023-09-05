@@ -375,6 +375,12 @@
 		4D796B5E1D78641900A15238 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
+		4D7AFDC72A5554A100835ED1 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7AFDC62A5554A100835ED1 /* divline.cpp */; };
+		4D7AFDC82A5554A100835ED1 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7AFDC62A5554A100835ED1 /* divline.cpp */; };
+		4D7AFDC92A5554A100835ED1 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7AFDC62A5554A100835ED1 /* divline.cpp */; };
+		4D7AFDCA2A5554A100835ED1 /* divline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7AFDC62A5554A100835ED1 /* divline.cpp */; };
+		4D7AFDCC2A5554C100835ED1 /* divline.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D7AFDCB2A5554C100835ED1 /* divline.h */; };
+		4D7AFDCD2A5554C100835ED1 /* divline.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D7AFDCB2A5554C100835ED1 /* divline.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D81351B2322C2CC00F59C01 /* keyaccid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D81351A2322C2CC00F59C01 /* keyaccid.h */; };
 		4D81351C2322C2CC00F59C01 /* keyaccid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D81351A2322C2CC00F59C01 /* keyaccid.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D81351E2322C41800F59C01 /* keyaccid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D81351D2322C41800F59C01 /* keyaccid.cpp */; };
@@ -1844,6 +1850,8 @@
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
 		4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawinginterface.cpp; path = src/drawinginterface.cpp; sourceTree = "<group>"; };
+		4D7AFDC62A5554A100835ED1 /* divline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = divline.cpp; path = src/divline.cpp; sourceTree = "<group>"; };
+		4D7AFDCB2A5554C100835ED1 /* divline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = divline.h; path = include/vrv/divline.h; sourceTree = "<group>"; };
 		4D81351A2322C2CC00F59C01 /* keyaccid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = keyaccid.h; path = include/vrv/keyaccid.h; sourceTree = "<group>"; };
 		4D81351D2322C41800F59C01 /* keyaccid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = keyaccid.cpp; path = src/keyaccid.cpp; sourceTree = "<group>"; };
 		4D88AD07289673D50006D7DA /* symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symbol.h; path = include/vrv/symbol.h; sourceTree = "<group>"; };
@@ -2607,8 +2615,9 @@
 				4DF2AF7D1A62F6A50016F869 /* drawinginterface.h */,
 				8F086EBE188539540037FD8E /* durationinterface.cpp */,
 				8F59291518854BF800FE51AD /* durationinterface.h */,
-				4DA0EAD322BB77AF00A7EBEB /* facsimileinterface.h */,
 				4DA0EAE922BB77C300A7EBEB /* facsimileinterface.cpp */,
+				4DA0EAD322BB77AF00A7EBEB /* facsimileinterface.h */,
+				4DE0B9A02988070C00D4C939 /* interface.h */,
 				4D94721E20CA702C00C780C8 /* linkinginterface.cpp */,
 				4D94721C20CA701000C780C8 /* linkinginterface.h */,
 				8F086ECF188539540037FD8E /* pitchinterface.cpp */,
@@ -2763,7 +2772,6 @@
 				4D95D4F41D7185DE00B2B856 /* floatingobject.h */,
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
-				4DE0B9A02988070C00D4C939 /* interface.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
@@ -2907,6 +2915,8 @@
 				8F59291218854BF800FE51AD /* clef.h */,
 				4DC34BA619BC4A83006175CD /* custos.cpp */,
 				4DC34BA019BC4A70006175CD /* custos.h */,
+				4D7AFDC62A5554A100835ED1 /* divline.cpp */,
+				4D7AFDCB2A5554C100835ED1 /* divline.h */,
 				4DC34BA719BC4A83006175CD /* dot.cpp */,
 				4DC34BA119BC4A70006175CD /* dot.h */,
 				4DEEDE631E617C930087E8BC /* elementpart.cpp */,
@@ -3205,6 +3215,7 @@
 				4DACCA112990F2E600B55913 /* attalternates.h in Headers */,
 				4DACC98C2990F29A00B55913 /* atts_usersymbols.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
+				4D7AFDCC2A5554C100835ED1 /* divline.h in Headers */,
 				E7F1C36429F033FB007E12C1 /* savefunctor.h in Headers */,
 				4DACCA172990F2E600B55913 /* attdef.h in Headers */,
 				4DB3D8EC1F83D18300B5FC2B /* proport.h in Headers */,
@@ -3491,6 +3502,7 @@
 				BB4C4B4C22A932D7001F6AF0 /* custos.h in Headers */,
 				4DACCA182990F2E600B55913 /* attdef.h in Headers */,
 				BB4C4ADA22A932B6001F6AF0 /* system.h in Headers */,
+				4D7AFDCD2A5554C100835ED1 /* divline.h in Headers */,
 				4DACC9CD2990F29A00B55913 /* attclasses.h in Headers */,
 				E76A9D4829A74E180044682D /* adjustdotsfunctor.h in Headers */,
 				4DA0EAE422BB77AF00A7EBEB /* surface.h in Headers */,
@@ -3845,6 +3857,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */,
+				4D7AFDC82A5554A100835ED1 /* divline.cpp in Sources */,
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
 				E7901661298BCB2C008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */,
@@ -4322,6 +4335,7 @@
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				E7876F2029C0A702002147DC /* adjusttupletsxfunctor.cpp in Sources */,
 				E79C87C3269440570098FE85 /* lv.cpp in Sources */,
+				4D7AFDC72A5554A100835ED1 /* divline.cpp in Sources */,
 				4DEC4DA621C81ED400D1D273 /* reg.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
 				4D4C26ED1EF7E75400681770 /* label.cpp in Sources */,
@@ -4406,6 +4420,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DEF8A6621B7AAF90093A76B /* f.cpp in Sources */,
+				4D7AFDC92A5554A100835ED1 /* divline.cpp in Sources */,
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
 				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
@@ -4687,6 +4702,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB4C4AF522A932BC001F6AF0 /* ref.cpp in Sources */,
+				4D7AFDCA2A5554A100835ED1 /* divline.cpp in Sources */,
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
 				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,

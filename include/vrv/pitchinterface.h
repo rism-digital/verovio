@@ -25,7 +25,7 @@ class Layer;
  * This class is an interface for elements with pitch, such as notes and neumes.
  * It is not an abstract class but should not be instanciated directly.
  */
-class PitchInterface : public Interface, public AttNoteGes, public AttOctave, public AttPitch {
+class PitchInterface : public Interface, public AttNoteGes, public AttOctave, public AttPitch, public AttPitchGes {
 public:
     /**
      * @name Constructors, destructors, reset methods

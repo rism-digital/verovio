@@ -590,7 +590,7 @@ Object *Object::FindDescendantByID(const std::string &id, int deepness, bool dir
 const Object *Object::FindDescendantByID(const std::string &id, int deepness, bool direction) const
 {
     FindByIDFunctor findByID(id);
-    findByID.PushDirection(direction);
+    findByID.SetDirection(direction);
     this->Process(findByID, deepness, true);
     return findByID.GetElement();
 }
@@ -614,7 +614,7 @@ Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness,
 const Object *Object::FindDescendantByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     FindByComparisonFunctor findByComparison(comparison);
-    findByComparison.PushDirection(direction);
+    findByComparison.SetDirection(direction);
     this->Process(findByComparison, deepness, true);
     return findByComparison.GetElement();
 }
@@ -628,7 +628,7 @@ Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int de
 const Object *Object::FindDescendantExtremeByComparison(Comparison *comparison, int deepness, bool direction) const
 {
     FindExtremeByComparisonFunctor findExtremeByComparison(comparison);
-    findExtremeByComparison.PushDirection(direction);
+    findExtremeByComparison.SetDirection(direction);
     this->Process(findExtremeByComparison, deepness, true);
     return findExtremeByComparison.GetElement();
 }
@@ -661,7 +661,7 @@ void Object::FindAllDescendantsByComparison(
     if (clear) objects->clear();
 
     FindAllByComparisonFunctor findAllByComparison(comparison, objects);
-    findAllByComparison.PushDirection(direction);
+    findAllByComparison.SetDirection(direction);
     this->Process(findAllByComparison, deepness, true);
 }
 
@@ -672,7 +672,7 @@ void Object::FindAllDescendantsByComparison(
     if (clear) objects->clear();
 
     FindAllConstByComparisonFunctor findAllConstByComparison(comparison, objects);
-    findAllConstByComparison.PushDirection(direction);
+    findAllConstByComparison.SetDirection(direction);
     this->Process(findAllConstByComparison, deepness, true);
 }
 
@@ -1360,68 +1360,69 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
     return *this;
 }
 
-void ObjectListInterface::ResetList(const Object *node) const
+void ObjectListInterface::ResetList() const
 {
     // nothing to do, the list if up to date
-    if (!node->IsModified()) {
+    const Object *owner = this->GetInterfaceOwner();
+    if (!owner->IsModified()) {
         return;
     }
 
-    node->Modify(false);
+    owner->Modify(false);
     m_list.clear();
-    node->FillFlatList(m_list);
+    owner->FillFlatList(m_list);
     this->FilterList(m_list);
 }
 
-const ListOfConstObjects &ObjectListInterface::GetList(const Object *node) const
+const ListOfConstObjects &ObjectListInterface::GetList() const
 {
-    this->ResetList(node);
+    this->ResetList();
     return m_list;
 }
 
-ListOfObjects ObjectListInterface::GetList(const Object *node)
+ListOfObjects ObjectListInterface::GetList()
 {
-    this->ResetList(node);
+    this->ResetList();
     ListOfObjects result;
     std::transform(m_list.begin(), m_list.end(), std::back_inserter(result),
         [](const Object *obj) { return const_cast<Object *>(obj); });
     return result;
 }
 
-bool ObjectListInterface::HasEmptyList(const Object *node) const
+bool ObjectListInterface::HasEmptyList() const
 {
-    this->ResetList(node);
+    this->ResetList();
     return m_list.empty();
 }
 
-int ObjectListInterface::GetListSize(const Object *node) const
+int ObjectListInterface::GetListSize() const
 {
-    this->ResetList(node);
+    this->ResetList();
     return static_cast<int>(m_list.size());
 }
 
-const Object *ObjectListInterface::GetListFront(const Object *node) const
+const Object *ObjectListInterface::GetListFront() const
 {
-    this->ResetList(node);
+    this->ResetList();
     assert(!m_list.empty());
     return m_list.front();
 }
 
-Object *ObjectListInterface::GetListFront(const Object *node)
+Object *ObjectListInterface::GetListFront()
 {
-    return const_cast<Object *>(std::as_const(*this).GetListFront(node));
+    return const_cast<Object *>(std::as_const(*this).GetListFront());
 }
 
-const Object *ObjectListInterface::GetListBack(const Object *node) const
+const Object *ObjectListInterface::GetListBack() const
 {
-    this->ResetList(node);
+    this->ResetList();
     assert(!m_list.empty());
     return m_list.back();
 }
 
-Object *ObjectListInterface::GetListBack(const Object *node)
+Object *ObjectListInterface::GetListBack()
 {
-    return const_cast<Object *>(std::as_const(*this).GetListBack(node));
+    return const_cast<Object *>(std::as_const(*this).GetListBack());
 }
 
 int ObjectListInterface::GetListIndex(const Object *listElement) const
@@ -1511,38 +1512,47 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
     return const_cast<Object *>(std::as_const(*this).GetListNext(listElement));
 }
 
+const Object *ObjectListInterface::GetInterfaceOwner() const
+{
+    if (!m_owner) {
+        m_owner = dynamic_cast<const Object *>(this);
+        assert(m_owner);
+    }
+    return m_owner;
+}
+
 //----------------------------------------------------------------------------
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::u32string TextListInterface::GetText(const Object *node) const
+std::u32string TextListInterface::GetText() const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
-    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        if ((*it)->Is(LB)) {
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
+    for (const Object *child : childList) {
+        if (child->Is(LB)) {
             continue;
         }
-        const Text *text = vrv_cast<const Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(child);
         assert(text);
         concatText += text->GetText();
     }
     return concatText;
 }
 
-void TextListInterface::GetTextLines(const Object *node, std::vector<std::u32string> &lines) const
+void TextListInterface::GetTextLines(std::vector<std::u32string> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
-    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        if ((*it)->Is(LB) && !concatText.empty()) {
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
+    for (const Object *child : childList) {
+        if (child->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
             continue;
         }
-        const Text *text = vrv_cast<const Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(child);
         assert(text);
         concatText += text->GetText();
     }
