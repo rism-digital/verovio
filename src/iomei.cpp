@@ -3849,9 +3849,9 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         AttConverter converter;
         m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
-    else {
-        // default to MEI 5
-        LogWarning("No meiversion found, falling back to MEI5 (dev)");
+    // Default to MEI 5
+    if (m_meiversion == meiVersion_MEIVERSION_NONE) {
+        LogWarning("MEI version found or not known, falling back to MEI5 (dev)");
         m_meiversion = meiVersion_MEIVERSION_5_0_0_dev;
     }
 
