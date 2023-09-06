@@ -69,7 +69,7 @@ void MeterSigGrp::AddAlternatingMeasureToVector(const Measure *measure)
 MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
 {
     MeterSig *newMeterSig = NULL;
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
     switch (this->GetFunc()) {
         // For alternating meterSig group alternate between children sequentially
         case meterSigGrpLog_FUNC_alternating: {

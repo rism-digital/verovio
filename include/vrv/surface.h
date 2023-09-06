@@ -27,7 +27,7 @@ namespace vrv {
  * in MEI
  */
 
-class Surface : public Object, public AttTyped, public AttCoordinated {
+class Surface : public Object, public AttTyped, public AttCoordinated, public AttCoordinatedUl {
 public:
     /**
      * @name Constructors, destructors, reset, and class name methods

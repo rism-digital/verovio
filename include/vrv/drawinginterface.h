@@ -95,12 +95,10 @@ public:
 
     /**
      * Return information about the position in the beam.
-     * (no const since the cached list is updated)
-     * Object * is a pointer to the object implementing the interface (e.g., Beam, fTrem)
      */
     ///@{
-    bool IsFirstIn(const Object *object, const LayerElement *element) const;
-    bool IsLastIn(const Object *object, const LayerElement *element) const;
+    bool IsFirstIn(const LayerElement *element) const;
+    bool IsLastIn(const LayerElement *element) const;
     ///@}
 
     /**
@@ -163,7 +161,7 @@ protected:
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
-    int GetPosition(const Object *object, const LayerElement *element) const;
+    int GetPosition(const LayerElement *element) const;
 
     //
 private:

@@ -16,9 +16,11 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "divline.h"
 #include "doc.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "liquescent.h"
 #include "mrpt.h"
 #include "nc.h"
 #include "neume.h"
@@ -70,12 +72,16 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     struct drawingParams {
-        char32_t fontNo = SMUFL_E990_chantPunctum;
+        wchar_t fontNo = SMUFL_E990_chantPunctum;
+        wchar_t fontNoLiq[5] = {};
         float xOffset = 0;
         float yOffset = 0;
+        float xOffsetLiq[5] = { 0, 0, 0, 0, 0 };
+        float yOffsetLiq[5] = { 0, 0, 0, 0, 0 };
     };
     std::vector<drawingParams> params;
     params.push_back(drawingParams());
+
     dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
@@ -98,30 +104,50 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         int pitchDifference = 0;
         bool isFirst;
         // Check if this is the first or second part of a ligature
-        Object *nextSibling = neume->GetChild(position + 1);
-        if (nextSibling != NULL) {
-            Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
-            assert(nextNc);
-            if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
-                isFirst = true;
-                pitchDifference = nextNc->PitchDifferenceTo(nc);
-                params.at(0).yOffset = pitchDifference;
-            }
-            else {
-                isFirst = false;
-            }
-        }
-        else {
-            isFirst = false;
-        }
+        // Object *nextSibling = neume->GetChild(position + 1);
+        // if (nextSibling != NULL) {
+        //     Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
+        //     assert(nextNc);
+        //     if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
+        //         isFirst = true;
+        //         pitchDifference = nextNc->PitchDifferenceTo(nc);
+        //         params.at(0).yOffset = pitchDifference;
+        //     }
+        //     else {
+        //         isFirst = false;
+        //     }
+        // }
+        // else {
+        //     isFirst = false;
+        // }
+        int ligCount = neume->GetLigatureCount(position);
 
-        if (!isFirst) { // still need to get pitchDifference
-            Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
-            assert(lastnc);
-            pitchDifference = nc->PitchDifferenceTo(lastnc);
+        if (ligCount % 2 == 0) {
+            isFirst = false;
+            Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
+            assert(lastNc);
+            pitchDifference = nc->PitchDifferenceTo(lastNc);
             params.at(0).xOffset = -1;
             params.at(0).yOffset = -pitchDifference;
         }
+        else {
+            isFirst = true;
+            Object *nextSibling = neume->GetChild(position + 1);
+            if (nextSibling != NULL) {
+                Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
+                assert(nextNc);
+                pitchDifference = nextNc->PitchDifferenceTo(nc);
+                params.at(0).yOffset = pitchDifference;
+            }
+        }
+
+        // if (!isFirst) { // still need to get pitchDifference
+        //     Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
+        //     assert(lastnc);
+        //     pitchDifference = nc->PitchDifferenceTo(lastnc);
+        //     params.at(0).xOffset = -1;
+        //     params.at(0).yOffset = -pitchDifference;
+        // }
 
         // set the glyph
         switch (pitchDifference) {
@@ -143,12 +169,39 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->GetTilt() == COMPASSDIRECTION_n && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+    if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
         params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
-    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    else if (nc->GetTilt() == COMPASSDIRECTION_n && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+        params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
+    }
+
+    else if (nc->GetCurve() == curvatureDirection_CURVE_c) {
+        params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params.at(0).fontNoLiq[1] = SMUFL_EB92_staffPosRaise3;
+        params.at(0).fontNoLiq[2] = SMUFL_E995_chantAuctumDesc;
+        params.at(0).fontNoLiq[3] = SMUFL_EB91_staffPosRaise2;
+        params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params.at(0).xOffsetLiq[4] = 0.8;
+        params.at(0).yOffsetLiq[0] = -1.5;
+        params.at(0).yOffsetLiq[4] = -1.75;
+    }
+    else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
+        params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params.at(0).fontNoLiq[1] = SMUFL_EB98_staffPosLower1;
+        params.at(0).fontNoLiq[2] = SMUFL_E994_chantAuctumAsc;
+        params.at(0).fontNoLiq[3] = SMUFL_EB99_staffPosLower2;
+        params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params.at(0).xOffsetLiq[4] = 0.8;
+        params.at(0).yOffsetLiq[0] = 0.5;
+        params.at(0).yOffsetLiq[4] = 0.75;
+    }
+
+    const int noteHeight
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int noteWidth
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     int noteY, noteX;
     int yValue;
     if (nc->HasFacs() && (m_doc->GetType() == Facs)) {
@@ -167,7 +220,14 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     // Calculating proper y offset based on pname, clef, staff, and staff rotate
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset = 0;
-    int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
+
+    // The default octave = 3, but the actual octave is calculated by
+    // taking into account the displacement of the clef
+    int clefOctave = 3;
+    if (clef->GetDis() && clef->GetDisPlace()) {
+        clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+    }
+    int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
     int rotateOffset;
     if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
@@ -187,9 +247,17 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
-    for (drawingParams &param : params) {
-        this->DrawSmuflCode(dc, noteX + param.xOffset * noteWidth, yValue + param.yOffset * noteHeight, param.fontNo,
-            staff->m_drawingStaffSize, false, true);
+    for (auto it = params.begin(); it != params.end(); it++) {
+        if (nc->GetCurve() == curvatureDirection_CURVE_a || nc->GetCurve() == curvatureDirection_CURVE_c) {
+            for (int i = 0; i < static_cast<int>(sizeof(params.at(0).fontNoLiq)); i++) {
+                DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight,
+                    it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
+            }
+        }
+        else {
+            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+                staff->m_drawingStaffSize, false, true);
+        }
     }
 
     // adjust facsimile values of element based on where it is rendered if necessary
@@ -279,4 +347,61 @@ void View::DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staf
     dc->EndGraphic(nc, this);
 }
 
+void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    DivLine *divLine = dynamic_cast<DivLine *>(element);
+    assert(divLine);
+
+    // int x = divLine->GetDrawingX();
+    // int y = divLine->GetDrawingY();
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    int sym = 0;
+
+    switch (divLine->GetForm()) {
+        case divLineLog_FORM_minima: sym = SMUFL_E8F3_chantDivisioMinima; break;
+        case divLineLog_FORM_maior: sym = SMUFL_E8F4_chantDivisioMaior; break;
+        case divLineLog_FORM_maxima: sym = SMUFL_E8F5_chantDivisioMaxima; break;
+        case divLineLog_FORM_finalis: sym = SMUFL_E8F6_chantDivisioFinalis; break;
+        case divLineLog_FORM_caesura: sym = SMUFL_E8F8_chantCaesura; break;
+        case divLineLog_FORM_virgula: sym = SMUFL_E8F7_chantVirgula; break;
+        default: break;
+    }
+
+    int x, y;
+    if ((m_doc->GetType() == Facs) && (divLine->HasFacs())) {
+        x = divLine->GetDrawingX();
+        y = ToLogicalY(staff->GetDrawingY());
+    }
+    else {
+        x = element->GetDrawingX();
+        y = element->GetDrawingY();
+        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
+
+    int rotateOffset;
+    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        double deg = staff->GetDrawingRotate();
+        int xDiff = x - staff->GetDrawingX();
+        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else {
+        rotateOffset = 0;
+    }
+
+    y -= rotateOffset;
+
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
+
+    dc->EndGraphic(element, this);
+}
 } // namespace vrv

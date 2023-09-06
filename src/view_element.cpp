@@ -12,6 +12,8 @@
 #include <cassert>
 #include <math.h>
 
+#include <string>
+
 //----------------------------------------------------------------------------
 
 #include "accid.h"
@@ -23,6 +25,7 @@
 #include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
+#include "divline.h"
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
@@ -108,6 +111,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(CUSTOS)) {
         this->DrawCustos(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(DIVLINE)) {
+        DrawDivLine(dc, element, layer, staff, measure);
     }
     else if (element->Is(DOT)) {
         this->DrawDot(dc, element, layer, staff, measure);
@@ -291,6 +297,19 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
         y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
+    }
+
+    if (notationType == NOTATIONTYPE_neume) {
+        int rotateOffset = 0;
+        if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+            double deg = staff->GetDrawingRotate();
+            int xDiff = x - staff->GetDrawingX();
+            rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+        }
+        if (accid->HasFacs() && (m_doc->GetType() == Facs)) {
+            y = ToLogicalY(y);
+        }
+        y -= rotateOffset;
     }
 
     this->DrawSmuflString(
@@ -671,8 +690,10 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
@@ -1010,7 +1031,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    ListOfObjects childList = keySig->GetList(keySig);
+    ListOfObjects childList = keySig->GetList();
     for (Object *child : childList) {
         KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
         assert(keyAccid);

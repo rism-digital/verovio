@@ -31,6 +31,7 @@ class ControlElement;
 class DeviceContext;
 class Dir;
 class Div;
+class DivLine;
 class Doc;
 class Dynam;
 class EditorialElement;
@@ -49,6 +50,7 @@ class KeyAccid;
 class Layer;
 class LayerElement;
 class Lb;
+class Liquescent;
 class Measure;
 class MNum;
 class Mordent;
@@ -412,6 +414,7 @@ protected:
      * Defined in view_neume.cpp
      */
     ///@{
+    void DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);

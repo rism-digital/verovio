@@ -809,6 +809,7 @@ private:
  * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
  * It is not an abstract class but should not be instanciated directly.
+ * It is expected to be used as a base class of element classes derived from Object.
  */
 class ObjectListInterface {
 public:
@@ -816,7 +817,7 @@ public:
     ObjectListInterface(){};
     virtual ~ObjectListInterface(){};
     ObjectListInterface(const ObjectListInterface &listInterface); // copy constructor;
-    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignement;
+    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignment;
 
     /**
      * Look for the Object in the list and return its position (-1 if not found)
@@ -853,28 +854,29 @@ public:
      * Return the list.
      * Before returning the list, it checks that the list is up-to-date with Object::IsModified
      * If not, it updates the list and also calls FilterList.
-     * Because this is an interface, we need to pass the object - not the best design.
      */
     ///@{
-    const ListOfConstObjects &GetList(const Object *node) const;
-    ListOfObjects GetList(const Object *node);
+    const ListOfConstObjects &GetList() const;
+    ListOfObjects GetList();
     ///@}
+
+    /**
+     * Reset the list of children and call FilterList().
+     */
+    void ResetList() const;
 
     /**
      * Convenience functions that check if the list is up-to-date
      * If not, the list is updated before returning the result
      */
     ///@{
-    bool HasEmptyList(const Object *node) const;
-    int GetListSize(const Object *node) const;
-    const Object *GetListFront(const Object *node) const;
-    Object *GetListFront(const Object *node);
-    const Object *GetListBack(const Object *node) const;
-    Object *GetListBack(const Object *node);
+    bool HasEmptyList() const;
+    int GetListSize() const;
+    const Object *GetListFront() const;
+    Object *GetListFront();
+    const Object *GetListBack() const;
+    Object *GetListBack();
     ///@}
-
-private:
-    mutable ListOfConstObjects m_list;
 
 protected:
     /**
@@ -883,12 +885,19 @@ protected:
      */
     virtual void FilterList(ListOfConstObjects &childList) const {};
 
-public:
+private:
     /**
-     * Reset the list of children and call FilterList().
-     * As for GetList, we need to pass the object.
+     * Retrieve the owner object of the interface.
      */
-    void ResetList(const Object *node) const;
+    const Object *GetInterfaceOwner() const;
+
+public:
+    //
+private:
+    // The flat list of children
+    mutable ListOfConstObjects m_list;
+    // The owner object
+    mutable const Object *m_owner = NULL;
 };
 
 //----------------------------------------------------------------------------
@@ -910,12 +919,12 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::u32string GetText(const Object *node) const;
+    std::u32string GetText() const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(const Object *node, std::vector<std::u32string> &lines) const;
+    void GetTextLines(std::vector<std::u32string> &lines) const;
 
 protected:
     /**

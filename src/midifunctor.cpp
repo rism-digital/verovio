@@ -386,7 +386,7 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
 FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 {
     // Do nothing if the tremolo is unmeasured
-    if (bTrem->GetForm() == bTremLog_FORM_unmeas) {
+    if (bTrem->GetForm() == tremForm_FORM_unmeas) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -443,7 +443,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
     // Handle grace chords
     if (chord->IsGraceNote()) {
         std::set<int> pitches;
-        const ListOfConstObjects &notes = chord->GetList(chord);
+        const ListOfConstObjects &notes = chord->GetList();
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);
             assert(note);
@@ -758,8 +758,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasKeySigInfo()) {
         const KeySig *keySig = vrv_cast<const KeySig *>(scoreDef->GetKeySig());
         if (keySig && keySig->HasSig()) {
-            m_midiFile->addKeySignature(
-                m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+            // m_midiFile->addKeySignature(
+            //     m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
         }
     }
     // set MIDI time signature
@@ -819,7 +819,7 @@ void GenerateMIDIFunctor::DeferMIDINote(const Note *refNote, double shift, bool 
     // Recursive call for chords
     const Chord *chord = refNote->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ListOfConstObjects &notes = chord->GetList(chord);
+        const ListOfConstObjects &notes = chord->GetList();
 
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);

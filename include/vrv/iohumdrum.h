@@ -22,6 +22,7 @@
 #include "clef.h"
 #include "dir.h"
 #include "ending.h"
+#include "fing.h"
 #include "ftrem.h"
 #include "harm.h"
 #include "io.h"
@@ -657,7 +658,7 @@ protected:
     void removeInstrumentAbbreviation(StaffDef *sd);
     std::string getEndIdForOttava(hum::HTp token);
     void prepareInitialOttavas(hum::HTp measure);
-    void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
+    void linkFingeringToNote(Fing *fing, hum::HTp token, int xstaffindex);
     bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
     void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool>> &data, hum::HTp token, char slurtype);
     void extractPhraseNoteAttachmentInformation(
@@ -830,6 +831,14 @@ protected:
         int staffadj, int trackdiff);
     bool hasNoStaves(hum::HumdrumFile &infile);
     hum::HTp getVisualKeySignature(hum::HTp keysigtok);
+    bool isNotAtStartOfMeasure(std::vector<hum::HTp> &layerdata, int index);
+    void analyzeFingerings(hum::HumdrumFile &infile);
+    void analyzeFingerings(hum::HTp sstart);
+    void insertMidMeasureKeySignature(
+        int staffindex, std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token);
+    int getKeySignatureNumber(const std::string &humkeysig);
+    int getStaffNumForSpine(hum::HTp token);
+    bool checkIfReversedSpineOrder(std::vector<hum::HTp> staffstarts);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

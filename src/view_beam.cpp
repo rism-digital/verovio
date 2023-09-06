@@ -45,7 +45,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // initialization
 
     // Should we assert this at the beginning?
-    if (beam->HasEmptyList(beam)) {
+    if (beam->HasEmptyList()) {
         return;
     }
 
@@ -95,7 +95,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // initialization
 
     // Should we assert this at the beginning?
-    if (fTrem->HasEmptyList(fTrem)) {
+    if (fTrem->HasEmptyList()) {
         return;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();

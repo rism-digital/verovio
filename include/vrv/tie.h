@@ -28,7 +28,7 @@ class Tie : public ControlElement,
             public TimeSpanningInterface,
             public AttColor,
             public AttCurvature,
-            public AttCurveRend {
+            public AttLineRendBase {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
