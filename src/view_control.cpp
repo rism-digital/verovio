@@ -1849,7 +1849,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
             continue;
         }
 
-        const int staffSize = staff->m_drawingStaffSize;
+        const int staffSize = staff->GetDrawingStaffNotationSize();
         const int y = fermata->GetDrawingY();
 
         const int width = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, drawingCueSize)
