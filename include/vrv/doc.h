@@ -122,11 +122,6 @@ public:
     bool HasPage(int pageIdx) const;
 
     /**
-     * Get all the Score in the visible Mdiv.
-     */
-    std::list<Score *> GetScores();
-
-    /**
      * Get the Pages in the visible Mdiv.
      * Will find it only when having read a pages-based MEI file,
      * or when a file was converted to page-based MEI.
@@ -140,6 +135,11 @@ public:
      * Get the total page count
      */
     int GetPageCount() const;
+
+    /**
+     * Get all scores
+     */
+    std::list<Score *> GetScores() { return m_scores; }
 
     /**
      * Return true if the MIDI generation is already done
@@ -477,6 +477,11 @@ private:
      */
     void PrepareMeasureIndices();
 
+    /**
+     * Determine all scores
+     */
+    void CollectScores();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
@@ -544,6 +549,12 @@ private:
      * The resources (glyph table).
      */
     Resources m_resources;
+
+    /**
+     * The list of all scores
+     * Used in Doc::GetScoreDefFor to quickly determine the corresponding score for an object
+     */
+    std::list<Score *> m_scores;
 
     /**
      * @name Holds a pointer to the current score/scoreDef.

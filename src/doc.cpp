@@ -574,6 +574,10 @@ void Doc::PrepareData()
 
     this->PrepareMeasureIndices();
 
+    /************ Collect all scores ************/
+
+    this->CollectScores();
+
     /************ Store default durations ************/
 
     PrepareDurationFunctor prepareDuration;
@@ -1446,18 +1450,6 @@ bool Doc::HasPage(int pageIdx) const
     return ((pageIdx >= 0) && (pageIdx < pages->GetChildCount()));
 }
 
-std::list<Score *> Doc::GetScores()
-{
-    std::list<Score *> scores;
-    ListOfObjects objects = this->FindAllDescendantsByType(SCORE, false, 3);
-    for (const auto object : objects) {
-        Score *score = vrv_cast<Score *>(object);
-        assert(score);
-        scores.push_back(score);
-    }
-    return scores;
-}
-
 Pages *Doc::GetPages()
 {
     return vrv_cast<Pages *>(this->FindDescendantByType(PAGES));
@@ -1472,6 +1464,17 @@ int Doc::GetPageCount() const
 {
     const Pages *pages = this->GetPages();
     return ((pages) ? pages->GetChildCount() : 0);
+}
+
+void Doc::CollectScores()
+{
+    m_scores.clear();
+    ListOfObjects objects = this->FindAllDescendantsByType(SCORE, false, 3);
+    for (Object *object : objects) {
+        Score *score = vrv_cast<Score *>(object);
+        assert(score);
+        m_scores.push_back(score);
+    }
 }
 
 int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
