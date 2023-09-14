@@ -142,6 +142,14 @@ public:
     std::list<Score *> GetScores() { return m_scores; }
 
     /**
+     * Get the first scoreDef
+     */
+    ///@{
+    ScoreDef *GetFirstScoreDef();
+    const ScoreDef *GetFirstScoreDef() const;
+    ///@}
+
+    /**
      * Return true if the MIDI generation is already done
      */
     bool GetMidiExportDone() const;

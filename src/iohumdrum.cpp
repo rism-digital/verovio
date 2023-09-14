@@ -3428,7 +3428,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     if (staffstarts.size() > 0) {
-        addMidiTempo(m_doc->GetCurrentScoreDef(), staffstarts[0], top, bot);
+        addMidiTempo(m_doc->GetFirstScoreDef(), staffstarts[0], top, bot);
     }
     hum::HumRegex hre;
     for (int i = 0; i < (int)staffstarts.size(); ++i) {
@@ -3462,7 +3462,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
         // If there is one staff, then no extra decoration.
         else if (staffstarts.size() == 1) {
             StaffGrp *sg = new StaffGrp();
-            m_doc->GetCurrentScoreDef()->AddChild(sg);
+            m_doc->GetFirstScoreDef()->AddChild(sg);
             sg->AddChild(m_staffdef[0]);
         }
         // do something if there is no staff in the score?
@@ -3471,7 +3471,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
         bool status = processStaffDecoration(decoration);
         if (!status) {
             StaffGrp *sg = new StaffGrp();
-            m_doc->GetCurrentScoreDef()->AddChild(sg);
+            m_doc->GetFirstScoreDef()->AddChild(sg);
             sg->SetBarThru(BOOLEAN_false);
             // setGroupSymbol(sg, staffGroupingSym_SYMBOL_bracket);
             for (int i = 0; i < (int)m_staffdef.size(); ++i) {
@@ -3498,7 +3498,7 @@ void HumdrumInput::prepareStaffGroups(int top, int bot)
 
 void HumdrumInput::promoteInstrumentNamesToGroup()
 {
-    ScoreDef *sdf = m_doc->GetCurrentScoreDef();
+    ScoreDef *sdf = m_doc->GetFirstScoreDef();
     int count = sdf->GetChildCount();
     for (int i = 0; i < count; ++i) {
         Object *obj = sdf->GetChild(i);
@@ -3572,7 +3572,7 @@ void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
 
 void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 {
-    ScoreDef *sdf = m_doc->GetCurrentScoreDef();
+    ScoreDef *sdf = m_doc->GetFirstScoreDef();
     int count = sdf->GetChildCount();
 
     for (int i = 0; i < count; ++i) {
@@ -4024,14 +4024,14 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
         // There is no barline across the staves in this case.
         root = new StaffGrp();
         root->SetBarThru(BOOLEAN_false);
-        m_doc->GetCurrentScoreDef()->AddChild(root);
+        m_doc->GetFirstScoreDef()->AddChild(root);
     }
     else if (d[0] == '(') {
         // The outer group is not bracketed, but bar goes all of
         // the way through system.
         root = new StaffGrp();
         root->SetBarThru(BOOLEAN_true);
-        m_doc->GetCurrentScoreDef()->AddChild(root);
+        m_doc->GetFirstScoreDef()->AddChild(root);
     }
     else if (pairing.back() == 0) {
         skipfirst = true;
@@ -4047,7 +4047,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
         else if (d[0] == '[') {
             setGroupSymbol(root, staffGroupingSym_SYMBOL_bracket);
         }
-        m_doc->GetCurrentScoreDef()->AddChild(root);
+        m_doc->GetFirstScoreDef()->AddChild(root);
     }
 
     std::vector<int> spine; // kernstart index
@@ -4288,7 +4288,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
             root->AddChild(sg);
         }
         else {
-            m_doc->GetCurrentScoreDef()->AddChild(sg);
+            m_doc->GetFirstScoreDef()->AddChild(sg);
         }
         for (int i = 0; i < (int)m_staffdef.size(); ++i) {
             sg->AddChild(m_staffdef[i]);
@@ -4311,7 +4311,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
                 root->AddChild(sg);
             }
             else {
-                m_doc->GetCurrentScoreDef()->AddChild(sg);
+                m_doc->GetFirstScoreDef()->AddChild(sg);
             }
         }
 
@@ -4388,7 +4388,7 @@ bool HumdrumInput::processStaffDecoration(const std::string &decoration)
         }
         else {
             root_sg = new StaffGrp();
-            m_doc->GetCurrentScoreDef()->AddChild(root_sg);
+            m_doc->GetFirstScoreDef()->AddChild(root_sg);
             root_sg->SetBarThru(BOOLEAN_false);
         }
         for (int i = 0; i < (int)newgroups.size(); ++i) {
@@ -4874,7 +4874,7 @@ bool HumdrumInput::prepareFooter(
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
     AttFormeworkComparison comparison(PGFOOT, PGFUNC_first);
-    Object *pgfoot = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison);
+    Object *pgfoot = tempdoc.GetFirstScoreDef()->FindDescendantByComparison(&comparison);
     if (pgfoot == NULL) {
         return false;
     }
@@ -4892,10 +4892,10 @@ bool HumdrumInput::prepareFooter(
         return false;
     }
 
-    m_doc->GetCurrentScoreDef()->AddChild(pgfoot);
+    m_doc->GetFirstScoreDef()->AddChild(pgfoot);
 
     AttFormeworkComparison comparison2(PGFOOT, PGFUNC_all);
-    Object *pgfoot2 = tempdoc.GetCurrentScoreDef()->FindDescendantByComparison(&comparison2);
+    Object *pgfoot2 = tempdoc.GetFirstScoreDef()->FindDescendantByComparison(&comparison2);
     if (pgfoot2 == NULL) {
         return true;
     }
@@ -4913,7 +4913,7 @@ bool HumdrumInput::prepareFooter(
         return true;
     }
 
-    m_doc->GetCurrentScoreDef()->AddChild(pgfoot2);
+    m_doc->GetFirstScoreDef()->AddChild(pgfoot2);
 
     return true;
 }
@@ -5049,7 +5049,7 @@ bool HumdrumInput::prepareHeader(
     // std::string meicontent = meioutput.GetOutput();
     // std::cout << "MEI CONTENT " << meicontent << std::endl;
 
-    Object *pghead = tempdoc.GetCurrentScoreDef()->FindDescendantByType(ClassId::PGHEAD);
+    Object *pghead = tempdoc.GetFirstScoreDef()->FindDescendantByType(ClassId::PGHEAD);
     if (pghead == NULL) {
         return false;
     }
@@ -5067,7 +5067,7 @@ bool HumdrumInput::prepareHeader(
         return false;
     }
 
-    m_doc->GetCurrentScoreDef()->AddChild(pghead);
+    m_doc->GetFirstScoreDef()->AddChild(pghead);
 
     return true;
 }
