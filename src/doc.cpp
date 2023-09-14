@@ -1480,6 +1480,22 @@ const ScoreDef *Doc::GetFirstScoreDef() const
     return score ? score->GetScoreDef() : NULL;
 }
 
+ScoreDef *Doc::GetCorrespScoreDef(const Object *object)
+{
+    return const_cast<ScoreDef *>(std::as_const(*this).GetCorrespScoreDef(object));
+}
+
+const ScoreDef *Doc::GetCorrespScoreDef(const Object *object) const
+{
+    const Score *correspScore = NULL;
+    for (Score *score : m_scores) {
+        if ((score == object) || Object::IsPreOrdered(score, object)) {
+            correspScore = score;
+        }
+    }
+    return correspScore ? correspScore->GetScoreDef() : NULL;
+}
+
 void Doc::CollectScores()
 {
     m_scores.clear();
