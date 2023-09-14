@@ -306,7 +306,7 @@ private:
      * Scoredef manipulation
      */
     ///@{
-    void WriteCustomScoreDef();
+    void WriteCustomScoreDef(ScoreDef *scoreDef);
     void AdjustStaffDef(StaffDef *staffDef, Measure *measure);
     bool AdjustLabel(Label *label);
     ///@}

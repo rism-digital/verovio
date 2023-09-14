@@ -1466,6 +1466,20 @@ int Doc::GetPageCount() const
     return ((pages) ? pages->GetChildCount() : 0);
 }
 
+ScoreDef *Doc::GetFirstScoreDef()
+{
+    return const_cast<ScoreDef *>(std::as_const(*this).GetFirstScoreDef());
+}
+
+const ScoreDef *Doc::GetFirstScoreDef() const
+{
+    // Use precalculated list of scores, if possible
+    const Score *score
+        = m_scores.empty() ? vrv_cast<const Score *>(this->FindDescendantByType(SCORE, 3)) : m_scores.front();
+
+    return score ? score->GetScoreDef() : NULL;
+}
+
 void Doc::CollectScores()
 {
     m_scores.clear();
