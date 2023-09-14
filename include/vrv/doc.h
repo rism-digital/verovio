@@ -150,6 +150,14 @@ public:
     ///@}
 
     /**
+     * Get the corresponding scoreDef for a node
+     */
+    ///@{
+    ScoreDef *GetCorrespScoreDef(const Object *object);
+    const ScoreDef *GetCorrespScoreDef(const Object *object) const;
+    ///@}
+
+    /**
      * Return true if the MIDI generation is already done
      */
     bool GetMidiExportDone() const;
@@ -560,7 +568,7 @@ private:
 
     /**
      * The list of all scores
-     * Used in Doc::GetScoreDefFor to quickly determine the corresponding score for an object
+     * Used in Doc::GetCorrespScoreDef to quickly determine the corresponding scoreDef for an object
      */
     std::list<Score *> m_scores;
 
