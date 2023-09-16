@@ -6753,6 +6753,9 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
             vrvmeter->SetVisible(BOOLEAN_false);
         }
     }
+    if (timetok->find("yy") != std::string::npos) {
+        vrvmeter->SetVisible(BOOLEAN_false);
+    }
 
     // Don't store time signature if there is a mensuration to show
     // (verivio will display both mensuration and time signature.
