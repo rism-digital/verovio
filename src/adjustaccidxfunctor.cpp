@@ -41,7 +41,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     if (accids.empty()) return FUNCTOR_SIBLINGS;
 
     assert(m_doc);
-    StaffDef *staffDef = m_doc->GetCurrentScoreDef()->GetStaffDef(alignmentReference->GetN());
+    StaffDef *staffDef = m_doc->GetCorrespScoreDef(alignmentReference)->GetStaffDef(alignmentReference->GetN());
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
     std::sort(accids.begin(), accids.end(), AccidSpaceSort());

@@ -137,9 +137,9 @@ public:
     int GetPageCount() const;
 
     /**
-     * Get all scores
+     * Get all visible scores
      */
-    std::list<Score *> GetScores() { return m_scores; }
+    std::list<Score *> GetVisibleScores() { return m_visibleScores; }
 
     /**
      * Get the first scoreDef
@@ -147,6 +147,15 @@ public:
     ///@{
     ScoreDef *GetFirstScoreDef();
     const ScoreDef *GetFirstScoreDef() const;
+    ///@}
+
+    /**
+     * Get the first or last visible scoreDef
+     * Lazily updates the visible scores, hence never const
+     */
+    ///@{
+    ScoreDef *GetFirstVisibleScoreDef();
+    ScoreDef *GetLastVisibleScoreDef();
     ///@}
 
     /**
@@ -241,7 +250,7 @@ public:
      * Get the default distance from the staff for the object
      * The distance is given in x * MEI UNIT
      */
-    data_MEASUREMENTSIGNED GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
+    data_MEASUREMENTSIGNED GetStaffDistance(const Object *object, int staffIndex, data_STAFFREL staffPosition) const;
 
     /**
      * Prepare the timemap for MIDI and timemap file export.
@@ -494,9 +503,9 @@ private:
     void PrepareMeasureIndices();
 
     /**
-     * Determine all scores
+     * Determine all visible scores
      */
-    void CollectScores();
+    void CollectVisibleScores();
 
 public:
     Page *m_selectionPreceding;
@@ -567,10 +576,10 @@ private:
     Resources m_resources;
 
     /**
-     * The list of all scores
+     * The list of all visible scores
      * Used in Doc::GetCorrespScoreDef to quickly determine the corresponding scoreDef for an object
      */
-    std::list<Score *> m_scores;
+    std::list<Score *> m_visibleScores;
 
     /**
      * @name Holds a pointer to the current score/scoreDef.

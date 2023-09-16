@@ -786,7 +786,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             assert(parent);
             newStaff = new Staff(1);
             newStaff->m_drawingStaffDef
-                = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(STAFFDEF));
+                = vrv_cast<StaffDef *>(m_doc->GetCorrespScoreDef(parent)->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
