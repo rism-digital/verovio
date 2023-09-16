@@ -804,8 +804,8 @@ protected:
     void analyzeHarmInterpretations(hum::HTp starttok);
     void analyzeDegreeInterpretations(hum::HTp starttok);
     void analyzeTextInterpretation(hum::HTp starttok);
-    void addHarmLabel(
-        hum::HumNum timestamp, const std::string &label, const std::string &n, const std::string &place, int staffNum);
+    void addHarmLabel(hum::HumNum timestamp, const std::string &label, const std::string &labelStyle,
+        const std::string &n, const std::string &place, int staffNum);
     std::u32string getMoveableDoName(hum::HTp token, int degree, int semitones);
     void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
     void setFontStyleForHarm(Harm *harm, const std::string &style);

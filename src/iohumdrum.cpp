@@ -1186,6 +1186,7 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
         aboveQ = true;
     }
     hum::HTp keydesig = NULL;
+    hum::HTp verselabel = NULL;
     hum::HTp current = starttok;
     std::string initialLabel = "";
     if (hre.search(current->getDataType(), "^\\*\\*[ab]data-(.*)")) {
@@ -1204,14 +1205,27 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
             if (keydesig && !keydesig->empty()) {
                 std::string label = keydesig->substr(1);
                 if (!label.empty()) {
-                    current->setValue("auto", "keylabel", label);
+                    current->setValue("auto", "keyLabel", label);
                 }
                 keydesig = NULL;
+                verselabel = NULL;
+            }
+            else if (verselabel) {
+                if (hre.search(verselabel, "^\\*v([ib]*):(.+)$")) {
+                    string style = hre.getMatch(1);
+                    string label = hre.getMatch(2);
+                    current->setValue("auto", "keyLabel", label);
+                    if (!style.empty()) {
+                        current->setValue("auto", "keyLabelStyle", style);
+                    }
+                }
+                keydesig = NULL;
+                verselabel = NULL;
             }
             else if (!initialLabel.empty()) {
                 std::string label = initialLabel;
                 label += ":";
-                current->setValue("auto", "keylabel", label);
+                current->setValue("auto", "keyLabel", label);
                 initialLabel.clear();
             }
         }
@@ -1226,6 +1240,9 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
         }
         else if (current->isKeyDesignation()) {
             keydesig = current;
+        }
+        else if (hre.search(current, "^\\*v[bi]*:")) {
+            verselabel = current;
         }
     }
 }
@@ -1352,7 +1369,7 @@ void HumdrumInput::analyzeDegreeInterpretations(hum::HTp starttok)
             if (keydesig) {
                 // add key designation as a label on the next
                 // scale degree found in the data
-                current->setValue("auto", "keylabel", keydesig->substr(1));
+                current->setValue("auto", "keyLabel", keydesig->substr(1));
                 keydesig = NULL;
             }
             if (minorQ) {
@@ -8815,9 +8832,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
             // Add key label (for harm/rhrm/deg/degree data)
             if (isCData || isHarm || isDegree) {
-                std::string keylabel = token->getValue("auto", "keylabel");
-                if (!keylabel.empty()) {
-                    addHarmLabel(tstamp, keylabel, tracktext, place, xstaffindex + 1);
+                std::string keyLabel = token->getValue("auto", "keyLabel");
+                std::string keyLabelStyle = token->getValue("auto", "keyLabelStyle");
+                if (!keyLabel.empty()) {
+                    addHarmLabel(tstamp, keyLabel, keyLabelStyle, tracktext, place, xstaffindex + 1);
                 }
             }
 
@@ -9009,8 +9027,8 @@ void HumdrumInput::setFontsizeForHarm(Harm *harm, const std::string &fontsize)
 // HumdrumInput::addHarmLabel --
 //
 
-void HumdrumInput::addHarmLabel(
-    hum::HumNum timestamp, const std::string &label, const std::string &n, const std::string &place, int staffNum)
+void HumdrumInput::addHarmLabel(hum::HumNum timestamp, const std::string &label, const std::string &labelStyle,
+    const std::string &n, const std::string &place, int staffNum)
 {
     if (label.empty()) {
         return;
@@ -9051,6 +9069,17 @@ void HumdrumInput::addHarmLabel(
     }
     // output += U"\u00a0"; // non-breaking space
     text->SetText(output);
+
+    // Add italic/bold styling if needed:
+    if (labelStyle.find("i") != std::string::npos) {
+        rend->SetFontstyle(FONTSTYLE_italic);
+    }
+    if (labelStyle.find("b") != std::string::npos) {
+        rend->SetFontweight(FONTWEIGHT_bold);
+    }
+    else if (labelStyle.find("B") != std::string::npos) {
+        rend->SetFontweight(FONTWEIGHT_bold);
+    }
 
     // add some extra space to separate from chord:
     Text *stext = new Text();
