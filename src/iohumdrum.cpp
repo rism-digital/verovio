@@ -17975,7 +17975,10 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
         // what is this for? Causes problems with pedal markings.
         // qbeat += fract * token->getDuration().getAbs();
     }
-    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+    // Below is temporary fix for issue https://github.com/rism-digital/verovio/issues/3515
+    hum::HumNum mfactor = ss.back().meter_bottom / 4;
+    // hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+
     // if (ss[staffindex].meter_bottom == 0) {
     //  mfactor = 1;
     //  mfactor /= 8;
