@@ -90,12 +90,12 @@ public:
     /**
      * Generate a document pgFoot if none is provided
      */
-    bool GenerateFooter();
+    void GenerateFooter();
 
     /**
      * Generate a document pgHead from the MEI header if none is provided
      */
-    bool GenerateHeader();
+    void GenerateHeader();
 
     /**
      * Generate measure numbers from measure attributes
@@ -137,11 +137,6 @@ public:
     int GetPageCount() const;
 
     /**
-     * Get all visible scores
-     */
-    std::list<Score *> GetVisibleScores() { return m_visibleScores; }
-
-    /**
      * Get the first scoreDef
      */
     ///@{
@@ -150,12 +145,12 @@ public:
     ///@}
 
     /**
-     * Get the first or last visible scoreDef
-     * Lazily updates the visible scores, hence never const
+     * Get all visible scores / the first visible scoreDef
+     * Lazily updates the visible scores, hence not const
      */
     ///@{
+    std::list<Score *> GetVisibleScores();
     ScoreDef *GetFirstVisibleScoreDef();
-    ScoreDef *GetLastVisibleScoreDef();
     ///@}
 
     /**
