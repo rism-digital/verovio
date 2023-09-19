@@ -3701,6 +3701,10 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
         Sb *sb = new Sb();
         section->AddChild(sb);
     }
+
+    if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
+        m_doc->GetCurrentScoreDef()->SetMnumVisible(BOOLEAN_false);
+    }
 }
 
 bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Layer *layer, bool isChord)
