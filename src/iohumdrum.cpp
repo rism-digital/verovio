@@ -11859,6 +11859,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 insertMidMeasureKeySignature(staffindex, elements, pointers, token);
             }
 
+            bool isTimeSignature = layerdata[i]->isTimeSignature();
+            if (notAtStart && isTimeSignature) {
+                insertMeterSigElement(elements, pointers, layerdata, i);
+            }
+
             bool forceClefChange = false;
             if (token->isClef() || (*token == "*")) {
                 if (!(token->isMensLike() && notAtStart)) {
@@ -11974,9 +11979,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
             if (token->isTimeSignature()) {
-                // Now done at the measure level.  This location might
-                // be good for time signatures which change in the
-                // middle of measures.
+                // Now done further above.
                 // insertMeterSigElement(elements, pointers, layerdata, i);
                 processDirections(token, staffindex);
             }
