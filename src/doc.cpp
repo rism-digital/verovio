@@ -883,12 +883,7 @@ void Doc::ScoreDefSetCurrentDoc(bool force)
     }
 
     // First we need to set Page::m_score and Page::m_scoreEnd
-    // We do it by going BACKWARD, with a depth limit of 3 (we want to hit the Score elements)
     ScoreDefSetCurrentPageFunctor scoreDefSetCurrentPage(this);
-    scoreDefSetCurrentPage.SetDirection(BACKWARD);
-    this->Process(scoreDefSetCurrentPage, 3);
-    // Do it again FORWARD to set Page::m_scoreEnd - relies on Page::m_score not being NULL
-    scoreDefSetCurrentPage.SetDirection(FORWARD);
     this->Process(scoreDefSetCurrentPage, 3);
 
     ScoreDefSetCurrentFunctor scoreDefSetCurrent(this);
