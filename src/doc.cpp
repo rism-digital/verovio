@@ -125,7 +125,6 @@ void Doc::Reset()
     m_drawingPageMarginTop = 0;
 
     m_drawingPage = NULL;
-    m_currentScore = NULL;
     m_currentScoreDefDone = false;
     m_dataPreparationDone = false;
     m_timemapTempo = 0.0;
@@ -346,7 +345,7 @@ void Doc::CalculateTimemap()
     double tempo = MIDI_TEMPO;
 
     // Set tempo
-    ScoreDef *scoreDef = this->GetFirstVisibleScoreDef();
+    ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
     }
@@ -385,7 +384,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     double tempo = MIDI_TEMPO;
 
     // set MIDI tempo
-    ScoreDef *scoreDef = this->GetFirstVisibleScoreDef();
+    ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
     }
@@ -1490,7 +1489,7 @@ std::list<Score *> Doc::GetVisibleScores()
     return m_visibleScores;
 }
 
-ScoreDef *Doc::GetFirstVisibleScoreDef()
+Score *Doc::GetFirstVisibleScore()
 {
     if (m_visibleScores.empty()) {
         this->CollectVisibleScores();
@@ -1498,25 +1497,25 @@ ScoreDef *Doc::GetFirstVisibleScoreDef()
         assert(!m_visibleScores.empty());
     }
 
-    return m_visibleScores.front()->GetScoreDef();
+    return m_visibleScores.front();
 }
 
-ScoreDef *Doc::GetCorrespScoreDef(const Object *object)
+Score *Doc::GetCorrespondingScore(const Object *object)
 {
-    return const_cast<ScoreDef *>(std::as_const(*this).GetCorrespScoreDef(object));
+    return const_cast<Score *>(std::as_const(*this).GetCorrespondingScore(object));
 }
 
-const ScoreDef *Doc::GetCorrespScoreDef(const Object *object) const
+const Score *Doc::GetCorrespondingScore(const Object *object) const
 {
     assert(!m_visibleScores.empty());
 
-    const Score *correspScore = m_visibleScores.front();
+    const Score *correspondingScore = m_visibleScores.front();
     for (Score *score : m_visibleScores) {
         if ((score == object) || Object::IsPreOrdered(score, object)) {
-            correspScore = score;
+            correspondingScore = score;
         }
     }
-    return correspScore->GetScoreDef();
+    return correspondingScore;
 }
 
 void Doc::CollectVisibleScores()
@@ -1907,7 +1906,7 @@ double Doc::GetTopMargin(const ClassId classId) const
 
 data_MEASUREMENTSIGNED Doc::GetStaffDistance(const Object *object, int staffIndex, data_STAFFREL staffPosition) const
 {
-    const ScoreDef *scoreDef = this->GetCorrespScoreDef(object);
+    const ScoreDef *scoreDef = this->GetCorrespondingScore(object)->GetScoreDef();
 
     data_MEASUREMENTSIGNED distance;
     if (staffPosition == STAFFREL_above || staffPosition == STAFFREL_below) {
@@ -2088,27 +2087,6 @@ int Doc::GetAdjustedDrawingPageWidth() const
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
-}
-
-Score *Doc::GetCurrentScore()
-{
-    if (!m_currentScore) {
-        m_currentScore = vrv_cast<Score *>(this->FindDescendantByType(SCORE));
-        assert(m_currentScore);
-    }
-    return m_currentScore;
-}
-
-ScoreDef *Doc::GetCurrentScoreDef()
-{
-    if (!m_currentScore) this->GetCurrentScore();
-
-    return m_currentScore->GetScoreDef();
-}
-
-void Doc::SetCurrentScore(Score *score)
-{
-    m_currentScore = score;
 }
 
 //----------------------------------------------------------------------------
