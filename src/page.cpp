@@ -555,8 +555,6 @@ void Page::LayOutVertically()
         this->Process(adjustSlurs);
     }
 
-    doc->SetCurrentScore(this->m_score);
-
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
     }

@@ -145,20 +145,20 @@ public:
     ///@}
 
     /**
-     * Get all visible scores / the first visible scoreDef
+     * Get all visible scores / the first visible score
      * Lazily updates the visible scores, hence not const
      */
     ///@{
     std::list<Score *> GetVisibleScores();
-    ScoreDef *GetFirstVisibleScoreDef();
+    Score *GetFirstVisibleScore();
     ///@}
 
     /**
-     * Get the corresponding scoreDef for a node
+     * Get the corresponding score for a node
      */
     ///@{
-    ScoreDef *GetCorrespScoreDef(const Object *object);
-    const ScoreDef *GetCorrespScoreDef(const Object *object) const;
+    Score *GetCorrespondingScore(const Object *object);
+    const Score *GetCorrespondingScore(const Object *object) const;
     ///@}
 
     /**
@@ -439,19 +439,6 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the current Score/ScoreDef.
-     * If not set, then looks for the first Score in the Document and use that.
-     * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
-     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMilestoneEnd
-     */
-    ///@{
-    Score *GetCurrentScore();
-    ScoreDef *GetCurrentScoreDef();
-    void SetCurrentScore(Score *score);
-    bool HasCurrentScore() const { return m_currentScore != NULL; }
-    ///@}
-
-    /**
      * Return true if the document has been cast off already.
      */
     bool IsCastOff() const { return m_isCastOff; }
@@ -572,17 +559,9 @@ private:
 
     /**
      * The list of all visible scores
-     * Used in Doc::GetCorrespScoreDef to quickly determine the corresponding scoreDef for an object
+     * Used in Doc::GetCorrespondingScore to quickly determine the score for an object
      */
     std::list<Score *> m_visibleScores;
-
-    /**
-     * @name Holds a pointer to the current score/scoreDef.
-     * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
-     */
-    ///@{
-    Score *m_currentScore;
-    ///@}
 
     /**
      * A flag indicating if the document has been cast off or not.
