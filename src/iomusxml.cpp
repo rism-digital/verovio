@@ -3703,7 +3703,7 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 
     if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
-        m_doc->GetCurrentScoreDef()->SetMnumVisible(BOOLEAN_false);
+        m_doc->GetFirstScoreDef()->SetMnumVisible(BOOLEAN_false);
     }
 }
 
