@@ -66,16 +66,13 @@ ScoreDefSetCurrentPageFunctor::ScoreDefSetCurrentPageFunctor(Doc *doc) : DocFunc
 
 FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
 {
-    if (!page->m_score) {
-        const Object *firstSystem = page->GetFirst(SYSTEM);
-        const Object *reference = firstSystem ? firstSystem : page;
-        page->m_score = m_doc->GetCorrespondingScore(reference);
-    }
-    else {
-        const Object *lastSystem = page->GetLast(SYSTEM);
-        const Object *reference = lastSystem ? lastSystem : page;
-        page->m_scoreEnd = m_doc->GetCorrespondingScore(reference);
-    }
+    const Object *firstSystem = page->GetFirst(SYSTEM);
+    const Object *reference = firstSystem ? firstSystem : page;
+    page->m_score = m_doc->GetCorrespondingScore(reference);
+
+    const Object *lastSystem = page->GetLast(SYSTEM);
+    reference = lastSystem ? lastSystem : page;
+    page->m_scoreEnd = m_doc->GetCorrespondingScore(reference);
 
     return FUNCTOR_CONTINUE;
 }
