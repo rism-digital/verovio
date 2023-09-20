@@ -1370,7 +1370,7 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
     }
 
     // This is happening only for the first staff element of the staff @n
-    ScoreDef *scoreDef = m_doc->GetCorrespScoreDef(staff);
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
     if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
             || ((staffDef->GetMultiNumber() != BOOLEAN_true) && (scoreDef->GetMultiNumber() == BOOLEAN_false));
