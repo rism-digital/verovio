@@ -219,13 +219,13 @@ bool MEIOutput::Export()
         // schema processing instruction
         std::string schema;
         if (this->IsPageBasedMEI()) {
-            schema = "https://www.verovio.org/schema/dev/mei-verovio.rng";
+            schema = "https://www.verovio.org/schema/5.0/mei-verovio.rng";
         }
         else if (this->GetBasic()) {
-            schema = "https://music-encoding.org/schema/dev/mei-basic.rng";
+            schema = "https://music-encoding.org/schema/5.0/mei-basic.rng";
         }
         else {
-            schema = "https://music-encoding.org/schema/dev/mei-all.rng";
+            schema = "https://music-encoding.org/schema/5.0/mei-all.rng";
         }
 
         decl = meiDoc.append_child(pugi::node_declaration);
@@ -246,8 +246,8 @@ bool MEIOutput::Export()
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
         AttConverter converter;
-        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION(meiVersion_MEIVERSION_MAX - 1);
-        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_0_0_devplusbasic;
+        meiVersion_MEIVERSION meiVersion = meiVersion_MEIVERSION_5_0;
+        if (this->GetBasic()) meiVersion = meiVersion_MEIVERSION_5_0plusbasic;
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
@@ -2139,8 +2139,6 @@ void MEIOutput::WriteOrnam(pugi::xml_node currentNode, Ornam *ornam)
     this->WriteTextDirInterface(currentNode, ornam);
     this->WriteTimePointInterface(currentNode, ornam);
     ornam->WriteColor(currentNode);
-    ornam->WriteExtSymAuth(currentNode);
-    ornam->WriteExtSymNames(currentNode);
     ornam->WriteOrnamentAccid(currentNode);
 }
 
@@ -2531,7 +2529,7 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
     // Only write att values if representing an attribute or in MEI basic
     if (!this->IsTreeObject(keySig)) {
         InstKeySigDefaultAnl attKeySigDefaultAnl;
-        // Broken in MEI 5.0.0-dev - waiting for a fix
+        // Broken in MEI 5.0 - waiting for a fix
         // attKeySigDefaultAnl.SetKeyAccid(keySig->GetAccid());
         attKeySigDefaultAnl.SetKeyMode(keySig->GetMode());
         attKeySigDefaultAnl.SetKeyPname(keySig->GetPname());
@@ -3851,10 +3849,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         AttConverter converter;
         m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
-    else {
-        // default to MEI 5
-        LogWarning("No meiversion found, falling back to MEI5 (dev)");
-        m_meiversion = meiVersion_MEIVERSION_5_0_0_dev;
+    // Default to MEI 5.0
+    if (m_meiversion == meiVersion_MEIVERSION_NONE) {
+        LogWarning("MEI version found or not known, falling back to MEI 5.0");
+        m_meiversion = meiVersion_MEIVERSION_5_0;
     }
 
     // only try to handle meiHead if we have a full MEI document
@@ -3938,7 +3936,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         m_readingScoreBased = false;
     }
     // Old page-based files. We skip the mdiv and load the pages element.
-    // The mdiv and score boundaries are added by UpgradePageTo_5_0_0.
+    // The mdiv and score boundaries are added by UpgradePageTo_5_0.
     // This work only for single page files
     else if (m_selectedMdiv.child("pages") && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         pages = m_selectedMdiv.child("pages");
@@ -4182,7 +4180,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     }
 
     if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
-        UpgradePageTo_5_0_0(vrvPage);
+        UpgradePageTo_5_0(vrvPage);
     }
 
     this->ReadUnsupportedAttr(page, vrvPage);
@@ -4677,8 +4675,8 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
     object->ReadSystems(element);
     object->ReadTyped(element);
 
-    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-        UpgradeScoreDefElementTo_5_0_0(element);
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+        UpgradeScoreDefElementTo_5_0(element);
     }
 
     InstCleffingLog cleffingLog;
@@ -4743,8 +4741,8 @@ bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
         vrvMensur->SetColor(mensuralVis.GetMensurColor());
         vrvMensur->SetOrient(mensuralVis.GetMensurOrient());
 
-        if (m_meiversion < meiVersion_MEIVERSION_5_0_0_dev) {
-            UpgradeMensurTo_5_0_0(element, vrvMensur);
+        if (m_meiversion < meiVersion_MEIVERSION_5_0) {
+            UpgradeMensurTo_5_0(element, vrvMensur);
         }
 
         object->AddChild(vrvMensur);
@@ -4844,26 +4842,26 @@ bool MEIInput::ReadScoreDefChildren(Object *parent, pugi::xml_node parentNode)
         }
         // headers and footers
         else if (std::string(current.name()) == "pgFoot") {
-            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-                UpgradePgHeadFootTo_5_0_0(current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+                UpgradePgHeadFootTo_5_0(current);
             }
             success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgFoot2") {
-            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-                UpgradePgHeadFootTo_5_0_0(current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+                UpgradePgHeadFootTo_5_0(current);
             }
             success = this->ReadPgFoot(parent, current);
         }
         else if (std::string(current.name()) == "pgHead") {
-            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-                UpgradePgHeadFootTo_5_0_0(current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+                UpgradePgHeadFootTo_5_0(current);
             }
             success = this->ReadPgHead(parent, current);
         }
         else if (std::string(current.name()) == "pgHead2") {
-            if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-                UpgradePgHeadFootTo_5_0_0(current);
+            if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+                UpgradePgHeadFootTo_5_0(current);
             }
             success = this->ReadPgHead(parent, current);
         }
@@ -5348,7 +5346,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadTyped(measure);
 
     if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
-        UpgradeMeasureTo_5_0_0(measure);
+        UpgradeMeasureTo_5_0(measure);
     }
 
     if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && (m_doc->GetType() == Transcription)) {
@@ -5816,8 +5814,6 @@ bool MEIInput::ReadOrnam(Object *parent, pugi::xml_node ornam)
     this->ReadTextDirInterface(ornam, vrvOrnam);
     this->ReadTimePointInterface(ornam, vrvOrnam);
     vrvOrnam->ReadColor(ornam);
-    vrvOrnam->ReadExtSymAuth(ornam);
-    vrvOrnam->ReadExtSymNames(ornam);
     vrvOrnam->ReadOrnamentAccid(ornam);
 
     parent->AddChild(vrvOrnam);
@@ -6044,7 +6040,7 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadVisibility(staff);
 
     if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
-        UpgradeStaffTo_5_0_0(staff);
+        UpgradeStaffTo_5_0(staff);
     }
 
     if (staff.attribute("coord.y1") && (m_doc->GetType() == Transcription)) {
@@ -6283,7 +6279,7 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     object->ReadTyped(element);
 
     if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
-        UpgradeLayerElementTo_5_0_0(element);
+        UpgradeLayerElementTo_5_0(element);
     }
 
     if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
@@ -6595,8 +6591,8 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
     KeySig *vrvKeySig = new KeySig();
     this->ReadLayerElement(keySig, vrvKeySig);
 
-    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-        UpgradeKeySigTo_5_0_0(keySig);
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+        UpgradeKeySigTo_5_0(keySig);
     }
 
     vrvKeySig->ReadAccidental(keySig);
@@ -6655,8 +6651,8 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadSlashCount(mensur);
     vrvMensur->ReadStaffLoc(mensur);
 
-    if (m_meiversion < meiVersion_MEIVERSION_5_0_0_dev) {
-        UpgradeMensurTo_5_0_0(mensur, vrvMensur);
+    if (m_meiversion < meiVersion_MEIVERSION_5_0) {
+        UpgradeMensurTo_5_0(mensur, vrvMensur);
     }
 
     parent->AddChild(vrvMensur);
@@ -6669,8 +6665,8 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     MeterSig *vrvMeterSig = new MeterSig();
     this->ReadLayerElement(meterSig, vrvMeterSig);
 
-    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-        this->UpgradeMeterSigTo_5_0_0(meterSig, vrvMeterSig);
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+        this->UpgradeMeterSigTo_5_0(meterSig, vrvMeterSig);
     }
 
     vrvMeterSig->ReadEnclosingChars(meterSig);
@@ -7181,8 +7177,8 @@ bool MEIInput::ReadNum(Object *parent, pugi::xml_node num)
 
 bool MEIInput::ReadRend(Object *parent, pugi::xml_node rend)
 {
-    if (m_meiversion <= meiVersion_MEIVERSION_5_0_0_dev) {
-        UpgradeRendTo_5_0_0(rend);
+    if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
+        UpgradeRendTo_5_0(rend);
     }
 
     Rend *vrvRend = new Rend();
@@ -8133,7 +8129,7 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
     }
 }
 
-void MEIInput::UpgradeKeySigTo_5_0_0(pugi::xml_node keySig)
+void MEIInput::UpgradeKeySigTo_5_0(pugi::xml_node keySig)
 {
     InstKeySigLog keySigLog;
 
@@ -8149,7 +8145,7 @@ void MEIInput::UpgradeKeySigTo_5_0_0(pugi::xml_node keySig)
     }
 }
 
-void MEIInput::UpgradePageTo_5_0_0(Page *page)
+void MEIInput::UpgradePageTo_5_0(Page *page)
 {
     assert(page);
 
@@ -8169,7 +8165,7 @@ void MEIInput::UpgradePageTo_5_0_0(Page *page)
     page->AddChild(mdivEnd);
 }
 
-void MEIInput::UpgradePgHeadFootTo_5_0_0(pugi::xml_node element)
+void MEIInput::UpgradePgHeadFootTo_5_0(pugi::xml_node element)
 {
     if ((std::string(element.name()) == "pgFoot") && !element.attribute("func")) {
         element.append_attribute("func") = "first";
@@ -8187,7 +8183,7 @@ void MEIInput::UpgradePgHeadFootTo_5_0_0(pugi::xml_node element)
     }
 }
 
-void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
+void MEIInput::UpgradeMeasureTo_5_0(pugi::xml_node measure)
 {
     if (measure.attribute("ulx")) {
         measure.attribute("ulx").set_name("coord.x1");
@@ -8197,7 +8193,7 @@ void MEIInput::UpgradeMeasureTo_5_0_0(pugi::xml_node measure)
     }
 }
 
-void MEIInput::UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig)
+void MEIInput::UpgradeMeterSigTo_5_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig)
 {
     if (meterSig.attribute("form")) {
         std::string value = meterSig.attribute("form").value();
@@ -8208,7 +8204,7 @@ void MEIInput::UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMet
     }
 }
 
-void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
+void MEIInput::UpgradeScoreDefElementTo_5_0(pugi::xml_node scoreDefElement)
 {
     InstKeySigLog keySigLog;
 
@@ -8237,21 +8233,21 @@ void MEIInput::UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement)
     }
 }
 
-void MEIInput::UpgradeStaffTo_5_0_0(pugi::xml_node staff)
+void MEIInput::UpgradeStaffTo_5_0(pugi::xml_node staff)
 {
     if (staff.attribute("uly")) {
         staff.attribute("uly").set_name("coord.y1");
     }
 }
 
-void MEIInput::UpgradeLayerElementTo_5_0_0(pugi::xml_node element)
+void MEIInput::UpgradeLayerElementTo_5_0(pugi::xml_node element)
 {
     if (element.attribute("ulx")) {
         element.attribute("ulx").set_name("coord.x1");
     }
 }
 
-void MEIInput::UpgradeRendTo_5_0_0(pugi::xml_node element)
+void MEIInput::UpgradeRendTo_5_0(pugi::xml_node element)
 {
     if (element.attribute("fontfam")) {
         std::string value = element.attribute("fontfam").value();
@@ -8306,7 +8302,12 @@ void MEIInput::UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *
         }
         else if (durGes.back() == 's') {
             durGes.pop_back();
-            interface->SetDurReal(std::stof(durGes));
+            try {
+                interface->SetDurReal(std::stof(durGes));
+            }
+            catch (const std::invalid_argument &ia) {
+                LogError("Upgrading to 4.0.0: %s", ia.what());
+            }
         }
         element.remove_attribute("dur.ges");
     }
@@ -8320,7 +8321,7 @@ void MEIInput::UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem)
     }
 }
 
-void MEIInput::UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur)
+void MEIInput::UpgradeMensurTo_5_0(pugi::xml_node mensur, Mensur *vrvMensur)
 {
     if (vrvMensur->HasTempus() && !vrvMensur->HasSign()) {
         vrvMensur->SetSign((vrvMensur->GetTempus() == TEMPUS_3) ? MENSURATIONSIGN_O : MENSURATIONSIGN_C);
