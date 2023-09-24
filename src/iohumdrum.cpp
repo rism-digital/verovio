@@ -5604,13 +5604,16 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         if (part->compare(0, 5, "*clef") == 0) {
             if (cleftok) {
                 if (clef == *part) {
-                    // there is already a clef found, and it is the same
+                    // There is already a clef found, and it is the same
                     // as this one, so ignore the second one.
                 }
                 else {
-                    // mark clef as a clef change to print in the layer
-                    part->setValue("auto", "clefChange", 1);
-                    markOtherClefsAsChange(part);
+                    // Mark clef as a clef change to print in the layer:
+                    if (part->isKern()) {
+                        // Don't mark as clef change in **mens.
+                        part->setValue("auto", "clefChange", 1);
+                        markOtherClefsAsChange(part);
+                    }
                 }
                 part = part->getNextToken();
                 continue;
@@ -5621,7 +5624,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
                 cleftok = part;
             }
             else if (part->find("clefX") != std::string::npos) {
-                // allow percussion clef to not have a line number since it is unpitched.
+                // Allow percussion clef to not have a line number since it is unpitched.
                 clef = *part;
                 cleftok = part;
             }
@@ -29392,7 +29395,6 @@ void HumdrumInput::markAdjacentNullsWithClef(hum::HTp clef)
 
 void HumdrumInput::markOtherClefsAsChange(hum::HTp clef)
 {
-
     int ctrack = clef->getTrack();
     int track;
 
