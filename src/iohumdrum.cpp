@@ -5729,7 +5729,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
             ss[staffindex].meter_bottom = bot;
             ss[staffindex].meter_top = top;
             if (bot == 0) {
-                // Can't to breve meters, so switch to semibreve meter (whole notes).
+                // Can't do breve meters, so switch to semibreve meter (whole notes).
                 ss[staffindex].meter_bottom = 1;
                 ss[staffindex].meter_top *= 2;
             }
@@ -5785,7 +5785,10 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
     // short-circuit *met with *omet for **mens data
     if (staffstart->isMensLike()) {
         if ((!m_omet.empty()) && (staffnumber == m_omet.back().first)) {
-            metersig = *m_omet.back().second;
+            auto ploc = m_omet.back().second->rfind(")");
+            if (ploc != std::string::npos) {
+                metersig = m_omet.back().second->substr(6, ploc - 6);
+            }
             metertok = m_omet.back().second;
         }
     }
@@ -11886,7 +11889,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                 }
                 if (m_mens) {
-                    if (token->isMensurationSymbol()) {
+                    if (token->compare(0, 6, "*omet(") == 0) {
+                        setMensurationSymbol(m_layer, *token, staffindex, token);
+                    }
+                    else if (token->isMensurationSymbol()) {
                         // add mensuration change to layer.
                         setMensurationSymbol(m_layer, *token, staffindex, token);
                     }

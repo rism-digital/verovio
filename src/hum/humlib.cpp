@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 23 22:51:29 PDT 2023
+// Last Modified: Sun Sep 24 17:52:16 PDT 2023
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -86326,6 +86326,9 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 				data += m_clef;
 				return data;
 			}
+		} else if (hre.search(token, "^\\*[mo]?clef")) {
+			string value = getClefConversion(token);
+			return value;
 		}
 	}
 	if (!token->isData()) {
@@ -86442,6 +86445,78 @@ void Tool_kern2mens::printBarline(HumdrumFile& infile, int line) {
 		}
 	}
 	m_humdrum_text << "\n";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kern2mens::getClefConversion --
+//    If token is *oclef and there is an adjacent *clef,
+//        convert *oclef to *clef and *clef to *mclef; otherwise,
+//        return the given clef.
+//
+//
+
+string Tool_kern2mens::getClefConversion(HTp token) {
+
+	vector<HTp> clefs;
+	vector<HTp> oclefs;
+	vector<HTp> mclefs;
+
+	HumRegex hre;
+
+	HTp current = token->getNextToken();
+	while (current) {
+		if (current->isData()) {
+			break;
+		}
+		if (current->compare(0, 5, "*clef") == 0) {
+			clefs.push_back(current);
+		}
+		if (current->compare(0, 6, "*oclef") == 0) {
+			oclefs.push_back(current);
+		}
+		if (current->compare(0, 6, "*mclef") == 0) {
+			mclefs.push_back(current);
+		}
+		current = current->getNextToken();
+	}
+
+	current = token->getPreviousToken();
+	while (current) {
+		if (current->isData()) {
+			break;
+		}
+		if (current->compare(0, 5, "*clef") == 0) {
+			clefs.push_back(current);
+		}
+		if (current->compare(0, 6, "*oclef") == 0) {
+			oclefs.push_back(current);
+		}
+		if (current->compare(0, 6, "*mclef") == 0) {
+			mclefs.push_back(current);
+		}
+		current = current->getPreviousToken();
+	}
+
+	if (token->compare(0, 5, "*clef") == 0) {
+		if (oclefs.size() > 0) {
+			string value = *token;
+			hre.replaceDestructive(value, "mclef", "clef");
+			return value;
+		}
+	}
+
+	if (token->compare(0, 6, "*oclef") == 0) {
+		if (clefs.size() > 0) {
+			string value = *token;
+			hre.replaceDestructive(value, "clef", "oclef");
+			return value;
+		}
+	}
+
+	return *token;
 }
 
 
