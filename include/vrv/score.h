@@ -57,12 +57,6 @@ public:
     ///@}
 
     /**
-     * Helper looking at the parent Doc and set its scoreDef as current one.
-     * Called from Object::Process
-     */
-    void SetAsCurrent();
-
-    /**
      * Calculate the height of the pgHead/pgHead2 and pgFoot/pgFoot2 (if any)
      * Requires the Doc to have an empty Pages object because it adds temporary pages
      * Called from Doc::CastOffBase

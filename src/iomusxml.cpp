@@ -888,23 +888,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
         }
         if (head) {
-            m_doc->GetCurrentScoreDef()->AddChild(head);
+            score->GetScoreDef()->AddChild(head);
         }
         if (foot) {
-            m_doc->GetCurrentScoreDef()->AddChild(foot);
+            score->GetScoreDef()->AddChild(foot);
         }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    score->GetScoreDef()->AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
     short int staffOffset = 0;
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) m_doc->GetCurrentScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
+    if (scoreMidiBpm) score->GetScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -2626,7 +2626,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // find staff's staffDef
     // TODO Tablature: is this the correct way to find a staff's staffDef?
     AttNIntegerComparison cnc(STAFFDEF, staff->GetN());
-    StaffDef *staffDef = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByComparison(&cnc));
+    StaffDef *staffDef = vrv_cast<StaffDef *>(m_doc->GetFirstScoreDef()->FindDescendantByComparison(&cnc));
     bool isTablature = false;
     Tuning *tuning = NULL;
 
@@ -3703,7 +3703,7 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 
     if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
-        m_doc->GetCurrentScoreDef()->SetMnumVisible(BOOLEAN_false);
+        m_doc->GetFirstScoreDef()->SetMnumVisible(BOOLEAN_false);
     }
 }
 
