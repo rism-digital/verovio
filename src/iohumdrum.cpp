@@ -23663,15 +23663,30 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     bool editorialQ = false;
 
     std::string edittype;
-    if (!m_signifiers.editacc.empty()) {
-        for (int x = 0; x < (int)m_signifiers.editacc.size(); ++x) {
-            if (tstring.find(m_signifiers.editacc[x]) != std::string::npos) {
-                editorialQ = true;
-                edittype = m_signifiers.edittype[x];
-                break;
+
+    if (token->isKern()) {
+        if (!m_signifiers.editaccKern.empty()) {
+            for (int x = 0; x < (int)m_signifiers.editaccKern.size(); ++x) {
+                if (tstring.find(m_signifiers.editaccKern[x]) != std::string::npos) {
+                    editorialQ = true;
+                    edittype = m_signifiers.edittypeKern[x];
+                    break;
+                }
             }
         }
     }
+    else if (token->isMens()) {
+        if (!m_signifiers.editaccMens.empty()) {
+            for (int x = 0; x < (int)m_signifiers.editaccMens.size(); ++x) {
+                if (tstring.find(m_signifiers.editaccMens[x]) != std::string::npos) {
+                    editorialQ = true;
+                    edittype = m_signifiers.edittypeMens[x];
+                    break;
+                }
+            }
+        }
+    }
+
     std::string edittype2 = token->getLayoutParameter("A", "edit", subtoken);
     if (edittype.empty() && !edittype2.empty()) {
         editorialQ = true;
@@ -23679,8 +23694,15 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             // default editorial accidental type
             edittype = "";
             // use the first editorial accidental RDF style in file if present
-            if (!m_signifiers.editacc.empty()) {
-                edittype = m_signifiers.edittype[0];
+            if (token->isKern()) {
+                if (!m_signifiers.editaccKern.empty()) {
+                    edittype = m_signifiers.edittypeKern[0];
+                }
+            }
+            else if (token->isMens()) {
+                if (!m_signifiers.editaccMens.empty()) {
+                    edittype = m_signifiers.edittypeMens[0];
+                }
             }
         }
         else {
@@ -28580,6 +28602,36 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
         }
 
+        if (key == "RDF**mens") {
+
+            // editorial accidentals:
+            if (value.find("editorial accidental", equals) != std::string::npos) {
+                m_signifiers.editaccMens.push_back(signifier);
+                if (value.find("brack") != std::string::npos) {
+                    if (value.find("up") != std::string::npos) {
+                        m_signifiers.edittypeMens.push_back("brack-up");
+                    }
+                    else {
+                        m_signifiers.edittypeMens.push_back("brack");
+                    }
+                }
+                else if (value.find("paren") != std::string::npos) {
+                    if (value.find("up") != std::string::npos) {
+                        m_signifiers.edittypeMens.push_back("paren-up");
+                    }
+                    else {
+                        m_signifiers.edittypeMens.push_back("paren");
+                    }
+                }
+                else if (value.find("none") != std::string::npos) {
+                    m_signifiers.edittypeMens.push_back("none");
+                }
+                else {
+                    m_signifiers.edittypeMens.push_back("");
+                }
+            }
+        }
+
         if (key != "RDF**kern") {
             continue;
         }
@@ -28656,28 +28708,28 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
 
         // editorial accidentals:
         if (value.find("editorial accidental", equals) != std::string::npos) {
-            m_signifiers.editacc.push_back(signifier);
+            m_signifiers.editaccKern.push_back(signifier);
             if (value.find("brack") != std::string::npos) {
                 if (value.find("up") != std::string::npos) {
-                    m_signifiers.edittype.push_back("brack-up");
+                    m_signifiers.edittypeKern.push_back("brack-up");
                 }
                 else {
-                    m_signifiers.edittype.push_back("brack");
+                    m_signifiers.edittypeKern.push_back("brack");
                 }
             }
             else if (value.find("paren") != std::string::npos) {
                 if (value.find("up") != std::string::npos) {
-                    m_signifiers.edittype.push_back("paren-up");
+                    m_signifiers.edittypeKern.push_back("paren-up");
                 }
                 else {
-                    m_signifiers.edittype.push_back("paren");
+                    m_signifiers.edittypeKern.push_back("paren");
                 }
             }
             else if (value.find("none") != std::string::npos) {
-                m_signifiers.edittype.push_back("none");
+                m_signifiers.edittypeKern.push_back("none");
             }
             else {
-                m_signifiers.edittype.push_back("");
+                m_signifiers.edittypeKern.push_back("");
             }
         }
 
