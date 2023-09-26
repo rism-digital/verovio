@@ -370,8 +370,11 @@ public:
     char cuesize = '\0'; // !!!RDF**kern: @ = cue size
     char terminallong = '\0'; // !!!RDF**kern: l = terminal long
     char terminalbreve = '\0'; // !!!RDF**kern: l = terminal breve
-    std::vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-    std::vector<std::string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+
+    std::vector<char> editaccKern; // !!!RDF**kern: i = editorial accidental
+    std::vector<char> editaccMens; // !!!RDF**mens: z = editorial accidental
+    std::vector<std::string> edittypeKern; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    std::vector<std::string> edittypeMens; // !!!RDF**mens: z = editoral accidental, brack[ets]/paren[theses]
 
     // for **dynam:
     std::string cresctext; // !!!RDF**kern: > = "cresc."

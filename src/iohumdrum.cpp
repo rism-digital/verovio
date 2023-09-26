@@ -6482,7 +6482,11 @@ void HumdrumInput::setMensurationSymbol(
     if (mensurtok) {
         setLocationId(vrvmensur, mensurtok);
     }
-    if (metersig == "*met(C)" || metersig == "C") {
+
+    string metdata = metersig;
+    hre.replaceDestructive(metdata, "$1", "^\\*o?met\\((.*)\\)");
+
+    if (metdata == "C") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6492,7 +6496,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metersig == "*met(C3)" || metersig == "C3") {
+    else if (metdata == "C3") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6502,7 +6506,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metersig == "*met(C|)" || metersig == "C|") {
+    else if (metdata == "C|") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6513,7 +6517,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metersig == "*met(C|3)" || metersig == "C|3") {
+    else if (metdata == "C|3") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6525,7 +6529,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metersig == "*met(O)" || metersig == "O") {
+    else if (metdata == "O") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6535,7 +6539,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metersig == "*met(O3)" || metersig == "O3") {
+    else if (metdata == "O3") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6545,7 +6549,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metersig == "*met(O|)" || metersig == "O|") {
+    else if (metdata == "O|") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6556,7 +6560,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metersig == "*met(O|3)" || metersig == "O|3") {
+    else if (metdata == "O|3") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6567,7 +6571,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metersig == "*met(O.)" || metersig == "O.") {
+    else if (metdata == "O.") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_3);
@@ -6577,7 +6581,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 3;
     }
-    else if (metersig == "*met(O.|)" || metersig == "O.|") {
+    else if (metdata == "O.|") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_3);
@@ -6588,7 +6592,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 3;
     }
-    else if (metersig == "*met(C.)" || metersig == "C.") {
+    else if (metdata == "C.") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_3);
@@ -6598,7 +6602,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 3;
     }
-    else if (metersig == "*met(C.|)" || metersig == "C.|") {
+    else if (metdata == "C.|") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_3);
@@ -6609,7 +6613,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 3;
     }
-    else if (metersig == "*met(C|3/2)" || metersig == "C|3/2") {
+    else if (metdata == "C|3/2") {
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6621,55 +6625,55 @@ void HumdrumInput::setMensurationSymbol(
         prolatio = 2;
     }
 
-    if (metersig.find('C') != std::string::npos) {
+    if (metdata.find('C') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_C);
-        if (metersig.find("3/2") != std::string::npos) {
+        if (metdata.find("3/2") != std::string::npos) {
             vrvmensur->SetNum(3);
             vrvmensur->SetNumbase(2);
         }
-        else if (metersig.find("C2") != std::string::npos) {
+        else if (metdata.find("C2") != std::string::npos) {
             vrvmensur->SetNum(2);
         }
-        else if (metersig.find("C3") != std::string::npos) {
+        else if (metdata.find("C3") != std::string::npos) {
             vrvmensur->SetNum(3);
         }
     }
-    else if (metersig.find('O') != std::string::npos) {
+    else if (metdata.find('O') != std::string::npos) {
         vrvmensur->SetSign(MENSURATIONSIGN_O);
-        if (metersig.find("3/2") != std::string::npos) {
+        if (metdata.find("3/2") != std::string::npos) {
             vrvmensur->SetNum(3);
             vrvmensur->SetNumbase(2);
         }
-        else if (metersig.find("O2") != std::string::npos) {
+        else if (metdata.find("O2") != std::string::npos) {
             vrvmensur->SetNum(2);
         }
-        else if (metersig.find("O3") != std::string::npos) {
+        else if (metdata.find("O3") != std::string::npos) {
             vrvmensur->SetNum(3);
         }
     }
     else {
-        std::cerr << "Warning: do not understand mensuration " << metersig << std::endl;
+        std::cerr << "Warning: do not understand mensuration " << metdata << std::endl;
         return;
     }
 
-    if (metersig.find('|') != std::string::npos) {
+    if (metdata.find('|') != std::string::npos) {
         vrvmensur->SetSlash(1);
     }
-    if (metersig.find('.') != std::string::npos) {
+    if (metdata.find('.') != std::string::npos) {
         vrvmensur->SetDot(BOOLEAN_true);
     }
-    if (metersig.find('r') != std::string::npos) {
+    if (metdata.find('r') != std::string::npos) {
         vrvmensur->SetOrient(ORIENTATION_reversed);
     }
 
-    if (hre.search(metersig, "(\\d+)/(\\d+)")) {
+    if (hre.search(metdata, "(\\d+)/(\\d+)")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
         vrvmensur->SetNumbase(hre.getMatchInt(2));
     }
-    else if (hre.search(metersig, "/(\\d+)")) {
+    else if (hre.search(metdata, "/(\\d+)")) {
         vrvmensur->SetNumbase(hre.getMatchInt(1));
     }
-    else if (hre.search(metersig, "(\\d+).*\\)")) {
+    else if (hre.search(metdata, "(\\d+).*\\)")) {
         vrvmensur->SetNum(hre.getMatchInt(1));
     }
 
