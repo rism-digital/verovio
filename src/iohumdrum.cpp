@@ -23669,6 +23669,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
     std::string edittype;
 
+    bool doubleQ = false; // Used for mensural editorial+visual accidentals.
+
     if (token->isKern()) {
         if (!m_signifiers.editaccKern.empty()) {
             for (int x = 0; x < (int)m_signifiers.editaccKern.size(); ++x) {
@@ -23681,11 +23683,18 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
     else if (token->isMens()) {
+        string doubleSignifier;
         if (!m_signifiers.editaccMens.empty()) {
             for (int x = 0; x < (int)m_signifiers.editaccMens.size(); ++x) {
+                doubleSignifier = m_signifiers.editaccMens[x];
+                doubleSignifier += m_signifiers.editaccMens[x];
                 if (tstring.find(m_signifiers.editaccMens[x]) != std::string::npos) {
                     editorialQ = true;
                     edittype = m_signifiers.edittypeMens[x];
+                    if (tstring.find(doubleSignifier) != std::string::npos) {
+                        // Show accidental as regular and editorial.
+                        doubleQ = true;
+                    }
                     break;
                 }
             }
@@ -23910,33 +23919,42 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                         break;
                 }
             }
-            else {
+
+            if ((!editorialQ) || doubleQ) {
+
+                Accid *myaccid = accid;
+                if (doubleQ) {
+                    myaccid = new Accid;
+                    appendElement(note, myaccid);
+                }
 
                 switch (accidCount) {
-                    case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
-                    case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
-                    case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                    case +3: myaccid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
+                    case +2: myaccid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+                    case +1: myaccid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
                     case 0:
                         // mensural music does not have a natural sign
                         // and accidentals are relative
                         switch (diatonic % 7) {
-                            case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // C# -> Cn
-                            case 1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // D# -> Dn
-                            case 2: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // E- -> En
-                            case 3: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // F# -> Fn
-                            case 4: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // G# -> Gn
-                            case 5: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // A- -> An
-                            case 6: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // B- -> Bn
+                            case 0: myaccid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // C# -> Cn
+                            case 1: myaccid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // D# -> Dn
+                            case 2: myaccid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // E- -> En
+                            case 3: myaccid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // F# -> Fn
+                            case 4: myaccid->SetAccid(ACCIDENTAL_WRITTEN_f); break; // G# -> Gn
+                            case 5: myaccid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // A- -> An
+                            case 6: myaccid->SetAccid(ACCIDENTAL_WRITTEN_s); break; // B- -> Bn
                         }
+                        myaccid->SetAccidGes(ACCIDENTAL_GESTURAL_n);
                         break;
-                    case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
-                    case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
-                    case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                        break;
+                    case -1: myaccid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                    case -2: myaccid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                    case -3: myaccid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                     default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
                 }
 
                 if (accidlevel != 0) {
-                    accid->SetFunc(accidLog_FUNC_edit);
+                    myaccid->SetFunc(accidLog_FUNC_edit);
                 }
             }
         }
