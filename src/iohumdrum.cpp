@@ -5524,7 +5524,8 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
 void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        scoreDef->SetMidiBpm(400.0 * m_globalTempoScaling);
+        // mensural tempo is not in quarter note units?
+        scoreDef->SetMidiBpm(200.0 * m_globalTempoScaling);
         return;
     }
     double sum = 0.0;
@@ -24142,7 +24143,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    // alterted notes (MEI 5):
     if (mensit) {
         addMensuralQuality(note, token);
     }
@@ -24313,7 +24313,7 @@ bool HumdrumInput::checkForJoin(Note *note, hum::HTp token)
 //////////////////////////////
 //
 // HumdrumInput::addMensuralQuality -- Add explicit @num and @numbase for mensural notes
-//     that doe not match the mensuration.  This can be removed later when verovio does
+//     that do not match the mensuration.  This can be removed later when verovio does
 //     this on its own.
 //
 //     maximodus   splits maxima    into 2 or 3 longas
@@ -24340,15 +24340,16 @@ void HumdrumInput::addMensuralQuality(Note *note, hum::HTp token)
     bool longa = token->find("L") == std::string::npos ? false : true;
     bool breve = token->find("S") == std::string::npos ? false : true;
     bool semibreve = token->find("s") == std::string::npos ? false : true;
+    bool minima = token->find("M") == std::string::npos ? false : true;
+    bool semiminima = token->find("m") == std::string::npos ? false : true;
+    bool fusa = token->find("U") == std::string::npos ? false : true;
+    bool semifusa = token->find("u") == std::string::npos ? false : true;
 
-    if (!(maxima || longa || breve || semibreve)) {
-        // minim, semiminim, fusa, and semifusa should always be imperfect
-        return;
-    }
-
-    // Do not put @num/@numbase on notes/rests that match the mensuration:
+    // Do not put @dur.quality on notes/rests that match the mensuration:
     int staffindex = m_currentstaff - 1;
+
     humaux::StaffStateVariables &ss = m_staffstates.at(staffindex);
+
     if (maxima && perfect && (ss.maximodus == 3)) {
         return;
     }
@@ -24373,19 +24374,26 @@ void HumdrumInput::addMensuralQuality(Note *note, hum::HTp token)
     else if (semibreve && imperfect && (ss.prolatio == 2)) {
         return;
     }
+    else if (minima && imperfect) {
+        return;
+    }
+    else if (semiminima && imperfect) {
+        return;
+    }
+    else if (fusa && imperfect) {
+        return;
+    }
+    else if (semifusa) {
+        // not allowed to be perfected
+        return;
+    }
 
     // Mark note/rest as perfect/imperfect:
     if (token->find("i") != std::string::npos) {
         note->SetDurQuality(DURQUALITY_mensural_imperfecta);
-        // imperfect time adjustment:
-        note->SetNum(3);
-        note->SetNumbase(2);
     }
     if (token->find("p") != std::string::npos) {
         note->SetDurQuality(DURQUALITY_mensural_perfecta);
-        // perfect time adjustment:
-        note->SetNum(2);
-        note->SetNumbase(3);
     }
 }
 
