@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
 #include "staff.h"
 
 //----------------------------------------------------------------------------
@@ -149,7 +148,7 @@ FunctorCode AdjustLayersFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustLayersFunctor::VisitScore(Score *score)
 {
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

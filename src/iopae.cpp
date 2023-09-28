@@ -73,7 +73,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->GetFirstScoreDef()->SaveObject(this, false);
+    m_doc->GetCurrentScoreDef()->SaveObject(this, false);
 
     m_docScoreDef = false;
 
@@ -1019,20 +1019,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        score->GetScoreDef()->AddChild(scoreDefKeySig);
+        m_doc->GetCurrentScoreDef()->AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        score->GetScoreDef()->AddChild(scoreDefMeterSig);
+        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        score->GetScoreDef()->AddChild(scoreDefMensur);
+        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMensur);
     }
 
-    score->GetScoreDef()->AddChild(staffGrp);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
 
     if (m_tie != NULL) {
         LogWarning("Open tie will not render because tstamp2 is missing");
@@ -2966,7 +2966,7 @@ bool PAEInput::Parse()
     staffDef->SetN(1);
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
-    score->GetScoreDef()->AddChild(staffGrp);
+    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
 
     if (m_isMensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
@@ -2977,17 +2977,17 @@ bool PAEInput::Parse()
         staffDef->AddChild(m_clef.Clone());
     }
     if (m_hasKeySig) {
-        score->GetScoreDef()->AddChild(m_keySig.Clone());
+        m_doc->GetCurrentScoreDef()->AddChild(m_keySig.Clone());
     }
     if (m_hasMeterSig) {
         // Make it an attribute for now
         m_meterSig.IsAttribute(true);
-        score->GetScoreDef()->AddChild(m_meterSig.Clone());
+        m_doc->GetCurrentScoreDef()->AddChild(m_meterSig.Clone());
     }
     if (m_hasMensur) {
         // Make it an attribute for now
         m_mensur.IsAttribute(true);
-        score->GetScoreDef()->AddChild(m_mensur.Clone());
+        m_doc->GetCurrentScoreDef()->AddChild(m_mensur.Clone());
     }
 
     // A stack to which layer element are added. At least a Layer, but then Beam, GraceGrp, Chord, etc.
