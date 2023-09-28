@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
 
 //----------------------------------------------------------------------------
 
@@ -231,7 +230,7 @@ FunctorCode AdjustGraceXPosFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustGraceXPosFunctor::VisitScore(Score *score)
 {
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }
