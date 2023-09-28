@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "score.h"
 
 //----------------------------------------------------------------------------
 
@@ -42,8 +41,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     if (accids.empty()) return FUNCTOR_SIBLINGS;
 
     assert(m_doc);
-    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(alignmentReference)->GetScoreDef();
-    StaffDef *staffDef = scoreDef->GetStaffDef(alignmentReference->GetN());
+    StaffDef *staffDef = m_doc->GetCurrentScoreDef()->GetStaffDef(alignmentReference->GetN());
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
     std::sort(accids.begin(), accids.end(), AccidSpaceSort());

@@ -11,7 +11,6 @@
 
 #include "doc.h"
 #include "elementpart.h"
-#include "score.h"
 #include "staff.h"
 
 //----------------------------------------------------------------------------
@@ -126,7 +125,7 @@ FunctorCode AdjustDotsFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustDotsFunctor::VisitScore(Score *score)
 {
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

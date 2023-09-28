@@ -12,7 +12,6 @@
 #include "doc.h"
 #include "multirest.h"
 #include "rest.h"
-#include "score.h"
 #include "staff.h"
 #include "system.h"
 
@@ -299,7 +298,7 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustXPosFunctor::VisitScore(Score *score)
 {
-    m_staffNs = score->GetScoreDef()->GetStaffNs();
+    m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }
