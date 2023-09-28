@@ -914,13 +914,12 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     if (this->IsTreeObject(object)) m_nodeStack.push_back(m_currentNode);
 
     if (object->Is(SCORE)) {
-        ScoreDef *scoreDef = vrv_cast<Score *>(object)->GetScoreDef();
         if (useCustomScoreDef) {
-            this->WriteCustomScoreDef(scoreDef);
+            this->WriteCustomScoreDef();
         }
         else {
             // Save the main scoreDef
-            scoreDef->SaveObject(this, this->GetBasic());
+            m_doc->GetCurrentScoreDef()->SaveObject(this, this->GetBasic());
         }
     }
 
@@ -1279,7 +1278,7 @@ void MEIOutput::WriteStackedObjectsEnd()
         [this](Object *object) { this->WriteObjectInternalEnd(object); });
 }
 
-void MEIOutput::WriteCustomScoreDef(ScoreDef *scoreDef)
+void MEIOutput::WriteCustomScoreDef()
 {
     // Determine the first measure with respect to the first filter match
     Measure *measure = NULL;
@@ -1306,8 +1305,8 @@ void MEIOutput::WriteCustomScoreDef(ScoreDef *scoreDef)
     if (measure && refScoreDef) {
         // Create a copy of the reference scoredef and adjust it to keep track of clef changes, key signature changes,
         // etc.
-        ScoreDef *customScoreDef = vrv_cast<ScoreDef *>(refScoreDef->Clone());
-        ListOfObjects staffDefs = customScoreDef->FindAllDescendantsByType(STAFFDEF);
+        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(refScoreDef->Clone());
+        ListOfObjects staffDefs = scoreDef->FindAllDescendantsByType(STAFFDEF);
         for (Object *staffDef : staffDefs) {
             this->AdjustStaffDef(vrv_cast<StaffDef *>(staffDef), measure);
         }
@@ -1320,7 +1319,7 @@ void MEIOutput::WriteCustomScoreDef(ScoreDef *scoreDef)
         }
         if (!drawLabels) {
             // If not, replace labels by abbreviation or delete them
-            ListOfObjects labels = customScoreDef->FindAllDescendantsByType(LABEL);
+            ListOfObjects labels = scoreDef->FindAllDescendantsByType(LABEL);
             for (Object *label : labels) {
                 if (!this->AdjustLabel(vrv_cast<Label *>(label))) {
                     label->GetParent()->DeleteChild(label);
@@ -1329,11 +1328,11 @@ void MEIOutput::WriteCustomScoreDef(ScoreDef *scoreDef)
         }
 
         // Save the adjusted score def and delete it afterwards
-        customScoreDef->SaveObject(this, this->GetBasic());
-        delete customScoreDef;
+        scoreDef->SaveObject(this, this->GetBasic());
+        delete scoreDef;
     }
     else {
-        scoreDef->SaveObject(this, this->GetBasic());
+        m_doc->GetCurrentScoreDef()->SaveObject(this, this->GetBasic());
     }
 }
 
