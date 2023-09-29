@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Sep 24 17:52:16 PDT 2023
+// Last Modified: Wed Sep 27 21:52:41 PDT 2023
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -5499,6 +5499,35 @@ class HumdrumFileSet {
 
 
 
+class Tool_addic : public HumTool {
+	public:
+		         Tool_addic        (void);
+		        ~Tool_addic        () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+		int      getInstrumentCodeIndex(HumdrumFile& infile);
+		int      getInstrumentClassIndex(HumdrumFile& infile);
+		void     updateInstrumentClassLine(HumdrumFile& infile, int codeIndex, int classIndex);
+		std::string makeClassLine(HumdrumFile& infile, int codeIndex);
+		std::string getInstrumentClass(const string& code);
+
+
+	protected:
+		void     initialize        (void);
+		void     processFile       (HumdrumFile& infile);
+
+	private:
+		std::vector<std::pair<std::string, std::string>> m_instrumentList;
+		bool m_fixQ = false;  // used with -f option: fix incorrect instrument classes
+
+
+};
+
+
 class Tool_autoaccid : public HumTool {
 	public:
 		         Tool_autoaccid    (void);
@@ -7918,13 +7947,20 @@ class Tool_kern2mens : public HumTool {
 		std::string convertKernTokenToMens(HTp token);
 		void        printBarline          (HumdrumFile& infile, int line);
 		std::string getClefConversion     (HTp token);
+		void        storeKernEditorialAccidental(HumdrumFile& infile);
+		void        addVerovioStyling     (HumdrumFile& infile);
 
 	private:
-		bool     m_numbersQ   = true;      // used with -N option
-		bool     m_measuresQ  = true;      // used with -M option
-		bool     m_invisibleQ = true;      // used with -I option
-		bool     m_doublebarQ = true;      // used with -D option
-		string   m_clef;                   // used with -c option
+		bool        m_numbersQ   = true; // used with -N option
+		bool        m_measuresQ  = true; // used with -M option
+		bool        m_invisibleQ = true; // used with -I option
+		bool        m_doublebarQ = true; // used with -D option
+		bool        m_noverovioQ = false; // used with -V option
+		std::string m_clef;              // used with -c option
+
+		std::string m_kernEditorialAccidental;  // used with !!!RDF**kern:
+		int         m_kernEdAccLineIndex = -1;
+		std::string m_mensEdAccLine;
 
 };
 
