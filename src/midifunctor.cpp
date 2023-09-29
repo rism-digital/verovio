@@ -158,6 +158,12 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
     }
+    else if (layerElement->Is(MENSUR)) {
+        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
+    }
+    else if (layerElement->Is(METERSIG)) {
+        this->m_currentMeterSig = vrv_cast<MeterSig *>(layerElement);
+    }
 
     return FUNCTOR_CONTINUE;
 }
