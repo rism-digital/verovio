@@ -5524,8 +5524,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
 void HumdrumInput::addDefaultTempo(ScoreDef *scoreDef)
 {
     if (m_mens) {
-        // mensural tempo is not in quarter note units?
-        scoreDef->SetMidiBpm(200.0 * m_globalTempoScaling);
+        scoreDef->SetMidiBpm(280.0 * m_globalTempoScaling);
         return;
     }
     double sum = 0.0;
@@ -6489,6 +6488,8 @@ void HumdrumInput::setMensurationSymbol(
 
     if (metdata == "C") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
@@ -6497,9 +6498,11 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metdata == "C3") {
+    else if (metdata == "C3") { // non-sesquialtera
         if (m_mens) {
-            vrvmensur->SetTempus(TEMPUS_2);
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
+            vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
         maximodus = 2;
@@ -6509,6 +6512,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "C|") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
@@ -6518,7 +6523,7 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 2;
         prolatio = 2;
     }
-    else if (metdata == "C|3") {
+    else if (metdata == "C|3") { // fix for regular and sesquialtera
         if (m_mens) {
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
@@ -6532,6 +6537,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "O") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
@@ -6540,8 +6547,10 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metdata == "O3") {
+    else if (metdata == "O3") { // also add sesquialtera interpretation
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_3);
+            vrvmensur->SetModusminor(MODUSMINOR_3);
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
@@ -6552,6 +6561,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "O|") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
@@ -6561,8 +6572,10 @@ void HumdrumInput::setMensurationSymbol(
         tempus = 3;
         prolatio = 2;
     }
-    else if (metdata == "O|3") {
+    else if (metdata == "O|3") { // also add sesquialtera interpretation
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_3);
+            vrvmensur->SetModusminor(MODUSMINOR_3);
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
@@ -6574,6 +6587,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "O.") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_3);
         }
@@ -6584,6 +6599,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "O.|") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_3);
             vrvmensur->SetProlatio(PROLATIO_3);
         }
@@ -6595,6 +6612,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "C.") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_3);
         }
@@ -6605,6 +6624,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "C.|") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_3);
         }
@@ -6616,6 +6637,8 @@ void HumdrumInput::setMensurationSymbol(
     }
     else if (metdata == "C|3/2") {
         if (m_mens) {
+            vrvmensur->SetModusmaior(MODUSMAIOR_2);
+            vrvmensur->SetModusminor(MODUSMINOR_2);
             vrvmensur->SetTempus(TEMPUS_2);
             vrvmensur->SetProlatio(PROLATIO_2);
         }
