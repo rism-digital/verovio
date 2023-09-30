@@ -620,7 +620,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
@@ -628,6 +628,7 @@ public:
     ///@{
     FunctorCode VisitDot(Dot *dot) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasureEnd(Measure *measure) override;
     ///@}
 
 protected:

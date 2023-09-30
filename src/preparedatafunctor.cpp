@@ -960,6 +960,16 @@ FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layer
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PreparePointersByLayerFunctor::VisitMeasureEnd(Measure *measure)
+{
+    if (m_lastDot) {
+        m_lastDot->m_drawingNextElement = measure->GetRightBarLine();
+        m_lastDot = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 //----------------------------------------------------------------------------
 // PrepareLyricsFunctor
 //----------------------------------------------------------------------------
