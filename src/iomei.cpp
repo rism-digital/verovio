@@ -8046,7 +8046,7 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     // LogDebug("%d %d %s!", startIdx, endIdx, start->GetID().c_str());
     for (int i = endIdx; i >= startIdx; --i) {
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
-        if (element) tuplet->AddChild(element);
+        if (element) tuplet->InsertChild(element, 0);
     }
     parentLayer->InsertChild(tuplet, startIdx);
 
