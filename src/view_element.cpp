@@ -2031,10 +2031,10 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, char32_t rptGlyph, int
         TextExtend extend;
         const std::u32string figures = this->IntToTimeSigFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
-        const int symHeight = m_doc->GetGlyphHeight(rptGlyph, staffSize, false);
+        const int symHeight = m_doc->GetGlyphHeight(rptGlyph, staffNotationSize, false);
         const int yNum = (y > ySymbol + symHeight / 2)
-            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2
-            : ySymbol + 3 * m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2;
+            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffNotationSize) + extend.m_height / 2
+            : ySymbol + 3 * m_doc->GetDrawingUnit(staffNotationSize) + extend.m_height / 2;
         dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(yNum));
         dc->ResetFont();
     }
