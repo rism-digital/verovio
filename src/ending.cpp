@@ -40,7 +40,7 @@ Ending::Ending()
     this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_LINEREND);
     this->RegisterAttClass(ATT_LINERENDBASE);
-    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
     this->Reset();
 }
