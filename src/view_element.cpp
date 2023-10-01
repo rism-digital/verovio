@@ -2022,7 +2022,7 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, char32_t rptGlyph, int
     if (line) {
         const int yBottom = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
         const int offset = (y == ySymbol) ? m_doc->GetDrawingDoubleUnit(staffSize) : 0;
-        this->DrawVerticalLine(dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffSize));
+        this->DrawVerticalLine(dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffNotationSize));
     }
 
     if (num > 0) {
