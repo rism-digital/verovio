@@ -828,15 +828,21 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
             if (dot->m_drawingPreviousElement && !dot->m_drawingNextElement) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
                 y = dot->m_drawingPreviousElement->GetDrawingY();
+                this->DrawDotsPart(dc, x, y, 1, staff);
             }
             if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
+                // Do not take into account the spacing since it is place in-between
+                dc->DeactivateGraphicX();
                 x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingPreviousElement->GetDrawingX()) / 2);
                 x += dot->m_drawingPreviousElement->GetDrawingRadius(m_doc);
                 y = dot->m_drawingPreviousElement->GetDrawingY();
+                this->DrawDotsPart(dc, x, y, 1, staff);
+                dc->ReactivateGraphic();
             }
         }
-
-        this->DrawDotsPart(dc, x, y, 1, staff);
+        else {
+            this->DrawDotsPart(dc, x, y, 1, staff);
+        }
     }
 
     dc->EndGraphic(element, this);
@@ -2022,7 +2028,8 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, char32_t rptGlyph, int
     if (line) {
         const int yBottom = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
         const int offset = (y == ySymbol) ? m_doc->GetDrawingDoubleUnit(staffSize) : 0;
-        this->DrawVerticalLine(dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffNotationSize));
+        this->DrawVerticalLine(
+            dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffNotationSize));
     }
 
     if (num > 0) {
