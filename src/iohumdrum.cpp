@@ -13765,6 +13765,7 @@ void HumdrumInput::convertMensuralToken(
 
         if (token->find(':') != std::string::npos) {
             Dot *dot = new Dot();
+            dot->SetForm(dotLog_FORM_aug);
             appendElement(elements, pointers, dot);
         }
     }
