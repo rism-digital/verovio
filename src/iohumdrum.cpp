@@ -18130,6 +18130,7 @@ template <class ELEMENT> void HumdrumInput::addMusicSymbol(ELEMENT *element, con
 //
 // HumdumInput::addTextElement -- Append text to a regular element.
 //   default value: fontstyle == ""
+//   default value: addSpacer == true
 //
 
 template <class ELEMENT>
@@ -18152,9 +18153,21 @@ void HumdrumInput::addTextElement(
 
     if (element->GetClassName() == "Syl") {
         // Approximate centering of single-letter text on noteheads.
-        // currently the text is left justified to the left edge of the notehead.
-        if ((data.size() == 1) && addSpacer) {
-            data = "&#160;" + data;
+        // currently the text is left justified to before the left edge of the notehead.
+        hum::HumRegex hre;
+        if (addSpacer) {
+            if (data.size() == 1) {
+                // Single-byte character:
+                data = "&#160;" + data;
+            }
+            else if (hre.search(data, "^&[^&;\\s]+;$")) {
+                // Some single-letter HTML/numeric entity
+                data = "&#160;" + data;
+            }
+            else if ((data.size() == 2) && (data[0] < 0)) {
+                // Some two-byte single character UTF-8 symbol:
+                data = "&#160;" + data;
+            }
         }
     }
 
@@ -25017,10 +25030,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
                     id += "S" + to_string(m + 1);
                     syls[m]->SetID(id);
                 }
-                bool spacer = false;
-                if ((contents.size() == 1) && (contents[0].size() == 1)) {
-                    spacer = true;
-                }
+                bool spacer = true;
 
                 if (ij) {
                     Rend *rend = new Rend();
