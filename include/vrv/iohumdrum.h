@@ -368,8 +368,12 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: N = no stem
     char cuesize = '\0'; // !!!RDF**kern: @ = cue size
-    char terminallong = '\0'; // !!!RDF**kern: l = terminal long
-    char terminalbreve = '\0'; // !!!RDF**kern: l = terminal breve
+
+    char kernTerminalLong = '\0'; // !!!RDF**kern: l = terminal long
+    char kernTerminalBreve = '\0'; // !!!RDF**kern: l = terminal breve
+
+    char mensTerminalLong = '\0'; // !!!RDF**mens: l = terminal long
+    char mensTerminalBreve = '\0'; // !!!RDF**mens: l = terminal breve
 
     std::vector<char> editaccKern; // !!!RDF**kern: i = editorial accidental
     std::vector<char> editaccMens; // !!!RDF**mens: z = editorial accidental

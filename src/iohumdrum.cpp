@@ -776,10 +776,16 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernAccidentals();
     infile.analyzeTextRepetition();
     parseSignifiers(infile);
-    if (m_signifiers.terminallong) {
+    if (m_signifiers.kernTerminalLong) {
         hideTerminalBarlines(infile);
     }
-    if (m_signifiers.terminalbreve) {
+    else if (m_signifiers.kernTerminalBreve) {
+        hideTerminalBarlines(infile);
+    }
+    else if (m_signifiers.mensTerminalLong) {
+        hideTerminalBarlines(infile);
+    }
+    else if (m_signifiers.mensTerminalBreve) {
         hideTerminalBarlines(infile);
     }
     checkForColorSpine(infile);
@@ -2021,10 +2027,16 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red unless it is an l.v. tie.
 
-        if (m_signifiers.terminallong && (token->find(m_signifiers.terminallong) != std::string::npos)) {
+        if (m_signifiers.kernTerminalLong && (token->find(m_signifiers.kernTerminalLong) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
-        else if (m_signifiers.terminalbreve && (token->find(m_signifiers.terminalbreve) != std::string::npos)) {
+        else if (m_signifiers.kernTerminalBreve && (token->find(m_signifiers.kernTerminalBreve) != std::string::npos)) {
+            // suppress hanging tie (because it was removed)
+        }
+        else if (m_signifiers.mensTerminalLong && (token->find(m_signifiers.mensTerminalLong) != std::string::npos)) {
+            // suppress hanging tie (because it was removed)
+        }
+        else if (m_signifiers.mensTerminalBreve && (token->find(m_signifiers.mensTerminalBreve) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
         else {
@@ -14687,20 +14699,44 @@ void HumdrumInput::addSpace(std::vector<std::string> &elements, std::vector<void
 
 void HumdrumInput::processTerminalLong(hum::HTp token)
 {
-    if (!m_signifiers.terminallong) {
+    if (token->isKern() && !m_signifiers.kernTerminalLong) {
         return;
     }
-    if (token->find(m_signifiers.terminallong) == std::string::npos) {
+    if (token->isMens() && !m_signifiers.mensTerminalLong) {
         return;
     }
+
+    if (token->isKern() && (token->find(m_signifiers.kernTerminalLong) == std::string::npos)) {
+        return;
+    }
+    if (token->isMens() && (token->find(m_signifiers.mensTerminalLong) == std::string::npos)) {
+        return;
+    }
+
     std::string doublelong;
-    doublelong += m_signifiers.terminallong;
-    doublelong += m_signifiers.terminallong;
+    if (token->isKern()) {
+        doublelong += m_signifiers.kernTerminalLong;
+        doublelong += m_signifiers.kernTerminalLong;
+    }
+    else if (token->isMens()) {
+        doublelong += m_signifiers.mensTerminalLong;
+        doublelong += m_signifiers.mensTerminalLong;
+    }
     if (token->find(doublelong) != std::string::npos) {
-        token->setValue("LO", "N", "vis", "000");
+        if (token->isKern()) {
+            token->setValue("LO", "N", "vis", "000");
+        }
+        else if (token->isMens()) {
+            token->setValue("LO", "N", "vis", "X");
+        }
     }
     else {
-        token->setValue("LO", "N", "vis", "00");
+        if (token->isKern()) {
+            token->setValue("LO", "N", "vis", "00");
+        }
+        else if (token->isMens()) {
+            token->setValue("LO", "N", "vis", "L");
+        }
     }
     if ((token->find('[') != std::string::npos) || (token->find('_') != std::string::npos)) {
         removeCharacter(token, '[');
@@ -14750,10 +14786,10 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
 
 void HumdrumInput::processTerminalBreve(hum::HTp token)
 {
-    if (!m_signifiers.terminalbreve) {
+    if (!m_signifiers.kernTerminalBreve) {
         return;
     }
-    if (token->find(m_signifiers.terminalbreve) == std::string::npos) {
+    if (token->find(m_signifiers.kernTerminalBreve) == std::string::npos) {
         return;
     }
     token->setValue("LO", "N", "vis", "0");
@@ -23477,9 +23513,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
+    processTerminalLong(token); // do this before assigning rhythmic value.
+    processTerminalBreve(token); // do this before assigning rhythmic value.
     if (!m_mens) {
-        processTerminalLong(token); // do this before assigning rhythmic value.
-        processTerminalBreve(token); // do this before assigning rhythmic value.
         processOverfillingNotes(token);
     }
 
@@ -28690,6 +28726,24 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
                     m_signifiers.edittypeMens.push_back("");
                 }
             }
+
+            // terminal longs
+            // !!!RDF**mens: l = terminal long
+            if (value.find("terminal long", equals) != std::string::npos) {
+                m_signifiers.mensTerminalLong = signifier;
+            }
+            else if (value.find("long note", equals) != std::string::npos) {
+                m_signifiers.mensTerminalLong = signifier;
+            }
+
+            // terminal breves
+            // !!!RDF**mens: l = terminal breve
+            if (value.find("terminal breve", equals) != std::string::npos) {
+                m_signifiers.mensTerminalBreve = signifier;
+            }
+            else if (value.find("breve note", equals) != std::string::npos) {
+                m_signifiers.mensTerminalBreve = signifier;
+            }
         }
 
         if (key != "RDF**kern") {
@@ -28743,19 +28797,19 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // terminal longs
         // !!!RDF**kern: i = terminal long
         if (value.find("terminal long", equals) != std::string::npos) {
-            m_signifiers.terminallong = signifier;
+            m_signifiers.kernTerminalLong = signifier;
         }
         else if (value.find("long note", equals) != std::string::npos) {
-            m_signifiers.terminallong = signifier;
+            m_signifiers.kernTerminalLong = signifier;
         }
 
         // terminal breves
         // !!!RDF**kern: i = terminal breve
         if (value.find("terminal breve", equals) != std::string::npos) {
-            m_signifiers.terminalbreve = signifier;
+            m_signifiers.kernTerminalBreve = signifier;
         }
         else if (value.find("breve note", equals) != std::string::npos) {
-            m_signifiers.terminalbreve = signifier;
+            m_signifiers.kernTerminalBreve = signifier;
         }
 
         // slur directions
@@ -29390,11 +29444,21 @@ void HumdrumInput::hideTerminalBarlines(hum::HumdrumFile &infile)
                 tok = tok->getNextToken();
                 continue;
             }
-            if (m_signifiers.terminallong && (tok->find(m_signifiers.terminallong) == std::string::npos)) {
+            if (m_signifiers.kernTerminalLong && (tok->find(m_signifiers.kernTerminalLong) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;
             }
-            else if (m_signifiers.terminalbreve && (tok->find(m_signifiers.terminalbreve) == std::string::npos)) {
+            else if (m_signifiers.kernTerminalBreve
+                && (tok->find(m_signifiers.kernTerminalBreve) == std::string::npos)) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            else if (m_signifiers.mensTerminalLong && (tok->find(m_signifiers.mensTerminalLong) == std::string::npos)) {
+                tok = tok->getNextToken();
+                continue;
+            }
+            else if (m_signifiers.mensTerminalBreve
+                && (tok->find(m_signifiers.mensTerminalBreve) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;
             }
