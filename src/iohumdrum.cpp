@@ -7433,18 +7433,6 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
         setLocationId(vrvclef, cleftok);
     }
 
-    if (clef.find("clefGG") != std::string::npos) {
-        vrvclef->SetShape(CLEFSHAPE_GG);
-    }
-    else if (clef.find("clefG") != std::string::npos) {
-        vrvclef->SetShape(CLEFSHAPE_G);
-    }
-    else if (clef.find("clefF") != std::string::npos) {
-        vrvclef->SetShape(CLEFSHAPE_F);
-    }
-    else if (clef.find("clefC") != std::string::npos) {
-        vrvclef->SetShape(CLEFSHAPE_C);
-    }
     if (clef.find("clefX") != std::string::npos) {
         vrvclef->SetShape(CLEFSHAPE_perc);
         hum::HumRegex hre;
@@ -7467,6 +7455,11 @@ void HumdrumInput::setClef(StaffDef *staff, const std::string &clef, hum::HTp cl
     std::string tok;
     if (cleftok) {
         tok = *cleftok;
+        if (cleftok->isMens()) {
+            if (*cleftok == "*clefGv2") {
+                tok = "*clefC4";
+            }
+        }
     }
     else {
         tok = clef;
@@ -19908,7 +19901,10 @@ Clef *HumdrumInput::insertClefElement(
 
 void HumdrumInput::setClefBasicShape(Clef *clef, const std::string &tok)
 {
-    if (tok.find("clefG") != std::string::npos) {
+    if (tok.find("clefGG") != std::string::npos) {
+        clef->SetShape(CLEFSHAPE_GG);
+    }
+    else if (tok.find("clefG") != std::string::npos) {
         clef->SetShape(CLEFSHAPE_G);
     }
     else if (tok.find("clefF") != std::string::npos) {
