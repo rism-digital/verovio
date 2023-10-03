@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Sep 27 21:52:41 PDT 2023
+// Last Modified: Mon Oct  2 19:58:27 PDT 2023
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -86575,6 +86575,7 @@ bool Tool_kern2mens::run(HumdrumFile& infile) {
 	m_noverovioQ =  getBoolean("no-verovio");
 	m_clef       =  getString("clef");
 	storeKernEditorialAccidental(infile);
+	storeKernTerminalLong(infile);
 	convertToMens(infile);
 	return true;
 }
@@ -86595,7 +86596,9 @@ void Tool_kern2mens::convertToMens(HumdrumFile& infile) {
 		}
 		if (!infile[i].hasSpines()) {
 			if (i == m_kernEdAccLineIndex) {
-				m_humdrum_text << m_mensEdAccLine;
+				m_humdrum_text << m_mensEdAccLine << endl;
+			} else if (i == m_kernTerminalLongIndex) {
+				m_humdrum_text << m_mensTerminalLongLine << endl;
 			} else {
 				m_humdrum_text << infile[i] << "\n";
 			}
@@ -86622,7 +86625,9 @@ void Tool_kern2mens::convertToMens(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_kern2mens::addVerovioStyling --
+// Tool_kern2mens::addVerovioStyling --  Add a spacing of 0.3, 0.5 if no
+//   spacing is already found in the data.  Use the -V option to no add any
+//   spacing options (to use the defaults in verovio).
 //
 
 void Tool_kern2mens::addVerovioStyling(HumdrumFile& infile) {
@@ -86631,11 +86636,19 @@ void Tool_kern2mens::addVerovioStyling(HumdrumFile& infile) {
 		if (infile[i].hasSpines()) {
 			continue;
 		}
-		if (hre.search(infile[i].token(0), "!!!verovio:\\s*evenNoteSpacing")) {
+		HTp token = infile[i].token(0);
+		if (hre.search(token, "!!!verovio:\\s*evenNoteSpacing")) {
+			return;
+		}
+		if (hre.search(token, "!!!verovio:\\s*spacingLinear")) {
+			return;
+		}
+		if (hre.search(token, "!!!verovio:\\s*spacingNonLinear")) {
 			return;
 		}
 	}
-	m_humdrum_text << "!!!verovio: evenNoteSpacing\n";
+	m_humdrum_text << "!!!verovio: spacingLinear 0.3\n";
+	m_humdrum_text << "!!!verovio: spacingNonLinear 0.5\n";
 }
 
 
@@ -86714,6 +86727,15 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 			hre.replaceDestructive(data, "$1z", "([#-n]+)", "g");
 		}
 	}
+
+	// transfer terminal longs
+	if (!m_kernTerminalLong.empty()) {
+		string searchTerm = "(" + m_kernTerminalLong + "+)";
+		if (hre.search(token, searchTerm)) {
+			data += hre.getMatch(1);
+		}
+	}
+
 	return data;
 }
 
@@ -86893,6 +86915,41 @@ void Tool_kern2mens::storeKernEditorialAccidental(HumdrumFile& infile) {
 				m_kernEdAccLineIndex = i;
 				m_mensEdAccLine = "!!!RDF**mens: z = ";
 				m_mensEdAccLine += definition;
+				break;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kern2mens::storeKernTerminalLong --
+//
+
+void Tool_kern2mens::storeKernTerminalLong(HumdrumFile& infile) {
+	for (int i=infile.getLineCount() - 1; i>= 0; i--) {
+		if (infile[i].hasSpines()) {
+			continue;
+		}
+		if (!infile[i].isReferenceRecord()) {
+			continue;
+		}
+		string key = infile[i].getReferenceKey();
+		if (key != "RDF**kern") {
+			continue;
+		}
+		HumRegex hre;
+		string value = infile[i].getReferenceValue();
+		if (hre.search(value, "^\\s*([^\\s]+)\\s*=\\s*(.*)\\s*$")) {
+			string signifier = hre.getMatch(1);
+			string definition = hre.getMatch(2);
+			if (hre.search(definition, "terminal\\s+long")) {
+				m_kernTerminalLong = signifier;
+				m_kernTerminalLongIndex = i;
+				m_mensTerminalLongLine = "!!!RDF**mens: " + signifier + " = ";
+				m_mensTerminalLongLine += definition;
 				break;
 			}
 		}
@@ -106953,13 +107010,13 @@ void Tool_nproof::checkForValidInstrumentCode(HTp token,
 
 	if (!found1) {
 		m_errorCount++;
-		m_errorList += "!!!TOOL-nproof-error-" + to_string(m_errorCount) + ": Unknown instrument code \"" + inst1 + "\" in token " + *token + "on line " + to_string(token->getLineNumber()) + ", field " + to_string(token->getFieldNumber()) + ". See list of codes at <a target='_blank' href='https://bit.ly/humdrum-instrument-codes'>https://bit.ly/humdrum-instrument-codes</a>.\n";
+		m_errorList += "!!!TOOL-nproof-error-" + to_string(m_errorCount) + ": Unknown instrument code \"" + inst1 + "\" in token " + *token + " on line " + to_string(token->getLineNumber()) + ", field " + to_string(token->getFieldNumber()) + ". See list of codes at <a target='_blank' href='https://bit.ly/humdrum-instrument-codes'>https://bit.ly/humdrum-instrument-codes</a>.\n";
 		m_errorHtml += "!! <li> @{TOOL-nproof-error-" + to_string(m_errorCount) + "} </li>\n";
 	}
 
 	if (!found2) {
 		m_errorCount++;
-		m_errorList += "!!!TOOL-nproof-error-" + to_string(m_errorCount) + ": Unknown instrument code \"" + inst2 + "\" in token " + *token + "on line " + to_string(token->getLineNumber()) + ", field " + to_string(token->getFieldNumber()) + ". See list of codes at <a target='_blank' href='https://bit.ly/humdrum-instrument-codes'>https://bit.ly/humdrum-instrument-codes</a>.\n";
+		m_errorList += "!!!TOOL-nproof-error-" + to_string(m_errorCount) + ": Unknown instrument code \"" + inst2 + "\" in token " + *token + " on line " + to_string(token->getLineNumber()) + ", field " + to_string(token->getFieldNumber()) + ". See list of codes at <a target='_blank' href='https://bit.ly/humdrum-instrument-codes'>https://bit.ly/humdrum-instrument-codes</a>.\n";
 		m_errorHtml += "!! <li> @{TOOL-nproof-error-" + to_string(m_errorCount) + "} </li>\n";
 	}
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Sep 27 21:52:41 PDT 2023
+// Last Modified: Mon Oct  2 19:58:27 PDT 2023
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -39,13 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _HUMLIB_H_INCLUDED
 #define _HUMLIB_H_INCLUDED
 
-#include <stdarg.h>
-#include <string.h>
-
 #include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <cstdarg>
+#include <cstring>
 #include <cstring>
 #include <ctime>
 #include <fstream>
@@ -7948,6 +7947,7 @@ class Tool_kern2mens : public HumTool {
 		void        printBarline          (HumdrumFile& infile, int line);
 		std::string getClefConversion     (HTp token);
 		void        storeKernEditorialAccidental(HumdrumFile& infile);
+		void        storeKernTerminalLong (HumdrumFile& infile);
 		void        addVerovioStyling     (HumdrumFile& infile);
 
 	private:
@@ -7961,6 +7961,10 @@ class Tool_kern2mens : public HumTool {
 		std::string m_kernEditorialAccidental;  // used with !!!RDF**kern:
 		int         m_kernEdAccLineIndex = -1;
 		std::string m_mensEdAccLine;
+
+		std::string m_kernTerminalLong;  // used with !!!RDF**kern:
+		int         m_kernTerminalLongIndex = -1;
+		std::string m_mensTerminalLongLine;
 
 };
 
