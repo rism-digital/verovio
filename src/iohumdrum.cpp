@@ -24854,6 +24854,10 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
 
         for (int j = 0; j < (int)vtexts.size(); ++j) {
             content = vtexts[j];
+            bool addSpacer = true;
+            if (content.find(" ") != std::string::npos) {
+                addSpacer = false;
+            }
             vtoken = vtoks[j];
             versenum++;
             if (content == "") {
@@ -25066,12 +25070,11 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
                     id += "S" + to_string(m + 1);
                     syls[m]->SetID(id);
                 }
-                bool spacer = true;
 
                 if (ij) {
                     Rend *rend = new Rend();
                     rend->SetFontstyle(FONTSTYLE_italic);
-                    addTextElement(rend, contents[m], "", spacer);
+                    addTextElement(rend, contents[m], "", addSpacer);
                     syls[m]->AddChild(rend);
                     std::string ijbegin = vtoken->getValue("auto", "ij-begin");
                     bool ijbeginQ = !ijbegin.empty();
@@ -25091,7 +25094,7 @@ template <class ELEMENT> void HumdrumInput::convertVerses(ELEMENT element, hum::
                     }
                 }
                 else {
-                    addTextElement(syls[m], contents[m], "", spacer);
+                    addTextElement(syls[m], contents[m], "", addSpacer);
                 }
             }
         }
