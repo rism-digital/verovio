@@ -131,6 +131,7 @@ void Doc::Reset()
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
     m_isCastOff = false;
+    m_visibleScores.clear();
 
     m_facsimile = NULL;
 
