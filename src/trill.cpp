@@ -29,6 +29,7 @@ static const ClassRegistrar<Trill> s_factory("trill", TRILL);
 Trill::Trill()
     : ControlElement(TRILL)
     , TimeSpanningInterface()
+    , AttEnclosingChars()
     , AttExtender()
     , AttExtSymAuth()
     , AttExtSymNames()
@@ -38,6 +39,7 @@ Trill::Trill()
     , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTENDER);
     this->RegisterAttClass(ATT_EXTSYMAUTH);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
@@ -55,6 +57,7 @@ void Trill::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
+    this->ResetEnclosingChars();
     this->ResetExtender();
     this->ResetExtSymAuth();
     this->ResetExtSymNames();
