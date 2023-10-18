@@ -99,7 +99,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
         LogWarning("No current mensur for calculating duration");
         return DUR_MENSURAL_REF;
     }
-    
+
     bool modusMaiorPerfectus = (currentMensur->GetModusmaior() != MODUSMAIOR_2);
     bool modusMinorPerfectus = (currentMensur->GetModusminor() != MODUSMINOR_2);
     bool tempusPerfectum = (currentMensur->GetTempus() != TEMPUS_2);
@@ -113,9 +113,9 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     else if (this->GetDurQuality() == DURQUALITY_mensural_perfecta) {
         if (((this->GetDur() == DURATION_longa) && !modusMinorPerfectus)
             || ((this->GetDur() == DURATION_brevis) && !tempusPerfectum)
-            || ((this->GetDur() == DURATION_semibrevis) && !prolatioMaior)
-            || (this->GetDur() == DURATION_minima) || (this->GetDur() == DURATION_semiminima)
-            || (this->GetDur() == DURATION_fusa) || (this->GetDur() == DURATION_semifusa)) {
+            || ((this->GetDur() == DURATION_semibrevis) && !prolatioMaior) || (this->GetDur() == DURATION_minima)
+            || (this->GetDur() == DURATION_semiminima) || (this->GetDur() == DURATION_fusa)
+            || (this->GetDur() == DURATION_semifusa)) {
             num *= 2;
             numBase *= 3;
         }
@@ -138,8 +138,23 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     } // Any other case (minor, perfecta in tempus perfectum, and imperfecta in tempus imperfectum) follows the
       // mensuration and has no @num and @numbase attributes
 
-    if (currentMensur->HasNum()) num *= currentMensur->GetNum();
-    if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
+    if (!currentMensur->HasLevel()) {
+        if (currentMensur->HasNum()) num *= currentMensur->GetNum();
+        if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
+    }
+    else {
+        // Sesquialtera - we currently expect `@num` and `@numbase` to be given
+        // Applies to semibrevis (and shorter)
+        if ((currentMensur->GetLevel() == DURATION_semibrevis) && (this->GetDur() >= DURATION_semibrevis)) {
+            if (currentMensur->HasNum()) num *= currentMensur->GetNum();
+            if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
+        }
+        // Applies to minima (and shorter)
+        else if ((currentMensur->GetLevel() == DURATION_minima) && (this->GetDur() >= DURATION_minima)) {
+            if (currentMensur->HasNum()) num *= currentMensur->GetNum();
+            if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
+        }
+    }
 
     double ratio = 0.0;
     double duration = (double)DUR_MENSURAL_REF;
