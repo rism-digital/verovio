@@ -99,6 +99,11 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
         LogWarning("No current mensur for calculating duration");
         return DUR_MENSURAL_REF;
     }
+    
+    bool modusMaiorPerfectus = (currentMensur->GetModusmaior() != MODUSMAIOR_2);
+    bool modusMinorPerfectus = (currentMensur->GetModusminor() != MODUSMINOR_2);
+    bool tempusPerfectum = (currentMensur->GetTempus() != TEMPUS_2);
+    bool prolatioMaior = (currentMensur->GetProlatio() != PROLATIO_2);
 
     if (this->HasNum() || this->HasNumbase()) {
         if (this->HasNum()) num *= this->GetNum();
@@ -106,9 +111,9 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     }
     // perfecta in imperfect mensuration (two perfectas in the place of the original three imperfectas)
     else if (this->GetDurQuality() == DURQUALITY_mensural_perfecta) {
-        if (((this->GetDur() == DURATION_longa) && (currentMensur->GetModusminor() == MODUSMINOR_2))
-            || ((this->GetDur() == DURATION_brevis) && (currentMensur->GetTempus() == TEMPUS_2))
-            || ((this->GetDur() == DURATION_semibrevis) && (currentMensur->GetProlatio() == PROLATIO_2))
+        if (((this->GetDur() == DURATION_longa) && !modusMinorPerfectus)
+            || ((this->GetDur() == DURATION_brevis) && !tempusPerfectum)
+            || ((this->GetDur() == DURATION_semibrevis) && !prolatioMaior)
             || (this->GetDur() == DURATION_minima) || (this->GetDur() == DURATION_semiminima)
             || (this->GetDur() == DURATION_fusa) || (this->GetDur() == DURATION_semifusa)) {
             num *= 2;
@@ -117,9 +122,9 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     }
     // imperfecta in perfect mensuration (three imperfectas in the place of the two original perfectas)
     else if (this->GetDurQuality() == DURQUALITY_mensural_imperfecta) {
-        if (((this->GetDur() == DURATION_longa) && (currentMensur->GetModusminor() != MODUSMINOR_2))
-            || ((this->GetDur() == DURATION_brevis) && (currentMensur->GetTempus() != TEMPUS_2))
-            || ((this->GetDur() == DURATION_semibrevis) && (currentMensur->GetProlatio() != PROLATIO_2))) {
+        if (((this->GetDur() == DURATION_longa) && modusMinorPerfectus)
+            || ((this->GetDur() == DURATION_brevis) && tempusPerfectum)
+            || ((this->GetDur() == DURATION_semibrevis) && prolatioMaior)) {
             num *= 3;
             numBase *= 2;
         }
