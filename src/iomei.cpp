@@ -2603,6 +2603,7 @@ void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteCue(currentNode);
     mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
+    mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashCount(currentNode);
     mensur->WriteStaffLoc(currentNode);
@@ -6647,6 +6648,7 @@ bool MEIInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
     vrvMensur->ReadMensuralShared(mensur);
+    vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
     vrvMensur->ReadSlashCount(mensur);
     vrvMensur->ReadStaffLoc(mensur);
