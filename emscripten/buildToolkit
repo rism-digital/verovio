@@ -122,6 +122,7 @@ if ($wasmQ) {
 	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
 	$LFLAGS .= " -s STACK_SIZE=256MB";
 	$LFLAGS .= " -s SINGLE_FILE=1";
+	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
 	$FLAGS_NAME = "-wasm";
 }
 
