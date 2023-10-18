@@ -240,16 +240,17 @@ if ($makeQ) {
 
 print "*************\nBuilding makefile...\n";
 my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+print "$cmakeCmd\n" if $CHATTY;
 system($cmakeCmd) == 0 or die "system $cmakeCmd failed: $?";
 
 print "*************\nCompiling...\n";
 my $makeCmd = "$EMMAKE make -j 8";
+print "$makeCmd\n" if $CHATTY;
 system($makeCmd);
 
 print "*************\nLinking...\n";
 my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output $modularize";
 print "$ccCmd\n" if $CHATTY;
-
 system($ccCmd);
 
 if ($? == 0) {
