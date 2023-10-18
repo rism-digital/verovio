@@ -29,6 +29,7 @@
 #include "neume.h"
 #include "page.h"
 #include "rend.h"
+#include "score.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -785,8 +786,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             parent = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
             assert(parent);
             newStaff = new Staff(1);
-            newStaff->m_drawingStaffDef
-                = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(STAFFDEF));
+            newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
+                m_doc->GetCorrespondingScore(parent)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }

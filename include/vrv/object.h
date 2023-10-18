@@ -692,7 +692,6 @@ private:
      * Helper methods for functor processing
      */
     ///@{
-    void UpdateDocumentScore(bool direction);
     bool SkipChildren(bool visibleOnly) const;
     bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
