@@ -776,16 +776,16 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernAccidentals();
     infile.analyzeTextRepetition();
     parseSignifiers(infile);
-    if (m_signifiers.kernTerminalLong) {
+    if (!m_signifiers.kernTerminalLong.empty()) {
         hideTerminalBarlines(infile);
     }
-    else if (m_signifiers.kernTerminalBreve) {
+    else if (!m_signifiers.kernTerminalBreve.empty()) {
         hideTerminalBarlines(infile);
     }
-    else if (m_signifiers.mensTerminalLong) {
+    else if (!m_signifiers.mensTerminalLong.empty()) {
         hideTerminalBarlines(infile);
     }
-    else if (m_signifiers.mensTerminalBreve) {
+    else if (!m_signifiers.mensTerminalBreve.empty()) {
         hideTerminalBarlines(infile);
     }
     checkForColorSpine(infile);
@@ -2027,16 +2027,20 @@ void HumdrumInput::processHangingTieStart(humaux::HumdrumTie &tieinfo)
         // This is a hanging tie for no apparent reason.  Display it, but make
         // it red unless it is an l.v. tie.
 
-        if (m_signifiers.kernTerminalLong && (token->find(m_signifiers.kernTerminalLong) != std::string::npos)) {
+        if (!m_signifiers.kernTerminalLong.empty()
+            && (token->find(m_signifiers.kernTerminalLong) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
-        else if (m_signifiers.kernTerminalBreve && (token->find(m_signifiers.kernTerminalBreve) != std::string::npos)) {
+        else if (!m_signifiers.kernTerminalBreve.empty()
+            && (token->find(m_signifiers.kernTerminalBreve) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
-        else if (m_signifiers.mensTerminalLong && (token->find(m_signifiers.mensTerminalLong) != std::string::npos)) {
+        else if (!m_signifiers.mensTerminalLong.empty()
+            && (token->find(m_signifiers.mensTerminalLong) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
-        else if (m_signifiers.mensTerminalBreve && (token->find(m_signifiers.mensTerminalBreve) != std::string::npos)) {
+        else if (!m_signifiers.mensTerminalBreve.empty()
+            && (token->find(m_signifiers.mensTerminalBreve) != std::string::npos)) {
             // suppress hanging tie (because it was removed)
         }
         else {
@@ -11058,16 +11062,16 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
 
     int direction = 0;
     if (tg.beamstart || tg.gbeamstart) {
-        if (m_signifiers.above) {
+        if (!m_signifiers.above.empty()) {
             std::string pattern = "[LJKk]+";
-            pattern.push_back(m_signifiers.above);
+            pattern += m_signifiers.above;
             if (regex_search(*token, regex(pattern))) {
                 direction = 1;
             }
         }
-        if (m_signifiers.below) {
+        if (!m_signifiers.below.empty()) {
             std::string pattern = "[LJKk]+";
-            pattern.push_back(m_signifiers.below);
+            pattern += m_signifiers.below;
             if (regex_search(*token, regex(pattern))) {
                 direction = -1;
             }
@@ -12437,13 +12441,13 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processPhrases(token);
             processDynamics(token, staffindex);
             assignAutomaticStem(note, token, staffindex);
-            if (m_signifiers.nostem && token->find(m_signifiers.nostem) != std::string::npos) {
+            if (!m_signifiers.nostem.empty() && token->find(m_signifiers.nostem) != std::string::npos) {
                 note->SetStemVisible(BOOLEAN_false);
             }
-            if (m_signifiers.hairpinAccent && token->find(m_signifiers.hairpinAccent) != std::string::npos) {
+            if (!m_signifiers.hairpinAccent.empty() && token->find(m_signifiers.hairpinAccent) != std::string::npos) {
                 addHairpinAccent(token);
             }
-            if (m_signifiers.cuesize && token->find(m_signifiers.cuesize) != std::string::npos) {
+            if (!m_signifiers.cuesize.empty() && token->find(m_signifiers.cuesize) != std::string::npos) {
                 note->SetCue(BOOLEAN_true);
             }
             else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
@@ -12992,7 +12996,8 @@ void HumdrumInput::addHairpinAccent(hum::HTp token)
     int position = -1; // place below by default (may change based on layer position later).
     bool setpos = false;
     if ((int)pos < (int)token->size() - 1) {
-        if (m_signifiers.above == token->at(pos + 1)) {
+        if (!m_signifiers.above.empty()
+            && (token->compare(pos + 1, m_signifiers.above.size(), m_signifiers.above) == 0)) {
             position = +1;
             setpos = true;
         }
@@ -13124,7 +13129,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
     }
     else {
         hum::HumRegex hre;
-        if (m_signifiers.above) {
+        if (!m_signifiers.above.empty()) {
             std::string value = "[LJkK]+";
             value += m_signifiers.above;
             if (hre.search(start, value)) {
@@ -13132,7 +13137,7 @@ void HumdrumInput::addExplicitStemDirection(FTrem *ftrem, hum::HTp start)
                 showplace = true;
             }
         }
-        else if (m_signifiers.below) {
+        else if (!m_signifiers.below.empty()) {
             std::string value = "[LJkK]+";
             value += m_signifiers.below;
             if (hre.search(start, value)) {
@@ -13927,12 +13932,19 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             continue;
         }
         posch = i < tsize - 1 ? nohidden.at(i + 1) : 0;
+
+        // string version of posch:
+        std::string poschstr = "";
+        poschstr += posch;
+
         if ((ch == '^') && (posch == '^')) {
             // use 6 slot in array for "^^" (heavy accent)
             ch = 6;
             intch = 6;
             articloc.at(intch) = i + 1;
             posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
+            poschstr = "";
+            poschstr += posch;
             i++;
         }
         if ((ch == '"') && (posch == '"')) {
@@ -13941,10 +13953,12 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             intch = 9;
             articloc.at(intch) = i + 1;
             posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
-            if (posch == m_signifiers.below) {
+            poschstr = "";
+            poschstr += posch;
+            if (poschstr == m_signifiers.below) {
                 articpos.at(intch) = -1;
             }
-            else if (posch == m_signifiers.above) {
+            else if (poschstr == m_signifiers.above) {
                 articpos.at(intch) = +1;
             }
             i++;
@@ -13955,6 +13969,8 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             ch = '`';
             intch = (unsigned char)ch;
             posch = i < tsize - 2 ? nohidden.at(i + 2) : 'g';
+            poschstr = "";
+            poschstr += posch;
             i++;
         }
         else if ((ch == '~') && (posch == '~')) {
@@ -13962,17 +13978,19 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             textTenuto = true;
             i++;
             posch = i < tsize - 1 ? nohidden.at(i + 1) : 0;
-            if (m_signifiers.below && (posch == m_signifiers.below)) {
+            std::string poschstr = "";
+            poschstr += posch;
+            if (!m_signifiers.below.empty() && (poschstr == m_signifiers.below)) {
                 textTenutoBelow = true;
             }
             continue;
         }
-        if (m_signifiers.verticalStroke == ch) {
+        if (!m_signifiers.verticalStroke.empty() && (m_signifiers.verticalStroke[0] == ch)) {
             // use 7 slot in array for vertical strokes
             ch = 7;
             intch = 7;
         }
-        if (m_signifiers.lhpizz == ch) {
+        if (!(m_signifiers.lhpizz.empty()) && (m_signifiers.lhpizz[0] == ch)) {
             // use 8 slot in array for left-hand pizzicato symbol
             ch = 8;
             intch = 8;
@@ -13990,19 +14008,21 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             if ((posch == 'y') && (pos2ch != 'y')) {
                 articges[ch] = 1;
             }
-            else if (m_signifiers.above && (posch == m_signifiers.above) && (pos2ch == 'y') && (pos3ch != 'y')) {
+            else if (!m_signifiers.above.empty() && (poschstr == m_signifiers.above) && (pos2ch == 'y')
+                && (pos3ch != 'y')) {
                 articges[ch] = 1;
             }
-            else if (m_signifiers.below && (posch == m_signifiers.below) && (pos2ch == 'y') && (pos3ch != 'y')) {
+            else if (!m_signifiers.below.empty() && (poschstr == m_signifiers.below) && (pos2ch == 'y')
+                && (pos3ch != 'y')) {
                 articges[ch] = 1;
             }
         }
 
-        if ((posch != 0) && (posch == m_signifiers.above)) {
+        if (!poschstr.empty() && (poschstr == m_signifiers.above)) {
             articpos.at(intch) = 1;
             showpos.at(intch) = true;
         }
-        else if ((posch != 0) && (posch == m_signifiers.below)) {
+        else if (!poschstr.empty() && (poschstr == m_signifiers.below)) {
             articpos.at(intch) = -1;
             showpos.at(intch) = true;
         }
@@ -14182,17 +14202,17 @@ int HumdrumInput::getDirection(const std::string &token, const std::string &targ
 {
     std::string newtarget;
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         newtarget = target;
-        newtarget.push_back(m_signifiers.above);
+        newtarget += m_signifiers.above;
         if (token.find(newtarget) != std::string::npos) {
             return +1;
         }
     }
 
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         newtarget = target;
-        newtarget.push_back(m_signifiers.below);
+        newtarget += m_signifiers.below;
         if (token.find(newtarget) != std::string::npos) {
             return -1;
         }
@@ -14699,10 +14719,10 @@ void HumdrumInput::addSpace(std::vector<std::string> &elements, std::vector<void
 
 void HumdrumInput::processTerminalLong(hum::HTp token)
 {
-    if (token->isKern() && !m_signifiers.kernTerminalLong) {
+    if (token->isKern() && m_signifiers.kernTerminalLong.empty()) {
         return;
     }
-    if (token->isMens() && !m_signifiers.mensTerminalLong) {
+    if (token->isMens() && m_signifiers.mensTerminalLong.empty()) {
         return;
     }
 
@@ -14786,7 +14806,7 @@ void HumdrumInput::processTerminalLong(hum::HTp token)
 
 void HumdrumInput::processTerminalBreve(hum::HTp token)
 {
-    if (!m_signifiers.kernTerminalBreve) {
+    if (m_signifiers.kernTerminalBreve.empty()) {
         return;
     }
     if (token->find(m_signifiers.kernTerminalBreve) == std::string::npos) {
@@ -14939,15 +14959,15 @@ void HumdrumInput::removeCharacter(hum::HTp token, char removechar)
 
 void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staffindex)
 {
-    if (m_signifiers.nostem && token->find(m_signifiers.nostem) != std::string::npos) {
+    if (!m_signifiers.nostem.empty() && token->find(m_signifiers.nostem) != std::string::npos) {
         chord->SetStemVisible(BOOLEAN_false);
     }
 
-    if (m_signifiers.cuesize) {
+    if (!m_signifiers.cuesize.empty()) {
         int tcount = 1;
         int cuecount = 0;
         for (int i = 0; i < (int)token->size(); ++i) {
-            if ((*token)[i] == m_signifiers.cuesize) {
+            if (token->compare(i, m_signifiers.cuesize.size(), m_signifiers.cuesize) == 0) {
                 cuecount++;
             }
             if ((*token)[i] == ' ') {
@@ -17387,12 +17407,14 @@ void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
     }
 
     // This code block should probably be deleted.
-    if (m_signifiers.below && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.below)) {
+    if (!m_signifiers.below.empty() && (loc < token->size() - 1)
+        && (token->compare(loc + 1, m_signifiers.below.size(), m_signifiers.below) == 0)) {
         aboveQ = false;
         belowQ = true;
         showpos = true;
     }
-    if (m_signifiers.above && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.above)) {
+    if (!m_signifiers.above.empty() && (loc < token->size() - 1)
+        && (token->compare(loc + 1, m_signifiers.above.size(), m_signifiers.above) == 0)) {
         aboveQ = true;
         belowQ = false;
         showpos = true;
@@ -18451,7 +18473,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             // do not specify the staff attribute, but later
             // add a list of the two staves involved.
             int staff = m_currentstaff;
-            if (m_signifiers.above) {
+            if (!m_signifiers.above.empty()) {
                 std::string sabove = "[a-g]+[-n#]*[xy]*";
                 sabove += m_signifiers.above;
                 if (hre.search(slurstart, sabove)) {
@@ -18461,7 +18483,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                     }
                 }
             }
-            if (m_signifiers.below) {
+            if (!m_signifiers.below.empty()) {
                 std::string sbelow = "[a-g]+[-n#]*[xy]*";
                 sbelow += m_signifiers.below;
                 if (hre.search(slurstart, sbelow)) {
@@ -18505,14 +18527,14 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             }
         }
 
-        if (m_signifiers.above) {
+        if (!m_signifiers.above.empty()) {
             int count = 0;
             for (int k = 0; k < (int)slurstart->size() - 1; k++) {
                 if (slurstart->at(k) == '(') {
                     count++;
                 }
                 if (count == slurstartnumber) {
-                    if (slurstart->at(k + 1) == m_signifiers.above) {
+                    if (slurstart->compare(k + 1, m_signifiers.above.size(), m_signifiers.above) == 0) {
                         slur->SetCurvedir(curvature_CURVEDIR_above);
                         appendTypeTag(slur, "placed");
                     }
@@ -18520,14 +18542,14 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 }
             }
         }
-        if (m_signifiers.below) {
+        if (!m_signifiers.below.empty()) {
             int count = 0;
             for (int k = 0; k < (int)slurstart->size() - 1; k++) {
                 if (slurstart->at(k) == '(') {
                     count++;
                 }
                 if (count == slurstartnumber) {
-                    if (slurstart->at(k + 1) == m_signifiers.below) {
+                    if (slurstart->compare(k + 1, m_signifiers.below.size(), m_signifiers.below) == 0) {
                         slur->SetCurvedir(curvature_CURVEDIR_below);
                         appendTypeTag(slur, "placed");
                     }
@@ -19083,25 +19105,25 @@ void HumdrumInput::addTieLineStyle(Tie *tie, hum::HTp token, int noteindex)
     std::string marker3 = "_";
     std::string marker4 = "_";
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         marker1 += m_signifiers.above;
         marker3 += m_signifiers.above;
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         marker2 += m_signifiers.below;
         marker4 += m_signifiers.below;
     }
 
-    if (m_signifiers.above && tstring.find(marker1) != std::string::npos) {
+    if (!m_signifiers.above.empty() && tstring.find(marker1) != std::string::npos) {
         tie->SetCurvedir(curvature_CURVEDIR_above);
     }
-    else if (m_signifiers.below && tstring.find(marker2) != std::string::npos) {
+    else if (!m_signifiers.below.empty() && tstring.find(marker2) != std::string::npos) {
         tie->SetCurvedir(curvature_CURVEDIR_below);
     }
-    else if (m_signifiers.above && tstring.find(marker3) != std::string::npos) {
+    else if (!m_signifiers.above.empty() && tstring.find(marker3) != std::string::npos) {
         tie->SetCurvedir(curvature_CURVEDIR_above);
     }
-    else if (m_signifiers.below && tstring.find(marker4) != std::string::npos) {
+    else if (!m_signifiers.below.empty() && tstring.find(marker4) != std::string::npos) {
         tie->SetCurvedir(curvature_CURVEDIR_below);
     }
 }
@@ -22857,8 +22879,8 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     }
 
     int stemslashes = 0;
-    if (m_signifiers.tremolo) {
-        stemslashes = (int)std::count(token->begin(), token->end(), m_signifiers.tremolo);
+    if (!m_signifiers.tremolo.empty()) {
+        stemslashes = (int)std::count(token->begin(), token->end(), m_signifiers.tremolo[0]);
     }
     if (stemslashes) {
         chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(stemslashes) + "slash"));
@@ -23371,9 +23393,9 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int sta
     }
     // addDurRecip(rest, tstring);
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         std::string pattern = "[ra-gA-G]+[-#nxXyY\\/]*";
-        pattern.push_back(m_signifiers.above);
+        pattern += m_signifiers.above;
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff - 1;
             if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
@@ -23381,9 +23403,9 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken, int sta
             }
         }
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         std::string pattern = "[ra-gA-G]+[-#nxXyY\\/]*";
-        pattern.push_back(m_signifiers.below);
+        pattern += m_signifiers.below;
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff + 1;
             if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
@@ -23794,8 +23816,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     int stemslashes = 0;
-    if ((!token->isChord()) && m_signifiers.tremolo) {
-        stemslashes = (int)std::count(tstring.begin(), tstring.end(), m_signifiers.tremolo);
+    if ((!token->isChord()) && !m_signifiers.tremolo.empty()) {
+        stemslashes = (int)std::count(tstring.begin(), tstring.end(), m_signifiers.tremolo.at(0));
     }
 
     bool removeStemQ = getBooleanParameter(token, "N", "xstem");
@@ -24254,9 +24276,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         }
     }
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         std::string pattern = "[ra-gA-G]+[-#nxXyY]*";
-        pattern.push_back(m_signifiers.above);
+        pattern += m_signifiers.above;
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff - 1;
             if ((staffadj == 0) && (newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
@@ -24264,9 +24286,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         std::string pattern = "[ra-gA-G]+[-#nxXyY]*";
-        pattern.push_back(m_signifiers.below);
+        pattern += m_signifiers.below;
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff + 1;
             if ((staffadj == 0) && (newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
@@ -24287,7 +24309,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     // check for cue-size signifier:
-    if (m_signifiers.cuesize && tstring.find(m_signifiers.cuesize) != std::string::npos) {
+    if (!m_signifiers.cuesize.empty() && tstring.find(m_signifiers.cuesize) != std::string::npos) {
         note->SetCue(BOOLEAN_true);
     }
     else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
@@ -25591,7 +25613,7 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
     upquery += m_signifiers.above;
     std::string downquery = "[A-Ga-gr][#n-]*[xXyY]*";
     downquery += m_signifiers.below;
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         for (int i = 0; i < scount; ++i) {
             if (!hre.search(subtokens[i], upquery)) {
                 allabove = false;
@@ -25602,7 +25624,7 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
     else {
         allabove = false;
     }
-    if (m_signifiers.below && !allabove) {
+    if (!m_signifiers.below.empty() && !allabove) {
         for (int i = 0; i < scount; ++i) {
             if (!hre.search(subtokens[i], downquery)) {
                 allbelow = false;
@@ -26097,16 +26119,16 @@ void HumdrumInput::addTurn(hum::HTp token, const string &tok, int noteIndex)
 
     turn->SetForm(invertedQ ? turnLog_FORM_lower : turnLog_FORM_upper);
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         if (turnend < (int)token->size() - 1) {
-            if ((*token)[turnend + 1] == m_signifiers.above) {
+            if (token->compare(turnend + 1, m_signifiers.above.size(), m_signifiers.above) == 0) {
                 setPlaceRelStaff(turn, "above", true);
             }
         }
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         if (turnend < (int)token->size() - 1) {
-            if ((*token)[turnend + 1] == m_signifiers.below) {
+            if (token->compare(turnend + 1, m_signifiers.below.size(), m_signifiers.below) == 0) {
                 setPlaceRelStaff(turn, "below", true);
             }
         }
@@ -26329,10 +26351,10 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     std::string query = "(";
     query += "[wWmM]+";
     query += "[y";
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         query += m_signifiers.above;
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         query += m_signifiers.below;
     }
     query += "]*";
@@ -26413,12 +26435,12 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         }
         // Set any explicit placement of the mordent:
         int direction = mplace.at(i);
-        if (m_signifiers.above) {
+        if (!m_signifiers.above.empty()) {
             if (mstring.at(i).find(m_signifiers.above) != std::string::npos) {
                 direction = +1;
             }
         }
-        if (m_signifiers.below) {
+        if (!m_signifiers.below.empty()) {
             if (mstring.at(i).find(m_signifiers.below) != std::string::npos) {
                 direction = -1;
             }
@@ -26523,14 +26545,14 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 int HumdrumInput::getNoteStaff(hum::HTp token, int homestaff)
 {
     hum::HumRegex hre;
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         std::string sstring = "[a-g]+[-#n]*";
         sstring += m_signifiers.above;
         if (hre.search(token, sstring)) {
             return homestaff - 1;
         }
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         std::string sstring = "[a-g]+[-#n]*";
         sstring += m_signifiers.below;
         if (hre.search(token, sstring)) {
@@ -26606,16 +26628,16 @@ void HumdrumInput::addTrill(Object *linked, hum::HTp token)
 
     setLocationId(trill, token, subtok);
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         if (tpos < token->size() - 1) {
-            if ((*token)[tpos + 1] == m_signifiers.above) {
+            if (token->compare(tpos + 1, m_signifiers.above.size(), m_signifiers.above) == 0) {
                 setPlaceRelStaff(trill, "above", true);
             }
         }
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         if (tpos < token->size() - 1) {
-            if ((*token)[tpos + 1] == m_signifiers.below) {
+            if (token->compare(tpos + 1, m_signifiers.below.size(), m_signifiers.below) == 0) {
                 setPlaceRelStaff(trill, "below", true);
             }
         }
@@ -26898,22 +26920,22 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
     ss[rtrack].tiestarts.back().setStart(
         noteid, m_measure, cl, tstring, pitch, timestamp, endtime, subindex, token, metertop, meterbot);
 
-    if (m_signifiers.above) {
+    if (!m_signifiers.above.empty()) {
         std::string marker = "[";
         if (tstring.find("_") != std::string::npos) {
             marker = "_";
         }
-        marker.push_back(m_signifiers.above);
+        marker += m_signifiers.above;
         if (tstring.find(marker) != std::string::npos) {
             ss[rtrack].tiestarts.back().setTieAbove();
         }
     }
-    if (m_signifiers.below) {
+    if (!m_signifiers.below.empty()) {
         std::string marker = "[";
         if (tstring.find("_") != std::string::npos) {
             marker = "_";
         }
-        marker.push_back(m_signifiers.below);
+        marker += m_signifiers.below;
         if (tstring.find(marker) != std::string::npos) {
             ss[rtrack].tiestarts.back().setTieBelow();
         }
@@ -28326,7 +28348,7 @@ void HumdrumInput::setLocationIdNSuffix(Object *object, hum::HTp token, int numb
 void HumdrumInput::checkBeamWith(
     Beam *beam, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> &layerdata, int startindex)
 {
-    if (!(m_signifiers.above || m_signifiers.below)) {
+    if (m_signifiers.above.empty() && m_signifiers.below.empty()) {
         return;
     }
     hum::HumRegex hre;
@@ -28620,17 +28642,14 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             continue;
         }
 
-        char signifier = 0;
-        for (int j = 0; j < (int)equals; ++j) {
-            if (isspace(value[j])) {
-                continue;
-            }
-            signifier = value[j];
-            break;
+        string signifier = "";
+        if (hre.search(value, "^\\s*([^\\s=]+)\\s*=")) {
+            signifier = hre.getMatch(1);
         }
-        if (!signifier) {
+        else {
             continue;
         }
+
         // check for known signifier meanings:
 
         if (((key == "RDF**silbe") || (key == "RDF**text")) && hre.search(value, "marked text|matched text")) {
@@ -28669,7 +28688,7 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
         }
         else if (key == "RDF**dynam") {
-            if (signifier == '>') {
+            if (signifier == ">") {
                 if (hre.search(afterequals, "^\\s*\"\\s*([^\"]+)\\s*\"")) {
                     m_signifiers.decresctext = hre.getMatch(1);
                 }
@@ -28684,7 +28703,7 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
                     }
                 }
             }
-            else if (signifier == '<') {
+            else if (signifier == "<") {
                 if (hre.search(afterequals, "^\\s*\"\\s*([^\"]+)\\s*\"")) {
                     m_signifiers.cresctext = hre.getMatch(1);
                 }
@@ -29447,20 +29466,22 @@ void HumdrumInput::hideTerminalBarlines(hum::HumdrumFile &infile)
                 tok = tok->getNextToken();
                 continue;
             }
-            if (m_signifiers.kernTerminalLong && (tok->find(m_signifiers.kernTerminalLong) == std::string::npos)) {
+            if (!m_signifiers.kernTerminalLong.empty()
+                && (tok->find(m_signifiers.kernTerminalLong) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;
             }
-            else if (m_signifiers.kernTerminalBreve
+            else if (!m_signifiers.kernTerminalBreve.empty()
                 && (tok->find(m_signifiers.kernTerminalBreve) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;
             }
-            else if (m_signifiers.mensTerminalLong && (tok->find(m_signifiers.mensTerminalLong) == std::string::npos)) {
+            else if (!m_signifiers.mensTerminalLong.empty()
+                && (tok->find(m_signifiers.mensTerminalLong) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;
             }
-            else if (m_signifiers.mensTerminalBreve
+            else if (!m_signifiers.mensTerminalBreve.empty()
                 && (tok->find(m_signifiers.mensTerminalBreve) == std::string::npos)) {
                 tok = tok->getNextToken();
                 continue;

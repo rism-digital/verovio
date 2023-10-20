@@ -366,17 +366,17 @@ public:
     bool empty = true;
 
     // boolean switches:
-    char nostem = '\0'; // !!!RDF**kern: N = no stem
-    char cuesize = '\0'; // !!!RDF**kern: @ = cue size
+    string nostem; // !!!RDF**kern: N = no stem
+    string cuesize; // !!!RDF**kern: @ = cue size
 
-    char kernTerminalLong = '\0'; // !!!RDF**kern: l = terminal long
-    char kernTerminalBreve = '\0'; // !!!RDF**kern: l = terminal breve
+    string kernTerminalLong; // !!!RDF**kern: l = terminal long
+    string kernTerminalBreve; // !!!RDF**kern: l = terminal breve
 
-    char mensTerminalLong = '\0'; // !!!RDF**mens: l = terminal long
-    char mensTerminalBreve = '\0'; // !!!RDF**mens: l = terminal breve
+    string mensTerminalLong; // !!!RDF**mens: l = terminal long
+    string mensTerminalBreve; // !!!RDF**mens: l = terminal breve
 
-    std::vector<char> editaccKern; // !!!RDF**kern: i = editorial accidental
-    std::vector<char> editaccMens; // !!!RDF**mens: z = editorial accidental
+    std::vector<string> editaccKern; // !!!RDF**kern: i = editorial accidental
+    std::vector<string> editaccMens; // !!!RDF**mens: z = editorial accidental
     std::vector<std::string> edittypeKern; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
     std::vector<std::string> edittypeMens; // !!!RDF**mens: z = editoral accidental, brack[ets]/paren[theses]
 
@@ -386,8 +386,8 @@ public:
     std::string decresctext; // !!!RDF**kern: > = "decresc."
     std::string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
 
-    char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
-    char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
+    string below; // !!!RDF**kern: < = below (previous signifier is "below")
+    string above; // !!!RDF**kern: > = above (previous signifier is "above")
 
     std::string phrase_color; // for global stying of phrase markers
     std::string phrase_style; // for global stying of phrase markers
@@ -405,26 +405,26 @@ public:
     // default is red if no color given:
     // !!!RDF**kern: i = matched note
     // !!!RDF**kern: i = marked note
-    std::vector<char> mark;
+    std::vector<string> mark;
     std::vector<std::string> mcolor;
     std::vector<std::string> markdir;
 
     // Coloring of **mens notes (not for coloration).
     // default color is hotpink, since red is used for
     // colored notes in black notation.
-    std::vector<char> mens_mark;
+    std::vector<string> mens_mark;
     std::vector<std::string> mens_mcolor;
     std::vector<std::string> mens_markdir;
 
     // Coloring of **text:
-    std::vector<char> textmark;
+    std::vector<string> textmark;
     std::vector<std::string> textcolor;
 
     // Articulation signfiers
-    char hairpinAccent = '\0'; // For <> accent on a note.
-    char verticalStroke = '\0'; // For horizontal stroke ornament
-    char lhpizz = '\0'; // For left-hand pizzicato
-    char tremolo = '\0'; // For unmeasured tremolo slashes
+    std::string hairpinAccent; // For <> accent on a note.
+    std::string verticalStroke; // For horizontal stroke ornament
+    std::string lhpizz; // For left-hand pizzicato
+    std::string tremolo; // For unmeasured tremolo slashes
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
