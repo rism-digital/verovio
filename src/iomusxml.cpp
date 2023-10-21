@@ -1708,6 +1708,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 
     this->MatchTies(true);
     if (!m_tieStack.empty()) this->MatchTies(false);
+    for (auto openTie : m_tieStack) {
+        openTie.m_note->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
+    }
 
     // clear stop stacks after each measure
     m_hairpinStopStack.clear();
@@ -1764,7 +1767,6 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             m_tieStopStack.erase(jter);
         }
         else {
-            iter->m_note->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
             ++iter;
         }
     }
