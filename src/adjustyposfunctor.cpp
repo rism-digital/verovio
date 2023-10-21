@@ -12,6 +12,7 @@
 #include "beamspan.h"
 #include "calcalignmentpitchposfunctor.h"
 #include "calcstemfunctor.h"
+#include "div.h"
 #include "system.h"
 
 //----------------------------------------------------------------------------
@@ -25,6 +26,13 @@ namespace vrv {
 AdjustYPosFunctor::AdjustYPosFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_cumulatedShift = 0;
+}
+
+FunctorCode AdjustYPosFunctor::VisitDiv(Div *div)
+{
+    div->AdjustRunningElementYPos();
+
+    return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AdjustYPosFunctor::VisitStaffAlignment(StaffAlignment *staffAlignment)
@@ -52,7 +60,7 @@ FunctorCode AdjustYPosFunctor::VisitSystem(System *system)
 
     system->m_systemAligner.Process(*this);
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 //----------------------------------------------------------------------------

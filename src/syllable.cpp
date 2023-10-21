@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "divline.h"
 #include "functor.h"
 #include "neume.h"
 #include "syl.h"
@@ -51,6 +52,15 @@ bool Syllable::IsSupportedChild(Object *child)
     else if (child->Is(NEUME)) {
         assert(dynamic_cast<Neume *>(child));
     }
+    else if (child->Is(DIVLINE)) {
+        assert(dynamic_cast<DivLine *>(child));
+    }
+    else if (child->Is(ACCID)) {
+        assert(dynamic_cast<Accid *>(child));
+    }
+    else if (child->Is(CLEF)) {
+        assert(dynamic_cast<Clef *>(child));
+    }
     else {
         return false;
     }
@@ -84,7 +94,7 @@ bool Syllable::MarkupAddSyl()
     return false;
 }
 
-FunctorCode Syllable::Accept(MutableFunctor &functor)
+FunctorCode Syllable::Accept(Functor &functor)
 {
     return functor.VisitSyllable(this);
 }
@@ -94,7 +104,7 @@ FunctorCode Syllable::Accept(ConstFunctor &functor) const
     return functor.VisitSyllable(this);
 }
 
-FunctorCode Syllable::AcceptEnd(MutableFunctor &functor)
+FunctorCode Syllable::AcceptEnd(Functor &functor)
 {
     return functor.VisitSyllableEnd(this);
 }

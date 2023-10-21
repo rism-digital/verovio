@@ -77,7 +77,7 @@ bool MNum::IsSupportedChild(Object *child)
 
 static const ClassRegistrar<MNum> s_factory("mNum", MNUM);
 
-FunctorCode MNum::Accept(MutableFunctor &functor)
+FunctorCode MNum::Accept(Functor &functor)
 {
     return functor.VisitMNum(this);
 }
@@ -87,7 +87,7 @@ FunctorCode MNum::Accept(ConstFunctor &functor) const
     return functor.VisitMNum(this);
 }
 
-FunctorCode MNum::AcceptEnd(MutableFunctor &functor)
+FunctorCode MNum::AcceptEnd(Functor &functor)
 {
     return functor.VisitMNumEnd(this);
 }
@@ -95,16 +95,6 @@ FunctorCode MNum::AcceptEnd(MutableFunctor &functor)
 FunctorCode MNum::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMNumEnd(this);
-}
-
-int MNum::Save(FunctorParams *functorParams)
-{
-    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::Save(functorParams);
-}
-
-int MNum::SaveEnd(FunctorParams *functorParams)
-{
-    return (this->IsGenerated()) ? FUNCTOR_SIBLINGS : Object::SaveEnd(functorParams);
 }
 
 } // namespace vrv

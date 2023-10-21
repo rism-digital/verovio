@@ -120,16 +120,6 @@ public:
     void SetArrowFillcolor(std::string arrowFillcolor_) { m_arrowFillcolor = arrowFillcolor_; }
     std::string GetArrowFillcolor() const { return m_arrowFillcolor; }
     bool HasArrowFillcolor() const;
-    //
-    void SetLineForm(data_LINEFORM lineForm_) { m_lineForm = lineForm_; }
-    data_LINEFORM GetLineForm() const { return m_lineForm; }
-    bool HasLineForm() const;
-    //
-    void SetLineWidth(data_LINEWIDTH lineWidth_) { m_lineWidth = lineWidth_; }
-    data_LINEWIDTH GetLineWidth() const { return m_lineWidth; }
-    bool HasLineWidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetLineWidthAlternate() { return &m_lineWidth; }
     ///@}
 
 private:
@@ -143,10 +133,6 @@ private:
     std::string m_arrowColor;
     /** Captures the fill color of the arrow if different from the line color. **/
     std::string m_arrowFillcolor;
-    /** Visual form of the line. **/
-    data_LINEFORM m_lineForm;
-    /** Width of the line. **/
-    data_LINEWIDTH m_lineWidth;
 };
 
 //----------------------------------------------------------------------------
@@ -203,7 +189,7 @@ public:
 
 private:
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -448,6 +434,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttCurvatureDirection
+//----------------------------------------------------------------------------
+
+class AttCurvatureDirection : public Att {
+protected:
+    AttCurvatureDirection();
+    ~AttCurvatureDirection() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetCurvatureDirection();
+
+    /** Read the values for the attribute class **/
+    bool ReadCurvatureDirection(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteCurvatureDirection(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCurve(curvatureDirection_CURVE curve_) { m_curve = curve_; }
+    curvatureDirection_CURVE GetCurve() const { return m_curve; }
+    bool HasCurve() const;
+    ///@}
+
+private:
+    /** Records direction of curvature. **/
+    curvatureDirection_CURVE m_curve;
+};
+
+//----------------------------------------------------------------------------
+// InstCurvatureDirection
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCurvatureDirection
+ */
+
+class InstCurvatureDirection : public AttCurvatureDirection {
+public:
+    InstCurvatureDirection() = default;
+    virtual ~InstCurvatureDirection() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttEpisemaVis
 //----------------------------------------------------------------------------
 
@@ -668,6 +703,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttGuitarGridVis
+//----------------------------------------------------------------------------
+
+class AttGuitarGridVis : public Att {
+protected:
+    AttGuitarGridVis();
+    ~AttGuitarGridVis() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetGuitarGridVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadGuitarGridVis(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteGuitarGridVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; }
+    data_BOOLEAN GetGridShow() const { return m_gridShow; }
+    bool HasGridShow() const;
+    ///@}
+
+private:
+    /** Determines whether to display guitar chord grids. **/
+    data_BOOLEAN m_gridShow;
+};
+
+//----------------------------------------------------------------------------
+// InstGuitarGridVis
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttGuitarGridVis
+ */
+
+class InstGuitarGridVis : public AttGuitarGridVis {
+public:
+    InstGuitarGridVis() = default;
+    virtual ~InstGuitarGridVis() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttHairpinVis
 //----------------------------------------------------------------------------
 
@@ -877,14 +961,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSigShowchange(data_BOOLEAN sigShowchange_) { m_sigShowchange = sigShowchange_; }
-    data_BOOLEAN GetSigShowchange() const { return m_sigShowchange; }
-    bool HasSigShowchange() const;
+    void SetCancelaccid(data_CANCELACCID cancelaccid_) { m_cancelaccid = cancelaccid_; }
+    data_CANCELACCID GetCancelaccid() const { return m_cancelaccid; }
+    bool HasCancelaccid() const;
     ///@}
 
 private:
-    /** Determines whether cautionary accidentals should be displayed at a key change. **/
-    data_BOOLEAN m_sigShowchange;
+    /** Determines where cautionary accidentals should be displayed at a key change. **/
+    data_CANCELACCID m_cancelaccid;
 };
 
 //----------------------------------------------------------------------------
@@ -926,20 +1010,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeysigShow(data_BOOLEAN keysigShow_) { m_keysigShow = keysigShow_; }
-    data_BOOLEAN GetKeysigShow() const { return m_keysigShow; }
-    bool HasKeysigShow() const;
+    void SetKeysigCancelaccid(data_CANCELACCID keysigCancelaccid_) { m_keysigCancelaccid = keysigCancelaccid_; }
+    data_CANCELACCID GetKeysigCancelaccid() const { return m_keysigCancelaccid; }
+    bool HasKeysigCancelaccid() const;
     //
-    void SetKeysigShowchange(data_BOOLEAN keysigShowchange_) { m_keysigShowchange = keysigShowchange_; }
-    data_BOOLEAN GetKeysigShowchange() const { return m_keysigShowchange; }
-    bool HasKeysigShowchange() const;
+    void SetKeysigVisible(data_BOOLEAN keysigVisible_) { m_keysigVisible = keysigVisible_; }
+    data_BOOLEAN GetKeysigVisible() const { return m_keysigVisible; }
+    bool HasKeysigVisible() const;
     ///@}
 
 private:
-    /** Indicates whether the key signature should be displayed. **/
-    data_BOOLEAN m_keysigShow;
-    /** Determines whether cautionary accidentals should be displayed at a key change. **/
-    data_BOOLEAN m_keysigShowchange;
+    /** Determines where cautionary accidentals should be displayed at a key change. **/
+    data_CANCELACCID m_keysigCancelaccid;
+    /** Determines whether the key signature is to be displayed. **/
+    data_BOOLEAN m_keysigVisible;
 };
 
 //----------------------------------------------------------------------------
@@ -1111,18 +1195,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCurve(liquescentVis_CURVE curve_) { m_curve = curve_; }
-    liquescentVis_CURVE GetCurve() const { return m_curve; }
-    bool HasCurve() const;
-    //
     void SetLooped(data_BOOLEAN looped_) { m_looped = looped_; }
     data_BOOLEAN GetLooped() const { return m_looped; }
     bool HasLooped() const;
     ///@}
 
 private:
-    /** Records direction of curvature. **/
-    liquescentVis_CURVE m_curve;
     /** Indicates whether curve is closed. **/
     data_BOOLEAN m_looped;
 };
@@ -1263,8 +1341,8 @@ public:
     /** Getter for reference (for alternate type only) */
     data_FONTSIZE *GetMensurSizeAlternate() { return &m_mensurSize; }
     //
-    void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; }
-    int GetMensurSlash() const { return m_mensurSlash; }
+    void SetMensurSlash(char mensurSlash_) { m_mensurSlash = mensurSlash_; }
+    char GetMensurSlash() const { return m_mensurSlash; }
     bool HasMensurSlash() const;
     ///@}
 
@@ -1290,7 +1368,7 @@ private:
      * Indicates the number lines added to the mensuration sign.
      * For example, one slash is added for what we now call 'alla breve'.
      **/
-    int m_mensurSlash;
+    char m_mensurSlash;
 };
 
 //----------------------------------------------------------------------------
@@ -1388,6 +1466,10 @@ public:
     void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; }
     data_BOOLEAN GetMeterShowchange() const { return m_meterShowchange; }
     bool HasMeterShowchange() const;
+    //
+    void SetMeterVisible(data_BOOLEAN meterVisible_) { m_meterVisible = meterVisible_; }
+    data_BOOLEAN GetMeterVisible() const { return m_meterVisible; }
+    bool HasMeterVisible() const;
     ///@}
 
 private:
@@ -1398,6 +1480,8 @@ private:
      * signature changes.
      **/
     data_BOOLEAN m_meterShowchange;
+    /** Determines whether the meter signature is to be displayed. **/
+    data_BOOLEAN m_meterVisible;
 };
 
 //----------------------------------------------------------------------------
@@ -1606,7 +1690,7 @@ private:
     /** Records the position of the piano damper pedal. **/
     data_STEMDIRECTION_basic m_dir;
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -1953,10 +2037,6 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; }
-    data_BOOLEAN GetGridShow() const { return m_gridShow; }
-    bool HasGridShow() const;
-    //
     void SetLayerscheme(data_LAYERSCHEME layerscheme_) { m_layerscheme = layerscheme_; }
     data_LAYERSCHEME GetLayerscheme() const { return m_layerscheme; }
     bool HasLayerscheme() const;
@@ -1975,8 +2055,6 @@ public:
     ///@}
 
 private:
-    /** Determines whether to display guitar chord grids. **/
-    data_BOOLEAN m_gridShow;
     /** Indicates the number of layers and their stem directions. **/
     data_LAYERSCHEME m_layerscheme;
     /** Captures the colors of the staff lines. **/
@@ -2112,7 +2190,7 @@ private:
     /** Records the position of the stem in relation to the note head(s). **/
     data_STEMPOSITION m_pos;
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/

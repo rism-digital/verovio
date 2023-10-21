@@ -16,8 +16,6 @@
 
 namespace vrv {
 
-class ConvertMarkupAnalyticalParams;
-
 //----------------------------------------------------------------------------
 // Fermata
 //----------------------------------------------------------------------------
@@ -29,7 +27,8 @@ class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
                 public AttEnclosingChars,
-                public AttExtSym,
+                public AttExtSymAuth,
+                public AttExtSymNames,
                 public AttFermataVis,
                 public AttPlacementRelStaff {
 public:
@@ -55,12 +54,6 @@ public:
         return vrv_cast<const TimePointInterface *>(this);
     }
     ///@}
-
-    /**
-     * Helper for converting markup (from Note, Chord, Rest, MRest)
-     */
-    void ConvertFromAnalyticalMarkup(
-        AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params);
 
     /**
      * Get the SMuFL glyph for the fermata based on type, shape or glyph.num
@@ -89,9 +82,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

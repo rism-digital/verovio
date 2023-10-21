@@ -27,11 +27,12 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch()
+PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch(), AttPitchGes()
 {
     this->RegisterInterfaceAttClass(ATT_NOTEGES);
     this->RegisterInterfaceAttClass(ATT_OCTAVE);
     this->RegisterInterfaceAttClass(ATT_PITCH);
+    this->RegisterInterfaceAttClass(ATT_PITCHGES);
 
     this->Reset();
 }
@@ -43,6 +44,7 @@ void PitchInterface::Reset()
     this->ResetNoteGes();
     this->ResetOctave();
     this->ResetPitch();
+    this->ResetPitchGes();
 }
 
 bool PitchInterface::HasIdenticalPitchInterface(const PitchInterface *otherPitchInterface) const

@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "fermata.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "pitchinterface.h"
 #include "rest.h"
@@ -58,7 +57,7 @@ void MRest::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MRest::Accept(MutableFunctor &functor)
+FunctorCode MRest::Accept(Functor &functor)
 {
     return functor.VisitMRest(this);
 }
@@ -68,7 +67,7 @@ FunctorCode MRest::Accept(ConstFunctor &functor) const
     return functor.VisitMRest(this);
 }
 
-FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
+FunctorCode MRest::AcceptEnd(Functor &functor)
 {
     return functor.VisitMRestEnd(this);
 }
@@ -76,19 +75,6 @@ FunctorCode MRest::AcceptEnd(MutableFunctor &functor)
 FunctorCode MRest::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMRestEnd(this);
-}
-
-int MRest::ConvertMarkupAnalytical(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    if (this->HasFermata()) {
-        Fermata *fermata = new Fermata();
-        fermata->ConvertFromAnalyticalMarkup(this, this->GetID(), params);
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 int MRest::GetOptimalLayerLocation(const Layer *layer, int defaultLocation) const

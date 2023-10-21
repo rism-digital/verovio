@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "vrv.h"
@@ -29,11 +28,13 @@ namespace vrv {
 
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
-MeterSig::MeterSig() : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis()
+MeterSig::MeterSig()
+    : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis(), AttVisibility()
 {
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_METERSIGLOG);
     this->RegisterAttClass(ATT_METERSIGVIS);
+    this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
 }
@@ -46,6 +47,7 @@ void MeterSig::Reset()
     this->ResetEnclosingChars();
     this->ResetMeterSigLog();
     this->ResetMeterSigVis();
+    this->ResetVisibility();
 }
 
 int MeterSig::GetTotalCount() const
@@ -128,7 +130,7 @@ std::pair<char32_t, char32_t> MeterSig::GetEnclosingGlyphs(bool smallGlyph) cons
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode MeterSig::Accept(MutableFunctor &functor)
+FunctorCode MeterSig::Accept(Functor &functor)
 {
     return functor.VisitMeterSig(this);
 }
@@ -138,7 +140,7 @@ FunctorCode MeterSig::Accept(ConstFunctor &functor) const
     return functor.VisitMeterSig(this);
 }
 
-FunctorCode MeterSig::AcceptEnd(MutableFunctor &functor)
+FunctorCode MeterSig::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeterSigEnd(this);
 }

@@ -16,7 +16,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "note.h"
 #include "smufl.h"
@@ -151,7 +150,7 @@ void Syl::AdjustToLyricSize(const Doc *doc, int &value)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Syl::Accept(MutableFunctor &functor)
+FunctorCode Syl::Accept(Functor &functor)
 {
     return functor.VisitSyl(this);
 }
@@ -161,7 +160,7 @@ FunctorCode Syl::Accept(ConstFunctor &functor) const
     return functor.VisitSyl(this);
 }
 
-FunctorCode Syl::AcceptEnd(MutableFunctor &functor)
+FunctorCode Syl::AcceptEnd(Functor &functor)
 {
     return functor.VisitSylEnd(this);
 }
@@ -169,20 +168,6 @@ FunctorCode Syl::AcceptEnd(MutableFunctor &functor)
 FunctorCode Syl::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSylEnd(this);
-}
-
-int Syl::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    const int startTime = params->m_totalTime + params->m_lastNote->GetScoreTimeOnset();
-    Text *text = vrv_cast<Text *>(this->GetChild(0, TEXT));
-    const std::string sylText = UTF32to8(text->GetText());
-
-    params->m_midiFile->addLyric(params->m_midiTrack, startTime * params->m_midiFile->getTPQ(), sylText);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 bool Syl::CreateDefaultZone(Doc *doc)

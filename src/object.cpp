@@ -28,7 +28,6 @@
 #include "editorial.h"
 #include "featureextractor.h"
 #include "findfunctor.h"
-#include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
@@ -37,11 +36,13 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "miscfunctor.h"
 #include "nc.h"
 #include "note.h"
 #include "page.h"
 #include "plistinterface.h"
 #include "resetfunctor.h"
+#include "savefunctor.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -895,9 +896,8 @@ void Object::Modify(bool modified) const
 
 void Object::FillFlatList(ListOfConstObjects &flatList) const
 {
-    Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams(&flatList);
-    this->Process(&addToFlatList, &addLayerElementToFlatListParams);
+    AddToFlatListFunctor addToFlatList(&flatList);
+    this->Process(addToFlatList);
 }
 
 ListOfObjects Object::GetAncestors()
@@ -1012,124 +1012,11 @@ bool Object::HasNonEditorialContent()
     return (!nonEditorial.empty());
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, Filters *filters,
-    int deepness, bool direction, bool skipFirst)
-{
-    if (functor->m_returnCode == FUNCTOR_STOP) {
-        return;
-    }
-
-    // Update the current score stored in the document
-    this->UpdateDocumentScore(direction);
-
-    if (!skipFirst) {
-        functor->Call(this, functorParams);
-    }
-
-    // do not go any deeper in this case
-    if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
-        functor->m_returnCode = FUNCTOR_CONTINUE;
-        return;
-    }
-    else if (this->IsEditorialElement()) {
-        // since editorial object doesn't count, we increase the deepness limit
-        deepness++;
-    }
-    if (deepness == 0) {
-        // any need to change the functor m_returnCode?
-        return;
-    }
-    deepness--;
-
-    if (!this->SkipChildren(functor->m_visibleOnly)) {
-        // We need a pointer to the array for the option to work on a reversed copy
-        ArrayOfObjects *children = &m_children;
-        if (direction == BACKWARD) {
-            for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                }
-            }
-        }
-        else {
-            for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                }
-            }
-        }
-    }
-
-    if (endFunctor && !skipFirst) {
-        endFunctor->Call(this, functorParams);
-    }
-}
-
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, Filters *filters,
-    int deepness, bool direction, bool skipFirst) const
-{
-    if (functor->m_returnCode == FUNCTOR_STOP) {
-        return;
-    }
-
-    // Update the current score stored in the document
-    const_cast<Object *>(this)->UpdateDocumentScore(direction);
-
-    if (!skipFirst) {
-        functor->Call(this, functorParams);
-    }
-
-    // do not go any deeper in this case
-    if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
-        functor->m_returnCode = FUNCTOR_CONTINUE;
-        return;
-    }
-    else if (this->IsEditorialElement()) {
-        // since editorial object doesn't count, we increase the deepness limit
-        deepness++;
-    }
-    if (deepness == 0) {
-        // any need to change the functor m_returnCode?
-        return;
-    }
-    deepness--;
-
-    if (!this->SkipChildren(functor->m_visibleOnly)) {
-        // We need a pointer to the array for the option to work on a reversed copy
-        const ArrayOfObjects *children = &m_children;
-        if (direction == BACKWARD) {
-            for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                }
-            }
-        }
-        else {
-            for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
-                // we will end here if there is no filter at all or for the current child type
-                if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                }
-            }
-        }
-    }
-
-    if (endFunctor && !skipFirst) {
-        endFunctor->Call(this, functorParams);
-    }
-}
-
-void Object::Process(MutableFunctor &functor, int deepness, bool skipFirst)
+void Object::Process(Functor &functor, int deepness, bool skipFirst)
 {
     if (functor.GetCode() == FUNCTOR_STOP) {
         return;
     }
-
-    // Update the current score stored in the document
-    this->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
         FunctorCode code = this->Accept(functor);
@@ -1185,9 +1072,6 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
         return;
     }
 
-    // Update the current score stored in the document
-    const_cast<Object *>(this)->UpdateDocumentScore(functor.GetDirection());
-
     if (!skipFirst) {
         FunctorCode code = this->Accept(functor);
         functor.SetCode(code);
@@ -1236,7 +1120,7 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     }
 }
 
-FunctorCode Object::Accept(MutableFunctor &functor)
+FunctorCode Object::Accept(Functor &functor)
 {
     return functor.VisitObject(this);
 }
@@ -1246,7 +1130,7 @@ FunctorCode Object::Accept(ConstFunctor &functor) const
     return functor.VisitObject(this);
 }
 
-FunctorCode Object::AcceptEnd(MutableFunctor &functor)
+FunctorCode Object::AcceptEnd(Functor &functor)
 {
     return functor.VisitObjectEnd(this);
 }
@@ -1254,26 +1138,6 @@ FunctorCode Object::AcceptEnd(MutableFunctor &functor)
 FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitObjectEnd(this);
-}
-
-void Object::UpdateDocumentScore(bool direction)
-{
-    // When we are starting a new score, we need to update the current score in the document
-    if (direction == FORWARD && this->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(this);
-        assert(score);
-        score->SetAsCurrent();
-    }
-    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
-        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
-        assert(elementEnd);
-        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
-            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
-            assert(score);
-            score->SetAsCurrent();
-        }
-    }
 }
 
 bool Object::SkipChildren(bool visibleOnly) const
@@ -1309,22 +1173,18 @@ bool Object::FiltersApply(const Filters *filters, Object *object) const
     return filters ? filters->Apply(object) : true;
 }
 
-int Object::SaveObject(SaveParams &saveParams)
+void Object::SaveObject(Output *output, bool basic)
 {
-    Functor save(&Object::Save);
+    SaveFunctor save(output, basic);
     // Special case where we want to process all objects
-    save.m_visibleOnly = false;
-    Functor saveEnd(&Object::SaveEnd);
-    this->Process(&save, &saveParams, &saveEnd);
-
-    return true;
+    save.SetVisibleOnly(false);
+    this->Process(save);
 }
 
 void Object::ReorderByXPos()
 {
-    ReorderByXPosParams params;
-    Functor reorder(&Object::ReorderByXPos);
-    this->Process(&reorder, &params);
+    ReorderByXPosFunctor reorderByXPos;
+    this->Process(reorderByXPos);
 }
 
 Object *Object::FindNextChild(Comparison *comp, Object *start)
@@ -1474,68 +1334,69 @@ ObjectListInterface &ObjectListInterface::operator=(const ObjectListInterface &i
     return *this;
 }
 
-void ObjectListInterface::ResetList(const Object *node) const
+void ObjectListInterface::ResetList() const
 {
     // nothing to do, the list if up to date
-    if (!node->IsModified()) {
+    const Object *owner = this->GetInterfaceOwner();
+    if (!owner->IsModified()) {
         return;
     }
 
-    node->Modify(false);
+    owner->Modify(false);
     m_list.clear();
-    node->FillFlatList(m_list);
+    owner->FillFlatList(m_list);
     this->FilterList(m_list);
 }
 
-const ListOfConstObjects &ObjectListInterface::GetList(const Object *node) const
+const ListOfConstObjects &ObjectListInterface::GetList() const
 {
-    this->ResetList(node);
+    this->ResetList();
     return m_list;
 }
 
-ListOfObjects ObjectListInterface::GetList(const Object *node)
+ListOfObjects ObjectListInterface::GetList()
 {
-    this->ResetList(node);
+    this->ResetList();
     ListOfObjects result;
     std::transform(m_list.begin(), m_list.end(), std::back_inserter(result),
         [](const Object *obj) { return const_cast<Object *>(obj); });
     return result;
 }
 
-bool ObjectListInterface::HasEmptyList(const Object *node) const
+bool ObjectListInterface::HasEmptyList() const
 {
-    this->ResetList(node);
+    this->ResetList();
     return m_list.empty();
 }
 
-int ObjectListInterface::GetListSize(const Object *node) const
+int ObjectListInterface::GetListSize() const
 {
-    this->ResetList(node);
+    this->ResetList();
     return static_cast<int>(m_list.size());
 }
 
-const Object *ObjectListInterface::GetListFront(const Object *node) const
+const Object *ObjectListInterface::GetListFront() const
 {
-    this->ResetList(node);
+    this->ResetList();
     assert(!m_list.empty());
     return m_list.front();
 }
 
-Object *ObjectListInterface::GetListFront(const Object *node)
+Object *ObjectListInterface::GetListFront()
 {
-    return const_cast<Object *>(std::as_const(*this).GetListFront(node));
+    return const_cast<Object *>(std::as_const(*this).GetListFront());
 }
 
-const Object *ObjectListInterface::GetListBack(const Object *node) const
+const Object *ObjectListInterface::GetListBack() const
 {
-    this->ResetList(node);
+    this->ResetList();
     assert(!m_list.empty());
     return m_list.back();
 }
 
-Object *ObjectListInterface::GetListBack(const Object *node)
+Object *ObjectListInterface::GetListBack()
 {
-    return const_cast<Object *>(std::as_const(*this).GetListBack(node));
+    return const_cast<Object *>(std::as_const(*this).GetListBack());
 }
 
 int ObjectListInterface::GetListIndex(const Object *listElement) const
@@ -1625,38 +1486,47 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
     return const_cast<Object *>(std::as_const(*this).GetListNext(listElement));
 }
 
+const Object *ObjectListInterface::GetInterfaceOwner() const
+{
+    if (!m_owner) {
+        m_owner = dynamic_cast<const Object *>(this);
+        assert(m_owner);
+    }
+    return m_owner;
+}
+
 //----------------------------------------------------------------------------
 // TextListInterface
 //----------------------------------------------------------------------------
 
-std::u32string TextListInterface::GetText(const Object *node) const
+std::u32string TextListInterface::GetText() const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
-    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        if ((*it)->Is(LB)) {
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
+    for (const Object *child : childList) {
+        if (child->Is(LB)) {
             continue;
         }
-        const Text *text = vrv_cast<const Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(child);
         assert(text);
         concatText += text->GetText();
     }
     return concatText;
 }
 
-void TextListInterface::GetTextLines(const Object *node, std::vector<std::u32string> &lines) const
+void TextListInterface::GetTextLines(std::vector<std::u32string> &lines) const
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::u32string concatText;
-    const ListOfConstObjects &childList = this->GetList(node); // make sure it's initialized
-    for (ListOfConstObjects::const_iterator it = childList.begin(); it != childList.end(); ++it) {
-        if ((*it)->Is(LB) && !concatText.empty()) {
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
+    for (const Object *child : childList) {
+        if (child->Is(LB) && !concatText.empty()) {
             lines.push_back(concatText);
             concatText.clear();
             continue;
         }
-        const Text *text = vrv_cast<const Text *>(*it);
+        const Text *text = vrv_cast<const Text *>(child);
         assert(text);
         concatText += text->GetText();
     }
@@ -1676,53 +1546,6 @@ void TextListInterface::FilterList(ListOfConstObjects &childList) const
         }
         ++iter;
     }
-}
-
-//----------------------------------------------------------------------------
-// Functor
-//----------------------------------------------------------------------------
-
-Functor::Functor()
-{
-    m_returnCode = FUNCTOR_CONTINUE;
-    m_visibleOnly = true;
-    obj_fpt = NULL;
-    const_obj_fpt = NULL;
-}
-
-Functor::Functor(int (Object::*_obj_fpt)(FunctorParams *))
-{
-    m_returnCode = FUNCTOR_CONTINUE;
-    m_visibleOnly = true;
-    obj_fpt = _obj_fpt;
-    const_obj_fpt = NULL;
-}
-
-Functor::Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const)
-{
-    m_returnCode = FUNCTOR_CONTINUE;
-    m_visibleOnly = true;
-    obj_fpt = NULL;
-    const_obj_fpt = _const_obj_fpt;
-}
-
-void Functor::Call(Object *ptr, FunctorParams *functorParams)
-{
-    if (const_obj_fpt) {
-        m_returnCode = (ptr->*const_obj_fpt)(functorParams);
-    }
-    else {
-        m_returnCode = (ptr->*obj_fpt)(functorParams);
-    }
-}
-
-void Functor::Call(const Object *ptr, FunctorParams *functorParams)
-{
-    if (!const_obj_fpt && obj_fpt) {
-        LogError("Non-const functor cannot be called from a const method!");
-        assert(false);
-    }
-    m_returnCode = (ptr->*const_obj_fpt)(functorParams);
 }
 
 //----------------------------------------------------------------------------
@@ -1785,103 +1608,6 @@ void ObjectFactory::Register(std::string name, ClassId classId, std::function<Ob
 {
     s_ctorsRegistry[name] = function;
     s_classIdsRegistry[name] = classId;
-}
-
-//----------------------------------------------------------------------------
-// Object functor methods
-//----------------------------------------------------------------------------
-
-int Object::AddLayerElementToFlatList(FunctorParams *functorParams) const
-{
-    AddLayerElementToFlatListParams *params = vrv_params_cast<AddLayerElementToFlatListParams *>(functorParams);
-    assert(params);
-
-    params->m_flatList->push_back(this);
-    // LogDebug("List %d", params->m_flatList->size());
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(m_parent);
-    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
-    if (m_parent->Is(LAYER)) {
-        assert(params->m_targetLayer);
-        this->MoveItselfTo(params->m_targetLayer);
-        // Do not precess children because we move the full sub-tree
-        return FUNCTOR_SIBLINGS;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::GetAlignmentLeftRight(FunctorParams *functorParams) const
-{
-    GetAlignmentLeftRightParams *params = vrv_params_cast<GetAlignmentLeftRightParams *>(functorParams);
-    assert(params);
-
-    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-
-    if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
-
-    if (this->Is(params->m_excludeClasses)) return FUNCTOR_CONTINUE;
-
-    int refLeft = this->GetSelfLeft();
-    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
-
-    int refRight = this->GetSelfRight();
-    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::GenerateFeatures(FunctorParams *functorParams)
-{
-    GenerateFeaturesParams *params = vrv_params_cast<GenerateFeaturesParams *>(functorParams);
-    assert(params);
-
-    params->m_extractor->Extract(this, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::Save(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_output->WriteObject(this)) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SaveEnd(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_output->WriteObjectEnd(this)) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::ReorderByXPos(FunctorParams *functorParams)
-{
-    if (this->GetFacsimileInterface() != NULL) {
-        if (this->GetFacsimileInterface()->HasFacs()) {
-            return FUNCTOR_SIBLINGS; // This would have already been reordered.
-        }
-    }
-
-    std::stable_sort(m_children.begin(), m_children.end(), sortByUlx);
-    this->Modify();
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

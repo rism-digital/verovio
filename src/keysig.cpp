@@ -18,13 +18,11 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keyaccid.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
-#include "transposition.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -77,17 +75,19 @@ KeySig::KeySig()
     : LayerElement(KEYSIG, "keysig-")
     , ObjectListInterface()
     , AttAccidental()
-    , AttPitch()
-    , AttKeySigAnl()
+    , AttColor()
+    , AttKeyMode()
     , AttKeySigLog()
     , AttKeySigVis()
+    , AttPitch()
     , AttVisibility()
 {
     this->RegisterAttClass(ATT_ACCIDENTAL);
-    this->RegisterAttClass(ATT_PITCH);
-    this->RegisterAttClass(ATT_KEYSIGANL);
+    this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_KEYMODE);
     this->RegisterAttClass(ATT_KEYSIGLOG);
     this->RegisterAttClass(ATT_KEYSIGVIS);
+    this->RegisterAttClass(ATT_PITCH);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
@@ -99,10 +99,11 @@ void KeySig::Reset()
 {
     LayerElement::Reset();
     this->ResetAccidental();
-    this->ResetPitch();
-    this->ResetKeySigAnl();
+    this->ResetColor();
+    this->ResetKeyMode();
     this->ResetKeySigLog();
     this->ResetKeySigVis();
+    this->ResetPitch();
     this->ResetVisibility();
 
     // key change drawing values
@@ -148,7 +149,7 @@ int KeySig::GetAccidCount(bool fromAttribute) const
         return this->HasSig() ? (this->GetSig().first) : 0;
     }
     else {
-        return this->GetListSize(this);
+        return this->GetListSize();
     }
 }
 
@@ -164,7 +165,7 @@ data_ACCIDENTAL_WRITTEN KeySig::GetAccidType() const
 
 bool KeySig::HasNonAttribKeyAccidChildren() const
 {
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
     return std::any_of(childList.begin(), childList.end(), [](const Object *child) { return !child->IsAttribute(); });
 }
 
@@ -173,7 +174,7 @@ void KeySig::GenerateKeyAccidAttribChildren()
     IsAttributeComparison isAttribute(KEYACCID);
     this->DeleteChildrenByComparison(&isAttribute);
 
-    if (this->HasEmptyList(this)) {
+    if (this->HasEmptyList()) {
         for (int i = 0; i < this->GetAccidCount(true); ++i) {
             std::optional<KeyAccidInfo> info = this->GetKeyAccidInfoAt(i);
             if (info) {
@@ -195,7 +196,7 @@ void KeySig::FillMap(MapOfOctavedPitchAccid &mapOfPitchAccid) const
 {
     mapOfPitchAccid.clear();
 
-    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
     if (!childList.empty()) {
         for (const Object *child : childList) {
             const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
@@ -248,7 +249,7 @@ int KeySig::GetFifthsInt() const
 data_KEYSIGNATURE KeySig::ConvertToSig() const
 {
     data_KEYSIGNATURE sig = std::make_pair(-1, ACCIDENTAL_WRITTEN_NONE);
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
     if (childList.size() > 1) {
         data_ACCIDENTAL_WRITTEN accidType = ACCIDENTAL_WRITTEN_NONE;
         bool isCommon = true;
@@ -366,7 +367,7 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN accidType, data_PITCHNAME pitch, c
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode KeySig::Accept(MutableFunctor &functor)
+FunctorCode KeySig::Accept(Functor &functor)
 {
     return functor.VisitKeySig(this);
 }
@@ -376,7 +377,7 @@ FunctorCode KeySig::Accept(ConstFunctor &functor) const
     return functor.VisitKeySig(this);
 }
 
-FunctorCode KeySig::AcceptEnd(MutableFunctor &functor)
+FunctorCode KeySig::AcceptEnd(Functor &functor)
 {
     return functor.VisitKeySigEnd(this);
 }
@@ -384,54 +385,6 @@ FunctorCode KeySig::AcceptEnd(MutableFunctor &functor)
 FunctorCode KeySig::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitKeySigEnd(this);
-}
-
-int KeySig::Transpose(FunctorParams *functorParams)
-{
-    TransposeParams *params = vrv_params_cast<TransposeParams *>(functorParams);
-    assert(params);
-
-    // Store current KeySig
-    int staffN = -1;
-    const StaffDef *staffDef = vrv_cast<StaffDef *>(this->GetFirstAncestor(STAFFDEF));
-    if (staffDef) {
-        staffN = staffDef->GetN();
-    }
-    else {
-        const Staff *staff = this->GetAncestorStaff(ANCESTOR_ONLY, false);
-        if (staff) staffN = staff->GetN();
-    }
-    params->m_keySigForStaffN[staffN] = this;
-
-    // Transpose
-    const int sig = this->GetFifthsInt();
-
-    int intervalClass = params->m_transposer->CircleOfFifthsToIntervalClass(sig);
-    intervalClass = params->m_transposer->Transpose(intervalClass);
-    int fifths = params->m_transposer->IntervalToCircleOfFifths(intervalClass);
-
-    if (fifths == INVALID_INTERVAL_CLASS) {
-        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
-    }
-    else if (fifths < 0) {
-        this->SetSig({ -fifths, ACCIDENTAL_WRITTEN_f });
-    }
-    else if (fifths > 0) {
-        this->SetSig({ fifths, ACCIDENTAL_WRITTEN_s });
-    }
-    else {
-        this->SetSig({ -1, ACCIDENTAL_WRITTEN_NONE });
-    }
-
-    // Also convert pname and accid attributes
-    if (this->HasPname()) {
-        TransPitch pitch = TransPitch(this->GetPname(), ACCIDENTAL_GESTURAL_NONE, this->GetAccid(), 4);
-        params->m_transposer->Transpose(pitch);
-        this->SetPname(pitch.GetPitchName());
-        this->SetAccid(pitch.GetAccidW());
-    }
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

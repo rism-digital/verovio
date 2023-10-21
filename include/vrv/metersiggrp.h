@@ -11,13 +11,11 @@
 #include "atts_cmn.h"
 #include "atts_mei.h"
 #include "atts_shared.h"
-#include "linkinginterface.h"
-#include "object.h"
+#include "layerelement.h"
 
 namespace vrv {
 
 class Measure;
-class MeterSig;
 
 //----------------------------------------------------------------------------
 // MeterSigGrp
@@ -27,13 +25,7 @@ class MeterSig;
  * This class represents a MEI meterSigGrp.
  * It contains meterSigGrp objects.
  */
-class MeterSigGrp : public Object,
-                    public ObjectListInterface,
-                    public LinkingInterface,
-                    public AttBasic,
-                    public AttLabelled,
-                    public AttMeterSigGrpLog,
-                    public AttTyped {
+class MeterSigGrp : public LayerElement, public ObjectListInterface, public AttBasic, public AttMeterSigGrpLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -48,19 +40,14 @@ public:
     ///@}
 
     /**
-     * @name Getter to interfaces
-     */
-    ///@{
-    LinkingInterface *GetLinkingInterface() override { return vrv_cast<LinkingInterface *>(this); }
-    const LinkingInterface *GetLinkingInterface() const override { return vrv_cast<const LinkingInterface *>(this); }
-    ///@}
-
-    /**
      * @name Methods for adding allowed content
      */
     ///@{
     bool IsSupportedChild(Object *object) override;
     ///@}
+
+    /** Override the method since check is required */
+    bool IsScoreDefElement() const override { return (this->GetParent() && this->GetFirstAncestor(SCOREDEF)); }
 
     /**
      * Add specified measureId to the m_alternatingMeasures vector
@@ -85,9 +72,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

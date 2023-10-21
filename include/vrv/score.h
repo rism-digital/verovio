@@ -57,12 +57,6 @@ public:
     ///@}
 
     /**
-     * Helper looking at the parent Doc and set its scoreDef as current one.
-     * Called from Object::Process
-     */
-    void SetAsCurrent();
-
-    /**
      * Calculate the height of the pgHead/pgHead2 and pgFoot/pgFoot2 (if any)
      * Requires the Doc to have an empty Pages object because it adds temporary pages
      * Called from Doc::CastOffBase
@@ -82,29 +76,11 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
-    ///@}
-
-    /**
-     * See Object::ConvertMarkupScoreDef
-     */
-    int ConvertMarkupScoreDef(FunctorParams *) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
 
 private:
     /**

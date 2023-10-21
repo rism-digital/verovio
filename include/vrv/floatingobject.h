@@ -125,9 +125,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -251,7 +251,7 @@ public:
     /**
      * Update the Y drawing relative position based on collision detection with the overlapping bounding box
      */
-    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+    void CalcDrawingYRel(const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
 
     /**
      * Align extender elements across systems

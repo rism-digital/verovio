@@ -15,7 +15,6 @@
 
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "measure.h"
 #include "scoredef.h"
 #include "section.h"
@@ -30,10 +29,18 @@ namespace vrv {
 
 static const ClassRegistrar<Ending> s_factory("ending", ENDING);
 
-Ending::Ending() : SystemElement(ENDING, "ending-"), SystemMilestoneInterface(), AttLineRend(), AttNNumberLike()
+Ending::Ending()
+    : SystemElement(ENDING, "ending-")
+    , SystemMilestoneInterface()
+    , AttLabelled()
+    , AttLineRend()
+    , AttLineRendBase()
+    , AttNNumberLike()
 {
+    this->RegisterAttClass(ATT_LABELLED);
     this->RegisterAttClass(ATT_LINEREND);
-    this->RegisterAttClass(ATT_NINTEGER);
+    this->RegisterAttClass(ATT_LINERENDBASE);
+    this->RegisterAttClass(ATT_NNUMBERLIKE);
 
     this->Reset();
 }
@@ -44,7 +51,9 @@ void Ending::Reset()
 {
     SystemElement::Reset();
     SystemMilestoneInterface::Reset();
+    this->ResetLabelled();
     this->ResetLineRend();
+    this->ResetLineRendBase();
     this->ResetNNumberLike();
 }
 
@@ -76,7 +85,7 @@ bool Ending::IsSupportedChild(Object *child)
 // Ending functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Ending::Accept(MutableFunctor &functor)
+FunctorCode Ending::Accept(Functor &functor)
 {
     return functor.VisitEnding(this);
 }
@@ -86,7 +95,7 @@ FunctorCode Ending::Accept(ConstFunctor &functor) const
     return functor.VisitEnding(this);
 }
 
-FunctorCode Ending::AcceptEnd(MutableFunctor &functor)
+FunctorCode Ending::AcceptEnd(Functor &functor)
 {
     return functor.VisitEndingEnd(this);
 }
@@ -94,27 +103,6 @@ FunctorCode Ending::AcceptEnd(MutableFunctor &functor)
 FunctorCode Ending::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitEndingEnd(this);
-}
-
-int Ending::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

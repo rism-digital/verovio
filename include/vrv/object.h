@@ -32,14 +32,13 @@ class Output;
 class Filters;
 class Functor;
 class FunctorParams;
-class MutableFunctor;
+class Functor;
 class ConstFunctor;
 class LinkingInterface;
 class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class Resources;
-class SaveParams;
 class ScoreDefInterface;
 class StemmedDrawingInterface;
 class TextDirInterface;
@@ -621,9 +620,8 @@ public:
 
     /**
      * Saves the object (and its children) using the specified output stream.
-     * Creates functors that will parse the tree.
      */
-    int SaveObject(SaveParams &saveParams);
+    void SaveObject(Output *output, bool basic);
 
     /**
      * Sort the child elements using std::stable_sort
@@ -633,28 +631,22 @@ public:
         std::stable_sort(m_children.begin(), m_children.end(), comp);
     }
 
-    virtual void ReorderByXPos();
+    void ReorderByXPos();
 
     Object *FindNextChild(Comparison *comp, Object *start);
 
     Object *FindPreviousChild(Comparison *comp, Object *start);
+
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The Filters class parameter makes is possible to process only objects of a
-     * type that matches the attribute value given in the Comparison object.
-     * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
-     * skipFirst does not call the functor or endFunctor on the first (calling) level
+     * skipFirst does not call the functor on the first (calling) level
      */
     ///@{
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false);
-    void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL, Filters *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool skipFirst = false) const;
-    void Process(MutableFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
+    void Process(Functor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
     void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
     ///@}
 
@@ -662,9 +654,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    virtual FunctorCode Accept(MutableFunctor &functor);
+    virtual FunctorCode Accept(Functor &functor);
     virtual FunctorCode Accept(ConstFunctor &functor) const;
-    virtual FunctorCode AcceptEnd(MutableFunctor &functor);
+    virtual FunctorCode AcceptEnd(Functor &functor);
     virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 
@@ -685,190 +677,6 @@ public:
      */
     static bool IsPreOrdered(const Object *left, const Object *right);
 
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * Add each LayerElements and its children to a flat list
-     */
-    virtual int AddLayerElementToFlatList(FunctorParams *functorParams) const;
-
-    /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
-     */
-    virtual int InitProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * @name Functors for finding objects
-     */
-    ///@{
-
-    /**
-     * Retrieve the minimum left and maximum right for an alignment.
-     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight.
-     */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) const;
-
-    ///@}
-
-    /**
-     * @name Functors for loading and saving the document
-     */
-    ///@{
-
-    /**
-     * Convert top-level all container (section, endings) and editorial elements to milestone elements.
-     */
-    virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
-     * Segment positions occur where a barLine is set on all staves.
-     */
-    virtual int ConvertToCastOffMensural(FunctorParams *functorParams);
-
-    /**
-     * Convert cast-off (measure) mensural segments MEI into mensural.
-     */
-    virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Convert analytical markup (\@fermata, \@tie) to elements.
-     * See Doc::ConvertMarkupAnalyticalDoc
-     */
-    virtual int ConvertMarkupAnalytical(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupAnalytical
-     */
-    virtual int ConvertMarkupAnalyticalEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Convert markup of artic@artic multi value into distinct artic elements.
-     * See Doc::ConvertMarkupAnalyticalDoc
-     */
-    virtual int ConvertMarkupArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupArtic
-     */
-    virtual int ConvertMarkupArticEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Move scoreDef clef, keySig, meterSig and mensur to staffDef.
-     * When a staffDef already has one, it is not replaced.
-     */
-    virtual int ConvertMarkupScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::ConvertMarkupScoreDef
-     */
-    virtual int ConvertMarkupScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Save the content of any object by calling the appropriate FileOutputStream method.
-     */
-    virtual int Save(FunctorParams *functorParams);
-
-    /**
-     * End Functor for Object::Save
-     */
-    virtual int SaveEnd(FunctorParams *functorParams);
-
-    ///@}
-
-    /**
-     * @name Functors for aligning the pages.
-     */
-    ///@{
-
-    /**
-     * Apply the Pixel Per Unit factor of the page to its elements.
-     */
-    virtual int ApplyPPUFactor(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    ///@}
-
-    /**
-     * @name Functors for generating MIDI output.
-     */
-    ///@{
-
-    /**
-     * Prepare Note onsets
-     */
-    virtual int InitOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::InitOnsetOffset
-     */
-    virtual int InitOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Calculate the maximum duration of each measure.
-     */
-    virtual int InitMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::CalcMaxMeasureDuration
-     */
-    virtual int InitMaxMeasureDurationEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust note timings based on ties
-     */
-    virtual int InitTimemapTies(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Initialize the MIDI export
-     * Captures information (i.e. from control elements) for MIDI interpretation
-     * This information is usually required beforehand in GenerateMIDI
-     */
-    virtual int InitMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Export the object to a MidiFile
-     */
-    virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End Functor for Object::GenerateMIDI
-     */
-    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Export the object to a JSON timemap file.
-     */
-    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Export the object to a JSON feature file.
-     */
-    virtual int GenerateFeatures(FunctorParams *functorParams);
-
-    ///@}
-
-    /**
-     * Reorder elements by x-position.
-     */
-    virtual int ReorderByXPos(FunctorParams *);
-
-    /**
-     * Transpose the content.
-     */
-    virtual int Transpose(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * End functor for Object::Transpose
-     */
-    virtual int TransposeEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
 private:
     /**
      * Method for generating the id.
@@ -884,7 +692,6 @@ private:
      * Helper methods for functor processing
      */
     ///@{
-    void UpdateDocumentScore(bool direction);
     bool SkipChildren(bool visibleOnly) const;
     bool FiltersApply(const Filters *filters, Object *object) const;
     ///@}
@@ -1001,6 +808,7 @@ private:
  * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
  * It is not an abstract class but should not be instanciated directly.
+ * It is expected to be used as a base class of element classes derived from Object.
  */
 class ObjectListInterface {
 public:
@@ -1008,7 +816,7 @@ public:
     ObjectListInterface(){};
     virtual ~ObjectListInterface(){};
     ObjectListInterface(const ObjectListInterface &listInterface); // copy constructor;
-    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignement;
+    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignment;
 
     /**
      * Look for the Object in the list and return its position (-1 if not found)
@@ -1045,28 +853,29 @@ public:
      * Return the list.
      * Before returning the list, it checks that the list is up-to-date with Object::IsModified
      * If not, it updates the list and also calls FilterList.
-     * Because this is an interface, we need to pass the object - not the best design.
      */
     ///@{
-    const ListOfConstObjects &GetList(const Object *node) const;
-    ListOfObjects GetList(const Object *node);
+    const ListOfConstObjects &GetList() const;
+    ListOfObjects GetList();
     ///@}
+
+    /**
+     * Reset the list of children and call FilterList().
+     */
+    void ResetList() const;
 
     /**
      * Convenience functions that check if the list is up-to-date
      * If not, the list is updated before returning the result
      */
     ///@{
-    bool HasEmptyList(const Object *node) const;
-    int GetListSize(const Object *node) const;
-    const Object *GetListFront(const Object *node) const;
-    Object *GetListFront(const Object *node);
-    const Object *GetListBack(const Object *node) const;
-    Object *GetListBack(const Object *node);
+    bool HasEmptyList() const;
+    int GetListSize() const;
+    const Object *GetListFront() const;
+    Object *GetListFront();
+    const Object *GetListBack() const;
+    Object *GetListBack();
     ///@}
-
-private:
-    mutable ListOfConstObjects m_list;
 
 protected:
     /**
@@ -1075,12 +884,19 @@ protected:
      */
     virtual void FilterList(ListOfConstObjects &childList) const {};
 
-public:
+private:
     /**
-     * Reset the list of children and call FilterList().
-     * As for GetList, we need to pass the object.
+     * Retrieve the owner object of the interface.
      */
-    void ResetList(const Object *node) const;
+    const Object *GetInterfaceOwner() const;
+
+public:
+    //
+private:
+    // The flat list of children
+    mutable ListOfConstObjects m_list;
+    // The owner object
+    mutable const Object *m_owner = NULL;
 };
 
 //----------------------------------------------------------------------------
@@ -1102,12 +918,12 @@ public:
     /**
      * Returns a contatenated version of all the text children
      */
-    std::u32string GetText(const Object *node) const;
+    std::u32string GetText() const;
 
     /**
      * Fill an array of lines with concatenated content of each line
      */
-    void GetTextLines(const Object *node, std::vector<std::u32string> &lines) const;
+    void GetTextLines(std::vector<std::u32string> &lines) const;
 
 protected:
     /**
@@ -1121,45 +937,7 @@ private:
 public:
     //
 private:
-};
-
-//----------------------------------------------------------------------------
-// Functor
-//----------------------------------------------------------------------------
-
-class Functor {
-private:
-    int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
-    int (Object::*const_obj_fpt)(FunctorParams *functorParams) const;
-
-public:
-    // constructor - takes pointer to a functor method and stores it
-    Functor();
-    Functor(int (Object::*_obj_fpt)(FunctorParams *));
-    Functor(int (Object::*_const_obj_fpt)(FunctorParams *) const);
-    virtual ~Functor(){};
-
-    // Call the internal functor method
-    void Call(Object *ptr, FunctorParams *functorParams);
-    void Call(const Object *ptr, FunctorParams *functorParams);
-
-private:
     //
-public:
-    /**
-     * The return code of the functor.
-     * FUNCTOR_CONTINUE: continue processing
-     * FUNCTOR_SIBLINGS: process only siblings (do not go deeper)
-     * FUNCTOR_STOP: stop the functor (e.g., when an Object or a value is found)
-     */
-    int m_returnCode;
-    /**
-     * A flag for indicating if only visible Object have to be processed.
-     * The value is true by default.
-     */
-    bool m_visibleOnly;
-
-private:
 };
 
 //----------------------------------------------------------------------------

@@ -23,12 +23,13 @@
 #include "comparison.h"
 #include "controlelement.h"
 #include "devicecontext.h"
+#include "div.h"
+#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "f.h"
 #include "fb.h"
 #include "fig.h"
-#include "functorparams.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "label.h"
@@ -134,9 +135,9 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    const ListOfObjects &scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList.begin(); it != scoreDefList.end(); ++it) {
-        StaffDef *staffDef = vrv_cast<StaffDef *>(*it);
+    const ListOfObjects &childList = scoreDef->GetList(); // make sure it's initialized
+    for (Object *child : childList) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(child);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
         KeySig *keySig = staffDef->GetKeySig();
@@ -540,8 +541,8 @@ void View::DrawLabels(
     LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
-    std::u32string labelStr = (label) ? label->GetText(label) : U"";
-    std::u32string labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : U"";
+    std::u32string labelStr = label ? label->GetText() : U"";
+    std::u32string labelAbbrStr = labelAbbr ? labelAbbr->GetText() : U"";
 
     if (abbreviations) {
         labelStr = labelAbbrStr;
@@ -568,7 +569,7 @@ void View::DrawLabels(
     params.m_y = y;
     params.m_pointSize = labelTxt.GetPointSize();
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
     dc->SetFont(&labelTxt);
 
     dc->StartGraphic(graphic, "", graphic->GetID());
@@ -585,7 +586,7 @@ void View::DrawLabels(
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
         std::vector<std::u32string> lines;
-        labelAbbr->GetTextLines(labelAbbr, lines);
+        labelAbbr->GetTextLines(lines);
         int maxLength = 0;
         for (std::u32string &line : lines) {
             dc->GetTextExtent(line, &extend, true);
@@ -651,9 +652,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
         const float currentWidthToHeightRatio = font->GetWidthToHeightRatio();
         const float widthAfterScalling = width * scale;
         font->SetWidthToHeightRatio(static_cast<float>(braceWidth) / widthAfterScalling);
-        dc->StartCustomGraphic("grpSym");
         this->DrawSmuflCode(dc, x, y2, SMUFL_E000_brace, staffSize * scale, false);
-        dc->EndCustomGraphic();
         font->SetWidthToHeightRatio(currentWidthToHeightRatio);
         return;
     }
@@ -694,8 +693,8 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     bez2[2] = points[2];
     bez2[3] = points[3];
 
-    dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, std::max(1, penWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     dc->DrawCubicBezierPathFilled(bez1, bez2);
 
@@ -1080,7 +1079,7 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
                 }
                 // hardcoded offset for the mNum based on the lyric font size
                 const int yOffset = m_doc->GetDrawingLyricFont(60)->GetPointSize();
-                this->DrawMNum(dc, mnum, measure, std::max(symbolOffset, yOffset));
+                this->DrawMNum(dc, mnum, measure, system, std::max(symbolOffset, yOffset));
             }
         }
     }
@@ -1117,14 +1116,14 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    ListOfObjects childList = meterSigGrp->GetList(meterSigGrp);
+    ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),
                         [](Object *object) {
                             MeterSig *meterSig = vrv_cast<MeterSig *>(object);
                             assert(meterSig);
-                            return ((meterSig->GetForm() == METERFORM_invis) || !meterSig->HasCount());
+                            return ((meterSig->GetVisible() == BOOLEAN_false) || !meterSig->HasCount());
                         }),
         childList.end());
 
@@ -1156,7 +1155,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     dc->EndGraphic(meterSigGrp, this);
 }
 
-void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset)
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset)
 {
     assert(dc);
     assert(measure);
@@ -1164,6 +1163,10 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
 
     Staff *staff = measure->GetTopVisibleStaff();
     if (staff) {
+        // Only one FloatingPositioner on the top (visible) staff
+        if (!system->SetCurrentFloatingPositioner(staff->GetN(), mnum, staff, staff)) {
+            return;
+        }
 
         dc->StartGraphic(mnum, "", mnum->GetID());
 
@@ -1200,7 +1203,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
             mnumTxt.SetPointSize(m_doc->GetDrawingLyricFont(80)->GetPointSize());
         }
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&mnumTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
@@ -1208,6 +1211,9 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset
         dc->EndText();
 
         dc->ResetFont();
+        dc->ResetBrush();
+
+        this->DrawTextEnclosure(dc, params, staff->m_drawingStaffSize);
 
         dc->EndGraphic(mnum, this);
     }
@@ -1240,7 +1246,9 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         this->DrawStaffLines(dc, staff, measure, system);
     }
 
-    this->DrawStaffDef(dc, staff, measure);
+    if (staffDef && (staffDef->GetNotationtype() != NOTATIONTYPE_neume) && (m_doc->GetType() != Facs)) {
+        this->DrawStaffDef(dc, staff, measure);
+    }
 
     if (!staff->GetLedgerLinesAbove().empty()) {
         this->DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);
@@ -1291,8 +1299,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     }
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
         // Skewed lines - with Facs (neumes) only for now
@@ -1359,8 +1367,8 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerL
         = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (cueSize) lineWidth *= m_doc->GetOptions()->m_graceFactor.GetValue();
 
-    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     for (const LedgerLine &line : lines) {
         for (const std::pair<int, int> &dash : line.m_dashes) {
@@ -1629,6 +1637,10 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
         else if (current->IsSystemElement()) {
             // cast to SystemElement check in DrawSystemEditorial element
             this->DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
+        }
+        else if (current->Is(DIV)) {
+            // cast to Div check in DrawDiv element
+            this->DrawDiv(dc, dynamic_cast<Div *>(current), system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawSystemEditorial element
@@ -1963,7 +1975,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF32to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText()));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

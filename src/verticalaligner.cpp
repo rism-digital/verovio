@@ -19,7 +19,6 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "scoredef.h"
 #include "slur.h"
 #include "smufl.h"
@@ -177,7 +176,7 @@ void SystemAligner::SetSpacing(const ScoreDef *scoreDef)
 
     m_spacingTypes.clear();
 
-    const ListOfConstObjects &childList = scoreDef->GetList(scoreDef);
+    const ListOfConstObjects &childList = scoreDef->GetList();
     for (const Object *object : childList) {
         // It should be staffDef only, but double check.
         if (!object->Is(STAFFDEF)) continue;
@@ -251,7 +250,7 @@ SystemAligner::SpacingType SystemAligner::CalculateSpacingAbove(const StaffDef *
     return spacingType;
 }
 
-FunctorCode SystemAligner::Accept(MutableFunctor &functor)
+FunctorCode SystemAligner::Accept(Functor &functor)
 {
     return functor.VisitSystemAligner(this);
 }
@@ -261,7 +260,7 @@ FunctorCode SystemAligner::Accept(ConstFunctor &functor) const
     return functor.VisitSystemAligner(this);
 }
 
-FunctorCode SystemAligner::AcceptEnd(MutableFunctor &functor)
+FunctorCode SystemAligner::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemAlignerEnd(this);
 }
@@ -424,7 +423,8 @@ int StaffAlignment::GetVerseCount(bool collapse) const
 int StaffAlignment::GetVersePosition(int verseN, bool collapse) const
 {
     if (m_verseNs.empty()) {
-        return 0;
+        // Syl in neumatic notation - since verse count will be 0, position is -1
+        return -1;
     }
     else if (collapse) {
         auto it = std::find(m_verseNs.rbegin(), m_verseNs.rend(), verseN);
@@ -513,11 +513,11 @@ int StaffAlignment::GetMinimumSpacing(const Doc *doc) const
     if (m_staff && m_staff->m_drawingStaffDef) {
         // Default or staffDef spacing
         if (m_staff->m_drawingStaffDef->HasSpacing()) {
-            if (m_staff->m_drawingStaffDef->GetSpacingStaff().GetType() == MEASUREMENTTYPE_px) {
-                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetPx();
+            if (m_staff->m_drawingStaffDef->GetSpacing().GetType() == MEASUREMENTTYPE_px) {
+                spacing = m_staff->m_drawingStaffDef->GetSpacing().GetPx();
             }
             else {
-                spacing = m_staff->m_drawingStaffDef->GetSpacingStaff().GetVu() * doc->GetDrawingUnit(100);
+                spacing = m_staff->m_drawingStaffDef->GetSpacing().GetVu() * doc->GetDrawingUnit(100);
             }
         }
         else {
@@ -714,7 +714,7 @@ void StaffAlignment::FindAllIntersectionPoints(
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode StaffAlignment::Accept(MutableFunctor &functor)
+FunctorCode StaffAlignment::Accept(Functor &functor)
 {
     return functor.VisitStaffAlignment(this);
 }
@@ -724,7 +724,7 @@ FunctorCode StaffAlignment::Accept(ConstFunctor &functor) const
     return functor.VisitStaffAlignment(this);
 }
 
-FunctorCode StaffAlignment::AcceptEnd(MutableFunctor &functor)
+FunctorCode StaffAlignment::AcceptEnd(Functor &functor)
 {
     return functor.VisitStaffAlignmentEnd(this);
 }

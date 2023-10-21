@@ -106,14 +106,6 @@ bool AttModule::SetAnalytical(Object *element, const std::string &attrType, cons
             return true;
         }
     }
-    if (element->HasAttClass(ATT_KEYSIGANL)) {
-        AttKeySigAnl *att = dynamic_cast<AttKeySigAnl *>(element);
-        assert(att);
-        if (attrType == "mode") {
-            att->SetMode(att->StrToMode(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTANL)) {
         AttKeySigDefaultAnl *att = dynamic_cast<AttKeySigDefaultAnl *>(element);
         assert(att);
@@ -188,13 +180,6 @@ void AttModule::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "intm", att->StrToStr(att->GetIntm()) });
         }
     }
-    if (element->HasAttClass(ATT_KEYSIGANL)) {
-        const AttKeySigAnl *att = dynamic_cast<const AttKeySigAnl *>(element);
-        assert(att);
-        if (att->HasMode()) {
-            attributes->push_back({ "mode", att->ModeToStr(att->GetMode()) });
-        }
-    }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTANL)) {
         const AttKeySigDefaultAnl *att = dynamic_cast<const AttKeySigDefaultAnl *>(element);
         assert(att);
@@ -248,14 +233,6 @@ bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::
         assert(att);
         if (attrType == "order") {
             att->SetOrder(att->StrToArpegLogOrder(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_BTREMLOG)) {
-        AttBTremLog *att = dynamic_cast<AttBTremLog *>(element);
-        assert(att);
-        if (attrType == "form") {
-            att->SetForm(att->StrToBTremLogForm(attrValue));
             return true;
         }
     }
@@ -344,14 +321,6 @@ bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::
         assert(att);
         if (attrType == "expand") {
             att->SetExpand(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_FTREMLOG)) {
-        AttFTremLog *att = dynamic_cast<AttFTremLog *>(element);
-        assert(att);
-        if (attrType == "form") {
-            att->SetForm(att->StrToFTremLogForm(attrValue));
             return true;
         }
     }
@@ -511,14 +480,6 @@ bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::
             return true;
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn *>(element);
-        assert(att);
-        if (attrType == "grid.show") {
-            att->SetGridShow(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_SLURREND)) {
         AttSlurRend *att = dynamic_cast<AttSlurRend *>(element);
         assert(att);
@@ -551,6 +512,14 @@ bool AttModule::SetCmn(Object *element, const std::string &attrType, const std::
             return true;
         }
     }
+    if (element->HasAttClass(ATT_TREMFORM)) {
+        AttTremForm *att = dynamic_cast<AttTremForm *>(element);
+        assert(att);
+        if (attrType == "form") {
+            att->SetForm(att->StrToTremFormForm(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_TREMMEASURED)) {
         AttTremMeasured *att = dynamic_cast<AttTremMeasured *>(element);
         assert(att);
@@ -570,13 +539,6 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasOrder()) {
             attributes->push_back({ "order", att->ArpegLogOrderToStr(att->GetOrder()) });
-        }
-    }
-    if (element->HasAttClass(ATT_BTREMLOG)) {
-        const AttBTremLog *att = dynamic_cast<const AttBTremLog *>(element);
-        assert(att);
-        if (att->HasForm()) {
-            attributes->push_back({ "form", att->BTremLogFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_BEAMPRESENT)) {
@@ -652,13 +614,6 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasExpand()) {
             attributes->push_back({ "expand", att->BooleanToStr(att->GetExpand()) });
-        }
-    }
-    if (element->HasAttClass(ATT_FTREMLOG)) {
-        const AttFTremLog *att = dynamic_cast<const AttFTremLog *>(element);
-        assert(att);
-        if (att->HasForm()) {
-            attributes->push_back({ "form", att->FTremLogFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_GLISSPRESENT)) {
@@ -792,13 +747,6 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "reh.enclose", att->RehearsalRehencloseToStr(att->GetRehEnclose()) });
         }
     }
-    if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        const AttScoreDefVisCmn *att = dynamic_cast<const AttScoreDefVisCmn *>(element);
-        assert(att);
-        if (att->HasGridShow()) {
-            attributes->push_back({ "grid.show", att->BooleanToStr(att->GetGridShow()) });
-        }
-    }
     if (element->HasAttClass(ATT_SLURREND)) {
         const AttSlurRend *att = dynamic_cast<const AttSlurRend *>(element);
         assert(att);
@@ -824,6 +772,13 @@ void AttModule::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasTieLwidth()) {
             attributes->push_back({ "tie.lwidth", att->LinewidthToStr(att->GetTieLwidth()) });
+        }
+    }
+    if (element->HasAttClass(ATT_TREMFORM)) {
+        const AttTremForm *att = dynamic_cast<const AttTremForm *>(element);
+        assert(att);
+        if (att->HasForm()) {
+            attributes->push_back({ "form", att->TremFormFormToStr(att->GetForm()) });
         }
     }
     if (element->HasAttClass(ATT_TREMMEASURED)) {
@@ -1033,23 +988,27 @@ namespace vrv {
 
 bool AttModule::SetExternalsymbols(Object *element, const std::string &attrType, const std::string &attrValue)
 {
-    if (element->HasAttClass(ATT_EXTSYM)) {
-        AttExtSym *att = dynamic_cast<AttExtSym *>(element);
+    if (element->HasAttClass(ATT_EXTSYMAUTH)) {
+        AttExtSymAuth *att = dynamic_cast<AttExtSymAuth *>(element);
         assert(att);
         if (attrType == "glyph.auth") {
             att->SetGlyphAuth(att->StrToStr(attrValue));
             return true;
         }
+        if (attrType == "glyph.uri") {
+            att->SetGlyphUri(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_EXTSYMNAMES)) {
+        AttExtSymNames *att = dynamic_cast<AttExtSymNames *>(element);
+        assert(att);
         if (attrType == "glyph.name") {
             att->SetGlyphName(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "glyph.num") {
             att->SetGlyphNum(att->StrToHexnum(attrValue));
-            return true;
-        }
-        if (attrType == "glyph.uri") {
-            att->SetGlyphUri(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -1059,20 +1018,24 @@ bool AttModule::SetExternalsymbols(Object *element, const std::string &attrType,
 
 void AttModule::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
 {
-    if (element->HasAttClass(ATT_EXTSYM)) {
-        const AttExtSym *att = dynamic_cast<const AttExtSym *>(element);
+    if (element->HasAttClass(ATT_EXTSYMAUTH)) {
+        const AttExtSymAuth *att = dynamic_cast<const AttExtSymAuth *>(element);
         assert(att);
         if (att->HasGlyphAuth()) {
             attributes->push_back({ "glyph.auth", att->StrToStr(att->GetGlyphAuth()) });
         }
+        if (att->HasGlyphUri()) {
+            attributes->push_back({ "glyph.uri", att->StrToStr(att->GetGlyphUri()) });
+        }
+    }
+    if (element->HasAttClass(ATT_EXTSYMNAMES)) {
+        const AttExtSymNames *att = dynamic_cast<const AttExtSymNames *>(element);
+        assert(att);
         if (att->HasGlyphName()) {
             attributes->push_back({ "glyph.name", att->StrToStr(att->GetGlyphName()) });
         }
         if (att->HasGlyphNum()) {
             attributes->push_back({ "glyph.num", att->HexnumToStr(att->GetGlyphNum()) });
-        }
-        if (att->HasGlyphUri()) {
-            attributes->push_back({ "glyph.uri", att->StrToStr(att->GetGlyphUri()) });
         }
     }
 }
@@ -1274,6 +1237,14 @@ bool AttModule::SetGestural(Object *element, const std::string &attrType, const 
             return true;
         }
     }
+    if (element->HasAttClass(ATT_ATTACKING)) {
+        AttAttacking *att = dynamic_cast<AttAttacking *>(element);
+        assert(att);
+        if (attrType == "attacca") {
+            att->SetAttacca(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_BENDGES)) {
         AttBendGes *att = dynamic_cast<AttBendGes *>(element);
         assert(att);
@@ -1310,47 +1281,11 @@ bool AttModule::SetGestural(Object *element, const std::string &attrType, const 
             return true;
         }
     }
-    if (element->HasAttClass(ATT_MDIVGES)) {
-        AttMdivGes *att = dynamic_cast<AttMdivGes *>(element);
-        assert(att);
-        if (attrType == "attacca") {
-            att->SetAttacca(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_NCGES)) {
-        AttNcGes *att = dynamic_cast<AttNcGes *>(element);
-        assert(att);
-        if (attrType == "oct.ges") {
-            att->SetOctGes(att->StrToOctave(attrValue));
-            return true;
-        }
-        if (attrType == "pname.ges") {
-            att->SetPnameGes(att->StrToPitchname(attrValue));
-            return true;
-        }
-        if (attrType == "pnum") {
-            att->SetPnum(att->StrToInt(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_NOTEGES)) {
         AttNoteGes *att = dynamic_cast<AttNoteGes *>(element);
         assert(att);
         if (attrType == "extremis") {
             att->SetExtremis(att->StrToNoteGesExtremis(attrValue));
-            return true;
-        }
-        if (attrType == "oct.ges") {
-            att->SetOctGes(att->StrToOctave(attrValue));
-            return true;
-        }
-        if (attrType == "pname.ges") {
-            att->SetPnameGes(att->StrToPitchname(attrValue));
-            return true;
-        }
-        if (attrType == "pnum") {
-            att->SetPnum(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -1366,11 +1301,19 @@ bool AttModule::SetGestural(Object *element, const std::string &attrType, const 
             return true;
         }
     }
-    if (element->HasAttClass(ATT_SECTIONGES)) {
-        AttSectionGes *att = dynamic_cast<AttSectionGes *>(element);
+    if (element->HasAttClass(ATT_PITCHGES)) {
+        AttPitchGes *att = dynamic_cast<AttPitchGes *>(element);
         assert(att);
-        if (attrType == "attacca") {
-            att->SetAttacca(att->StrToBoolean(attrValue));
+        if (attrType == "oct.ges") {
+            att->SetOctGes(att->StrToOctave(attrValue));
+            return true;
+        }
+        if (attrType == "pname.ges") {
+            att->SetPnameGes(att->StrToPitchname(attrValue));
+            return true;
+        }
+        if (attrType == "pnum") {
+            att->SetPnum(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -1430,6 +1373,13 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "artic.ges", att->ArticulationListToStr(att->GetArticGes()) });
         }
     }
+    if (element->HasAttClass(ATT_ATTACKING)) {
+        const AttAttacking *att = dynamic_cast<const AttAttacking *>(element);
+        assert(att);
+        if (att->HasAttacca()) {
+            attributes->push_back({ "attacca", att->BooleanToStr(att->GetAttacca()) });
+        }
+    }
     if (element->HasAttClass(ATT_BENDGES)) {
         const AttBendGes *att = dynamic_cast<const AttBendGes *>(element);
         assert(att);
@@ -1459,40 +1409,11 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "dur.recip", att->StrToStr(att->GetDurRecip()) });
         }
     }
-    if (element->HasAttClass(ATT_MDIVGES)) {
-        const AttMdivGes *att = dynamic_cast<const AttMdivGes *>(element);
-        assert(att);
-        if (att->HasAttacca()) {
-            attributes->push_back({ "attacca", att->BooleanToStr(att->GetAttacca()) });
-        }
-    }
-    if (element->HasAttClass(ATT_NCGES)) {
-        const AttNcGes *att = dynamic_cast<const AttNcGes *>(element);
-        assert(att);
-        if (att->HasOctGes()) {
-            attributes->push_back({ "oct.ges", att->OctaveToStr(att->GetOctGes()) });
-        }
-        if (att->HasPnameGes()) {
-            attributes->push_back({ "pname.ges", att->PitchnameToStr(att->GetPnameGes()) });
-        }
-        if (att->HasPnum()) {
-            attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
-        }
-    }
     if (element->HasAttClass(ATT_NOTEGES)) {
         const AttNoteGes *att = dynamic_cast<const AttNoteGes *>(element);
         assert(att);
         if (att->HasExtremis()) {
             attributes->push_back({ "extremis", att->NoteGesExtremisToStr(att->GetExtremis()) });
-        }
-        if (att->HasOctGes()) {
-            attributes->push_back({ "oct.ges", att->OctaveToStr(att->GetOctGes()) });
-        }
-        if (att->HasPnameGes()) {
-            attributes->push_back({ "pname.ges", att->PitchnameToStr(att->GetPnameGes()) });
-        }
-        if (att->HasPnum()) {
-            attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCIDGES)) {
@@ -1505,11 +1426,17 @@ void AttModule::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "accidlower.ges", att->AccidentalGesturalToStr(att->GetAccidlowerGes()) });
         }
     }
-    if (element->HasAttClass(ATT_SECTIONGES)) {
-        const AttSectionGes *att = dynamic_cast<const AttSectionGes *>(element);
+    if (element->HasAttClass(ATT_PITCHGES)) {
+        const AttPitchGes *att = dynamic_cast<const AttPitchGes *>(element);
         assert(att);
-        if (att->HasAttacca()) {
-            attributes->push_back({ "attacca", att->BooleanToStr(att->GetAttacca()) });
+        if (att->HasOctGes()) {
+            attributes->push_back({ "oct.ges", att->OctaveToStr(att->GetOctGes()) });
+        }
+        if (att->HasPnameGes()) {
+            attributes->push_back({ "pname.ges", att->PitchnameToStr(att->GetPnameGes()) });
+        }
+        if (att->HasPnum()) {
+            attributes->push_back({ "pnum", att->IntToStr(att->GetPnum()) });
         }
     }
     if (element->HasAttClass(ATT_SOUNDLOCATION)) {
@@ -1591,6 +1518,14 @@ namespace vrv {
 
 bool AttModule::SetHeader(Object *element, const std::string &attrType, const std::string &attrValue)
 {
+    if (element->HasAttClass(ATT_ADLIBITUM)) {
+        AttAdlibitum *att = dynamic_cast<AttAdlibitum *>(element);
+        assert(att);
+        if (attrType == "adlib") {
+            att->SetAdlib(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         AttBifoliumSurfaces *att = dynamic_cast<AttBifoliumSurfaces *>(element);
         assert(att);
@@ -1623,6 +1558,22 @@ bool AttModule::SetHeader(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_PERFRES)) {
+        AttPerfRes *att = dynamic_cast<AttPerfRes *>(element);
+        assert(att);
+        if (attrType == "solo") {
+            att->SetSolo(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRESBASIC)) {
+        AttPerfResBasic *att = dynamic_cast<AttPerfResBasic *>(element);
+        assert(att);
+        if (attrType == "count") {
+            att->SetCount(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
         AttRecordType *att = dynamic_cast<AttRecordType *>(element);
         assert(att);
@@ -1645,6 +1596,13 @@ bool AttModule::SetHeader(Object *element, const std::string &attrType, const st
 
 void AttModule::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_ADLIBITUM)) {
+        const AttAdlibitum *att = dynamic_cast<const AttAdlibitum *>(element);
+        assert(att);
+        if (att->HasAdlib()) {
+            attributes->push_back({ "adlib", att->BooleanToStr(att->GetAdlib()) });
+        }
+    }
     if (element->HasAttClass(ATT_BIFOLIUMSURFACES)) {
         const AttBifoliumSurfaces *att = dynamic_cast<const AttBifoliumSurfaces *>(element);
         assert(att);
@@ -1669,6 +1627,20 @@ void AttModule::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasVerso()) {
             attributes->push_back({ "verso", att->StrToStr(att->GetVerso()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRES)) {
+        const AttPerfRes *att = dynamic_cast<const AttPerfRes *>(element);
+        assert(att);
+        if (att->HasSolo()) {
+            attributes->push_back({ "solo", att->BooleanToStr(att->GetSolo()) });
+        }
+    }
+    if (element->HasAttClass(ATT_PERFRESBASIC)) {
+        const AttPerfResBasic *att = dynamic_cast<const AttPerfResBasic *>(element);
+        assert(att);
+        if (att->HasCount()) {
+            attributes->push_back({ "count", att->IntToStr(att->GetCount()) });
         }
     }
     if (element->HasAttClass(ATT_RECORDTYPE)) {
@@ -2062,6 +2034,14 @@ namespace vrv {
 
 bool AttModule::SetNeumes(Object *element, const std::string &attrType, const std::string &attrValue)
 {
+    if (element->HasAttClass(ATT_DIVLINELOG)) {
+        AttDivLineLog *att = dynamic_cast<AttDivLineLog *>(element);
+        assert(att);
+        if (attrType == "form") {
+            att->SetForm(att->StrToDivLineLogForm(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_NCLOG)) {
         AttNcLog *att = dynamic_cast<AttNcLog *>(element);
         assert(att);
@@ -2085,10 +2065,6 @@ bool AttModule::SetNeumes(Object *element, const std::string &attrType, const st
             att->SetCon(att->StrToNcFormCon(attrValue));
             return true;
         }
-        if (attrType == "curve") {
-            att->SetCurve(att->StrToNcFormCurve(attrValue));
-            return true;
-        }
         if (attrType == "hooked") {
             att->SetHooked(att->StrToBoolean(attrValue));
             return true;
@@ -2110,12 +2086,27 @@ bool AttModule::SetNeumes(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_NEUMETYPE)) {
+        AttNeumeType *att = dynamic_cast<AttNeumeType *>(element);
+        assert(att);
+        if (attrType == "type") {
+            att->SetType(att->StrToStr(attrValue));
+            return true;
+        }
+    }
 
     return false;
 }
 
 void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_DIVLINELOG)) {
+        const AttDivLineLog *att = dynamic_cast<const AttDivLineLog *>(element);
+        assert(att);
+        if (att->HasForm()) {
+            attributes->push_back({ "form", att->DivLineLogFormToStr(att->GetForm()) });
+        }
+    }
     if (element->HasAttClass(ATT_NCLOG)) {
         const AttNcLog *att = dynamic_cast<const AttNcLog *>(element);
         assert(att);
@@ -2135,9 +2126,6 @@ void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasCon()) {
             attributes->push_back({ "con", att->NcFormConToStr(att->GetCon()) });
         }
-        if (att->HasCurve()) {
-            attributes->push_back({ "curve", att->NcFormCurveToStr(att->GetCurve()) });
-        }
         if (att->HasHooked()) {
             attributes->push_back({ "hooked", att->BooleanToStr(att->GetHooked()) });
         }
@@ -2152,6 +2140,13 @@ void AttModule::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasTilt()) {
             attributes->push_back({ "tilt", att->CompassdirectionToStr(att->GetTilt()) });
+        }
+    }
+    if (element->HasAttClass(ATT_NEUMETYPE)) {
+        const AttNeumeType *att = dynamic_cast<const AttNeumeType *>(element);
+        assert(att);
+        if (att->HasType()) {
+            attributes->push_back({ "type", att->StrToStr(att->GetType()) });
         }
     }
 }
@@ -2462,14 +2457,6 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_COORDINATED)) {
         AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
         assert(att);
-        if (attrType == "ulx") {
-            att->SetUlx(att->StrToInt(attrValue));
-            return true;
-        }
-        if (attrType == "uly") {
-            att->SetUly(att->StrToInt(attrValue));
-            return true;
-        }
         if (attrType == "lrx") {
             att->SetLrx(att->StrToInt(attrValue));
             return true;
@@ -2480,6 +2467,18 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         }
         if (attrType == "rotate") {
             att->SetRotate(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_COORDINATEDUL)) {
+        AttCoordinatedUl *att = dynamic_cast<AttCoordinatedUl *>(element);
+        assert(att);
+        if (attrType == "ulx") {
+            att->SetUlx(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "uly") {
+            att->SetUly(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -2504,18 +2503,6 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         }
         if (attrType == "curvedir") {
             att->SetCurvedir(att->StrToCurvatureCurvedir(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_CURVEREND)) {
-        AttCurveRend *att = dynamic_cast<AttCurveRend *>(element);
-        assert(att);
-        if (attrType == "lform") {
-            att->SetLform(att->StrToLineform(attrValue));
-            return true;
-        }
-        if (attrType == "lwidth") {
-            att->SetLwidth(att->StrToLinewidth(attrValue));
             return true;
         }
     }
@@ -2695,6 +2682,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_FORMEWORK)) {
+        AttFormework *att = dynamic_cast<AttFormework *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToPgfunc(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_GRPSYMLOG)) {
         AttGrpSymLog *att = dynamic_cast<AttGrpSymLog *>(element);
         assert(att);
@@ -2743,6 +2738,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_KEYMODE)) {
+        AttKeyMode *att = dynamic_cast<AttKeyMode *>(element);
+        assert(att);
+        if (attrType == "mode") {
+            att->SetMode(att->StrToMode(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
         AttKeySigLog *att = dynamic_cast<AttKeySigLog *>(element);
         assert(att);
@@ -2754,8 +2757,8 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog *>(element);
         assert(att);
-        if (attrType == "key.sig") {
-            att->SetKeySig(att->StrToKeysignature(attrValue));
+        if (attrType == "keysig") {
+            att->SetKeysig(att->StrToKeysignature(attrValue));
             return true;
         }
     }
@@ -2830,12 +2833,12 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
             att->SetLform(att->StrToLineform(attrValue));
             return true;
         }
-        if (attrType == "lsegs") {
-            att->SetLsegs(att->StrToInt(attrValue));
-            return true;
-        }
         if (attrType == "lwidth") {
             att->SetLwidth(att->StrToLinewidth(attrValue));
+            return true;
+        }
+        if (attrType == "lsegs") {
+            att->SetLsegs(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -2948,6 +2951,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         assert(att);
         if (attrType == "meiversion") {
             att->SetMeiversion(att->StrToMeiVersionMeiversion(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_MENSURLOG)) {
+        AttMensurLog *att = dynamic_cast<AttMensurLog *>(element);
+        assert(att);
+        if (attrType == "level") {
+            att->SetLevel(att->StrToDuration(attrValue));
             return true;
         }
     }
@@ -3340,6 +3351,14 @@ bool AttModule::SetShared(Object *element, const std::string &attrType, const st
         }
         if (attrType == "confidence") {
             att->SetConfidence(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_REPEATMARKLOG)) {
+        AttRepeatMarkLog *att = dynamic_cast<AttRepeatMarkLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToRepeatMarkLogFunc(attrValue));
             return true;
         }
     }
@@ -4044,12 +4063,6 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_COORDINATED)) {
         const AttCoordinated *att = dynamic_cast<const AttCoordinated *>(element);
         assert(att);
-        if (att->HasUlx()) {
-            attributes->push_back({ "ulx", att->IntToStr(att->GetUlx()) });
-        }
-        if (att->HasUly()) {
-            attributes->push_back({ "uly", att->IntToStr(att->GetUly()) });
-        }
         if (att->HasLrx()) {
             attributes->push_back({ "lrx", att->IntToStr(att->GetLrx()) });
         }
@@ -4058,6 +4071,16 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasRotate()) {
             attributes->push_back({ "rotate", att->DblToStr(att->GetRotate()) });
+        }
+    }
+    if (element->HasAttClass(ATT_COORDINATEDUL)) {
+        const AttCoordinatedUl *att = dynamic_cast<const AttCoordinatedUl *>(element);
+        assert(att);
+        if (att->HasUlx()) {
+            attributes->push_back({ "ulx", att->IntToStr(att->GetUlx()) });
+        }
+        if (att->HasUly()) {
+            attributes->push_back({ "uly", att->IntToStr(att->GetUly()) });
         }
     }
     if (element->HasAttClass(ATT_CUE)) {
@@ -4078,16 +4101,6 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasCurvedir()) {
             attributes->push_back({ "curvedir", att->CurvatureCurvedirToStr(att->GetCurvedir()) });
-        }
-    }
-    if (element->HasAttClass(ATT_CURVEREND)) {
-        const AttCurveRend *att = dynamic_cast<const AttCurveRend *>(element);
-        assert(att);
-        if (att->HasLform()) {
-            attributes->push_back({ "lform", att->LineformToStr(att->GetLform()) });
-        }
-        if (att->HasLwidth()) {
-            attributes->push_back({ "lwidth", att->LinewidthToStr(att->GetLwidth()) });
         }
     }
     if (element->HasAttClass(ATT_CUSTOSLOG)) {
@@ -4238,6 +4251,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "nonfiling", att->IntToStr(att->GetNonfiling()) });
         }
     }
+    if (element->HasAttClass(ATT_FORMEWORK)) {
+        const AttFormework *att = dynamic_cast<const AttFormework *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back({ "func", att->PgfuncToStr(att->GetFunc()) });
+        }
+    }
     if (element->HasAttClass(ATT_GRPSYMLOG)) {
         const AttGrpSymLog *att = dynamic_cast<const AttGrpSymLog *>(element);
         assert(att);
@@ -4280,6 +4300,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "join", att->StrToStr(att->GetJoin()) });
         }
     }
+    if (element->HasAttClass(ATT_KEYMODE)) {
+        const AttKeyMode *att = dynamic_cast<const AttKeyMode *>(element);
+        assert(att);
+        if (att->HasMode()) {
+            attributes->push_back({ "mode", att->ModeToStr(att->GetMode()) });
+        }
+    }
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
         const AttKeySigLog *att = dynamic_cast<const AttKeySigLog *>(element);
         assert(att);
@@ -4290,8 +4317,8 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         const AttKeySigDefaultLog *att = dynamic_cast<const AttKeySigDefaultLog *>(element);
         assert(att);
-        if (att->HasKeySig()) {
-            attributes->push_back({ "key.sig", att->KeysignatureToStr(att->GetKeySig()) });
+        if (att->HasKeysig()) {
+            attributes->push_back({ "keysig", att->KeysignatureToStr(att->GetKeysig()) });
         }
     }
     if (element->HasAttClass(ATT_LABELLED)) {
@@ -4354,11 +4381,11 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasLform()) {
             attributes->push_back({ "lform", att->LineformToStr(att->GetLform()) });
         }
-        if (att->HasLsegs()) {
-            attributes->push_back({ "lsegs", att->IntToStr(att->GetLsegs()) });
-        }
         if (att->HasLwidth()) {
             attributes->push_back({ "lwidth", att->LinewidthToStr(att->GetLwidth()) });
+        }
+        if (att->HasLsegs()) {
+            attributes->push_back({ "lsegs", att->IntToStr(att->GetLsegs()) });
         }
     }
     if (element->HasAttClass(ATT_LINKING)) {
@@ -4450,6 +4477,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasMeiversion()) {
             attributes->push_back({ "meiversion", att->MeiVersionMeiversionToStr(att->GetMeiversion()) });
+        }
+    }
+    if (element->HasAttClass(ATT_MENSURLOG)) {
+        const AttMensurLog *att = dynamic_cast<const AttMensurLog *>(element);
+        assert(att);
+        if (att->HasLevel()) {
+            attributes->push_back({ "level", att->DurationToStr(att->GetLevel()) });
         }
     }
     if (element->HasAttClass(ATT_METADATAPOINTING)) {
@@ -4775,6 +4809,13 @@ void AttModule::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasConfidence()) {
             attributes->push_back({ "confidence", att->DblToStr(att->GetConfidence()) });
+        }
+    }
+    if (element->HasAttClass(ATT_REPEATMARKLOG)) {
+        const AttRepeatMarkLog *att = dynamic_cast<const AttRepeatMarkLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back({ "func", att->RepeatMarkLogFuncToStr(att->GetFunc()) });
         }
     }
     if (element->HasAttClass(ATT_RESPONSIBILITY)) {
@@ -5339,14 +5380,6 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
             att->SetArrowFillcolor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "line.form") {
-            att->SetLineForm(att->StrToLineform(attrValue));
-            return true;
-        }
-        if (attrType == "line.width") {
-            att->SetLineWidth(att->StrToLinewidth(attrValue));
-            return true;
-        }
     }
     if (element->HasAttClass(ATT_BARLINEVIS)) {
         AttBarLineVis *att = dynamic_cast<AttBarLineVis *>(element);
@@ -5408,6 +5441,14 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_CURVATUREDIRECTION)) {
+        AttCurvatureDirection *att = dynamic_cast<AttCurvatureDirection *>(element);
+        assert(att);
+        if (attrType == "curve") {
+            att->SetCurve(att->StrToCurvatureDirectionCurve(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_EPISEMAVIS)) {
         AttEpisemaVis *att = dynamic_cast<AttEpisemaVis *>(element);
         assert(att);
@@ -5456,6 +5497,14 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
             return true;
         }
     }
+    if (element->HasAttClass(ATT_GUITARGRIDVIS)) {
+        AttGuitarGridVis *att = dynamic_cast<AttGuitarGridVis *>(element);
+        assert(att);
+        if (attrType == "grid.show") {
+            att->SetGridShow(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_HAIRPINVIS)) {
         AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
@@ -5499,20 +5548,20 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         AttKeySigVis *att = dynamic_cast<AttKeySigVis *>(element);
         assert(att);
-        if (attrType == "sig.showchange") {
-            att->SetSigShowchange(att->StrToBoolean(attrValue));
+        if (attrType == "cancelaccid") {
+            att->SetCancelaccid(att->StrToCancelaccid(attrValue));
             return true;
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTVIS)) {
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis *>(element);
         assert(att);
-        if (attrType == "keysig.show") {
-            att->SetKeysigShow(att->StrToBoolean(attrValue));
+        if (attrType == "keysig.cancelaccid") {
+            att->SetKeysigCancelaccid(att->StrToCancelaccid(attrValue));
             return true;
         }
-        if (attrType == "keysig.showchange") {
-            att->SetKeysigShowchange(att->StrToBoolean(attrValue));
+        if (attrType == "keysig.visible") {
+            att->SetKeysigVisible(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -5555,10 +5604,6 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_LIQUESCENTVIS)) {
         AttLiquescentVis *att = dynamic_cast<AttLiquescentVis *>(element);
         assert(att);
-        if (attrType == "curve") {
-            att->SetCurve(att->StrToLiquescentVisCurve(attrValue));
-            return true;
-        }
         if (attrType == "looped") {
             att->SetLooped(att->StrToBoolean(attrValue));
             return true;
@@ -5637,6 +5682,10 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
         }
         if (attrType == "meter.showchange") {
             att->SetMeterShowchange(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "meter.visible") {
+            att->SetMeterVisible(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -5727,10 +5776,6 @@ bool AttModule::SetVisual(Object *element, const std::string &attrType, const st
     if (element->HasAttClass(ATT_STAFFDEFVIS)) {
         AttStaffDefVis *att = dynamic_cast<AttStaffDefVis *>(element);
         assert(att);
-        if (attrType == "grid.show") {
-            att->SetGridShow(att->StrToBoolean(attrValue));
-            return true;
-        }
         if (attrType == "layerscheme") {
             att->SetLayerscheme(att->StrToLayerscheme(attrValue));
             return true;
@@ -5835,12 +5880,6 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasArrowFillcolor()) {
             attributes->push_back({ "arrow.fillcolor", att->StrToStr(att->GetArrowFillcolor()) });
         }
-        if (att->HasLineForm()) {
-            attributes->push_back({ "line.form", att->LineformToStr(att->GetLineForm()) });
-        }
-        if (att->HasLineWidth()) {
-            attributes->push_back({ "line.width", att->LinewidthToStr(att->GetLineWidth()) });
-        }
     }
     if (element->HasAttClass(ATT_BARLINEVIS)) {
         const AttBarLineVis *att = dynamic_cast<const AttBarLineVis *>(element);
@@ -5892,6 +5931,13 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "clef.visible", att->BooleanToStr(att->GetClefVisible()) });
         }
     }
+    if (element->HasAttClass(ATT_CURVATUREDIRECTION)) {
+        const AttCurvatureDirection *att = dynamic_cast<const AttCurvatureDirection *>(element);
+        assert(att);
+        if (att->HasCurve()) {
+            attributes->push_back({ "curve", att->CurvatureDirectionCurveToStr(att->GetCurve()) });
+        }
+    }
     if (element->HasAttClass(ATT_EPISEMAVIS)) {
         const AttEpisemaVis *att = dynamic_cast<const AttEpisemaVis *>(element);
         assert(att);
@@ -5932,6 +5978,13 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back({ "orient", att->FingGrpVisOrientToStr(att->GetOrient()) });
         }
     }
+    if (element->HasAttClass(ATT_GUITARGRIDVIS)) {
+        const AttGuitarGridVis *att = dynamic_cast<const AttGuitarGridVis *>(element);
+        assert(att);
+        if (att->HasGridShow()) {
+            attributes->push_back({ "grid.show", att->BooleanToStr(att->GetGridShow()) });
+        }
+    }
     if (element->HasAttClass(ATT_HAIRPINVIS)) {
         const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
@@ -5968,18 +6021,18 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         const AttKeySigVis *att = dynamic_cast<const AttKeySigVis *>(element);
         assert(att);
-        if (att->HasSigShowchange()) {
-            attributes->push_back({ "sig.showchange", att->BooleanToStr(att->GetSigShowchange()) });
+        if (att->HasCancelaccid()) {
+            attributes->push_back({ "cancelaccid", att->CancelaccidToStr(att->GetCancelaccid()) });
         }
     }
     if (element->HasAttClass(ATT_KEYSIGDEFAULTVIS)) {
         const AttKeySigDefaultVis *att = dynamic_cast<const AttKeySigDefaultVis *>(element);
         assert(att);
-        if (att->HasKeysigShow()) {
-            attributes->push_back({ "keysig.show", att->BooleanToStr(att->GetKeysigShow()) });
+        if (att->HasKeysigCancelaccid()) {
+            attributes->push_back({ "keysig.cancelaccid", att->CancelaccidToStr(att->GetKeysigCancelaccid()) });
         }
-        if (att->HasKeysigShowchange()) {
-            attributes->push_back({ "keysig.showchange", att->BooleanToStr(att->GetKeysigShowchange()) });
+        if (att->HasKeysigVisible()) {
+            attributes->push_back({ "keysig.visible", att->BooleanToStr(att->GetKeysigVisible()) });
         }
     }
     if (element->HasAttClass(ATT_LIGATUREVIS)) {
@@ -6014,9 +6067,6 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_LIQUESCENTVIS)) {
         const AttLiquescentVis *att = dynamic_cast<const AttLiquescentVis *>(element);
         assert(att);
-        if (att->HasCurve()) {
-            attributes->push_back({ "curve", att->LiquescentVisCurveToStr(att->GetCurve()) });
-        }
         if (att->HasLooped()) {
             attributes->push_back({ "looped", att->BooleanToStr(att->GetLooped()) });
         }
@@ -6080,6 +6130,9 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasMeterShowchange()) {
             attributes->push_back({ "meter.showchange", att->BooleanToStr(att->GetMeterShowchange()) });
+        }
+        if (att->HasMeterVisible()) {
+            attributes->push_back({ "meter.visible", att->BooleanToStr(att->GetMeterVisible()) });
         }
     }
     if (element->HasAttClass(ATT_MULTIRESTVIS)) {
@@ -6158,9 +6211,6 @@ void AttModule::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_STAFFDEFVIS)) {
         const AttStaffDefVis *att = dynamic_cast<const AttStaffDefVis *>(element);
         assert(att);
-        if (att->HasGridShow()) {
-            attributes->push_back({ "grid.show", att->BooleanToStr(att->GetGridShow()) });
-        }
         if (att->HasLayerscheme()) {
             attributes->push_back({ "layerscheme", att->LayerschemeToStr(att->GetLayerscheme()) });
         }

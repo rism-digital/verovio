@@ -90,12 +90,12 @@ public:
     /**
      * Generate a document pgFoot if none is provided
      */
-    bool GenerateFooter();
+    void GenerateFooter();
 
     /**
      * Generate a document pgHead from the MEI header if none is provided
      */
-    bool GenerateHeader();
+    void GenerateHeader();
 
     /**
      * Generate measure numbers from measure attributes
@@ -122,11 +122,6 @@ public:
     bool HasPage(int pageIdx) const;
 
     /**
-     * Get all the Score in the visible Mdiv.
-     */
-    std::list<Score *> GetScores();
-
-    /**
      * Get the Pages in the visible Mdiv.
      * Will find it only when having read a pages-based MEI file,
      * or when a file was converted to page-based MEI.
@@ -140,6 +135,31 @@ public:
      * Get the total page count
      */
     int GetPageCount() const;
+
+    /**
+     * Get the first scoreDef
+     */
+    ///@{
+    ScoreDef *GetFirstScoreDef();
+    const ScoreDef *GetFirstScoreDef() const;
+    ///@}
+
+    /**
+     * Get all visible scores / the first visible score
+     * Lazily updates the visible scores, hence not const
+     */
+    ///@{
+    std::list<Score *> GetVisibleScores();
+    Score *GetFirstVisibleScore();
+    ///@}
+
+    /**
+     * Get the corresponding score for a node
+     */
+    ///@{
+    Score *GetCorrespondingScore(const Object *object);
+    const Score *GetCorrespondingScore(const Object *object) const;
+    ///@}
 
     /**
      * Return true if the MIDI generation is already done
@@ -225,7 +245,7 @@ public:
      * Get the default distance from the staff for the object
      * The distance is given in x * MEI UNIT
      */
-    data_MEASUREMENTSIGNED GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
+    data_MEASUREMENTSIGNED GetStaffDistance(const Object *object, int staffIndex, data_STAFFREL staffPosition) const;
 
     /**
      * Prepare the timemap for MIDI and timemap file export.
@@ -419,19 +439,6 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the current Score/ScoreDef.
-     * If not set, then looks for the first Score in the Document and use that.
-     * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
-     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMilestoneEnd
-     */
-    ///@{
-    Score *GetCurrentScore();
-    ScoreDef *GetCurrentScoreDef();
-    void SetCurrentScore(Score *score);
-    bool HasCurrentScore() const { return m_currentScore != NULL; }
-    ///@}
-
-    /**
      * Return true if the document has been cast off already.
      */
     bool IsCastOff() const { return m_isCastOff; }
@@ -460,9 +467,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -476,6 +483,11 @@ private:
      * Generate the measure indices
      */
     void PrepareMeasureIndices();
+
+    /**
+     * Determine all visible scores
+     */
+    void CollectVisibleScores();
 
 public:
     Page *m_selectionPreceding;
@@ -546,12 +558,10 @@ private:
     Resources m_resources;
 
     /**
-     * @name Holds a pointer to the current score/scoreDef.
-     * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
+     * The list of all visible scores
+     * Used in Doc::GetCorrespondingScore to quickly determine the score for an object
      */
-    ///@{
-    Score *m_currentScore;
-    ///@}
+    std::list<Score *> m_visibleScores;
 
     /**
      * A flag indicating if the document has been cast off or not.

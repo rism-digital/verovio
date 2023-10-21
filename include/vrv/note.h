@@ -34,7 +34,6 @@ class Note;
 class Slur;
 class TabGrp;
 class Tie;
-class TransPitch;
 class Verse;
 
 //----------------------------------------------------------------------------
@@ -52,7 +51,8 @@ class Note : public LayerElement,
              public AttColor,
              public AttColoration,
              public AttCue,
-             public AttExtSym,
+             public AttExtSymAuth,
+             public AttExtSymNames,
              public AttGraced,
              public AttHarmonicFunction,
              public AttMidiVelocity,
@@ -147,7 +147,7 @@ public:
     Chord *IsChordTone();
     const Chord *IsChordTone() const;
     int GetDrawingDur() const;
-    bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
+    bool IsNoteGroupExtreme() const; // used to find if it is the highest or lowest note in a note group
     ///@}
 
     /**
@@ -172,12 +172,12 @@ public:
     bool IsUnisonWith(const Note *note, bool ignoreAccid = false) const;
 
     /**
-     * @name Setter and getter for the chord cluster and the position of the note
+     * @name Setter and getter for the chord note group and the position of the note
      */
     ///@{
-    void SetCluster(ChordCluster *cluster, int position);
-    ChordCluster *GetCluster() { return m_cluster; }
-    int GetClusterPosition() const { return m_clusterPosition; }
+    void SetNoteGroup(ChordNoteGroup *noteGroup, int position);
+    ChordNoteGroup *GetNoteGroup() { return m_noteGroup; }
+    int GetNoteGroupPosition() const { return m_noteGroupPosition; }
     ///@}
 
     /**
@@ -191,7 +191,7 @@ public:
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
+    int GetDiatonicPitch() const;
 
     /**
      * Get the stem up / stem down attachment point.
@@ -282,6 +282,14 @@ public:
      */
     static int PnameToPclass(data_PITCHNAME pitchName);
 
+    /**
+     * Get and set the pitch for transposition
+     */
+    ///@{
+    TransPitch GetTransPitch() const;
+    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -290,31 +298,11 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ConvertMarkupAnalytical
-     */
-    int ConvertMarkupAnalytical(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateMIDI
-     */
-    int GenerateMIDI(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::GenerateTimemap
-     */
-    int GenerateTimemap(FunctorParams *functorParams) override;
-
-    /**
-     * See Object::Transpose
-     */
-    int Transpose(FunctorParams *functorParams) override;
 
 protected:
     /**
@@ -335,20 +323,6 @@ private:
      */
     int GetChromaticAlteration() const;
 
-    TransPitch GetTransPitch() const;
-
-    void UpdateFromTransPitch(const TransPitch &tp, bool hasKeySig);
-
-    /**
-     * Register deferred notes for MIDI
-     */
-    void DeferMIDINote(FunctorParams *functorParams, double shift, bool includeChordSiblings);
-
-    /**
-     * Create the MIDI output of the grace note sequence stored in params
-     */
-    void GenerateGraceNoteMIDI(FunctorParams *functorParams, double startTime, int tpq, int channel, int velocity);
-
 public:
     //
 private:
@@ -363,14 +337,14 @@ private:
     bool m_flippedNotehead;
 
     /**
-     * flags for determining clusters in chord (cluster this belongs to)
+     * flags for determining note groups in chord (note group this belongs to)
      */
-    ChordCluster *m_cluster;
+    ChordNoteGroup *m_noteGroup;
 
     /**
-     * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
+     * Position in the note group (1-indexed position in said note group; 0 if does not have position)
      */
-    int m_clusterPosition;
+    int m_noteGroupPosition;
 
     /**
      * A pointer to a note with which the note shares its stem and implementing @stem.sameas.

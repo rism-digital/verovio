@@ -16,7 +16,6 @@
 #include "comparison.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -122,7 +121,7 @@ void StaffGrp::FilterList(ListOfConstObjects &childList) const
 
 int StaffGrp::GetMaxStaffSize() const
 {
-    const ListOfConstObjects &childList = this->GetList(this);
+    const ListOfConstObjects &childList = this->GetList();
 
     if (childList.empty()) return 100;
 
@@ -151,7 +150,7 @@ std::pair<StaffDef *, StaffDef *> StaffGrp::GetFirstLastStaffDef()
 
 std::pair<const StaffDef *, const StaffDef *> StaffGrp::GetFirstLastStaffDef() const
 {
-    const ListOfConstObjects &staffDefs = this->GetList(this);
+    const ListOfConstObjects &staffDefs = this->GetList();
     if (staffDefs.empty()) {
         return { NULL, NULL };
     }
@@ -261,7 +260,7 @@ void StaffGrp::SetEverythingVisible()
 // StaffGrp functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode StaffGrp::Accept(MutableFunctor &functor)
+FunctorCode StaffGrp::Accept(Functor &functor)
 {
     return functor.VisitStaffGrp(this);
 }
@@ -271,7 +270,7 @@ FunctorCode StaffGrp::Accept(ConstFunctor &functor) const
     return functor.VisitStaffGrp(this);
 }
 
-FunctorCode StaffGrp::AcceptEnd(MutableFunctor &functor)
+FunctorCode StaffGrp::AcceptEnd(Functor &functor)
 {
     return functor.VisitStaffGrpEnd(this);
 }

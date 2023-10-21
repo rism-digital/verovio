@@ -6,7 +6,7 @@ excludes:
     data.DURATION,
     data.DURATION.cmn,
     data.DURATION.mensural,
-    data.DURATION.gestural,
+    data.DURATION.GESTURAL,
     data.DURATIONRESTS,
     data.HEXNUM,
     data.KEYSIGNATURE,
@@ -52,7 +52,7 @@ mapped:
         int
     data.DURATION.cmn:
         data_DURATION
-    data.DURATION.gestural:
+    data.DURATION.GESTURAL:
         data_DURATION
     data.DURATION.mensural:
         data_DURATION
@@ -96,7 +96,7 @@ mapped:
         std::string
     data.PGSCALE:
         std::string
-    data.PITCHNAME.GES:
+    data.PITCHNAME.GESTURAL:
         data_PITCHNAME
     data.PITCHCLASS:
         int
@@ -208,6 +208,11 @@ modules:
                 type: double
                 default: -1.0
 
+    neumes:
+        att.divLine.log:
+            form:
+                type: divLineLog_FORM
+
     shared:
         att.articulation:
             artic:
@@ -219,7 +224,7 @@ modules:
             sig:
                 type: data_KEYSIGNATURE
         att.keySigDefault.log:
-            key.sig:
+            keysig:
                 type: data_KEYSIGNATURE
         att.meterSig.log:
             count:
@@ -253,3 +258,9 @@ modules:
             tab.fret:
                 type: int
                 default: -1
+    
+    visual:
+        att.mensural.vis:
+            mensur.slash:
+                type: char
+                default: 0

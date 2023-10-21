@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
 #include "system.h"
 
 namespace vrv {
@@ -59,7 +58,7 @@ void SystemElement::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode SystemElement::Accept(MutableFunctor &functor)
+FunctorCode SystemElement::Accept(Functor &functor)
 {
     return functor.VisitSystemElement(this);
 }
@@ -69,7 +68,7 @@ FunctorCode SystemElement::Accept(ConstFunctor &functor) const
     return functor.VisitSystemElement(this);
 }
 
-FunctorCode SystemElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode SystemElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitSystemElementEnd(this);
 }
@@ -77,28 +76,6 @@ FunctorCode SystemElement::AcceptEnd(MutableFunctor &functor)
 FunctorCode SystemElement::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitSystemElementEnd(this);
-}
-
-int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_targetSystem);
-    this->MoveItselfTo(params->m_targetSystem);
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

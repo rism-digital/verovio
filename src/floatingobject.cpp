@@ -33,6 +33,7 @@
 #include "pedal.h"
 #include "pitchinflection.h"
 #include "reh.h"
+#include "repeatmark.h"
 #include "slur.h"
 #include "staff.h"
 #include "tempo.h"
@@ -183,7 +184,7 @@ std::pair<int, bool> FloatingObject::GetVerticalContentBoundaryRel(const Doc *do
     return { boundary, false };
 }
 
-FunctorCode FloatingObject::Accept(MutableFunctor &functor)
+FunctorCode FloatingObject::Accept(Functor &functor)
 {
     return functor.VisitFloatingObject(this);
 }
@@ -193,7 +194,7 @@ FunctorCode FloatingObject::Accept(ConstFunctor &functor) const
     return functor.VisitFloatingObject(this);
 }
 
-FunctorCode FloatingObject::AcceptEnd(MutableFunctor &functor)
+FunctorCode FloatingObject::AcceptEnd(Functor &functor)
 {
     return functor.VisitFloatingObjectEnd(this);
 }
@@ -313,6 +314,13 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *a
         assert(reh);
         // reh above by default
         m_place = (reh->GetPlace() != STAFFREL_NONE) ? reh->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(REPEATMARK)) {
+        RepeatMark *repeatMark = vrv_cast<RepeatMark *>(object);
+        assert(repeatMark);
+        // repeatMark above by default
+        m_place = (repeatMark->GetPlace() != STAFFREL_NONE) ? repeatMark->GetPlace()
+                                                            : repeatMark->GetLayerPlace(STAFFREL_above);
     }
     else if (object->Is(TEMPO)) {
         Tempo *tempo = vrv_cast<Tempo *>(object);
@@ -437,7 +445,7 @@ int FloatingPositioner::GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox,
 }
 
 void FloatingPositioner::CalcDrawingYRel(
-    Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
+    const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
 {
     assert(doc);
     assert(staffAlignment);
@@ -452,8 +460,7 @@ void FloatingPositioner::CalcDrawingYRel(
         int staffIndex = staffAlignment->GetStaff()->GetN();
 
         int minStaffDistance = 0.0;
-        data_MEASUREMENTSIGNED minStaffDistanceMeasurement
-            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place);
+        data_MEASUREMENTSIGNED minStaffDistanceMeasurement = doc->GetStaffDistance(m_object, staffIndex, m_place);
 
         if (minStaffDistanceMeasurement.HasValue()) {
             if (minStaffDistanceMeasurement.GetType() == MEASUREMENTTYPE_px) {
@@ -812,7 +819,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
 
         // For selected types use the cut out boundary
         int boxTopY = boundingBox->GetTopBy(type);
-        if (boundingBox->Is(ACCID)) {
+        if (this->GetObject()->Is({ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
             const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxTopY = boundingBox->GetCutOutTop(*resources);
@@ -849,7 +856,7 @@ std::pair<int, int> FloatingCurvePositioner::CalcDirectionalLeftRightAdjustment(
 
         // For selected types use the cut out boundary
         int boxBottomY = boundingBox->GetBottomBy(type);
-        if (boundingBox->Is(ACCID)) {
+        if (this->GetObject()->Is({ PHRASE, SLUR }) && boundingBox->Is(ACCID)) {
             const Resources *resources = vrv_cast<const Object *>(boundingBox)->GetDocResources();
             if (resources) {
                 boxBottomY = boundingBox->GetCutOutBottom(*resources);

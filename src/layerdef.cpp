@@ -62,7 +62,7 @@ bool LayerDef::IsSupportedChild(Object *child)
     return true;
 }
 
-FunctorCode LayerDef::Accept(MutableFunctor &functor)
+FunctorCode LayerDef::Accept(Functor &functor)
 {
     return functor.VisitLayerDef(this);
 }
@@ -72,7 +72,7 @@ FunctorCode LayerDef::Accept(ConstFunctor &functor) const
     return functor.VisitLayerDef(this);
 }
 
-FunctorCode LayerDef::AcceptEnd(MutableFunctor &functor)
+FunctorCode LayerDef::AcceptEnd(Functor &functor)
 {
     return functor.VisitLayerDefEnd(this);
 }

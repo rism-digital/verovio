@@ -17,7 +17,6 @@
 #include "controlelement.h"
 #include "fig.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -122,7 +121,7 @@ bool EditorialElement::IsSupportedChild(Object *child)
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode EditorialElement::Accept(MutableFunctor &functor)
+FunctorCode EditorialElement::Accept(Functor &functor)
 {
     return functor.VisitEditorialElement(this);
 }
@@ -132,7 +131,7 @@ FunctorCode EditorialElement::Accept(ConstFunctor &functor) const
     return functor.VisitEditorialElement(this);
 }
 
-FunctorCode EditorialElement::AcceptEnd(MutableFunctor &functor)
+FunctorCode EditorialElement::AcceptEnd(Functor &functor)
 {
     return functor.VisitEditorialElementEnd(this);
 }
@@ -140,55 +139,6 @@ FunctorCode EditorialElement::AcceptEnd(MutableFunctor &functor)
 FunctorCode EditorialElement::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitEditorialElementEnd(this);
-}
-
-int EditorialElement::Save(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    // When writing MEI basic, only visible elements within editorial markup a saved
-    if (params->m_basic && this->m_visibility == Hidden) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return Object::Save(functorParams);
-    }
-}
-
-int EditorialElement::SaveEnd(FunctorParams *functorParams)
-{
-    SaveParams *params = vrv_params_cast<SaveParams *>(functorParams);
-    assert(params);
-
-    // Same as above
-    if (params->m_basic && this->m_visibility == Hidden) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else {
-        return Object::SaveEnd(functorParams);
-    }
-}
-
-int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    if (m_visibility == Visible) ConvertToPageBasedMilestone(this, params->m_currentSystem);
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

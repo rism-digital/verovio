@@ -22,7 +22,7 @@ namespace vrv {
 /**
  * This class models the MEI <symbol> element.
  */
-class Symbol : public TextElement, public AttColor, public AttExtSym, public AttTypography {
+class Symbol : public TextElement, public AttColor, public AttExtSymAuth, public AttExtSymNames, public AttTypography {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -50,9 +50,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

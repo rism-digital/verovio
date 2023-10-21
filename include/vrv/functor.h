@@ -29,7 +29,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FunctorBase(){};
+    FunctorBase() {}
     virtual ~FunctorBase() = default;
     ///@}
 
@@ -43,15 +43,32 @@ public:
     ///@}
 
     /**
-     * Getters/Setters for the properties
+     * Getter/Setter for the visibility
      */
     ///@{
-    Filters *GetFilters() { return m_filters; }
-    void SetFilters(Filters *filters) { m_filters = filters; }
     bool VisibleOnly() const { return m_visibleOnly; }
     void SetVisibleOnly(bool visibleOnly) { m_visibleOnly = visibleOnly; }
+    ///@}
+
+    /**
+     * Getters/Setters for the filters and direction
+     * Here setters return the previous value
+     */
+    ///@{
+    Filters *GetFilters() const { return m_filters; }
+    Filters *SetFilters(Filters *filters)
+    {
+        Filters *previous = m_filters;
+        m_filters = filters;
+        return previous;
+    }
     bool GetDirection() const { return m_direction; }
-    void SetDirection(bool direction) { m_direction = direction; }
+    bool SetDirection(bool direction)
+    {
+        bool previous = m_direction;
+        m_direction = direction;
+        return previous;
+    }
     ///@}
 
     /**
@@ -75,20 +92,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MutableFunctor
+// Functor
 //----------------------------------------------------------------------------
 
 /**
  * This abstract class is the base class for all mutable functors.
  */
-class MutableFunctor : public FunctorBase, public FunctorInterface {
+class Functor : public FunctorBase, public FunctorInterface {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    MutableFunctor(){};
-    virtual ~MutableFunctor() = default;
+    Functor() {}
+    virtual ~Functor() = default;
     ///@}
 
 private:
@@ -112,7 +129,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConstFunctor(){};
+    ConstFunctor() {}
     virtual ~ConstFunctor() = default;
     ///@}
 
@@ -131,7 +148,7 @@ private:
 /**
  * This abstract class is the base class for all mutable functors that need access to the document.
  */
-class DocFunctor : public MutableFunctor {
+class DocFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -190,6 +207,45 @@ protected:
 
 private:
     //
+};
+
+//----------------------------------------------------------------------------
+// CollectAndProcess
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a mixin for all functors that require two step processing:
+ * (1) Collecing data. (2) Processing data.
+ */
+class CollectAndProcess {
+protected:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    CollectAndProcess() = default;
+    ~CollectAndProcess() = default;
+    ///@}
+
+public:
+    /**
+     * Check and switch the current phase.
+     */
+    ///@{
+    bool IsCollectingData() const { return !m_processingData; }
+    bool IsProcessingData() const { return m_processingData; }
+    void SetDataCollectionCompleted() { m_processingData = true; }
+    ///@}
+
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    // Indicates the current phase: collecting vs processing data
+    bool m_processingData = false;
 };
 
 } // namespace vrv

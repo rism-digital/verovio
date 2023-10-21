@@ -12,6 +12,7 @@
 #include "doc.h"
 #include "multirest.h"
 #include "rest.h"
+#include "score.h"
 #include "staff.h"
 #include "system.h"
 
@@ -214,9 +215,8 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
 
     const bool hasSystemStartLine = measure->IsFirstInSystem() && system->GetDrawingScoreDef()->HasSystemStartLine();
 
-    Filters *previousFilters = this->GetFilters();
     Filters filters;
-    this->SetFilters(&filters);
+    Filters *previousFilters = this->SetFilters(&filters);
 
     for (auto staffN : m_staffNs) {
         m_minPos = 0;
@@ -299,7 +299,7 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AdjustXPosFunctor::VisitScore(Score *score)
 {
-    m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs();
+    m_staffNs = score->GetScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

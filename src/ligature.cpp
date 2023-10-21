@@ -18,7 +18,6 @@
 #include "dot.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "note.h"
 #include "staff.h"
 #include "vrv.h"
@@ -70,7 +69,7 @@ Note *Ligature::GetFirstNote()
 
 const Note *Ligature::GetFirstNote() const
 {
-    const Note *firstNote = vrv_cast<const Note *>(this->GetListFront(this));
+    const Note *firstNote = vrv_cast<const Note *>(this->GetListFront());
     assert(firstNote);
     return firstNote;
 }
@@ -83,7 +82,7 @@ Note *Ligature::GetLastNote()
 const Note *Ligature::GetLastNote() const
 {
     // The first note is the bottom
-    const Note *lastNote = vrv_cast<const Note *>(this->GetListBack(this));
+    const Note *lastNote = vrv_cast<const Note *>(this->GetListBack());
     assert(lastNote);
     return lastNote;
 }
@@ -120,7 +119,7 @@ int Ligature::GetDrawingNoteShape(const Note *note) const
 // Functors methods
 //----------------------------------------------------------------------------
 
-FunctorCode Ligature::Accept(MutableFunctor &functor)
+FunctorCode Ligature::Accept(Functor &functor)
 {
     return functor.VisitLigature(this);
 }
@@ -130,7 +129,7 @@ FunctorCode Ligature::Accept(ConstFunctor &functor) const
     return functor.VisitLigature(this);
 }
 
-FunctorCode Ligature::AcceptEnd(MutableFunctor &functor)
+FunctorCode Ligature::AcceptEnd(Functor &functor)
 {
     return functor.VisitLigatureEnd(this);
 }

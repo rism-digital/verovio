@@ -19,11 +19,11 @@
 #include "clef.h"
 #include "comparison.h"
 #include "custos.h"
+#include "divline.h"
 #include "doc.h"
 #include "editorial.h"
 #include "findlayerelementsfunctor.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "keysig.h"
 #include "measure.h"
 #include "mensur.h"
@@ -183,8 +183,8 @@ LayerElement *Layer::GetPrevious(const LayerElement *element)
 
 const LayerElement *Layer::GetPrevious(const LayerElement *element) const
 {
-    this->ResetList(this);
-    if (!element || this->HasEmptyList(this)) return NULL;
+    this->ResetList();
+    if (!element || this->HasEmptyList()) return NULL;
 
     return dynamic_cast<const LayerElement *>(this->GetListPrevious(element));
 }
@@ -197,6 +197,13 @@ LayerElement *Layer::GetAtPos(int x)
 const LayerElement *Layer::GetAtPos(int x) const
 {
     const Object *first = this->GetFirst();
+    if (!first) return NULL;
+
+    if (first->IsEditorialElement()) {
+        IsEditorialElementComparison cmp;
+        cmp.ReverseComparison();
+        first = this->FindDescendantByComparison(&cmp);
+    }
     if (!first || !first->IsLayerElement()) return NULL;
 
     const LayerElement *element = vrv_cast<const LayerElement *>(first);
@@ -205,8 +212,19 @@ const LayerElement *Layer::GetAtPos(int x) const
 
     const Object *next;
     while ((next = this->GetNext())) {
-        if (!next->IsLayerElement()) continue;
-        const LayerElement *nextLayerElement = vrv_cast<const LayerElement *>(next);
+        const LayerElement *nextLayerElement = NULL;
+        if (next->IsLayerElement()) {
+            nextLayerElement = vrv_cast<const LayerElement *>(next);
+        }
+        else if (next->IsEditorialElement()) {
+            IsEditorialElementComparison cmp;
+            cmp.ReverseComparison();
+            nextLayerElement = vrv_cast<const LayerElement *>(next->FindDescendantByComparison(&cmp));
+            if (!nextLayerElement) continue;
+        }
+        else {
+            continue;
+        }
         assert(nextLayerElement);
         if (nextLayerElement->GetDrawingX() > x) return element;
         element = nextLayerElement;
@@ -229,7 +247,7 @@ const Clef *Layer::GetClef(const LayerElement *test) const
     }
 
     // make sure list is set
-    this->ResetList(this);
+    this->ResetList();
     if (!test->Is(CLEF)) {
         testObject = this->GetListFirstBackward(testObject, CLEF);
     }
@@ -276,7 +294,7 @@ int Layer::GetClefLocOffset(const LayerElement *test) const
 int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
 {
     if (element->m_crossStaff) {
-        ResetList(this);
+        this->ResetList();
         if (!element->Is(CLEF)) {
             const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
             if (clef && clef->m_crossStaff) {
@@ -423,8 +441,8 @@ ListOfConstObjects Layer::GetLayerElementsForTimeSpanOf(const LayerElement *elem
     else if (element->Is(BEAM)) {
         const Beam *beam = vrv_cast<const Beam *>(element);
 
-        const LayerElement *first = vrv_cast<const LayerElement *>(beam->GetListFront(beam));
-        const LayerElement *last = vrv_cast<const LayerElement *>(beam->GetListBack(beam));
+        const LayerElement *first = vrv_cast<const LayerElement *>(beam->GetListFront());
+        const LayerElement *last = vrv_cast<const LayerElement *>(beam->GetListBack());
 
         if (!first || !last) return {};
 
@@ -479,8 +497,10 @@ Clef *Layer::GetCurrentClef()
 const Clef *Layer::GetCurrentClef() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
-    return staff->m_drawingStaffDef->GetCurrentClef();
+    if (staff && staff->m_drawingStaffDef) {
+        return staff->m_drawingStaffDef->GetCurrentClef();
+    }
+    return NULL;
 }
 
 KeySig *Layer::GetCurrentKeySig()
@@ -594,7 +614,7 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Layer::Accept(MutableFunctor &functor)
+FunctorCode Layer::Accept(Functor &functor)
 {
     return functor.VisitLayer(this);
 }
@@ -604,7 +624,7 @@ FunctorCode Layer::Accept(ConstFunctor &functor) const
     return functor.VisitLayer(this);
 }
 
-FunctorCode Layer::AcceptEnd(MutableFunctor &functor)
+FunctorCode Layer::AcceptEnd(Functor &functor)
 {
     return functor.VisitLayerEnd(this);
 }
@@ -612,109 +632,6 @@ FunctorCode Layer::AcceptEnd(MutableFunctor &functor)
 FunctorCode Layer::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitLayerEnd(this);
-}
-
-int Layer::ConvertMarkupArticEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
-    assert(params);
-
-    for (auto &[parent, artic] : params->m_articPairsToConvert) {
-        artic->SplitMultival(parent);
-    }
-    params->m_articPairsToConvert.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    params->m_contentLayer = this;
-
-    params->m_targetLayer = new Layer(*this);
-    params->m_targetLayer->ClearChildren();
-    params->m_targetLayer->CloneReset();
-    // Keep the xml:id of the layer in the first segment
-    params->m_targetLayer->SwapID(this);
-    assert(params->m_targetStaff);
-    params->m_targetStaff->AddChild(params->m_targetLayer);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    if (params->m_contentLayer == NULL) {
-        params->m_contentLayer = this;
-    }
-    else {
-        params->m_contentLayer->MoveChildrenFrom(this);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Layer::InitProcessingLists(FunctorParams *functorParams)
-{
-    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
-    assert(params);
-
-    // Alternate solution with StaffN_LayerN_VerseN_t
-    // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
-
-    Staff *staff = vrv_cast<Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff);
-    params->m_layerTree.child[staff->GetN()].child[this->GetN()];
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    params->m_currentScoreTime = 0.0;
-    params->m_currentRealTimeSeconds = 0.0;
-
-    params->m_currentMensur = this->GetCurrentMensur();
-    params->m_currentMeterSig = this->GetCurrentMeterSig();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->GetCue() == BOOLEAN_true && params->m_cueExclusion) return FUNCTOR_SIBLINGS;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::GenerateMIDIEnd(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // stop all previously held notes
-    for (auto &held : params->m_heldNotes) {
-        if (held.m_pitch > 0) {
-            params->m_midiFile->addNoteOff(params->m_midiTrack, held.m_stopTime * params->m_midiFile->getTPQ(),
-                params->m_midiChannel, held.m_pitch);
-        }
-    }
-
-    params->m_heldNotes.clear();
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

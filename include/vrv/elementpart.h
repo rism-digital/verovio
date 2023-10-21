@@ -59,18 +59,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -132,18 +124,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
 private:
@@ -221,18 +205,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
 private:
@@ -312,18 +288,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    int Save(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
-    int SaveEnd(FunctorParams *functorParams) override { return FUNCTOR_CONTINUE; }
     ///@}
 
 private:

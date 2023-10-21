@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "fig.h"
@@ -75,7 +76,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
         this->ResetCode();
     }
     else if (layer->GetStaffDefMeterSig()) {
-        if (layer->GetStaffDefMeterSig()->GetForm() != METERFORM_invis) {
+        if (layer->GetStaffDefMeterSig()->GetVisible() != BOOLEAN_false) {
             this->VisitMeterSig(layer->GetStaffDefMeterSig());
         }
     }
@@ -159,7 +160,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // Ligature notes are all aligned with the first note
         Note *note = vrv_cast<Note *>(layerElement);
         assert(note);
-        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront(ligatureParent));
+        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront());
         if (firstNote && (firstNote != note)) {
             Alignment *alignment = firstNote->GetAlignment();
             layerElement->SetAlignment(alignment);
@@ -296,6 +297,10 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // The time will be reset to 0.0 when starting a new layer anyway
         if (layerElement->Is(TIMESTAMP_ATTR)) {
             m_time = duration;
+            // When a tstamp is pointing to the end of a measure, then use the right barline alignment
+            if (m_time == this->m_measureAligner->GetRightAlignment()->GetTime()) {
+                type = ALIGNMENT_MEASURE_RIGHT_BARLINE;
+            }
         }
         else {
             m_measureAligner->SetMaxTime(m_time + duration);
@@ -411,6 +416,15 @@ AlignMeasuresFunctor::AlignMeasuresFunctor(Doc *doc) : DocFunctor(doc)
     m_storeCastOffSystemWidths = false;
 }
 
+FunctorCode AlignMeasuresFunctor::VisitDiv(Div *div)
+{
+    if (div->GetDrawingInline()) div->SetDrawingXRel(m_shift);
+
+    m_shift += div->GetContentWidth();
+
+    return FUNCTOR_SIBLINGS;
+}
+
 FunctorCode AlignMeasuresFunctor::VisitMeasure(Measure *measure)
 {
     if (m_applySectionRestartShift) {
@@ -486,6 +500,15 @@ AlignVerticallyFunctor::AlignVerticallyFunctor(Doc *doc) : DocFunctor(doc)
     m_pageWidth = 0;
 }
 
+FunctorCode AlignVerticallyFunctor::VisitDiv(Div *div)
+{
+    m_systemAligner->GetBottomAlignment()->SetYRel(-div->GetTotalHeight(m_doc));
+
+    m_pageWidth = div->GetTotalWidth(m_doc);
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode AlignVerticallyFunctor::VisitFig(Fig *fig)
 {
     Svg *svg = vrv_cast<Svg *>(fig->FindDescendantByType(SVG));
@@ -532,6 +555,8 @@ FunctorCode AlignVerticallyFunctor::VisitPageEnd(Page *page)
 
 FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 {
+    if (!rend->GetFirstAncestorInRange(TEXT_LAYOUT_ELEMENT, TEXT_LAYOUT_ELEMENT_max)) return FUNCTOR_SIBLINGS;
+
     if (rend->GetHalign()) {
         switch (rend->GetHalign()) {
             case HORIZONTALALIGNMENT_right: rend->SetDrawingXRel(m_pageWidth); break;
@@ -545,7 +570,9 @@ FunctorCode AlignVerticallyFunctor::VisitRend(Rend *rend)
 
 FunctorCode AlignVerticallyFunctor::VisitRunningElement(RunningElement *runningElement)
 {
-    m_pageWidth = runningElement->GetWidth();
+    this->VisitTextLayoutElement(runningElement);
+
+    m_pageWidth = runningElement->GetTotalWidth(m_doc);
 
     return FUNCTOR_CONTINUE;
 }
@@ -694,16 +721,11 @@ FunctorCode AlignSystemsFunctor::VisitSystem(System *system)
     assert(systemAligner.GetBottomAlignment());
 
     // No spacing for the first system
-    int systemSpacing = system->IsFirstInPage() ? 0 : m_systemSpacing;
-    if (systemSpacing) {
-        const int contentOverflow = m_prevBottomOverflow + systemAligner.GetOverflowAbove(m_doc);
-        const int clefOverflow = m_prevBottomClefOverflow + systemAligner.GetOverflowAbove(m_doc, true);
-        // Alignment is already pre-determined with staff alignment overflow
-        // We need to subtract them from the desired spacing
-        const int actualSpacing = systemSpacing - std::max(contentOverflow, clefOverflow);
-        // Ensure minimal white space between consecutive systems by adding one staff space
+    if (!system->IsFirstInPage()) {
+        // const int contentOverflow = m_prevBottomOverflow + systemAligner.GetOverflowAbove(m_doc);
+        // const int clefOverflow = m_prevBottomClefOverflow + systemAligner.GetOverflowAbove(m_doc, true);
         const int unit = m_doc->GetDrawingUnit(100);
-        m_shift -= std::max(actualSpacing, 2 * unit);
+        m_shift -= std::max(m_systemSpacing, 2 * unit);
     }
 
     system->SetDrawingYRel(m_shift);
@@ -716,6 +738,7 @@ FunctorCode AlignSystemsFunctor::VisitSystem(System *system)
         m_justificationSum -= m_doc->GetOptions()->m_justificationSystem.GetValue();
     }
 
+    // These are currently not used
     m_prevBottomOverflow = systemAligner.GetOverflowBelow(m_doc);
     m_prevBottomClefOverflow = systemAligner.GetOverflowBelow(m_doc, true);
 

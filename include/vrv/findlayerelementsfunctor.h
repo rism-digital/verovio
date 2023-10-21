@@ -231,7 +231,7 @@ private:
 
 /**
  * This class goes through all layer elements of the layer and returns the next/previous element
- * relative to the specified layer element.
+ * (depending on traversal direction) relative to the specified layer element.
  * It will search recursively through children elements until note, chord or ftrem is found.
  * It can be used to look into neighboring layers as well, but only the first element will be checked.
  */
@@ -241,7 +241,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    GetRelativeLayerElementFunctor(int elementIndex, bool searchDirection, bool anotherLayer);
+    GetRelativeLayerElementFunctor(int elementIndex, bool anotherLayer);
     virtual ~GetRelativeLayerElementFunctor() = default;
     ///@}
 
@@ -273,8 +273,6 @@ private:
     const LayerElement *m_relativeElement;
     // The index of the layer element that is being compared to (starting point)
     int m_initialElementIndex;
-    // The direction of search - BACKWARD is for previous element, FORWARD - next
-    bool m_searchDirection;
     // The flag to indicate whether search is done in the same layer as the given element, or in neighboring one
     bool m_isInNeighboringLayer;
 };

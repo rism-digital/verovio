@@ -14,7 +14,6 @@
 namespace vrv {
 
 class DeviceContext;
-class InitProcessingListsParams;
 class RunningElement;
 class Score;
 class Staff;
@@ -48,11 +47,6 @@ public:
     ///@{
     bool IsSupportedChild(Object *object) override;
     ///@}
-
-    /**
-     * Return the number of system (children are System object only)
-     */
-    int GetSystemCount() const { return (int)GetChildren().size(); }
 
     /**
      * @name Get and set the pixel per unit factor.
@@ -159,22 +153,17 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * Apply the Pixel Per Unit factor of the page to its elements.
-     */
-    int ApplyPPUFactor(FunctorParams *functorParams) override;
 
 private:
     /**
      * Adjust the horizontal position of the syl processing verse by verse
      */
-    void AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc);
+    void AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc);
 
     /**
      * Check whether vertical justification is required for the current page

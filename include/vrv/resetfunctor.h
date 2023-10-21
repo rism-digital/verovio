@@ -19,7 +19,7 @@ namespace vrv {
 /**
  * This class resets the drawing values before calling PrepareData after changes.
  */
-class ResetDataFunctor : public MutableFunctor {
+class ResetDataFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -42,9 +42,11 @@ public:
     FunctorCode VisitArpeg(Arpeg *arpeg) override;
     FunctorCode VisitArtic(Artic *artic) override;
     FunctorCode VisitBeam(Beam *beam) override;
+    FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
     FunctorCode VisitChord(Chord *chord) override;
     FunctorCode VisitControlElement(ControlElement *controlElement) override;
     FunctorCode VisitCustos(Custos *custos) override;
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitDot(Dot *dot) override;
     FunctorCode VisitDots(Dots *dots) override;
     FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
@@ -60,6 +62,7 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMRest(MRest *mRest) override;
     FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitSection(Section *section) override;
     FunctorCode VisitSlur(Slur *slur) override;
@@ -90,7 +93,7 @@ private:
 /**
  * This class resets the horizontal alignment for various types.
  */
-class ResetHorizontalAlignmentFunctor : public MutableFunctor {
+class ResetHorizontalAlignmentFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -114,6 +117,7 @@ public:
     FunctorCode VisitBeam(Beam *beam) override;
     FunctorCode VisitBeamSpan(BeamSpan *beamSpan) override;
     FunctorCode VisitCustos(Custos *custos) override;
+    FunctorCode VisitDiv(Div *div) override;
     FunctorCode VisitDot(Dot *dot) override;
     FunctorCode VisitDots(Dots *dots) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
@@ -147,7 +151,7 @@ private:
 /**
  * This class resets the vertical alignment for various types.
  */
-class ResetVerticalAlignmentFunctor : public MutableFunctor {
+class ResetVerticalAlignmentFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

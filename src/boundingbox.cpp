@@ -303,6 +303,31 @@ int BoundingBox::VerticalBottomOverlap(const BoundingBox *other, const Doc *doc,
     return overlap;
 }
 
+int BoundingBox::GetRectangles(const SMuFLGlyphAnchor &anchor, Point rect[2][2], const Resources &resources) const
+{
+    const Glyph *glyph = NULL;
+
+    bool glyphRect = true;
+
+    if (m_smuflGlyph != 0) {
+        glyph = resources.GetGlyph(m_smuflGlyph);
+        assert(glyph);
+
+        if (glyph->HasAnchor(anchor)) {
+            glyphRect = this->GetGlyph1PointRectangles(anchor, glyph, rect);
+            if (glyphRect) return 2;
+        }
+    }
+    if (!glyphRect) {
+        LogDebug("Illogical values for anchor points in glyph '%02x'", m_smuflGlyph);
+    }
+
+    rect[0][0] = Point(this->GetSelfLeft(), this->GetSelfTop());
+    rect[0][1] = Point(this->GetSelfRight(), this->GetSelfBottom());
+
+    return 1;
+}
+
 int BoundingBox::GetRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2],
     const Resources &resources) const
 {
@@ -558,6 +583,44 @@ int BoundingBox::GetCutOutRight(const Resources &resources) const
     return rightValues[1];
 }
 
+int BoundingBox::GetCutOutLeft(const Resources &resources, bool fromTop) const
+{
+    const SMuFLGlyphAnchor anchor = fromTop ? SMUFL_cutOutNW : SMUFL_cutOutSW;
+
+    Point BBrect[2][2];
+
+    const int rectangleCount = this->GetRectangles(anchor, BBrect, resources);
+    std::vector<int> leftValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        leftValues.push_back(BBrect[i][0].x);
+    }
+    assert(!leftValues.empty());
+
+    // Return the second smallest value (if there are at least two)
+    if (leftValues.size() == 1) return leftValues[0];
+    std::sort(leftValues.begin(), leftValues.end());
+    return leftValues[1];
+}
+
+int BoundingBox::GetCutOutRight(const Resources &resources, bool fromTop) const
+{
+    const SMuFLGlyphAnchor anchor = fromTop ? SMUFL_cutOutNE : SMUFL_cutOutSE;
+
+    Point BBrect[2][2];
+
+    const int rectangleCount = this->GetRectangles(anchor, BBrect, resources);
+    std::vector<int> rightValues;
+    for (int i = 0; i < rectangleCount; ++i) {
+        rightValues.push_back(BBrect[i][1].x);
+    }
+    assert(!rightValues.empty());
+
+    // Return the second largest value (if there are at least two)
+    if (rightValues.size() == 1) return rightValues[0];
+    std::sort(rightValues.begin(), rightValues.end(), std::greater<int>());
+    return rightValues[1];
+}
+
 bool BoundingBox::Encloses(const Point point) const
 {
     if (this->GetContentRight() < point.x) return false;
@@ -715,7 +778,8 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
     return 0;
 }
 
-int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor type, const int margin) const
+int BoundingBox::Intersects(
+    const BeamDrawingInterface *beamInterface, Accessor type, int margin, bool fromBeamContentSide) const
 {
     assert(beamInterface);
     assert(beamInterface->HasCoords());
@@ -771,12 +835,15 @@ int BoundingBox::Intersects(const BeamDrawingInterface *beamInterface, Accessor 
     }
 
     // calculate vertical overlap of the BB with beam section
-    if (beamInterface->m_drawingPlace == BEAMPLACE_above) {
+    const bool beamAbove = (beamInterface->m_drawingPlace == BEAMPLACE_above);
+    const bool beamBelow = (beamInterface->m_drawingPlace == BEAMPLACE_below);
+
+    if ((beamAbove && !fromBeamContentSide) || (beamBelow && fromBeamContentSide)) {
         const int topY = std::max(leftIntersection.y, rightIntersection.y);
         const int shift = topY - this->GetBottomBy(type) + margin;
         return std::max(shift, 0);
     }
-    else if (beamInterface->m_drawingPlace == BEAMPLACE_below) {
+    else if ((beamBelow && !fromBeamContentSide) || (beamAbove && fromBeamContentSide)) {
         const int bottomY = std::min(leftIntersection.y, rightIntersection.y);
         const int shift = bottomY - this->GetTopBy(type) - margin;
         return std::min(shift, 0);

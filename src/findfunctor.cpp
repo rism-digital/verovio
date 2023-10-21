@@ -20,8 +20,7 @@ namespace vrv {
 // FindAllByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindAllByComparisonFunctor::FindAllByComparisonFunctor(Comparison *comparison, ListOfObjects *elements)
-    : MutableFunctor()
+FindAllByComparisonFunctor::FindAllByComparisonFunctor(Comparison *comparison, ListOfObjects *elements) : Functor()
 {
     m_comparison = comparison;
     m_elements = elements;
@@ -146,7 +145,7 @@ FunctorCode FindByComparisonFunctor::VisitObject(const Object *object)
 // FindByIDFunctor
 //----------------------------------------------------------------------------
 
-FindByIDFunctor::FindByIDFunctor(const std::string &id)
+FindByIDFunctor::FindByIDFunctor(const std::string &id) : ConstFunctor()
 {
     m_id = id;
     m_element = NULL;
@@ -172,6 +171,7 @@ FunctorCode FindByIDFunctor::VisitObject(const Object *object)
 //----------------------------------------------------------------------------
 
 FindNextChildByComparisonFunctor::FindNextChildByComparisonFunctor(Comparison *comparison, const Object *start)
+    : ConstFunctor()
 {
     m_comparison = comparison;
     m_start = start;
@@ -205,6 +205,7 @@ FunctorCode FindNextChildByComparisonFunctor::VisitObject(const Object *object)
 //----------------------------------------------------------------------------
 
 FindPreviousChildByComparisonFunctor::FindPreviousChildByComparisonFunctor(Comparison *comparison, const Object *start)
+    : ConstFunctor()
 {
     m_comparison = comparison;
     m_start = start;
@@ -231,7 +232,7 @@ FunctorCode FindPreviousChildByComparisonFunctor::VisitObject(const Object *obje
 // FindExtremeByComparisonFunctor
 //----------------------------------------------------------------------------
 
-FindExtremeByComparisonFunctor::FindExtremeByComparisonFunctor(Comparison *comparison)
+FindExtremeByComparisonFunctor::FindExtremeByComparisonFunctor(Comparison *comparison) : ConstFunctor()
 {
     m_comparison = comparison;
     m_element = NULL;
@@ -251,7 +252,7 @@ FunctorCode FindExtremeByComparisonFunctor::VisitObject(const Object *object)
 // FindAllReferencedObjectsFunctor
 //----------------------------------------------------------------------------
 
-FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *elements)
+FindAllReferencedObjectsFunctor::FindAllReferencedObjectsFunctor(ListOfObjects *elements) : Functor()
 {
     m_elements = elements;
     m_milestoneReferences = false;
@@ -304,7 +305,7 @@ FunctorCode FindAllReferencedObjectsFunctor::VisitObject(Object *object)
 // FindElementInLayerStaffDefFunctor
 //----------------------------------------------------------------------------
 
-FindElementInLayerStaffDefFunctor::FindElementInLayerStaffDefFunctor(const std::string &xmlId)
+FindElementInLayerStaffDefFunctor::FindElementInLayerStaffDefFunctor(const std::string &xmlId) : ConstFunctor()
 {
     m_id = xmlId;
     m_element = NULL;
@@ -331,6 +332,23 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
     }
 
     return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// AddToFlatListFunctor
+//----------------------------------------------------------------------------
+
+AddToFlatListFunctor::AddToFlatListFunctor(ListOfConstObjects *flatList) : ConstFunctor()
+{
+    m_flatList = flatList;
+}
+
+FunctorCode AddToFlatListFunctor::VisitObject(const Object *object)
+{
+    m_flatList->push_back(object);
+    // LogDebug("List %d", m_flatList->size());
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

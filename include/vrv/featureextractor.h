@@ -10,7 +10,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "functorparams.h"
 #include "options.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +38,7 @@ public:
     /**
      * Extract a feature for the object
      */
-    void Extract(Object *object, GenerateFeaturesParams *params);
+    void Extract(const Object *object);
 
     /**
      * Write the current content of the extractor to a JSON string
@@ -53,7 +52,7 @@ public:
      * A list of previous notes for interval calculation.
      * Usually one note, but sometimes more than one with tied notes.
      */
-    std::list<Note *> m_previousNotes;
+    std::list<const Note *> m_previousNotes;
 
     jsonxx::Array m_pitchesChromatic;
     jsonxx::Array m_pitchesDiatonic;

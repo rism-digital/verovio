@@ -25,7 +25,6 @@
 #include "doc.h"
 #include "dot.h"
 #include "fermata.h"
-#include "functorparams.h"
 #include "gracegrp.h"
 #include "keyaccid.h"
 #include "keysig.h"
@@ -74,12 +73,11 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    SaveParams saveParams(this, false);
-    m_doc->GetCurrentScoreDef()->SaveObject(saveParams);
+    m_doc->GetFirstScoreDef()->SaveObject(this, false);
 
     m_docScoreDef = false;
 
-    m_doc->SaveObject(saveParams);
+    m_doc->SaveObject(this, false);
 
     output = m_streamStringOutput.str();
 
@@ -352,7 +350,7 @@ void PAEOutput::WriteKeySig(KeySig *keySig)
 
     data_ACCIDENTAL_WRITTEN accidType = keySig->GetSig().second;
     std::string sig;
-    sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
+    if (accidType != ACCIDENTAL_WRITTEN_n) sig.push_back((accidType == ACCIDENTAL_WRITTEN_s) ? 'x' : 'b');
     for (int i = 0; i < keySig->GetSig().first; ++i) {
         data_PITCHNAME pname = KeySig::GetAccidPnameAt(accidType, i);
         std::string pnameStr = keySig->AttTyped::PitchnameToStr(pname);
@@ -1021,20 +1019,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->GetCurrentScoreDef()->AddChild(scoreDefKeySig);
+        score->GetScoreDef()->AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMeterSig);
+        score->GetScoreDef()->AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMensur);
+        score->GetScoreDef()->AddChild(scoreDefMensur);
     }
 
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    score->GetScoreDef()->AddChild(staffGrp);
 
     if (m_tie != NULL) {
         LogWarning("Open tie will not render because tstamp2 is missing");
@@ -2968,7 +2966,7 @@ bool PAEInput::Parse()
     staffDef->SetN(1);
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    score->GetScoreDef()->AddChild(staffGrp);
 
     if (m_isMensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
@@ -2979,17 +2977,17 @@ bool PAEInput::Parse()
         staffDef->AddChild(m_clef.Clone());
     }
     if (m_hasKeySig) {
-        m_doc->GetCurrentScoreDef()->AddChild(m_keySig.Clone());
+        score->GetScoreDef()->AddChild(m_keySig.Clone());
     }
     if (m_hasMeterSig) {
         // Make it an attribute for now
         m_meterSig.IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(m_meterSig.Clone());
+        score->GetScoreDef()->AddChild(m_meterSig.Clone());
     }
     if (m_hasMensur) {
         // Make it an attribute for now
         m_mensur.IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(m_mensur.Clone());
+        score->GetScoreDef()->AddChild(m_mensur.Clone());
     }
 
     // A stack to which layer element are added. At least a Layer, but then Beam, GraceGrp, Chord, etc.
@@ -4803,7 +4801,7 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
             keySig->SetSig({ altNumber, alterationType });
         }
         if (cancel) {
-            keySig->SetSigShowchange(BOOLEAN_true);
+            keySig->SetCancelaccid(CANCELACCID_before);
         }
     }
     else {

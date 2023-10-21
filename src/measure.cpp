@@ -24,7 +24,6 @@
 #include "ending.h"
 #include "f.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "multirest.h"
@@ -40,7 +39,6 @@
 #include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
-#include "timemap.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -708,7 +706,7 @@ std::vector<std::pair<LayerElement *, LayerElement *>> Measure::GetInternalTieEn
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Measure::Accept(MutableFunctor &functor)
+FunctorCode Measure::Accept(Functor &functor)
 {
     return functor.VisitMeasure(this);
 }
@@ -718,7 +716,7 @@ FunctorCode Measure::Accept(ConstFunctor &functor) const
     return functor.VisitMeasure(this);
 }
 
-FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
+FunctorCode Measure::AcceptEnd(Functor &functor)
 {
     return functor.VisitMeasureEnd(this);
 }
@@ -726,202 +724,6 @@ FunctorCode Measure::AcceptEnd(MutableFunctor &functor)
 FunctorCode Measure::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitMeasureEnd(this);
-}
-
-int Measure::ConvertMarkupAnalyticalEnd(FunctorParams *functorParams)
-{
-    ConvertMarkupAnalyticalParams *params = vrv_params_cast<ConvertMarkupAnalyticalParams *>(functorParams);
-    assert(params);
-
-    ArrayOfObjects::iterator iter;
-    for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); ++iter) {
-        this->AddChild(*iter);
-    }
-
-    params->m_controlEvents.clear();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = vrv_params_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    // Move itself to the pageBasedSystem - do not process children
-    assert(params->m_currentSystem);
-    this->MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToCastOffMensuralParams *params = vrv_params_cast<ConvertToCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    // We are processing by staff/layer from the call below - we obviously do not want to loop...
-    if (params->m_targetMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    bool convertToMeasured = params->m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
-
-    assert(params->m_targetSystem);
-    assert(params->m_layerTree);
-
-    // Create a temporary subsystem for receiving the measure segments
-    System targetSubSystem;
-    params->m_targetSubSystem = &targetSubSystem;
-
-    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based
-    // MEI file instead
-    Measure *measure = new Measure(convertToMeasured);
-    if (convertToMeasured) {
-        measure->SetN(StringFormat("%d", params->m_segmentTotal + 1));
-    }
-    params->m_targetSubSystem->AddChild(measure);
-
-    Filters filters;
-    // Now we can process by layer and move their content to (measure) segments
-    for (auto const &staves : params->m_layerTree->child) {
-        for (auto const &layers : staves.second.child) {
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves.first);
-            AttNIntegerComparison matchLayer(LAYER, layers.first);
-            filters = { &matchStaff, &matchLayer };
-
-            params->m_segmentIdx = 1;
-            params->m_targetMeasure = measure;
-
-            Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
-            this->Process(&convertToCastOffMensural, params, NULL, &filters);
-        }
-    }
-
-    params->m_targetMeasure = NULL;
-    params->m_targetSubSystem = NULL;
-    params->m_segmentTotal = targetSubSystem.GetChildCount();
-    // Copy the measure segments to the final target segment
-    params->m_targetSystem->MoveChildrenFrom(&targetSubSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
-{
-    ConvertToUnCastOffMensuralParams *params = vrv_params_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
-    assert(params);
-
-    if (params->m_contentMeasure == NULL) {
-        params->m_contentMeasure = this;
-    }
-    else if (params->m_addSegmentsToDelete) {
-        params->m_segmentsToDelete.push_back(this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::Save(FunctorParams *functorParams)
-{
-    return (this->IsMeasuredMusic()) ? Object::Save(functorParams) : FUNCTOR_CONTINUE;
-}
-
-int Measure::SaveEnd(FunctorParams *functorParams)
-{
-    return (this->IsMeasuredMusic()) ? Object::SaveEnd(functorParams) : FUNCTOR_CONTINUE;
-}
-
-int Measure::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
-    if (m_xAbs2 != VRV_UNSET) m_xAbs2 /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitMIDI(FunctorParams *functorParams)
-{
-    InitMIDIParams *params = vrv_params_cast<InitMIDIParams *>(functorParams);
-    assert(params);
-
-    params->m_currentTempo = m_currentTempo;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::GenerateMIDI(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = vrv_params_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // Here we need to update the m_totalTime from the starting time of the measure.
-    params->m_totalTime = m_scoreTimeOffset.back();
-
-    if (m_currentTempo != params->m_currentTempo) {
-        params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
-        params->m_currentTempo = m_currentTempo;
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::GenerateTimemap(FunctorParams *functorParams)
-{
-    GenerateTimemapParams *params = vrv_params_cast<GenerateTimemapParams *>(functorParams);
-    assert(params);
-
-    params->m_scoreTimeOffset = this->m_scoreTimeOffset.back();
-    params->m_realTimeOffsetMilliseconds = this->m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = this->m_currentTempo;
-
-    params->m_timemap->AddEntry(this, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitMaxMeasureDuration(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    m_scoreTimeOffset.clear();
-    m_scoreTimeOffset.push_back(params->m_currentScoreTime);
-
-    m_realTimeOffsetMilliseconds.clear();
-    // m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
-    m_realTimeOffsetMilliseconds.push_back(params->m_currentRealTimeSeconds * 1000.0);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitMaxMeasureDurationEnd(FunctorParams *functorParams)
-{
-    InitMaxMeasureDurationParams *params = vrv_params_cast<InitMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    const double scoreTimeIncrement
-        = m_measureAligner.GetRightAlignment()->GetTime() * params->m_multiRestFactor * DURATION_4 / DUR_MAX;
-    m_currentTempo = params->m_currentTempo * params->m_tempoAdjustment;
-    params->m_currentScoreTime += scoreTimeIncrement;
-    params->m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / m_currentTempo;
-    params->m_multiRestFactor = 1;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::InitOnsetOffset(FunctorParams *functorParams)
-{
-    InitOnsetOffsetParams *params = vrv_params_cast<InitOnsetOffsetParams *>(functorParams);
-    assert(params);
-
-    params->m_currentTempo = m_currentTempo;
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

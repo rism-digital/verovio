@@ -67,6 +67,11 @@ bool IsValidInteger(const std::string &value);
 bool IsValidDouble(const std::string &value);
 
 /**
+ * Utility to check if the string contains only digits (positive integer without sign)
+ */
+bool IsDigits(const std::string &value);
+
+/**
  * Extract the ID from any URI
  */
 std::string ExtractIDFragment(std::string refID);

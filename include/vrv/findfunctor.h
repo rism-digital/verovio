@@ -22,7 +22,7 @@ class Object;
 /**
  * This class finds all elements in the tree by comparison
  */
-class FindAllByComparisonFunctor : public MutableFunctor {
+class FindAllByComparisonFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -403,7 +403,7 @@ private:
 /**
  * This class finds all objects to which another object refers to.
  */
-class FindAllReferencedObjectsFunctor : public MutableFunctor {
+class FindAllReferencedObjectsFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors
@@ -488,6 +488,46 @@ private:
     const Object *m_element;
     // ID of the element to be found
     std::string m_id;
+};
+
+//----------------------------------------------------------------------------
+// AddToFlatListFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class adds elements and its children to a flat list.
+ */
+class AddToFlatListFunctor : public ConstFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    AddToFlatListFunctor(ListOfConstObjects *flatList);
+    virtual ~AddToFlatListFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitObject(const Object *object) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    // The list of elements
+    ListOfConstObjects *m_flatList;
 };
 
 } // namespace vrv

@@ -45,6 +45,7 @@ enum AlignmentType {
     ALIGNMENT_ACCID,
     ALIGNMENT_GRACENOTE,
     ALIGNMENT_BARLINE,
+    ALIGNMENT_DIVLINE,
     ALIGNMENT_DEFAULT,
     // Non-justifiable
     ALIGNMENT_MEASURE_RIGHT_BARLINE,
@@ -125,13 +126,13 @@ public:
     bool IsOfType(const std::vector<AlignmentType> &types) const;
 
     /**
-     * Retrive the minimum left and maximum right position for the objects in an alignment.
-     * Returns (-)VRV_UNSET in nothing for the staff specified.
-     * Uses Object::GetAlignmentLeftRight
+     * Retrieve the minimum left and maximum right position for the objects in an alignment.
+     * Returns (-)VRV_UNSET if there is nothing for the staff specified.
+     * Internally uses GetAlignmentLeftRightFunctor
      */
-    void GetLeftRight(const std::vector<int> &staffNs, int &minLeft, int &maxRight,
-        const std::vector<ClassId> &m_excludes = {}) const;
-    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &m_excludes = {}) const;
+    void GetLeftRight(
+        const std::vector<int> &staffNs, int &minLeft, int &maxRight, const std::vector<ClassId> &excludes = {}) const;
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight, const std::vector<ClassId> &excludes = {}) const;
 
     /**
      * Return all GraceAligners for the Alignment.
@@ -167,12 +168,6 @@ public:
      * Return pair of max and min Y value within alignment. Elements will be counted by alignment references.
      */
     std::pair<int, int> GetAlignmentTopBottom() const;
-
-    /**
-     * Add an accidental to the accidSpace of the AlignmentReference holding it.
-     * The Alignment has to have a AlignmentReference holding it.
-     */
-    void AddToAccidSpace(Accid *accid);
 
     /**
      * Return true if there is vertical overlap with accidentals from another alignment for specific staffN
@@ -219,9 +214,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -296,16 +291,6 @@ public:
     void AddChild(Object *object) override;
 
     /**
-     * Add an accidental to the accidSpace of the AlignmentReference.
-     */
-    void AddToAccidSpace(Accid *accid);
-
-    /**
-     * See AdjustAccidXFunctor
-     */
-    void AdjustAccidWithAccidSpace(Accid *accid, const Doc *doc, int staffSize, std::set<Accid *> &adjustedAccids);
-
-    /**
      * Return true if one of objects overlaps with accidentals from current reference (i.e. if there are accidentals)
      */
     bool HasAccidVerticalOverlap(const ArrayOfConstObjects &objects) const;
@@ -320,12 +305,6 @@ public:
      */
     bool HasCrossStaffElements() const;
 
-    /**
-     * Set whether accidentals should be aligned with all elements of alignmentReference or elements from same layer
-     * only. Set for each accidental in accidSpace separately
-     */
-    void SetAccidLayerAlignment();
-
     //----------//
     // Functors //
     //----------//
@@ -334,20 +313,16 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
 private:
     //
 public:
-    /**
-     * The accid space of the AlignmentReference.
-     */
-    std::vector<Accid *> m_accidSpace;
-
+    //
 private:
     /**
      *
@@ -391,9 +366,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -529,9 +504,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -634,9 +609,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
@@ -696,9 +671,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

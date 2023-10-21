@@ -21,8 +21,11 @@ namespace vrv {
  */
 class Element {
 public:
-    Element(std::string name) {}
+    Element(std::string name) { m_name = name; }
     virtual ~Element() {}
+
+    std::string m_name;
+    std::string m_xmlId;
 };
 
 } // namespace vrv

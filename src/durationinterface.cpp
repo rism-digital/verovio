@@ -17,7 +17,6 @@
 
 #include "beam.h"
 #include "chord.h"
-#include "functorparams.h"
 #include "mensur.h"
 #include "note.h"
 #include "vrv.h"
@@ -163,7 +162,7 @@ bool DurationInterface::IsFirstInBeam(const LayerElement *noteOrRest) const
     if (!beam) {
         return false;
     }
-    return (noteOrRest == beam->GetListFront(beam));
+    return (noteOrRest == beam->GetListFront());
 }
 
 bool DurationInterface::IsLastInBeam(const LayerElement *noteOrRest) const
@@ -172,7 +171,7 @@ bool DurationInterface::IsLastInBeam(const LayerElement *noteOrRest) const
     if (!beam) {
         return false;
     }
-    return (noteOrRest == beam->GetListBack(beam));
+    return (noteOrRest == beam->GetListBack());
 }
 
 int DurationInterface::GetActualDur() const

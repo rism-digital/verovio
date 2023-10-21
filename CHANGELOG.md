@@ -1,10 +1,22 @@
 # Changelog
 
-## [unreleased]
+## [4.0.1] - 2023-09-05
+* Fix MEI version in output
+
+## [4.0.0] - 2023-09-05
+* Update schemas to MEI 5.0 and corresponding adjustments
+* Support for `space` within `beam`
+
+## [3.16.0] - 2023-07-03
+* Support for rectangular tone clusters (@eNote-GmbH)
 * Support for delayed turns on chords (@eNote-GmbH)
+* Support for `pgHead@func` and `pgFoot@func` instead of `pgHead2` and `pgFoot2`
+* Support for `ending@lform` and `ending@label`
+* Update key signature handling according to the latest changes in MEI
 * Improve endpoint location for spanning slurs (@eNote-GmbH)
 * Improve layout for inner slurs in cross-staff situations (@eNote-GmbH)
 * Fix validity of MEI output by ensuring correct element order
+* Option --neume-as-note to render neumes as CMWN notes
 * Option --octave-no-spanning-parentheses to prevent () in spanning octave displacements (@eNote-GmbH)
 
 ## [3.15.0] - 2023-03-01

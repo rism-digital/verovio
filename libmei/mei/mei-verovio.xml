@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_odds.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_odds.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns="http://www.tei-c.org/ns/1.0">
+	<teiHeader>
+		<fileDesc>
+			<titleStmt>
+				<title>Music Encoding Initiative Guidelines – Verovio customization</title>
+				<respStmt>
+					<resp>Authored by</resp>
+					<name xml:id="LP">Laurent Pugin</name>
+					<name xml:id="AH">Andrew Hankinson</name>
+					<name xml:id="PR">Perry Roland</name>
+					<name xml:id="KR">Klaus Rettinghaus</name>
+				</respStmt>
+			</titleStmt>
+			<publicationStmt>
+				<p />
+			</publicationStmt>
+			<sourceDesc>
+				<p />
+			</sourceDesc>
+		</fileDesc>
+		<revisionDesc>
+			<change n="5" when="2022-11-08" resp="#KR">
+				<desc xml:lang="en">Added att.margins.</desc>
+			</change>
+			<change n="5" when="2022-10-26" resp="#KR">
+				<desc xml:lang="en">Moved to PureODD.</desc>
+			</change>
+			<change n="4" when="2022-07-15">
+				<desc xml:lang="en">Add all supported versions of MEI.</desc>
+			</change>
+			<change n="4" when="2021-03-30">
+				<desc xml:lang="en">Include tablature preliminary proposal.</desc>
+			</change>
+			<change n="3" when="2013-11-08">
+				<desc xml:lang="en">Changing to /measure/staff organisation; adding /pages container in /mdiv; adding /page@position; changing scb to secb.</desc>
+			</change>
+			<change n="2" when="2013-09-08">
+				<desc xml:lang="en">Adding /staff/measure organisation and other fixes.</desc>
+			</change>
+			<change n="2" when="2013-09-02">
+				<desc xml:lang="en">Fixing naming according to MEI convention and other small fixes.</desc>
+			</change>
+			<change n="1" when="2013-08-29">
+				<desc xml:lang="en">Initial setup of the customization.</desc>
+			</change>
+		</revisionDesc>
+	</teiHeader>
+	<text>
+		<front>
+			<divGen type="toc"/>
+		</front>
+		<body>
+			<schemaSpec ident="mei" start="mei meiHead meiCorpus music" ns="http://www.music-encoding.org/ns/mei">
+				<moduleRef key="MEI"/>
+				<moduleRef key="MEI.analytical"/>
+				<moduleRef key="MEI.cmn"/>
+				<moduleRef key="MEI.cmnOrnaments"/>
+				<moduleRef key="MEI.corpus"/>
+				<moduleRef key="MEI.critapp"/>
+				<moduleRef key="MEI.drama"/>
+				<moduleRef key="MEI.edittrans"/>
+				<moduleRef key="MEI.externalsymbols"/>
+				<moduleRef key="MEI.facsimile"/>
+				<moduleRef key="MEI.figtable"/>
+				<moduleRef key="MEI.fingering"/>
+				<moduleRef key="MEI.frbr"/>
+				<moduleRef key="MEI.gestural"/>
+				<moduleRef key="MEI.harmony"/>
+				<moduleRef key="MEI.header"/>
+				<moduleRef key="MEI.lyrics"/>
+				<moduleRef key="MEI.mensural"/>
+				<moduleRef key="MEI.midi"/>
+				<moduleRef key="MEI.namesdates"/>
+				<moduleRef key="MEI.neumes"/>
+				<moduleRef key="MEI.performance"/>
+				<moduleRef key="MEI.ptrref"/>
+				<moduleRef key="MEI.shared"/>
+				<moduleRef key="MEI.tablature"/>
+				<moduleRef key="MEI.text"/>
+				<moduleRef key="MEI.usersymbols"/>
+				<moduleRef key="MEI.visual"/>
+				<moduleRef key="MEI.pageBased"/>
+				<moduleRef key="MEI.frettab"/>
+
+				<classSpec ident="att.meiVersion" module="MEI.shared" type="atts" mode="replace">
+					<desc xml:lang="en">Attributes that record the version of MEI supported.</desc>
+					<attList>
+						<attDef ident="meiversion" usage="req">
+							<desc xml:lang="en">Specifies a generic MEI version label.</desc>
+							<defaultVal>5.0</defaultVal>
+							<valList type="closed">
+								<valItem ident="2013">
+									<desc xml:lang="en">MEI 2013</desc>
+								</valItem>
+								<valItem ident="3.0.0">
+									<desc xml:lang="en">MEI 3.0.0</desc>
+								</valItem>
+								<valItem ident="4.0.0">
+									<desc xml:lang="en">MEI 4.0.0</desc>
+								</valItem>
+								<valItem ident="4.0.1">
+									<desc xml:lang="en">MEI 4.0.1</desc>
+								</valItem>
+								<valItem ident="5.0">
+									<desc xml:lang="en">MEI 5.0</desc>
+								</valItem>
+								<valItem ident="5.0+basic">
+									<desc>MEI 5.0+basic</desc>
+								</valItem>
+								<valItem ident="5.0+CMN">
+									<desc>MEI 5.0+CMN</desc>
+								</valItem>
+								<valItem ident="5.0+Mensural">
+									<desc>MEI 5.0+Mensural</desc>
+								</valItem>
+								<valItem ident="5.0+Neumes">
+									<desc>MEI 5.0+Neumes</desc>
+								</valItem>
+							</valList>
+						</attDef>
+					</attList>
+				</classSpec>
+
+				<!-- ****************************************************************** -->
+				<!-- Page-based MEI -->
+				<!-- ****************************************************************** -->
+
+				<moduleSpec ident="MEI.pageBased" mode="add">
+					<desc/>
+				</moduleSpec>
+
+				<classSpec ident="model.pagesLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects pagesLike elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="pages" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">A set of pages in a page-based encoding</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.pagesLike"/>
+					</classes>
+					<content>
+						<rng:zeroOrMore>
+							<rng:ref name="model.pageLike"/>
+						</rng:zeroOrMore>
+					</content>
+				</elementSpec>
+
+				<classSpec ident="model.pageLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects pageLike elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="page" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">A page in a page-base encoding</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="att.dimensions"/>
+						<memberOf key="att.facsimile"/>
+						<memberOf key="att.margins"/>
+						<!--<memberOf key="att.pageRef"/>-->
+						<memberOf key="model.pageLike"/>
+					</classes>
+					<content>
+						<rng:zeroOrMore>
+							<rng:choice>
+								<rng:ref name="model.systemLike"/>
+								<rng:ref name="model.milestoneLike"/>
+								<rng:ref name="model.secbLike"/>
+								<rng:ref name="model.mdivbLike"/>
+								<rng:ref name="model.scoreLike"/>
+								<rng:ref name="model.partsLike"/>
+							</rng:choice>
+						</rng:zeroOrMore>
+					</content>
+				</elementSpec>
+
+				<!-- remove att.pages and att.systems from att.scoreDef.vis, 
+					as they go on other elements now -->
+				<!--<classSpec ident="att.scoreDef.vis" module="MEI.visual" type="atts" mode="change">
+					<desc xml:lang="en">Visual domain attributes for scoreDef in the CMN repertoire.</desc>
+					<classes mode="change">
+					<memberOf key="att.pages" mode="delete"/>
+					<memberOf key="att.systems" mode="delete"/>
+					</classes>
+					</classSpec>-->
+
+				<elementSpec ident="body" module="MEI.shared" mode="change">
+					<content>
+						<rng:oneOrMore>
+							<rng:choice>
+								<rng:ref name="model.divLike"/>
+								<rng:ref name="model.mdivLike"/>
+								<rng:ref name="model.pagesLike"/>
+							</rng:choice>
+						</rng:oneOrMore>
+					</content>
+					<!--<constraintSpec ident="page-atts-on-scoreDef" scheme="isoschematron" mode="add">
+						<constraint>
+						<sch:rule context="mei:scoreDef">
+						<sch:assert role="warning" test="@*[starts-with(local-name(),'page.')]">Page-related attributes should go on a page element.</sch:assert>
+						<sch:assert role="warning" test="@*[starts-with(local-name(),'system.')]">System-related attributes should go on a system element.</sch:assert>                                
+						</sch:rule>
+						</constraint>
+						</constraintSpec>       -->
+				</elementSpec>
+
+				<classSpec ident="model.systemLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects systemLike elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="system" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">A system in a page-based encoding</desc>
+					<classes>
+						<memberOf key="att.systems"/>
+						<memberOf key="att.common"/>
+						<memberOf key="att.coordinated"/>
+						<memberOf key="model.systemLike"/>
+					</classes>
+					<content>
+						<!-- then the actual content of a system -->
+						<rng:zeroOrMore>
+							<rng:choice>
+								<!-- section are turned into milestones -->
+								<rng:ref name="model.secbLike"/>
+								<!-- measures for measured music -->
+								<rng:ref name="model.measureLike"/>
+								<!-- staves for un-measured music -->
+								<rng:ref name="model.staffLike"/>
+								<!-- scoreDef for redefinition -->
+								<rng:ref name="model.scoreDefLike"/>
+								<rng:ref name="model.milestoneLike"/>
+								<!-- anything else? -->
+							</rng:choice>
+						</rng:zeroOrMore>
+					</content>
+				</elementSpec>
+
+				<classSpec ident="model.secbLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects secbLike (section beginning) elements.</desc>
+				</classSpec>
+
+				<!-- because the hierarchy is flipped, &lt;section&gt; has to become a milestone -->
+				<elementSpec ident="secb" module="MEI.pageBased" mode="add">
+					<gloss xml:lang="en">section beginning</gloss>
+					<desc xml:lang="en">A milestone element indicating the start of a new section in page-based MEI.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.secbLike"/>
+					</classes>
+					<content>
+						<empty/>
+					</content>
+				</elementSpec>
+
+				<classSpec ident="model.mdivbLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects mdivbLike (mdiv beginning) elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="mdivb" module="MEI.pageBased" mode="add">
+					<gloss xml:lang="en">mdiv beginning</gloss>
+					<desc xml:lang="en">A milestone element indicating the start of a new mdiv in page-based MEI.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.mdivbLike"/>
+					</classes>
+					<content>
+						<empty/>
+					</content>
+				</elementSpec>
+
+				<classSpec ident="model.scorebLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects scorebLike (score beginning) elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="scoreb" module="MEI.pageBased" mode="add">
+					<gloss xml:lang="en">score beginning</gloss>
+					<desc xml:lang="en">A milestone element indicating the start of a new score in page-based MEI.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.scorebLike"/>
+					</classes>
+					<content>
+						<rng:optional>
+							<rng:ref name="model.scoreDefLike"/>
+						</rng:optional>
+					</content>
+					<remarks>
+						<p>This element is necessary to allow round-tripping between page-based and score-based (regular) MEI.</p>
+					</remarks>
+				</elementSpec>
+
+				<classSpec ident="model.partsbLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects partsbLike (parts beginning) elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="partsb" module="MEI.pageBased" mode="add">
+					<gloss xml:lang="en">parts beginning</gloss>
+					<desc xml:lang="en">A milestone element indicating the start of new parts in page-based MEI.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.scorebLike"/>
+					</classes>
+					<content>
+						<empty/>
+					</content>
+					<remarks>
+						<p>This element is necessary to allow round-tripping between page-based and score-based (regular) MEI.</p>
+					</remarks>
+				</elementSpec>
+
+				<classSpec ident="model.partbLike" type="model" module="MEI.pageBased" mode="add">
+					<desc xml:lang="en">Collects partbLike (part beginning) elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="partb" module="MEI.pageBased" mode="add">
+					<gloss xml:lang="en">part beginning</gloss>
+					<desc xml:lang="en">A milestone element indicating the start of a new part in page-based MEI.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.partbLike"/>
+					</classes>
+					<content>
+						<rng:optional>
+							<rng:ref name="model.scoreDefLike"/>
+						</rng:optional>
+					</content>
+					<remarks>
+						<p>This element is necessary to allow round-tripping between page-based and score-based (regular) MEI.</p>
+					</remarks>
+				</elementSpec>
+
+				<classSpec ident="model.milestoneLike" type="model" module="MEI.ptrref" mode="add">
+					<desc xml:lang="en">Collects milestone like elements.</desc>
+				</classSpec>
+
+				<elementSpec ident="milestone" module="MEI.ptrref" mode="add">
+					<gloss xml:lang="en">milestone</gloss>
+					<desc xml:lang="en">A generic milestone element that can be used as anchor in an MEI file.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="model.milestoneLike"/>
+						<!-- the following two will allow milestone to appear in many places -->
+						<memberOf key="model.annotLike"/>
+						<memberOf key="model.eventLike"/>
+					</classes>
+					<content>
+						<empty/>
+					</content>
+				</elementSpec>
+
+				<elementSpec ident="milestoneEnd" module="MEI.ptrref" mode="add">
+					<gloss xml:lang="en">milestone end</gloss>
+					<desc xml:lang="en">A milestone element that can be used to indicate the end of an arbitrary feature in MEI.</desc>
+					<classes>
+						<memberOf key="att.common"/>
+						<memberOf key="att.startId"/>
+						<memberOf key="model.milestoneLike"/>
+						<!-- the following two will allow milestone to appear in many places -->
+						<memberOf key="model.annotLike"/>
+						<memberOf key="model.eventLike"/>
+					</classes>
+					<content>
+						<empty/>
+					</content>
+					<constraintSpec ident="check_milestoneEnd" scheme="isoschematron">
+						<constraint>
+							<sch:rule context="mei:milestoneEnd">
+								<sch:assert role="error" test="exists(@startid)">milestoneEnd needs a @startid attribute.</sch:assert>
+							</sch:rule>
+						</constraint>
+					</constraintSpec>
+					<remarks>
+						<p>The @startid attribute should be used to point to the element starting the feature that is ended by an milestoneEnd.</p>
+					</remarks>
+				</elementSpec>
+
+				<classSpec ident="att.coord.x1" module="MEI.shared" type="atts">
+					<desc xml:lang="en">Attributes that record the x coordinate of the left side of a feature.</desc>
+					<attList>
+						<attDef ident="coord.x1" usage="opt">
+							<desc xml:lang="en">gives coordinates for the left side of a feature.</desc>
+							<datatype>
+								<rng:data type="decimal">
+									<rng:param name="minInclusive">0</rng:param>
+								</rng:data>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+				<classSpec ident="att.coord.x2" module="MEI.shared" type="atts">
+					<desc xml:lang="en">Attributes that record the x coordinate of the right side of a feature.</desc>
+					<attList>
+						<attDef ident="coord.x2" usage="opt">
+							<desc xml:lang="en">gives coordinates for the right side of a feature.</desc>
+							<datatype>
+								<rng:data type="decimal">
+									<rng:param name="minInclusive">0</rng:param>
+								</rng:data>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+				<classSpec ident="att.coord.y1" module="MEI.shared" type="atts">
+					<desc xml:lang="en">Attributes that record the y coordinate of the top left of a feature.</desc>
+					<attList>
+						<attDef ident="coord.y1" usage="opt">
+							<desc xml:lang="en">gives y coordinates for the top left of a feature.</desc>
+							<datatype>
+								<rng:data type="decimal">
+									<rng:param name="minInclusive">0</rng:param>
+								</rng:data>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+				<classSpec ident="att.coord.y2" module="MEI.shared" type="atts">
+					<desc xml:lang="en">Attributes that record the y coordinate of the top right of a feature.</desc>
+					<attList>
+						<attDef ident="coord.y1" usage="opt">
+							<desc xml:lang="en">gives y coordinates for the top right of a feature.</desc>
+							<datatype>
+								<rng:data type="decimal">
+									<rng:param name="minInclusive">0</rng:param>
+								</rng:data>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+
+				<classSpec ident="att.coord.lr" module="MEI.shared" type="atts">
+					<desc xml:lang="en">Attributes for left/right coordinates.</desc>
+					<classes>
+						<memberOf key="att.coord.x1"/>
+						<memberOf key="att.coord.x2"/>
+					</classes>
+				</classSpec>
+
+				<elementSpec ident="measure" module="MEI.cmn" mode="change">
+					<classes mode="change">
+						<memberOf key="att.coord.lr" mode="add"/>
+					</classes>
+				</elementSpec>
+
+				<elementSpec ident="staff" module="MEI.shared" mode="change">
+					<classes mode="change">
+						<memberOf key="att.coord.y1" mode="add"/>
+					</classes>
+				</elementSpec>
+
+				<classSpec ident="att.xy" module="MEI.shared" type="atts" mode="change">
+					<classes mode="change">
+						<memberOf key="att.coord.x1"/>
+					</classes>
+				</classSpec>
+
+				<!-- Making att.facsimile a member of att.coordinated -->
+				<!-- is this necessary? -->
+				<!--<classSpec ident="att.facsimile" module="MEI.facsimile" type="atts" mode="change">
+					<desc xml:lang="en">Attributes that associate a feature corresponding with all or part of an image.</desc>
+					<classes mode="change">
+					<memberOf key="att.coordinated" mode="add"/>
+					</classes>
+					</classSpec>-->
+
+
+				<!-- todos down here -->
+
+				<classSpec ident="att.margins" module="MEI.pageBased" type="atts" mode="add">
+					<desc xml:lang="en">Attribute that define margins of a page.</desc>
+					<attList org="group">
+						<attDef ident="topmar" usage="opt">
+							<gloss xml:lang="en">top margin</gloss>
+							<desc xml:lang="en">Indicates the amount of whitespace at the top of a page.</desc>
+							<datatype maxOccurs="1" minOccurs="1">
+								<dataRef key="data.MEASUREMENTUNSIGNED"/>
+							</datatype>
+						</attDef>
+						<attDef ident="botmar" usage="opt">
+							<gloss xml:lang="en">bottom margin</gloss>
+							<desc xml:lang="en">Indicates the amount of whitespace at the bottom of a page.</desc>
+							<datatype maxOccurs="1" minOccurs="1">
+								<dataRef key="data.MEASUREMENTUNSIGNED"/>
+							</datatype>
+						</attDef>
+						<attDef ident="leftmar" usage="opt">
+							<gloss xml:lang="en">left margin</gloss>
+							<desc xml:lang="en">Indicates the amount of whitespace at the left side of a page.</desc>
+							<datatype maxOccurs="1" minOccurs="1">
+								<dataRef key="data.MEASUREMENTUNSIGNED"/>
+							</datatype>
+						</attDef>
+						<attDef ident="rightmar" usage="opt">
+							<gloss xml:lang="en">right margin</gloss>
+							<desc xml:lang="en">Indicates the amount of whitespace at the right side of a page.</desc>
+							<datatype maxOccurs="1" minOccurs="1">
+								<dataRef key="data.MEASUREMENTUNSIGNED"/>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+
+				<classSpec ident="att.surface" module="MEI.pageBased" type="atts" mode="add">
+					<desc xml:lang="en">This attribute is used to point to a surface.</desc>
+					<attList>
+						<attDef ident="surface" usage="opt">
+							<desc xml:lang="en">contains a reference to a surface element</desc>
+							<datatype>
+								<dataRef key="data.URI"/>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+
+				<!-- ****************************************************************** -->
+				<!-- Tablature MEI -->
+				<!-- ****************************************************************** -->
+
+				<moduleSpec ident="MEI.frettab" mode="add">
+					<desc/>
+				</moduleSpec>
+				<dataSpec ident="data.COURSENUMBER" module="MEI.frettab" mode="add">
+					<desc xml:lang="en">In string tablature, the number of the course to be played, i.e., [1-9]+.</desc>
+					<content>
+						<rng:data type="positiveInteger"/>
+					</content>
+				</dataSpec>
+				<dataSpec ident="data.COURSETUNING" module="MEI.frettab">
+					<desc xml:lang="en">Standard course tunings.</desc>
+					<content>
+						<valList type="semi">
+							<valItem ident="guitar.standard">
+								<desc xml:lang="en">Standard tuning for current guitars. The courses are tuned to E2 A2 D3 G3 B3 E4.</desc>
+							</valItem>
+							<valItem ident="guitar.drop.D">
+								<desc xml:lang="en">Drop D tuning for guitars. The lowest course is tuned down to D, while all other courses are kept to their regular pitches. D2 A2 D3 G3 B3 E4.</desc>
+							</valItem>
+							<valItem ident="guitar.open.D">
+								<desc xml:lang="en">Open D tuning for guitars. D2 A2 D3 F3s A3 D4.</desc>
+							</valItem>
+							<valItem ident="guitar.open.G">
+								<desc xml:lang="en">Open G tuning for guitars. D2 G2 D2 G2 B3 D4.</desc>
+							</valItem>
+							<valItem ident="guitar.open.A">
+								<desc xml:lang="en">Open A tuning for guitars. E2 A2 E3 A3 C4s E4.</desc>
+							</valItem>
+							<valItem ident="lute.renaissance.6">
+								<desc xml:lang="en">Renaissance tuning for lutes with 10 strings on 6 courses. G2G3 C3C4 F3F4 A4A4 D4 G4.</desc>
+							</valItem>
+							<valItem ident="lute.baroque.d.major">
+								<desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D Major.</desc>
+							</valItem>
+							<valItem ident="lute.baroque.d.minor">
+								<desc xml:lang="en">Baroque tuning for lutes with 6 stable courses, and additional bass courses tuned to the key of D minor.</desc>
+							</valItem>
+						</valList>
+					</content>
+				</dataSpec>
+				<dataSpec ident="data.NOTATIONTYPE" module="MEI" mode="replace">
+					<desc xml:lang="en">Notation type and subtype</desc>
+					<content>
+						<valList type="closed">
+							<valItem ident="cmn">
+								<desc xml:lang="en">Common Music Notation.</desc>
+							</valItem>
+							<valItem ident="mensural">
+								<desc xml:lang="en">Mensural notation.</desc>
+							</valItem>
+							<valItem ident="mensural.black">
+								<desc xml:lang="en">Black mensural notation.</desc>
+							</valItem>
+							<valItem ident="mensural.white">
+								<desc xml:lang="en">White mensural notation.</desc>
+							</valItem>
+							<!-- Adding four notation types -->
+							<valItem ident="tab.lute.french">
+								<desc xml:lang="en">Letters for fret and courses closest to the ground when playing are at the top of the stave.</desc>
+							</valItem>
+							<valItem ident="tab.lute.italian">
+								<desc xml:lang="en">Numbers for fret and courses closest to the ground when playing are at the bottom of the stave.</desc>
+							</valItem>
+							<valItem ident="tab.lute.german">
+								<desc xml:lang="en">No staff lines, although vertical position may imply voicing and symbols (based on letters) for fret and course.</desc>
+							</valItem>
+							<valItem ident="tab.guitar">
+								<desc xml:lang="en">Numbers for frets and courses closest to the ground when playing are at the top of the stave.</desc>
+							</valItem>
+							<valItem ident="neume">
+								<desc xml:lang="en">Neumatic notation.</desc>
+							</valItem>
+							<!-- <valItem ident="neume.heighted"> <desc xml:lang="en">Heighted neumatic notation</desc> </valItem> <valItem ident="neume.unheighted"> <desc xml:lang="en">Unheighted neumatic notation</desc> </valItem> -->
+							<valItem ident="tab">
+								<desc xml:lang="en">Tablature notation.</desc>
+							</valItem>
+						</valList>
+					</content>
+				</dataSpec>
+
+				<classSpec ident="att.note.ges.tab" module="MEI.frettab" type="atts" mode="add">
+					<attList>
+						<attDef ident="tab.course" usage="opt" mode="add">
+							<desc xml:lang="en">Records which course is to be played.</desc>
+							<datatype>
+								<dataRef key="data.COURSENUMBER"/>
+							</datatype>
+						</attDef>
+						<attDef ident="tab.fret" usage="opt" mode="add">
+							<desc xml:lang="en">Records which course is to be played.</desc>
+							<datatype>
+								<dataRef key="data.FRETNUMBER"/>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+				<classSpec ident="att.course.log" module="MEI.frettab" type="atts" mode="add">
+					<attList>
+						<attDef ident="tuning.standard" usage="opt" mode="add">
+							<desc xml:lang="en">Indicates a tuning standard for the course.</desc>
+							<datatype>
+								<dataRef key="data.COURSETUNING"/>
+							</datatype>
+						</attDef>
+					</attList>
+				</classSpec>
+				<elementSpec ident="course" module="MEI.frettab" mode="add">
+					<gloss>course tuning information</gloss>
+					<desc xml:lang="en">Describes the tuning of a course on a lute.</desc>
+					<classes>
+						<memberOf key="att.course.log"/>
+					</classes>
+				</elementSpec>
+				<elementSpec ident="foo" module="MEI.frettab" mode="add">
+					<gloss>foo information</gloss>
+					<desc xml:lang="en">Dummy element for enforcing that the att classes are used.</desc>
+					<classes>
+						<memberOf key="att.note.ges.tab"/>
+					</classes>
+				</elementSpec>
+			</schemaSpec>
+		</body>
+	</text>
+</TEI>

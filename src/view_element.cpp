@@ -12,6 +12,8 @@
 #include <cassert>
 #include <math.h>
 
+#include <string>
+
 //----------------------------------------------------------------------------
 
 #include "accid.h"
@@ -23,12 +25,13 @@
 #include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
+#include "divline.h"
+#include "doc.h"
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
 #include "f.h"
 #include "ftrem.h"
-#include "functorparams.h"
 #include "halfmrpt.h"
 #include "keyaccid.h"
 #include "label.h"
@@ -73,13 +76,13 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         return;
     }
 
-    int previousColor = m_currentColour;
+    int previousColor = m_currentColor;
 
     if (element == m_currentElement) {
-        m_currentColour = AxRED;
+        m_currentColor = AxRED;
     }
     else {
-        m_currentColour = AxNONE;
+        m_currentColor = AxNONE;
     }
 
     if (element->Is(ACCID)) {
@@ -108,6 +111,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(CUSTOS)) {
         this->DrawCustos(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(DIVLINE)) {
+        DrawDivLine(dc, element, layer, staff, measure);
     }
     else if (element->Is(DOT)) {
         this->DrawDot(dc, element, layer, staff, measure);
@@ -214,7 +220,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
 
-    m_currentColour = previousColor;
+    m_currentColor = previousColor;
 }
 
 //----------------------------------------------------------------------------
@@ -249,7 +255,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->HasPlace() || (accid->GetFunc() == accidLog_FUNC_edit)) {
+    if (accid->HasPlace() || accid->HasOnstaff() || (accid->GetFunc() == accidLog_FUNC_edit)) {
         const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const int staffTop = staff->GetDrawingY();
         const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
@@ -291,6 +297,19 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
         y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
+    }
+
+    if (notationType == NOTATIONTYPE_neume) {
+        int rotateOffset = 0;
+        if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+            double deg = staff->GetDrawingRotate();
+            int xDiff = x - staff->GetDrawingX();
+            rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+        }
+        if (accid->HasFacs() && (m_doc->GetType() == Facs)) {
+            y = ToLogicalY(y);
+        }
+        y -= rotateOffset;
     }
 
     this->DrawSmuflString(
@@ -536,6 +555,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = vrv_cast<Chord *>(element);
     assert(chord);
 
+    if (chord->HasCluster()) {
+        DrawChordCluster(dc, chord, layer, staff, measure);
+        return;
+    }
+
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
     chord->ResetDrawingList();
@@ -543,6 +567,63 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Draw children (notes, accidentals, etc) ************/
 
     this->DrawLayerChildren(dc, chord, layer, staff, measure);
+}
+
+void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(chord);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Note *topNote = chord->GetTopNote();
+    Note *bottomNote = chord->GetBottomNote();
+
+    const int unit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int x = chord->GetDrawingX();
+    const int y1 = topNote->GetDrawingY() + unit;
+    const int y2 = bottomNote->GetDrawingY() - unit;
+    const int width = 2 * topNote->GetDrawingRadius(m_doc);
+
+    dc->StartCustomGraphic("notehead");
+
+    if (chord->GetActualDur() < DUR_4) {
+        const int line = unit / 2;
+        this->DrawNotFilledRectangle(dc, x + line / 2, y1 - line / 2, x + width - line / 2, y2 + line / 2, line, 0);
+    }
+    else {
+        this->DrawFilledRectangle(dc, x, y1, x + width, y2);
+    }
+
+    dc->EndCustomGraphic();
+
+    if (chord->GetCluster() != CLUSTER_chromatic) {
+        const int staffTop = staff->GetDrawingY();
+        const int staffBottom = staffTop - (staff->m_drawingLines - 1) * unit * 2;
+        const int accidGlyph
+            = (chord->GetCluster() == CLUSTER_black) ? SMUFL_E260_accidentalFlat : SMUFL_E261_accidentalNatural;
+        const int accidX = x + (width - m_doc->GetGlyphWidth(accidGlyph, staffSize, true)) / 2;
+
+        int accidY;
+        if (chord->GetDrawingStemDir() == STEMDIRECTION_down) {
+            accidY = std::max(staffTop, y1) + unit - m_doc->GetGlyphBottom(accidGlyph, staffSize, true);
+        }
+        else {
+            accidY = std::min(staffBottom, y2) - unit - m_doc->GetGlyphTop(accidGlyph, staffSize, true);
+        }
+
+        this->DrawSmuflCode(dc, accidX, accidY, accidGlyph, staffSize, true, true);
+    }
+
+    // Draw dots and stem
+    const int dotsX = x + width + unit;
+    DrawDotsPart(dc, dotsX, topNote->GetDrawingY(), chord->GetDots(), staff, false);
+    if ((y1 - y2) > 5 * unit) DrawDotsPart(dc, dotsX, bottomNote->GetDrawingY(), chord->GetDots(), staff, false);
+
+    Stem *stem = vrv_cast<Stem *>(chord->GetFirst(STEM));
+    DrawStem(dc, stem, layer, staff, measure);
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -609,8 +690,10 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
     if ((m_doc->GetType() == Facs) && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        const int noteHeight
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+        const int noteWidth
+            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
 
         FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(x);
@@ -745,15 +828,21 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
             if (dot->m_drawingPreviousElement && !dot->m_drawingNextElement) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
                 y = dot->m_drawingPreviousElement->GetDrawingY();
+                this->DrawDotsPart(dc, x, y, 1, staff);
             }
             if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
+                // Do not take into account the spacing since it is place in-between
+                dc->DeactivateGraphicX();
                 x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingPreviousElement->GetDrawingX()) / 2);
                 x += dot->m_drawingPreviousElement->GetDrawingRadius(m_doc);
                 y = dot->m_drawingPreviousElement->GetDrawingY();
+                this->DrawDotsPart(dc, x, y, 1, staff);
+                dc->ReactivateGraphic();
             }
         }
-
-        this->DrawDotsPart(dc, x, y, 1, staff);
+        else {
+            this->DrawDotsPart(dc, x, y, 1, staff);
+        }
     }
 
     dc->EndGraphic(element, this);
@@ -881,10 +970,13 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
+    if (staff->IsTablature()) {
+        // Encoded keySig will not be shown on tablature
+        return;
+    }
+
     KeySig *keySig = vrv_cast<KeySig *>(element);
     assert(keySig);
-
-    int x, y;
 
     Clef *clef = layer->GetClef(element);
     if (!clef) {
@@ -914,55 +1006,47 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
 
-    x = element->GetDrawingX();
+    int x = element->GetDrawingX();
     // HARDCODED
-    int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-    int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int naturalStep = step * TEMP_KEYSIG_NATURAL_STEP;
-    step *= TEMP_KEYSIG_STEP;
+    const int step = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_STEP;
 
     int clefLocOffset = layer->GetClefLocOffset(element);
 
     dc->StartGraphic(element, "", element->GetID());
 
+    bool showCancelAfter = false;
+
     // Show cancellation if showchange is true (false by default) or if C major
     if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
-        && ((keySig->GetSigShowchange() == BOOLEAN_true) || (keySig->GetAccidCount() == 0))) {
+        && ((keySig->HasCancelaccid() && (keySig->GetCancelaccid() != CANCELACCID_none))
+            || (keySig->GetAccidCount() == 0))) {
         if (keySig->m_skipCancellation) {
             LogWarning("Cautionary accidentals are skipped if the new or previous KeySig contains KeyAccid children.");
+        }
+        // For French style (after)
+        else if ((keySig->GetCancelaccid() == CANCELACCID_after)
+            && (keySig->GetAccidType() == keySig->m_drawingCancelAccidType)) {
+            showCancelAfter = true;
         }
         else {
             const int beginCancel
                 = (keySig->GetAccidType() == keySig->m_drawingCancelAccidType) ? keySig->GetAccidCount() : 0;
-            for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
-                const int loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-                dc->StartCustomGraphic("keyAccid");
-
-                this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-
-                dc->EndCustomGraphic();
-
-                x += naturalGlyphWidth + naturalStep;
-                if ((keySig->GetAccidCount() > 0) && (i + 1 == keySig->m_drawingCancelAccidCount)) {
-                    // Add some extra space after last natural
-                    x += step;
-                }
-            }
+            this->DrawKeySigCancellation(dc, keySig, staff, clef, clefLocOffset, beginCancel, x);
         }
     }
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    ListOfObjects childList = keySig->GetList(keySig);
+    ListOfObjects childList = keySig->GetList();
     for (Object *child : childList) {
         KeyAccid *keyAccid = vrv_cast<KeyAccid *>(child);
         assert(keyAccid);
         this->DrawKeyAccid(dc, keyAccid, staff, clef, clefLocOffset, x);
         x += step;
+    }
+
+    if (showCancelAfter) {
+        this->DrawKeySigCancellation(dc, keySig, staff, clef, clefLocOffset, keySig->GetAccidCount(), x);
     }
 
     dc->ResetFont();
@@ -982,7 +1066,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(meterSig);
 
     // hidden time signature
-    if (meterSig->GetForm() == METERFORM_invis) {
+    if (meterSig->GetVisible() == BOOLEAN_false) {
         dc->StartGraphic(element, "", element->GetID());
         meterSig->SetEmptyBB();
         dc->EndGraphic(element, this);
@@ -990,6 +1074,28 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
 
     this->DrawMeterSig(dc, meterSig, staff, 0);
+}
+
+void View::DrawKeySigCancellation(
+    DeviceContext *dc, KeySig *keySig, Staff *staff, Clef *clef, int clefLocOffset, int beginCancel, int &x)
+{
+    const int naturalGlyphWidth = m_doc->GetGlyphWidth(SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+    const int naturalStep = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * TEMP_KEYSIG_NATURAL_STEP;
+
+    for (int i = beginCancel; i < keySig->m_drawingCancelAccidCount; ++i) {
+        data_PITCHNAME pitch = KeySig::GetAccidPnameAt(keySig->m_drawingCancelAccidType, i);
+        const int loc = PitchInterface::CalcLoc(
+            pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, clef), clefLocOffset);
+        int y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+        dc->StartCustomGraphic("keyAccid");
+
+        this->DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+
+        dc->EndCustomGraphic();
+
+        x += naturalGlyphWidth + naturalStep;
+    }
 }
 
 void View::DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x)
@@ -1057,6 +1163,8 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     MRest *mRest = vrv_cast<MRest *>(element);
     assert(mRest);
 
+    const int staffSize = staff->GetDrawingStaffNotationSize();
+
     dc->StartGraphic(element, "", element->GetID());
 
     mRest->CenterDrawingX();
@@ -1064,25 +1172,24 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     const bool drawingCueSize = mRest->GetDrawingCueSize();
     int x = mRest->GetDrawingX();
     int y = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2))
-        ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+        ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staffSize)
         : element->GetDrawingY();
     char32_t rest
         = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
 
-    x -= m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize) / 2;
+    x -= m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize) / 2;
 
-    this->DrawSmuflCode(dc, x, y, rest, staff->m_drawingStaffSize, drawingCueSize);
+    this->DrawSmuflCode(dc, x, y, rest, staffSize, drawingCueSize);
 
     // single legder line for whole rest glyphs
     if ((measure->m_measureAligner.GetMaxTime() < (DUR_MAX * 2))
         && (y > staff->GetDrawingY()
-            || y < staff->GetDrawingY()
-                    - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) {
-        const int width = m_doc->GetGlyphWidth(rest, staff->m_drawingStaffSize, drawingCueSize);
+            || y < staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize))) {
+        const int width = m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize);
         int ledgerLineThickness
-            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
         int ledgerLineExtension
-            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staffSize);
         if (drawingCueSize) {
             ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
@@ -1109,6 +1216,8 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     mRpt->CenterDrawingX();
 
+    const int staffSize = staff->GetDrawingStaffNotationSize();
+
     dc->StartGraphic(element, "", element->GetID());
 
     this->DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, 0, false, staff);
@@ -1116,12 +1225,11 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // draw the measure count
     const int mRptNum = mRpt->HasNum() ? mRpt->GetNum() : mRpt->m_drawingMeasureCount;
     if ((mRptNum > 0) && (mRpt->GetNumVisible() != BOOLEAN_false)) {
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         // calculate the extend of the number
         TextExtend extend;
         const std::u32string figures = this->IntToTupletFigures(mRptNum);
         dc->GetSmuflTextExtent(figures, &extend);
-        const int staffSize = staff->m_drawingStaffSize;
         const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
         const int offset = std::max(m_doc->GetGlyphHeight(SMUFL_E500_repeat1Bar, staffSize, false) - staffHeight, 0);
         int yNum = staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + offset / 2;
@@ -1185,6 +1293,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     multiRest->CenterDrawingX();
 
+    const int staffNotationSize = staff->GetDrawingStaffNotationSize();
+    const int staffSize = staff->m_drawingStaffSize;
+
     dc->StartGraphic(element, "", element->GetID());
 
     int measureWidth = measure->GetInnerWidth();
@@ -1205,24 +1316,23 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     const int num = multiRest->HasNum() ? std::min(multiRest->GetNum(), 999) : 1;
 
     const int multiRestThickness
-        = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_multiRestThickness.GetValue();
+        = m_doc->GetDrawingUnit(staffNotationSize) * m_doc->GetOptions()->m_multiRestThickness.GetValue();
     // Position centered in staff
-    int y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1)
+    int y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1)
         - multiRestThickness / 2;
     if (multiRest->HasLoc()) {
-        y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
+        y2 -= m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1 - multiRest->GetLoc());
     }
     int y1 = y2 + multiRestThickness;
 
     if (multiRest->UseBlockStyle(m_doc)) {
         // This is 1/2 the length of the black rectangle
-        int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staffNotationSize);
         if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
-            const int fixedWidth
-                = multiRest->AttWidth::GetWidth().GetVu() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int fixedWidth = multiRest->AttWidth::GetWidth().GetVu() * m_doc->GetDrawingUnit(staffNotationSize);
             width = (width > fixedWidth) ? fixedWidth : width;
         }
-        if (width > m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 4) {
+        if (width > m_doc->GetDrawingStemWidth(staffNotationSize) * 4) {
             // xCentered is the central point, calculate x1 and x2
             const int x1 = xCentered - width / 2;
             const int x2 = xCentered + width / 2;
@@ -1234,58 +1344,57 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
             this->DrawFilledRectangle(dc, x1, y1, x2, y2);
 
             // Draw two lines at beginning and end
-            int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            int border = m_doc->GetDrawingUnit(staffNotationSize);
             this->DrawFilledRectangle(
-                dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
-            this->DrawFilledRectangle(
-                dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
+                dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staffNotationSize) * 2, y2 - border);
+            this->DrawFilledRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize) * 2, y1 + border, x2, y2 - border);
 
             dc->ReactivateGraphic();
         }
     }
     else {
         if (staff->m_drawingLines % 2 != 0) {
-            y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y2 += m_doc->GetDrawingUnit(staffSize);
+            y1 += m_doc->GetDrawingUnit(staffSize);
         }
 
-        const int lgWidth = m_doc->GetGlyphWidth(SMUFL_E4E1_restLonga, staff->m_drawingStaffSize, false);
-        const int brWidth = m_doc->GetGlyphWidth(SMUFL_E4E2_restDoubleWhole, staff->m_drawingStaffSize, false);
-        const int sbWidth = m_doc->GetGlyphWidth(SMUFL_E4E3_restWhole, staff->m_drawingStaffSize, false);
+        const int lgWidth = m_doc->GetGlyphWidth(SMUFL_E4E1_restLonga, staffSize, false);
+        const int brWidth = m_doc->GetGlyphWidth(SMUFL_E4E2_restDoubleWhole, staffSize, false);
+        const int sbWidth = m_doc->GetGlyphWidth(SMUFL_E4E3_restWhole, staffSize, false);
 
-        int width = (num / 4) * (lgWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        width += ((num % 4) / 2) * (brWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        width = (num % 2) ? width + sbWidth : width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int width = (num / 4) * (lgWidth + m_doc->GetDrawingUnit(staffSize));
+        width += ((num % 4) / 2) * (brWidth + m_doc->GetDrawingUnit(staffSize));
+        width = (num % 2) ? width + sbWidth : width - m_doc->GetDrawingUnit(staffSize);
 
         int x1 = xCentered - width / 2;
 
         int count = num;
         while ((count / 4)) {
-            this->DrawSmuflCode(dc, x1, y2, SMUFL_E4E1_restLonga, staff->m_drawingStaffSize, false);
-            x1 += lgWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            this->DrawSmuflCode(dc, x1, y2, SMUFL_E4E1_restLonga, staffSize, false);
+            x1 += lgWidth + m_doc->GetDrawingUnit(staffSize);
             count -= 4;
         }
         while ((count / 2)) {
-            this->DrawSmuflCode(dc, x1, y2, SMUFL_E4E2_restDoubleWhole, staff->m_drawingStaffSize, false);
-            x1 += brWidth + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            this->DrawSmuflCode(dc, x1, y2, SMUFL_E4E2_restDoubleWhole, staffSize, false);
+            x1 += brWidth + m_doc->GetDrawingUnit(staffSize);
             count -= 2;
         }
-        if (count) this->DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staff->m_drawingStaffSize, false);
+        if (count) this->DrawSmuflCode(dc, x1, y1, SMUFL_E4E3_restWhole, staffSize, false);
     }
 
     // Draw the number
     if (multiRest->GetNumVisible() != BOOLEAN_false) {
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffNotationSize, false));
 
-        const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        const int offset = 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const int staffHeight = (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
+        const int offset = 3 * m_doc->GetDrawingUnit(staffNotationSize);
 
         const int y = (multiRest->GetNumPlace() == STAFFREL_basic_below)
             ? std::min(staff->GetDrawingY() - staffHeight, y2) - offset
             : std::max(staff->GetDrawingY(), y1) + offset;
 
         this->DrawSmuflString(
-            dc, xCentered, y, this->IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize);
+            dc, xCentered, y, this->IntToTimeSigFigures(num), HORIZONTALALIGNMENT_center, staffNotationSize);
         dc->ResetFont();
     }
 
@@ -1422,6 +1531,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
+    const int staffSize = staff->GetDrawingStaffNotationSize();
     int drawingDur = rest->GetActualDur();
     if (drawingDur == DUR_NONE) {
         if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
@@ -1434,21 +1544,21 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const int x = element->GetDrawingX();
     const int y = element->GetDrawingY();
 
-    this->DrawSmuflCode(dc, x, y, drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+    this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
 
     if ((drawingDur == DUR_1 || drawingDur == DUR_2 || drawingDur == DUR_BR)) {
-        const int width = m_doc->GetGlyphWidth(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+        const int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
         int ledgerLineThickness
-            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
         int ledgerLineExtension
-            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            = m_doc->GetOptions()->m_ledgerLineExtension.GetValue() * m_doc->GetDrawingUnit(staffSize);
         if (drawingCueSize) {
             ledgerLineThickness *= m_doc->GetOptions()->m_graceFactor.GetValue();
             ledgerLineExtension *= m_doc->GetOptions()->m_graceFactor.GetValue();
         }
         const int topMargin = staff->GetDrawingY();
-        const int bottomMargin = staff->GetDrawingY()
-            - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        const int bottomMargin
+            = staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
 
         dc->StartCustomGraphic("ledgerLines");
         // single legder line for half and whole rests
@@ -1460,7 +1570,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         // double ledger line for breve rests
         else if (drawingDur == DUR_BR && (y >= topMargin || y <= bottomMargin)) {
-            const int height = m_doc->GetGlyphHeight(drawingGlyph, staff->m_drawingStaffSize, drawingCueSize);
+            const int height = m_doc->GetGlyphHeight(drawingGlyph, staffSize, drawingCueSize);
             dc->DeactivateGraphicX();
             if (y != topMargin) {
                 this->DrawHorizontalLine(
@@ -1636,7 +1746,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
 
-    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetBrush(m_currentColor, AxSOLID);
 
     FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     if (syl->HasFontweight()) {
@@ -1645,7 +1755,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     if (syl->HasFontstyle()) {
         currentFont.SetStyle(syl->GetFontstyle());
     }
-    if (syl->GetStart()->GetDrawingCueSize()) {
+    if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
     dc->SetFont(&currentFont);
@@ -1748,7 +1858,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         params.m_y = staff->GetDrawingY() + this->GetSylYRel(std::max(1, verse->GetN()), staff);
         params.m_pointSize = labelTxt.GetPointSize();
 
-        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetBrush(m_currentColor, AxSOLID);
         dc->SetFont(&labelTxt);
 
         dc->StartGraphic(graphic, "", graphic->GetID());
@@ -1907,29 +2017,31 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
 
 void View::DrawMRptPart(DeviceContext *dc, int xCentered, char32_t rptGlyph, int num, bool line, Staff *staff)
 {
+    const int staffNotationSize = staff->GetDrawingStaffNotationSize();
     const int staffSize = staff->m_drawingStaffSize;
     const int y = staff->GetDrawingY();
-    const int xSymbol = xCentered - m_doc->GetGlyphWidth(rptGlyph, staffSize, false) / 2;
+    const int xSymbol = xCentered - m_doc->GetGlyphWidth(rptGlyph, staffNotationSize, false) / 2;
     const int ySymbol = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingUnit(staffSize);
 
-    this->DrawSmuflCode(dc, xSymbol, ySymbol, rptGlyph, staffSize, false);
+    this->DrawSmuflCode(dc, xSymbol, ySymbol, rptGlyph, staffNotationSize, false);
 
     if (line) {
         const int yBottom = y - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize);
         const int offset = (y == ySymbol) ? m_doc->GetDrawingDoubleUnit(staffSize) : 0;
-        this->DrawVerticalLine(dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffSize));
+        this->DrawVerticalLine(
+            dc, y + offset, yBottom - offset, xCentered, m_doc->GetDrawingBarLineWidth(staffNotationSize));
     }
 
     if (num > 0) {
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffNotationSize, false));
         // calculate the width of the figures
         TextExtend extend;
         const std::u32string figures = this->IntToTimeSigFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
-        const int symHeight = m_doc->GetGlyphHeight(rptGlyph, staffSize, false);
+        const int symHeight = m_doc->GetGlyphHeight(rptGlyph, staffNotationSize, false);
         const int yNum = (y > ySymbol + symHeight / 2)
-            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2
-            : ySymbol + 3 * m_doc->GetDrawingUnit(staffSize) + extend.m_height / 2;
+            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staffNotationSize) + extend.m_height / 2
+            : ySymbol + 3 * m_doc->GetDrawingUnit(staffNotationSize) + extend.m_height / 2;
         dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(yNum));
         dc->ResetFont();
     }

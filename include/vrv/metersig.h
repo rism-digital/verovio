@@ -23,7 +23,11 @@ class ScoreDefInterface;
 /**
  * This class models the MEI <meterSig> element.
  */
-class MeterSig : public LayerElement, public AttEnclosingChars, public AttMeterSigLog, public AttMeterSigVis {
+class MeterSig : public LayerElement,
+                 public AttEnclosingChars,
+                 public AttMeterSigLog,
+                 public AttMeterSigVis,
+                 public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -60,9 +64,9 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 

@@ -24,7 +24,8 @@ class Artic : public LayerElement,
               public AttArticulationGes,
               public AttColor,
               public AttEnclosingChars,
-              public AttExtSym,
+              public AttExtSymAuth,
+              public AttExtSymNames,
               public AttPlacementRelEvent {
 public:
     /**
@@ -46,12 +47,6 @@ public:
     bool IsRelativeToStaff() const override { return true; }
 
     data_ARTICULATION GetArticFirst() const;
-
-    /**
-     * Split the multi-valued artic attributes into distinct artic elements.
-     * Applied by ConvertMarkupArtic functor.
-     */
-    void SplitMultival(Object *parent);
 
     void GetAllArtics(bool direction, std::vector<Artic *> &artics);
 
@@ -112,16 +107,11 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
-
-    /**
-     * See Object::ConvertMarkupArtic
-     */
-    int ConvertMarkupArtic(FunctorParams *functorParams) override;
 
 private:
     bool IsInsideArtic(data_ARTICULATION artic) const;

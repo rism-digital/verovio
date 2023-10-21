@@ -52,11 +52,11 @@ public:
      * @name Setters
      */
     ///@{
-    void SetBackground(int colour, int style = AxSOLID) override;
+    void SetBackground(int color, int style = AxSOLID) override;
     void SetBackgroundImage(void *image, double opacity = 1.0) override;
     void SetBackgroundMode(int mode) override;
-    void SetTextForeground(int colour) override;
-    void SetTextBackground(int colour) override;
+    void SetTextForeground(int color) override;
+    void SetTextBackground(int color) override;
     void SetLogicalOrigin(int x, int y) override;
     ///@}
 
@@ -286,9 +286,9 @@ private:
 
     void WriteLine(std::string);
 
-    std::string GetColour(int colour);
+    std::string GetColor(int color);
 
-    pugi::xml_node AppendChild(std::string name);
+    pugi::xml_node AddChild(std::string name);
 
     /**
      * Transform pen properties into stroke attributes

@@ -214,6 +214,9 @@ FunctorCode AdjustFloatingPositionersFunctor::VisitSystem(System *system)
     adjustFloatingPositionerGrps.SetPlace(STAFFREL_below);
     system->m_systemAligner.Process(adjustFloatingPositionerGrps);
 
+    m_classId = REPEATMARK;
+    system->m_systemAligner.Process(*this);
+
     m_classId = TEMPO;
     system->m_systemAligner.Process(*this);
 

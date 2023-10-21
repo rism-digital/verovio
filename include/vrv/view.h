@@ -30,6 +30,8 @@ class Chord;
 class ControlElement;
 class DeviceContext;
 class Dir;
+class Div;
+class DivLine;
 class Doc;
 class Dynam;
 class EditorialElement;
@@ -48,6 +50,7 @@ class KeyAccid;
 class Layer;
 class LayerElement;
 class Lb;
+class Liquescent;
 class Measure;
 class MNum;
 class Mordent;
@@ -61,12 +64,11 @@ class Page;
 class PageElement;
 class Pedal;
 class PgFoot;
-class PgFoot;
 class PgHead;
-class PgHead2;
 class PitchInflection;
 class Reh;
 class Rend;
+class RepeatMark;
 class RunningElement;
 class Slur;
 class Staff;
@@ -81,6 +83,7 @@ class Tempo;
 class Text;
 class TextDrawingParams;
 class TextElement;
+class TextLayoutElement;
 class Tie;
 class Trill;
 class Turn;
@@ -227,7 +230,7 @@ protected:
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, const ArrayOfLedgerLines &lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff);
-    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, int yOffset);
+    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure, System *system, int yOffset);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
@@ -238,13 +241,13 @@ protected:
     ///@}
 
     /**
-     * @name Methods for drawing RunningElements (PgHead, PgFoot, etc.)
-     * Defined in view_running.cpp
+     * @name Methods for drawing TextLayoutElement (Div, PgHead, PgFoot, etc.)
+     * Defined in view_text.cpp
      */
     ///@{
+    void DrawDiv(DeviceContext *dc, Div *div, System *system);
     void DrawRunningElements(DeviceContext *dc, Page *page);
-    void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
-    void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
+    void DrawTextLayoutElement(DeviceContext *dc, TextLayoutElement *textLayoutElement);
     ///@}
 
     /**
@@ -347,8 +350,11 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
+    void DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff *staff, Measure *measure);
     void DrawClefEnclosing(DeviceContext *dc, Clef *clef, Staff *staff, char32_t glyph, int x, int y);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, const Staff *staff, bool dimin = false);
+    void DrawKeySigCancellation(
+        DeviceContext *dc, KeySig *keySig, Staff *staff, Clef *clef, int clefLocOffset, int beginCancel, int &x);
     void DrawKeyAccid(DeviceContext *dc, KeyAccid *keyAccid, Staff *staff, Clef *clef, int clefLocOffset, int &x);
     void DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int horizOffset);
     /** Returns the width of the drawn figures */
@@ -408,10 +414,20 @@ protected:
      * Defined in view_neume.cpp
      */
     ///@{
+    void DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
+
+    /**
+     * @name Methods for drawing parts of neume LayerElement child classes.
+     * Defined in view_neumes.cpp
+     */
+    ///@{
+    void DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
+
     /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.
@@ -426,7 +442,7 @@ protected:
         char32_t endGlyph, int x, int y, int height, bool cueSize);
     void DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system);
     void DrawCaesura(DeviceContext *dc, Caesura *caesura, Measure *measure, System *system);
-    void DrawDirOrOrnam(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
+    void DrawControlElementText(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawDynamSymbolOnly(DeviceContext *dc, Staff *staff, Dynam *dynam, const std::u32string &dynamSymbol,
         data_HORIZONTALALIGNMENT alignment, TextDrawingParams &params);
@@ -436,6 +452,7 @@ protected:
     void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
     void DrawReh(DeviceContext *dc, Reh *reh, Measure *measure, System *system);
+    void DrawRepeatMark(DeviceContext *dc, RepeatMark *repeatMark, Measure *measure, System *system);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);
@@ -659,10 +676,10 @@ public:
 
 protected:
     /**
-     * The colour currently being used when drawing.
+     * The color currently being used when drawing.
      * It can change when drawing the m_currentElement, for example
      */
-    int m_currentColour;
+    int m_currentColor;
 
     /**
      * Control the handling of slurs

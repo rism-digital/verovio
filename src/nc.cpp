@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "elementpart.h"
 #include "functor.h"
+#include "liquescent.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -34,6 +35,7 @@ Nc::Nc()
     , PitchInterface()
     , PositionInterface()
     , AttColor()
+    , AttCurvatureDirection()
     , AttIntervalMelodic()
     , AttNcForm()
 
@@ -42,6 +44,7 @@ Nc::Nc()
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATUREDIRECTION);
     this->RegisterAttClass(ATT_INTERVALMELODIC);
     this->RegisterAttClass(ATT_NCFORM);
 
@@ -57,11 +60,12 @@ void Nc::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
+    this->ResetCurvatureDirection();
     this->ResetIntervalMelodic();
     this->ResetNcForm();
 }
 
-FunctorCode Nc::Accept(MutableFunctor &functor)
+FunctorCode Nc::Accept(Functor &functor)
 {
     return functor.VisitNc(this);
 }
@@ -71,7 +75,7 @@ FunctorCode Nc::Accept(ConstFunctor &functor) const
     return functor.VisitNc(this);
 }
 
-FunctorCode Nc::AcceptEnd(MutableFunctor &functor)
+FunctorCode Nc::AcceptEnd(Functor &functor)
 {
     return functor.VisitNcEnd(this);
 }
@@ -79,6 +83,17 @@ FunctorCode Nc::AcceptEnd(MutableFunctor &functor)
 FunctorCode Nc::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitNcEnd(this);
+}
+
+bool Nc::IsSupportedChild(Object *child)
+{
+    if (child->Is(LIQUESCENT)) {
+        assert(dynamic_cast<Liquescent *>(child));
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 } // namespace vrv

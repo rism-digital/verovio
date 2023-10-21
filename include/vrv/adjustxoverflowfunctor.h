@@ -20,7 +20,7 @@ namespace vrv {
  * This class adjusts the X position of right barlines in order to make sure there is no text content
  * overflowing.
  */
-class AdjustXOverflowFunctor : public MutableFunctor {
+class AdjustXOverflowFunctor : public Functor {
 public:
     /**
      * @name Constructors, destructors

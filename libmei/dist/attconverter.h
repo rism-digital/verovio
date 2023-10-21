@@ -75,6 +75,9 @@ public:
     std::string BooleanToStr(data_BOOLEAN data) const;
     data_BOOLEAN StrToBoolean(const std::string &value, bool logWarning = true) const;
 
+    std::string CancelaccidToStr(data_CANCELACCID data) const;
+    data_CANCELACCID StrToCancelaccid(const std::string &value, bool logWarning = true) const;
+
     std::string CertaintyToStr(data_CERTAINTY data) const;
     data_CERTAINTY StrToCertainty(const std::string &value, bool logWarning = true) const;
 
@@ -297,9 +300,6 @@ public:
     std::string AudienceAudienceToStr(audience_AUDIENCE data) const;
     audience_AUDIENCE StrToAudienceAudience(const std::string &value, bool logWarning = true) const;
 
-    std::string BTremLogFormToStr(bTremLog_FORM data) const;
-    bTremLog_FORM StrToBTremLogForm(const std::string &value, bool logWarning = true) const;
-
     std::string BeamRendFormToStr(beamRend_FORM data) const;
     beamRend_FORM StrToBeamRendForm(const std::string &value, bool logWarning = true) const;
 
@@ -312,11 +312,17 @@ public:
     std::string CurvatureCurvedirToStr(curvature_CURVEDIR data) const;
     curvature_CURVEDIR StrToCurvatureCurvedir(const std::string &value, bool logWarning = true) const;
 
+    std::string CurvatureDirectionCurveToStr(curvatureDirection_CURVE data) const;
+    curvatureDirection_CURVE StrToCurvatureDirectionCurve(const std::string &value, bool logWarning = true) const;
+
     std::string CurveLogFuncToStr(curveLog_FUNC data) const;
     curveLog_FUNC StrToCurveLogFunc(const std::string &value, bool logWarning = true) const;
 
     std::string CutoutCutoutToStr(cutout_CUTOUT data) const;
     cutout_CUTOUT StrToCutoutCutout(const std::string &value, bool logWarning = true) const;
+
+    std::string DivLineLogFormToStr(divLineLog_FORM data) const;
+    divLineLog_FORM StrToDivLineLogForm(const std::string &value, bool logWarning = true) const;
 
     std::string DotLogFormToStr(dotLog_FORM data) const;
     dotLog_FORM StrToDotLogForm(const std::string &value, bool logWarning = true) const;
@@ -330,11 +336,8 @@ public:
     std::string EvidenceEvidenceToStr(evidence_EVIDENCE data) const;
     evidence_EVIDENCE StrToEvidenceEvidence(const std::string &value, bool logWarning = true) const;
 
-    std::string ExtSymGlyphauthToStr(extSym_GLYPHAUTH data) const;
-    extSym_GLYPHAUTH StrToExtSymGlyphauth(const std::string &value, bool logWarning = true) const;
-
-    std::string FTremLogFormToStr(fTremLog_FORM data) const;
-    fTremLog_FORM StrToFTremLogForm(const std::string &value, bool logWarning = true) const;
+    std::string ExtSymAuthGlyphauthToStr(extSymAuth_GLYPHAUTH data) const;
+    extSymAuth_GLYPHAUTH StrToExtSymAuthGlyphauth(const std::string &value, bool logWarning = true) const;
 
     std::string FermataVisFormToStr(fermataVis_FORM data) const;
     fermataVis_FORM StrToFermataVisForm(const std::string &value, bool logWarning = true) const;
@@ -384,9 +387,6 @@ public:
     std::string LineLogFuncToStr(lineLog_FUNC data) const;
     lineLog_FUNC StrToLineLogFunc(const std::string &value, bool logWarning = true) const;
 
-    std::string LiquescentVisCurveToStr(liquescentVis_CURVE data) const;
-    liquescentVis_CURVE StrToLiquescentVisCurve(const std::string &value, bool logWarning = true) const;
-
     std::string MeasurementUnitToStr(measurement_UNIT data) const;
     measurement_UNIT StrToMeasurementUnit(const std::string &value, bool logWarning = true) const;
 
@@ -411,11 +411,11 @@ public:
     std::string NcFormConToStr(ncForm_CON data) const;
     ncForm_CON StrToNcFormCon(const std::string &value, bool logWarning = true) const;
 
-    std::string NcFormCurveToStr(ncForm_CURVE data) const;
-    ncForm_CURVE StrToNcFormCurve(const std::string &value, bool logWarning = true) const;
-
     std::string NcFormRellenToStr(ncForm_RELLEN data) const;
     ncForm_RELLEN StrToNcFormRellen(const std::string &value, bool logWarning = true) const;
+
+    std::string NeumeTypeTypeToStr(neumeType_TYPE data) const;
+    neumeType_TYPE StrToNeumeTypeType(const std::string &value, bool logWarning = true) const;
 
     std::string NoteGesExtremisToStr(noteGes_EXTREMIS data) const;
     noteGes_EXTREMIS StrToNoteGesExtremis(const std::string &value, bool logWarning = true) const;
@@ -450,6 +450,9 @@ public:
     std::string RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) const;
     rehearsal_REHENCLOSE StrToRehearsalRehenclose(const std::string &value, bool logWarning = true) const;
 
+    std::string RepeatMarkLogFuncToStr(repeatMarkLog_FUNC data) const;
+    repeatMarkLog_FUNC StrToRepeatMarkLogFunc(const std::string &value, bool logWarning = true) const;
+
     std::string SbVisFormToStr(sbVis_FORM data) const;
     sbVis_FORM StrToSbVisForm(const std::string &value, bool logWarning = true) const;
 
@@ -467,6 +470,9 @@ public:
 
     std::string TempoLogFuncToStr(tempoLog_FUNC data) const;
     tempoLog_FUNC StrToTempoLogFunc(const std::string &value, bool logWarning = true) const;
+
+    std::string TremFormFormToStr(tremForm_FORM data) const;
+    tremForm_FORM StrToTremFormForm(const std::string &value, bool logWarning = true) const;
 
     std::string TupletVisNumformatToStr(tupletVis_NUMFORMAT data) const;
     tupletVis_NUMFORMAT StrToTupletVisNumformat(const std::string &value, bool logWarning = true) const;

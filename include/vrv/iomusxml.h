@@ -197,7 +197,14 @@ public:
     MusicXmlInput(Doc *doc);
     virtual ~MusicXmlInput();
 
+private:
+    /*
+     * Objects that were not successfully added and should be destroyed at the end of the import
+     */
+    ListOfObjects m_garbage;
+
 #ifndef NO_MUSICXML_SUPPORT
+public:
     bool Import(const std::string &musicxml) override;
 
 private:
@@ -277,9 +284,8 @@ private:
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
-     * Returns true if the measure was added to the tree (did not exist before)
      */
-    bool AddMeasure(Section *section, Measure *measure, int i);
+    void AddMeasure(Section *section, Measure *measure, int i);
 
     /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.

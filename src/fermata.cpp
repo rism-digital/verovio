@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
-#include "functorparams.h"
+#include "resources.h"
 #include "smufl.h"
 #include "verticalaligner.h"
 
@@ -30,14 +30,16 @@ Fermata::Fermata()
     : ControlElement(FERMATA, "fermata-")
     , TimePointInterface()
     , AttColor()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttFermataVis()
     , AttPlacementRelStaff()
 {
     this->RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_FERMATAVIS);
     this->RegisterAttClass(ATT_PLACEMENTRELSTAFF);
 
@@ -53,23 +55,10 @@ void Fermata::Reset()
     TimePointInterface::Reset();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetFermataVis();
     this->ResetPlacementRelStaff();
-}
-
-void Fermata::ConvertFromAnalyticalMarkup(
-    AttFermataPresent *fermataPresent, const std::string &id, ConvertMarkupAnalyticalParams *params)
-{
-    this->SetPlace(Att::StaffrelBasicToStaffrel(fermataPresent->GetFermata()));
-    if (params->m_permanent) {
-        fermataPresent->ResetFermataPresent();
-    }
-    else {
-        this->IsAttribute(true);
-    }
-    this->SetStartid("#" + id);
-    params->m_controlEvents.push_back(this);
 }
 
 char32_t Fermata::GetFermataGlyph() const
@@ -151,7 +140,7 @@ data_VERTICALALIGNMENT Fermata::GetVerticalAlignment(char32_t code)
 // Fermata functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Fermata::Accept(MutableFunctor &functor)
+FunctorCode Fermata::Accept(Functor &functor)
 {
     return functor.VisitFermata(this);
 }
@@ -161,7 +150,7 @@ FunctorCode Fermata::Accept(ConstFunctor &functor) const
     return functor.VisitFermata(this);
 }
 
-FunctorCode Fermata::AcceptEnd(MutableFunctor &functor)
+FunctorCode Fermata::AcceptEnd(Functor &functor)
 {
     return functor.VisitFermataEnd(this);
 }

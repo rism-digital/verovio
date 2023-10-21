@@ -25,7 +25,12 @@ class Measure;
  * It can be both a container (in score-based MEI) and a milestone (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public SystemMilestoneInterface, public AttLineRend, public AttNNumberLike {
+class Ending : public SystemElement,
+               public SystemMilestoneInterface,
+               public AttLabelled,
+               public AttLineRend,
+               public AttLineRendBase,
+               public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -52,18 +57,10 @@ public:
      * Interface for class functor visitation
      */
     ///@{
-    FunctorCode Accept(MutableFunctor &functor) override;
+    FunctorCode Accept(Functor &functor) override;
     FunctorCode Accept(ConstFunctor &functor) const override;
-    FunctorCode AcceptEnd(MutableFunctor &functor) override;
+    FunctorCode AcceptEnd(Functor &functor) override;
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
-    ///@}
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    ///@{
-    int ConvertToPageBased(FunctorParams *functorParams) override;
-    int ConvertToPageBasedEnd(FunctorParams *functorParams) override;
     ///@}
 
 private:

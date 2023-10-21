@@ -18,7 +18,6 @@
 #include "elementpart.h"
 #include "floatingobject.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "layer.h"
 #include "smufl.h"
 #include "staff.h"
@@ -48,14 +47,16 @@ Artic::Artic()
     , AttArticulationGes()
     , AttColor()
     , AttEnclosingChars()
-    , AttExtSym()
+    , AttExtSymAuth()
+    , AttExtSymNames()
     , AttPlacementRelEvent()
 {
     this->RegisterAttClass(ATT_ARTICULATION);
     this->RegisterAttClass(ATT_ARTICULATIONGES);
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
-    this->RegisterAttClass(ATT_EXTSYM);
+    this->RegisterAttClass(ATT_EXTSYMAUTH);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_PLACEMENTRELEVENT);
 
     this->Reset();
@@ -70,7 +71,8 @@ void Artic::Reset()
     this->ResetArticulationGes();
     this->ResetColor();
     this->ResetEnclosingChars();
-    this->ResetExtSym();
+    this->ResetExtSymAuth();
+    this->ResetExtSymNames();
     this->ResetPlacementRelEvent();
 
     m_drawingPlace = STAFFREL_NONE;
@@ -99,37 +101,6 @@ data_ARTICULATION Artic::GetArticFirst() const
     if (articList.empty()) return ARTICULATION_NONE;
 
     return articList.front();
-}
-
-void Artic::SplitMultival(Object *parent)
-{
-    assert(parent);
-
-    std::vector<data_ARTICULATION> articList = this->GetArtic();
-    if (articList.empty()) return;
-
-    int idx = this->GetIdx() + 1;
-    std::vector<data_ARTICULATION>::iterator iter;
-    for (iter = articList.begin() + 1; iter != articList.end(); ++iter) {
-        Artic *artic = new Artic();
-        artic->SetArtic({ *iter });
-        artic->AttColor::operator=(*this);
-        artic->AttEnclosingChars::operator=(*this);
-        artic->AttExtSym::operator=(*this);
-        artic->AttPlacementRelEvent::operator=(*this);
-        parent->InsertChild(artic, idx);
-        idx++;
-    }
-
-    // The original element only keep the first value
-    this->SetArtic({ articList.at(0) });
-
-    // Multiple valued attributes cannot be preserved as such
-    if (this->IsAttribute()) {
-        this->IsAttribute(false);
-        LogInfo("Multiple valued attribute @artic on '%s' permanently converted to <artic> elements",
-            parent->GetID().c_str());
-    }
 }
 
 void Artic::GetAllArtics(bool direction, std::vector<Artic *> &artics)
@@ -308,7 +279,7 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Artic::Accept(MutableFunctor &functor)
+FunctorCode Artic::Accept(Functor &functor)
 {
     return functor.VisitArtic(this);
 }
@@ -318,7 +289,7 @@ FunctorCode Artic::Accept(ConstFunctor &functor) const
     return functor.VisitArtic(this);
 }
 
-FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
+FunctorCode Artic::AcceptEnd(Functor &functor)
 {
     return functor.VisitArticEnd(this);
 }
@@ -326,17 +297,6 @@ FunctorCode Artic::AcceptEnd(MutableFunctor &functor)
 FunctorCode Artic::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitArticEnd(this);
-}
-
-int Artic::ConvertMarkupArtic(FunctorParams *functorParams)
-{
-    ConvertMarkupArticParams *params = vrv_params_cast<ConvertMarkupArticParams *>(functorParams);
-    assert(params);
-
-    if (this->GetArtic().size() > 1)
-        params->m_articPairsToConvert.emplace_back(std::make_pair(this->GetParent(), this));
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

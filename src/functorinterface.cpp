@@ -26,6 +26,7 @@
 #include "course.h"
 #include "custos.h"
 #include "dir.h"
+#include "div.h"
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
@@ -80,15 +81,14 @@
 #include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "phrase.h"
 #include "pitchinflection.h"
 #include "plica.h"
 #include "proport.h"
 #include "reh.h"
 #include "rend.h"
+#include "repeatmark.h"
 #include "rest.h"
 #include "sb.h"
 #include "score.h"
@@ -110,6 +110,7 @@
 #include "tabgrp.h"
 #include "tempo.h"
 #include "text.h"
+#include "textlayoutelement.h"
 #include "tie.h"
 #include "timestamp.h"
 #include "trill.h"
@@ -334,14 +335,24 @@ FunctorCode FunctorInterface::VisitEditorialElementEnd(EditorialElement *editori
     return this->VisitObjectEnd(editorialElement);
 }
 
+FunctorCode FunctorInterface::VisitDiv(Div *div)
+{
+    return this->VisitTextLayoutElement(div);
+}
+
+FunctorCode FunctorInterface::VisitDivEnd(Div *div)
+{
+    return this->VisitTextLayoutElementEnd(div);
+}
+
 FunctorCode FunctorInterface::VisitRunningElement(RunningElement *runningElement)
 {
-    return this->VisitObject(runningElement);
+    return this->VisitTextLayoutElement(runningElement);
 }
 
 FunctorCode FunctorInterface::VisitRunningElementEnd(RunningElement *runningElement)
 {
-    return this->VisitObjectEnd(runningElement);
+    return this->VisitTextLayoutElementEnd(runningElement);
 }
 
 FunctorCode FunctorInterface::VisitPgHead(PgHead *pgHead)
@@ -354,16 +365,6 @@ FunctorCode FunctorInterface::VisitPgHeadEnd(PgHead *pgHead)
     return this->VisitRunningElementEnd(pgHead);
 }
 
-FunctorCode FunctorInterface::VisitPgHead2(PgHead2 *pgHead2)
-{
-    return this->VisitRunningElement(pgHead2);
-}
-
-FunctorCode FunctorInterface::VisitPgHead2End(PgHead2 *pgHead2)
-{
-    return this->VisitRunningElementEnd(pgHead2);
-}
-
 FunctorCode FunctorInterface::VisitPgFoot(PgFoot *pgFoot)
 {
     return this->VisitRunningElement(pgFoot);
@@ -374,14 +375,14 @@ FunctorCode FunctorInterface::VisitPgFootEnd(PgFoot *pgFoot)
     return this->VisitRunningElementEnd(pgFoot);
 }
 
-FunctorCode FunctorInterface::VisitPgFoot2(PgFoot2 *pgFoot2)
+FunctorCode FunctorInterface::VisitTextLayoutElement(TextLayoutElement *textLayoutElement)
 {
-    return this->VisitRunningElement(pgFoot2);
+    return this->VisitObject(textLayoutElement);
 }
 
-FunctorCode FunctorInterface::VisitPgFoot2End(PgFoot2 *pgFoot2)
+FunctorCode FunctorInterface::VisitTextLayoutElementEnd(TextLayoutElement *textLayoutElement)
 {
-    return this->VisitRunningElementEnd(pgFoot2);
+    return this->VisitObjectEnd(textLayoutElement);
 }
 
 FunctorCode FunctorInterface::VisitEnding(Ending *ending)
@@ -694,6 +695,16 @@ FunctorCode FunctorInterface::VisitRehEnd(Reh *reh)
     return this->VisitControlElementEnd(reh);
 }
 
+FunctorCode FunctorInterface::VisitRepeatMark(RepeatMark *repeatMark)
+{
+    return this->VisitControlElement(repeatMark);
+}
+
+FunctorCode FunctorInterface::VisitRepeatMarkEnd(RepeatMark *repeatMark)
+{
+    return this->VisitControlElementEnd(repeatMark);
+}
+
 FunctorCode FunctorInterface::VisitSlur(Slur *slur)
 {
     return this->VisitControlElement(slur);
@@ -956,12 +967,12 @@ FunctorCode FunctorInterface::VisitMeterSigEnd(MeterSig *meterSig)
 
 FunctorCode FunctorInterface::VisitMeterSigGrp(MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObject(meterSigGrp);
+    return this->VisitLayerElement(meterSigGrp);
 }
 
 FunctorCode FunctorInterface::VisitMeterSigGrpEnd(MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObjectEnd(meterSigGrp);
+    return this->VisitLayerElementEnd(meterSigGrp);
 }
 
 FunctorCode FunctorInterface::VisitMRest(MRest *mRest)
@@ -1608,14 +1619,24 @@ FunctorCode ConstFunctorInterface::VisitEditorialElementEnd(const EditorialEleme
     return this->VisitObjectEnd(editorialElement);
 }
 
+FunctorCode ConstFunctorInterface::VisitDiv(const Div *div)
+{
+    return this->VisitTextLayoutElement(div);
+}
+
+FunctorCode ConstFunctorInterface::VisitDivEnd(const Div *div)
+{
+    return this->VisitTextLayoutElementEnd(div);
+}
+
 FunctorCode ConstFunctorInterface::VisitRunningElement(const RunningElement *runningElement)
 {
-    return this->VisitObject(runningElement);
+    return this->VisitTextLayoutElement(runningElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitRunningElementEnd(const RunningElement *runningElement)
 {
-    return this->VisitObjectEnd(runningElement);
+    return this->VisitTextLayoutElementEnd(runningElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitPgHead(const PgHead *pgHead)
@@ -1628,16 +1649,6 @@ FunctorCode ConstFunctorInterface::VisitPgHeadEnd(const PgHead *pgHead)
     return this->VisitRunningElementEnd(pgHead);
 }
 
-FunctorCode ConstFunctorInterface::VisitPgHead2(const PgHead2 *pgHead2)
-{
-    return this->VisitRunningElement(pgHead2);
-}
-
-FunctorCode ConstFunctorInterface::VisitPgHead2End(const PgHead2 *pgHead2)
-{
-    return this->VisitRunningElementEnd(pgHead2);
-}
-
 FunctorCode ConstFunctorInterface::VisitPgFoot(const PgFoot *pgFoot)
 {
     return this->VisitRunningElement(pgFoot);
@@ -1648,14 +1659,14 @@ FunctorCode ConstFunctorInterface::VisitPgFootEnd(const PgFoot *pgFoot)
     return this->VisitRunningElementEnd(pgFoot);
 }
 
-FunctorCode ConstFunctorInterface::VisitPgFoot2(const PgFoot2 *pgFoot2)
+FunctorCode ConstFunctorInterface::VisitTextLayoutElement(const TextLayoutElement *textLayoutElement)
 {
-    return this->VisitRunningElement(pgFoot2);
+    return this->VisitObject(textLayoutElement);
 }
 
-FunctorCode ConstFunctorInterface::VisitPgFoot2End(const PgFoot2 *pgFoot2)
+FunctorCode ConstFunctorInterface::VisitTextLayoutElementEnd(const TextLayoutElement *textLayoutElement)
 {
-    return this->VisitRunningElementEnd(pgFoot2);
+    return this->VisitObjectEnd(textLayoutElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitEnding(const Ending *ending)
@@ -1968,6 +1979,16 @@ FunctorCode ConstFunctorInterface::VisitRehEnd(const Reh *reh)
     return this->VisitControlElementEnd(reh);
 }
 
+FunctorCode ConstFunctorInterface::VisitRepeatMark(const RepeatMark *repeatMark)
+{
+    return this->VisitControlElement(repeatMark);
+}
+
+FunctorCode ConstFunctorInterface::VisitRepeatMarkEnd(const RepeatMark *repeatMark)
+{
+    return this->VisitControlElementEnd(repeatMark);
+}
+
 FunctorCode ConstFunctorInterface::VisitSlur(const Slur *slur)
 {
     return this->VisitControlElement(slur);
@@ -2230,12 +2251,12 @@ FunctorCode ConstFunctorInterface::VisitMeterSigEnd(const MeterSig *meterSig)
 
 FunctorCode ConstFunctorInterface::VisitMeterSigGrp(const MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObject(meterSigGrp);
+    return this->VisitLayerElement(meterSigGrp);
 }
 
 FunctorCode ConstFunctorInterface::VisitMeterSigGrpEnd(const MeterSigGrp *meterSigGrp)
 {
-    return this->VisitObjectEnd(meterSigGrp);
+    return this->VisitLayerElementEnd(meterSigGrp);
 }
 
 FunctorCode ConstFunctorInterface::VisitMRest(const MRest *mRest)

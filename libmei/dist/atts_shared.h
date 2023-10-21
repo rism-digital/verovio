@@ -477,7 +477,7 @@ public:
 
 private:
     /**
-     * States the length of barlines in virtual units.
+     * States the length of bar lines in virtual units.
      * The value must be greater than 0 and is typically equal to 2 times (the number
      * of staff lines - 1); e.g., a value of 8 for a 5-line staff.
      **/
@@ -1215,14 +1215,6 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetUlx(int ulx_) { m_ulx = ulx_; }
-    int GetUlx() const { return m_ulx; }
-    bool HasUlx() const;
-    //
-    void SetUly(int uly_) { m_uly = uly_; }
-    int GetUly() const { return m_uly; }
-    bool HasUly() const;
-    //
     void SetLrx(int lrx_) { m_lrx = lrx_; }
     int GetLrx() const { return m_lrx; }
     bool HasLrx() const;
@@ -1237,10 +1229,6 @@ public:
     ///@}
 
 private:
-    /** Indicates the upper-left corner x coordinate. **/
-    int m_ulx;
-    /** Indicates the upper-left corner y coordinate. **/
-    int m_uly;
     /** Indicates the lower-right corner x coordinate. **/
     int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
@@ -1266,6 +1254,61 @@ class InstCoordinated : public AttCoordinated {
 public:
     InstCoordinated() = default;
     virtual ~InstCoordinated() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttCoordinatedUl
+//----------------------------------------------------------------------------
+
+class AttCoordinatedUl : public Att {
+protected:
+    AttCoordinatedUl();
+    ~AttCoordinatedUl() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetCoordinatedUl();
+
+    /** Read the values for the attribute class **/
+    bool ReadCoordinatedUl(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteCoordinatedUl(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetUlx(int ulx_) { m_ulx = ulx_; }
+    int GetUlx() const { return m_ulx; }
+    bool HasUlx() const;
+    //
+    void SetUly(int uly_) { m_uly = uly_; }
+    int GetUly() const { return m_uly; }
+    bool HasUly() const;
+    ///@}
+
+private:
+    /** Indicates the upper-left corner x coordinate. **/
+    int m_ulx;
+    /** Indicates the upper-left corner y coordinate. **/
+    int m_uly;
+};
+
+//----------------------------------------------------------------------------
+// InstCoordinatedUl
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttCoordinatedUl
+ */
+
+class InstCoordinatedUl : public AttCoordinatedUl {
+public:
+    InstCoordinatedUl() = default;
+    virtual ~InstCoordinatedUl() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -1388,63 +1431,6 @@ class InstCurvature : public AttCurvature {
 public:
     InstCurvature() = default;
     virtual ~InstCurvature() = default;
-};
-
-//----------------------------------------------------------------------------
-// AttCurveRend
-//----------------------------------------------------------------------------
-
-class AttCurveRend : public Att {
-protected:
-    AttCurveRend();
-    ~AttCurveRend() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetCurveRend();
-
-    /** Read the values for the attribute class **/
-    bool ReadCurveRend(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteCurveRend(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetLform(data_LINEFORM lform_) { m_lform = lform_; }
-    data_LINEFORM GetLform() const { return m_lform; }
-    bool HasLform() const;
-    //
-    void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
-    data_LINEWIDTH GetLwidth() const { return m_lwidth; }
-    bool HasLwidth() const;
-    /** Getter for reference (for alternate type only) */
-    data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
-    ///@}
-
-private:
-    /** Describes the line style of a curve. **/
-    data_LINEFORM m_lform;
-    /** Width of a curved line. **/
-    data_LINEWIDTH m_lwidth;
-};
-
-//----------------------------------------------------------------------------
-// InstCurveRend
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttCurveRend
- */
-
-class InstCurveRend : public AttCurveRend {
-public:
-    InstCurveRend() = default;
-    virtual ~InstCurveRend() = default;
 };
 
 //----------------------------------------------------------------------------
@@ -2345,6 +2331,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttFormework
+//----------------------------------------------------------------------------
+
+class AttFormework : public Att {
+protected:
+    AttFormework();
+    ~AttFormework() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetFormework();
+
+    /** Read the values for the attribute class **/
+    bool ReadFormework(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteFormework(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(data_PGFUNC func_) { m_func = func_; }
+    data_PGFUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    data_PGFUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstFormework
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttFormework
+ */
+
+class InstFormework : public AttFormework {
+public:
+    InstFormework() = default;
+    virtual ~InstFormework() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 
@@ -2653,6 +2688,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttKeyMode
+//----------------------------------------------------------------------------
+
+class AttKeyMode : public Att {
+protected:
+    AttKeyMode();
+    ~AttKeyMode() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetKeyMode();
+
+    /** Read the values for the attribute class **/
+    bool ReadKeyMode(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteKeyMode(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMode(data_MODE mode_) { m_mode = mode_; }
+    data_MODE GetMode() const { return m_mode; }
+    bool HasMode() const;
+    ///@}
+
+private:
+    /** Indicates major, minor, or other tonality. **/
+    data_MODE m_mode;
+};
+
+//----------------------------------------------------------------------------
+// InstKeyMode
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttKeyMode
+ */
+
+class InstKeyMode : public AttKeyMode {
+public:
+    InstKeyMode() = default;
+    virtual ~InstKeyMode() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
@@ -2726,14 +2810,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; }
-    data_KEYSIGNATURE GetKeySig() const { return m_keySig; }
-    bool HasKeySig() const;
+    void SetKeysig(data_KEYSIGNATURE keysig_) { m_keysig = keysig_; }
+    data_KEYSIGNATURE GetKeysig() const { return m_keysig; }
+    bool HasKeysig() const;
     ///@}
 
 private:
     /** Written key signature. **/
-    data_KEYSIGNATURE m_keySig;
+    data_KEYSIGNATURE m_keysig;
 };
 
 //----------------------------------------------------------------------------
@@ -3105,20 +3189,22 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
-    void SetLsegs(int lsegs_) { m_lsegs = lsegs_; }
-    int GetLsegs() const { return m_lsegs; }
-    bool HasLsegs() const;
-    //
     void SetLwidth(data_LINEWIDTH lwidth_) { m_lwidth = lwidth_; }
     data_LINEWIDTH GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
     /** Getter for reference (for alternate type only) */
     data_LINEWIDTH *GetLwidthAlternate() { return &m_lwidth; }
+    //
+    void SetLsegs(int lsegs_) { m_lsegs = lsegs_; }
+    int GetLsegs() const { return m_lsegs; }
+    bool HasLsegs() const;
     ///@}
 
 private:
-    /** Describes the line style of a curve. **/
+    /** Describes the style of a line. **/
     data_LINEFORM m_lform;
+    /** Width of a line. **/
+    data_LINEWIDTH m_lwidth;
     /**
      * Describes the number of segments into which a dashed or dotted line may be
      * divided, or the number of "peaks" of a wavy line; a pair of space-separated
@@ -3127,8 +3213,6 @@ private:
      * amount of space; that is, the minimum and maximum values are equal.
      **/
     int m_lsegs;
-    /** Width of a curved line. **/
-    data_LINEWIDTH m_lwidth;
 };
 
 //----------------------------------------------------------------------------
@@ -3600,6 +3684,55 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AttMensurLog
+//----------------------------------------------------------------------------
+
+class AttMensurLog : public Att {
+protected:
+    AttMensurLog();
+    ~AttMensurLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetMensurLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadMensurLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteMensurLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLevel(data_DURATION level_) { m_level = level_; }
+    data_DURATION GetLevel() const { return m_level; }
+    bool HasLevel() const;
+    ///@}
+
+private:
+    /** Indicates the nesting level of staff grouping symbols. **/
+    data_DURATION m_level;
+};
+
+//----------------------------------------------------------------------------
+// InstMensurLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttMensurLog
+ */
+
+class InstMensurLog : public AttMensurLog {
+public:
+    InstMensurLog() = default;
+    virtual ~InstMensurLog() = default;
+};
+
+//----------------------------------------------------------------------------
 // AttMetadataPointing
 //----------------------------------------------------------------------------
 
@@ -3749,7 +3882,7 @@ private:
      * point of alignment across all the parts.
      * Bar lines within a score are usually controlling; that is, they "line up". Bar
      * lines within parts may or may not be controlling. When applied to measure, this
-     * attribute indicates the nature of the right barline but not the left.
+     * attribute indicates the nature of the right bar line but not the left.
      **/
     data_BOOLEAN m_control;
 };
@@ -5462,6 +5595,55 @@ class InstRanging : public AttRanging {
 public:
     InstRanging() = default;
     virtual ~InstRanging() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttRepeatMarkLog
+//----------------------------------------------------------------------------
+
+class AttRepeatMarkLog : public Att {
+protected:
+    AttRepeatMarkLog();
+    ~AttRepeatMarkLog() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetRepeatMarkLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadRepeatMarkLog(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteRepeatMarkLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(repeatMarkLog_FUNC func_) { m_func = func_; }
+    repeatMarkLog_FUNC GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Describes the function of the bracketed event sequence. **/
+    repeatMarkLog_FUNC m_func;
+};
+
+//----------------------------------------------------------------------------
+// InstRepeatMarkLog
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttRepeatMarkLog
+ */
+
+class InstRepeatMarkLog : public AttRepeatMarkLog {
+public:
+    InstRepeatMarkLog() = default;
+    virtual ~InstRepeatMarkLog() = default;
 };
 
 //----------------------------------------------------------------------------

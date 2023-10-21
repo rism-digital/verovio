@@ -116,13 +116,52 @@ bool parse_string(std::istream& input, String& value) {
                     break;
                 case 'u': {
                         int i;
-                        std::stringstream ss;
-                        for( i = 0; (!input.eof() && input.good()) && i < 4; ++i ) {
-                            input.get(ch);
-                            ss << std::hex << ch;
+                        {
+                            std::stringstream ss;
+                            for (i = 0; (!input.eof() && input.good()) && i < 4; ++i) {
+                                input.get(ch);
+                                ss << std::hex << ch;
+                            }
+                            if (!input.good() || !(ss >> i)) {
+                                break;
+                            }
                         }
-                        if( input.good() && (ss >> i) )
+
+                        // Decode UTF-16 surrogate pair.
+                        if (0xd800 <= i && i <= 0xdbff) {
+                            if (!match("\\u", input)) {
+                                break;
+                            }
+                            int j;
+                            std::stringstream ss;
+                            for (j = 0; (!input.eof() && input.good()) && j < 4; ++j) {
+                                input.get(ch);
+                                ss << std::hex << ch;
+                            }
+                            if (!input.good() || !(ss >> j)) {
+                                break;
+                            }
+                            i = static_cast<int>(
+                                (static_cast<unsigned int>(i) << 10) +
+                                static_cast<unsigned int>(j) - 0x35fdc00u);
+                        }
+
+                        // Encode codepoint via UTF-8.
+                        if (i < 0x80) {
                             value.push_back(static_cast<char>(i));
+                        } else if (i < 0x800) {
+                            value.push_back(static_cast<char>((i >> 6) | 0xc0));
+                            value.push_back(static_cast<char>((i & 0x3f) | 0x80));
+                        } else if (i < 0x10000) {
+                            value.push_back(static_cast<char>((i >> 12) | 0xe0));
+                            value.push_back(static_cast<char>(((i >> 6) & 0x3f) | 0x80));
+                            value.push_back(static_cast<char>((i & 0x3f) | 0x80));
+                        } else {
+                            value.push_back(static_cast<char>((i >> 18) | 0xf0));
+                            value.push_back(static_cast<char>(((i >> 12) & 0x3f) | 0x80));
+                            value.push_back(static_cast<char>(((i >> 6) & 0x3f) | 0x80));
+                            value.push_back(static_cast<char>((i & 0x3f) | 0x80));
+                        }
                     }
                     break;
                 default:

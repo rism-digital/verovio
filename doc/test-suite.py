@@ -1,12 +1,11 @@
 # This script it expected to be run from ./bindings/python
 import argparse
-import hashlib
 import json
 import os
 import sys
 import xml.etree.ElementTree as ET
 
-import cairosvg
+from cairosvg import svg2png
 
 # Add path for toolkit built in-place
 sys.path.append('.')
@@ -55,23 +54,23 @@ if __name__ == '__main__':
     path2 = args.output_dir.replace("\ ", " ")
     dir1 = sorted(os.listdir(path1))
     for item1 in dir1:
-        if not(os.path.isdir(os.path.join(path1, item1))):
+        if not (os.path.isdir(os.path.join(path1, item1))):
             continue
 
         # create the output directory if necessary
-        if not(os.path.isdir(os.path.join(path2, item1))):
+        if not (os.path.isdir(os.path.join(path2, item1))):
             os.mkdir(os.path.join(path2, item1))
 
         dir2 = sorted(os.listdir(os.path.join(path1, item1)))
         for item2 in dir2:
             # skip directories
-            if not(os.path.isfile(os.path.join(path1, item1, item2))):
+            if not (os.path.isfile(os.path.join(path1, item1, item2))):
                 continue
             # skip hidden files
             if item2.startswith('.'):
                 continue
 
-            if shortlist and not(os.path.join(item1, item2) in shortlist):
+            if shortlist and not (os.path.join(item1, item2) in shortlist):
                 continue
 
             # reset the options
@@ -79,8 +78,7 @@ if __name__ == '__main__':
 
             # filenames (input MEI/XML and output SVG)
             inputFile = os.path.join(path1, item1, item2)
-            options.update({"xmlIdSeed": int(hashlib.sha256(
-                inputFile.encode("utf-8")).hexdigest(), 16) % 10**9})
+            options.update({"xmlIdChecksum": True})
             print(f'Rendering {item2}')
             name, ext = os.path.splitext(item2)
             svgFile = os.path.join(path2, item1, name + '.svg')
@@ -106,7 +104,7 @@ if __name__ == '__main__':
             svgString = svgString.replace(
                 "overflow=\"inherit\"", "overflow=\"visible\"")
             ET.ElementTree(ET.fromstring(svgString)).write(svgFile)
-            cairosvg.svg2png(bytestring=svgString, scale=2, write_to=pngFile)
+            svg2png(bytestring=svgString, scale=2, write_to=pngFile)
             # create time map
             tk.renderToTimemapFile(timeMapFile)
             tk.resetOptions()

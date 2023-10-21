@@ -38,8 +38,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 3
-#define VERSION_MINOR 16
+#define VERSION_MAJOR 4
+#define VERSION_MINOR 1
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -115,7 +115,6 @@ enum ClassId : uint16_t {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
-    METERSIGGRP,
     PAGE,
     PAGES,
     STAFF,
@@ -153,13 +152,15 @@ enum ClassId : uint16_t {
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
+    // Ids for TextLayoutElement child classes
+    TEXT_LAYOUT_ELEMENT,
+    DIV,
     // Ids for RunningElement child classes
     RUNNING_ELEMENT,
     PGFOOT,
-    PGFOOT2,
     PGHEAD,
-    PGHEAD2,
     RUNNING_ELEMENT_max,
+    TEXT_LAYOUT_ELEMENT_max,
     // Ids for PageElement child classes
     PAGE_ELEMENT,
     PAGE_MILESTONE_END,
@@ -199,6 +200,7 @@ enum ClassId : uint16_t {
     PHRASE,
     PITCHINFLECTION,
     REH,
+    REPEATMARK,
     SLUR,
     TEMPO,
     TIE,
@@ -216,6 +218,7 @@ enum ClassId : uint16_t {
     CHORD,
     CLEF,
     CUSTOS,
+    DIVLINE,
     DOT,
     DOTS,
     FLAG,
@@ -225,8 +228,10 @@ enum ClassId : uint16_t {
     KEYSIG,
     KEYACCID,
     LIGATURE,
+    LIQUESCENT,
     MENSUR,
     METERSIG,
+    METERSIGGRP,
     MREST,
     MRPT,
     MRPT2,
@@ -307,6 +312,7 @@ class BeamElementCoord;
 class BoundingBox;
 class Comparison;
 class CurveSpannedElement;
+class DivLine;
 class FloatingPositioner;
 class FloatingCurvePositioner;
 class GraceAligner;
@@ -314,6 +320,7 @@ class InterfaceComparison;
 class LayerElement;
 class LedgerLine;
 class LinkingInterface;
+class Liquescent;
 class Nc;
 class Note;
 class Neume;
@@ -334,7 +341,7 @@ typedef std::list<Object *> ListOfObjects;
 
 typedef std::list<const Object *> ListOfConstObjects;
 
-typedef std::vector<Note *> ChordCluster;
+typedef std::vector<Note *> ChordNoteGroup;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int>> ArrayOfAdjustmentTuples;
 
@@ -348,7 +355,7 @@ typedef std::multimap<std::string, LinkingInterface *> MapOfLinkingInterfaceIDPa
 
 typedef std::map<std::string, Note *> MapOfNoteIDPairs;
 
-typedef std::vector<std::tuple<PlistInterface *, std::string, Object *>> ArrayOfPlistInterfaceIDTuples;
+typedef std::vector<std::pair<PlistInterface *, std::string>> ArrayOfPlistInterfaceIDPairs;
 
 typedef std::vector<CurveSpannedElement *> ArrayOfCurveSpannedElements;
 
@@ -676,6 +683,13 @@ enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline
 #define SUB_SCRIPT_POSITION -0.17 // lowered down from the baseline
+
+//----------------------------------------------------------------------------
+// Neume notation note size to staff size ratio defines
+//----------------------------------------------------------------------------
+
+#define NOTE_HEIGHT_TO_STAFF_SIZE_RATIO 2
+#define NOTE_WIDTH_TO_STAFF_SIZE_RATIO 1.4
 
 } // namespace vrv
 

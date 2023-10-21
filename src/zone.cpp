@@ -28,6 +28,7 @@ Zone::Zone() : Object(ZONE, "zone-"), AttTyped(), AttCoordinated()
 {
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterAttClass(ATT_COORDINATED);
+    this->RegisterAttClass(ATT_COORDINATEDUL);
     this->Reset();
 }
 
@@ -37,6 +38,7 @@ void Zone::Reset()
 {
     this->ResetTyped();
     this->ResetCoordinated();
+    this->ResetCoordinatedUl();
 }
 
 void Zone::ShiftByXY(int xDiff, int yDiff)

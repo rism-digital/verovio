@@ -114,7 +114,7 @@ bool PgHead::GenerateFromMEIHeader(const pugi::xml_document &header)
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode PgHead::Accept(MutableFunctor &functor)
+FunctorCode PgHead::Accept(Functor &functor)
 {
     return functor.VisitPgHead(this);
 }
@@ -124,7 +124,7 @@ FunctorCode PgHead::Accept(ConstFunctor &functor) const
     return functor.VisitPgHead(this);
 }
 
-FunctorCode PgHead::AcceptEnd(MutableFunctor &functor)
+FunctorCode PgHead::AcceptEnd(Functor &functor)
 {
     return functor.VisitPgHeadEnd(this);
 }

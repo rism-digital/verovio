@@ -140,13 +140,14 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure, Objec
             staffList = this->GetStaff();
         }
     }
-    else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
+    else if (m_start && !m_start->Is({ BARLINE, TIMESTAMP_ATTR })) {
         Staff *staff = m_start->GetAncestorStaff();
         staffList.push_back(staff->GetN());
     }
     else if (measure->GetChildCount(STAFF) == 1) {
-        // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
-        staffList.push_back(1);
+        // If we have no @staff or startid but only one staff child assume it is the first one
+        Staff *staff = vrv_cast<Staff *>(measure->GetFirst(STAFF));
+        staffList.push_back(staff->GetN());
     }
 
     for (int staffN : staffList) {
@@ -382,7 +383,7 @@ FunctorCode TimeSpanningInterface::InterfacePrepareTimeSpanning(PrepareTimeSpann
         return FUNCTOR_CONTINUE;
     }
 
-    if (!functor.FillMode()) {
+    if (functor.IsProcessingData()) {
         return FUNCTOR_CONTINUE;
     }
 

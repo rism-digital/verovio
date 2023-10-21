@@ -50,15 +50,13 @@
 #include "comparison.h"
 #include "doc.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "justifyfunctor.h"
 #include "libmei.h"
+#include "miscfunctor.h"
 #include "pageelement.h"
 #include "pages.h"
 #include "pgfoot.h"
-#include "pgfoot2.h"
 #include "pghead.h"
-#include "pghead2.h"
 #include "resetfunctor.h"
 #include "score.h"
 #include "staff.h"
@@ -155,10 +153,10 @@ const RunningElement *Page::GetHeader() const
 
     // first page or use the pgHeader for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgHeaderForAll.GetValue())) {
-        return m_score->GetScoreDef()->GetPgHead();
+        return m_score->GetScoreDef()->GetPgHead(PGFUNC_first);
     }
     else {
-        return m_score->GetScoreDef()->GetPgHead2();
+        return m_score->GetScoreDef()->GetPgHead(PGFUNC_all);
     }
 }
 
@@ -181,10 +179,10 @@ const RunningElement *Page::GetFooter() const
 
     // first page or use the pgFooter for all pages?
     if ((pages->GetFirst() == this) || (doc->GetOptions()->m_usePgFooterForAll.GetValue())) {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_first);
     }
     else {
-        return m_scoreEnd->GetScoreDef()->GetPgFoot2();
+        return m_scoreEnd->GetScoreDef()->GetPgFoot(PGFUNC_all);
     }
 }
 
@@ -380,6 +378,9 @@ void Page::LayOutHorizontally()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Get the scoreDef at the beginning of the page
+    ScoreDef *scoreDef = m_score->GetScoreDef();
+
     // Adjust the position of outside articulations
     AdjustArticFunctor adjustArtic(doc);
     this->Process(adjustArtic);
@@ -387,16 +388,16 @@ void Page::LayOutHorizontally()
     // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
-    AdjustLayersFunctor adjustLayers(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersFunctor adjustLayers(doc, scoreDef->GetStaffNs());
     this->Process(adjustLayers);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
-    AdjustDotsFunctor adjustDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustDotsFunctor adjustDots(doc, scoreDef->GetStaffNs());
     this->Process(adjustDots);
 
     // Adjust layers again, this time including dots positioning
-    AdjustLayersFunctor adjustLayersWithDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersFunctor adjustLayersWithDots(doc, scoreDef->GetStaffNs());
     adjustLayersWithDots.IgnoreDots(false);
     this->Process(adjustLayersWithDots);
 
@@ -406,7 +407,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustXPosFunctor adjustXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustXPosFunctor adjustXPos(doc, scoreDef->GetStaffNs());
     adjustXPos.SetExcluded({ TABDURSYM });
     this->Process(adjustXPos);
 
@@ -418,7 +419,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustGraceXPosFunctor adjustGraceXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustGraceXPosFunctor adjustGraceXPos(doc, scoreDef->GetStaffNs());
     this->Process(adjustGraceXPos);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
@@ -428,11 +429,10 @@ void Page::LayOutHorizontally()
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    InitProcessingListsParams initProcessingListsParams;
-    Functor initProcessingLists(&Object::InitProcessingLists);
-    this->Process(&initProcessingLists, &initProcessingListsParams);
+    InitProcessingListsFunctor initProcessingLists;
+    this->Process(initProcessingLists);
 
-    this->AdjustSylSpacingByVerse(initProcessingListsParams, doc);
+    this->AdjustSylSpacingByVerse(initProcessingLists.GetVerseTree(), doc);
 
     AdjustHarmGrpsSpacingFunctor adjustHarmGrpsSpacing(doc);
     this->Process(adjustHarmGrpsSpacing);
@@ -554,8 +554,6 @@ void Page::LayOutVertically()
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(adjustSlurs);
     }
-
-    doc->SetCurrentScore(this->m_score);
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
@@ -739,18 +737,18 @@ int Page::GetContentWidth() const
     return maxWidth;
 }
 
-void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *doc)
+void Page::AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc)
 {
-    IntTree_t::iterator staves;
-    IntTree_t::iterator layers;
-    IntTree_t::iterator verses;
+    IntTree_t::const_iterator staves;
+    IntTree_t::const_iterator layers;
+    IntTree_t::const_iterator verses;
 
-    if (listsParams.m_verseTree.child.empty()) return;
+    if (verseTree.child.empty()) return;
 
     Filters filters;
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {
+    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // Create ad comparison object for each type / @n
@@ -771,7 +769,7 @@ void Page::AdjustSylSpacingByVerse(InitProcessingListsParams &listsParams, Doc *
 // Functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Page::Accept(MutableFunctor &functor)
+FunctorCode Page::Accept(Functor &functor)
 {
     return functor.VisitPage(this);
 }
@@ -781,7 +779,7 @@ FunctorCode Page::Accept(ConstFunctor &functor) const
     return functor.VisitPage(this);
 }
 
-FunctorCode Page::AcceptEnd(MutableFunctor &functor)
+FunctorCode Page::AcceptEnd(Functor &functor)
 {
     return functor.VisitPageEnd(this);
 }
@@ -789,22 +787,6 @@ FunctorCode Page::AcceptEnd(MutableFunctor &functor)
 FunctorCode Page::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitPageEnd(this);
-}
-
-int Page::ApplyPPUFactor(FunctorParams *functorParams)
-{
-    ApplyPPUFactorParams *params = vrv_params_cast<ApplyPPUFactorParams *>(functorParams);
-    assert(params);
-
-    params->m_page = this;
-    m_pageWidth /= params->m_page->GetPPUFactor();
-    m_pageHeight /= params->m_page->GetPPUFactor();
-    m_pageMarginBottom /= params->m_page->GetPPUFactor();
-    m_pageMarginLeft /= params->m_page->GetPPUFactor();
-    m_pageMarginRight /= params->m_page->GetPPUFactor();
-    m_pageMarginTop /= params->m_page->GetPPUFactor();
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

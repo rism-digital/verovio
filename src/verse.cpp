@@ -17,7 +17,6 @@
 #include "doc.h"
 #include "editorial.h"
 #include "functor.h"
-#include "functorparams.h"
 #include "label.h"
 #include "labelabbr.h"
 #include "layer.h"
@@ -107,7 +106,7 @@ int Verse::AdjustPosition(int &overlap, int freeSpace, const Doc *doc)
 // Verse functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode Verse::Accept(MutableFunctor &functor)
+FunctorCode Verse::Accept(Functor &functor)
 {
     return functor.VisitVerse(this);
 }
@@ -117,7 +116,7 @@ FunctorCode Verse::Accept(ConstFunctor &functor) const
     return functor.VisitVerse(this);
 }
 
-FunctorCode Verse::AcceptEnd(MutableFunctor &functor)
+FunctorCode Verse::AcceptEnd(Functor &functor)
 {
     return functor.VisitVerseEnd(this);
 }
@@ -125,36 +124,6 @@ FunctorCode Verse::AcceptEnd(MutableFunctor &functor)
 FunctorCode Verse::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitVerseEnd(this);
-}
-
-int Verse::InitProcessingLists(FunctorParams *functorParams)
-{
-    InitProcessingListsParams *params = vrv_params_cast<InitProcessingListsParams *>(functorParams);
-    assert(params);
-    // StaffN_LayerN_VerseN_t *tree = vrv_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
-
-    Staff *staff = this->GetAncestorStaff();
-    Layer *layer = vrv_cast<Layer *>(this->GetFirstAncestor(LAYER));
-    assert(layer);
-
-    params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
-    // Alternate solution with StaffN_LayerN_VerseN_t
-    //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Verse::GenerateMIDI(FunctorParams *)
-{
-    LayerElement *parent = vrv_cast<Note *>(this->GetFirstAncestor(NOTE));
-    if (!parent) parent = vrv_cast<Chord *>(this->GetFirstAncestor(CHORD));
-    assert(parent);
-
-    Verse *previousVerse = vrv_cast<Verse *>(parent->GetPrevious(this, VERSE));
-
-    if (previousVerse) return FUNCTOR_SIBLINGS;
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

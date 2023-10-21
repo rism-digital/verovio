@@ -61,7 +61,7 @@ bool F::IsSupportedChild(Object *child)
 // F functor methods
 //----------------------------------------------------------------------------
 
-FunctorCode F::Accept(MutableFunctor &functor)
+FunctorCode F::Accept(Functor &functor)
 {
     return functor.VisitF(this);
 }
@@ -71,7 +71,7 @@ FunctorCode F::Accept(ConstFunctor &functor) const
     return functor.VisitF(this);
 }
 
-FunctorCode F::AcceptEnd(MutableFunctor &functor)
+FunctorCode F::AcceptEnd(Functor &functor)
 {
     return functor.VisitFEnd(this);
 }
