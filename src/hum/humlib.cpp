@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  2 19:58:27 PDT 2023
+// Last Modified: Tue Oct  3 17:45:18 PDT 2023
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -86527,6 +86527,7 @@ Tool_kern2mens::Tool_kern2mens(void) {
 	define("D|no-double-bar=b",      "keep thick final barlines");
 	define("c|clef=s",               "clef to use in mensural notation");
 	define("V|no-verovio=b",         "don't add verovio styling");
+	define("e|evenNoteSpacing|even-note-spacing=b", "add evenNoteSpacing option");
 }
 
 
@@ -86574,6 +86575,7 @@ bool Tool_kern2mens::run(HumdrumFile& infile) {
 	m_doublebarQ = !getBoolean("no-double-bar");
 	m_noverovioQ =  getBoolean("no-verovio");
 	m_clef       =  getString("clef");
+	m_evenNoteSpacingQ = getBoolean("even-note-spacing");
 	storeKernEditorialAccidental(infile);
 	storeKernTerminalLong(infile);
 	convertToMens(infile);
@@ -86588,6 +86590,7 @@ bool Tool_kern2mens::run(HumdrumFile& infile) {
 //
 
 void Tool_kern2mens::convertToMens(HumdrumFile& infile) {
+	analyzeColoration(infile);
 	int maxtrack = infile.getMaxTrack();
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (infile[i].isBarline()) {
@@ -86640,15 +86643,21 @@ void Tool_kern2mens::addVerovioStyling(HumdrumFile& infile) {
 		if (hre.search(token, "!!!verovio:\\s*evenNoteSpacing")) {
 			return;
 		}
-		if (hre.search(token, "!!!verovio:\\s*spacingLinear")) {
-			return;
-		}
-		if (hre.search(token, "!!!verovio:\\s*spacingNonLinear")) {
-			return;
+		if (!m_evenNoteSpacingQ) {
+			if (hre.search(token, "!!!verovio:\\s*spacingLinear")) {
+				return;
+			}
+			if (hre.search(token, "!!!verovio:\\s*spacingNonLinear")) {
+				return;
+			}
 		}
 	}
-	m_humdrum_text << "!!!verovio: spacingLinear 0.3\n";
-	m_humdrum_text << "!!!verovio: spacingNonLinear 0.5\n";
+	if (m_evenNoteSpacingQ) {
+		m_humdrum_text << "!!!verovio: evenNoteSpacing\n";
+	} else {
+		m_humdrum_text << "!!!verovio: spacingLinear 0.3\n";
+		m_humdrum_text << "!!!verovio: spacingNonLinear 0.5\n";
+	}
 }
 
 
@@ -86705,7 +86714,10 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 	if (rhythm.find('.') != std::string::npos) {
 		perfect = true;
 	}
-	hre.replaceDestructive(data, rhythm, "\\d+\\.*");
+	hre.replaceDestructive(data, rhythm, "\\d+%?\\d*\\.*");
+	hre.replaceDestructive(data, "S", "3\\%4");
+	hre.replaceDestructive(data, "s", "3\\%2");
+	hre.replaceDestructive(data, "M", "3");
 	hre.replaceDestructive(data, "X", "000");
 	hre.replaceDestructive(data, "L", "00");
 	hre.replaceDestructive(data, "S", "0");
@@ -86734,6 +86746,11 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 		if (hre.search(token, searchTerm)) {
 			data += hre.getMatch(1);
 		}
+	}
+
+	bool coloration = token->getValueBool("auto", "coloration");
+	if (coloration) {
+		data += "~";
 	}
 
 	return data;
@@ -86945,16 +86962,65 @@ void Tool_kern2mens::storeKernTerminalLong(HumdrumFile& infile) {
 		if (hre.search(value, "^\\s*([^\\s]+)\\s*=\\s*(.*)\\s*$")) {
 			string signifier = hre.getMatch(1);
 			string definition = hre.getMatch(2);
+
 			if (hre.search(definition, "terminal\\s+long")) {
 				m_kernTerminalLong = signifier;
 				m_kernTerminalLongIndex = i;
 				m_mensTerminalLongLine = "!!!RDF**mens: " + signifier + " = ";
 				m_mensTerminalLongLine += definition;
 				break;
+			} else if (hre.search(definition, "long\\s+note")) {
+				m_kernTerminalLong = signifier;
+				m_kernTerminalLongIndex = i;
+				m_mensTerminalLongLine = "!!!RDF**mens: " + signifier + " = ";
+				m_mensTerminalLongLine += definition;
+				break;
 			}
+
 		}
 	}
 }
+
+
+
+//////////////////////////////
+//
+// Tool_kern2mens::analyzeColoration --
+//
+
+void Tool_kern2mens::analyzeColoration(HumdrumFile& infile) {
+	vector<HTp> spinestarts = infile.getKernSpineStartList();
+	for (int i=0; i<(int)spinestarts.size(); i++) {
+		analyzeColoration(spinestarts[i]);
+	}
+}
+
+void Tool_kern2mens::analyzeColoration(HTp stok) {
+	HTp current = stok->getNextToken();
+	bool coloration = false;
+	while (current) {
+		if (current->isInterpretation()) {
+			if (*current == "*col") {
+				coloration = true;
+			} else if (*current == "*Xcol") {
+				coloration = false;
+			}
+		}
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (coloration) {
+			current->setValue("auto", "coloration", 1);
+		}
+		current = current->getNextToken();
+	}
+}
+
 
 
 

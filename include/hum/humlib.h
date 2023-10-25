@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  2 19:58:27 PDT 2023
+// Last Modified: Tue Oct  3 17:45:18 PDT 2023
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -7949,6 +7949,8 @@ class Tool_kern2mens : public HumTool {
 		void        storeKernEditorialAccidental(HumdrumFile& infile);
 		void        storeKernTerminalLong (HumdrumFile& infile);
 		void        addVerovioStyling     (HumdrumFile& infile);
+		void        analyzeColoration     (HumdrumFile& infile);
+		void        analyzeColoration     (HTp infile);
 
 	private:
 		bool        m_numbersQ   = true; // used with -N option
@@ -7956,6 +7958,7 @@ class Tool_kern2mens : public HumTool {
 		bool        m_invisibleQ = true; // used with -I option
 		bool        m_doublebarQ = true; // used with -D option
 		bool        m_noverovioQ = false; // used with -V option
+		bool        m_evenNoteSpacingQ = false; // used with -e option
 		std::string m_clef;              // used with -c option
 
 		std::string m_kernEditorialAccidental;  // used with !!!RDF**kern:

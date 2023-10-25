@@ -16615,7 +16615,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             }
             else {
                 forceBelowQ = true;
-                staffadj2 = 1;
+                // Don't know what the following adjustment is for.
+                // Probably for two-staff parts?  If so then have
+                // separate cases for single/double staff parts.
+                // Similar case below search for "What is this here".
+                // staffadj2 = 1;
             }
         }
 
