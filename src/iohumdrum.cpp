@@ -18025,11 +18025,24 @@ hum::HTp HumdrumInput::getHairpinEnd(hum::HTp token, const std::string &endchar)
     if (token == NULL) {
         return NULL;
     }
+    int subtrack = token->getSubtrack();
+    if (subtrack == 0) {
+        subtrack = 1;
+    }
     token = token->getNextNonNullDataToken();
     int badtoken = 0;
     while (token != NULL) {
         if (token->find(endchar) != std::string::npos) {
-            return token;
+            int esubtrack = token->getSubtrack();
+            if (esubtrack == 0) {
+                esubtrack = 1;
+            }
+            if (subtrack == esubtrack) {
+                return token;
+            }
+            else {
+                return NULL;
+            }
         }
         badtoken = 0;
         for (int i = 0; i < (int)token->size(); ++i) {
