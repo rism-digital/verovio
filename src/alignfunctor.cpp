@@ -264,12 +264,11 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     }
     else if (layerElement->Is(SYL)) {
         Staff *staff = layerElement->GetAncestorStaff();
-        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+        Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
+        if (!note || (staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
             type = ALIGNMENT_DEFAULT;
         }
         else {
-            Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
-            assert(note);
             layerElement->SetAlignment(note->GetAlignment());
         }
     }
