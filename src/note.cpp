@@ -579,8 +579,13 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
 
     if (DUR_BR == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
     if (DUR_1 == duration) return SMUFL_E0A2_noteheadWhole;
-    if (DUR_2 == duration) return SMUFL_E0A3_noteheadHalf;
-    return SMUFL_E0A4_noteheadBlack;
+    // We support solid on half notes or void on quarter and shorter notes
+    if (DUR_2 == duration) {
+        return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
+    }
+    else {
+        return (this->GetHeadFill() == FILL_void) ? SMUFL_E0A3_noteheadHalf : SMUFL_E0A4_noteheadBlack;
+    }
 }
 
 bool Note::IsVisible() const
