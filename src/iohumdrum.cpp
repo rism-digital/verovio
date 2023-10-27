@@ -6834,6 +6834,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
         mensuration = true;
     }
 
+    hum::HumRegex hre;
     int top = -1000;
     int bot = -1000;
     int bot2 = -1000;
@@ -6872,6 +6873,20 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
                 vrvmeter->SetUnit(bot);
                 vrvmeter->SetForm(METERFORM_num);
             }
+            else if (hre.search(metersig, "^(\\d+)$")) {
+                int value = hre.getMatchInt(1);
+                vrvmeter->SetCount({ { value }, MeterCountSign::None });
+                if (bot > 0) {
+                    vrvmeter->SetUnit(bot);
+                }
+                else {
+                    // Borrow bottom of time signature if available, otherwise
+                    // assume a quarter note unit for now:
+                    vrvmeter->SetUnit(4);
+                }
+                vrvmeter->SetForm(METERFORM_num);
+            }
+
             else {
                 vrvmeter->SetCount({ { top }, MeterCountSign::None });
                 vrvmeter->SetUnit(bot);
