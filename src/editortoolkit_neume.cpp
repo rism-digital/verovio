@@ -2197,7 +2197,46 @@ bool EditorToolkitNeume::Remove(std::string elementId)
                     = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(linkedID));
                 if (linkedSyllable != NULL) {
                     if (linkedSyllable->HasPrecedes()) linkedSyllable->SetPrecedes("");
-                    if (linkedSyllable->HasFollows()) linkedSyllable->SetFollows("");
+                    if (linkedSyllable->HasFollows()) {
+                        linkedSyllable->SetFollows("");
+                        // Create an empty syl for the second part
+                        Syl *syl = new Syl();
+                        Text *text = new Text();
+                        std::u32string str = U"";
+                        text->SetText(str);
+                        syl->AddChild(text);
+                        linkedSyllable->AddChild(syl);
+
+                        // Create default bounding box if facs
+                        if (m_doc->GetType() == Facs) {
+                            Zone *zone = new Zone();
+
+                            zone->SetUlx(linkedSyllable->GetFirst(NEUME)
+                                             ->GetFirst(NC)
+                                             ->GetFacsimileInterface()
+                                             ->GetZone()
+                                             ->GetUlx());
+                            zone->SetUly(
+                                linkedSyllable->GetAncestorStaff()->GetFacsimileInterface()->GetZone()->GetLry());
+                            zone->SetLrx(linkedSyllable->GetLast(NEUME)
+                                             ->GetLast(NC)
+                                             ->GetFacsimileInterface()
+                                             ->GetZone()
+                                             ->GetLrx());
+                            zone->SetLry(zone->GetUly() + 100);
+
+                            // Make bbox larger if it has less than 2 ncs
+                            if (linkedSyllable->GetChildCount(NC, 2) <= 2) {
+                                zone->SetLrx(zone->GetLrx() + 50);
+                            }
+
+                            assert(m_doc->GetFacsimile());
+                            m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
+                            FacsimileInterface *fi = syl->GetFacsimileInterface();
+                            assert(fi);
+                            fi->AttachZone(zone);
+                        }
+                    };
                 }
             }
             // Delete the syllable empty of neumes
