@@ -378,6 +378,9 @@ void Page::LayOutHorizontally()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Get the scoreDef at the beginning of the page
+    ScoreDef *scoreDef = m_score->GetScoreDef();
+
     // Adjust the position of outside articulations
     AdjustArticFunctor adjustArtic(doc);
     this->Process(adjustArtic);
@@ -385,16 +388,16 @@ void Page::LayOutHorizontally()
     // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
-    AdjustLayersFunctor adjustLayers(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersFunctor adjustLayers(doc, scoreDef->GetStaffNs());
     this->Process(adjustLayers);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
-    AdjustDotsFunctor adjustDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustDotsFunctor adjustDots(doc, scoreDef->GetStaffNs());
     this->Process(adjustDots);
 
     // Adjust layers again, this time including dots positioning
-    AdjustLayersFunctor adjustLayersWithDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersFunctor adjustLayersWithDots(doc, scoreDef->GetStaffNs());
     adjustLayersWithDots.IgnoreDots(false);
     this->Process(adjustLayersWithDots);
 
@@ -404,7 +407,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustXPosFunctor adjustXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustXPosFunctor adjustXPos(doc, scoreDef->GetStaffNs());
     adjustXPos.SetExcluded({ TABDURSYM });
     this->Process(adjustXPos);
 
@@ -416,7 +419,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustGraceXPosFunctor adjustGraceXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustGraceXPosFunctor adjustGraceXPos(doc, scoreDef->GetStaffNs());
     this->Process(adjustGraceXPos);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
@@ -551,8 +554,6 @@ void Page::LayOutVertically()
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(adjustSlurs);
     }
-
-    doc->SetCurrentScore(this->m_score);
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();
