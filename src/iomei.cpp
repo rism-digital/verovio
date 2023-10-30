@@ -1710,9 +1710,6 @@ void MEIOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     this->WriteXmlId(currentNode, scoreDefElement);
-    scoreDefElement->WriteMeasureNumbers(currentNode);
-    scoreDefElement->WriteSpacing(currentNode);
-    scoreDefElement->WriteSystems(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -3080,10 +3077,13 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteBarring(element);
     interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
+    interface->WriteMeasureNumbers(element);
     interface->WriteMidiTempo(element);
     interface->WriteMmTempo(element);
     interface->WriteMultinumMeasures(element);
     interface->WritePianoPedals(element);
+    interface->WriteSpacing(element);
+    interface->WriteSystems(element);
 }
 
 void MEIOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
@@ -4671,9 +4671,6 @@ bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEn
 bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     this->SetMeiID(element, object);
-    object->ReadMeasureNumbers(element);
-    object->ReadSpacing(element);
-    object->ReadSystems(element);
     object->ReadTyped(element);
 
     if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
@@ -7352,10 +7349,13 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadBarring(element);
     interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
+    interface->ReadMeasureNumbers(element);
     interface->ReadMidiTempo(element);
     interface->ReadMmTempo(element);
     interface->ReadMultinumMeasures(element);
     interface->ReadPianoPedals(element);
+    interface->ReadSpacing(element);
+    interface->ReadSystems(element);
     return true;
 }
 
