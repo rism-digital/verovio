@@ -36,6 +36,7 @@ class ScoreDefInterface : public Interface,
                           public AttMidiTempo,
                           public AttMmTempo,
                           public AttMultinumMeasures,
+                          public AttOctaveDefault,
                           public AttPianoPedals,
                           public AttSpacing,
                           public AttSystems {
