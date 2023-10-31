@@ -1189,10 +1189,11 @@ void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &ou
 void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
 {
     // map of all categories and expected string arguments for them
-    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
-        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Layout, "layout" },
-        { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Midi, "midi" },
-        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+    const std::map<vrv::OptionsCategory, std::string> categories
+        = { { vrv::OptionsCategory::Base, "base" }, { vrv::OptionsCategory::General, "general" },
+              { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
+              { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
+              { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
     // display_version();
