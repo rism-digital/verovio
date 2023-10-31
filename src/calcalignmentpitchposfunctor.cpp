@@ -15,6 +15,7 @@
 #include "mrest.h"
 #include "nc.h"
 #include "rest.h"
+#include "score.h"
 #include "staff.h"
 #include "tuning.h"
 
@@ -308,6 +309,34 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
         nc->SetDrawingLoc(loc);
         nc->SetDrawingYRel(yRel);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitScore(Score *score)
+{
+    ScoreDef *scoreDef = score->GetScoreDef();
+    if (scoreDef) {
+        scoreDef->Process(*this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    m_octDefaultForStaffN.clear();
+    m_octDefault = scoreDef->GetOctDefault();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    if (staffDef->HasOctDefault() && staffDef->HasN()) {
+        m_octDefaultForStaffN[staffDef->GetN()] = staffDef->GetOctDefault();
     }
 
     return FUNCTOR_CONTINUE;
