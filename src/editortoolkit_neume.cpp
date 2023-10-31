@@ -1306,20 +1306,10 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
 
     // find closest neume
     ListOfObjects neumes;
-    Object *neume;
-    assert(neume);
     ClassIdComparison ac(NEUME);
     staff->FindAllDescendantsByComparison(&neumes, &ac);
-    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
-    if (neumes.size() > 0) {
-        ClosestNeume compN;
-        compN.x = ulx;
-        compN.y = uly;
 
-        std::sort(neumesVector.begin(), neumesVector.end(), compN);
-        neume = neumesVector.at(0);
-    }
-    else {
+    if (neumes.empty()) {
         LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import(
@@ -1327,6 +1317,14 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         return false;
     }
 
+    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
+    ClosestNeume compN;
+    compN.x = ulx;
+    compN.y = uly;
+    std::sort(neumesVector.begin(), neumesVector.end(), compN);
+
+    Object *neume = neumesVector.at(0);
+    assert(neume);
     // get nearest syllable using nearest neume
     Object *syllable = neume->GetParent();
     assert(syllable);
