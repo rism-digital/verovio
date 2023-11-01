@@ -6820,7 +6820,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, const 
             vrvmeter->SetVisible(BOOLEAN_false);
         }
     }
-    if (timetok->find("yy") != std::string::npos) {
+    if (timetok && timetok->find("yy") != std::string::npos) {
         vrvmeter->SetVisible(BOOLEAN_false);
     }
 
