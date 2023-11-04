@@ -25353,6 +25353,7 @@ template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT elemen
 template <class ELEMENT>
 void HumdrumInput::setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::HumNum visdur, hum::HumNum gesdur)
 {
+    bool durGesSet = false;
     pair<data_DURATION, int> visDurAndDots = getDurAndDots(visdur);
     element->SetDur(visDurAndDots.first);
     if (visDurAndDots.second != 0) {
@@ -25361,8 +25362,14 @@ void HumdrumInput::setVisualAndGesturalRhythmFromDuration(ELEMENT element, hum::
     pair<data_DURATION, int> gesDurAndDots = getDurAndDots(gesdur);
     if (gesDurAndDots.first != visDurAndDots.first) {
         element->SetDurGes(gesDurAndDots.first);
+        durGesSet = true;
     }
-    if (gesDurAndDots.second != visDurAndDots.second) {
+    if (!durGesSet) {
+        if (gesDurAndDots.second != visDurAndDots.second) {
+            element->SetDotsGes(gesDurAndDots.second);
+        }
+    }
+    else {
         element->SetDotsGes(gesDurAndDots.second);
     }
 }
@@ -25419,14 +25426,15 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
 
     if (!vstring.empty()) {
         int visualdotcount = characterCountInSubtoken(vstring, '.');
-        if (visualdotcount > 0) {
-            element->SetDots(visualdotcount);
-        }
         int gesturaldotcount = characterCountInSubtoken(tstring, '.');
-        if (gesturaldotcount != visualdotcount) {
-            element->SetDotsGes(gesturaldotcount);
+        // It would be prettier to avoid @dots.ges="0" if @dots is not set,
+        // but we cannot tell from here whether @dots will be set (the
+        // call to setRhythmFromDuration() can set @dots unexpectedly).
+        // So we always set @dots.ges if @dur.ges is going to be set.
+        if (visualdotcount != 0) {
             element->SetDots(visualdotcount);
         }
+        element->SetDotsGes(gesturaldotcount);
     }
     else {
         int dotcount = characterCountInSubtoken(tstring, '.');
@@ -25450,9 +25458,10 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         dur /= 4; // convert duration to whole-note units
         int logicaldurdots = (int)std::count(logicaldur.begin(), logicaldur.end(), '.');
         int visualdurdots = (int)std::count(visualdur.begin(), visualdur.end(), '.');
-        if (visualdurdots != logicaldurdots) {
-            element->SetDotsGes(logicaldurdots);
+        if (visualdurdots != 0) {
+            element->SetDots(visualdurdots);
         }
+        element->SetDotsGes(logicaldurdots);
         std::string typestring = token->getValue("auto", "MEI", "type");
         if (typestring.empty()) {
             element->SetType("overfill");
