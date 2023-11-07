@@ -2135,7 +2135,7 @@ Tie *HumdrumInput::addHangingTieToNextItem(hum::HTp token, int subindex, hum::Hu
     }
 
     hum::HumNum tstamp;
-    if (trackend->isData()) {
+    if (trackend && trackend->isData()) {
         hum::HumNum frombar = trackend->getDurationFromBarline();
         tstamp = frombar;
         tstamp *= meterunit;
@@ -5533,7 +5533,7 @@ void HumdrumInput::addMidiTempo(ScoreDef *scoreDef, hum::HTp kernpart, int top, 
 
 //////////////////////////////
 //
-// HumdrumInput::addDefaultTempo --  Add MM400 if average rhythm is more than
+// HumdrumInput::addDefaultTempo --  Add MM400 if average hhythm is more than
 //    a half note (for basic Renaissance default tempo).
 //
 
@@ -12666,17 +12666,19 @@ data_DURATION HumdrumInput::oneOverDenominatorToDur(int denominator)
 
 //////////////////////////////
 //
-// HumdrumInput::isExpressibleDuration -- returns MEI @dur/@dots attributes
-//      for a duration.
+// HumdrumInput::getDurAndDots -- returns MEI @dur/@dots attributes
+//      for a duration.  Input duration is required to have the
+//      tuplet component present, and it will be removed when calculating
+//      the output (tupletless) duration and dots.
 //
 
 pair<data_DURATION, int> HumdrumInput::getDurAndDots(hum::HumNum duration)
 {
     pair<data_DURATION, int> output;
 
-    // convert to whole note units
+    // Convert to whole-note units:
     hum::HumNum dur = duration / 4;
-    // take into account current tuplet scaling
+    // Remove active tuplet factor(s) from note:
     dur *= m_tupletscaling;
 
     if (dur.getDenominator() == 1) {
@@ -25474,6 +25476,9 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         dur = hum::Convert::recipToDurationNoDots(tstring);
         dur /= 4; // convert duration to whole-note units
         if (!grace) {
+            // Remove tuplet component of duration (if any).
+            // This should convert duration to a power of two
+            // plus duration related to augmentation dots.
             dur *= m_tupletscaling;
         }
     }
@@ -25481,6 +25486,9 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         dur = hum::Convert::recipToDurationNoDots(vstring);
         dur /= 4; // convert duration to whole-note units
         if (!grace) {
+            // Remove tuplet component of duration (if any).
+            // This should convert duration to a power of two
+            // plus duration related to augmentation dots.
             dur *= m_tupletscaling;
         }
 
@@ -25562,6 +25570,9 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         }
         hum::HumNum newdur = hum::Convert::recipToDuration(vstring);
         // See note eDcRfV
+        // Restore the tuplet factors before calling setRhythmFromDuration
+        // as they will be removed (again) in getDurAndDots().
+        newdur /= m_tupletscaling;
         setRhythmFromDuration(element, newdur);
         return newdur;
     }
