@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct  3 17:45:18 PDT 2023
+// Last Modified: Mon Nov  6 19:54:46 PST 2023
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -62185,7 +62185,7 @@ string Tool_cmr::getLocalLabelToken(int number, int dir) {
 Tool_colorgroups::Tool_colorgroups(void) {
 	define("A=s:crimson",    "Color for group A");
 	define("B=s:dodgerblue", "Color for group B");
-	define("C=s:limegreen",  "Color for group C");
+	define("C=s:purple",     "Color for group C");
 	define("command=b",     "print shed command only");
 }
 
