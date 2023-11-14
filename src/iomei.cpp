@@ -1447,7 +1447,7 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     // ---- header ----
     if (!m_ignoreHeader) {
-        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
+        if (this->GetBasic() || !m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
         m_mei.append_copy(m_doc->m_header.first_child());
         // Add transposition in the revision list but not in mei-basic
         if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {
@@ -1459,7 +1459,7 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     pugi::xml_node music = m_mei.append_child("music");
     Facsimile *facs = doc->GetFacsimile();
-    if ((facs != NULL) && (facs->GetChildCount() > 0)) {
+    if (!this->GetBasic() && (facs != NULL) && (facs->GetChildCount() > 0)) {
         pugi::xml_node facsimile = music.append_child("facsimile");
         this->WriteFacsimile(facsimile, facs);
         m_nodeStack.push_back(facsimile);
