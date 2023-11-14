@@ -289,11 +289,31 @@ bool Doc::GenerateMeasureNumbers()
 
 void Doc::GenerateMEIHeader(bool meiBasic)
 {
+    // Try to preserve titles if we have an existing header
+    std::list<std::string> titles;
+    pugi::xpath_node_set titlesNodeSet = m_header.select_nodes("//meiHead/fileDesc/titleStmt/title/text()");
+    for (pugi::xpath_node titleXpathNode : titlesNodeSet) {
+        pugi::xml_node titleNode = titleXpathNode.node();
+        if (!titleNode) continue;
+        titles.push_back(titleNode.text().as_string());
+    }
+
     m_header.remove_children();
     pugi::xml_node meiHead = m_header.append_child("meiHead");
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    titleStmt.append_child("title");
+    // Re-add preserved titles
+    if (titles.size() > 0) {
+        for (auto &title : titles) {
+            pugi::xml_node titleNode = titleStmt.append_child("title");
+            pugi::xml_node textNode = titleNode.append_child(pugi::node_pcdata);
+            textNode.text() = title.c_str();
+        }
+    }
+    // Add an empty title for validity
+    else {
+        titleStmt.append_child("title");
+    }
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node date = pubStmt.append_child("date");
 
