@@ -29,11 +29,11 @@
                <goal>run</goal>
              </goals>
              <configuration>
-               <tasks>
+               <target>
                  <property name="native.classpath" refid="maven.compile.classpath" />
                  <echo file="${project.build.directory}/compile-classpath" message="${native.classpath}" />
                  <exec dir="." executable="./build.sh" failonerror="true"/>
-               </tasks>
+               </target>
              </configuration>
            </execution>
          </executions>
