@@ -6934,12 +6934,13 @@ void HumdrumInput::setTimeSig(ELEMENT element, hum::HTp timesigtok, hum::HTp met
     }
     else if (timesigtok && regex_search(*timesigtok, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
         count = stoi(matches[1]);
+        unit = stoi(matches[2]);
+        if (unit == 0) {
+            // Breve time signature not possible in MEI, so change to whole note unit:
+            count *= 2;
+            unit = 1;
+        }
         if (!metersigtok) {
-            unit = stoi(matches[2]);
-            if (unit == 0) {
-                count *= 2;
-                unit = 1;
-            }
             MeterSig *vrvmetersig = getMeterSig(element);
             vrvmetersig->SetCount({ { count }, MeterCountSign::None });
             vrvmetersig->SetUnit(unit);
