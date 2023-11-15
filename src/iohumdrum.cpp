@@ -2810,7 +2810,82 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 
 void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
 {
+    std::vector<string> keysThatGoHere = {
+        "EED", "ENC", "EEV", "EFL", "YEP", "YER",
+        "END", "YEC", "YEM", "YEN", "TXL", "ONB"
+    };
+    
+    if (!anyReferenceItemsExist(keysThatGoHere)) {
+        return;
+    }
+    
+    pugi::xml_node source = sourceDesc.append_child("source");
+    source.append_attribute("type") = "digital";
+    pugi::xml_node bibl = source.append_child("bibl");
+    bibl.append_copy(m_simpleTitle.first_child());
+    for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
+        bibl.append_copy(*childIt);
+    }
 
+    std::vector<HumdrumReferenceItem> editors = getReferenceItems("EED");
+    std::vector<HumdrumReferenceItem> encoders = getReferenceItems("ENC");
+    std::vector<HumdrumReferenceItem> versions = getReferenceItems("EEV");
+    std::vector<HumdrumReferenceItem> fileNumbers = getReferenceItems("EFL");
+    std::vector<HumdrumReferenceItem> publishers = getReferenceItems("YEP");
+    std::vector<HumdrumReferenceItem> releaseDates = getReferenceItems("YER");
+    std::vector<HumdrumReferenceItem> encodingDates = getReferenceItems("END");
+    std::vector<HumdrumReferenceItem> copyrights = getReferenceItems("YEC");
+    std::vector<HumdrumReferenceItem> copyrightStatements = getReferenceItems("YEM");
+    std::vector<HumdrumReferenceItem> copyrightCountries = getReferenceItems("YEN");
+    std::vector<HumdrumReferenceItem> textLanguages = getReferenceItems("TXL");
+    std::vector<HumdrumReferenceItem> notes = getReferenceItems("ONB");
+
+    for (auto editor : editors) {
+        pugi::xml_node editorEl = bibl.append_child("editor");
+        editorEl.append_attribute("analog") = "humdrum:EED";
+        editorEl.append_child(pugi::node_pcdata).set_value(editor.value.c_str());
+    }
+    
+    if (!encoders.empty()) {
+        pugi::xml_node respStmt = bibl.append_child("respStmt");
+        for (auto encoder : encoders) {
+            pugi::xml_node respEl = respStmt.append_child("resp");
+            respEl.append_child(pugi::node_pcdata).set_value("encoder");
+            pugi::xml_node persNameEl = respStmt.append_child("persName");
+            persNameEl.append_attribute("analog") = "humdrum:ENC";
+            persNameEl.append_child(pugi::node_pcdata).set_value(encoder.value.c_str());
+        }
+    }
+    
+    for (auto version : versions) {
+        pugi::xml_node versionEl = bibl.append_child("edition");
+        versionEl.append_attribute("type") = "version";
+        versionEl.append_attribute("analog") = "humdrum:EEV";
+        versionEl.append_child(pugi::node_pcdata).set_value(version.value.c_str());
+    }
+    
+    for (auto fileNumber : fileNumbers) {
+        pugi::xml_node fileNumberEl = bibl.append_child("extent");
+        fileNumberEl.append_attribute("type") = "fileNumber";
+        fileNumberEl.append_attribute("unit") = "file";
+        fileNumberEl.append_attribute("analog") = "humdrum:EFL";
+        fileNumberEl.append_child(pugi::node_pcdata).set_value(fileNumber.value.c_str());
+    }
+    
+    if (!publishers.empty() || !releaseDates.empty() || !encodingDates.empty()) {
+        pugi::xml_node imprint = bibl.append_child("imprint");
+        for (auto publisher : publishers) {
+            pugi::xml_node publisherEl = imprint.append_child("publisher");
+            publisherEl.append_attribute("analog") = "humdrum:YEP";
+            publisherEl.append_child(pugi::node_pcdata).set_value(publisher.value.c_str());
+        }
+        for (auto releaseDate : releaseDates) {
+            pugi::xml_node releaseDateEl = imprint.append_child("date");
+            releaseDateEl.append_attribute("analog") = "humdrum:YER";
+            //fillInIsodate(releaseDateEl, releaseDate.value)
+            releaseDateEl.append_child(pugi::node_pcdata).set_value(releaseDate.value.c_str());
+        }
+    }
 }
 
 void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)

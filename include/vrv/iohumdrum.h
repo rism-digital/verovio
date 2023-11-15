@@ -1240,7 +1240,7 @@ private:
     // Some metadata elements that are computed once and used multiple times
     std::map<std::string, std::vector<HumdrumReferenceItem>> m_references;
     pugi::xml_document m_simpleTitle;
-    pugi::xml_document m_simpleComposer;
+    pugi::xml_document m_simpleComposers;
 
     vector<string> m_standardHumdrumKeys = {
         "COM", // composer's name
