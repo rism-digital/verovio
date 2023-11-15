@@ -2755,18 +2755,18 @@ void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
 void HumdrumInput::createHeader()
 {
     hum::HumdrumFile &infile = m_infiles[0];
-    std::vector<HumdrumReferenceItem> references = getAllReferenceItems(infile);
-    createSimpleTitleElement(references);
-    // createSimpleComposerElement(references);
+    m_references = getAllReferenceItems(infile);
+    createSimpleTitleElement();
+    // createSimpleComposerElement();
 
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
-    createFileDesc(meiHead, references);
-    createEncodingDesc(meiHead, references);
-    createWorkList(meiHead, references);
-    createHumdrumVerbatimExtMeta(meiHead, references);
+    createFileDesc(meiHead);
+    createEncodingDesc(meiHead);
+    createWorkList(meiHead);
+    createHumdrumVerbatimExtMeta(meiHead);
 }
 
-void HumdrumInput::createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 {
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
@@ -2778,8 +2778,8 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumRef
 
     // If sourceDesc ends up with no children, we will fileDesc.remove_child(sourceDesc) to avoid an empty <sourceDesc/>.
     pugi::xml_node sourceDesc = fileDesc.append_child("sourceDesc");
-    createDigitalSource(sourceDesc, references);
-    createPrintedSource(sourceDesc, references);
+    createDigitalSource(sourceDesc);
+    createPrintedSource(sourceDesc);
     pugi::xml_node digitalSource = sourceDesc.find_child_by_attribute("source", "type", "digital");
     pugi::xml_node printedSource = sourceDesc.find_child_by_attribute("source", "type", "printed");
     if (!digitalSource.empty() && !printedSource.empty()) {
@@ -2798,37 +2798,55 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumRef
         printedRelatedItem.append_attribute("target") = "#source0_digital";
     }
 
+    createRecordedSource(sourceDesc);
+    createUnpublishedSource(sourceDesc);
+    
+    pugi::xml_node firstSource = sourceDesc.child("source");
+    if (firstSource.empty()) {
+        // delete <sourceDesc>, it's unneeded
+        fileDesc.remove_child(sourceDesc);
+    }
 }
 
-void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
 {
 
 }
 
-void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 {
 
 }
 
-void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
 {
 
 }
 
-void HumdrumInput::createWorkList(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
 {
 
 }
 
-void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead)
 {
 
 }
 
-void HumdrumInput::createSimpleTitleElement(std::vector<HumdrumReferenceItem> references)
+void HumdrumInput::createWorkList(pugi::xml_node meiHead)
 {
-    std::vector<HumdrumReferenceItem>titles = getReferenceItems("OTL", references);
-    std::vector<HumdrumReferenceItem>movementNames = getReferenceItems("OMD", references);
+
+}
+
+void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
+{
+
+}
+
+void HumdrumInput::createSimpleTitleElement()
+{
+    std::vector<HumdrumReferenceItem>titles = getReferenceItems("OTL");
+    std::vector<HumdrumReferenceItem>movementNames = getReferenceItems("OMD");
     pugi::xml_node titleEl = m_simpleTitle.append_child("title");
     string firstLang;
     int bestTitleIdx = getBestItem(titles, string());
@@ -2893,7 +2911,7 @@ int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, string r
     return -1;
 }
 
-std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::HumdrumFile infile)
+std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllReferenceItems(hum::HumdrumFile infile)
 {
     int firstDataLineIdx = infile.getLineCount();
     for (int lineIdx=0; lineIdx < infile.getLineCount(); lineIdx++) {
@@ -2903,10 +2921,9 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
         }
     }
 
+    std::map<std::string, std::vector<HumdrumReferenceItem>> items;
     vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
-    int len = (int)references.size();
-    std::vector<HumdrumReferenceItem> items(len);
-    for (int i = 0; i < len; ++i) {
+    for (int i = 0; i < (int)references.size(); ++i) {
         hum::HumRegex hre;
         string baseKey = references[i]->getReferenceKey();
         string baseValue = references[i]->getReferenceValue();
@@ -2916,7 +2933,6 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
         bool isHumdrumKey = false;
         string language;
         bool isTranslated = false;
-        string number;
         int index = 0;
 
         if (baseKey.substr(0,5) == "RDF**" || baseKey == "system-decoration") {
@@ -2926,10 +2942,7 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
         if (hre.search(baseKey, "^([^0-9@ \t]*)([0-9]*)?((@{1,2})([a-zA-Z]*))?$")) {
             isParseable = true;
             key = hre.getMatch(1);
-            number = hre.getMatch(2);
-            if (!number.empty()) {
-                index = std::stoi(number);
-            }
+            index = hre.getMatchInt(2);
             language = hre.getMatch(5);
             std::transform(language.begin(), language.end(), language.begin(), ::tolower);
             isTranslated = !language.empty() && hre.getMatch(4) != "@@";
@@ -2968,15 +2981,21 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
                 }
             }
         }
-
-        items[i].lineText = references[i]->getText();
-        items[i].key = key;
-        items[i].value = value;
-        items[i].isParseable = isParseable;
-        items[i].isHumdrumKey = isHumdrumKey;
-        items[i].isTranslated = isTranslated;
-        items[i].language = language;
-        items[i].index = index;
+        HumdrumReferenceItem item;
+        item.lineText = references[i]->getText();
+        item.key = key;
+        item.value = value;
+        item.isParseable = isParseable;
+        item.isHumdrumKey = isHumdrumKey;
+        item.isTranslated = isTranslated;
+        item.language = language;
+        item.index = index;
+        std::vector<HumdrumReferenceItem> oldItemVec;
+        if (auto search = items.find(key); search != items.end()) {
+             oldItemVec = items.at(key);
+        }
+        oldItemVec.push_back(item);
+        items[key] = oldItemVec;
     }
 
     return items;
@@ -2990,16 +3009,22 @@ bool HumdrumInput::isStandardHumdrumKey(string key) {
     return std::find(m_standardHumdrumKeys.begin(), m_standardHumdrumKeys.end(), key) != m_standardHumdrumKeys.end();
 }
 
-std::vector<HumdrumReferenceItem> HumdrumInput::getReferenceItems(const std::string &key,
-    std::vector<HumdrumReferenceItem> &references)
+std::vector<HumdrumReferenceItem> HumdrumInput::getReferenceItems(const std::string &key)
 {
     std::vector<HumdrumReferenceItem> items;
-    for (int i = 0; i < (int)references.size(); ++i) {
-        if (key == references[i].key) {
-            items.push_back(references[i]);
-        }
+    if (auto search = m_references.find(key); search != m_references.end()) {
+        items = m_references[key];
     }
     return items;
+}
+
+bool HumdrumInput::anyReferenceItemsExist(std::vector<string> keys) {
+    for (string key : keys) {
+        if (auto items = m_references.find(key); items != m_references.end()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////

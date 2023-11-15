@@ -868,14 +868,18 @@ protected:
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
-    void createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
-    void createDigitalSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references);
-    void createPrintedSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references);
-    void createEncodingDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
-    void createWorkList(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
-    void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
-    void createSimpleTitleElement(std::vector<HumdrumReferenceItem> references);
-    std::vector<HumdrumReferenceItem> getAllReferenceItems(hum::HumdrumFile infile);
+    void createFileDesc(pugi::xml_node meiHead);
+    void createDigitalSource(pugi::xml_node sourceDesc);
+    void createPrintedSource(pugi::xml_node sourceDesc);
+    void createRecordedSource(pugi::xml_node sourceDesc);
+    void createUnpublishedSource(pugi::xml_node sourceDesc);
+    void createEncodingDesc(pugi::xml_node meiHead);
+    void createWorkList(pugi::xml_node meiHead);
+    void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead);
+    void createSimpleTitleElement();
+    std::map<std::string, std::vector<HumdrumReferenceItem>> getAllReferenceItems(hum::HumdrumFile infile);
+    std::vector<HumdrumReferenceItem> getReferenceItems(const std::string &key);
+    bool anyReferenceItemsExist(std::vector<string> keys);
     int getBestItem(std::vector<HumdrumReferenceItem> items, string requiredLanguage);
     bool isStandardHumdrumKey(string key);
 
@@ -951,7 +955,6 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static hum::HumNum nextHigherPowerOfTwo(hum::HumNum x);
     static std::string getDateString();
-    std::vector<HumdrumReferenceItem> getReferenceItems(const std::string &key, std::vector<HumdrumReferenceItem> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     static bool replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr);
 
@@ -1235,6 +1238,7 @@ private:
     std::string m_textSmuflSpacer = "\xc2\xa0";
 
     // Some metadata elements that are computed once and used multiple times
+    std::map<std::string, std::vector<HumdrumReferenceItem>> m_references;
     pugi::xml_document m_simpleTitle;
     pugi::xml_document m_simpleComposer;
 
