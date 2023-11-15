@@ -869,6 +869,8 @@ protected:
     // header related functions: ///////////////////////////////////////////
     void createHeader();
     void createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
+    void createDigitalSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references);
+    void createPrintedSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references);
     void createEncodingDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
     void createWorkList(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
     void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);

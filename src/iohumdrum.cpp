@@ -2758,7 +2758,7 @@ void HumdrumInput::createHeader()
     std::vector<HumdrumReferenceItem> references = getAllReferenceItems(infile);
     createSimpleTitleElement(references);
     // createSimpleComposerElement(references);
-    
+
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
     createFileDesc(meiHead, references);
     createEncodingDesc(meiHead, references);
@@ -2771,34 +2771,58 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumRef
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
     titleStmt.append_copy(m_simpleTitle.first_child());
-    
+
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node unpub = pubStmt.append_child("unpub");
     unpub.append_child(pugi::node_pcdata).set_value("This MEI file was created by Verovio's Humdrum converter. When published, this unpub element should be removed, and the enclosing pubStmt element should be properly filled out.");
-    
+
     // If sourceDesc ends up with no children, we will fileDesc.remove_child(sourceDesc) to avoid an empty <sourceDesc/>.
     pugi::xml_node sourceDesc = fileDesc.append_child("sourceDesc");
-//    pugi::xml_node digitalSource = createDigitalSource(sourceDesc, references);
-//    pugi::xml_node printedSource = createPrintedSource(sourceDesc, references);
-//    if (!digitalSource.empty() && !printedSource.empty()) {
-//        pugi::xml_node digitalSourceBibl = digitalSource.child("bibl");
-//    }
+    createDigitalSource(sourceDesc, references);
+    createPrintedSource(sourceDesc, references);
+    pugi::xml_node digitalSource = sourceDesc.find_child_by_attribute("source", "type", "digital");
+    pugi::xml_node printedSource = sourceDesc.find_child_by_attribute("source", "type", "printed");
+    if (!digitalSource.empty() && !printedSource.empty()) {
+        pugi::xml_node digitalSourceBibl = digitalSource.child("bibl");
+        digitalSourceBibl.append_attribute("xml:id") = "source0_digital";
+
+        pugi::xml_node printedSourceBibl = printedSource.child("bibl");
+        printedSourceBibl.append_attribute("xml:id") = "source1_printed";
+
+        pugi::xml_node digitalRelatedItem = digitalSourceBibl.append_child("relatedItem");
+        digitalRelatedItem.append_attribute("rel") = "otherFormat";
+        digitalRelatedItem.append_attribute("target") = "#source1_printed";
+
+        pugi::xml_node printedRelatedItem = printedSourceBibl.append_child("relatedItem");
+        printedRelatedItem.append_attribute("rel") = "otherFormat";
+        printedRelatedItem.append_attribute("target") = "#source0_digital";
+    }
+
+}
+
+void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references)
+{
+
+}
+
+void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc, std::vector<HumdrumReferenceItem> references)
+{
 
 }
 
 void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
 {
-    
+
 }
 
 void HumdrumInput::createWorkList(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
 {
-    
+
 }
 
 void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
 {
-    
+
 }
 
 void HumdrumInput::createSimpleTitleElement(std::vector<HumdrumReferenceItem> references)
@@ -2815,16 +2839,16 @@ void HumdrumInput::createSimpleTitleElement(std::vector<HumdrumReferenceItem> re
     if (bestTitleIdx < 0 && bestMovementNameIdx >= 0 and !movementNames[bestMovementNameIdx].language.empty()) {
         firstLang = movementNames[bestMovementNameIdx].language;
     }
-    
+
     if (bestTitleIdx < 0 && bestMovementNameIdx < 0) {
         // m_simpleTitle is just <title/>
         return;
     }
-    
+
     if (!firstLang.empty()) {
         titleEl.append_attribute("xml:lang") = firstLang.c_str();
     }
-    
+
     if (bestTitleIdx >= 0 && bestMovementNameIdx >= 0
             && titles[bestTitleIdx].value != movementNames[bestMovementNameIdx].value) {
         string combinedName = titles[bestTitleIdx].value + string(", ") + movementNames[bestMovementNameIdx].value;
@@ -2845,7 +2869,7 @@ int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, string r
     // If nothing is found that has the right language/is untranslated,
     // just return the first item.
     bool noRequiredLanguage = requiredLanguage.empty();
-    
+
     for (int i = 0; i < titles.size(); i++) {
         HumdrumReferenceItem title = titles[i];
         if (noRequiredLanguage) {
@@ -2861,11 +2885,11 @@ int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, string r
             }
         }
     }
-    
+
     if (!titles.empty()) {
         return 0;
     }
-    
+
     return -1;
 }
 
@@ -2878,14 +2902,16 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
             break;
         }
     }
-    
+
     vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
     int len = (int)references.size();
     std::vector<HumdrumReferenceItem> items(len);
     for (int i = 0; i < len; ++i) {
         hum::HumRegex hre;
-        string key = references[i]->getReferenceKey();
-        string value = references[i]->getReferenceValue();
+        string baseKey = references[i]->getReferenceKey();
+        string baseValue = references[i]->getReferenceValue();
+        string key;
+        string value;
         bool isParseable = false;
         bool isHumdrumKey = false;
         string language;
@@ -2893,7 +2919,11 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
         string number;
         int index = 0;
 
-        if (hre.search(key, "^([^0-9@ \t]*)([0-9]*)?((@{1,2})([a-zA-Z]*))?$")) {
+        if (baseKey.substr(0,5) == "RDF**" || baseKey == "system-decoration") {
+            continue;
+        }
+
+        if (hre.search(baseKey, "^([^0-9@ \t]*)([0-9]*)?((@{1,2})([a-zA-Z]*))?$")) {
             isParseable = true;
             key = hre.getMatch(1);
             number = hre.getMatch(2);
@@ -2903,13 +2933,11 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
             language = hre.getMatch(5);
             std::transform(language.begin(), language.end(), language.begin(), ::tolower);
             isTranslated = !language.empty() && hre.getMatch(4) != "@@";
-            isHumdrumKey = (key.size() >= 3) && (isStandardHumdrumKey(key.substr(0, 3)));
+            isHumdrumKey = (key.size() >= 3) && isStandardHumdrumKey(key.substr(0, 3));
         }
-        
-        if (key.substr(0,3) == "RDF" || key == "system-decoration") {
-            continue;
-        }
-        
+
+        value = baseValue;
+
         if (key == "OMD") {
             // Only take OMDs before the firstDataLineIdx as movementName in metadata,
             // because after the first data line, they're not movementNames, just
@@ -2918,11 +2946,11 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
             if (references[i]->getLineIndex() > firstDataLineIdx) {
                 continue;
             }
-            
-            if (hre.search(value,
+
+            if (hre.search(baseValue,
                     // With parens, e.g. 'Allegro M.M. ([quarter] = 128.0)'
                     "(.*?)\\s*(M\\.M\\.|M\\. M\\.|M\\:M\\:|M M)?\\s*\\(\\[([^=\\]]*)\\]\\s*=\\s*(\\d+\\.?\\d*)")
-                || hre.search(value,
+                || hre.search(baseValue,
                     // Without parens, e.g. 'Allegro M.M. [quarter] = 128.0'
                     "(.*?)\\s*(M\\.M\\.|M\\. M\\.|M\\:M\\:|M M)?\\s*\\[([^=\\]]*)\\]\\s*=\\s*(\\d+\\.?\\d*)")) {
                 // It has metronome info.
@@ -2940,7 +2968,7 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
                 }
             }
         }
-        
+
         items[i].lineText = references[i]->getText();
         items[i].key = key;
         items[i].value = value;
@@ -2950,7 +2978,7 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::Humdru
         items[i].language = language;
         items[i].index = index;
     }
-    
+
     return items;
 }
 
