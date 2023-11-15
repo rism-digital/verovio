@@ -211,13 +211,15 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 }
 
 void SvgDeviceContext::StartGraphic(
-    Object *object, std::string gClass, std::string gId, GraphicID graphicID, bool prepend)
+    Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID, bool prepend)
 {
+    std::string gClassFull = gClass;
+
     if (object->HasAttClass(ATT_TYPED)) {
         AttTyped *att = dynamic_cast<AttTyped *>(object);
         assert(att);
         if (att->HasType()) {
-            gClass.append((gClass.empty() ? "" : " ") + att->GetType());
+            gClassFull.append((gClassFull.empty() ? "" : " ") + att->GetType());
         }
     }
 
@@ -228,7 +230,7 @@ void SvgDeviceContext::StartGraphic(
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
-    AppendIdAndClass(gId, object->GetClassName(), gClass, graphicID);
+    AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     AppendAdditionalAttributes(object);
 
     // this sets staffDef styles for lyrics
@@ -323,14 +325,14 @@ void SvgDeviceContext::StartGraphic(
     // this->GetColor(currentBrush.GetColor()).c_str(), currentBrush.GetOpacity()).c_str();
 }
 
-void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
+void SvgDeviceContext::StartCustomGraphic(const std::string &name, std::string gClass, std::string gId)
 {
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, name, gClass);
 }
 
-void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId)
 {
     m_currentNode = AddChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
@@ -1069,9 +1071,10 @@ void SvgDeviceContext::AddDescription(const std::string &text)
 }
 
 void SvgDeviceContext::AppendIdAndClass(
-    std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID)
+    const std::string &gId, const std::string &baseClass, const std::string &addedClasses, GraphicID graphicID)
 {
-    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
+    std::string baseClassFull = baseClass;
+    std::transform(baseClassFull.begin(), baseClassFull.begin() + 1, baseClassFull.begin(), ::tolower);
 
     if (gId.length() > 0) {
         if (m_html5) {
@@ -1085,17 +1088,17 @@ void SvgDeviceContext::AppendIdAndClass(
     }
 
     if (m_html5) {
-        m_currentNode.append_attribute("data-class") = baseClass.c_str();
+        m_currentNode.append_attribute("data-class") = baseClassFull.c_str();
     }
 
     if (graphicID != PRIMARY) {
         std::string addClass = (graphicID == SPANNING) ? " spanning" : " symbol-ref";
-        baseClass.append(" id-" + gId + addClass);
+        baseClassFull.append(" id-" + gId + addClass);
     }
     if (!addedClasses.empty()) {
-        baseClass.append(" " + addedClasses);
+        baseClassFull.append(" " + addedClasses);
     }
-    m_currentNode.append_attribute("class") = baseClass.c_str();
+    m_currentNode.append_attribute("class") = baseClassFull.c_str();
 }
 
 void SvgDeviceContext::AppendAdditionalAttributes(Object *object)

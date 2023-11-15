@@ -117,7 +117,7 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+    void StartGraphic(Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID = PRIMARY,
         bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
     ///@}
@@ -126,7 +126,7 @@ public:
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
      */
     ///@{
-    void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "") override;
+    void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = "") override;
     void EndCustomGraphic() override;
     ///@}
 
@@ -142,7 +142,7 @@ public:
      * @name Method for starting and ending a text (<tspan>) text graphic
      */
     ///@{
-    void StartTextGraphic(Object *object, std::string gClass, std::string gId) override;
+    void StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId) override;
     void EndTextGraphic(Object *object, View *view) override;
     ///@}
 
@@ -171,8 +171,8 @@ public:
     /**
      * Add id, data-id and class attributes
      */
-    void AppendIdAndClass(
-        std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID = PRIMARY);
+    void AppendIdAndClass(const std::string &gId, const std::string &baseClass, const std::string &addedClasses,
+        GraphicID graphicID = PRIMARY);
 
     /**
      * Append additional attributes, as given in m_svgAdditionalAttributes
@@ -225,7 +225,7 @@ public:
     /**
      * Setter for an additional CSS
      */
-    void SetCss(std::string css) { m_css = css; }
+    void SetCss(const std::string &css) { m_css = css; }
 
     /**
      *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
