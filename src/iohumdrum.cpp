@@ -2752,262 +2752,226 @@ void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
 //
 // HumdrumInput::createHeader --
 //
-// References:
-//      http://music-encoding.org/wp-content/uploads/2015/03/CheatSheetHeader.pdf
-//      http://music-encoding.org/support/tutorials/mei-1st/exploring-the-mei-header
-//
-// <meiHead>
-//     <altId>  . . . . . . . . . . Alternate bibliographic identifier.
-//     <fileDesc> . . . . . . . . . Full bibliographic description of file.
-//        <titleStmt> (required) == Title and responsibility container.
-//           <title>  (required) == Title of bibliographic entry.
-//           <respStmt>          == Names of those repsonsible for
-// intellectual/artistic content.
-//        <pubStmt>   (required) == Pub. name, address, date and related info.
-//
-//        <sourceDesc>           == Sources used to create electronic file.
-//           <source n="1">
-//              <identifier> <titleStmt> <editionStmt> <putStmt> <physDesc>
-//              <seriesStmt> <noteStmt> <history> <langUsage> <key> <tempo>
-//              <meter> <perfMedium> <classification> <contents> <relatedItem>
-//
-//      <encodingDesc>  . . . . . . Relation of file to sources and how it was
-// created.
-//         <appInfo>? <editorialDecl>?
-//
-// changed to <workList> in MEI 4.0:
-//     <workDesc>  . . . . . . . . Groupling for non-bibliograhpic aspects of
-// text.
-//        <identifier> <titleStmt> <history> <langUsage> <key> <tempo> <meter>
-//        <perfMedium> <notesStmt> <classification> <castList> <incipit>
-//        <contents> <relatedItem>
-//
-//     <revisionDesc>  . . . . . . Alterations to the file.
-//        <change>
-//
-
 void HumdrumInput::createHeader()
 {
     hum::HumdrumFile &infile = m_infiles[0];
-    std::vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
-    std::vector<std::vector<std::string>> respPeople;
-    getRespPeople(respPeople, references);
+    std::vector<HumdrumReferenceItem> references = getAllReferenceItems(infile);
+    createSimpleTitleElement(references);
+    // createSimpleComposerElement(references);
+    
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
-
-    // <fileDesc> /////////////
-    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
-    pugi::xml_node fileTitle = fileDesc.append_child("titleStmt");
-
-    std::string OTL = getReferenceValue("OTL", references);
-    pugi::xml_node title = fileTitle.append_child("title");
-    if (!OTL.empty()) {
-        title.append_child(pugi::node_pcdata).set_value(unescapeHtmlEntities(OTL).c_str());
-    }
-
-    // <pubStmt> /////////////
-    pugi::xml_node pubRespStmt;
-    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pugi::xml_document availability;
-    for (int i = 0; i < (int)references.size(); ++i) {
-        std::string refKey = references[i]->getReferenceKey();
-        if (refKey.compare(0, 2, "YE") && refKey.compare(0, 3, "EED") && refKey.compare(0, 3, "PED")) {
-            continue;
-        }
-        else if (refKey.compare(0, 3, "EED") == 0) {
-            if (!pubRespStmt) {
-                pubRespStmt = pubStmt.prepend_child("respStmt");
-            }
-            pugi::xml_node editor = pubRespStmt.append_child("persName");
-            editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
-            editor.append_attribute("analog") = "humdrum:EED";
-            editor.append_attribute("role") = "digital editor";
-            editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-        else if (refKey.compare(0, 3, "PED") == 0) {
-            if (!pubRespStmt) {
-                pubRespStmt = pubStmt.prepend_child("respStmt");
-            }
-            pugi::xml_node editor = pubRespStmt.append_child("persName");
-            editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
-            editor.append_attribute("analog") = "humdrum:PED";
-            editor.append_attribute("role") = "source editor";
-            editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-        else if (refKey.compare(2, 1, "C") == 0) {
-            pugi::xml_node useRestrict = availability.append_child("useRestrict");
-            useRestrict.append_attribute("xml:id")
-                = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
-            useRestrict.append_attribute("analog") = "humdrum:YEC";
-            useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-        else if (refKey.compare(2, 1, "M") == 0) {
-            pugi::xml_node useRestrict = availability.append_child("useRestrict");
-            useRestrict.append_attribute("xml:id")
-                = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
-            useRestrict.append_attribute("analog") = "humdrum:YEM";
-            useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-        else if (refKey.compare(2, 1, "N") == 0) {
-            pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
-            pubPlace.append_attribute("xml:id") = StringFormat("pubplace-L%d", references[i]->getLineNumber()).c_str();
-            pubPlace.append_attribute("analog") = "humdrum:YEN";
-            pubPlace.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-        else if (refKey.compare(2, 1, "P") == 0) {
-            pugi::xml_node publisher = pubStmt.append_child("publisher");
-            publisher.append_attribute("xml:id")
-                = StringFormat("publisher-L%d", references[i]->getLineNumber()).c_str();
-            publisher.append_attribute("analog") = "humdrum:YEP";
-            publisher.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-        else if (refKey.compare(2, 1, "R") == 0) {
-            pugi::xml_node pubDate = pubStmt.append_child("date");
-            pubDate.append_attribute("xml:id") = StringFormat("date-L%d", references[i]->getLineNumber()).c_str();
-            pubDate.append_attribute("analog") = "humdrum:YER";
-            pubDate.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-        }
-    }
-    if (availability.first_child()) {
-        pugi::xml_node copyright = pubStmt.append_child("availability");
-        for (pugi::xml_node child = availability.first_child(); child; child = child.next_sibling()) {
-            copyright.append_copy(child);
-        }
-        availability.reset();
-    }
-
-    // <encodingDesc> /////////
-    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-
-    // <appInfo> /////////
-    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
-    pugi::xml_node application = appInfo.append_child("application");
-    application.append_attribute("isodate") = getDateString().c_str();
-    application.append_attribute("version") = GetVersion().c_str();
-    pugi::xml_node name = application.append_child("name");
-    name.append_child(pugi::node_pcdata).set_value("Verovio");
-    pugi::xml_node p1 = application.append_child("p");
-    p1.append_child(pugi::node_pcdata).set_value("Transcoded from Humdrum");
-    // <editorialDecl> /////////
-    std::string RNB = getReferenceValue("RNB", references);
-    std::string RWG = getReferenceValue("RWG", references);
-    if (!RNB.empty() || !RWG.empty()) {
-        pugi::xml_node editorialDecl = encodingDesc.append_child("editorialDecl");
-        for (int i = 0; i < (int)references.size(); ++i) {
-            std::string key = references[i]->getReferenceKey();
-            if (key == "RNB") {
-                pugi::xml_node note = editorialDecl.append_child("p");
-                note.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-                note.append_attribute("label") = "note";
-            }
-            if (key == "RWG") {
-                pugi::xml_node warning = editorialDecl.append_child("p");
-                warning.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-                warning.append_attribute("label") = "warning";
-            }
-        }
-    }
-    // <projectDesc> /////////
-    std::string ENC = getReferenceValue("ENC", references);
-    std::string EEV = getReferenceValue("EEV", references);
-    if (!ENC.empty() || !EEV.empty()) {
-        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-        if (!ENC.empty()) {
-            ENC = "Encoded by: " + ENC;
-            pugi::xml_node p2 = projectDesc.append_child("p");
-            p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
-        }
-        if (!EEV.empty()) {
-            EEV = "Version: " + EEV;
-            pugi::xml_node p3 = projectDesc.append_child("p");
-            p3.append_child(pugi::node_pcdata).set_value(EEV.c_str());
-        }
-    }
-
-    // <sourceDesc> /////////
-
-    // <workDesc> /////////////
-    // <workDesc> changed to <workList> in MEI 4.0
-    // pugi::xml_node workDesc = meiHead.append_child("workDesc");
-    pugi::xml_node workList = meiHead.append_child("workList");
-    // pugi::xml_node work = workDesc.append_child("work");
-    pugi::xml_node work = workList.append_child("work");
-
-    std::string SCT = getReferenceValue("SCT", references);
-    if (!SCT.empty()) {
-        pugi::xml_node identifier = work.append_child("identifier");
-        identifier.append_attribute("analog") = "humdrum:SCT";
-        identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
-    }
-    // <titleStmt> removed in MEI 4.0
-    // pugi::xml_node titleStmt = work.append_child("titleStmt");
-    // pugi::xml_node titleStmt = work.append_child("titleStmt");
-    // insertTitle(titleStmt, references);
-    insertTitle(work, references);
-    if (respPeople.size() > 0) {
-        // insertRespStmt(titleStmt, respPeople);
-        // Update for MEI 4.0:
-        insertPeople(work, respPeople);
-    }
-    std::string ODT = getReferenceValue("ODT", references);
-    std::string OCY = getReferenceValue("OCY", references);
-    std::string OPC = getReferenceValue("OPC", references);
-    if (!ODT.empty() || !OCY.empty() || !OPC.empty()) {
-        pugi::xml_node creation = work.append_child("creation");
-        if (!ODT.empty()) {
-            pugi::xml_node date = creation.append_child("date");
-            date.append_attribute("analog") = "humdrum:ODT";
-            date.append_child(pugi::node_pcdata).set_value(ODT.c_str());
-        }
-        if (!OCY.empty()) {
-            pugi::xml_node country = creation.append_child("geogName");
-            country.append_attribute("analog") = "humdrum:OCY";
-            country.append_child(pugi::node_pcdata).set_value(OCY.c_str());
-        }
-        if (!OPC.empty()) {
-            pugi::xml_node place = creation.append_child("geogName");
-            place.append_attribute("analog") = "humdrum:OPC";
-            place.append_child(pugi::node_pcdata).set_value(OPC.c_str());
-        }
-    }
-    std::string HAO = getReferenceValue("HAO", references);
-    if (!HAO.empty()) {
-        pugi::xml_node history = work.append_child("history");
-        history.append_attribute("analog") = "humdrum:HAO";
-        for (int i = 0; i < (int)references.size(); ++i) {
-            std::string refKey = references[i]->getReferenceKey();
-            if (refKey.compare(0, 3, "HAO")) {
-                continue;
-            }
-            else {
-                pugi::xml_node histLine = history.append_child("p");
-                histLine.append_attribute("xml:id") = StringFormat("p-L%d", references[i]->getLineNumber()).c_str();
-                histLine.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-            }
-        }
-    }
-
-    // <extMeta> /////////////
-    if (references.size() > 0) {
-        insertExtMeta(references);
-    }
-
-    // pugi::xml_node creation = work.append_child("creation");
+    createFileDesc(meiHead, references);
+    createEncodingDesc(meiHead, references);
+    createWorkList(meiHead, references);
+    createHumdrumVerbatimExtMeta(meiHead, references);
 }
 
-//////////////////////////////
-//
-// HumdrumInput::getReferenceValue --
-//
-
-string HumdrumInput::getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references)
+void HumdrumInput::createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
 {
-    for (int i = 0; i < (int)references.size(); ++i) {
-        if (key == references[i]->getReferenceKey()) {
-            return references[i]->getReferenceValue();
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    titleStmt.append_copy(m_simpleTitle.first_child());
+    
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    pugi::xml_node unpub = pubStmt.append_child("unpub");
+    unpub.append_child(pugi::node_pcdata).set_value("This MEI file was created by Verovio's Humdrum converter. When published, this unpub element should be removed, and the enclosing pubStmt element should be properly filled out.");
+    
+    // If sourceDesc ends up with no children, we will fileDesc.remove_child(sourceDesc) to avoid an empty <sourceDesc/>.
+    pugi::xml_node sourceDesc = fileDesc.append_child("sourceDesc");
+//    pugi::xml_node digitalSource = createDigitalSource(sourceDesc, references);
+//    pugi::xml_node printedSource = createPrintedSource(sourceDesc, references);
+//    if (!digitalSource.empty() && !printedSource.empty()) {
+//        pugi::xml_node digitalSourceBibl = digitalSource.child("bibl");
+//    }
+
+}
+
+void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+{
+    
+}
+
+void HumdrumInput::createWorkList(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+{
+    
+}
+
+void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references)
+{
+    
+}
+
+void HumdrumInput::createSimpleTitleElement(std::vector<HumdrumReferenceItem> references)
+{
+    std::vector<HumdrumReferenceItem>titles = getReferenceItems("OTL", references);
+    std::vector<HumdrumReferenceItem>movementNames = getReferenceItems("OMD", references);
+    pugi::xml_node titleEl = m_simpleTitle.append_child("title");
+    string firstLang;
+    int bestTitleIdx = getBestItem(titles, string());
+    if (bestTitleIdx >= 0 && !titles[bestTitleIdx].language.empty()) {
+        firstLang = titles[bestTitleIdx].language;
+    }
+    int bestMovementNameIdx = getBestItem(movementNames, string());
+    if (bestTitleIdx < 0 && bestMovementNameIdx >= 0 and !movementNames[bestMovementNameIdx].language.empty()) {
+        firstLang = movementNames[bestMovementNameIdx].language;
+    }
+    
+    if (bestTitleIdx < 0 && bestMovementNameIdx < 0) {
+        // m_simpleTitle is just <title/>
+        return;
+    }
+    
+    if (!firstLang.empty()) {
+        titleEl.append_attribute("xml:lang") = firstLang.c_str();
+    }
+    
+    if (bestTitleIdx >= 0 && bestMovementNameIdx >= 0
+            && titles[bestTitleIdx].value != movementNames[bestMovementNameIdx].value) {
+        string combinedName = titles[bestTitleIdx].value + string(", ") + movementNames[bestMovementNameIdx].value;
+        titleEl.append_child(pugi::node_pcdata).set_value(combinedName.c_str());
+    }
+    else if (bestTitleIdx >= 0) {
+        titleEl.append_child(pugi::node_pcdata).set_value(titles[bestTitleIdx].value.c_str());
+    }
+    else if (bestMovementNameIdx >= 0) {
+        titleEl.append_child(pugi::node_pcdata).set_value(movementNames[bestMovementNameIdx].value.c_str());
+    }
+}
+
+int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, string requiredLanguage)
+{
+    // If requiredLanguage is set, return the first item with that language,
+    // otherwise return the first item that is untranslated.
+    // If nothing is found that has the right language/is untranslated,
+    // just return the first item.
+    bool noRequiredLanguage = requiredLanguage.empty();
+    
+    for (int i = 0; i < titles.size(); i++) {
+        HumdrumReferenceItem title = titles[i];
+        if (noRequiredLanguage) {
+            // best title is first non-translated title
+            if (!title.isTranslated) {
+                return i;
+            }
+        }
+        else {
+            // best title is first title in the required language
+            if (title.language == requiredLanguage) {
+                return i;
+            }
         }
     }
-    std::string empty;
-    return empty;
+    
+    if (!titles.empty()) {
+        return 0;
+    }
+    
+    return -1;
+}
+
+std::vector<HumdrumReferenceItem> HumdrumInput::getAllReferenceItems(hum::HumdrumFile infile)
+{
+    int firstDataLineIdx = infile.getLineCount();
+    for (int lineIdx=0; lineIdx < infile.getLineCount(); lineIdx++) {
+        if (infile[lineIdx].isData()) {
+            firstDataLineIdx = lineIdx;
+            break;
+        }
+    }
+    
+    vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
+    int len = (int)references.size();
+    std::vector<HumdrumReferenceItem> items(len);
+    for (int i = 0; i < len; ++i) {
+        hum::HumRegex hre;
+        string key = references[i]->getReferenceKey();
+        string value = references[i]->getReferenceValue();
+        bool isParseable = false;
+        bool isHumdrumKey = false;
+        string language;
+        bool isTranslated = false;
+        string number;
+        int index = 0;
+
+        if (hre.search(key, "^([^0-9@ \t]*)([0-9]*)?((@{1,2})([a-zA-Z]*))?$")) {
+            isParseable = true;
+            key = hre.getMatch(1);
+            number = hre.getMatch(2);
+            if (!number.empty()) {
+                index = std::stoi(number);
+            }
+            language = hre.getMatch(5);
+            std::transform(language.begin(), language.end(), language.begin(), ::tolower);
+            isTranslated = !language.empty() && hre.getMatch(4) != "@@";
+            isHumdrumKey = (key.size() >= 3) && (isStandardHumdrumKey(key.substr(0, 3)));
+        }
+        
+        if (key.substr(0,3) == "RDF" || key == "system-decoration") {
+            continue;
+        }
+        
+        if (key == "OMD") {
+            // Only take OMDs before the firstDataLineIdx as movementName in metadata,
+            // because after the first data line, they're not movementNames, just
+            // tempo changes.  And of the ones that are early enough to take, skip the
+            // ones that have metronome info but no tempo name.
+            if (references[i]->getLineIndex() > firstDataLineIdx) {
+                continue;
+            }
+            
+            if (hre.search(value,
+                    // With parens, e.g. 'Allegro M.M. ([quarter] = 128.0)'
+                    "(.*?)\\s*(M\\.M\\.|M\\. M\\.|M\\:M\\:|M M)?\\s*\\(\\[([^=\\]]*)\\]\\s*=\\s*(\\d+\\.?\\d*)")
+                || hre.search(value,
+                    // Without parens, e.g. 'Allegro M.M. [quarter] = 128.0'
+                    "(.*?)\\s*(M\\.M\\.|M\\. M\\.|M\\:M\\:|M M)?\\s*\\[([^=\\]]*)\\]\\s*=\\s*(\\d+\\.?\\d*)")) {
+                // It has metronome info.
+                if (hre.getMatch(1) != "") {
+                    // it has a tempo name and some other metronome-like info.  Strip off the metronome info and
+                    // just use the tempo name as the movement name.  (Strip off leading and trailing white-space, too.)
+                    value = hre.getMatch(1);
+                    value.erase(0,value.find_first_not_of(" \t"));
+                    value.erase(value.find_last_not_of(" \t")+1);
+                }
+                else {
+                    // It has metronome info, but has no tempo name;
+                    // you can't use "[quarter] = 128" as a movement name
+                    continue;
+                }
+            }
+        }
+        
+        items[i].lineText = references[i]->getText();
+        items[i].key = key;
+        items[i].value = value;
+        items[i].isParseable = isParseable;
+        items[i].isHumdrumKey = isHumdrumKey;
+        items[i].isTranslated = isTranslated;
+        items[i].language = language;
+        items[i].index = index;
+    }
+    
+    return items;
+}
+
+bool HumdrumInput::isStandardHumdrumKey(string key) {
+    if (key[0] == 'X' and key.size() == 3) {
+        // translated title
+        return true;
+    }
+    return std::find(m_standardHumdrumKeys.begin(), m_standardHumdrumKeys.end(), key) != m_standardHumdrumKeys.end();
+}
+
+std::vector<HumdrumReferenceItem> HumdrumInput::getReferenceItems(const std::string &key,
+    std::vector<HumdrumReferenceItem> &references)
+{
+    std::vector<HumdrumReferenceItem> items;
+    for (int i = 0; i < (int)references.size(); ++i) {
+        if (key == references[i].key) {
+            items.push_back(references[i]);
+        }
+    }
+    return items;
 }
 
 //////////////////////////////
@@ -3022,278 +2986,6 @@ string HumdrumInput::getDateString()
     std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     return dateStr;
-}
-
-//////////////////////////////
-//
-// HumdrumInput::insertRespStmt -- Print a list of composer and/or lyricist.
-//     This is for MEI 3.0 and no longer used, so should eventually be deleted.
-//
-
-void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string>> &respPeople)
-{
-    if (respPeople.size() == 0) {
-        return;
-    }
-    pugi::xml_node respStmt = titleStmt.append_child("respStmt");
-    for (int i = 0; i < (int)respPeople.size(); ++i) {
-        pugi::xml_node person = respStmt.append_child("persName");
-        person.append_attribute("xml:id") = StringFormat("persname-L%s", respPeople[i][3].c_str()).c_str();
-        person.append_attribute("analog") = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
-        person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
-        person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
-    }
-}
-
-//////////////////////////////
-//
-// HumdrumInput::insertPeople -- Print a list of composer and/or lyricist.
-//    Adapted from HumdrumInput::insertRespStmt().
-//    Each entry in respPeople:
-//   [0] = Person's name
-//   [1] = role:
-//          COM = composer
-//          COA = attributed composer
-//          COS = suspected composer
-//          LYR = lyricist composer
-//          see definition of getRespPeople() for more roles.
-//   [2] = @analog
-//   [3] = Line number for xml:id creation
-//
-
-void HumdrumInput::insertPeople(pugi::xml_node &work, std::vector<std::vector<std::string>> &respPeople)
-{
-    if (respPeople.size() == 0) {
-        return;
-    }
-    // pugi::xml_node respStmt = titleStmt.append_child("respStmt");
-    bool created = false;
-    pugi::xml_node person;
-    for (int i = 0; i < (int)respPeople.size(); ++i) {
-        created = false;
-        if (respPeople[i][1] == "composer") {
-            person = work.append_child("composer");
-            created = true;
-        }
-        if (respPeople[i][1] == "attributed composer") {
-            person = work.append_child("composer");
-            person.append_attribute("cert") = "unknown";
-            created = true;
-        }
-        if (respPeople[i][1] == "suspected composer") {
-            person = work.append_child("composer");
-            person.append_attribute("cert") = "unknown";
-            created = true;
-        }
-        else if (respPeople[i][1] == "lyricist") {
-            person = work.append_child("lyricist");
-            created = true;
-        }
-        else if (respPeople[i][1] == "librettist") {
-            person = work.append_child("librettist");
-            created = true;
-        }
-
-        if (created) {
-            person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
-            if (!respPeople[i][2].empty()) {
-                person.append_attribute("analog") = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
-            }
-            person.append_attribute("xml:id") = StringFormat("person-L%s", respPeople[i][3].c_str()).c_str();
-        }
-    }
-}
-
-//////////////////////////////
-//
-// HumdrumInput::getRespPeople -- Get the respStmnt people, such as the composer
-// and/or lyricist.
-//
-// Roles (4th parameter in addPerson(), is free-form, but should use the roles
-// are listed in these two webpages:
-//    http://www.loc.gov/marc/relators/relacode.html
-//       list of three-letter relator codes
-//    http://www.loc.gov/marc/relators/relaterm.html
-//       short descriptions of relator codes
-//
-
-void HumdrumInput::getRespPeople(
-    std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references)
-{
-
-    // precalculate a reference map here to make more O(N) rather than O(N^2)
-    addPerson(respPeople, references, "COM", "composer"); // cmp
-    addPerson(respPeople, references, "COA", "attributed composer");
-    addPerson(respPeople, references, "COS", "suspected composer");
-    addPerson(respPeople, references, "LYR", "lyricist"); // lyr
-    addPerson(respPeople, references, "LIB", "librettist"); // lbt
-    addPerson(respPeople, references, "LAR", "arranger"); // arr
-    addPerson(respPeople, references, "LOR", "adapter"); // orchestrator, adp
-    addPerson(respPeople, references, "RPN", "producer"); // pro
-    addPerson(respPeople, references, "MPN", "performer"); // prf, also: Singer/Instrumentalist
-    addPerson(respPeople, references, "MCN", "conductor"); // cnd
-    addPerson(respPeople, references, "ODE", "dedicatee"); // dte
-    addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
-    addPerson(respPeople, references, "OCL", "collector"); // col
-    addPerson(respPeople, references, "PED", "source editor");
-    addPerson(respPeople, references, "EED", "digital editor");
-    addPerson(respPeople, references, "ENC", "encoder"); // mrk,
-    // Markup editor
-}
-
-//////////////////////////////
-//
-// HumdrumInput::addPerson --
-//
-
-void HumdrumInput::addPerson(std::vector<std::vector<std::string>> &respPeople,
-    std::vector<hum::HumdrumLine *> &references, const std::string &key, const std::string &role)
-{
-    for (int i = 0; i < (int)references.size(); ++i) {
-        if (references[i]->getReferenceKey() == key) {
-            respPeople.resize(respPeople.size() + 1);
-            respPeople.back().resize(4);
-            respPeople.back()[0] = references[i]->getReferenceValue();
-            respPeople.back()[1] = role;
-            respPeople.back()[2] = key;
-            respPeople.back()[3] = std::to_string(references[i]->getLineNumber());
-        }
-    }
-}
-
-//////////////////////////////
-//
-// HumdrumInput::insertExtMeta -- Print Humdrum reference records as XML into
-//     <extMeta> element.
-//
-
-void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
-{
-    // for now do not print for **mens data, since timestamps are used
-    if (m_mens) {
-        return;
-    }
-    std::stringstream xmldata;
-    xmldata << "<extMeta>\n";
-    xmldata << "\t<frames xmlns=\"http://www.humdrum.org/ns/humxml\">\n";
-    for (int i = 0; i < (int)references.size(); ++i) {
-        std::string refKey = references[i]->getReferenceKey();
-        // Keep all reference records for round-trip conversions:
-        // if (!(refKey.compare(0, 3, "EED") && refKey.compare(0, 2, "HA") && refKey.compare(0, 2, "OT")
-        //         && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
-        //     continue;
-        // }
-        references[i]->printXml(xmldata, 4);
-    }
-    xmldata << "\t</frames>\n";
-    xmldata << "</extMeta>\n";
-
-    pugi::xml_document tmpdoc;
-    pugi::xml_parse_result result = tmpdoc.load_string(xmldata.str().c_str());
-    if (!result) {
-        // some sort of error, so give up;
-        cerr << "ExtMeta parse error: " << result.description() << endl;
-        cerr << xmldata.str();
-        return;
-    }
-
-    m_doc->m_header.first_child().append_copy(tmpdoc.document_element());
-}
-
-//////////////////////////////
-//
-// HumdrumInput::insertTitle --
-//
-
-void HumdrumInput::insertTitle(pugi::xml_node &work, const std::vector<hum::HumdrumLine *> &references)
-{
-    std::string key;
-    std::string value;
-    bool lang;
-    bool plang;
-    std::string language;
-
-    int titlecount = 0;
-
-    for (int i = 0; i < (int)references.size(); ++i) {
-        plang = false;
-        lang = false;
-        key = references[i]->getReferenceKey();
-        if (key.compare(0, 2, "OT") && key.compare(0, 1, "X")) {
-            continue;
-        }
-        value = references[i]->getReferenceValue();
-        if (value.empty()) {
-            continue;
-        }
-        auto loc = key.find("@");
-        if (loc != std::string::npos) {
-            lang = true;
-            if (key.find("@@") != std::string::npos) {
-                plang = true;
-                language = key.substr(loc + 2);
-                if (language.empty()) {
-                    plang = false;
-                    lang = false;
-                }
-            }
-            else {
-                language = key.substr(loc + 1);
-                if (language.empty()) {
-                    plang = false;
-                    lang = false;
-                }
-            }
-        }
-
-        for (int j = 0; j < (int)language.size(); ++j) {
-            if (language[j] == '-') {
-                // don't force to lower case after first dash
-                // as BCP 47 country codes are in upper case, and
-                // variant codes usually start capitalized.
-                break;
-            }
-            language[j] = std::tolower(language[j]);
-        }
-
-        pugi::xml_node title = work.append_child("title");
-        titlecount++;
-        title.text().set(unescapeHtmlEntities(value).c_str());
-        title.append_attribute("xml:id") = StringFormat("title-L%d", references[i]->getLineNumber()).c_str();
-        title.append_attribute("analog") = StringFormat("humdrum:%s", key.substr(0, 3).c_str()).c_str();
-        if (key.compare(0, 3, "OTL") == 0) {
-            if (!lang || plang) {
-                title.append_attribute("type") = "main";
-            }
-            else {
-                title.append_attribute("type") = "translated";
-            }
-            if (lang) {
-                title.append_attribute("xml:lang") = language.c_str();
-            }
-        }
-        else if (key.compare(0, 3, "OTA") == 0) {
-            title.append_attribute("type") = "alternative";
-            if (lang) {
-                title.append_attribute("xml:lang") = language.c_str();
-            }
-        }
-        else if (key.compare(0, 3, "OTP") == 0) {
-            title.append_attribute("type") = "alternative";
-            title.append_attribute("label") = "popular";
-            if (lang) {
-                title.append_attribute("xml:lang") = language.c_str();
-            }
-        }
-        else {
-            title.append_attribute("type") = "translated";
-        }
-    }
-
-    if (!titlecount) {
-        // Put in a required empty <title/> tag:
-        work.append_child("title");
-    }
 }
 
 //////////////////////////////

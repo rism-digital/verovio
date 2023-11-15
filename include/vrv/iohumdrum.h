@@ -429,6 +429,25 @@ public:
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
+struct HumdrumReferenceItem {
+    string lineText;            // the full text of the HumdrumLine containing this item,
+                                // e.g. "!!!OTL2@FR:Le deuxième titre Français"
+    string key;                 // the interpreted key, with key, index, isTranslated, language stripped out
+                                // e.g. "OTL" (if not parseable, we get everything between "!!!" and ":")
+    string value;               // the value (everything after the ':')
+                                // e.g. "Le deuxième titre Français"
+    bool isParseable;           // true if we could parse out key, index, isTranslated, language
+                                // e.g. true
+    bool isHumdrumKey;          // true if isParseable and key is in the known list of Humdrum keys
+                                // e.g. true
+    bool isTranslated;          // true if single '@' (not '@@') is present
+                                // e.g. true
+    string language;            // the language, if present, lowercased
+                                // e.g. "fr"
+    int index;                  // the index (0 if not present)
+                                // e.g. 2
+};
+
 //----------------------------------------------------------------------------
 // HumdrumInput
 //----------------------------------------------------------------------------
@@ -849,13 +868,14 @@ protected:
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
-    void insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references);
-    void insertExtMeta(std::vector<hum::HumdrumLine *> &references);
-    void addPerson(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references,
-        const std::string &key, const std::string &role);
-    void getRespPeople(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references);
-    void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string>> &respPeople);
-    void insertPeople(pugi::xml_node &work, std::vector<std::vector<std::string>> &respPeople);
+    void createFileDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
+    void createEncodingDesc(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
+    void createWorkList(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
+    void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead, std::vector<HumdrumReferenceItem> references);
+    void createSimpleTitleElement(std::vector<HumdrumReferenceItem> references);
+    std::vector<HumdrumReferenceItem> getAllReferenceItems(hum::HumdrumFile infile);
+    int getBestItem(std::vector<HumdrumReferenceItem> items, string requiredLanguage);
+    bool isStandardHumdrumKey(string key);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
@@ -929,7 +949,7 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static hum::HumNum nextHigherPowerOfTwo(hum::HumNum x);
     static std::string getDateString();
-    static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
+    std::vector<HumdrumReferenceItem> getReferenceItems(const std::string &key, std::vector<HumdrumReferenceItem> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     static bool replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr);
 
@@ -1211,6 +1231,109 @@ private:
     // m_textSmuflSpace = space to give between SMuFL characters
     // (excluding augmentation dots).
     std::string m_textSmuflSpacer = "\xc2\xa0";
+
+    // Some metadata elements that are computed once and used multiple times
+    pugi::xml_document m_simpleTitle;
+    pugi::xml_document m_simpleComposer;
+
+    vector<string> m_standardHumdrumKeys = {
+        "COM", // composer's name
+        "COA", // attributed composer
+        "COS", // suspected composer
+        "COL", // composer's abbreviated, alias, or stage name
+        "COC", // composer's corporate name
+        "CDT", // composer's birth and death dates (**zeit format)
+        "CBL", // composer's birth location
+        "CDL", // composer's death location
+        "CNT", // composer's nationality
+        "LYR", // lyricist's name
+        "LIB", // librettist's name
+        "LAR", // music arranger's name
+        "LOR", // orchestrator's name
+        "TXO", // original language of vocal/choral text
+        "TXL", // language of the encoded vocal/choral text
+        "TRN", // translator of the text
+        "RTL", // album title
+        "RMM", // manufacturer or sponsoring company
+        "RC#", // recording company's catalog number of album
+        "RRD", // release date (**date format)
+        "RLC", // place of recording
+        "RNP", // producer's name
+        "RDT", // date of recording (**date format)
+        "RT#", // track number
+        "MGN", // Humdrum encodes, say, a MIDI performance)
+        "MPN", // ensemble's name
+        "MPS", // performer's name
+        "MRD", // suspected performer
+        "MLC", // date of performance (**date format)
+        "MCN", // place of performance
+        "MPD", // conductor's name
+        "MDT", // date of first performance (**date format)
+        "OTL", // I've seen 'em (another way to say date of performance?)
+        "OTP", // title
+        "OTA", // popular title
+        "OPR", // alternative title
+        "OAC", // title of parent work
+        "OSC", // act number (e.g. '2' or 'Act 2')
+        "OMV", // scene number (e.g. '3' or 'Scene 3')
+        "OMD", // movement number (e.g. '4', or 'mov. 4', or...)
+        "OPS", // movement name
+        "ONM", // opus number (e.g. '23', or 'Opus 23')
+        "OVM", // number (e.g. number of song within ABC multi-song file)
+        "ODE", // volume number (e.g. '6' or 'Vol. 6')
+        "OCO", // dedicated to
+        "OCL", // commissioned by
+        "ONB", // collected/transcribed by
+        "ODT", // free form note related to title or identity of work
+        "OCY", // date or period of composition (**date or **zeit format)
+        "OPC", // country of composition
+        "GTL", // city, town, or village of composition
+        "GAW", // group title (e.g. 'The Seasons')
+        "GCO", // associated work, such as a play or film
+        "PUB", // publication status 'published'/'unpublished'
+        "PED", // publication editor
+        "PPR", // first publisher
+        "PDT", // date first published (**date format)
+        "PTL", // publication (volume) title
+        "PPP", // place first published
+        "PC#", // publisher's catalog number (NOT scholarly catalog)
+        "SCT", // scholarly catalog abbrev/number (e.g. 'BWV 551')
+        "SCA", // scholarly catalog (unabbreviated) (e.g. 'Koechel 117')
+        "SMS", // unpublished manuscript source name
+        "SML", // unpublished manuscript location
+        "SMA", // acknowledgment of manuscript access
+        "YEP", // publisher of electronic edition
+        "YEC", // date and owner of electronic copyright
+        "YER", // date electronic edition released
+        "YEM", // copyright message (e.g. 'All rights reserved')
+        "YEN", // country of copyright
+        "YOR", // original document from which encoded doc was prepared
+        "YOO", // original document owner
+        "YOY", // original copyright year
+        "YOE", // original editor
+        "EED", // electronic editor
+        "ENC", // electronic encoder (person)
+        "END", // encoding date
+        "EMD", // electronic document modification description (one/mod)
+        "EEV", // electronic edition version
+        "EFL", // file number e.g. '1/4' for one of four
+        "EST", // encoding status (usually deleted before distribution)
+        "VTS", // checksum (excluding the VTS line itself)
+        "ACO", // collection designation
+        "AFR", // form designation
+        "AGN", // genre designation
+        "AST", // style, period, or type of work designation
+        "AMD", // mode classification e.g. '5; Lydian'
+        "AMT", // metric classification, must be one of eight names, e.g. 'simple quadruple'
+        "AIN", // instrumentation, must be alphabetical list of *I abbrevs, space-delimited
+        "ARE", // geographical region of origin (list of 'narrowing down' names of regions)
+        "ARL", // geographical location of origin (lat/long)
+        "HAO", // aural history (lots of text, stories about the work)
+        "HTX", // freeform translation of vocal text
+        "RLN", // Extended ASCII language code
+        "RNB", // a note about the representation
+        "RWB"  // a warning about the representation
+    };
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
