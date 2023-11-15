@@ -263,6 +263,11 @@ public:
     ///@}
 
     /**
+     * Method for changing the color of a custom graphic
+     */
+    virtual void SetCustomGraphicColor(const std::string &color){};
+
+    /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      * The methods can be used to the output together, for example for a Beam
      */

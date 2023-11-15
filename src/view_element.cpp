@@ -1481,6 +1481,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
             dc->StartCustomGraphic("notehead");
 
+            if (note->HasHeadColor()) {
+                dc->SetCustomGraphicColor(note->GetHeadColor());
+            }
+
             this->DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
 
             // handle notehead enclosure
