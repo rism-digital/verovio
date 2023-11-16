@@ -2881,21 +2881,94 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
         }
         for (auto releaseDate : releaseDates) {
             pugi::xml_node releaseDateEl = imprint.append_child("date");
+            releaseDateEl.append_attribute("type") = "releaseDate";
             releaseDateEl.append_attribute("analog") = "humdrum:YER";
             fillInIsoDate(releaseDateEl, releaseDate.value);
             releaseDateEl.append_child(pugi::node_pcdata).set_value(releaseDate.value.c_str());
         }
+        for (auto encodingDate : encodingDates) {
+            pugi::xml_node encodingDateEl = imprint.append_child("date");
+            encodingDateEl.append_attribute("type") = "encodingDate";
+            encodingDateEl.append_attribute("analog") = "humdrum:END";
+            fillInIsoDate(encodingDateEl, encodingDate.value);
+            encodingDateEl.append_child(pugi::node_pcdata).set_value(encodingDate.value.c_str());
+        }
+    }
+    if (!copyrights.empty() || !copyrightStatements.empty() || !copyrightCountries.empty()) {
+        pugi::xml_node availability = bibl.append_child("availability");
+        for (auto copyright : copyrights) {
+            pugi::xml_node copyrightEl = availability.append_child("useRestrict");
+            copyrightEl.append_attribute("type") = "copyright";
+            copyrightEl.append_attribute("analog") = "humdrum:YEC";
+            fillInIsoDate(copyrightEl, copyright.value);
+            copyrightEl.append_child(pugi::node_pcdata).set_value(copyright.value.c_str());
+        }
+        for (auto copyrightStatement : copyrightStatements) {
+            pugi::xml_node copyrightStatementEl = availability.append_child("useRestrict");
+            copyrightStatementEl.append_attribute("type") = "copyrightStatement";
+            copyrightStatementEl.append_attribute("analog") = "humdrum:YEM";
+            fillInIsoDate(copyrightStatementEl, copyrightStatement.value);
+            copyrightStatementEl.append_child(pugi::node_pcdata).set_value(copyrightStatement.value.c_str());
+        }
+        for (auto copyrightCountry : copyrightCountries) {
+            pugi::xml_node copyrightCountryEl = availability.append_child("useRestrict");
+            copyrightCountryEl.append_attribute("type") = "copyrightCountry";
+            copyrightCountryEl.append_attribute("analog") = "humdrum:YEN";
+            fillInIsoDate(copyrightCountryEl, copyrightCountry.value);
+            copyrightCountryEl.append_child(pugi::node_pcdata).set_value(copyrightCountry.value.c_str());
+        }
+    }
+    if (!notes.empty()) {
+        pugi::xml_node annot = bibl.append_child("annot");
+        std::string languageForAll = getTextListLanguage(notes);
+        pugi::xml_node lineGroup = annot.append_child("lg");
+        if (!languageForAll.empty()) {
+            lineGroup.append_attribute("xml:lang") = languageForAll.c_str();
+        }
+        for (auto note : notes) {
+            pugi::xml_node line = lineGroup.append_child("l");
+            // <l> does not take @analog, so use @type instead (says Perry)
+            line.append_attribute("type") = "humdrum:ONB";
+            line.append_child(pugi::node_pcdata).set_value(note.value.c_str());
+            if (languageForAll.empty() && !note.language.empty()) {
+                line.append_attribute("xml:lang") = note.language.c_str();
+            }
+        }
+    }
+    
+    for (auto textLanguage : textLanguages) {
+        pugi::xml_node textLanguageEl = bibl.append_child("textLang");
+        textLanguageEl.append_attribute("analog") = "humdrum:TXL";
+        textLanguageEl.append_child(pugi::node_pcdata).set_value(textLanguage.value.c_str());
     }
 }
 
-void HumdrumInput::fillInIsoDate(pugi::xml_node element, string dateString) {
-    std::map<string, string> attribs = isoDateAttributesFromHumdrumDate(dateString);
+std::string HumdrumInput::getTextListLanguage(std::vector<HumdrumReferenceItem> textItems) {
+    // returns empty string if there is no common language (or there are no languages at all)
+    std::string theLanguage;
+    for (auto textItem : textItems) {
+        if (theLanguage.empty() && !textItem.language.empty()) {
+            theLanguage = textItem.language;
+            continue;
+        }
+        if (!theLanguage.empty() && !textItem.language.empty()) {
+            if (theLanguage != textItem.language) {
+                theLanguage = std::string();
+                break;
+            }
+        }
+    }
+    return theLanguage;
+}
+
+void HumdrumInput::fillInIsoDate(pugi::xml_node element, std::string dateString) {
+    std::map<std::string, std::string> attribs = isoDateAttributesFromHumdrumDate(dateString);
     for (auto const& attrib : attribs) {
         element.append_attribute(attrib.first.c_str()) = attrib.second.c_str();
     }
 }
 
-std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDate(string inHumdrumDate, bool edtf) {
+std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDate(std::string inHumdrumDate, bool edtf) {
     // if edtf is true, the map returned will just be {"edtf", "an edtf date"}.
     // if edtf is false, the map returned can be {"isodate", "an isodate"} or {"notbefore", "an isodate"}, etc
     // Note that MEI doesn't use edtf dates (yet), but the <mads> data we emit in <work><extMeta> does.
@@ -2907,7 +2980,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
         return attribs;
     }
     
-    string humdrumDate = inHumdrumDate;
+    std::string humdrumDate = inHumdrumDate;
     if (humdrumDate[0] == '<') {
         typeNeeded = "DateRelative";
         humdrumDate.erase(0, 1);
@@ -2919,7 +2992,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
         relativeType = "after";
     }
 
-    std::vector<string> dateStrings;
+    std::vector<std::string> dateStrings;
     if (humdrumDate.find_first_of("-") != -1) {
         typeNeeded = "DateBetween";
         hum::HumRegex hre;
@@ -2968,7 +3041,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
         std::vector<std::string> dateParts;
         for (int i = 0; i < 6; i++) {
             int value = INT_MIN;
-            string error;
+            std::string error;
             if (i == 0) {
                 value = date.year;
                 error = date.yearError;
@@ -2997,7 +3070,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
                 // ignore anything after this
                 break;
             }
-            string suffix = "";
+            std::string suffix = "";
             if (!error.empty()) {
                 if (!edtf) {
                     // pre-EDTF ISO dates can't describe approximate/uncertain values.
@@ -3010,11 +3083,11 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
                     suffix = "~";
                 }
             }
-            string sub = std::to_string(value);
+            std::string sub = std::to_string(value);
             sub += suffix;
             dateParts.push_back(sub);
         }
-        string isodate;
+        std::string isodate;
         
         for (int i = 0; i < 3; i++) {
             if (i >= dateParts.size()) {
@@ -3082,7 +3155,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     else if (typeNeeded == "DateSelection") {
         if (edtf) {
             // From humdrum it's always "or".  "and" would be curly braces instead of square.
-            string combinedDates;
+            std::string combinedDates;
             for (int i = 0; i < isodates.size(); i++) {
                 if (i == 0) {
                     combinedDates += "[";
@@ -3107,9 +3180,9 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     return attribs;
 }
 
-DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(string humdrumDate) {
+DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDate) {
     DateWithErrors date;
-    string dateString = humdrumDate;
+    std::string dateString = humdrumDate;
     
     if (!dateString.empty()) {
         if (dateString[0] == '~') {
@@ -3124,7 +3197,7 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(string humdrumDate) {
 
     std::vector<std::string> dateSubStrs;
     std::vector<int> values = {INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN};
-    std::vector<string> errors = {"", "", "", "", "", ""};
+    std::vector<std::string> errors = {"", "", "", "", "", ""};
     hum::HumRegex hre;
     hre.replaceDestructive(dateString, "/", ":");
     hre.replaceDestructive(dateString, "", " ");
@@ -3265,10 +3338,10 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(string humdrumDate) {
     return date;
 }
 
-std::string HumdrumInput::stripDateError(string &value) {
-    string approxSyms = "~x";
-    string uncertainSyms = "?z";
-    string allErrorSyms = approxSyms + uncertainSyms;
+std::string HumdrumInput::stripDateError(std::string &value) {
+    std::string approxSyms = "~x";
+    std::string uncertainSyms = "?z";
+    std::string allErrorSyms = approxSyms + uncertainSyms;
     size_t idx = value.find_first_of(allErrorSyms);
     if (idx == SIZE_MAX) {
         return "";
@@ -3319,12 +3392,12 @@ void HumdrumInput::createSimpleTitleElement()
     std::vector<HumdrumReferenceItem>titles = getReferenceItems("OTL");
     std::vector<HumdrumReferenceItem>movementNames = getReferenceItems("OMD");
     pugi::xml_node titleEl = m_simpleTitle.append_child("title");
-    string firstLang;
-    int bestTitleIdx = getBestItem(titles, string());
+    std::string firstLang;
+    int bestTitleIdx = getBestItem(titles, std::string());
     if (bestTitleIdx >= 0 && !titles[bestTitleIdx].language.empty()) {
         firstLang = titles[bestTitleIdx].language;
     }
-    int bestMovementNameIdx = getBestItem(movementNames, string());
+    int bestMovementNameIdx = getBestItem(movementNames, std::string());
     if (bestTitleIdx < 0 && bestMovementNameIdx >= 0 and !movementNames[bestMovementNameIdx].language.empty()) {
         firstLang = movementNames[bestMovementNameIdx].language;
     }
@@ -3340,7 +3413,7 @@ void HumdrumInput::createSimpleTitleElement()
 
     if (bestTitleIdx >= 0 && bestMovementNameIdx >= 0
             && titles[bestTitleIdx].value != movementNames[bestMovementNameIdx].value) {
-        string combinedName = titles[bestTitleIdx].value + string(", ") + movementNames[bestMovementNameIdx].value;
+        std::string combinedName = titles[bestTitleIdx].value + std::string(", ") + movementNames[bestMovementNameIdx].value;
         titleEl.append_child(pugi::node_pcdata).set_value(combinedName.c_str());
     }
     else if (bestTitleIdx >= 0) {
@@ -3351,7 +3424,7 @@ void HumdrumInput::createSimpleTitleElement()
     }
 }
 
-int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, string requiredLanguage)
+int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, std::string requiredLanguage)
 {
     // If requiredLanguage is set, return the first item with that language,
     // otherwise return the first item that is untranslated.
@@ -3396,13 +3469,13 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
     vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
     for (int i = 0; i < (int)references.size(); ++i) {
         hum::HumRegex hre;
-        string baseKey = references[i]->getReferenceKey();
-        string baseValue = references[i]->getReferenceValue();
-        string key;
-        string value;
+        std::string baseKey = references[i]->getReferenceKey();
+        std::string baseValue = references[i]->getReferenceValue();
+        std::string key;
+        std::string value;
         bool isParseable = false;
         bool isHumdrumKey = false;
-        string language;
+        std::string language;
         bool isTranslated = false;
         int index = 0;
 
@@ -3472,7 +3545,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
     return items;
 }
 
-bool HumdrumInput::isStandardHumdrumKey(string key) {
+bool HumdrumInput::isStandardHumdrumKey(std::string key) {
     if (key[0] == 'X' and key.size() == 3) {
         // translated title
         return true;
@@ -3489,8 +3562,8 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getReferenceItems(const std::str
     return items;
 }
 
-bool HumdrumInput::anyReferenceItemsExist(std::vector<string> keys) {
-    for (string key : keys) {
+bool HumdrumInput::anyReferenceItemsExist(std::vector<std::string> keys) {
+    for (auto key : keys) {
         if (auto items = m_references.find(key); items != m_references.end()) {
             return true;
         }
@@ -3503,7 +3576,7 @@ bool HumdrumInput::anyReferenceItemsExist(std::vector<string> keys) {
 // HumdrumInput::getDateSting -- Return the current time and date as a std::string.
 //
 
-string HumdrumInput::getDateString()
+std::string HumdrumInput::getDateString()
 {
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);

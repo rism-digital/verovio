@@ -898,6 +898,7 @@ protected:
     std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(string inHumdrumDate, bool edtf=false);
     DateWithErrors dateWithErrorsFromHumdrumDate(string dateString);
     std::string stripDateError(string &value);
+    std::string getTextListLanguage(std::vector<HumdrumReferenceItem> textItems);
     std::map<std::string, std::vector<HumdrumReferenceItem>> getAllReferenceItems(hum::HumdrumFile infile);
     std::vector<HumdrumReferenceItem> getReferenceItems(const std::string &key);
     bool anyReferenceItemsExist(std::vector<string> keys);
