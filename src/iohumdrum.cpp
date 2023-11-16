@@ -2882,10 +2882,406 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
         for (auto releaseDate : releaseDates) {
             pugi::xml_node releaseDateEl = imprint.append_child("date");
             releaseDateEl.append_attribute("analog") = "humdrum:YER";
-            //fillInIsodate(releaseDateEl, releaseDate.value)
+            fillInIsoDate(releaseDateEl, releaseDate.value);
             releaseDateEl.append_child(pugi::node_pcdata).set_value(releaseDate.value.c_str());
         }
     }
+}
+
+void HumdrumInput::fillInIsoDate(pugi::xml_node element, string dateString) {
+    std::map<string, string> attribs = isoDateAttributesFromHumdrumDate(dateString);
+    for (auto const& attrib : attribs) {
+        element.append_attribute(attrib.first.c_str()) = attrib.second.c_str();
+    }
+}
+
+std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDate(string inHumdrumDate, bool edtf) {
+    // if edtf is true, the map returned will just be {"edtf", "an edtf date"}.
+    // if edtf is false, the map returned can be {"isodate", "an isodate"} or {"notbefore", "an isodate"}, etc
+    // Note that MEI doesn't use edtf dates (yet), but the <mads> data we emit in <work><extMeta> does.
+    std::string typeNeeded = "DateSingle";
+    std::string relativeType = "";
+    std::map<std::string, std::string> attribs;
+    
+    if (inHumdrumDate.empty() or inHumdrumDate.size() < 1) {
+        return attribs;
+    }
+    
+    string humdrumDate = inHumdrumDate;
+    if (humdrumDate[0] == '<') {
+        typeNeeded = "DateRelative";
+        humdrumDate.erase(0, 1);
+        relativeType = "before";
+    }
+    else if (humdrumDate[0] == '>') {
+        typeNeeded = "DateRelative";
+        humdrumDate.erase(0, 1);
+        relativeType = "after";
+    }
+
+    std::vector<string> dateStrings;
+    if (humdrumDate.find_first_of("-") != -1) {
+        typeNeeded = "DateBetween";
+        hum::HumRegex hre;
+        hre.split(dateStrings, humdrumDate, "-");
+    }
+    else if (humdrumDate.find_first_of("^") != -1) {
+        typeNeeded = "DateBetween";
+        hum::HumRegex hre;
+        hre.split(dateStrings, humdrumDate, "^");
+    }
+    else if (humdrumDate.find_first_of("|") != -1) {
+        typeNeeded = "DateSelection";
+        hum::HumRegex hre;
+        hre.split(dateStrings, humdrumDate, "|");
+    }
+    else {
+        typeNeeded = "DateSingle";
+        dateStrings.push_back(humdrumDate);
+    }
+
+    std::vector<DateWithErrors> dates;
+    for (auto dateString : dateStrings) {
+        DateWithErrors date = dateWithErrorsFromHumdrumDate(dateString);
+        if (date.valid == false) {
+            // give up on this whole Humdrum date, and return empty attribs
+            return attribs;
+        }
+        dates.push_back(date);
+    }
+    
+    // Produce isodates for every date found.
+    std::vector<std::string> isodates;
+    for (auto date : dates) {
+        if (!date.valid) {
+            return attribs;
+        }
+        if (!date.dateError.empty()) {
+            if (!edtf) {
+                // pre-EDTF isodates can't represent uncertain/approximate dates,
+                // so don't return any.  The plain text will still describe it,
+                // and should be parseable by most folks.
+                return attribs;
+            }
+        }
+        
+        std::vector<std::string> dateParts;
+        for (int i = 0; i < 6; i++) {
+            int value = INT_MIN;
+            string error;
+            if (i == 0) {
+                value = date.year;
+                error = date.yearError;
+            }
+            else if (i == 1) {
+                value = date.month;
+                error = date.monthError;
+            }
+            else if (i == 2) {
+                value = date.day;
+                error = date.dayError;
+            }
+            else if (i == 3) {
+                value = date.hour;
+                error = date.hourError;
+            }
+            else if (i == 4) {
+                value = date.minute;
+                error = date.minuteError;
+            }
+            else if (i == 5) {
+                value = date.second;
+                error = date.secondError;
+            }
+            if (value == INT_MIN) {
+                // ignore anything after this
+                break;
+            }
+            string suffix = "";
+            if (!error.empty()) {
+                if (!edtf) {
+                    // pre-EDTF ISO dates can't describe approximate/uncertain values.
+                    return attribs;
+                }
+                if (error == "uncertain") {
+                    suffix = "?";
+                }
+                else if (error == "approximate") {
+                    suffix = "~";
+                }
+            }
+            string sub = std::to_string(value);
+            sub += suffix;
+            dateParts.push_back(sub);
+        }
+        string isodate;
+        
+        for (int i = 0; i < 3; i++) {
+            if (i >= dateParts.size()) {
+                break;
+            }
+            if (i > 0) {
+                isodate += "-";
+            }
+            isodate += dateParts[i];
+        }
+        
+        if (dateParts.size() >= 4) {
+            for (int i = 3; i < 6; i++) {
+                if (i >= dateParts.size()) {
+                    break;
+                }
+                if (i == 3) {
+                    isodate += "T";
+                }
+                else {
+                    isodate += ":";
+                }
+                isodate += dateParts[i];
+            }
+        }
+        isodates.push_back(isodate);
+    }
+        
+    // set up and return attribs
+    if (typeNeeded == "DateSingle") {
+        if (edtf) {
+            attribs["edtf"] = isodates[0];
+        }
+        else {
+            attribs["isodate"] = isodates[0];
+        }
+    }
+    else if (typeNeeded == "DateRelative") {
+        if (relativeType == "before") {
+            if (edtf) {
+                attribs["edtf"] = "../" + isodates[0];
+            }
+            else {
+                attribs["notafter"] = isodates[0];
+            }
+        }
+        else if (relativeType == "after") {
+            if (edtf) {
+                attribs["edtf"] = isodates[0] + "/..";
+            }
+            else {
+                attribs["notbefore"] = isodates[0];
+            }
+        }
+    }
+    else if (typeNeeded == "DateBetween") {
+        if (edtf) {
+            attribs["edtf"] = isodates[0] + "/" + isodates[1];
+        }
+        else {
+            attribs["startdate"] = isodates[0];
+            attribs["enddate"] = isodates[1];
+        }
+    }
+    else if (typeNeeded == "DateSelection") {
+        if (edtf) {
+            // From humdrum it's always "or".  "and" would be curly braces instead of square.
+            string combinedDates;
+            for (int i = 0; i < isodates.size(); i++) {
+                if (i == 0) {
+                    combinedDates += "[";
+                }
+                else {
+                    combinedDates += ",";
+                }
+                
+                combinedDates += isodates[i];
+                
+                if (i == isodates.size() - 1) {
+                    combinedDates += "]";
+                }
+            }
+            attribs["edtf"] = combinedDates;
+        }
+        else {
+            // pre-EDTF ISO dates can't describe date selection lists. Leave attribs blank.
+        }
+    }
+    
+    return attribs;
+}
+
+DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(string humdrumDate) {
+    DateWithErrors date;
+    string dateString = humdrumDate;
+    
+    if (!dateString.empty()) {
+        if (dateString[0] == '~') {
+            dateString.erase(0, 1);
+            date.dateError = "approximate";
+        }
+        else if (dateString[0] == '?') {
+            dateString.erase(0, 1);
+            date.dateError = "uncertain";
+        }
+    }
+
+    std::vector<std::string> dateSubStrs;
+    std::vector<int> values = {INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN};
+    std::vector<string> errors = {"", "", "", "", "", ""};
+    hum::HumRegex hre;
+    hre.replaceDestructive(dateString, "/", ":");
+    hre.replaceDestructive(dateString, "", " ");
+    hre.split(dateSubStrs, dateString, "/");
+    bool gotOne = false;
+    try {
+        for (int i = 0; i < dateSubStrs.size(); i++) {
+            std::string value = dateSubStrs[i];
+            std::string error = stripDateError(value);
+            if (i == 0 && value.size() >= 2) {
+                if (value[0] == '@') {
+                    // year with prepended '@' is B.C.E. so replace with '-'
+                    value[0] = '-';
+                }
+            }
+            if (value.empty()) {
+                values[i] = INT_MIN;
+            }
+            else if (i == 5) {
+                // second is a float, but we truncate to int
+                values[i] = int(atof(value.c_str()));
+                gotOne = true;
+            }
+            else {
+                values[i] = atoi(value.c_str());
+                gotOne = true;
+            }
+            errors[i] = error;
+        }
+    }
+    catch (...) {
+        // if anything failed to convert to integer, this string is unparseable
+        gotOne = false;
+    }
+    
+    if (gotOne) {
+        // sanity check the numbers
+        int month = INT_MIN;
+        int year = INT_MIN;
+        for (int i = 0; i < 6; i++) {
+            if (i == 0) {
+                year = values[i];
+                // year (can be anything except INT_MIN)
+                if (values[i] == INT_MIN) {
+                    gotOne = false;
+                    break;
+                }
+            }
+            else if (i == 1) {
+                // month (must be INT_MIN or 1..12)
+                month = values[i];
+                if (values[i] == INT_MIN) {
+                    // we're ok
+                }
+                else if (values[i] < 1 || values[i] > 12) {
+                    // bad month
+                    gotOne = false;
+                    break;
+                }
+            }
+            else if (i == 2) {
+                // day needs to match number of days in month.
+                if (month == INT_MIN) {
+                    if (values[i] != INT_MIN) {
+                        // bad: day without month
+                        gotOne = false;
+                        break;
+                    }
+                }
+                else if (values[i] < 1) {
+                    gotOne = false;
+                    break;
+                }
+                else if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12) {
+                    if (values[i] > 31) {
+                        gotOne = false;
+                        break;
+                    }
+                }
+                else if (month == 2) {
+                    // There are weird non-leap years sometimes (recent centuries that are divisible by 400, for
+                    // example).  I am treating them like they are leap years, because otherwise I would go insane.
+                    if (year % 4 == 0 && values[i] > 29) {
+                        // leap year fail
+                        gotOne = false;
+                        break;
+                    }
+                    if (year % 4 != 0 && values[i] > 28) {
+                        // non-leap year fail
+                        gotOne = false;
+                        break;
+                    }
+                }
+                else if (month == 4 || month == 6 || month == 9 | month == 11) {
+                    if (values[i] > 30) {
+                        gotOne = false;
+                        break;
+                    }
+                }
+            }
+            else if (i == 3) {
+                // hour (must be INT_MIN or 0..23
+                if (values[i] == INT_MIN) {
+                    // ok
+                }
+                else if (values[i] < 0 || values[i] > 23) {
+                    gotOne = false;
+                    break;
+                }
+            }
+            else if (i == 4 || i == 5) {
+                // minute or second (must be INT_MIN or 0..59)
+                if (values[i] == INT_MIN) {
+                    // ok
+                }
+                else if (values[i] < 0 || values[i] > 59) {
+                    gotOne = false;
+                    break;
+                }
+            }
+        }
+    }
+    if (gotOne) {
+        date.valid = true;
+        date.year = values[0];
+        date.yearError = errors[0];
+        date.month = values[1];
+        date.monthError = errors[1];
+        date.day = values[2];
+        date.dayError = errors[2];
+        date.hour = values[3];
+        date.hourError = errors[3];
+        date.minute = values[4];
+        date.minuteError = errors[4];
+        date.second = values[5];
+        date.secondError = errors[5];
+    }
+    return date;
+}
+
+std::string HumdrumInput::stripDateError(string &value) {
+    string approxSyms = "~x";
+    string uncertainSyms = "?z";
+    string allErrorSyms = approxSyms + uncertainSyms;
+    size_t idx = value.find_first_of(allErrorSyms);
+    if (idx == SIZE_MAX) {
+        return "";
+    }
+    char errorStr[1];
+    errorStr[0] = value[idx];
+    
+    hum::HumRegex hre;
+    hre.replaceDestructive(value, "", errorStr);
+    if (errorStr[0] == '~' || errorStr[0] == 'x') {
+        return "approximate";
+    }
+    return "uncertain";
 }
 
 void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)

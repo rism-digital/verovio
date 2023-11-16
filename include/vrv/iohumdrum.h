@@ -448,6 +448,23 @@ struct HumdrumReferenceItem {
                                 // e.g. 2
 };
 
+struct DateWithErrors {
+    bool valid = false;         // if false, ignore everything here, the date was not parseable.
+    string dateError = "";      // error of the entire date ("", "approximate", "uncertain")
+    int year = INT_MIN;
+    string yearError = "";      // error of the year ("", "approximate", "uncertain")
+    int month = INT_MIN;
+    string monthError = "";     // error of the month ("", "approximate", "uncertain")
+    int day = INT_MIN;
+    string dayError = "";       // error of the day ("", "approximate", "uncertain")
+    int hour = INT_MIN;
+    string hourError = "";      // error of the hour ("", "approximate", "uncertain")
+    int minute = INT_MIN;
+    string minuteError = "";    // error of the minute ("", "approximate", "uncertain")
+    int second = INT_MIN;
+    string secondError = "";    // error of the second ("", "approximate", "uncertain")
+};
+
 //----------------------------------------------------------------------------
 // HumdrumInput
 //----------------------------------------------------------------------------
@@ -877,6 +894,10 @@ protected:
     void createWorkList(pugi::xml_node meiHead);
     void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead);
     void createSimpleTitleElement();
+    void fillInIsoDate(pugi::xml_node element, string dateString);
+    std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(string inHumdrumDate, bool edtf=false);
+    DateWithErrors dateWithErrorsFromHumdrumDate(string dateString);
+    std::string stripDateError(string &value);
     std::map<std::string, std::vector<HumdrumReferenceItem>> getAllReferenceItems(hum::HumdrumFile infile);
     std::vector<HumdrumReferenceItem> getReferenceItems(const std::string &key);
     bool anyReferenceItemsExist(std::vector<string> keys);
