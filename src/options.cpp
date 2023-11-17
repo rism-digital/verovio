@@ -1372,7 +1372,7 @@ Options::Options()
     this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
 
     m_lyricWordSpace.SetInfo("Lyric word space", "The lyric word space length");
-    m_lyricWordSpace.Init(1.20, 0.50, 3.00);
+    m_lyricWordSpace.Init(1.20, 0.50, 10.00);
     this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
 
     m_lyricVerseCollapse.SetInfo("Lyric verse collapse", "Collapse empty verse lines in lyrics");
