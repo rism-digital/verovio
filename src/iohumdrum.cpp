@@ -2800,7 +2800,7 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 
     createRecordedSource(sourceDesc);
     createUnpublishedSource(sourceDesc);
-    
+
     pugi::xml_node firstSource = sourceDesc.child("source");
     if (firstSource.empty()) {
         // delete <sourceDesc>, it's unneeded
@@ -2814,11 +2814,11 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
         "EED", "ENC", "EEV", "EFL", "YEP", "YER",
         "END", "YEC", "YEM", "YEN", "TXL", "ONB"
     };
-    
+
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
     }
-    
+
     pugi::xml_node source = sourceDesc.append_child("source");
     source.append_attribute("type") = "digital";
     pugi::xml_node bibl = source.append_child("bibl");
@@ -2845,7 +2845,7 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
         editorEl.append_attribute("analog") = "humdrum:EED";
         editorEl.append_child(pugi::node_pcdata).set_value(editor.value.c_str());
     }
-    
+
     if (!encoders.empty()) {
         pugi::xml_node respStmt = bibl.append_child("respStmt");
         for (auto encoder : encoders) {
@@ -2856,14 +2856,14 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
             persNameEl.append_child(pugi::node_pcdata).set_value(encoder.value.c_str());
         }
     }
-    
+
     for (auto version : versions) {
         pugi::xml_node versionEl = bibl.append_child("edition");
         versionEl.append_attribute("type") = "version";
         versionEl.append_attribute("analog") = "humdrum:EEV";
         versionEl.append_child(pugi::node_pcdata).set_value(version.value.c_str());
     }
-    
+
     for (auto fileNumber : fileNumbers) {
         pugi::xml_node fileNumberEl = bibl.append_child("extent");
         fileNumberEl.append_attribute("type") = "fileNumber";
@@ -2871,7 +2871,7 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
         fileNumberEl.append_attribute("analog") = "humdrum:EFL";
         fileNumberEl.append_child(pugi::node_pcdata).set_value(fileNumber.value.c_str());
     }
-    
+
     if (!publishers.empty() || !releaseDates.empty() || !encodingDates.empty()) {
         pugi::xml_node imprint = bibl.append_child("imprint");
         for (auto publisher : publishers) {
@@ -2935,7 +2935,7 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
             }
         }
     }
-    
+
     for (auto textLanguage : textLanguages) {
         pugi::xml_node textLanguageEl = bibl.append_child("textLang");
         textLanguageEl.append_attribute("analog") = "humdrum:TXL";
@@ -2975,11 +2975,11 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     std::string typeNeeded = "DateSingle";
     std::string relativeType = "";
     std::map<std::string, std::string> attribs;
-    
+
     if (inHumdrumDate.empty() or inHumdrumDate.size() < 1) {
         return attribs;
     }
-    
+
     std::string humdrumDate = inHumdrumDate;
     if (humdrumDate[0] == '<') {
         typeNeeded = "DateRelative";
@@ -3022,7 +3022,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
         }
         dates.push_back(date);
     }
-    
+
     // Produce isodates for every date found.
     std::vector<std::string> isodates;
     for (auto date : dates) {
@@ -3037,7 +3037,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
                 return attribs;
             }
         }
-        
+
         std::vector<std::string> dateParts;
         for (int i = 0; i < 6; i++) {
             int value = INT_MIN;
@@ -3088,7 +3088,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
             dateParts.push_back(sub);
         }
         std::string isodate;
-        
+
         for (int i = 0; i < 3; i++) {
             if (i >= dateParts.size()) {
                 break;
@@ -3098,7 +3098,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
             }
             isodate += dateParts[i];
         }
-        
+
         if (dateParts.size() >= 4) {
             for (int i = 3; i < 6; i++) {
                 if (i >= dateParts.size()) {
@@ -3115,7 +3115,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
         }
         isodates.push_back(isodate);
     }
-        
+
     // set up and return attribs
     if (typeNeeded == "DateSingle") {
         if (edtf) {
@@ -3163,9 +3163,9 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
                 else {
                     combinedDates += ",";
                 }
-                
+
                 combinedDates += isodates[i];
-                
+
                 if (i == isodates.size() - 1) {
                     combinedDates += "]";
                 }
@@ -3176,14 +3176,14 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
             // pre-EDTF ISO dates can't describe date selection lists. Leave attribs blank.
         }
     }
-    
+
     return attribs;
 }
 
 DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDate) {
     DateWithErrors date;
     std::string dateString = humdrumDate;
-    
+
     if (!dateString.empty()) {
         if (dateString[0] == '~') {
             dateString.erase(0, 1);
@@ -3232,7 +3232,7 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
         // if anything failed to convert to integer, this string is unparseable
         gotOne = false;
     }
-    
+
     if (gotOne) {
         // sanity check the numbers
         int month = INT_MIN;
@@ -3348,7 +3348,7 @@ std::string HumdrumInput::stripDateError(std::string &value) {
     }
     char errorStr[1];
     errorStr[0] = value[idx];
-    
+
     hum::HumRegex hre;
     hre.replaceDestructive(value, "", errorStr);
     if (errorStr[0] == '~' || errorStr[0] == 'x') {
@@ -3479,7 +3479,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
         bool isTranslated = false;
         int index = 0;
 
-        if (baseKey.substr(0,5) == "RDF**" || baseKey == "system-decoration") {
+        if (baseKey.compare(0, 5, "RDF**") || baseKey == "system-decoration") {
             continue;
         }
 
