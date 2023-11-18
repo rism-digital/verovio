@@ -2757,7 +2757,7 @@ void HumdrumInput::createHeader()
     hum::HumdrumFile &infile = m_infiles[0];
     m_references = getAllReferenceItems(infile);
     createSimpleTitleElement();
-    // createSimpleComposerElement();
+    createSimpleComposerElements();
 
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
     createFileDesc(meiHead);
@@ -3684,7 +3684,97 @@ void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
 
 void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
 {
+    std::vector<string> keysThatGoHere = {
+        "SMS", "YOR", "SML", "YOO", "YOE", "YOY", "SMA"
+    };
+    
+    if (!anyReferenceItemsExist(keysThatGoHere)) {
+        return;
+    }
+    
+    std::vector<HumdrumReferenceItem> manuscriptNames = getReferenceItems("SMS");
+    std::vector<HumdrumReferenceItem> moreManuscriptNames = getReferenceItems("YOR");
+    std::vector<HumdrumReferenceItem> manuscriptLocations = getReferenceItems("SML");
+    std::vector<HumdrumReferenceItem> manuscriptOwners = getReferenceItems("YOO");
+    std::vector<HumdrumReferenceItem> editors = getReferenceItems("YOE");
+    std::vector<HumdrumReferenceItem> copyrightDates = getReferenceItems("YOY");
+    std::vector<HumdrumReferenceItem> acknowledgments = getReferenceItems("SMA");
+    
+    pugi::xml_node source = sourceDesc.append_child("source");
+    source.append_attribute("type") = "unpub";
+    pugi::xml_node bibl = source.append_child("bibl");
+    
+    for (auto manuscriptName : manuscriptNames) {
+        pugi::xml_node identifierEl = bibl.append_child("identifier");
+        identifierEl.append_attribute("analog") = "humdrum:SMS";
+        identifierEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
+    }
+    
+    for (auto manuscriptName : moreManuscriptNames) {
+        pugi::xml_node identifierEl = bibl.append_child("identifier");
+        identifierEl.append_attribute("analog") = "humdrum:YOR";
+        identifierEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
+    }
+    
+    // do both again as <title>
+    for (auto manuscriptName : manuscriptNames) {
+        pugi::xml_node titleEl = bibl.append_child("title");
+        titleEl.append_attribute("analog") = "humdrum:SMS";
+        titleEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
+    }
+    
+    for (auto manuscriptName : moreManuscriptNames) {
+        pugi::xml_node titleEl = bibl.append_child("title");
+        titleEl.append_attribute("analog") = "humdrum:YOR";
+        titleEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
+    }
+    
+    for (auto manuscriptLocation : manuscriptLocations) {
+        pugi::xml_node repositoryEl = bibl.append_child("repository");
+        repositoryEl.append_attribute("analog") = "humdrum:SML";
+        repositoryEl.append_child(pugi::node_pcdata).set_value(manuscriptLocation.value.c_str());
+    }
 
+    for (auto manuscriptOwner : manuscriptOwners) {
+        pugi::xml_node nameEl = bibl.append_child("name");
+        nameEl.append_attribute("role") = "manuscriptOwner";
+        nameEl.append_attribute("analog") = "humdrum:YOO";
+        nameEl.append_child(pugi::node_pcdata).set_value(manuscriptOwner.value.c_str());
+    }
+
+    for (auto editor : editors) {
+        pugi::xml_node editorEl = bibl.append_child("editor");
+        editorEl.append_attribute("analog") = "humdrum:YOE";
+        editorEl.append_child(pugi::node_pcdata).set_value(editor.value.c_str());
+    }
+
+    for (auto copyrightDate : copyrightDates) {
+        pugi::xml_node dateEl = bibl.append_child("date");
+        dateEl.append_attribute("type") = "copyrightDate";
+        dateEl.append_attribute("analog") = "humdrum:YOY";
+        fillInIsoDate(dateEl, copyrightDate.value);
+        dateEl.append_child(pugi::node_pcdata).set_value(copyrightDate.value.c_str());
+    }
+
+    if (!acknowledgments.empty()) {
+        pugi::xml_node annot = bibl.append_child("annot");
+        annot.append_attribute("type") = "manuscriptAccessAcknowledgment";
+        std::string languageForAll = getTextListLanguage(acknowledgments);
+        pugi::xml_node lineGroup = annot.append_child("lg");
+        if (!languageForAll.empty()) {
+            lineGroup.append_attribute("xml:lang") = languageForAll.c_str();
+        }
+        
+        for (auto acknowledgment : acknowledgments) {
+            pugi::xml_node line = lineGroup.append_child("l");
+            // <l> does not take @analog, so use @type instead (says Perry)
+            line.append_attribute("type") = "humdrum:SMA";
+            if (!acknowledgment.language.empty() and languageForAll.empty()) {
+                line.append_attribute("xml:lang") = acknowledgment.language.c_str();
+            }
+            line.append_child(pugi::node_pcdata).set_value(acknowledgment.value.c_str());
+        }
+    }
 }
 
 void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead)
@@ -3736,6 +3826,58 @@ void HumdrumInput::createSimpleTitleElement()
     }
     else if (bestMovementNameIdx >= 0) {
         titleEl.append_child(pugi::node_pcdata).set_value(movementNames[bestMovementNameIdx].value.c_str());
+    }
+}
+
+void HumdrumInput::createSimpleComposerElements()
+{
+    // Just all the COMs.  If no COMs, then do the COCs (corporate), the COAs (attributed),
+    // the COSs (suspected), or the COLs (aliases), in that order of preference.
+    std::vector<HumdrumReferenceItem> composers = getReferenceItems("COM");
+    if (composers.empty()) {
+        composers = getReferenceItems("COC");
+    }
+    if (composers.empty()) {
+        composers = getReferenceItems("COA");
+    }
+    if (composers.empty()) {
+        composers = getReferenceItems("COS");
+    }
+    if (composers.empty()) {
+        composers = getReferenceItems("COL");
+    }
+    if (composers.empty()) {
+        return;
+    }
+    
+    for (auto composer : composers) {
+        pugi::xml_node composerEl = m_simpleComposers.append_child("composer");
+        std::string composerCert;
+        if (composer.key == "COA") {
+            composerCert = "medium";
+        }
+        else if (composer.key == "COS") {
+            composerCert = "low";
+        }
+        if (!composerCert.empty()) {
+            // We put @cert on <composer>, not on <persName>.
+            // The uncertainty is about whether this composer was involved,
+            // not about what this composer's name was.
+            composerEl.append_attribute("cert") = composerCert.c_str();
+        }
+        
+        pugi::xml_node nameEl;
+        if (composer.key == "COC") {
+            nameEl = composerEl.append_child("corpName");
+        }
+        else {
+            nameEl = composerEl.append_child("persName");
+        }
+        
+        if (composer.key == "COL") {
+            nameEl.append_attribute("type") = "alias";
+        }
+        nameEl.append_child(pugi::node_pcdata).set_value(composer.value.c_str());
     }
 }
 
