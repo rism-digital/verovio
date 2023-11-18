@@ -3224,14 +3224,12 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
             }
         }
         if (i == 0) {
-            char yearChars[16];
-            snprintf(yearChars, 16, "%d%s", value, suffix.c_str());
-            dateParts.push_back(yearChars);
+            std::string yearStr = StringFormat("%d%s", value, suffix.c_str());
+            dateParts.push_back(yearStr);
         }
         else {
-            char numChars[3];
-            snprintf(numChars, 3, "%02d%s", value, suffix.c_str());
-            dateParts.push_back(numChars);
+            std::string numStr = StringFormat("%02d%s", value, suffix.c_str());
+            dateParts.push_back(numStr);
         }
     }
 
@@ -3780,7 +3778,61 @@ void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
 
 void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead)
 {
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+    
+    // Humdrum has no <appInfo> equivalent, so nothing to bring over, we just need to mention ourselves
+    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+    pugi::xml_node application = appInfo.append_child("application");
+    application.append_attribute("isodate") = getDateString().c_str();
+    application.append_attribute("version") = GetVersion().c_str();
+    pugi::xml_node name = application.append_child("name");
+    name.append_child(pugi::node_pcdata).set_value("Verovio");
+    pugi::xml_node p1 = application.append_child("p");
+    p1.append_child(pugi::node_pcdata).set_value("Transcoded from Humdrum");
 
+    std::vector<HumdrumReferenceItem> encodingNotes = getReferenceItems("RNB");
+    std::vector<HumdrumReferenceItem> encodingWarnings = getReferenceItems("RWB");
+
+    if (!encodingNotes.empty() || !encodingWarnings.empty()) {
+        pugi::xml_node editorialDecl = encodingDesc.append_child("editorialDecl");
+        pugi::xml_node p = editorialDecl.append_child("p");
+        
+        if (!encodingNotes.empty()) {
+            std::string languageForAll = getTextListLanguage(encodingNotes);
+            pugi::xml_node lineGroup = p.append_child("lg");
+            if (!languageForAll.empty()) {
+                lineGroup.append_attribute("xml:lang") = languageForAll.c_str();
+            }
+            
+            for (auto note : encodingNotes) {
+                pugi::xml_node line = lineGroup.append_child("l");
+                // <l> does not take @analog, so use @type instead (says Perry)
+                line.append_attribute("type") = "humdrum:RNB";
+                if (!note.language.empty() && languageForAll.empty()) {
+                    line.append_attribute("xml:lang") = note.language.c_str();
+                }
+                line.append_child(pugi::node_pcdata).set_value(note.value.c_str());
+            }
+        }
+        
+        if (!encodingWarnings.empty()) {
+            std::string languageForAll = getTextListLanguage(encodingWarnings);
+            pugi::xml_node lineGroup = p.append_child("lg");
+            if (!languageForAll.empty()) {
+                lineGroup.append_attribute("xml:lang") = languageForAll.c_str();
+            }
+            
+            for (auto warning : encodingWarnings) {
+                pugi::xml_node line = lineGroup.append_child("l");
+                // <l> does not take @analog, so use @type instead (says Perry)
+                line.append_attribute("type") = "humdrum:RWB";
+                if (!warning.language.empty() && languageForAll.empty()) {
+                    line.append_attribute("xml:lang") = warning.language.c_str();
+                }
+                line.append_child(pugi::node_pcdata).set_value(warning.value.c_str());
+            }
+        }
+    }
 }
 
 void HumdrumInput::createWorkList(pugi::xml_node meiHead)
