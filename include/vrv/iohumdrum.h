@@ -451,17 +451,17 @@ struct HumdrumReferenceItem {
 struct DateWithErrors {
     bool valid = false;         // if false, ignore everything here, the date was not parseable.
     std::string dateError;      // error of the entire date ("", "approximate", "uncertain")
-    std::string year;
+    int year;
     std::string yearError;      // error of the year ("", "approximate", "uncertain")
-    std::string month;
+    int month;
     std::string monthError;     // error of the month ("", "approximate", "uncertain")
-    std::string day;
+    int day;
     std::string dayError;       // error of the day ("", "approximate", "uncertain")
-    std::string hour;
+    int hour;
     std::string hourError;      // error of the hour ("", "approximate", "uncertain")
-    std::string minute;
+    int minute;
     std::string minuteError;    // error of the minute ("", "approximate", "uncertain")
-    std::string second;
+    int second;
     std::string secondError;    // error of the second ("", "approximate", "uncertain")
 };
 
@@ -899,8 +899,8 @@ protected:
     DateWithErrors dateWithErrorsFromHumdrumDate(string dateString);
     std::string isoDateFromDateWithErrors(DateWithErrors date, bool edtf);
     bool sanityCheckDate(
-            std::string year, std::string month, std::string day,
-            std::string hour, std::string minute, std::string second);
+            int year, int month, int day,
+            int hour, int minute, int second);
     std::string stripDateError(string &value);
     std::string getTextListLanguage(std::vector<HumdrumReferenceItem> textItems);
     std::map<std::string, std::vector<HumdrumReferenceItem>> getAllReferenceItems(hum::HumdrumFile infile);

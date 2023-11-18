@@ -3107,13 +3107,13 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
     }
 
     std::vector<std::string> dateSubStrs;
-    std::vector<std::string> values = {"", "", "", "", "", ""};
+    std::vector<int> values = {INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN};
     std::vector<std::string> errors = {"", "", "", "", "", ""};
     hum::HumRegex hre;
     hre.replaceDestructive(dateString, "/", ":");
     hre.replaceDestructive(dateString, "", " ");
     hre.split(dateSubStrs, dateString, "/");
-    
+
     for (int i = 0; i < dateSubStrs.size(); i++) {
         std::string value = dateSubStrs[i];
         std::string error = stripDateError(value);
@@ -3130,14 +3130,22 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
                 value = value.substr(0, idx);
             }
         }
-        values[i] = value;
+        try {
+            if (value.size() > 0) {
+                values[i] = stoi(value);
+            }
+        }
+        catch (...) {
+            date.valid = false;
+            return date;
+        }
         errors[i] = error;
     }
 
     bool gotOne = sanityCheckDate(
         values[0], values[1], values[2],
         values[3], values[4], values[5]);
-    
+
     if (gotOne) {
         date.valid = true;
         date.year = values[0];
@@ -3171,7 +3179,7 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
     std::vector<std::string> dateParts;
     // We do this as a loop so we can break out at first missing date part.
     for (int i = 0; i < 6; i++) {
-        std::string value;
+        int value = INT_MIN;
         std::string error;
         if (i == 0) {
             value = date.year;
@@ -3197,7 +3205,7 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
             value = date.second;
             error = date.secondError;
         }
-        if (value.size() == 0) {
+        if (value == INT_MIN) {
             // ignore this and anything after this
             break;
         }
@@ -3214,9 +3222,18 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
                 suffix = "~";
             }
         }
-        dateParts.push_back(value + suffix);
+        if (i == 0) {
+            char yearChars[16];
+            snprintf(yearChars, 16, "%d%s", value, suffix.c_str());
+            dateParts.push_back(yearChars);
+        }
+        else {
+            char numChars[3];
+            snprintf(numChars, 3, "%02d%s", value, suffix.c_str());
+            dateParts.push_back(numChars);
+        }
     }
-    
+
     std::string isodate;
 
     for (int i = 0; i < 3; i++) {
@@ -3242,118 +3259,87 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
             isodate += dateParts[i];
         }
     }
-    
+
     return isodate;
 }
 
 bool HumdrumInput::sanityCheckDate(
-        std::string year, std::string month, std::string day,
-        std::string hour, std::string minute, std::string second) {
-    // Convert to integers
-    int yearInt = INT_MIN;
-    int monthInt = INT_MIN;
-    int dayInt = INT_MIN;
-    int hourInt = INT_MIN;
-    int minuteInt = INT_MIN;
-    int secondInt = INT_MIN;
-    try {
-        if (year.size() > 0) {
-            yearInt = stoi(year);
-        }
-        if (month.size() > 0) {
-            monthInt = stoi(month);
-        }
-        if (day.size() > 0) {
-            dayInt = stoi(day);
-        }
-        if (hour.size() > 0) {
-            hourInt = stoi(hour);
-        }
-        if (minute.size() > 0) {
-            minuteInt = stoi(minute);
-        }
-        if (second.size() > 0) {
-            secondInt = stoi(second);
-        }
-    }
-    catch (...) {
-        return false;
-    }
-    
+        int year, int month, int day,
+        int hour, int minute, int second) {
     // sanity check the integers
 
     // year has to be there, the others are optional.
-    if (yearInt == INT_MIN) {
+    if (year == INT_MIN) {
         return false;
     }
-    
-    if (monthInt != INT_MIN) {
-        if (monthInt < 1 || monthInt > 12) {
+
+    if (month != INT_MIN) {
+        if (month < 1 || month > 12) {
             return false;
         }
     }
-    
-    if (dayInt != INT_MIN) {
-        if (monthInt == INT_MIN) {
+
+    if (day != INT_MIN) {
+        if (month == INT_MIN) {
             // if month is missing, so must day be missing
             return false;
         }
-        if (dayInt < 1 || dayInt > 31) {
+        if (day < 1 || day > 31) {
             return false;
         }
-        if (monthInt == 4 || monthInt == 6 || monthInt == 9 || monthInt == 11) {
-            if (dayInt == 31) {
+        if (month == 4 || month == 6 || month == 9 || month == 11) {
+            if (day == 31) {
                 return false;
             }
         }
-        if (monthInt == 2) {
-            if (dayInt > 29) {
+        if (month == 2) {
+            if (day > 29) {
                 return false;
             }
             // 29 is a fail during non-leap years.  Not checking Gregorian
             // leap year rules, since they change historically.
-            if (dayInt == 29) {
-                if (yearInt % 4 != 0) {
+            if (day == 29) {
+                if (year % 4 != 0) {
                     return false;
                 }
             }
         }
     }
-    
-    if (hourInt != INT_MIN) {
-        if (dayInt == INT_MIN) {
+
+    if (hour != INT_MIN) {
+        if (day == INT_MIN) {
             // if day is missing, so must hour be missing
             return false;
         }
-        if (minuteInt == INT_MIN || secondInt == INT_MIN) {
+        if (minute == INT_MIN || second == INT_MIN) {
             // if hour is there, minute and second must also be there (unlike year/month/day, which can be year or year/month).
             return false;
         }
-        if (hourInt < 0 || hourInt > 23) {
+        if (hour < 0 || hour > 23) {
             return false;
         }
     }
-    
-    if (minuteInt != INT_MIN) {
-        if (hourInt == INT_MIN) {
+
+    if (minute != INT_MIN) {
+        if (hour == INT_MIN) {
             // if hour is missing, so must minute be missing
             return false;
         }
-        if (minuteInt < 0 || minuteInt > 59) {
+        if (minute < 0 || minute > 59) {
             return false;
         }
     }
-    
-    if (secondInt != INT_MIN) {
-        if (minuteInt == INT_MIN) {
+
+    if (second != INT_MIN) {
+        if (minute == INT_MIN) {
             // if minute is missing, so must second be missing
             return false;
         }
-        if (secondInt < 0 || secondInt > 59) {
+        if (second < 0 || second > 59) {
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -3382,11 +3368,11 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
         "LAR", "PED", "LOR", "TRN", "OCL", "OVM",
         "PTL", "PPR", "PDT", "PPP", "PC#"
     };
-    
+
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
     }
-    
+
     std::vector<HumdrumReferenceItem> arrangers = getReferenceItems("LAR");
     std::vector<HumdrumReferenceItem> editors = getReferenceItems("PED");
     std::vector<HumdrumReferenceItem> orchestrators = getReferenceItems("LOR");
@@ -3398,35 +3384,35 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
     std::vector<HumdrumReferenceItem> datesPublished = getReferenceItems("PDT");
     std::vector<HumdrumReferenceItem> locationsPublished = getReferenceItems("PPP");
     std::vector<HumdrumReferenceItem> publisherCatalogNumbers = getReferenceItems("PC#");
-    
+
     pugi::xml_node source = sourceDesc.append_child("source");
     source.append_attribute("type") = "printed";
     pugi::xml_node bibl = source.append_child("bibl");
-    
+
     for (auto publisherCatalogNumber : publisherCatalogNumbers) {
         pugi::xml_node identifierEl = bibl.append_child("identifier");
         identifierEl.append_attribute("type") = "catalogNumber";
         identifierEl.append_attribute("analog") = "humdrum:PC#";
         identifierEl.append_child(pugi::node_pcdata).set_value(publisherCatalogNumber.value.c_str());
     }
-    
+
     bibl.append_copy(m_simpleTitle.first_child());
     for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
         bibl.append_copy(*childIt);
     }
-    
+
     for (auto editor : editors) {
         pugi::xml_node editorEl = bibl.append_child("editor");
         editorEl.append_attribute("analog") = "humdrum:PED";
         editorEl.append_child(pugi::node_pcdata).set_value(editor.value.c_str());
     }
-    
+
     if (!arrangers.empty() || !orchestrators.empty() || !translators.empty() || !collectors.empty()) {
         // arrangers could technically go outside <respStmt>, but
         // Perry requests that they go inside <respStmt> for ease
         // of conversion to his proposed v. 6.
         pugi::xml_node respStmt = bibl.append_child("respStmt");
-        
+
         for (auto arranger : arrangers) {
             pugi::xml_node respEl = respStmt.append_child("resp");
             respEl.append_child(pugi::node_pcdata).set_value("arranger");
@@ -3434,7 +3420,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             persNameEl.append_attribute("analog") = "humdrum:LAR";
             persNameEl.append_child(pugi::node_pcdata).set_value(arranger.value.c_str());
         }
-        
+
         for (auto orchestrator : orchestrators) {
             pugi::xml_node respEl = respStmt.append_child("resp");
             respEl.append_child(pugi::node_pcdata).set_value("orchestrator");
@@ -3442,7 +3428,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             persNameEl.append_attribute("analog") = "humdrum:LOR";
             persNameEl.append_child(pugi::node_pcdata).set_value(orchestrator.value.c_str());
         }
-        
+
         for (auto translator : translators) {
             pugi::xml_node respEl = respStmt.append_child("resp");
             respEl.append_child(pugi::node_pcdata).set_value("translator");
@@ -3450,7 +3436,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             persNameEl.append_attribute("analog") = "humdrum:TRN";
             persNameEl.append_child(pugi::node_pcdata).set_value(translator.value.c_str());
         }
-        
+
         for (auto collector : collectors) {
             pugi::xml_node respEl = respStmt.append_child("resp");
             respEl.append_child(pugi::node_pcdata).set_value("collector/transcriber");
@@ -3459,7 +3445,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             nameEl.append_child(pugi::node_pcdata).set_value(collector.value.c_str());
         }
     }
-    
+
     if (!publishers.empty() || !datesPublished.empty() || !locationsPublished.empty()) {
         pugi::xml_node imprint = bibl.append_child("imprint");
         for (auto publisher : publishers) {
@@ -3467,14 +3453,14 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             publisherEl.append_attribute("analog") = "humdrum:PPR";
             publisherEl.append_child(pugi::node_pcdata).set_value(publisher.value.c_str());
         }
-        
+
         for (auto datePublished : datesPublished) {
             pugi::xml_node dateEl = imprint.append_child("date");
             dateEl.append_attribute("type") = "datePublished";
             dateEl.append_attribute("analog") = "humdrum:PDT";
             dateEl.append_child(pugi::node_pcdata).set_value(datePublished.value.c_str());
         }
-        
+
         for (auto locationPublished : locationsPublished) {
             pugi::xml_node geogNameEl = imprint.append_child("geogName");
             geogNameEl.append_attribute("role") = "locationPublished";
@@ -3482,7 +3468,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             geogNameEl.append_child(pugi::node_pcdata).set_value(locationPublished.value.c_str());
         }
     }
-    
+
     size_t numberOfVolumesWithNameAndNumber = min(volumeNames.size(), volumeNumbers.size());
     for (size_t i = 0; i < numberOfVolumesWithNameAndNumber; i++) {
         HumdrumReferenceItem volumeName = volumeNames[i];
@@ -3490,16 +3476,16 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
         pugi::xml_node relatedItem = bibl.append_child("relatedItem");
         relatedItem.append_attribute("rel") = "host";
         pugi::xml_node relBibl = relatedItem.append_child("bibl");
-        
+
         pugi::xml_node titleElement = relBibl.append_child("title");
         titleElement.append_attribute("analog") = "humdrum:PTL";
         titleElement.append_child(pugi::node_pcdata).set_value(volumeName.value.c_str());
-        
+
         pugi::xml_node biblScope = relBibl.append_child("biblScope");
         biblScope.append_attribute("analog") = "humdrum:OVM";
         biblScope.append_child(pugi::node_pcdata).set_value(volumeNumber.value.c_str());
     }
-    
+
     if (volumeNames.size() > volumeNumbers.size()) {
         // we ignore any extra volume numbers, since a number without a name
         // isn't interesting.
@@ -3508,7 +3494,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             pugi::xml_node relatedItem = bibl.append_child("relatedItem");
             relatedItem.append_attribute("rel") = "host";
             pugi::xml_node relBibl = relatedItem.append_child("bibl");
-            
+
             pugi::xml_node titleElement = relBibl.append_child("title");
             titleElement.append_attribute("analog") = "humdrum:PTL";
             titleElement.append_child(pugi::node_pcdata).set_value(volumeName.value.c_str());
@@ -3518,7 +3504,182 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 
 void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
 {
+    std::vector<string> keysThatGoHere = {
+        "RTL", "RC#", "MGN", "MPN", "MPS", "RNP",
+        "MCN", "RMM", "RRD", "RLC", "RDT", "RT#"
+    };
 
+    if (!anyReferenceItemsExist(keysThatGoHere)) {
+        return;
+    }
+
+    std::vector<HumdrumReferenceItem> albumTitles = getReferenceItems("RTL");
+    std::vector<HumdrumReferenceItem> albumCatalogNumbers = getReferenceItems("RC#");
+    std::vector<HumdrumReferenceItem> ensembleNames = getReferenceItems("MGN");
+    std::vector<HumdrumReferenceItem> performerNames = getReferenceItems("MPN");
+    std::vector<HumdrumReferenceItem> suspectedPerformerNames = getReferenceItems("MPS");
+    std::vector<HumdrumReferenceItem> producers = getReferenceItems("RNP");
+    std::vector<HumdrumReferenceItem> conductors = getReferenceItems("MCN");
+    std::vector<HumdrumReferenceItem> manufacturers = getReferenceItems("RMM");
+    std::vector<HumdrumReferenceItem> releaseDates = getReferenceItems("RRD");
+    std::vector<HumdrumReferenceItem> recordingLocations = getReferenceItems("RLC");
+    std::vector<HumdrumReferenceItem> recordingDates = getReferenceItems("RDT");
+    std::vector<HumdrumReferenceItem> trackNumbers = getReferenceItems("RT#");
+
+    size_t longestLen = albumTitles.size();
+    longestLen = max(longestLen, albumCatalogNumbers.size());
+    longestLen = max(longestLen, ensembleNames.size());
+    longestLen = max(longestLen, performerNames.size());
+    longestLen = max(longestLen, suspectedPerformerNames.size());
+    longestLen = max(longestLen, producers.size());
+    longestLen = max(longestLen, conductors.size());
+    longestLen = max(longestLen, manufacturers.size());
+    longestLen = max(longestLen, releaseDates.size());
+    longestLen = max(longestLen, recordingLocations.size());
+    longestLen = max(longestLen, recordingDates.size());
+    longestLen = max(longestLen, trackNumbers.size());
+
+    pugi::xml_node source = sourceDesc.append_child("source");
+    source.append_attribute("type") = "recording";
+    pugi::xml_node biblStruct = source.append_child("biblStruct");
+
+    for (size_t i = 0; i < longestLen; i++) {
+        if (i < trackNumbers.size()) {
+            pugi::xml_node analytic = biblStruct.append_child("analytic");
+            analytic.append_copy(m_simpleTitle.first_child());
+
+            pugi::xml_node biblScope = analytic.append_child("biblScope");
+            biblScope.append_attribute("type") = "trackNumber";
+            biblScope.append_attribute("unit") = "track";
+            biblScope.append_attribute("analog") = "humdrum:RT#";
+            biblScope.append_child(pugi::node_pcdata).set_value(trackNumbers[i].value.c_str());
+        }
+
+        if (i < albumTitles.size()
+            || i < albumCatalogNumbers.size()
+            || i < ensembleNames.size()
+            || i < performerNames.size()
+            || i < suspectedPerformerNames.size()
+            || i < producers.size()
+            || i < conductors.size()
+            || i < manufacturers.size()
+            || i < releaseDates.size()
+            || i < recordingLocations.size()
+            || i < recordingDates.size()) {
+            pugi::xml_node monogr = biblStruct.append_child("monogr");
+
+            if (i < albumTitles.size()) {
+                HumdrumReferenceItem albumTitle = albumTitles[i];
+                pugi::xml_node albumTitleEl = monogr.append_child("title");
+                albumTitleEl.append_attribute("analog") = "humdrum:RTL";
+                albumTitleEl.append_child(pugi::node_pcdata).set_value(albumTitle.value.c_str());
+            }
+
+            if (i < albumCatalogNumbers.size()) {
+                HumdrumReferenceItem albumCatalogNumber = albumCatalogNumbers[i];
+                pugi::xml_node albumCatalogNumberEl = monogr.append_child("identifier");
+                albumCatalogNumberEl.append_attribute("type") = "albumCatalogNumber";
+                albumCatalogNumberEl.append_attribute("analog") = "humdrum:RC#";
+                albumCatalogNumberEl.append_child(pugi::node_pcdata).set_value(albumCatalogNumber.value.c_str());
+            }
+
+            if (i < ensembleNames.size()
+                || i < performerNames.size()
+                || i < suspectedPerformerNames.size()
+                || i < producers.size()
+                || i < conductors.size()) {
+                pugi::xml_node respStmt = monogr.append_child("respStmt");
+
+                if (i < ensembleNames.size()) {
+                    HumdrumReferenceItem ensembleName = ensembleNames[i];
+                    pugi::xml_node respEl = respStmt.append_child("resp");
+                    respEl.append_child(pugi::node_pcdata).set_value("performer");
+                    pugi::xml_node nameEl = respStmt.append_child("corpName");
+                    nameEl.append_attribute("type") = "ensembleName";
+                    nameEl.append_attribute("analog") = "humdrum:MGN";
+                    nameEl.append_child(pugi::node_pcdata).set_value(ensembleName.value.c_str());
+                }
+
+                if (i < performerNames.size()) {
+                    HumdrumReferenceItem performerName = performerNames[i];
+                    pugi::xml_node respEl = respStmt.append_child("resp");
+                    respEl.append_child(pugi::node_pcdata).set_value("performer");
+                    pugi::xml_node nameEl = respStmt.append_child("persName");
+                    nameEl.append_attribute("analog") = "humdrum:MPN";
+                    nameEl.append_child(pugi::node_pcdata).set_value(performerName.value.c_str());
+                }
+
+                if (i < suspectedPerformerNames.size()) {
+                    HumdrumReferenceItem suspectedPerformerName = suspectedPerformerNames[i];
+                    pugi::xml_node respEl = respStmt.append_child("resp");
+                    respEl.append_child(pugi::node_pcdata).set_value("performer");
+                    pugi::xml_node nameEl = respStmt.append_child("persName");
+                    nameEl.append_attribute("cert") = "medium";
+                    nameEl.append_attribute("analog") = "humdrum:MPS";
+                    nameEl.append_child(pugi::node_pcdata).set_value(suspectedPerformerName.value.c_str());
+                }
+
+                if (i < producers.size()) {
+                    HumdrumReferenceItem producer = producers[i];
+                    pugi::xml_node respEl = respStmt.append_child("resp");
+                    respEl.append_child(pugi::node_pcdata).set_value("producer");
+                    pugi::xml_node nameEl = respStmt.append_child("name");
+                    nameEl.append_attribute("analog") = "humdrum:RNP";
+                    nameEl.append_child(pugi::node_pcdata).set_value(producer.value.c_str());
+                }
+
+                if (i < conductors.size()) {
+                    HumdrumReferenceItem conductor = conductors[i];
+                    pugi::xml_node respEl = respStmt.append_child("resp");
+                    respEl.append_child(pugi::node_pcdata).set_value("conductor");
+                    pugi::xml_node nameEl = respStmt.append_child("persName");
+                    nameEl.append_attribute("analog") = "humdrum:MCN";
+                    nameEl.append_child(pugi::node_pcdata).set_value(conductor.value.c_str());
+                }
+            }
+
+            if (i < manufacturers.size()
+                || i < releaseDates.size()
+                || i < recordingLocations.size()
+                || i < recordingDates.size()) {
+                pugi::xml_node imprint = monogr.append_child("imprint");
+
+                if (i < manufacturers.size()) {
+                    HumdrumReferenceItem manufacturer = manufacturers[i];
+                    pugi::xml_node nameEl = imprint.append_child("corpName");
+                    nameEl.append_attribute("role") = "production/distribution";
+                    nameEl.append_attribute("analog") = "humdrum:RMM";
+                    nameEl.append_child(pugi::node_pcdata).set_value(manufacturer.value.c_str());
+                }
+
+                if (i < releaseDates.size()) {
+                    HumdrumReferenceItem releaseDate = releaseDates[i];
+                    pugi::xml_node dateEl = imprint.append_child("date");
+                    dateEl.append_attribute("type") = "releaseDate";
+                    dateEl.append_attribute("analog") = "humdrum:RRD";
+                    fillInIsoDate(dateEl, releaseDate.value);
+                    dateEl.append_child(pugi::node_pcdata).set_value(releaseDate.value.c_str());
+                }
+
+                if (i < recordingLocations.size()) {
+                    HumdrumReferenceItem recordingLocation = recordingLocations[i];
+                    pugi::xml_node geogNameEl = imprint.append_child("geogName");
+                    geogNameEl.append_attribute("role") = "recordingLocation";
+                    geogNameEl.append_attribute("analog") = "humdrum:RLC";
+                    geogNameEl.append_child(pugi::node_pcdata).set_value(recordingLocation.value.c_str());
+                }
+
+                if (i < recordingDates.size()) {
+                    HumdrumReferenceItem recordingDate = recordingDates[i];
+                    pugi::xml_node dateEl = imprint.append_child("date");
+                    dateEl.append_attribute("type") = "recordingDate";
+                    dateEl.append_attribute("analog") = "humdrum:RDT";
+                    fillInIsoDate(dateEl, recordingDate.value);
+                    dateEl.append_child(pugi::node_pcdata).set_value(recordingDate.value.c_str());
+                }
+            }
+        }
+    }
 }
 
 void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
