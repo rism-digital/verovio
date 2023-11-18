@@ -3837,7 +3837,368 @@ void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead)
 
 void HumdrumInput::createWorkList(pugi::xml_node meiHead)
 {
+    // the main (encoded) work
+    std::vector<HumdrumReferenceItem> catalogNumbers = getReferenceItems("SCA");
+    std::vector<HumdrumReferenceItem> catalogAbbrevNumbers = getReferenceItems("SCT");
+    std::vector<HumdrumReferenceItem> opusNumbers = getReferenceItems("OPS");
+    std::vector<HumdrumReferenceItem> creationDates = getReferenceItems("ODT");
+    std::vector<HumdrumReferenceItem> creationCountries = getReferenceItems("OCY");
+    std::vector<HumdrumReferenceItem> creationSettlements = getReferenceItems("OPC");
+    std::vector<HumdrumReferenceItem> creationRegions = getReferenceItems("ARE");
+    std::vector<HumdrumReferenceItem> creationLatLongs = getReferenceItems("ARL");
+    std::vector<HumdrumReferenceItem> lyricists = getReferenceItems("LYR");
+    std::vector<HumdrumReferenceItem> librettists = getReferenceItems("LIB");
+    std::vector<HumdrumReferenceItem> dedicatees = getReferenceItems("ODE");
+    std::vector<HumdrumReferenceItem> funders = getReferenceItems("OCO");
+    std::vector<HumdrumReferenceItem> languages = getReferenceItems("TXO");
+    std::vector<HumdrumReferenceItem> histories = getReferenceItems("HAO");
+    std::vector<HumdrumReferenceItem> instrumentLists = getReferenceItems("AIN");
+    std::vector<HumdrumReferenceItem> forms = getReferenceItems("AFR");
+    std::vector<HumdrumReferenceItem> genres = getReferenceItems("AGN");
+    std::vector<HumdrumReferenceItem> modes = getReferenceItems("AMD");
+    std::vector<HumdrumReferenceItem> meters = getReferenceItems("AMT");
+    std::vector<HumdrumReferenceItem> styles = getReferenceItems("AST");
+    std::vector<HumdrumReferenceItem> firstPerformanceDates = getReferenceItems("MPD");
+    // MRD is documented as "date of performance", but MDT is often used instead.
+    std::vector<HumdrumReferenceItem> performanceDates = getReferenceItems("MDT");
+    std::vector<HumdrumReferenceItem> morePerformanceDates = getReferenceItems("MRD");
+    performanceDates.insert(performanceDates.end(), morePerformanceDates.begin(), morePerformanceDates.end());
+    std::vector<HumdrumReferenceItem> performanceLocations = getReferenceItems("MLC");
 
+    // related works
+    std::vector<HumdrumReferenceItem> parentWorkTitles = getReferenceItems("OPR");
+    std::vector<HumdrumReferenceItem> groupWorkTitles = getReferenceItems("GTL");
+    std::vector<HumdrumReferenceItem> associatedWorkTitles = getReferenceItems("GAW");
+    // GCO and ACO have the same definition: "Collection designation, such as
+    // Norton Scores, Smmithsonian Collection, etc."
+    std::vector<HumdrumReferenceItem> collectionWorkTitles = getReferenceItems("GCO");
+    std::vector<HumdrumReferenceItem> moreCollectionWorkTitles = getReferenceItems("ACO");
+    collectionWorkTitles.insert(collectionWorkTitles.end(), moreCollectionWorkTitles.begin(), moreCollectionWorkTitles.end());
+
+    pugi::xml_node workList;
+    int workNumber = 0;
+    
+    // the parent work
+    if (!parentWorkTitles.empty()) {
+        if (workList.empty()) {
+            workList = meiHead.append_child("workList");
+        }
+        
+        std::string xmlId = StringFormat("work%d_parent", workNumber++);
+        pugi::xml_node parentWork = workList.append_child("work");
+        parentWork.append_attribute("xml:id") = xmlId.c_str();
+        parentWork.append_attribute("type") = "parent";
+        
+        for (auto parentWorkTitle : parentWorkTitles) {
+            pugi::xml_node titleEl = parentWork.append_child("title");
+            titleEl.append_attribute("analog") = "humdrum:OPR";
+            titleEl.append_child(pugi::node_pcdata).set_value(parentWorkTitle.value.c_str());
+        }
+    }
+    
+    // the group work
+    if (!groupWorkTitles.empty()) {
+        if (workList.empty()) {
+            workList = meiHead.append_child("workList");
+        }
+        
+        std::string xmlId = StringFormat("work%d_group", workNumber++);
+        pugi::xml_node groupWork = workList.append_child("work");
+        groupWork.append_attribute("xml:id") = xmlId.c_str();
+        groupWork.append_attribute("type") = "group";
+        
+        for (auto groupWorkTitle : groupWorkTitles) {
+            pugi::xml_node titleEl = groupWork.append_child("title");
+            titleEl.append_attribute("analog") = "humdrum:GTL";
+            titleEl.append_child(pugi::node_pcdata).set_value(groupWorkTitle.value.c_str());
+        }
+    }
+
+    // the associated work
+    if (!associatedWorkTitles.empty()) {
+        if (workList.empty()) {
+            workList = meiHead.append_child("workList");
+        }
+        
+        std::string xmlId = StringFormat("work%d_associated", workNumber++);
+        pugi::xml_node associatedWork = workList.append_child("work");
+        associatedWork.append_attribute("xml:id") = xmlId.c_str();
+        associatedWork.append_attribute("type") = "associated";
+        
+        for (auto associatedWorkTitle : associatedWorkTitles) {
+            pugi::xml_node titleEl = associatedWork.append_child("title");
+            titleEl.append_attribute("analog") = "humdrum:GAW";
+            titleEl.append_child(pugi::node_pcdata).set_value(associatedWorkTitle.value.c_str());
+        }
+    }
+
+    // the collection work
+    if (!collectionWorkTitles.empty()) {
+        if (workList.empty()) {
+            workList = meiHead.append_child("workList");
+        }
+        
+        std::string xmlId = StringFormat("work%d_collection", workNumber++);
+        pugi::xml_node collectionWork = workList.append_child("work");
+        collectionWork.append_attribute("xml:id") = xmlId.c_str();
+        collectionWork.append_attribute("type") = "collection";
+        
+        for (auto collectionWorkTitle : collectionWorkTitles) {
+            pugi::xml_node titleEl = collectionWork.append_child("title");
+            titleEl.append_attribute("analog") = "humdrum:GCO";
+            titleEl.append_child(pugi::node_pcdata).set_value(collectionWorkTitle.value.c_str());
+        }
+    }
+
+    // the main (encoded) work
+    std::vector<string> titleInfoKeys = {
+        "OTL", "OTA", "OTP", "ONM", "OMV", "OMD", "OPS", "OAC", "OSC"
+    };
+    std::vector<string> composerInfoKeys = {
+        "COM", "COA", "COS", "COC", "COL", "CDT", "CBL", "CDL", "CNT"
+    };
+
+    if (!catalogNumbers.empty()
+        || !catalogNumbers.empty()
+        || !opusNumbers.empty()
+        || anyReferenceItemsExist(titleInfoKeys)
+        || !creationDates.empty()
+        || !creationCountries.empty()
+        || !creationSettlements.empty()
+        || !creationRegions.empty()
+        || !creationLatLongs.empty()
+        || anyReferenceItemsExist(composerInfoKeys)
+        || !lyricists.empty()
+        || !librettists.empty()
+        || !dedicatees.empty()
+        || !funders.empty()
+        || !languages.empty()
+        || !histories.empty()
+        || !instrumentLists.empty()
+        || !forms.empty()
+        || !genres.empty()
+        || !modes.empty()
+        || !meters.empty()
+        || !styles.empty()
+        || !firstPerformanceDates.empty()
+        || !performanceDates.empty()
+        || !performanceLocations.empty()) {
+        if (workList.empty()) {
+            workList = meiHead.append_child("workList");
+        }
+        pugi::xml_node theWork = workList.append_child("work");
+        std::string xmlId = StringFormat("work%d_encoded", workNumber++);
+        theWork.append_attribute("xml:id") = xmlId.c_str();
+        theWork.append_attribute("type") = "encoded";
+        
+        // <identifier>
+        for (auto catalogNumber : catalogNumbers) {
+            pugi::xml_node identifierEl = theWork.append_child("identifier");
+            identifierEl.append_attribute("analog") = "humdrum:SCA";
+            identifierEl.append_child(pugi::node_pcdata).set_value(catalogNumber.value.c_str());
+        }
+        
+        for (auto catalogAbbrevNumber : catalogAbbrevNumbers) {
+            pugi::xml_node identifierEl = theWork.append_child("identifier");
+            identifierEl.append_attribute("analog") = "humdrum:SCT";
+            identifierEl.append_child(pugi::node_pcdata).set_value(catalogAbbrevNumber.value.c_str());
+        }
+        
+        for (auto opusNumber : opusNumbers) {
+            pugi::xml_node identifierEl = theWork.append_child("identifier");
+            identifierEl.append_attribute("analog") = "humdrum:OPS";
+            identifierEl.append_child(pugi::node_pcdata).set_value(opusNumber.value.c_str());
+        }
+        
+        // titles
+        createTitleElements(theWork);
+        
+        // composers
+        createComposerElements(theWork);
+        
+        
+        
+    }
+}
+
+void HumdrumInput::createTitleElements(pugi::xml_node work)
+{
+    std::vector<HumdrumReferenceItem> mainTitles = getReferenceItems("OTL");
+    std::vector<HumdrumReferenceItem> alternativeTitles = getReferenceItems("OTA");
+    std::vector<HumdrumReferenceItem> popularTitles = getReferenceItems("OTP");
+    std::vector<HumdrumReferenceItem> plainNumbers = getReferenceItems("ONM");
+    std::vector<HumdrumReferenceItem> movementNumbers = getReferenceItems("OMV");
+    std::vector<HumdrumReferenceItem> movementNames = getReferenceItems("OMD");
+    std::vector<HumdrumReferenceItem> opusNumbers = getReferenceItems("OPS");
+    std::vector<HumdrumReferenceItem> actNumbers = getReferenceItems("OAC");
+    std::vector<HumdrumReferenceItem> sceneNumbers = getReferenceItems("OSC");
+
+    // Untranslated and translated title elements (in that order).
+    // If either/both of them end up empty, we will work.child_remove() it/them.
+    pugi::xml_node untranslatedTitleEl = work.append_child("title");
+    pugi::xml_node translatedTitleEl = work.append_child("title");
+    
+    // First any main title(s) (OTL).
+    for (auto mainTitle : mainTitles) {
+        pugi::xml_node titlePart;
+        if (mainTitle.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+            titlePart.append_attribute("type") = "translated";
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+            titlePart.append_attribute("type") = "main";
+        }
+        titlePart.append_attribute("analog") = "humdrum:OTL";
+        if (!mainTitle.language.empty()) {
+            titlePart.append_attribute("xml:lang") = mainTitle.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(mainTitle.value.c_str());
+    }
+
+    // Then any movement name(s) (OMD).
+    for (auto movementName : movementNames) {
+        pugi::xml_node titlePart;
+        if (movementName.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+        }
+        titlePart.append_attribute("type") = "movementName";
+        titlePart.append_attribute("analog") = "humdrum:OMD";
+        if (!movementName.language.empty()) {
+            titlePart.append_attribute("xml:lang") = movementName.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(movementName.value.c_str());
+    }
+    
+    // Then any number(s) (ONM).
+    for (auto plainNumber : plainNumbers) {
+        pugi::xml_node titlePart;
+        if (plainNumber.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+        }
+        titlePart.append_attribute("type") = "number";
+        titlePart.append_attribute("analog") = "humdrum:ONM";
+        if (!plainNumber.language.empty()) {
+            titlePart.append_attribute("xml:lang") = plainNumber.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(plainNumber.value.c_str());
+    }
+    
+    // Then any movement number(s) (OMV).
+    for (auto movementNumber : movementNumbers) {
+        pugi::xml_node titlePart;
+        if (movementNumber.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+        }
+        titlePart.append_attribute("type") = "movementNumber";
+        titlePart.append_attribute("analog") = "humdrum:OMV";
+        if (!movementNumber.language.empty()) {
+            titlePart.append_attribute("xml:lang") = movementNumber.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(movementNumber.value.c_str());
+    }
+    
+    // Then any opus number(s) (OPS).
+    for (auto opusNumber : opusNumbers) {
+        pugi::xml_node titlePart;
+        if (opusNumber.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+        }
+        titlePart.append_attribute("type") = "opusNumber";
+        titlePart.append_attribute("analog") = "humdrum:OPS";
+        if (!opusNumber.language.empty()) {
+            titlePart.append_attribute("xml:lang") = opusNumber.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(opusNumber.value.c_str());
+    }
+    
+    // Then any act number(s) (OAC).
+    for (auto actNumber : actNumbers) {
+        pugi::xml_node titlePart;
+        if (actNumber.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+        }
+        titlePart.append_attribute("type") = "actNumber";
+        titlePart.append_attribute("analog") = "humdrum:OAC";
+        if (!actNumber.language.empty()) {
+            titlePart.append_attribute("xml:lang") = actNumber.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(actNumber.value.c_str());
+    }
+    
+    // Then any scene number(s) (OSC).
+    for (auto sceneNumber : sceneNumbers) {
+        pugi::xml_node titlePart;
+        if (sceneNumber.isTranslated) {
+            titlePart = translatedTitleEl.append_child("titlePart");
+        }
+        else {
+            titlePart = untranslatedTitleEl.append_child("titlePart");
+        }
+        titlePart.append_attribute("type") = "sceneNumber";
+        titlePart.append_attribute("analog") = "humdrum:OSC";
+        if (!sceneNumber.language.empty()) {
+            titlePart.append_attribute("xml:lang") = sceneNumber.language.c_str();
+        }
+        titlePart.append_child(pugi::node_pcdata).set_value(sceneNumber.value.c_str());
+    }
+    
+    // Separately, any alternative title(s) (OTA) (no titleParts).
+    for (auto alternativeTitle : alternativeTitles) {
+        pugi::xml_node alternativeTitleEl = work.append_child("title");
+        alternativeTitleEl.append_attribute("type") = "alternative";
+        alternativeTitleEl.append_attribute("analog") = "humdrum:OTA";
+        if (!alternativeTitle.language.empty()) {
+            alternativeTitleEl.append_attribute("xml:lang") = alternativeTitle.language.c_str();
+        }
+        alternativeTitleEl.append_child(pugi::node_pcdata).set_value(alternativeTitle.value.c_str());
+    }
+
+    // Separately, any popular title(s) (OTP) (no titleParts).
+    for (auto popularTitle : popularTitles) {
+        pugi::xml_node popularTitleEl = work.append_child("title");
+        popularTitleEl.append_attribute("type") = "popular";
+        popularTitleEl.append_attribute("analog") = "humdrum:OTP";
+        if (!popularTitle.language.empty()) {
+            popularTitleEl.append_attribute("xml:lang") = popularTitle.language.c_str();
+        }
+        popularTitleEl.append_child(pugi::node_pcdata).set_value(popularTitle.value.c_str());
+    }
+    
+    // if untranslatedTitleEl or translatedTitleEl are empty, remove them, else give them a type
+    if (untranslatedTitleEl.empty()) {
+        work.remove_child(untranslatedTitleEl);
+    }
+    else {
+        untranslatedTitleEl.append_attribute("type") = "uniform";
+    }
+    
+    if (translatedTitleEl.empty()) {
+        work.remove_child(translatedTitleEl);
+    }
+    else {
+        translatedTitleEl.append_attribute("type") = "translated";
+    }
+}
+
+void HumdrumInput::createComposerElements(pugi::xml_node work)
+{
+    
 }
 
 void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)

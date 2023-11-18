@@ -895,6 +895,8 @@ protected:
     void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead);
     void createSimpleTitleElement();
     void createSimpleComposerElements();
+    void createTitleElements(pugi::xml_node element);
+    void createComposerElements(pugi::xml_node element);
     void fillInIsoDate(pugi::xml_node element, string dateString);
     std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(string inHumdrumDate, bool edtf=false);
     DateWithErrors dateWithErrorsFromHumdrumDate(string dateString);
