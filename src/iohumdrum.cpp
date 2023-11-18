@@ -2755,6 +2755,7 @@ void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
 void HumdrumInput::createHeader()
 {
     hum::HumdrumFile &infile = m_infiles[0];
+    m_humdrumLineReferences = infile.getReferenceRecords();
     m_references = getAllReferenceItems(infile);
     createSimpleTitleElement();
     createSimpleComposerElements();
@@ -3687,11 +3688,11 @@ void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
     std::vector<string> keysThatGoHere = {
         "SMS", "YOR", "SML", "YOO", "YOE", "YOY", "SMA"
     };
-    
+
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
     }
-    
+
     std::vector<HumdrumReferenceItem> manuscriptNames = getReferenceItems("SMS");
     std::vector<HumdrumReferenceItem> moreManuscriptNames = getReferenceItems("YOR");
     std::vector<HumdrumReferenceItem> manuscriptLocations = getReferenceItems("SML");
@@ -3699,36 +3700,36 @@ void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
     std::vector<HumdrumReferenceItem> editors = getReferenceItems("YOE");
     std::vector<HumdrumReferenceItem> copyrightDates = getReferenceItems("YOY");
     std::vector<HumdrumReferenceItem> acknowledgments = getReferenceItems("SMA");
-    
+
     pugi::xml_node source = sourceDesc.append_child("source");
     source.append_attribute("type") = "unpub";
     pugi::xml_node bibl = source.append_child("bibl");
-    
+
     for (auto manuscriptName : manuscriptNames) {
         pugi::xml_node identifierEl = bibl.append_child("identifier");
         identifierEl.append_attribute("analog") = "humdrum:SMS";
         identifierEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
     }
-    
+
     for (auto manuscriptName : moreManuscriptNames) {
         pugi::xml_node identifierEl = bibl.append_child("identifier");
         identifierEl.append_attribute("analog") = "humdrum:YOR";
         identifierEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
     }
-    
+
     // do both again as <title>
     for (auto manuscriptName : manuscriptNames) {
         pugi::xml_node titleEl = bibl.append_child("title");
         titleEl.append_attribute("analog") = "humdrum:SMS";
         titleEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
     }
-    
+
     for (auto manuscriptName : moreManuscriptNames) {
         pugi::xml_node titleEl = bibl.append_child("title");
         titleEl.append_attribute("analog") = "humdrum:YOR";
         titleEl.append_child(pugi::node_pcdata).set_value(manuscriptName.value.c_str());
     }
-    
+
     for (auto manuscriptLocation : manuscriptLocations) {
         pugi::xml_node repositoryEl = bibl.append_child("repository");
         repositoryEl.append_attribute("analog") = "humdrum:SML";
@@ -3764,7 +3765,7 @@ void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
         if (!languageForAll.empty()) {
             lineGroup.append_attribute("xml:lang") = languageForAll.c_str();
         }
-        
+
         for (auto acknowledgment : acknowledgments) {
             pugi::xml_node line = lineGroup.append_child("l");
             // <l> does not take @analog, so use @type instead (says Perry)
@@ -3789,7 +3790,35 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
 
 void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
 {
+    // for now do not print for **mens data, since timestamps are used
+    if (m_mens) {
+        return;
+    }
+    std::stringstream xmldata;
+    xmldata << "<extMeta>\n";
+    xmldata << "\t<frames xmlns=\"http://www.humdrum.org/ns/humxml\">\n";
+    for (int i = 0; i < (int)m_humdrumLineReferences.size(); ++i) {
+        std::string refKey = m_humdrumLineReferences[i]->getReferenceKey();
+        // Keep all reference records for round-trip conversions:
+        // if (!(refKey.compare(0, 3, "EED") && refKey.compare(0, 2, "HA") && refKey.compare(0, 2, "OT")
+        //         && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
+        //     continue;
+        // }
+        m_humdrumLineReferences[i]->printXml(xmldata, 4);
+    }
+    xmldata << "\t</frames>\n";
+    xmldata << "</extMeta>\n";
 
+    pugi::xml_document tmpdoc;
+    pugi::xml_parse_result result = tmpdoc.load_string(xmldata.str().c_str());
+    if (!result) {
+        // some sort of error, so give up;
+        cerr << "ExtMeta parse error: " << result.description() << endl;
+        cerr << xmldata.str();
+        return;
+    }
+
+    meiHead.append_copy(tmpdoc.document_element());
 }
 
 void HumdrumInput::createSimpleTitleElement()
@@ -3849,7 +3878,7 @@ void HumdrumInput::createSimpleComposerElements()
     if (composers.empty()) {
         return;
     }
-    
+
     for (auto composer : composers) {
         pugi::xml_node composerEl = m_simpleComposers.append_child("composer");
         std::string composerCert;
@@ -3865,7 +3894,7 @@ void HumdrumInput::createSimpleComposerElements()
             // not about what this composer's name was.
             composerEl.append_attribute("cert") = composerCert.c_str();
         }
-        
+
         pugi::xml_node nameEl;
         if (composer.key == "COC") {
             nameEl = composerEl.append_child("corpName");
@@ -3873,7 +3902,7 @@ void HumdrumInput::createSimpleComposerElements()
         else {
             nameEl = composerEl.append_child("persName");
         }
-        
+
         if (composer.key == "COL") {
             nameEl.append_attribute("type") = "alias";
         }
@@ -3923,11 +3952,10 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
     }
 
     std::map<std::string, std::vector<HumdrumReferenceItem>> items;
-    vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
-    for (int i = 0; i < (int)references.size(); ++i) {
+    for (int i = 0; i < (int)m_humdrumLineReferences.size(); ++i) {
         hum::HumRegex hre;
-        std::string baseKey = references[i]->getReferenceKey();
-        std::string baseValue = references[i]->getReferenceValue();
+        std::string baseKey = m_humdrumLineReferences[i]->getReferenceKey();
+        std::string baseValue = m_humdrumLineReferences[i]->getReferenceValue();
         std::string key;
         std::string value;
         bool isParseable = false;
@@ -3957,7 +3985,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
             // because after the first data line, they're not movementNames, just
             // tempo changes.  And of the ones that are early enough to take, skip the
             // ones that have metronome info but no tempo name.
-            if (references[i]->getLineIndex() > firstDataLineIdx) {
+            if (m_humdrumLineReferences[i]->getLineIndex() > firstDataLineIdx) {
                 continue;
             }
 
@@ -3983,7 +4011,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
             }
         }
         HumdrumReferenceItem item;
-        item.lineText = references[i]->getText();
+        item.lineText = m_humdrumLineReferences[i]->getText();
         item.key = key;
         item.value = value;
         item.isParseable = isParseable;
@@ -4030,7 +4058,7 @@ bool HumdrumInput::anyReferenceItemsExist(std::vector<std::string> keys) {
 
 //////////////////////////////
 //
-// HumdrumInput::getDateSting -- Return the current time and date as a std::string.
+// HumdrumInput::getDateString -- Return the current time and date as a std::string.
 //
 
 std::string HumdrumInput::getDateString()

@@ -430,11 +430,11 @@ public:
 #endif /* NO_HUMDRUM_SUPPORT */
 
 struct HumdrumReferenceItem {
-    string lineText;            // the full text of the HumdrumLine containing this item,
+    std::string lineText;       // the full text of the HumdrumLine containing this item,
                                 // e.g. "!!!OTL2@FR:Le deuxième titre Français"
-    string key;                 // the interpreted key, with key, index, isTranslated, language stripped out
+    std::string key;                 // the interpreted key, with key, index, isTranslated, language stripped out
                                 // e.g. "OTL" (if not parseable, we get everything between "!!!" and ":")
-    string value;               // the value (everything after the ':')
+    std::string value;          // the value (everything after the ':')
                                 // e.g. "Le deuxième titre Français"
     bool isParseable;           // true if we could parse out key, index, isTranslated, language
                                 // e.g. true
@@ -442,7 +442,7 @@ struct HumdrumReferenceItem {
                                 // e.g. true
     bool isTranslated;          // true if single '@' (not '@@') is present
                                 // e.g. true
-    string language;            // the language, if present, lowercased
+    std::string language;       // the language, if present, lowercased
                                 // e.g. "fr"
     int index;                  // the index (0 if not present)
                                 // e.g. 2
@@ -1265,6 +1265,7 @@ private:
     std::string m_textSmuflSpacer = "\xc2\xa0";
 
     // Some metadata elements that are computed once and used multiple times
+    std::vector<hum::HumdrumLine *> m_humdrumLineReferences;
     std::map<std::string, std::vector<HumdrumReferenceItem>> m_references;
     pugi::xml_document m_simpleTitle;
     pugi::xml_document m_simpleComposers;
