@@ -450,19 +450,19 @@ struct HumdrumReferenceItem {
 
 struct DateWithErrors {
     bool valid = false;         // if false, ignore everything here, the date was not parseable.
-    string dateError = "";      // error of the entire date ("", "approximate", "uncertain")
-    int year = INT_MIN;
-    string yearError = "";      // error of the year ("", "approximate", "uncertain")
-    int month = INT_MIN;
-    string monthError = "";     // error of the month ("", "approximate", "uncertain")
-    int day = INT_MIN;
-    string dayError = "";       // error of the day ("", "approximate", "uncertain")
-    int hour = INT_MIN;
-    string hourError = "";      // error of the hour ("", "approximate", "uncertain")
-    int minute = INT_MIN;
-    string minuteError = "";    // error of the minute ("", "approximate", "uncertain")
-    int second = INT_MIN;
-    string secondError = "";    // error of the second ("", "approximate", "uncertain")
+    std::string dateError;      // error of the entire date ("", "approximate", "uncertain")
+    std::string year;
+    std::string yearError;      // error of the year ("", "approximate", "uncertain")
+    std::string month;
+    std::string monthError;     // error of the month ("", "approximate", "uncertain")
+    std::string day;
+    std::string dayError;       // error of the day ("", "approximate", "uncertain")
+    std::string hour;
+    std::string hourError;      // error of the hour ("", "approximate", "uncertain")
+    std::string minute;
+    std::string minuteError;    // error of the minute ("", "approximate", "uncertain")
+    std::string second;
+    std::string secondError;    // error of the second ("", "approximate", "uncertain")
 };
 
 //----------------------------------------------------------------------------
@@ -897,6 +897,10 @@ protected:
     void fillInIsoDate(pugi::xml_node element, string dateString);
     std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(string inHumdrumDate, bool edtf=false);
     DateWithErrors dateWithErrorsFromHumdrumDate(string dateString);
+    std::string isoDateFromDateWithErrors(DateWithErrors date, bool edtf);
+    bool sanityCheckDate(
+            std::string year, std::string month, std::string day,
+            std::string hour, std::string minute, std::string second);
     std::string stripDateError(string &value);
     std::string getTextListLanguage(std::vector<HumdrumReferenceItem> textItems);
     std::map<std::string, std::vector<HumdrumReferenceItem>> getAllReferenceItems(hum::HumdrumFile infile);

@@ -2819,14 +2819,6 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
         return;
     }
 
-    pugi::xml_node source = sourceDesc.append_child("source");
-    source.append_attribute("type") = "digital";
-    pugi::xml_node bibl = source.append_child("bibl");
-    bibl.append_copy(m_simpleTitle.first_child());
-    for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
-        bibl.append_copy(*childIt);
-    }
-
     std::vector<HumdrumReferenceItem> editors = getReferenceItems("EED");
     std::vector<HumdrumReferenceItem> encoders = getReferenceItems("ENC");
     std::vector<HumdrumReferenceItem> versions = getReferenceItems("EEV");
@@ -2839,6 +2831,14 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     std::vector<HumdrumReferenceItem> copyrightCountries = getReferenceItems("YEN");
     std::vector<HumdrumReferenceItem> textLanguages = getReferenceItems("TXL");
     std::vector<HumdrumReferenceItem> notes = getReferenceItems("ONB");
+
+    pugi::xml_node source = sourceDesc.append_child("source");
+    source.append_attribute("type") = "digital";
+    pugi::xml_node bibl = source.append_child("bibl");
+    bibl.append_copy(m_simpleTitle.first_child());
+    for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
+        bibl.append_copy(*childIt);
+    }
 
     for (auto editor : editors) {
         pugi::xml_node editorEl = bibl.append_child("editor");
@@ -2900,21 +2900,18 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
             pugi::xml_node copyrightEl = availability.append_child("useRestrict");
             copyrightEl.append_attribute("type") = "copyright";
             copyrightEl.append_attribute("analog") = "humdrum:YEC";
-            fillInIsoDate(copyrightEl, copyright.value);
             copyrightEl.append_child(pugi::node_pcdata).set_value(copyright.value.c_str());
         }
         for (auto copyrightStatement : copyrightStatements) {
             pugi::xml_node copyrightStatementEl = availability.append_child("useRestrict");
             copyrightStatementEl.append_attribute("type") = "copyrightStatement";
             copyrightStatementEl.append_attribute("analog") = "humdrum:YEM";
-            fillInIsoDate(copyrightStatementEl, copyrightStatement.value);
             copyrightStatementEl.append_child(pugi::node_pcdata).set_value(copyrightStatement.value.c_str());
         }
         for (auto copyrightCountry : copyrightCountries) {
             pugi::xml_node copyrightCountryEl = availability.append_child("useRestrict");
             copyrightCountryEl.append_attribute("type") = "copyrightCountry";
             copyrightCountryEl.append_attribute("analog") = "humdrum:YEN";
-            fillInIsoDate(copyrightCountryEl, copyrightCountry.value);
             copyrightCountryEl.append_child(pugi::node_pcdata).set_value(copyrightCountry.value.c_str());
         }
     }
@@ -2976,7 +2973,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     std::string relativeType = "";
     std::map<std::string, std::string> attribs;
 
-    if (inHumdrumDate.empty() or inHumdrumDate.size() < 1) {
+    if (inHumdrumDate.empty()) {
         return attribs;
     }
 
@@ -3026,93 +3023,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     // Produce isodates for every date found.
     std::vector<std::string> isodates;
     for (auto date : dates) {
-        if (!date.valid) {
-            return attribs;
-        }
-        if (!date.dateError.empty()) {
-            if (!edtf) {
-                // pre-EDTF isodates can't represent uncertain/approximate dates,
-                // so don't return any.  The plain text will still describe it,
-                // and should be parseable by most folks.
-                return attribs;
-            }
-        }
-
-        std::vector<std::string> dateParts;
-        for (int i = 0; i < 6; i++) {
-            int value = INT_MIN;
-            std::string error;
-            if (i == 0) {
-                value = date.year;
-                error = date.yearError;
-            }
-            else if (i == 1) {
-                value = date.month;
-                error = date.monthError;
-            }
-            else if (i == 2) {
-                value = date.day;
-                error = date.dayError;
-            }
-            else if (i == 3) {
-                value = date.hour;
-                error = date.hourError;
-            }
-            else if (i == 4) {
-                value = date.minute;
-                error = date.minuteError;
-            }
-            else if (i == 5) {
-                value = date.second;
-                error = date.secondError;
-            }
-            if (value == INT_MIN) {
-                // ignore anything after this
-                break;
-            }
-            std::string suffix = "";
-            if (!error.empty()) {
-                if (!edtf) {
-                    // pre-EDTF ISO dates can't describe approximate/uncertain values.
-                    return attribs;
-                }
-                if (error == "uncertain") {
-                    suffix = "?";
-                }
-                else if (error == "approximate") {
-                    suffix = "~";
-                }
-            }
-            std::string sub = std::to_string(value);
-            sub += suffix;
-            dateParts.push_back(sub);
-        }
-        std::string isodate;
-
-        for (int i = 0; i < 3; i++) {
-            if (i >= dateParts.size()) {
-                break;
-            }
-            if (i > 0) {
-                isodate += "-";
-            }
-            isodate += dateParts[i];
-        }
-
-        if (dateParts.size() >= 4) {
-            for (int i = 3; i < 6; i++) {
-                if (i >= dateParts.size()) {
-                    break;
-                }
-                if (i == 3) {
-                    isodate += "T";
-                }
-                else {
-                    isodate += ":";
-                }
-                isodate += dateParts[i];
-            }
-        }
+        std::string isodate = isoDateFromDateWithErrors(date, edtf);
         isodates.push_back(isodate);
     }
 
@@ -3196,130 +3107,37 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
     }
 
     std::vector<std::string> dateSubStrs;
-    std::vector<int> values = {INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN};
+    std::vector<std::string> values = {"", "", "", "", "", ""};
     std::vector<std::string> errors = {"", "", "", "", "", ""};
     hum::HumRegex hre;
     hre.replaceDestructive(dateString, "/", ":");
     hre.replaceDestructive(dateString, "", " ");
     hre.split(dateSubStrs, dateString, "/");
-    bool gotOne = false;
-    try {
-        for (int i = 0; i < dateSubStrs.size(); i++) {
-            std::string value = dateSubStrs[i];
-            std::string error = stripDateError(value);
-            if (i == 0 && value.size() >= 2) {
-                if (value[0] == '@') {
-                    // year with prepended '@' is B.C.E. so replace with '-'
-                    value[0] = '-';
-                }
+    
+    for (int i = 0; i < dateSubStrs.size(); i++) {
+        std::string value = dateSubStrs[i];
+        std::string error = stripDateError(value);
+        if (i == 0 && value.size() >= 2) {
+            if (value[0] == '@') {
+                // year with prepended '@' is B.C.E. so replace with '-'
+                value[0] = '-';
             }
-            if (value.empty()) {
-                values[i] = INT_MIN;
-            }
-            else if (i == 5) {
-                // second is a float, but we truncate to int
-                values[i] = int(atof(value.c_str()));
-                gotOne = true;
-            }
-            else {
-                values[i] = atoi(value.c_str());
-                gotOne = true;
-            }
-            errors[i] = error;
         }
-    }
-    catch (...) {
-        // if anything failed to convert to integer, this string is unparseable
-        gotOne = false;
+        if (i == 5) {
+            // second is a float, but we truncate to int
+            size_t idx = value.find_first_of(".");
+            if (idx < SIZE_T_MAX) {
+                value = value.substr(0, idx);
+            }
+        }
+        values[i] = value;
+        errors[i] = error;
     }
 
-    if (gotOne) {
-        // sanity check the numbers
-        int month = INT_MIN;
-        int year = INT_MIN;
-        for (int i = 0; i < 6; i++) {
-            if (i == 0) {
-                year = values[i];
-                // year (can be anything except INT_MIN)
-                if (values[i] == INT_MIN) {
-                    gotOne = false;
-                    break;
-                }
-            }
-            else if (i == 1) {
-                // month (must be INT_MIN or 1..12)
-                month = values[i];
-                if (values[i] == INT_MIN) {
-                    // we're ok
-                }
-                else if (values[i] < 1 || values[i] > 12) {
-                    // bad month
-                    gotOne = false;
-                    break;
-                }
-            }
-            else if (i == 2) {
-                // day needs to match number of days in month.
-                if (month == INT_MIN) {
-                    if (values[i] != INT_MIN) {
-                        // bad: day without month
-                        gotOne = false;
-                        break;
-                    }
-                }
-                else if (values[i] < 1) {
-                    gotOne = false;
-                    break;
-                }
-                else if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 | month == 10 || month == 12) {
-                    if (values[i] > 31) {
-                        gotOne = false;
-                        break;
-                    }
-                }
-                else if (month == 2) {
-                    // There are weird non-leap years sometimes (recent centuries that are divisible by 400, for
-                    // example).  I am treating them like they are leap years, because otherwise I would go insane.
-                    if (year % 4 == 0 && values[i] > 29) {
-                        // leap year fail
-                        gotOne = false;
-                        break;
-                    }
-                    if (year % 4 != 0 && values[i] > 28) {
-                        // non-leap year fail
-                        gotOne = false;
-                        break;
-                    }
-                }
-                else if (month == 4 || month == 6 || month == 9 | month == 11) {
-                    if (values[i] > 30) {
-                        gotOne = false;
-                        break;
-                    }
-                }
-            }
-            else if (i == 3) {
-                // hour (must be INT_MIN or 0..23
-                if (values[i] == INT_MIN) {
-                    // ok
-                }
-                else if (values[i] < 0 || values[i] > 23) {
-                    gotOne = false;
-                    break;
-                }
-            }
-            else if (i == 4 || i == 5) {
-                // minute or second (must be INT_MIN or 0..59)
-                if (values[i] == INT_MIN) {
-                    // ok
-                }
-                else if (values[i] < 0 || values[i] > 59) {
-                    gotOne = false;
-                    break;
-                }
-            }
-        }
-    }
+    bool gotOne = sanityCheckDate(
+        values[0], values[1], values[2],
+        values[3], values[4], values[5]);
+    
     if (gotOne) {
         date.valid = true;
         date.year = values[0];
@@ -3336,6 +3154,207 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
         date.secondError = errors[5];
     }
     return date;
+}
+
+std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool edtf) {
+    if (!date.valid) {
+        return "";
+    }
+    if (!date.dateError.empty()) {
+        if (!edtf) {
+            // non-EDTF isodates can't represent uncertain/approximate dates,
+            // so don't return anything.
+            return "";
+        }
+    }
+
+    std::vector<std::string> dateParts;
+    // We do this as a loop so we can break out at first missing date part.
+    for (int i = 0; i < 6; i++) {
+        std::string value;
+        std::string error;
+        if (i == 0) {
+            value = date.year;
+            error = date.yearError;
+        }
+        else if (i == 1) {
+            value = date.month;
+            error = date.monthError;
+        }
+        else if (i == 2) {
+            value = date.day;
+            error = date.dayError;
+        }
+        else if (i == 3) {
+            value = date.hour;
+            error = date.hourError;
+        }
+        else if (i == 4) {
+            value = date.minute;
+            error = date.minuteError;
+        }
+        else if (i == 5) {
+            value = date.second;
+            error = date.secondError;
+        }
+        if (value.size() == 0) {
+            // ignore this and anything after this
+            break;
+        }
+        std::string suffix = "";
+        if (!error.empty()) {
+            if (!edtf) {
+                // non-EDTF ISO dates can't describe approximate/uncertain values.
+                return "";
+            }
+            if (error == "uncertain") {
+                suffix = "?";
+            }
+            else if (error == "approximate") {
+                suffix = "~";
+            }
+        }
+        dateParts.push_back(value + suffix);
+    }
+    
+    std::string isodate;
+
+    for (int i = 0; i < 3; i++) {
+        if (i >= dateParts.size()) {
+            break;
+        }
+        if (i > 0) {
+            isodate += "-";
+        }
+        isodate += dateParts[i];
+    }
+
+    // If dateParts.size() is < 6, ignore the time (3..5) (this date+time should have been rejected in sanityCheckDate).
+    // We only emit a time if all three parts of the time are present.
+    if (dateParts.size() == 6) {
+        for (int i = 3; i < 6; i++) {
+            if (i == 3) {
+                isodate += "T";
+            }
+            else {
+                isodate += ":";
+            }
+            isodate += dateParts[i];
+        }
+    }
+    
+    return isodate;
+}
+
+bool HumdrumInput::sanityCheckDate(
+        std::string year, std::string month, std::string day,
+        std::string hour, std::string minute, std::string second) {
+    // Convert to integers
+    int yearInt = INT_MIN;
+    int monthInt = INT_MIN;
+    int dayInt = INT_MIN;
+    int hourInt = INT_MIN;
+    int minuteInt = INT_MIN;
+    int secondInt = INT_MIN;
+    try {
+        if (year.size() > 0) {
+            yearInt = stoi(year);
+        }
+        if (month.size() > 0) {
+            monthInt = stoi(month);
+        }
+        if (day.size() > 0) {
+            dayInt = stoi(day);
+        }
+        if (hour.size() > 0) {
+            hourInt = stoi(hour);
+        }
+        if (minute.size() > 0) {
+            minuteInt = stoi(minute);
+        }
+        if (second.size() > 0) {
+            secondInt = stoi(second);
+        }
+    }
+    catch (...) {
+        return false;
+    }
+    
+    // sanity check the integers
+
+    // year has to be there, the others are optional.
+    if (yearInt == INT_MIN) {
+        return false;
+    }
+    
+    if (monthInt != INT_MIN) {
+        if (monthInt < 1 || monthInt > 12) {
+            return false;
+        }
+    }
+    
+    if (dayInt != INT_MIN) {
+        if (monthInt == INT_MIN) {
+            // if month is missing, so must day be missing
+            return false;
+        }
+        if (dayInt < 1 || dayInt > 31) {
+            return false;
+        }
+        if (monthInt == 4 || monthInt == 6 || monthInt == 9 || monthInt == 11) {
+            if (dayInt == 31) {
+                return false;
+            }
+        }
+        if (monthInt == 2) {
+            if (dayInt > 29) {
+                return false;
+            }
+            // 29 is a fail during non-leap years.  Not checking Gregorian
+            // leap year rules, since they change historically.
+            if (dayInt == 29) {
+                if (yearInt % 4 != 0) {
+                    return false;
+                }
+            }
+        }
+    }
+    
+    if (hourInt != INT_MIN) {
+        if (dayInt == INT_MIN) {
+            // if day is missing, so must hour be missing
+            return false;
+        }
+        if (minuteInt == INT_MIN || secondInt == INT_MIN) {
+            // if hour is there, minute and second must also be there (unlike year/month/day, which can be year or year/month).
+            return false;
+        }
+        if (hourInt < 0 || hourInt > 23) {
+            return false;
+        }
+    }
+    
+    if (minuteInt != INT_MIN) {
+        if (hourInt == INT_MIN) {
+            // if hour is missing, so must minute be missing
+            return false;
+        }
+        if (minuteInt < 0 || minuteInt > 59) {
+            return false;
+        }
+    }
+    
+    if (secondInt != INT_MIN) {
+        if (minuteInt == INT_MIN) {
+            // if minute is missing, so must second be missing
+            return false;
+        }
+        if (secondInt < 0 || secondInt > 59) {
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 std::string HumdrumInput::stripDateError(std::string &value) {
@@ -3359,7 +3378,142 @@ std::string HumdrumInput::stripDateError(std::string &value) {
 
 void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 {
-
+    std::vector<string> keysThatGoHere = {
+        "LAR", "PED", "LOR", "TRN", "OCL", "OVM",
+        "PTL", "PPR", "PDT", "PPP", "PC#"
+    };
+    
+    if (!anyReferenceItemsExist(keysThatGoHere)) {
+        return;
+    }
+    
+    std::vector<HumdrumReferenceItem> arrangers = getReferenceItems("LAR");
+    std::vector<HumdrumReferenceItem> editors = getReferenceItems("PED");
+    std::vector<HumdrumReferenceItem> orchestrators = getReferenceItems("LOR");
+    std::vector<HumdrumReferenceItem> translators = getReferenceItems("TRN");
+    std::vector<HumdrumReferenceItem> collectors = getReferenceItems("OCL");
+    std::vector<HumdrumReferenceItem> volumeNumbers = getReferenceItems("OVM");
+    std::vector<HumdrumReferenceItem> volumeNames = getReferenceItems("PTL");
+    std::vector<HumdrumReferenceItem> publishers = getReferenceItems("PPR");
+    std::vector<HumdrumReferenceItem> datesPublished = getReferenceItems("PDT");
+    std::vector<HumdrumReferenceItem> locationsPublished = getReferenceItems("PPP");
+    std::vector<HumdrumReferenceItem> publisherCatalogNumbers = getReferenceItems("PC#");
+    
+    pugi::xml_node source = sourceDesc.append_child("source");
+    source.append_attribute("type") = "printed";
+    pugi::xml_node bibl = source.append_child("bibl");
+    
+    for (auto publisherCatalogNumber : publisherCatalogNumbers) {
+        pugi::xml_node identifierEl = bibl.append_child("identifier");
+        identifierEl.append_attribute("type") = "catalogNumber";
+        identifierEl.append_attribute("analog") = "humdrum:PC#";
+        identifierEl.append_child(pugi::node_pcdata).set_value(publisherCatalogNumber.value.c_str());
+    }
+    
+    bibl.append_copy(m_simpleTitle.first_child());
+    for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
+        bibl.append_copy(*childIt);
+    }
+    
+    for (auto editor : editors) {
+        pugi::xml_node editorEl = bibl.append_child("editor");
+        editorEl.append_attribute("analog") = "humdrum:PED";
+        editorEl.append_child(pugi::node_pcdata).set_value(editor.value.c_str());
+    }
+    
+    if (!arrangers.empty() || !orchestrators.empty() || !translators.empty() || !collectors.empty()) {
+        // arrangers could technically go outside <respStmt>, but
+        // Perry requests that they go inside <respStmt> for ease
+        // of conversion to his proposed v. 6.
+        pugi::xml_node respStmt = bibl.append_child("respStmt");
+        
+        for (auto arranger : arrangers) {
+            pugi::xml_node respEl = respStmt.append_child("resp");
+            respEl.append_child(pugi::node_pcdata).set_value("arranger");
+            pugi::xml_node persNameEl = respStmt.append_child("persName");
+            persNameEl.append_attribute("analog") = "humdrum:LAR";
+            persNameEl.append_child(pugi::node_pcdata).set_value(arranger.value.c_str());
+        }
+        
+        for (auto orchestrator : orchestrators) {
+            pugi::xml_node respEl = respStmt.append_child("resp");
+            respEl.append_child(pugi::node_pcdata).set_value("orchestrator");
+            pugi::xml_node persNameEl = respStmt.append_child("persName");
+            persNameEl.append_attribute("analog") = "humdrum:LOR";
+            persNameEl.append_child(pugi::node_pcdata).set_value(orchestrator.value.c_str());
+        }
+        
+        for (auto translator : translators) {
+            pugi::xml_node respEl = respStmt.append_child("resp");
+            respEl.append_child(pugi::node_pcdata).set_value("translator");
+            pugi::xml_node persNameEl = respStmt.append_child("persName");
+            persNameEl.append_attribute("analog") = "humdrum:TRN";
+            persNameEl.append_child(pugi::node_pcdata).set_value(translator.value.c_str());
+        }
+        
+        for (auto collector : collectors) {
+            pugi::xml_node respEl = respStmt.append_child("resp");
+            respEl.append_child(pugi::node_pcdata).set_value("collector/transcriber");
+            pugi::xml_node nameEl = respStmt.append_child("name");
+            nameEl.append_attribute("analog") = "humdrum:OCL";
+            nameEl.append_child(pugi::node_pcdata).set_value(collector.value.c_str());
+        }
+    }
+    
+    if (!publishers.empty() || !datesPublished.empty() || !locationsPublished.empty()) {
+        pugi::xml_node imprint = bibl.append_child("imprint");
+        for (auto publisher : publishers) {
+            pugi::xml_node publisherEl = imprint.append_child("publisher");
+            publisherEl.append_attribute("analog") = "humdrum:PPR";
+            publisherEl.append_child(pugi::node_pcdata).set_value(publisher.value.c_str());
+        }
+        
+        for (auto datePublished : datesPublished) {
+            pugi::xml_node dateEl = imprint.append_child("date");
+            dateEl.append_attribute("type") = "datePublished";
+            dateEl.append_attribute("analog") = "humdrum:PDT";
+            dateEl.append_child(pugi::node_pcdata).set_value(datePublished.value.c_str());
+        }
+        
+        for (auto locationPublished : locationsPublished) {
+            pugi::xml_node geogNameEl = imprint.append_child("geogName");
+            geogNameEl.append_attribute("role") = "locationPublished";
+            geogNameEl.append_attribute("analog") = "humdrum:PPP";
+            geogNameEl.append_child(pugi::node_pcdata).set_value(locationPublished.value.c_str());
+        }
+    }
+    
+    size_t numberOfVolumesWithNameAndNumber = min(volumeNames.size(), volumeNumbers.size());
+    for (size_t i = 0; i < numberOfVolumesWithNameAndNumber; i++) {
+        HumdrumReferenceItem volumeName = volumeNames[i];
+        HumdrumReferenceItem volumeNumber = volumeNumbers[i];
+        pugi::xml_node relatedItem = bibl.append_child("relatedItem");
+        relatedItem.append_attribute("rel") = "host";
+        pugi::xml_node relBibl = relatedItem.append_child("bibl");
+        
+        pugi::xml_node titleElement = relBibl.append_child("title");
+        titleElement.append_attribute("analog") = "humdrum:PTL";
+        titleElement.append_child(pugi::node_pcdata).set_value(volumeName.value.c_str());
+        
+        pugi::xml_node biblScope = relBibl.append_child("biblScope");
+        biblScope.append_attribute("analog") = "humdrum:OVM";
+        biblScope.append_child(pugi::node_pcdata).set_value(volumeNumber.value.c_str());
+    }
+    
+    if (volumeNames.size() > volumeNumbers.size()) {
+        // we ignore any extra volume numbers, since a number without a name
+        // isn't interesting.
+        for (size_t i = volumeNumbers.size(); i < volumeNames.size(); i++) {
+            HumdrumReferenceItem volumeName = volumeNames[i];
+            pugi::xml_node relatedItem = bibl.append_child("relatedItem");
+            relatedItem.append_attribute("rel") = "host";
+            pugi::xml_node relBibl = relatedItem.append_child("bibl");
+            
+            pugi::xml_node titleElement = relBibl.append_child("title");
+            titleElement.append_attribute("analog") = "humdrum:PTL";
+            titleElement.append_child(pugi::node_pcdata).set_value(volumeName.value.c_str());
+        }
+    }
 }
 
 void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
@@ -3479,7 +3633,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
         bool isTranslated = false;
         int index = 0;
 
-        if (baseKey.compare(0, 5, "RDF**") || baseKey == "system-decoration") {
+        if (baseKey.compare(0, 5, "RDF**") == 0 || baseKey == "system-decoration") {
             continue;
         }
 
