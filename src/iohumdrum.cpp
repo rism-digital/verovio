@@ -2771,7 +2771,7 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 {
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    titleStmt.append_copy(m_simpleTitle.first_child());
+    titleStmt.append_copy(m_simpleTitle);
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node unpub = pubStmt.append_child("unpub");
@@ -2836,8 +2836,8 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     pugi::xml_node source = sourceDesc.append_child("source");
     source.append_attribute("type") = "digital";
     pugi::xml_node bibl = source.append_child("bibl");
-    bibl.append_copy(m_simpleTitle.first_child());
-    for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
+    bibl.append_copy(m_simpleTitle);
+    for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end(); ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -3395,8 +3395,8 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
         identifierEl.append_child(pugi::node_pcdata).set_value(publisherCatalogNumber.value.c_str());
     }
 
-    bibl.append_copy(m_simpleTitle.first_child());
-    for (pugi::xml_node_iterator childIt = m_simpleComposers.begin(); childIt != m_simpleComposers.end(); ++childIt) {
+    bibl.append_copy(m_simpleTitle);
+    for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end(); ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -3545,7 +3545,7 @@ void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
     for (size_t i = 0; i < longestLen; i++) {
         if (i < trackNumbers.size()) {
             pugi::xml_node analytic = biblStruct.append_child("analytic");
-            analytic.append_copy(m_simpleTitle.first_child());
+            analytic.append_copy(m_simpleTitle);
 
             pugi::xml_node biblScope = analytic.append_child("biblScope");
             biblScope.append_attribute("type") = "trackNumber";
@@ -3870,7 +3870,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
     std::vector<HumdrumReferenceItem> groupWorkTitles = getReferenceItems("GTL");
     std::vector<HumdrumReferenceItem> associatedWorkTitles = getReferenceItems("GAW");
     // GCO and ACO have the same definition: "Collection designation, such as
-    // Norton Scores, Smmithsonian Collection, etc."
+    // Norton Scores, Smithsonian Collection, etc."
     std::vector<HumdrumReferenceItem> collectionWorkTitles = getReferenceItems("GCO");
     std::vector<HumdrumReferenceItem> moreCollectionWorkTitles = getReferenceItems("ACO");
     collectionWorkTitles.insert(collectionWorkTitles.end(), moreCollectionWorkTitles.begin(), moreCollectionWorkTitles.end());
@@ -4018,6 +4018,10 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         
         
         
+        
+        // when all done, append the <madsCollection>
+        pugi::xml_node extMeta = theWork.append_child("extMeta");
+        extMeta.append_copy(m_madsCollection);
     }
 }
 
@@ -4038,14 +4042,19 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     pugi::xml_node untranslatedTitleEl = work.append_child("title");
     pugi::xml_node translatedTitleEl = work.append_child("title");
     
+    bool untranslatedTitleIsEmpty = true;
+    bool translatedTitleIsEmpty = true;
+
     // First any main title(s) (OTL).
     for (auto mainTitle : mainTitles) {
         pugi::xml_node titlePart;
         if (mainTitle.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
             titlePart.append_attribute("type") = "translated";
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
             titlePart.append_attribute("type") = "main";
         }
@@ -4060,9 +4069,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     for (auto movementName : movementNames) {
         pugi::xml_node titlePart;
         if (movementName.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
         }
         titlePart.append_attribute("type") = "movementName";
@@ -4077,9 +4088,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     for (auto plainNumber : plainNumbers) {
         pugi::xml_node titlePart;
         if (plainNumber.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
         }
         titlePart.append_attribute("type") = "number";
@@ -4094,9 +4107,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     for (auto movementNumber : movementNumbers) {
         pugi::xml_node titlePart;
         if (movementNumber.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
         }
         titlePart.append_attribute("type") = "movementNumber";
@@ -4111,9 +4126,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     for (auto opusNumber : opusNumbers) {
         pugi::xml_node titlePart;
         if (opusNumber.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
         }
         titlePart.append_attribute("type") = "opusNumber";
@@ -4128,9 +4145,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     for (auto actNumber : actNumbers) {
         pugi::xml_node titlePart;
         if (actNumber.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
         }
         titlePart.append_attribute("type") = "actNumber";
@@ -4145,9 +4164,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     for (auto sceneNumber : sceneNumbers) {
         pugi::xml_node titlePart;
         if (sceneNumber.isTranslated) {
+            translatedTitleIsEmpty = false;
             titlePart = translatedTitleEl.append_child("titlePart");
         }
         else {
+            untranslatedTitleIsEmpty = false;
             titlePart = untranslatedTitleEl.append_child("titlePart");
         }
         titlePart.append_attribute("type") = "sceneNumber";
@@ -4181,14 +4202,14 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     }
     
     // if untranslatedTitleEl or translatedTitleEl are empty, remove them, else give them a type
-    if (untranslatedTitleEl.empty()) {
+    if (untranslatedTitleIsEmpty) {
         work.remove_child(untranslatedTitleEl);
     }
     else {
         untranslatedTitleEl.append_attribute("type") = "uniform";
     }
     
-    if (translatedTitleEl.empty()) {
+    if (translatedTitleIsEmpty) {
         work.remove_child(translatedTitleEl);
     }
     else {
@@ -4198,7 +4219,172 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
 
 void HumdrumInput::createComposerElements(pugi::xml_node work)
 {
+    // emits all the composer-related elements.  This includes emitting
+    // any <mads> XML for composer personal information (e.g. birth and
+    // death dates/places, nationality), stashing them in m_madsElements
+    // to emit at the end of the <work type="encoded">.
+    std::vector<HumdrumReferenceItem> composers = getReferenceItems("COM");
+    std::vector<HumdrumReferenceItem> attributedComposers = getReferenceItems("COA");
+    std::vector<HumdrumReferenceItem> suspectedComposers = getReferenceItems("COS");
+    std::vector<HumdrumReferenceItem> corporateComposers = getReferenceItems("COC");
+    std::vector<HumdrumReferenceItem> composerAliases = getReferenceItems("COL");
+    std::vector<HumdrumReferenceItem> composerDates = getReferenceItems("CDT");
+    std::vector<HumdrumReferenceItem> composerBirthPlaces = getReferenceItems("CBL");
+    std::vector<HumdrumReferenceItem> composerDeathPlaces = getReferenceItems("CDL");
+    std::vector<HumdrumReferenceItem> composerNationalities = getReferenceItems("CNT");
     
+    std::vector<HumdrumReferenceItem> allComposers;
+    allComposers.insert(allComposers.end(), composers.begin(), composers.end());
+    allComposers.insert(allComposers.end(), attributedComposers.begin(), attributedComposers.end());
+    allComposers.insert(allComposers.end(), suspectedComposers.begin(), suspectedComposers.end());
+    allComposers.insert(allComposers.end(), corporateComposers.begin(), corporateComposers.end());
+    
+    int madsXmlIdIndex = 0;
+    for (size_t i = 0; i < allComposers.size(); i++) {
+        HumdrumReferenceItem composer = allComposers[i];
+        
+        HumdrumReferenceItem composerAlias;
+        HumdrumReferenceItem composerBirthAndDeathDate;
+        HumdrumReferenceItem composerBirthPlace;
+        HumdrumReferenceItem composerDeathPlace;
+        HumdrumReferenceItem composerNationality;
+        
+        if (i < composerAliases.size()) {
+            composerAlias = composerAliases[i];
+        }
+        if (i < composerDates.size()) {
+            composerBirthAndDeathDate = composerDates[i];
+        }
+        if (i < composerBirthPlaces.size()) {
+            composerBirthPlace = composerBirthPlaces[i];
+        }
+        if (i < composerDeathPlaces.size()) {
+            composerDeathPlace = composerDeathPlaces[i];
+        }
+        if (i < composerNationalities.size()) {
+            composerNationality = composerNationalities[i];
+        }
+
+        pugi::xml_node composerEl = work.append_child("composer");
+        
+        // composer persName ("COM"/"COA"/"COS")
+        std::string composerAnalog = "humdrum:COM";
+        std::string composerCert;
+        std::string composerNameElementName = "persName";
+        if (composer.key == "COA") {
+            composerAnalog = "humdrum:COA";
+            composerCert = "medium";
+        }
+        else if (composer.key == "COS") {
+            composerAnalog = "humdrum:COS";
+            composerCert = "low";
+        }
+        else if (composer.key == "COC") {
+            composerAnalog = "humdrum:COC";
+            composerNameElementName = "corpName";
+        }
+        
+        if (!composerCert.empty()) {
+            // We put @cert on <composer>, not on <persName>.
+            // The uncertainty is about whether this composer was involved,
+            // not about this composer's name.
+            composerEl.append_attribute("cert") = composerCert.c_str();
+        }
+        
+        pugi::xml_node nameEl = composerEl.append_child(composerNameElementName.c_str());
+        nameEl.append_attribute("analog") = composerAnalog.c_str();
+        nameEl.append_child(pugi::node_pcdata).set_value(composer.value.c_str());
+        
+        // MADS-style authority records (personal info about a composer)
+        if (composerBirthAndDeathDate.lineText.empty()
+            && composerBirthPlace.lineText.empty()
+            && composerDeathPlace.lineText.empty()
+            && composerNationality.lineText.empty()) {
+            // nothing for MADS
+            continue;
+        }
+        
+        std::string madsXmlId = StringFormat("mads%d", madsXmlIdIndex++);
+        
+        // reference <mads> element from composer's name element
+        nameEl.append_attribute("auth.uri") = StringFormat("#%s", madsXmlId.c_str()).c_str();
+        
+        // There is extra info about the composer, that will need to go
+        // in <work><extMeta><madsCollection><mads>
+        if (m_madsCollection.empty()) {
+            m_madsCollection = m_madsDoc.append_child("madsCollection");
+            m_madsCollection.append_attribute("xmlns:xsi")
+                = "http://www.w3.org/2001/XMLSchema-instance";
+            m_madsCollection.append_attribute("xsi:schemaLocation")
+                = "http://www.loc.gov/mads/v2 https://www.loc.gov/standards/mads/mads-2-1.xsd";
+            m_madsCollection.append_attribute("xmlns") = "http://www.loc.gov/mads/v2";
+        }
+        
+        pugi::xml_node mads = m_madsCollection.append_child("mads");
+        mads.append_attribute("ID") = madsXmlId.c_str();
+        pugi::xml_node authority = mads.append_child("authority");
+        pugi::xml_node name = authority.append_child("name");
+        if (composerNameElementName == "corpName") {
+            name.append_attribute("type") = "corporate";
+        }
+        pugi::xml_node namePart = name.append_child("namePart");
+        namePart.append_child(pugi::node_pcdata).set_value(composer.value.c_str());
+        
+        // composerAlias ("humdrum:COL") goes in <mads><variant>
+        if (!composerAlias.lineText.empty()) {
+            pugi::xml_node variant = mads.append_child("variant");
+            variant.append_attribute("type") = "other";
+            variant.append_attribute("otherType") = "humdrum:COL";
+            pugi::xml_node name = variant.append_child("name");
+            pugi::xml_node namePart = name.append_child("namePart");
+            namePart.append_child(pugi::node_pcdata).set_value(composerAlias.value.c_str());
+        }
+        
+        // extra info goes in <mads><personInfo>
+        if (!composerBirthAndDeathDate.lineText.empty()
+            || !composerBirthPlace.lineText.empty()
+            || !composerDeathPlace.lineText.empty()
+            || !composerNationality.lineText.empty()) {
+            pugi::xml_node personInfo = mads.append_child("personInfo");
+            if (!composerBirthAndDeathDate.lineText.empty()) {
+                std::map<std::string, std::string> attribs
+                    = isoDateAttributesFromHumdrumDate(composerBirthAndDeathDate.value, true);
+                std::string isodate;
+                if (attribs.count("edtf") > 0) {
+                    isodate = attribs.at("edtf");
+                }
+                if (!isodate.empty()) {
+                    hum::HumRegex hre;
+                    std::vector<std::string> isodates;
+                    hre.split(isodates, isodate, "/");
+                    pugi::xml_node birthDate = personInfo.append_child("birthDate");
+                    birthDate.append_attribute("encoding") = "edtf";
+                    birthDate.append_child(pugi::node_pcdata).set_value(isodates[0].c_str());
+                    
+                    if (isodates.size() > 1) {
+                        pugi::xml_node deathDate = personInfo.append_child("deathDate");
+                        deathDate.append_attribute("encoding") = "edtf";
+                        deathDate.append_child(pugi::node_pcdata).set_value(isodates[1].c_str());
+                    }
+                }
+            }
+            
+            if (!composerBirthPlace.lineText.empty()) {
+                pugi::xml_node birthPlace = personInfo.append_child("birthPlace");
+                birthPlace.append_child(pugi::node_pcdata).set_value(composerBirthPlace.value.c_str());
+            }
+            
+            if (!composerDeathPlace.lineText.empty()) {
+                pugi::xml_node deathPlace = personInfo.append_child("deathPlace");
+                deathPlace.append_child(pugi::node_pcdata).set_value(composerDeathPlace.value.c_str());
+            }
+            
+            if (!composerNationality.lineText.empty()) {
+                pugi::xml_node nationality = personInfo.append_child("nationality");
+                nationality.append_child(pugi::node_pcdata).set_value(composerNationality.value.c_str());
+            }
+        }
+    }
 }
 
 void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
@@ -4238,7 +4424,7 @@ void HumdrumInput::createSimpleTitleElement()
 {
     std::vector<HumdrumReferenceItem>titles = getReferenceItems("OTL");
     std::vector<HumdrumReferenceItem>movementNames = getReferenceItems("OMD");
-    pugi::xml_node titleEl = m_simpleTitle.append_child("title");
+    m_simpleTitle = m_simpleTitleDoc.append_child("title");
     std::string firstLang;
     int bestTitleIdx = getBestItem(titles, std::string());
     if (bestTitleIdx >= 0 && !titles[bestTitleIdx].language.empty()) {
@@ -4255,19 +4441,19 @@ void HumdrumInput::createSimpleTitleElement()
     }
 
     if (!firstLang.empty()) {
-        titleEl.append_attribute("xml:lang") = firstLang.c_str();
+        m_simpleTitle.append_attribute("xml:lang") = firstLang.c_str();
     }
 
     if (bestTitleIdx >= 0 && bestMovementNameIdx >= 0
             && titles[bestTitleIdx].value != movementNames[bestMovementNameIdx].value) {
         std::string combinedName = titles[bestTitleIdx].value + std::string(", ") + movementNames[bestMovementNameIdx].value;
-        titleEl.append_child(pugi::node_pcdata).set_value(combinedName.c_str());
+        m_simpleTitle.append_child(pugi::node_pcdata).set_value(combinedName.c_str());
     }
     else if (bestTitleIdx >= 0) {
-        titleEl.append_child(pugi::node_pcdata).set_value(titles[bestTitleIdx].value.c_str());
+        m_simpleTitle.append_child(pugi::node_pcdata).set_value(titles[bestTitleIdx].value.c_str());
     }
     else if (bestMovementNameIdx >= 0) {
-        titleEl.append_child(pugi::node_pcdata).set_value(movementNames[bestMovementNameIdx].value.c_str());
+        m_simpleTitle.append_child(pugi::node_pcdata).set_value(movementNames[bestMovementNameIdx].value.c_str());
     }
 }
 
@@ -4293,7 +4479,7 @@ void HumdrumInput::createSimpleComposerElements()
     }
 
     for (auto composer : composers) {
-        pugi::xml_node composerEl = m_simpleComposers.append_child("composer");
+        pugi::xml_node composerEl = m_simpleComposersDoc.append_child("composer");
         std::string composerCert;
         if (composer.key == "COA") {
             composerCert = "medium";

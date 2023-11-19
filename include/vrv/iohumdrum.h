@@ -432,19 +432,19 @@ public:
 struct HumdrumReferenceItem {
     std::string lineText;       // the full text of the HumdrumLine containing this item,
                                 // e.g. "!!!OTL2@FR:Le deuxième titre Français"
-    std::string key;                 // the interpreted key, with key, index, isTranslated, language stripped out
+    std::string key;            // the interpreted key, with key, index, isTranslated, language stripped out
                                 // e.g. "OTL" (if not parseable, we get everything between "!!!" and ":")
     std::string value;          // the value (everything after the ':')
                                 // e.g. "Le deuxième titre Français"
-    bool isParseable;           // true if we could parse out key, index, isTranslated, language
+    bool isParseable = false;   // true if we could parse out key, index, isTranslated, language
                                 // e.g. true
-    bool isHumdrumKey;          // true if isParseable and key is in the known list of Humdrum keys
+    bool isHumdrumKey = false;  // true if isParseable and key is in the known list of Humdrum keys
                                 // e.g. true
-    bool isTranslated;          // true if single '@' (not '@@') is present
+    bool isTranslated = false;  // true if single '@' (not '@@') is present
                                 // e.g. true
     std::string language;       // the language, if present, lowercased
                                 // e.g. "fr"
-    int index;                  // the index (0 if not present)
+    int index = -1;             // the index (0 if not present)
                                 // e.g. 2
 };
 
@@ -1269,8 +1269,11 @@ private:
     // Some metadata elements that are computed once and used multiple times
     std::vector<hum::HumdrumLine *> m_humdrumLineReferences;
     std::map<std::string, std::vector<HumdrumReferenceItem>> m_references;
-    pugi::xml_document m_simpleTitle;
-    pugi::xml_document m_simpleComposers;
+    pugi::xml_document m_simpleTitleDoc;
+    pugi::xml_node m_simpleTitle;
+    pugi::xml_document m_simpleComposersDoc;
+    pugi::xml_document m_madsDoc;
+    pugi::xml_node m_madsCollection;
 
     vector<string> m_standardHumdrumKeys = {
         "COM", // composer's name
