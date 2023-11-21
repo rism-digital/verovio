@@ -3172,7 +3172,7 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(const std::string &hu
         if (i == 5) {
             // second is a float, but we truncate to int
             size_t idx = value.find_first_of(".");
-            if (idx < SIZE_T_MAX) {
+            if (idx != std::string::npos) {
                 value = value.substr(0, idx);
             }
         }
