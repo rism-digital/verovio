@@ -992,7 +992,7 @@ bool HumdrumInput::convertHumdrum()
 //     that increase to the right.
 //
 
-bool HumdrumInput::checkIfReversedSpineOrder(std::vector<hum::HTp> staffstarts)
+bool HumdrumInput::checkIfReversedSpineOrder(std::vector<hum::HTp> &staffstarts)
 {
     std::vector<int> staffnums(staffstarts.size(), -1000);
     for (int i = 0; i < (int)staffstarts.size(); i++) {
@@ -2767,6 +2767,11 @@ void HumdrumInput::createHeader()
     createHumdrumVerbatimExtMeta(meiHead);
 }
 
+//////////////////////////////
+//
+// HumdrumInput:: createFileDesc --
+//
+
 void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 {
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
@@ -2775,9 +2780,12 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node unpub = pubStmt.append_child("unpub");
-    unpub.append_child(pugi::node_pcdata).set_value("This MEI file was created by Verovio's Humdrum converter. When published, this unpub element should be removed, and the enclosing pubStmt element should be properly filled out.");
+    unpub.append_child(pugi::node_pcdata)
+        .set_value("This MEI file was created by Verovio's Humdrum converter. When published, this unpub element "
+                   "should be removed, and the enclosing pubStmt element should be properly filled out.");
 
-    // If sourceDesc ends up with no children, we will fileDesc.remove_child(sourceDesc) to avoid an empty <sourceDesc/>.
+    // If sourceDesc ends up with no children, we will fileDesc.remove_child(sourceDesc) to avoid an empty
+    // <sourceDesc/>.
     pugi::xml_node sourceDesc = fileDesc.append_child("sourceDesc");
     createDigitalSource(sourceDesc);
     createPrintedSource(sourceDesc);
@@ -2809,12 +2817,15 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput:: createDigitalSource --
+//
+
 void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
 {
-    std::vector<string> keysThatGoHere = {
-        "EED", "ENC", "EEV", "EFL", "YEP", "YER",
-        "END", "YEC", "YEM", "YEN", "TXL", "ONB"
-    };
+    std::vector<string> keysThatGoHere
+        = { "EED", "ENC", "EEV", "EFL", "YEP", "YER", "END", "YEC", "YEM", "YEN", "TXL", "ONB" };
 
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
@@ -2837,7 +2848,8 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     source.append_attribute("type") = "digital";
     pugi::xml_node bibl = source.append_child("bibl");
     bibl.append_copy(m_simpleTitle);
-    for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end(); ++childIt) {
+    for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
+         ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -2941,7 +2953,13 @@ void HumdrumInput::createDigitalSource(pugi::xml_node sourceDesc)
     }
 }
 
-std::string HumdrumInput::getTextListLanguage(std::vector<HumdrumReferenceItem> textItems) {
+//////////////////////////////
+//
+// HumdrumInput::getTextListLanguage --
+//
+
+std::string HumdrumInput::getTextListLanguage(const std::vector<HumdrumReferenceItem> &textItems)
+{
     // returns empty string if there is no common language (or there are no languages at all)
     std::string theLanguage;
     for (auto const &textItem : textItems) {
@@ -2959,10 +2977,17 @@ std::string HumdrumInput::getTextListLanguage(std::vector<HumdrumReferenceItem> 
     return theLanguage;
 }
 
-void HumdrumInput::fillInIsoDate(pugi::xml_node element, std::string dateString) {
+//////////////////////////////
+//
+// HumdrumInput::fillInIsoDate --
+//
+
+void HumdrumInput::fillInIsoDate(pugi::xml_node element, const std::string &dateString)
+{
     std::map<std::string, std::string> attribs = isoDateAttributesFromHumdrumDate(dateString);
     if (attribs.size() == 2 && attribs.count("startdate") == 1 && attribs.count("enddate") == 1) {
-        // for human readability, put startdate before enddate (map sorts alphabetically by key, so it would be backward)
+        // for human readability, put startdate before enddate (map sorts alphabetically by key, so it would be
+        // backward)
         element.append_attribute("startdate") = attribs.at("startdate").c_str();
         element.append_attribute("enddate") = attribs.at("enddate").c_str();
         return;
@@ -2973,7 +2998,14 @@ void HumdrumInput::fillInIsoDate(pugi::xml_node element, std::string dateString)
     }
 }
 
-std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDate(std::string inHumdrumDate, bool edtf) {
+//////////////////////////////
+//
+// HumdrumInput::isoDateAttributesFromHumdrumDate --
+//
+
+std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDate(
+    const std::string &inHumdrumDate, bool edtf)
+{
     // if edtf is true, the map returned will just be {"edtf", "an edtf date"}.
     // if edtf is false, the map returned can be {"isodate", "an isodate"} or {"notbefore", "an isodate"}, etc
     // Note that MEI doesn't use edtf dates (yet), but the <mads> data we emit in <work><extMeta> does.
@@ -2998,17 +3030,17 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     }
 
     std::vector<std::string> dateStrings;
-    if (humdrumDate.find_first_of("-") != -1) {
+    if (humdrumDate.find_first_of("-") != std::string::npos) {
         typeNeeded = "DateBetween";
         hum::HumRegex hre;
         hre.split(dateStrings, humdrumDate, "-");
     }
-    else if (humdrumDate.find_first_of("^") != -1) {
+    else if (humdrumDate.find_first_of("^") != std::string::npos) {
         typeNeeded = "DateBetween";
         hum::HumRegex hre;
         hre.split(dateStrings, humdrumDate, "^");
     }
-    else if (humdrumDate.find_first_of("|") != -1) {
+    else if (humdrumDate.find_first_of("|") != std::string::npos) {
         typeNeeded = "DateSelection";
         hum::HumRegex hre;
         hre.split(dateStrings, humdrumDate, "|");
@@ -3075,7 +3107,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
         if (edtf) {
             // From humdrum it's always "or".  "and" would be curly braces instead of square.
             std::string combinedDates;
-            for (int i = 0; i < isodates.size(); i++) {
+            for (int i = 0; i < (int)isodates.size(); i++) {
                 if (i == 0) {
                     combinedDates += "[";
                 }
@@ -3085,7 +3117,7 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
 
                 combinedDates += isodates[i];
 
-                if (i == isodates.size() - 1) {
+                if (i == (int)isodates.size() - 1) {
                     combinedDates += "]";
                 }
             }
@@ -3099,7 +3131,13 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     return attribs;
 }
 
-DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDate) {
+//////////////////////////////
+//
+// HumdrumInput::dateWithErrorsFromHumdrumDate --
+//
+
+DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(const std::string &humdrumDate)
+{
     DateWithErrors date;
     std::string dateString = humdrumDate;
 
@@ -3115,14 +3153,14 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
     }
 
     std::vector<std::string> dateSubStrs;
-    std::vector<int> values = {INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN};
-    std::vector<std::string> errors = {"", "", "", "", "", ""};
+    std::vector<int> values = { INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN, INT_MIN };
+    std::vector<std::string> errors = { "", "", "", "", "", "" };
     hum::HumRegex hre;
     hre.replaceDestructive(dateString, "/", ":");
     hre.replaceDestructive(dateString, "", " ");
     hre.split(dateSubStrs, dateString, "/");
 
-    for (int i = 0; i < dateSubStrs.size(); i++) {
+    for (int i = 0; i < (int)dateSubStrs.size(); i++) {
         std::string value = dateSubStrs[i];
         std::string error = stripDateError(value);
         if (i == 0 && value.size() >= 2) {
@@ -3150,9 +3188,7 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
         errors[i] = error;
     }
 
-    bool gotOne = sanityCheckDate(
-        values[0], values[1], values[2],
-        values[3], values[4], values[5]);
+    bool gotOne = sanityCheckDate(values[0], values[1], values[2], values[3], values[4], values[5]);
 
     if (gotOne) {
         date.valid = true;
@@ -3172,7 +3208,13 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(std::string humdrumDa
     return date;
 }
 
-std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool edtf) {
+//////////////////////////////
+//
+// HumdrumInput::isoDateFromDateWithErrors --
+//
+
+std::string HumdrumInput::isoDateFromDateWithErrors(const DateWithErrors &date, bool edtf)
+{
     if (!date.valid) {
         return "";
     }
@@ -3243,7 +3285,7 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
     std::string isodate;
 
     for (int i = 0; i < 3; i++) {
-        if (i >= dateParts.size()) {
+        if (i >= (int)dateParts.size()) {
             break;
         }
         if (i > 0) {
@@ -3269,9 +3311,13 @@ std::string HumdrumInput::isoDateFromDateWithErrors(DateWithErrors date, bool ed
     return isodate;
 }
 
-bool HumdrumInput::sanityCheckDate(
-        int year, int month, int day,
-        int hour, int minute, int second) {
+//////////////////////////////
+//
+// HumdrumInput::sanityCheckDate --
+//
+
+bool HumdrumInput::sanityCheckDate(int year, int month, int day, int hour, int minute, int second)
+{
     // sanity check the integers
 
     // year has to be there, the others are optional.
@@ -3318,7 +3364,8 @@ bool HumdrumInput::sanityCheckDate(
             return false;
         }
         if (minute == INT_MIN || second == INT_MIN) {
-            // if hour is there, minute and second must also be there (unlike year/month/day, which can be year or year/month).
+            // if hour is there, minute and second must also be there (unlike year/month/day, which can be year or
+            // year/month).
             return false;
         }
         if (hour < 0 || hour > 23) {
@@ -3349,7 +3396,13 @@ bool HumdrumInput::sanityCheckDate(
     return true;
 }
 
-std::string HumdrumInput::stripDateError(std::string &value) {
+//////////////////////////////
+//
+// HumdrumInput::stripDateError --
+//
+
+std::string HumdrumInput::stripDateError(std::string &value)
+{
     std::string approxSyms = "~x";
     std::string uncertainSyms = "?z";
     std::string allErrorSyms = approxSyms + uncertainSyms;
@@ -3368,12 +3421,15 @@ std::string HumdrumInput::stripDateError(std::string &value) {
     return "uncertain";
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createPrintedSource --
+//
+
 void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
 {
-    std::vector<string> keysThatGoHere = {
-        "LAR", "PED", "LOR", "TRN", "OCL", "OVM",
-        "PTL", "PPR", "PDT", "PPP", "PC#"
-    };
+    std::vector<string> keysThatGoHere
+        = { "LAR", "PED", "LOR", "TRN", "OCL", "OVM", "PTL", "PPR", "PDT", "PPP", "PC#" };
 
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
@@ -3403,7 +3459,8 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
     }
 
     bibl.append_copy(m_simpleTitle);
-    for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end(); ++childIt) {
+    for (pugi::xml_node_iterator childIt = m_simpleComposersDoc.begin(); childIt != m_simpleComposersDoc.end();
+         ++childIt) {
         bibl.append_copy(*childIt);
     }
 
@@ -3508,12 +3565,15 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createRecordedSource --
+//
+
 void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
 {
-    std::vector<string> keysThatGoHere = {
-        "RTL", "RC#", "MGN", "MPN", "MPS", "RNP",
-        "MCN", "RMM", "RRD", "RLC", "RDT", "RT#"
-    };
+    std::vector<string> keysThatGoHere
+        = { "RTL", "RC#", "MGN", "MPN", "MPS", "RNP", "MCN", "RMM", "RRD", "RLC", "RDT", "RT#" };
 
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
@@ -3561,17 +3621,10 @@ void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
             biblScope.append_child(pugi::node_pcdata).set_value(trackNumbers[i].value.c_str());
         }
 
-        if (i < albumTitles.size()
-            || i < albumCatalogNumbers.size()
-            || i < ensembleNames.size()
-            || i < performerNames.size()
-            || i < suspectedPerformerNames.size()
-            || i < producers.size()
-            || i < conductors.size()
-            || i < manufacturers.size()
-            || i < releaseDates.size()
-            || i < recordingLocations.size()
-            || i < recordingDates.size()) {
+        if (i < albumTitles.size() || i < albumCatalogNumbers.size() || i < ensembleNames.size()
+            || i < performerNames.size() || i < suspectedPerformerNames.size() || i < producers.size()
+            || i < conductors.size() || i < manufacturers.size() || i < releaseDates.size()
+            || i < recordingLocations.size() || i < recordingDates.size()) {
             pugi::xml_node monogr = biblStruct.append_child("monogr");
 
             if (i < albumTitles.size()) {
@@ -3589,11 +3642,8 @@ void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
                 albumCatalogNumberEl.append_child(pugi::node_pcdata).set_value(albumCatalogNumber->value.c_str());
             }
 
-            if (i < ensembleNames.size()
-                || i < performerNames.size()
-                || i < suspectedPerformerNames.size()
-                || i < producers.size()
-                || i < conductors.size()) {
+            if (i < ensembleNames.size() || i < performerNames.size() || i < suspectedPerformerNames.size()
+                || i < producers.size() || i < conductors.size()) {
                 pugi::xml_node respStmt = monogr.append_child("respStmt");
 
                 if (i < ensembleNames.size()) {
@@ -3644,9 +3694,7 @@ void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
                 }
             }
 
-            if (i < manufacturers.size()
-                || i < releaseDates.size()
-                || i < recordingLocations.size()
+            if (i < manufacturers.size() || i < releaseDates.size() || i < recordingLocations.size()
                 || i < recordingDates.size()) {
                 pugi::xml_node imprint = monogr.append_child("imprint");
 
@@ -3688,11 +3736,14 @@ void HumdrumInput::createRecordedSource(pugi::xml_node sourceDesc)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createUnpublishedSource --
+//
+
 void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
 {
-    std::vector<string> keysThatGoHere = {
-        "SMS", "YOR", "SML", "YOO", "YOE", "YOY", "SMA"
-    };
+    std::vector<string> keysThatGoHere = { "SMS", "YOR", "SML", "YOO", "YOE", "YOY", "SMA" };
 
     if (!anyReferenceItemsExist(keysThatGoHere)) {
         return;
@@ -3783,6 +3834,11 @@ void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createEncodingDesc --
+//
+
 void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead)
 {
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
@@ -3842,6 +3898,11 @@ void HumdrumInput::createEncodingDesc(pugi::xml_node meiHead)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createWorkList --
+//
+
 void HumdrumInput::createWorkList(pugi::xml_node meiHead)
 {
     // the main (encoded) work
@@ -3880,7 +3941,8 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
     // Norton Scores, Smithsonian Collection, etc."
     std::vector<HumdrumReferenceItem> collectionWorkTitles = getReferenceItems("GCO");
     std::vector<HumdrumReferenceItem> moreCollectionWorkTitles = getReferenceItems("ACO");
-    collectionWorkTitles.insert(collectionWorkTitles.end(), moreCollectionWorkTitles.begin(), moreCollectionWorkTitles.end());
+    collectionWorkTitles.insert(
+        collectionWorkTitles.end(), moreCollectionWorkTitles.begin(), moreCollectionWorkTitles.end());
 
     pugi::xml_node workList;
     std::string parentWorkXmlId;
@@ -3963,38 +4025,16 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
     }
 
     // the main (encoded) work
-    std::vector<string> titleInfoKeys = {
-        "OTL", "OTA", "OTP", "ONM", "OMV", "OMD", "OPS", "OAC", "OSC"
-    };
-    std::vector<string> composerInfoKeys = {
-        "COM", "COA", "COS", "COC", "COL", "CDT", "CBL", "CDL", "CNT"
-    };
+    std::vector<string> titleInfoKeys = { "OTL", "OTA", "OTP", "ONM", "OMV", "OMD", "OPS", "OAC", "OSC" };
+    std::vector<string> composerInfoKeys = { "COM", "COA", "COS", "COC", "COL", "CDT", "CBL", "CDL", "CNT" };
 
-    if (!catalogNumbers.empty()
-        || !catalogNumbers.empty()
-        || !opusNumbers.empty()
-        || anyReferenceItemsExist(titleInfoKeys)
-        || !creationDates.empty()
-        || !creationCountries.empty()
-        || !creationSettlements.empty()
-        || !creationRegions.empty()
-        || !creationLatLongs.empty()
-        || anyReferenceItemsExist(composerInfoKeys)
-        || !lyricists.empty()
-        || !librettists.empty()
-        || !dedicatees.empty()
-        || !funders.empty()
-        || !languages.empty()
-        || !histories.empty()
-        || !instrumentLists.empty()
-        || !forms.empty()
-        || !genres.empty()
-        || !modes.empty()
-        || !meters.empty()
-        || !styles.empty()
-        || !firstPerformanceDates.empty()
-        || !performanceDates.empty()
-        || !performanceLocations.empty()) {
+    if (!catalogNumbers.empty() || !catalogNumbers.empty() || !opusNumbers.empty()
+        || anyReferenceItemsExist(titleInfoKeys) || !creationDates.empty() || !creationCountries.empty()
+        || !creationSettlements.empty() || !creationRegions.empty() || !creationLatLongs.empty()
+        || anyReferenceItemsExist(composerInfoKeys) || !lyricists.empty() || !librettists.empty() || !dedicatees.empty()
+        || !funders.empty() || !languages.empty() || !histories.empty() || !instrumentLists.empty() || !forms.empty()
+        || !genres.empty() || !modes.empty() || !meters.empty() || !styles.empty() || !firstPerformanceDates.empty()
+        || !performanceDates.empty() || !performanceLocations.empty()) {
         if (workList.empty()) {
             workList = meiHead.append_child("workList");
         }
@@ -4053,12 +4093,8 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         }
 
         // <creation> et al
-        if (!creationDates.empty()
-            || !creationCountries.empty()
-            || !creationSettlements.empty()
-            || !creationRegions.empty()
-            || !creationLatLongs.empty()
-            || !dedicatees.empty()) {
+        if (!creationDates.empty() || !creationCountries.empty() || !creationSettlements.empty()
+            || !creationRegions.empty() || !creationLatLongs.empty() || !dedicatees.empty()) {
             pugi::xml_node creation = theWork.append_child("creation");
 
             for (auto const &creationDate : creationDates) {
@@ -4133,11 +4169,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         // TODO: <perfMedium><perfResList> from instrumentLists (AIN).
 
         // <classification>
-        if (!forms.empty()
-            || !genres.empty()
-            || !modes.empty()
-            || !meters.empty()
-            || !styles.empty()) {
+        if (!forms.empty() || !genres.empty() || !modes.empty() || !meters.empty() || !styles.empty()) {
             pugi::xml_node classification = theWork.append_child("classification");
             pugi::xml_node termList = classification.append_child("termList");
 
@@ -4178,8 +4210,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         }
 
         // <expressionList>
-        if (!firstPerformanceDates.empty()
-            || !performanceDates.empty()) {
+        if (!firstPerformanceDates.empty() || !performanceDates.empty()) {
             pugi::xml_node expressionList = theWork.append_child("expressionList");
 
             if (!firstPerformanceDates.empty()) {
@@ -4224,9 +4255,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         }
 
         // relationList (relationships between the encoded work and up to four related works)
-        if (!parentWorkXmlId.empty()
-            || !groupWorkXmlId.empty()
-            || !associatedWorkXmlId.empty()
+        if (!parentWorkXmlId.empty() || !groupWorkXmlId.empty() || !associatedWorkXmlId.empty()
             || !collectionWorkXmlId.empty()) {
             pugi::xml_node relationList = theWork.append_child("relationList");
 
@@ -4266,6 +4295,11 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         }
     }
 }
+
+//////////////////////////////
+//
+// HumdrumInput::createTitleElements --
+//
 
 void HumdrumInput::createTitleElements(pugi::xml_node work)
 {
@@ -4459,6 +4493,11 @@ void HumdrumInput::createTitleElements(pugi::xml_node work)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createComposerEleents --
+//
+
 void HumdrumInput::createComposerElements(pugi::xml_node work)
 {
     // emits all the composer-related elements.  This includes emitting
@@ -4538,10 +4577,7 @@ void HumdrumInput::createComposerElements(pugi::xml_node work)
         nameEl.append_child(pugi::node_pcdata).set_value(composer->value.c_str());
 
         // MADS-style authority records (personal info about a composer)
-        if (!composerBirthAndDeathDate
-            && !composerBirthPlace
-            && !composerDeathPlace
-            && !composerNationality) {
+        if (!composerBirthAndDeathDate && !composerBirthPlace && !composerDeathPlace && !composerNationality) {
             // nothing for MADS
             continue;
         }
@@ -4555,8 +4591,7 @@ void HumdrumInput::createComposerElements(pugi::xml_node work)
         // in <work><extMeta><madsCollection><mads>
         if (m_madsCollection.empty()) {
             m_madsCollection = m_madsDoc.append_child("madsCollection");
-            m_madsCollection.append_attribute("xmlns:xsi")
-                = "http://www.w3.org/2001/XMLSchema-instance";
+            m_madsCollection.append_attribute("xmlns:xsi") = "http://www.w3.org/2001/XMLSchema-instance";
             m_madsCollection.append_attribute("xsi:schemaLocation")
                 = "http://www.loc.gov/mads/v2 https://www.loc.gov/standards/mads/mads-2-1.xsd";
             m_madsCollection.append_attribute("xmlns") = "http://www.loc.gov/mads/v2";
@@ -4583,10 +4618,7 @@ void HumdrumInput::createComposerElements(pugi::xml_node work)
         }
 
         // extra info goes in <mads><personInfo>
-        if (composerBirthAndDeathDate
-            || composerBirthPlace
-            || composerDeathPlace
-            || composerNationality) {
+        if (composerBirthAndDeathDate || composerBirthPlace || composerDeathPlace || composerNationality) {
             pugi::xml_node personInfo = mads.append_child("personInfo");
             if (composerBirthAndDeathDate) {
                 std::map<std::string, std::string> attribs
@@ -4629,6 +4661,11 @@ void HumdrumInput::createComposerElements(pugi::xml_node work)
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createHumdrumVerbatimExtMeta --
+//
+
 void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
 {
     // for now do not print for **mens data, since timestamps are used
@@ -4662,10 +4699,15 @@ void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
     meiHead.append_copy(tmpdoc.document_element());
 }
 
+//////////////////////////////
+//
+// HumdrumInput::createSimpleTitleElement --
+//
+
 void HumdrumInput::createSimpleTitleElement()
 {
-    std::vector<HumdrumReferenceItem>titles = getReferenceItems("OTL");
-    std::vector<HumdrumReferenceItem>movementNames = getReferenceItems("OMD");
+    std::vector<HumdrumReferenceItem> titles = getReferenceItems("OTL");
+    std::vector<HumdrumReferenceItem> movementNames = getReferenceItems("OMD");
     m_simpleTitle = m_simpleTitleDoc.append_child("title");
     std::string firstLang;
     int bestTitleIdx = getBestItem(titles, std::string());
@@ -4687,8 +4729,9 @@ void HumdrumInput::createSimpleTitleElement()
     }
 
     if (bestTitleIdx >= 0 && bestMovementNameIdx >= 0
-            && titles[bestTitleIdx].value != movementNames[bestMovementNameIdx].value) {
-        std::string combinedName = titles[bestTitleIdx].value + std::string(", ") + movementNames[bestMovementNameIdx].value;
+        && titles[bestTitleIdx].value != movementNames[bestMovementNameIdx].value) {
+        std::string combinedName
+            = titles[bestTitleIdx].value + std::string(", ") + movementNames[bestMovementNameIdx].value;
         m_simpleTitle.append_child(pugi::node_pcdata).set_value(combinedName.c_str());
     }
     else if (bestTitleIdx >= 0) {
@@ -4698,6 +4741,11 @@ void HumdrumInput::createSimpleTitleElement()
         m_simpleTitle.append_child(pugi::node_pcdata).set_value(movementNames[bestMovementNameIdx].value.c_str());
     }
 }
+
+//////////////////////////////
+//
+// HumdrumInput::createSimpleComposerElements --
+//
 
 void HumdrumInput::createSimpleComposerElements()
 {
@@ -4751,7 +4799,12 @@ void HumdrumInput::createSimpleComposerElements()
     }
 }
 
-int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, std::string requiredLanguage)
+//////////////////////////////
+//
+// HumdrumInput::getBestItem --
+//
+
+int HumdrumInput::getBestItem(const std::vector<HumdrumReferenceItem> &titles, const std::string &requiredLanguage)
 {
     // If requiredLanguage is set, return the first item with that language,
     // otherwise return the first item that is untranslated.
@@ -4759,8 +4812,8 @@ int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, std::str
     // just return the first item.
     bool noRequiredLanguage = requiredLanguage.empty();
 
-    for (int i = 0; i < titles.size(); i++) {
-        HumdrumReferenceItem *title = &titles[i];
+    for (int i = 0; i < (int)titles.size(); i++) {
+        const HumdrumReferenceItem *title = &titles[i];
         if (noRequiredLanguage) {
             // best title is first non-translated title
             if (!title->isTranslated) {
@@ -4782,10 +4835,15 @@ int HumdrumInput::getBestItem(std::vector<HumdrumReferenceItem> titles, std::str
     return -1;
 }
 
-std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllReferenceItems(hum::HumdrumFile infile)
+//////////////////////////////
+//
+// HumdrumInput::getAllReferenceItems --
+//
+
+std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllReferenceItems(hum::HumdrumFile &infile)
 {
     int firstDataLineIdx = infile.getLineCount();
-    for (int lineIdx=0; lineIdx < infile.getLineCount(); lineIdx++) {
+    for (int lineIdx = 0; lineIdx < infile.getLineCount(); lineIdx++) {
         if (infile[lineIdx].isData()) {
             firstDataLineIdx = lineIdx;
             break;
@@ -4841,8 +4899,8 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
                     // it has a tempo name and some other metronome-like info.  Strip off the metronome info and
                     // just use the tempo name as the movement name.  (Strip off leading and trailing white-space, too.)
                     value = hre.getMatch(1);
-                    value.erase(0,value.find_first_not_of(" \t"));
-                    value.erase(value.find_last_not_of(" \t")+1);
+                    value.erase(0, value.find_first_not_of(" \t"));
+                    value.erase(value.find_last_not_of(" \t") + 1);
                 }
                 else {
                     // It has metronome info, but has no tempo name;
@@ -4862,7 +4920,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
         item.index = index;
         std::vector<HumdrumReferenceItem> oldItemVec;
         if (auto search = items.find(key); search != items.end()) {
-             oldItemVec = items.at(key);
+            oldItemVec = items.at(key);
         }
         oldItemVec.push_back(item);
         items[key] = oldItemVec;
@@ -4871,13 +4929,24 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
     return items;
 }
 
-bool HumdrumInput::isStandardHumdrumKey(std::string key) {
+//////////////////////////////
+//
+// HumdrumInput::isStandardHumdrumKey --
+//
+
+bool HumdrumInput::isStandardHumdrumKey(const std::string &key)
+{
     if (key[0] == 'X' and key.size() == 3) {
         // translated title
         return true;
     }
     return std::find(m_standardHumdrumKeys.begin(), m_standardHumdrumKeys.end(), key) != m_standardHumdrumKeys.end();
 }
+
+//////////////////////////////
+//
+// HumdrumInput::getReferenceItems --
+//
 
 std::vector<HumdrumReferenceItem> HumdrumInput::getReferenceItems(const std::string &key)
 {
@@ -4888,7 +4957,13 @@ std::vector<HumdrumReferenceItem> HumdrumInput::getReferenceItems(const std::str
     return items;
 }
 
-bool HumdrumInput::anyReferenceItemsExist(std::vector<std::string> keys) {
+//////////////////////////////
+//
+// HumdrumInput::anyReferenceItemsExist --
+//
+
+bool HumdrumInput::anyReferenceItemsExist(const std::vector<std::string> &keys)
+{
     for (auto const &key : keys) {
         if (auto items = m_references.find(key); items != m_references.end()) {
             return true;
