@@ -3064,6 +3064,10 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     std::vector<std::string> isodates;
     for (auto const &date : dates) {
         std::string isodate = isoDateFromDateWithErrors(date, edtf);
+        if (isodate.empty()) {
+            // date not representable as isodate; bail on all isodates for this piece of metadata
+            return attribs;
+        }
         isodates.push_back(isodate);
     }
 
@@ -3410,8 +3414,17 @@ std::string HumdrumInput::stripDateError(std::string &value)
     if (idx == SIZE_MAX) {
         return "";
     }
-    char errorStr[1];
-    errorStr[0] = value[idx];
+    std::string errorStr;
+    if (value[idx] == '?') {
+        // we have to escape it (twice) to put it in a regex
+        errorStr = "\\?";
+    }
+    else {
+        char chars[2];
+        chars[0] = value[idx];
+        chars[1] = 0;
+        errorStr = chars;
+    }
 
     hum::HumRegex hre;
     hre.replaceDestructive(value, "", errorStr);
