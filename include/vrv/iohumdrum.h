@@ -910,6 +910,8 @@ protected:
     bool anyReferenceItemsExist(const std::vector<string> &keys);
     int getBestItem(const std::vector<HumdrumReferenceItem> &items, const std::string &requiredLanguage);
     bool isStandardHumdrumKey(const std::string &key);
+    void appendText(pugi::xml_node element, std::string text);
+
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
