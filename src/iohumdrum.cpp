@@ -3144,6 +3144,7 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(const std::string &hu
     DateWithErrors date;
     std::string dateString = humdrumDate;
 
+    // check if there's an error for the whole date
     if (!dateString.empty()) {
         if (dateString[0] == '~') {
             dateString.erase(0, 1);
@@ -3262,25 +3263,25 @@ std::string HumdrumInput::isoDateFromDateWithErrors(const DateWithErrors &date, 
             // ignore this and anything after this
             break;
         }
-        std::string suffix = "";
+        std::string prefix = "";
         if (!error.empty()) {
             if (!edtf) {
                 // non-EDTF ISO dates can't describe approximate/uncertain values.
                 return "";
             }
             if (error == "uncertain") {
-                suffix = "?";
+                prefix = "?";
             }
             else if (error == "approximate") {
-                suffix = "~";
+                prefix = "~";
             }
         }
         if (i == 0) {
-            std::string yearStr = StringFormat("%d%s", value, suffix.c_str());
+            std::string yearStr = StringFormat("%s%d", prefix.c_str(), value);
             dateParts.push_back(yearStr);
         }
         else {
-            std::string numStr = StringFormat("%02d%s", value, suffix.c_str());
+            std::string numStr = StringFormat("%s%02d", prefix.c_str(), value);
             dateParts.push_back(numStr);
         }
     }
@@ -3310,7 +3311,14 @@ std::string HumdrumInput::isoDateFromDateWithErrors(const DateWithErrors &date, 
             isodate += dateParts[i];
         }
     }
-
+    
+    if (date.dateError == "approximate") {
+        isodate += "~";
+    }
+    else if (date.dateError == "uncertain") {
+        isodate += "?";
+    }
+    
     return isodate;
 }
 
