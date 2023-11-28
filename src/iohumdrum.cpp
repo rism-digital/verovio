@@ -2765,6 +2765,7 @@ void HumdrumInput::createHeader()
     createEncodingDesc(meiHead);
     createWorkList(meiHead);
     createHumdrumVerbatimExtMeta(meiHead);
+    createBackMatter();
 }
 
 //////////////////////////////
@@ -4737,6 +4738,42 @@ void HumdrumInput::createHumdrumVerbatimExtMeta(pugi::xml_node meiHead)
     }
 
     meiHead.append_copy(tmpdoc.document_element());
+}
+
+//////////////////////////////
+//
+// HumdrumInput::createBackMatter --
+//
+
+void HumdrumInput::createBackMatter()
+{
+    // There's one bit of metadata that goes in music/back/div@type="textTranslation":
+    // humdrum:HTX
+    std::vector<HumdrumReferenceItem> htxItems = getReferenceItems("HTX");
+    if (htxItems.empty()) {
+        return;
+    }
+    std::string languageForAll = getTextListLanguage(htxItems);
+    pugi::xml_node back = m_doc->m_back.child("back");
+    if (back.empty()) {
+        back = m_doc->m_back.append_child("back");
+    }
+    pugi::xml_node div = back.append_child("div");
+    div.append_attribute("type") = "textTranslation";
+    pugi::xml_node lineGroup = div.append_child("lg");
+    if (!languageForAll.empty()) {
+        lineGroup.append_attribute("xml:lang") = languageForAll.c_str();
+    }
+    
+    for (auto const &htxItem : htxItems) {
+        pugi::xml_node line = lineGroup.append_child("l");
+        // <l> can't take @analog, so use @type instead (says Perry)
+        line.append_attribute("type") = "humdrum:HTX";
+        if (languageForAll.empty() && !htxItem.language.empty()) {
+            line.append_attribute("xml:lang") = htxItem.language.c_str();
+        }
+        appendText(line, htxItem.value.c_str());
+    }
 }
 
 //////////////////////////////

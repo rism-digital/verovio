@@ -893,6 +893,7 @@ protected:
     void createEncodingDesc(pugi::xml_node meiHead);
     void createWorkList(pugi::xml_node meiHead);
     void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead);
+    void createBackMatter();
     void createSimpleTitleElement();
     void createSimpleComposerElements();
     void createTitleElements(pugi::xml_node element);
