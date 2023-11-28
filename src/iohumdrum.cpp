@@ -4062,6 +4062,7 @@ void HumdrumInput::createWorkList(pugi::xml_node meiHead)
         pugi::xml_node theWork = workList.append_child("work");
         std::string xmlId = StringFormat("work%d_encoded", workNumber++);
         theWork.append_attribute("xml:id") = xmlId.c_str();
+        m_doc->m_musicDecls = "#" + xmlId;
         theWork.append_attribute("type") = "encoded";
 
         // <identifier>
