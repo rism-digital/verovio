@@ -3014,8 +3014,6 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     // {"notbefore", "an isodate"}, etc.
     // Note that MEI doesn't use edtf dates (yet), but the <mads> data we emit
     // in <work><extMeta> does.
-    std::string typeNeeded = "DateSingle";
-    std::string relativeType = "";
     std::map<std::string, std::string> attribs;
 
     if (inHumdrumDate.empty()) {
@@ -3023,190 +3021,12 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromHumdrumDat
     }
 
     std::string humdrumDate = inHumdrumDate;
-    if (humdrumDate[0] == '<') {
-        typeNeeded = "DateRelative";
-        humdrumDate.erase(0, 1);
-        relativeType = "before";
-    }
-    else if (humdrumDate[0] == '>') {
-        typeNeeded = "DateRelative";
-        humdrumDate.erase(0, 1);
-        relativeType = "after";
+    DateConstruct dateConstruct = dateConstructFromHumdrumDate(humdrumDate);
+    if (dateConstruct.constructType.empty()) {
+        return attribs;
     }
 
-    std::vector<std::string> dateStrings;
-    if (humdrumDate.find_first_of("-") != std::string::npos) {
-        typeNeeded = "DateBetween";
-        hum::HumRegex hre;
-        hre.split(dateStrings, humdrumDate, "-");
-        if (dateStrings.size() == 2
-            && (dateStrings[0].find_first_of("^") != std::string::npos
-                || dateStrings[1].find_first_of("^") != std::string::npos)) {
-            // it's a nested date range
-            typeNeeded = "NestedDateBetween";
-        }
-    }
-    else if (humdrumDate.find_first_of("^") != std::string::npos) {
-        typeNeeded = "DateBetween";
-        hum::HumRegex hre;
-        hre.split(dateStrings, humdrumDate, "^");
-    }
-    else if (humdrumDate.find_first_of("|") != std::string::npos) {
-        typeNeeded = "DateSelection";
-        hum::HumRegex hre;
-        hre.split(dateStrings, humdrumDate, "|");
-    }
-    else {
-        typeNeeded = "DateSingle";
-        dateStrings.push_back(humdrumDate);
-    }
-
-    if (typeNeeded == "NestedDateBetween") {
-        if (!edtf) {
-            // can't do nested ranges, even with two attributes.  Return empty attribs.
-            return attribs;
-        }
-
-        // we know that dateStrings.size() is 2, so we set up to do the start on the first
-        // iteration, and the end on the next iteration.
-        bool emittingStartOfRange = true;
-        for (auto const &dateString : dateStrings) {
-            std::vector<std::string> oneOrTwoDateStrings;
-            hum::HumRegex hre;
-            hre.split(oneOrTwoDateStrings, dateString, "\\^");
-            if (oneOrTwoDateStrings.size() > 2) {
-                // It is not 1 (a single date) or 2 (a date range).
-                // Give up on this whole Humdrum date, and return empty attribs
-                return std::map<std::string, std::string>();
-            }
-            std::vector<DateWithErrors> dates;
-            for (size_t i = 0; i < oneOrTwoDateStrings.size(); i++) {
-                DateWithErrors date = dateWithErrorsFromHumdrumDate(oneOrTwoDateStrings[i]);
-                if (date.valid == false) {
-                    // give up on this whole Humdrum date, and return empty attribs
-                    return std::map<std::string, std::string>();
-                }
-                dates.push_back(date);
-            }
-
-            // dates now holds a single date or range that is the start/end date.
-            // Turn it into an isodate (with '/' between if it's a range) and
-            // put it in attribs as "startedtf" or "endedtf".
-            std::vector<std::string> isodates;
-            for (auto const &date : dates) {
-                std::string isodate = isoDateFromDateWithErrors(date, edtf);
-                if (isodate.empty()) {
-                    // date not representable as isodate; bail on all isodates for this piece of metadata
-                    return std::map<std::string, std::string>();
-                }
-                isodates.push_back(isodate);
-            }
-
-            if (isodates.size() == 2) {
-                if (emittingStartOfRange) {
-                    attribs["startedtf"] = isodates[0] + "/" + isodates[1];
-                }
-                else {
-                    attribs["endedtf"] = isodates[0] + "/" + isodates[1];
-                }
-            }
-            else {
-                if (emittingStartOfRange) {
-                    attribs["startedtf"] = isodates[0];
-                }
-                else {
-                    attribs["endedtf"] = isodates[0];
-                }
-            }
-
-            // Repeat for end of range
-            emittingStartOfRange = false;
-        }
-    }
-    else {
-        std::vector<DateWithErrors> dates;
-        for (auto const &dateString : dateStrings) {
-            DateWithErrors date = dateWithErrorsFromHumdrumDate(dateString);
-            if (date.valid == false) {
-                // give up on this whole Humdrum date, and return empty attribs
-                return attribs;
-            }
-            dates.push_back(date);
-        }
-
-        // Produce isodates for every date found.
-        std::vector<std::string> isodates;
-        for (auto const &date : dates) {
-            std::string isodate = isoDateFromDateWithErrors(date, edtf);
-            if (isodate.empty()) {
-                // date not representable as isodate; bail on all isodates for this piece of metadata
-                return attribs;
-            }
-            isodates.push_back(isodate);
-        }
-
-        // set up and return attribs
-        if (typeNeeded == "DateSingle") {
-            if (edtf) {
-                attribs["edtf"] = isodates[0];
-            }
-            else {
-                attribs["isodate"] = isodates[0];
-            }
-        }
-        else if (typeNeeded == "DateRelative") {
-            if (relativeType == "before") {
-                if (edtf) {
-                    attribs["edtf"] = "../" + isodates[0];
-                }
-                else {
-                    attribs["notafter"] = isodates[0];
-                }
-            }
-            else if (relativeType == "after") {
-                if (edtf) {
-                    attribs["edtf"] = isodates[0] + "/..";
-                }
-                else {
-                    attribs["notbefore"] = isodates[0];
-                }
-            }
-        }
-        else if (typeNeeded == "DateBetween") {
-            if (edtf) {
-                attribs["edtf"] = isodates[0] + "/" + isodates[1];
-            }
-            else {
-                attribs["startdate"] = isodates[0];
-                attribs["enddate"] = isodates[1];
-            }
-        }
-        else if (typeNeeded == "DateSelection") {
-            if (edtf) {
-                // From humdrum it's always "or".  "and" would be curly braces instead of square.
-                std::string combinedDates;
-                for (int i = 0; i < (int)isodates.size(); i++) {
-                    if (i == 0) {
-                        combinedDates += "[";
-                    }
-                    else {
-                        combinedDates += ",";
-                    }
-
-                    combinedDates += isodates[i];
-
-                    if (i == (int)isodates.size() - 1) {
-                        combinedDates += "]";
-                    }
-                }
-                attribs["edtf"] = combinedDates;
-            }
-            else {
-                // pre-EDTF ISO dates can't describe date selection lists. Leave attribs blank.
-            }
-        }
-    }
-
+    attribs = isoDateAttributesFromDateConstruct(dateConstruct, edtf);
     return attribs;
 }
 
@@ -3288,6 +3108,221 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(const std::string &hu
     return date;
 }
 
+//////////////////////////////
+//
+// HumdrumInput::dateConstructFromHumdrumDate --
+//
+
+DateConstruct HumdrumInput::dateConstructFromHumdrumDate(const std::string &inHumdrumDate)
+{
+    DateConstruct result;
+    std::string typeNeeded;
+    std::string relativeType;
+    std::string dateError;
+    std::string humdrumDate = inHumdrumDate;
+    std::vector<std::string> dateStrings;
+
+    if (humdrumDate.empty()) {
+        return result;
+    }
+
+    if (humdrumDate.find_first_of("-") != std::string::npos) {
+        // This is a range between two dates, and if those dates are simple enough,
+        // we can describe this with a "DateBetween", which can be represented with
+        // a single isodate of the form date1/date2. But there are a bunch of cases
+        // (see below) where this won't work, and this range will need to be
+        // described as a "DateConstructRange", which can only be represented with
+        // two isodates.
+        typeNeeded = "DateBetween";
+        hum::HumRegex hre;
+        hre.split(dateStrings, humdrumDate, "-");
+        if (dateStrings.size() != 2) {
+            // not parseable: return empty DateConstruct
+            return result;
+        }
+
+        if (dateStrings[0].find_first_of("^") != std::string::npos
+                || dateStrings[1].find_first_of("^") != std::string::npos
+                || dateStrings[0][0] == '~'
+                || dateStrings[0][0] == '?'
+                || dateStrings[0][0] == '<'
+                || dateStrings[0][0] == '>'
+                || dateStrings[1][0] == '~'
+                || dateStrings[1][0] == '?'
+                || dateStrings[1][0] == '<'
+                || dateStrings[1][0] == '>') {
+            // It will require two DateConstructs to describe this date range, because one or both ends of
+            // the range are either DateBetweens themselves (or DateRelatives), or have full date errors.
+            typeNeeded = "DateConstructRange";
+        }
+    }
+    else if (humdrumDate.find_first_of("^") != std::string::npos) {
+        typeNeeded = "DateBetween";
+        hum::HumRegex hre;
+        hre.split(dateStrings, humdrumDate, "\\^");
+    }
+    else if (humdrumDate.find_first_of("|") != std::string::npos) {
+        typeNeeded = "DateSelection";
+        hum::HumRegex hre;
+        hre.split(dateStrings, humdrumDate, "\\|");
+    }
+    else if (humdrumDate[0] == '<') {
+        typeNeeded = "DateRelative";
+        humdrumDate.erase(0, 1);
+        relativeType = "before";
+        dateStrings.push_back(humdrumDate);
+    }
+    else if (humdrumDate[0] == '>') {
+        typeNeeded = "DateRelative";
+        humdrumDate.erase(0, 1);
+        relativeType = "after";
+        dateStrings.push_back(humdrumDate);
+    }
+    else {
+        typeNeeded = "DateSingle";
+        dateStrings.push_back(humdrumDate);
+    }
+
+    if (typeNeeded == "DateConstructRange") {
+        std::vector<DateConstruct> dateConstructs;
+        for (auto const &dateString : dateStrings) {
+            DateConstruct dateConstruct = dateConstructFromHumdrumDate(dateString);
+            if (dateConstruct.constructType.empty()) {
+                return DateConstruct();
+            }
+            dateConstructs.push_back(dateConstruct);
+        }
+
+        result.constructType = "DateConstructRange";
+        result.dateConstructs = dateConstructs;
+    }
+    else {
+        std::vector<DateWithErrors> dates;
+        for (auto const &dateString : dateStrings) {
+            DateWithErrors date = dateWithErrorsFromHumdrumDate(dateString);
+            if (date.valid == false) {
+                // give up on this whole Humdrum date, and return empty attribs
+                return result;
+            }
+            dates.push_back(date);
+        }
+
+        result.constructType = typeNeeded;
+        result.dates = dates;
+        if (typeNeeded == "DateRelative") {
+            result.qualifier = relativeType;
+        }
+    }
+
+    return result;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::isoDateAttributesFromDateConstruct --
+//
+
+std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstruct(const DateConstruct &dateConstruct, bool edtf)
+{
+    std::map<std::string, std::string> attribs;
+
+    // Produce isodates for every date found.
+    std::vector<std::string> isodates;
+    if (dateConstruct.constructType == "DateConstructRange") {
+        // special case of complex date range, can only be handled by two edtf attributes
+        if (!edtf) {
+            return attribs;
+        }
+        std::map<std::string, std::string> attribStart = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[0], edtf);
+        std::map<std::string, std::string> attribEnd = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[1], edtf);
+        attribs["startedtf"] = attribStart["edtf"];
+        attribs["endedtf"] = attribEnd["edtf"];
+        return attribs;
+    }
+
+    // all other (simpler) types
+    for (auto const &date : dateConstruct.dates) {
+        std::string isodate = isoDateFromDateWithErrors(date, edtf);
+        if (isodate.empty()) {
+            // date not representable as isodate; bail on all isodates for this piece of metadata
+            return attribs;
+        }
+        isodates.push_back(isodate);
+    }
+
+    // set up and return attribs
+    if (dateConstruct.constructType == "DateSingle") {
+        if (edtf) {
+            attribs["edtf"] = isodates[0];
+        }
+        else {
+            attribs["isodate"] = isodates[0];
+        }
+    }
+    else if (dateConstruct.constructType == "DateRelative") {
+        if (dateConstruct.qualifier == "before") {
+            if (edtf) {
+                attribs["edtf"] = "../" + isodates[0];
+            }
+            else {
+                attribs["notafter"] = isodates[0];
+            }
+        }
+        else if (dateConstruct.qualifier == "after") {
+            if (edtf) {
+                attribs["edtf"] = isodates[0] + "/..";
+            }
+            else {
+                attribs["notbefore"] = isodates[0];
+            }
+        }
+    }
+    else if (dateConstruct.constructType == "DateBetween") {
+        if (edtf) {
+            attribs["edtf"] = isodates[0] + "/" + isodates[1];
+        }
+        else {
+            attribs["startdate"] = isodates[0];
+            attribs["enddate"] = isodates[1];
+        }
+    }
+    else if (dateConstruct.constructType == "DateSelection") {
+        if (edtf) {
+            std::string combinedDates;
+            for (int i = 0; i < (int)isodates.size(); i++) {
+                if (i == 0) {
+                    if (dateConstruct.qualifier == "and") {
+                        combinedDates += "{";
+                    }
+                    else {
+                        combinedDates += "[";
+                    }
+                }
+                else {
+                    combinedDates += ",";
+                }
+
+                combinedDates += isodates[i];
+
+                if (i == (int)isodates.size() - 1) {
+                    if (dateConstruct.qualifier == "and") {
+                        combinedDates += "}";
+                    }
+                    else {
+                        combinedDates += "]";
+                    }
+                }
+            }
+            attribs["edtf"] = combinedDates;
+        }
+        else {
+            // pre-EDTF ISO dates can't describe date selection lists. Leave attribs blank.
+        }
+    }
+
+    return attribs;
+
+}
 //////////////////////////////
 //
 // HumdrumInput::isoDateFromDateWithErrors --
