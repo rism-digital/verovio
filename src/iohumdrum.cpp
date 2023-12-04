@@ -3078,6 +3078,12 @@ DateWithErrors HumdrumInput::dateWithErrorsFromHumdrumDate(const std::string &hu
         }
         try {
             if (value.size() > 0) {
+                // reject value that has extra chars that stoi will ignore silently
+                // (e.g. stoi("1910 (rev. 1923)") returns 1910).
+                if (!hre.match(value, "^\\d+$")) {
+                    date.valid = false;
+                    return date;
+                }
                 values[i] = stoi(value);
             }
         }
@@ -3652,6 +3658,7 @@ void HumdrumInput::createPrintedSource(pugi::xml_node sourceDesc)
             pugi::xml_node dateEl = imprint.append_child("date");
             dateEl.append_attribute("type") = "datePublished";
             dateEl.append_attribute("analog") = "humdrum:PDT";
+            fillInIsoDate(dateEl, datePublished.value);
             appendText(dateEl, datePublished.value);
         }
 
