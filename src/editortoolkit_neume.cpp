@@ -782,10 +782,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     if (elementType == "staff") {
         Object *parent;
         Staff *newStaff;
+        std::string columnValue;
         // Use closest existing staff (if there is one)
         if (staff) {
             parent = staff->GetParent();
             assert(parent);
+            columnValue = staff->GetType();
             int n = parent->GetChildCount() + 1;
             newStaff = new Staff(n);
             newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
@@ -810,6 +812,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         assert(surface);
         surface->AddChild(zone);
         newStaff->AttachZone(zone);
+        if (columnValue.length()) newStaff->SetType(columnValue);
         Layer *newLayer = new Layer();
         newStaff->AddChild(newLayer);
 
