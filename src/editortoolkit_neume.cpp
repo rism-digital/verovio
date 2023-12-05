@@ -2084,6 +2084,58 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
     return true;
 }
 
+void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Could not get the drawing page.");
+        return;
+    }
+
+    assert(syllable);
+
+    std::string linkedID = (syllable->HasPrecedes() ? syllable->GetPrecedes() : syllable->GetFollows());
+    if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
+    Syllable *linkedSyllable = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(linkedID));
+    if (linkedSyllable != NULL) {
+        if (linkedSyllable->HasPrecedes()) linkedSyllable->SetPrecedes("");
+        if (linkedSyllable->HasFollows()) {
+            linkedSyllable->SetFollows("");
+
+            // Create an empty syl for the second part
+            Syl *syl = new Syl();
+            Text *text = new Text();
+            std::u32string str = U"";
+            text->SetText(str);
+            syl->AddChild(text);
+            linkedSyllable->AddChild(syl);
+
+            // Create default bounding box if facs
+            if (m_doc->GetType() == Facs) {
+                Zone *zone = new Zone();
+
+                zone->SetUlx(
+                    linkedSyllable->GetFirst(NEUME)->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
+                zone->SetUly(linkedSyllable->GetAncestorStaff()->GetFacsimileInterface()->GetZone()->GetLry());
+                zone->SetLrx(linkedSyllable->GetLast(NEUME)->GetLast(NC)->GetFacsimileInterface()->GetZone()->GetLrx());
+                zone->SetLry(zone->GetUly() + 100);
+
+                // Make bbox larger if it has less than 2 ncs
+                if (linkedSyllable->GetChildCount(NC, 2) <= 2) {
+                    zone->SetLrx(zone->GetLrx() + 50);
+                }
+
+                assert(m_doc->GetFacsimile());
+                m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
+                FacsimileInterface *fi = syl->GetFacsimileInterface();
+                assert(fi);
+                fi->AttachZone(zone);
+            }
+        }
+    }
+}
+
 bool EditorToolkitNeume::Remove(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -2156,6 +2208,14 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }
     }
 
+    if (obj->Is(SYLLABLE)) {
+        Syllable *syllable = dynamic_cast<Syllable *>(obj);
+        assert(syllable);
+        if (syllable->HasPrecedes() || syllable->HasFollows()) {
+            UnlinkSyllable(syllable);
+        }
+    }
+
     if (!result) {
         result = parent->DeleteChild(obj);
     }
@@ -2194,53 +2254,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             Syllable *li = dynamic_cast<Syllable *>(obj);
             assert(li);
             if (li->HasPrecedes() || li->HasFollows()) {
-                std::string linkedID = (li->HasPrecedes() ? li->GetPrecedes() : li->GetFollows());
-                if (linkedID.compare(0, 1, "#") == 0) linkedID.erase(0, 1);
-                Syllable *linkedSyllable
-                    = dynamic_cast<Syllable *>(m_doc->GetDrawingPage()->FindDescendantByID(linkedID));
-                if (linkedSyllable != NULL) {
-                    if (linkedSyllable->HasPrecedes()) linkedSyllable->SetPrecedes("");
-                    if (linkedSyllable->HasFollows()) {
-                        linkedSyllable->SetFollows("");
-                        // Create an empty syl for the second part
-                        Syl *syl = new Syl();
-                        Text *text = new Text();
-                        std::u32string str = U"";
-                        text->SetText(str);
-                        syl->AddChild(text);
-                        linkedSyllable->AddChild(syl);
-
-                        // Create default bounding box if facs
-                        if (m_doc->GetType() == Facs) {
-                            Zone *zone = new Zone();
-
-                            zone->SetUlx(linkedSyllable->GetFirst(NEUME)
-                                             ->GetFirst(NC)
-                                             ->GetFacsimileInterface()
-                                             ->GetZone()
-                                             ->GetUlx());
-                            zone->SetUly(
-                                linkedSyllable->GetAncestorStaff()->GetFacsimileInterface()->GetZone()->GetLry());
-                            zone->SetLrx(linkedSyllable->GetLast(NEUME)
-                                             ->GetLast(NC)
-                                             ->GetFacsimileInterface()
-                                             ->GetZone()
-                                             ->GetLrx());
-                            zone->SetLry(zone->GetUly() + 100);
-
-                            // Make bbox larger if it has less than 2 ncs
-                            if (linkedSyllable->GetChildCount(NC, 2) <= 2) {
-                                zone->SetLrx(zone->GetLrx() + 50);
-                            }
-
-                            assert(m_doc->GetFacsimile());
-                            m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->AddChild(zone);
-                            FacsimileInterface *fi = syl->GetFacsimileInterface();
-                            assert(fi);
-                            fi->AttachZone(zone);
-                        }
-                    };
-                }
+                UnlinkSyllable(li);
             }
             // Delete the syllable empty of neumes
             std::string syllableId = obj->GetID();
