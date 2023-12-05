@@ -55,6 +55,7 @@ public:
     bool Remove(std::string elementId);
     bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float resize = NAN);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
+    void UnlinkSyllable(Syllable *syllable);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds);
