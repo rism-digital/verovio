@@ -101,6 +101,7 @@ public:
         m_verticalShift = false;
         m_alignment = HORIZONTALALIGNMENT_left;
         m_pointSize = 0;
+        m_letterSpacing = 0;
         m_actualWidth = 0;
         m_enclose = TEXTRENDITION_NONE;
         m_textEnclose = ENCLOSURE_NONE;
@@ -119,6 +120,7 @@ public:
     bool m_verticalShift;
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
+    int m_letterSpacing;
     std::vector<TextElement *> m_enclosedRend;
     data_TEXTRENDITION m_enclose;
     data_ENCLOSURE m_textEnclose;
