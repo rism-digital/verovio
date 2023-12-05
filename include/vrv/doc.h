@@ -509,12 +509,12 @@ public:
      * A copy of the back tree stored as pugi::xml_document
      */
     pugi::xml_document m_back;
-    
+
     /**
      * The music@decls value
      */
     std::string m_musicDecls;
-    
+
     /** The current page height */
     int m_drawingPageHeight;
     /** The current page width */
