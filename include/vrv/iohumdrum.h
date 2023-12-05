@@ -466,8 +466,9 @@ struct DateWithErrors {
 };
 
 struct DateConstruct {
-    // constructType can be any of "" (invalid), "DateSingle" (one date), "DateRelative" (one date, qualifier="before" or "after"),
-    // "DateBetween" (two dates), "DateSelection" (N dates, qualifier="and" or "or"), or "DateConstructRange" (two DateConstructs).
+    // constructType can be any of "" (invalid), "DateSingle" (one date), "DateRelative"
+    // (one date, qualifier="before" or "after"), "DateBetween" (two dates), "DateSelection"
+    // (N dates, qualifier="and" or "or"), or "DateConstructRange" (two DateConstructs).
     std::string constructType; // if type is "", ignore everything here, the date construct was not parseable.
     std::string dateConstructError; // error of the entire DateConstruct
     std::string qualifier;
@@ -924,7 +925,6 @@ protected:
     int getBestItem(const std::vector<HumdrumReferenceItem> &items, const std::string &requiredLanguage);
     bool isStandardHumdrumKey(const std::string &key);
     void appendText(pugi::xml_node element, std::string text);
-
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);

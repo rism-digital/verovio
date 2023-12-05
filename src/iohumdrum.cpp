@@ -2781,8 +2781,9 @@ void HumdrumInput::createFileDesc(pugi::xml_node meiHead)
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pugi::xml_node unpub = pubStmt.append_child("unpub");
-    appendText(unpub, "This MEI file was created by Verovio's Humdrum converter. When published, this unpub element "
-               "should be removed, and the enclosing pubStmt element should be properly filled out.");
+    appendText(unpub,
+        "This MEI file was created by Verovio's Humdrum converter. When published, this unpub element "
+        "should be removed, and the enclosing pubStmt element should be properly filled out.");
 
     // If sourceDesc ends up with no children, we will fileDesc.remove_child(sourceDesc) to avoid an empty
     // <sourceDesc/>.
@@ -3148,15 +3149,10 @@ DateConstruct HumdrumInput::dateConstructFromHumdrumDate(const std::string &inHu
         }
 
         if (dateStrings[0].find_first_of("^") != std::string::npos
-                || dateStrings[1].find_first_of("^") != std::string::npos
-                || dateStrings[0][0] == '~'
-                || dateStrings[0][0] == '?'
-                || dateStrings[0][0] == '<'
-                || dateStrings[0][0] == '>'
-                || dateStrings[1][0] == '~'
-                || dateStrings[1][0] == '?'
-                || dateStrings[1][0] == '<'
-                || dateStrings[1][0] == '>') {
+            || dateStrings[1].find_first_of("^") != std::string::npos || dateStrings[0][0] == '~'
+            || dateStrings[0][0] == '?' || dateStrings[0][0] == '<' || dateStrings[0][0] == '>'
+            || dateStrings[1][0] == '~' || dateStrings[1][0] == '?' || dateStrings[1][0] == '<'
+            || dateStrings[1][0] == '>') {
             // It will require two DateConstructs to describe this date range, because one or both ends of
             // the range are either DateBetweens themselves (or DateRelatives), or have full date errors.
             typeNeeded = "DateConstructRange";
@@ -3228,7 +3224,8 @@ DateConstruct HumdrumInput::dateConstructFromHumdrumDate(const std::string &inHu
 // HumdrumInput::isoDateAttributesFromDateConstruct --
 //
 
-std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstruct(const DateConstruct &dateConstruct, bool edtf)
+std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstruct(
+    const DateConstruct &dateConstruct, bool edtf)
 {
     std::map<std::string, std::string> attribs;
 
@@ -3239,8 +3236,10 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstr
         if (!edtf) {
             return attribs;
         }
-        std::map<std::string, std::string> attribStart = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[0], edtf);
-        std::map<std::string, std::string> attribEnd = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[1], edtf);
+        std::map<std::string, std::string> attribStart
+            = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[0], edtf);
+        std::map<std::string, std::string> attribEnd
+            = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[1], edtf);
         attribs["startedtf"] = attribStart["edtf"];
         attribs["endedtf"] = attribEnd["edtf"];
         return attribs;
@@ -3327,7 +3326,6 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstr
     }
 
     return attribs;
-
 }
 //////////////////////////////
 //
@@ -4452,7 +4450,6 @@ void HumdrumInput::appendText(pugi::xml_node element, std::string text)
         }
         element.append_child(pugi::node_pcdata).set_value(s.c_str());
     }
-
 }
 
 //////////////////////////////
