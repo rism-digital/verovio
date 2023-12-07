@@ -3225,7 +3225,7 @@ DateConstruct HumdrumInput::dateConstructFromHumdrumDate(const std::string &inHu
 //
 
 std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstruct(
-    const DateConstruct &dateConstruct, bool edtf)
+    const DateConstruct &dateConstruct, bool edtf, bool isEdgeOfDateConstructRange)
 {
     std::map<std::string, std::string> attribs;
 
@@ -3237,9 +3237,9 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstr
             return attribs;
         }
         std::map<std::string, std::string> attribStart
-            = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[0], edtf);
+            = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[0], edtf, true);
         std::map<std::string, std::string> attribEnd
-            = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[1], edtf);
+            = isoDateAttributesFromDateConstruct(dateConstruct.dateConstructs[1], edtf, true);
         attribs["startedtf"] = attribStart["edtf"];
         attribs["endedtf"] = attribEnd["edtf"];
         return attribs;
@@ -3284,7 +3284,14 @@ std::map<std::string, std::string> HumdrumInput::isoDateAttributesFromDateConstr
     }
     else if (dateConstruct.constructType == "DateBetween") {
         if (edtf) {
-            attribs["edtf"] = isodates[0] + "/" + isodates[1];
+            if (isEdgeOfDateConstructRange) {
+                // DateBetween is actually a selection (one date, somewhere between these two dates)
+                attribs["edtf"] = "[" + isodates[0] + ".." + isodates[1] + "]";
+            }
+            else {
+                // DateBetween is a proper range (this entire range of dates)
+                attribs["edtf"] = isodates[0] + "/" + isodates[1];
+            }
         }
         else {
             attribs["startdate"] = isodates[0];

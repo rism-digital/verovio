@@ -913,7 +913,8 @@ protected:
     std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(
         const std::string &inHumdrumDate, bool edtf = false);
     DateConstruct dateConstructFromHumdrumDate(const std::string &dateString);
-    std::map<std::string, std::string> isoDateAttributesFromDateConstruct(const DateConstruct &date, bool edtf);
+    std::map<std::string, std::string> isoDateAttributesFromDateConstruct(
+        const DateConstruct &dateConstruct, bool edtf, bool isEdgeOfDateConstructRange = false);
     std::string isoDateFromDateWithErrors(const DateWithErrors &dateWithErrors, bool edtf);
     DateWithErrors dateWithErrorsFromHumdrumDate(const std::string &dateString);
     bool sanityCheckDate(int year, int month, int day, int hour, int minute, int second);
