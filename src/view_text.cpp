@@ -127,6 +127,7 @@ void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDra
                 bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflStr);
                 vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
+                vrvTxt.SetLetterSpacing(90);
                 dc->SetFont(&vrvTxt);
                 this->DrawTextString(dc, smuflStr, params);
                 dc->ResetFont();
@@ -417,6 +418,10 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     }
     if (rend->HasFontweight()) {
         rendFont.SetWeight(rend->GetFontweight());
+        customFont = true;
+    }
+    if (rend->HasLetterspacing()) {
+        rendFont.SetLetterSpacing(rend->GetLetterspacing() * m_doc->GetDrawingUnit(100));
         customFont = true;
     }
 
