@@ -111,10 +111,16 @@ public:
     ///@}
 
     /**
-     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
+     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue
      * attributes
      */
     void InitCue(bool beamCue);
+
+    /**
+     * Initialize m_notesStemDir value based on the @graceGrp attribute and presence of child elements with @grace
+     * attributes
+     */
+    void InitGraceStemDir(bool graceGrp);
 
     bool IsHorizontal() const;
 

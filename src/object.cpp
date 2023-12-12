@@ -118,7 +118,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // New id
     this->GenerateID();
     // For now do not copy them
-    // m_unsupported = object.m_unsupported;
+    m_unsupported = object.m_unsupported;
 
     if (!object.CopyChildren()) {
         return;
@@ -164,7 +164,7 @@ Object &Object::operator=(const Object &object)
         // New id
         this->GenerateID();
         // For now do now copy them
-        // m_unsupported = object.m_unsupported;
+        m_unsupported = object.m_unsupported;
         LinkingInterface *link = this->GetLinkingInterface();
         if (link) link->AddBackLink(&object);
 

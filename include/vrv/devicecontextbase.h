@@ -133,6 +133,7 @@ public:
     FontInfo()
     {
         m_pointSize = 0;
+        m_letterSpacing = 0.0;
         m_family = 0; // was wxFONTFAMILY_DEFAULT;
         m_style = FONTSTYLE_NONE;
         m_weight = FONTWEIGHT_NONE;
@@ -147,6 +148,7 @@ public:
 
     // accessors and modifiers for the font elements
     int GetPointSize() const { return m_pointSize; }
+    int GetLetterSpacing() const { return m_letterSpacing; }
     data_FONTSTYLE GetStyle() const { return m_style; }
     data_FONTWEIGHT GetWeight() const { return m_weight; }
     bool GetUnderlined() const { return m_underlined; }
@@ -158,6 +160,7 @@ public:
     SmuflTextFont GetSmuflFont() const { return m_smuflFont; }
 
     void SetPointSize(int pointSize) { m_pointSize = pointSize; }
+    void SetLetterSpacing(double letterSpacing) { m_letterSpacing = letterSpacing; }
     void SetStyle(data_FONTSTYLE style) { m_style = style; }
     void SetWeight(data_FONTWEIGHT weight) { m_weight = weight; }
     void SetUnderlined(bool underlined) { m_underlined = underlined; }
@@ -171,6 +174,7 @@ public:
 
 private:
     int m_pointSize;
+    int m_letterSpacing;
     int m_family;
     data_FONTSTYLE m_style;
     data_FONTWEIGHT m_weight;

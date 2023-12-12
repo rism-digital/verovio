@@ -1481,6 +1481,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
             dc->StartCustomGraphic("notehead");
 
+            if (note->HasHeadColor()) {
+                dc->SetCustomGraphicColor(note->GetHeadColor());
+            }
+
             this->DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
 
             // handle notehead enclosure
@@ -1757,6 +1761,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
     if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
+    }
+    if (syl->HasLetterspacing()) {
+        currentFont.SetLetterSpacing(syl->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     }
     dc->SetFont(&currentFont);
 
