@@ -1762,6 +1762,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     if (syl->GetStart() && syl->GetStart()->GetDrawingCueSize()) {
         currentFont.SetPointSize(m_doc->GetCueSize(currentFont.GetPointSize()));
     }
+    if (syl->HasLetterspacing()) {
+        currentFont.SetLetterSpacing(syl->GetLetterspacing() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+    }
     dc->SetFont(&currentFont);
 
     TextDrawingParams params;

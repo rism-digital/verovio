@@ -969,6 +969,10 @@ void SvgDeviceContext::DrawText(
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
+    if (m_fontStack.top()->GetLetterSpacing() != 0.0) {
+        textChild.append_attribute("letter-spacing")
+            = StringFormat("%dpx", m_fontStack.top()->GetLetterSpacing()).c_str();
+    }
     textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
