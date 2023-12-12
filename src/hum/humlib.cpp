@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Dec 12 10:50:27 PST 2023
+// Last Modified: Tue Dec 12 11:01:04 PST 2023
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -45828,7 +45828,7 @@ bool MxmlEvent::isInvisible(void) {
 int MxmlEvent::getStaffIndex(void) const {
 	if (m_staff > 0) {
 		vector<pair<int, int>> mapping = getOwner()->getOwner()->getVoiceMapping();
-		if (getVoiceNumber() < mapping.size()) {
+		if (getVoiceNumber() < (int)mapping.size()) {
 			const auto& [mappingStaffIndex, mappingVoiceIndex] = mapping[getVoiceNumber()];
 			if (m_staff - 1 != mappingStaffIndex) {
 				return mappingStaffIndex;
@@ -45861,7 +45861,7 @@ int MxmlEvent::getStaffIndex(void) const {
 int MxmlEvent::getCrossStaffOffset(void) const {
 	if (m_staff > 0) {
 		vector<pair<int, int>> mapping = getOwner()->getOwner()->getVoiceMapping();
-		if (getVoiceNumber() < mapping.size()) {
+		if (getVoiceNumber() < (int)mapping.size()) {
 			const auto& [mappingStaffIndex, mappingVoiceIndex] = mapping[getVoiceNumber()];
 			return m_staff - 1 - mappingStaffIndex;
 		}
