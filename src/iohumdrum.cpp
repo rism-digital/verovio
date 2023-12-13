@@ -3838,7 +3838,7 @@ void HumdrumInput::createUnpublishedSource(pugi::xml_node sourceDesc)
             pugi::xml_node line = lineGroup.append_child("l");
             // <l> does not take @analog, so use @type instead (says Perry)
             line.append_attribute("type") = "humdrum:SMA";
-            if (!acknowledgment.language.empty() and languageForAll.empty()) {
+            if (!acknowledgment.language.empty() && languageForAll.empty()) {
                 line.append_attribute("xml:lang") = acknowledgment.language.c_str();
             }
             appendText(line, acknowledgment.value);
@@ -4747,7 +4747,7 @@ void HumdrumInput::createSimpleTitleElement()
         firstLang = titles[bestTitleIdx].language;
     }
     int bestMovementNameIdx = getBestItem(movementNames, std::string());
-    if (bestTitleIdx < 0 && bestMovementNameIdx >= 0 and !movementNames[bestMovementNameIdx].language.empty()) {
+    if ((bestTitleIdx < 0) && (bestMovementNameIdx >= 0) && !movementNames[bestMovementNameIdx].language.empty()) {
         firstLang = movementNames[bestMovementNameIdx].language;
     }
 
@@ -4968,7 +4968,7 @@ std::map<std::string, std::vector<HumdrumReferenceItem>> HumdrumInput::getAllRef
 
 bool HumdrumInput::isStandardHumdrumKey(const std::string &key)
 {
-    if (key[0] == 'X' and key.size() == 3) {
+    if ((key[0] == 'X') && (key.size() == 3)) {
         // translated title
         return true;
     }
