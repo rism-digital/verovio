@@ -4467,6 +4467,13 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <section>", current.name());
         }
     }
+
+    // New <measure> for blank files in neume notation
+    if (!unmeasured && parent->Is(SECTION) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+        unmeasured = new Measure(false);
+        m_doc->SetMensuralMusicOnly(true);
+        parent->AddChild(unmeasured);
+    }
     return success;
 }
 

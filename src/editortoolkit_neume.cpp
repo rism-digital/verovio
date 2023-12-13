@@ -816,28 +816,27 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Layer *newLayer = new Layer();
         newStaff->AddChild(newLayer);
 
-        // Find index to insert new staff
-        ListOfObjects staves = parent->FindAllDescendantsByType(STAFF, false);
-        std::vector<Object *> stavesVector(staves.begin(), staves.end());
-        stavesVector.push_back(newStaff);
-        StaffSort staffSort;
-        std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
-        for (int i = 0; i < (int)staves.size(); ++i) {
-            if (stavesVector.at(i) == newStaff) {
-                parent->InsertChild(newStaff, i);
-                parent->Modify();
+        if (staff) {
+            // Find index to insert new staff
+            ListOfObjects staves = parent->FindAllDescendantsByType(STAFF, false);
+            std::vector<Object *> stavesVector(staves.begin(), staves.end());
+            stavesVector.push_back(newStaff);
+            StaffSort staffSort;
+            std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
+            for (int i = 0; i < (int)staves.size(); ++i) {
+                if (stavesVector.at(i) == newStaff) {
+                    parent->InsertChild(newStaff, i);
+                    parent->Modify();
 
-                m_editInfo.import("uuid", newStaff->GetID());
-                m_editInfo.import("status", status);
-                m_editInfo.import("message", message);
+                    m_editInfo.import("uuid", newStaff->GetID());
+                    m_editInfo.import("status", status);
+                    m_editInfo.import("message", message);
 
-                return true;
+                    return true;
+                }
             }
         }
-        LogWarning("Failed to insert newStaff into staff");
-        message += "Failed to insert newStaff into staves.";
         parent->AddChild(newStaff);
-        parent->Modify();
 
         m_editInfo.import("uuid", newStaff->GetID());
         m_editInfo.import("status", status);
