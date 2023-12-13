@@ -51,9 +51,14 @@ void SystemAligner::Reset()
     ArrayOfObjects &children = this->GetChildrenForModification();
     m_bottomAlignment = new StaffAlignment();
     m_bottomAlignment->SetStaff(NULL, NULL, this->GetAboveSpacingType(NULL));
-    m_bottomAlignment->SetParent(this);
     m_bottomAlignment->SetParentSystem(this->GetSystem());
-    children.push_back(m_bottomAlignment);
+    this->AddChild(m_bottomAlignment);
+}
+
+bool SystemAligner::IsSupportedChild(Object *child)
+{
+    assert(dynamic_cast<StaffAlignment *>(child));
+    return true;
 }
 
 StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, const Doc *doc)
@@ -77,14 +82,42 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, const Do
     // We create the StaffAlignment
     StaffAlignment *alignment = new StaffAlignment();
     alignment->SetStaff(staff, doc, this->GetAboveSpacingType(staff));
-    alignment->SetParent(this);
     alignment->SetParentSystem(this->GetSystem());
-    children.push_back(alignment);
+    this->AddChild(alignment);
 
     // put back the bottomAlignment
     children.push_back(m_bottomAlignment);
 
     return alignment;
+}
+
+void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
+{
+    std::vector<int> order = staffNs;
+    // First check that staffNs are unique
+    std::sort(order.begin(), order.end());
+    order.erase(std::unique(order.begin(), order.end()), order.end());
+    // If not, we should return because the re-ordering below will corrupt the data
+    if (order.size() != staffNs.size()) return;
+
+    ArrayOfObjects &children = this->GetChildrenForModification();
+
+    // Since we have a bottom alignment, the number is +1
+    if (children.size() != staffNs.size() + 1) return;
+
+    ListOfObjects orderedAlignments;
+    for (auto staffN : staffNs) {
+        StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staffN);
+        if (!alignment) return;
+        // Something is wrong in the data, we keep the order as it is
+        orderedAlignments.push_back(alignment);
+    }
+    int i = 0;
+    // We know that
+    for (auto alignment : orderedAlignments) {
+        children.at(i) = alignment;
+        ++i;
+    }
 }
 
 StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
