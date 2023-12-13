@@ -27,6 +27,7 @@ using namespace std;
 #include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <climits>
 #include <cmath>
 #include <locale>
 #include <regex>
