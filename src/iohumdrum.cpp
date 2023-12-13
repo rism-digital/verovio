@@ -4813,7 +4813,7 @@ void HumdrumInput::createComposerElements(pugi::xml_node work)
                         appendText(deathDate, isodates[1]);
                     }
                 }
-                else if (!isodateBirth.empty() and !isodateDeath.empty()) {
+                else if (!isodateBirth.empty() && !isodateDeath.empty()) {
                     pugi::xml_node birthDate = personInfo.append_child("birthDate");
                     birthDate.append_attribute("encoding") = "edtf";
                     appendText(birthDate, isodateBirth);
