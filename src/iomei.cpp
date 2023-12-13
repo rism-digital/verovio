@@ -1458,6 +1458,10 @@ bool MEIOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
+    if (!m_doc->m_musicDecls.empty()) {
+        music.append_attribute("decls") = m_doc->m_musicDecls.c_str();
+    }
+
     Facsimile *facs = doc->GetFacsimile();
     if (!this->GetBasic() && (facs != NULL) && (facs->GetChildCount() > 0)) {
         pugi::xml_node facsimile = music.append_child("facsimile");

@@ -465,6 +465,17 @@ struct DateWithErrors {
     std::string secondError; // error of the second ("", "approximate", "uncertain")
 };
 
+struct DateConstruct {
+    // constructType can be any of "" (invalid), "DateSingle" (one date), "DateRelative"
+    // (one date, qualifier="before" or "after"), "DateBetween" (two dates), "DateSelection"
+    // (N dates, qualifier="and" or "or"), or "DateConstructRange" (two DateConstructs).
+    std::string constructType; // if type is "", ignore everything here, the date construct was not parseable.
+    std::string dateConstructError; // error of the entire DateConstruct
+    std::string qualifier;
+    std::vector<DateWithErrors> dates; // empty for "DateConstructRange"
+    std::vector<DateConstruct> dateConstructs; // only used for "DateConstructRange" (has two elements in that case)
+};
+
 //----------------------------------------------------------------------------
 // HumdrumInput
 //----------------------------------------------------------------------------
@@ -893,6 +904,7 @@ protected:
     void createEncodingDesc(pugi::xml_node meiHead);
     void createWorkList(pugi::xml_node meiHead);
     void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead);
+    void createBackMatter();
     void createSimpleTitleElement();
     void createSimpleComposerElements();
     void createTitleElements(pugi::xml_node element);
@@ -900,8 +912,11 @@ protected:
     void fillInIsoDate(pugi::xml_node element, const std::string &dateString);
     std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(
         const std::string &inHumdrumDate, bool edtf = false);
+    DateConstruct dateConstructFromHumdrumDate(const std::string &dateString);
+    std::map<std::string, std::string> isoDateAttributesFromDateConstruct(
+        const DateConstruct &dateConstruct, bool edtf, bool isEdgeOfDateConstructRange = false);
+    std::string isoDateFromDateWithErrors(const DateWithErrors &dateWithErrors, bool edtf);
     DateWithErrors dateWithErrorsFromHumdrumDate(const std::string &dateString);
-    std::string isoDateFromDateWithErrors(const DateWithErrors &date, bool edtf);
     bool sanityCheckDate(int year, int month, int day, int hour, int minute, int second);
     std::string stripDateError(std::string &value);
     std::string getTextListLanguage(const std::vector<HumdrumReferenceItem> &textItems);
@@ -911,7 +926,6 @@ protected:
     int getBestItem(const std::vector<HumdrumReferenceItem> &items, const std::string &requiredLanguage);
     bool isStandardHumdrumKey(const std::string &key);
     void appendText(pugi::xml_node element, std::string text);
-
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
