@@ -510,6 +510,11 @@ public:
      */
     pugi::xml_document m_back;
 
+    /**
+     * The music@decls value
+     */
+    std::string m_musicDecls;
+
     /** The current page height */
     int m_drawingPageHeight;
     /** The current page width */
