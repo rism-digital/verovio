@@ -98,6 +98,7 @@ void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
     std::sort(order.begin(), order.end());
     order.erase(std::unique(order.begin(), order.end()), order.end());
     // If not, we should return because the re-ordering below will corrupt the data
+    // Returning will keep the order as it is
     if (order.size() != staffNs.size()) return;
 
     ArrayOfObjects &children = this->GetChildrenForModification();
@@ -108,12 +109,13 @@ void SystemAligner::ReorderBy(const std::vector<int> &staffNs)
     ListOfObjects orderedAlignments;
     for (auto staffN : staffNs) {
         StaffAlignment *alignment = this->GetStaffAlignmentForStaffN(staffN);
-        if (!alignment) return;
         // Something is wrong in the data, we keep the order as it is
+        if (!alignment) return;
         orderedAlignments.push_back(alignment);
     }
     int i = 0;
-    // We know that
+    // Since the number of staffAlignment is the same and they are unique, we can
+    // blindly replace them in the StaffAligner children
     for (auto alignment : orderedAlignments) {
         children.at(i) = alignment;
         ++i;
