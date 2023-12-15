@@ -50,14 +50,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; }
-    std::string GetForm() const { return m_form; }
+    void SetForm(divLineLog_FORM form_) { m_form = form_; }
+    divLineLog_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
 private:
     /** Indicates to what degree the harmonic label is supported by the notation. **/
-    std::string m_form;
+    divLineLog_FORM m_form;
 };
 
 //----------------------------------------------------------------------------
@@ -162,10 +162,6 @@ public:
     ncForm_CON GetCon() const { return m_con; }
     bool HasCon() const;
     //
-    void SetCurve(ncForm_CURVE curve_) { m_curve = curve_; }
-    ncForm_CURVE GetCurve() const { return m_curve; }
-    bool HasCurve() const;
-    //
     void SetHooked(data_BOOLEAN hooked_) { m_hooked = hooked_; }
     data_BOOLEAN GetHooked() const { return m_hooked; }
     bool HasHooked() const;
@@ -195,8 +191,6 @@ private:
      * should not be used for the first component of a neume.
      **/
     ncForm_CON m_con;
-    /** Records direction of curvature. **/
-    ncForm_CURVE m_curve;
     /** Pen stroke has an extension; specific to Hispanic notation. **/
     data_BOOLEAN m_hooked;
     /** Indicates participation in a ligature. **/
@@ -224,6 +218,58 @@ class InstNcForm : public AttNcForm {
 public:
     InstNcForm() = default;
     virtual ~InstNcForm() = default;
+};
+
+//----------------------------------------------------------------------------
+// AttNeumeType
+//----------------------------------------------------------------------------
+
+class AttNeumeType : public Att {
+protected:
+    AttNeumeType();
+    ~AttNeumeType() = default;
+
+public:
+    /** Reset the default values for the attribute class **/
+    void ResetNeumeType();
+
+    /** Read the values for the attribute class **/
+    bool ReadNeumeType(pugi::xml_node element, bool removeAttr = true);
+
+    /** Write the values for the attribute class **/
+    bool WriteNeumeType(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetType(std::string type_) { m_type = type_; }
+    std::string GetType() const { return m_type; }
+    bool HasType() const;
+    ///@}
+
+private:
+    /**
+     * Provides a description of the relationship between the current and the target
+     * categories.
+     **/
+    std::string m_type;
+};
+
+//----------------------------------------------------------------------------
+// InstNeumeType
+//----------------------------------------------------------------------------
+
+/**
+ * Instantiable version of AttNeumeType
+ */
+
+class InstNeumeType : public AttNeumeType {
+public:
+    InstNeumeType() = default;
+    virtual ~InstNeumeType() = default;
 };
 
 } // namespace vrv

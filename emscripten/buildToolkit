@@ -122,6 +122,7 @@ if ($wasmQ) {
 	$LFLAGS .= " -s INITIAL_MEMORY=512MB";
 	$LFLAGS .= " -s STACK_SIZE=256MB";
 	$LFLAGS .= " -s SINGLE_FILE=1";
+	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
 	$FLAGS_NAME = "-wasm";
 }
 
@@ -240,16 +241,17 @@ if ($makeQ) {
 
 print "*************\nBuilding makefile...\n";
 my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+print "$cmakeCmd\n" if $CHATTY;
 system($cmakeCmd) == 0 or die "system $cmakeCmd failed: $?";
 
 print "*************\nCompiling...\n";
 my $makeCmd = "$EMMAKE make -j 8";
+print "$makeCmd\n" if $CHATTY;
 system($makeCmd);
 
 print "*************\nLinking...\n";
 my $ccCmd = "$EMCC $CHATTY libverovio.a $LFLAGS $FLAGS $embed $exports $extra_exports $output $modularize";
 print "$ccCmd\n" if $CHATTY;
-
 system($ccCmd);
 
 if ($? == 0) {

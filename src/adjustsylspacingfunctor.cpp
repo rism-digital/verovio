@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "label.h"
 #include "labelabbr.h"
 #include "staff.h"
 #include "syl.h"
@@ -167,6 +168,12 @@ FunctorCode AdjustSylSpacingFunctor::VisitVerse(Verse *verse)
     // Use the syl because the content bounding box of the verse might be invalid at this stage
     int overlap = m_lastSyl->GetContentRight() - (firstSyl->GetContentLeft() + xShift);
     overlap += m_lastSyl->CalcConnectorSpacing(m_doc, m_staffSize);
+
+    // Check that we also include the space for the label if the verse has a new label
+    Label *label = vrv_cast<Label *>(verse->FindDescendantByType(LABEL));
+    if (label) {
+        overlap += (label->GetContentX2() - label->GetContentX1()) + m_doc->GetDrawingDoubleUnit(m_staffSize);
+    }
 
     int nextFreeSpace = m_previousVerse->AdjustPosition(overlap, m_freeSpace, m_doc);
 

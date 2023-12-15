@@ -11,6 +11,7 @@
 
 #include "doc.h"
 #include "elementpart.h"
+#include "score.h"
 #include "staff.h"
 
 //----------------------------------------------------------------------------
@@ -101,7 +102,7 @@ FunctorCode AdjustDotsFunctor::VisitMeasure(Measure *measure)
     if (!measure->HasAlignmentRefWithMultipleLayers()) return FUNCTOR_SIBLINGS;
 
     Filters filters;
-    this->PushFilters(&filters);
+    Filters *previousFilters = this->SetFilters(&filters);
 
     std::vector<int>::iterator iter;
     for (iter = m_staffNs.begin(); iter != m_staffNs.end(); ++iter) {
@@ -118,14 +119,14 @@ FunctorCode AdjustDotsFunctor::VisitMeasure(Measure *measure)
         measure->m_measureAligner.Process(*this);
     }
 
-    this->PopFilters();
+    this->SetFilters(previousFilters);
 
     return FUNCTOR_SIBLINGS;
 }
 
 FunctorCode AdjustDotsFunctor::VisitScore(Score *score)
 {
-    m_staffNs = m_doc->GetCurrentScoreDef()->GetStaffNs();
+    m_staffNs = score->GetScoreDef()->GetStaffNs();
 
     return FUNCTOR_CONTINUE;
 }

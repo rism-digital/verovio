@@ -664,7 +664,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight, const std:
         Filters filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.Add(&matchStaff);
-        getAlignmentLeftRight.PushFilters(&filters);
+        getAlignmentLeftRight.SetFilters(&filters);
         this->Process(getAlignmentLeftRight);
     }
     else {

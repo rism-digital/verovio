@@ -95,12 +95,10 @@ public:
 
     /**
      * Return information about the position in the beam.
-     * (no const since the cached list is updated)
-     * Object * is a pointer to the object implementing the interface (e.g., Beam, fTrem)
      */
     ///@{
-    bool IsFirstIn(const Object *object, const LayerElement *element) const;
-    bool IsLastIn(const Object *object, const LayerElement *element) const;
+    bool IsFirstIn(const LayerElement *element) const;
+    bool IsLastIn(const LayerElement *element) const;
     ///@}
 
     /**
@@ -113,10 +111,16 @@ public:
     ///@}
 
     /**
-     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
+     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue
      * attributes
      */
     void InitCue(bool beamCue);
+
+    /**
+     * Initialize m_notesStemDir value based on the @graceGrp attribute and presence of child elements with @grace
+     * attributes
+     */
+    void InitGraceStemDir(bool graceGrp);
 
     bool IsHorizontal() const;
 
@@ -163,7 +167,7 @@ protected:
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
      */
-    int GetPosition(const Object *object, const LayerElement *element) const;
+    int GetPosition(const LayerElement *element) const;
 
     //
 private:

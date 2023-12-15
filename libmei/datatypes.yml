@@ -168,7 +168,7 @@ defaults:
     data_MIDIVALUE_PAN:
         data_MIDIVALUE_PAN()
     data_OCTAVE:
-        -127
+        MEI_UNSET_OCT
     data_SUMMAND_List:
         std::vector<int>()
     xsdAnyURI_List:
@@ -207,6 +207,11 @@ modules:
             len:
                 type: double
                 default: -1.0
+
+    neumes:
+        att.divLine.log:
+            form:
+                type: divLineLog_FORM
 
     shared:
         att.articulation:
@@ -253,3 +258,9 @@ modules:
             tab.fret:
                 type: int
                 default: -1
+    
+    visual:
+        att.mensural.vis:
+            mensur.slash:
+                type: char
+                default: 0

@@ -78,13 +78,13 @@ void TabGrp::FilterList(ListOfConstObjects &childList) const
 int TabGrp::GetYTop() const
 {
     // The last note is the top
-    return this->GetListBack(this)->GetDrawingY();
+    return this->GetListBack()->GetDrawingY();
 }
 
 int TabGrp::GetYBottom() const
 {
     // The first note is the bottom
-    return this->GetListFront(this)->GetDrawingY();
+    return this->GetListFront()->GetDrawingY();
 }
 
 Note *TabGrp::GetTopNote()
@@ -94,7 +94,7 @@ Note *TabGrp::GetTopNote()
 
 const Note *TabGrp::GetTopNote() const
 {
-    const Note *topNote = vrv_cast<const Note *>(this->GetListBack(this));
+    const Note *topNote = vrv_cast<const Note *>(this->GetListBack());
     assert(topNote);
     return topNote;
 }
@@ -107,7 +107,7 @@ Note *TabGrp::GetBottomNote()
 const Note *TabGrp::GetBottomNote() const
 {
     // The first note is the bottom
-    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront(this));
+    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront());
     assert(bottomNote);
     return bottomNote;
 }

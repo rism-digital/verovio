@@ -27,11 +27,12 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch()
+PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch(), AttPitchGes()
 {
     this->RegisterInterfaceAttClass(ATT_NOTEGES);
     this->RegisterInterfaceAttClass(ATT_OCTAVE);
     this->RegisterInterfaceAttClass(ATT_PITCH);
+    this->RegisterInterfaceAttClass(ATT_PITCHGES);
 
     this->Reset();
 }
@@ -43,6 +44,9 @@ void PitchInterface::Reset()
     this->ResetNoteGes();
     this->ResetOctave();
     this->ResetPitch();
+    this->ResetPitchGes();
+
+    m_octDefault = MEI_UNSET_OCT;
 }
 
 bool PitchInterface::HasIdenticalPitchInterface(const PitchInterface *otherPitchInterface) const
@@ -153,13 +157,14 @@ int PitchInterface::CalcLoc(
         if (note->HasLoc()) {
             return note->GetLoc();
         }
-        else if (note->HasPname() && note->HasOct()) {
+        else if (note->HasPname() && (note->HasOct() || note->HasOctDefault())) {
             int offset = layer->GetClefLocOffset(crossStaffElement);
             const Layer *parentLayer = vrv_cast<const Layer *>(layerElement->GetFirstAncestor(LAYER));
             if (parentLayer != layer) {
                 offset = parentLayer->GetCrossStaffClefLocOffset(layerElement, offset);
             }
-            return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), offset);
+            const data_OCTAVE oct = (note->HasOct()) ? note->GetOct() : note->GetOctDefault();
+            return PitchInterface::CalcLoc(note->GetPname(), oct, offset);
         }
         else {
             return 0;

@@ -29,7 +29,7 @@ FunctorCode CalcLigatureNotePosFunctor::VisitLigature(Ligature *ligature)
 
     ligature->m_drawingShapes.clear();
 
-    const ListOfObjects &notes = ligature->GetList(ligature);
+    const ListOfObjects &notes = ligature->GetList();
     Note *lastNote = dynamic_cast<Note *>(notes.back());
     Staff *staff = ligature->GetAncestorStaff();
 

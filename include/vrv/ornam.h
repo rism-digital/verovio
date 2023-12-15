@@ -29,8 +29,6 @@ class Ornam : public ControlElement,
               public TextDirInterface,
               public TimePointInterface,
               public AttColor,
-              public AttExtSymAuth,
-              public AttExtSymNames,
               public AttOrnamentAccid {
 public:
     /**
@@ -63,11 +61,6 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     bool IsSupportedChild(Object *object) override;
-
-    /**
-     * Get the SMuFL glyph for the ornam based glyph.num
-     */
-    char32_t GetOrnamGlyph() const;
 
     //----------//
     // Functors //

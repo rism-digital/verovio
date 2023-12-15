@@ -132,7 +132,7 @@ void Chord::CalculateNoteGroups()
 {
     this->ClearNoteGroups();
 
-    const ListOfObjects &childList = this->GetList(this);
+    const ListOfObjects &childList = this->GetList();
     ListOfObjects::const_iterator iter = childList.begin();
 
     Note *curNote, *lastNote = vrv_cast<Note *>(*iter);
@@ -235,7 +235,7 @@ void Chord::FilterList(ListOfConstObjects &childList) const
 
 int Chord::PositionInChord(const Note *note) const
 {
-    const int size = this->GetListSize(this);
+    const int size = this->GetListSize();
     int position = this->GetListIndex(note);
     assert(position != -1);
     // this is the middle (only if odd)
@@ -247,21 +247,21 @@ int Chord::PositionInChord(const Note *note) const
 void Chord::GetYExtremes(int &yMax, int &yMin) const
 {
     // The first note is the bottom
-    yMin = this->GetListFront(this)->GetDrawingY();
+    yMin = this->GetListFront()->GetDrawingY();
     // The last note is the top
-    yMax = this->GetListBack(this)->GetDrawingY();
+    yMax = this->GetListBack()->GetDrawingY();
 }
 
 int Chord::GetYTop() const
 {
     // The last note is the top
-    return this->GetListBack(this)->GetDrawingY();
+    return this->GetListBack()->GetDrawingY();
 }
 
 int Chord::GetYBottom() const
 {
     // The first note is the bottom
-    return this->GetListFront(this)->GetDrawingY();
+    return this->GetListFront()->GetDrawingY();
 }
 
 Note *Chord::GetTopNote()
@@ -271,7 +271,7 @@ Note *Chord::GetTopNote()
 
 const Note *Chord::GetTopNote() const
 {
-    const Note *topNote = vrv_cast<const Note *>(this->GetListBack(this));
+    const Note *topNote = vrv_cast<const Note *>(this->GetListBack());
     assert(topNote);
     return topNote;
 }
@@ -284,35 +284,31 @@ Note *Chord::GetBottomNote()
 const Note *Chord::GetBottomNote() const
 {
     // The first note is the bottom
-    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront(this));
+    const Note *bottomNote = vrv_cast<const Note *>(this->GetListFront());
     assert(bottomNote);
     return bottomNote;
 }
 
 int Chord::GetXMin() const
 {
-    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
     assert(childList.size() > 0);
 
     int x = -VRV_UNSET;
-    ListOfConstObjects::const_iterator iter = childList.begin();
-    while (iter != childList.end()) {
-        if ((*iter)->GetDrawingX() < x) x = (*iter)->GetDrawingX();
-        ++iter;
+    for (const Object *child : childList) {
+        x = std::min(child->GetDrawingX(), x);
     }
     return x;
 }
 
 int Chord::GetXMax() const
 {
-    const ListOfConstObjects &childList = this->GetList(this); // make sure it's initialized
+    const ListOfConstObjects &childList = this->GetList(); // make sure it's initialized
     assert(childList.size() > 0);
 
     int x = VRV_UNSET;
-    ListOfConstObjects::const_iterator iter = childList.begin();
-    while (iter != childList.end()) {
-        if ((*iter)->GetDrawingX() > x) x = (*iter)->GetDrawingX();
-        ++iter;
+    for (const Object *child : childList) {
+        x = std::max(child->GetDrawingX(), x);
     }
     return x;
 }
@@ -408,7 +404,7 @@ bool Chord::IsVisible() const
     }
 
     // if the chord doesn't have it, see if all the children are invisible
-    const ListOfConstObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList();
 
     for (const Object *object : notes) {
         const Note *note = vrv_cast<const Note *>(object);
@@ -440,7 +436,7 @@ bool Chord::HasAdjacentNotesInStaff(const Staff *staff) const
 
 bool Chord::HasNoteWithDots() const
 {
-    const ListOfConstObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList();
 
     return std::any_of(notes.cbegin(), notes.cend(), [](const Object *object) {
         const Note *note = vrv_cast<const Note *>(object);
@@ -462,11 +458,11 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
             otherElementLocations.insert(note->GetDrawingLoc());
         }
     }
-    const ListOfObjects &notes = this->GetList(this);
+    const ListOfObjects &notes = this->GetList();
     // get current chord positions
     std::set<int> chordElementLocations;
-    for (const auto iter : notes) {
-        Note *note = vrv_cast<Note *>(iter);
+    for (Object *child : notes) {
+        Note *note = vrv_cast<Note *>(child);
         assert(note);
         chordElementLocations.insert(note->GetDrawingLoc());
     }
@@ -523,7 +519,7 @@ int Chord::AdjustOverlappingLayers(const Doc *doc, const std::vector<LayerElemen
 
 std::list<const Note *> Chord::GetAdjacentNotesList(const Staff *staff, int loc) const
 {
-    const ListOfConstObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList();
 
     std::list<const Note *> adjacentNotes;
     for (const Object *obj : notes) {
@@ -567,7 +563,7 @@ FunctorCode Chord::AcceptEnd(ConstFunctor &functor) const
 
 MapOfNoteLocs Chord::CalcNoteLocations(NotePredicate predicate) const
 {
-    const ListOfConstObjects &notes = this->GetList(this);
+    const ListOfConstObjects &notes = this->GetList();
 
     MapOfNoteLocs noteLocations;
     for (const Object *obj : notes) {

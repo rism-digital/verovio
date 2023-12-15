@@ -34,34 +34,34 @@ namespace vrv {
 
 static const ClassRegistrar<Tie> s_factory("tie", TIE);
 
-Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+Tie::Tie() : ControlElement(TIE, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
-    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LINERENDBASE);
 
     this->Reset();
 }
 
 Tie::Tie(ClassId classId)
-    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+    : ControlElement(classId, "tie-"), TimeSpanningInterface(), AttColor(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
-    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LINERENDBASE);
 
     this->Reset();
 }
 
 Tie::Tie(ClassId classId, const std::string &classIdStr)
-    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttCurveRend()
+    : ControlElement(classId, classIdStr), TimeSpanningInterface(), AttColor(), AttCurvature(), AttLineRendBase()
 {
     this->RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_CURVATURE);
-    this->RegisterAttClass(ATT_CURVEREND);
+    this->RegisterAttClass(ATT_LINERENDBASE);
 
     this->Reset();
 }
@@ -74,7 +74,7 @@ void Tie::Reset()
     TimeSpanningInterface::Reset();
     this->ResetColor();
     this->ResetCurvature();
-    this->ResetCurveRend();
+    this->ResetLineRendBase();
 }
 
 bool Tie::AdjustEnharmonicTies(const Doc *doc, const FloatingCurvePositioner *curve, Point bezier[4],

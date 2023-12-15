@@ -130,7 +130,7 @@ std::set<const Note *> Arpeg::GetNotes() const
         }
         else if (object->Is(CHORD)) {
             const Chord *chord = vrv_cast<const Chord *>(object);
-            const ListOfConstObjects &childList = chord->GetList(chord);
+            const ListOfConstObjects &childList = chord->GetList();
             for (const Object *child : childList) {
                 const Note *note = vrv_cast<const Note *>(child);
                 assert(note);

@@ -261,8 +261,21 @@ void BeamDrawingInterface::InitCue(bool beamCue)
         });
     }
 
+    return;
+}
+
+void BeamDrawingInterface::InitGraceStemDir(bool graceGrp)
+{
+    if (!graceGrp) {
+        graceGrp = std::all_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
+            if (!coord->m_element) return false;
+            if (coord->m_element->IsGraceNote()) return true;
+            return false;
+        });
+    }
+
     // Always set stem direction to up for grace note beam unless stem direction is provided
-    if (m_cueSize && (m_notesStemDir == STEMDIRECTION_NONE)) {
+    if (graceGrp && (m_notesStemDir == STEMDIRECTION_NONE)) {
         m_notesStemDir = STEMDIRECTION_up;
     }
 }
@@ -463,31 +476,29 @@ bool BeamDrawingInterface::HasOneStepHeight() const
     return (abs(top - bottom) <= 1);
 }
 
-bool BeamDrawingInterface::IsFirstIn(const Object *object, const LayerElement *element) const
+bool BeamDrawingInterface::IsFirstIn(const LayerElement *element) const
 {
-    this->GetList(object);
-    int position = this->GetPosition(object, element);
+    this->GetList();
+    const int position = this->GetPosition(element);
     // This method should be called only if the note is part of a fTrem
     assert(position != -1);
     // this is the first one
-    if (position == 0) return true;
-    return false;
+    return (position == 0);
 }
 
-bool BeamDrawingInterface::IsLastIn(const Object *object, const LayerElement *element) const
+bool BeamDrawingInterface::IsLastIn(const LayerElement *element) const
 {
-    const int size = this->GetListSize(object);
-    int position = this->GetPosition(object, element);
+    const int size = this->GetListSize();
+    const int position = this->GetPosition(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
     // this is the last one
-    if (position == (size - 1)) return true;
-    return false;
+    return (position == size - 1);
 }
 
-int BeamDrawingInterface::GetPosition(const Object *object, const LayerElement *element) const
+int BeamDrawingInterface::GetPosition(const LayerElement *element) const
 {
-    this->GetList(object);
+    this->GetList();
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
     if ((position == -1) && (element->Is(NOTE))) {
@@ -623,7 +634,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSigGrp(const MeterSigGrp *meterSig
 bool StaffDefDrawingInterface::DrawMeterSigGrp() const
 {
     if (m_drawMeterSigGrp) {
-        const int childListSize = m_currentMeterSigGrp.GetListSize(&m_currentMeterSigGrp);
+        const int childListSize = m_currentMeterSigGrp.GetListSize();
         if (childListSize > 1) return true;
     }
     return false;
