@@ -112,7 +112,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Installation step for Ubuntu
       - name: Configure Ubuntu with ${{ matrix.compiler }}-${{ matrix.version }}
@@ -239,7 +239,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -291,7 +291,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create TEMP_DIR
         working-directory: ${{ github.workspace }}
@@ -353,7 +353,7 @@ jobs:
 
     steps:
       - name: Checkout GH_PAGES_REPO into GH_PAGES_DIR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # repository to check out
           repository: ${{ env.GH_PAGES_REPO }}
@@ -435,7 +435,7 @@ jobs:
 
     steps:
       - name: Checkout main repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install doxygen
         run: |
@@ -472,7 +472,7 @@ jobs:
 
     steps:
       - name: Checkout DOXYGEN_REPO into DOXYGEN_DIR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # repository to check out
           repository: ${{ env.DOXYGEN_REPO }}

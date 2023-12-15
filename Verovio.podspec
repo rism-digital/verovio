@@ -1,21 +1,21 @@
 Pod::Spec.new do |s|
   s.name           = 'Verovio'
-  s.version        = '4.1.0-dev'
-  s.license        = { :type => 'LGPL' }
+  s.version        = '4.2.0-dev'
+  s.license        = { :type => 'LGPL', :file => 'COPYING' }
   s.homepage       = 'https://www.verovio.org/index.xhtml'
   s.authors        = { 'Contributors List' => 'https://github.com/rism-digital/verovio/graphs/contributors' }
   s.summary        = 'Verovio'
   s.source         = { :git => 'https://github.com/rism-digital/verovio.git', :tag => 'version-' + s.version.to_s }
-  s.swift_versions = ['3.0', '4.0', '4.1', '4.2', '5.0','5.1']
+  s.swift_versions = ['3.0', '4.0', '4.1', '4.2', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7']
   s.source_files        = 'src/**/*.{h,cpp,cc}',
-                          'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
-                          'libmei/{dist,addons}/*.{h,cpp}'
+                        'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
+                        'libmei/{dist,addons}/*.{h,cpp}'
   s.public_header_files = 'src/**/*.{h}',
                           'include/{crc,hum,json,midi,pugi,utf8,vrv,zip}/*.{h,hpp}',
                           'libmei/{dist,addons}/*.{h}'
   s.resources      = 'data'
-  s.ios.deployment_target = '10.0'
-  s.osx.deployment_target = '10.13'
+  s.ios.deployment_target = '14.0'
+  s.osx.deployment_target = '10.15'
   s.pod_target_xcconfig = {
       "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
       "CLANG_CXX_LIBRARY" => "libc++",
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
       "MTL_FAST_MATH" => "YES",
       "SUPPORTS_UIKITFORMAC" => "NO",
       "MTL_ENABLE_DEBUG_INFO" => "NO",
-      "PRODUCT_BUNDLE_IDENTIFIER" => "com.rism.VerovioFramework"
+      "PRODUCT_BUNDLE_IDENTIFIER" => "digital.rism.VerovioFramework"
     }
 end
 

@@ -86,7 +86,7 @@ enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SM
 // Option
 //----------------------------------------------------------------------------
 
-enum class OptionsCategory { None, Base, General, Layout, Margins, Midi, Selectors, Full };
+enum class OptionsCategory { None, Base, General, Layout, Mensural, Margins, Midi, Selectors, Full };
 
 /**
  * This class is a base class of each styling parameter
@@ -626,8 +626,6 @@ public:
     OptionBool m_incip;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
-    OptionBool m_ligatureAsBracket;
-    OptionBool m_mensuralToMeasure;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_moveScoreDefinitionToStaff;
@@ -825,6 +823,14 @@ public:
 
     OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
+
+    /**
+     * Mensural
+     */
+    OptionGrp m_mensural;
+
+    OptionBool m_ligatureAsBracket;
+    OptionBool m_mensuralToMeasure;
 
     /**
      * Deprecated options

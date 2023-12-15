@@ -4093,7 +4093,7 @@ AttOctave::AttOctave() : Att()
 
 void AttOctave::ResetOctave()
 {
-    m_oct = -127;
+    m_oct = MEI_UNSET_OCT;
 }
 
 bool AttOctave::ReadOctave(pugi::xml_node element, bool removeAttr)
@@ -4119,7 +4119,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 
 bool AttOctave::HasOct() const
 {
-    return (m_oct != -127);
+    return (m_oct != MEI_UNSET_OCT);
 }
 
 //----------------------------------------------------------------------------
@@ -4133,7 +4133,7 @@ AttOctaveDefault::AttOctaveDefault() : Att()
 
 void AttOctaveDefault::ResetOctaveDefault()
 {
-    m_octDefault = -127;
+    m_octDefault = MEI_UNSET_OCT;
 }
 
 bool AttOctaveDefault::ReadOctaveDefault(pugi::xml_node element, bool removeAttr)
@@ -4159,7 +4159,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 
 bool AttOctaveDefault::HasOctDefault() const
 {
-    return (m_octDefault != -127);
+    return (m_octDefault != MEI_UNSET_OCT);
 }
 
 //----------------------------------------------------------------------------
@@ -5814,7 +5814,7 @@ AttStaffLocPitched::AttStaffLocPitched() : Att()
 void AttStaffLocPitched::ResetStaffLocPitched()
 {
     m_ploc = PITCHNAME_NONE;
-    m_oloc = -127;
+    m_oloc = MEI_UNSET_OCT;
 }
 
 bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element, bool removeAttr)
@@ -5854,7 +5854,7 @@ bool AttStaffLocPitched::HasPloc() const
 
 bool AttStaffLocPitched::HasOloc() const
 {
-    return (m_oloc != -127);
+    return (m_oloc != MEI_UNSET_OCT);
 }
 
 //----------------------------------------------------------------------------

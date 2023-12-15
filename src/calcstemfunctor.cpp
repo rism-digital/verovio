@@ -58,6 +58,7 @@ FunctorCode CalcStemFunctor::VisitBeam(Beam *beam)
     if (!beam->HasCoords()) {
         beam->InitCoords(beamChildren, staff, beam->GetPlace());
         const bool isCue = ((beam->GetCue() == BOOLEAN_true) || beam->GetFirstAncestor(GRACEGRP));
+        beam->InitGraceStemDir(beam->GetFirstAncestor(GRACEGRP));
         beam->InitCue(isCue);
     }
 

@@ -158,6 +158,12 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
     }
+    else if (layerElement->Is(MENSUR)) {
+        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
+    }
+    else if (layerElement->Is(METERSIG)) {
+        this->m_currentMeterSig = vrv_cast<MeterSig *>(layerElement);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -793,8 +799,7 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
     const int startTime = m_totalTime + m_lastNote->GetScoreTimeOnset();
-    const Text *text = vrv_cast<const Text *>(syl->GetChild(0, TEXT));
-    const std::string sylText = UTF32to8(text->GetText());
+    const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
 

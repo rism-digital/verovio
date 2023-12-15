@@ -29,6 +29,7 @@
 #include "neume.h"
 #include "page.h"
 #include "rend.h"
+#include "score.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -785,8 +786,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             parent = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
             assert(parent);
             newStaff = new Staff(1);
-            newStaff->m_drawingStaffDef
-                = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(STAFFDEF));
+            newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
+                m_doc->GetCorrespondingScore(parent)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -1305,20 +1306,10 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
 
     // find closest neume
     ListOfObjects neumes;
-    Object *neume;
-    assert(neume);
     ClassIdComparison ac(NEUME);
     staff->FindAllDescendantsByComparison(&neumes, &ac);
-    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
-    if (neumes.size() > 0) {
-        ClosestNeume compN;
-        compN.x = ulx;
-        compN.y = uly;
 
-        std::sort(neumesVector.begin(), neumesVector.end(), compN);
-        neume = neumesVector.at(0);
-    }
-    else {
+    if (neumes.empty()) {
         LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
         m_infoObject.import("status", "FAILURE");
         m_infoObject.import(
@@ -1326,6 +1317,14 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         return false;
     }
 
+    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
+    ClosestNeume compN;
+    compN.x = ulx;
+    compN.y = uly;
+    std::sort(neumesVector.begin(), neumesVector.end(), compN);
+
+    Object *neume = neumesVector.at(0);
+    assert(neume);
     // get nearest syllable using nearest neume
     Object *syllable = neume->GetParent();
     assert(syllable);
