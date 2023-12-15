@@ -1246,7 +1246,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         this->DrawStaffLines(dc, staff, measure, system);
     }
 
-    if (staffDef && (staffDef->GetNotationtype() != NOTATIONTYPE_neume) && (m_doc->GetType() != Facs)) {
+    if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
     }
 

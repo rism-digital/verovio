@@ -15,6 +15,7 @@
 #include "mrest.h"
 #include "nc.h"
 #include "rest.h"
+#include "score.h"
 #include "staff.h"
 #include "tuning.h"
 
@@ -26,7 +27,10 @@ namespace vrv {
 // CalcAlignmentPitchPosFunctor
 //----------------------------------------------------------------------------
 
-CalcAlignmentPitchPosFunctor::CalcAlignmentPitchPosFunctor(Doc *doc) : DocFunctor(doc) {}
+CalcAlignmentPitchPosFunctor::CalcAlignmentPitchPosFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_octDefault = MEI_UNSET_OCT;
+}
 
 FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerElement)
 {
@@ -36,6 +40,15 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     Staff *staffY = layerElement->GetAncestorStaff();
     Layer *layerY = vrv_cast<Layer *>(layerElement->GetFirstAncestor(LAYER));
     assert(layerY);
+
+    PitchInterface *pitchInterface = layerElement->GetPitchInterface();
+    if (pitchInterface) {
+        pitchInterface->SetOctDefault(m_octDefault);
+        // Check if there is a octave default for the staff - ignore cross-staff for this and use staffY
+        if (m_octDefaultForStaffN.count(staffY->GetN()) > 0) {
+            pitchInterface->SetOctDefault(m_octDefaultForStaffN.at(staffY->GetN()));
+        }
+    }
 
     if (layerElement->m_crossStaff && layerElement->m_crossLayer) {
         layerElementY = layerElement->m_crossLayer->GetAtPos(layerElement->GetDrawingX());
@@ -94,7 +107,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             loc = staffY->m_drawingTuning->CalcPitchPos(
                 note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
         }
-        else if ((note->HasPname() && note->HasOct()) || note->HasLoc()) {
+        else if ((note->HasPname() && (note->HasOct() || note->HasOctDefault())) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
         }
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
@@ -308,6 +321,33 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
         nc->SetDrawingLoc(loc);
         nc->SetDrawingYRel(yRel);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitScore(Score *score)
+{
+    ScoreDef *scoreDef = score->GetScoreDef();
+    if (scoreDef) {
+        scoreDef->Process(*this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitScoreDef(ScoreDef *scoreDef)
+{
+    m_octDefaultForStaffN.clear();
+    m_octDefault = scoreDef->GetOctDefault();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode CalcAlignmentPitchPosFunctor::VisitStaffDef(StaffDef *staffDef)
+{
+    if (staffDef->HasOctDefault() && staffDef->HasN()) {
+        m_octDefaultForStaffN[staffDef->GetN()] = staffDef->GetOctDefault();
     }
 
     return FUNCTOR_CONTINUE;

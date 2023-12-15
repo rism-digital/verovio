@@ -22,6 +22,7 @@
 namespace vrv {
 
 #define MEI_UNSET -0x7FFFFFFF
+#define MEI_UNSET_OCT -127
 
 /**
  * MEI virtual unit;

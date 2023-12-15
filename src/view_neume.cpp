@@ -238,14 +238,18 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         rotateOffset = 0;
     }
 
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
+    if (nc->HasLoc()) {
+        yValue = noteY + (nc->GetLoc() - 2 * (staffLineNumber - 1)) * (staffSize / 2);
     }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
+    else {
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
+        }
+        yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
     }
-
-    yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
         if (nc->GetCurve() == curvatureDirection_CURVE_a || nc->GetCurve() == curvatureDirection_CURVE_c) {

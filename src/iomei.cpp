@@ -914,12 +914,13 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
     if (this->IsTreeObject(object)) m_nodeStack.push_back(m_currentNode);
 
     if (object->Is(SCORE)) {
+        ScoreDef *scoreDef = vrv_cast<Score *>(object)->GetScoreDef();
         if (useCustomScoreDef) {
-            this->WriteCustomScoreDef();
+            this->WriteCustomScoreDef(scoreDef);
         }
         else {
             // Save the main scoreDef
-            m_doc->GetCurrentScoreDef()->SaveObject(this, this->GetBasic());
+            scoreDef->SaveObject(this, this->GetBasic());
         }
     }
 
@@ -1278,7 +1279,7 @@ void MEIOutput::WriteStackedObjectsEnd()
         [this](Object *object) { this->WriteObjectInternalEnd(object); });
 }
 
-void MEIOutput::WriteCustomScoreDef()
+void MEIOutput::WriteCustomScoreDef(ScoreDef *scoreDef)
 {
     // Determine the first measure with respect to the first filter match
     Measure *measure = NULL;
@@ -1305,8 +1306,8 @@ void MEIOutput::WriteCustomScoreDef()
     if (measure && refScoreDef) {
         // Create a copy of the reference scoredef and adjust it to keep track of clef changes, key signature changes,
         // etc.
-        ScoreDef *scoreDef = vrv_cast<ScoreDef *>(refScoreDef->Clone());
-        ListOfObjects staffDefs = scoreDef->FindAllDescendantsByType(STAFFDEF);
+        ScoreDef *customScoreDef = vrv_cast<ScoreDef *>(refScoreDef->Clone());
+        ListOfObjects staffDefs = customScoreDef->FindAllDescendantsByType(STAFFDEF);
         for (Object *staffDef : staffDefs) {
             this->AdjustStaffDef(vrv_cast<StaffDef *>(staffDef), measure);
         }
@@ -1319,7 +1320,7 @@ void MEIOutput::WriteCustomScoreDef()
         }
         if (!drawLabels) {
             // If not, replace labels by abbreviation or delete them
-            ListOfObjects labels = scoreDef->FindAllDescendantsByType(LABEL);
+            ListOfObjects labels = customScoreDef->FindAllDescendantsByType(LABEL);
             for (Object *label : labels) {
                 if (!this->AdjustLabel(vrv_cast<Label *>(label))) {
                     label->GetParent()->DeleteChild(label);
@@ -1328,11 +1329,11 @@ void MEIOutput::WriteCustomScoreDef()
         }
 
         // Save the adjusted score def and delete it afterwards
-        scoreDef->SaveObject(this, this->GetBasic());
-        delete scoreDef;
+        customScoreDef->SaveObject(this, this->GetBasic());
+        delete customScoreDef;
     }
     else {
-        m_doc->GetCurrentScoreDef()->SaveObject(this, this->GetBasic());
+        scoreDef->SaveObject(this, this->GetBasic());
     }
 }
 
@@ -1446,7 +1447,7 @@ bool MEIOutput::WriteDoc(Doc *doc)
 
     // ---- header ----
     if (!m_ignoreHeader) {
-        if (!m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
+        if (this->GetBasic() || !m_doc->m_header.first_child()) m_doc->GenerateMEIHeader(this->GetBasic());
         m_mei.append_copy(m_doc->m_header.first_child());
         // Add transposition in the revision list but not in mei-basic
         if (!this->GetBasic() && !m_doc->GetOptions()->m_transpose.GetValue().empty()) {
@@ -1457,8 +1458,12 @@ bool MEIOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
+    if (!m_doc->m_musicDecls.empty()) {
+        music.append_attribute("decls") = m_doc->m_musicDecls.c_str();
+    }
+
     Facsimile *facs = doc->GetFacsimile();
-    if ((facs != NULL) && (facs->GetChildCount() > 0)) {
+    if (!this->GetBasic() && (facs != NULL) && (facs->GetChildCount() > 0)) {
         pugi::xml_node facsimile = music.append_child("facsimile");
         this->WriteFacsimile(facsimile, facs);
         m_nodeStack.push_back(facsimile);
@@ -1709,9 +1714,6 @@ void MEIOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     this->WriteXmlId(currentNode, scoreDefElement);
-    scoreDefElement->WriteMeasureNumbers(currentNode);
-    scoreDefElement->WriteSpacing(currentNode);
-    scoreDefElement->WriteSystems(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -3079,10 +3081,14 @@ void MEIOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteBarring(element);
     interface->WriteDurationDefault(element);
     interface->WriteLyricStyle(element);
+    interface->WriteMeasureNumbers(element);
     interface->WriteMidiTempo(element);
     interface->WriteMmTempo(element);
     interface->WriteMultinumMeasures(element);
+    interface->WriteOctaveDefault(element);
     interface->WritePianoPedals(element);
+    interface->WriteSpacing(element);
+    interface->WriteSystems(element);
 }
 
 void MEIOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
@@ -4670,9 +4676,6 @@ bool MEIInput::ReadSystemMilestoneEnd(Object *parent, pugi::xml_node milestoneEn
 bool MEIInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     this->SetMeiID(element, object);
-    object->ReadMeasureNumbers(element);
-    object->ReadSpacing(element);
-    object->ReadSystems(element);
     object->ReadTyped(element);
 
     if (m_meiversion <= meiVersion_MEIVERSION_5_0) {
@@ -7351,10 +7354,14 @@ bool MEIInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadBarring(element);
     interface->ReadDurationDefault(element);
     interface->ReadLyricStyle(element);
+    interface->ReadMeasureNumbers(element);
     interface->ReadMidiTempo(element);
     interface->ReadMmTempo(element);
     interface->ReadMultinumMeasures(element);
+    interface->ReadOctaveDefault(element);
     interface->ReadPianoPedals(element);
+    interface->ReadSpacing(element);
+    interface->ReadSystems(element);
     return true;
 }
 
@@ -8046,7 +8053,7 @@ bool MEIInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     // LogDebug("%d %d %s!", startIdx, endIdx, start->GetID().c_str());
     for (int i = endIdx; i >= startIdx; --i) {
         LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
-        if (element) tuplet->AddChild(element);
+        if (element) tuplet->InsertChild(element, 0);
     }
     parentLayer->InsertChild(tuplet, startIdx);
 

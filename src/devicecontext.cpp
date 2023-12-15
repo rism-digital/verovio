@@ -316,6 +316,12 @@ void DeviceContext::AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend)
     tmp = advX * m_fontStack.top()->GetPointSize();
     advX = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
+    const int letterSpacing = m_fontStack.top()->GetLetterSpacing();
+    // This is not the first letter, add a letter spacing
+    if ((letterSpacing != 0) && (extend->m_width > 0)) {
+        extend->m_width += letterSpacing;
+    }
+
     // Changed because the width should only be the sum of advX
     // Alternatively we could add what is below 0 for the first and what is beyond the advx for the last
     // extend->m_width += std::max(partialWidth + x, advX);

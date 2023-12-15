@@ -403,7 +403,7 @@ AttPitchGes::AttPitchGes() : Att()
 
 void AttPitchGes::ResetPitchGes()
 {
-    m_octGes = -127;
+    m_octGes = MEI_UNSET_OCT;
     m_pnameGes = PITCHNAME_NONE;
     m_pnum = MEI_UNSET;
 }
@@ -449,7 +449,7 @@ bool AttPitchGes::WritePitchGes(pugi::xml_node element)
 
 bool AttPitchGes::HasOctGes() const
 {
-    return (m_octGes != -127);
+    return (m_octGes != MEI_UNSET_OCT);
 }
 
 bool AttPitchGes::HasPnameGes() const

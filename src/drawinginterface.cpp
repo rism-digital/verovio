@@ -261,8 +261,21 @@ void BeamDrawingInterface::InitCue(bool beamCue)
         });
     }
 
+    return;
+}
+
+void BeamDrawingInterface::InitGraceStemDir(bool graceGrp)
+{
+    if (!graceGrp) {
+        graceGrp = std::all_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
+            if (!coord->m_element) return false;
+            if (coord->m_element->IsGraceNote()) return true;
+            return false;
+        });
+    }
+
     // Always set stem direction to up for grace note beam unless stem direction is provided
-    if (m_cueSize && (m_notesStemDir == STEMDIRECTION_NONE)) {
+    if (graceGrp && (m_notesStemDir == STEMDIRECTION_NONE)) {
         m_notesStemDir = STEMDIRECTION_up;
     }
 }

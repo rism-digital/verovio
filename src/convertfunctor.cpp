@@ -541,6 +541,9 @@ FunctorCode ConvertMarkupAnalyticalFunctor::VisitNote(Note *note)
     }
     assert(check);
 
+    Object *currentMeasure = note->GetFirstAncestor(MEASURE);
+    assert(currentMeasure);
+
     std::vector<Note *>::iterator iter = m_currentNotes.begin();
     while (iter != m_currentNotes.end()) {
         // same octave and same pitch - this is the one!
@@ -553,7 +556,14 @@ FunctorCode ConvertMarkupAnalyticalFunctor::VisitNote(Note *note)
                 }
                 tie->SetStartid("#" + (*iter)->GetID());
                 tie->SetEndid("#" + note->GetID());
-                m_controlEvents.push_back(tie);
+                // Add it to the starting measure when we are already in the next one
+                Object *startMeasure = (*iter)->GetFirstAncestor(MEASURE);
+                if (startMeasure && (startMeasure != currentMeasure)) {
+                    startMeasure->AddChild(tie);
+                }
+                else {
+                    m_controlEvents.push_back(tie);
+                }
             }
             else {
                 LogWarning("Expected @tie median or terminal in note '%s', skipping it", note->GetID().c_str());

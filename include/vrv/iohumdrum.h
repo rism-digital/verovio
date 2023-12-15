@@ -366,12 +366,19 @@ public:
     bool empty = true;
 
     // boolean switches:
-    char nostem = '\0'; // !!!RDF**kern: N = no stem
-    char cuesize = '\0'; // !!!RDF**kern: @ = cue size
-    char terminallong = '\0'; // !!!RDF**kern: l = terminal long
-    char terminalbreve = '\0'; // !!!RDF**kern: l = terminal breve
-    std::vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-    std::vector<std::string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    std::string nostem; // !!!RDF**kern: N = no stem
+    std::string cuesize; // !!!RDF**kern: @ = cue size
+
+    std::string kernTerminalLong; // !!!RDF**kern: l = terminal long
+    std::string kernTerminalBreve; // !!!RDF**kern: l = terminal breve
+
+    std::string mensTerminalLong; // !!!RDF**mens: l = terminal long
+    std::string mensTerminalBreve; // !!!RDF**mens: l = terminal breve
+
+    std::vector<string> editaccKern; // !!!RDF**kern: i = editorial accidental
+    std::vector<string> editaccMens; // !!!RDF**mens: z = editorial accidental
+    std::vector<std::string> edittypeKern; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    std::vector<std::string> edittypeMens; // !!!RDF**mens: z = editoral accidental, brack[ets]/paren[theses]
 
     // for **dynam:
     std::string cresctext; // !!!RDF**kern: > = "cresc."
@@ -379,8 +386,8 @@ public:
     std::string decresctext; // !!!RDF**kern: > = "decresc."
     std::string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
 
-    char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
-    char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
+    std::string below; // !!!RDF**kern: < = below (previous signifier is "below")
+    std::string above; // !!!RDF**kern: > = above (previous signifier is "above")
 
     std::string phrase_color; // for global stying of phrase markers
     std::string phrase_style; // for global stying of phrase markers
@@ -398,29 +405,76 @@ public:
     // default is red if no color given:
     // !!!RDF**kern: i = matched note
     // !!!RDF**kern: i = marked note
-    std::vector<char> mark;
+    std::vector<string> mark;
     std::vector<std::string> mcolor;
     std::vector<std::string> markdir;
 
     // Coloring of **mens notes (not for coloration).
     // default color is hotpink, since red is used for
     // colored notes in black notation.
-    std::vector<char> mens_mark;
+    std::vector<string> mens_mark;
     std::vector<std::string> mens_mcolor;
     std::vector<std::string> mens_markdir;
 
     // Coloring of **text:
-    std::vector<char> textmark;
+    std::vector<string> textmark;
     std::vector<std::string> textcolor;
 
     // Articulation signfiers
-    char hairpinAccent = '\0'; // For <> accent on a note.
-    char verticalStroke = '\0'; // For horizontal stroke ornament
-    char lhpizz = '\0'; // For left-hand pizzicato
-    char tremolo = '\0'; // For unmeasured tremolo slashes
+    std::string hairpinAccent; // For <> accent on a note.
+    std::string verticalStroke; // For horizontal stroke ornament
+    std::string lhpizz; // For left-hand pizzicato
+    std::string tremolo; // For unmeasured tremolo slashes
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
+
+struct HumdrumReferenceItem {
+    std::string lineText; // the full text of the HumdrumLine containing this item,
+                          // e.g. "!!!OTL2@FR:Le deuxième titre Français"
+    std::string key; // the interpreted key, with key, index, isTranslated, language stripped out
+                     // e.g. "OTL" (if not parseable, we get everything between "!!!" and ":")
+    std::string value; // the value (everything after the ':')
+                       // e.g. "Le deuxième titre Français"
+    bool isParseable = false; // true if we could parse out key, index, isTranslated, language
+                              // e.g. true
+    bool isHumdrumKey = false; // true if isParseable and key is in the known list of Humdrum keys
+                               // e.g. true
+    bool isTranslated = false; // true if single '@' (not '@@') is present
+                               // e.g. true
+    std::string language; // the language, if present, lowercased
+                          // e.g. "fr"
+    int index = -1; // the index (0 if not present)
+                    // e.g. 2
+};
+
+struct DateWithErrors {
+    bool valid = false; // if false, ignore everything here, the date was not parseable.
+    std::string dateError; // error of the entire date ("", "approximate", "uncertain")
+    int year;
+    std::string yearError; // error of the year ("", "approximate", "uncertain")
+    int month;
+    std::string monthError; // error of the month ("", "approximate", "uncertain")
+    int day;
+    std::string dayError; // error of the day ("", "approximate", "uncertain")
+    int hour;
+    std::string hourError; // error of the hour ("", "approximate", "uncertain")
+    int minute;
+    std::string minuteError; // error of the minute ("", "approximate", "uncertain")
+    int second;
+    std::string secondError; // error of the second ("", "approximate", "uncertain")
+};
+
+struct DateConstruct {
+    // constructType can be any of "" (invalid), "DateSingle" (one date), "DateRelative"
+    // (one date, qualifier="before" or "after"), "DateBetween" (two dates), "DateSelection"
+    // (N dates, qualifier="and" or "or"), or "DateConstructRange" (two DateConstructs).
+    std::string constructType; // if type is "", ignore everything here, the date construct was not parseable.
+    std::string dateConstructError; // error of the entire DateConstruct
+    std::string qualifier;
+    std::vector<DateWithErrors> dates; // empty for "DateConstructRange"
+    std::vector<DateConstruct> dateConstructs; // only used for "DateConstructRange" (has two elements in that case)
+};
 
 //----------------------------------------------------------------------------
 // HumdrumInput
@@ -483,7 +537,7 @@ protected:
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
     void addBreath(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(vrv::Object *linked, hum::HTp token);
-    void addTurn(hum::HTp token, const string &tok, int noteIndex);
+    void addTurn(hum::HTp token, const std::string &tok, int noteIndex);
     void addMordent(vrv::Object *linked, hum::HTp token);
     void addOrnaments(vrv::Object *object, hum::HTp token);
     void addArpeggio(vrv::Object *object, hum::HTp token);
@@ -597,7 +651,7 @@ protected:
     void embedQstampInClass(vrv::Space *irest, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
-    void splitSyllableBySpaces(vector<std::string> &vtext, char spacer = ' ');
+    void splitSyllableBySpaces(std::vector<std::string> &vtext, char spacer = ' ');
     void addDefaultTempo(ScoreDef *scoreDef);
     int getChordNoteCount(hum::HTp token);
     bool isLeftmostSystemArpeggio(hum::HTp token);
@@ -724,7 +778,7 @@ protected:
     bool hasLayoutParameter(hum::HTp token, const std::string &category, const std::string &param);
     void assignTupletScalings(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &catkey,
-        const string &trueString, const string &falseString = "");
+        const std::string &trueString, const std::string &falseString = "");
     void analyzeClefNulls(hum::HumdrumFile &infile);
     void markAdjacentNullsWithClef(hum::HTp clef);
     void markOtherClefsAsChange(hum::HTp clef);
@@ -745,12 +799,12 @@ protected:
     void addPlicaUp(Note *note);
     void addPlicaDown(Note *note);
     void setLayoutSlurDirection(Slur *slur, hum::HTp token);
-    void setFontStyle(Rend *rend, const string &fontstyle);
+    void setFontStyle(Rend *rend, const std::string &fontstyle);
     void setFontWeight(Rend *rend, const std::string &fontweight);
     void importVerovioOptions(Doc *doc);
     void adjustChordNoteDurations(Chord *chord, std::vector<Note *> &notes, std::vector<string> &tstrings);
     void adjustChordNoteDuration(Note *note, hum::HumNum hdur, int dur, int dots, hum::HumNum chorddur,
-        const string &tstring, hum::HumNum factor);
+        const std::string &tstring, hum::HumNum factor);
     void setNoteMeiDur(Note *note, int meidur);
     void storeExpansionListsInChoice(Section *section, std::vector<hum::HTp> &expansions);
     double getMmTempo(hum::HTp token, bool checklast = false);
@@ -767,7 +821,7 @@ protected:
     void addBarLineElement(hum::HTp bartok, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void prepareFingerings(hum::HumdrumFile &infile);
     void prepareFingerings(hum::HTp fstart);
-    std::string getLoColor(hum::HTp token, const string &category, int subtoken = 0);
+    std::string getLoColor(hum::HTp token, const std::string &category, int subtoken = 0);
     bool isTieAllowedToHang(hum::HTp token);
     void analyzeVerseColor(hum::HumdrumFile &infile);
     void analyzeVerseColor(hum::HTp &token);
@@ -804,8 +858,8 @@ protected:
     void analyzeHarmInterpretations(hum::HTp starttok);
     void analyzeDegreeInterpretations(hum::HTp starttok);
     void analyzeTextInterpretation(hum::HTp starttok);
-    void addHarmLabel(
-        hum::HumNum timestamp, const std::string &label, const std::string &n, const std::string &place, int staffNum);
+    void addHarmLabel(hum::HumNum timestamp, const std::string &label, const std::string &labelStyle,
+        const std::string &n, const std::string &place, int staffNum);
     std::u32string getMoveableDoName(hum::HTp token, int degree, int semitones);
     void setFontsizeForHarm(Harm *harm, const std::string &fontsize);
     void setFontStyleForHarm(Harm *harm, const std::string &style);
@@ -825,7 +879,7 @@ protected:
     void checkForLineContinuations(hum::HTp token);
     std::u32string convertNumberToWstring(int number);
     void appendTextToRend(Rend *rend, const std::string &content);
-    void parseMultiVerovioOptions(std::map<std::string, std::string> &parameters, const string &input);
+    void parseMultiVerovioOptions(std::map<std::string, std::string> &parameters, const std::string &input);
     void addSforzandoToNote(hum::HTp token, int staffindex);
     void addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp line, const std::string &letters, int staffindex,
         int staffadj, int trackdiff);
@@ -838,17 +892,40 @@ protected:
         int staffindex, std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HTp token);
     int getKeySignatureNumber(const std::string &humkeysig);
     int getStaffNumForSpine(hum::HTp token);
-    bool checkIfReversedSpineOrder(std::vector<hum::HTp> staffstarts);
+    bool checkIfReversedSpineOrder(std::vector<hum::HTp> &staffstarts);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
-    void insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references);
-    void insertExtMeta(std::vector<hum::HumdrumLine *> &references);
-    void addPerson(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references,
-        const std::string &key, const std::string &role);
-    void getRespPeople(std::vector<std::vector<std::string>> &respPeople, std::vector<hum::HumdrumLine *> &references);
-    void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string>> &respPeople);
-    void insertPeople(pugi::xml_node &work, std::vector<std::vector<std::string>> &respPeople);
+    void createFileDesc(pugi::xml_node meiHead);
+    void createDigitalSource(pugi::xml_node sourceDesc);
+    void createPrintedSource(pugi::xml_node sourceDesc);
+    void createRecordedSource(pugi::xml_node sourceDesc);
+    void createUnpublishedSource(pugi::xml_node sourceDesc);
+    void createEncodingDesc(pugi::xml_node meiHead);
+    void createWorkList(pugi::xml_node meiHead);
+    void createHumdrumVerbatimExtMeta(pugi::xml_node meiHead);
+    void createBackMatter();
+    void createSimpleTitleElement();
+    void createSimpleComposerElements();
+    void createTitleElements(pugi::xml_node element);
+    void createComposerElements(pugi::xml_node element);
+    void fillInIsoDate(pugi::xml_node element, const std::string &dateString);
+    std::map<std::string, std::string> isoDateAttributesFromHumdrumDate(
+        const std::string &inHumdrumDate, bool edtf = false);
+    DateConstruct dateConstructFromHumdrumDate(const std::string &dateString);
+    std::map<std::string, std::string> isoDateAttributesFromDateConstruct(
+        const DateConstruct &dateConstruct, bool edtf, bool isEdgeOfDateConstructRange = false);
+    std::string isoDateFromDateWithErrors(const DateWithErrors &dateWithErrors, bool edtf);
+    DateWithErrors dateWithErrorsFromHumdrumDate(const std::string &dateString);
+    bool sanityCheckDate(int year, int month, int day, int hour, int minute, int second);
+    std::string stripDateError(std::string &value);
+    std::string getTextListLanguage(const std::vector<HumdrumReferenceItem> &textItems);
+    std::map<std::string, std::vector<HumdrumReferenceItem>> getAllReferenceItems(hum::HumdrumFile &infile);
+    std::vector<HumdrumReferenceItem> getReferenceItems(const std::string &key);
+    bool anyReferenceItemsExist(const std::vector<string> &keys);
+    int getBestItem(const std::vector<HumdrumReferenceItem> &items, const std::string &requiredLanguage);
+    bool isStandardHumdrumKey(const std::string &key);
+    void appendText(pugi::xml_node element, std::string text);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
@@ -906,8 +983,8 @@ protected:
     template <class ELEMENT> void addDurRecip(ELEMENT element, const std::string &ttoken);
     template <class ELEMENT> void addFermata(ELEMENT *rest, const std::string &tstring);
     template <class ELEMENT> void storeExpansionList(ELEMENT *parent, hum::HTp etok);
-    template <class ELEMENT> void setWrittenAccidentalUpper(ELEMENT element, const string &value);
-    template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const string &value);
+    template <class ELEMENT> void setWrittenAccidentalUpper(ELEMENT element, const std::string &value);
+    template <class ELEMENT> void setWrittenAccidentalLower(ELEMENT element, const std::string &value);
     template <class ELEMENT> void attachToToken(ELEMENT *element, hum::HTp token);
     template <class ELEMENT> void setAttachmentType(ELEMENT *element, hum::HTp token);
     template <class ELEMENT>
@@ -922,7 +999,6 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static hum::HumNum nextHigherPowerOfTwo(hum::HumNum x);
     static std::string getDateString();
-    static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     static bool replace(std::u32string &str, const std::u32string &oldStr, const std::u32string &newStr);
 
@@ -1157,13 +1233,13 @@ private:
     std::vector<Slur *> m_ftrem_slurs;
 
     // m_group_name == used to store group names, such as *I""trumpets
-    std::map<int, string> m_group_name;
+    std::map<int, std::string> m_group_name;
 
     // m_group_name_tok == used to store group names, such as *I""trumpets
     std::map<int, hum::HTp> m_group_name_tok;
 
     // m_group_abbr == used to store group abbreviations, such as *I""trps.
-    std::map<int, string> m_group_abbr;
+    std::map<int, std::string> m_group_abbr;
 
     // m_group_abbr_tok == used to store group abbreviations, such as *I""trps.
     std::map<int, hum::HTp> m_group_abbr_tok;
@@ -1204,6 +1280,114 @@ private:
     // m_textSmuflSpace = space to give between SMuFL characters
     // (excluding augmentation dots).
     std::string m_textSmuflSpacer = "\xc2\xa0";
+
+    // Some metadata elements that are computed once and used multiple times
+    std::vector<hum::HumdrumLine *> m_humdrumLineReferences;
+    std::map<std::string, std::vector<HumdrumReferenceItem>> m_references;
+    pugi::xml_document m_simpleTitleDoc;
+    pugi::xml_node m_simpleTitle;
+    pugi::xml_document m_simpleComposersDoc;
+    pugi::xml_document m_madsDoc;
+    pugi::xml_node m_madsCollection;
+
+    std::vector<string> m_standardHumdrumKeys = {
+        "COM", // composer's name
+        "COA", // attributed composer
+        "COS", // suspected composer
+        "COL", // composer's abbreviated, alias, or stage name
+        "COC", // composer's corporate name
+        "CDT", // composer's birth and death dates (**zeit format)
+        "CBL", // composer's birth location
+        "CDL", // composer's death location
+        "CNT", // composer's nationality
+        "LYR", // lyricist's name
+        "LIB", // librettist's name
+        "LAR", // music arranger's name
+        "LOR", // orchestrator's name
+        "TXO", // original language of vocal/choral text
+        "TXL", // language of the encoded vocal/choral text
+        "TRN", // translator of the text
+        "RTL", // album title
+        "RMM", // manufacturer or sponsoring company
+        "RC#", // recording company's catalog number of album
+        "RRD", // release date (**date format)
+        "RLC", // place of recording
+        "RNP", // producer's name
+        "RDT", // date of recording (**date format)
+        "RT#", // track number
+        "MGN", // Humdrum encodes, say, a MIDI performance)
+        "MPN", // ensemble's name
+        "MPS", // performer's name
+        "MRD", // suspected performer
+        "MLC", // date of performance (**date format)
+        "MCN", // place of performance
+        "MPD", // conductor's name
+        "MDT", // date of first performance (**date format)
+        "OTL", // I've seen 'em (another way to say date of performance?)
+        "OTP", // title
+        "OTA", // popular title
+        "OPR", // alternative title
+        "OAC", // title of parent work
+        "OSC", // act number (e.g. '2' or 'Act 2')
+        "OMV", // scene number (e.g. '3' or 'Scene 3')
+        "OMD", // movement number (e.g. '4', or 'mov. 4', or...)
+        "OPS", // movement name
+        "ONM", // opus number (e.g. '23', or 'Opus 23')
+        "OVM", // number (e.g. number of song within ABC multi-song file)
+        "ODE", // volume number (e.g. '6' or 'Vol. 6')
+        "OCO", // dedicated to
+        "OCL", // commissioned by
+        "ONB", // collected/transcribed by
+        "ODT", // free form note related to title or identity of work
+        "OCY", // date or period of composition (**date or **zeit format)
+        "OPC", // country of composition
+        "GTL", // city, town, or village of composition
+        "GAW", // group title (e.g. 'The Seasons')
+        "GCO", // associated work, such as a play or film
+        "PUB", // publication status 'published'/'unpublished'
+        "PED", // publication editor
+        "PPR", // first publisher
+        "PDT", // date first published (**date format)
+        "PTL", // publication (volume) title
+        "PPP", // place first published
+        "PC#", // publisher's catalog number (NOT scholarly catalog)
+        "SCT", // scholarly catalog abbrev/number (e.g. 'BWV 551')
+        "SCA", // scholarly catalog (unabbreviated) (e.g. 'Koechel 117')
+        "SMS", // unpublished manuscript source name
+        "SML", // unpublished manuscript location
+        "SMA", // acknowledgment of manuscript access
+        "YEP", // publisher of electronic edition
+        "YEC", // date and owner of electronic copyright
+        "YER", // date electronic edition released
+        "YEM", // copyright message (e.g. 'All rights reserved')
+        "YEN", // country of copyright
+        "YOR", // original document from which encoded doc was prepared
+        "YOO", // original document owner
+        "YOY", // original copyright year
+        "YOE", // original editor
+        "EED", // electronic editor
+        "ENC", // electronic encoder (person)
+        "END", // encoding date
+        "EMD", // electronic document modification description (one/mod)
+        "EEV", // electronic edition version
+        "EFL", // file number e.g. '1/4' for one of four
+        "EST", // encoding status (usually deleted before distribution)
+        "VTS", // checksum (excluding the VTS line itself)
+        "ACO", // collection designation
+        "AFR", // form designation
+        "AGN", // genre designation
+        "AST", // style, period, or type of work designation
+        "AMD", // mode classification e.g. '5; Lydian'
+        "AMT", // metric classification, must be one of eight names, e.g. 'simple quadruple'
+        "AIN", // instrumentation, must be alphabetical list of *I abbrevs, space-delimited
+        "ARE", // geographical region of origin (list of 'narrowing down' names of regions)
+        "ARL", // geographical location of origin (lat/long)
+        "HAO", // aural history (lots of text, stories about the work)
+        "HTX", // freeform translation of vocal text
+        "RLN", // Extended ASCII language code
+        "RNB", // a note about the representation
+        "RWB" // a warning about the representation
+    };
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

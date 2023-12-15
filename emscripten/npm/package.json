@@ -1,6 +1,6 @@
 {
   "name": "verovio",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "This is the stable version of the verovio package",
   "main": "dist/verovio-toolkit-wasm.js",
   "exports": {

@@ -960,6 +960,16 @@ FunctorCode PreparePointersByLayerFunctor::VisitLayerElement(LayerElement *layer
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PreparePointersByLayerFunctor::VisitMeasureEnd(Measure *measure)
+{
+    if (m_lastDot) {
+        m_lastDot->m_drawingNextElement = measure->GetRightBarLine();
+        m_lastDot = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 //----------------------------------------------------------------------------
 // PrepareLyricsFunctor
 //----------------------------------------------------------------------------
@@ -1360,10 +1370,10 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
     }
 
     // This is happening only for the first staff element of the staff @n
-    if (StaffDef *staffDef = m_doc->GetCurrentScoreDef()->GetStaffDef(staff->GetN())) {
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
-            || ((staffDef->GetMultiNumber() != BOOLEAN_true)
-                && (m_doc->GetCurrentScoreDef()->GetMultiNumber() == BOOLEAN_false));
+            || ((staffDef->GetMultiNumber() != BOOLEAN_true) && (scoreDef->GetMultiNumber() == BOOLEAN_false));
         if (hideNumber) {
             // Set it just in case, but stopping the functor should do it for this staff @n
             m_multiNumber = BOOLEAN_false;
