@@ -1,6 +1,8 @@
 # Changelog
 
 ## [unreleased]
+
+## [4.1.0] - 2023-12-15
 * Support for staves ordered by `scoreDef`
 * Support for `rend@letterspacing` and `syl@letterspacing` in MEI vu
 * Support for `nc@loc`
