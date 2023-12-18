@@ -3694,14 +3694,12 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(node);
     assert(section);
 
-    int pageBreaks = node.attribute("blank-page").as_int();
-    if (node.attribute("new-page").as_bool() || pageBreaks > 0) {
-        pageBreaks++;
-    }
-
-    for (int i = 0; i < pageBreaks; i++) {
-        Pb *pb = new Pb();
-        section->AddChild(pb);
+    if (node.attribute("new-page").as_bool()) {
+        int pageBreaks = node.attribute("blank-page").as_int() + 1;
+        for (int i = 0; i < pageBreaks; ++i) {
+            Pb *pb = new Pb();
+            section->AddChild(pb);
+        }
     }
 
     if (node.attribute("new-system").as_bool()) {
