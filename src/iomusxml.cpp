@@ -3695,8 +3695,11 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(section);
 
     if (node.attribute("new-page").as_bool()) {
-        Pb *pb = new Pb();
-        section->AddChild(pb);
+        const int pageBreaks = node.attribute("blank-page").as_int() + 1;
+        for (int i = 0; i < pageBreaks; ++i) {
+            Pb *pb = new Pb();
+            section->AddChild(pb);
+        }
     }
 
     if (node.attribute("new-system").as_bool()) {
