@@ -99,3 +99,4 @@ Release/
 # Intermediate font files
 fonts/**/tmp
 libmei/tools/__pycache__
+doc/.venv

@@ -118,7 +118,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // New id
     this->GenerateID();
     // For now do not copy them
-    // m_unsupported = object.m_unsupported;
+    m_unsupported = object.m_unsupported;
 
     if (!object.CopyChildren()) {
         return;
@@ -164,7 +164,7 @@ Object &Object::operator=(const Object &object)
         // New id
         this->GenerateID();
         // For now do now copy them
-        // m_unsupported = object.m_unsupported;
+        m_unsupported = object.m_unsupported;
         LinkingInterface *link = this->GetLinkingInterface();
         if (link) link->AddBackLink(&object);
 
@@ -1018,9 +1018,6 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
         return;
     }
 
-    // Update the current score stored in the document
-    this->UpdateDocumentScore(functor.GetDirection());
-
     if (!skipFirst) {
         FunctorCode code = this->Accept(functor);
         functor.SetCode(code);
@@ -1074,9 +1071,6 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     if (functor.GetCode() == FUNCTOR_STOP) {
         return;
     }
-
-    // Update the current score stored in the document
-    const_cast<Object *>(this)->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
         FunctorCode code = this->Accept(functor);
@@ -1144,26 +1138,6 @@ FunctorCode Object::AcceptEnd(Functor &functor)
 FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
 {
     return functor.VisitObjectEnd(this);
-}
-
-void Object::UpdateDocumentScore(bool direction)
-{
-    // When we are starting a new score, we need to update the current score in the document
-    if (direction == FORWARD && this->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(this);
-        assert(score);
-        score->SetAsCurrent();
-    }
-    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
-        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
-        assert(elementEnd);
-        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
-            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
-            assert(score);
-            score->SetAsCurrent();
-        }
-    }
 }
 
 bool Object::SkipChildren(bool visibleOnly) const

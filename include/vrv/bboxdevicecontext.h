@@ -115,7 +115,7 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+    void StartGraphic(Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID = PRIMARY,
         bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
     ///@}

@@ -168,7 +168,7 @@ defaults:
     data_MIDIVALUE_PAN:
         data_MIDIVALUE_PAN()
     data_OCTAVE:
-        -127
+        MEI_UNSET_OCT
     data_SUMMAND_List:
         std::vector<int>()
     xsdAnyURI_List:
