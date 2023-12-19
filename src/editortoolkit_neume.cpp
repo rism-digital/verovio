@@ -2145,10 +2145,11 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     Object *obj = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
     assert(obj);
     bool result = false;
-    bool isNeumeOrNc, isNc, isClef;
+    bool isNeumeOrNc, isNc, isClef, isSyllable;
     isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
     isNc = obj->Is(NC);
     isClef = obj->Is(CLEF);
+    isSyllable = obj->Is(SYLLABLE);
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo.import("uuid", elementId);
@@ -2205,8 +2206,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             pi->AdjustPitchForNewClef(clef, previousClef);
         }
     }
-
-    if (obj->Is(SYLLABLE)) {
+    else if (isSyllable) {
         Syllable *syllable = dynamic_cast<Syllable *>(obj);
         assert(syllable);
         if (syllable->HasPrecedes() || syllable->HasFollows()) {
