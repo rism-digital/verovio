@@ -880,22 +880,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-        ulx -= noteWidth / 2;
-
-        // calculate staff rotation offset
-        double theta = staff->GetDrawingRotate();
-        int offsetY = 0;
-        if (theta) {
-            double factor = 1.3;
-            offsetY = (int)((ulx - staff->GetFacsimileInterface()->GetZone()->GetUlx()) * tan(theta * M_PI / 180.0)
-                / factor);
-        }
 
         // Set up facsimile
         zone->SetUlx(ulx);
-        zone->SetUly(uly + offsetY);
+        zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
-        zone->SetLry(uly + offsetY + noteHeight);
+        zone->SetLry(uly + noteHeight);
 
         // add syl bounding box if Facs
         if (m_doc->GetType() == Facs) {
@@ -903,17 +893,25 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             assert(fi);
             sylZone = new Zone();
 
-            int draw_h = staff->GetHeight();
-            int staffUly = staff->GetDrawingY();
+            int staffLry = staff->GetFacsimileInterface()->GetZone()->GetLry();
 
             // width height and offset can be adjusted
             int bboxHeight = 175;
             int bboxOffsetX = 50;
 
+            // calculate staff rotation offset
+            double theta = staff->GetDrawingRotate();
+            int offsetY = 0;
+            if (theta) {
+                double factor = 1.3;
+                offsetY = (int)((ulx - staff->GetFacsimileInterface()->GetZone()->GetUlx()) * tan(theta * M_PI / 180.0)
+                    / factor);
+            }
+
             sylZone->SetUlx(ulx);
-            sylZone->SetUly(staffUly + draw_h + offsetY);
+            sylZone->SetUly(staffLry + offsetY);
             sylZone->SetLrx(ulx + noteWidth + bboxOffsetX);
-            sylZone->SetLry(staffUly + draw_h + offsetY + bboxHeight);
+            sylZone->SetLry(staffLry + offsetY + bboxHeight);
             surface->AddChild(sylZone);
             fi->AttachZone(sylZone);
         }
