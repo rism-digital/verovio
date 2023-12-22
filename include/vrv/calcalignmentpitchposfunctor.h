@@ -40,6 +40,9 @@ public:
      */
     ///@{
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitScore(Score *score) override;
+    FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
+    FunctorCode VisitStaffDef(StaffDef *staffDef) override;
     ///@}
 
 protected:
@@ -49,7 +52,10 @@ private:
 public:
     //
 private:
-    //
+    // The current scoreDef default octave
+    data_OCTAVE m_octDefault;
+    // The current staffDef default octaves
+    std::map<int, data_OCTAVE> m_octDefaultForStaffN;
 };
 
 } // namespace vrv

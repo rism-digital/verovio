@@ -259,7 +259,7 @@ void Tuplet::CalcDrawingBracketAndNumPos(bool tupletNumHead)
         return;
     }
 
-    const ListOfObjects &tupletChildren = this->GetList(this);
+    const ListOfObjects &tupletChildren = this->GetList();
 
     // There are unbeamed notes of two different beams
     // treat all the notes as unbeamed

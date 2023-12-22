@@ -35,6 +35,7 @@ Nc::Nc()
     , PitchInterface()
     , PositionInterface()
     , AttColor()
+    , AttCurvatureDirection()
     , AttIntervalMelodic()
     , AttNcForm()
 
@@ -43,6 +44,7 @@ Nc::Nc()
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     this->RegisterAttClass(ATT_COLOR);
+    this->RegisterAttClass(ATT_CURVATUREDIRECTION);
     this->RegisterAttClass(ATT_INTERVALMELODIC);
     this->RegisterAttClass(ATT_NCFORM);
 
@@ -58,6 +60,7 @@ void Nc::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     this->ResetColor();
+    this->ResetCurvatureDirection();
     this->ResetIntervalMelodic();
     this->ResetNcForm();
 }

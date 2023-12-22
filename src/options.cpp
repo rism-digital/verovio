@@ -1047,14 +1047,6 @@ Options::Options()
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
-    m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
-    m_ligatureAsBracket.Init(false);
-    this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_general);
-
-    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
-    m_mensuralToMeasure.Init(false);
-    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
-
     m_minLastJustification.SetInfo("Minimum last-system-justification width",
         "The last system is only justified if the unjustified width is greater than this percent");
     m_minLastJustification.Init(0.8, 0.0, 1.0);
@@ -1380,7 +1372,7 @@ Options::Options()
     this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
 
     m_lyricWordSpace.SetInfo("Lyric word space", "The lyric word space length");
-    m_lyricWordSpace.Init(1.20, 0.50, 3.00);
+    m_lyricWordSpace.Init(1.20, 0.00, 10.00);
     this->Register(&m_lyricWordSpace, "lyricWordSpace", &m_generalLayout);
 
     m_lyricVerseCollapse.SetInfo("Lyric verse collapse", "Collapse empty verse lines in lyrics");
@@ -1805,6 +1797,20 @@ Options::Options()
     m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
+
+    /********* General *********/
+
+    m_mensural.SetLabel("Mensural notation options", "6-mensural");
+    m_mensural.SetCategory(OptionsCategory::Mensural);
+    m_grps.push_back(&m_mensural);
+
+    m_ligatureAsBracket.SetInfo("Ligature as bracket", "Render ligatures as bracket instead of original notation");
+    m_ligatureAsBracket.Init(false);
+    this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
+
+    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
+    m_mensuralToMeasure.Init(false);
+    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
 
     /********* Deprecated options *********/
 

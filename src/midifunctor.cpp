@@ -158,6 +158,12 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
     }
+    else if (layerElement->Is(MENSUR)) {
+        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
+    }
+    else if (layerElement->Is(METERSIG)) {
+        this->m_currentMeterSig = vrv_cast<MeterSig *>(layerElement);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -386,7 +392,7 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
 FunctorCode GenerateMIDIFunctor::VisitBTrem(const BTrem *bTrem)
 {
     // Do nothing if the tremolo is unmeasured
-    if (bTrem->GetForm() == bTremLog_FORM_unmeas) {
+    if (bTrem->GetForm() == tremForm_FORM_unmeas) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -443,7 +449,7 @@ FunctorCode GenerateMIDIFunctor::VisitChord(const Chord *chord)
     // Handle grace chords
     if (chord->IsGraceNote()) {
         std::set<int> pitches;
-        const ListOfConstObjects &notes = chord->GetList(chord);
+        const ListOfConstObjects &notes = chord->GetList();
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);
             assert(note);
@@ -758,8 +764,8 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     if (scoreDef->HasKeySigInfo()) {
         const KeySig *keySig = vrv_cast<const KeySig *>(scoreDef->GetKeySig());
         if (keySig && keySig->HasSig()) {
-            m_midiFile->addKeySignature(
-                m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
+            // m_midiFile->addKeySignature(
+            //     m_midiTrack, currentTick, keySig->GetFifthsInt(), (keySig->GetMode() == MODE_minor));
         }
     }
     // set MIDI time signature
@@ -793,8 +799,7 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
     const int startTime = m_totalTime + m_lastNote->GetScoreTimeOnset();
-    const Text *text = vrv_cast<const Text *>(syl->GetChild(0, TEXT));
-    const std::string sylText = UTF32to8(text->GetText());
+    const std::string sylText = UTF32to8(syl->GetText());
 
     m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
 
@@ -819,7 +824,7 @@ void GenerateMIDIFunctor::DeferMIDINote(const Note *refNote, double shift, bool 
     // Recursive call for chords
     const Chord *chord = refNote->IsChordTone();
     if (chord && includeChordSiblings) {
-        const ListOfConstObjects &notes = chord->GetList(chord);
+        const ListOfConstObjects &notes = chord->GetList();
 
         for (const Object *obj : notes) {
             const Note *note = vrv_cast<const Note *>(obj);

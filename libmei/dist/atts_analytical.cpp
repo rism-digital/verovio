@@ -183,46 +183,6 @@ bool AttIntervalMelodic::HasIntm() const
 }
 
 //----------------------------------------------------------------------------
-// AttKeySigAnl
-//----------------------------------------------------------------------------
-
-AttKeySigAnl::AttKeySigAnl() : Att()
-{
-    ResetKeySigAnl();
-}
-
-void AttKeySigAnl::ResetKeySigAnl()
-{
-    m_mode = MODE_NONE;
-}
-
-bool AttKeySigAnl::ReadKeySigAnl(pugi::xml_node element, bool removeAttr)
-{
-    bool hasAttribute = false;
-    if (element.attribute("mode")) {
-        this->SetMode(StrToMode(element.attribute("mode").value()));
-        if (removeAttr) element.remove_attribute("mode");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttKeySigAnl::WriteKeySigAnl(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasMode()) {
-        element.append_attribute("mode") = ModeToStr(this->GetMode()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttKeySigAnl::HasMode() const
-{
-    return (m_mode != MODE_NONE);
-}
-
-//----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
 //----------------------------------------------------------------------------
 

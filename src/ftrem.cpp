@@ -74,7 +74,7 @@ bool FTrem::IsSupportedChild(Object *child)
 
 const ArrayOfBeamElementCoords *FTrem::GetElementCoords()
 {
-    this->GetList(this);
+    this->GetList();
 
     return &m_beamElementCoords;
 }

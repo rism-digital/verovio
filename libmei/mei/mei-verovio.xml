@@ -91,7 +91,7 @@
 					<attList>
 						<attDef ident="meiversion" usage="req">
 							<desc xml:lang="en">Specifies a generic MEI version label.</desc>
-							<defaultVal>5.0.0-dev</defaultVal>
+							<defaultVal>5.0</defaultVal>
 							<valList type="closed">
 								<valItem ident="2013">
 									<desc xml:lang="en">MEI 2013</desc>
@@ -105,11 +105,20 @@
 								<valItem ident="4.0.1">
 									<desc xml:lang="en">MEI 4.0.1</desc>
 								</valItem>
-								<valItem ident="5.0.0-dev+basic">
-									<desc xml:lang="en">MEI basic</desc>
+								<valItem ident="5.0">
+									<desc xml:lang="en">MEI 5.0</desc>
 								</valItem>
-								<valItem ident="5.0.0-dev">
-									<desc xml:lang="en">Development version of MEI 5.0.0</desc>
+								<valItem ident="5.0+basic">
+									<desc>MEI 5.0+basic</desc>
+								</valItem>
+								<valItem ident="5.0+CMN">
+									<desc>MEI 5.0+CMN</desc>
+								</valItem>
+								<valItem ident="5.0+Mensural">
+									<desc>MEI 5.0+Mensural</desc>
+								</valItem>
+								<valItem ident="5.0+Neumes">
+									<desc>MEI 5.0+Neumes</desc>
 								</valItem>
 							</valList>
 						</attDef>
@@ -243,7 +252,7 @@
 						<memberOf key="model.secbLike"/>
 					</classes>
 					<content>
-						<rng:empty/>
+						<empty/>
 					</content>
 				</elementSpec>
 
@@ -259,7 +268,7 @@
 						<memberOf key="model.mdivbLike"/>
 					</classes>
 					<content>
-						<rng:empty/>
+						<empty/>
 					</content>
 				</elementSpec>
 
@@ -296,7 +305,7 @@
 						<memberOf key="model.scorebLike"/>
 					</classes>
 					<content>
-						<rng:empty/>
+						<empty/>
 					</content>
 					<remarks>
 						<p>This element is necessary to allow round-tripping between page-based and score-based (regular) MEI.</p>

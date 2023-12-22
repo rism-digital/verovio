@@ -43,7 +43,7 @@ CalcStemFunctor::CalcStemFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode CalcStemFunctor::VisitBeam(Beam *beam)
 {
-    const ListOfObjects &beamChildren = beam->GetList(beam);
+    const ListOfObjects &beamChildren = beam->GetList();
 
     // Should we assert this at the beginning?
     if (beamChildren.empty()) {
@@ -58,6 +58,7 @@ FunctorCode CalcStemFunctor::VisitBeam(Beam *beam)
     if (!beam->HasCoords()) {
         beam->InitCoords(beamChildren, staff, beam->GetPlace());
         const bool isCue = ((beam->GetCue() == BOOLEAN_true) || beam->GetFirstAncestor(GRACEGRP));
+        beam->InitGraceStemDir(beam->GetFirstAncestor(GRACEGRP));
         beam->InitCue(isCue);
     }
 
@@ -173,7 +174,7 @@ FunctorCode CalcStemFunctor::VisitChord(Chord *chord)
 
 FunctorCode CalcStemFunctor::VisitFTrem(FTrem *fTrem)
 {
-    const ListOfObjects &fTremChildren = fTrem->GetList(fTrem);
+    const ListOfObjects &fTremChildren = fTrem->GetList();
 
     // Should we assert this at the beginning?
     if (fTremChildren.empty()) {
@@ -583,7 +584,7 @@ FunctorCode CalcStemFunctor::VisitTabGrp(TabGrp *tabGrp)
 
 data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int verticalCenter) const
 {
-    const ListOfConstObjects &childList = chord->GetList(chord);
+    const ListOfConstObjects &childList = chord->GetList();
     ListOfConstObjects topNotes, bottomNotes;
 
     // split notes into two vectors - notes above vertical center and below
