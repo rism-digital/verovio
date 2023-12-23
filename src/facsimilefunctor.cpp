@@ -36,12 +36,12 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor() : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({NOTE, REST})) return FUNCTOR_CONTINUE;
-    
+    if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
+
     Zone *zone = layerElement->GetZone();
     assert(zone);
     layerElement->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -51,17 +51,16 @@ FunctorCode SyncFromFacsimileFunctor::VisitMeasure(Measure *measure)
     assert(zone);
     measure->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
     measure->m_xAbs2 = zone->GetLrx() * DEFINITION_FACTOR;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncFromFacsimileFunctor::VisitPage(Page *page)
 {
     m_currentPage = page;
-    
+
     return FUNCTOR_CONTINUE;
 }
-
 
 FunctorCode SyncFromFacsimileFunctor::VisitPb(Pb *pb)
 {
@@ -87,7 +86,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitSb(Sb *sb)
     m_currentSystem->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
     m_currentSystem->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
     */
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -96,14 +95,14 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
     Zone *zone = staff->GetZone();
     assert(zone);
     staff->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncFromFacsimileFunctor::VisitSystem(System *system)
 {
     m_currentSystem = system;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -119,59 +118,56 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor() : Functor()
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({NOTE, REST})) return FUNCTOR_CONTINUE;
-    
-    //layerElement->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
-    
+    if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
+
+    // layerElement->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitMeasure(Measure *measure)
 {
-    //measure->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
-    //measure->m_xAbs2 = zone->GetLrx() * DEFINITION_FACTOR;
-    
+    // measure->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
+    // measure->m_xAbs2 = zone->GetLrx() * DEFINITION_FACTOR;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitPage(Page *page)
 {
     m_currentPage = page;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
-
 FunctorCode SyncToFacsimileFunctor::VisitPb(Pb *pb)
 {
-    //m_currentPage->m_pageHeight = zone->GetLry() * DEFINITION_FACTOR;
-    //m_currentPage->m_pageWidth = zone->GetLrx() * DEFINITION_FACTOR;
+    // m_currentPage->m_pageHeight = zone->GetLry() * DEFINITION_FACTOR;
+    // m_currentPage->m_pageWidth = zone->GetLrx() * DEFINITION_FACTOR;
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitSb(Sb *sb)
 {
-    //m_currentSystem->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
-    //m_currentSystem->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
-    
+    // m_currentSystem->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
+    // m_currentSystem->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitStaff(Staff *staff)
 {
-    //staff->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
-    
+    // staff->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncToFacsimileFunctor::VisitSystem(System *system)
 {
     m_currentSystem = system;
-    
+
     return FUNCTOR_CONTINUE;
 }
-
-
 
 } // namespace vrv
