@@ -204,12 +204,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     int noteY, noteX;
     int yValue;
-    if (nc->HasFacs() && (m_doc->GetType() == Facs)) {
+    if (nc->HasFacs() && m_doc->IsFacs()) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = nc->GetDrawingX();
         params.at(0).xOffset = 0;
     }
-    else if (neume->HasFacs() && (m_doc->GetType() == Facs)) {
+    else if (neume->HasFacs() && m_doc->IsFacs()) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = neume->GetDrawingX() + position * noteWidth;
     }
@@ -229,7 +229,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
     int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
     int rotateOffset;
-    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = noteX - staff->GetDrawingX();
         rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
@@ -265,7 +265,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     // adjust facsimile values of element based on where it is rendered if necessary
-    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
+    if (m_doc->IsFacs() && element->HasFacs()) {
         FacsimileInterface *fi = element->GetFacsimileInterface();
         fi->GetZone()->SetUlx(noteX);
         fi->GetZone()->SetUly(ToDeviceContextY(yValue));
@@ -380,7 +380,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
 
     int x, y;
-    if ((m_doc->GetType() == Facs) && (divLine->HasFacs())) {
+    if (m_doc->IsFacs() && (divLine->HasFacs())) {
         x = divLine->GetDrawingX();
         y = ToLogicalY(staff->GetDrawingY());
     }
@@ -393,7 +393,7 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
 
     int rotateOffset;
-    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
         rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
