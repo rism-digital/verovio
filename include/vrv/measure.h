@@ -66,6 +66,17 @@ public:
     void CloneReset() override;
 
     /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
+    ///@}
+
+    /**
      * Return true if measured music (otherwise we have fake measures)
      */
     bool IsMeasuredMusic() const { return m_measuredMusic; }
