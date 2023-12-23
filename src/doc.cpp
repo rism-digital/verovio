@@ -1281,7 +1281,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     if (!m_isMensuralMusicOnly) return;
 
     // Do not convert transcription files
-    if (this->GetType() == Transcription) return;
+    if (this->IsTranscription()) return;
 
     // Do not convert facs files
     if (this->IsFacs()) return;
@@ -2088,7 +2088,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || this->IsFacs()) {
+    if (this->IsTranscription() || this->IsFacs()) {
         return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
     }
 
@@ -2100,7 +2100,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || this->IsFacs()) {
+    if (this->IsTranscription() || this->IsFacs()) {
         return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
     }
 
