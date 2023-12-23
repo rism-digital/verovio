@@ -79,12 +79,7 @@ int FacsimileInterface::GetSurfaceY() const
     assert(m_zone);
     Surface *surface = vrv_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
     assert(surface);
-    if (surface->HasLry()) {
-        return surface->GetLry();
-    }
-    else {
-        return surface->GetMaxY();
-    }
+    return surface->GetMaxY();
 }
 
 void FacsimileInterface::AttachZone(Zone *zone)
