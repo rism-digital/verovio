@@ -1698,6 +1698,7 @@ void MEIOutput::WritePb(pugi::xml_node currentNode, Pb *pb)
     assert(pb);
 
     this->WriteSystemElement(currentNode, pb);
+    this->WriteFacsimileInterface(currentNode, pb);
     pb->WriteNNumberLike(currentNode);
 }
 
@@ -1706,6 +1707,7 @@ void MEIOutput::WriteSb(pugi::xml_node currentNode, Sb *sb)
     assert(sb);
 
     this->WriteSystemElement(currentNode, sb);
+    this->WriteFacsimileInterface(currentNode, sb);
     sb->WriteNNumberLike(currentNode);
 }
 
@@ -4528,6 +4530,7 @@ bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 
     Pb *vrvPb = new Pb();
     this->ReadSystemElement(pb, vrvPb);
+    this->ReadFacsimileInterface(pb, vrvPb);
 
     vrvPb->ReadNNumberLike(pb);
 
@@ -4544,6 +4547,7 @@ bool MEIInput::ReadSb(Object *parent, pugi::xml_node sb)
 
     Sb *vrvSb = new Sb();
     this->ReadSystemElement(sb, vrvSb);
+    this->ReadFacsimileInterface(sb, vrvSb);
 
     vrvSb->ReadNNumberLike(sb);
 
