@@ -107,5 +107,71 @@ FunctorCode SyncFromFacsimileFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// SyncToFacsimileFunctor
+//----------------------------------------------------------------------------
+
+SyncToFacsimileFunctor::SyncToFacsimileFunctor() : Functor()
+{
+    m_currentPage = NULL;
+    m_currentSystem = NULL;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    if (!layerElement->Is({NOTE, REST})) return FUNCTOR_CONTINUE;
+    
+    //layerElement->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitMeasure(Measure *measure)
+{
+    //measure->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
+    //measure->m_xAbs2 = zone->GetLrx() * DEFINITION_FACTOR;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitPage(Page *page)
+{
+    m_currentPage = page;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+
+FunctorCode SyncToFacsimileFunctor::VisitPb(Pb *pb)
+{
+    //m_currentPage->m_pageHeight = zone->GetLry() * DEFINITION_FACTOR;
+    //m_currentPage->m_pageWidth = zone->GetLrx() * DEFINITION_FACTOR;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitSb(Sb *sb)
+{
+    //m_currentSystem->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
+    //m_currentSystem->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitStaff(Staff *staff)
+{
+    //staff->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncToFacsimileFunctor::VisitSystem(System *system)
+{
+    m_currentSystem = system;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+
 
 } // namespace vrv

@@ -67,6 +67,53 @@ private:
     System *m_currentSystem;
 };
 
+//----------------------------------------------------------------------------
+// SyncToFacsimileFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class sync the layout calculated to the facsimile
+ */
+class SyncToFacsimileFunctor : public Functor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    SyncToFacsimileFunctor();
+    virtual ~SyncToFacsimileFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitPb(Pb *pb) override;
+    FunctorCode VisitSb(Sb *sb) override;
+    FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    //
+    Page *m_currentPage;
+    System *m_currentSystem;
+};
+
 } // namespace vrv
 
 #endif // __VRV_FACSIMILEFUNCTOR_H__
