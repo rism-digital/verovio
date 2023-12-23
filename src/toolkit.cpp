@@ -751,7 +751,7 @@ bool Toolkit::LoadData(const std::string &data)
 
     // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
     // to be converted
-    if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
+    if (m_doc.IsTranscription() || m_doc.IsFacs()) breaks = BREAKS_none;
 
     if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
@@ -1402,7 +1402,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
+    if ((this->GetPageCount() == 0) || m_doc.IsTranscription() || m_doc.IsFacs()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1465,7 +1465,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
     if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
-    if (m_doc.GetType() == Transcription) {
+    if (m_doc.IsTranscription()) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
@@ -1488,7 +1488,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
 
-    if (m_doc.GetType() == Facs) {
+    if (m_doc.IsFacs()) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
         deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
     }
@@ -1524,7 +1524,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetMMOutput(true);
     }
 
-    if (m_doc.GetType() == Facs) {
+    if (m_doc.IsFacs()) {
         svg.SetFacsimile(true);
     }
 
