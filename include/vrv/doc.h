@@ -109,7 +109,6 @@ public:
 
     /**
      * Getter and setter for the DocType.
-     * The setter resets the document.
      */
     ///@{
     DocType GetType() const { return m_type; }
@@ -369,6 +368,12 @@ public:
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertMarkupDoc(bool permanent = true);
+
+    /**
+     * Sync the coordinate provided trought <facsimile> to m_Abs.
+     * Call the SyncToFacsimile functor.
+     */
+    void SyncFromFacsimileDoc();
 
     /**
      * Transpose the content of the doc.

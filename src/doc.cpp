@@ -23,6 +23,7 @@
 #include "convertfunctor.h"
 #include "docselection.h"
 #include "expansion.h"
+#include "facsimilefunctor.h"
 #include "featureextractor.h"
 #include "functor.h"
 #include "glyph.h"
@@ -1389,6 +1390,15 @@ void Doc::ConvertMarkupDoc(bool permanent)
         ConvertMarkupScoreDefFunctor convertMarkupScoreDef(this);
         this->Process(convertMarkupScoreDef);
     }
+}
+
+void Doc::SyncFromFacsimileDoc()
+{
+    PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
+    this->Process(prepareFacsimile);
+
+    SyncFromFacsimileFunctor syncFacsimileFunctor;
+    this->Process(syncFacsimileFunctor);
 }
 
 void Doc::TransposeDoc()
