@@ -400,7 +400,7 @@ int LayerElement::GetDrawingX() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->IsFacs()) {
             return FacsimileInterface::GetDrawingX();
         }
     }
@@ -448,7 +448,7 @@ int LayerElement::GetDrawingY() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->IsFacs()) {
             return FacsimileInterface::GetDrawingY();
         }
     }
