@@ -2216,7 +2216,7 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     assert(staff);
 
     this->WriteXmlId(currentNode, staff);
-    staff->WriteFacsimile(currentNode);
+    this->WriteFacsimileInterface(currentNode, staff);
     staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
     staff->WriteVisibility(currentNode);
@@ -2298,6 +2298,7 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     assert(element);
 
     this->WriteXmlId(currentNode, element);
+    this->WriteFacsimileInterface(currentNode, element);
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
@@ -2320,7 +2321,6 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     }
 
     WriteLayerElement(currentNode, accid);
-    WriteFacsimileInterface(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
@@ -2433,7 +2433,6 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     }
 
     this->WriteLayerElement(currentNode, clef);
-    this->WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefLog(currentNode);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
@@ -2451,7 +2450,6 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
 
-    this->WriteFacsimileInterface(currentNode, custos);
     this->WritePitchInterface(currentNode, custos);
     this->WritePositionInterface(currentNode, custos);
     this->WriteLayerElement(currentNode, custos);
@@ -2465,7 +2463,6 @@ void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
     assert(divLine);
 
     this->WriteLayerElement(currentNode, divLine);
-    this->WriteFacsimileInterface(currentNode, divLine);
     divLine->WriteDivLineLog(currentNode);
     divLine->WriteColor(currentNode);
     divLine->WriteVisibility(currentNode);
@@ -2698,7 +2695,6 @@ void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     this->WriteLayerElement(currentNode, nc);
     this->WriteDurationInterface(currentNode, nc);
-    this->WriteFacsimileInterface(currentNode, nc);
     this->WritePitchInterface(currentNode, nc);
     this->WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
@@ -2711,7 +2707,6 @@ void MEIOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     this->WriteLayerElement(currentNode, neume);
-    this->WriteFacsimileInterface(currentNode, neume);
     neume->WriteColor(currentNode);
 }
 
@@ -2830,7 +2825,6 @@ void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     this->WriteLayerElement(currentNode, syl);
-    this->WriteFacsimileInterface(currentNode, syl);
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
@@ -6036,8 +6030,8 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
 {
     Staff *vrvStaff = new Staff();
     this->SetMeiID(staff, vrvStaff);
+    this->ReadFacsimileInterface(staff, vrvStaff);
 
-    vrvStaff->ReadFacsimile(staff);
     vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
@@ -6277,6 +6271,7 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
     this->SetMeiID(element, object);
+    this->ReadFacsimileInterface(element, object);
     this->ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
@@ -6299,7 +6294,6 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     this->ReadLayerElement(accid, vrvAccid);
 
     ReadPositionInterface(accid, vrvAccid);
-    ReadFacsimileInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
@@ -6444,7 +6438,6 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 {
     Clef *vrvClef = new Clef();
     this->ReadLayerElement(clef, vrvClef);
-    this->ReadFacsimileInterface(clef, vrvClef);
 
     vrvClef->ReadClefLog(clef);
     vrvClef->ReadClefShape(clef);
@@ -6502,7 +6495,6 @@ bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
     DivLine *vrvDivLine = new DivLine();
     this->ReadLayerElement(divLine, vrvDivLine);
 
-    this->ReadFacsimileInterface(divLine, vrvDivLine);
     vrvDivLine->ReadDivLineLog(divLine);
     vrvDivLine->ReadColor(divLine);
     vrvDivLine->ReadVisibility(divLine);
@@ -6785,7 +6777,6 @@ bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
     this->ReadLayerElement(nc, vrvNc);
 
     this->ReadDurationInterface(nc, vrvNc);
-    this->ReadFacsimileInterface(nc, vrvNc);
     this->ReadPitchInterface(nc, vrvNc);
     this->ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
@@ -6800,7 +6791,6 @@ bool MEIInput::ReadNeume(Object *parent, pugi::xml_node neume)
 {
     Neume *vrvNeume = new Neume();
     this->ReadLayerElement(neume, vrvNeume);
-    this->ReadFacsimileInterface(neume, vrvNeume);
 
     vrvNeume->ReadColor(neume);
 
