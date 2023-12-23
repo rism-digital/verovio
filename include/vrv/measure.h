@@ -11,6 +11,7 @@
 #include "atts_cmn.h"
 #include "atts_shared.h"
 #include "barline.h"
+#include "facsimileinterface.h"
 #include "horizontalaligner.h"
 #include "object.h"
 
@@ -34,6 +35,7 @@ class TimestampAttr;
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
 class Measure : public Object,
+                public FacsimileInterface,
                 public AttBarring,
                 public AttCoordX1,
                 public AttCoordX2,

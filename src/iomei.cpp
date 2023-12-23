@@ -1883,6 +1883,8 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     assert(measure);
 
     this->WriteXmlId(currentNode, measure);
+    this->WriteFacsimileInterface(currentNode, measure);
+
     measure->WriteBarring(currentNode);
     measure->WriteMeasureLog(currentNode);
     measure->WriteMeterConformanceBar(currentNode);
@@ -5334,6 +5336,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
         m_doc->SetMensuralMusicOnly(false);
     }
     this->SetMeiID(measure, vrvMeasure);
+    this->ReadFacsimileInterface(measure, vrvMeasure);
 
     vrvMeasure->ReadBarring(measure);
     vrvMeasure->ReadMeasureLog(measure);

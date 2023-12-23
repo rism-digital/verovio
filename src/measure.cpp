@@ -56,6 +56,7 @@ static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
+    , FacsimileInterface()
     , AttBarring()
     , AttCoordX1()
     , AttCoordX2()
@@ -73,6 +74,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_POINTING);
     this->RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
 
     m_measuredMusic = measureMusic;
 
@@ -121,6 +123,7 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
+    FacsimileInterface::Reset();
     this->ResetCoordX1();
     this->ResetCoordX2();
     this->ResetMeasureLog();
