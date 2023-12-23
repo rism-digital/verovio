@@ -3907,8 +3907,7 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         // Temporary solution to set the document type to Transcription when using <facsimile>
         else if (m_doc->HasFacsimile() && !m_doc->GetFacsimile()->GetType().empty()) {
             m_doc->SetType(StrToDocType(m_doc->GetFacsimile()->GetType()));
-            m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
-            m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
+            // Facsimile data eventually sync with Doc::SyncFromFacsimileDoc below
         }
         if (facsimile.next_sibling("facsimile")) {
             LogWarning("Only first <facsimile> is processed");

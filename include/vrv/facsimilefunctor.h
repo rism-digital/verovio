@@ -14,7 +14,11 @@ namespace vrv {
 
 class LayerElement;
 class Measure;
+class Page;
+class Pb;
+class Sb;
 class Staff;
+class System;
 
 //----------------------------------------------------------------------------
 // SyncFromFacsimileFunctor
@@ -44,7 +48,11 @@ public:
     ///@{
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
+    FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitPb(Pb *pb) override;
+    FunctorCode VisitSb(Sb *sb) override;
     FunctorCode VisitStaff(Staff *staff) override;
+    FunctorCode VisitSystem(System *system) override;
     ///@}
 
 protected:
@@ -55,6 +63,8 @@ public:
     //
 private:
     //
+    Page *m_currentPage;
+    System *m_currentSystem;
 };
 
 } // namespace vrv
