@@ -2900,6 +2900,7 @@ void MEIOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
     assert(zone);
     this->WriteXmlId(currentNode, zone);
     zone->WriteCoordinated(currentNode);
+    zone->WriteCoordinatedUl(currentNode);
     zone->WriteTyped(currentNode);
 }
 
@@ -8531,6 +8532,7 @@ bool MEIInput::ReadZone(Surface *parent, pugi::xml_node zone)
     Zone *vrvZone = new Zone();
     this->SetMeiID(zone, vrvZone);
     vrvZone->ReadCoordinated(zone);
+    vrvZone->ReadCoordinatedUl(zone);
     vrvZone->ReadTyped(zone);
     parent->AddChild(vrvZone);
     return true;
