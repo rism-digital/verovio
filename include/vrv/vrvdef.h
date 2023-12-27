@@ -61,7 +61,7 @@ namespace vrv {
 #ifdef VRV_DYNAMIC_CAST
 // To be used for all cases where type is cheched through Object::m_type
 #define vrv_cast dynamic_cast
-// To be used for all FunctorParams casts within Functors
+// To be used for params casts within Functors
 #define vrv_params_cast dynamic_cast
 #else
 #define vrv_cast static_cast

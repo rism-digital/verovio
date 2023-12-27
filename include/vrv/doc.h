@@ -380,7 +380,7 @@ public:
      * The document must have encoded layout and the option --break encoded must have enabled.
      */
     void SyncToFacsimileDoc();
-    
+
     /**
      * Transpose the content of the doc.
      */
