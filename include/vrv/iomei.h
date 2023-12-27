@@ -306,7 +306,7 @@ private:
      * Scoredef manipulation
      */
     ///@{
-    void WriteCustomScoreDef();
+    void WriteCustomScoreDef(ScoreDef *scoreDef);
     void AdjustStaffDef(StaffDef *staffDef, Measure *measure);
     bool AdjustLabel(Label *label);
     ///@}
@@ -889,20 +889,20 @@ private:
      */
     ///@{
     // to MEI 5.0.0
-    void UpgradeKeySigTo_5_0_0(pugi::xml_node keySig);
-    void UpgradePageTo_5_0_0(Page *page);
-    void UpgradePgHeadFootTo_5_0_0(pugi::xml_node element);
-    void UpgradeMeasureTo_5_0_0(pugi::xml_node measure);
-    void UpgradeMeterSigTo_5_0_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
-    void UpgradeScoreDefElementTo_5_0_0(pugi::xml_node scoreDefElement);
-    void UpgradeStaffTo_5_0_0(pugi::xml_node staff);
-    void UpgradeLayerElementTo_5_0_0(pugi::xml_node element);
-    void UpgradeRendTo_5_0_0(pugi::xml_node element);
+    void UpgradeKeySigTo_5_0(pugi::xml_node keySig);
+    void UpgradePageTo_5_0(Page *page);
+    void UpgradePgHeadFootTo_5_0(pugi::xml_node element);
+    void UpgradeMeasureTo_5_0(pugi::xml_node measure);
+    void UpgradeMeterSigTo_5_0(pugi::xml_node meterSig, MeterSig *vrvMeterSig);
+    void UpgradeScoreDefElementTo_5_0(pugi::xml_node scoreDefElement);
+    void UpgradeStaffTo_5_0(pugi::xml_node staff);
+    void UpgradeLayerElementTo_5_0(pugi::xml_node element);
+    void UpgradeRendTo_5_0(pugi::xml_node element);
     // to MEI 4.0.0
     void UpgradeBeatRptTo_4_0_0(pugi::xml_node beatRpt, BeatRpt *vrvBeatRpt);
     void UpgradeDurGesTo_4_0_0(pugi::xml_node element, DurationInterface *interface);
     void UpgradeFTremTo_4_0_0(pugi::xml_node fTrem, FTrem *vrvFTrem);
-    void UpgradeMensurTo_5_0_0(pugi::xml_node mensur, Mensur *vrvMensur);
+    void UpgradeMensurTo_5_0(pugi::xml_node mensur, Mensur *vrvMensur);
     void UpgradeMordentTo_4_0_0(pugi::xml_node mordent, Mordent *vrvMordent);
     void UpgradeScoreDefElementTo_4_0_0(pugi::xml_node scoreDefElement, ScoreDefElement *vrvScoreDefElement);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);

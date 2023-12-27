@@ -24,7 +24,7 @@ jobs:
       # Build the wheels for Linux, Windows and macOS
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         architecture: [x86, x64]
         include:
           - os: macos-latest
@@ -48,7 +48,7 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -82,7 +82,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.1
+        uses: pypa/cibuildwheel@v2.16.1
         with:
           output-dir: wheelhouse
         env:
@@ -147,7 +147,7 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -224,7 +224,7 @@ jobs:
     steps:
       #===============================================#
       # Set up
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4

@@ -233,55 +233,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttKeySigAnl
-//----------------------------------------------------------------------------
-
-class AttKeySigAnl : public Att {
-protected:
-    AttKeySigAnl();
-    ~AttKeySigAnl() = default;
-
-public:
-    /** Reset the default values for the attribute class **/
-    void ResetKeySigAnl();
-
-    /** Read the values for the attribute class **/
-    bool ReadKeySigAnl(pugi::xml_node element, bool removeAttr = true);
-
-    /** Write the values for the attribute class **/
-    bool WriteKeySigAnl(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetMode(data_MODE mode_) { m_mode = mode_; }
-    data_MODE GetMode() const { return m_mode; }
-    bool HasMode() const;
-    ///@}
-
-private:
-    /** Indicates major, minor, or other tonality. **/
-    data_MODE m_mode;
-};
-
-//----------------------------------------------------------------------------
-// InstKeySigAnl
-//----------------------------------------------------------------------------
-
-/**
- * Instantiable version of AttKeySigAnl
- */
-
-class InstKeySigAnl : public AttKeySigAnl {
-public:
-    InstKeySigAnl() = default;
-    virtual ~InstKeySigAnl() = default;
-};
-
-//----------------------------------------------------------------------------
 // AttKeySigDefaultAnl
 //----------------------------------------------------------------------------
 

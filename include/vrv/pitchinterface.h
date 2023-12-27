@@ -25,7 +25,7 @@ class Layer;
  * This class is an interface for elements with pitch, such as notes and neumes.
  * It is not an abstract class but should not be instanciated directly.
  */
-class PitchInterface : public Interface, public AttNoteGes, public AttOctave, public AttPitch {
+class PitchInterface : public Interface, public AttNoteGes, public AttOctave, public AttPitch, public AttPitchGes {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -36,6 +36,15 @@ public:
     virtual ~PitchInterface();
     void Reset() override;
     InterfaceId IsInterface() const override { return INTERFACE_PITCH; }
+    ///@}
+
+    /**
+     * @name Set and get the default octave
+     */
+    ///@{
+    void SetOctDefault(data_OCTAVE oct) { m_octDefault = oct; }
+    data_OCTAVE GetOctDefault() const { return m_octDefault; }
+    bool HasOctDefault() const { return (m_octDefault != MEI_UNSET_OCT); }
     ///@}
 
     /**
@@ -90,7 +99,10 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The default octave: extracted from scoreDef/staffDef and used when no octave attribute is given
+     */
+    data_OCTAVE m_octDefault;
 };
 
 } // namespace vrv

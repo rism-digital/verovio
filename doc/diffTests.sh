@@ -30,8 +30,10 @@ then
     echo "Emptying directories ..."
     rm $indir1/*/*.png
     rm $indir1/*/*.svg
+    rm $indir1/*/*.json
     rm $indir2/*/*.png
     rm $indir2/*/*.svg
+    rm $indir2/*/*.json
     rm $outdir/*/*.png
     rm $outdir/index.html
 fi

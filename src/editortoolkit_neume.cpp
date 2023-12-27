@@ -29,6 +29,7 @@
 #include "neume.h"
 #include "page.h"
 #include "rend.h"
+#include "score.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
@@ -798,8 +799,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             parent = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
             assert(parent);
             newStaff = new Staff(1);
-            newStaff->m_drawingStaffDef
-                = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(STAFFDEF));
+            newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
+                m_doc->GetCorrespondingScore(parent)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -947,13 +948,13 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             }
             else if (it->first == "curve") {
                 Liquescent *liquescent = new Liquescent();
-                ncForm_CURVE curve = ncForm_CURVE_NONE;
+                curvatureDirection_CURVE curve = curvatureDirection_CURVE_NONE;
                 if (it->second == "a") {
-                    curve = ncForm_CURVE_a;
+                    curve = curvatureDirection_CURVE_a;
                     nc->SetCurve(curve);
                 }
                 else if (it->second == "c") {
-                    curve = ncForm_CURVE_c;
+                    curve = curvatureDirection_CURVE_c;
                     nc->SetCurve(curve);
                 }
                 nc->AddChild(liquescent);
@@ -1306,20 +1307,10 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
 
     // find closest neume
     ListOfObjects neumes;
-    Object *neume;
-    assert(neume);
     ClassIdComparison ac(NEUME);
     staff->FindAllDescendantsByComparison(&neumes, &ac);
-    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
-    if (neumes.size() > 0) {
-        ClosestNeume compN;
-        compN.x = ulx;
-        compN.y = uly;
 
-        std::sort(neumesVector.begin(), neumesVector.end(), compN);
-        neume = neumesVector.at(0);
-    }
-    else {
+    if (neumes.empty()) {
         LogError("A syllable must exist in the staff to insert a '%s' into.", element->GetClassName().c_str());
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import(
@@ -1327,6 +1318,14 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         return false;
     }
 
+    std::vector<Object *> neumesVector(neumes.begin(), neumes.end());
+    ClosestNeume compN;
+    compN.x = ulx;
+    compN.y = uly;
+    std::sort(neumesVector.begin(), neumesVector.end(), compN);
+
+    Object *neume = neumesVector.at(0);
+    assert(neume);
     // get nearest syllable using nearest neume
     Object *syllable = neume->GetParent();
     assert(syllable);
@@ -2442,7 +2441,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 Set(linkedID, "precedes", "");
 
                 // group into two new syllables
-                int idx = std::distance(elementIds.begin(), it);
+                int idx = static_cast<int>(std::distance(elementIds.begin(), it));
                 std::string resultId0;
                 std::string resultId1;
 

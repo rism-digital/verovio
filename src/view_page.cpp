@@ -135,9 +135,9 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    const ListOfObjects &scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList.begin(); it != scoreDefList.end(); ++it) {
-        StaffDef *staffDef = vrv_cast<StaffDef *>(*it);
+    const ListOfObjects &childList = scoreDef->GetList(); // make sure it's initialized
+    for (Object *child : childList) {
+        StaffDef *staffDef = vrv_cast<StaffDef *>(child);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
         KeySig *keySig = staffDef->GetKeySig();
@@ -541,8 +541,8 @@ void View::DrawLabels(
     LabelAbbr *labelAbbr = vrv_cast<LabelAbbr *>(object->FindDescendantByType(LABELABBR, 1));
     Object *graphic = label;
 
-    std::u32string labelStr = (label) ? label->GetText(label) : U"";
-    std::u32string labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : U"";
+    std::u32string labelStr = label ? label->GetText() : U"";
+    std::u32string labelAbbrStr = labelAbbr ? labelAbbr->GetText() : U"";
 
     if (abbreviations) {
         labelStr = labelAbbrStr;
@@ -586,7 +586,7 @@ void View::DrawLabels(
     if (labelAbbr && !abbreviations && (labelAbbrStr.length() > 0)) {
         TextExtend extend;
         std::vector<std::u32string> lines;
-        labelAbbr->GetTextLines(labelAbbr, lines);
+        labelAbbr->GetTextLines(lines);
         int maxLength = 0;
         for (std::u32string &line : lines) {
             dc->GetTextExtent(line, &extend, true);
@@ -1116,7 +1116,7 @@ void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
     assert(staff);
 
     MeterSigGrp *meterSigGrp = layer->GetStaffDefMeterSigGrp();
-    ListOfObjects childList = meterSigGrp->GetList(meterSigGrp);
+    ListOfObjects childList = meterSigGrp->GetList();
 
     // Ignore invisible meter signatures and those without count
     childList.erase(std::remove_if(childList.begin(), childList.end(),
@@ -1238,7 +1238,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     dc->StartGraphic(staff, "", staff->GetID());
 
-    if (m_doc->GetType() == Facs) {
+    if (m_doc->IsFacs()) {
         staff->SetFromFacsimile(m_doc);
     }
 
@@ -1246,7 +1246,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         this->DrawStaffLines(dc, staff, measure, system);
     }
 
-    if (staffDef && (staffDef->GetNotationtype() != NOTATIONTYPE_neume) && (m_doc->GetType() != Facs)) {
+    if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
     }
 
@@ -1283,7 +1283,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
 
     int j, x1, x2, y1, y2;
 
-    if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
+    if (staff->HasFacs() && m_doc->IsFacs()) {
         double d = staff->GetDrawingRotate();
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
@@ -1975,7 +1975,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
 
     Annot *annot = vrv_cast<Annot *>(element);
     assert(annot);
-    dc->AddDescription(UTF32to8(annot->GetText(annot)));
+    dc->AddDescription(UTF32to8(annot->GetText()));
 
     if (isTextElement) {
         dc->EndTextGraphic(element, this);

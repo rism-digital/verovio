@@ -989,7 +989,7 @@ void View::DrawPedalLine(
     if (spanningType == SPANNING_START_END || spanningType == SPANNING_START) {
         x1 -= startRadius;
         // With pedline we need to take into account the initial symbol
-        if (pedal->GetForm() == PEDALSTYLE_pedline) {
+        if ((pedal->GetForm() == PEDALSTYLE_pedline) || (pedal->GetForm() == PEDALSTYLE_pedstar)) {
             x1 += m_doc->GetGlyphWidth(SMUFL_E650_keyboardPedalPed, staff->m_drawingStaffSize, false);
         }
     }
@@ -1010,15 +1010,26 @@ void View::DrawPedalLine(
 
     // Opening bracket - but only if not a pedline value
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        if (pedal->GetForm() != PEDALSTYLE_pedline) {
+        if ((pedal->GetForm() != PEDALSTYLE_pedline && pedal->GetForm() != PEDALSTYLE_pedstar)) {
             this->DrawFilledRectangle(dc, x1, y, x1 + bracketSize / 2, y + lineWidth);
             this->DrawFilledRectangle(dc, x1, y, x1 + lineWidth, y + bracketSize);
         }
     }
     // Closing bracket
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        this->DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
-        this->DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
+        if (pedal->GetForm() != PEDALSTYLE_pedstar) {
+            this->DrawFilledRectangle(dc, x2 - bracketSize / 2, y, x2, y + lineWidth);
+            this->DrawFilledRectangle(dc, x2 - lineWidth, y, x2, y + bracketSize);
+        }
+        else {
+            std::u32string str;
+            str.push_back(SMUFL_E655_keyboardPedalUp);
+            const int staffSize = staff->m_drawingStaffSize;
+            data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left;
+            dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
+            this->DrawSmuflString(dc, x2, y, str, alignment, staffSize);
+            dc->ResetFont();
+        }
     }
     this->DrawFilledRectangle(dc, x1 + bracketSize / 2, y, x2 - bracketSize / 2, y + lineWidth);
 
@@ -1849,7 +1860,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
             continue;
         }
 
-        const int staffSize = staff->m_drawingStaffSize;
+        const int staffSize = staff->GetDrawingStaffNotationSize();
         const int y = fermata->GetDrawingY();
 
         const int width = (symbolDef) ? symbolDef->GetSymbolWidth(m_doc, staffSize, drawingCueSize)

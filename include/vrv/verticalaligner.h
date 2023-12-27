@@ -40,6 +40,11 @@ public:
     virtual ~SystemAligner();
 
     /**
+     * Override the method of adding AlignmentReference children
+     */
+    bool IsSupportedChild(Object *object) override;
+
+    /**
      * Do not copy children for HorizontalAligner
      */
     bool CopyChildren() const override { return false; }
@@ -66,6 +71,13 @@ public:
      * (no const since the bottom alignment is temporarily removed)
      */
     StaffAlignment *GetStaffAlignment(int idx, Staff *staff, const Doc *doc);
+
+    /**
+     * Reorder the staff alignment as given in the staffNs.
+     * Reordering will fail if the number of staffAlignment does not correspond, or
+     * if some staffAlignment pointers are missing for a corresponding staffN
+     */
+    void ReorderBy(const std::vector<int> &staffNs);
 
     /**
      * Get the StaffAlignment for the staffN.

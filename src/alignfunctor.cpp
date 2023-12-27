@@ -160,7 +160,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // Ligature notes are all aligned with the first note
         Note *note = vrv_cast<Note *>(layerElement);
         assert(note);
-        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront(ligatureParent));
+        Note *firstNote = dynamic_cast<Note *>(ligatureParent->GetListFront());
         if (firstNote && (firstNote != note)) {
             Alignment *alignment = firstNote->GetAlignment();
             layerElement->SetAlignment(alignment);
@@ -264,12 +264,11 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     }
     else if (layerElement->Is(SYL)) {
         Staff *staff = layerElement->GetAncestorStaff();
-        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+        Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
+        if (!note || (staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
             type = ALIGNMENT_DEFAULT;
         }
         else {
-            Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
-            assert(note);
             layerElement->SetAlignment(note->GetAlignment());
         }
     }
@@ -642,6 +641,12 @@ FunctorCode AlignVerticallyFunctor::VisitSystemEnd(System *system)
 {
     m_cumulatedShift = 0;
     m_staffIdx = 0;
+
+    // StaffAlignment are added following the staff element in the measures
+    // We can now reorder them according to the scoreDef order
+    if (system->GetDrawingScoreDef()) {
+        system->m_systemAligner.ReorderBy(system->GetDrawingScoreDef()->GetStaffNs());
+    }
 
     system->m_systemAligner.Process(*this);
 
