@@ -380,8 +380,7 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
         FacsimileInterface *interface = object->GetFacsimileInterface();
         assert(interface);
         if (interface->HasFacs()) {
-            std::string facsID = ((interface->GetFacs().compare(0, 1, "#") == 0) ? interface->GetFacs().substr(1)
-                                                                                 : interface->GetFacs());
+            std::string facsID = ExtractIDFragment(interface->GetFacs());
             Zone *zone = m_facsimile->FindZoneByID(facsID);
             if (zone != NULL) {
                 interface->AttachZone(zone);
