@@ -2876,6 +2876,7 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     assert(surface);
     this->WriteXmlId(currentNode, surface);
     surface->WriteCoordinated(currentNode);
+    surface->WriteCoordinatedUl(currentNode);
     surface->WriteTyped(currentNode);
 
     for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
@@ -8512,6 +8513,7 @@ bool MEIInput::ReadSurface(Object *parent, pugi::xml_node surface)
     Surface *vrvSurface = new Surface();
     this->SetMeiID(surface, vrvSurface);
     vrvSurface->ReadCoordinated(surface);
+    vrvSurface->ReadCoordinatedUl(surface);
     vrvSurface->ReadTyped(surface);
 
     for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
