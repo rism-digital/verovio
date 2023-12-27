@@ -82,11 +82,9 @@ FunctorCode SyncFromFacsimileFunctor::VisitSb(Sb *sb)
     assert(m_currentSystem);
 
     Zone *zone = sb->GetZone();
-    /*
     assert(zone);
     m_currentSystem->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
     m_currentSystem->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
-    */
 
     return FUNCTOR_CONTINUE;
 }
