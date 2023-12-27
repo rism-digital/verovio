@@ -857,6 +857,8 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
         hadSelection = true;
         m_doc.DeactiveateSelection();
     }
+    
+    m_doc.SyncToFacsimileDoc();
 
     MEIOutput meioutput(&m_doc);
     meioutput.SetScoreBasedMEI(scoreBased);
