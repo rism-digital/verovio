@@ -1413,12 +1413,9 @@ void Doc::SyncToFacsimileDoc()
         m_facsimile->AddChild(new Surface());
     }
     m_facsimile->SetType("transcription");
-    Surface *surface = vrv_cast<Surface *>(m_facsimile->FindDescendantByType(SURFACE));
-    assert(surface);
-    
-    const int width = m_options->m_pageWidth.GetUnfactoredValue();
-    const int height = m_options->m_pageHeight.GetUnfactoredValue();
-    SyncToFacsimileFunctor syncToFacimileFunctor(this, surface, height, width);
+    m_facsimile->ClearChildren();
+
+    SyncToFacsimileFunctor syncToFacimileFunctor(this);
     this->Process(syncToFacimileFunctor);
 }
 

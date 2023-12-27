@@ -109,12 +109,11 @@ FunctorCode SyncFromFacsimileFunctor::VisitSystem(System *system)
 // SyncToFacsimileFunctor
 //----------------------------------------------------------------------------
 
-SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc, Surface *surface, int height, int width) : Functor()
+SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc) : Functor()
 {
     m_doc = doc;
-    m_height = height;
-    m_width = width;
-    m_surface = surface;
+    m_view.SetDoc(doc);
+    m_surface = NULL;
     m_currentPage = NULL;
     m_currentSystem = NULL;
 }
@@ -124,8 +123,8 @@ FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement
     if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
 
     // layerElement->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
-    Zone *zone = this->GetZone(layerElement);
-    zone->SetUlx(layerElement->GetDrawingX() / DEFINITION_FACTOR);
+    Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
+    zone->SetUlx(m_view.ToLogicalX(layerElement->GetDrawingX()) / DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -134,7 +133,7 @@ FunctorCode SyncToFacsimileFunctor::VisitMeasure(Measure *measure)
 {
     // measure->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
     // measure->m_xAbs2 = zone->GetLrx() * DEFINITION_FACTOR;
-    Zone *zone = this->GetZone(measure);
+    Zone *zone = this->GetZone(measure, measure->GetClassName());
     zone->SetUlx(measure->GetDrawingX() / DEFINITION_FACTOR);
     zone->SetLrx(measure->GetDrawingX() + measure->GetWidth() / DEFINITION_FACTOR);
 
@@ -146,6 +145,18 @@ FunctorCode SyncToFacsimileFunctor::VisitPage(Page *page)
     m_currentPage = page;
     m_doc->SetDrawingPage(page->GetIdx());
     page->LayOut();
+    //
+    Surface *surface = new Surface();
+    assert(m_doc->GetFacsimile());
+    m_doc->GetFacsimile()->AddChild(surface);
+    surface->SetLrx(m_doc->m_drawingPageWidth / DEFINITION_FACTOR);
+    surface->SetLry(m_doc->m_drawingPageHeight / DEFINITION_FACTOR);
+    m_surface = new Surface();
+    surface->AddChild(m_surface);
+    m_surface->SetUlx(m_doc->m_drawingPageMarginLeft / DEFINITION_FACTOR);
+    m_surface->SetUly(m_doc->m_drawingPageMarginRight / DEFINITION_FACTOR);
+    m_surface->SetLrx(m_doc->m_drawingPageContentWidth / DEFINITION_FACTOR);
+    m_surface->SetLry(m_doc->m_drawingPageContentHeight / DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -154,10 +165,8 @@ FunctorCode SyncToFacsimileFunctor::VisitPb(Pb *pb)
 {
     // m_currentPage->m_pageHeight = zone->GetLry() * DEFINITION_FACTOR;
     // m_currentPage->m_pageWidth = zone->GetLrx() * DEFINITION_FACTOR;
-    Zone *zone = this->GetZone(pb);
-    zone->SetLry(m_height);
-    zone->SetLrx(m_width);
-    
+    // Zone *zone = this->GetZone(pb, pb->GetClassName());
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -165,9 +174,9 @@ FunctorCode SyncToFacsimileFunctor::VisitSb(Sb *sb)
 {
     // m_currentSystem->m_xAbs = zone->GetUlx() * DEFINITION_FACTOR;
     // m_currentSystem->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
-    Zone *zone = this->GetZone(sb);
-    zone->SetUlx(m_currentSystem->GetDrawingX() / DEFINITION_FACTOR);
-    zone->SetUly(m_currentSystem->GetDrawingY() / DEFINITION_FACTOR);
+    Zone *zone = this->GetZone(sb, sb->GetClassName());
+    zone->SetUlx(m_view.ToLogicalX(m_currentSystem->GetDrawingX()) / DEFINITION_FACTOR);
+    zone->SetUly(m_view.ToLogicalY(m_currentSystem->GetDrawingY()) / DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -175,8 +184,8 @@ FunctorCode SyncToFacsimileFunctor::VisitSb(Sb *sb)
 FunctorCode SyncToFacsimileFunctor::VisitStaff(Staff *staff)
 {
     // staff->m_yAbs = zone->GetUly() * DEFINITION_FACTOR;
-    Zone *zone = this->GetZone(staff);
-    zone->SetUly(staff->GetDrawingY() / DEFINITION_FACTOR);
+    Zone *zone = this->GetZone(staff, staff->GetClassName());
+    zone->SetUly(m_view.ToLogicalY(staff->GetDrawingY()) / DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -188,7 +197,7 @@ FunctorCode SyncToFacsimileFunctor::VisitSystem(System *system)
     return FUNCTOR_CONTINUE;
 }
 
-Zone *SyncToFacsimileFunctor::GetZone(FacsimileInterface *interface)
+Zone *SyncToFacsimileFunctor::GetZone(FacsimileInterface *interface, std::string type)
 {
     if (interface->GetZone()) {
         // Here we should probably check if the zone is a child of m_surface
@@ -196,6 +205,8 @@ Zone *SyncToFacsimileFunctor::GetZone(FacsimileInterface *interface)
     }
     else {
         Zone *zone = new Zone();
+        std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+        zone->SetType(type);
         m_surface->AddChild(zone);
         interface->SetFacs(StringFormat("#%s", zone->GetID().c_str()));
         interface->AttachZone(zone);

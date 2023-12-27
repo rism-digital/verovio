@@ -9,6 +9,7 @@
 #define __VRV_FACSIMILEFUNCTOR_H__
 
 #include "functor.h"
+#include "view.h"
 
 namespace vrv {
 
@@ -81,7 +82,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SyncToFacsimileFunctor(Doc *doc, Surface *surface, int height, int width);
+    SyncToFacsimileFunctor(Doc *doc);
     virtual ~SyncToFacsimileFunctor() = default;
     ///@}
 
@@ -107,20 +108,20 @@ protected:
     //
 private:
     /** Create zone if not exist */
-    Zone *GetZone(FacsimileInterface *interface);
+    Zone *GetZone(FacsimileInterface *interface, std::string type);
+
 public:
     //
 private:
     /** The doc */
     Doc *m_doc;
-    /** Page height and width */
-    int m_height;
-    int m_width;
     /** The surface we are going to add / update zone  */
     Surface *m_surface;
     //
     Page *m_currentPage;
     System *m_currentSystem;
+    //
+    View m_view;
 };
 
 } // namespace vrv

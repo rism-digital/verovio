@@ -13,8 +13,7 @@
 #include "interface.h"
 
 namespace vrv {
-class FunctorParams;
-class View;
+
 class Zone;
 
 //----------------------------------------------------------------------------
