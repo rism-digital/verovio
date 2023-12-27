@@ -59,6 +59,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
@@ -1397,8 +1398,28 @@ void Doc::SyncFromFacsimileDoc()
     PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
     this->Process(prepareFacsimile);
 
-    SyncFromFacsimileFunctor syncFacsimileFunctor;
-    this->Process(syncFacsimileFunctor);
+    SyncFromFacsimileFunctor syncFromFacsimileFunctor;
+    this->Process(syncFromFacsimileFunctor);
+}
+
+void Doc::SyncToFacsimileDoc()
+{
+    // Create a new facsimile object if we do not have one already
+    if (!this->HasFacsimile()) {
+        Facsimile *facsimile = new Facsimile();
+        this->SetFacsimile(facsimile);
+    }
+    if (!m_facsimile->FindDescendantByType(SURFACE)) {
+        m_facsimile->AddChild(new Surface());
+    }
+    m_facsimile->SetType("transcription");
+    Surface *surface = vrv_cast<Surface *>(m_facsimile->FindDescendantByType(SURFACE));
+    assert(surface);
+    
+    const int width = m_options->m_pageWidth.GetUnfactoredValue();
+    const int height = m_options->m_pageHeight.GetUnfactoredValue();
+    SyncToFacsimileFunctor syncToFacimileFunctor(this, surface, height, width);
+    this->Process(syncToFacimileFunctor);
 }
 
 void Doc::TransposeDoc()

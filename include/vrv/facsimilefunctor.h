@@ -18,6 +18,7 @@ class Page;
 class Pb;
 class Sb;
 class Staff;
+class Surface;
 class System;
 
 //----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SyncToFacsimileFunctor();
+    SyncToFacsimileFunctor(Doc *doc, Surface *surface, int height, int width);
     virtual ~SyncToFacsimileFunctor() = default;
     ///@}
 
@@ -105,10 +106,18 @@ public:
 protected:
     //
 private:
-    //
+    /** Create zone if not exist */
+    Zone *GetZone(FacsimileInterface *interface);
 public:
     //
 private:
+    /** The doc */
+    Doc *m_doc;
+    /** Page height and width */
+    int m_height;
+    int m_width;
+    /** The surface we are going to add / update zone  */
+    Surface *m_surface;
     //
     Page *m_currentPage;
     System *m_currentSystem;

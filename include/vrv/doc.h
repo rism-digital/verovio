@@ -376,6 +376,12 @@ public:
     void SyncFromFacsimileDoc();
 
     /**
+     * Sync the coordinate provided in rendering to a <facsimile>.
+     * The document must have encoded layout and the option --break encoded must have enabled.
+     */
+    void SyncToFacsimileDoc();
+    
+    /**
      * Transpose the content of the doc.
      */
     void TransposeDoc();
