@@ -2038,6 +2038,15 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
+    UpdatePageDrawingSizes();
+
+    return m_drawingPage;
+}
+
+void Doc::UpdatePageDrawingSizes()
+{
+    assert(m_drawingPage);
+
     int glyph_size;
 
     // we use the page members only if set (!= -1)
@@ -2103,8 +2112,6 @@ Page *Doc::SetDrawingPage(int pageIdx)
     glyph_size = this->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 
     m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
-
-    return m_drawingPage;
 }
 
 int Doc::CalcMusicFontSize()

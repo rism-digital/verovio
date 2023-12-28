@@ -399,6 +399,11 @@ public:
     Page *SetDrawingPage(int pageIdx);
 
     /**
+     * Update the drawing page sizes when a page is set as drawing page.
+     */
+    void UpdatePageDrawingSizes();
+
+    /**
      * Reset drawing page to NULL.
      * This might be necessary if we have replaced a page in the document.
      * We need to call this because otherwise looking at the page idx will fail.
