@@ -2884,10 +2884,6 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
             pugi::xml_node childNode = currentNode.append_child("graphic");
             this->WriteGraphic(childNode, dynamic_cast<Graphic *>(child));
         }
-        else if (child->GetClassId() == SURFACE) {
-            pugi::xml_node childNode = currentNode.append_child("surface");
-            this->WriteSurface(childNode, dynamic_cast<Surface *>(child));
-        }
         else if (child->GetClassId() == ZONE) {
             pugi::xml_node childNode = currentNode.append_child("zone");
             this->WriteZone(childNode, dynamic_cast<Zone *>(child));
@@ -8507,7 +8503,7 @@ bool MEIInput::ReadGraphic(Object *parent, pugi::xml_node graphic)
     return true;
 }
 
-bool MEIInput::ReadSurface(Object *parent, pugi::xml_node surface)
+bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 {
     assert(parent);
     Surface *vrvSurface = new Surface();
@@ -8519,9 +8515,6 @@ bool MEIInput::ReadSurface(Object *parent, pugi::xml_node surface)
     for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
         if (strcmp(child.name(), "graphic") == 0) {
             this->ReadGraphic(vrvSurface, child);
-        }
-        else if (strcmp(child.name(), "surface") == 0) {
-            this->ReadSurface(vrvSurface, child);
         }
         else if (strcmp(child.name(), "zone") == 0) {
             this->ReadZone(vrvSurface, child);
