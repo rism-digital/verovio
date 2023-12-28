@@ -954,7 +954,7 @@ Options::Options()
     m_baseOptions.AddOption(&m_scale);
 
     m_outputTo.SetInfo("Output to",
-        "Select output format to: \"mei\", \"mei-pb\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
+        "Select output format to: \"mei\", \"mei-pb\", \"mei-facs\", \"mei-basic\", \"svg\", \"midi\", \"timemap\", "
         "\"expansionmap\", \"humdrum\" or "
         "\"pae\"");
     m_outputTo.Init("svg");
