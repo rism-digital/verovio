@@ -2900,6 +2900,7 @@ void MEIOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
     assert(zone);
     this->WriteXmlId(currentNode, zone);
     zone->WriteCoordinated(currentNode);
+    zone->WriteCoordinatedUl(currentNode);
     zone->WriteTyped(currentNode);
 }
 
@@ -4141,7 +4142,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     Page *vrvPage = new Page();
     this->SetMeiID(page, vrvPage);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
@@ -4180,12 +4181,12 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     parent->AddChild(vrvPage);
     bool success = this->ReadPageChildren(vrvPage, page);
 
-    if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
+    if (success && m_doc->IsTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
         ApplyPPUFactorFunctor applyPPUFactor;
         vrvPage->Process(applyPPUFactor);
     }
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_5_0(vrvPage);
     }
 
@@ -4472,6 +4473,13 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <section>", current.name());
         }
     }
+
+    // New <measure> for blank files in neume notation
+    if (!unmeasured && parent->Is(SECTION) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+        unmeasured = new Measure(false);
+        m_doc->SetMensuralMusicOnly(true);
+        parent->AddChild(unmeasured);
+    }
     return success;
 }
 
@@ -4563,7 +4571,7 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_systemRightMar = system.attribute("system.rightmar").as_int();
         system.remove_attribute("system.rightmar");
     }
-    if (system.attribute("uly") && (m_doc->GetType() == Transcription)) {
+    if (system.attribute("uly") && m_doc->IsTranscription()) {
         vrvSystem->m_yAbs = system.attribute("uly").as_int() * DEFINITION_FACTOR;
         system.remove_attribute("uly");
     }
@@ -4612,7 +4620,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     assert(system);
                     unmeasured = new Measure(false);
                     m_doc->SetMensuralMusicOnly(true);
-                    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+                    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
                     system->AddChild(unmeasured);
@@ -5348,11 +5356,11 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeMeasureTo_5_0(measure);
     }
 
-    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && (m_doc->GetType() == Transcription)) {
+    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && m_doc->IsTranscription()) {
         vrvMeasure->ReadCoordX1(measure);
         vrvMeasure->ReadCoordX2(measure);
         vrvMeasure->m_xAbs = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
@@ -6042,11 +6050,11 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeStaffTo_5_0(staff);
     }
 
-    if (staff.attribute("coord.y1") && (m_doc->GetType() == Transcription)) {
+    if (staff.attribute("coord.y1") && m_doc->IsTranscription()) {
         vrvStaff->ReadCoordY1(staff);
         vrvStaff->m_yAbs = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
     }
@@ -6281,11 +6289,11 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeLayerElementTo_5_0(element);
     }
 
-    if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
+    if (element.attribute("coord.x1") && m_doc->IsTranscription()) {
         object->ReadCoordX1(element);
         object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
     }
@@ -6940,7 +6948,7 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
     // Add empty text node for empty syl element for invisible bbox in neume notation
-    if (!syl.first_child() && (m_doc->GetType() == Facs) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+    if (!syl.first_child() && m_doc->IsFacs() && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
         syl.text().set("");
     }
     Syl *vrvSyl = new Syl();
@@ -8524,6 +8532,7 @@ bool MEIInput::ReadZone(Surface *parent, pugi::xml_node zone)
     Zone *vrvZone = new Zone();
     this->SetMeiID(zone, vrvZone);
     vrvZone->ReadCoordinated(zone);
+    vrvZone->ReadCoordinatedUl(zone);
     vrvZone->ReadTyped(zone);
     parent->AddChild(vrvZone);
     return true;
