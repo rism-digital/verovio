@@ -35,7 +35,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SyncFromFacsimileFunctor();
+    SyncFromFacsimileFunctor(Doc *doc);
     virtual ~SyncFromFacsimileFunctor() = default;
     ///@}
 
@@ -64,6 +64,10 @@ private:
 public:
     //
 private:
+    /** The doc */
+    Doc *m_doc;
+    //
+    View m_view;
     //
     Page *m_currentPage;
     System *m_currentSystem;
@@ -115,13 +119,16 @@ public:
 private:
     /** The doc */
     Doc *m_doc;
+    //
+    View m_view;
     /** The surface we are going to add / update zone  */
     Surface *m_surface;
     //
     Page *m_currentPage;
     System *m_currentSystem;
     //
-    View m_view;
+    int m_pageMarginTop;
+    int m_pageMarginLeft;
 };
 
 } // namespace vrv

@@ -1398,7 +1398,7 @@ void Doc::SyncFromFacsimileDoc()
     PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
     this->Process(prepareFacsimile);
 
-    SyncFromFacsimileFunctor syncFromFacsimileFunctor;
+    SyncFromFacsimileFunctor syncFromFacsimileFunctor(this);
     this->Process(syncFromFacsimileFunctor);
 }
 

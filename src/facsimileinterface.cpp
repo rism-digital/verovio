@@ -35,7 +35,7 @@ FacsimileInterface::~FacsimileInterface() {}
 void FacsimileInterface::Reset()
 {
     this->ResetFacsimile();
-   
+
     m_zone = NULL;
     m_surface = NULL;
 }
@@ -116,7 +116,7 @@ FunctorCode FacsimileInterface::InterfacePrepareFacsimile(PrepareFacsimileFuncto
         LogWarning("Could not find @facs '%s' in facsimile element", facsID.c_str());
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (facsDescendant->Is(ZONE)) {
         m_zone = vrv_cast<Zone *>(facsDescendant);
         assert(m_zone);
