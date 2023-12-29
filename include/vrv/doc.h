@@ -370,7 +370,7 @@ public:
     void ConvertMarkupDoc(bool permanent = true);
 
     /**
-     * Sync the coordinate provided trought <facsimile> to m_Abs.
+     * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.
      * Call the SyncToFacsimile functor.
      */
     void SyncFromFacsimileDoc();

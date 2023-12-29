@@ -43,7 +43,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerEleme
 
     Zone *zone = layerElement->GetZone();
     assert(zone);
-    layerElement->m_xAbs = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+    layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -52,8 +52,8 @@ FunctorCode SyncFromFacsimileFunctor::VisitMeasure(Measure *measure)
 {
     Zone *zone = measure->GetZone();
     assert(zone);
-    measure->m_xAbs = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-    measure->m_xAbs2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
+    measure->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+    measure->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -97,8 +97,8 @@ FunctorCode SyncFromFacsimileFunctor::VisitSb(Sb *sb)
 
     Zone *zone = sb->GetZone();
     assert(zone);
-    m_currentSystem->m_xAbs = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-    m_currentSystem->m_yAbs = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    m_currentSystem->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+    m_currentSystem->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }
@@ -107,7 +107,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
 {
     Zone *zone = staff->GetZone();
     assert(zone);
-    staff->m_yAbs = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    staff->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
 
     return FUNCTOR_CONTINUE;
 }

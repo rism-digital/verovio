@@ -137,8 +137,8 @@ void Measure::Reset()
     this->ResetDrawingScoreDef();
 
     m_timestampAligner.Reset();
-    m_xAbs = VRV_UNSET;
-    m_xAbs2 = VRV_UNSET;
+    m_drawingFacsX1 = VRV_UNSET;
+    m_drawingFacsX2 = VRV_UNSET;
     m_drawingXRel = 0;
 
     m_cachedXRel = VRV_UNSET;
@@ -150,8 +150,8 @@ void Measure::Reset()
     m_leftBarLine.SetForm(this->GetLeft());
 
     if (!m_measuredMusic) {
-        m_xAbs = VRV_UNSET;
-        m_xAbs2 = VRV_UNSET;
+        m_drawingFacsX1 = VRV_UNSET;
+        m_drawingFacsX2 = VRV_UNSET;
     }
 
     m_drawingEnding = NULL;
@@ -216,12 +216,12 @@ int Measure::GetDrawingX() const
     if (!this->IsMeasuredMusic()) {
         const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
-        if (system->m_yAbs != VRV_UNSET) {
+        if (system->m_drawingFacsY != VRV_UNSET) {
             return (system->m_systemLeftMar);
         }
     }
 
-    if (m_xAbs != VRV_UNSET) return m_xAbs;
+    if (m_drawingFacsX1 != VRV_UNSET) return m_drawingFacsX1;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
@@ -356,7 +356,7 @@ int Measure::GetWidth() const
     if (!this->IsMeasuredMusic()) {
         const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
-        if (system->m_yAbs != VRV_UNSET) {
+        if (system->m_drawingFacsY != VRV_UNSET) {
             const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
             assert(page);
             // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
@@ -364,7 +364,7 @@ int Measure::GetWidth() const
         }
     }
 
-    if (m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    if (m_drawingFacsX2 != VRV_UNSET) return (m_drawingFacsX2 - m_drawingFacsX1);
 
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();

@@ -371,8 +371,8 @@ public:
      * This is the left and right position of the measure.
      */
     ///@{
-    int m_xAbs;
-    int m_xAbs2;
+    int m_drawingFacsX1;
+    int m_drawingFacsX2;
     ///@}
 
     /**

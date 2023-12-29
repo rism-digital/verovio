@@ -1640,8 +1640,8 @@ void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
     currentNode.append_attribute("system.rightmar")
         = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
     // y positions
-    if (system->m_yAbs != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
+    if (system->m_drawingFacsY != VRV_UNSET) {
+        currentNode.append_attribute("uly") = StringFormat("%d", system->m_drawingFacsY / DEFINITION_FACTOR).c_str();
     }
     system->WriteTyped(currentNode);
 }
@@ -1894,9 +1894,9 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
     // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_xAbs != VRV_UNSET) && (measure->m_xAbs2 != VRV_UNSET)) {
-        measure->SetCoordX1(measure->m_xAbs / DEFINITION_FACTOR);
-        measure->SetCoordX2(measure->m_xAbs2 / DEFINITION_FACTOR);
+    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET)) {
+        measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
+        measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
         measure->WriteCoordX1(currentNode);
         measure->WriteCoordX2(currentNode);
     }
@@ -2226,8 +2226,8 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     staff->WriteVisibility(currentNode);
 
     // y position
-    if (staff->m_yAbs != VRV_UNSET) {
-        staff->SetCoordY1(staff->m_yAbs / DEFINITION_FACTOR);
+    if (staff->m_drawingFacsY != VRV_UNSET) {
+        staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
 }
@@ -2306,8 +2306,8 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
-    if (element->m_xAbs != VRV_UNSET) {
-        element->SetCoordX1(element->m_xAbs / DEFINITION_FACTOR);
+    if (element->m_drawingFacsX != VRV_UNSET) {
+        element->SetCoordX1(element->m_drawingFacsX / DEFINITION_FACTOR);
         element->WriteCoordX1(currentNode);
     }
 }
@@ -4578,7 +4578,7 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
         system.remove_attribute("system.rightmar");
     }
     if (system.attribute("uly") && m_doc->IsTranscription()) {
-        vrvSystem->m_yAbs = system.attribute("uly").as_int() * DEFINITION_FACTOR;
+        vrvSystem->m_drawingFacsY = system.attribute("uly").as_int() * DEFINITION_FACTOR;
         system.remove_attribute("uly");
     }
 
@@ -5370,8 +5370,8 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && m_doc->IsTranscription()) {
         vrvMeasure->ReadCoordX1(measure);
         vrvMeasure->ReadCoordX2(measure);
-        vrvMeasure->m_xAbs = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
-        vrvMeasure->m_xAbs2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
+        vrvMeasure->m_drawingFacsX1 = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
+        vrvMeasure->m_drawingFacsX2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
     }
 
     parent->AddChild(vrvMeasure);
@@ -6063,7 +6063,7 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
 
     if (staff.attribute("coord.y1") && m_doc->IsTranscription()) {
         vrvStaff->ReadCoordY1(staff);
-        vrvStaff->m_yAbs = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
+        vrvStaff->m_drawingFacsY = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
     }
 
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
@@ -6303,7 +6303,7 @@ bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 
     if (element.attribute("coord.x1") && m_doc->IsTranscription()) {
         object->ReadCoordX1(element);
-        object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
+        object->m_drawingFacsX = object->GetCoordX1() * DEFINITION_FACTOR;
     }
 
     return true;
@@ -8471,14 +8471,14 @@ void MEIInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     assert(system);
     assert(!measure->IsMeasuredMusic());
 
-    if (system->m_yAbs == VRV_UNSET) return;
+    if (system->m_drawingFacsY == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
 
     Page *page = vrv_cast<Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
-    measure->m_xAbs = system->m_systemLeftMar;
-    measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
+    measure->m_drawingFacsX1 = system->m_systemLeftMar;
+    measure->m_drawingFacsX2 = page->m_pageWidth - system->m_systemRightMar;
 }
 
 void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
