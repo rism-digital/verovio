@@ -54,7 +54,7 @@ namespace vrv {
 
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
-Measure::Measure(bool measureMusic, int logMeasureNb)
+Measure::Measure(MeasureType measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
     , FacsimileInterface()
     , AttBarring()
@@ -76,7 +76,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
 
-    m_measuredMusic = measureMusic;
+    m_measureType = measureMusic;
 
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
@@ -149,7 +149,7 @@ void Measure::Reset()
     m_rightBarLine.SetForm(this->GetRight());
     m_leftBarLine.SetForm(this->GetLeft());
 
-    if (!m_measuredMusic) {
+    if (!m_measureType) {
         m_drawingFacsX1 = VRV_UNSET;
         m_drawingFacsX2 = VRV_UNSET;
     }

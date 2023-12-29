@@ -2875,7 +2875,7 @@ bool PAEInput::Import(const std::string &input)
     }
 
     // Add a measure at the beginning of the data because there is always at least one measure
-    Measure *measure = new Measure(true, 1);
+    Measure *measure = new Measure(MEASURED, 1);
     // By default there is no end barline on an incipit
     measure->SetRight(BARRENDITION_invis);
     m_pae.push_back(pae::Token(0, pae::UNKOWN_POS, measure));
@@ -3394,7 +3394,7 @@ bool PAEInput::ConvertMeasure()
             // We can now create a new measure but not if we have reached the end of the data
             if (!token.IsEnd()) {
                 measureCount++;
-                currentMeasure = new Measure(true, measureCount);
+                currentMeasure = new Measure(MEASURED, measureCount);
                 currentMeasure->SetRight(BARRENDITION_invis);
                 measureToken->m_object = currentMeasure;
             }
