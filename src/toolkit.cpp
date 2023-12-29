@@ -752,9 +752,14 @@ bool Toolkit::LoadData(const std::string &data)
         breaks = BREAKS_none;
     }
 
-    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
-    // to be converted
-    if (m_doc.IsTranscription() || m_doc.IsFacs()) breaks = BREAKS_none;
+    // Always set breaks to 'none' with Facs rendering
+    if (m_doc.IsFacs()) breaks = BREAKS_none;
+
+    // Always set breaks to 'none' or 'encoded' with Transcription rendering
+    // rendering them differenty requires the MEI
+    if (m_doc.IsTranscription()) {
+        breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
+    }
 
     if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
@@ -785,6 +790,10 @@ bool Toolkit::LoadData(const std::string &data)
             m_doc.CastOffDoc();
             // LogElapsedTimeEnd("cast-off");
         }
+    }
+
+    if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
+        m_doc.SyncFromFacsimileDoc();
     }
 
     delete input;

@@ -3999,10 +3999,6 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());
         }
 
-        if (success && m_doc->IsTranscription()) {
-            m_doc->SyncFromFacsimileDoc();
-        }
-
         if (success && !m_hasScoreDef) {
             LogWarning("No scoreDef provided, trying to generate one...");
             success = m_doc->GenerateDocumentScoreDef();
