@@ -445,7 +445,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteSymbolTable(m_currentNode, vrv_cast<SymbolTable *>(object));
     }
     else if (object->Is(MEASURE)) {
-        m_currentNode = m_currentNode.append_child("measure");
+        Measure *measure = vrv_cast<Measure *>(object);
+        assert(measure);
+        std::string name = "measure";
+        if (measure->IsNeumeLine()) {
+            name = "section";
+            measure->SetType(NEUME_LINE_TYPE);
+        }
+        m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteMeasure(m_currentNode, vrv_cast<Measure *>(object));
     }
     else if (object->Is(STAFF)) {
@@ -4394,7 +4401,13 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
 bool MEIInput::ReadSection(Object *parent, pugi::xml_node section)
 {
     Section *vrvSection = new Section();
-    this->SetMeiID(section, vrvSection);
+    this->ReadSystemElement(section, vrvSection);
+
+    if (vrvSection->GetType() == NEUME_LINE_TYPE) {
+        delete vrvSection;
+        m_doc->SetNeumeLines(true);
+        return ReadSectionChildren(parent, section);
+    }
 
     vrvSection->ReadNNumberLike(section);
     vrvSection->ReadSectionVis(section);
@@ -4454,8 +4467,13 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is(SECTION)) {
-                    unmeasured = new Measure(false);
-                    m_doc->SetMensuralMusicOnly(true);
+                    if (m_doc->IsNeumeLines()) {
+                        unmeasured = new Measure(NEUMELINE);
+                    }
+                    else {
+                        unmeasured = new Measure(UNMEASURED);
+                        m_doc->SetMensuralMusicOnly(true);
+                    }
                     parent->AddChild(unmeasured);
                 }
                 else {
@@ -4484,8 +4502,13 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
 
     // New <measure> for blank files in neume notation
     if (!unmeasured && parent->Is(SECTION) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
-        unmeasured = new Measure(false);
-        m_doc->SetMensuralMusicOnly(true);
+        if (m_doc->IsNeumeLines()) {
+            unmeasured = new Measure(NEUMELINE);
+        }
+        else {
+            unmeasured = new Measure(UNMEASURED);
+            m_doc->SetMensuralMusicOnly(true);
+        }
         parent->AddChild(unmeasured);
     }
     return success;
@@ -4628,7 +4651,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                 if (parent->Is(SYSTEM)) {
                     System *system = vrv_cast<System *>(parent);
                     assert(system);
-                    unmeasured = new Measure(false);
+                    unmeasured = new Measure(UNMEASURED);
                     m_doc->SetMensuralMusicOnly(true);
                     if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
