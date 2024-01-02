@@ -1,5 +1,19 @@
 # Changelog
 
+## [unreleased]
+
+## [4.1.0] - 2023-12-15
+* Support for staves ordered by `scoreDef`
+* Support for `rend@letterspacing` and `syl@letterspacing` in MEI vu
+* Support for `nc@loc`
+* Support for `note@head.color`
+* Support for `note@head.fill` with `@headshape="diammond"`
+* Support for `staffDef@oct.default`
+* Improved metadata in the Humdrum importer (@gregchapman-dev)
+* Improved layout with labels in verses
+* Fix validity of the MEI header output in MEI Basic
+* Fix for the Java binding and cocoaPods
+
 ## [4.0.1] - 2023-09-05
 * Fix MEI version in output
 

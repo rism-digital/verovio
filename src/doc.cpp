@@ -869,7 +869,7 @@ void Doc::PrepareData()
     }
 
     /************ Resolve @facs ************/
-    if (this->GetType() == Facs) {
+    if (this->IsFacs()) {
         // Associate zones with elements
         PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
         this->Process(prepareFacsimile);
@@ -1281,15 +1281,18 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     if (!m_isMensuralMusicOnly) return;
 
     // Do not convert transcription files
-    if (this->GetType() == Transcription) return;
+    if (this->IsTranscription()) return;
 
     // Do not convert facs files
-    if (this->GetType() == Facs) return;
+    if (this->IsFacs()) return;
 
     // We are converting to measure music in a definite way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
         m_isMensuralMusicOnly = false;
     }
+
+    // Calling Doc::PrepareData is expected to collect visible scores
+    assert(m_dataPreparationDone);
 
     // Make sure the document is not cast-off
     this->UnCastOffDoc();
@@ -2085,7 +2088,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
+    if (this->IsTranscription() || this->IsFacs()) {
         return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
     }
 
@@ -2097,7 +2100,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
+    if (this->IsTranscription() || this->IsFacs()) {
         return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
     }
 

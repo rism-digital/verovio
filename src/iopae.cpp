@@ -2303,7 +2303,7 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_026_GRACE_NESTED, "The appoggiatura must be closed with 'r' before starting a new one." },
     { ERR_027_GRACE_CLOSING, "An extra 'r' is present to close an appoggiatura" },
     { ERR_028_GRACE_OPEN, "The appoggiatura must be closed with 'r' before the end of the measure." },
-    { ERR_029_GRACE_UNRESOLVED, "An appoggiatura cannot be started using 'q' before completing the previous one." },
+    { ERR_029_GRACE_UNRESOLVED, "A grace note cannot be started with 'g' or 'q' before completing the previous one." },
     { ERR_030_GRACE_DURATION, "No rhythmic value can be entered when using an acciaccatura with 'g'." },
     { ERR_031_GRACE_NO_NOTE, "A grace note using 'g' or 'q' must be followed by a note." },
     { ERR_032_TUPLET_NESTED, "A special rhythm group cannot be started with '(' before closing the previous one." },

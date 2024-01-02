@@ -1238,7 +1238,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     dc->StartGraphic(staff, "", staff->GetID());
 
-    if (m_doc->GetType() == Facs) {
+    if (m_doc->IsFacs()) {
         staff->SetFromFacsimile(m_doc);
     }
 
@@ -1283,7 +1283,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
 
     int j, x1, x2, y1, y2;
 
-    if (staff->HasFacs() && (m_doc->GetType() == Facs)) {
+    if (staff->HasFacs() && m_doc->IsFacs()) {
         double d = staff->GetDrawingRotate();
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();

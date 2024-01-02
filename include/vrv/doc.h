@@ -114,6 +114,10 @@ public:
     ///@{
     DocType GetType() const { return m_type; }
     void SetType(DocType type);
+    bool IsFacs() const { return (m_type == Facs); }
+    bool IsRaw() const { return (m_type == Raw); }
+    bool IsRendering() const { return (m_type == Rendering); }
+    bool IsTranscription() const { return (m_type == Transcription); }
     ///@}
 
     /**

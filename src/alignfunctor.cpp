@@ -642,6 +642,12 @@ FunctorCode AlignVerticallyFunctor::VisitSystemEnd(System *system)
     m_cumulatedShift = 0;
     m_staffIdx = 0;
 
+    // StaffAlignment are added following the staff element in the measures
+    // We can now reorder them according to the scoreDef order
+    if (system->GetDrawingScoreDef()) {
+        system->m_systemAligner.ReorderBy(system->GetDrawingScoreDef()->GetStaffNs());
+    }
+
     system->m_systemAligner.Process(*this);
 
     return FUNCTOR_SIBLINGS;
