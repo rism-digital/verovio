@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Dec 12 11:01:04 PST 2023
+// Last Modified: Tue Jan  2 22:35:54 PST 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -22600,6 +22600,31 @@ void HumdrumFileBase::clearTokenLinkInfo(void) {
 
 //////////////////////////////
 //
+// HumdrumFileContent::analyzeAccidentals -- Analyze kern and mens accidentals.
+//
+
+bool HumdrumFileContent::analyzeAccidentals(void) {
+	bool status = true;
+	status &= analyzeKernAccidentals();
+	status &= analyzeMensAccidentals();
+	return status;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeMensAccidentals -- Analyze kern and mens accidentals.
+//
+
+bool HumdrumFileContent::analyzeMensAccidentals(void) {
+	return analyzeKernAccidentals("**mens");
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumFileContent::analyzeKernAccidentals -- Identify accidentals that
 //    should be printed (only in **kern spines) as well as cautionary
 //    accidentals (accidentals which are forced to be displayed but otherwise
@@ -22608,7 +22633,7 @@ void HumdrumFileBase::clearTokenLinkInfo(void) {
 //    about grace-note accidental display still needs to be done.
 //
 
-bool HumdrumFileContent::analyzeKernAccidentals(void) {
+bool HumdrumFileContent::analyzeKernAccidentals(const string& dataType) {
 
 	// ottava marks must be analyzed first:
 	this->analyzeOttavas();
@@ -22620,7 +22645,17 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 
 	// ktracks == List of **kern spines in data.
 	// rtracks == Reverse mapping from track to ktrack index (part/staff index).
-	vector<HTp> ktracks = getKernSpineStartList();
+	vector<HTp> ktracks;
+	if ((dataType == "**kern") || dataType.empty()) {
+		ktracks = getKernSpineStartList();
+	} else if (dataType == "**mens") {
+		getSpineStartList(ktracks, "**mens");
+	} else {
+		getSpineStartList(ktracks, dataType);
+	}
+	if (ktracks.empty()) {
+		return true;
+	}
 	vector<int> rtracks(getMaxTrack()+1, -1);
 	for (i=0; i<(int)ktracks.size(); i++) {
 		track = ktracks[i]->getTrack();
@@ -23009,10 +23044,10 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if ((loc != string::npos) && (loc > 0)) {
 						if (subtok[loc-1] == '#') {
 							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
-									token->setValue("auto", to_string(k), "visualAccidental", "true");
+							token->setValue("auto", to_string(k), "visualAccidental", "true");
 						} else if (subtok[loc-1] == '-') {
 							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
-									token->setValue("auto", to_string(k), "visualAccidental", "true");
+							token->setValue("auto", to_string(k), "visualAccidental", "true");
 						} else if (subtok[loc-1] == 'n') {
 							token->setValue("auto", to_string(k), "cautionaryAccidental", "true");
 							token->setValue("auto", to_string(k), "visualAccidental", "true");
@@ -23025,7 +23060,8 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 	}
 
 	// Indicate that the accidental analysis has been done:
-	infile.setValue("auto", "accidentalAnalysis", "true");
+	string dataTypeDone = "accidentalAnalysis" + dataType;
+	infile.setValue("auto", dataTypeDone, "true");
 
 	return true;
 }
@@ -23039,23 +23075,26 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 //    only by HumdrumFileContent::analyzeKernAccidentals().
 //
 
-void HumdrumFileContent::fillKeySignature(vector<int>& states,
-		const string& keysig) {
+void HumdrumFileContent::fillKeySignature(vector<int>& states, const string& keysig) {
+	if (states.size() < 7) {
+		cerr << "In HumdrumFileContent::fillKeySignature, states is too small: " << states.size() << endl;
+		return;
+	}
 	std::fill(states.begin(), states.end(), 0);
-	if (keysig.find("f#") != string::npos) { states[3] = +1; }
-	if (keysig.find("c#") != string::npos) { states[0] = +1; }
-	if (keysig.find("g#") != string::npos) { states[4] = +1; }
-	if (keysig.find("d#") != string::npos) { states[1] = +1; }
-	if (keysig.find("a#") != string::npos) { states[5] = +1; }
-	if (keysig.find("e#") != string::npos) { states[2] = +1; }
-	if (keysig.find("b#") != string::npos) { states[6] = +1; }
-	if (keysig.find("b-") != string::npos) { states[6] = -1; }
-	if (keysig.find("e-") != string::npos) { states[2] = -1; }
-	if (keysig.find("a-") != string::npos) { states[5] = -1; }
-	if (keysig.find("d-") != string::npos) { states[1] = -1; }
-	if (keysig.find("g-") != string::npos) { states[4] = -1; }
-	if (keysig.find("c-") != string::npos) { states[0] = -1; }
-	if (keysig.find("f-") != string::npos) { states[3] = -1; }
+	if (keysig.find("f#") != string::npos) { states.at(3) = +1; }
+	if (keysig.find("c#") != string::npos) { states.at(0) = +1; }
+	if (keysig.find("g#") != string::npos) { states.at(4) = +1; }
+	if (keysig.find("d#") != string::npos) { states.at(1) = +1; }
+	if (keysig.find("a#") != string::npos) { states.at(5) = +1; }
+	if (keysig.find("e#") != string::npos) { states.at(2) = +1; }
+	if (keysig.find("b#") != string::npos) { states.at(6) = +1; }
+	if (keysig.find("b-") != string::npos) { states.at(6) = -1; }
+	if (keysig.find("e-") != string::npos) { states.at(2) = -1; }
+	if (keysig.find("a-") != string::npos) { states.at(5) = -1; }
+	if (keysig.find("d-") != string::npos) { states.at(1) = -1; }
+	if (keysig.find("g-") != string::npos) { states.at(4) = -1; }
+	if (keysig.find("c-") != string::npos) { states.at(0) = -1; }
+	if (keysig.find("f-") != string::npos) { states.at(3) = -1; }
 }
 
 
@@ -34048,10 +34087,19 @@ int HumdrumToken::hasVisibleAccidental(int subtokenIndex) const {
 	if (humfile == NULL) {
 		return -1;
 	}
-	if (!humfile->getValueBool("auto", "accidentalAnalysis")) {
-		int status = humfile->analyzeKernAccidentals();
-		if (!status) {
-			return -1;
+	if (isKern()) {
+		if (!humfile->getValueBool("auto", "accidentalAnalysis**kern")) {
+			int status = humfile->analyzeKernAccidentals();
+			if (!status) {
+				return -1;
+			}
+		}
+	} else if (isMens()) {
+		if (!humfile->getValueBool("auto", "accidentalAnalysis**mens")) {
+			int status = humfile->analyzeMensAccidentals();
+			if (!status) {
+				return -1;
+			}
 		}
 	}
 	return getValueBool("auto", to_string(subtokenIndex), "visualAccidental");
@@ -34078,10 +34126,19 @@ int HumdrumToken::hasCautionaryAccidental(int subtokenIndex) const {
 	if (humfile == NULL) {
 		return -1;
 	}
-	if (!humfile->getValueBool("auto", "accidentalAnalysis")) {
-		int status = humfile->analyzeKernAccidentals();
-		if (!status) {
-			return -1;
+	if (isKern()) {
+		if (!humfile->getValueBool("auto", "accidentalAnalysis**kern")) {
+			int status = humfile->analyzeKernAccidentals();
+			if (!status) {
+				return -1;
+			}
+		}
+	} else if (isMens()) {
+		if (!humfile->getValueBool("auto", "accidentalAnalysis**mens")) {
+			int status = humfile->analyzeMensAccidentals();
+			if (!status) {
+				return -1;
+			}
 		}
 	}
 	return getValueBool("auto", to_string(subtokenIndex), "cautionaryAccidental");
@@ -105903,9 +105960,59 @@ void Tool_myank::printStarting(HumdrumFile& infile) {
 		if (!m_hideStarting) {
 			m_humdrum_text << infile[i] << "\n";
 		} else {
-			if (infile[i].rfind("!!!RDF", 0) == 0) {
+			if (infile[i].rfind("!!!RDF", 0) == 0 || infile[i].rfind("!!!system-decoration", 0) == 0) {
 				m_humdrum_text << infile[i] << "\n";
 			}
+		}
+	}
+
+	// keep *part interpretations
+	bool hasPart = false;
+	for (i=exi+1; i<infile.getLineCount(); i++) {
+		hasPart = false;
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			if (infile.token(i, j)->compare(0, 5, "*part") == 0) {
+				hasPart = true;
+				break;
+			}
+		}
+		if (hasPart) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (infile.token(i, j)->compare(0, 5, "*part") == 0) {
+					m_humdrum_text << infile.token(i, j);
+				} else {
+					m_humdrum_text << "*";
+				}
+				if (j < infile[i].getFieldCount() - 1) {
+					m_humdrum_text << "\t";
+				}
+			}
+			m_humdrum_text << "\n";
+		}
+	}
+
+	// keep *staff interpretations
+	bool hasStaff = false;
+	for (i=exi+1; i<infile.getLineCount(); i++) {
+		hasStaff = false;
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			if (infile.token(i, j)->compare(0, 6, "*staff") == 0) {
+				hasStaff = true;
+				break;
+			}
+		}
+		if (hasStaff) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (infile.token(i, j)->compare(0, 6, "*staff") == 0) {
+					m_humdrum_text << infile.token(i, j);
+				} else {
+					m_humdrum_text << "*";
+				}
+				if (j < infile[i].getFieldCount() - 1) {
+					m_humdrum_text << "\t";
+				}
+			}
+			m_humdrum_text << "\n";
 		}
 	}
 
@@ -105999,7 +106106,7 @@ void Tool_myank::printEnding(HumdrumFile& infile, int lastline, int adjlin) {
 	if (startline >= 0) {
 		for (i=startline; i<infile.getLineCount(); i++) {
 			if (m_hideEnding && (i > ending)) {
-				if (infile[i].rfind("!!!RDF", 0) == 0) {
+				if (infile[i].rfind("!!!RDF", 0) == 0 || infile[i].rfind("!!!system-decoration", 0) == 0) {
 					m_humdrum_text << infile[i] << "\n";
 				}
 			} else {
@@ -122010,10 +122117,20 @@ string Tool_tspos::generateTable(HumdrumFile& infile, vector<string>& names) {
 // Tool_tspos::makeOpacityColor --
 //
 
-string Tool_tspos::makeOpacityColor(string& color, double value, double total) {
+string Tool_tspos::makeOpacityColor(string& color, double value, double total, bool enhance) {
 	stringstream output;
-	int percent  = int(value / total * 255.49 + 0.5);
-	output << color << std::hex << std::setw(2) << std::setfill('0') << percent << std::dec;
+	int opacity;
+	if (enhance) {
+		opacity = logisticColorMap(value, total);
+	} else {
+		opacity  = int(value / total * 255.49 + 0.5);
+	}
+	if (opacity < 0) {
+		opacity = 0;
+	} else if (opacity > 255) {
+		opacity = 255;
+	}
+	output << color << std::hex << std::setw(2) << std::setfill('0') << opacity << std::dec;
 	return output.str();
 }
 
@@ -122604,6 +122721,29 @@ int Tool_tspos::getToolCounter(HumdrumFile& infile) {
 		}
 	}
 	return counter;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tspos::logisticColorMap -- Increase sensitivity of color mapping
+//    around 40%.
+//
+
+int Tool_tspos::logisticColorMap(double input, double max) {
+	double center = max * 0.40;
+	double k = 0.04;
+	int output = max / (1.0 + pow(M_E, -k * (input + center) - (max + center)/2));
+	output -= 11.4209;
+	output = output * 255.0 / 243.377;
+	if (output < 0) {
+		output = 0;
+	}
+	if (output > 255) {
+		output = 255;
+	}
+	return output;
 }
 
 

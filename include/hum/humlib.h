@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Dec 12 11:01:04 PST 2023
+// Last Modified: Tue Jan  2 22:35:54 PST 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -2499,7 +2499,9 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool   analyzePhrasings           (void);
 		bool   analyzeTextRepetition      (void);
 		bool   analyzeKernTies            (void);
-		bool   analyzeKernAccidentals     (void);
+		bool   analyzeAccidentals         (void);
+		bool   analyzeKernAccidentals     (const std::string& dataType = "**kern");
+		bool   analyzeMensAccidentals     (void);
 		bool   analyzeRScale              (void);
 
 		// in HumdrumFileContent-rest.cpp
@@ -10628,9 +10630,10 @@ class Tool_tspos : public HumTool {
 		bool             hasFullTriadAttack(HumdrumLine& line);
 		void             avoidRdfCollisions(HumdrumFile& infile);
 		void             printUsedMarkers(void);
-		std::string      makeOpacityColor(std::string& color, double value, double total);
+		std::string      makeOpacityColor(std::string& color, double value, double total, bool enhance = false);
 		int              getToolCounter(HumdrumFile& infile);
 		std::string      makePercentString(double value, double total, int digits);
+		int              logisticColorMap(double input, double max);
 
 	private:
 		std::string m_root_marker      = "@";
