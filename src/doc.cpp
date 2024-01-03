@@ -1291,9 +1291,6 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
         m_isMensuralMusicOnly = false;
     }
 
-    // Calling Doc::PrepareData is expected to collect visible scores
-    assert(m_dataPreparationDone);
-
     // Make sure the document is not cast-off
     this->UnCastOffDoc();
 
