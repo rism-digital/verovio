@@ -774,7 +774,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernTies();
     // infile.analyzeKernStemLengths();
     infile.analyzeRestPositions();
-    infile.analyzeKernAccidentals();
+    infile.analyzeAccidentals();
     infile.analyzeTextRepetition();
     parseSignifiers(infile);
     if (!m_signifiers.kernTerminalLong.empty()) {
@@ -25831,7 +25831,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     bool mensit = false;
-    bool gesturalQ = false;
     bool hasAccidental = false;
     int accidlevel = 0;
     if (m_mens && token->isMensLike()) {
@@ -25854,14 +25853,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         else if (tstring.find("y") != std::string::npos) {
             accidlevel = 4;
         }
-        if (accidlevel <= ss[staffindex].acclev) {
-            gesturalQ = false;
-        }
-        else {
-            gesturalQ = true;
-        }
     }
-
     Accid *accid = NULL;
 
     int accidCount = hum::Convert::base40ToAccidental(base40);
@@ -25908,7 +25900,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             subelementQ = true;
         }
 
-        if (gesturalQ) {
+        if (showInAccidGes) {
             switch (accidCount) {
                 case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
                 case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
@@ -26014,7 +26006,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                 showInAccid = false;
             }
         }
-
         if (!editorialQ) {
             if (showInAccid) {
                 switch (accidCount) {
