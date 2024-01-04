@@ -150,8 +150,8 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
         secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     }
 
-    // Number of bars to draw
-    const int allBars = fTrem->GetBeams();
+    // Number of beams to draw
+    const int allBars = fTrem->HasBeams() ? fTrem->GetBeams() : fTrem->GetUnitdur() - DURATION_4;
     int floatingBars = fTrem->HasBeamsFloat() ? fTrem->GetBeamsFloat() : 0;
     int fullBars = allBars - floatingBars;
 
