@@ -2710,6 +2710,7 @@ void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     this->WritePitchInterface(currentNode, nc);
     this->WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
+    nc->WriteCurvatureDirection(currentNode);
     nc->WriteIntervalMelodic(currentNode);
     nc->WriteNcForm(currentNode);
 }

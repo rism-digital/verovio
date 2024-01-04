@@ -948,7 +948,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                 contour = it->second;
             }
             else if (it->first == "curve") {
-                Liquescent *liquescent = new Liquescent();
                 curvatureDirection_CURVE curve = curvatureDirection_CURVE_NONE;
                 if (it->second == "a") {
                     curve = curvatureDirection_CURVE_a;
@@ -958,7 +957,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     curve = curvatureDirection_CURVE_c;
                     nc->SetCurve(curve);
                 }
-                nc->AddChild(liquescent);
             }
         }
 
