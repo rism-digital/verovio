@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Support for `fTrem@unitdur` (@eNote-GmbH)
 
 ## [4.1.0] - 2023-12-15
 * Support for staves ordered by `scoreDef`
