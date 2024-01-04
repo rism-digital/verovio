@@ -48,7 +48,6 @@ void SystemAligner::Reset()
     m_spacingTypes.clear();
     m_system = NULL;
 
-    ArrayOfObjects &children = this->GetChildrenForModification();
     m_bottomAlignment = new StaffAlignment();
     m_bottomAlignment->SetStaff(NULL, NULL, this->GetAboveSpacingType(NULL));
     m_bottomAlignment->SetParentSystem(this->GetSystem());
