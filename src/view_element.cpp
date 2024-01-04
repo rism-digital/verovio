@@ -113,7 +113,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawCustos(dc, element, layer, staff, measure);
     }
     else if (element->Is(DIVLINE)) {
-        DrawDivLine(dc, element, layer, staff, measure);
+        this->DrawDivLine(dc, element, layer, staff, measure);
     }
     else if (element->Is(DOT)) {
         this->DrawDot(dc, element, layer, staff, measure);
