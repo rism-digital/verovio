@@ -1526,6 +1526,11 @@ const Score *Doc::GetCorrespondingScore(const Object *object) const
     return this->GetCorrespondingScore(object, m_visibleScores);
 }
 
+Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores)
+{
+    return const_cast<Score *>(std::as_const(*this).GetCorrespondingScore(object, scores));
+}
+
 const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const
 {
     assert(!scores.empty());
