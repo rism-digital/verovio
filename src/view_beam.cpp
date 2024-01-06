@@ -49,6 +49,14 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
+    if (beam->GetFirst(FTREM)) {
+        // If there is a fTrem we ignore the beam and just handle its children
+        dc->StartGraphic(element, "", element->GetID());
+        this->DrawLayerChildren(dc, beam, layer, staff, measure);
+        dc->EndGraphic(element, this);
+        return;
+    }
+
     beam->m_beamSegment.InitCoordRefs(beam->GetElementCoords());
 
     data_BEAMPLACE initialPlace = beam->GetPlace();
