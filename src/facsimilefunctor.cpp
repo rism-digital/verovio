@@ -149,7 +149,7 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
         m_currentNeumeLine->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
         m_staffZones[staff] = zone;
 
-        // The staff slope is going up. The y left postion needs to be adjusted accordingly
+        // The staff slope is going up. The y left position needs to be adjusted accordingly
         if (zone->GetRotate() < 0) {
             staff->m_drawingFacsY = staff->m_drawingFacsY
                 + (m_currentNeumeLine->m_drawingFacsX2 - m_currentNeumeLine->m_drawingFacsX1)

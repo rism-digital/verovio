@@ -94,6 +94,12 @@ void Staff::CloneReset()
     m_drawingRotation = 0.0;
 }
 
+int Staff::GetDrawingRotationOffsetFor(int x)
+{
+    int xDiff = x - this->GetDrawingX();
+    return int(xDiff * tan(this->GetDrawingRotation() * M_PI / 180.0));
+}
+
 void Staff::ClearLedgerLines()
 {
     m_ledgerLinesAbove.clear();

@@ -120,6 +120,7 @@ public:
     void SetDrawingRotation(double drawingRotation) { m_drawingRotation = drawingRotation; }
     double GetDrawingRotation() const { return m_drawingRotation; }
     bool HasDrawingRotation() const { return (m_drawingRotation != 0.0); }
+    int GetDrawingRotationOffsetFor(int x);
     ///@}
 
     /**
