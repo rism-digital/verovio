@@ -775,6 +775,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (staff->HasDrawingRotation()) {
         y -= staff->GetDrawingRotationOffsetFor(x);
     }
+    else if (staff->HasDrawingRotation()) {
+        y -= staff->GetDrawingRotationOffsetFor(x);
+    }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
