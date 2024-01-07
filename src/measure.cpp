@@ -213,6 +213,7 @@ void Measure::AddChildBack(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    /*
     if (!this->IsMeasuredMusic()) {
         const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
@@ -220,6 +221,7 @@ int Measure::GetDrawingX() const
             return (system->m_systemLeftMar);
         }
     }
+    */
 
     if (m_drawingFacsX1 != VRV_UNSET) return m_drawingFacsX1;
 
@@ -353,6 +355,7 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
+    /*
     if (!this->IsMeasuredMusic()) {
         const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
         assert(system);
@@ -363,6 +366,7 @@ int Measure::GetWidth() const
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
         }
     }
+    */
 
     if (m_drawingFacsX2 != VRV_UNSET) return (m_drawingFacsX2 - m_drawingFacsX1);
 
