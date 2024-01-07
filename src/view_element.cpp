@@ -300,16 +300,19 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     if (notationType == NOTATIONTYPE_neume) {
-        int rotateOffset = 0;
+        int rotationOffset = 0;
         if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
             double deg = staff->GetDrawingRotate();
             int xDiff = x - staff->GetDrawingX();
-            rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+            rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
+        }
+        else if (staff->HasDrawingRotation()) {
+            rotationOffset = staff->GetDrawingRotationOffsetFor(x);
         }
         if (accid->HasFacs() && m_doc->IsFacs()) {
             y = ToLogicalY(y);
         }
-        y -= rotateOffset;
+        y -= rotationOffset;
     }
 
     this->DrawSmuflString(
@@ -676,6 +679,9 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             int xDiff = x - staff->GetDrawingX();
             y -= int(xDiff * tan(deg * M_PI / 180.0));
         }
+        else if (staff->HasDrawingRotation()) {
+            y -= staff->GetDrawingRotationOffsetFor(x);
+        }
     }
     else if (clef->GetShape() == CLEFSHAPE_perc) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
@@ -793,6 +799,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
         y -= int(xDiff * tan(deg * M_PI / 180.0));
+    }
+    else if (staff->HasDrawingRotation()) {
+        y -= staff->GetDrawingRotationOffsetFor(x);
     }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
