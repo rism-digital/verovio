@@ -957,6 +957,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
                     curve = curvatureDirection_CURVE_c;
                     nc->SetCurve(curve);
                 }
+                Liquescent *liquescent = new Liquescent();
+                nc->AddChild(liquescent);
             }
         }
 
