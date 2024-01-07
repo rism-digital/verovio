@@ -113,6 +113,16 @@ public:
     ///@}
 
     /**
+     * @name Getters and setters for the rotation.
+     * Used only with facsimile rendering.
+     */
+    ///@{
+    void SetDrawingRotation(double drawingRotation) { m_drawingRotation = drawingRotation; }
+    double GetDrawingRotation() const { return m_drawingRotation; }
+    bool HasDrawingRotation() const { return (m_drawingRotation != 0.0); }
+    ///@}
+
+    /**
      * Delete all the legder line arrays.
      */
     void ClearLedgerLines();
@@ -290,6 +300,12 @@ private:
     ArrayOfLedgerLines m_ledgerLinesAboveCue;
     ArrayOfLedgerLines m_ledgerLinesBelowCue;
     ///@}
+
+    /**
+     * The drawing rotation.
+     * Used only with facsimile rendering
+     */
+    double m_drawingRotation;
 };
 
 } // namespace vrv

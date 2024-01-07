@@ -1295,7 +1295,12 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
         x1 = measure->GetDrawingX();
         x2 = x1 + measure->GetWidth();
         y1 = staff->GetDrawingY();
-        y2 = y1;
+        if (!staff->HasDrawingRotation()) {
+            y2 = y1;
+        }
+        else {
+            y2 = y1 - staff->GetWidth() * tan(staff->GetDrawingRotation() * M_PI / 180.0);
+        }
     }
 
     const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
