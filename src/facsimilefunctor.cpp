@@ -106,9 +106,11 @@ FunctorCode SyncFromFacsimileFunctor::VisitPb(Pb *pb)
     assert(m_currentPage);
 
     Zone *zone = pb->GetZone();
-    assert(zone && zone->GetParent());
-    Surface *surface = (zone->GetParent()->Is(SURFACE)) ? vrv_cast<Surface *>(zone->GetParent()) : NULL;
-    // Use the parent surface attributes if given
+    Surface *surface = pb->GetSurface();
+    if (!surface && zone && zone->GetParent())
+        surface = (zone->GetParent()->Is(SURFACE)) ? vrv_cast<Surface *>(zone->GetParent()) : NULL;
+    assert(zone || surface);
+    // Use the (parent) surface attributes if given
     if (surface && surface->HasLrx() && surface->HasLry()) {
         m_currentPage->m_pageHeight = surface->GetLry() * DEFINITION_FACTOR;
         m_currentPage->m_pageWidth = surface->GetLrx() * DEFINITION_FACTOR;
