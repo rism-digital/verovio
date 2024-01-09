@@ -1291,9 +1291,6 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
         m_isMensuralMusicOnly = false;
     }
 
-    // Calling Doc::PrepareData is expected to collect visible scores
-    assert(m_dataPreparationDone);
-
     // Make sure the document is not cast-off
     this->UnCastOffDoc();
 
@@ -1526,10 +1523,20 @@ Score *Doc::GetCorrespondingScore(const Object *object)
 
 const Score *Doc::GetCorrespondingScore(const Object *object) const
 {
-    assert(!m_visibleScores.empty());
+    return this->GetCorrespondingScore(object, m_visibleScores);
+}
 
-    const Score *correspondingScore = m_visibleScores.front();
-    for (Score *score : m_visibleScores) {
+Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores)
+{
+    return const_cast<Score *>(std::as_const(*this).GetCorrespondingScore(object, scores));
+}
+
+const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const
+{
+    assert(!scores.empty());
+
+    const Score *correspondingScore = scores.front();
+    for (Score *score : scores) {
         if ((score == object) || Object::IsPreOrdered(score, object)) {
             correspondingScore = score;
         }

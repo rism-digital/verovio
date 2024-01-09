@@ -163,6 +163,9 @@ public:
     ///@{
     Score *GetCorrespondingScore(const Object *object);
     const Score *GetCorrespondingScore(const Object *object) const;
+    // Generic version that does not necessarily rely on precalculated visible scores
+    Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores);
+    const Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const;
     ///@}
 
     /**
