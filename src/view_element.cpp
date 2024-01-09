@@ -766,17 +766,18 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
 
     int x, y;
-    if (custos->HasFacs() && m_doc->IsFacs()) {
+    // For neume notation we ignore the value set in CalcAlignmentPitchPosFunctor
+    if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
         x = custos->GetDrawingX();
         // Recalculate y from pitch to prevent visual/meaning mismatch
         Clef *clef = layer->GetClef(element);
-        y = ToLogicalY(staff->GetDrawingY());
+        y = staff->GetDrawingY();
         PitchInterface pi;
         // Neume notation uses C3 for C clef rather than C4.
         // Take this into account when determining location.
         // However this doesn't affect the value for F clef.
         pi.SetPname(PITCHNAME_c);
-        if ((staff->m_drawingNotationType == NOTATIONTYPE_neume) && (clef->GetShape() == CLEFSHAPE_C)) {
+        if (clef->GetShape() == CLEFSHAPE_C) {
             pi.SetOct(3);
         }
         else {
