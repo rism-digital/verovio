@@ -177,7 +177,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
 
-    else if (nc->GetCurve() == curvatureDirection_CURVE_c) {
+    else if (nc->GetCurve() == curvatureDirection_CURVE_c && nc->FindDescendantByType(LIQUESCENT)) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).fontNoLiq[1] = SMUFL_EB92_staffPosRaise3;
         params.at(0).fontNoLiq[2] = SMUFL_E995_chantAuctumDesc;
@@ -187,7 +187,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         params.at(0).yOffsetLiq[0] = -1.5;
         params.at(0).yOffsetLiq[4] = -1.75;
     }
-    else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
+    else if (nc->GetCurve() == curvatureDirection_CURVE_a && nc->FindDescendantByType(LIQUESCENT)) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
         params.at(0).fontNoLiq[1] = SMUFL_EB98_staffPosLower1;
         params.at(0).fontNoLiq[2] = SMUFL_E994_chantAuctumAsc;
@@ -274,7 +274,9 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     // Draw the children
-    this->DrawLayerChildren(dc, nc, layer, staff, measure);
+    if (!nc->FindDescendantByType(LIQUESCENT)) {
+        this->DrawLayerChildren(dc, nc, layer, staff, measure);
+    }
 
     dc->EndGraphic(element, this);
 }
