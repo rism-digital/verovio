@@ -8206,12 +8206,14 @@ void MEIInput::UpgradePageTo_5_0(Page *page)
 
     PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
+    score->SetEnd(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
     page->InsertChild(mdiv, 0);
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
+    mdiv->SetEnd(mdivEnd);
 }
 
 void MEIInput::UpgradePgHeadFootTo_5_0(pugi::xml_node element)
