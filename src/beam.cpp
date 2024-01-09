@@ -19,6 +19,7 @@
 #include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
+#include "ftrem.h"
 #include "functor.h"
 #include "gracegrp.h"
 #include "layer.h"
@@ -1633,6 +1634,9 @@ bool Beam::IsSupportedChild(Object *child)
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(FTREM)) {
+        assert(dynamic_cast<FTrem *>(child));
     }
     else if (child->Is(GRACEGRP)) {
         assert(dynamic_cast<GraceGrp *>(child));
