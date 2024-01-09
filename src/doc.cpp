@@ -1408,6 +1408,8 @@ void Doc::SyncToFacsimileDoc()
     if (!m_facsimile->FindDescendantByType(SURFACE)) {
         m_facsimile->AddChild(new Surface());
     }
+    this->ScoreDefSetCurrentDoc();
+
     m_facsimile->SetType("transcription");
     m_facsimile->ClearChildren();
 
