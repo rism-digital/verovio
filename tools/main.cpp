@@ -278,13 +278,12 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
-        && (outformat != "mei-facs") && (outformat != "midi") && (outformat != "timemap")
-        && (outformat != "expansionmap") && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")) {
+    const std::vector<std::string> outformats = { "mei", "mei-basic", "mei-pb", "mei-facs", "svg", "midi", "timemap",
+        "expansionmap", "humdrum", "hum", "pae" };
+    if (std::find(outformats.begin(), outformats.end(), outformat) == outformats.end()) {
         std::cerr << "Output format (" << outformat
                   << ") can only be 'mei', 'mei-basic', 'mei-pb', mei-facs', 'svg', 'midi', 'timemap', 'expansionmap', "
-                     "'humdrum' "
-                     "or 'pae'."
+                     "'humdrum', 'hum', or 'pae'."
                   << std::endl;
         exit(1);
     }
