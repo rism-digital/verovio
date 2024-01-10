@@ -127,7 +127,7 @@ void LayerElement::Reset()
     this->ResetLabelled();
     this->ResetTyped();
 
-    m_xAbs = VRV_UNSET;
+    m_drawingFacsX = VRV_UNSET;
     m_drawingYRel = 0;
     m_drawingXRel = 0;
     m_drawingCueSize = false;
@@ -405,8 +405,8 @@ int LayerElement::GetDrawingX() const
         }
     }
 
-    // Since m_xAbs is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
-    if (m_xAbs != VRV_UNSET) return m_xAbs + this->GetDrawingXRel();
+    // Since m_drawingFacsX is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
+    if (m_drawingFacsX != VRV_UNSET) return m_drawingFacsX + this->GetDrawingXRel();
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
@@ -532,7 +532,7 @@ void LayerElement::CacheYRel(bool restore)
 
 void LayerElement::CenterDrawingX()
 {
-    if (m_xAbs != VRV_UNSET) return;
+    if (m_drawingFacsX != VRV_UNSET) return;
 
     this->SetDrawingXRel(0);
 

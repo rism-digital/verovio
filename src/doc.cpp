@@ -23,6 +23,7 @@
 #include "convertfunctor.h"
 #include "docselection.h"
 #include "expansion.h"
+#include "facsimilefunctor.h"
 #include "featureextractor.h"
 #include "functor.h"
 #include "glyph.h"
@@ -58,6 +59,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
@@ -1388,6 +1390,32 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 }
 
+void Doc::SyncFromFacsimileDoc()
+{
+    PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
+    this->Process(prepareFacsimile);
+
+    SyncFromFacsimileFunctor syncFromFacsimileFunctor(this);
+    this->Process(syncFromFacsimileFunctor);
+}
+
+void Doc::SyncToFacsimileDoc()
+{
+    // Create a new facsimile object if we do not have one already
+    if (!this->HasFacsimile()) {
+        Facsimile *facsimile = new Facsimile();
+        this->SetFacsimile(facsimile);
+    }
+    if (!m_facsimile->FindDescendantByType(SURFACE)) {
+        m_facsimile->AddChild(new Surface());
+    }
+    m_facsimile->SetType("transcription");
+    m_facsimile->ClearChildren();
+
+    SyncToFacsimileFunctor syncToFacimileFunctor(this);
+    this->Process(syncToFacimileFunctor);
+}
+
 void Doc::TransposeDoc()
 {
     Transposer transposer;
@@ -2017,6 +2045,15 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
+    UpdatePageDrawingSizes();
+
+    return m_drawingPage;
+}
+
+void Doc::UpdatePageDrawingSizes()
+{
+    assert(m_drawingPage);
+
     int glyph_size;
 
     // we use the page members only if set (!= -1)
@@ -2082,8 +2119,6 @@ Page *Doc::SetDrawingPage(int pageIdx)
     glyph_size = this->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 
     m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
-
-    return m_drawingPage;
 }
 
 int Doc::CalcMusicFontSize()

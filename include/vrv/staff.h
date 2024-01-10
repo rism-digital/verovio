@@ -226,7 +226,7 @@ public:
      * The Y absolute position of the staff for facsimile (transcription) encodings.
      * This is the top left corner of the staff (the X position is the position of the system).
      */
-    int m_yAbs;
+    int m_drawingFacsY;
 
     StaffDef *m_drawingStaffDef;
 

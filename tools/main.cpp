@@ -278,12 +278,12 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if ((outformat != "svg") && (outformat != "mei") && (outformat != "mei-basic") && (outformat != "mei-pb")
-        && (outformat != "midi") && (outformat != "timemap") && (outformat != "expansionmap")
-        && (outformat != "humdrum") && (outformat != "hum") && (outformat != "pae")) {
+    const std::vector<std::string> outformats = { "mei", "mei-basic", "mei-pb", "mei-facs", "svg", "midi", "timemap",
+        "expansionmap", "humdrum", "hum", "pae" };
+    if (std::find(outformats.begin(), outformats.end(), outformat) == outformats.end()) {
         std::cerr << "Output format (" << outformat
-                  << ") can only be 'mei', 'mei-basic', 'mei-pb', 'svg', 'midi', 'timemap', 'expansionmap', 'humdrum' "
-                     "or 'pae'."
+                  << ") can only be 'mei', 'mei-basic', 'mei-pb', mei-facs', 'svg', 'midi', 'timemap', 'expansionmap', "
+                     "'humdrum', 'hum', or 'pae'."
                   << std::endl;
         exit(1);
     }
@@ -553,10 +553,12 @@ int main(int argc, char **argv)
         const char *scoreBased = (outformat == "mei-pb") ? "false" : "true";
         const char *basic = (outformat == "mei-basic") ? "true" : "false";
         const char *removeIds = (options->m_removeIds.GetValue()) ? "true" : "false";
+        const char *generateFacs = (outformat == "mei-facs") ? "true" : "false";
         outfile += ".mei";
         if (all_pages) {
             std::string params
-                = vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s}", scoreBased, basic, removeIds);
+                = vrv::StringFormat("{'scoreBased': %s, 'basic': %s, 'removeIds': %s, 'generateFacs': %s}", scoreBased,
+                    basic, removeIds, generateFacs);
             if (std_output) {
                 std::string output;
                 std::cout << toolkit.GetMEI(params);
@@ -570,7 +572,8 @@ int main(int argc, char **argv)
         }
         else {
             std::string params = vrv::StringFormat(
-                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s}", scoreBased, basic, page, removeIds);
+                "{'scoreBased': %s, 'basic': %s, 'pageNo': %d, 'removeIds': %s, 'generateFacs': %s}", scoreBased, basic,
+                page, removeIds, generateFacs);
             if (std_output) {
                 std::cout << toolkit.GetMEI(params);
             }

@@ -11,6 +11,7 @@
 #include "atts_cmn.h"
 #include "atts_shared.h"
 #include "barline.h"
+#include "facsimileinterface.h"
 #include "horizontalaligner.h"
 #include "object.h"
 
@@ -34,6 +35,7 @@ class TimestampAttr;
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
 class Measure : public Object,
+                public FacsimileInterface,
                 public AttBarring,
                 public AttCoordX1,
                 public AttCoordX2,
@@ -62,6 +64,17 @@ public:
      * Overriding CloneReset() method to be called after copy / assignment calls.
      */
     void CloneReset() override;
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
+    ///@}
 
     /**
      * Return true if measured music (otherwise we have fake measures)
@@ -358,8 +371,8 @@ public:
      * This is the left and right position of the measure.
      */
     ///@{
-    int m_xAbs;
-    int m_xAbs2;
+    int m_drawingFacsX1;
+    int m_drawingFacsX2;
     ///@}
 
     /**
