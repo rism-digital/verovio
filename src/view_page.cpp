@@ -1299,7 +1299,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
             y2 = y1;
         }
         else {
-            y2 = y1 - staff->GetWidth() * tan(staff->GetDrawingRotation() * M_PI / 180.0);
+            y2 = y1 - measure->GetWidth() * tan(staff->GetDrawingRotation() * M_PI / 180.0);
         }
     }
 
