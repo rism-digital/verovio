@@ -17598,7 +17598,6 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         }
     }
     else {
-
         dir = new Dir();
         if (placement == "between") {
             setStaffBetween(dir, m_currentstaff);
@@ -20091,7 +20090,7 @@ hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
 
 /////////////////////////////
 //
-// HumdrumInput::addSmuflSymbol -- Add a SMuFL symbol to some
+// HumdrumInput::addMusicSymbol -- Add a SMuFL symbol to some
 //      text-based element (such as <rend>).  Humdrum music symbol names assumed
 //      as input, such as "sc" for segnum contruentiae..
 
@@ -20174,7 +20173,7 @@ void HumdrumInput::addTextElement(
 
     // Parse [ASCII] music codes to route to VerovioText font rends:
     hum::HumRegex hre;
-    if (hre.search(data, "^(.*?)(\\[.*?\\])(.*)$")) {
+    if (hre.search(data, "^(.*?\\[*?)(\\[[^[[].*?\\])(.*)$")) {
         std::string pretext = hre.getMatch(1);
         std::string rawmusictext = hre.getMatch(2);
         std::vector<std::string> musictext = convertMusicSymbolNameToSmuflName(rawmusictext);
@@ -20183,6 +20182,11 @@ void HumdrumInput::addTextElement(
             Lb *lb = new Lb();
             element->AddChild(lb);
             pretext = "";
+        }
+        else if (hre.search(pretext, "\\\\n(.*)")) {
+            Lb *lb = new Lb();
+            element->AddChild(lb);
+            pretext = hre.getMatch(1);
         }
         if (musictext.empty()) {
             hum::HumRegex hre2;
