@@ -6,7 +6,7 @@ on:
     # but only for the branches specified
     branches:
       # Push events on develop branch
-      - develop-c++20
+      - "develop-c++20"
       # Push events on ci-test branch (uncomment if needed for testing purposes)
       # - ci-test
     paths-ignore:
