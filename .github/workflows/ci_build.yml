@@ -82,7 +82,7 @@ jobs:
             compiler: g++
             version: "11"
 
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             compiler: g++
             version: "12"
 
