@@ -88,11 +88,11 @@ jobs:
 
           - os: ubuntu-20.04
             compiler: clang
-            version: "6.0"
+            version: "9"
 
           - os: ubuntu-20.04
             compiler: clang
-            version: "9"
+            version: "10"
 
           - os: ubuntu-20.04
             compiler: clang
