@@ -48,7 +48,7 @@ if(MSVC)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
     add_definitions(-DUSE_PAE_OLD_PARSER)
-    add_definitions(/std:c++17)
+    add_definitions(/std:c++20)
     include_directories(../include/win32)
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -60,7 +60,7 @@ else()
     # jsonxx raises -Wdollar-in-identifier-extension
     # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
-    add_definitions(-std=c++17)
+    add_definitions(-std=c++20)
 
     # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
     # https://github.com/llvm-mirror/clang/blob/master/include/clang/Basic/DiagnosticGroups.td
