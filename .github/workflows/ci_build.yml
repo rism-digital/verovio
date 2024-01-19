@@ -76,10 +76,6 @@ jobs:
         include:
           - os: ubuntu-20.04
             compiler: g++
-            version: "9"
-
-          - os: ubuntu-20.04
-            compiler: g++
             version: "10"
 
           - os: ubuntu-20.04
@@ -87,12 +83,16 @@ jobs:
             version: "11"
 
           - os: ubuntu-20.04
-            compiler: clang
-            version: "9"
+            compiler: g++
+            version: "12"
 
           - os: ubuntu-20.04
             compiler: clang
             version: "10"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "11"
 
           - os: ubuntu-20.04
             compiler: clang
