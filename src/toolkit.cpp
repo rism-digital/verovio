@@ -152,6 +152,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
     else if (outputTo == "mei-pb") {
         m_outputTo = MEI;
     }
+    else if (outputTo == "mei-facs") {
+        m_outputTo = MEI;
+    }
     else if (outputTo == "midi") {
         m_outputTo = MIDI;
     }
@@ -749,9 +752,14 @@ bool Toolkit::LoadData(const std::string &data)
         breaks = BREAKS_none;
     }
 
-    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
-    // to be converted
-    if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
+    // Always set breaks to 'none' with Facs rendering
+    if (m_doc.IsFacs()) breaks = BREAKS_none;
+
+    // Always set breaks to 'none' or 'encoded' with Transcription rendering
+    // rendering them differenty requires the MEI
+    if (m_doc.IsTranscription()) {
+        breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
+    }
 
     if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
@@ -782,6 +790,10 @@ bool Toolkit::LoadData(const std::string &data)
             m_doc.CastOffDoc();
             // LogElapsedTimeEnd("cast-off");
         }
+    }
+
+    if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
+        m_doc.SyncFromFacsimileDoc();
     }
 
     delete input;
@@ -816,6 +828,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     std::string firstMeasure;
     std::string lastMeasure;
     std::string mdiv;
+    bool generateFacs = false;
 
     jsonxx::Object json;
 
@@ -838,6 +851,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
             if (json.has<jsonxx::String>("firstMeasure")) firstMeasure = json.get<jsonxx::String>("firstMeasure");
             if (json.has<jsonxx::String>("lastMeasure")) lastMeasure = json.get<jsonxx::String>("lastMeasure");
             if (json.has<jsonxx::String>("mdiv")) mdiv = json.get<jsonxx::String>("mdiv");
+            if (json.has<jsonxx::Boolean>("generateFacs")) generateFacs = json.get<jsonxx::Boolean>("generateFacs");
         }
     }
 
@@ -872,6 +886,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (!firstMeasure.empty()) meioutput.SetFirstMeasure(firstMeasure);
     if (!lastMeasure.empty()) meioutput.SetLastMeasure(lastMeasure);
     if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
+
+    if (generateFacs) {
+        if (meioutput.HasFilter() || !scoreBased || (m_options->m_breaks.GetValue() != BREAKS_encoded)
+            || m_doc.HasSelection()) {
+            LogError("Generating facsimile is only possible with all pages, encoded breaks, score-based output and "
+                     "without selection.");
+            return "";
+        }
+        m_doc.SyncToFacsimileDoc();
+    }
 
     std::string output = meioutput.GetOutput();
 
@@ -1402,7 +1426,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
+    if ((this->GetPageCount() == 0) || m_doc.IsTranscription() || m_doc.IsFacs()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1465,7 +1489,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
     if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
-    if (m_doc.GetType() == Transcription) {
+    if (m_doc.IsTranscription()) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
@@ -1488,7 +1512,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
 
-    if (m_doc.GetType() == Facs) {
+    if (m_doc.IsFacs()) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
         deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
     }
@@ -1524,7 +1548,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetMMOutput(true);
     }
 
-    if (m_doc.GetType() == Facs) {
+    if (m_doc.IsFacs()) {
         svg.SetFacsimile(true);
     }
 

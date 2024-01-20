@@ -55,7 +55,7 @@ my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularize
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
-my $cpp = 17;             # c++ version to compile (11, 14, 17)
+my $cpp = 20;             # c++ version to compile (11, 14, 17)
 my $VEROVIO_ROOT  = "..";
 
 Getopt::Long::Configure("bundling");

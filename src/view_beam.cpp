@@ -49,6 +49,14 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
 
+    if (beam->GetFirst(FTREM)) {
+        // If there is a fTrem we ignore the beam and just handle its children
+        dc->StartGraphic(element, "", element->GetID());
+        this->DrawLayerChildren(dc, beam, layer, staff, measure);
+        dc->EndGraphic(element, this);
+        return;
+    }
+
     beam->m_beamSegment.InitCoordRefs(beam->GetElementCoords());
 
     data_BEAMPLACE initialPlace = beam->GetPlace();
@@ -150,8 +158,8 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
         secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     }
 
-    // Number of bars to draw
-    const int allBars = fTrem->GetBeams();
+    // Number of beams to draw
+    const int allBars = fTrem->HasBeams() ? fTrem->GetBeams() : fTrem->GetUnitdur() - DURATION_4;
     int floatingBars = fTrem->HasBeamsFloat() ? fTrem->GetBeamsFloat() : 0;
     int fullBars = allBars - floatingBars;
 

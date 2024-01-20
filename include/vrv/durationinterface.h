@@ -16,7 +16,6 @@
 
 namespace vrv {
 
-class FunctorParams;
 class Mensur;
 class Object;
 

@@ -23,6 +23,7 @@
 #include "convertfunctor.h"
 #include "docselection.h"
 #include "expansion.h"
+#include "facsimilefunctor.h"
 #include "featureextractor.h"
 #include "functor.h"
 #include "glyph.h"
@@ -58,6 +59,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "surface.h"
 #include "syl.h"
 #include "syllable.h"
 #include "system.h"
@@ -869,7 +871,7 @@ void Doc::PrepareData()
     }
 
     /************ Resolve @facs ************/
-    if (this->GetType() == Facs) {
+    if (this->IsFacs()) {
         // Associate zones with elements
         PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
         this->Process(prepareFacsimile);
@@ -1281,10 +1283,10 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     if (!m_isMensuralMusicOnly) return;
 
     // Do not convert transcription files
-    if (this->GetType() == Transcription) return;
+    if (this->IsTranscription()) return;
 
     // Do not convert facs files
-    if (this->GetType() == Facs) return;
+    if (this->IsFacs()) return;
 
     // We are converting to measure music in a definite way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
@@ -1386,6 +1388,32 @@ void Doc::ConvertMarkupDoc(bool permanent)
         ConvertMarkupScoreDefFunctor convertMarkupScoreDef(this);
         this->Process(convertMarkupScoreDef);
     }
+}
+
+void Doc::SyncFromFacsimileDoc()
+{
+    PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
+    this->Process(prepareFacsimile);
+
+    SyncFromFacsimileFunctor syncFromFacsimileFunctor(this);
+    this->Process(syncFromFacsimileFunctor);
+}
+
+void Doc::SyncToFacsimileDoc()
+{
+    // Create a new facsimile object if we do not have one already
+    if (!this->HasFacsimile()) {
+        Facsimile *facsimile = new Facsimile();
+        this->SetFacsimile(facsimile);
+    }
+    if (!m_facsimile->FindDescendantByType(SURFACE)) {
+        m_facsimile->AddChild(new Surface());
+    }
+    m_facsimile->SetType("transcription");
+    m_facsimile->ClearChildren();
+
+    SyncToFacsimileFunctor syncToFacimileFunctor(this);
+    this->Process(syncToFacimileFunctor);
 }
 
 void Doc::TransposeDoc()
@@ -1523,10 +1551,20 @@ Score *Doc::GetCorrespondingScore(const Object *object)
 
 const Score *Doc::GetCorrespondingScore(const Object *object) const
 {
-    assert(!m_visibleScores.empty());
+    return this->GetCorrespondingScore(object, m_visibleScores);
+}
 
-    const Score *correspondingScore = m_visibleScores.front();
-    for (Score *score : m_visibleScores) {
+Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores)
+{
+    return const_cast<Score *>(std::as_const(*this).GetCorrespondingScore(object, scores));
+}
+
+const Score *Doc::GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const
+{
+    assert(!scores.empty());
+
+    const Score *correspondingScore = scores.front();
+    for (Score *score : scores) {
         if ((score == object) || Object::IsPreOrdered(score, object)) {
             correspondingScore = score;
         }
@@ -2007,6 +2045,15 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingPage = vrv_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
+    UpdatePageDrawingSizes();
+
+    return m_drawingPage;
+}
+
+void Doc::UpdatePageDrawingSizes()
+{
+    assert(m_drawingPage);
+
     int glyph_size;
 
     // we use the page members only if set (!= -1)
@@ -2072,8 +2119,6 @@ Page *Doc::SetDrawingPage(int pageIdx)
     glyph_size = this->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 
     m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
-
-    return m_drawingPage;
 }
 
 int Doc::CalcMusicFontSize()
@@ -2085,7 +2130,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
+    if (this->IsTranscription() || this->IsFacs()) {
         return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
     }
 
@@ -2097,7 +2142,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if ((this->GetType() == Transcription) || (this->GetType() == Facs)) {
+    if (this->IsTranscription() || this->IsFacs()) {
         return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
     }
 
