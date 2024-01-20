@@ -9684,6 +9684,15 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         }
     }
 
+    bool omdTextQ = hasOmdText(startline, endline);
+
+    if (omdTextQ) {
+        // Do not print the !!!OMD: reference record since there is an
+        // alternate !!LO:TX:omd: entry that will be printed (expected
+        // to be attached to a time signature for now).
+        return;
+    }
+
     if (!value.empty()) {
         Tempo *tempo = new Tempo();
         hum::HTp token = infile.token(index, 0);
@@ -9712,6 +9721,28 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         setStaff(tempo, 1);
         m_omd = infile[index].getDurationFromStart();
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasOmdText -- Check for global layout text that should
+//      be used instead of any OMD reference record.
+//
+
+bool HumdrumInput::hasOmdText(int startline, int endline)
+{
+    hum::HumdrumFile &infile = m_infiles[0];
+    hum::HumRegex hre;
+    for (int i = startline; i <= endline; i++) {
+        if (infile[i].hasSpines()) {
+            continue;
+        }
+        hum::HTp token = infile.token(i, 0);
+        if (hre.search(token, "^!!LO:TX.*:omd(:|$)")) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////

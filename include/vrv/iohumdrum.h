@@ -893,6 +893,7 @@ protected:
     int getKeySignatureNumber(const std::string &humkeysig);
     int getStaffNumForSpine(hum::HTp token);
     bool checkIfReversedSpineOrder(std::vector<hum::HTp> &staffstarts);
+    bool hasOmdText(int startline, int endline);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
