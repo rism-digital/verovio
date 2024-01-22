@@ -687,7 +687,12 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
+    if (clef->HasFontname() && m_doc->GetResources().FontHasGlyphAvailable(clef->GetFontname(), sym)) {
+        this->DrawSmuflCodeWithCustomFont(dc, clef->GetFontname(), x, y, sym, staff->m_drawingStaffSize, false);
+    }
+    else {
+        this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
+    }
 
     if (m_doc->IsFacs() && element->HasFacs()) {
         const int noteHeight
@@ -1133,10 +1138,15 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
         x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false);
     }
 
-    if (meterSig->HasSym()) {
+    if (meterSig->HasSym() || meterSig->HasGlyphNum() || meterSig->HasGlyphName()) {
         const char32_t code = meterSig->GetSymbolGlyph();
-        this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
-        x += m_doc->GetGlyphWidth(code, glyphSize, false);
+        if (meterSig->HasFontname() && m_doc->GetResources().FontHasGlyphAvailable(meterSig->GetFontname(), code)) {
+            x += this->DrawSmuflCodeWithCustomFont(dc, meterSig->GetFontname(), x, y, code, glyphSize, false);
+        }
+        else {
+            this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
+            x += m_doc->GetGlyphWidth(code, glyphSize, false);
+        }
     }
     else if (meterSig->GetForm() == METERFORM_num) {
         x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
