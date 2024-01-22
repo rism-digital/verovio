@@ -6473,6 +6473,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadOctave(clef);
     vrvClef->ReadOctaveDisplacement(clef);
     vrvClef->ReadStaffIdent(clef);
+    vrvClef->ReadTypography(clef);
     vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
@@ -6689,8 +6690,10 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     }
 
     vrvMeterSig->ReadEnclosingChars(meterSig);
+    vrvMeterSig->ReadExtSymNames(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
+    vrvMeterSig->ReadTypography(meterSig);
     vrvMeterSig->ReadVisibility(meterSig);
 
     parent->AddChild(vrvMeterSig);

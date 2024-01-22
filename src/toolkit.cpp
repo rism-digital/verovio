@@ -72,12 +72,12 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
+    m_options = m_doc.GetOptions();
+
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.InitFonts();
+        resources.InitFonts(m_options->m_addCustomFont.GetValue(), m_options->m_font.GetValue());
     }
-
-    m_options = m_doc.GetOptions();
 
     m_editorToolkit = NULL;
 
@@ -117,13 +117,13 @@ bool Toolkit::SetResourcePath(const std::string &path)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
-    return resources.InitFonts();
+    return resources.InitFonts(m_options->m_addCustomFont.GetValue(), m_options->m_font.GetValue());
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
 {
     Resources &resources = m_doc.GetResourcesForModification();
-    const bool ok = resources.SetFont(fontName);
+    const bool ok = resources.SetCurrentFont(fontName, true);
     if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
     return ok;
 }
@@ -1129,7 +1129,13 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     m_options->Sync();
 
     // Forcing font resource to be reset if the font is given in the options
-    if (json.has<jsonxx::String>("font")) this->SetFont(m_options->m_font.GetValue());
+    if (json.has<jsonxx::Array>("addCustomFont")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.InitFonts(m_options->m_addCustomFont.GetValue(), m_options->m_font.GetValue());
+    }
+    else if (json.has<jsonxx::String>("font")) {
+        this->SetFont(m_options->m_font.GetValue());
+    }
 
     return true;
 }

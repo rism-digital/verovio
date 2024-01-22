@@ -8,6 +8,7 @@
 #ifndef __VRV_METERSIG_H__
 #define __VRV_METERSIG_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
 #include "layerelement.h"
@@ -25,8 +26,10 @@ class ScoreDefInterface;
  */
 class MeterSig : public LayerElement,
                  public AttEnclosingChars,
+                 public AttExtSymNames,
                  public AttMeterSigLog,
                  public AttMeterSigVis,
+                 public AttTypography,
                  public AttVisibility {
 public:
     /**

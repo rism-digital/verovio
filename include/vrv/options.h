@@ -686,6 +686,7 @@ public:
     OptionDbl m_extenderLineMinSpace;
     OptionDbl m_fingeringScale;
     OptionString m_font;
+    OptionArray m_addCustomFont;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
