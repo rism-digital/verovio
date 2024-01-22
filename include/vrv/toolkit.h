@@ -77,7 +77,7 @@ public:
     std::string GetResourcePath() const;
 
     /**
-     * Set the resource path for the Toolkit instance.
+     * Set the resource path for the Toolkit instance and any extra fonts
      *
      * This method needs to be called if the constructor had initFont=false or if the resource path
      * needs to be changed.
