@@ -50,18 +50,26 @@ Resources::Resources()
     m_currentStyle = k_defaultStyle;
 }
 
-bool Resources::InitFonts()
+bool Resources::InitFonts(const std::vector<std::string> &extraFonts, const std::string &defaultFont)
 {
-    // We will need to rethink this for adding the option to add custom fonts
-    // Font Bravura first since it is expected to have always all symbols
-    if (!LoadFont("Bravura", false)) LogError("Bravura font could not be loaded.");
-    // The Leipzig as the default font
-    if (!LoadFont("Leipzig", false)) LogError("Leipzig font could not be loaded.");
+    // We need to rethink this for handling multiple fonts in an optimal way
 
-    if (m_fontGlyphTable.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, m_fontGlyphTable.size());
-        return false;
+    // Font Bravura first. As it is expected to have always all symbols we build the code -> name table from it
+    if (!LoadFont("Bravura", false, true)) LogError("Bravura font could not be loaded.");
+    // Leipzig is our initial default font
+    if (!LoadFont("Leipzig", false)) LogError("Leipzig font could not be loaded.");
+    // options supplied fonts
+    for (const std::string &font : extraFonts) {
+        if (!LoadFont(font, true)) LogError("Option supplied font %s could not be loaded.", font.c_str());
     }
+    // and the default font provided in options, if it is not on: of the previous
+    if (!defaultFont.empty() && !IsFontLoaded(defaultFont)) {
+        if (!LoadFont(defaultFont, false))
+            LogError("%s default font could not be loaded. Fallballing to Leipzig", defaultFont.c_str());
+    }
+
+    m_defaultFontName = IsFontLoaded(defaultFont) ? defaultFont : "Leipzig";
+    m_currentFontName = m_defaultFontName;
 
     struct TextFontInfo_type {
         const StyleAttributes m_style;
@@ -86,19 +94,29 @@ bool Resources::InitFonts()
     return true;
 }
 
-bool Resources::SetFont(const std::string &fontName)
+bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
 {
-    return LoadFont(fontName);
+    if (IsFontLoaded(fontName)) {
+        m_currentFontName = fontName;
+        return true;
+    }
+    else if (allowLoading && LoadFont(fontName)) {
+        m_currentFontName = fontName;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 const Glyph *Resources::GetGlyph(char32_t smuflCode) const
 {
-    return m_fontGlyphTable.count(smuflCode) ? &m_fontGlyphTable.at(smuflCode) : NULL;
+    return GetCurrentGlyphTable().count(smuflCode) ? &GetCurrentGlyphTable().at(smuflCode) : NULL;
 }
 
 const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 {
-    return m_glyphNameTable.count(smuflName) ? &m_fontGlyphTable.at(m_glyphNameTable.at(smuflName)) : NULL;
+    return m_glyphNameTable.count(smuflName) ? &GetCurrentGlyphTable().at(m_glyphNameTable.at(smuflName)) : NULL;
 }
 
 char32_t Resources::GetGlyphCode(const std::string &smuflName) const
@@ -108,11 +126,29 @@ char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 
 bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
 {
+    if (!m_loadedFonts.at(m_currentFontName).useFallback()) {
+        return false;
+    }
     for (char32_t c : text) {
         const Glyph *glyph = this->GetGlyph(c);
-        if (glyph && glyph->GetFallback()) return true;
+        if (glyph == NULL) return true;
     }
     return false;
+}
+
+bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuflCode) const
+{
+    if (!IsFontLoaded(fontName)) {
+        return false;
+    }
+
+    const GlyphTable &table = m_loadedFonts.at(fontName).GetGlyphTable();
+    if (table.find(smuflCode) != table.end()) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const
@@ -158,7 +194,7 @@ char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
     return smuflChar;
 }
 
-bool Resources::LoadFont(const std::string &fontName, bool withFallback)
+bool Resources::LoadFont(const std::string &fontName, bool withFallback, bool buildNameTable)
 {
     pugi::xml_document doc;
     const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
@@ -174,11 +210,7 @@ bool Resources::LoadFont(const std::string &fontName, bool withFallback)
         return false;
     }
 
-    if (withFallback) {
-        for (auto &glyph : m_fontGlyphTable) {
-            glyph.second.SetFallback(true);
-        }
-    }
+    GlyphTable glyphTable;
 
     const int unitsPerEm = atoi(root.attribute("units-per-em").value());
 
@@ -211,12 +243,20 @@ bool Resources::LoadFont(const std::string &fontName, bool withFallback)
         }
 
         const char32_t smuflCode = (char32_t)strtol(c_attribute.value(), NULL, 16);
-        glyph.SetFallback(false);
-        m_fontGlyphTable[smuflCode] = glyph;
-        m_glyphNameTable[n_attribute.value()] = smuflCode;
+        glyphTable[smuflCode] = glyph;
+        if (buildNameTable) {
+            m_glyphNameTable[n_attribute.value()] = smuflCode;
+        }
     }
 
-    m_fontName = fontName;
+    if (buildNameTable && glyphTable.size() < SMUFL_COUNT) {
+        LogError("Expected %d default SMuFL glyphs but could load only %d.", SMUFL_COUNT, glyphTable.size());
+        return false;
+    }
+
+    m_loadedFonts.insert(std::pair<std::string, LoadedFont>(
+        fontName, Resources::LoadedFont(fontName, m_path, glyphTable, withFallback)));
+
     return true;
 }
 

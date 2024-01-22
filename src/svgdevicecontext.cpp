@@ -84,6 +84,40 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
     return true;
 }
 
+SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int idx, const std::string &postfix) : m_glyph(glyph)
+{
+    if (idx == 0) {
+        m_refId = StringFormat("%s-%s", glyph->GetCodeStr().c_str(), postfix.c_str());
+    }
+    else {
+        m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), idx, postfix.c_str());
+    }
+};
+
+const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
+{
+    const std::string code = glyph->GetCodeStr();
+    const std::string path = glyph->GetPath();
+
+    if (m_smuflGlyphs.find(path) != m_smuflGlyphs.end()) {
+        return m_smuflGlyphs.at(path).GetRefId();
+    }
+
+    int count;
+    if (m_glyphCodesCounter.find(code) == m_glyphCodesCounter.end()) {
+        count = 0;
+    }
+    else {
+        count = m_glyphCodesCounter[(code)];
+    }
+    GlyphRef ref(glyph, count, m_glyphPostfixId);
+    const std::string id = ref.GetRefId();
+    m_smuflGlyphs.insert(std::pair<const std::string, GlyphRef>(path, ref));
+    m_glyphCodesCounter[code] = count + 1;
+
+    return id;
+}
+
 void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resources *resources)
 {
     assert(resources);
@@ -95,7 +129,7 @@ void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resour
         std::ifstream cssFontFile(cssFontPath);
         if (!cssFontFile.is_open()) {
             LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
-                resources->GetCurrentFontName().c_str());
+                resources->GetCurrentFont().c_str());
         }
         else {
             std::stringstream cssFontStream;
@@ -156,7 +190,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         const Resources *resources = this->GetResources(true);
         // include the selected font
         if (m_vrvTextFont && resources) {
-            this->IncludeTextFont(resources->GetCurrentFontName(), resources);
+            this->IncludeTextFont(resources->GetCurrentFont(), resources);
         }
         // include the Leipzig fallback font
         if (m_vrvTextFontFallback && resources) {
@@ -171,15 +205,14 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (const Glyph *smuflGlyph : m_smuflGlyphs) {
+        for (const std::pair<const std::string &, const SvgDeviceContext::GlyphRef &> entry : m_smuflGlyphs) {
             // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source(smuflGlyph->GetPath());
+            std::ifstream source(entry.first);
             sourceDoc.load(source);
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
-                std::string id = StringFormat("%s-%s", child.attribute("id").value(), m_glyphPostfixId.c_str());
-                child.attribute("id").set_value(id.c_str());
+                child.attribute("id").set_value(entry.second.GetRefId().c_str());
                 defs.append_copy(child);
             }
         }
@@ -1020,12 +1053,11 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         }
 
         // Add the glyph to the array for the <defs>
-        m_smuflGlyphs.insert(glyph);
+        const std::string id = InsertGlyphRef(glyph);
 
         // Write the char in the SVG
         pugi::xml_node useChild = AddChild("use");
-        useChild.append_attribute(hrefAttrib.c_str())
-            = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
+        useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", id.c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
