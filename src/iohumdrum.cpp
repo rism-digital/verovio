@@ -20242,7 +20242,7 @@ void HumdrumInput::addTextElement(
 
     // Parse [ASCII] music codes to route to VerovioText font rends:
     hum::HumRegex hre;
-    if (hre.search(data, "^(.*?\\[*?)(\\[[^[[].*?\\])(.*)$")) {
+    if (hre.search(data, "^(.*?\\[*?)(\\[[^[[][^.]*?\\])(.*)$")) {
         std::string pretext = hre.getMatch(1);
         std::string rawmusictext = hre.getMatch(2);
         std::vector<std::string> musictext = convertMusicSymbolNameToSmuflName(rawmusictext);
