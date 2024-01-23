@@ -17987,10 +17987,23 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
 
 bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
 {
+
+    Rend *rend = NULL;
     hum::HumRegex hre;
+    if (hre.search(text, "\\\\n")) {
+        // Insert text into <rend> if an <lb> will be added
+        rend = new Rend();
+        tempo->AddChild(rend);
+    }
+
     if (!hre.search(text, "(.*)\\[([^=\\]]*)\\]\\s*=\\s*(\\d+.*)")) {
         // no musical characters to unescape
-        addTextElement(tempo, text);
+        if (rend) {
+            addTextElement(rend, text);
+        }
+        else {
+            addTextElement(tempo, text);
+        }
         return true;
     }
     std::string first = hre.getMatch(1);
@@ -18004,7 +18017,12 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
             // to separate parenthesis and notehead:
             first += "&#x200A;";
         }
-        addTextElement(tempo, first);
+        if (rend) {
+            addTextElement(rend, first);
+        }
+        else {
+            addTextElement(tempo, first);
+        }
     }
 
     // Add the musical symbols, adding a space between them
@@ -18018,10 +18036,20 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
         if (counter) {
             // Add a space element between music symbols.
             if (name == "metAugmentationDot") {
-                addTextElement(tempo, m_textAugmentationDotSpacer);
+                if (rend) {
+                    addTextElement(rend, m_textAugmentationDotSpacer);
+                }
+                else {
+                    addTextElement(tempo, m_textAugmentationDotSpacer);
+                }
             }
             else {
-                addTextElement(tempo, m_textSmuflSpacer);
+                if (rend) {
+                    addTextElement(rend, m_textSmuflSpacer);
+                }
+                else {
+                    addTextElement(tempo, m_textSmuflSpacer);
+                }
             }
         }
         ++counter;
@@ -18029,12 +18057,22 @@ bool HumdrumInput::setTempoContent(Tempo *tempo, const std::string &text)
         Symbol *symbol = new Symbol();
         setSmuflContent(symbol, name);
         setFontsize(symbol, name, "");
-        tempo->AddChild(symbol);
+        if (rend) {
+            rend->AddChild(symbol);
+        }
+        else {
+            tempo->AddChild(symbol);
+        }
     }
 
     // Force spaces around equals sign:
     third = m_textSmuflSpacer + "=" + m_textSmuflSpacer + third;
-    addTextElement(tempo, third);
+    if (rend) {
+        addTextElement(rend, third);
+    }
+    else {
+        addTextElement(tempo, third);
+    }
 
     return true;
 }
