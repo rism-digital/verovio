@@ -162,8 +162,7 @@ public:
      * @name Return the smufl string to use for a note give the notation type
      */
     ///@{
-    std::u32string GetTabFretString(
-        data_NOTATIONTYPE notationType, const std::string &notationSubtype, int &overline, int &strike) const;
+    std::u32string GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike) const;
     ///@}
 
     /**

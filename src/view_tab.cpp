@@ -109,8 +109,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::u32string fret = note->GetTabFretString(
-            staff->m_drawingNotationType, staff->m_drawingStaffDef->GetNotationsubtype(), overline, strike);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike);
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
@@ -136,8 +135,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::u32string fret = note->GetTabFretString(
-            staff->m_drawingNotationType, staff->m_drawingStaffDef->GetNotationsubtype(), overline, strike);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
