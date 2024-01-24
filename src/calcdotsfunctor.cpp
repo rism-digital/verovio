@@ -182,7 +182,7 @@ bool CalcDotsFunctor::IsDotOverlappingWithFlag(const Note *note, const int staff
     if (!stem) return false;
 
     const Flag *flag = vrv_cast<const Flag *>(stem->GetFirst(FLAG));
-    if (!flag) return false;
+    if (!flag || (flag->m_drawingNbFlags == 0)) return false;
 
     // for the purposes of vertical spacing we care only up to 16th flags - shorter ones grow upwards
     char32_t flagGlyph = SMUFL_E242_flag16thUp;
