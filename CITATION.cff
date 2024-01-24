@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: Verovio
+message: 'If you use this software, please cite it as below.'
+type: software
+repository-code: 'https://github.com/rism-digital/verovio'
+url: 'https://www.verovio.org'
+repository: 'https://github.com/rism-digital/verovio.org'
+abstract: >-
+  Verovio is a fast, portable and lightweight open-source
+  library for engraving Music Encoding Initiative (MEI)
+  music scores into SVG.
+license: LGPL-3.0
+date-released: '2023-12-15'
