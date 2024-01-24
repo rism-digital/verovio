@@ -21,7 +21,7 @@ preferred-citation:
     family-names: Zitellini
   - given-names: Perry
     family-names: Roland
-  conference: "15th International Society for Music Information Retrieval Conference (ISMIR 2014)"
+  collection-title: "Proceedings of the 15th International Society for Music Information Retrieval Conference (ISMIR 2014)"
   month: 10
   start: 107 # First page number
   end: 112 # Last page number
