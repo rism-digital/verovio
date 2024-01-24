@@ -72,6 +72,8 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
     return false;
 }
 
+#define OPTION_TO_GETOPT(opt, has_arg) { vrv::FromCamelCase(opt.GetKey()).c_str(), has_arg, 0, opt.GetShortOption() }
+
 int main(int argc, char **argv)
 {
     std::string infile;
@@ -89,18 +91,20 @@ int main(int argc, char **argv)
     // The fonts will be loaded later with Resources::InitFonts()
     vrv::Toolkit toolkit(false);
 
+    vrv::Options *options = toolkit.GetOptionsObj();
+
     static struct option base_options[] = { //
-        { "all-pages", no_argument, 0, 'a' }, //
-        { "input-from", required_argument, 0, 'f' }, //
-        { "help", required_argument, 0, 'h' }, //
-        { "log-level", required_argument, 0, 'l' }, //
-        { "outfile", required_argument, 0, 'o' }, //
-        { "page", required_argument, 0, 'p' }, //
-        { "resource-path", required_argument, 0, 'r' }, //
-        { "scale", required_argument, 0, 's' }, //
-        { "output-to", required_argument, 0, 't' }, //
-        { "version", no_argument, 0, 'v' }, //
-        { "xml-id-seed", required_argument, 0, 'x' }, //
+        OPTION_TO_GETOPT(options->m_allPages, no_argument), //
+        OPTION_TO_GETOPT(options->m_inputFrom, required_argument), //
+        OPTION_TO_GETOPT(options->m_help, required_argument), //
+        OPTION_TO_GETOPT(options->m_logLevel, required_argument), //
+        OPTION_TO_GETOPT(options->m_outfile, required_argument), //
+        OPTION_TO_GETOPT(options->m_page, required_argument), //
+        OPTION_TO_GETOPT(options->m_resourcePath, required_argument), //
+        OPTION_TO_GETOPT(options->m_scale, required_argument), //
+        OPTION_TO_GETOPT(options->m_outputTo, required_argument), //
+        OPTION_TO_GETOPT(options->m_version, no_argument), //
+        OPTION_TO_GETOPT(options->m_xmlIdSeed, required_argument), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
         { 0, 0, 0, 0 }
@@ -108,7 +112,6 @@ int main(int argc, char **argv)
 
     int baseSize = sizeof(base_options) / sizeof(option);
 
-    vrv::Options *options = toolkit.GetOptionsObj();
     const vrv::MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
 
