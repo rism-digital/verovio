@@ -56,14 +56,25 @@ bool Tuning::IsSupportedChild(Object *child)
     return true;
 }
 
-int Tuning::CalcPitchPos(int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index) const
+int Tuning::CalcPitchPos(
+    int course, data_NOTATIONTYPE notationType, int lines, int listSize, int index, int loc, bool topAlign) const
 {
     switch (notationType) {
         case NOTATIONTYPE_tab_lute_french:
             // all courses >= 7 are positioned above line 0
             return (lines - std::min(course, 7)) * 2 + 1; // above the line
         case NOTATIONTYPE_tab_lute_italian: return (course - 1) * 2;
-        case NOTATIONTYPE_tab_lute_german: return (lines - (listSize - index)) * 2;
+        case NOTATIONTYPE_tab_lute_german:
+            if (loc != MEI_UNSET) {
+                return loc;
+            }
+            else if (topAlign) {
+                return (lines - (listSize - index)) * 2;
+            }
+            else {
+                // bottom align
+                return index * 2;
+            }
         case NOTATIONTYPE_tab_guitar: [[fallthrough]];
         default: return abs(course - lines) * 2;
     }

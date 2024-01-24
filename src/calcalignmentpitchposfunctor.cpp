@@ -105,8 +105,10 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         TabGrp *tabGrp = note->IsTabGrpNote();
         if (tabGrp) {
             assert(staffY->m_drawingTuning);
+            assert(staffY->m_drawingStaffDef);
             loc = staffY->m_drawingTuning->CalcPitchPos(note->GetTabCourse(), staffY->m_drawingNotationType,
-                staffY->m_drawingLines, tabGrp->GetListSize(tabGrp), tabGrp->GetListIndex(note));
+                staffY->m_drawingLines, tabGrp->GetListSize(), tabGrp->GetListIndex(note), note->GetLoc(),
+                staffY->m_drawingStaffDef->GetValign() != VERTICALALIGNMENT_bottom);
         }
         else if ((note->HasPname() && (note->HasOct() || note->HasOctDefault())) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
