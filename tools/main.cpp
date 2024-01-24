@@ -96,7 +96,7 @@ int main(int argc, char **argv)
         { "log-level", required_argument, 0, 'l' }, //
         { "outfile", required_argument, 0, 'o' }, //
         { "page", required_argument, 0, 'p' }, //
-        { "resources", required_argument, 0, 'r' }, //
+        { "resource-path", required_argument, 0, 'r' }, //
         { "scale", required_argument, 0, 's' }, //
         { "output-to", required_argument, 0, 't' }, //
         { "version", no_argument, 0, 'v' }, //
