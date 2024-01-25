@@ -31,6 +31,7 @@
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
+#include "symboldef.h"
 #include "tabgrp.h"
 #include "tie.h"
 #include "tuning.h"
@@ -52,6 +53,7 @@ static const ClassRegistrar<Note> s_factory("note", NOTE);
 Note::Note()
     : LayerElement(NOTE, "note-")
     , StemmedDrawingInterface()
+    , AltSymInterface()
     , DurationInterface()
     , PitchInterface()
     , PositionInterface()
@@ -71,6 +73,7 @@ Note::Note()
     , AttTiePresent()
     , AttVisibility()
 {
+    this->RegisterInterface(AltSymInterface::GetAttClasses(), AltSymInterface::IsInterface());
     this->RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     this->RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -99,6 +102,7 @@ void Note::Reset()
 {
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
+    AltSymInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
@@ -271,6 +275,49 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
 {
     overline = 0;
     strike = 0;
+
+    // @glyph.num, @glyph.name or @altsym
+    const Resources *resources = this->GetDocResources();
+    if (resources != NULL) {
+        std::u32string fretStr;
+        // If there is @glyph.num, return glyph based on it (first priority)
+        if (this->HasGlyphNum()) {
+            const char32_t code = this->GetGlyphNum();
+            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+        }
+
+        // If there is @glyph.name (second priority)
+        else if (this->HasGlyphName()) {
+            const char32_t code = resources->GetGlyphCode(this->GetGlyphName());
+            if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+        }
+
+        // If there is @altsym (third priority)
+        else if (this->HasAltsym() && this->HasAltSymbolDef()) {
+            const SymbolDef *symbolDef = this->GetAltSymbolDef();
+
+            // there may be more than one <symbol>
+            for (const Object *child : symbolDef->GetChildren()) {
+                if (child->Is(SYMBOL)) {
+                    const Symbol *symbol = vrv_cast<const Symbol *>(child);
+
+                    // If there is @glyph.num, return glyph based on it (fourth priority)
+                    if (symbol->HasGlyphNum()) {
+                        const char32_t code = symbol->GetGlyphNum();
+                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                    }
+
+                    // If there is @glyph.name (fifth priority)
+                    else if (symbol->HasGlyphName()) {
+                        const char32_t code = resources->GetGlyphCode(symbol->GetGlyphName());
+                        if (NULL != resources->GetGlyph(code)) fretStr.push_back(code);
+                    }
+                }
+            }
+        }
+
+        if (!fretStr.empty()) return fretStr;
+    }
 
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
