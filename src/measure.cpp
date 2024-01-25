@@ -497,7 +497,7 @@ int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
     double timeDuration
-        = m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5;
+        = m_measureAligner.GetRightAlignment()->GetTime() * static_cast<int>(DURATION_4) / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5;
     std::vector<double>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
