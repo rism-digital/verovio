@@ -13,11 +13,11 @@
 #include <string>
 #include <sys/stat.h>
 
-//#ifndef _WIN32
+#ifndef _WIN32
 #include <getopt.h>
-//#else
-//#include "win_getopt.h"
-//#endif
+#else
+#include "win_getopt.h"
+#endif
 
 //----------------------------------------------------------------------------
 
