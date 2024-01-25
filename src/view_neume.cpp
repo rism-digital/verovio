@@ -74,10 +74,10 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     struct drawingParams {
         wchar_t fontNo = SMUFL_E990_chantPunctum;
         wchar_t fontNoLiq[5] = {};
-        float xOffset = 0;
-        float yOffset = 0;
-        float xOffsetLiq[5] = { 0, 0, 0, 0, 0 };
-        float yOffsetLiq[5] = { 0, 0, 0, 0, 0 };
+        double xOffset = 0;
+        double yOffset = 0;
+        double xOffsetLiq[5] = { 0, 0, 0, 0, 0 };
+        double yOffsetLiq[5] = { 0, 0, 0, 0, 0 };
     };
     std::vector<drawingParams> params;
     params.push_back(drawingParams());
