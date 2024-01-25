@@ -239,8 +239,8 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
     const double tempo = this->GetAdjustedTempo();
     measure->SetCurrentTempo(tempo);
 
-    const double scoreTimeIncrement
-        = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor * static_cast<int>(DURATION_4) / DUR_MAX;
+    const double scoreTimeIncrement = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor
+        * static_cast<int>(DURATION_4) / DUR_MAX;
     m_currentScoreTime += scoreTimeIncrement;
     m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / tempo;
     m_multiRestFactor = 1;
