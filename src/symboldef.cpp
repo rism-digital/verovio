@@ -16,6 +16,7 @@
 #include "doc.h"
 #include "graphic.h"
 #include "svg.h"
+#include "symbol.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -47,6 +48,9 @@ bool SymbolDef::IsSupportedChild(Object *child)
     }
     else if (child->Is(SVG)) {
         assert(dynamic_cast<Svg *>(child));
+    }
+    else if (child->Is(SYMBOL)) {
+        assert(dynamic_cast<Symbol *>(child));
     }
     else {
         return false;
