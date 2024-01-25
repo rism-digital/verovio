@@ -243,7 +243,8 @@ static int
 parse_long_options(char * const *nargv, const char *options,
 	const struct option *long_options, int *idx, int short_too)
 {
-	char *current_argv, *has_equal;
+    const char *current_argv;
+    char *has_equal;
 	size_t current_argv_len;
 	int i, ambiguous, match;
 
