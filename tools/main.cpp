@@ -72,7 +72,10 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
     return false;
 }
 
-#define OPTION_TO_GETOPT(opt, has_arg) { vrv::FromCamelCase(opt.GetKey()).c_str(), has_arg, 0, opt.GetShortOption() }
+#define OPTION_TO_GETOPT(opt, has_arg)                                                                                 \
+    {                                                                                                                  \
+        vrv::FromCamelCase(opt.GetKey()).c_str(), has_arg, 0, opt.GetShortOption()                                     \
+    }
 
 int main(int argc, char **argv)
 {
