@@ -29,7 +29,6 @@ class Resources;
 
 namespace vrv {
 
-
 //----------------------------------------------------------------------------
 // SvgDeviceContext
 //----------------------------------------------------------------------------
@@ -335,18 +334,19 @@ private:
     // With multiple font support we need to keep track of:
     //  a) the path to the glyph (to check if is has been already added)
     //  b) the id assigned to glyphs on the (that is has been consumed by the already rendered elements)
-    // To keep things as similar as possible to previous versions we generate ids with as uuuu-ss (where uuuu is the Smulf code
-    // for the glyph and ss the per-session suffix) for most of the cases (single font usage). When the same glyph has been used
-    // from several fonts we use uuuu-n-ss where n indicates the collision count . Maybe we don't need to
-    // keep this pattern and can simplify this.
+    // To keep things as similar as possible to previous versions we generate ids with as uuuu-ss (where uuuu is the
+    // Smulf code for the glyph and ss the per-session suffix) for most of the cases (single font usage). When the same
+    // glyph has been used from several fonts we use uuuu-n-ss where n indicates the collision count . Maybe we don't
+    // need to keep this pattern and can simplify this.
     class GlyphRef {
-        public:
-            GlyphRef(const Glyph *glyph, int idx, const std::string &postfix);
-            const Glyph* GetGlyph() const { return m_glyph; };
-            const std::string& GetRefId() const { return m_refId; };
-        private:
-            const Glyph* m_glyph;
-            std::string m_refId;
+    public:
+        GlyphRef(const Glyph *glyph, int idx, const std::string &postfix);
+        const Glyph *GetGlyph() const { return m_glyph; };
+        const std::string &GetRefId() const { return m_refId; };
+
+    private:
+        const Glyph *m_glyph;
+        std::string m_refId;
     };
     const std::string InsertGlyphRef(const Glyph *glyph);
     std::map<const std::string, GlyphRef> m_smuflGlyphs;
