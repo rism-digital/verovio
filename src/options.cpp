@@ -905,7 +905,7 @@ Options::Options()
     m_baseOptions.AddOption(&m_standardOutput);
 
     m_help.SetInfo("Help", "Display this message");
-    m_help.Init(false);
+    m_help.Init("");
     m_help.SetKey("help");
     m_help.SetShortOption('h', true);
     m_baseOptions.AddOption(&m_help);

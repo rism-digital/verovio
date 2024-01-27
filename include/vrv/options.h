@@ -122,6 +122,7 @@ public:
     void SetShortOption(char shortOption, bool isCmdOnly);
     char GetShortOption() const { return m_shortOption; }
     bool IsCmdOnly() const { return m_isCmdOnly; }
+    bool IsArgumentRequired() const { return true; }
 
     /**
      * Return a JSON object for the option
@@ -185,6 +186,8 @@ public:
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool value);
+
+    bool IsArgumentRequired() const { return false; }
 
 private:
     //
@@ -593,7 +596,7 @@ public:
     // These options are only given for documentation - except for m_scale
     // They are ordered by short option alphabetical order
     OptionBool m_standardOutput;
-    OptionBool m_help;
+    OptionString m_help;
     OptionBool m_allPages;
     OptionString m_inputFrom;
     OptionString m_logLevel;
