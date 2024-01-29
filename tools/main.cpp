@@ -72,11 +72,11 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
     return false;
 }
 
-#define OPTION_TO_GETOPT(opt)                                                                                          \
-    {                                                                                                                  \
-        vrv::FromCamelCase(opt.GetKey()).c_str(), opt.IsArgumentRequired() ? required_argument : no_argument, 0,       \
-            opt.GetShortOption()                                                                                       \
-    }
+option optionStruct(vrv::Option *option, const std::map<vrv::Option *, std::string> &optionNames)
+{
+    return { optionNames.at(option).c_str(), option->IsArgumentRequired() ? required_argument : no_argument, 0,
+        option->GetShortOption() };
+}
 
 int main(int argc, char **argv)
 {
@@ -97,18 +97,32 @@ int main(int argc, char **argv)
 
     vrv::Options *options = toolkit.GetOptionsObj();
 
+    // map storing lower-case option names
+    std::map<vrv::Option *, std::string> optionNames
+        = { { &options->m_allPages, vrv::FromCamelCase(options->m_allPages.GetKey()) },
+              { &options->m_inputFrom, vrv::FromCamelCase(options->m_inputFrom.GetKey()) },
+              { &options->m_help, vrv::FromCamelCase(options->m_help.GetKey()) },
+              { &options->m_logLevel, vrv::FromCamelCase(options->m_logLevel.GetKey()) },
+              { &options->m_outfile, vrv::FromCamelCase(options->m_outfile.GetKey()) },
+              { &options->m_page, vrv::FromCamelCase(options->m_page.GetKey()) },
+              { &options->m_resourcePath, vrv::FromCamelCase(options->m_resourcePath.GetKey()) },
+              { &options->m_scale, vrv::FromCamelCase(options->m_scale.GetKey()) },
+              { &options->m_outputTo, vrv::FromCamelCase(options->m_outputTo.GetKey()) },
+              { &options->m_version, vrv::FromCamelCase(options->m_version.GetKey()) },
+              { &options->m_xmlIdSeed, vrv::FromCamelCase(options->m_xmlIdSeed.GetKey()) } };
+
     static struct option base_options[] = { //
-        OPTION_TO_GETOPT(options->m_allPages), //
-        OPTION_TO_GETOPT(options->m_inputFrom), //
-        OPTION_TO_GETOPT(options->m_help), //
-        OPTION_TO_GETOPT(options->m_logLevel), //
-        OPTION_TO_GETOPT(options->m_outfile), //
-        OPTION_TO_GETOPT(options->m_page), //
-        OPTION_TO_GETOPT(options->m_resourcePath), //
-        OPTION_TO_GETOPT(options->m_scale), //
-        OPTION_TO_GETOPT(options->m_outputTo), //
-        OPTION_TO_GETOPT(options->m_version), //
-        OPTION_TO_GETOPT(options->m_xmlIdSeed), //
+        optionStruct(&options->m_allPages, optionNames), //
+        optionStruct(&options->m_inputFrom, optionNames), //
+        optionStruct(&options->m_help, optionNames), //
+        optionStruct(&options->m_logLevel, optionNames), //
+        optionStruct(&options->m_outfile, optionNames), //
+        optionStruct(&options->m_page, optionNames), //
+        optionStruct(&options->m_resourcePath, optionNames), //
+        optionStruct(&options->m_scale, optionNames), //
+        optionStruct(&options->m_outputTo, optionNames), //
+        optionStruct(&options->m_version, optionNames), //
+        optionStruct(&options->m_xmlIdSeed, optionNames), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
         { 0, 0, 0, 0 }
