@@ -276,7 +276,7 @@ jobs:
 
       - name: Upload js build artifact (${{ matrix.toolkit.target }})
         if: ${{ matrix.toolkit.upload == true }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}/${{ matrix.toolkit.filepath }}
@@ -301,7 +301,7 @@ jobs:
         run: cp data/*.css $GITHUB_WORKSPACE/$TEMP_DIR/data/
 
       - name: Upload font data artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
@@ -455,7 +455,7 @@ jobs:
         run: (cat verovio.conf ; echo "OUTPUT_DIRECTORY = $GITHUB_WORKSPACE/$DOXYGEN_DIR") | doxygen -
 
       - name: Upload doxygen build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.DOC_BUILD }}
           path: ${{ github.workspace }}/${{ env.DOXYGEN_DIR }}
