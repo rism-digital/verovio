@@ -9,7 +9,7 @@
 
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) digital scores into SVG images. Verovio also contains on-the-fly converters to render [Plaine & Easie Code](https://www.iaml.info/plaine-easie-code), [Humdrum](https://www.humdrum.org), [Musedata](https://musedata.org), [MusicXML](https://www.musicxml.com), [EsAC](http://esac-data.org), and [ABC](https://en.wikipedia.org/wiki/ABC_notation) digital scores. 
 
-Verovio is written in standard 2017 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](https://book.verovio.org/first-steps/) for web integration and user interaction.
+Verovio is written in standard 2020 C++ and can be compiled as a standalone command-line tool, used as a compiled music-rendering library for applications (Qt, python), or compiled into Javascript using the Emscripten LLVM-to-JavaScript compiler.  Check out the JavaScript toolkit version of verovio running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) as well as the [app](http://www.verovio.org/app.html) or [tutorials](https://book.verovio.org/first-steps/) for web integration and user interaction.
 
 ![Choice interaction](https://raw.githubusercontent.com/rism-digital/verovio.org/gh-pages/movies/reflow.gif)
 
