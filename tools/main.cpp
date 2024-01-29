@@ -72,9 +72,10 @@ bool optionExists(const std::string &option, int argc, char **argv, std::string 
     return false;
 }
 
-#define OPTION_TO_GETOPT(opt, has_arg)                                                                                 \
+#define OPTION_TO_GETOPT(opt)                                                                                          \
     {                                                                                                                  \
-        vrv::FromCamelCase(opt.GetKey()).c_str(), has_arg, 0, opt.GetShortOption()                                     \
+        vrv::FromCamelCase(opt.GetKey()).c_str(), opt.IsArgumentRequired() ? required_argument : no_argument, 0,       \
+            opt.GetShortOption()                                                                                       \
     }
 
 int main(int argc, char **argv)
@@ -97,17 +98,17 @@ int main(int argc, char **argv)
     vrv::Options *options = toolkit.GetOptionsObj();
 
     static struct option base_options[] = { //
-        OPTION_TO_GETOPT(options->m_allPages, no_argument), //
-        OPTION_TO_GETOPT(options->m_inputFrom, required_argument), //
-        OPTION_TO_GETOPT(options->m_help, required_argument), //
-        OPTION_TO_GETOPT(options->m_logLevel, required_argument), //
-        OPTION_TO_GETOPT(options->m_outfile, required_argument), //
-        OPTION_TO_GETOPT(options->m_page, required_argument), //
-        OPTION_TO_GETOPT(options->m_resourcePath, required_argument), //
-        OPTION_TO_GETOPT(options->m_scale, required_argument), //
-        OPTION_TO_GETOPT(options->m_outputTo, required_argument), //
-        OPTION_TO_GETOPT(options->m_version, no_argument), //
-        OPTION_TO_GETOPT(options->m_xmlIdSeed, required_argument), //
+        OPTION_TO_GETOPT(options->m_allPages), //
+        OPTION_TO_GETOPT(options->m_inputFrom), //
+        OPTION_TO_GETOPT(options->m_help), //
+        OPTION_TO_GETOPT(options->m_logLevel), //
+        OPTION_TO_GETOPT(options->m_outfile), //
+        OPTION_TO_GETOPT(options->m_page), //
+        OPTION_TO_GETOPT(options->m_resourcePath), //
+        OPTION_TO_GETOPT(options->m_scale), //
+        OPTION_TO_GETOPT(options->m_outputTo), //
+        OPTION_TO_GETOPT(options->m_version), //
+        OPTION_TO_GETOPT(options->m_xmlIdSeed), //
         // standard input - long options only or - as filename
         { "stdin", no_argument, 0, 'z' }, //
         { 0, 0, 0, 0 }
