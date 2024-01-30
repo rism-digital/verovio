@@ -76,7 +76,7 @@ Toolkit::Toolkit(bool initFont)
 
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.InitFonts(m_options->m_addCustomFont.GetValue(), m_options->m_font.GetValue());
+        resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
     }
 
     m_editorToolkit = NULL;
@@ -117,7 +117,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
-    return resources.InitFonts(m_options->m_addCustomFont.GetValue(), m_options->m_font.GetValue());
+    return resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
@@ -1131,7 +1131,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     // Forcing font resource to be reset if the font is given in the options
     if (json.has<jsonxx::Array>("addCustomFont")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.InitFonts(m_options->m_addCustomFont.GetValue(), m_options->m_font.GetValue());
+        resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
     }
     else if (json.has<jsonxx::String>("font")) {
         this->SetFont(m_options->m_font.GetValue());
