@@ -1290,9 +1290,9 @@ Options::Options()
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
 
-    m_addCustomFont.SetInfo("Add custom font", "Add a custom music font");
-    m_addCustomFont.Init();
-    this->Register(&m_addCustomFont, "addCustomFont", &m_generalLayout);
+    m_fontAddCustom.SetInfo("Add custom font", "Add a custom music font");
+    m_fontAddCustom.Init();
+    this->Register(&m_fontAddCustom, "addCustomFont", &m_generalLayout);
 
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
