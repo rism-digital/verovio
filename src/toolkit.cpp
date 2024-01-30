@@ -1129,7 +1129,7 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     m_options->Sync();
 
     // Forcing font resource to be reset if the font is given in the options
-    if (json.has<jsonxx::Array>("addCustomFont")) {
+    if (json.has<jsonxx::Array>("fontAddCustom")) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
     }
