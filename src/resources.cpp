@@ -156,14 +156,18 @@ bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
     }
 }
 
-const Glyph *Resources::GetGlyph(char32_t smuflCode) const
+const Glyph *Resources::GetGlyph(char32_t smuflCode, const std::string &fontname) const
 {
-    if (GetCurrentGlyphTable().count(smuflCode)) {
+    if (!fontname.empty() && this->HasGlyphTableFor(fontname)) {
+        const GlyphTable &fontGlyphTable = this->GetGlyphTableFor(fontname);
+        if (fontGlyphTable.contains(smuflCode)) return &fontGlyphTable.at(smuflCode);
+    }
+    if (GetCurrentGlyphTable().contains(smuflCode)) {
         return &GetCurrentGlyphTable().at(smuflCode);
     }
     else if (!this->IsCurrentFontFallback()) {
         const GlyphTable &fallbackTable = this->GetFallbackGlyphTable();
-        return (fallbackTable.count(smuflCode)) ? &fallbackTable.at(smuflCode) : NULL;
+        return (fallbackTable.contains(smuflCode)) ? &fallbackTable.at(smuflCode) : NULL;
     }
     else {
         return NULL;
@@ -177,7 +181,7 @@ const Glyph *Resources::GetGlyph(const std::string &smuflName) const
 
 char32_t Resources::GetGlyphCode(const std::string &smuflName) const
 {
-    return m_glyphNameTable.count(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
+    return m_glyphNameTable.contains(smuflName) ? m_glyphNameTable.at(smuflName) : 0;
 }
 
 bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const

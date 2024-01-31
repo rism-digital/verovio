@@ -79,7 +79,7 @@ public:
      */
     ///@{
     /** Returns the glyph (if exists) for a glyph code in the current SMuFL font */
-    const Glyph *GetGlyph(char32_t smuflCode) const;
+    const Glyph *GetGlyph(char32_t smuflCode, const std::string &fontname = "") const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
     const Glyph *GetGlyph(const std::string &smuflName) const;
     /** Returns the glyph (if exists) for a glyph name in the current SMuFL font */
@@ -134,6 +134,11 @@ private:
 
     bool LoadFont(const std::string &fontName);
 
+    const bool HasGlyphTableFor(const std::string &fontname) const { return m_loadedFonts.contains(fontname); }
+    const GlyphTable &GetGlyphTableFor(const std::string &fontname) const
+    {
+        return m_loadedFonts.at(fontname).GetGlyphTable();
+    }
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
     const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
 

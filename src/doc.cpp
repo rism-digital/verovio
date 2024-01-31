@@ -1586,11 +1586,11 @@ void Doc::CollectVisibleScores()
     }
 }
 
-int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code, fontname);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1599,11 +1599,11 @@ int Doc::GetGlyphHeight(char32_t code, int staffSize, bool graceSize) const
     return h;
 }
 
-int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code, fontname);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1612,10 +1612,10 @@ int Doc::GetGlyphWidth(char32_t code, int staffSize, bool graceSize) const
     return w;
 }
 
-int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphAdvX(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code, fontname);
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1642,11 +1642,11 @@ Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staf
     return point;
 }
 
-int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code, fontname);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     x = x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1655,16 +1655,17 @@ int Doc::GetGlyphLeft(char32_t code, int staffSize, bool graceSize) const
     return x;
 }
 
-int Doc::GetGlyphRight(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphRight(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
-    return this->GetGlyphLeft(code, staffSize, graceSize) + this->GetGlyphWidth(code, staffSize, graceSize);
+    return this->GetGlyphLeft(code, staffSize, graceSize, fontname)
+        + this->GetGlyphWidth(code, staffSize, graceSize, fontname);
 }
 
-int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
     int x, y, w, h;
     const Resources &resources = this->GetResources();
-    const Glyph *glyph = resources.GetGlyph(code);
+    const Glyph *glyph = resources.GetGlyph(code, fontname);
     assert(glyph);
     glyph->GetBoundingBox(x, y, w, h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -1673,9 +1674,10 @@ int Doc::GetGlyphBottom(char32_t code, int staffSize, bool graceSize) const
     return y;
 }
 
-int Doc::GetGlyphTop(char32_t code, int staffSize, bool graceSize) const
+int Doc::GetGlyphTop(char32_t code, int staffSize, bool graceSize, const std::string &fontname) const
 {
-    return this->GetGlyphBottom(code, staffSize, graceSize) + this->GetGlyphHeight(code, staffSize, graceSize);
+    return this->GetGlyphBottom(code, staffSize, graceSize, fontname)
+        + this->GetGlyphHeight(code, staffSize, graceSize, fontname);
 }
 
 int Doc::GetTextGlyphHeight(char32_t code, const FontInfo *font, bool graceSize) const
