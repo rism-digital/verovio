@@ -776,7 +776,7 @@
   <g c="E8F5" x="0.0" y="-375.0" w="14.0" h="750.0" h-a-x="14" n="chantDivisioMaxima" />
   <g c="E8F6" x="0.0" y="-375.0" w="114.0" h="750.0" h-a-x="114" n="chantDivisioFinalis" />
   <g c="E8F7" x="0.0" y="264.0" w="85.0" h="234.0" h-a-x="85" n="chantVirgula" />
-  <g c="E8F8" x="-0.11" y="263.68" w="137.45" h="234.59" h-a-x="138" n="chantCaesura" />
+  <g c="E8F8" x="-0.0" y="264.0" w="137.34" h="234.27" h-a-x="138" n="chantCaesura" />
   <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise1" />
   <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise2" />
   <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise3" />
@@ -792,4 +792,5 @@
   <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
   <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
   <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
+  <g c="EB9F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower8" />
 </bounding-boxes>
