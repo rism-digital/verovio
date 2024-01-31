@@ -132,7 +132,7 @@ jobs:
 
       #===============================================#
       # Upload artifacts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: cibuildwheel-${{ runner.os }}-python-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
@@ -208,7 +208,7 @@ jobs:
 
       #===============================================#
       # Upload artifact
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: sdist-${{ runner.os }}-python-3.9
           path: dist/*.tar.gz
