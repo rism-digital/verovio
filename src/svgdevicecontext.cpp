@@ -84,13 +84,14 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
     return true;
 }
 
-SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int idx, const std::string &postfix) : m_glyph(glyph)
+SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int count, const std::string &postfix) : m_glyph(glyph)
 {
-    if (idx == 0) {
+    // Add the counter only when necessary (more than one font for that glyph)
+    if (count == 0) {
         m_refId = StringFormat("%s-%s", glyph->GetCodeStr().c_str(), postfix.c_str());
     }
     else {
-        m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), idx, postfix.c_str());
+        m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), count, postfix.c_str());
     }
 };
 
@@ -98,21 +99,24 @@ const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 {
     const std::string code = glyph->GetCodeStr();
 
+    // We have already used this glyph
     if (m_smuflGlyphs.find(glyph) != m_smuflGlyphs.end()) {
         return m_smuflGlyphs.at(glyph).GetRefId();
     }
 
     int count;
-    if (m_glyphCodesCounter.find(code) == m_glyphCodesCounter.end()) {
+    // This is the first time we have a glyph with this code
+    if (m_glyphCodeFontCounter.find(code) == m_glyphCodeFontCounter.end()) {
         count = 0;
     }
+    // We used it but with another font
     else {
-        count = m_glyphCodesCounter[(code)];
+        count = m_glyphCodeFontCounter[(code)];
     }
     GlyphRef ref(glyph, count, m_glyphPostfixId);
     const std::string id = ref.GetRefId();
     m_smuflGlyphs.insert(std::pair<const Glyph *, GlyphRef>(glyph, ref));
-    m_glyphCodesCounter[code] = count + 1;
+    m_glyphCodeFontCounter[code] = count + 1;
 
     return id;
 }
