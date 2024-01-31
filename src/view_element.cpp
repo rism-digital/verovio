@@ -687,12 +687,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    if (clef->HasFontname() && m_doc->GetResources().FontHasGlyphAvailable(clef->GetFontname(), sym)) {
-        this->DrawSmuflCodeWithCustomFont(dc, clef->GetFontname(), x, y, sym, staff->m_drawingStaffSize, false);
-    }
-    else {
-        this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
-    }
+    this->DrawSmuflCodeWithCustomFont(dc, clef->GetFontname(), x, y, sym, staff->m_drawingStaffSize, false);
 
     if (m_doc->IsFacs() && element->HasFacs()) {
         const int noteHeight
@@ -1134,19 +1129,14 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
     if (enclosingFront) {
-        this->DrawSmuflCode(dc, x, y, enclosingFront, glyphSize, false);
-        x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false);
+        this->DrawSmuflCodeWithCustomFont(dc, meterSig->GetFontname(), x, y, enclosingFront, glyphSize, false);
+        x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false, meterSig->GetFontname());
     }
 
     if (meterSig->HasSym() || meterSig->HasGlyphNum() || meterSig->HasGlyphName()) {
         const char32_t code = meterSig->GetSymbolGlyph();
-        if (meterSig->HasFontname() && m_doc->GetResources().FontHasGlyphAvailable(meterSig->GetFontname(), code)) {
-            x += this->DrawSmuflCodeWithCustomFont(dc, meterSig->GetFontname(), x, y, code, glyphSize, false);
-        }
-        else {
-            this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
-            x += m_doc->GetGlyphWidth(code, glyphSize, false);
-        }
+        this->DrawSmuflCodeWithCustomFont(dc, meterSig->GetFontname(), x, y, code, glyphSize, false);
+        x += m_doc->GetGlyphWidth(code, glyphSize, false, meterSig->GetFontname());
     }
     else if (meterSig->GetForm() == METERFORM_num) {
         x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
@@ -1156,7 +1146,7 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
     }
 
     if (enclosingBack) {
-        this->DrawSmuflCode(dc, x, y, enclosingBack, glyphSize, false);
+        this->DrawSmuflCodeWithCustomFont(dc, meterSig->GetFontname(), x, y, enclosingBack, glyphSize, false);
     }
 
     dc->EndGraphic(meterSig, this);
