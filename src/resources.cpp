@@ -126,7 +126,7 @@ bool Resources::LoadAll()
     for (const std::filesystem::directory_entry &entry : std::filesystem::directory_iterator(path)) {
         const std::filesystem::path path = entry.path();
         if (path.has_extension() && path.has_stem() && path.extension() == ".xml") {
-            const std::string fontName = path.stem();
+            const std::string fontName = path.stem().string();
             if (!IsFontLoaded(fontName)) {
                 success = success && LoadFont(fontName);
             }
