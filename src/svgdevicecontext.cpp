@@ -195,9 +195,9 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         if (m_vrvTextFont && resources) {
             this->IncludeTextFont(resources->GetCurrentFont(), resources);
         }
-        // include the Leipzig fallback font
+        // include the fallback font
         if (m_vrvTextFontFallback && resources) {
-            this->IncludeTextFont("Leipzig", resources);
+            this->IncludeTextFont(resources->GetCurrentFont(), resources);
         }
     }
 
