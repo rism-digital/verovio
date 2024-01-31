@@ -112,7 +112,7 @@ const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
     }
     GlyphRef ref(glyph, count, m_glyphPostfixId);
     const std::string id = ref.GetRefId();
-    m_smuflGlyphs.insert(std::pair<const Glyph*, GlyphRef>(glyph, ref));
+    m_smuflGlyphs.insert(std::pair<const Glyph *, GlyphRef>(glyph, ref));
     m_glyphCodesCounter[code] = count + 1;
 
     return id;
