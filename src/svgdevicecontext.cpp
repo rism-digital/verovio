@@ -97,7 +97,6 @@ SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int idx, const std::str
 const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
 {
     const std::string code = glyph->GetCodeStr();
-    const std::string path = glyph->GetPath();
 
     if (m_smuflGlyphs.find(glyph) != m_smuflGlyphs.end()) {
         return m_smuflGlyphs.at(glyph).GetRefId();
