@@ -32,6 +32,9 @@ const std::map<int, std::string> Option::s_condense
 const std::map<int, std::string> Option::s_elision = { { ELISION_regular, "regular" }, { ELISION_narrow, "narrow" },
     { ELISION_wide, "wide" }, { ELISION_unicode, "unicode" } };
 
+const std::map<int, std::string> Option::s_fontFallback
+    = { { FONT_FALLBACK_Leipzig, "Leipzig" }, { FONT_FALLBACK_Bravura, "Bravura" } };
+
 const std::map<int, std::string> Option::s_footer
     = { { FOOTER_none, "none" }, { FOOTER_auto, "auto" }, { FOOTER_encoded, "encoded" }, { FOOTER_always, "always" } };
 
@@ -1293,6 +1296,14 @@ Options::Options()
     m_fontAddCustom.SetInfo("Add custom font", "Add a custom music font");
     m_fontAddCustom.Init();
     this->Register(&m_fontAddCustom, "fontAddCustom", &m_generalLayout);
+
+    m_fontFallback.SetInfo("Font fallback", "The music font fallback for missing glyphs");
+    m_fontFallback.Init(FONT_FALLBACK_Leipzig, &Option::s_fontFallback);
+    this->Register(&m_fontFallback, "fontFallback", &m_generalLayout);
+
+    m_fontLoadAll.SetInfo("Font init all", "Load all music fonts");
+    m_fontLoadAll.Init(false);
+    this->Register(&m_fontLoadAll, "fontLoadAll", &m_generalLayout);
 
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
