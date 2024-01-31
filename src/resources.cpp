@@ -156,12 +156,8 @@ bool Resources::SetCurrentFont(const std::string &fontName, bool allowLoading)
     }
 }
 
-const Glyph *Resources::GetGlyph(char32_t smuflCode, const std::string &fontname) const
+const Glyph *Resources::GetGlyph(char32_t smuflCode) const
 {
-    if (!fontname.empty() && this->HasGlyphTableFor(fontname)) {
-        const GlyphTable &fontGlyphTable = this->GetGlyphTableFor(fontname);
-        if (fontGlyphTable.contains(smuflCode)) return &fontGlyphTable.at(smuflCode);
-    }
     if (GetCurrentGlyphTable().contains(smuflCode)) {
         return &GetCurrentGlyphTable().at(smuflCode);
     }
