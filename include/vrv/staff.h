@@ -24,6 +24,49 @@ class TimeSpanningInterface;
 class Tuning;
 
 //----------------------------------------------------------------------------
+// LedgerLine
+//----------------------------------------------------------------------------
+
+/**
+ * This is a class with no MEI equivalent for representing legder lines.
+ * A ledger line is represented by a list of dashes.
+ * Each dash is represented by a pair of points (left - right).
+ */
+class LedgerLine {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    LedgerLine();
+    virtual ~LedgerLine();
+    virtual void Reset();
+    ///@}
+
+    /**
+     * Add a dash to the ledger line object.
+     * If necessary merges overlapping dashes.
+     */
+    void AddDash(int left, int right, int extension);
+
+protected:
+    //
+private:
+    //
+public:
+    /**
+     * A list of dashes relative to the staff position.
+     */
+    std::list<std::pair<int, int>> m_dashes;
+
+protected:
+    //
+private:
+    //
+};
+
+//----------------------------------------------------------------------------
 // Staff
 //----------------------------------------------------------------------------
 
@@ -247,49 +290,6 @@ private:
     ArrayOfLedgerLines m_ledgerLinesAboveCue;
     ArrayOfLedgerLines m_ledgerLinesBelowCue;
     ///@}
-};
-
-//----------------------------------------------------------------------------
-// LedgerLine
-//----------------------------------------------------------------------------
-
-/**
- * This is a class with no MEI equivalent for representing legder lines.
- * A ledger line is represented by a list of dashes.
- * Each dash is represented by a pair of points (left - right).
- */
-class LedgerLine {
-public:
-    /**
-     * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    LedgerLine();
-    virtual ~LedgerLine();
-    virtual void Reset();
-    ///@}
-
-    /**
-     * Add a dash to the ledger line object.
-     * If necessary merges overlapping dashes.
-     */
-    void AddDash(int left, int right, int extension);
-
-protected:
-    //
-private:
-    //
-public:
-    /**
-     * A list of dashes relative to the staff position.
-     */
-    std::list<std::pair<int, int>> m_dashes;
-
-protected:
-    //
-private:
-    //
 };
 
 } // namespace vrv

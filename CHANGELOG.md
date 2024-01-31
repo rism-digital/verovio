@@ -2,6 +2,7 @@
 
 ## [unreleased]
 * Support for `fTrem@unitdur` (@eNote-GmbH)
+* Upgrade to C++20
 
 ## [4.1.0] - 2023-12-15
 * Support for staves ordered by `scoreDef`

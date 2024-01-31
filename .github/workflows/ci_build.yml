@@ -6,7 +6,7 @@ on:
     # but only for the branches specified
     branches:
       # Push events on develop branch
-      - develop
+      - 'develop'
       # Push events on ci-test branch (uncomment if needed for testing purposes)
       # - ci-test
     paths-ignore:
@@ -44,7 +44,7 @@ env:
   # emscripten
   EM_VERSION: latest
   EM_CACHE_FOLDER: "emsdk-cache"
-  EM_CACHE_ID: 2
+  EM_CACHE_ID: 3
 
   # gh-pages
   GH_PAGES_REPO: ${{ github.repository_owner }}/verovio.org # works from rism-digital and from forks
@@ -76,23 +76,23 @@ jobs:
         include:
           - os: ubuntu-20.04
             compiler: g++
-            version: "9"
-
-          - os: ubuntu-20.04
-            compiler: g++
             version: "10"
 
           - os: ubuntu-20.04
             compiler: g++
             version: "11"
 
-          - os: ubuntu-20.04
-            compiler: clang
-            version: "6.0"
+          - os: ubuntu-22.04
+            compiler: g++
+            version: "12"
 
           - os: ubuntu-20.04
             compiler: clang
-            version: "9"
+            version: "10"
+
+          - os: ubuntu-20.04
+            compiler: clang
+            version: "11"
 
           - os: ubuntu-20.04
             compiler: clang
