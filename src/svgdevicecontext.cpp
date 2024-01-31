@@ -99,8 +99,8 @@ const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
     const std::string code = glyph->GetCodeStr();
     const std::string path = glyph->GetPath();
 
-    if (m_smuflGlyphs.find(path) != m_smuflGlyphs.end()) {
-        return m_smuflGlyphs.at(path).GetRefId();
+    if (m_smuflGlyphs.find(glyph) != m_smuflGlyphs.end()) {
+        return m_smuflGlyphs.at(glyph).GetRefId();
     }
 
     int count;
@@ -112,7 +112,7 @@ const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
     }
     GlyphRef ref(glyph, count, m_glyphPostfixId);
     const std::string id = ref.GetRefId();
-    m_smuflGlyphs.insert(std::pair<const std::string, GlyphRef>(path, ref));
+    m_smuflGlyphs.insert(std::pair<const Glyph*, GlyphRef>(glyph, ref));
     m_glyphCodesCounter[code] = count + 1;
 
     return id;
@@ -205,9 +205,9 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (const std::pair<const std::string &, const SvgDeviceContext::GlyphRef &> entry : m_smuflGlyphs) {
+        for (const std::pair<const Glyph *, const SvgDeviceContext::GlyphRef &> entry : m_smuflGlyphs) {
             // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source(entry.first);
+            std::ifstream source(entry.first->GetPath());
             sourceDoc.load(source);
 
             // copy all the nodes inside into the master document
