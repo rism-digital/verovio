@@ -72,12 +72,12 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
-    m_options = m_doc.GetOptions();
-
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
+        resources.InitFonts();
     }
+
+    m_options = m_doc.GetOptions();
 
     m_editorToolkit = NULL;
 
@@ -117,7 +117,15 @@ bool Toolkit::SetResourcePath(const std::string &path)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
-    return resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
+    bool success = resources.InitFonts();
+    success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    if (m_options->m_fontLoadAll.GetValue()) {
+        success = success && resources.LoadAll();
+    }
+    if (!m_options->m_fontAddCustom.GetValue().empty()) {
+        success = success && resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    }
+    return success;
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
@@ -1131,10 +1139,18 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     // Forcing font resource to be reset if the font is given in the options
     if (json.has<jsonxx::Array>("fontAddCustom")) {
         Resources &resources = m_doc.GetResourcesForModification();
-        resources.InitFonts(m_options->m_fontAddCustom.GetValue(), m_options->m_font.GetValue());
+        resources.AddCustom(m_options->m_fontAddCustom.GetValue());
     }
-    else if (json.has<jsonxx::String>("font")) {
+    if (json.has<jsonxx::String>("font")) {
         this->SetFont(m_options->m_font.GetValue());
+    }
+    if (json.has<jsonxx::Array>("fontFallback")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    }
+    if (json.has<jsonxx::Array>("fontLoadAll")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.LoadAll();
     }
 
     return true;

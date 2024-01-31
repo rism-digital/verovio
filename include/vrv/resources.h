@@ -56,9 +56,18 @@ public:
      */
     ///@{
     /** Init the SMufL music and text fonts */
-    bool InitFonts(const std::vector<std::string> &extraFonts, const std::string &defaultFont);
+    bool InitFonts();
+    /**  Set the font to be used and loads it if necessary */
+    bool SetFont(const std::string &fontName);
+    /** Add custom (external) fonts */
+    bool AddCustom(const std::vector<std::string> &extraFonts);
+    /** Load all music fonts available in the resource directory */
+    bool LoadAll();
+    /** Set the fallback font (Leipzig or Bravura) when some glyphs are missing in the current font */
+    bool SetFallback(const std::string &fontName);
     /** Init the text font (bounding boxes and ASCII only) */
     bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
+
     /** Select a particular font */
     bool SetCurrentFont(const std::string &fontName, bool allowLoading = false);
     std::string GetCurrentFont() const { return m_currentFontName; }
@@ -83,6 +92,11 @@ public:
     bool IsSmuflFallbackNeeded(const std::u32string &text) const;
 
     /**
+     * Check if the current font is the fallback font
+     */
+    bool IsCurrentFontFallback() const;
+
+    /**
      * Text fonts
      */
     ///@{
@@ -103,33 +117,32 @@ public:
 private:
     class LoadedFont {
     public:
-        // LoadedFont() {};
-        LoadedFont(
-            const std::string &name, const std::string &path, const GlyphTable &glyphTable, bool useFallback = true)
-            : m_name(name), m_path(path), m_glyphTable(glyphTable), m_useFallback(useFallback){};
+        LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback){};
         ~LoadedFont(){};
         const std::string GetName() const { return m_name; };
-        const std::string GetPath() const { return m_path; };
         const GlyphTable &GetGlyphTable() const { return m_glyphTable; };
-        bool useFallback() const { return m_useFallback; };
+        GlyphTable &GetGlyphTableForModification() { return m_glyphTable; };
+        bool isFallback() const { return m_isFallback; };
 
     private:
         std::string m_name;
-        /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
-        std::string m_path;
         /** The loaded SMuFL font */
         GlyphTable m_glyphTable;
-        /** If the font have a fallback when a glyph is not present **/
-        const bool m_useFallback;
+        /** If the font needs to fallback when a glyph is not present **/
+        const bool m_isFallback;
     };
 
-    bool LoadFont(const std::string &fontName, bool withFallback = true, bool buildNameTable = false);
+    bool LoadFont(const std::string &fontName);
+
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
+    const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
 
     std::string m_path;
     std::string m_defaultFontName;
+    std::string m_fallbackFontName;
     std::map<std::string, LoadedFont> m_loadedFonts;
     std::string m_currentFontName;
+
     /** A text font used for bounding box calculations */
     GlyphTextMap m_textFont;
     mutable StyleAttributes m_currentStyle;
