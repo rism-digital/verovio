@@ -123,7 +123,7 @@ void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDra
                 std::u32string smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
                 vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-                vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+                vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
                 bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflStr);
                 vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
@@ -197,7 +197,7 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
 
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflAccid);
             vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
             dc->SetFont(&vrvTxt);
@@ -292,7 +292,7 @@ void View::DrawLyricString(
 
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
             std::u32string elision;
             elision.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(elision);
@@ -407,7 +407,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
         rendFont.SetSmuflWithFallback(false);
-        rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+        rendFont.SetFaceName(m_doc->GetResources().GetCurrentFont());
         int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
         rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
         customFont = true;
@@ -619,7 +619,7 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
     if (symbol->HasGlyphAuth() && symbol->GetGlyphAuth() == "smufl") {
         bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);
         symbolFont.SetSmuflWithFallback(isFallbackNeeded);
-        symbolFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+        symbolFont.SetFaceName(m_doc->GetResources().GetCurrentFont());
         int pointSize = (symbolFont.GetPointSize() != 0) ? symbolFont.GetPointSize() : params.m_pointSize;
         symbolFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
     }

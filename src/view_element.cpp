@@ -1816,7 +1816,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
             FontInfo vrvTxt;
             assert(dc->HasFont());
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
             std::u32string str;
             str.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);
