@@ -149,10 +149,15 @@ const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor) const
 
 std::string Glyph::GetXML() const
 {
-    std::ifstream fstream(m_path);
-    std::stringstream sstream;
-    sstream << fstream.rdbuf();
-    return sstream.str();
+    if (!m_xml.empty()) {
+        return m_xml;
+    }
+    else {
+        std::ifstream fstream(m_path);
+        std::stringstream sstream;
+        sstream << fstream.rdbuf();
+        return sstream.str();
+    }
 }
 
 } // namespace vrv
