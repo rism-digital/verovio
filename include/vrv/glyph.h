@@ -106,6 +106,11 @@ public:
      */
     const Point *GetAnchor(SMuFLGlyphAnchor anchor) const;
 
+    /**
+     * Return the XML (content) of the glyph
+     */
+    std::string GetXML() const;
+
 private:
     //
 public:

@@ -209,9 +209,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
         // for each needed glyph
         for (const std::pair<const Glyph *, const SvgDeviceContext::GlyphRef &> entry : m_smuflGlyphs) {
-            // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source(entry.first->GetPath());
-            sourceDoc.load(source);
+            // load the XML as a pugi::xml_document
+            sourceDoc.load_string(entry.first->GetXML().c_str());
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
