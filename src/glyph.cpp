@@ -11,6 +11,9 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -142,6 +145,14 @@ bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor) const
 const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor) const
 {
     return &m_anchors.at(anchor);
+}
+
+std::string Glyph::GetXML() const
+{
+    std::ifstream fstream(m_path);
+    std::stringstream sstream;
+    sstream << fstream.rdbuf();
+    return sstream.str();
 }
 
 } // namespace vrv
