@@ -10,7 +10,11 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
+//----------------------------------------------------------------------------
+
+/** Forward declaration of the zip_file.hpp class */
 namespace miniz_cpp {
 class zip_file;
 }
