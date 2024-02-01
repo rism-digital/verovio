@@ -1293,7 +1293,7 @@ Options::Options()
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
 
-    m_fontAddCustom.SetInfo("Add custom font", "Add a custom music font");
+    m_fontAddCustom.SetInfo("Add custom font", "Add a custom music font as zip file");
     m_fontAddCustom.Init();
     this->Register(&m_fontAddCustom, "fontAddCustom", &m_generalLayout);
 

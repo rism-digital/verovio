@@ -110,10 +110,13 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
 {
     bool success = true;
     // options supplied fonts
-    for (const std::string &fontName : extraFonts) {
-        success = success && LoadFont(fontName);
+    for (const std::string &fontFile : extraFonts) {
+        std::filesystem::path path(fontFile);
+        ZipFileReader zipFile;
+        zipFile.Load(fontFile);
+        success = success && path.has_stem() && LoadFont(path.stem().string(), &zipFile);
         if (!success) {
-            LogError("Option supplied font %s could not be loaded.", fontName.c_str());
+            LogError("Option supplied font %s could not be loaded.", fontFile.c_str());
         }
     }
     return success;
@@ -255,15 +258,33 @@ char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
     return smuflChar;
 }
 
-bool Resources::LoadFont(const std::string &fontName)
+bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
 {
     pugi::xml_document doc;
-    const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
-    pugi::xml_parse_result parseResult = doc.load_file(filename.c_str());
-    if (!parseResult) {
-        // File not found, default bounding boxes will be used
-        LogError("Failed to load font and glyph bounding boxes");
-        return false;
+    // For zip archive custom font, load the data from the zipFile
+    if (zipFile) {
+        const std::string filename = fontName + ".xml";
+        if (!zipFile->HasFile(filename)) {
+            // File not found, default bounding boxes will be used
+            LogError("Failed to load font and glyph bounding boxes");
+            return false;
+        }
+        pugi::xml_parse_result parseResult = doc.load_string(zipFile->ReadTextFile(filename).c_str());
+        if (!parseResult) {
+            // File not found, default bounding boxes will be used
+            LogError("Failed to load font and glyph bounding boxes");
+            return false;
+        }
+    }
+    // Other wise use the resource directory
+    else {
+        const std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
+        pugi::xml_parse_result parseResult = doc.load_file(filename.c_str());
+        if (!parseResult) {
+            // File not found, default bounding boxes will be used
+            LogError("Failed to load font and glyph bounding boxes");
+            return false;
+        }
     }
     pugi::xml_node root = doc.first_child();
     if (!root.attribute("units-per-em")) {
@@ -295,7 +316,17 @@ bool Resources::LoadFont(const std::string &fontName)
         if (current.attribute("w")) width = current.attribute("w").as_float();
         if (current.attribute("h")) height = current.attribute("h").as_float();
         glyph.SetBoundingBox(x, y, width, height);
-        glyph.SetPath(Resources::GetPath() + "/" + fontName + "/" + c_attribute.value() + ".xml");
+
+        std::string glyphFilename = fontName + "/" + c_attribute.value() + ".xml";
+        // Store the XML in the glyph for fonts loaded from zip files
+        if (zipFile) {
+            glyph.SetXML(zipFile->ReadTextFile(glyphFilename));
+        }
+        // Otherwise only store the path
+        else {
+            glyph.SetPath(Resources::GetPath() + "/" + glyphFilename);
+        }
+
         if (current.attribute("h-a-x")) glyph.SetHorizAdvX(current.attribute("h-a-x").as_float());
 
         // load anchors

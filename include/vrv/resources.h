@@ -12,6 +12,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "filereader.h"
 #include "glyph.h"
 
 namespace vrv {
@@ -132,7 +133,7 @@ private:
         const bool m_isFallback;
     };
 
-    bool LoadFont(const std::string &fontName);
+    bool LoadFont(const std::string &fontName, ZipFileReader *zipFile = NULL);
 
     const GlyphTable &GetCurrentGlyphTable() const { return m_loadedFonts.at(m_currentFontName).GetGlyphTable(); };
     const GlyphTable &GetFallbackGlyphTable() const { return m_loadedFonts.at(m_fallbackFontName).GetGlyphTable(); };
