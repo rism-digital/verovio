@@ -9,10 +9,8 @@
 #define __VRV_SVG_DC_H__
 
 #include <fstream>
-#include <iostream>
 #include <list>
 #include <set>
-#include <sstream>
 #include <string>
 #include <vector>
 
