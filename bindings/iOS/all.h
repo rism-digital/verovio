@@ -94,6 +94,7 @@
 #import <VerovioFramework/expansionmap.h>
 #import <VerovioFramework/f.h>
 #import <VerovioFramework/facsimile.h>
+#import <VerovioFramework/facsimilefunctor.h>
 #import <VerovioFramework/facsimileinterface.h>
 #import <VerovioFramework/fb.h>
 #import <VerovioFramework/featureextractor.h>
