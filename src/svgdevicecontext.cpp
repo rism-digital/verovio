@@ -128,17 +128,7 @@ void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resour
     std::string cssContent;
 
     if (m_smuflTextFont == SMUFLTEXTFONT_embedded) {
-        const std::string cssFontPath = StringFormat("%s/%s.css", resources->GetPath().c_str(), fontname.c_str());
-        std::ifstream cssFontFile(cssFontPath);
-        if (!cssFontFile.is_open()) {
-            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
-                resources->GetCurrentFont().c_str());
-        }
-        else {
-            std::stringstream cssFontStream;
-            cssFontStream << cssFontFile.rdbuf();
-            cssContent = cssFontStream.str();
-        }
+        cssContent = resources->GetCSSFontFor(fontname);
     }
     else {
         std::string versionPath
