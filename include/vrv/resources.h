@@ -110,13 +110,24 @@ public:
     ///@}
 
     /**
+     * Get the CSS font string for the corresponding font.
+     * Return an empty string if the font has not been loaded.
+     */
+    std::string GetCSSFontFor(const std::string &fontName) const;
+
+    /**
      * Static method that converts unicode music code points to SMuFL equivalent.
      * Return the parameter char if nothing can be converted.
      */
     static char32_t GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar);
 
 private:
+    //----------------------------------------------------------------------------
+    // LoadedFont
+    //----------------------------------------------------------------------------
+
     class LoadedFont {
+
     public:
         LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback){};
         ~LoadedFont(){};
@@ -125,13 +136,20 @@ private:
         GlyphTable &GetGlyphTableForModification() { return m_glyphTable; };
         bool isFallback() const { return m_isFallback; };
 
+        void SetCSSFont(const std::string &css) { m_css = css; }
+        std::string GetCSSFont(const std::string &path) const;
+
     private:
         std::string m_name;
         /** The loaded SMuFL font */
         GlyphTable m_glyphTable;
         /** If the font needs to fallback when a glyph is not present **/
         const bool m_isFallback;
+        /** CSS font for font loaded as zip archive */
+        std::string m_css;
     };
+
+    //----------------------------------------------------------------------------
 
     bool LoadFont(const std::string &fontName, ZipFileReader *zipFile = NULL);
 

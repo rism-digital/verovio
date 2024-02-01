@@ -10,6 +10,9 @@
 //----------------------------------------------------------------------------
 
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -215,6 +218,16 @@ bool Resources::FontHasGlyphAvailable(const std::string &fontName, char32_t smuf
     }
 }
 
+std::string Resources::GetCSSFontFor(const std::string &fontName) const
+{
+    if (!IsFontLoaded(fontName)) {
+        return "";
+    }
+
+    const LoadedFont &font = m_loadedFonts.at(fontName);
+    return font.GetCSSFont(m_path);
+}
+
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const
 {
     if (fontWeight == FONTWEIGHT_NONE) {
@@ -297,6 +310,11 @@ bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
 
     m_loadedFonts.insert(std::pair<std::string, LoadedFont>(fontName, Resources::LoadedFont(fontName, isFallback)));
     LoadedFont &font = m_loadedFonts.at(fontName);
+
+    // For zip archive custom font also store the CSS
+    if (zipFile) {
+        font.SetCSSFont(zipFile->ReadTextFile(fontName + ".css"));
+    }
 
     GlyphTable &glyphTable = font.GetGlyphTableForModification();
 
@@ -401,6 +419,20 @@ bool Resources::InitTextFont(const std::string &fontName, const StyleAttributes 
         }
     }
     return true;
+}
+
+std::string Resources::LoadedFont::GetCSSFont(const std::string &path) const
+{
+    if (!m_css.empty()) {
+        return m_css;
+    }
+    else {
+        const std::string cssFontPath = StringFormat("%s/%s.css", path.c_str(), m_name.c_str());
+        std::ifstream fstream(cssFontPath);
+        std::stringstream sstream;
+        sstream << fstream.rdbuf();
+        return sstream.str();
+    }
 }
 
 } // namespace vrv
