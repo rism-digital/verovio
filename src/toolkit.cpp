@@ -21,6 +21,7 @@
 #include "editortoolkit_cmn.h"
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
+#include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -47,10 +48,6 @@
 #include "MidiFile.h"
 #include "crc.h"
 #include "jsonxx.h"
-
-#ifndef NO_MXL_SUPPORT
-#include "zip_file.hpp"
-#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
@@ -431,26 +428,24 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
 #ifndef NO_MXL_SUPPORT
-    miniz_cpp::zip_file file(bytes);
+    ZipFileReader zipFileReader;
+    zipFileReader.Load(bytes);
 
-    std::string filename;
-    // Look for the meta file in the zip
-    for (miniz_cpp::zip_info &member : file.infolist()) {
-        if (member.filename == "META-INF/container.xml") {
-            std::string container = file.read(member.filename);
-            // Find the file name with an xpath query
-            pugi::xml_document doc;
-            doc.load_buffer(container.c_str(), container.size());
-            pugi::xml_node root = doc.first_child();
-            pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
-            filename = rootfile.attribute("full-path").value();
-            break;
-        }
+    const std::string metaInf = "META-INF/container.xml";
+    if (!zipFileReader.HasFile(metaInf)) {
+        LogError("No '%s' file to load found in the archive", metaInf.c_str());
+        return false;
     }
+    std::string containerXml = zipFileReader.ReadTextFile("META-INF/container.xml");
+    pugi::xml_document doc;
+    doc.load_buffer(containerXml.c_str(), containerXml.size());
+    pugi::xml_node root = doc.first_child();
+    pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
+    std::string filename = rootfile.attribute("full-path").value();
 
     if (!filename.empty()) {
         LogInfo("Loading file '%s' in the archive", filename.c_str());
-        return this->LoadData(file.read(filename));
+        return this->LoadData(zipFileReader.ReadTextFile(filename));
     }
     else {
         LogError("No file to load found in the archive");

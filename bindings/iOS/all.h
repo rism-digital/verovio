@@ -100,6 +100,7 @@
 #import <VerovioFramework/featureextractor.h>
 #import <VerovioFramework/fermata.h>
 #import <VerovioFramework/fig.h>
+#import <VerovioFramework/filereader.h>
 #import <VerovioFramework/findfunctor.h>
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/fing.h>
