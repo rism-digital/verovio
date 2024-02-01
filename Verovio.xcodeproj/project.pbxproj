@@ -182,6 +182,12 @@
 		4D16945A1E3A44F300569BF4 /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
 		4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
 		4D1694741E3A455200569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
+		4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC97A2B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC97C2B6A9BD000434023 /* filereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1AC97B2B6A9BD000434023 /* filereader.h */; };
+		4D1AC97D2B6A9BD000434023 /* filereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1AC97B2B6A9BD000434023 /* filereader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
 		4D1BD1B621908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
 		4D1BD1B721908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
@@ -1763,6 +1769,8 @@
 		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
 		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D1AC9762B6A9BB200434023 /* filereader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filereader.cpp; path = src/filereader.cpp; sourceTree = "<group>"; };
+		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
 		4D1BD1B821908D78000D35B2 /* halfmrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = halfmrpt.h; path = include/vrv/halfmrpt.h; sourceTree = "<group>"; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
@@ -2776,6 +2784,8 @@
 				36E0442D2347A9290054F141 /* expansionmap.h */,
 				4D79643826C6B3520026288B /* featureextractor.cpp */,
 				4D79643026C6AA720026288B /* featureextractor.h */,
+				4D1AC9762B6A9BB200434023 /* filereader.cpp */,
+				4D1AC97B2B6A9BD000434023 /* filereader.h */,
 				4DF28A041A754DF000BA9F7D /* floatingobject.cpp */,
 				4D95D4F41D7185DE00B2B856 /* floatingobject.h */,
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
@@ -3388,6 +3398,7 @@
 				E79320642991452100D80975 /* calcstemfunctor.h in Headers */,
 				4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */,
 				4DACC9F42990F29A00B55913 /* atts_visual.h in Headers */,
+				4D1AC97C2B6A9BD000434023 /* filereader.h in Headers */,
 				4DA0EADD22BB77AF00A7EBEB /* zone.h in Headers */,
 				E71EF3C32975E4DC00D36264 /* resetfunctor.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
@@ -3706,6 +3717,7 @@
 				BBC19FBF22B37CA000100F42 /* all.h in Headers */,
 				4DA0EAE222BB77AF00A7EBEB /* editortoolkit_mensural.h in Headers */,
 				E79C87C8269440810098FE85 /* lv.h in Headers */,
+				4D1AC97D2B6A9BD000434023 /* filereader.h in Headers */,
 				BB4C4B5822A932D7001F6AF0 /* layerelement.h in Headers */,
 				BB4C4B9422A932E5001F6AF0 /* areaposinterface.h in Headers */,
 			);
@@ -3873,6 +3885,7 @@
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
 				E7901661298BCB2C008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */,
+				4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
@@ -4153,6 +4166,7 @@
 			files = (
 				4DEF8A6421B7AAF90093A76B /* f.cpp in Sources */,
 				4DB3D89E1F7E7FAA00B5FC2B /* fig.cpp in Sources */,
+				4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
 				4DEC4D9621C81E3B00D1D273 /* expan.cpp in Sources */,
@@ -4438,6 +4452,7 @@
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
 				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
+				4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D766F0220ACAD6E006875D8 /* nc.cpp in Sources */,
 				4DEC4D9821C81E3B00D1D273 /* expan.cpp in Sources */,
 				4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */,
@@ -4721,6 +4736,7 @@
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
 				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
+				4D1AC97A2B6A9BB200434023 /* filereader.cpp in Sources */,
 				BB4C4B2F22A932CF001F6AF0 /* pedal.cpp in Sources */,
 				4D2E759222BC2B80004C51F0 /* tuning.cpp in Sources */,
 				BB4C4B4922A932D7001F6AF0 /* clef.cpp in Sources */,
