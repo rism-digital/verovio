@@ -66,7 +66,7 @@ void Staff::Reset()
     this->ResetTyped();
     this->ResetVisibility();
 
-    m_yAbs = VRV_UNSET;
+    m_drawingFacsY = VRV_UNSET;
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
@@ -142,7 +142,7 @@ int Staff::GetDrawingY() const
         }
     }
 
-    if (m_yAbs != VRV_UNSET) return m_yAbs;
+    if (m_drawingFacsY != VRV_UNSET) return m_drawingFacsY;
 
     if (!m_staffAlignment) return 0;
 

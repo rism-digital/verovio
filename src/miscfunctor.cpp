@@ -32,15 +32,15 @@ FunctorCode ApplyPPUFactorFunctor::VisitLayerElement(LayerElement *layerElement)
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (layerElement->m_xAbs != VRV_UNSET) layerElement->m_xAbs /= m_page->GetPPUFactor();
+    if (layerElement->m_drawingFacsX != VRV_UNSET) layerElement->m_drawingFacsX /= m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ApplyPPUFactorFunctor::VisitMeasure(Measure *measure)
 {
-    if (measure->m_xAbs != VRV_UNSET) measure->m_xAbs /= m_page->GetPPUFactor();
-    if (measure->m_xAbs2 != VRV_UNSET) measure->m_xAbs2 /= m_page->GetPPUFactor();
+    if (measure->m_drawingFacsX1 != VRV_UNSET) measure->m_drawingFacsX1 /= m_page->GetPPUFactor();
+    if (measure->m_drawingFacsX2 != VRV_UNSET) measure->m_drawingFacsX2 /= m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
@@ -60,15 +60,15 @@ FunctorCode ApplyPPUFactorFunctor::VisitPage(Page *page)
 
 FunctorCode ApplyPPUFactorFunctor::VisitStaff(Staff *staff)
 {
-    if (staff->m_yAbs != VRV_UNSET) staff->m_yAbs /= m_page->GetPPUFactor();
+    if (staff->m_drawingFacsY != VRV_UNSET) staff->m_drawingFacsY /= m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode ApplyPPUFactorFunctor::VisitSystem(System *system)
 {
-    if (system->m_xAbs != VRV_UNSET) system->m_xAbs /= m_page->GetPPUFactor();
-    if (system->m_yAbs != VRV_UNSET) system->m_yAbs /= m_page->GetPPUFactor();
+    if (system->m_drawingFacsX != VRV_UNSET) system->m_drawingFacsX /= m_page->GetPPUFactor();
+    if (system->m_drawingFacsY != VRV_UNSET) system->m_drawingFacsY /= m_page->GetPPUFactor();
     system->m_systemLeftMar *= m_page->GetPPUFactor();
     system->m_systemRightMar *= m_page->GetPPUFactor();
 

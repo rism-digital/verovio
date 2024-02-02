@@ -386,7 +386,7 @@ private:
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
-    int m_xAbs;
+    int m_drawingFacsX;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
      * See PrepareCrossStaffFunctor

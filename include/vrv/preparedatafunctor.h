@@ -219,6 +219,11 @@ public:
     const ListOfObjects &GetZonelessSyls() const { return m_zonelessSyls; }
 
     /*
+     * Getter for the facsimile
+     */
+    Facsimile *GetFacsimile() const { return m_facsimile; }
+
+    /*
      * Functor interface
      */
     ///@{

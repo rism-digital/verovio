@@ -653,7 +653,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     int x, y;
-    if (m_doc->GetType() == Facs && clef->HasFacs()) {
+    if (m_doc->IsFacs() && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
         x = clef->GetDrawingX();
     }

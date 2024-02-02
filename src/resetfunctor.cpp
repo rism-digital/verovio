@@ -63,10 +63,7 @@ FunctorCode ResetDataFunctor::VisitArpeg(Arpeg *arpeg)
 {
     // Call parent one too
     this->VisitControlElement(arpeg);
-
-    PlistInterface *interface = arpeg->GetPlistInterface();
-    assert(interface);
-    interface->InterfaceResetData(*this, arpeg);
+    arpeg->PlistInterface::InterfaceResetData(*this, arpeg);
 
     return FUNCTOR_CONTINUE;
 }
@@ -184,6 +181,9 @@ FunctorCode ResetDataFunctor::VisitDots(Dots *dots)
 
 FunctorCode ResetDataFunctor::VisitEditorialElement(EditorialElement *editorialElement)
 {
+    // Call parent one too
+    this->VisitObject(editorialElement);
+
     if (editorialElement->IsSystemMilestone()) {
         editorialElement->SystemMilestoneInterface::InterfaceResetData(*this);
     }
@@ -194,7 +194,6 @@ FunctorCode ResetDataFunctor::VisitEditorialElement(EditorialElement *editorialE
 FunctorCode ResetDataFunctor::VisitEnding(Ending *ending)
 {
     this->VisitFloatingObject(ending);
-
     ending->SystemMilestoneInterface::InterfaceResetData(*this);
 
     return FUNCTOR_CONTINUE;
@@ -203,10 +202,7 @@ FunctorCode ResetDataFunctor::VisitEnding(Ending *ending)
 FunctorCode ResetDataFunctor::VisitF(F *f)
 {
     this->VisitTextElement(f);
-
-    TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
-    assert(interface);
-    interface->InterfaceResetData(*this, f);
+    f->TimeSpanningInterface::InterfaceResetData(*this, f);
 
     return FUNCTOR_CONTINUE;
 }
@@ -222,10 +218,19 @@ FunctorCode ResetDataFunctor::VisitFlag(Flag *flag)
 
 FunctorCode ResetDataFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
+    // Call parent one too
+    this->VisitObject(floatingObject);
+
     floatingObject->ResetDrawing();
     floatingObject->SetDrawingGrpId(0);
 
     // Pass it to the pseudo functor of the interface
+    if (floatingObject->HasInterface(INTERFACE_FACSIMILE)) {
+        FacsimileInterface *interface = floatingObject->GetFacsimileInterface();
+        assert(interface);
+        interface->InterfaceResetData(*this, floatingObject);
+    }
+    // else / else if because TimpeSpanningInterface::InterfaceResetData resets TimePointingInterface
     if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
         assert(interface);
@@ -265,6 +270,9 @@ FunctorCode ResetDataFunctor::VisitHairpin(Hairpin *hairpin)
 
 FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 {
+    // Call parent one too
+    this->VisitObject(layer);
+
     layer->SetCrossStaffFromAbove(false);
     layer->SetCrossStaffFromBelow(false);
     return FUNCTOR_CONTINUE;
@@ -272,6 +280,10 @@ FunctorCode ResetDataFunctor::VisitLayer(Layer *layer)
 
 FunctorCode ResetDataFunctor::VisitLayerElement(LayerElement *layerElement)
 {
+    // Call parent one too
+    this->VisitObject(layerElement);
+    layerElement->FacsimileInterface::InterfaceResetData(*this, layerElement);
+
     layerElement->SetIsInBeamSpan(false);
     layerElement->SetDrawingCueSize(false);
     layerElement->m_crossStaff = NULL;
@@ -299,6 +311,10 @@ FunctorCode ResetDataFunctor::VisitLigature(Ligature *ligature)
 
 FunctorCode ResetDataFunctor::VisitMeasure(Measure *measure)
 {
+    // Call parent one too
+    this->VisitObject(measure);
+    measure->FacsimileInterface::InterfaceResetData(*this, measure);
+
     measure->m_timestampAligner.Reset();
     measure->SetDrawingEnding(NULL);
     return FUNCTOR_CONTINUE;
@@ -327,6 +343,11 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ResetDataFunctor::VisitObject(Object *object)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ResetDataFunctor::VisitRepeatMark(RepeatMark *repeatMark)
 {
     // Call parent one too
@@ -348,6 +369,7 @@ FunctorCode ResetDataFunctor::VisitRest(Rest *rest)
 
 FunctorCode ResetDataFunctor::VisitSection(Section *section)
 {
+    // Call parent one too
     this->VisitFloatingObject(section);
 
     if (section->IsSystemMilestone()) {
@@ -369,6 +391,10 @@ FunctorCode ResetDataFunctor::VisitSlur(Slur *slur)
 
 FunctorCode ResetDataFunctor::VisitStaff(Staff *staff)
 {
+    // Call parent one too
+    this->VisitObject(staff);
+    staff->FacsimileInterface::InterfaceResetData(*this, staff);
+
     staff->m_timeSpanningElements.clear();
     staff->ClearLedgerLines();
     return FUNCTOR_CONTINUE;

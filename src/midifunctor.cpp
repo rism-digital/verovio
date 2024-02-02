@@ -239,8 +239,8 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
     const double tempo = this->GetAdjustedTempo();
     measure->SetCurrentTempo(tempo);
 
-    const double scoreTimeIncrement
-        = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor * DURATION_4 / DUR_MAX;
+    const double scoreTimeIncrement = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor
+        * static_cast<int>(DURATION_4) / DUR_MAX;
     m_currentScoreTime += scoreTimeIncrement;
     m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / tempo;
     m_multiRestFactor = 1;
@@ -698,7 +698,7 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
 
-    double pedalTime = pedal->GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    double pedalTime = pedal->GetStart()->GetAlignment()->GetTime() * static_cast<int>(DURATION_4) / DUR_MAX;
     double startTime = m_totalTime + pedalTime;
     int tpq = m_midiFile->getTPQ();
 

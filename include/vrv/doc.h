@@ -109,7 +109,6 @@ public:
 
     /**
      * Getter and setter for the DocType.
-     * The setter resets the document.
      */
     ///@{
     DocType GetType() const { return m_type; }
@@ -163,6 +162,9 @@ public:
     ///@{
     Score *GetCorrespondingScore(const Object *object);
     const Score *GetCorrespondingScore(const Object *object) const;
+    // Generic version that does not necessarily rely on precalculated visible scores
+    Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores);
+    const Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const;
     ///@}
 
     /**
@@ -371,6 +373,18 @@ public:
     void ConvertMarkupDoc(bool permanent = true);
 
     /**
+     * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.
+     * Call the SyncToFacsimile functor.
+     */
+    void SyncFromFacsimileDoc();
+
+    /**
+     * Sync the coordinate provided in rendering to a <facsimile>.
+     * The document must have encoded layout and the option --break encoded must have enabled.
+     */
+    void SyncToFacsimileDoc();
+
+    /**
      * Transpose the content of the doc.
      */
     void TransposeDoc();
@@ -386,6 +400,11 @@ public:
      * If a page is given, the size of the page is taken.
      */
     Page *SetDrawingPage(int pageIdx);
+
+    /**
+     * Update the drawing page sizes when a page is set as drawing page.
+     */
+    void UpdatePageDrawingSizes();
 
     /**
      * Reset drawing page to NULL.

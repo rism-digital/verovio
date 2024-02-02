@@ -88,6 +88,7 @@ public:
      */
     ///@{
     FunctorCode VisitPageEnd(Page *page) override;
+    FunctorCode VisitScore(Score *score) override;
     ///@}
 
 protected:
@@ -97,7 +98,8 @@ private:
 public:
     //
 private:
-    //
+    // The list of all scores
+    std::list<Score *> m_scores;
 };
 
 //----------------------------------------------------------------------------
