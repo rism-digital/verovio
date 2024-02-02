@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan  8 08:56:08 PST 2024
+// Last Modified: Tue Jan 23 21:56:32 PST 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -85428,7 +85428,7 @@ void Tool_humtr::initialize(void) {
 	}
 
 	if (getBoolean("popc")) {
-		addFromToCombined("ſ:s ʃ:s &#383;:s ν:u ί:í α:a ť:k ᴣ:z ʓ:z̨ ʒ̇:ż ʒ́:ź Ʒ̇:Ż Ʒ́:Ź æ:ae");
+		addFromToCombined("ſ:s ʃ:s &#383;:s ν:u ί:í α:a ť:k ᴣ:z ʓ:z̨ ʒ̇:ż ʒ́:ź Ʒ̇:Ż Ʒ́:Ź ӡ:z Ʒ:Z æ:ae");
 	}
 }
 
