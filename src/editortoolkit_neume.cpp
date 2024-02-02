@@ -996,9 +996,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
 
                 // Apply offset due to rotate
                 newUly += (newUlx - ulx) * tan(-staff->GetDrawingRotate() * M_PI / 180.0);
-                newZone->SetUlx(newUlx);
+                newZone->SetUlx(newUlx - noteWidthOffset);
                 newZone->SetUly(newUly);
-                newZone->SetLrx(newUlx + noteWidth);
+                newZone->SetLrx(newUlx + noteWidthOffset);
                 newZone->SetLry(newUly + noteHeight);
 
                 newNc->AttachZone(newZone);
