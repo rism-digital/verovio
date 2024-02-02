@@ -1139,11 +1139,11 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
     if (json.has<jsonxx::String>("font")) {
         this->SetFont(m_options->m_font.GetValue());
     }
-    if (json.has<jsonxx::Array>("fontFallback")) {
+    if (json.has<jsonxx::String>("fontFallback")) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.SetFallback(m_options->m_fontFallback.GetStrValue());
     }
-    if (json.has<jsonxx::Array>("fontLoadAll")) {
+    if (json.has<jsonxx::Boolean>("fontLoadAll")) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.LoadAll();
     }
