@@ -47,6 +47,15 @@ void ZipFileReader::Reset()
 
 bool ZipFileReader::Load(const std::string &filename)
 {
+#ifdef __EMSCRIPTEN__
+    std::string data = filename;
+    if (data.starts_with("data:")) {
+        data = data.substr(data.find("base64,") + 7);
+    }
+    LogWarning("%s", data.c_str());
+    std::vector<unsigned char> bytes = Base64Decode(data);
+    return this->Load(bytes);
+#else
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
         return false;
@@ -65,6 +74,7 @@ bool ZipFileReader::Load(const std::string &filename)
         bytes.push_back(buffer);
     }
     return this->Load(bytes);
+#endif
 }
 
 bool ZipFileReader::Load(const std::vector<unsigned char> &bytes)
