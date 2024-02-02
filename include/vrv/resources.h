@@ -116,6 +116,11 @@ public:
     std::string GetCSSFontFor(const std::string &fontName) const;
 
     /**
+     * Retrieve the font name either from the filename path or from the zipFile content.
+     */
+    std::string GetCustomFontname(const std::string &filename, const ZipFileReader &zipFile);
+
+    /**
      * Static method that converts unicode music code points to SMuFL equivalent.
      * Return the parameter char if nothing can be converted.
      */
