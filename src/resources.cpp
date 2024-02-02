@@ -114,12 +114,15 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
     bool success = true;
     // options supplied fonts
     for (const std::string &fontFile : extraFonts) {
-        std::filesystem::path path(fontFile);
         ZipFileReader zipFile;
         zipFile.Load(fontFile);
-        success = success && path.has_stem() && LoadFont(path.stem().string(), &zipFile);
+        std::string fontName = GetCustomFontname("", zipFile);
+        if (fontName.empty() || IsFontLoaded(fontName)) {
+            continue;
+        }
+        success = success && LoadFont(fontName, &zipFile);
         if (!success) {
-            LogError("Option supplied font %s could not be loaded.", fontFile.c_str());
+            LogError("Option supplied font %s could not be loaded.", fontName.c_str());
         }
     }
     return success;
@@ -228,6 +231,23 @@ std::string Resources::GetCSSFontFor(const std::string &fontName) const
     return font.GetCSSFont(m_path);
 }
 
+std::string Resources::GetCustomFontname(const std::string &filename, const ZipFileReader &zipFile)
+{
+#ifdef __EMSCRIPTEN__
+    for (auto &s : zipFile->GetFileList()) {
+        std::filesystem::path path(s);
+        if (!path.has_parent_path() && path.has_extension() && path.extension() == ".xml") {
+            return path.stem();
+        }
+    }
+    LogWarning("The font name could not be extracted from the archive");
+    return "";
+#else
+    std::filesystem::path path(filename);
+    return (path.has_stem()) ? path.stem().string() : "";
+#endif
+}
+
 void Resources::SelectTextFont(data_FONTWEIGHT fontWeight, data_FONTSTYLE fontStyle) const
 {
     if (fontWeight == FONTWEIGHT_NONE) {
@@ -271,11 +291,13 @@ char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
     return smuflChar;
 }
 
-bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
+bool Resources::LoadFont(const std::string &fontname, ZipFileReader *zipFile)
 {
+    std::string fontName = fontname;
     pugi::xml_document doc;
     // For zip archive custom font, load the data from the zipFile
     if (zipFile) {
+        fontName = "GoldenAge";
         const std::string filename = fontName + ".xml";
         if (!zipFile->HasFile(filename)) {
             // File not found, default bounding boxes will be used
