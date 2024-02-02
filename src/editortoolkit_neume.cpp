@@ -881,11 +881,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int noteWidthOffset = (int)(noteWidth / 2);
 
         // Set up facsimile
-        zone->SetUlx(ulx);
+        zone->SetUlx(ulx - noteWidthOffset);
         zone->SetUly(uly);
-        zone->SetLrx(ulx + noteWidth);
+        zone->SetLrx(ulx + noteWidthOffset);
         zone->SetLry(uly + noteHeight);
 
         // add syl bounding box if Facs
