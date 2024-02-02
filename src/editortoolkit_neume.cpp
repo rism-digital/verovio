@@ -1028,14 +1028,21 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         Clef *clef = new Clef();
         data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
 
+        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int noteWidthOffsetR, noteWidthOffsetL;
+
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "shape") {
                 if (it->second == "C") {
                     clefShape = CLEFSHAPE_C;
+                    noteWidthOffsetR = (int)(staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO / 2);
+                    noteWidthOffsetL = noteWidthOffsetR;
                     break;
                 }
                 else if (it->second == "F") {
                     clefShape = CLEFSHAPE_F;
+                    noteWidthOffsetR = 0;
+                    noteWidthOffsetL = (int)(staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO / 2);
                     break;
                 }
             }
@@ -1049,7 +1056,6 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             return false;
         }
         clef->SetShape(clefShape);
-        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         int yDiff = -staff->GetDrawingY() + uly;
         yDiff += ((ulx - staff->GetZone()->GetUlx()))
             * tan(-staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
@@ -1057,9 +1063,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         clef->SetLine(clefLine);
 
         Zone *zone = new Zone();
-        zone->SetUlx(ulx);
+        zone->SetUlx(ulx - noteWidthOffsetR);
         zone->SetUly(uly);
-        zone->SetLrx(ulx + staffSize / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        zone->SetLrx(ulx + noteWidthOffsetL);
         zone->SetLry(uly + staffSize / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         clef->AttachZone(zone);
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
