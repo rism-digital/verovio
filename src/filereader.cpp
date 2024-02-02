@@ -49,10 +49,10 @@ bool ZipFileReader::Load(const std::string &filename)
 {
 #ifdef __EMSCRIPTEN__
     std::string data = filename;
+    // Remove the mimetype prefix if any
     if (data.starts_with("data:")) {
         data = data.substr(data.find("base64,") + 7);
     }
-    LogWarning("%s", data.c_str());
     std::vector<unsigned char> bytes = Base64Decode(data);
     return this->Load(bytes);
 #else
@@ -86,7 +86,7 @@ bool ZipFileReader::Load(const std::vector<unsigned char> &bytes)
     return true;
 }
 
-std::list<std::string> ZipFileReader::GetFileList()
+std::list<std::string> ZipFileReader::GetFileList() const
 {
     assert(m_file);
 

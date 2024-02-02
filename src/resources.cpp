@@ -234,7 +234,7 @@ std::string Resources::GetCSSFontFor(const std::string &fontName) const
 std::string Resources::GetCustomFontname(const std::string &filename, const ZipFileReader &zipFile)
 {
 #ifdef __EMSCRIPTEN__
-    for (auto &s : zipFile->GetFileList()) {
+    for (auto &s : zipFile.GetFileList()) {
         std::filesystem::path path(s);
         if (!path.has_parent_path() && path.has_extension() && path.extension() == ".xml") {
             return path.stem();
@@ -291,13 +291,11 @@ char32_t Resources::GetSmuflGlyphForUnicodeChar(const char32_t unicodeChar)
     return smuflChar;
 }
 
-bool Resources::LoadFont(const std::string &fontname, ZipFileReader *zipFile)
+bool Resources::LoadFont(const std::string &fontName, ZipFileReader *zipFile)
 {
-    std::string fontName = fontname;
     pugi::xml_document doc;
     // For zip archive custom font, load the data from the zipFile
     if (zipFile) {
-        fontName = "GoldenAge";
         const std::string filename = fontName + ".xml";
         if (!zipFile->HasFile(filename)) {
             // File not found, default bounding boxes will be used
