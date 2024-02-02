@@ -1,6 +1,49 @@
 
 import { createEmscriptenProxy } from "./emscripten-proxy.js";
 
+async function solve(options) {      
+    const res = await fetch(
+      `https://raw.githubusercontent.com/lpugin/test-font/main/GoldenAge.zip`,
+       {
+            method: "GET",
+       }
+    );
+    const data = await res.blob();
+    console.log( res );
+    console.log( options );
+    return options;
+}
+
+const convertToBase64 = (blob) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => resolve(event.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+});
+
+async function preprocessOptions(options)
+{  
+    // Nothing to do if we do not have 'fontAddCustom' set
+    if (!Object.hasOwn(options, 'fontAddCustom')) {
+        return options;
+    }
+    const filenames = options['fontAddCustom'];
+    let filesInBase64 = [];
+    // Get all the files and convert them to a base64 string
+    for ( let i = 0; i < filenames.length; i++ ) {
+        const res = await fetch(filenames[i], {
+                method: "GET",
+            }
+        );
+        const data = await res.blob();
+        const fileInBase64 = await convertToBase64(data);
+        filesInBase64.push(fileInBase64);
+    } 
+    options["fontAddCustom"] = filesInBase64;
+    //console.log( options );
+    return options;
+};
+
 export class VerovioToolkit {
 
     constructor(VerovioModule) {
@@ -182,7 +225,8 @@ export class VerovioToolkit {
         return this.proxy.select(this.ptr, JSON.stringify(selection));
     }
 
-    setOptions(options) {
+    async setOptions(options) {
+        options = await preprocessOptions(options);
         return this.proxy.setOptions(this.ptr, JSON.stringify(options));
     }
 
