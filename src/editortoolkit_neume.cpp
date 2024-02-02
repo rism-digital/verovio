@@ -1165,13 +1165,14 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+        const int offsetX = (int)(noteWidth / 2);
 
         ulx -= noteWidth / 2;
         uly -= noteHeight / 2;
 
-        zone->SetUlx(ulx);
+        zone->SetUlx(ulx + offsetX);
         zone->SetUly(uly);
-        zone->SetLrx(ulx + noteWidth);
+        zone->SetLrx(ulx + noteWidth + offsetX);
         zone->SetLry(uly + noteHeight);
         layer->ReorderByXPos();
 
