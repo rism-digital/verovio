@@ -69,7 +69,7 @@ public:
     /**
      * Return a list of all files (including directories)
      */
-    std::list<std::string> GetFileList();
+    std::list<std::string> GetFileList() const;
 
 private:
     //
