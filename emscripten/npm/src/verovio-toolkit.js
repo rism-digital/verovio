@@ -14,36 +14,6 @@ async function solve(options) {
     return options;
 }
 
-const convertToBase64 = (blob) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => resolve(event.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-});
-
-async function preprocessOptions(options)
-{  
-    // Nothing to do if we do not have 'fontAddCustom' set
-    if (!Object.hasOwn(options, 'fontAddCustom')) {
-        return options;
-    }
-    const filenames = options['fontAddCustom'];
-    let filesInBase64 = [];
-    // Get all the files and convert them to a base64 string
-    for ( let i = 0; i < filenames.length; i++ ) {
-        const res = await fetch(filenames[i], {
-                method: "GET",
-            }
-        );
-        const data = await res.blob();
-        const fileInBase64 = await convertToBase64(data);
-        filesInBase64.push(fileInBase64);
-    } 
-    options["fontAddCustom"] = filesInBase64;
-    //console.log( options );
-    return options;
-};
-
 export class VerovioToolkit {
 
     constructor(VerovioModule) {
@@ -225,8 +195,8 @@ export class VerovioToolkit {
         return this.proxy.select(this.ptr, JSON.stringify(selection));
     }
 
-    async setOptions(options) {
-        options = await preprocessOptions(options);
+    setOptions(options) {
+        options = this.preprocessOptions(options);
         return this.proxy.setOptions(this.ptr, JSON.stringify(options));
     }
 
@@ -237,6 +207,30 @@ export class VerovioToolkit {
         return JSON.parse(this.proxy.validatePAE(this.ptr, data));
     }
 
+    preprocessOptions(options) {
+        // Nothing to do if we do not have 'fontAddCustom' set
+        if (!Object.hasOwn(options, 'fontAddCustom')) {
+            return options;
+        }
+        const filenames = options['fontAddCustom'];
+        let filesInBase64 = [];
+        // Get all the files and convert them to a base64 string
+        for (let i = 0; i < filenames.length; i++ ) {
+            const request = new XMLHttpRequest();
+            request.open("GET", filenames[i], false); // `false` makes the request synchronous
+            request.send(null);
+
+            if (request.status === 200) {
+                filesInBase64.push(request.responseText);
+            }
+            else {
+                console.error(`${filenames[i]} could not be retrieved`);
+            }
+        }
+        options["fontAddCustom"] = filesInBase64;
+        //console.log( options );
+        return options;
+    }
 }
 
 // A pointer to the object - only one instance can be created for now
