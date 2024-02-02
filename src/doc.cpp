@@ -609,18 +609,16 @@ void Doc::PrepareData()
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningFunctor prepareTimeSpanning;
-    prepareTimeSpanning.SetDirection(BACKWARD);
     this->Process(prepareTimeSpanning);
     prepareTimeSpanning.SetDataCollectionCompleted();
 
-    // First we try backwards because normally the spanning elements are at the end of
-    // the measure. However, in some case, one (or both) end points will appear afterwards
-    // in the encoding. For these, the previous iteration will not have resolved the link and
-    // the spanning elements will remain in the timeSpanningElements array. We try again forwards
-    // but this time without filling the list (that is only will the remaining elements)
+    // First we try a forward pass which should collect most of the spanning elements.
+    // However, in some cases, one (or both) end points might appear a few measures
+    // before the spanning element in the encoding. For these, the previous iteration will not have resolved the link
+    // and the spanning elements will remain in the timeSpanningElements array. We try again forwards but this time
+    // without filling the list (that is only resolving remaining elements).
     const ListOfSpanningInterOwnerPairs &interfaceOwnerPairs = prepareTimeSpanning.GetInterfaceOwnerPairs();
     if (!interfaceOwnerPairs.empty()) {
-        prepareTimeSpanning.SetDirection(FORWARD);
         this->Process(prepareTimeSpanning);
     }
 

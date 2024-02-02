@@ -650,7 +650,10 @@ FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor(), CollectAndProcess() {}
+PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor(), CollectAndProcess()
+{
+    m_insideMeasure = false;
+}
 
 void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpanningInterface *interface)
 {
@@ -659,19 +662,16 @@ void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpa
 
 FunctorCode PrepareTimeSpanningFunctor::VisitF(F *f)
 {
-    // Pass it to the pseudo functor of the interface
-    TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimeSpanning(*this, f);
+    if (!m_insideMeasure) {
+        return this->CallPseudoFunctor(f);
+    }
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimeSpanningFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
-    // Pass it to the pseudo functor of the interface
-    if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimeSpanning(*this, floatingObject);
+    if (!m_insideMeasure && floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
+        return this->CallPseudoFunctor(floatingObject);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -699,26 +699,47 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
+FunctorCode PrepareTimeSpanningFunctor::VisitMeasure(Measure *measure)
 {
-    if (this->IsProcessingData()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
-    while (iter != m_timeSpanningInterfaces.end()) {
-        // At the end of the measure (going backward) we remove elements for which we do not need to match the end (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
-        // midi output
-        if (iter->second->GetClassId() == HARM) {
-            iter = m_timeSpanningInterfaces.erase(iter);
-        }
-        else {
-            ++iter;
+    if (this->IsCollectingData()) {
+        ListOfObjects timeSpanningObjects;
+        InterfaceComparison ic(INTERFACE_TIME_SPANNING);
+        measure->FindAllDescendantsByComparison(&timeSpanningObjects, &ic);
+        for (Object *object : timeSpanningObjects) {
+            this->CallPseudoFunctor(object);
         }
     }
+    m_insideMeasure = true;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
+{
+    if (this->IsCollectingData()) {
+        ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
+        while (iter != m_timeSpanningInterfaces.end()) {
+            // At the end of the measure we remove elements for which we do not need to match the end (for now).
+            // Eventually, we could consider them, for example if we want to display their spanning or for
+            // improved midi output
+            if (iter->second->GetClassId() == HARM) {
+                iter = m_timeSpanningInterfaces.erase(iter);
+            }
+            else {
+                ++iter;
+            }
+        }
+    }
+    m_insideMeasure = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::CallPseudoFunctor(Object *timeSpanningObject)
+{
+    TimeSpanningInterface *interface = timeSpanningObject->GetTimeSpanningInterface();
+    assert(interface);
+    return interface->InterfacePrepareTimeSpanning(*this, timeSpanningObject);
 }
 
 //----------------------------------------------------------------------------
