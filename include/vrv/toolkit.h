@@ -145,6 +145,17 @@ public:
     bool LoadData(const std::string &data);
 
     /**
+     * Load a reference data previously resolved.
+     */
+    bool LoadDataRef(const std::string &id, const std::string &data);
+
+    /**
+     * List all the files referenced in the passed data.
+     * Return a JSON string representing an object with a map id: file
+     */
+    std::string GetDataRefs(const std::string &data);
+
+    /**
      * Load a MusicXML compressed file passed as base64 encoded string.
      *
      * @param data A ZIP file as a base64 encoded string
@@ -778,6 +789,11 @@ private:
      * @return A stringified JSON object
      */
     std::string GetOptions(bool defaultValues) const;
+
+    /**
+     * Load all the data references listed in the map.
+     */
+    bool FetchDataRefs(const std::string &jsonString);
 
 public:
     //

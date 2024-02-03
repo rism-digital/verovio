@@ -14,6 +14,10 @@
 #include <locale>
 #include <regex>
 
+#ifndef NO_POINTING
+#include <curl/curl.h>
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "comparison.h"
@@ -81,6 +85,10 @@ Toolkit::Toolkit(bool initFont)
 #ifndef NO_RUNTIME
     m_runtimeClock = NULL;
 #endif
+
+#ifndef NO_POINTING
+    curl_global_init(CURL_GLOBAL_ALL);
+#endif
 }
 
 Toolkit::~Toolkit()
@@ -102,6 +110,10 @@ Toolkit::~Toolkit()
         delete m_runtimeClock;
         m_runtimeClock = NULL;
     }
+#endif
+
+#ifndef NO_POINTING
+    // curl_global_cleanup();
 #endif
 }
 
@@ -700,6 +712,10 @@ bool Toolkit::LoadData(const std::string &data)
         return false;
     }
 
+    if (!this->FetchDataRefs(this->GetDataRefs(data))) {
+        LogWarning("All references could not be resolved");
+    }
+
     // load the file
     if (inputFormat != HUMDRUM) {
         if (!input->Import(newData.size() ? newData : data)) {
@@ -817,6 +833,50 @@ bool Toolkit::LoadData(const std::string &data)
     }
 #endif
 
+    return true;
+}
+
+std::string Toolkit::GetDataRefs(const std::string &data)
+{
+    jsonxx::Object json;
+
+    json << "id1"
+         << "https://music-encoding.org";
+    json << "id2"
+         << "https://example.com";
+
+    return json.json();
+}
+
+bool Toolkit::FetchDataRefs(const std::string &jsonString)
+{
+    jsonxx::Object json;
+
+    if (!json.parse(jsonString)) {
+        LogError("Cannot parse JSON std::string.");
+        return false;
+    }
+
+    for (auto kv : json.kv_map()) {
+        // This should not happen since we build the map internally
+        if (!kv.second->is<jsonxx::String>()) {
+            continue;
+        }
+        std::string id = kv.first;
+        std::string ref = kv.second->get<jsonxx::String>();
+
+        HttpFileReader httpFile;
+        if (!httpFile.Load(ref) || !this->LoadDataRef(id, httpFile.GetTextContent())) {
+            LogError("The reference file '%s' could not be fetched", ref.c_str());
+        }
+    }
+
+    return true;
+}
+
+bool Toolkit::LoadDataRef(const std::string &id, const std::string &data)
+{
+    LogInfo("%s", data.c_str());
     return true;
 }
 
