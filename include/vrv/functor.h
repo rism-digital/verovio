@@ -174,6 +174,11 @@ public:
      */
     Doc *GetDoc() { return m_doc; }
 
+    /*
+     * Get the maximal number of threads
+     */
+    int GetMaxNumberOfThreads() const final;
+
 private:
     //
 public:
@@ -207,6 +212,11 @@ public:
      * Getter for the document
      */
     const Doc *GetDoc() const { return m_doc; }
+
+    /*
+     * Get the maximal number of threads
+     */
+    int GetMaxNumberOfThreads() const final;
 
 private:
     //
