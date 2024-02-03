@@ -11,6 +11,10 @@
 
 #include <fstream>
 
+#ifndef NO_POINTING
+#include <curl/curl.h>
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "vrv.h"
@@ -124,6 +128,111 @@ std::string ZipFileReader::ReadTextFile(const std::string &filename)
 
     LogError("No file '%s' to read found in the archive", filename.c_str());
     return "";
+}
+
+//----------------------------------------------------------------------------
+// HttpFileReader
+//----------------------------------------------------------------------------
+
+bool HttpFileReader::s_init = false;
+
+HttpFileReader::HttpFileReader()
+{
+#ifndef NO_POINTING
+    if (!HttpFileReader::s_init) {
+        curl_global_init(CURL_GLOBAL_ALL);
+        HttpFileReader::s_init = true;
+    }
+#endif
+
+    this->Reset();
+}
+
+HttpFileReader::~HttpFileReader()
+{
+    this->Reset();
+}
+
+void HttpFileReader::Reset()
+{
+    m_textContent = "";
+}
+
+bool HttpFileReader::Load(const std::string &filename)
+{
+#ifndef NO_POINTING
+    CURL *curlHandle;
+    CURLcode curlCode;
+
+    struct HttpFileReader::MemoryStruct chunk;
+
+    chunk.memory = (char *)malloc(1); /* will be grown as needed by the realloc above */
+    chunk.size = 0; /* no data at this point */
+
+    /* init the curl session */
+    curlHandle = curl_easy_init();
+
+    /* specify URL to get */
+    curl_easy_setopt(curlHandle, CURLOPT_URL, filename.c_str());
+
+    /* send all data to this function  */
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+
+    /* we pass our 'chunk' struct to the callback function */
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, (void *)&chunk);
+
+    /* some servers do not like requests that are made without a user-agent
+       field, so we provide one */
+    curl_easy_setopt(curlHandle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+
+    m_textContent = "";
+
+    /* get it! */
+    curlCode = curl_easy_perform(curlHandle);
+
+    /* check for errors */
+    if (curlCode != CURLE_OK) {
+        LogError("curl_easy_perform() failed: %s", curl_easy_strerror(curlCode));
+    }
+    else {
+        m_textContent.reserve(chunk.size); // Reserve space to avoid reallocations
+        std::copy(chunk.memory, chunk.memory + chunk.size, std::back_inserter(m_textContent));
+        LogDebug("%lu bytes retrieved", (unsigned long)chunk.size);
+    }
+
+    /* cleanup curl stuff */
+    curl_easy_cleanup(curlHandle);
+
+    free(chunk.memory);
+
+    /* we are done with libcurl, so clean it up */
+    // curl_global_cleanup();
+
+    return (curlCode == CURLE_OK);
+#else
+    LogError("This method is not implemented in the current build.");
+    return false;
+#endif
+}
+
+size_t HttpFileReader::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    struct HttpFileReader::MemoryStruct *mem = (struct MemoryStruct *)userp;
+
+    char *ptr = (char *)realloc(mem->memory, mem->size + realsize + 1);
+    if (!ptr) {
+        /* out of memory! */
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
+
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
 }
 
 } // namespace vrv

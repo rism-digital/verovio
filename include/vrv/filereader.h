@@ -81,6 +81,64 @@ private:
 
 }; // class ZipFileReader
 
+//----------------------------------------------------------------------------
+// HttpFileReader
+//----------------------------------------------------------------------------
+
+/**
+ * This class is a reader for zip archives.
+ */
+class HttpFileReader {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    HttpFileReader();
+    ~HttpFileReader();
+    ///@}
+
+    /**
+     * Reset a previously loaded file.
+     */
+    void Reset();
+
+    /**
+     * Load a file into memory.
+     */
+    bool Load(const std::string &filename);
+
+    /**
+     * Get the text file.
+     * Return an empty string if the file does not exist.
+     */
+    std::string GetTextContent() { return m_textContent; }
+
+    /**
+     * The call back for writing files into memory
+     */
+    static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
+
+    /**
+     * A structure to be passed to the HttpFileReader::WriteMemoryCallback
+     */
+    struct MemoryStruct {
+        char *memory;
+        size_t size;
+    };
+
+private:
+    //
+public:
+    //
+private:
+    /** The string containing the text content once loaded */
+    std::string m_textContent;
+    /** A flag for the initialization of libcurl */
+    static bool s_init;
+
+}; // class HttpFileReader
+
 } // namespace vrv
 
 #endif // __VRV_FILEREADER_H__
