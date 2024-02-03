@@ -16,6 +16,9 @@ namespace vrv {
 
 class Doc;
 
+// Helper enum classes
+enum class ProcessingStrategy { Sequential, MeasureParallel, SystemParallel };
+
 //----------------------------------------------------------------------------
 // FunctorBase
 //----------------------------------------------------------------------------
@@ -75,6 +78,14 @@ public:
      * Return true if the functor implements the end interface
      */
     virtual bool ImplementsEndInterface() const = 0;
+
+    /**
+     * Override to enable parallel functor processing
+     */
+    ///@{
+    virtual ProcessingStrategy GetProcessingStrategy() const { return ProcessingStrategy::Sequential; }
+    virtual int GetMaxNumberOfThreads() const { return 1; }
+    ///@}
 
 private:
     //
