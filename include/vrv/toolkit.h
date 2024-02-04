@@ -146,12 +146,19 @@ public:
 
     /**
      * Load a reference data previously resolved.
+     *
+     * @param id A string with xml:id of the element holding the reference
+     * @param data A string with the data (i.e., MEI data) to be loaded
+     * @return True if the data was successfully loaded
      */
     bool LoadDataRef(const std::string &id, const std::string &data);
 
     /**
      * List all the files referenced in the passed data.
-     * Return a JSON string representing an object with a map id: file
+     * Return a JSON string representing an object with a map of xml:id => file
+     *
+     * @param data A string with the data (i.e., MEI data) to be loaded
+     * @return A stringified JSON object with the reference map
      */
     std::string GetDataRefs(const std::string &data);
 
