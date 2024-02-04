@@ -14,6 +14,40 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Functor
+//----------------------------------------------------------------------------
+
+Functor *Functor::CloneFunctor() const
+{
+    assert(false);
+    return NULL;
+}
+
+void Functor::MergeFunctor(const Functor &functor)
+{
+    if (functor.GetCode() == FUNCTOR_STOP) {
+        this->SetCode(FUNCTOR_STOP);
+    }
+}
+
+//----------------------------------------------------------------------------
+// ConstFunctor
+//----------------------------------------------------------------------------
+
+ConstFunctor *ConstFunctor::CloneFunctor() const
+{
+    assert(false);
+    return NULL;
+}
+
+void ConstFunctor::MergeFunctor(const ConstFunctor &functor)
+{
+    if (functor.GetCode() == FUNCTOR_STOP) {
+        this->SetCode(FUNCTOR_STOP);
+    }
+}
+
+//----------------------------------------------------------------------------
 // DocFunctor
 //----------------------------------------------------------------------------
 

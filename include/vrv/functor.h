@@ -119,6 +119,18 @@ public:
     virtual ~Functor() = default;
     ///@}
 
+    /**
+     * Copy child classes
+     * Must be overridden in order to use it (e.g. during parallelization)
+     */
+    virtual Functor *CloneFunctor() const;
+
+    /**
+     * Merge child classes, i.e. combine the state of the functor passed in with the current one
+     * The default implementation only considers the functor code
+     */
+    virtual void MergeFunctor(const Functor &functor);
+
 private:
     //
 public:
@@ -143,6 +155,18 @@ public:
     ConstFunctor() {}
     virtual ~ConstFunctor() = default;
     ///@}
+
+    /**
+     * Copy child classes
+     * Must be overridden in order to use it (e.g. during parallelization)
+     */
+    virtual ConstFunctor *CloneFunctor() const;
+
+    /**
+     * Merge child classes, i.e. combine the state of the functor passed in with the current one
+     * The default implementation only considers the functor code
+     */
+    virtual void MergeFunctor(const ConstFunctor &functor);
 
 private:
     //
