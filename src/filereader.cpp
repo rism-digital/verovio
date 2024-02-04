@@ -192,7 +192,7 @@ bool HttpFileReader::Load(const std::string &filename)
 
     /* check for errors */
     if (curlCode != CURLE_OK) {
-        LogError("curl_easy_perform() failed: %s", curl_easy_strerror(curlCode));
+        LogError("Request failed: %s", curl_easy_strerror(curlCode));
     }
     else {
         m_textContent.reserve(chunk.size); // Reserve space to avoid reallocations

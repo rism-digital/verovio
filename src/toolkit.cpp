@@ -838,12 +838,26 @@ bool Toolkit::LoadData(const std::string &data)
 
 std::string Toolkit::GetDataRefs(const std::string &data)
 {
+    pugi::xml_document doc;
+    if (!doc.load_string(data.c_str()) || !doc.first_child()) {
+        LogError("Data could not be parsed");
+        return "";
+    }
+
     jsonxx::Object json;
 
-    json << "id1"
-         << "https://music-encoding.org";
-    json << "id2"
-         << "https://example.com";
+    pugi::xpath_node_set targets = doc.first_child().select_nodes("//music//*[@xml:id and @target and @label='ptr']");
+
+    for (pugi::xpath_node target : targets) {
+        pugi::xml_node node = target.node();
+        std::string name = node.name();
+        if (name != "symbolTable") {
+            continue;
+        }
+        std::string id = node.attribute("xml:id").value();
+        std::string ref = node.attribute("target").value();
+        json << id << ref;
+    }
 
     return json.json();
 }
@@ -876,7 +890,13 @@ bool Toolkit::FetchDataRefs(const std::string &jsonString)
 
 bool Toolkit::LoadDataRef(const std::string &id, const std::string &data)
 {
-    LogInfo("%s", data.c_str());
+    // LogInfo("%s", data.c_str());
+    pugi::xml_document doc;
+    if (!doc.load_string(data.c_str())) {
+        LogError("Reference for '%s' could not be parsed", id.c_str());
+        return false;
+    }
+
     return true;
 }
 
