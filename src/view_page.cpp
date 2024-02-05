@@ -1242,9 +1242,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    if ((staffDef && (staffDef->GetLinesVisible() != BOOLEAN_false)) || staff->IsTabLuteGerman()) {
-        this->DrawStaffLines(dc, staff, measure, system);
-    }
+    this->DrawStaffLines(dc, staff, staffDef, measure, system);
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
@@ -1274,7 +1272,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     dc->EndGraphic(staff, this);
 }
 
-void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system)
+void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system)
 {
     assert(dc);
     assert(staff);
@@ -1302,14 +1300,18 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColor, AxSOLID);
 
-    if (staff->IsTabLuteGerman()) {
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    if (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() != BOOLEAN_true) {
         // German tablature has no staff, just a single base line
         // But internally we maintain the fiction of an invisible staff as a coordinate system
         SegmentedLine line(x1, x2);
         y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
         this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
     }
-    else {
+    else if (staffDef->GetLinesVisible() != BOOLEAN_false) {
+        // draw staff lines
         for (j = 0; j < staff->m_drawingLines; ++j) {
             // Skewed lines - with Facs (neumes) only for now
             if (y1 != y2) {

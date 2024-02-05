@@ -2721,6 +2721,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     assert(note);
 
     this->WriteLayerElement(currentNode, note);
+    this->WriteAltSymInterface(currentNode, note);
     this->WriteDurationInterface(currentNode, note);
     this->WritePitchInterface(currentNode, note);
     this->WritePositionInterface(currentNode, note);
@@ -6823,6 +6824,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         }
     }
 
+    this->ReadAltSymInterface(note, vrvNote);
     this->ReadDurationInterface(note, vrvNote);
     this->ReadPitchInterface(note, vrvNote);
     this->ReadPositionInterface(note, vrvNote);
@@ -7115,6 +7117,9 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         }
         else if (elementName == "svg") {
             success = this->ReadSvg(parent, xmlElement);
+        }
+        else if (elementName == "symbol") {
+            success = this->ReadSymbol(parent, xmlElement);
         }
         // xml comment
         else if (elementName == "") {
