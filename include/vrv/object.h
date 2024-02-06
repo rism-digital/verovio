@@ -646,7 +646,9 @@ public:
      */
     ///@{
     void Process(Functor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false);
+    void ProcessChildren(Functor &functor, int deepness);
     void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
+    void ProcessChildren(ConstFunctor &functor, int deepness) const;
     ///@}
 
     /**
