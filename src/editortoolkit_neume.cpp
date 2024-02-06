@@ -2728,6 +2728,10 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
                 + obj->GetChildCount(CLEF))) {
             Object *leftover;
             while ((leftover = obj->FindDescendantByType(SYL)) != NULL) {
+                Zone *zone = dynamic_cast<Zone *>(leftover->GetFacsimileInterface()->GetZone());
+                if (zone != NULL) {
+                    m_doc->GetFacsimile()->FindDescendantByType(SURFACE)->DeleteChild(zone);
+                }
                 obj->DeleteChild(leftover);
             }
             while ((leftover = obj->FindDescendantByType(DIVLINE)) != NULL) {
