@@ -14,6 +14,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// FunctorBase
+//----------------------------------------------------------------------------
+
+std::optional<ClassId> FunctorBase::GetParallelizationClass() const
+{
+    if (this->GetMaxNumberOfThreads() > 1) {
+        switch (this->GetProcessingStrategy()) {
+            case ProcessingStrategy::MeasureParallel: return MEASURE;
+            case ProcessingStrategy::SystemParallel: return SYSTEM;
+            default: break;
+        }
+    }
+    return std::nullopt;
+}
+
+//----------------------------------------------------------------------------
 // Functor
 //----------------------------------------------------------------------------
 

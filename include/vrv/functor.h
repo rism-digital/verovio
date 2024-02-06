@@ -8,6 +8,10 @@
 #ifndef __VRV_FUNCTOR_H__
 #define __VRV_FUNCTOR_H__
 
+#include <optional>
+
+//----------------------------------------------------------------------------
+
 #include "comparison.h"
 #include "functorinterface.h"
 #include "vrvdef.h"
@@ -86,6 +90,12 @@ public:
     virtual ProcessingStrategy GetProcessingStrategy() const { return ProcessingStrategy::Sequential; }
     virtual int GetMaxNumberOfThreads() const { return 1; }
     ///@}
+
+    /**
+     * Returns the object class on which parallelization is applied
+     * Additionally checks if we have more than one thread
+     */
+    std::optional<ClassId> GetParallelizationClass() const;
 
 private:
     //

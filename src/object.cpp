@@ -1039,6 +1039,9 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
     --deepness;
 
     if (!this->SkipChildren(functor.VisibleOnly())) {
+        // Objects which will be processed in parallel are collected here
+        ArrayOfObjects parallelProcessed;
+        const std::optional<ClassId> branchClass = functor.GetParallelizationClass();
         // We need a pointer to the array for the option to work on a reversed copy
         ArrayOfObjects *children = &m_children;
         Filters *filters = functor.GetFilters();
@@ -1046,7 +1049,12 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
             for (ArrayOfObjects::reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
                 if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
+                    if (branchClass && (*iter)->Is(*branchClass)) {
+                        parallelProcessed.push_back(*iter);
+                    }
+                    else {
+                        (*iter)->Process(functor, deepness);
+                    }
                 }
             }
         }
@@ -1054,7 +1062,12 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
             for (ArrayOfObjects::iterator iter = children->begin(); iter != children->end(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
                 if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
+                    if (branchClass && (*iter)->Is(*branchClass)) {
+                        parallelProcessed.push_back(*iter);
+                    }
+                    else {
+                        (*iter)->Process(functor, deepness);
+                    }
                 }
             }
         }
@@ -1093,6 +1106,9 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     --deepness;
 
     if (!this->SkipChildren(functor.VisibleOnly())) {
+        // Objects which will be processed in parallel are collected here
+        ArrayOfConstObjects parallelProcessed;
+        const std::optional<ClassId> branchClass = functor.GetParallelizationClass();
         // We need a pointer to the array for the option to work on a reversed copy
         const ArrayOfObjects *children = &m_children;
         Filters *filters = functor.GetFilters();
@@ -1100,7 +1116,12 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
             for (ArrayOfObjects::const_reverse_iterator iter = children->rbegin(); iter != children->rend(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
                 if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
+                    if (branchClass && (*iter)->Is(*branchClass)) {
+                        parallelProcessed.push_back(*iter);
+                    }
+                    else {
+                        (*iter)->Process(functor, deepness);
+                    }
                 }
             }
         }
@@ -1108,7 +1129,12 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
             for (ArrayOfObjects::const_iterator iter = children->begin(); iter != children->end(); ++iter) {
                 // we will end here if there is no filter at all or for the current child type
                 if (this->FiltersApply(filters, *iter)) {
-                    (*iter)->Process(functor, deepness);
+                    if (branchClass && (*iter)->Is(*branchClass)) {
+                        parallelProcessed.push_back(*iter);
+                    }
+                    else {
+                        (*iter)->Process(functor, deepness);
+                    }
                 }
             }
         }
