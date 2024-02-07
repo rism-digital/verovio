@@ -31,6 +31,7 @@ static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
 MeterSig::MeterSig()
     : LayerElement(METERSIG, "msig-")
+    , AttColor()
     , AttEnclosingChars()
     , AttExtSymNames()
     , AttMeterSigLog()
@@ -38,6 +39,7 @@ MeterSig::MeterSig()
     , AttTypography()
     , AttVisibility()
 {
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
     this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_METERSIGLOG);
@@ -53,6 +55,7 @@ MeterSig::~MeterSig() {}
 void MeterSig::Reset()
 {
     LayerElement::Reset();
+    this->ResetColor();
     this->ResetEnclosingChars();
     this->ResetExtSymNames();
     this->ResetMeterSigLog();

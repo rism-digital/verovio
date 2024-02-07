@@ -25,6 +25,7 @@ class ScoreDefInterface;
  * This class models the MEI <meterSig> element.
  */
 class MeterSig : public LayerElement,
+                 public AttColor,
                  public AttEnclosingChars,
                  public AttExtSymNames,
                  public AttMeterSigLog,
