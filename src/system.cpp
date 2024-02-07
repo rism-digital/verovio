@@ -74,9 +74,9 @@ void System::Reset()
 
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
-    m_xAbs = VRV_UNSET;
+    m_drawingFacsX = VRV_UNSET;
     m_drawingXRel = 0;
-    m_yAbs = VRV_UNSET;
+    m_drawingFacsY = VRV_UNSET;
     m_drawingYRel = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
@@ -111,7 +111,7 @@ bool System::IsSupportedChild(Object *child)
 
 int System::GetDrawingX() const
 {
-    if (m_xAbs != VRV_UNSET) return m_xAbs;
+    if (m_drawingFacsX != VRV_UNSET) return m_drawingFacsX;
 
     m_cachedDrawingX = 0;
     return m_drawingXRel;
@@ -119,7 +119,7 @@ int System::GetDrawingX() const
 
 int System::GetDrawingY() const
 {
-    if (m_yAbs != VRV_UNSET) return m_yAbs;
+    if (m_drawingFacsY != VRV_UNSET) return m_drawingFacsY;
 
     m_cachedDrawingY = 0;
     return m_drawingYRel;

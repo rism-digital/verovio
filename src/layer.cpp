@@ -273,7 +273,7 @@ const Clef *Layer::GetClefFacs(const LayerElement *test) const
 {
     const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
     assert(doc);
-    if (doc->GetType() == Facs) {
+    if (doc->IsFacs()) {
         ListOfConstObjects clefs;
         ClassIdComparison ac(CLEF);
         doc->FindAllDescendantsBetween(&clefs, &ac, doc->GetFirst(CLEF), test);

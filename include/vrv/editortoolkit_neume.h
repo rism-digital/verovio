@@ -31,8 +31,8 @@ namespace vrv {
 class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc *doc, View *view) : EditorToolkit(doc, view) {}
-    bool ParseEditorAction(const std::string &json_editorAction);
-    virtual std::string EditInfo() { return m_infoObject.json(); };
+    bool ParseEditorAction(const std::string &json_editorAction) override;
+    std::string EditInfo() override;
 
     /**
      * Experimental editor functions.
@@ -44,6 +44,7 @@ public:
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
         std::vector<std::pair<std::string, std::string>> attributes);
     bool InsertToSyllable(std::string elementId);
+    bool MatchHeight(std::string elementId);
     bool Merge(std::vector<std::string> elementIds);
     bool MoveOutsideSyllable(std::string elementId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
@@ -54,6 +55,7 @@ public:
     bool Remove(std::string elementId);
     bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float resize = NAN);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
+    void UnlinkSyllable(Syllable *syllable);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds);
@@ -72,6 +74,7 @@ protected:
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
         int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
     bool ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId);
+    bool ParseMatchHeightAction(jsonxx::Object param, std::string *elementId);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
@@ -98,9 +101,6 @@ protected:
     bool AdjustPitchFromPosition(Object *obj, Clef *clef = NULL);
     bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
-
-private:
-    jsonxx::Object m_infoObject;
 };
 
 //--------------------------------------------------------------------------------

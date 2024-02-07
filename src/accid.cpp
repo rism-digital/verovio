@@ -162,7 +162,7 @@ void Accid::AdjustX(LayerElement *element, const Doc *doc, int staffSize, std::v
             leftAccids.push_back(accid);
             return;
         }
-        if (adjustedAccids.count(accid) == 0) return;
+        if (!adjustedAccids.contains(accid)) return;
     }
 
     int xRelShift = 0;

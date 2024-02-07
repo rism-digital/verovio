@@ -31,7 +31,6 @@ class EditorialElement;
 class Output;
 class Filters;
 class Functor;
-class FunctorParams;
 class Functor;
 class ConstFunctor;
 class LinkingInterface;

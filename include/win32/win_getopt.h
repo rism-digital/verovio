@@ -36,7 +36,7 @@ int	optopt = '?';		/* character checked for validity */
 #undef	optreset		/* see getopt.h */
 #define	optreset		__mingw_optreset
 int	optreset;		/* reset getopt */
-char    *optarg;		/* argument associated with option */
+const char *optarg;		/* argument associated with option */
 #endif
 
 //extern int optind;		/* index of first non-option in argv      */
@@ -76,7 +76,7 @@ static int parse_long_options(char * const *, const char *,
 static int gcd(int, int);
 static void permute_args(int, int, int, char * const *);
 
-static char *place = EMSG; /* option letter processing */
+static const char *place = EMSG; /* option letter processing */
 
 /* XXX: set optreset to 1 rather than these two */
 static int nonopt_start = -1; /* first non option argument (for permute) */
@@ -243,7 +243,7 @@ static int
 parse_long_options(char * const *nargv, const char *options,
 	const struct option *long_options, int *idx, int short_too)
 {
-	char *current_argv, *has_equal;
+    const char *current_argv, *has_equal;
 	size_t current_argv_len;
 	int i, ambiguous, match;
 

@@ -66,7 +66,7 @@ void Staff::Reset()
     this->ResetTyped();
     this->ResetVisibility();
 
-    m_yAbs = VRV_UNSET;
+    m_drawingFacsY = VRV_UNSET;
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
@@ -125,7 +125,7 @@ int Staff::GetDrawingX() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->IsFacs()) {
             return FacsimileInterface::GetDrawingX();
         }
     }
@@ -137,12 +137,12 @@ int Staff::GetDrawingY() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(DOC);
-        if (doc->GetType() == Facs) {
+        if (doc->IsFacs()) {
             return FacsimileInterface::GetDrawingY();
         }
     }
 
-    if (m_yAbs != VRV_UNSET) return m_yAbs;
+    if (m_drawingFacsY != VRV_UNSET) return m_drawingFacsY;
 
     if (!m_staffAlignment) return 0;
 
@@ -160,7 +160,7 @@ double Staff::GetDrawingRotate() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->IsFacs()) {
             return FacsimileInterface::GetDrawingRotate();
         }
     }
@@ -172,7 +172,7 @@ void Staff::AdjustDrawingStaffSize()
     if (this->HasFacs()) {
         Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->GetType() == Facs) {
+        if (doc->IsFacs()) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
             assert(zone);
