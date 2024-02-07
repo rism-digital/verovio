@@ -67,6 +67,8 @@ enum option_ELISION {
     ELISION_unicode = UNICODE_UNDERTIE
 };
 
+enum option_FONT_FALLBACK { FONT_FALLBACK_Leipzig = 0, FONT_FALLBACK_Bravura };
+
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
@@ -140,6 +142,7 @@ public:
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
     static const std::map<int, std::string> s_elision;
+    static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_multiRestStyle;
@@ -689,6 +692,9 @@ public:
     OptionDbl m_extenderLineMinSpace;
     OptionDbl m_fingeringScale;
     OptionString m_font;
+    OptionArray m_fontAddCustom;
+    OptionIntMap m_fontFallback;
+    OptionBool m_fontLoadAll;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
