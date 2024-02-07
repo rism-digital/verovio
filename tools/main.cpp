@@ -293,12 +293,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    // Load a specified font
-    if (!toolkit.SetOptions(vrv::StringFormat("{\"font\": \"%s\" }", options->m_font.GetValue().c_str()))) {
-        std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
-        exit(1);
-    }
-
     const std::vector<std::string> outformats = { "mei", "mei-basic", "mei-pb", "mei-facs", "svg", "midi", "timemap",
         "expansionmap", "humdrum", "hum", "pae" };
     if (std::find(outformats.begin(), outformats.end(), outformat) == outformats.end()) {

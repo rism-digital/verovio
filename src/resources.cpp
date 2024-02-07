@@ -115,8 +115,10 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
     // options supplied fonts
     for (const std::string &fontFile : extraFonts) {
         ZipFileReader zipFile;
-        zipFile.Load(fontFile);
-        std::string fontName = GetCustomFontname("", zipFile);
+        if (!zipFile.Load(fontFile)) {
+            continue;
+        }
+        std::string fontName = GetCustomFontname(fontFile, zipFile);
         if (fontName.empty() || IsFontLoaded(fontName)) {
             continue;
         }

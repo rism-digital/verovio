@@ -58,6 +58,7 @@ bool ZipFileReader::Load(const std::string &filename)
 #else
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
+        LogError("File archive '%s' could not be open.", filename.c_str());
         return false;
     }
 
