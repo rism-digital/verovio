@@ -197,8 +197,7 @@ bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
         return false;
     }
     for (char32_t c : text) {
-        const Glyph *glyph = this->GetGlyph(c);
-        if (glyph == NULL) return true;
+        if (!GetCurrentGlyphTable().contains(c)) return true;
     }
     return false;
 }

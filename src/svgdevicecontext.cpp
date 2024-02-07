@@ -187,7 +187,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         }
         // include the fallback font
         if (m_vrvTextFontFallback && resources) {
-            this->IncludeTextFont(resources->GetCurrentFont(), resources);
+            this->IncludeTextFont(resources->GetFallbackFont(), resources);
         }
     }
 
