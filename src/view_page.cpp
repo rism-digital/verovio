@@ -1307,8 +1307,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
         // German tablature has no staff, just a single base line
         // But internally we maintain the fiction of an invisible staff as a coordinate system
         SegmentedLine line(x1, x2);
-        y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
-        this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
+        // Issue #3589 move base line slightly further down and reduce thickness
+        y1 -= (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines) * 11 / 10;
+        this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth / 2);
     }
     else if (staffDef->GetLinesVisible() != BOOLEAN_false) {
         // draw staff lines
@@ -1321,11 +1322,12 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, M
                 y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             }
             else {
-                const bool isFrenchOrItalianTablature = (staff->IsTabLuteFrench() || staff->IsTabLuteItalian());
+                const bool isFrenchOrGermanOrItalianTablature
+                    = (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian());
                 SegmentedLine line(x1, x2);
-                // We do not need to do this during layout calculation - and only with tablature but not for French or
-                // Italian tablature
-                if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrItalianTablature) {
+                // We do not need to do this during layout calculation - and only with guitar tablature but not for
+                // French, German or Italian lute tablature
+                if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrGermanOrItalianTablature) {
                     Object fullLine;
                     fullLine.SetParent(system);
                     fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
