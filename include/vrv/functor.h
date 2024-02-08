@@ -95,7 +95,7 @@ public:
      * Returns the object class on which parallelization is applied
      * Additionally checks if we have more than one thread
      */
-    std::optional<ClassId> GetParallelizationClass() const;
+    std::optional<ClassId> GetConcurrentClass() const;
 
 private:
     //

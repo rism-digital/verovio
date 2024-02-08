@@ -17,7 +17,7 @@ namespace vrv {
 // FunctorBase
 //----------------------------------------------------------------------------
 
-std::optional<ClassId> FunctorBase::GetParallelizationClass() const
+std::optional<ClassId> FunctorBase::GetConcurrentClass() const
 {
     if (this->GetMaxNumberOfThreads() > 1) {
         switch (this->GetProcessingStrategy()) {
