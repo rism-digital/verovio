@@ -1103,7 +1103,10 @@ void Object::ProcessInParallel(Functor &functor, int deepness, const ArrayOfObje
     }
 
     // Clone the functor for each task
-    std::vector<Functor *> functorClones(concurrency, functor.CloneFunctor());
+    std::vector<Functor *> functorClones;
+    for (int taskIndex = 0; taskIndex < concurrency; ++taskIndex) {
+        functorClones.push_back(functor.CloneFunctor());
+    }
 
     // Launch parallel tasks
     std::vector<std::future<void>> futures;
@@ -1214,7 +1217,10 @@ void Object::ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayO
     }
 
     // Clone the functor for each task
-    std::vector<ConstFunctor *> functorClones(concurrency, functor.CloneFunctor());
+    std::vector<ConstFunctor *> functorClones;
+    for (int taskIndex = 0; taskIndex < concurrency; ++taskIndex) {
+        functorClones.push_back(functor.CloneFunctor());
+    }
 
     // Launch parallel tasks
     std::vector<std::future<void>> futures;
