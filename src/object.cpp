@@ -1084,6 +1084,10 @@ void Object::ProcessChildren(Functor &functor, int deepness)
             }
         }
     }
+    // Perform parallel processing
+    if (!parallelProcessed.empty()) {
+        this->ProcessInParallel(functor, deepness, parallelProcessed);
+    }
 }
 
 void Object::ProcessInParallel(Functor &functor, int deepness, const ArrayOfObjects &objects)
@@ -1191,9 +1195,13 @@ void Object::ProcessChildren(ConstFunctor &functor, int deepness) const
             }
         }
     }
+    // Perform parallel processing
+    if (!parallelProcessed.empty()) {
+        this->ProcessInParallel(functor, deepness, parallelProcessed);
+    }
 }
 
-void Object::ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayOfConstObjects &objects)
+void Object::ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayOfConstObjects &objects) const
 {
     const int hardwareLimit = static_cast<int>(std::thread::hardware_concurrency());
     const int concurrency = std::min(functor.GetMaxNumberOfThreads(), hardwareLimit);

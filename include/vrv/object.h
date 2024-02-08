@@ -650,7 +650,7 @@ public:
     void ProcessInParallel(Functor &functor, int deepness, const ArrayOfObjects &objects);
     void Process(ConstFunctor &functor, int deepness = UNLIMITED_DEPTH, bool skipFirst = false) const;
     void ProcessChildren(ConstFunctor &functor, int deepness) const;
-    void ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayOfConstObjects &objects);
+    void ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayOfConstObjects &objects) const;
     ///@}
 
     /**
