@@ -39,9 +39,9 @@ Functor *Functor::CloneFunctor() const
     return NULL;
 }
 
-void Functor::MergeFunctor(const Functor &functor)
+void Functor::MergeFunctor(const Functor *functor)
 {
-    if (functor.GetCode() == FUNCTOR_STOP) {
+    if (functor->GetCode() == FUNCTOR_STOP) {
         this->SetCode(FUNCTOR_STOP);
     }
 }
@@ -56,9 +56,9 @@ ConstFunctor *ConstFunctor::CloneFunctor() const
     return NULL;
 }
 
-void ConstFunctor::MergeFunctor(const ConstFunctor &functor)
+void ConstFunctor::MergeFunctor(const ConstFunctor *functor)
 {
-    if (functor.GetCode() == FUNCTOR_STOP) {
+    if (functor->GetCode() == FUNCTOR_STOP) {
         this->SetCode(FUNCTOR_STOP);
     }
 }

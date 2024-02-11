@@ -1123,7 +1123,7 @@ void Object::ProcessInParallel(Functor &functor, int deepness, const ArrayOfObje
         future.get();
     }
     for (Functor *clone : functorClones) {
-        functor.MergeFunctor(*clone);
+        functor.MergeFunctor(clone);
         delete clone;
     }
 }
@@ -1237,7 +1237,7 @@ void Object::ProcessInParallel(ConstFunctor &functor, int deepness, const ArrayO
         future.get();
     }
     for (ConstFunctor *clone : functorClones) {
-        functor.MergeFunctor(*clone);
+        functor.MergeFunctor(clone);
         delete clone;
     }
 }

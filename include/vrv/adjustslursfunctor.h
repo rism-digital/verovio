@@ -62,6 +62,15 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Enable parallelization
+     */
+    ///@{
+    ProcessingStrategy GetProcessingStrategy() const override { return ProcessingStrategy::SystemParallel; }
+    AdjustSlursFunctor *CloneFunctor() const override { return new AdjustSlursFunctor(*this); }
+    void MergeFunctor(const Functor *functor) override;
+    ///@}
+
+    /*
      * Check existence of cross-staff slurs
      */
     bool HasCrossStaffSlurs() const { return m_crossStaffSlurs; }

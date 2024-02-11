@@ -139,7 +139,7 @@ public:
      * Merge child classes, i.e. combine the state of the functor passed in with the current one
      * The default implementation only considers the functor code
      */
-    virtual void MergeFunctor(const Functor &functor);
+    virtual void MergeFunctor(const Functor *functor);
 
 private:
     //
@@ -176,7 +176,7 @@ public:
      * Merge child classes, i.e. combine the state of the functor passed in with the current one
      * The default implementation only considers the functor code
      */
-    virtual void MergeFunctor(const ConstFunctor &functor);
+    virtual void MergeFunctor(const ConstFunctor *functor);
 
 private:
     //
