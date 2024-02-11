@@ -32,6 +32,8 @@ AdjustSlursFunctor::AdjustSlursFunctor(Doc *doc) : DocFunctor(doc)
 
 void AdjustSlursFunctor::MergeFunctor(const Functor *functor)
 {
+    Functor::MergeFunctor(functor);
+
     const AdjustSlursFunctor *adjustSlursFunctor = dynamic_cast<const AdjustSlursFunctor *>(functor);
     if (adjustSlursFunctor && adjustSlursFunctor->HasCrossStaffSlurs()) {
         m_crossStaffSlurs = true;
