@@ -139,6 +139,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(LIGATURE)) {
         this->DrawLigature(dc, element, layer, staff, measure);
     }
+    else if (element->Is(LIQUESCENT)) {
+        this->DrawLiquescent(dc, element, layer, staff, measure);
+    }
     else if (element->Is(MENSUR)) {
         this->DrawMensur(dc, element, layer, staff, measure);
     }
