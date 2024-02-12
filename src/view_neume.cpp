@@ -349,9 +349,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     // Draw the children
-    if (!nc->FindDescendantByType(LIQUESCENT)) {
-        this->DrawLayerChildren(dc, nc, layer, staff, measure);
-    }
+    this->DrawLayerChildren(dc, nc, layer, staff, measure);
 
     dc->EndGraphic(element, this);
 }
