@@ -4154,6 +4154,8 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         for (auto it = pitchedChildren.begin(); it != pitchedChildren.end(); ++it) {
+            if ((*it)->Is(LIQUESCENT)) continue;
+
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             if (fi == NULL || !fi->HasFacs()) {
                 LogError("Could not adjust pitch: child %s does not have facsimile data", (*it)->GetID().c_str());
