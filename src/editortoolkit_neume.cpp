@@ -2836,6 +2836,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
     ListOfObjects syllables; // List of syllables used. groupType=neume only.
 
     jsonxx::Array uuidArray;
+    bool breakOnEnd = false;
 
     // Check if you can get drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -2920,10 +2921,15 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 fparent->ReorderByXPos();
                 uuidArray << (*it);
                 it = elementIds.erase(it);
-                if (it == elementIds.end()) break;
+                if (it == elementIds.end()) {
+                    breakOnEnd = true;
+                    break;
+                }
                 el = m_doc->GetDrawingPage()->FindDescendantByID(*it);
             }
         }
+        if (breakOnEnd) break;
+
         if (elementIds.begin() == it || firstIsSyl) {
             // if the element is a syl we want it to stay attached to the first element
             // we'll still need to initialize all the parents, thus the bool
