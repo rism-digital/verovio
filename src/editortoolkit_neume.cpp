@@ -1895,11 +1895,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
             std::u32string str = U"";
             text->SetText(str);
             syl->AddChild(text);
-
             syllable->AddChild(syl);
-            Text *textChild = new Text();
-            textChild->SetText(wtext);
-            syl->AddChild(textChild);
             if (m_doc->GetType() == Facs) {
                 // Create a default bounding box
                 Zone *zone = new Zone();
