@@ -3625,6 +3625,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 TabGrp *tabGrp = vrv_cast<TabGrp *>(element);
                 tabGrp->SetBreaksec(breakSec);
             }
+            if (element->Is(REST)) {
+                Rest *rest = vrv_cast<Rest *>(element);
+                rest->SetBreaksec(breakSec);
+            }
         }
         else {
             if (IsInStack(BEAM, layer)) {
