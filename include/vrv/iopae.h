@@ -166,6 +166,7 @@ private:
     ///@{
     void WriteDur(DurationInterface *interface);
     void WriteGrace(AttGraced *attGraced);
+    bool HasFermata(Object *object);
     ///@}
 
 public:
