@@ -454,9 +454,7 @@ void PAEOutput::WriteNote(Note *note)
         m_streamStringOutput << accid;
     }
 
-    PointingToComparison pointingToComparisonFermata(FERMATA, note);
-    Fermata *fermata
-        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    bool fermata = this->HasFermata(note);
     if (fermata) m_streamStringOutput << "(";
 
     std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
@@ -581,6 +579,14 @@ void PAEOutput::WriteGrace(AttGraced *attGraced)
     else if (attGraced->HasGrace()) {
         m_streamStringOutput << "q";
     }
+}
+
+bool PAEOutput::HasFermata(Object *object)
+{
+    PointingToComparison pointingToComparisonFermata(FERMATA, object);
+    Fermata *fermata
+        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    return (fermata);
 }
 
 //----------------------------------------------------------------------------
