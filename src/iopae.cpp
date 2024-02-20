@@ -401,7 +401,12 @@ void PAEOutput::WriteMRest(MRest *mRest)
 
     if (m_skip) return;
 
+    bool fermata = this->HasFermata(mRest);
+    if (fermata) m_streamStringOutput << "(";
+
     m_streamStringOutput << "=";
+
+    if (fermata) m_streamStringOutput << ")";
 }
 
 void PAEOutput::WriteMultiRest(MultiRest *multiRest)
@@ -479,7 +484,13 @@ void PAEOutput::WriteRest(Rest *rest)
     if (m_skip) return;
 
     this->WriteDur(rest);
+
+    bool fermata = this->HasFermata(rest);
+    if (fermata) m_streamStringOutput << "(";
+
     m_streamStringOutput << "-";
+
+    if (fermata) m_streamStringOutput << ")";
 }
 
 void PAEOutput::WriteSpace(Space *space)
