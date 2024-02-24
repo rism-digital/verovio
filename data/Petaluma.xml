@@ -645,6 +645,7 @@
   <g c="E0F5" x="0.0" y="-197.0" w="106.0" h="394.0" h-a-x="76" n="noteheadParenthesisLeft" />
   <g c="E0F6" x="-30.0" y="-199.08" w="112.0" h="405.08" h-a-x="81" n="noteheadParenthesisRight" />
   <g c="E0FA" x="0.0" y="-130.0" w="489.0" h="260.0" h-a-x="490" n="noteheadWholeFilled" />
+  <g c="E0FB" x="-1.0" y="-130.0" w="322.0" h="261.0" h-a-x="322" n="noteheadHalfFilled" />
   <g c="E510" x="10.0" y="0.0" w="212.04" h="422.0" h-a-x="222" n="ottava" />
   <g c="E511" x="10.0" y="0.0" w="625.0" h="426.0" h-a-x="635" n="ottavaAlta" />
   <g c="E512" x="10.0" y="-37.81" w="616.0" h="459.81" h-a-x="610" n="ottavaBassa" />
