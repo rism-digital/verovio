@@ -269,7 +269,7 @@
         <!--<glyph glyph-code="E0F8" smufl-name="noteheadHeavyX" />-->
         <!--<glyph glyph-code="E0F9" smufl-name="noteheadHeavyXHat" />-->
         <glyph glyph-code="E0FA" smufl-name="noteheadWholeFilled" />
-        <!--<glyph glyph-code="E0FB" smufl-name="noteheadHalfFilled" />-->
+        <glyph glyph-code="E0FB" smufl-name="noteheadHalfFilled" />
         <!--<glyph glyph-code="E0FC" smufl-name="noteheadDiamondOpen" />-->
         <range_end>U+E0FF</range_end>
         <range_start>U+E0A0</range_start>
