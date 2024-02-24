@@ -137,6 +137,7 @@
   <g c="E0F5" x="0.0" y="-181.0" w="109.0" h="362.0" h-a-x="73" n="noteheadParenthesisLeft" />
   <g c="E0F6" x="-36.0" y="-181.0" w="109.0" h="362.0" h-a-x="73" n="noteheadParenthesisRight" />
   <g c="E0FA" x="0.0" y="-125.0" w="422.0" h="250.0" h-a-x="422" n="noteheadWholeFilled" />
+  <g c="E0FB" x="0.0" y="-125.0" w="295.0" h="250.0" h-a-x="295" n="noteheadHalfFilled" />
   <g c="E101" x="0.0" y="-250.0" w="530.0" h="500.0" h-a-x="531" n="noteheadSlashHorizontalEnds">
     <a n="stemDownNW" x="0.0" y="-1.0" />
     <a n="stemUpSE" x="2.12" y="1.0" />
