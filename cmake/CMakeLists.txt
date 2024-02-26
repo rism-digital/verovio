@@ -242,8 +242,15 @@ if (BUILD_AS_ANDROID_LIBRARY)
     target_link_libraries(verovio ${log-lib})
 endif()
 
-install(
-    TARGETS verovio DESTINATION bin
+install(TARGETS verovio
+        # for executables and dll on Win
+        RUNTIME DESTINATION bin
+        # shared libraries
+        LIBRARY DESTINATION lib
+        # for static libraries
+        ARCHIVE DESTINATION lib
+        # public headers
+        INCLUDES DESTINATION include
 )
 install(
     DIRECTORY ../data/
