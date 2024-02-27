@@ -175,6 +175,9 @@ set(all_SRC
 
 if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
     message(STATUS "***** Building Verovio as shared library *****")
+    if(WIN32)
+		add_definitions(-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
+    endif()
     add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
 
 ###########
