@@ -179,6 +179,8 @@ if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
 		add_definitions(-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
     endif()
     add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+    # list all headers to be copied for all installation
+    file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*")
 
 ###########
 # WASM BC #
@@ -260,3 +262,7 @@ install(
     DESTINATION share/verovio
     FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css"
 )
+# install all headers in /usr/local/include/verovio
+if (BUILD_AS_LIBRARY)
+    install(FILES ${all_HEADERS} DESTINATION include/verovio)
+endif()
