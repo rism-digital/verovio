@@ -1,4 +1,9 @@
-## Build instructions
+## Documentation for the Qt binding
+
+> [!WARNING]  
+> This documentation has not been updated and might be obsolete
+
+### Build instructions
 
 Building the demo for Qt involves following steps:
 
@@ -30,7 +35,7 @@ Building the demo for Qt involves following steps:
    make -j8
    ```
 
-## Start Qt Demo
+### Start Qt Demo
 
 To start the Qt demo add the directories for the CPP and Qt libraries to LD_LIBRARY_PATH
 
@@ -38,7 +43,7 @@ To start the Qt demo add the directories for the CPP and Qt libraries to LD_LIBR
 LD_LIBRARY_PATH=../../../tools/:../build-library ./verovio-qt-demo
 ```
 
-## Android
+### Android
 
 The demo can also be compiled for Android. This requires following steps:
 
