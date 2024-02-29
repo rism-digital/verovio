@@ -178,9 +178,9 @@ if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
     if(WIN32)
 		add_definitions(-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
     endif()
-    add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+    add_library(verovio SHARED "../tools/c_wrapper.cpp" ${all_SRC})
     # list all headers to be copied for all installation
-    file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*")
+    file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tools/c_wrapper.h")
 
 ###########
 # WASM BC #
