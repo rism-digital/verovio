@@ -115,6 +115,19 @@ const char *vrvToolkit_getHumdrum(void *tkPtr)
     return buffer;
 }
 
+bool vrvToolkit_getHumdrumFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->GetHumdrumFile(filename);
+}
+
+const char *vrvToolkit_getID(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetID());
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_convertHumdrumToHumdrum(void *tkPtr, const char *humdrumData)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -192,6 +205,19 @@ int vrvToolkit_getPageWithElement(void *tkPtr, const char *xmlId)
     return tk->GetPageWithElement(xmlId);
 }
 
+const char *vrvToolkit_getResourcePath(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->GetResourcePath());
+    return tk->GetCString();
+}
+
+int vrvToolkit_getScale(void *tkPtr)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->GetScale();
+}
+
 double vrvToolkit_getTimeForElement(void *tkPtr, const char *xmlId)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -216,6 +242,12 @@ bool vrvToolkit_loadData(void *tkPtr, const char *data)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     return tk->LoadData(data);
+}
+
+bool vrvToolkit_loadFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->LoadFile(filename);
 }
 
 bool vrvToolkit_loadZipDataBase64(void *tkPtr, const char *data)
@@ -256,11 +288,23 @@ const char *vrvToolkit_renderToExpansionMap(void *tkPtr)
     return tk->GetCString();
 }
 
-const char *vrvToolkit_renderToMIDI(void *tkPtr, const char *c_options)
+bool vrvToolkit_renderToExpansionMapFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToExpansionMapFile(filename);
+}
+
+const char *vrvToolkit_renderToMIDI(void *tkPtr)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->RenderToMIDI());
     return tk->GetCString();
+}
+
+bool vrvToolkit_renderToMIDIFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToMIDIFile(filename);
 }
 
 const char *vrvToolkit_renderToPAE(void *tkPtr)
@@ -270,6 +314,12 @@ const char *vrvToolkit_renderToPAE(void *tkPtr)
     return tk->GetCString();
 }
 
+bool vrvToolkit_renderToPAEFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToPAEFile(filename);
+}
+
 const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, bool xmlDeclaration)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
@@ -277,11 +327,23 @@ const char *vrvToolkit_renderToSVG(void *tkPtr, int page_no, bool xmlDeclaration
     return tk->GetCString();
 }
 
+bool vrvToolkit_renderToSVGFile(void *tkPtr, const char *filename, int pageNo)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToSVGFile(filename, pageNo);
+}
+
 const char *vrvToolkit_renderToTimemap(void *tkPtr, const char *c_options)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->RenderToTimemap(c_options));
     return tk->GetCString();
+}
+
+bool vrvToolkit_renderToTimemapFile(void *tkPtr, const char *filename, const char *c_options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->RenderToTimemapFile(filename, c_options);
 }
 
 void vrvToolkit_resetOptions(void *tkPtr)
@@ -296,10 +358,22 @@ void vrvToolkit_resetXmlIdSeed(void *tkPtr, int seed)
     tk->ResetXmlIdSeed(seed);
 }
 
+bool vrvToolkit_saveFile(void *tkPtr, const char *filename, const char *c_options)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->SaveFile(filename, c_options);
+}
+
 bool vrvToolkit_select(void *tkPtr, const char *selection)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     return tk->Select(selection);
+}
+
+bool vrvToolkit_setInputFrom(void *tkPtr, const char *inputFrom)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->SetInputFrom(inputFrom);
 }
 
 bool vrvToolkit_setOptions(void *tkPtr, const char *options)
@@ -308,10 +382,35 @@ bool vrvToolkit_setOptions(void *tkPtr, const char *options)
     return tk->SetOptions(options);
 }
 
+bool vrvToolkit_setOutputTo(void *tkPtr, const char *outputTo)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->SetOutputTo(outputTo);
+}
+
+bool vrvToolkit_setResourcePath(void *tkPtr, const char *path)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->SetResourcePath(path);
+}
+
+bool vrvToolkit_setScale(void *tkPtr, int scale)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    return tk->SetScale(scale);
+}
+
 const char *vrvToolkit_validatePAE(void *tkPtr, const char *data)
 {
     Toolkit *tk = static_cast<Toolkit *>(tkPtr);
     tk->SetCString(tk->ValidatePAE(data));
+    return tk->GetCString();
+}
+
+const char *vrvToolkit_validatePAEFile(void *tkPtr, const char *filename)
+{
+    Toolkit *tk = static_cast<Toolkit *>(tkPtr);
+    tk->SetCString(tk->ValidatePAEFile(filename));
     return tk->GetCString();
 }
 
