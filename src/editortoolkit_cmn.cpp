@@ -451,7 +451,8 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         }
 
         if (currentNote->HasEditorialContent()) {
-            LogInfo("Inserting a note where a note has editorial content is not possible");
+            LogInfo("Inserting a note where a note has editorial content is not "
+                    "possible");
             return false;
         }
 
@@ -513,7 +514,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
     Beam *beam = note->GetAncestorBeam();
     if (chord) {
         if (chord->HasEditorialContent()) {
-            LogInfo("Deleting a note in a chord that has editorial content is not possible");
+            LogInfo("Deleting a note in a chord that has editorial content is not "
+                    "possible");
             return false;
         }
         int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
@@ -558,7 +560,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         }
     }
     else if (beam) {
-        // If the beam has exactly 2 notes (take apart and leave a single note and a rest)
+        // If the beam has exactly 2 notes (take apart and leave a single note and a
+        // rest)
         if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
             bool insertBefore = true;
             LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
@@ -612,9 +615,10 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             m_chainedId = rest->GetID();
         }
         // All but the first IF statement branches lead here
-        /* Clearing the coords here fixes an error where the children get updated, but the
-         * internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
-         * to update that structure to reflect the current children. */
+        /* Clearing the coords here fixes an error where the children get updated,
+         * but the internal m_beamElementCoordRefs does not.  By clearing it, the
+         * system is forced to update that structure to reflect the current
+         * children. */
         beam->ClearCoords();
         return true;
     }
