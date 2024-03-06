@@ -213,7 +213,6 @@ bool EditorToolkitCMN::Delete(std::string &elementId)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-	
     if (element->Is(NOTE)) {
         return this->DeleteNote(vrv_cast<Note *>(element));
     }
@@ -348,10 +347,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     assert(element);
-    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
-    assert(interface);
+    TimeSpanningInterface *timespan_interface = element->GetTimeSpanningInterface();
+    assert(timespan_interface);
     measure->AddChild(element);
-    interface->SetStartid("#" + startid);
+    timespan_interface->SetStartid("#" + startid);
 
     m_chainedId = element->GetID();
     m_editInfo.import("uuid", element->GetID());
@@ -512,7 +511,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 
     Chord *chord = note->IsChordTone();
     Beam *beam = note->GetAncestorBeam();
-	
     if (chord) {
         if (chord->HasEditorialContent()) {
             LogInfo("Deleting a note in a chord that has editorial content is not possible");
@@ -581,6 +579,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             }
             beam->DetachChild(otherElement->GetIdx());
             parent->ReplaceChild(beam, otherElement);
+			otherElement->
+			// Here
             delete beam;
             m_chainedId = rest->GetID();
             return true;
