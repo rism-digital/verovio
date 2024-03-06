@@ -246,7 +246,7 @@ bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, b
 
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
-        PitchInterface* pitch_interface = element->GetPitchInterface();
+        PitchInterface *pitch_interface = element->GetPitchInterface();
         assert(pitch_interface);
         int step;
         switch (key) {
@@ -613,10 +613,9 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         }
         
         // All but the first IF statement branches lead here
-        
-        // Clearing the coords here fixes an error where the children get updated, but the
-        // internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
-        // to update that structure to reflect the current children.
+        /* Clearing the coords here fixes an error where the children get updated, but the
+         * internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
+         * to update that structure to reflect the current children. */
         beam->ClearCoords();
         return true;
     }
