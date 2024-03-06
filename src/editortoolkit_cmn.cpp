@@ -213,7 +213,7 @@ bool EditorToolkitCMN::Delete(std::string &elementId)
 {
     Object *element = this->GetElement(elementId);
     if (!element) return false;
-
+	
     if (element->Is(NOTE)) {
         return this->DeleteNote(vrv_cast<Note *>(element));
     }
@@ -247,15 +247,15 @@ bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, b
 
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
-        PitchInterface *interface = element->GetPitchInterface();
-        assert(interface);
+        PitchInterface* pitch_interface = element->GetPitchInterface();
+        assert(pitch_interface);
         int step;
         switch (key) {
             case KEY_UP: step = 1; break;
             case KEY_DOWN: step = -1; break;
             default: step = 0;
         }
-        interface->AdjustPitchByOffset(step);
+        pitch_interface->AdjustPitchByOffset(step);
         return true;
     }
     return false;
@@ -301,11 +301,11 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     assert(element);
-    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
-    assert(interface);
+    TimeSpanningInterface *timespan_interface = element->GetTimeSpanningInterface();
+    assert(timespan_interface);
     measure->AddChild(element);
-    interface->SetStartid("#" + startid);
-    interface->SetEndid("#" + endid);
+    timespan_interface->SetStartid("#" + startid);
+    timespan_interface->SetEndid("#" + endid);
 
     m_chainedId = element->GetID();
     m_editInfo.import("uuid", element->GetID());
@@ -512,7 +512,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
 
     Chord *chord = note->IsChordTone();
     Beam *beam = note->GetAncestorBeam();
-
+	
     if (chord) {
         if (chord->HasEditorialContent()) {
             LogInfo("Deleting a note in a chord that has editorial content is not possible");
@@ -560,6 +560,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         }
     }
     else if (beam) {
+		// If the beam has exactly 2 notes (take apart and leave a single note and a rest)
         if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
             bool insertBefore = true;
             LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
@@ -584,7 +585,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             m_chainedId = rest->GetID();
             return true;
         }
-        if (beam->IsFirstIn(note)) {
+		// If the beam has more than 2 and this is first
+        else if (beam->IsFirstIn(note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             Object *parent = beam->GetParent();
@@ -592,8 +594,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             parent->InsertBefore(beam, rest);
             beam->DeleteChild(note);
             m_chainedId = rest->GetID();
-            return true;
         }
+		// If the beam has more than 2 and this is last
         else if (beam->IsLastIn(note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
@@ -602,18 +604,26 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             parent->InsertAfter(beam, rest);
             beam->DeleteChild(note);
             m_chainedId = rest->GetID();
-            return true;
         }
+		// If the beam has more than 2 and this in the middle
         else {
-            Rest *rest = new Rest();
+			Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             beam->ReplaceChild(note, rest);
             delete note;
             m_chainedId = rest->GetID();
-            return true;
         }
+		
+		// All but the first IF statement branches lead here
+		
+		// Clearing the coords here fixes an error where the children get updated, but the
+		// internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
+		// to update that structure to reflect the current children.
+		beam->ClearCoords();
+		return true;
     }
     else {
+		// Deal with just a single note (Not in beam or chord)
         Rest *rest = new Rest();
         rest->DurationInterface::operator=(*note);
         Object *parent = note->GetParent();
