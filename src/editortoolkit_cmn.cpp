@@ -611,7 +611,6 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             delete note;
             m_chainedId = rest->GetID();
         }
-        
         // All but the first IF statement branches lead here
         /* Clearing the coords here fixes an error where the children get updated, but the
          * internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
