@@ -558,7 +558,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         }
     }
     else if (beam) {
-		// If the beam has exactly 2 notes (take apart and leave a single note and a rest)
+        // If the beam has exactly 2 notes (take apart and leave a single note and a rest)
         if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
             bool insertBefore = true;
             LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
@@ -579,13 +579,11 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             }
             beam->DetachChild(otherElement->GetIdx());
             parent->ReplaceChild(beam, otherElement);
-			otherElement->
-			// Here
             delete beam;
             m_chainedId = rest->GetID();
             return true;
         }
-		// If the beam has more than 2 and this is first
+        // If the beam has more than 2 and this is first
         else if (beam->IsFirstIn(note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
@@ -595,7 +593,7 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             beam->DeleteChild(note);
             m_chainedId = rest->GetID();
         }
-		// If the beam has more than 2 and this is last
+        // If the beam has more than 2 and this is last
         else if (beam->IsLastIn(note)) {
             Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
@@ -605,25 +603,25 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             beam->DeleteChild(note);
             m_chainedId = rest->GetID();
         }
-		// If the beam has more than 2 and this in the middle
+        // If the beam has more than 2 and this in the middle
         else {
-			Rest *rest = new Rest();
+            Rest *rest = new Rest();
             rest->DurationInterface::operator=(*note);
             beam->ReplaceChild(note, rest);
             delete note;
             m_chainedId = rest->GetID();
         }
-		
-		// All but the first IF statement branches lead here
-		
-		// Clearing the coords here fixes an error where the children get updated, but the
-		// internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
-		// to update that structure to reflect the current children.
-		beam->ClearCoords();
-		return true;
+        
+        // All but the first IF statement branches lead here
+        
+        // Clearing the coords here fixes an error where the children get updated, but the
+        // internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
+        // to update that structure to reflect the current children.
+        beam->ClearCoords();
+        return true;
     }
     else {
-		// Deal with just a single note (Not in beam or chord)
+        // Deal with just a single note (Not in beam or chord)
         Rest *rest = new Rest();
         rest->DurationInterface::operator=(*note);
         Object *parent = note->GetParent();
