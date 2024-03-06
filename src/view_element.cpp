@@ -1488,8 +1488,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             }
             drawingDur = DUR_4;
         }
-        drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-
         if (drawingDur < DUR_BR) {
             this->DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
@@ -1497,7 +1495,15 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // Whole notes
             char32_t fontNo;
             if (note->GetColored() == BOOLEAN_true) {
-                fontNo = (drawingDur == DUR_1) ? SMUFL_E0FA_noteheadWholeFilled : SMUFL_E0A3_noteheadHalf;
+                if (DUR_1 == drawingDur) {
+                    fontNo = SMUFL_E0FA_noteheadWholeFilled;
+                }
+                else if (DUR_2 == drawingDur) {
+                    fontNo = SMUFL_E0FB_noteheadHalfFilled;
+                }
+                else {
+                    fontNo = SMUFL_E0A3_noteheadHalf;
+                }
             }
             else {
                 fontNo = note->GetNoteheadGlyph(drawingDur);
