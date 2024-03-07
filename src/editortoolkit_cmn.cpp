@@ -246,15 +246,15 @@ bool EditorToolkitCMN::KeyDown(std::string &elementId, int key, bool shiftKey, b
 
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
-        PitchInterface *pitch_interface = element->GetPitchInterface();
-        assert(pitch_interface);
+        PitchInterface *interface = element->GetPitchInterface();
+        assert(interface);
         int step;
         switch (key) {
             case KEY_UP: step = 1; break;
             case KEY_DOWN: step = -1; break;
             default: step = 0;
         }
-        pitch_interface->AdjustPitchByOffset(step);
+        interface->AdjustPitchByOffset(step);
         return true;
     }
     return false;
@@ -300,11 +300,11 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     assert(element);
-    TimeSpanningInterface *timespan_interface = element->GetTimeSpanningInterface();
-    assert(timespan_interface);
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    assert(interface);
     measure->AddChild(element);
-    timespan_interface->SetStartid("#" + startid);
-    timespan_interface->SetEndid("#" + endid);
+    interface->SetStartid("#" + startid);
+    interface->SetEndid("#" + endid);
 
     m_chainedId = element->GetID();
     m_editInfo.import("uuid", element->GetID());
@@ -347,10 +347,10 @@ bool EditorToolkitCMN::Insert(std::string &elementType, std::string const &start
     }
 
     assert(element);
-    TimeSpanningInterface *timespan_interface = element->GetTimeSpanningInterface();
-    assert(timespan_interface);
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
+    assert(interface);
     measure->AddChild(element);
-    timespan_interface->SetStartid("#" + startid);
+    interface->SetStartid("#" + startid);
 
     m_chainedId = element->GetID();
     m_editInfo.import("uuid", element->GetID());
@@ -451,7 +451,8 @@ bool EditorToolkitCMN::InsertNote(Object *object)
         }
 
         if (currentNote->HasEditorialContent()) {
-            LogInfo("Inserting a note where a note has editorial content is not possible");
+            LogInfo("Inserting a note where a note has editorial content is not "
+                    "possible");
             return false;
         }
 
@@ -513,7 +514,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
     Beam *beam = note->GetAncestorBeam();
     if (chord) {
         if (chord->HasEditorialContent()) {
-            LogInfo("Deleting a note in a chord that has editorial content is not possible");
+            LogInfo("Deleting a note in a chord that has editorial content is not "
+                    "possible");
             return false;
         }
         int count = chord->GetChildCount(NOTE, UNLIMITED_DEPTH);
@@ -558,7 +560,8 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
         }
     }
     else if (beam) {
-        // If the beam has exactly 2 notes (take apart and leave a single note and a rest)
+        // If the beam has exactly 2 notes (take apart and leave a single note and a
+        // rest)
         if ((int)beam->m_beamSegment.GetElementCoordRefs()->size() == 2) {
             bool insertBefore = true;
             LayerElement *otherElement = beam->m_beamSegment.GetElementCoordRefs()->back()->m_element;
@@ -612,9 +615,10 @@ bool EditorToolkitCMN::DeleteNote(Note *note)
             m_chainedId = rest->GetID();
         }
         // All but the first IF statement branches lead here
-        /* Clearing the coords here fixes an error where the children get updated, but the
-         * internal m_beamElementCoordRefs does not.  By clearing it, the system is forced
-         * to update that structure to reflect the current children. */
+        /* Clearing the coords here fixes an error where the children get updated,
+         * but the internal m_beamElementCoordRefs does not.  By clearing it, the
+         * system is forced to update that structure to reflect the current
+         * children. */
         beam->ClearCoords();
         return true;
     }
