@@ -566,7 +566,7 @@ std::string PAEOutput::GetPaeDur(data_DURATION ndur, int ndots)
         case (DURATION_semifusa): dur = "6"; break;
         default: LogWarning("Unsupported duration"); dur = "4";
     }
-    
+
     if (ndots > 0) {
         dur += std::string(ndots, '.');
     }
