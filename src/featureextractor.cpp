@@ -72,9 +72,9 @@ void FeatureExtractor::Extract(const Object *object)
 
         std::stringstream pitch;
         std::stringstream pitchWithDuration;
-        
+
         pitchWithDuration << PAEOutput::GetPaeDur(note->GetDur(), note->GetDots());
-        
+
         data_OCTAVE oct = note->GetOct();
         char octSign = (oct > 3) ? '\'' : ',';
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);
