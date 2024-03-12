@@ -542,6 +542,38 @@ void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
     m_streamStringOutput << ";" << tuplet->GetNum() << ")";
 }
 
+std::string PAEOutput::GetPaeDur(data_DURATION ndur, int ndots)
+{
+    std::string dur;
+    switch (ndur) {
+        case (DURATION_long): dur = "0"; break;
+        case (DURATION_breve): dur = "9"; break;
+        case (DURATION_1): dur = "1"; break;
+        case (DURATION_2): dur = "2"; break;
+        case (DURATION_4): dur = "4"; break;
+        case (DURATION_8): dur = "8"; break;
+        case (DURATION_16): dur = "6"; break;
+        case (DURATION_32): dur = "3"; break;
+        case (DURATION_64): dur = "5"; break;
+        case (DURATION_128): dur = "7"; break;
+        case (DURATION_maxima): dur = "0"; break;
+        case (DURATION_longa): dur = "0"; break;
+        case (DURATION_brevis): dur = "9"; break;
+        case (DURATION_semibrevis): dur = "1"; break;
+        case (DURATION_minima): dur = "2"; break;
+        case (DURATION_semiminima): dur = "4"; break;
+        case (DURATION_fusa): dur = "8"; break;
+        case (DURATION_semifusa): dur = "6"; break;
+        default: LogWarning("Unsupported duration"); dur = "4";
+    }
+
+    if (ndots > 0) {
+        dur += std::string(ndots, '.');
+    }
+
+    return dur;
+}
+
 void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
@@ -550,30 +582,7 @@ void PAEOutput::WriteDur(DurationInterface *interface)
     if ((interface->GetDur() != m_currentDur) || (ndots != m_currentDots)) {
         m_currentDur = interface->GetDur();
         m_currentDots = ndots;
-        std::string dur;
-        switch (m_currentDur) {
-            case (DURATION_long): dur = "0"; break;
-            case (DURATION_breve): dur = "9"; break;
-            case (DURATION_1): dur = "1"; break;
-            case (DURATION_2): dur = "2"; break;
-            case (DURATION_4): dur = "4"; break;
-            case (DURATION_8): dur = "8"; break;
-            case (DURATION_16): dur = "6"; break;
-            case (DURATION_32): dur = "3"; break;
-            case (DURATION_64): dur = "5"; break;
-            case (DURATION_128): dur = "7"; break;
-            case (DURATION_maxima): dur = "0"; break;
-            case (DURATION_longa): dur = "0"; break;
-            case (DURATION_brevis): dur = "9"; break;
-            case (DURATION_semibrevis): dur = "1"; break;
-            case (DURATION_minima): dur = "2"; break;
-            case (DURATION_semiminima): dur = "4"; break;
-            case (DURATION_fusa): dur = "8"; break;
-            case (DURATION_semifusa): dur = "6"; break;
-            default: LogWarning("Unsupported duration"); dur = "4";
-        }
-        m_streamStringOutput << dur;
-        m_streamStringOutput << std::string(m_currentDots, '.');
+        m_streamStringOutput << PAEOutput::GetPaeDur(interface->GetDur(), m_currentDots);
     }
 }
 
