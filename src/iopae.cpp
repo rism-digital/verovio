@@ -582,7 +582,7 @@ void PAEOutput::WriteDur(DurationInterface *interface)
     if ((interface->GetDur() != m_currentDur) || (ndots != m_currentDots)) {
         m_currentDur = interface->GetDur();
         m_currentDots = ndots;
-        m_streamStringOutput << GetPaeDur(interface->GetDur(), m_currentDots);
+        m_streamStringOutput << PAEOutput::GetPaeDur(interface->GetDur(), m_currentDots);
     }
 }
 
