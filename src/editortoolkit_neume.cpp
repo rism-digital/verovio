@@ -752,7 +752,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         m_editInfo.import("message", "Could not get drawing page.");
         return false;
     }
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogError("Drawing page without facsimile");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Drawing page without facsimile is unsupported.");
@@ -897,7 +897,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLry(uly + noteHeight);
 
         // add syl bounding box if Facs
-        if (m_doc->GetType() == Facs) {
+        if (!m_doc->HasFacsimile()) {
             FacsimileInterface *fi = vrv_cast<FacsimileInterface *>(syl->GetFacsimileInterface());
             assert(fi);
             sylZone = new Zone();
@@ -1271,7 +1271,7 @@ bool EditorToolkitNeume::InsertToSyllable(std::string elementId)
         m_editInfo.import("message", "Could not get drawing page.");
         return false;
     }
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogError("Drawing page without facsimile");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Drawing page without facsimile is unsupported.");
@@ -1421,7 +1421,7 @@ bool EditorToolkitNeume::MoveOutsideSyllable(std::string elementId)
         m_editInfo.import("message", "Could not get drawing page.");
         return false;
     }
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogError("Drawing page without facsimile");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Drawing page without facsimile is unsupported.");
@@ -1621,7 +1621,7 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         m_editInfo.import("message", "Could not get drawing page.");
         return false;
     }
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogError("Drawing page without facsimile");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Drawing page without facsimile is unsupported.");
@@ -1826,7 +1826,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
         success = true;
     else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
-    if (success && m_doc->GetType() != Facs) {
+    if (success && !m_doc->HasFacsimile()) {
         m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
@@ -1896,7 +1896,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
             text->SetText(str);
             syl->AddChild(text);
             syllable->AddChild(syl);
-            if (m_doc->GetType() == Facs) {
+            if (!m_doc->HasFacsimile()) {
                 // Create a default bounding box
                 Zone *zone = new Zone();
                 int ulx, uly, lrx, lry;
@@ -1990,7 +1990,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
             pi->AdjustPitchByOffset(shift);
         }
     }
-    if (success && m_doc->GetType() != Facs) {
+    if (success && !m_doc->HasFacsimile()) {
         m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
@@ -2165,7 +2165,7 @@ void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
             linkedSyllable->AddChild(syl);
 
             // Create default bounding box if facs
-            if (m_doc->GetType() == Facs) {
+            if (!m_doc->HasFacsimile()) {
                 Zone *zone = new Zone();
 
                 zone->SetUlx(
@@ -2335,7 +2335,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         m_editInfo.import("message", "Could not get the drawing page.");
         return false;
     }
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogWarning("Resizing is only available in facsimile mode.");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Resizing is only available in facsimile mode.");
@@ -2644,7 +2644,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             parent->AddChild(syl);
 
             // add a default bounding box if you need to
-            if (m_doc->GetType() == Facs) {
+            if (!m_doc->HasFacsimile()) {
                 Zone *zone = new Zone();
 
                 zone->SetUlx(parent->GetFirst(NEUME)->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
@@ -2702,7 +2702,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (syl != NULL && m_doc->GetType() == Facs) {
+                if (syl != NULL && !m_doc->HasFacsimile()) {
                     Zone *zone = dynamic_cast<Zone *>(syl->GetFacsimileInterface()->GetZone());
 
                     if (fullSyl == NULL) {
@@ -2736,7 +2736,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             fullText->SetText(fullString);
             parent->AddChild(fullSyl);
 
-            if (m_doc->GetType() == Facs) {
+            if (!m_doc->HasFacsimile()) {
                 Zone *zone = dynamic_cast<Zone *>(fullSyl->GetFacsimileInterface()->GetZone());
                 zone->SetUlx(ulx);
                 zone->SetUly(uly);
@@ -3027,7 +3027,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 newParent->AddChild(syl);
 
                 // Create default bounding box if facs
-                if (m_doc->GetType() == Facs) {
+                if (!m_doc->HasFacsimile()) {
                     Zone *zone = new Zone();
 
                     zone->SetUlx(el->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
@@ -3364,7 +3364,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     //     m_editInfo.import("message", "isLigature value '" + isLigature + "' is invalid.");
     //     return false;
     // }
-    if (success1 && success2 && m_doc->GetType() != Facs) {
+    if (success1 && success2 && !m_doc->HasFacsimile()) {
         m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
@@ -3389,7 +3389,7 @@ bool EditorToolkitNeume::ChangeStaff(std::string elementId)
         return false;
     }
 
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogWarning("Staff re-association is only available in facsimile mode.");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Staff re-association is only available in facsimile mode.");
@@ -3594,7 +3594,7 @@ bool EditorToolkitNeume::ChangeStaffTo(std::string elementId, std::string staffI
         return false;
     }
 
-    if (m_doc->GetType() != Facs) {
+    if (!m_doc->HasFacsimile()) {
         LogWarning("Staff re-association is only available in facsimile mode.");
         m_editInfo.import("status", "FAILURE");
         m_editInfo.import("message", "Staff re-association is only available in facsimile mode.");
