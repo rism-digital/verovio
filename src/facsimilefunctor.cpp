@@ -40,7 +40,7 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ CLEF, CUSTOS, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
     assert(zone);
@@ -187,7 +187,7 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
