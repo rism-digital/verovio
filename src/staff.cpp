@@ -142,13 +142,6 @@ int Staff::GetDrawingX() const
 
 int Staff::GetDrawingY() const
 {
-    if (this->HasFacs()) {
-        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-        assert(DOC);
-        if (doc->IsFacs()) {
-            return FacsimileInterface::GetDrawingY();
-        }
-    }
 
     if (m_drawingFacsY != VRV_UNSET) return m_drawingFacsY;
 

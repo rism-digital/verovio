@@ -396,14 +396,6 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
-    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingX
-    if (this->HasFacs()) {
-        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-        assert(doc);
-        if (doc->IsFacs()) {
-            return FacsimileInterface::GetDrawingX();
-        }
-    }
 
     // Since m_drawingFacsX is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
     if (m_drawingFacsX != VRV_UNSET) return m_drawingFacsX + this->GetDrawingXRel();
@@ -444,14 +436,6 @@ int LayerElement::GetDrawingX() const
 
 int LayerElement::GetDrawingY() const
 {
-    // If this element has a facsimile and we are in facsimile mode, use Facsimile::GetDrawingY
-    if (this->HasFacs()) {
-        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-        assert(doc);
-        if (doc->IsFacs()) {
-            return FacsimileInterface::GetDrawingY();
-        }
-    }
 
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
