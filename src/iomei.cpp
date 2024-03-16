@@ -2313,7 +2313,7 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
-    if (element->m_drawingFacsX != VRV_UNSET) {
+    if (element->m_drawingFacsX != VRV_UNSET && !(m_doc->IsTranscription() && m_doc->HasFacsimile())) {
         element->SetCoordX1(element->m_drawingFacsX / DEFINITION_FACTOR);
         element->WriteCoordX1(currentNode);
     }
