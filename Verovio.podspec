@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '14.0'
   s.osx.deployment_target = '10.15'
   s.pod_target_xcconfig = {
-      "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+      "CLANG_CXX_LANGUAGE_STANDARD" => "c++20",
       "CLANG_CXX_LIBRARY" => "libc++",
       "GCC_C_LANGUAGE_STANDARD" => "gnu11",
       "GCC_DYNAMIC_NO_PIC" => "NO",
