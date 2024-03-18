@@ -659,14 +659,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     int x, y;
-    if (m_doc->IsFacs() && clef->HasFacs()) {
-        y = ToLogicalY(staff->GetDrawingY());
-        x = clef->GetDrawingX();
-    }
-    else {
-        y = staff->GetDrawingY();
-        x = element->GetDrawingX();
-    }
+    y = staff->GetDrawingY();
+    x = element->GetDrawingX();
 
     char32_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
 
@@ -677,12 +671,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (clef->HasLine()) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
-        if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-            double deg = staff->GetDrawingRotate();
-            int xDiff = x - staff->GetDrawingX();
-            y -= int(xDiff * tan(deg * M_PI / 180.0));
-        }
-        else if (staff->HasDrawingRotation()) {
+        if (staff->HasDrawingRotation()) {
             y -= staff->GetDrawingRotationOffsetFor(x);
         }
     }
@@ -705,7 +694,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
-    if (m_doc->IsFacs() && element->HasFacs()) {
+    if (m_doc->IsTranscription() && element->HasFacs()) {
         const int noteHeight
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
