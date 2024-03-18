@@ -437,9 +437,6 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     DivLine *divLine = dynamic_cast<DivLine *>(element);
     assert(divLine);
 
-    // int x = divLine->GetDrawingX();
-    // int y = divLine->GetDrawingY();
-
     dc->StartGraphic(element, "", element->GetID());
 
     int sym = 0;
@@ -455,29 +452,14 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
 
     int x, y;
-    if (m_doc->IsFacs() && (divLine->HasFacs())) {
-        x = divLine->GetDrawingX();
-        y = ToLogicalY(staff->GetDrawingY());
-    }
-    else {
-        x = element->GetDrawingX();
-        y = element->GetDrawingY();
-        y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    x = divLine->GetDrawingX();
+    y = staff->GetDrawingY();
 
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
 
-    int rotationOffset = 0;
-    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-        double deg = staff->GetDrawingRotate();
-        int xDiff = x - staff->GetDrawingX();
-        rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
+    if (staff->HasDrawingRotation()) {
+        y -= staff->GetDrawingRotationOffsetFor(x);
     }
-    else if (staff->HasDrawingRotation()) {
-        rotationOffset = staff->GetDrawingRotationOffsetFor(x);
-    }
-
-    y -= rotationOffset;
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
