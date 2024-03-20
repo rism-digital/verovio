@@ -3834,8 +3834,9 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
 void MusicXmlInput::ReadMusicXmlTies(
     const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum)
 {
-    pugi::xpath_node ties = node.select_node("notations[tied]");
-    for (pugi::xml_node xmlTie : ties.node().children("tied")) {
+    pugi::xpath_node_set xmlTies = node.select_nodes("notations/tied");
+    for (pugi::xpath_node_set::const_iterator it = xmlTies.begin(); it != xmlTies.end(); ++it) {
+        pugi::xml_node xmlTie = (*it).node();
         std::string tieType = xmlTie.attribute("type").as_string();
 
         if (tieType.empty()) {
