@@ -1135,6 +1135,10 @@ Options::Options()
     m_scaleToPageSize.Init(false);
     this->Register(&m_scaleToPageSize, "scaleToPageSize", &m_general);
 
+    m_setLocale.SetInfo("Set the global locale", "Changes the global locale to C (this is not thread-safe)");
+    m_setLocale.Init(false);
+    this->Register(&m_setLocale, "setLocale", &m_general);
+
     m_showRuntime.SetInfo("Show runtime on CLI", "Display the total runtime on command-line");
     m_showRuntime.Init(false);
     this->Register(&m_showRuntime, "showRuntime", &m_general);

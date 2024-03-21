@@ -652,6 +652,7 @@ public:
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_scaleToPageSize;
+    OptionBool m_setLocale;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionIntMap m_smuflTextFont;
