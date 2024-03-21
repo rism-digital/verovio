@@ -790,6 +790,8 @@ private:
 
     Options *m_options;
 
+    std::locale m_previousLocale;
+
     /**
      * The C buffer string.
      */
