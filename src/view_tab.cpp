@@ -22,6 +22,7 @@
 #include "rend.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "system.h"
 #include "tabdursym.h"
@@ -103,10 +104,12 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int glyphSize = staff->GetDrawingStaffNotationSize();
     bool drawingCueSize = false;
+    int overline = 0;
+    int strike = 0;
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike);
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
@@ -132,7 +135,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
@@ -142,9 +145,48 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                 - m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
         }
+        // Center for German tablature
+        else if (staff->IsTabLuteGerman()) {
+            y -= m_doc->GetGlyphHeight(SMUFL_EC17_luteGermanAUpper, glyphSize, drawingCueSize) / 2;
+        }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
+
+        // Add overlines or strikethoughs if required
+        if ((overline > 0 || strike > 0) && !fret.empty()) {
+            const int lineThickness
+                = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int widthFront = m_doc->GetGlyphWidth(fret.front(), glyphSize, drawingCueSize);
+            const int widthBack = m_doc->GetGlyphWidth(fret.back(), glyphSize, drawingCueSize);
+            TextExtend extend;
+            dc->GetSmuflTextExtent(fret, &extend);
+
+            const int x1 = x - widthFront / 2;
+            const int x2 = x + extend.m_width - widthBack * 3 / 10; // trim right hand overhang on last character
+
+            dc->SetPen(m_currentColor, lineThickness, AxSOLID);
+            dc->SetBrush(m_currentColor, AxSOLID);
+
+            // overlines
+            int y1 = y + extend.m_ascent + lineThickness;
+
+            for (int i = 0; i < overline; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 += 2 * lineThickness;
+            }
+
+            // strikethroughs
+            y1 = y + extend.m_ascent / 2 - (strike - 1) * lineThickness;
+
+            for (int i = 0; i < strike; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 += 2 * lineThickness;
+            }
+
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
         dc->ResetFont();
     }
 
@@ -167,18 +209,24 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(tabDurSym, "", tabDurSym->GetID());
 
+    if (tabDurSym->HasLoc()) {
+        const int yRel = ((staff->m_drawingLines - 1) * 2 - tabDurSym->GetLoc())
+            * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
+    }
+
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
+
     const int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
 
     // For beam and guitar notation, stem are drawn through the child Stem
     if (!tabGrp->IsInBeam() && !staff->IsTabGuitar()) {
         int symc = 0;
         switch (drawingDur) {
-                // TODO SMUFL_EBA6_luteDurationDoubleWhole is defined by SMUFL but not yet implemented in Verovio
-                /* case DUR_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag */
+            case DUR_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag
             case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break; // 0 flags
             case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break; // 1 flag
             case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break; // 2 flags

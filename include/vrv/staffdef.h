@@ -32,7 +32,8 @@ class StaffDef : public ScoreDefElement,
                  public AttStaffDefLog,
                  public AttStaffDefVis,
                  public AttTimeBase,
-                 public AttTransposition {
+                 public AttTransposition,
+                 public AttVerticalAlign {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

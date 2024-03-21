@@ -1816,6 +1816,7 @@ void MEIOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteStaffDefVis(currentNode);
     staffDef->WriteTimeBase(currentNode);
     staffDef->WriteTransposition(currentNode);
+    staffDef->WriteVerticalAlign(currentNode);
 }
 
 void MEIOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
@@ -2720,6 +2721,7 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     assert(note);
 
     this->WriteLayerElement(currentNode, note);
+    this->WriteAltSymInterface(currentNode, note);
     this->WriteDurationInterface(currentNode, note);
     this->WritePitchInterface(currentNode, note);
     this->WritePositionInterface(currentNode, note);
@@ -2793,6 +2795,7 @@ void MEIOutput::WriteTabDurSym(pugi::xml_node currentNode, TabDurSym *tabDurSym)
 
     this->WriteLayerElement(currentNode, tabDurSym);
     tabDurSym->WriteNNumberLike(currentNode);
+    tabDurSym->WriteStaffLoc(currentNode);
 }
 
 void MEIOutput::WriteTabGrp(pugi::xml_node currentNode, TabGrp *tabGrp)
@@ -5121,6 +5124,7 @@ bool MEIInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadStaffDefVis(staffDef);
     vrvStaffDef->ReadTimeBase(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
+    vrvStaffDef->ReadVerticalAlign(staffDef);
 
     if (!vrvStaffDef->HasN()) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");
@@ -6839,6 +6843,7 @@ bool MEIInput::ReadNote(Object *parent, pugi::xml_node note)
         }
     }
 
+    this->ReadAltSymInterface(note, vrvNote);
     this->ReadDurationInterface(note, vrvNote);
     this->ReadPitchInterface(note, vrvNote);
     this->ReadPositionInterface(note, vrvNote);
@@ -6994,6 +6999,7 @@ bool MEIInput::ReadTabDurSym(Object *parent, pugi::xml_node tabRhyhtm)
     this->ReadLayerElement(tabRhyhtm, vrvTabDurSym);
 
     vrvTabDurSym->ReadNNumberLike(tabRhyhtm);
+    vrvTabDurSym->ReadStaffLoc(tabRhyhtm);
 
     parent->AddChild(vrvTabDurSym);
     this->ReadUnsupportedAttr(tabRhyhtm, vrvTabDurSym);
@@ -7130,6 +7136,9 @@ bool MEIInput::ReadSymbolDefChildren(Object *parent, pugi::xml_node parentNode, 
         }
         else if (elementName == "svg") {
             success = this->ReadSvg(parent, xmlElement);
+        }
+        else if (elementName == "symbol") {
+            success = this->ReadSymbol(parent, xmlElement);
         }
         // xml comment
         else if (elementName == "") {
