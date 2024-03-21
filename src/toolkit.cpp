@@ -69,6 +69,9 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
+    // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+    m_previousLocale = std::locale::global(std::locale::classic());
+
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.InitFonts();
@@ -85,6 +88,8 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
+    std::locale::global(m_previousLocale);
+
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;

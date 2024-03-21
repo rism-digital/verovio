@@ -211,14 +211,12 @@ void EnableLogToBuffer(bool value)
 
 std::string StringFormat(const char *fmt, ...)
 {
-    std::locale previousLocale = std::locale::global(std::locale("C"));
     std::string str(STRING_FORMAT_MAX_LEN, 0);
     va_list args;
     va_start(args, fmt);
     vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, fmt, args);
     va_end(args);
     str.resize(strlen(str.data()));
-    std::locale::global(previousLocale);
     return str;
 }
 
