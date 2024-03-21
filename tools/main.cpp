@@ -259,6 +259,8 @@ int main(int argc, char **argv)
     }
     options->Sync();
 
+    toolkit.SetLocale();
+
     if (show_version) {
         display_version();
         exit(0);

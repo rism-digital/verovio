@@ -733,6 +733,14 @@ public:
     int GetOutputTo() { return m_outputTo; }
 
     /**
+     * Setting the global locale.
+     */
+    ///@{
+    void SetLocale();
+    void ResetLocale();
+    ///@}
+
+    /**
      * Measuring runtime.
      *
      * @ingroup nodoc
