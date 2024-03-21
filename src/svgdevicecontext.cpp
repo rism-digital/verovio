@@ -496,8 +496,8 @@ void SvgDeviceContext::StartPage()
             = StringFormat("0 0 %d %d", this->GetWidth(), this->GetHeight()).c_str();
     }
     else {
-        m_currentNode.append_attribute("viewBox") = StringFormat(
-            "0 0 %d %d", this->GetWidth() * DEFINITION_FACTOR, this->GetContentHeight() * DEFINITION_FACTOR)
+        m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
+            int(this->GetWidth() * this->GetViewBoxFactor()), int(this->GetContentHeight() * this->GetViewBoxFactor()))
                                                         .c_str();
     }
 

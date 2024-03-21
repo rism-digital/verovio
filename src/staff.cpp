@@ -75,6 +75,7 @@ void Staff::Reset()
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
     m_drawingTuning = NULL;
+    m_drawingRotation = 0.0;
 
     ClearLedgerLines();
 }
@@ -90,6 +91,13 @@ void Staff::CloneReset()
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
     m_drawingTuning = NULL;
+    m_drawingRotation = 0.0;
+}
+
+int Staff::GetDrawingRotationOffsetFor(int x)
+{
+    int xDiff = x - this->GetDrawingX();
+    return int(xDiff * tan(this->GetDrawingRotation() * M_PI / 180.0));
 }
 
 void Staff::ClearLedgerLines()

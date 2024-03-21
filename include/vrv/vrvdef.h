@@ -662,6 +662,14 @@ enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
 enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
 
 //----------------------------------------------------------------------------
+// Measure type
+//----------------------------------------------------------------------------
+
+enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+#define NEUME_LINE_TYPE "neon-neume-line"
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 

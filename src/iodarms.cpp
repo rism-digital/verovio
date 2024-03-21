@@ -473,7 +473,7 @@ bool DarmsInput::Import(const std::string &data_str)
     score->AddChild(section);
 
     m_staff = new Staff(1);
-    m_measure = new Measure(true, 1);
+    m_measure = new Measure(MEASURED, 1);
     m_layer = new Layer();
     m_layer->SetN(1);
 

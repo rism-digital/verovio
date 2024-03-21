@@ -58,6 +58,13 @@ public:
     Zone *GetZone() { return m_zone; }
     const Zone *GetZone() const { return m_zone; }
     ///@}
+    ///
+
+    /** Get the surface */
+    ///@{
+    Surface *GetSurface() { return m_surface; }
+    const Surface *GetSurface() const { return m_surface; }
+    ///@}
 
     //-----------------//
     // Pseudo functors //

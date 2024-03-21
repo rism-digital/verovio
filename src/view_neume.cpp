@@ -228,14 +228,14 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
     }
     int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
-    int rotateOffset;
+    int rotationOffset = 0;
     if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = noteX - staff->GetDrawingX();
-        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+        rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
     }
-    else {
-        rotateOffset = 0;
+    else if (staff->HasDrawingRotation()) {
+        rotationOffset = staff->GetDrawingRotationOffsetFor(noteX);
     }
 
     if (nc->HasLoc()) {
@@ -248,7 +248,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         else if (clef->GetShape() == CLEFSHAPE_F) {
             pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
         }
-        yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
+        yValue = clefYPosition + pitchOffset + octaveOffset - rotationOffset;
     }
 
     for (auto it = params.begin(); it != params.end(); it++) {
@@ -392,17 +392,17 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     y -= (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) * 3;
 
-    int rotateOffset;
+    int rotationOffset = 0;
     if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
-        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
+        rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
     }
-    else {
-        rotateOffset = 0;
+    else if (staff->HasDrawingRotation()) {
+        rotationOffset = staff->GetDrawingRotationOffsetFor(x);
     }
 
-    y -= rotateOffset;
+    y -= rotationOffset;
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 

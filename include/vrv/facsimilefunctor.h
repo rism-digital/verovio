@@ -42,7 +42,7 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
@@ -51,6 +51,7 @@ public:
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitPageEnd(Page *page) override;
     FunctorCode VisitPb(Pb *pb) override;
     FunctorCode VisitSb(Sb *sb) override;
     FunctorCode VisitStaff(Staff *staff) override;
@@ -71,6 +72,9 @@ private:
     //
     Page *m_currentPage;
     System *m_currentSystem;
+    Measure *m_currentNeumeLine;
+    /** map to store the zone corresponding to a staff */
+    std::map<Staff *, Zone *> m_staffZones;
 };
 
 //----------------------------------------------------------------------------
