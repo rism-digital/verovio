@@ -1050,6 +1050,11 @@ Options::Options()
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
+    m_maxThreads.SetInfo(
+        "Maximal number of threads", "The maximal number of threads (values above 1 activate parallelization)");
+    m_maxThreads.Init(1, 1, 256);
+    this->Register(&m_maxThreads, "maxThreads", &m_general);
+
     m_minLastJustification.SetInfo("Minimum last-system-justification width",
         "The last system is only justified if the unjustified width is greater than this percent");
     m_minLastJustification.Init(0.8, 0.0, 1.0);

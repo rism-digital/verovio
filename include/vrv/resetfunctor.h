@@ -110,6 +110,17 @@ public:
     bool ImplementsEndInterface() const override { return false; }
 
     /*
+     * Enable parallelization
+     */
+    ///@{
+    ProcessingStrategy GetProcessingStrategy() const override { return ProcessingStrategy::MeasureParallel; }
+    ResetHorizontalAlignmentFunctor *CloneFunctor() const override
+    {
+        return new ResetHorizontalAlignmentFunctor(*this);
+    }
+    ///@}
+
+    /*
      * Functor interface
      */
     ///@{
@@ -166,6 +177,14 @@ public:
      * Abstract base implementation
      */
     bool ImplementsEndInterface() const override { return false; }
+
+    /*
+     * Enable parallelization
+     */
+    ///@{
+    ProcessingStrategy GetProcessingStrategy() const override { return ProcessingStrategy::MeasureParallel; }
+    ResetVerticalAlignmentFunctor *CloneFunctor() const override { return new ResetVerticalAlignmentFunctor(*this); }
+    ///@}
 
     /*
      * Functor interface
