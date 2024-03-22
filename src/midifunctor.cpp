@@ -612,6 +612,8 @@ FunctorCode GenerateMIDIFunctor::VisitNote(const Note *note)
         return FUNCTOR_SIBLINGS;
     }
 
+    m_currentNoteLyrics.clear();
+
     const int channel = m_midiChannel;
     int velocity = MIDI_VELOCITY;
     if (note->HasVel()) velocity = note->GetVel();
@@ -799,9 +801,15 @@ FunctorCode GenerateMIDIFunctor::VisitStaffDef(const StaffDef *staffDef)
 FunctorCode GenerateMIDIFunctor::VisitSyl(const Syl *syl)
 {
     const double startTime = m_totalTime + m_lastNote->GetScoreTimeOnset();
-    const std::string sylText = UTF32to8(syl->GetText());
 
-    m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), sylText);
+    m_currentNoteLyrics.append(!m_currentNoteLyrics.empty(), ' ');
+    m_currentNoteLyrics.append(UTF32to8(syl->GetText()));
+
+    const Object *parent = syl->GetParent();
+    assert(parent);
+    if (parent->GetNext(syl, SYL) == NULL) {
+        m_midiFile->addLyric(m_midiTrack, startTime * m_midiFile->getTPQ(), m_currentNoteLyrics);
+    }
 
     return FUNCTOR_SIBLINGS;
 }
