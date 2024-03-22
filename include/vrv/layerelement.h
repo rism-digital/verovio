@@ -296,7 +296,7 @@ public:
     /**
      * Helper function to set shortening for elements with beam interface
      */
-    virtual void SetElementShortening(int shortening){};
+    virtual void SetElementShortening(int shortening) {};
 
     /**
      * Get the stem mod for the element (if any)
