@@ -357,6 +357,8 @@ private:
     bool m_accentedGraceNote;
     // Indicates whether cue notes should be included
     bool m_cueExclusion;
+    // Lyrics text from any previous syllables in the current note
+    std::string m_currentNoteLyrics;
     // Tablature held notes indexed by (course - 1)
     std::vector<MIDIHeldNote> m_heldNotes;
 };
