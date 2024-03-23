@@ -733,6 +733,14 @@ public:
     int GetOutputTo() { return m_outputTo; }
 
     /**
+     * Setting the global locale.
+     */
+    ///@{
+    void SetLocale();
+    void ResetLocale();
+    ///@}
+
+    /**
      * Measuring runtime.
      *
      * @ingroup nodoc
@@ -789,6 +797,8 @@ private:
     FileFormat m_outputTo;
 
     Options *m_options;
+
+    std::optional<std::locale> m_previousLocale;
 
     /**
      * The C buffer string.

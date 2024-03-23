@@ -85,6 +85,8 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
+    this->ResetLocale();
+
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
@@ -1136,6 +1138,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
+    this->SetLocale();
+
     // Forcing font resource to be reset if the font is given in the options
     if (json.has<jsonxx::Array>("fontAddCustom")) {
         Resources &resources = m_doc.GetResourcesForModification();
@@ -2149,6 +2153,21 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
 #else
     return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #endif
+}
+
+void Toolkit::SetLocale()
+{
+    if (m_options->m_setLocale.GetValue() && !m_previousLocale) {
+        // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+        m_previousLocale = std::locale::global(std::locale::classic());
+    }
+}
+
+void Toolkit::ResetLocale()
+{
+    if (m_previousLocale) {
+        std::locale::global(*m_previousLocale);
+    }
 }
 
 void Toolkit::InitClock()
