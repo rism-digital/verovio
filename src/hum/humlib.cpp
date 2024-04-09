@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jan 23 21:56:32 PST 2024
+// Last Modified: Thu Apr  4 23:30:44 PDT 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -24655,10 +24655,15 @@ void HumdrumFileContent::linkPhraseEndpoints(HTp phrasestart, HTp phraseend) {
 
 void HumdrumFileContent::analyzeRestPositions(void) {
 	vector<HTp> kernstarts = getKernSpineStartList();
-	for (int i=0; i<(int)kernstarts.size(); i++) {
-		assignImplicitVerticalRestPositions(kernstarts[i]);
-	}
 
+	// Now using verovio automatic rest positions, so not calcualting
+	// by default anymore.  This code can be uncommented out if explicit
+	// rest positions are needed for other purposes.
+	//for (int i=0; i<(int)kernstarts.size(); i++) {
+	//	assignImplicitVerticalRestPositions(kernstarts[i]);
+	//}
+
+	// Check for explicit positioning:
 	checkForExplicitVerticalRestPositions();
 }
 
@@ -27431,6 +27436,10 @@ bool HumdrumFileStructure::analyzeStrophes(void) {
 				break;
 			}
 			if (*current == "*Xstrophe") {
+				break;
+			}
+			if (*current == "*S-") {
+				// Alternate for *Xstrophe
 				break;
 			}
 			current->setStrophe(strophestarts[i]);
@@ -79886,6 +79895,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(homorhythm2, infile, commands[i].second, status);
 		} else if (commands[i].first == "hproof") {
 			RUNTOOL(hproof, infile, commands[i].second, status);
+		} else if (commands[i].first == "humbreak") {
+			RUNTOOL(humbreak, infile, commands[i].second, status);
 		} else if (commands[i].first == "humsheet") {
 			RUNTOOL(humsheet, infile, commands[i].second, status);
 		} else if (commands[i].first == "humtr") {
@@ -79922,6 +79933,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(recip, infile, commands[i].second, status);
 		} else if (commands[i].first == "restfill") {
 			RUNTOOL(restfill, infile, commands[i].second, status);
+		} else if (commands[i].first == "sab2gs") {
+			RUNTOOL(sab2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "scordatura") {
 			RUNTOOL(scordatura, infile, commands[i].second, status);
 		} else if (commands[i].first == "semitones") {
@@ -83659,6 +83672,233 @@ void Tool_hproof::markHarmonicTones(HTp tok, vector<int>& cts) {
 
 /////////////////////////////////
 //
+// Tool_humbreak::Tool_humbreak -- Set the recognized options for the tool.
+//
+
+Tool_humbreak::Tool_humbreak(void) {
+	define("m|measures=s", "Measures numbers to place linebreaks before");
+	define("p|page-breaks=s", "Measure numbers to place page breaks before");
+	define("g|group=s:original", "Line/page break group");
+	define("r|remove|remove-breaks=b", "Remove line/page breaks");
+	define("l|page-to-line-breaks=b", "Convert page breaks to line breaks");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_humbreak::run -- Do the main work of the tool.
+//
+
+bool Tool_humbreak::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_humbreak::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humbreak::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_humbreak::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humbreak::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_humbreak::initialize(void) {
+	string systemMeasures = getString("measures");
+	string pageMeasures = getString("page-breaks");
+	m_group = getString("group");
+	m_removeQ = getBoolean("remove-breaks");
+	m_page2lineQ = getBoolean("page-to-line-breaks");
+
+	vector<string> lbs;
+	vector<string> pbs;
+	HumRegex hre;
+	hre.split(lbs, systemMeasures, "[^\\d]+");
+	hre.split(pbs, pageMeasures, "[^\\d]+");
+
+	for (int i=0; i<(int)lbs.size(); i++) {
+		int number = std::stoi(lbs[i]);
+		m_lineMeasures[number] = 1;
+	}
+
+	for (int i=0; i<(int)pbs.size(); i++) {
+		int number = std::stoi(lbs[i]);
+		m_pageMeasures[number] = 1;
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_humbreak::addBreaks --
+//
+
+void Tool_humbreak::addBreaks(HumdrumFile& infile) {
+
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+
+		if ((i<infile.getLineCount()-1) && (infile.token(i, 0)->compare(0, 8, "!!LO:PB:") == 0)) {
+			// Add group to existing LO:PB:
+			HTp token = infile.token(i, 0);
+			HTp barToken = infile.token(i+1, 0);
+			if (barToken->isBarline()) {
+				int measure = infile[i+1].getBarNumber();
+				int pbStatus = m_pageMeasures[measure];
+				if (pbStatus) {
+					string query = "\\b" + m_group + "\\b";
+					if (!hre.match(token, query)) {
+						m_humdrum_text << token << ", " << m_group << endl;
+					} else {
+						m_humdrum_text << token << endl;
+					}
+				} else {
+					m_humdrum_text << token << endl;
+				}
+				m_humdrum_text << infile[i+1] << endl;
+				i++;
+				continue;
+			}
+		}
+
+		if ((i<infile.getLineCount()-1) && (infile.token(i, 0)->compare(0, 8, "!!LO:LB:") == 0)) {
+			// Add group to existing LO:LB:
+			HTp token = infile.token(i, 0);
+			HTp barToken = infile.token(i+1, 0);
+			if (barToken->isBarline()) {
+				int measure = infile[i+1].getBarNumber();
+				int lbStatus = m_lineMeasures[measure];
+				if (lbStatus) {
+					string query = "\\b" + m_group + "\\b";
+					if (!hre.match(token, query)) {
+						m_humdrum_text << token << ", " << m_group << endl;
+					} else {
+						m_humdrum_text << token << endl;
+					}
+				} else {
+					m_humdrum_text << token << endl;
+				}
+				m_humdrum_text << infile[i+1] << endl;
+				i++;
+				continue;
+			}
+		}
+
+		if (!infile[i].isBarline()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		
+		int measure = infile[i].getBarNumber();
+		int pbStatus = m_pageMeasures[measure];
+		int lbStatus = m_lineMeasures[measure];
+
+
+		if (pbStatus) {
+			m_humdrum_text << "!!LO:PB:g=" << m_group << endl;
+		} else if (lbStatus) {
+			m_humdrum_text << "!!LO:LB:g=" << m_group << endl;
+		}
+
+		m_humdrum_text << infile[i] << endl;
+	}
+}
+
+
+
+
+//////////////////////////////
+//
+// Tool_humbreak::processFile --
+//
+
+void Tool_humbreak::processFile(HumdrumFile& infile) {
+	initialize();
+	if (m_removeQ) {
+		removeBreaks(infile);
+	} else if (m_page2lineQ) {
+		convertPageToLine(infile);
+	} else {
+		addBreaks(infile);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humbreak::removeBreaks --
+//
+
+void Tool_humbreak::removeBreaks(HumdrumFile& infile) {
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].token(0)->compare(0, 7, "!!LO:LB") == 0) {
+			continue;
+		}
+		if (infile[i].token(0)->compare(0, 7, "!!LO:PB") == 0) {
+			continue;
+		}
+		m_humdrum_text << infile[i] << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_humbreak::convertPageToLine --
+//
+
+void Tool_humbreak::convertPageToLine(HumdrumFile& infile) {
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].token(0)->compare(0, 7, "!!LO:PB") == 0) {
+			string text = *infile[i].token(0);
+			hre.replaceDestructive(text, "!!LO:LB", "!!LO:PB");
+			m_humdrum_text << text << endl;
+			continue;
+		}
+		m_humdrum_text << infile[i] << endl;
+	}
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_humdiff::Tool_humdiff -- Set the recognized options for the tool.
 //
 
@@ -85428,7 +85668,7 @@ void Tool_humtr::initialize(void) {
 	}
 
 	if (getBoolean("popc")) {
-		addFromToCombined("ſ:s ʃ:s &#383;:s ν:u ί:í α:a ť:k ᴣ:z ʓ:z̨ ʒ̇:ż ʒ́:ź Ʒ̇:Ż Ʒ́:Ź ӡ:z Ʒ:Z æ:ae");
+		addFromToCombined("ſ:s ʃ:s &#383;:s ν:u ί:í α:a ť:k ᴣ:z ʓ:z̨ ʒ̇:ż ʒ́:ź Ʒ̇:Ż Ʒ́:Ź ӡ:z Ʒ:Z Ӡ:Z æ:ae");
 	}
 }
 
@@ -111132,6 +111372,702 @@ void Tool_ruthfix::createTiedNote(HTp left, HTp right) {
 	}
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_sab2gs::Tool_sab2gs -- Set the recognized options for the tool.
+//
+
+Tool_sab2gs::Tool_sab2gs(void) {
+	define("b|below=s:<", "Marker for displaying on next staff below");
+	define("d|down=b", "Use only *down/*Xdown interpretations");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_sab2gs::run -- Do the main work of the tool.
+//
+
+bool Tool_sab2gs::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_sab2gs::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_sab2gs::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_sab2gs::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_sab2gs::initialize(void) {
+	m_belowMarker = getString("below");
+	m_downQ       = getBoolean("down");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::processFile --
+//
+
+void Tool_sab2gs::processFile(HumdrumFile& infile) {
+
+	vector<HTp> spines;
+	infile.getSpineStartList(spines);
+	vector<HTp> kernSpines;
+	for (int i=0; i<(int)spines.size(); i++) {
+		if (spines[i]->isKern()) {
+			kernSpines.push_back(spines[i]);
+		}
+	}
+	if (kernSpines.size() != 3) {
+		// Not valid for processing kern spines, so return original:
+		m_humdrum_text << infile;
+		return;
+	}
+
+	string belowMarker = hasBelowMarker(infile);
+	if (!belowMarker.empty()) {
+		m_hasBelowMarker = true;
+		m_belowMarker = belowMarker;
+	}
+
+	adjustMiddleVoice(kernSpines[1]);
+	printGrandStaff(infile, kernSpines);
+}
+
+
+
+/////////////////////////////
+//
+// Tool_sab2gs::hasBelowMarker -- Returns below marker if found; otherwise,
+//     returns empty string.
+//
+
+string Tool_sab2gs::hasBelowMarker(HumdrumFile& infile) {
+	string output;
+	HumRegex hre;
+	if (m_hasCrossStaff) {
+		// Search backwards since if there is a below marker, it will be more
+		// likely found at the bottom of the score.
+		for (int i=infile.getLineCount()-1; i<=0; i--) {
+			if (infile[i].hasSpines()) {
+				continue;
+			}
+			if (hre.search(infile.token(i, 0), "^!!!RDF\\*\\*kern\\s*:\\s*([^\\s=]+)\\s*=\\s*below\\s*$")) {
+				output = hre.getMatch(1);
+				break;
+			}
+		}
+	}
+	return output;
+}
+
+
+
+///////////////////////////////
+//
+// Tool_sab2gs::printGrandStaff --
+//
+
+void Tool_sab2gs::printGrandStaff(HumdrumFile& infile, vector<HTp>& starts) {
+	bool foundData = false;
+
+	vector<int> ktracks(starts.size());
+	for (int i=0; i<(int)starts.size(); i++) {
+		ktracks.at(i) = starts.at(i)->getTrack();
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		if (!foundData && (infile[i].isData() || infile[i].isBarline())) {
+			printSpineSplit(infile, i, ktracks);
+			foundData = true;
+		}
+		if (*infile.token(i, 0) == "*-") {
+			printSpineMerge(infile, i, ktracks);
+			foundData = false;
+			printReducedLine(infile, i, ktracks);
+			if (m_hasCrossStaff && !m_hasBelowMarker) {
+				m_humdrum_text << "!!!RDF**kern: " << m_belowMarker << " = below" << endl;
+			}
+			continue;
+		}
+		if (foundData) {
+			printSwappedLine(infile, i, ktracks);
+		} else {
+			printReducedLine(infile, i, ktracks);
+		}
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::printSpineSplit -- Split second and third spines, moving non-kern spines
+//    after the second one to the end of the line (null interpretations);
+//
+
+void Tool_sab2gs::printSpineSplit(HumdrumFile& infile, int index, vector<int>& ktracks) {
+	// First print all non-kern spines at the start of the line:
+	int nextIndex = 0;
+	int fcount = 0;
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << "*";
+		nextIndex++;
+	}
+	// Must be on the first **kern spine:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Print the first **kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << "*";
+	nextIndex++;
+	// Next print all non-kern spines after first **kern spine:
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		m_humdrum_text << "*";
+		nextIndex++;
+	}
+	// Second **kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend B on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Ignore the second kern spine as it does not exist yet in the
+	// output data.
+	nextIndex++;
+	// Then store any non-kern spines between the second and third kern spines to 
+	// append to the end of the data line later.
+	string postData;
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (!postData.empty()) {
+			postData += "\t";
+		}
+		nextIndex++;
+		postData += "*";
+	}
+	// Third kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend C on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Now print the third kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	nextIndex++;
+	m_humdrum_text << "*^";
+	// Now print the non-kern spines after the third **kern spine (or rather just
+	// all spines including any other **kern spines, although current requirement
+	// is that there are only three **kern spines.
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		// HTp token = infile.token(index, nextIndex);
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		nextIndex++;
+		m_humdrum_text << "*";
+	}
+	// Finally print any non-kern spines after the second **kern spine:
+	if (!postData.empty()) {
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << postData;
+	}
+	m_humdrum_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::printSpineMerge -- Merge second and third spines, moving non-kern spines
+//    after the second one to the end of the line (null interpretations);
+//
+
+void Tool_sab2gs::printSpineMerge(HumdrumFile& infile, int index, vector<int>& ktracks) {
+	// First print all non-kern spines at the start of the line:
+	int nextIndex = 0;
+	int fcount = 0;
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << "*";
+		nextIndex++;
+	}
+	// Must be on the first **kern spine:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Print the first **kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << "*";
+	nextIndex++;
+	// Next print all non-kern spines after first **kern spine:
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		m_humdrum_text << "*";
+		nextIndex++;
+	}
+	// Second **kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend B on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Save the second kern spine as it does not exist yet in the
+	// output data.
+	// HTp savedKernToken = infile.token(index, nextIndex);
+	nextIndex++;
+	// Then store any non-kern spines between the second and third kern spines to 
+	// append to the end of the data line later.
+	string postData;
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (!postData.empty()) {
+			postData += "\t";
+		}
+		nextIndex++;
+		postData += "*";
+	}
+	// Third kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend C on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Now print the third kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << "*v";
+	nextIndex++;
+	// Now printed the saved second **kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	m_humdrum_text << "*v";
+	fcount++;
+	// Now print the non-kern spines after the third **kern spine (or rather just
+	// all spines including any other **kern spines, although current requirement
+	// is that there are only three **kern spines.
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		// HTp token = infile.token(index, nextIndex);
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		nextIndex++;
+		m_humdrum_text << "*";
+	}
+	// Finally print any non-kern spines after the second **kern spine:
+	if (!postData.empty()) {
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << postData;
+	}
+	m_humdrum_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::printSwappedLine -- move the second **kern spine immediately after
+//    the third one, and move any non-kern spines after then end of the line.
+//
+
+void Tool_sab2gs::printSwappedLine(HumdrumFile& infile, int index, vector<int>& ktracks) {
+	// First print all non-kern spines at the start of the line:
+	int nextIndex = 0;
+	int fcount = 0;
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << token;
+		nextIndex++;
+	}
+	// Must be on the first **kern spine:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Print the first **kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << infile.token(index, nextIndex);
+	nextIndex++;
+	// Next print all non-kern spines after first **kern spine:
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		m_humdrum_text << token;
+		nextIndex++;
+	}
+	// Second **kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend B on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Save the second kern spine as it does not exist yet in the
+	// output data.
+	HTp savedKernToken = infile.token(index, nextIndex++);
+	// Then store any non-kern spines between the second and third kern spines to 
+	// append to the end of the data line later.
+	string postData;
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (!postData.empty()) {
+			postData += "\t";
+		}
+		nextIndex++;
+		postData += *token;
+	}
+	// Third kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend C on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Now print the third kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << infile.token(index, nextIndex++);
+	// Now printed the saved second **kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	m_humdrum_text << savedKernToken;
+	fcount++;
+	// Now print the non-kern spines after the third **kern spine (or rather just
+	// all spines including any other **kern spines, although current requirement
+	// is that there are only three **kern spines.
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, nextIndex);
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		nextIndex++;
+		m_humdrum_text << token;
+	}
+	// Finally print any non-kern spines after the second **kern spine:
+	if (!postData.empty()) {
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << postData;
+	}
+	m_humdrum_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::printReducedLine -- remove the contents of the second **kern
+//    spine, and move any non-kernspines after it to become after the third **kern spine
+//
+
+void Tool_sab2gs::printReducedLine(HumdrumFile& infile, int index, vector<int>& ktracks) {
+	// First print all non-kern spines at the start of the line:
+	int nextIndex = 0;
+	int fcount = 0;
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << token;
+		nextIndex++;
+	}
+	// Must be on the first **kern spine:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Print the first **kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << infile.token(index, nextIndex++);
+	// Next print all non-kern spines after first **kern spine:
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		m_humdrum_text << token;
+		nextIndex++;
+	}
+	// Second **kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend B on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Ignore the second kern spine as it does not exist yet in the
+	// output data.
+	nextIndex++;
+	// Then store any non-kern spines between the second and third kern spines to 
+	// append to the end of the data line later.
+	string postData;
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (token->isKern()) {
+			break;
+		}
+		if (!postData.empty()) {
+			postData += "\t";
+		}
+		nextIndex++;
+		postData += *token;
+	}
+	// Third kern spine must be **kern data:
+	if (!infile.token(index, nextIndex)->isKern()) {
+		cerr << "Something strange happend C on line " << index+1 << ": " << infile[index] << endl;
+		return;
+	}
+	// Now print the third kern spine:
+	if (fcount > 0) {
+		m_humdrum_text << "\t";
+	}
+	fcount++;
+	m_humdrum_text << infile.token(index, nextIndex++);
+	// Now print the non-kern spines after the third **kern spine (or rather just
+	// all spines including any other **kern spines, although current requirement
+	// is that there are only three **kern spines.
+	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, nextIndex);
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		nextIndex++;
+		m_humdrum_text << token;
+	}
+	// Finally print any non-kern spines after the second **kern spine:
+	if (!postData.empty()) {
+		if (fcount > 0) {
+			m_humdrum_text << "\t";
+		}
+		fcount++;
+		m_humdrum_text << postData;
+	}
+	m_humdrum_text << endl;
+}
+
+
+//////////////////////////////
+//
+// Tool_sab2gs::adjustMiddleVoice --
+//
+
+void Tool_sab2gs::adjustMiddleVoice(HTp spineStart) {
+	HTp current = spineStart;
+	// staff: +1 = top staff, -1 = bottom staff
+	// when on top staff, force stem down, or on bottom staff, force stem up
+	// when on bottom staff add "<" marker after pitch (or rest) to move to
+	// bottom staff.  Staff choice is selected by clef: clefG2 is for top staff
+	// and staffF4 is for bottom staff. Chords are not expected.
+	int staff = 0; 
+	string replacement = "$1" + m_belowMarker;
+	HumRegex hre;
+	while (current) {
+		if (*current == "*-") {
+			break;
+		}
+		if (!m_downQ && current->isClef()) {
+			if (current->substr(0, 7) == "*clefG2") {
+				staff = 1;
+				// suppress clef:
+				string text = "*x" + current->substr(1);
+				current->setText(text);
+			} else if (current->substr(0, 7) == "*clefF4") {
+				staff = -1;
+				// suppress clef:
+				string text = "*x" + current->substr(1);
+				current->setText(text);
+			}
+		} else if (current->isInterpretation()) {
+			if (*current == "*down") {
+				staff = -1;
+			} else if (*current == "*Xdown") {
+				staff = 1;
+			}
+		} else if ((staff != 0) && current->isData()) {
+			if (current->isNull()) {
+				// nothing to do with token
+				current = current->getNextToken();
+				continue;
+			}
+			if (staff > 0) {
+				// force stems down or add stem down to non-rest notes
+				if (hre.search(current, "[/\\\\]")) {
+					string value = hre.replaceCopy(current, "\\", "/", "g");
+					if (value != *current) {
+						current->setText(value);
+					}
+					current = current->getNextToken();
+					continue;
+				} if (current->isRest()) {
+					current = current->getNextToken();
+					continue;
+				} else {
+					string value = *current;
+					value += "\\";
+					current->setText(value);
+					current = current->getNextToken();
+					continue;
+				}
+
+			} else if (staff < 0) {
+				// force stems up or add stem up to non-rest notes
+				if (hre.search(current, "[/\\\\]")) {
+					string value = hre.replaceCopy(current, "\\", "/", "g");
+					if (value != *current) {
+						current->setText(value);
+					}
+					current = current->getNextToken();
+					continue;
+				} if (current->isRest()) {
+					// Do not at stem direction to rests
+				} else {
+					// Force stem up (assuming not a chord, although it should not matter):
+					string value = hre.replaceCopy(current, "/", "$");
+					if (value != *current) {
+						current->setText(value);
+					}
+				}
+				// Add < after pitch (and accidental and qualifiers) to display
+				// on staff below.
+				m_hasCrossStaff = true;
+				string output = hre.replaceCopy(current, replacement, "([A-Ga-gr]+[-#nXYxy]*)", "g");
+				if (output != *current) {
+					current->setText(output);
+				}
+			}
+		}
+		current = current->getNextToken();
+	}
+}
 
 
 

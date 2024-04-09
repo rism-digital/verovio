@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jan 23 21:56:32 PST 2024
+// Last Modified: Thu Apr  4 23:30:44 PDT 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -7663,6 +7663,33 @@ class Tool_hproof : public HumTool {
 
 
 
+class Tool_humbreak : public HumTool {
+	public:
+		         Tool_humbreak     (void);
+		        ~Tool_humbreak     () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void    processFile        (HumdrumFile& infile);
+		void    initialize         (void);
+		void    addBreaks          (HumdrumFile& infile);
+		void    removeBreaks       (HumdrumFile& infile);
+		void    convertPageToLine  (HumdrumFile& infile);
+
+	private:
+		std::map<int, int> m_lineMeasures;  // list of measures to add line breaks to
+		std::map<int, int> m_pageMeasures;  // list of measures to add page breaks to
+		std::string m_group = "original";
+		bool m_removeQ = false;
+		bool m_page2lineQ = false;
+
+};
+
+
 // A TimePoint records the event times in a file.  These are positions of note attacks
 // in the file.  The "index" variable keeps track of the line in the original file
 // (for the first position in index), and other positions in index keep track of the
@@ -9762,6 +9789,39 @@ class Tool_ruthfix : public HumTool {
 		void    insertCrossBarTies (HumdrumFile& infile);
 		void    insertCrossBarTies (HumdrumFile& infile, int strand);
 		void    createTiedNote     (HTp left, HTp right);
+
+};
+
+
+class Tool_sab2gs : public HumTool {
+	public:
+		         Tool_sab2gs      (void);
+		        ~Tool_sab2gs      () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void    processFile        (HumdrumFile& infile);
+		void    initialize         (void);
+
+		void    adjustMiddleVoice  (HTp spineStart);
+		void    printGrandStaff    (HumdrumFile& infile, std::vector<HTp>& starts);
+		std::string hasBelowMarker(HumdrumFile& infile);
+
+		void    printReducedLine   (HumdrumFile& infile, int index, std::vector<int>& ktracks);
+		void    printSpineMerge    (HumdrumFile& infile, int index, std::vector<int>& ktracks);
+		void    printSpineSplit    (HumdrumFile& infile, int index, std::vector<int>& ktracks);
+		void    printSwappedLine   (HumdrumFile& infile, int index, std::vector<int>& ktracks);
+
+	private:
+		bool    m_hasCrossStaff = false;   // Middle voice has notes/rests on bottom staff
+		bool    m_hasBelowMarker = false;  // Input data has RDF**kern down marker
+		string  m_belowMarker = "<";       // RDF**kern marker for staff down
+		bool    m_downQ = false;           // Used only *down/*Xdown for staff changes
+
 
 };
 
