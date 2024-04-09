@@ -112,8 +112,8 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     int noteY, noteX;
     int yValue;
-    if (nc->HasFacs() && m_doc->IsFacs()) {
-        noteY = ToLogicalY(staff->GetDrawingY());
+    if (nc->HasFacs() && m_doc->IsNeumeLines()) {
+        noteY = staff->GetDrawingY();
         noteX = nc->GetDrawingX();
     }
     else {
@@ -132,14 +132,9 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
         clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
     }
     int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
-    int rotateOffset;
-    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-        double deg = staff->GetDrawingRotate();
-        int xDiff = noteX - staff->GetDrawingX();
-        rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
-    }
-    else {
-        rotateOffset = 0;
+    int rotateOffset = 0;
+    if (staff->HasDrawingRotation()) {
+        rotateOffset = staff->GetDrawingRotationOffsetFor(noteX);
     }
 
     if (clef->GetShape() == CLEFSHAPE_C) {
