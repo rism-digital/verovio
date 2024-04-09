@@ -2233,7 +2233,7 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     staff->WriteVisibility(currentNode);
 
     // y position
-    if (staff->m_drawingFacsY != VRV_UNSET) {
+    if (staff->m_drawingFacsY != VRV_UNSET && !(m_doc->IsNeumeLines())) {
         staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
@@ -2313,7 +2313,7 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
-    if (element->m_drawingFacsX != VRV_UNSET && !(m_doc->IsTranscription() && m_doc->HasFacsimile())) {
+    if (element->m_drawingFacsX != VRV_UNSET && !(m_doc->IsNeumeLines())) {
         element->SetCoordX1(element->m_drawingFacsX / DEFINITION_FACTOR);
         element->WriteCoordX1(currentNode);
     }
