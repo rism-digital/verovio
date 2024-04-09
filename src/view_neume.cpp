@@ -205,23 +205,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     else if (nc->GetLigated() == BOOLEAN_true) {
         int pitchDifference = 0;
         bool isFirst;
-        // Check if this is the first or second part of a ligature
-        // Object *nextSibling = neume->GetChild(position + 1);
-        // if (nextSibling != NULL) {
-        //     Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
-        //     assert(nextNc);
-        //     if (nextNc->GetLigated() == BOOLEAN_true) { // first part of the ligature
-        //         isFirst = true;
-        //         pitchDifference = nextNc->PitchDifferenceTo(nc);
-        //         params.at(0).yOffset = pitchDifference;
-        //     }
-        //     else {
-        //         isFirst = false;
-        //     }
-        // }
-        // else {
-        //     isFirst = false;
-        // }
         int ligCount = neume->GetLigatureCount(position);
 
         if (ligCount % 2 == 0) {
@@ -242,14 +225,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
                 params.at(0).yOffset = pitchDifference;
             }
         }
-
-        // if (!isFirst) { // still need to get pitchDifference
-        //     Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
-        //     assert(lastnc);
-        //     pitchDifference = nc->PitchDifferenceTo(lastnc);
-        //     params.at(0).xOffset = -1;
-        //     params.at(0).yOffset = -pitchDifference;
-        // }
 
         // set the glyph
         switch (pitchDifference) {
@@ -285,13 +260,13 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
     int noteY, noteX;
     int yValue;
-    if (nc->HasFacs() && m_doc->IsFacs()) {
-        noteY = ToLogicalY(staff->GetDrawingY());
+    if (nc->HasFacs() && m_doc->IsNeumeLines()) {
+        noteY = staff->GetDrawingY();
         noteX = nc->GetDrawingX();
         params.at(0).xOffset = 0;
     }
-    else if (neume->HasFacs() && m_doc->IsFacs()) {
-        noteY = ToLogicalY(staff->GetDrawingY());
+    else if (neume->HasFacs() && m_doc->IsNeumeLines()) {
+        noteY = staff->GetDrawingY();
         noteX = neume->GetDrawingX() + position * noteWidth;
     }
     else {
@@ -310,12 +285,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
     int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
     int rotationOffset = 0;
-    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-        double deg = staff->GetDrawingRotate();
-        int xDiff = noteX - staff->GetDrawingX();
-        rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
-    }
-    else if (staff->HasDrawingRotation()) {
+    if (staff->HasDrawingRotation()) {
         rotationOffset = staff->GetDrawingRotationOffsetFor(noteX);
     }
 
@@ -337,15 +307,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
             DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
                 staff->m_drawingStaffSize, false, true);
         }
-    }
-
-    // adjust facsimile values of element based on where it is rendered if necessary
-    if (m_doc->IsFacs() && element->HasFacs()) {
-        FacsimileInterface *fi = element->GetFacsimileInterface();
-        fi->GetZone()->SetUlx(noteX);
-        fi->GetZone()->SetUly(ToDeviceContextY(yValue));
-        fi->GetZone()->SetLrx(noteX + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(yValue - noteHeight));
     }
 
     // Draw the children

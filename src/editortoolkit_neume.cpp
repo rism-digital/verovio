@@ -4174,15 +4174,12 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             }
             pi->SetOct(octave);
 
-            // Use the same pitchDifference equation for both syllables and custos
-            const int pitchDifference
-                = round((double)(staff->GetDrawingY() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine()))
-                            - fi->GetZone()->GetUly()
-                            - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx())
-                                * tan(-staff->GetDrawingRotate() * M_PI / 180.0)))
-                    / (double)(staffSize));
-
-            pi->AdjustPitchByOffset(pitchDifference);
+            const int pitchDifference = round(
+                (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                    - m_view->ToLogicalY(fi->GetZone()->GetUly()))
+                    / staffSize
+                - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset()));
+            pi->AdjustPitchByOffset(-pitchDifference);
         }
 
         return true;
