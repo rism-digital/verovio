@@ -26603,6 +26603,7 @@ std::string HumdrumInput::checkNoteForScordatura(const std::string &token)
 void HumdrumInput::addCautionaryAccidental(Accid *accid, hum::HTp token, int acount)
 {
     accid->SetFunc(accidLog_FUNC_caution);
+    accid->SetType("caution");
     switch (acount) {
         case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_ts); break;
         case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
