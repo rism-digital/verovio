@@ -738,6 +738,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
     return true;
@@ -4106,15 +4107,12 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        // Use the same pitchDifference equation for both syllables and custos
-        const int pitchDifference
-            = round((double)(staff->GetDrawingY() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine()))
-                        - fi->GetZone()->GetUly()
-                        - ((fi->GetZone()->GetUlx() - staff->GetZone()->GetUlx())
-                            * tan(-staff->GetDrawingRotate() * M_PI / 180.0)))
-                / (double)(staffSize));
-
-        pi->AdjustPitchByOffset(pitchDifference);
+        const int pitchDifference = round(
+            (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                - m_view->ToLogicalY(fi->GetZone()->GetUly()))
+                / staffSize
+            - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset()));
+        pi->AdjustPitchByOffset(-pitchDifference);
         return true;
     }
 

@@ -788,27 +788,11 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-        double deg = staff->GetDrawingRotate();
-        int xDiff = x - staff->GetDrawingX();
-        y -= int(xDiff * tan(deg * M_PI / 180.0));
-    }
-    else if (staff->HasDrawingRotation()) {
+    if (staff->HasDrawingRotation()) {
         y -= staff->GetDrawingRotationOffsetFor(x);
     }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
-
-    if (m_doc->IsFacs() && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-
-        FacsimileInterface *fi = element->GetFacsimileInterface();
-        fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(ToDeviceContextY(y));
-        fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
-    }
 
     /************ Draw children (accidentals, etc) ************/
     // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
