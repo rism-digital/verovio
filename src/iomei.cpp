@@ -1901,7 +1901,7 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
     // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET)) {
+    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET) && !m_doc->IsNeumeLines()) {
         measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
         measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
         measure->WriteCoordX1(currentNode);
