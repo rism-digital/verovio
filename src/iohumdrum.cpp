@@ -25936,6 +25936,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
+    bool brackQ = hasLayoutParameter(token, "ACC", "brack");
+    bool parenQ = hasLayoutParameter(token, "ACC", "paren");
     std::string loaccid = token->getLayoutParameter("N", "acc", subtoken);
     if (!loaccid.empty()) {
         // show the performance accidental in @accid.ges, and the
@@ -25985,7 +25987,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         else {
 
             if (editorialQ) {
-
                 accid->SetGlyphAuth("smufl");
                 switch (accidCount) {
                     case +3:
@@ -26080,6 +26081,12 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             }
         }
         if (!editorialQ) {
+            if (brackQ) {
+                accid->SetEnclose(ENCLOSURE_brack);
+            }
+            else if (parenQ) {
+                accid->SetEnclose(ENCLOSURE_paren);
+            }
             if (showInAccid) {
                 switch (accidCount) {
                     case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
