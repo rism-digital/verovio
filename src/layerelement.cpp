@@ -129,6 +129,7 @@ void LayerElement::Reset()
 
     m_drawingFacsX = VRV_UNSET;
     m_drawingYRel = 0;
+    m_drawingFacsY = VRV_UNSET;
     m_drawingXRel = 0;
     m_drawingCueSize = false;
 
@@ -436,6 +437,8 @@ int LayerElement::GetDrawingX() const
 
 int LayerElement::GetDrawingY() const
 {
+
+    if (m_drawingFacsY != VRV_UNSET) return m_drawingFacsY + this->GetDrawingYRel();
 
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 

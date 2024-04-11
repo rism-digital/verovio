@@ -45,6 +45,9 @@ FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerEleme
     Zone *zone = layerElement->GetZone();
     assert(zone);
     layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+    if (layerElement->Is({ ACCID, SYL })) {
+        layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -191,6 +194,9 @@ FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
+    if (layerElement->Is({ ACCID, SYL })) {
+        zone->SetUly(m_view.ToDeviceContextY(layerElement->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
+    }
 
     return FUNCTOR_CONTINUE;
 }

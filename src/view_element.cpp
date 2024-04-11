@@ -302,22 +302,6 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
     }
 
-    if (notationType == NOTATIONTYPE_neume) {
-        int rotationOffset = 0;
-        if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-            double deg = staff->GetDrawingRotate();
-            int xDiff = x - staff->GetDrawingX();
-            rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
-        }
-        else if (staff->HasDrawingRotation()) {
-            rotationOffset = staff->GetDrawingRotationOffsetFor(x);
-        }
-        if (accid->HasFacs() && m_doc->IsFacs()) {
-            y = ToLogicalY(y);
-        }
-        y -= rotationOffset;
-    }
-
     this->DrawSmuflString(
         dc, x, y, accidStr, HORIZONTALALIGNMENT_center, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
@@ -1754,9 +1738,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = vrv_cast<Syl *>(element);
     assert(syl);
 
-    bool isNeume = (staff->m_drawingNotationType == NOTATIONTYPE_neume);
-
-    if (!syl->GetStart() && !isNeume) {
+    if (!syl->GetStart() && !(staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
@@ -1786,7 +1768,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
-    if (m_doc->IsFacs()) {
+    if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }
