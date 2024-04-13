@@ -219,7 +219,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
     // Calculating proper y offset based on pname, clef, staff, and staff rotate
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset = 0;
 
     // The default octave = 3, but the actual octave is calculated by
     // taking into account the displacement of the clef
@@ -242,6 +241,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         yValue = noteY + (nc->GetLoc() - 2 * (staffLineNumber - 1)) * (staffSize / 2);
     }
     else {
+        int pitchOffset = 0;
         if (clef->GetShape() == CLEFSHAPE_C) {
             pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
         }
