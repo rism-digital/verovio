@@ -1743,7 +1743,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+    if (m_doc->IsFacs()) {
+        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+    }
 
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
