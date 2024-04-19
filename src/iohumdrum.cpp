@@ -856,6 +856,7 @@ bool HumdrumInput::convertHumdrum()
             m_harm = true;
         }
         else if (it->isDataType("**mxhm")) {
+            analyzeHarmInterpretations(it);
             m_harm = true;
         }
         else if (it->isDataType("**fing")) {
@@ -1188,15 +1189,23 @@ bool HumdrumInput::hasNoStaves(hum::HumdrumFile &infile)
 void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
 {
     bool aboveQ = false;
+    bool belowQ = false;
+    bool ignoreLabels = false;
     hum::HumRegex hre;
     if (hre.search(starttok->getDataType(), "^\\*\\*adata")) {
         aboveQ = true;
+    }
+    else if (hre.search(starttok->getDataType(), "^\\*\\*bdata")) {
+        belowQ = true;
+    }
+    else if (hre.search(starttok->getDataType(), "^\\*\\*mxhm")) {
+        ignoreLabels = true;
     }
     hum::HTp keydesig = NULL;
     hum::HTp verselabel = NULL;
     hum::HTp current = starttok;
     std::string initialLabel = "";
-    if (hre.search(current->getDataType(), "^\\*\\*[ab]data-(.*)")) {
+    if (!ignoreLabels && hre.search(current->getDataType(), "^\\*\\*[ab]data-(.*)")) {
         initialLabel = hre.getMatch(1);
     }
 
@@ -1209,6 +1218,14 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
             if (aboveQ) {
                 current->setValue("auto", "above", 1);
             }
+            else if (belowQ) {
+                current->setValue("auto", "below", 1);
+            }
+
+            if (ignoreLabels) {
+                continue;
+            }
+
             if (keydesig && !keydesig->empty()) {
                 std::string label = keydesig->substr(1);
                 if (!label.empty()) {
@@ -1239,13 +1256,21 @@ void HumdrumInput::analyzeHarmInterpretations(hum::HTp starttok)
         if (!current->isInterpretation()) {
             continue;
         }
+
         if (*current == "*above") {
+            belowQ = false;
             aboveQ = true;
         }
         else if (*current == "*below") {
             aboveQ = false;
+            belowQ = true;
         }
-        else if (current->isKeyDesignation()) {
+
+        if (ignoreLabels) {
+            continue;
+        }
+
+        if (current->isKeyDesignation()) {
             keydesig = current;
         }
         else if (hre.search(current, "^\\*v[bi]*:")) {
@@ -10821,12 +10846,20 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             harm->SetTstamp(tstamp.getFloat());
 
             // Place harm data above/below staff:
-            std::string place = "below";
+            std::string place;
             int aboveQ = token->getValueInt("auto", "above");
             if (aboveQ) {
                 place = "above";
             }
-            setPlaceRelStaff(harm, place, false);
+            else {
+                int belowQ = token->getValueInt("auto", "below");
+                if (belowQ) {
+                    place = "below";
+                }
+            }
+            if (place.size() > 0) {
+                setPlaceRelStaff(harm, place, false);
+            }
 
             // Add key label (for harm/rhrm/deg/degree data)
             if (isCData || isHarm || isDegree) {
@@ -10858,7 +10891,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             else if (datatype == "**rhrm") {
                 setHarmContent(harmRend, token);
             }
-            else if (datatype == "*mxhm") {
+            else if (datatype == "**mxhm") {
                 setMxHarmContent(harmRend, *token);
             }
             else if (isDegree) {
