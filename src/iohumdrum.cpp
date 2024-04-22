@@ -975,6 +975,8 @@ bool HumdrumInput::convertHumdrum()
 
     finalizeDocument(m_doc);
 
+    processMeiOptions(infile);
+
     if (m_debug) {
         cout << GetMeiString();
     }
@@ -2711,6 +2713,42 @@ void HumdrumInput::parseEmbeddedOptions(Doc *doc)
         }
         else {
             entry->second->SetValue(inputoption.second);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processMeiOptions --
+//
+// Known options:
+//
+//  !!!mei: staffDef@tempo.dist="4"
+//     Set the minimum distance to the staff to 4 diatonic steps.
+//
+
+void HumdrumInput::processMeiOptions(hum::HumdrumFile &infile)
+{
+    std::vector<std::string> meiOptions;
+    for (int i = infile.getLineCount() - 1; i >= 0; i--) {
+        if (!infile[i].isComment()) {
+            continue;
+        }
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        std::string key = infile[i].getReferenceKey();
+        if (key == "mei") {
+            std::string value = infile[i].getReferenceValue();
+            meiOptions.push_back(value);
+        }
+    }
+
+    hum::HumRegex hre;
+    for (int i = 0; i < (int)meiOptions.size(); i++) {
+        if (hre.search(meiOptions[i], "\\bscoreDef@tempo.dist=\"([\\d.+-]+)\"")) {
+            double distance = hre.getMatchDouble(1);
+            addDefaultTempoDist(distance);
         }
     }
 }

@@ -894,6 +894,7 @@ protected:
     int getStaffNumForSpine(hum::HTp token);
     bool checkIfReversedSpineOrder(std::vector<hum::HTp> &staffstarts);
     bool hasOmdText(int startline, int endline);
+    void processMeiOptions(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
