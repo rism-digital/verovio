@@ -927,6 +927,7 @@ protected:
     int getBestItem(const std::vector<HumdrumReferenceItem> &items, const std::string &requiredLanguage);
     bool isStandardHumdrumKey(const std::string &key);
     void appendText(pugi::xml_node element, std::string text);
+    void addDefaultTempoDist(double distance);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);

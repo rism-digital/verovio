@@ -969,6 +969,8 @@ bool HumdrumInput::convertHumdrum()
     promoteInstrumentAbbreviationsToGroup();
     promoteInstrumentNamesToGroup();
 
+    addDefaultTempoDist(3);
+
     processHangingTieEnds();
 
     finalizeDocument(m_doc);
@@ -985,6 +987,18 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addDefaultTempoDist -- Add scoreDef@tempo.dist.
+//
+
+void HumdrumInput::addDefaultTempoDist(double distance)
+{
+    data_MEASUREMENTSIGNED something;
+    something.SetVu(distance);
+    m_score->GetScoreDef()->SetTempoDist(something);
 }
 
 //////////////////////////////
