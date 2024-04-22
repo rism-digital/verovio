@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Apr  4 23:30:44 PDT 2024
+// Last Modified: Fri Apr 19 18:10:19 PDT 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -2397,6 +2397,8 @@ string Convert::museFiguredBassToKernFiguredBass(const string& mfb) {
 			output += 'X';
 		} else if (mfb[i] == 'f') { // flat
 			output += '-';
+		} else if (mfb[i] == 'x') { // sharp
+			output += '#';
 		} else if ((mfb[i] == '&') && (i < (int)mfb.size()-1) && (mfb[i+1] == '0')) {
 			output += ":";
 			i++;
@@ -6323,6 +6325,17 @@ GridSlice* GridMeasure::addBarlineToken(const string& tok, HumNum timestamp,
 
 //////////////////////////////
 //
+// GridMeasure::setKernBar -- set the token for the barline.
+//
+
+void GridMeasure::setKernBar(const string& kernBar) {
+	m_kernBar = kernBar;
+}
+
+
+
+//////////////////////////////
+//
 // GridMeasure::addFiguredBass --
 //
 GridSlice* GridMeasure::addFiguredBass(HTp token, HumNum timestamp, int part, int maxstaff) {
@@ -8792,7 +8805,8 @@ void GridStaff::setNullTokenLayer(int layerindex, SliceType type,
 			}
 			cerr << "Warning, replacing existing token: "
 			     << *this->at(layerindex)->getToken()
-			     << " with a null token"
+			     << " with a null token around time " 
+			     << nextdur
 			     << endl;
 		}
 	}
@@ -10870,6 +10884,12 @@ string HumGrid::createBarToken(int m, int barnum, GridMeasure* measure) {
 //
 
 void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
+return;
+
+/* Disabling for now.  Causes problems in MuseData conversion, but usually needed for MusicXML conversion
+ * to get correct measures numbers (related to pickup measures, particularly in older MusicXML files).
+ * For MuseData, the first barline in a score is not explicitly given, which is the source of the problem.
+
 	int mcount = (int)this->size();
 	barnums.resize(mcount);
 
@@ -10923,6 +10943,7 @@ void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
 			barnums[m] = counter++;
 		}
 	}
+*/
 }
 
 
@@ -36567,6 +36588,17 @@ MuseRecord& MuseData::getRecord(int lindex) {
 }
 
 
+
+//////////////////////////////
+//
+// MuseData::getRecordPointer --
+//
+
+MuseRecord* MuseData::getRecordPointer(int lindex) {
+	return m_data[lindex];
+}
+
+
 //////////////////////////////
 //
 // MuseData::getRecord -- This version with two index inputs is
@@ -36677,6 +36709,8 @@ void MuseData::doAnalyses(void) {
 	if (hasError()) { return; }
 	analyzeTies();
 	if (hasError()) { return; }
+	linkPrintSuggestions();
+	linkMusicDirections();
 }
 
 
@@ -37035,8 +37069,8 @@ void MuseData::analyzeType(void) {
 			case 'P': thing[i].setType(E_muserec_print_suggestion);   break;
 			case 'S': thing[i].setType(E_muserec_sound_directives);   break;
 			case '/': thing[i].setType(E_muserec_end);
-		   foundend = 1;
-		   break;
+			          foundend = 1;
+			          break;
 			case 'a': thing[i].setType(E_muserec_append);             break;
 			case 'b': thing[i].setType(E_muserec_backspace);          break;
 			case 'f': thing[i].setType(E_muserec_figured_harmony);    break;
@@ -37045,8 +37079,8 @@ void MuseData::analyzeType(void) {
 			case 'r': thing[i].setType(E_muserec_rest);               break;
 			case '*': thing[i].setType(E_muserec_musical_directions); break;
 			case '$': thing[i].setType(E_muserec_musical_attributes);
-						 foundattributes = 1;
-						 break;
+			          foundattributes = 1;
+			          break;
 		}
 	}
 }
@@ -38826,6 +38860,83 @@ void MuseData::assignHeaderBodyState(void) {
 }
 
 
+//////////////////////////////
+//
+// MuseData::linkPrintSuggestions -- Store print suggestions with
+//    the record that they apply to.  A print suggestion starts
+//    with the letter "P" and follows immediately after the
+//    record to which they apply (unless another print suggestion
+//    or a comment.
+//
+
+void MuseData::linkPrintSuggestions(void) {
+	// don't go all of the way to 0: stop at header:
+	vector<int> Plines;
+	for (int i=getLineCount()-1; i>=0; i--) {
+		if (!m_data[i]->isPrintSuggestion()) {
+			continue;
+		}
+		Plines.clear();
+		Plines.push_back(i);
+		i--;
+		while (i>=0 && (m_data[i]->isPrintSuggestion() || m_data[i]->isAnyComment())) {
+			if (m_data[i]->isPrintSuggestion()) {
+				cerr << "PRINT SUGGESTION: " << m_data[i] << endl;
+				Plines.push_back(i);
+			}
+			i--;
+		}
+		if (i<0) {
+			break;
+		}
+		// Store the print suggestions on the current line, which is at least
+		// a note/rest or musical direction.
+		for (int j=0; j<(int)Plines.size(); j++) {
+			m_data[i]->addPrintSuggestion(Plines[j] - i);
+		}
+		Plines.clear();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MuseData::linkMusicDirections -- Store music directions with
+//    the record that they apply to.  A music direction starts
+//    with "*" and precedes the record to which they apply (unless
+//    a print suggestion or a comment intervenes.
+//
+
+
+void MuseData::linkMusicDirections(void) {
+	vector<int> Dlines;
+	for (int i=0; i<getLineCount(); i++) {
+		if (!m_data[i]->isDirection()) {
+			continue;
+		}
+		Dlines.clear();
+		Dlines.push_back(i);
+		i++;
+		while (i<getLineCount() && !m_data[i]->isAnyNoteOrRest()) {
+			if (m_data[i]->isMusicalDirection()) {
+				Dlines.push_back(i);
+			}
+			i++;
+		}
+		if (i>=getLineCount()) {
+			break;
+		}
+		// Store the print suggestions on the current line, which is hopefully
+		// a note/rest or musical direction.
+		for (int j=0; j<(int)Dlines.size(); j++) {
+			m_data[i]->addMusicDirection(Dlines[j] - i);
+		}
+		Dlines.clear();
+	}
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -39315,58 +39426,1158 @@ ostream& operator<<(ostream& out, MuseDataSet& musedataset) {
 
 //////////////////////////////
 //
-// MuseRecord::MuseRecord --
+// MuseRecord::getAttributeMap --
 //
 
-MuseRecord::MuseRecord(void) : MuseRecordBasic() { }
-MuseRecord::MuseRecord(const string& aLine) : MuseRecordBasic(aLine) { }
-MuseRecord::MuseRecord(MuseRecord& aRecord) : MuseRecordBasic(aRecord) { }
-
-
-
-//////////////////////////////
-//
-// MuseRecord::~MuseRecord --
-//
-
-MuseRecord::~MuseRecord() {
-	// do nothing
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::operator= --
-//
-
-MuseRecord& MuseRecord::operator=(MuseRecord& aRecord) {
-	// don't copy onto self
-	if (&aRecord == this) {
-		return *this;
+void MuseRecord::getAttributeMap(map<string, string>& amap) {
+	amap.clear();
+	// Should be "3" on the next line, but "1" or "2" might catch poorly formatted data.
+	string contents = getLine().substr(2);
+	if (contents.empty()) {
+		return;
+	}
+	int i = 0;
+	string key;
+	string value;
+	int state = 0;  // 0 outside, 1 = in key, 2 = in value
+	while (i < (int)contents.size()) {
+		switch (state) {
+			case 0: // outside of key or value
+				if (!isspace(contents[i])) {
+					if (contents[i] == ':') {
+						// Strange: should not happen
+						key.clear();
+						state = 2;
+					} else {
+						state = 1;
+						key += contents[i];
+					}
+				}
+				break;
+			case 1: // in key
+				if (!isspace(contents[i])) {
+					if (contents[i] == ':') {
+						value.clear();
+						state = 2;
+					} else {
+						// Add to key, such as "C2" for second staff clef.
+						key += contents[i];
+					}
+				}
+				break;
+			case 2: // in value
+				if (key == "D") {
+					value += contents[i];
+				} else if (isspace(contents[i])) {
+					// store parameter and clear variables
+					amap[key] = value;
+					state = 0;
+					key.clear();
+					value.clear();
+				} else {
+					value += contents[i];
+				}
+				break;
+		}
+		i++;
 	}
 
-	setLine(aRecord.getLine());
-	setType(aRecord.getType());
-	m_lineindex = aRecord.m_lineindex;
-
-	m_absbeat = aRecord.m_absbeat;
-	m_lineduration = aRecord.m_lineduration;
-	m_noteduration = aRecord.m_noteduration;
-
-	m_b40pitch     = aRecord.m_b40pitch;
-	m_nexttiednote = aRecord.m_nexttiednote;
-	m_lasttiednote = aRecord.m_lasttiednote;
-
-	return *this;
+	if ((!key.empty()) && (!value.empty())) {
+		amap[key] = value;
+	}
 }
 
 
 
-//////////////////////////////////////////////////////////////////////////
+//////////////////////////////
 //
-// functions that work with note records
+// MuseRecord::getAttributes --
 //
+
+string MuseRecord::getAttributes(void) {
+	string output;
+	switch (getType()) {
+		case E_muserec_musical_attributes:
+			break;
+		default:
+			cerr << "Error: cannot use getAttributes function on line: "
+				  << getLine() << endl;
+			return "";
+	}
+
+	int ending = 0;
+	int tempcol;
+	for (int column=4; column <= getLength(); column++) {
+		if (getColumn(column) == ':') {
+			tempcol = column - 1;
+			while (tempcol > 0 && getColumn(tempcol) != ' ') {
+				tempcol--;
+			}
+			tempcol++;
+			while (tempcol <= column) {
+				output += getColumn(tempcol);
+				if (output.back() == 'D') {
+					ending = 1;
+				}
+				tempcol++;
+			}
+		}
+		if (ending) {
+			break;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::attributeQ --
+//
+
+int MuseRecord::attributeQ(const string& attribute) {
+	switch (getType()) {
+		case E_muserec_musical_attributes:
+			break;
+		default:
+			cerr << "Error: cannot use getAttributes function on line: "
+				  << getLine() << endl;
+			return 0;
+	}
+
+
+	string attributelist = getAttributes();
+
+	int output = 0;
+	int attstrlength = (int)attributelist.size();
+	int attlength = (int)attribute.size();
+
+	for (int i=0; i<attstrlength-attlength+1; i++) {
+		if (attributelist[i] == attribute[0]) {
+			output = 1;
+			for (int j=0; j<attlength; j++) {
+				if (attributelist[i] != attribute[j]) {
+					output = 0;
+					break;
+				}
+			}
+			if (output == 1) {
+				break;
+			}
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getAttributeInt --
+//
+
+int MuseRecord::getAttributeInt(char attribute) {
+	switch (getType()) {
+		case E_muserec_musical_attributes:
+			break;
+		default:
+			cerr << "Error: cannot use getAttributeInt function on line: "
+				  << getLine() << endl;
+			return 0;
+	}
+
+	int output = E_unknown;
+	int ending = 0;
+	// int index = 0;
+	int tempcol;
+	int column;
+	for (column=4; column <= getLength(); column++) {
+		if (getColumn(column) == ':') {
+			tempcol = column - 1;
+			while (tempcol > 0 && getColumn(tempcol) != ' ') {
+				tempcol--;
+			}
+			tempcol++;
+			while (tempcol <= column) {
+				if (getColumn(tempcol) == attribute) {
+					ending = 2;
+				} else if (getColumn(tempcol) == 'D') {
+					ending = 1;
+				}
+				tempcol++;
+				// index++;
+			}
+		}
+		if (ending) {
+			break;
+		}
+	}
+
+	if (ending == 0 || ending == 1) {
+		return output;
+	} else {
+		string value = &getColumn(column+1);
+		if (value.empty()) {
+			output = std::stoi(value);
+			return output;
+		} else {
+			return 0;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getAttributeField -- returns true if found attribute
+//
+
+int MuseRecord::getAttributeField(string& value, const string& key) {
+	switch (getType()) {
+		case E_muserec_musical_attributes:
+			break;
+		default:
+			cerr << "Error: cannot use getAttributeInt function on line: "
+				  << getLine() << endl;
+			return 0;
+	}
+
+	int returnValue = 0;
+	int ending = 0;
+	// int index = 0;
+	int tempcol;
+	int column;
+	for (column=4; column <= getLength(); column++) {
+		if (getColumn(column) == ':') {
+			tempcol = column - 1;
+			while (tempcol > 0 && getColumn(tempcol) != ' ') {
+				tempcol--;
+			}
+			tempcol++;
+			while (tempcol <= column) {
+				if (getColumn(tempcol) == key[0]) {
+					ending = 2;
+				} else if (getColumn(tempcol) == 'D') {
+					ending = 1;
+				}
+				tempcol++;
+				// index++;
+			}
+		}
+		if (ending) {
+			break;
+		}
+	}
+
+	value.clear();
+	if (ending == 0 || ending == 1) {
+		return returnValue;
+	} else {
+		returnValue = 1;
+		column++;
+		while (getColumn(column) != ' ') {
+			value += getColumn(column++);
+		}
+		return returnValue;
+	}
+}
+
+
+
+
+//////////////////////////////
+//
+// MuseRecord::addMusicDirection -- add a delta index for associated
+//     print suggestion.
+//
+
+void MuseRecord::addMusicDirection(int deltaIndex) {
+	m_musicalDirections.push_back(deltaIndex);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getDirectionAsciiCharacters -- returns columns 25
+//    and later, but with the return string removing any trailing spaces.
+//
+
+std::string MuseRecord::getDirectionAsciiCharacters(void) {
+	if (!isDirection()) {
+		return "";
+	}
+	string& mrs = m_recordString;
+	if (mrs.size() < 25) {
+		return "";
+	}
+	string output = mrs.substr(24);
+	size_t endpos = output.find_last_not_of(" \t\r\n");
+   return (endpos != std::string::npos) ? output.substr(0, endpos + 1) : "";
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::hasMusicalDirection --
+//
+
+bool MuseRecord::hasMusicalDirection(void) {
+	if (isDirection()) {
+		return true;
+	}
+	if (!m_musicalDirections.empty()) {
+		return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getMusicalDuration -- return any associated
+//     Musical Direction record for the current record.  If there
+//     is no linked direction, then return NULL.  If the record is
+//     itself a muscial direction, return the pointer to the record.
+//     Default value for index is 0.
+//
+
+MuseRecord* MuseRecord::getMusicalDirection(int index) {
+	if (m_musicalDirections.empty()) {
+		return NULL;
+	}
+	if (index >= (int)m_musicalDirections.size()) {
+		return NULL;
+	}
+	return getDirectionRecord(m_musicalDirections.at(index));
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getDirectionRecord -- return the given direction from the store
+//    delta index for the musical direction line.  Default value index = 0.
+//
+
+MuseRecord* MuseRecord::getDirectionRecord(int deltaIndex) {
+	int index = m_lineindex + deltaIndex;
+	if (index < 0) {
+		return NULL;
+	}
+	if (!m_owner) {
+		return NULL;
+	}
+	int lineCount = m_owner->getLineCount();
+	if (index >= lineCount) {
+		return NULL;
+	}
+	return m_owner->getRecordPointer(index);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getDirectionType -- columns 17 and 18 of
+//    musical directions.  This function will remove space
+//    chaters from the columns.
+//
+// Direction Types:
+// =================
+// A = segno sign
+// E = dynamics hairpin start (qualifiers [BCDG])
+// F = dynamics hairpin start
+// G = dynamics letters (in columns 25+)
+// H = dash line start (qualifiers [BCDG])
+// J = dash line end (qualifiers [BCDG])
+// P = piano pedal start
+// Q = piano pedal end
+// R = rehearsal number or letter
+// U = shift notes up (usually by 8va)
+// V = shift notes down (usually by 8va)
+// W = stop octave shift
+// X = tie terminator
+//
+
+string MuseRecord::getDirectionType(void) {
+	if (!isDirection()) {
+		return "";
+	}
+	string value = getColumns(17, 18);
+	if (value[1] == ' ') {
+		value.resize(1);
+	}
+	if (value[0] == ' ') {
+		value.resize(0);
+	}
+	return value;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::isDynamic -- helper function for getDirectionType() == "G".
+//
+
+bool MuseRecord::isDynamic(void) {
+	string dirtype = getDirectionType();
+	if (dirtype.empty()) {
+		return false;
+	}
+	if (dirtype.at(0) == 'G') {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getDynamicText --
+//
+
+string MuseRecord::getDynamicText(void) {
+	return getDirectionAsciiCharacters();
+}
+
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getFigureCountField -- column 2.
+//
+
+string MuseRecord::getFigureCountField(void) {
+	allowFigurationOnly("getFigureCountField");
+	return extract(2, 2);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getFigurationCountString --
+//
+
+string MuseRecord::getFigureCountString(void) {
+	allowFigurationOnly("getFigureCount");
+	string output = extract(2, 2);
+	if (output[0] == ' ') {
+		output = "";
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getFigurationCount --
+//
+
+int MuseRecord::getFigureCount(void) {
+	allowFigurationOnly("getFigureCount");
+	string temp = getFigureCountString();
+	int output = (int)strtol(temp.c_str(), NULL, 36);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// getFigurePointerField -- columns 6 -- 8.
+//
+
+string MuseRecord::getFigurePointerField(void) {
+	allowFigurationOnly("getFigurePointerField");
+	return extract(6, 8);
+}
+
+
+//////////////////////////////
+//
+// figurePointerQ --
+//
+
+int MuseRecord::figurePointerQ(void) {
+	allowFigurationOnly("figurePointerQ");
+	int output = 0;
+	for (int i=6; i<=8; i++) {
+		if (getColumn(i) != ' ') {
+			output = 1;
+			break;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getFigureString --
+//
+
+string MuseRecord::getFigureString(void) {
+	string output = getFigureFields();
+	for (int i=(int)output.size()-1; i>= 0; i--) {
+		if (isspace(output[i])) {
+			output.resize((int)output.size() - 1);
+		} else {
+			break;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getFigureFields -- columns 17 -- 80
+//
+
+string MuseRecord::getFigureFields(void) {
+	allowFigurationOnly("getFigureFields");
+	return extract(17, 80);
+}
+
+
+//////////////////////////////
+//
+// MuseRecord::figureFieldsQ --
+//
+
+int MuseRecord::figureFieldsQ(void) {
+	allowFigurationOnly("figureFieldsQ");
+	int output = 0;
+	if (getLength() < 17) {
+		output = 0;
+	} else {
+		for (int i=17; i<=80; i++) {
+			if (getColumn(i) != ' ') {
+				output = 1;
+				break;
+			}
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// getFigure --
+//
+
+string MuseRecord::getFigure(int index) {
+	string output;
+	allowFigurationOnly("getFigure");
+	if (index >= getFigureCount()) {
+		return output;
+	}
+	string temp = getFigureString();
+	if (index == 0) {
+		return temp;
+	}
+	HumRegex hre;
+	vector<string> pieces;
+	hre.split(pieces, temp, " +");
+	if (index < (int)pieces.size()) {
+	output = pieces[index];
+	}
+	return output;
+}
+
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getKernBeamStyle --
+//
+
+string MuseRecord::getKernBeamStyle(void) {
+	string output;
+	string beams = getBeamField();
+	for (int i=0; i<(int)beams.size(); i++) {
+		switch (beams[i]) {
+			case '[':                 // start beam
+				output += "L";
+				break;
+			case '=':                 // continue beam
+				// do nothing
+				break;
+			case ']':                 // end beam
+				output += "J";
+				break;
+			case '/':                 // forward hook
+				output += "K";
+				break;
+			case '\\':                 // backward hook
+				output += "k";
+				break;
+			default:
+				;  // do nothing
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getKernNoteStyle --
+//     default values: beams = 0, stems = 0
+//
+
+string MuseRecord::getKernNoteStyle(int beams, int stems) {
+	string output;
+
+	if (!isAnyNote()) {
+		// not a note, so return nothing
+		return "";
+	}
+
+	// place the rhythm
+	stringstream tempdur;
+	int notetype = getGraphicNoteType();
+	if (timeModificationLeftQ()) {
+		notetype = notetype / 4 * getTimeModificationLeft();
+		if (timeModificationRightQ()) {
+			notetype = notetype * getTimeModificationRight();
+		} else {
+			notetype = notetype * 2;
+		}
+	}
+
+	// logical duration of the note
+	HumNum logicalduration = getTicks();
+	logicalduration /= getTpq();
+	string durrecip = Convert::durationToRecip(logicalduration);
+
+	// graphical duration of the note
+	string graphicrecip = getGraphicRecip();
+	HumNum graphicdur = Convert::recipToDuration(graphicrecip);
+
+	string displayrecip;
+
+	if (graphicdur != logicalduration) {
+		// switch to the logical duration and store the graphic
+		// duration.  The logical duration will be used on the
+		// main kern token, and the graphic duration will be stored
+		// as a layout parameter, such as !LO:N:vis=4. to display
+		// the note as a dotted quarter regardless of the logical
+		// duration.
+
+		// Current test file has encoding bug related to triplets, so
+		// disable graphic notation dealing with tuplets for now.
+
+		// for now just looking to see if one has a dot and the other does not
+		if ((durrecip.find(".") != string::npos) &&
+				(graphicrecip.find(".") == string::npos)) {
+			m_graphicrecip = graphicrecip;
+			displayrecip = durrecip;
+		} else if ((durrecip.find(".") == string::npos) &&
+				(graphicrecip.find(".") != string::npos)) {
+			m_graphicrecip = graphicrecip;
+			displayrecip = durrecip;
+		}
+	}
+
+	if (displayrecip.size() > 0) {
+		output = displayrecip;
+	} else {
+		tempdur << notetype;
+		output = tempdur.str();
+		// add any dots of prolongation to the output string
+		output += getStringProlongation();
+	}
+
+	// add the pitch to the output string
+	string musepitch = getPitchString();
+	string kernpitch = Convert::musePitchToKernPitch(musepitch);
+	output += kernpitch;
+
+	string logicalAccidental = getAccidentalString();
+	string notatedAccidental = getNotatedAccidentalString();
+
+	if (notatedAccidental.empty() && !logicalAccidental.empty()) {
+		// Indicate that the logical accidental should not be
+		// displayed (because of key signature or previous
+		// note in the measure that alters the accidental
+		// state of the current note).
+		output += "y";
+	} else if ((logicalAccidental == notatedAccidental) && !notatedAccidental.empty()) {
+		// Indicate that the accidental should be displayed
+		// and is not suppressed by the key signature or a
+		// previous note in the measure.
+		output += "X";
+	}
+	// There can be cases where the logical accidental
+	// is natural but the notated accidetnal is sharp (but
+	// the notated accidental means play a natural accidetnal).
+	// Deal with this later.
+
+	// if there is a notated natural sign, then add it now:
+	string temp = getNotatedAccidentalField();
+	if (temp == "n") {
+		output += "n";
+	}
+
+	// check if a grace note
+	if (getType() == 'g') {
+		output += "Q";
+	}
+
+	// if stems is true, then show stem directions
+	if (stems && stemDirectionQ()) {
+		switch (getStemDirection()) {
+			case 1:                         // 'u' = up
+				output += "/";
+				break;
+			case -1:                        // 'd' = down
+				output += "\\";
+			default:
+				; // nothing                 // ' ' = no stem (if stage 2)
+		}
+	}
+
+	// if beams is true, then show any beams
+	if (beams && beamQ()) {
+		temp = getKernBeamStyle();
+		output += temp;
+	}
+
+	if (isTied()) {
+		string tiestarts;
+		string tieends;
+		int lasttie = getLastTiedNoteLineIndex();
+		int nexttie = getNextTiedNoteLineIndex();
+		int state = 0;
+		if (lasttie >= 0) {
+			state |= 2;
+		}
+		if (nexttie >= 0) {
+			state |= 1;
+		}
+		switch (state) {
+			case 1:
+				tiestarts += "[";
+				break;
+			case 2:
+				tieends += "]";
+				break;
+			case 3:
+				tieends += "_";
+				break;
+		}
+		if (state) {
+			output = tiestarts + output + tieends;
+		}
+	}
+
+	string slurstarts;
+	string slurends;
+	getSlurInfo(slurstarts, slurends);
+	if ((!slurstarts.empty()) || (!slurends.empty())) {
+		output = slurstarts + output + slurends;
+	}
+
+	return output;
+}
+
+
+//////////////////////////////
+//
+// MuseRecord::getKernNoteAccents --
+//
+
+string MuseRecord::getKernNoteAccents(void) {
+	string output;
+	int addnotecount = getAddCount();
+	for (int i=0; i<addnotecount; i++) {
+		string tempnote = getAddItem(i);
+		switch (tempnote[0]) {
+			case 'v':   output += "v";   break; // up-bow
+			case 'n':   output += "u";   break; // down-bow
+			case 'o':   output += "j";   break; // harmonic
+			case 'O':   output += "I";   break; // open string (to generic)
+			case 'A':   output += "^";   break; // accent up
+			case 'V':   output += "^";   break; // accent down
+			case '>':   output += "^";   break; // horizontal accent
+			case '.':   output += "'";   break; // staccato
+			case '_':   output += "~";   break; // tenuto
+			case '=':   output += "~'";  break; // detached legato
+			case 'i':   output += "s";   break; // spiccato
+			case '\'':  output += ",";   break; // breath mark
+			case 'F':   output += ";";   break; // fermata up
+			case 'E':   output += ";";   break; // fermata down
+			case 'S':   output += ":";   break; // staccato
+			case 't':   output += "O";   break; // trill (to generic)
+			case 'r':   output += "S";   break; // turn
+			case 'k':   output += "O";   break; // delayed turn (to generic)
+			case 'w':   output += "O";   break; // shake (to generic)
+			case 'M':   output += "O";   break; // mordent (to generic)
+			case 'j':   output += "H";   break; // glissando (slide)
+		}
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getKernRestStyle --
+//
+
+string MuseRecord::getKernRestStyle(void) {
+
+	string output;
+	string rhythmstring;
+
+	// place the rhythm
+	stringstream tempdur;
+
+	if (!isAnyRest()) {
+		// not a rest, so return nothing
+		return "";
+	}
+
+	// logical duration of the note
+	HumNum logicalduration = getTicks();
+	logicalduration /= getTpq();
+	string durrecip = Convert::durationToRecip(logicalduration);
+
+	/*
+	int notetype;
+	if (graphicNoteTypeQ()) {
+		notetype = getGraphicNoteType();
+
+		if (timeModificationLeftQ()) {
+			notetype = notetype / 4 * getTimeModificationLeft();
+		}
+		if (timeModificationRightQ()) {
+			notetype = notetype * getTimeModificationRight() / 2;
+		}
+		tempdur << notetype;
+		output =  tempdur.str();
+
+		// add any dots of prolongation to the output string
+		output += getStringProlongation();
+	} else {   // stage 1 data:
+		HumNum dnotetype(getTickDuration(), quarter);
+		rhythmstring = Convert::durationToRecip(dnotetype);
+		output += rhythmstring;
+	}
+	*/
+
+	output = durrecip;
+
+	// add the pitch to the output string
+	output += "r";
+
+	if (isInvisibleRest()) {
+		output += "yy";
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getKernMeasure -- Return the **kern measure token
+//     for barline.
+//
+
+string MuseRecord::getKernMeasure(void) {
+	if (!isBarline()) {
+		return "";
+	}
+	string measureStyle = getMeasureType();
+	string measureFlag  = getMeasureFlags();
+
+	string output = "=";
+	if ((measureStyle.find("mheavy") != string::npos) && measureFlag.empty()) {
+		output += "=";
+	}
+
+	if ((output != "==") && measureNumberQ()) {
+		output += getMeasureNumber();
+	}
+
+	if (measureStyle == "mheavy1") {
+		output += "!";
+	} else if (measureStyle == "mheavy2") {
+		if (measureFlagEqual(":||:")) {
+			output += ":|!|:";
+		} else if (measureFlagEqual("|: :|")) {
+			// Vivaldi op. 1, no. 1, mvmt. 1, m. 10: mheavy4          |: :|
+			output += ":|!|:";
+		}
+	} else if (measureStyle == "mheavy3") {
+		output += "!|";
+	} else if (measureStyle == "mheavy4") {
+		if (measureFlagEqual(":||:")) {
+			output += ":!!:";
+		} else if (measureFlagEqual(":||:")) {
+			output += ":|!|:";
+		} else if (measureFlagEqual("|: :|")) {
+			output += ":|!|:";
+		} else {
+			output += "!!";
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getKernNoteOtherNotations -- Extract note-level ornaments
+//    and articulations.  See MuseRecord::getOtherNotation() for list
+//    of "other notations".
+//
+
+string MuseRecord::getKernNoteOtherNotations(void) {
+	string output;
+	string notations = getOtherNotations();
+	for (int i=0; i<(int)notations.size(); i++) {
+		switch(notations[i]) {
+			case 'F': // fermata above
+				output += ";";
+				break;
+			case 'E': // fermata below
+				output += ";<";
+				break;
+			case '.': // staccato
+				output += "'";
+				break;
+			case ',': // breath mark
+				output += ",";
+				break;
+			case '=': // tenuto-staccato
+				output += "~'";
+				break;
+			case '>': // accent
+				output += "^";
+				break;
+			case 'A': // heavy accent
+				output += "^^";
+				break;
+			case 'M': // mordent
+				output += "M";
+				break;
+			case 'r': // turn
+				output += "S";
+				break;
+			case 't': // trill
+				output += "T";
+				break;
+			case 'n': // down bow
+				output += "u";
+				break;
+			case 'v': // up bow
+				output += "v";
+				break;
+			case 'Z': // sfz
+				output += "zz";
+				break;
+		}
+	}
+	return output;
+}
+
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getMeasureNumberField -- Columns 9-12 contain the measure number.
+//
+
+string MuseRecord::getMeasureNumberField(void) {
+	if (!isBarline()) {
+		return "";
+	}
+	return extract(9, 12);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getMeasureNumber -- Remove spaces from field.
+//
+
+string MuseRecord::getMeasureNumber(void) {
+	return trimSpaces(getMeasureNumberField());
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getMeasureType -- Columns 1-7.
+//
+
+string MuseRecord::getMeasureType(void) {
+	if (!isBarline()) {
+		return "";
+	}
+	return extract(1, 7);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::measureNumberQ -- Returns true if barline
+//     has a measure number.
+//
+
+bool MuseRecord::measureNumberQ(void) {
+	return (getMeasureNumber() != "");
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getMeasureFlags --  Columns 17 to 80.  This is
+//    the styling of the barline.
+//
+
+string MuseRecord::getMeasureFlags(void) {
+	if (m_recordString.size() < 17) {
+		return "";
+	} else {
+		return trimSpaces(m_recordString.substr(16));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::measureFermataQ -- returns true if there is a
+//	fermata above or below the measure
+//
+
+int MuseRecord::measureFermataQ(void) {
+	int output = 0;
+	for (int i=17; i<=80 && i<= getLength(); i++) {
+		if (getColumn(i) == 'F' || getColumn(i) == 'E') {
+			output = 1;
+			break;
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::measureFlagEqual -- Returns true if there are non-space
+//     characters in columns 17 through 80.   A more smarter way of
+//     doing this is checking the allocated length of the record, and
+//     do not search non-allocated columns for non-space characters...
+//
+
+bool MuseRecord::measureFlagEqual(const string& key) {
+	return (getMeasureFlags() == key);
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::addMeasureFlag -- add the following characters to the
+//    Flag region of the measure flag area (columns 17-80).  But only
+//    add the flag if it is not already present in the region.  If it is
+//    not present, then append it after the last non-space character
+//    in that region.  A space will be added between the last item
+//    and the newly added parameter.
+//
+
+void MuseRecord::addMeasureFlag(const string& strang) {
+	string flags = getColumns(17, 80);
+	string flag = strang;
+
+	HumRegex hre;
+	hre.replaceDestructive(flag, "\\*", "\\*", "g");
+	hre.replaceDestructive(flag, "\\|", "\\|", "g");
+	if (hre.search(flags, flag)) {
+		// flag was already found in flags, so don't do anything
+		return;
+	}
+	hre.replaceDestructive(flags, "", "\\s+$");
+	flags += " ";
+	flags += strang;
+	setColumns(flags, 17, 80);
+}
+
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getOtherNotationsString -- return columns
+//   32-42 (for notes and rests, but currently not checking if
+//   the correct record type).
+//
+
+string MuseRecord::getOtherNotations(void) {
+    if ((int)m_recordString.size() < 32) {
+        return "";
+    } else {
+        size_t lengthToExtract = std::min(size_t(12), m_recordString.size() - 31);
+        return m_recordString.substr(31, lengthToExtract);
+    }
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::hasFermata -- Return 0 if no fermata
+//    E or F in columns 32-43 of a note or rest.  Returns +1 if fermata
+//    above (E), or -1 if fermata below (F).  Check for &+ before
+//    fermata for editorial.
+//
+
+int MuseRecord::hasFermata(void) {
+	string notations = getOtherNotations();
+	for (int i=0; i<(int)notations.size(); i++) {
+		if (notations[i] == 'F') {
+			return +1;
+		}
+		if (notations[i] == 'E') {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+
 
 
 //////////////////////////////
@@ -39387,11 +40598,10 @@ string MuseRecord::getNoteField(void) {
 			break;
 		default:
 			cerr << "Error: cannot use getNoteField function on line: "
-			   << getLine() << endl;
+			     << getLine() << endl;
 	}
 	return "";
 }
-
 
 
 
@@ -40263,12 +41473,12 @@ int MuseRecord::addAdditionalNotation(char symbol) {
 	}
 
 	if (symbol == '-') {
-	  // give preferential treatment to placing only ties in
-	  // column 32
-	  if (getColumn(32) == ' ') {
-		  getColumn(32) = '-';
-		  return 32;
-	  }
+		// give preferential treatment to placing only ties in
+		// column 32
+		if (getColumn(32) == ' ') {
+			getColumn(32) = '-';
+			return 32;
+		}
 	}
 
 	if (blank < 0) {
@@ -40846,7 +42056,7 @@ int MuseRecord::prolongationQ(void) {
 //////////////////////////////
 //
 // MuseRecord::getNotatedAccidentalField -- actual notated accidental is
-//	    stored in column 19.
+//     stored in column 19.
 //
 
 string MuseRecord::getNotatedAccidentalField(void) {
@@ -41491,40 +42701,6 @@ int MuseRecord::beam256Q(void) {
 
 //////////////////////////////
 //
-// MuseRecord::getKernBeamStyle --
-//
-
-string MuseRecord::getKernBeamStyle(void) {
-	string output;
-	string beams = getBeamField();
-	for (int i=0; i<(int)beams.size(); i++) {
-		switch (beams[i]) {
-			case '[':                 // start beam
-				output += "L";
-				break;
-			case '=':                 // continue beam
-				// do nothing
-				break;
-			case ']':                 // end beam
-				output += "J";
-				break;
-			case '/':                 // forward hook
-				output += "K";
-				break;
-			case '\\':                 // backward hook
-				output += "k";
-				break;
-			default:
-				;  // do nothing
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
 // MuseRecord::getAdditionalNotationsField -- returns the contents
 // 	of columns 32-43.
 //
@@ -41900,170 +43076,6 @@ string MuseRecord::getVerseUtf8(int index) {
 
 //////////////////////////////
 //
-// MuseRecord::getKernNoteStyle --
-//	    default values: beams = 0, stems = 0
-//
-
-string MuseRecord::getKernNoteStyle(int beams, int stems) {
-	string output;
-
-	if (!isAnyNote()) {
-		// not a note, so return nothing
-		return "";
-	}
-
-	// place the rhythm
-	stringstream tempdur;
-	int notetype = getGraphicNoteType();
-	if (timeModificationLeftQ()) {
-		notetype = notetype / 4 * getTimeModificationLeft();
-		if (timeModificationRightQ()) {
-			notetype = notetype * getTimeModificationRight();
-		} else {
-			notetype = notetype * 2;
-		}
-	}
-
-	// logical duration of the note
-	HumNum logicalduration = getTicks();
-	logicalduration /= getTpq();
-	string durrecip = Convert::durationToRecip(logicalduration);
-
-	// graphical duration of the note
-	string graphicrecip = getGraphicRecip();
-	HumNum graphicdur = Convert::recipToDuration(graphicrecip);
-
-	string displayrecip;
-
-	if (graphicdur != logicalduration) {
-		// switch to the logical duration and store the graphic
-		// duration.  The logical duration will be used on the
-		// main kern token, and the graphic duration will be stored
-		// as a layout parameter, such as !LO:N:vis=4. to display
-		// the note as a dotted quarter regardless of the logical
-		// duration.
-
-		// Current test file has encoding bug related to triplets, so
-		// disable graphic notation dealing with tuplets for now.
-
-		// for now just looking to see if one has a dot and the other does not
-		if ((durrecip.find(".") != string::npos) &&
-				(graphicrecip.find(".") == string::npos)) {
-			m_graphicrecip = graphicrecip;
-			displayrecip = durrecip;
-		} else if ((durrecip.find(".") == string::npos) &&
-				(graphicrecip.find(".") != string::npos)) {
-			m_graphicrecip = graphicrecip;
-			displayrecip = durrecip;
-		}
-	}
-
-	if (displayrecip.size() > 0) {
-		output = displayrecip;
-	} else {
-		tempdur << notetype;
-		output = tempdur.str();
-		// add any dots of prolongation to the output string
-		output += getStringProlongation();
-	}
-
-	// add the pitch to the output string
-	string musepitch = getPitchString();
-	string kernpitch = Convert::musePitchToKernPitch(musepitch);
-	output += kernpitch;
-
-	string logicalAccidental = getAccidentalString();
-	string notatedAccidental = getNotatedAccidentalString();
-
-	if (notatedAccidental.empty() && !logicalAccidental.empty()) {
-		// Indicate that the logical accidental should not be
-		// displayed (because of key signature or previous
-		// note in the measure that alters the accidental
-		// state of the current note).
-		output += "y";
-	} else if ((logicalAccidental == notatedAccidental) && !notatedAccidental.empty()) {
-		// Indicate that the accidental should be displayed
-		// and is not suppressed by the key signature or a
-		// previous note in the measure.
-		output += "X";
-	}
-	// There can be cases where the logical accidental
-	// is natural but the notated accidetnal is sharp (but
-	// the notated accidental means play a natural accidetnal).
-	// Deal with this later.
-
-	// if there is a notated natural sign, then add it now:
-	string temp = getNotatedAccidentalField();
-	if (temp == "n") {
-		output += "n";
-	}
-
-	// check if a grace note
-	if (getType() == 'g') {
-		output += "Q";
-	}
-
-	// if stems is true, then show stem directions
-	if (stems && stemDirectionQ()) {
-		switch (getStemDirection()) {
-			case 1:                         // 'u' = up
-				output += "/";
-				break;
-			case -1:                        // 'd' = down
-				output += "\\";
-			default:
-				; // nothing                 // ' ' = no stem (if stage 2)
-		}
-	}
-
-	// if beams is true, then show any beams
-	if (beams && beamQ()) {
-		temp = getKernBeamStyle();
-		output += temp;
-	}
-
-	if (isTied()) {
-		string tiestarts;
-		string tieends;
-		int lasttie = getLastTiedNoteLineIndex();
-		int nexttie = getNextTiedNoteLineIndex();
-		int state = 0;
-		if (lasttie >= 0) {
-			state |= 2;
-		}
-		if (nexttie >= 0) {
-			state |= 1;
-		}
-		switch (state) {
-			case 1:
-				tiestarts += "[";
-				break;
-			case 2:
-				tieends += "]";
-				break;
-			case 3:
-				tieends += "_";
-				break;
-		}
-		if (state) {
-			output = tiestarts + output + tieends;
-		}
-	}
-
-	string slurstarts;
-	string slurends;
-	getSlurInfo(slurstarts, slurends);
-	if ((!slurstarts.empty()) || (!slurends.empty())) {
-		output = slurstarts + output + slurends;
-	}
-
-	return output;
-}
-
-
-
-//////////////////////////////
-//
 // MuseRecord::getSlurInfo --
 //
 //   ( ) = regular slur
@@ -42096,753 +43108,53 @@ void MuseRecord::getSlurInfo(string& slurstarts, string& slurends) {
 
 
 
+
 //////////////////////////////
 //
-// MuseRecord::getKernNoteAccents --
+// MuseRecord::MuseRecord --
 //
 
-string MuseRecord::getKernNoteAccents(void) {
-	string output;
-	int addnotecount = getAddCount();
-	for (int i=0; i<addnotecount; i++) {
-		string tempnote = getAddItem(i);
-		switch (tempnote[0]) {
-			case 'v':   output += "v";   break; // up-bow
-			case 'n':   output += "u";   break; // down-bow
-			case 'o':   output += "j";   break; // harmonic
-			case 'O':   output += "I";   break; // open string (to generic)
-			case 'A':   output += "^";   break; // accent up
-			case 'V':   output += "^";   break; // accent down
-			case '>':   output += "^";   break; // horizontal accent
-			case '.':   output += "'";   break; // staccato
-			case '_':   output += "~";   break; // tenuto
-			case '=':   output += "~'";  break; // detached legato
-			case 'i':   output += "s";   break; // spiccato
-			case '\'':  output += ",";   break; // breath mark
-			case 'F':   output += ";";   break; // fermata up
-			case 'E':   output += ";";   break; // fermata down
-			case 'S':   output += ":";   break; // staccato
-			case 't':   output += "O";   break; // trill (to generic)
-			case 'r':   output += "S";   break; // turn
-			case 'k':   output += "O";   break; // delayed turn (to generic)
-			case 'w':   output += "O";   break; // shake (to generic)
-			case 'M':   output += "O";   break; // mordent (to generic)
-			case 'j':   output += "H";   break; // glissando (slide)
-	  }
-	}
+MuseRecord::MuseRecord(void) : MuseRecordBasic() { }
+MuseRecord::MuseRecord(const string& aLine) : MuseRecordBasic(aLine) { }
+MuseRecord::MuseRecord(MuseRecord& aRecord) : MuseRecordBasic(aRecord) { }
 
-	return output;
+
+
+//////////////////////////////
+//
+// MuseRecord::~MuseRecord --
+//
+
+MuseRecord::~MuseRecord() {
+	// do nothing
 }
 
 
 
 //////////////////////////////
 //
-// MuseRecord::getKernRestStyle --
+// MuseRecord::operator= --
 //
 
-string MuseRecord::getKernRestStyle(void) {
-
-	string output;
-	string rhythmstring;
-
-	// place the rhythm
-	stringstream tempdur;
-
-	if (!isAnyRest()) {
-		// not a rest, so return nothing
-		return "";
+MuseRecord& MuseRecord::operator=(MuseRecord& aRecord) {
+	// don't copy onto self
+	if (&aRecord == this) {
+		return *this;
 	}
 
-	// logical duration of the note
-	HumNum logicalduration = getTicks();
-	logicalduration /= getTpq();
-	string durrecip = Convert::durationToRecip(logicalduration);
-
-	/*
-	int notetype;
-	if (graphicNoteTypeQ()) {
-		notetype = getGraphicNoteType();
-
-		if (timeModificationLeftQ()) {
-			notetype = notetype / 4 * getTimeModificationLeft();
-		}
-		if (timeModificationRightQ()) {
-			notetype = notetype * getTimeModificationRight() / 2;
-		}
-		tempdur << notetype;
-		output =  tempdur.str();
-
-		// add any dots of prolongation to the output string
-		output += getStringProlongation();
-	} else {   // stage 1 data:
-		HumNum dnotetype(getTickDuration(), quarter);
-		rhythmstring = Convert::durationToRecip(dnotetype);
-		output += rhythmstring;
-	}
-	*/
-
-	output = durrecip;
-
-	// add the pitch to the output string
-	output += "r";
-
-	if (isInvisibleRest()) {
-		output += "yy";
-	}
-
-	return output;
-}
-
-
-
-//////////////////////////////////////////////////////////////////////////
-//
-// functions that work with measure records
-//
-
-
-//////////////////////////////
-//
-// MuseRecord::getMeasureNumberField -- columns 9-12
-//
-
-string MuseRecord::getMeasureNumberField(void) {
-	allowMeasuresOnly("getMeasureNumberField");
-	return extract(9, 12);
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getMeasureTypeField -- columns 1 -- 7
-//
-
-string MuseRecord::getMeasureTypeField(void) {
-	allowMeasuresOnly("getMeasureTypeField");
-	return extract(1, 7);
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getMeasureNumberString --
-//
-
-string MuseRecord::getMeasureNumberString(void) {
-	string output = getMeasureNumberField();
-	for (int i=3; i>=0; i--) {
-		if (output[i] == ' ') {
-			output.resize(i);
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getMeasureNumber --
-//
-
-int MuseRecord::getMeasureNumber(void) {
-	string measureInfo = getMeasureNumberField();
-	if (measureInfo.empty()) {
-		return 0;
-	}
-	return std::stoi(measureInfo);
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::measureNumberQ --
-//
-
-int MuseRecord::measureNumberQ(void) {
-	string temp = getMeasureNumberString();
-	int i = 0;
-	int output = 0;
-	while (temp[i] != '\0') {
-		if (temp[i] != ' ') {
-			output = 1;
-			break;
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getMeasureFlagsString --  Columns 17 to 80.
-//
-
-string MuseRecord::getMeasureFlagsString(void) {
-	if (m_recordString.size() < 17) {
-		return "";
-	} else {
-		return trimSpaces(m_recordString.substr(16));
-	}
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::measureFermataQ -- returns true if there is a
-//	fermata above or below the measure
-//
-
-int MuseRecord::measureFermataQ(void) {
-	int output = 0;
-	for (int i=17; i<=80 && i<= getLength(); i++) {
-		if (getColumn(i) == 'F' || getColumn(i) == 'E') {
-			output = 1;
-			break;
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::measureFlagQ -- Returns true if there are non-space
-//     characters in columns 17 through 80.   A more smarter way of
-//     doing this is checking the allocated length of the record, and
-//     do not search non-allocated columns for non-space characters...
-//
-
-int MuseRecord::measureFlagQ(const string& key) {
-	int output = 0;
-	int len = (int)key.size();
-	for (int i=17; i<=80-len && i<getLength(); i++) {
-		if (getColumn(i) == key[0]) {
-			output = 1;
-			for (int j=0; j<len; j++) {
-				if (getColumn(i+j) != key[j]) {
-					output = 0;
-					break;
-				}
-			}
-			if (output == 1) {
-				break;
-			}
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::addMeasureFlag -- add the following characters to the
-//    Flag region of the measure flag area (columns 17-80).  But only
-//    add the flag if it is not already present in the region.  If it is
-//    not present, then append it after the last non-space character
-//    in that region.  A space will be added between the last item
-//    and the newly added parameter.
-//
-
-void MuseRecord::addMeasureFlag(const string& strang) {
-	string flags = getColumns(17, 80);
-	string flag = strang;
-
-	HumRegex hre;
-	hre.replaceDestructive(flag, "\\*", "\\*", "g");
-	hre.replaceDestructive(flag, "\\|", "\\|", "g");
-	if (hre.search(flags, flag)) {
-		// flag was already found in flags, so don't do anything
-		return;
-	}
-	hre.replaceDestructive(flags, "", "\\s+$");
-	flags += " ";
-	flags += strang;
-	setColumns(flags, 17, 80);
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getKernMeasureStyle --
-//
-
-string MuseRecord::getKernMeasureStyle(void) {
-	allowMeasuresOnly("getKernMeasureStyle");
-	string temp;
-	string tempstyle = getMeasureTypeField();
-
-	string output = "=";
-	if (tempstyle == "mheavy2") {
-		output += "=";
-	} else if (tempstyle == "mheavy3") {
-		output += "=";
-	} else if (tempstyle == "mheavy4") {
-		output += "=";
-	}
-
-	if (measureNumberQ()) {
-		temp = getMeasureNumberString();
-		output += temp;
-	}
-
-	// what is this for-loop for?
-	for (int i=0; i<(int)temp.size(); i++) {
-		temp[i] = std::tolower(temp[i]);
-	}
-
-	if (tempstyle == "mheavy1") {
-		output += "!";
-	} else if (tempstyle == "mheavy2") {
-		  if (measureFlagQ(":||:")) {
-			  output += ":|!:";
-			  zerase(output, 1);             // make "==" become "="
-		  } else if (measureFlagQ(":|")) {
-			  output += ":|!";
-			  zerase(output, 1);             // make "==" become "="
-		  }
-	} else if (tempstyle == "mheavy3") {
-		output += "!|";
-	} else if (tempstyle == "mheavy4") {
-		if (measureFlagQ(":||:")) {
-			output += ":!!:";
-		} else {
-			output += "!!";
-		}
-	}
-	return output;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//
-// functions that work with musical attributes records
-//
-
-//////////////////////////////
-//
-// MuseRecord::getAttributeMap --
-//
-
-void MuseRecord::getAttributeMap(map<string, string>& amap) {
-	amap.clear();
-	// Should be "3" on the next line, but "1" or "2" might catch poorly formatted data.
-	string contents = getLine().substr(2);
-	if (contents.empty()) {
-		return;
-	}
-	int i = 0;
-	string key;
-	string value;
-	int state = 0;  // 0 outside, 1 = in key, 2 = in value
-	while (i < (int)contents.size()) {
-		switch (state) {
-			case 0: // outside of key or value
-				if (!isspace(contents[i])) {
-					if (contents[i] == ':') {
-						// Strange: should not happen
-						key.clear();
-						state = 2;
-					} else {
-						state = 1;
-						key += contents[i];
-					}
-				}
-				break;
-			case 1: // in key
-				if (!isspace(contents[i])) {
-					if (contents[i] == ':') {
-						value.clear();
-						state = 2;
-					} else {
-						// Add to key, such as "C2" for second staff clef.
-						key += contents[i];
-					}
-				}
-				break;
-			case 2: // in value
-				if (key == "D") {
-					value += contents[i];
-				} else if (isspace(contents[i])) {
-					// store parameter and clear variables
-					amap[key] = value;
-					state = 0;
-					key.clear();
-					value.clear();
-				} else {
-					value += contents[i];
-				}
-				break;
-		}
-		i++;
-	}
-
-	if ((!key.empty()) && (!value.empty())) {
-		amap[key] = value;
-	}
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getAttributes --
-//
-
-string MuseRecord::getAttributes(void) {
-	string output;
-	switch (getType()) {
-		case E_muserec_musical_attributes:
-			break;
-		default:
-			cerr << "Error: cannot use getAttributes function on line: "
-				  << getLine() << endl;
-			return "";
-	}
-
-	int ending = 0;
-	int tempcol;
-	for (int column=4; column <= getLength(); column++) {
-		if (getColumn(column) == ':') {
-			tempcol = column - 1;
-			while (tempcol > 0 && getColumn(tempcol) != ' ') {
-				tempcol--;
-			}
-			tempcol++;
-			while (tempcol <= column) {
-				output += getColumn(tempcol);
-				if (output.back() == 'D') {
-					ending = 1;
-				}
-				tempcol++;
-			}
-		}
-		if (ending) {
-			break;
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::attributeQ --
-//
-
-int MuseRecord::attributeQ(const string& attribute) {
-	switch (getType()) {
-		case E_muserec_musical_attributes:
-			break;
-		default:
-			cerr << "Error: cannot use getAttributes function on line: "
-				  << getLine() << endl;
-			return 0;
-	}
-
-
-	string attributelist = getAttributes();
-
-	int output = 0;
-	int attstrlength = (int)attributelist.size();
-	int attlength = (int)attribute.size();
-
-	for (int i=0; i<attstrlength-attlength+1; i++) {
-		if (attributelist[i] == attribute[0]) {
-			output = 1;
-			for (int j=0; j<attlength; j++) {
-				if (attributelist[i] != attribute[j]) {
-					output = 0;
-					break;
-				}
-			}
-			if (output == 1) {
-				break;
-			}
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getAttributeInt --
-//
-
-int MuseRecord::getAttributeInt(char attribute) {
-	switch (getType()) {
-		case E_muserec_musical_attributes:
-			break;
-		default:
-			cerr << "Error: cannot use getAttributeInt function on line: "
-				  << getLine() << endl;
-			return 0;
-	}
-
-	int output = E_unknown;
-	int ending = 0;
-	// int index = 0;
-	int tempcol;
-	int column;
-	for (column=4; column <= getLength(); column++) {
-		if (getColumn(column) == ':') {
-			tempcol = column - 1;
-			while (tempcol > 0 && getColumn(tempcol) != ' ') {
-				tempcol--;
-			}
-			tempcol++;
-			while (tempcol <= column) {
-				if (getColumn(tempcol) == attribute) {
-					ending = 2;
-				} else if (getColumn(tempcol) == 'D') {
-					ending = 1;
-				}
-				tempcol++;
-				// index++;
-			}
-		}
-		if (ending) {
-			break;
-		}
-	}
-
-	if (ending == 0 || ending == 1) {
-		return output;
-	} else {
-		string value = &getColumn(column+1);
-		if (value.empty()) {
-			output = std::stoi(value);
-			return output;
-		} else {
-			return 0;
-		}
-	}
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getAttributeField -- returns true if found attribute
-//
-
-int MuseRecord::getAttributeField(string& value, const string& key) {
-	switch (getType()) {
-		case E_muserec_musical_attributes:
-			break;
-		default:
-			cerr << "Error: cannot use getAttributeInt function on line: "
-				  << getLine() << endl;
-			return 0;
-	}
-
-	int returnValue = 0;
-	int ending = 0;
-	// int index = 0;
-	int tempcol;
-	int column;
-	for (column=4; column <= getLength(); column++) {
-		if (getColumn(column) == ':') {
-			tempcol = column - 1;
-			while (tempcol > 0 && getColumn(tempcol) != ' ') {
-				tempcol--;
-			}
-			tempcol++;
-			while (tempcol <= column) {
-				if (getColumn(tempcol) == key[0]) {
-					ending = 2;
-				} else if (getColumn(tempcol) == 'D') {
-					ending = 1;
-				}
-				tempcol++;
-				// index++;
-			}
-		}
-		if (ending) {
-			break;
-		}
-	}
-
-	value.clear();
-	if (ending == 0 || ending == 1) {
-		return returnValue;
-	} else {
-		returnValue = 1;
-		column++;
-		while (getColumn(column) != ' ') {
-			value += getColumn(column++);
-		}
-		return returnValue;
-	}
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////
-//
-// functions that work with basso continuo figuration records (f):
-//
-
-
-//////////////////////////////
-//
-// MuseRecord::getFigureCountField -- column 2.
-//
-
-string MuseRecord::getFigureCountField(void) {
-	allowFigurationOnly("getFigureCountField");
-	return extract(2, 2);
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getFigurationCountString --
-//
-
-string MuseRecord::getFigureCountString(void) {
-	allowFigurationOnly("getFigureCount");
-	string output = extract(2, 2);
-	if (output[0] == ' ') {
-		output = "";
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getFigurationCount --
-//
-
-int MuseRecord::getFigureCount(void) {
-	allowFigurationOnly("getFigureCount");
-	string temp = getFigureCountString();
-	int output = (int)strtol(temp.c_str(), NULL, 36);
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// getFigurePointerField -- columns 6 -- 8.
-//
-
-string MuseRecord::getFigurePointerField(void) {
-	allowFigurationOnly("getFigurePointerField");
-	return extract(6, 8);
-}
-
-
-//////////////////////////////
-//
-// figurePointerQ --
-//
-
-int MuseRecord::figurePointerQ(void) {
-	allowFigurationOnly("figurePointerQ");
-	int output = 0;
-	for (int i=6; i<=8; i++) {
-		if (getColumn(i) != ' ') {
-			output = 1;
-			break;
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getFigureString --
-//
-
-string MuseRecord::getFigureString(void) {
-	string output = getFigureFields();
-	for (int i=(int)output.size()-1; i>= 0; i--) {
-		if (isspace(output[i])) {
-			output.resize((int)output.size() - 1);
-		} else {
-			break;
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecord::getFigureFields -- columns 17 -- 80
-//
-
-string MuseRecord::getFigureFields(void) {
-	allowFigurationOnly("getFigureFields");
-	return extract(17, 80);
-}
-
-
-//////////////////////////////
-//
-// MuseRecord::figureFieldsQ --
-//
-
-int MuseRecord::figureFieldsQ(void) {
-	allowFigurationOnly("figureFieldsQ");
-	int output = 0;
-	if (getLength() < 17) {
-		output = 0;
-	} else {
-		for (int i=17; i<=80; i++) {
-			if (getColumn(i) != ' ') {
-				output = 1;
-				break;
-			}
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// getFigure --
-//
-
-string MuseRecord::getFigure(int index) {
-	string output;
-	allowFigurationOnly("getFigure");
-	if (index >= getFigureCount()) {
-		return output;
-	}
-	string temp = getFigureString();
-	if (index == 0) {
-		return temp;
-	}
-	HumRegex hre;
-	vector<string> pieces;
-	hre.split(pieces, temp, " +");
-	if (index < (int)pieces.size()) {
-	output = pieces[index];
-	}
-	return output;
+	setLine(aRecord.getLine());
+	setType(aRecord.getType());
+	m_lineindex = aRecord.m_lineindex;
+
+	m_absbeat = aRecord.m_absbeat;
+	m_lineduration = aRecord.m_lineduration;
+	m_noteduration = aRecord.m_noteduration;
+
+	m_b40pitch     = aRecord.m_b40pitch;
+	m_nexttiednote = aRecord.m_nexttiednote;
+	m_lasttiednote = aRecord.m_lasttiednote;
+
+	return *this;
 }
 
 
@@ -43530,6 +43842,440 @@ void MuseRecord::getAllPrintSuggestions(vector<string>& suggestions) {
 
 
 
+//////////////////////////////
+//
+// MuseRecordBasic::isPartName --
+//
+
+bool MuseRecordBasic::isPartName(void) {
+	return m_type == E_muserec_header_part_name;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isAttributes --
+//
+
+bool MuseRecordBasic::isAttributes(void) {
+	return m_type == E_muserec_musical_attributes;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isSource --
+//
+
+bool MuseRecordBasic::isSource(void) {
+	return m_type == E_muserec_source;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isEncoder --
+//
+
+bool MuseRecordBasic::isEncoder(void) {
+	return m_type == E_muserec_encoder;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isId --
+//
+
+bool MuseRecordBasic::isId(void) {
+	return m_type == E_muserec_id;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isBarline --
+//
+
+bool MuseRecordBasic::isBarline(void) {
+	return m_type == E_muserec_measure;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isBackup --
+//
+
+bool MuseRecordBasic::isBackup(void) {
+	return m_type == E_muserec_back;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isAnyComment --
+//
+
+bool MuseRecordBasic::isAnyComment(void) {
+	return isLineComment() || isBlockComment();
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isLineComment --
+//
+
+bool MuseRecordBasic::isLineComment(void) {
+	return m_type == E_muserec_comment_line;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isBlockComment --
+//
+
+bool MuseRecordBasic::isBlockComment(void) {
+	return m_type == E_muserec_comment_toggle;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isChordNote -- Is a regular note that is a seoncdary
+//    note in a chord (not the first note in the chord).
+//
+
+bool MuseRecordBasic::isChordNote(void) {
+	return m_type == E_muserec_note_chord;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isDirection -- Is a musical direction (text)
+//     instruction.
+//
+
+bool MuseRecordBasic::isDirection(void) {
+	return m_type == E_muserec_musical_directions;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isMusicalDirection -- Is a musical direction (text)
+//     instruction.
+//
+
+bool MuseRecordBasic::isMusicalDirection(void) {
+	return isDirection();
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isGraceNote -- A grace note, either a single note or
+//     the first note in a gracenote chord.
+//
+
+bool MuseRecordBasic::isGraceNote(void) {
+	return m_type == E_muserec_note_grace;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isCueNote --
+//
+
+bool MuseRecordBasic::isCueNote(void) {
+	return m_type == E_muserec_note_cue;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isChordNote --
+//
+
+bool MuseRecordBasic::isChordGraceNote(void) {
+	return m_type == E_muserec_note_grace_chord;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isFiguredHarmony --
+//
+
+bool MuseRecordBasic::isFiguredHarmony(void) {
+	return m_type == E_muserec_figured_harmony;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isPrintSuggestion --
+//
+
+bool MuseRecordBasic::isPrintSuggestion(void) {
+	switch (m_type) {
+		case E_muserec_print_suggestion:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isRegularNote --
+//
+
+bool MuseRecordBasic::isRegularNote(void) {
+	switch (m_type) {
+		case E_muserec_note_regular:
+			return true;
+	}
+	return false;
+}
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isAnyNote --
+//
+
+bool MuseRecordBasic::isAnyNote(void) {
+	switch (m_type) {
+		case E_muserec_note_regular:
+		case E_muserec_note_chord:
+		case E_muserec_note_cue:
+		case E_muserec_note_grace:
+		case E_muserec_note_grace_chord:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isAnyNoteOrRest --
+//
+
+bool MuseRecordBasic::isAnyNoteOrRest(void) {
+	switch (m_type) {
+		case E_muserec_note_regular:
+		case E_muserec_note_chord:
+		case E_muserec_note_cue:
+		case E_muserec_note_grace:
+		case E_muserec_note_grace_chord:
+		case E_muserec_rest_invisible:
+		case E_muserec_rest:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isInvisibleRest --
+//
+
+bool MuseRecordBasic::isInvisibleRest(void) {
+	switch (m_type) {
+		case E_muserec_rest_invisible:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isRegularRest --
+//
+
+bool MuseRecordBasic::isRegularRest(void) {
+	switch (m_type) {
+		case E_muserec_rest:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isAnyRest -- Also cue-sized rests?
+//
+
+bool MuseRecordBasic::isAnyRest(void) {
+	switch (m_type) {
+		case E_muserec_rest_invisible:
+		case E_muserec_rest:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isCopyright --
+//
+
+bool MuseRecordBasic::isCopyright(void) {
+	switch (m_type) {
+		case E_muserec_copyright:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isWorkInfo --
+//
+
+bool MuseRecordBasic::isWorkInfo(void) {
+	switch (m_type) {
+		case E_muserec_work_info:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isWorkTitle --
+//
+
+bool MuseRecordBasic::isWorkTitle(void) {
+	switch (m_type) {
+		case E_muserec_work_title:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isMovementTitle --
+//
+
+bool MuseRecordBasic::isMovementTitle(void) {
+	switch (m_type) {
+		case E_muserec_movement_title:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isGroup --
+//
+
+bool MuseRecordBasic::isGroup(void) {
+	switch (m_type) {
+		case E_muserec_group:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isGroupMembership --
+//
+
+bool MuseRecordBasic::isGroupMembership(void) {
+	switch (m_type) {
+		case E_muserec_group_memberships:
+			return true;
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isHeaderRecord -- True if a header, or a comment
+//   occurring before the first non-header record.
+//
+
+bool MuseRecordBasic::isHeaderRecord(void) {
+	return m_header > 0;
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecordBasic::isBodyRecord -- True if not a header record.
+//
+
+bool MuseRecordBasic::isBodyRecord(void) {
+	return m_header == 0;
+}
+
+
+
+
+//////////////////////////////
+//
+// MuseRecord::addPrintSuggestion -- add a delta index for associated
+//     print suggestion.
+//
+
+void MuseRecord::addPrintSuggestion(int deltaIndex) {
+	m_printSuggestions.push_back(deltaIndex);
+}
+
+
+
+
+
 
 //////////////////////////////
 //
@@ -43965,7 +44711,7 @@ void MuseRecordBasic::appendString(const string& astring) {
 
 //////////////////////////////
 //
-// MuseRecord::appendInteger -- Insert an integer after the last character
+// MuseRecordBasic::appendInteger -- Insert an integer after the last character
 //     in the current line.
 //
 
@@ -43978,7 +44724,7 @@ void MuseRecordBasic::appendInteger(int value) {
 
 //////////////////////////////
 //
-// MuseRecord::appendRational -- Insert a rational after the last character
+// MuseRecordBasic::appendRational -- Insert a rational after the last character
 //     in the current line.
 //
 
@@ -43993,7 +44739,7 @@ void MuseRecordBasic::appendRational(HumNum& value) {
 
 //////////////////////////////
 //
-// MuseRecord::append -- append multiple objects in sequence
+// MuseRecordBasic::append -- append multiple objects in sequence
 // from left to right onto the record.  The format contains
 // characters with two possibilities at the moment:
 //    "i": integer value
@@ -44283,413 +45029,6 @@ void MuseRecordBasic::cleanLineEnding(void) {
 		m_recordString.resize((int)m_recordString.size() - 1);
 		i = (int)m_recordString.size() - 1;
 	}
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isPartName --
-//
-
-bool MuseRecordBasic::isPartName(void) {
-	return m_type == E_muserec_header_part_name;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isAttributes --
-//
-
-bool MuseRecordBasic::isAttributes(void) {
-	return m_type == E_muserec_musical_attributes;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isSource --
-//
-
-bool MuseRecordBasic::isSource(void) {
-	return m_type == E_muserec_source;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isEncoder --
-//
-
-bool MuseRecordBasic::isEncoder(void) {
-	return m_type == E_muserec_encoder;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isId --
-//
-
-bool MuseRecordBasic::isId(void) {
-	return m_type == E_muserec_id;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isBarline --
-//
-
-bool MuseRecordBasic::isBarline(void) {
-	return m_type == E_muserec_measure;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isBackup --
-//
-
-bool MuseRecordBasic::isBackup(void) {
-	return m_type == E_muserec_back;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isAnyComment --
-//
-
-bool MuseRecordBasic::isAnyComment(void) {
-	return isLineComment() || isBlockComment();
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isLineComment --
-//
-
-bool MuseRecordBasic::isLineComment(void) {
-	return m_type == E_muserec_comment_line;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isBlockComment --
-//
-
-bool MuseRecordBasic::isBlockComment(void) {
-	return m_type == E_muserec_comment_toggle;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isChordNote -- Is a regular note that is a seoncdary
-//    note in a chord (not the first note in the chord).
-//
-
-bool MuseRecordBasic::isChordNote(void) {
-	return m_type == E_muserec_note_chord;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isDirection -- Is a musical direction (text)
-//     instruction.
-//
-
-bool MuseRecordBasic::isDirection(void) {
-	return m_type == E_muserec_musical_directions;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isGraceNote -- A grace note, either a single note or
-//     the first note in a gracenote chord.
-//
-
-bool MuseRecordBasic::isGraceNote(void) {
-	return m_type == E_muserec_note_grace;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isCueNote --
-//
-
-bool MuseRecordBasic::isCueNote(void) {
-	return m_type == E_muserec_note_cue;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isChordNote --
-//
-
-bool MuseRecordBasic::isChordGraceNote(void) {
-	return m_type == E_muserec_note_grace_chord;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isFiguredHarmony --
-//
-
-bool MuseRecordBasic::isFiguredHarmony(void) {
-	return m_type == E_muserec_figured_harmony;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isPrintSuggestion --
-//
-
-bool MuseRecordBasic::isPrintSuggestion(void) {
-	switch (m_type) {
-		case E_muserec_print_suggestion:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isRegularNote --
-//
-
-bool MuseRecordBasic::isRegularNote(void) {
-	switch (m_type) {
-		case E_muserec_note_regular:
-			return true;
-	}
-	return false;
-}
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isAnyNote --
-//
-
-bool MuseRecordBasic::isAnyNote(void) {
-	switch (m_type) {
-		case E_muserec_note_regular:
-		case E_muserec_note_chord:
-		case E_muserec_note_cue:
-		case E_muserec_note_grace:
-		case E_muserec_note_grace_chord:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isAnyNoteOrRest --
-//
-
-bool MuseRecordBasic::isAnyNoteOrRest(void) {
-	switch (m_type) {
-		case E_muserec_note_regular:
-		case E_muserec_note_chord:
-		case E_muserec_note_cue:
-		case E_muserec_note_grace:
-		case E_muserec_note_grace_chord:
-		case E_muserec_rest_invisible:
-		case E_muserec_rest:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isInvisibleRest --
-//
-
-bool MuseRecordBasic::isInvisibleRest(void) {
-	switch (m_type) {
-		case E_muserec_rest_invisible:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isRegularRest --
-//
-
-bool MuseRecordBasic::isRegularRest(void) {
-	switch (m_type) {
-		case E_muserec_rest:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isAnyRest -- Also cue-sized rests?
-//
-
-bool MuseRecordBasic::isAnyRest(void) {
-	switch (m_type) {
-		case E_muserec_rest_invisible:
-		case E_muserec_rest:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isCopyright --
-//
-
-bool MuseRecordBasic::isCopyright(void) {
-	switch (m_type) {
-		case E_muserec_copyright:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isWorkInfo --
-//
-
-bool MuseRecordBasic::isWorkInfo(void) {
-	switch (m_type) {
-		case E_muserec_work_info:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isWorkTitle --
-//
-
-bool MuseRecordBasic::isWorkTitle(void) {
-	switch (m_type) {
-		case E_muserec_work_title:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isMovementTitle --
-//
-
-bool MuseRecordBasic::isMovementTitle(void) {
-	switch (m_type) {
-		case E_muserec_movement_title:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isGroup --
-//
-
-bool MuseRecordBasic::isGroup(void) {
-	switch (m_type) {
-		case E_muserec_group:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isGroupMembership --
-//
-
-bool MuseRecordBasic::isGroupMembership(void) {
-	switch (m_type) {
-		case E_muserec_group_memberships:
-			return true;
-	}
-	return false;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isHeaderRecord -- True if a header, or a comment
-//   occurring before the first non-header record.
-//
-
-bool MuseRecordBasic::isHeaderRecord(void) {
-	return m_header > 0;
-}
-
-
-
-//////////////////////////////
-//
-// MuseRecordBasic::isBodyRecord -- True if not a header record.
-//
-
-bool MuseRecordBasic::isBodyRecord(void) {
-	return m_header == 0;
 }
 
 
@@ -52640,6 +52979,1012 @@ string Tool_addic::getInstrumentClass(const string& code) {
 	// return two instrument classes:
 	return class1 + divider + "IC" + class2;
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_addkey::Tool_addkey -- Set the recognized options for the tool.
+//
+
+Tool_addkey::Tool_addkey(void) {
+	define("k|key=s", "Add given key designtation to data");
+	define("K|reference-key=b", "Update or add !!!key: designation, used with -k");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_addkey::run -- Do the main work of the tool.
+//
+
+bool Tool_addkey::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_addkey::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_addkey::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_addkey::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_addkey::initialize(void) {
+	m_addKeyRefQ = getBoolean("reference-key");
+	m_keyQ       = getBoolean("key");
+	m_key        = getString("key");
+	HumRegex hre;
+	hre.replaceDestructive(m_key, "", ":$");
+	hre.replaceDestructive(m_key, "", "^\\*");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::processFile --
+//
+
+void Tool_addkey::processFile(HumdrumFile& infile) {
+	initialize();
+	if (m_keyQ) {
+		addInputKey(infile);
+	} else {
+		insertReferenceKey(infile);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::addInputKey -- Insert key from -k option into score
+//    rather than !!!key: entry.  Insert input into !!!key: entry if
+//    -K option is given.
+//
+
+void Tool_addkey::addInputKey(HumdrumFile& infile) {
+	getLineIndexes(infile);
+
+	if (m_refKeyIndex != -1) {
+		string text = "!!!key: " + m_key;
+		infile[m_refKeyIndex].token(0)->setText(text);
+	}
+
+	HumRegex hre;
+	string keyDesig = "*" + m_key;
+	if (!hre.search(m_key, ":")) {
+		keyDesig += ":";
+	}
+	insertKeyDesig(infile, keyDesig);
+
+	// Update the reference key record if -K option is used:
+	if (m_addKeyRefQ) {
+		if (m_refKeyIndex != -1) {
+			string text = "!!!key: " + m_key;
+			infile[m_refKeyIndex].setText(text);
+		}
+		// Or print just before exinterp line later if not found,
+		// but needs to be created.
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::insertKeyDesig --
+//
+
+void Tool_addkey::insertKeyDesig(HumdrumFile& infile, const string& keyDesig) {
+	// Replace the key designation if any are found in the header.
+	// If not found, then store in key signature for printing later.
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (i >= m_dataStartIndex) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isKeyDesignation()) {
+				token->setText(keyDesig);
+			} else if ((m_keyDesigIndex == -1) && (token->isKeySignature())) {
+				// Store keyDesig later to print:
+				token->setValue("auto", "keyDesig", keyDesig);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::insertReferenceKey -- Take the !!!key: value and insert
+// into key designations in the header.  Add key designation line if not
+// present already in header.
+//
+
+void Tool_addkey::insertReferenceKey(HumdrumFile& infile) {
+	getLineIndexes(infile);
+
+	if (m_refKeyIndex == -1) {
+		// Nothing to do, add later before exinterp line.
+		return;
+	}
+
+	HumRegex hre;
+	string keyValue = infile[m_refKeyIndex].getReferenceValue();
+	if (!hre.search(keyValue, ":")) {
+		keyValue += ":";
+	}
+	if (!hre.search(keyValue, "^\\*")) {
+		hre.replaceDestructive(keyValue, "*", "^");
+	}
+	if (m_keyDesigIndex > 0) {
+		for (int i=m_exinterpIndex+1; i<=m_keyDesigIndex; i++) {
+			if (!infile[i].isInterpretation()) {
+				continue;
+			}
+			for (int j=0; j<infile[i].getFieldCount(); j++) {
+				HTp token = infile.token(i, j);
+				if (!token->isKeyDesignation()) {
+					continue;
+				}
+				string text = "*" + keyValue;
+				token->setText(text);
+			}
+		}
+		infile.generateLinesFromTokens();
+		m_humdrum_text << infile;
+	} else if (m_keySigIndex > 0) {
+		printKeyDesig(infile, m_keySigIndex, keyValue, +1);
+	} else if (m_dataStartIndex > 0) {
+		printKeyDesig(infile, m_dataStartIndex, keyValue, -1);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::printKeyDesig --
+//
+
+void Tool_addkey::printKeyDesig(HumdrumFile& infile, int index, const string& desig, int direction) {
+	int index2 = index + direction;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (i != index2) {
+			m_humdrum_text << infile[i] << endl;
+		} else {
+			if (index > index2) {
+				m_humdrum_text << infile[i] << endl;
+			}
+			for (int j=0; j<infile[index].getFieldCount(); j++) {
+				HTp token = infile.token(index, j);
+				if (j > 0) {
+					m_humdrum_text << "\t";
+				}
+				if (token->isKern()) {
+					m_humdrum_text << desig;
+				} else {
+					m_humdrum_text << "*";
+				}
+			}
+			m_humdrum_text << endl;
+			if (index < index2) {
+				m_humdrum_text << infile[i] << endl;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addkey::getLineIndexes --
+//
+
+void Tool_addkey::getLineIndexes(HumdrumFile& infile) {
+	m_refKeyIndex    = -1;
+	m_keyDesigIndex  = -1;
+	m_keySigIndex    = -1;
+	m_dataStartIndex = -1;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isExclusiveInterpretation()) {
+			m_exinterpIndex = i;
+			continue;
+		}
+		if (infile[i].isData()) {
+			m_dataStartIndex = i;
+			break;
+		}
+		if (infile[i].isBarline()) {
+			m_dataStartIndex = i;
+			break;
+		}
+		if (infile[i].token(0)->compare(0, 7, "!!!key:") == 0) {
+			m_refKeyIndex = i;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (token->isKeySignature()) {
+				m_keySigIndex = i;
+			} else if (token->isKeyDesignation()) {
+				m_keyDesigIndex = i;
+			}
+		}
+	}
+
+	if (m_refKeyIndex == -1) {
+		// !!!key: could be at bottom, so search backwards in file.
+		for (int i=infile.getLineCount() - 1; i>=0; i--) {
+			if (!infile[i].isReference()) {
+				continue;
+			}
+			string key = infile[i].getReferenceKey();
+			if (key == "key") {
+				m_refKeyIndex   = i;
+				break;
+			}
+		}
+	}
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_addlabels::Tool_addlabels -- Set the recognized options for the tool.
+//
+
+Tool_addlabels::Tool_addlabels(void) {
+	define("d|default=s:", "Default expansion list");
+	define("r|norep=s:",   "norep expansion list");
+	define("l|labels=s:",  "List of labels to insert");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_addlabels::run -- Do the main work of the tool.
+//
+
+bool Tool_addlabels::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_addlabels::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_addlabels::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_addlabels::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addlabels::initialize -- Process input options.
+//
+
+void Tool_addlabels::initialize(void) {
+	m_default = getString("default");
+	m_norep   = getString("norep");
+	m_zeroth.clear();
+
+	HumRegex hre;
+	if (!m_default.empty()) {
+		if (!hre.search(m_default, "^\\[")) {
+			m_default = "[" + m_default;
+		}
+		if (!hre.search(m_default, "\\]$")) {
+			m_default += "]";
+		}
+	}
+	if (!m_norep.empty()) {
+		if (!hre.search(m_norep, "^\\[")) {
+			m_norep = "[" + m_norep;
+		}
+		if (!hre.search(m_norep, "\\]$")) {
+			m_norep += "]";
+		}
+	}
+
+	string value = getString("labels");
+	hre.replaceDestructive(value, "", "^[\\s;,]+");
+	hre.replaceDestructive(value, "", "[\\s;,]+$");
+
+	vector<string> pieces;
+	hre.split(pieces, value, "\\s*[;,]\\s*");
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (hre.search(pieces[i], "^\\s$")) {
+			continue;
+		}
+		if (hre.search(pieces[i], "^\\s*m?\\s*(\\d+)([a-z]?)\\s*:\\s*(.+)\\s*$")) {
+			int barnum = hre.getMatchInt(1);
+			string sub = hre.getMatch(2);
+			int subbar = 0;
+			if (!sub.empty()) {
+				subbar = sub[0] - 'a';
+			}
+			string label = hre.getMatch(3);
+
+			if ((barnum <= 0) && (subbar <= 0)) {
+				m_zeroth = label;
+				continue;
+			}
+			m_barnums.push_back(barnum);
+			m_subbarnums.push_back(subbar);
+			m_labels.push_back(label);
+		} else {
+			cerr << "Error parsing label (ignoring): " << pieces[i] << endl;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addlabels::processFile --
+//
+
+void Tool_addlabels::processFile(HumdrumFile& infile) {
+	initialize();
+
+	vector<string> llist;
+	assignLabels(llist, infile);
+
+	m_defaultIndex = getExpansionIndex(infile);
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (i == m_defaultIndex) {
+			printExpansionLists(infile, i);
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		m_humdrum_text << infile[i] << endl;
+		if (!llist.at(i).empty()) {
+			for (int j=0; j<infile[i].getFieldCount(); j++) {
+				m_humdrum_text << "*>" << llist.at(i);
+				if (j < infile[i].getFieldCount() - 1) {
+					m_humdrum_text << "\t";
+				}
+			}
+			m_humdrum_text << endl;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addlabels::getExpsnsionIndex -- Return index that is where the 
+//    expansion labels and 0th label should be printed ABOVE.
+//
+
+int Tool_addlabels::getExpansionIndex(HumdrumFile& infile) {
+	int staffIndex    = -1;
+	int partIndex     = -1;
+	int groupIndex    = -1;
+	int instIndex     = -1;
+	int abbrIndex     = -1;
+	int clefIndex     = -1;
+	int keySigIndex   = -1;
+	int keyDesigIndex = -1;
+	int exIndex       = -1;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isExclusiveInterpretation()) {
+			exIndex = i;
+			continue;
+		}
+		if (infile[i].isData()) {
+			break;
+		}
+		if (infile[i].isBarline()) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (*token == "*") {
+				continue;
+			}
+			if ((clefIndex < 0) && token->isClef()) {
+				clefIndex = i;
+			}
+			if ((instIndex < 0) && token->compare(0, 3, "*I\"") == 0) {
+				instIndex = i;
+			}
+			if ((abbrIndex < 0) && token->compare(0, 3, "*I\"") == 0) {
+				abbrIndex = i;
+			}
+			if ((keySigIndex < 0) && token->isKeySignature()) {
+				keySigIndex = i;
+			}
+			if ((keyDesigIndex < 0) && token->isKeyDesignation()) {
+				keyDesigIndex = i;
+			}
+			if ((staffIndex != i) && (token->compare(0, 6, "*staff") == 0)) {
+				staffIndex = i;
+			}
+			if ((partIndex != i) && (token->compare(0, 5, "*part") == 0)) {
+				partIndex = i;
+			}
+			if ((groupIndex != i) && (token->compare(0, 6, "*group") == 0)) {
+				groupIndex = i;
+			}
+		}
+	}
+
+	int spigaIndex = staffIndex;
+	if (partIndex > spigaIndex) {
+		spigaIndex = partIndex;
+	}
+	if (groupIndex > spigaIndex) {
+		spigaIndex = groupIndex;
+	}
+	if (instIndex > spigaIndex) {
+		spigaIndex = instIndex;
+	}
+	if (abbrIndex > spigaIndex) {
+		spigaIndex = abbrIndex;
+	}
+
+	if (spigaIndex > 0) {
+		return spigaIndex + 1;
+	}
+
+	int tindex = -1;
+
+	if ((clefIndex > 0) && (tindex > 0)) {
+		tindex = clefIndex;
+	}
+
+	if ((keySigIndex > 0) && (tindex > 0)) {
+		if (keySigIndex < tindex) {
+			tindex = keySigIndex;
+		}
+	}
+
+	if ((keyDesigIndex > 0) && (tindex > 0)) {
+		if (keyDesigIndex < tindex) {
+			tindex = keyDesigIndex;
+		}
+	}
+	if (tindex > 0) {
+		if (exIndex < tindex - 1) {
+			return tindex;
+		}
+	}
+	return exIndex + 1;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addlabels::printExpansionLists -- printing above given line index
+//   But use field count of next spined line in data if target line is
+//   unspined.
+//
+
+void Tool_addlabels::printExpansionLists(HumdrumFile& infile, int index) {
+	int ii = -1;
+	for (int i=index; i<infile.getLineCount(); i++) {
+		if (infile[i].hasSpines()) {
+			ii = i;
+			break;
+		}
+	}
+	if (ii < 0) {
+		cerr << "STRANGE ERROR ON LINE: " << infile[index] << endl;
+	}
+
+	if (!m_default.empty()) {
+		for (int j=0; j<infile[ii].getFieldCount(); j++) {
+			m_humdrum_text << "*>" << m_default;
+			if (j < infile[ii].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
+
+	if (!m_norep.empty()) {
+		for (int j=0; j<infile[ii].getFieldCount(); j++) {
+			m_humdrum_text << "*>norep" << m_norep;
+			if (j < infile[ii].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
+
+	if (!m_zeroth.empty()) {
+		for (int j=0; j<infile[ii].getFieldCount(); j++) {
+			m_humdrum_text << "*>" << m_zeroth;
+			if (j < infile[ii].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addlabels::assignLabels -- assign labels to specific lines.
+//
+
+void Tool_addlabels::assignLabels(vector<string>& llist, HumdrumFile& infile) {
+	llist.resize(infile.getLineCount());
+	for (int i=0; i<(int)m_barnums.size(); i++) {
+		addLabel(llist, infile, m_barnums.at(i), m_subbarnums.at(i), m_labels.at(i));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addlabels::addLabel -- Add specified tempo to list.
+//
+
+void Tool_addlabels::addLabel(vector<string>& llist, HumdrumFile& infile,
+		int barnum, int subbarnum, const string& label) {
+
+	if (barnum <= 0) {
+		return;
+	}
+
+	// find barnum index:
+	int barIndex = -1;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		int bar = infile[i].getBarNumber();
+		if (bar == barnum) {
+			barIndex = i;
+			break;
+		}
+	}
+	if (barIndex < 0) {
+		cerr << "WARNING: could not find measure number " << barnum << endl;
+		return;
+	}
+
+	int counter = 0;
+	if (subbarnum > 0) {
+		for (int i=barIndex + 1; i<infile.getLineCount(); i++) {
+			if (!infile[i].isBarline()) {
+				continue;
+			}
+			counter++;
+			if (counter >= subbarnum) {
+				barIndex = i;
+				break;
+			}
+		}
+	}
+
+	if (barIndex < 0) {
+		return;
+	}
+
+	// insert at the next spined line (but figure that out later):
+	llist.at(barIndex) = label;
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_addtempo::Tool_addtempo -- Set the recognized options for the tool.
+//
+
+Tool_addtempo::Tool_addtempo(void) {
+	define("q|quarter-notes-per-minute=s:120", "Quarter notes per minute (or list by measure)");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_addtempo::run -- Do the main work of the tool.
+//
+
+bool Tool_addtempo::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_addtempo::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_addtempo::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_addtempo::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addtempo::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_addtempo::initialize(void) {
+	string value = getString("quarter-notes-per-minute");
+	HumRegex hre;
+	m_tempos.clear();
+	vector<string> pieces;
+	hre.split(pieces, value, "\\s*;\\s*");
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (hre.search(pieces[i], "^\\s$")) {
+			continue;
+		}
+		if (hre.search(pieces[i], "^\\s*m\\s*(\\d+)\\s*:\\s*([\\d.]+)\\s*$")) {
+			int measure = hre.getMatchInt(1);
+			double tempo = hre.getMatchDouble(2);
+			m_tempos.emplace_back(measure, tempo);
+		} else if (hre.search(pieces[i], "^\\s*([\\d.]+)\\s*$")) {
+			int measure = 0;
+			double tempo = hre.getMatchDouble(1);
+			m_tempos.emplace_back(measure, tempo);
+		}
+	}
+
+    auto compareByFirst = [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
+        return a.first < b.first;
+    };
+    std::sort(m_tempos.begin(), m_tempos.end(), compareByFirst);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addtempo::processFile --
+//
+
+void Tool_addtempo::processFile(HumdrumFile& infile) {
+	initialize();
+
+	vector<double> tlist;
+	assignTempoChanges(tlist, infile);
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (tlist.at(i) > 0.0) {
+			for (int j=0; j<infile[i].getFieldCount(); j++) {
+				HTp token = infile.token(i, j);
+				if (token->isKern()) {
+					m_humdrum_text << "*MM" << tlist.at(i);
+				} else {
+					m_humdrum_text << "*";
+				}
+				if (j < infile[i].getFieldCount() - 1) {
+					m_humdrum_text << "\t";
+				}
+			}
+			m_humdrum_text << endl;
+		}
+		m_humdrum_text << infile[i] << endl;
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_addtempo::assignTempoChanges -- add non-zero
+//    tempo when it should change.
+//
+
+void Tool_addtempo::assignTempoChanges(vector<double>& tlist, HumdrumFile& infile) {
+	tlist.resize(infile.getLineCount());
+	std::fill(tlist.begin(), tlist.end(), 0.0);
+	for (int i=0; i<(int)m_tempos.size(); i++) {
+		addTempo(tlist, infile, m_tempos[i].first, m_tempos[i].second);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addtempo::addTempo -- Add specified tempo to list.
+//
+
+void Tool_addtempo::addTempo(vector<double>& tlist, HumdrumFile& infile,
+		int measure, double tempo) {
+
+	if (measure == 0) {
+		addTempoToStart(tlist, infile, tempo);
+		return;
+	}
+
+	// find measure index:
+	int barIndex = -1;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		int bar = infile[i].getBarNumber();
+		if (bar == measure) {
+			barIndex = i;
+			break;
+		}
+	}
+	if (barIndex < 0) {
+		return;
+	}
+	int sigIndex = -1;
+	int symIndex = -1;
+	int dataIndex = -1;
+	for (int i=barIndex+1; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			dataIndex = i;
+			break;
+		}
+		if (infile[i].isBarline()) {
+			break;
+		}
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isTimeSignature()) {
+				sigIndex = i;
+			} else if (token->isMetricSymbol()) {
+				symIndex = i;
+			}
+		}
+	}
+
+	if (dataIndex < 0) {
+		return;
+	}
+
+	if ((sigIndex >= 0) && (symIndex >= 0)) {
+		if (sigIndex > symIndex) {
+			tlist.at(sigIndex+1) = tempo;
+		} else {
+			tlist.at(symIndex+1) = tempo;
+		}
+		return;
+	} else if (sigIndex >= 0) {
+		tlist.at(sigIndex+1) = tempo;
+		return;
+	} else if (symIndex >= 0) {
+		return;
+	} else if (dataIndex >= 0) {
+		int localIndex = dataIndex - 1;
+		int lastSpineIndex = localIndex;
+		if (infile[dataIndex-1].isLocalComment()) {
+			while (infile[localIndex].isLocalComment() || !infile[localIndex].hasSpines()) {
+				if (!infile[localIndex].hasSpines()) {
+					localIndex--;
+					continue;
+				} else {
+					lastSpineIndex = localIndex;
+				}
+				if (infile[localIndex].isLocalComment()) {
+					lastSpineIndex = localIndex;
+					localIndex--;
+					continue;
+				}
+			}
+			tlist.at(lastSpineIndex) = tempo;
+			return;
+		} else {
+			tlist.at(dataIndex) = tempo;
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_addtempo::addTempoToStart --
+//
+
+void Tool_addtempo::addTempoToStart(vector<double>& tlist,
+		HumdrumFile& infile, double tempo) {
+
+	// find first measure and data line indexes:
+	int barIndex  = -1;
+	int dataIndex = -1;
+	int sigIndex  = -1;
+	int symIndex  = -1;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			dataIndex = i;
+			break;
+		}
+
+		if (infile[i].isBarline()) {
+			if (barIndex < 0) {
+				barIndex = i;
+			}
+			continue;
+		}
+
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isTimeSignature()) {
+				sigIndex = i;
+			} else if (token->isMetricSymbol()) {
+				symIndex = i;
+			}
+		}
+	}
+
+	if (dataIndex < 0) {
+		return;
+	}
+
+	if ((sigIndex >= 0) && (symIndex >= 0)) {
+		if (sigIndex > symIndex) {
+			tlist.at(sigIndex+1) = tempo;
+		} else {
+			tlist.at(symIndex+1) = tempo;
+		}
+		return;
+	} else if (sigIndex >= 0) {
+		tlist.at(sigIndex+1) = tempo;
+		return;
+	} else if (symIndex >= 0) {
+		return;
+	} else if (dataIndex >= 0) {
+		if (infile[dataIndex-1].isLocalComment()) {
+			int localIndex = dataIndex - 1;
+			int lastSpineIndex = localIndex;
+			while (infile[localIndex].isLocalComment() || !infile[localIndex].hasSpines()) {
+				if (!infile[localIndex].hasSpines()) {
+					localIndex--;
+					continue;
+				} else {
+					lastSpineIndex = localIndex;
+				}
+				if (infile[localIndex].isLocalComment()) {
+					lastSpineIndex = localIndex;
+					localIndex--;
+					continue;
+				}
+			}
+			tlist.at(lastSpineIndex) = tempo;
+			return;
+		} else {
+			tlist.at(dataIndex) = tempo;
+		}
+	}
+
+}
+
 
 
 
@@ -79855,6 +81200,12 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 	for (int i=0; i<(int)commands.size(); i++) {
 		if (commands[i].first == "addic") {
 			RUNTOOL(addic, infile, commands[i].second, status);
+		} else if (commands[i].first == "addkey") {
+			RUNTOOL(addkey, infile, commands[i].second, status);
+		} else if (commands[i].first == "addlabels") {
+			RUNTOOL(addlabels, infile, commands[i].second, status);
+		} else if (commands[i].first == "addtempo") {
+			RUNTOOL(addtempo, infile, commands[i].second, status);
 		} else if (commands[i].first == "autoaccid") {
 			RUNTOOL(autoaccid, infile, commands[i].second, status);
 		} else if (commands[i].first == "autobeam") {
@@ -79884,8 +81235,6 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "filter") {
 			RUNTOOL(filter, infile, commands[i].second, status);
 		} else if (commands[i].first == "gasparize") {
-			RUNTOOL(grep, infile, commands[i].second, status);
-		} else if (commands[i].first == "grep") {
 			RUNTOOL(gasparize, infile, commands[i].second, status);
 		} else if (commands[i].first == "half") {
 			RUNTOOL(half, infile, commands[i].second, status);
@@ -80005,6 +81354,11 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "extractx") { // humlib cli name
 			RUNTOOL(extract, infile, commands[i].second, status);
 
+		} else if (commands[i].first == "grep") {
+			RUNTOOL(grep, infile, commands[i].second, status);
+		} else if (commands[i].first == "humgrep") {
+			RUNTOOL(grep, infile, commands[i].second, status);
+
 		} else if (commands[i].first == "myank") { // humlib version of Humdrum Extras myank tool
 			RUNTOOL(myank, infile, commands[i].second, status);
 		} else if (commands[i].first == "myankx") { // humlib cli name
@@ -80022,8 +81376,6 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 		} else if (commands[i].first == "satb2gsx") { // humlib cli name
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
 
-		} else if (commands[i].first == "thru") {
-			RUNTOOL(thru, infile, commands[i].second, status);
 		} else if (commands[i].first == "thru") { // humlib version of Humdrum Toolkit thru tool
 			RUNTOOL(thru, infile, commands[i].second, status);
 		} else if (commands[i].first == "thrux") { // Humdrum Extras cli name
@@ -80035,8 +81387,9 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(timebase, infile, commands[i].second, status);
 		} else if (commands[i].first == "timebasex") { // humlib cli name
 			RUNTOOL(timebase, infile, commands[i].second, status);
+		} else {
+			cerr << "UNKNOWN FILTER: " << commands[i].first << " OPTIONS: " << commands[i].second << endl;
 		}
-
 
 	}
 
@@ -82604,7 +83957,7 @@ bool Tool_grep::run(HumdrumFile& infile) {
 //
 
 void Tool_grep::initialize(void) {
-	m_negateQ = !getBoolean("remove-matching-lines");
+	m_negateQ = getBoolean("remove-matching-lines");
 	m_regex = getString("regular-expression");
 }
 
@@ -98413,9 +99766,10 @@ Tool_musedata2hum::Tool_musedata2hum(void) {
 	// Options& options = m_options;
 	// options.define("k|kern=b","display corresponding **kern data");
 
-	define("g|group=s:score", "the data group to process");
-	define("r|recip=b",       "output **recip spine");
-	define("s|stems=b",       "include stems in output");
+	define("g|group=s:score", "The data group to process");
+	define("r|recip=b",       "Output **recip spine");
+	define("s|stems=b",       "Include stems in output");
+	define("omv|no-omv=b",    "Exclude extracted OMV record in output data");
 }
 
 
@@ -98429,6 +99783,7 @@ void Tool_musedata2hum::initialize(void) {
 	m_stemsQ = getBoolean("stems");
 	m_recipQ = getBoolean("recip");
 	m_group  = getString("group");
+	m_noOmvQ = getBoolean("no-omv");
 }
 
 
@@ -98508,7 +99863,6 @@ bool Tool_musedata2hum::convert(ostream& out, MuseDataSet& mds) {
 	initialize();
 
 	m_tempo = mds.getMidiTempo();
-cerr << "TEMPO " << m_tempo << endl;
 
 	vector<int> groupMemberIndex = mds.getGroupIndexList(m_group);
 	if (groupMemberIndex.empty()) {
@@ -98524,8 +99878,11 @@ cerr << "TEMPO " << m_tempo << endl;
 
 	HumdrumFile outfile;
 	outdata.transferTokens(outfile);
+	if (needsAboveBelowKernRdf()) {
+		outfile.appendLine("!!!RDF**kern: > = above");
+		outfile.appendLine("!!!RDF**kern: < = above");
+	}
 	outfile.createLinesFromTokens();
-
 
 	// Convert comments in header of first part:
 	int ii = groupMemberIndex[0];
@@ -98581,10 +99938,12 @@ cerr << "TEMPO " << m_tempo << endl;
 		}
 	}
 
-	if (!m_usedReferences["OMV"]) {
-		string movementtitle = mds[ii].getMovementTitle();
-		if (!movementtitle.empty()) {
-			out << "!!!OMV: " << movementtitle << endl;
+	if (!m_noOmvQ) {
+		if (!m_usedReferences["OMV"]) {
+			string movementtitle = mds[ii].getMovementTitle();
+			if (!movementtitle.empty()) {
+				out << "!!!OMV: " << movementtitle << endl;
+			}
 		}
 	}
 
@@ -98608,7 +99967,41 @@ cerr << "TEMPO " << m_tempo << endl;
 		}
 	}
 
-	out << outfile;
+	bool foundDataQ = false;
+	for (int i=0; i<outfile.getLineCount(); i++) {
+		if (outfile[i].isData()) {
+			foundDataQ = true;
+		}
+		if (outfile[i].isBarline() && !foundDataQ) {
+			HTp token = outfile.token(i, 0);
+			if (*token == "=") {
+				HTp nextBar = NULL;
+				for (int j=i+1; j<outfile.getLineCount(); j++) {
+					if (outfile[j].isBarline()) {
+						nextBar = outfile.token(j, 0);
+						break;
+					}
+				}
+				if (nextBar) {
+					HumRegex hre;
+					if (hre.search(nextBar, "\\b1\\b")) {
+						continue;
+					} else if (hre.search(nextBar, "\\b2\\b")) {
+						for (int j=0; j<outfile[i].getFieldCount(); j++) {
+							out << "=1";
+							if (j < outfile[i].getFieldCount() - 1) {
+								out << "\t";
+							}
+						}
+						out << endl;
+						continue;
+					}
+					// also deal with repeat barlines at the start of the music.
+				}
+			}
+		}
+		printLine(out, outfile[i]);
+	}
 
 	if (!m_usedReferences["SMS"]) {
 		string source = mds[ii].getSource();
@@ -98678,6 +100071,43 @@ cerr << "TEMPO " << m_tempo << endl;
 
 //////////////////////////////
 //
+// Tool_musedata2hum::printLine -- Print line of Humdrum file
+//     contents.  If there is any layout parameter in the line tokens,
+//     then print an extra line with these.  Currently only checking for
+//     a single parameter.
+//
+
+void Tool_musedata2hum::printLine(ostream& out, HumdrumLine& line) {
+	vector<string> lo(line.getFieldCount());
+	int count = 0;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		HTp token = line.token(i);
+		string value = token->getValue("auto", "LO");
+		if (!value.empty()) {
+			lo.at(i) = value;
+			count++;
+		}
+	}
+	if (count > 0) {
+		for (int i=0; i<(int)lo.size(); i++) {
+			if (lo[i].empty()) {
+				out << "!";
+			} else {
+				out << lo[i];
+			}
+			if (i < (int)lo.size() - 1) {
+				out << "\t";
+			}
+		}
+		out << endl;
+	}
+	out << line << endl;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_musedata2hum::convertPart --
 //
 
@@ -98735,10 +100165,6 @@ int Tool_musedata2hum::convertMeasure(HumGrid& outdata, MuseData& part, int part
 	}
 
 	GridMeasure* gm = getMeasure(outdata, starttime);
-	setMeasureNumber(outdata[(int)outdata.size() - 1], part[startindex]);
-	if (partindex == 0) {
-		gm->setBarStyle(MeasureStyle::Plain);
-	}
 	int i = startindex;
 	for (i=startindex; i<part.getLineCount(); i++) {
 		if ((i != startindex) && part[i].isBarline()) {
@@ -98767,6 +100193,8 @@ int Tool_musedata2hum::convertMeasure(HumGrid& outdata, MuseData& part, int part
 			// GridMeasure objects only has a setting
 			// for a single barline style.
 			setMeasureStyle(outdata.back(), part[i]);
+			setMeasureNumber(outdata.back(), part[i]);
+			// gm->setBarStyle(MeasureStyle::Plain);
 		}
 	}
 
@@ -98798,6 +100226,7 @@ void Tool_musedata2hum::setMeasureNumber(GridMeasure* gm, MuseRecord& mr) {
 		}
 	}
 	if (pos < 0) {
+		gm->setMeasureNumber(-1);
 		return;
 	}
 	int num = stoi(line.substr(pos));
@@ -98817,9 +100246,8 @@ void Tool_musedata2hum::setMeasureNumber(GridMeasure* gm, MuseRecord& mr) {
 //
 
 void Tool_musedata2hum::setMeasureStyle(GridMeasure* gm, MuseRecord& mr) {
-	// Add bar numbers as well.
 	string line = mr.getLine();
-	string barstyle = mr.getMeasureFlagsString();
+	string barstyle = mr.getMeasureFlags();
 	if (line.compare(0, 7, "mheavy2") == 0) {
 		if (barstyle.find(":|") != string::npos) {
 			gm->setStyle(MeasureStyle::RepeatBackward);
@@ -98832,6 +100260,9 @@ void Tool_musedata2hum::setMeasureStyle(GridMeasure* gm, MuseRecord& mr) {
 		}
 	} else if (line.compare(0, 7, "mheavy4") == 0) {
 		if (barstyle.find(":|:") != string::npos) {
+			gm->setStyle(MeasureStyle::RepeatBoth);
+		} else if (barstyle.find("|: :|") != string::npos) {
+			// Vivaldi op. 1, no. 1, mvmt. 1, m. 10: mheavy4          |: :|
 			gm->setStyle(MeasureStyle::RepeatBoth);
 		}
 	} else if (line.compare(0, 7, "mdouble") == 0) {
@@ -98855,13 +100286,18 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 		layer = layer - 1;
 	}
 
+	if (mr.isDirection()) {
+		return;
+	}
+
 	HumNum timestamp = mr.getAbsBeat();
 	// cerr << "CONVERTING LINE " << timestamp << "\t" << mr << endl;
 	string tok;
 	GridSlice* slice = NULL;
 
 	if (mr.isBarline()) {
-		tok = mr.getKernMeasureStyle();
+		// barline handled elsewhere
+		// tok = mr.getKernMeasure();
 	} else if (mr.isAttributes()) {
 		map<string, string> attributes;
 		mr.getAttributeMap(attributes);
@@ -98907,16 +100343,31 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 		}
 	} else if (mr.isRegularNote()) {
 		tok = mr.getKernNoteStyle(1, 1);
+		string other = mr.getKernNoteOtherNotations();
+		if (!needsAboveBelowKernRdf()) {
+			if (other.find("<") != string::npos) {
+				addAboveBelowKernRdf();
+			} else if (other.find(">") != string::npos) {
+				addAboveBelowKernRdf();
+			}
+		}
+		if (!other.empty()) {
+			tok += other;
+		}
 		slice = gm->addDataToken(tok, timestamp, part, staff, layer, maxstaff);
 		if (slice) {
 			mr.setVoice(slice->at(part)->at(staff)->at(layer));
 			string gr = mr.getLayoutVis();
 			if (gr.size() > 0) {
-				cerr << "GRAPHIC VERSION OF NOTEA " << gr << endl;
+				// Visual and performance durations are not equal:
+				HTp token = slice->at(part)->at(staff)->at(layer)->getToken();
+				string text = "!LO:N:vis=" + gr;
+				token->setValue("auto", "LO", text);
 			}
 		}
 		m_lastnote = slice->at(part)->at(staff)->at(layer)->getToken();
 		addNoteDynamics(slice, part, mr);
+		addDirectionDynamics(slice, part, mr);
 		addLyrics(slice, part, staff, mr);
 	} else if (mr.isFiguredHarmony()) {
 		addFiguredHarmony(mr, gm, timestamp, part, maxstaff);
@@ -98947,11 +100398,68 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 			}
 		}
 	} else if (mr.isDirection()) {
-		cerr << "PROCESS DIRECTION HERE: " << mr << endl;
 		if (mr.isTextDirection()) {
 			addTextDirection(gm, part, staff, mr, timestamp);
 		}
 	}
+}
+
+
+//////////////////////////////
+//
+// Tool_musedata2hum::addDirectionDynamics -- search for a dynamic
+//     marking before the current line and after any previous note
+//     or similar line.   These lines are store in "musical directions"
+//     which start the line with a "*" character.
+//
+// Example for "p" dyamic, with print suggesting.
+//             1         2
+//    12345678901234567890123456789
+//    *               G       p
+//    P    C17:Y57
+//
+
+void Tool_musedata2hum::addDirectionDynamics(GridSlice* slice, int part, MuseRecord& mr) {
+	MuseRecord* direction = mr.getMusicalDirection();
+	if (direction == NULL) {
+		return;
+	}
+
+	if (direction->isDynamic()) {
+		string dynamicText = direction->getDynamicText();
+		if (!dynamicText.empty()) {
+			slice->at(part)->setDynamics(dynamicText);
+			HumGrid* grid = slice->getOwner();
+			if (grid) {
+				grid->setDynamicsPresent(part);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musedata2hum::addAboveBelowKernRdf -- Save for later that
+//      !!!RDF**kern: > = above
+//      !!!RDF**kern: < = below
+//    in the output Humdrum data file.
+//
+
+void Tool_musedata2hum::addAboveBelowKernRdf(void) {
+	m_aboveBelowKernRdf = true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musedata2hum::needsAboveBelowKernRdf -- Function name says it all.
+//
+
+bool Tool_musedata2hum::needsAboveBelowKernRdf(void) {
+	return m_aboveBelowKernRdf;
 }
 
 
@@ -119686,6 +121194,13 @@ bool Tool_timebase::run(HumdrumFile& infile) {
 //
 
 void Tool_timebase::processFile(HumdrumFile& infile) {
+	// Test code:
+	#ifdef __EMSCRIPTEN__
+	std::cout << "Compiled with Emscripten into WebAssembly or JavaScript." << std::endl;
+	#else
+	std::cout << "Compiled as a native OS executable." << std::endl;
+	#endif
+
 	m_grace   = getBoolean("grace");
 	m_quiet   = getBoolean("quiet");
 	if (!getBoolean("timebase")) {
