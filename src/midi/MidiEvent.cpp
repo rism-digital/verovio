@@ -13,7 +13,7 @@
 
 #include "MidiEvent.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 
 namespace smf {
@@ -275,6 +275,20 @@ double MidiEvent::getDurationInSeconds(void) const {
 	} else {
 		return seconds - seconds2;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// operator<<(MidiMessage) -- Print tick value followed by MIDI bytes for event.
+//     The tick value will be either relative or absolute depending on the state
+//     of the MidiFile object containing it.
+//
+
+std::ostream& operator<<(std::ostream& out, MidiEvent& event) {
+	out << event.tick << '(' << static_cast<MidiMessage&>(event) << ')';
+	return out;
 }
 
 

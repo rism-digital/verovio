@@ -15,7 +15,10 @@
 #define _MIDIEVENT_H_INCLUDED
 
 #include "MidiMessage.h"
+
+#include <ostream>
 #include <vector>
+
 
 namespace smf {
 
@@ -62,6 +65,10 @@ class MidiEvent : public MidiMessage {
 		MidiEvent* m_eventlink;  // used to match note-ons and note-offs
 
 };
+
+
+std::ostream& operator<<(std::ostream& out, MidiEvent& event);
+
 
 } // end of namespace smf
 

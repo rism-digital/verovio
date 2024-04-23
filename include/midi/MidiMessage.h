@@ -14,9 +14,11 @@
 #ifndef _MIDIMESSAGE_H_INCLUDED
 #define _MIDIMESSAGE_H_INCLUDED
 
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
+
 
 namespace smf {
 
@@ -122,6 +124,12 @@ class MidiMessage : public std::vector<uchar> {
 		void           makePatchChange      (int channel, int patchnum);
 		void           makeTimbre           (int channel, int patchnum);
 		void           makeController       (int channel, int num, int value);
+		void           makePitchBend        (int channel, int lsb, int msb);
+		void           makePitchBend        (int channel, int value);
+		void           makePitchBendDouble  (int channel, double value);
+		void           makePitchbend        (int channel, int lsb, int msb) { makePitchBend(channel, lsb, msb); }
+		void           makePitchbend        (int channel, int value) { makePitchBend(channel, value); }
+		void           makePitchbendDouble  (int channel, double value) { makePitchBendDouble(channel, value); }
 
 		// helper functions to create various continuous controller messages:
 		void           makeSustain          (int channel, int value);
@@ -197,6 +205,9 @@ class MidiMessage : public std::vector<uchar> {
 		void           makeTemperamentMeantoneCommaHalf(int referencePitchClass = 2, int channelMask = 0b1111111111111111);
 
 };
+
+
+std::ostream& operator<<(std::ostream& out, MidiMessage& event);
 
 
 } // end of namespace smf
