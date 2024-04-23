@@ -173,7 +173,7 @@ void Staff::AdjustDrawingStaffSize()
     if (this->HasFacs()) {
         Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->IsFacs()) {
+        if (doc->IsFacs() || doc->IsNeumeLines()) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
             assert(zone);
