@@ -674,11 +674,11 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             if (fi->GetZone() != NULL) zones.insert(fi->GetZone());
         }
         for (auto it = zones.begin(); it != zones.end(); ++it) {
-            // Transform y to device context
             (*it)->ShiftByXY(x, -y);
         }
 
         staff->GetParent()->StableSort(StaffSort());
+        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         return true; // Can't reorder by layer since staves contain layers
     }
@@ -1259,6 +1259,9 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         return false;
     }
     layer->ReorderByXPos();
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
     return true;
@@ -1700,6 +1703,8 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
         zone->SetLry(uly + offsetY + height);
     }
 
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     return true;
@@ -1790,6 +1795,8 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
     m_editInfo.import("uuid", fillStaff->GetID());
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     // TODO change zones for staff children
 
@@ -1934,6 +1941,9 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
         m_editInfo.import("message", "Element type '" + element->GetClassName() + "' is unsupported for SetText.");
         return false;
     }
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("status", success ? status : "FAILURE");
     m_editInfo.import("message", success ? message : "SetText method failed.");
     return success;
@@ -2132,6 +2142,9 @@ bool EditorToolkitNeume::Split(std::string elementId, int x)
         }
     }
     layer->ClearRelinquishedChildren();
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     m_editInfo.import("uuid", splitStaff->GetID());
@@ -2185,6 +2198,8 @@ void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
                 FacsimileInterface *fi = syl->GetFacsimileInterface();
                 assert(fi);
                 fi->AttachZone(zone);
+
+                if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
             }
         }
     }
@@ -2411,6 +2426,9 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         m_editInfo.import("message", "Element of type '" + obj->GetClassName() + "' is unsupported.");
         return false;
     }
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     return true;
@@ -2800,6 +2818,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     secondParent->ReorderByXPos();
 
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("uuid", parent->GetID());
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
@@ -3082,6 +3102,8 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
         }
     }
 
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     m_editInfo.import("uuid", uuidArray);
@@ -3249,7 +3271,6 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         }
         zone->SetUlx(newUlx);
         zone->SetUly(newUly);
-        ;
         zone->SetLrx(newLrx);
         zone->SetLry(newLry);
 
@@ -3267,6 +3288,9 @@ bool EditorToolkitNeume::ChangeGroup(std::string elementId, std::string contour)
         initialLry = newLry;
         prevNc = newNc;
     }
+
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("uuid", el->GetID());
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
@@ -3378,6 +3402,8 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     }
 
     surface->AddChild(zone);
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     return success1 && success2;
 }
 
