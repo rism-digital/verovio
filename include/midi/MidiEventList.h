@@ -14,7 +14,9 @@
 #define _MIDIEVENTLIST_H_INCLUDED
 
 #include "MidiEvent.h"
+
 #include <vector>
+
 
 namespace smf {
 
