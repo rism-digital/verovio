@@ -789,26 +789,28 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     Zone *zone = new Zone();
 
     if (elementType == "staff") {
-        Object *parent;
+        Object *grandParent; // System->(Measure->Staff) for neume lines
+        Measure *newMeasure = new Measure(NEUMELINE);
         Staff *newStaff;
         std::string columnValue;
+
         // Use closest existing staff (if there is one)
         if (staff) {
-            parent = staff->GetParent();
-            assert(parent);
+            grandParent = staff->GetParent()->GetParent();
+            assert(grandParent);
             columnValue = staff->GetType();
-            int n = parent->GetChildCount() + 1;
+            int n = grandParent->GetChildCount(MEASURE) + 1;
             newStaff = new Staff(n);
             newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
             newStaff->m_drawingNotationType = staff->m_drawingNotationType;
             newStaff->m_drawingLines = staff->m_drawingLines;
         }
         else {
-            parent = m_doc->GetDrawingPage()->FindDescendantByType(MEASURE);
-            assert(parent);
+            grandParent = m_doc->GetDrawingPage()->FindDescendantByType(SYSTEM);
+            assert(grandParent);
             newStaff = new Staff(1);
             newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
-                m_doc->GetCorrespondingScore(parent)->GetScoreDef()->FindDescendantByType(STAFFDEF));
+                m_doc->GetCorrespondingScore(grandParent)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -824,28 +826,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (columnValue.length()) newStaff->SetType(columnValue);
         Layer *newLayer = new Layer();
         newStaff->AddChild(newLayer);
+        newMeasure->AddChild(newStaff);
 
-        if (staff) {
-            // Find index to insert new staff
-            ListOfObjects staves = parent->FindAllDescendantsByType(STAFF, false);
-            std::vector<Object *> stavesVector(staves.begin(), staves.end());
-            stavesVector.push_back(newStaff);
-            StaffSort staffSort;
-            std::stable_sort(stavesVector.begin(), stavesVector.end(), staffSort);
-            for (int i = 0; i < (int)staves.size(); ++i) {
-                if (stavesVector.at(i) == newStaff) {
-                    parent->InsertChild(newStaff, i);
-                    parent->Modify();
+        grandParent->AddChild(newMeasure);
+        grandParent->StableSort(StaffSort());
 
-                    m_editInfo.import("uuid", newStaff->GetID());
-                    m_editInfo.import("status", status);
-                    m_editInfo.import("message", message);
-
-                    return true;
-                }
-            }
-        }
-        parent->AddChild(newStaff);
+        if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         m_editInfo.import("uuid", newStaff->GetID());
         m_editInfo.import("status", status);
