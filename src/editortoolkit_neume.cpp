@@ -677,7 +677,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             (*it)->ShiftByXY(x, -y);
         }
 
-        staff->GetParent()->StableSort(StaffSort());
+        staff->GetParent()->GetParent()->StableSort(StaffSort());
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         return true; // Can't reorder by layer since staves contain layers

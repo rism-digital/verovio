@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "editortoolkit.h"
+#include "measure.h"
 #include "view.h"
 #include "vrv.h"
 #include "zone.h"
@@ -179,11 +180,26 @@ struct ClosestNeume {
 struct StaffSort {
     // Sort staves left-to-right and top-to-bottom
     // Sort by y if there is no intersection, by x if there is x intersection is smaller than half length of staff line
+
+    // Update 2024-04:
+    // Used only in neume lines,
+    // System->(Measure->Staff)
+    // Need to sort Measure to sort staff
     bool operator()(Object *a, Object *b)
     {
-        if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
-        Zone *zoneA = a->GetFacsimileInterface()->GetZone();
-        Zone *zoneB = b->GetFacsimileInterface()->GetZone();
+        if (!a->Is(MEASURE) || !b->Is(MEASURE)) return false;
+        Measure *measureA = dynamic_cast<Measure *>(a);
+        Measure *measureB = dynamic_cast<Measure *>(b);
+
+        if (!measureA->IsNeumeLine() || !measureB->IsNeumeLine()) return true;
+        Object *staffA = a->FindDescendantByType(STAFF);
+        Object *staffB = b->FindDescendantByType(STAFF);
+        assert(staffA);
+        assert(staffB);
+        Zone *zoneA = staffA->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = staffB->GetFacsimileInterface()->GetZone();
+        assert(zoneA);
+        assert(zoneB);
 
         int aLowest, bLowest, aHighest, bHighest;
 
