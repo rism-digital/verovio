@@ -884,12 +884,12 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         zone->SetLry(uly + noteHeight);
 
         // add syl bounding box if Facs
-        if (!m_doc->HasFacsimile()) {
+        if (m_doc->HasFacsimile()) {
             FacsimileInterface *fi = vrv_cast<FacsimileInterface *>(syl->GetFacsimileInterface());
             assert(fi);
             sylZone = new Zone();
 
-            int staffLry = staff->GetFacsimileInterface()->GetZone()->GetLry();
+            int staffLry = staff->GetZone()->GetLry();
 
             // width height and offset can be adjusted
             int bboxHeight = 175;
@@ -900,8 +900,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             int offsetY = 0;
             if (theta) {
                 double factor = 1.3;
-                offsetY = (int)((ulx - staff->GetFacsimileInterface()->GetZone()->GetUlx()) * tan(theta * M_PI / 180.0)
-                    / factor);
+                offsetY = (int)((ulx - staff->GetZone()->GetUlx()) * tan(theta * M_PI / 180.0) / factor);
             }
 
             sylZone->SetUlx(ulx);
@@ -1050,7 +1049,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
             return false;
         }
         clef->SetShape(clefShape);
-        int yDiff = -staff->GetDrawingY() + uly;
+        int yDiff = -staff->GetZone()->GetUly() + uly;
         yDiff += ((ulx - staff->GetZone()->GetUlx()))
             * tan(-staff->GetDrawingRotate() * M_PI / 180.0); // Subtract distance due to rotate.
         int clefLine = staff->m_drawingLines - round((double)yDiff / (double)staffSize);
