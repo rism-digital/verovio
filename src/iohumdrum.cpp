@@ -26189,36 +26189,46 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             else if (!loaccid.empty()) {
                 if (loaccid == "n#") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_ns);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "#") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "n") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "##") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_ss);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "x") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_x);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "-") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "--") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "#x") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_sx);
                 }
                 else if (loaccid == "###") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "n-") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_nf);
+                    showInAccidGes = true;
                 }
                 else if (loaccid == "---") {
                     accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
+                    showInAccidGes = true;
                 }
                 else {
                     std::cerr << "Warning: unknown accidental type " << std::endl;
@@ -26227,6 +26237,18 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                 // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
                 // nd, 1qf, 3qf, 1qs, 3qs
                 // http://music-encoding.org/guidelines/v3/data-types/data.accidental.explicit.html
+
+                if (showInAccidGes) {
+                    switch (accidCount) {
+                        // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
+                        // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
+                        case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
+                        case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
+                        case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
+                        case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
+                        case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
+                    }
+                }
             }
         }
         else {
@@ -26243,27 +26265,41 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
                 accid->SetFunc(accidLog_FUNC_edit);
             }
             if (edittype.find("brack") != std::string::npos) {
-                // enclose="brack" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_brack);
+                accid->SetType("edit");
             }
             else if (edittype.find("brac") != std::string::npos) {
-                // enclose="brac" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_brack);
+                accid->SetType("edit");
             }
             if (edittype.find("paren") != std::string::npos) {
-                // enclose="paren" cannot be present with func="edit" at the moment...
                 accid->SetEnclose(ENCLOSURE_paren);
+                accid->SetType("edit");
             }
             else if (edittype.find("none") != std::string::npos) {
                 // display as a regular accidental
+                accid->SetType("edit");
             }
+
             if (loaccid.empty()) {
                 switch (accidCount) {
                     case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
-                    case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
-                    case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
-                    case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
-                    case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                    case +1:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+                        showInAccidGes = false;
+                        break;
+                    case 0:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+                        showInAccidGes = false;
+                        break;
+                    case -1:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+                        showInAccidGes = false;
+                        break;
+                    case -2:
+                        accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+                        showInAccidGes = false;
+                        break;
                 }
             }
             else {
