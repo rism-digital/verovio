@@ -677,7 +677,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             (*it)->ShiftByXY(x, -y);
         }
 
-        staff->GetParent()->GetParent()->StableSort(StaffSort());
+        SortStaves();
+
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         return true; // Can't reorder by layer since staves contain layers
@@ -2039,6 +2040,42 @@ bool EditorToolkitNeume::SetLiquescent(std::string elementId, std::string curve)
     return true;
 }
 
+bool EditorToolkitNeume::SortStaves()
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get drawing page.");
+        m_editInfo.import("status", "FAILURE");
+        m_editInfo.import("message", "Could not get drawing page.");
+        return false;
+    }
+
+    Object *page = m_doc->GetDrawingPage();
+
+    page->StableSort(StaffSort());
+
+    Object *pb = page->FindDescendantByType(PB);
+    Object *milestoneEnd = page->FindDescendantByType(SYSTEM_MILESTONE_END);
+    assert(pb);
+    assert(milestoneEnd);
+    Object *pbParent = pb->GetParent();
+    Object *milestoneEndParent = milestoneEnd->GetParent();
+    int pbIdx = pbParent->GetChildIndex(pb);
+    int milestoneEndIdx = milestoneEndParent->GetChildIndex(milestoneEnd);
+
+    pb = pbParent->DetachChild(pbIdx);
+    milestoneEnd = milestoneEndParent->DetachChild(milestoneEndIdx);
+
+    Object *firstSystem = page->GetFirst(SYSTEM);
+    Object *lastSystem = page->GetLast(SYSTEM);
+    assert(firstSystem);
+    assert(lastSystem);
+
+    firstSystem->InsertChild(pb, 0);
+    lastSystem->InsertChild(milestoneEnd, lastSystem->GetChildCount());
+
+    return true;
+}
+
 bool EditorToolkitNeume::Split(std::string elementId, int x)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -2369,7 +2406,7 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
             zone->SetRotate(rotate);
         }
         zone->Modify();
-        staff->GetParent()->StableSort(StaffSort());
+        SortStaves();
     }
     else if (obj->Is(SYL)) {
         Syl *syl = vrv_cast<Syl *>(obj);

@@ -52,6 +52,7 @@ public:
     bool SetText(std::string elementId, const std::string &text);
     bool SetClef(std::string elementId, std::string shape);
     bool SetLiquescent(std::string elementId, std::string shape);
+    bool SortStaves();
     bool Split(std::string elementId, int x);
     bool SplitNeume(std::string elementId, std::string ncId);
     bool Remove(std::string elementId);
@@ -187,10 +188,10 @@ struct StaffSort {
     // Need to sort Measure to sort staff
     bool operator()(Object *a, Object *b)
     {
-        if (!a->Is(MEASURE) || !b->Is(MEASURE)) return false;
-        Measure *measureA = dynamic_cast<Measure *>(a);
-        Measure *measureB = dynamic_cast<Measure *>(b);
-
+        if (!a->Is(SYSTEM) || !b->Is(SYSTEM)) return false;
+        if (!a->FindDescendantByType(MEASURE) || !b->FindDescendantByType(MEASURE)) return false;
+        Measure *measureA = dynamic_cast<Measure *>(a->FindDescendantByType(MEASURE));
+        Measure *measureB = dynamic_cast<Measure *>(b->FindDescendantByType(MEASURE));
         if (!measureA->IsNeumeLine() || !measureB->IsNeumeLine()) return true;
         Object *staffA = a->FindDescendantByType(STAFF);
         Object *staffB = b->FindDescendantByType(STAFF);
