@@ -26168,9 +26168,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         if (!editorialQ) {
             if (brackQ) {
                 accid->SetEnclose(ENCLOSURE_brack);
+                cautionaryQ = true;
             }
             else if (parenQ) {
                 accid->SetEnclose(ENCLOSURE_paren);
+                cautionaryQ = true;
             }
             if (showInAccid) {
                 switch (accidCount) {
