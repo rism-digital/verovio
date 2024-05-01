@@ -25,7 +25,7 @@
 #include "fing.h"
 #include "ftrem.h"
 #include "harm.h"
-#include "io.h"
+#include "iobase.h"
 #include "keysig.h"
 #include "label.h"
 #include "metersig.h"

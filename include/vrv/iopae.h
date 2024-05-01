@@ -27,7 +27,7 @@
 
 #include "atts_cmn.h"
 #include "clef.h"
-#include "io.h"
+#include "iobase.h"
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"

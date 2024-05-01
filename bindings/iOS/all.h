@@ -121,7 +121,7 @@
 #import <VerovioFramework/humlib.h>
 #import <VerovioFramework/instrdef.h>
 #import <VerovioFramework/interface.h>
-#import <VerovioFramework/io.h>
+#import <VerovioFramework/iobase.h>
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/iodarms.h>
 #import <VerovioFramework/iohumdrum.h>
