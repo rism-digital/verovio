@@ -100,11 +100,11 @@ jobs:
 
           - os: macos-latest
             compiler: xcode
-            version: "13.1"
+            version: "14.3"
 
           - os: macos-latest
             compiler: xcode
-            version: "14.2"
+            version: "15.3"
 
           - os: macos-11
             compiler: g++
