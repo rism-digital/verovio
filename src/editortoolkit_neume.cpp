@@ -1895,7 +1895,7 @@ bool EditorToolkitNeume::SetText(std::string elementId, const std::string &text)
             text->SetText(str);
             syl->AddChild(text);
             syllable->AddChild(syl);
-            if (!m_doc->HasFacsimile()) {
+            if (m_doc->HasFacsimile()) {
                 // Create a default bounding box
                 Zone *zone = new Zone();
                 int ulx, uly, lrx, lry;
