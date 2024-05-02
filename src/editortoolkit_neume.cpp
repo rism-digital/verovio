@@ -1825,7 +1825,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
         success = true;
     else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
-    if (success && !m_doc->HasFacsimile()) {
+    if (success && m_doc->HasFacsimile()) {
         m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
@@ -1992,7 +1992,7 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
             pi->AdjustPitchByOffset(shift);
         }
     }
-    if (success && !m_doc->HasFacsimile()) {
+    if (success && m_doc->HasFacsimile()) {
         m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
@@ -2213,7 +2213,7 @@ void EditorToolkitNeume::UnlinkSyllable(Syllable *syllable)
             linkedSyllable->AddChild(syl);
 
             // Create default bounding box if facs
-            if (!m_doc->HasFacsimile()) {
+            if (m_doc->HasFacsimile()) {
                 Zone *zone = new Zone();
 
                 zone->SetUlx(
@@ -2692,6 +2692,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     // if there are no full parents we need to make a new one to attach everything to
     if (fullParents.empty()) {
+        LogError("empty");
         if (elementClass == NC) {
             parent = new Neume();
         }
@@ -2714,7 +2715,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             parent->AddChild(syl);
 
             // add a default bounding box if you need to
-            if (!m_doc->HasFacsimile()) {
+            if (m_doc->HasFacsimile()) {
                 Zone *zone = new Zone();
 
                 zone->SetUlx(parent->GetFirst(NEUME)->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
@@ -2772,7 +2773,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             std::u32string fullString = U"";
             for (auto it = fullParents.begin(); it != fullParents.end(); ++it) {
                 Syl *syl = dynamic_cast<Syl *>((*it)->FindDescendantByType(SYL));
-                if (syl != NULL && !m_doc->HasFacsimile()) {
+                if (syl != NULL && m_doc->HasFacsimile()) {
                     Zone *zone = dynamic_cast<Zone *>(syl->GetFacsimileInterface()->GetZone());
 
                     if (fullSyl == NULL) {
@@ -2806,7 +2807,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             fullText->SetText(fullString);
             parent->AddChild(fullSyl);
 
-            if (!m_doc->HasFacsimile()) {
+            if (m_doc->HasFacsimile()) {
                 Zone *zone = dynamic_cast<Zone *>(fullSyl->GetFacsimileInterface()->GetZone());
                 zone->SetUlx(ulx);
                 zone->SetUly(uly);
@@ -2817,6 +2818,8 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             secondParent->AddChild(parent);
         }
     }
+
+    LogError("2");
 
     // change the pitch of any pitched elements whose clef may have changed
     assert(newClef);
@@ -2832,6 +2835,7 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
     }
+    LogError("3");
 
     // Delete any empty parents
     for (auto it = parents.begin(); it != parents.end(); ++it) {
@@ -3099,7 +3103,7 @@ bool EditorToolkitNeume::Ungroup(std::string groupType, std::vector<std::string>
                 newParent->AddChild(syl);
 
                 // Create default bounding box if facs
-                if (!m_doc->HasFacsimile()) {
+                if (m_doc->HasFacsimile()) {
                     Zone *zone = new Zone();
 
                     zone->SetUlx(el->GetFirst(NC)->GetFacsimileInterface()->GetZone()->GetUlx());
@@ -3440,7 +3444,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     //     m_editInfo.import("message", "isLigature value '" + isLigature + "' is invalid.");
     //     return false;
     // }
-    if (success1 && success2 && !m_doc->HasFacsimile()) {
+    if (success1 && success2 && m_doc->HasFacsimile()) {
         m_doc->PrepareData();
         m_doc->GetDrawingPage()->LayOut(true);
     }
