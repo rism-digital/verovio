@@ -25,19 +25,21 @@
 #include "divline.h"
 #include "layer.h"
 #include "liquescent.h"
+#include "measure.h"
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
 #include "rend.h"
+#include "sb.h"
 #include "score.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "surface.h"
 #include "syl.h"
 #include "syllable.h"
+#include "system.h"
 #include "text.h"
 #include "vrv.h"
-
 //--------------------------------------------------------------------------------
 
 namespace vrv {
@@ -790,28 +792,27 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     Zone *zone = new Zone();
 
     if (elementType == "staff") {
-        Object *grandParent; // System->(Measure->Staff) for neume lines
+        Object *page = m_doc->GetDrawingPage();
+        System *newSystem = new System();
+        Sb *newSb = new Sb();
         Measure *newMeasure = new Measure(NEUMELINE);
         Staff *newStaff;
+        Layer *newLayer = new Layer();
         std::string columnValue;
 
         // Use closest existing staff (if there is one)
         if (staff) {
-            grandParent = staff->GetParent()->GetParent();
-            assert(grandParent);
             columnValue = staff->GetType();
-            int n = grandParent->GetChildCount(MEASURE) + 1;
+            int n = page->GetChildCount(SYSTEM) + 1;
             newStaff = new Staff(n);
             newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
             newStaff->m_drawingNotationType = staff->m_drawingNotationType;
             newStaff->m_drawingLines = staff->m_drawingLines;
         }
         else {
-            grandParent = m_doc->GetDrawingPage()->FindDescendantByType(SYSTEM);
-            assert(grandParent);
             newStaff = new Staff(1);
             newStaff->m_drawingStaffDef = vrv_cast<StaffDef *>(
-                m_doc->GetCorrespondingScore(grandParent)->GetScoreDef()->FindDescendantByType(STAFFDEF));
+                m_doc->GetCorrespondingScore(page)->GetScoreDef()->FindDescendantByType(STAFFDEF));
             newStaff->m_drawingNotationType = NOTATIONTYPE_neume;
             newStaff->m_drawingLines = 4;
         }
@@ -825,12 +826,16 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         surface->AddChild(zone);
         newStaff->AttachZone(zone);
         if (columnValue.length()) newStaff->SetType(columnValue);
-        Layer *newLayer = new Layer();
+
         newStaff->AddChild(newLayer);
         newMeasure->AddChild(newStaff);
+        newSystem->AddChild(newSb);
+        newSystem->AddChild(newMeasure);
+        newSystem->SetDrawingScoreDef(vrv_cast<ScoreDef *>(m_doc->GetCorrespondingScore(page)->GetScoreDef()));
 
-        grandParent->AddChild(newMeasure);
-        grandParent->StableSort(StaffSort());
+        page->InsertAfter(page->GetFirst(SCORE), newSystem);
+
+        SortStaves();
 
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
@@ -2055,22 +2060,29 @@ bool EditorToolkitNeume::SortStaves()
 
     Object *pb = page->FindDescendantByType(PB);
     Object *milestoneEnd = page->FindDescendantByType(SYSTEM_MILESTONE_END);
+    Object *section = page->FindDescendantByType(SECTION);
     assert(pb);
     assert(milestoneEnd);
+    assert(section);
+
     Object *pbParent = pb->GetParent();
     Object *milestoneEndParent = milestoneEnd->GetParent();
+    Object *sectionParent = section->GetParent();
     int pbIdx = pbParent->GetChildIndex(pb);
     int milestoneEndIdx = milestoneEndParent->GetChildIndex(milestoneEnd);
+    int sectionIdx = sectionParent->GetChildIndex(section);
 
     pb = pbParent->DetachChild(pbIdx);
     milestoneEnd = milestoneEndParent->DetachChild(milestoneEndIdx);
+    section = sectionParent->DetachChild(sectionIdx);
 
     Object *firstSystem = page->GetFirst(SYSTEM);
     Object *lastSystem = page->GetLast(SYSTEM);
     assert(firstSystem);
     assert(lastSystem);
 
-    firstSystem->InsertChild(pb, 0);
+    firstSystem->InsertChild(section, 0);
+    firstSystem->InsertChild(pb, 1);
     lastSystem->InsertChild(milestoneEnd, lastSystem->GetChildCount());
 
     return true;
