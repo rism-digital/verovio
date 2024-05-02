@@ -2414,11 +2414,28 @@ bool EditorToolkitNeume::Resize(std::string elementId, int ulx, int uly, int lrx
         zone->SetUly(uly);
         zone->SetLrx(lrx);
         zone->SetLry(lry);
+        double orgRotate = staff->GetDrawingRotation();
         if (!isnan(rotate)) {
             zone->SetRotate(rotate);
         }
         zone->Modify();
         SortStaves();
+
+        if (staff->HasDrawingRotation()) {
+            ListOfObjects accids = staff->FindAllDescendantsByType(ACCID);
+            for (auto it = accids.begin(); it != accids.end(); ++it) {
+                Accid *accid = dynamic_cast<Accid *>(*it);
+                FacsimileInterface *fi = accid->GetFacsimileInterface();
+                Zone *accidZone = fi->GetZone();
+                double rotationOffset = (accid->GetDrawingX() - staff->GetDrawingX()) * tan(rotate * M_PI / 180.0);
+                if (orgRotate) {
+                    double orgOffset = (accid->GetDrawingX() - staff->GetDrawingX()) * tan(orgRotate * M_PI / 180.0);
+                    rotationOffset -= orgOffset;
+                }
+                accidZone->SetUly(accidZone->GetUly() + int(rotationOffset));
+                accidZone->SetLry(accidZone->GetLry() + int(rotationOffset));
+            }
+        }
     }
     else if (obj->Is(SYL)) {
         Syl *syl = vrv_cast<Syl *>(obj);
