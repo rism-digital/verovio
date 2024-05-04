@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Apr 19 18:10:19 PDT 2024
+// Last Modified: Sat May  4 10:07:24 PDT 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -2645,11 +2645,12 @@ int Convert::kernToBase40PC(const string& kerndata) {
 //
 
 int Convert::kernToBase40(const string& kerndata) {
-	int pc = Convert::kernToBase40PC(kerndata);
+	string trimmed = Convert::trimWhiteSpace(kerndata);
+	int pc = Convert::kernToBase40PC(trimmed);
 	if (pc < 0) {
 		return pc;
 	}
-	int octave   = Convert::kernToOctaveNumber(kerndata);
+	int octave   = Convert::kernToOctaveNumber(trimmed);
 	return pc + 40 * octave;
 }
 
@@ -8796,22 +8797,36 @@ void GridStaff::setNullTokenLayer(int layerindex, SliceType type,
 		cerr << "!!SLICE TYPE: " << (int)type << endl;
 	}
 
+	bool errorQ = false;
 	if (layerindex < (int)this->size()) {
 		if ((at(layerindex) != NULL) && (at(layerindex)->getToken() != NULL)) {
 			if ((string)*at(layerindex)->getToken() == nulltoken) {
 				// there is already a null data token here, so don't
 				// replace it.
 				return;
+			} else {
+				cerr << "GRID STAFF: " << this << endl;
+				cerr << "Warning, replacing existing token: "
+				     << this->at(layerindex)->getToken()
+				     << " with a null token around time "
+				     << nextdur
+				     << " in layerindex " << layerindex
+				     << endl;
+				errorQ = true;
 			}
-			cerr << "Warning, replacing existing token: "
-			     << *this->at(layerindex)->getToken()
-			     << " with a null token around time " 
-			     << nextdur
-			     << endl;
 		}
 	}
-	HumdrumToken* token = new  HumdrumToken(nulltoken);
-	setTokenLayer(layerindex, token, nextdur);
+	if (errorQ) {
+		string original = *this->at(layerindex)->getToken();
+		HumRegex hre;
+		hre.replaceDestructive(original, "", ".ZZZ", "g");
+		string value = nulltoken + "ZZZ" + original;
+		HumdrumToken* token = new  HumdrumToken(value);
+		setTokenLayer(layerindex, token, nextdur);
+	} else {
+		HumdrumToken* token = new  HumdrumToken(nulltoken);
+		setTokenLayer(layerindex, token, nextdur);
+	}
 
 }
 
@@ -35839,6 +35854,21 @@ ostream& HumdrumToken::printXmlStructureInfo(ostream& out, int level,
 
 //////////////////////////////
 //
+// HumdrumToken::getBeat -- Return the beat (1 indexed)
+//
+
+HumNum HumdrumToken::getBeat(HumNum scale) {
+	if (!m_address.hasOwner()) {
+		return 0;
+	} else {
+		return m_address.getOwner()->getBeat(scale);
+	}
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::printXmlContentInfo -- Print content analysis information.
 // default value: out = cout
 // default value: level = 0
@@ -39895,13 +39925,51 @@ int MuseRecord::getFigureCount(void) {
 
 //////////////////////////////
 //
-// getFigurePointerField -- columns 6 -- 8.
+// getFigurePointerField -- columns 6-8.
 //
 
 string MuseRecord::getFigurePointerField(void) {
 	allowFigurationOnly("getFigurePointerField");
 	return extract(6, 8);
 }
+
+
+
+//////////////////////////////
+//
+// getFigurePointer -- columns 6-8 for figures, removing
+//    spaces.
+//
+
+string MuseRecord::getFigurePointer(void) {
+	return trimSpaces(getFigurePointerField());
+}
+
+
+
+//////////////////////////////
+//
+// MuseRecord::getFigureDuration -- return the duration
+//    in ticks for figured bass (to give an offset to next
+//    figure which happens before another note in the score).
+//
+
+int MuseRecord::getFigureDuration(void) {
+	string value = getFigurePointer();
+	int output = 0;
+	if (value.empty()) {
+		return output;
+	} else {
+		try {
+			output = std::stoi(value);
+		} catch (const std::invalid_argument& e) {
+        cout << "Invalid integer: " << e.what() << ". Setting to 0." << endl;
+        output = 0;
+		}
+	}
+	return output;
+}
+
 
 
 //////////////////////////////
@@ -40053,14 +40121,10 @@ string MuseRecord::getKernNoteStyle(int beams, int stems) {
 
 	// place the rhythm
 	stringstream tempdur;
-	int notetype = getGraphicNoteType();
-	if (timeModificationLeftQ()) {
-		notetype = notetype / 4 * getTimeModificationLeft();
-		if (timeModificationRightQ()) {
-			notetype = notetype * getTimeModificationRight();
-		} else {
-			notetype = notetype * 2;
-		}
+	HumNum notetype = getGraphicNoteType();
+	HumNum mod = getTimeModification();
+	if (mod != 1) {
+		notetype *= mod;
 	}
 
 	// logical duration of the note
@@ -42150,35 +42214,46 @@ string MuseRecord::getTimeModificationField(void) {
 
 //////////////////////////////
 //
+// MuseRecord::getTimeModificationString --
+//
+
+string MuseRecord::getTimeModificationString(void) {
+	string output = getTimeModificationField();
+	HumRegex hre;
+	if (hre.search(output, "[1-9A-Z]:[1-9A-Z]")) {
+		return output;
+	}
+	return "";
+}
+
+
+
+//////////////////////////////
+//
 // MuseRecord::getTimeModification --
 //
 
-string MuseRecord::getTimeModification(void) {
+HumNum MuseRecord::getTimeModification(void) {
 	string output = getTimeModificationField();
-	int index = 2;
-	while (index >= 0 && output[index] == ' ') {
-		output.resize(index);
-		index--;
-	}
-	if (output.size() > 2) {
-		if (output[0] == ' ') {
-			output[0] = output[1];
-			output[1] = output[2];
-			output.resize(2);
+	HumRegex hre;
+	if (hre.search(output, "([1-9A-Z]):([1-9A-Z])")) {
+		string top = hre.getMatch(1);
+		string bot = hre.getMatch(2);
+		int topint = (int)strtol(top.c_str(), NULL, 36);
+		int botint = (int)strtol(top.c_str(), NULL, 36);
+		HumNum number(topint, botint);
+		return number;
+	} else {
+		if (hre.search(output, "^([1-9A-Z])")) {
+			string value = hre.getMatch(1);
+			int top = (int)strtol(value.c_str(), NULL, 36);
+			// Time modification can be "3  " for triplets.
+			HumNum out(top, 2);
+			return out;
+		} else {
+			return 1;
 		}
 	}
-	if (output.size() > 1) {
-		if (output[0] == ' ') {
-			output[0] = output[1];
-			output.resize(1);
-		}
-	}
-	if (output[0] == ' ') {
-		cerr << "Error: funny error occured in time modification "
-			  << "(columns 20-22): " << getLine() << endl;
-		return "";
-	}
-	return output;
 }
 
 
@@ -42190,8 +42265,11 @@ string MuseRecord::getTimeModification(void) {
 
 string MuseRecord::getTimeModificationLeftField(void) {
 	string output = getTimeModificationField();
-	output.resize(1);
-	return output;
+	HumRegex hre;
+	if (!hre.search(output, "^[1-9A-Z]:[1-9A-Z]$")) {
+		return " ";
+	}
+	return output.substr(0, 1);
 }
 
 
@@ -42203,12 +42281,11 @@ string MuseRecord::getTimeModificationLeftField(void) {
 
 string MuseRecord::getTimeModificationLeftString(void) {
 	string output = getTimeModificationField();
-	if (output[0] == ' ') {
-		output = "";
-	} else {
-		output.resize(1);
+	HumRegex hre;
+	if (!hre.search(output, "^[1-9A-Z]:[1-9A-Z]$")) {
+		return "";
 	}
-	return output;
+	return output.substr(0, 1);
 }
 
 
@@ -42221,8 +42298,8 @@ string MuseRecord::getTimeModificationLeftString(void) {
 int MuseRecord::getTimeModificationLeft(void) {
 	int output = 0;
 	string recordInfo = getTimeModificationLeftString();
-	if (recordInfo[0] == ' ') {
-		output = 0;
+	if (recordInfo.empty()) {
+		return 1;
 	} else {
 		output = (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
@@ -42250,13 +42327,12 @@ string MuseRecord::getTimeModificationRightField(void) {
 //
 
 string MuseRecord::getTimeModificationRightString(void) {
+	HumRegex hre;
 	string output = getTimeModificationField();
-	if (output[2] == ' ') {
-		output = "";
-	} else {
-		output = output[2];
+	if (!hre.search(output, "^[1-9A-Z]:[1-9A-Z]$")) {
+		return " ";
 	}
-	return output;
+	return output.substr(2, 1);
 }
 
 
@@ -42267,15 +42343,15 @@ string MuseRecord::getTimeModificationRightString(void) {
 //
 
 int MuseRecord::getTimeModificationRight(void) {
-	int output = 0;
 	string recordInfo = getTimeModificationRightString();
-	if (recordInfo[2] == ' ') {
-		output = 0;
+	HumRegex hre;
+	if (recordInfo.empty()) {
+		return 1;
+	} else if (!hre.search(recordInfo, "^[1-9A-Z]$")) {
+		return 1;
 	} else {
-		string temp = recordInfo.substr(2);
-		output = (int)strtol(temp.c_str(), NULL, 36);
+		return (int)strtol(recordInfo.c_str(), NULL, 36);
 	}
-	return output;
 }
 
 
@@ -42285,15 +42361,14 @@ int MuseRecord::getTimeModificationRight(void) {
 // MuseRecord::timeModificationQ --
 //
 
-int MuseRecord::timeModificationQ(void) {
-	int output = 0;
+bool MuseRecord::timeModificationQ(void) {
 	string recordInfo = getTimeModificationField();
-	if (recordInfo[0] != ' ' || recordInfo[1] != ' ' || recordInfo[2] != ' ') {
-		output = 1;
+	HumRegex hre;
+	if (hre.search(recordInfo, "^[1-9A-Z]:[1-9A-Z]$")) {
+		return true;
 	} else {
-		output = 0;
+		return false;
 	}
-	return output;
 }
 
 
@@ -42303,15 +42378,16 @@ int MuseRecord::timeModificationQ(void) {
 // MuseRecord::timeModificationLeftQ --
 //
 
-int MuseRecord::timeModificationLeftQ(void) {
-	int output = 0;
+bool MuseRecord::timeModificationLeftQ(void) {
 	string recordInfo = getTimeModificationField();
-	if (recordInfo[0] == ' ') {
-		output = 0;
+	HumRegex hre;
+	string value;
+	value.push_back(recordInfo.at(0));
+	if (hre.search(value, "^[1-9A-Z]$")) {
+		return true;
 	} else {
-		output = 1;
+		return false;
 	}
-	return output;
 }
 
 
@@ -42321,15 +42397,16 @@ int MuseRecord::timeModificationLeftQ(void) {
 // MuseRecord::timeModificationRightQ --
 //
 
-int MuseRecord::timeModificationRightQ(void) {
-	int output = 0;
+bool MuseRecord::timeModificationRightQ(void) {
 	string recordInfo = getTimeModificationField();
-	if (recordInfo[2] == ' ') {
-		output = 0;
+	HumRegex hre;
+	string value;
+	value.push_back(recordInfo.at(0));
+	if (hre.search(value, "^[1-9A-Z]$")) {
+		return true;
 	} else {
-		output = 1;
+		return false;
 	}
-	return output;
 }
 
 
@@ -50996,10 +51073,91 @@ int Options::optionsArg(void) {
 //
 
 ostream& Options::print(ostream& out) {
-	for (unsigned int i=0; i<m_optionRegister.size(); i++) {
-		out << m_optionRegister[i]->getDefinition() << "\t"
-			  << m_optionRegister[i]->getDescription() << endl;
+	vector<string> declarations;
+	vector<string> descriptions;
+	int maxlen = 0;
+	for (int i=0; i<(int)m_optionRegister.size(); i++) {
+		declarations.push_back(m_optionRegister[i]->getDefinition());
+		if (maxlen < (int)declarations.back().size()) {
+			maxlen = (int)declarations.back().size();
+		}
+		descriptions.push_back(m_optionRegister[i]->getDescription());
 	}
+	int separation = 3;
+
+	for (int i=0; i<(int)declarations.size(); i++) {
+		out << declarations[i];
+		for (int j=(int)declarations[i].size(); j < maxlen + separation; j++) {
+			out << ' ';
+		}
+		out << descriptions[i] << endl;
+	}
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// Options::printEmscripten -- Print a list of the defined options
+//    when compiled with Emscripten (for use in https://verovio.humdrum.org
+//    with JavaScript compiled code for a web browser using Humdrum data.
+//
+
+ostream& Options::printEmscripten(ostream& out) {
+	vector<string> declarations;
+	vector<string> descriptions;
+	out << "!!@@BEGIN: PREHTML" << endl;
+	out << "!!<table>" << endl;
+	out << "!!   <tr>" << endl;
+	out << "!!      <th>Option</th><th>Type</th><th>Default</th><th>Description</th>" << endl;
+	out << "!!   </tr>" << endl;
+	HumRegex hre;
+	for (int i=0; i<(int)m_optionRegister.size(); i++) {
+		out << "!!   <tr>" << endl;
+		string definition = m_optionRegister[i]->getDefinition();
+		string description = m_optionRegister[i]->getDescription();
+		string option = "";
+		string optionType = "";
+		string defaultValue = "";
+		string prefix = "";
+		if (hre.search(definition, "^([^|]+).*=([a-z]):?(.*)$")) {
+			option = hre.getMatch(1);
+			if (option.length() == 0) {
+				prefix = "";
+			} else if (option.length() == 1) {
+				prefix = "-";
+			} else if (option.length() > 1) {
+				prefix = "--";
+			}
+			optionType = hre.getMatch(2);
+			defaultValue = hre.getMatch(3);
+
+			if (optionType == "b")      { optionType = "boolean"; }
+			else if (optionType == "s") { optionType = "string";  }
+			else if (optionType == "i") { optionType = "integer"; }
+			else if (optionType == "d") { optionType = "double";  }
+
+			hre.replaceDestructive(option,       "&lt;", "<", "g");
+			hre.replaceDestructive(option,       "&gt;", ">", "g");
+			hre.replaceDestructive(optionType,   "&lt;", "<", "g");
+			hre.replaceDestructive(optionType,   "&gt;", ">", "g");
+			hre.replaceDestructive(defaultValue, "&lt;", "<", "g");
+			hre.replaceDestructive(defaultValue, "&gt;", ">", "g");
+			hre.replaceDestructive(description,  "&lt;", "<", "g");
+			hre.replaceDestructive(description,  "&gt;", ">", "g");
+
+			out << "!!     <td>" << prefix << option << "</td>";
+			out << "<td>" << optionType << " </td>";
+			out << "<td>" << optionType << " </td>";
+			out << "<td>" << defaultValue << " </td>";
+			out << "<td>" << description << " </td>";
+			out << endl;
+		}
+		out << "!!   </tr>" << endl;
+	}
+	out << "!!</table>" << endl;
+	out << "!!@@END: PREHTML" << endl;
 	return out;
 }
 
@@ -51340,8 +51498,11 @@ int Options::getRegIndex(const string& optionName) {
 	}
 
 	if (optionName == "options") {
+		#ifndef __EMSCRIPTEN__
 		print(cout);
-		return -1;
+		exit(0);
+		#endif
+		return +1;
 	}
 
 	auto it = m_optionList.find(optionName);
@@ -51399,6 +51560,7 @@ bool Options::isOption(const string& aString, int& argp) {
 #define OPTION_FORM_CONTINUE  2
 
 int Options::storeOption(int index, int& position, int& running) {
+cerr << "STORING OPTION INDEX " << index << endl;
 	int optionForm;
 	char tempname[1024];
 	char optionType = '\0';
@@ -51478,7 +51640,11 @@ int Options::storeOption(int index, int& position, int& running) {
 
 	if (index >= (int)m_argv.size()) {
 		m_error << "Error: last option requires a parameter" << endl;
+		#ifdef __EMSCRIPTEN__
+		return +1;
+		#else
 		return -1;
+		#endif
 	}
 	setModified(tempname, &m_argv[index][position]);
 
@@ -52989,7 +53155,7 @@ string Tool_addic::getInstrumentClass(const string& code) {
 //
 
 Tool_addkey::Tool_addkey(void) {
-	define("k|key=s", "Add given key designtation to data");
+	define("k|key=s",           "Add given key designtation to data");
 	define("K|reference-key=b", "Update or add !!!key: designation, used with -k");
 }
 
@@ -53435,7 +53601,7 @@ void Tool_addlabels::processFile(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_addlabels::getExpsnsionIndex -- Return index that is where the 
+// Tool_addlabels::getExpsnsionIndex -- Return index that is where the
 //    expansion labels and 0th label should be printed ABOVE.
 //
 
@@ -53670,7 +53836,7 @@ void Tool_addlabels::addLabel(vector<string>& llist, HumdrumFile& infile,
 //
 
 Tool_addtempo::Tool_addtempo(void) {
-	define("q|quarter-notes-per-minute=s:120", "Quarter notes per minute (or list by measure)");
+	define("q|quarter-notes-per-minute=d:120.0", "Quarter notes per minute (or list by measure)");
 }
 
 
@@ -53735,21 +53901,27 @@ void Tool_addtempo::initialize(void) {
 		if (hre.search(pieces[i], "^\\s$")) {
 			continue;
 		}
-		if (hre.search(pieces[i], "^\\s*m\\s*(\\d+)\\s*:\\s*([\\d.]+)\\s*$")) {
+		if (hre.search(pieces[i], "^\\s*m\\s*(\\d+)\\s*([a-z]?)\\s*:\\s*([\\d.]+)\\s*$")) {
 			int measure = hre.getMatchInt(1);
-			double tempo = hre.getMatchDouble(2);
-			m_tempos.emplace_back(measure, tempo);
+			string soffset = hre.getMatch(2);
+			int offset = 0;
+			if (!soffset.empty()) {
+				offset = soffset.at(0) - 'a';
+			}
+			double tempo = hre.getMatchDouble(3);
+			m_tempos.emplace_back(measure, tempo, offset);
 		} else if (hre.search(pieces[i], "^\\s*([\\d.]+)\\s*$")) {
 			int measure = 0;
+			int offset = 0;
 			double tempo = hre.getMatchDouble(1);
-			m_tempos.emplace_back(measure, tempo);
+			m_tempos.emplace_back(measure, tempo, offset);
 		}
 	}
 
-    auto compareByFirst = [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-        return a.first < b.first;
-    };
-    std::sort(m_tempos.begin(), m_tempos.end(), compareByFirst);
+	auto compareByFirst = [](const std::tuple<int, double, int>& a, const std::tuple<int, double, int>& b) {
+		return std::get<0>(a) < std::get<0>(b);
+	};
+	std::sort(m_tempos.begin(), m_tempos.end(), compareByFirst);
 }
 
 
@@ -53785,6 +53957,7 @@ void Tool_addtempo::processFile(HumdrumFile& infile) {
 }
 
 
+
 //////////////////////////////
 //
 // Tool_addtempo::assignTempoChanges -- add non-zero
@@ -53795,7 +53968,7 @@ void Tool_addtempo::assignTempoChanges(vector<double>& tlist, HumdrumFile& infil
 	tlist.resize(infile.getLineCount());
 	std::fill(tlist.begin(), tlist.end(), 0.0);
 	for (int i=0; i<(int)m_tempos.size(); i++) {
-		addTempo(tlist, infile, m_tempos[i].first, m_tempos[i].second);
+		addTempo(tlist, infile, std::get<0>(m_tempos[i]), std::get<1>(m_tempos[i]), std::get<2>(m_tempos[i]));
 	}
 }
 
@@ -53807,7 +53980,7 @@ void Tool_addtempo::assignTempoChanges(vector<double>& tlist, HumdrumFile& infil
 //
 
 void Tool_addtempo::addTempo(vector<double>& tlist, HumdrumFile& infile,
-		int measure, double tempo) {
+		int measure, double tempo, int offset) {
 
 	if (measure == 0) {
 		addTempoToStart(tlist, infile, tempo);
@@ -53822,7 +53995,20 @@ void Tool_addtempo::addTempo(vector<double>& tlist, HumdrumFile& infile,
 		}
 		int bar = infile[i].getBarNumber();
 		if (bar == measure) {
-			barIndex = i;
+			if (offset == 0) {
+				barIndex = i;
+				break;
+			}
+			int counter = 0;
+			for (int j=i+1; j<infile.getLineCount(); j++) {
+				if (infile[j].isBarline()) {
+					counter++;
+					if (counter == offset) {
+						barIndex = j;
+						break;
+					}
+				}
+			}
 			break;
 		}
 	}
@@ -53902,7 +54088,7 @@ void Tool_addtempo::addTempo(vector<double>& tlist, HumdrumFile& infile,
 
 //////////////////////////////
 //
-// Tool_addtempo::addTempoToStart --
+// Tool_addtempo::addTempoToStart -- Can't use letter postfix for 0 measure for now.
 //
 
 void Tool_addtempo::addTempoToStart(vector<double>& tlist,
@@ -53995,10 +54181,10 @@ void Tool_addtempo::addTempoToStart(vector<double>& tlist,
 //
 
 Tool_autoaccid::Tool_autoaccid(void) {
-	define("x|visual=b", "mark visual accidentals only");
-	define("y|suppressed=b", "mark hidden accidentals only");
-	define("r|remove=b", "remove accidental qualifications");
-	define("c|keep-cautionary|keep-courtesy|cautionary|caution|courtesy=b", "keep cautionary accidentals when removing markers");
+	define("x|visual=b",                        "mark visual accidentals only");
+	define("y|suppressed=b",                    "mark hidden accidentals only");
+	define("r|remove=b",                        "remove accidental qualifications");
+	define("c|keep-cautionary|keep-courtesy=b", "keep cautionary accidentals when removing markers");
 }
 
 
@@ -55337,20 +55523,19 @@ void Tool_autobeam::removeEdgeRests(HTp& startnote, HTp& endnote) {
 //
 
 Tool_autostem::Tool_autostem(void) {
-	define("d|debug=b",       "Debugging information");
-	define("r|remove=b",      "Remove stems");
-	define("R|removeall=b",   "Remove all stems including explicit beams");
-	define("o|overwrite|replace=b","Overwrite non-explicit stems in input");
-	define("O|overwriteall|replaceall=b",  "Overwrite all stems in input");
-	define("L|no-long|not-long|not-longs=b",
-	       "Do not put stems one whole notes or breves");
-	define("u|up=b",          "Middle note on staff has stem up");
-	define("p|pos=b",         "Display only note vertical positions on staves");
-	define("v|voice=b",       "Display only voice/layer information");
-	define("author=b",        "Program author");
-	define("version=b",       "Program version");
-	define("example=b",       "Program examples");
-	define("h|help=b",        "Short description");
+	define("d|debug=b",                      "Debugging information");
+	define("r|remove=b",                     "Remove stems");
+	define("R|removeall=b",                  "Remove all stems including explicit beams");
+	define("o|overwrite|replace=b",          "Overwrite non-explicit stems in input");
+	define("O|overwriteall|replaceall=b",    "Overwrite all stems in input");
+	define("L|no-long|not-long|not-longs=b", "Do not put stems one whole notes or breves");
+	define("u|up=b",                         "Middle note on staff has stem up");
+	define("p|pos=b",                        "Display only note vertical positions on staves");
+	define("v|voice=b",                      "Display only voice/layer information");
+	define("author=b",                       "Program author");
+	define("version=b",                      "Program version");
+	define("example=b",                      "Program examples");
+	define("h|help=b",                       "Short description");
 }
 
 
@@ -56829,20 +57014,20 @@ void Tool_binroll::processStrand(vector<vector<char>>& roll, HTp starting,
 //
 
 Tool_chantize::Tool_chantize(void) {
-	define("R|no-reference-records=b", "Do not add reference records");
-	define("r|only-add-reference-records=b", "Only add reference records");
+	define("R|no-reference-records=b",                "do not add reference records");
+	define("r|only-add-reference-records=b",          "only add reference records");
 
-	define("B|do-not-delete-breaks=b", "Do not delete system/page break markers");
-	define("b|only-delete-breaks=b", "only delete breaks");
+	define("B|do-not-delete-breaks=b",                "do not delete system/page break markers");
+	define("b|only-delete-breaks=b",                  "only delete breaks");
 
-	define("A|do-not-fix-instrument-abbreviations=b", "Do not fix instrument abbreviations");
-	define("a|only-fix-instrument-abbreviations=b", "Only fix instrument abbreviations");
+	define("A|do-not-fix-instrument-abbreviations=b", "do not fix instrument abbreviations");
+	define("a|only-fix-instrument-abbreviations=b",   "only fix instrument abbreviations");
 
-	define("E|do-not-fix-editorial-accidentals=b", "Do not fix instrument abbreviations");
-	define("e|only-fix-editorial-accidentals=b", "Only fix editorial accidentals");
+	define("E|do-not-fix-editorial-accidentals=b",    "do not fix instrument abbreviations");
+	define("e|only-fix-editorial-accidentals=b",      "only fix editorial accidentals");
 
-	define("N|do-not-remove-empty-transpositions=b", "Do not remove empty transposition instructions");
-	define ("n|only-remove-empty-transpositions=b", "Only remove empty transpositions");
+	define("N|do-not-remove-empty-transpositions=b",  "do not remove empty transposition instructions");
+	define ("n|only-remove-empty-transpositions=b",   "only remove empty transpositions");
 }
 
 
@@ -57695,6 +57880,680 @@ bool Tool_chantize::hasDiamondNotes(HumdrumFile& infile) {
 
 
 
+#define UNDEFINED_INTERVAL (-1000)
+#define REST_INTERVAL (-1001)
+
+/////////////////////////////////
+//
+// Tool_chint::Tool_chint -- Set the recognized options for the tool.
+//
+
+Tool_chint::Tool_chint(void) {
+	define("b|bottom-part=i:1",      "bottom part number to colorize, 1-indexed");
+	define("c|chromatic-coloring=b", "chromatic coloring");
+	define("d|diatonic=b",           "diatonic intervals");
+	define("m|middle=b",             "show diatonic intervals between staves");
+	define("n|negative=b",           "show diatonic intervals for cross voices");
+	define("t|top-part=i:2",         "top part number to colorize, 1-indexed");
+	define("i|intervals=b",          "display interval names");
+	define("B|no-color-bottom=b",    "do not color top analysis staff");
+	define("T|no-color-top=b",       "do not color bottom analysis staff");
+	define("8|octave=b",             "do not collapse P8 to P1");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_chint::run -- Do the main work of the tool.
+//
+
+bool Tool_chint::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_chint::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_chint::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_chint::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_chint::initialize(void) {
+	m_intervalQ = getBoolean("intervals");
+	if (getBoolean("chromatic-coloring")) {
+		chromaticColoring();
+	} else {
+		dissonanceColoring();
+	}
+
+	if (getBoolean("diatonic")) {
+		fillIntervalNamesDiatonic();
+	} else {
+		fillIntervalNames();
+	}
+
+	m_noColorBotQ = getBoolean("no-color-bottom");
+	m_noColorTopQ = getBoolean("no-color-top");
+	m_negativeQ   = getBoolean("negative");
+	m_octaveQ     = getBoolean("octave");
+	m_middleQ     = getBoolean("middle");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::processFile --
+//
+
+void Tool_chint::processFile(HumdrumFile& infile) {
+	initialize();
+
+	vector<HTp> kernSpines;
+	kernSpines = infile.getKernSpineStartList();
+
+	int maxIndex = (int)kernSpines.size() - 1;
+	int topIndex = -1;
+	int botIndex = -1;
+
+	if (getString("top-part") == "$") {
+		topIndex = maxIndex;
+	} else {
+		topIndex = getInteger("top-part") - 1;
+	}
+
+	if (getString("bottom-part") == "$") {
+		botIndex = maxIndex;
+	} else {
+		botIndex = getInteger("bottom-part") - 1;
+	}
+
+	if (topIndex < botIndex) {
+		int temp = botIndex;
+		botIndex = topIndex;
+		topIndex = temp;
+	}
+
+	if ((topIndex < 0) | (botIndex < 0)) {
+		return;
+	}
+
+	if ((topIndex > maxIndex) | (botIndex > maxIndex)) {
+		return;
+	}
+
+	if (topIndex == botIndex) {
+		return;
+	}
+
+	vector<int> topInterval;
+	vector<int> botInterval;
+
+	getPartIntervals(botInterval, topInterval, kernSpines[botIndex], kernSpines[topIndex], infile);
+
+	int botTrack = kernSpines[botIndex]->getTrack();
+	int topTrack = kernSpines[topIndex]->getTrack();
+	insertPartColors(infile, botInterval, topInterval, botTrack, topTrack);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::getPartIntervals -- Assuming no *x
+//
+
+void Tool_chint::getPartIntervals(vector<int>& botInterval, vector<int>& topInterval,
+		HTp botSpine, HTp topSpine, HumdrumFile& infile) {
+
+	m_botPitch.resize(infile.getLineCount());
+	m_topPitch.resize(infile.getLineCount());
+
+	std::fill(m_botPitch.begin(), m_botPitch.end(), ".");
+	std::fill(m_topPitch.begin(), m_topPitch.end(), ".");
+
+	botInterval.resize(infile.getLineCount());
+	topInterval.resize(infile.getLineCount());
+
+	std::fill(botInterval.begin(), botInterval.end(), UNDEFINED_INTERVAL);
+	std::fill(topInterval.begin(), topInterval.end(), UNDEFINED_INTERVAL);
+
+	HumRegex hre;
+	HTp current = botSpine->getNextToken();
+	int ttrack = topSpine->getTrack();
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+
+		HTp bot = current;
+		int line = current->getLineIndex();
+		HTp top = NULL;
+		int botField = current->getFieldIndex();
+		for (int i=botField+1; i<infile[line].getFieldCount(); i++) {
+			HTp token = infile.token(line, i);
+			int track = token->getTrack();
+			if (track != ttrack) {
+				continue;
+			}
+			top = token;
+			break;
+		}
+
+		if (!top) {
+			cerr << "TOP TOKEN IS NULL. BOTTOM TOKEN: " << bot << endl;
+			return;
+		}
+
+		HTp botResolve = bot;
+		HTp topResolve = top;
+		if (botResolve->isNull()) {
+			botResolve = botResolve->resolveNull();
+		}
+		if (topResolve->isNull()) {
+			topResolve = topResolve->resolveNull();
+		}
+		if ((!botResolve) || botResolve->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if ((!topResolve) || topResolve->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+
+		if (botResolve->isRest()) {
+			topInterval[line] = REST_INTERVAL;
+			botInterval[line] = REST_INTERVAL;
+			current = current->getNextToken();
+			continue;
+		}
+
+		if (topResolve->isRest()) {
+			botInterval[line] = REST_INTERVAL;
+			topInterval[line] = REST_INTERVAL;
+			current = current->getNextToken();
+			continue;
+		}
+
+		m_botPitch[line] = hre.replaceDestructive(*botResolve, "", " .*");
+		m_topPitch[line] = hre.replaceDestructive(*topResolve, "", " .*");
+
+		int botB40 = abs(botResolve->getBase40Pitch());
+		int topB40 = abs(topResolve->getBase40Pitch());
+
+		int difference = topB40 - botB40;
+		int negative = 1;
+		if (difference < 0) {
+			difference = -difference;
+			negative = -1;
+		}
+		int difference2 = difference % 40;
+		if (m_octaveQ && (difference2 == 0)) {
+			if (difference != 0) {
+				difference2 = 40;
+			}
+		}
+
+		botInterval.at(line) = negative * difference2;
+		topInterval.at(line) = negative * difference2;
+
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// insertPartColors --
+//
+
+void Tool_chint::insertPartColors(HumdrumFile& infile, vector<int>& botInterval,
+		vector<int>& topInterval, int botTrack, int topTrack) {
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		vector<string> output;
+		output.clear();
+		int fields = infile[i].getFieldCount();
+		bool botUsed = false;
+		bool topUsed = false;
+		bool intervalUsed = false;
+		for (int j = fields - 1; j >= 0; j--) {
+			HTp token = infile.token(i, j);
+			int track = token->getTrack();
+			if (!botUsed && (track == botTrack)) {
+				botUsed = true;
+				if (!m_noColorBotQ) {
+					if (token->isNull()) {
+						output.push_back(".");
+					} else {
+						output.push_back(getColorToken(botInterval[i], infile, i, token));
+					}
+				}
+			}
+			if (!topUsed && (track == topTrack)) {
+				topUsed = true;
+				if (!m_noColorTopQ) {
+					output.push_back(getColorToken(topInterval[i], infile, i, token));
+				}
+				if ((!intervalUsed) && m_intervalQ) {
+					intervalUsed = true;
+					if (token->isNull()) {
+						output.push_back(".");
+					} else {
+						output.push_back(getIntervalToken(topInterval[i], infile, i));
+					}
+				}
+			}
+			output.push_back(*token);
+		}
+		for (int i=(int)output.size() - 1; i>=0; i--) {
+			m_humdrum_text << output[i];
+			if (i > 0) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::getColorToken --
+//
+
+string Tool_chint::getColorToken(int interval, HumdrumFile& infile, int line, HTp token) {
+	int absinterval = interval;
+	if (absinterval > UNDEFINED_INTERVAL) {
+		absinterval = abs(absinterval);
+	}
+	if (infile[line].isData()) {
+		if (interval == REST_INTERVAL) {
+			return "black";
+		}
+		if (interval == UNDEFINED_INTERVAL) {
+			return ".";
+		}
+		if (token->isNull()) {
+			return ".";
+		}
+		if (absinterval > 40) {
+			return ".";
+		} else {
+			return m_color.at(absinterval);
+		}
+	}
+	if (infile[line].isLocalComment()) {
+		return "!";
+	}
+	HTp firstToken = infile.token(line, 0);
+	if (firstToken->compare(0, 2, "**") == 0) {
+		return "**color";
+	}
+	if (*firstToken == "*-") {
+		return "*-";
+	}
+	if (firstToken->compare(0, 1, "*") == 0) {
+		return "*";
+	}
+	if (firstToken->isBarline()) {
+		return *firstToken;
+	}
+	return "ERROR";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::getIntervalToken --
+//
+
+string Tool_chint::getIntervalToken(int interval, HumdrumFile& infile, int line) {
+	int absinterval = interval;
+	if (interval > UNDEFINED_INTERVAL) {
+		absinterval = abs(absinterval);
+	}
+	HumRegex hre;
+	if (infile[line].isData()) {
+		if (absinterval < 0) {
+			return ".";
+		}
+		bool botTieQ = false;
+		bool topTieQ = false;
+		if (hre.search(m_botPitch[line], "[\\]_]")) {
+			botTieQ = true;
+		}
+		if (hre.search(m_topPitch[line], "[\\]_]")) {
+			topTieQ = true;
+		}
+		if (botTieQ && topTieQ) {
+			return ".";
+		}
+	
+		if (interval > 40) {
+			// Above an octave is not handled.
+			return ".";
+		} else {
+			if (m_negativeQ) {
+				if (interval < 0) {
+					return "-" + m_intervals.at(absinterval);
+				} else {
+					return m_intervals.at(absinterval);
+				}
+			} else {
+				return m_intervals.at(absinterval);
+			}
+		}
+	}
+	if (infile[line].isLocalComment()) {
+		return "!";
+	}
+	HTp firstToken = infile.token(line, 0);
+	if (firstToken->compare(0, 2, "**") == 0) {
+		if (!m_middleQ) {
+			#ifdef __EMSCRIPTEN__
+			return "**adata=hint";
+			#else
+			return "**hint";
+			#endif
+		} else {
+			#ifdef __EMSCRIPTEN__
+			return "**bdata=hint";
+			#else
+			return "**hint";
+			#endif
+		}
+	}
+	if (*firstToken == "*-") {
+		return "*-";
+	}
+	if (firstToken->compare(0, 1, "*") == 0) {
+		return "*";
+	}
+	if (firstToken->isBarline()) {
+		return *firstToken;
+	}
+	return "ERROR";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::ChromaticColoring --
+//
+
+void Tool_chint::chromaticColoring(void) {
+
+	m_color.resize(41);
+
+	m_color[0]   = "gray";          // P1
+	m_color[1]   = "lightgray";     // A1
+	m_color[2]   = "gainsboro";     // AA1
+	m_color[3]   = "white";         // unused
+	m_color[4]   = "navy";          // d2
+	m_color[5]   = "darkblue";      // m2
+	m_color[6]   = "mediumblue";    // M2
+	m_color[7]   = "royalblue";     // A2
+	m_color[8]   = "steelblue";     // AA2
+	m_color[9]   = "white";         // unused
+	m_color[10]  = "darkgreen";     // dd3
+	m_color[11]  = "green";         // d3
+	m_color[12]  = "limegreen";     // m3
+	m_color[13]  = "lawngreen";     // M3
+	m_color[14]  = "lightgreen";    // A3
+	m_color[15]  = "brown";         // dd4
+	m_color[16]  = "darkorange";    // d4
+	m_color[17]  = "orange";        // P4
+	m_color[18]  = "gold";          // A4
+	m_color[19]  = "yellow";        // AA4
+	m_color[20]  = "white";         // unused
+	m_color[21]  = "mistyrose";     // dd5
+	m_color[22]  = "hotpink";       // d5
+	m_color[23]  = "red";           // P5
+	m_color[24]  = "crimson";       // A5
+	m_color[25]  = "firebrick";     // AA5
+	m_color[26]  = "white";         // unused
+	m_color[27]  = "darkturquoise"; // d6
+	m_color[28]  = "turquoise";     // m6
+	m_color[29]  = "deepskyblue";   // M6
+	m_color[30]  = "lightblue";     // A6
+	m_color[31]  = "powderblue";    // AA6
+	m_color[32]  = "white";         // unused
+	m_color[33]  = "indigo";        // d7
+	m_color[34]  = "purple";        // m7
+	m_color[35]  = "darkmagenta";   // M7
+	m_color[36]  = "mediumorchid";  // A7
+	m_color[37]  = "mediumpurple";  // AA7
+	m_color[38]  = "slategray";     // dd1
+	m_color[39]  = "dimgray";       // d1
+	m_color[40]  = "gray";          // P1
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::dissonanceColoring --
+//    gray          = P1 (unison)
+//    indigo        = P5 (perfect intervals)
+//    darkviolet    = P4 (other perfect intervals)
+//    dodgerblue    = M3, M6 (major 3, 6)
+//    darkturquoise = m3, m6 (minor 3, 6)
+//    limegreen     = M2, m6 (weak dissonance)
+//    limegreen     = M2, m6 (weak dissonance)
+//    orange        = m2, M6 (strong dissonance)
+//    gold          = A4 (strong dissonance)
+//    crimson       = d5 (strong dissonance)
+//    red           = other
+//
+
+void Tool_chint::dissonanceColoring(void) {
+
+	m_color.resize(41);
+
+	m_color[0]   = "gray";          // P1
+	m_color[1]   = "red";           // A1
+	m_color[2]   = "red";           // AA1
+	m_color[3]   = "white";         // unused
+	m_color[4]   = "red";           // dd2
+	m_color[5]   = "orange";        // m2
+	m_color[6]   = "limegreen";     // M2
+	m_color[7]   = "royalblue";     // A2
+	m_color[8]   = "steelblue";     // AA2
+	m_color[9]   = "white";         // AA1
+	m_color[10]  = "red";           // d3
+	m_color[11]  = "darkturquoise"; // m3
+	m_color[12]  = "dodgerblue";    // M3
+	m_color[13]  = "red";           // A3
+	m_color[14]  = "red";           // AA3
+	m_color[15]  = "red";           // dd4
+	m_color[16]  = "red";           // d4
+	m_color[17]  = "blueviolet";    // P4
+	m_color[18]  = "gold";          // A4
+	m_color[19]  = "red";           // AA4
+	m_color[20]  = "white";         // unused
+	m_color[21]  = "red";           // dd5
+	m_color[22]  = "hotpink";       // d5
+	m_color[23]  = "purple";        // P5
+	m_color[24]  = "red";           // A5
+	m_color[25]  = "red";           // AA5
+	m_color[26]  = "white";         // unused
+	m_color[27]  = "red";           // d6
+	m_color[28]  = "darkturquoise"; // m6
+	m_color[29]  = "dodgerblue";    // M6
+	m_color[30]  = "red";           // A6
+	m_color[31]  = "red";           // AA6
+	m_color[32]  = "white";         // unused
+	m_color[33]  = "chocolate";     // d7
+	m_color[34]  = "limegreen";     // m7
+	m_color[35]  = "darkorange";    // M7
+	m_color[36]  = "red";           // A7
+	m_color[37]  = "red";           // AA7
+	m_color[38]  = "red";           // dd1
+	m_color[39]  = "red";           // d1
+	m_color[40]  = "gray";          // P1
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::fillIntervalNames --
+//
+
+void Tool_chint::fillIntervalNames(void) {
+
+	m_intervals.resize(41);
+
+	m_intervals[0]   = "P1";      // C
+	m_intervals[1]   = "A1";
+	m_intervals[2]   = "AA1";
+	m_intervals[3]   = "ERROR";
+	m_intervals[4]   = "d2";
+	m_intervals[5]   = "m2";
+	m_intervals[6]   = "M2";      // D
+	m_intervals[7]   = "A2";
+	m_intervals[8]   = "AA2";
+	m_intervals[9]   = "ERROR";
+	m_intervals[10]  = "d3";
+	m_intervals[11]  = "m3";
+	m_intervals[12]  = "M3";      // E
+	m_intervals[13]  = "A3";
+	m_intervals[14]  = "AA3";
+	m_intervals[15]  = "dd4";
+	m_intervals[16]  = "d4";
+	m_intervals[17]  = "P4";      // F
+	m_intervals[18]  = "A4";
+	m_intervals[19]  = "AA4";
+	m_intervals[20]  = "ERROR";
+	m_intervals[21]  = "dd5";
+	m_intervals[22]  = "d5";
+	m_intervals[23]  = "P5";      // G
+	m_intervals[24]  = "A5";
+	m_intervals[25]  = "AA5";
+	m_intervals[26]  = "ERROR";
+	m_intervals[27]  = "d6";
+	m_intervals[28]  = "m6";
+	m_intervals[29]  = "M6";      // A
+	m_intervals[30]  = "A6";
+	m_intervals[31]  = "AA6";
+	m_intervals[32]  = "ERROR";
+	m_intervals[33]  = "d7";
+	m_intervals[34]  = "m7";
+	m_intervals[35]  = "M7";      // B
+	m_intervals[36]  = "A7";
+	m_intervals[37]  = "AA7";
+	m_intervals[38]  = "dd1";
+	m_intervals[39]  = "d1";
+	m_intervals[40]  = "P8";
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_chint::fillIntervalNamesDiatonic --
+//
+
+void Tool_chint::fillIntervalNamesDiatonic(void) {
+
+	m_intervals.resize(41);
+
+	m_intervals[0]   = "1";        // C
+	m_intervals[1]   = "A1";
+	m_intervals[2]   = "AA1";
+	m_intervals[3]   = "ERROR";
+	m_intervals[4]   = "d2";
+	m_intervals[5]   = "2";
+	m_intervals[6]   = "2";        // D
+	m_intervals[7]   = "A2";
+	m_intervals[8]   = "AA2";
+	m_intervals[9]   = "ERROR";
+	m_intervals[10]  = "d3";
+	m_intervals[11]  = "3";
+	m_intervals[12]  = "3";        // E
+	m_intervals[13]  = "A3";
+	m_intervals[14]  = "AA3";
+	m_intervals[15]  = "dd4";
+	m_intervals[16]  = "d4";
+	m_intervals[17]  = "4";        // F
+	m_intervals[18]  = "A4";
+	m_intervals[19]  = "AA4";
+	m_intervals[20]  = "ERROR";
+	m_intervals[21]  = "dd5";
+	m_intervals[22]  = "d5";
+	m_intervals[23]  = "5";        // G
+	m_intervals[24]  = "A5";
+	m_intervals[25]  = "AA5";
+	m_intervals[26]  = "ERROR";
+	m_intervals[27]  = "d6";
+	m_intervals[28]  = "6";
+	m_intervals[29]  = "6";        // A
+	m_intervals[30]  = "A6";
+	m_intervals[31]  = "AA6";
+	m_intervals[32]  = "ERROR";
+	m_intervals[33]  = "d7";
+	m_intervals[34]  = "7";
+	m_intervals[35]  = "7";        // B
+	m_intervals[36]  = "A7";
+	m_intervals[37]  = "AA7";
+	m_intervals[38]  = "dd1";
+	m_intervals[39]  = "d1";
+	m_intervals[40]  = "8";
+
+}
+
+
+
+
 
 /////////////////////////////////
 //
@@ -58134,54 +58993,54 @@ void Tool_chord::maximizeChordPitches(vector<string>& notes,
 //
 
 Tool_cint::Tool_cint(void) {
-	define("base-40|base40|b40|40=b", "display pitches/intervals in base-40");
-	define("base-12|base12|b12|12=b", "display pitches/intervals in base-12");
-	define("base-7|base7|b7|7|diatonic=b", "display pitches/intervals in base-7");
-	define("g|grid|pitch|pitches=b", "display pitch grid used to calculate modules");
-	define("r|rhythm=b", "display rhythmic positions of notes");
-	define("f|filename=b", "display filenames with --count");
-	define("raw=b", "display only modules without formatting");
-	define("raw2=b", "display only modules formatted for Vishesh");
-	define("c|uncross=b", "uncross crossed voices when creating modules");
-	define("k|koption=s:", "Select only two spines to analyze");
-	define("C|comma=b", "separate intervals by comma rather than space");
-	define("retro|retrospective=b", "Retrospective module display in the score");
-	define("suspension|suspensions=b", "mark suspensions");
-	define("rows|row=b", "display lattices in row form");
-	define("dur|duration=b", "display durations appended to harmonic interval note attacks");
-	define("id=b", "ids are echoed in module data");
-	define("L|interleaved-lattice=b", "display interleaved lattices");
-	define("q|harmonic-parentheses=b", "put square brackets around harmonic intervals");
-	define("h|harmonic-marker=b", "put h character after harmonic intervals");
-	define("m|melodic-marker=b", "put m character after melodic intervals");
-	define("y|melodic-parentheses=b", "put curly braces around melodic intervals");
-	define("p|parentheses=b", "put parentheses around modules intervals");
-	define("l|lattice=b", "calculate lattice");
-	define("loc|location=b", "displayLocation");
-	define("s|sustain=b", "display sustain/attack states of notes");
-	define("o|octave=b", "reduce compound intervals to within an octave");
-	define("H|no-harmonic=b", "don't display harmonic intervals");
-	define("M|no-melodic=b", "don't display melodic intervals");
-	define("t|top=b", "display top melodic interval of modules");
-	define("T|top-only=b", "display only top melodic interval of modules");
-	define("U|no-melodic-unisons=b", "no melodic perfect unisons");
-	define("attacks|attack=b", "start/stop module chains on pairs of note attacks");
-	define("z|zero=b", "display diatonic intervals with 0 offset");
-	define("N|note-marker=s:@", "pass-through note marking character");
-	define("x|xoption=b", "display attack/sustain information on harmonic intervals only");
-	define("n|chain=i:1", "number of sequential modules");
+	define("base-40|base40|b40|40=b",             "display pitches/intervals in base-40");
+	define("base-12|base12|b12|12=b",             "display pitches/intervals in base-12");
+	define("base-7|base7|b7|7|diatonic=b",        "display pitches/intervals in base-7");
+	define("g|grid|pitch|pitches=b",              "display pitch grid used to calculate modules");
+	define("r|rhythm=b",                          "display rhythmic positions of notes");
+	define("f|filename=b",                        "display filenames with --count");
+	define("raw=b",                               "display only modules without formatting");
+	define("raw2=b",                              "display only modules formatted for Vishesh");
+	define("c|uncross=b",                         "uncross crossed voices when creating modules");
+	define("k|koption=s:",                        "select only two spines to analyze");
+	define("C|comma=b",                           "separate intervals by comma rather than space");
+	define("retro|retrospective=b",               "retrospective module display in the score");
+	define("suspension|suspensions=b",            "mark suspensions");
+	define("rows|row=b",                          "display lattices in row form");
+	define("dur|duration=b",                      "display durations appended to harmonic interval note attacks");
+	define("id=b",                                "ids are echoed in module data");
+	define("L|interleaved-lattice=b",             "display interleaved lattices");
+	define("q|harmonic-parentheses=b",            "put square brackets around harmonic intervals");
+	define("h|harmonic-marker=b",                 "put h character after harmonic intervals");
+	define("m|melodic-marker=b",                  "put m character after melodic intervals");
+	define("y|melodic-parentheses=b",             "put curly braces around melodic intervals");
+	define("p|parentheses=b",                     "put parentheses around modules intervals");
+	define("l|lattice=b",                         "calculate lattice");
+	define("loc|location=b",                      "displayLocation");
+	define("s|sustain=b",                         "display sustain/attack states of notes");
+	define("o|octave=b",                          "reduce compound intervals to within an octave");
+	define("H|no-harmonic=b",                     "don't display harmonic intervals");
+	define("M|no-melodic=b",                      "don't display melodic intervals");
+	define("t|top=b",                             "display top melodic interval of modules");
+	define("T|top-only=b",                        "display only top melodic interval of modules");
+	define("U|no-melodic-unisons=b",              "no melodic perfect unisons");
+	define("attacks|attack=b",                    "start/stop module chains on pairs of note attacks");
+	define("z|zero=b",                            "display diatonic intervals with 0 offset");
+	define("N|note-marker=s:@",                   "pass-through note marking character");
+	define("x|xoption=b",                         "display attack/sustain information on harmonic intervals only");
+	define("n|chain=i:1",                         "number of sequential modules");
 	define("R|no-rest|no-rests|norest|norests=b", "number of sequential modules");
-	define("O|octave-all=b", "transpose all harmonic intervals to within an octave");
-	define("chromatic=b", "display intervals as diatonic intervals with chromatic alterations");
-	define("color=s:red", "color of marked notes");
-	define("search=s:", "search string");
-	define("mark=b", "mark matches notes from searches in data");
-	define("count=b", "count matched modules from search query");
-	define("debug=b");              // determine bad input line num
-	define("author=b");             // author of program
-	define("version=b");            // compilation info
-	define("example=b");            // example usages
-	define("help=b");               // short description
+	define("O|octave-all=b",                      "transpose all harmonic intervals to within an octave");
+	define("chromatic=b",                         "display intervals as diatonic intervals with chromatic alterations");
+	define("color=s:red",                         "color of marked notes");
+	define("search=s:",                           "search string");
+	define("mark=b",                              "mark matches notes from searches in data");
+	define("count=b",                             "count matched modules from search query");
+	define("debug=b",                             "determine bad input line number");
+	define("author=b",                            "author of the program");
+	define("version=b",                           "complation info");
+	define("example=b",                           "example usages");
+	define("help=b",                              "short description");
 }
 
 
@@ -61767,31 +62626,31 @@ string cmr_group_info::getPitch(void) {
 //
 
 Tool_cmr::Tool_cmr(void) {
-	define("data|raw|raw-data=b",       "print analysis data");
-	define("m|mark-up|marker-up=s:+",   "symbol to mark peak cmr notes");
+	define("data|raw|raw-data=b",         "print analysis data");
+	define("m|mark-up|marker-up=s:+",     "symbol to mark peak cmr notes");
 	define("M|mark-down|marker-down=s:|", "symbol to mark anti-peak cmr notes");
-	define("c|color|color-up=s:red",    "color of CMR peak notes");
-	define("C|color-down=s:orange",     "color of CMR anti-peak notes");
-	define("r|ignore-rest=d:1.0",       "ignore rests smaller than given value (in whole notes)");
-	define("n|number=i:3",              "number of high notes in a row");
-	define("N|cmr-number=b",            "show enumeration number of CMR above/below starting note");
-	define("d|dur|duration=d:6.0",      "maximum duration between cmr note attacks in whole notes");
-	define("i|info=b",                  "print cmr info");
-	define("p|peaks=b",                 "detect only positive cmrs");
-	define("t|troughs=b",               "detect only negative cmrs");
-	define("A|not-accented=b",          "counts only cmrs that do not have melodic accentation");
-	define("s|syncopation-weight=d:1.0","weight for syncopated notes");
-	define("leap|leap-weight=d:0.5",    "weight for leapng notes");
-	define("l|local-peaks=b",           "mark local peaks");
-	define("L|only-local-peaks=b",      "mark local peaks only");
-	define("merge|merged|show-merged=b","print merged groups");
-	define("S|summary=b",               "summarize CMRs for multiple inputs");
-	define("v|vega=b",                  "output default Vega-lite plot");
-	define("V|no-html=b",               "output Vega-lite plot without HTML");
-	define("countplot=b",               "output Vega-lite plot for CMR count");
-	define("strengthplot=b",            "output Vega-lite plot with strength scores");
-	define("h|half=b",                  "durations given in half notes (mimims)");
-	define("D|debug=b",                 "print debug information");
+	define("c|color|color-up=s:red",      "color of CMR peak notes");
+	define("C|color-down=s:orange",       "color of CMR anti-peak notes");
+	define("r|ignore-rest=d:1.0",         "ignore rests smaller than given value (in whole notes)");
+	define("n|number=i:3",                "number of high notes in a row");
+	define("N|cmr-number=b",              "show enumeration number of CMR above/below starting note");
+	define("d|dur|duration=d:6.0",        "maximum duration between cmr note attacks in whole notes");
+	define("i|info=b",                    "print cmr info");
+	define("p|peaks=b",                   "detect only positive cmrs");
+	define("t|troughs=b",                 "detect only negative cmrs");
+	define("A|not-accented=b",            "counts only cmrs that do not have melodic accentation");
+	define("s|syncopation-weight=d:1.0",  "weight for syncopated notes");
+	define("leap|leap-weight=d:0.5",      "weight for leapng notes");
+	define("l|local-peaks=b",             "mark local peaks");
+	define("L|only-local-peaks=b",        "mark local peaks only");
+	define("merge|merged|show-merged=b",  "print merged groups");
+	define("S|summary=b",                 "summarize CMRs for multiple inputs");
+	define("v|vega=b",                    "output default Vega-lite plot");
+	define("V|no-html=b",                 "output Vega-lite plot without HTML");
+	define("countplot=b",                 "output Vega-lite plot for CMR count");
+	define("strengthplot=b",              "output Vega-lite plot with strength scores");
+	define("h|half=b",                    "durations given in half notes (mimims)");
+	define("D|debug=b",                   "print debug information");
 }
 
 
@@ -63622,10 +64481,10 @@ string Tool_cmr::getLocalLabelToken(int number, int dir) {
 //
 
 Tool_colorgroups::Tool_colorgroups(void) {
-	define("A=s:crimson",    "Color for group A");
-	define("B=s:dodgerblue", "Color for group B");
-	define("C=s:purple",     "Color for group C");
-	define("command=b",     "print shed command only");
+	define("A=s:crimson",    "color for group A");
+	define("B=s:dodgerblue", "color for group B");
+	define("C=s:purple",     "color for group C");
+	define("command=b",      "print shed command only");
 }
 
 
@@ -63730,24 +64589,24 @@ void Tool_colorgroups::processFile(HumdrumFile& infile) {
 //
 
 Tool_colortriads::Tool_colortriads(void) {
-	define("A=b", "Do not color triads with diatonic A root");
-	define("B=b", "Do not color triads with diatonic B root");
-	define("C=b", "Do not color triads with diatonic C root");
-	define("D=b", "Do not color triads with diatonic D root");
-	define("E=b", "Do not color triads with diatonic E root");
-	define("F=b", "Do not color triads with diatonic F root");
-	define("G=b", "Do not color triads with diatonic G root");
-	define("a=s:darkviolet",     "color for A triads");
-	define("b=s:darkorange",     "color for B triads");
-	define("c=s:limegreen",      "color for C triads");
-	define("d=s:royalblue",      "color for D triads");
-	define("e=s:crimson",        "color for E triads");
-	define("f=s:gold",           "color for F triads");
-	define("g=s:skyblue",        "color for G triads");
-	define("r|relative=b",       "functional coloring (green = key tonic)");
-	define("k|key=s",            "key to transpose coloring to");
-	define("commands=b",         "print msearch commands only");
-	define("filters=b",          "print filter commands only");
+	define("A=b",            "do not color triads with diatonic A root");
+	define("B=b",            "do not color triads with diatonic B root");
+	define("C=b",            "do not color triads with diatonic C root");
+	define("D=b",            "do not color triads with diatonic D root");
+	define("E=b",            "do not color triads with diatonic E root");
+	define("F=b",            "do not color triads with diatonic F root");
+	define("G=b",            "do not color triads with diatonic G root");
+	define("a=s:darkviolet", "color for A triads");
+	define("b=s:darkorange", "color for B triads");
+	define("c=s:limegreen",  "color for C triads");
+	define("d=s:royalblue",  "color for D triads");
+	define("e=s:crimson",    "color for E triads");
+	define("f=s:gold",       "color for F triads");
+	define("g=s:skyblue",    "color for G triads");
+	define("r|relative=b",   "functional coloring (green = key tonic)");
+	define("k|key=s",        "key to transpose coloring to");
+	define("commands=b",     "print msearch commands only");
+	define("filters=b",      "print filter commands only");
 }
 
 
@@ -63993,28 +64852,28 @@ void Tool_colortriads::processFile(HumdrumFile& infile) {
 //
 
 Tool_composite::Tool_composite(void) {
-	define("debug=b",         "print debug statements");
-	define("a|append=b",      "append data to end of line (top of system)");
-	define("x|extract=b",     "only output composite rhythm spines");
-	define("grace=b",         "include grace notes in composite rhythms");
-	define("u|up-stem=b",     "force notes to be up-stem");
+	define("debug=b",                  "print debug statements");
+	define("a|append=b",               "append data to end of line (top of system)");
+	define("x|extract=b",              "only output composite rhythm spines");
+	define("grace=b",                  "include grace notes in composite rhythms");
+	define("u|up-stem=b",              "force notes to be up-stem");
 	define("C|color-full-composite=b", "color full composite rhythm if score has groups");
 	define("l|score-size=d:100.0",     "set staff size of input score (percent)");
 	define("L|analysis-size=d:100.0",  "set staff size of analysis staves (percent)");
-	define("o|only=s",        "output notes of given group (A or B)");
-	define("r|rhythms=b",     "convert input score to rhythms only.");
-	define("e|events=b",      "show event counts on analysis staves.");
-	define("F|no-full-composite=b", "Do not do full composite rhythm analysis");
-	define("c|coincidence=b", "Do coincidence rhythm analysis");
-	define("g|group|groups|grouping|groupings=b", "Do group rhythm analysis");
-	define("m|mark=b",        "Mark coincidences in group analysis and input score");
-	define("M|mark-input=b",  "Mark coincidences in input score");
+	define("o|only=s",                 "output notes of given group (A or B)");
+	define("r|rhythms=b",              "convert input score to rhythms only.");
+	define("e|events=b",               "show event counts on analysis staves.");
+	define("F|no-full-composite=b",    "do not do full composite rhythm analysis");
+	define("c|coincidence=b",          "do coincidence rhythm analysis");
+	define("g|group|groups=b",         "do group rhythm analysis");
+	define("m|mark=b",                 "mark coincidences in group analysis and input score");
+	define("M|mark-input=b",           "mark coincidences in input score");
 
 	// Numeric analysis options:
-	define("A|analysis|analyses=s",  "List of numeric analysis features to extract");
+	define("A|analysis|analyses=s",    "list of numeric analysis features to extract");
 
 	// Styling for numeric analyses;
-	define("Z|no-zeros|no-zeroes=b", "do not show zeros in analyses.");
+	define("Z|no-zeros|no-zeroes=b",   "do not show zeros in analyses.");
 }
 
 
@@ -67337,31 +68196,31 @@ int Tool_composite::getEventCount(vector<string>& data) {
 //
 
 Tool_compositeold::Tool_compositeold(void) {
-	define("a|append=b",    "append data to end of line (top of system)");
+	define("a|append=b",                      "append data to end of line (top of system)");
 
-	define("P|analysis-onsets=b",    "count number of note (pitch) onsets in feature");
-	define("A|analysis-accents=b",   "count number of accents in feature");
-	define("O|analysis-ornaments=b", "count number of ornaments in feature");
-	define("S|analysis-slurs=b",     "count number of slur beginnings/ending in feature");
-	define("T|analysis-total=b",     "count total number of analysis features for each note");
-	define("all|all-analyses=b",     "do all analyses");
+	define("P|analysis-onsets=b",             "count number of note (pitch) onsets in feature");
+	define("A|analysis-accents=b",            "count number of accents in feature");
+	define("O|analysis-ornaments=b",          "count number of ornaments in feature");
+	define("S|analysis-slurs=b",              "count number of slur beginnings/ending in feature");
+	define("T|analysis-total=b",              "count total number of analysis features for each note");
+	define("all|all-analyses=b",              "do all analyses");
 
-	define("grace=b",       "include grace notes in composite rhythm");
-	define("u|stem-up=b",   "stem-up for composite rhythm parts");
-	define("x|extract=b",   "only output composite rhythm spines");
-	define("o|only=s",      "output notes of given group");
-	define("t|tremolo=b",   "preserve tremolos");
-	define("B|no-beam=b",   "do not apply automatic beaming");
-	define("G|only-groups=b", "only split composite rhythm into separate streams by group markers");
-	define("g|add-groups=b", "also split composite rhythm into separate streams by group markers");
-	define("c|coincidence-rhythm=b", "add coincidence rhythm for groups");
-	define("m|match|together=s:limegreen", "mark alignments in group composite analyses");
-	define("M=b",           "equivalent to -m limegreen");
+	define("grace=b",                         "include grace notes in composite rhythm");
+	define("u|stem-up=b",                     "stem-up for composite rhythm parts");
+	define("x|extract=b",                     "only output composite rhythm spines");
+	define("o|only=s",                        "output notes of given group");
+	define("t|tremolo=b",                     "preserve tremolos");
+	define("B|no-beam=b",                     "do not apply automatic beaming");
+	define("G|only-groups=b",                 "only split composite rhythm into separate streams by group markers");
+	define("g|add-groups=b",                  "also split composite rhythm into separate streams by group markers");
+	define("c|coincidence-rhythm=b",          "add coincidence rhythm for groups");
+	define("m|match|together=s:limegreen",    "mark alignments in group composite analyses");
+	define("M=b",                             "equivalent to -m limegreen");
 	define("n|together-in-score=s:limegreen", "mark alignments in group in SCORE (not analyses)");
-	define("N=b",           "equivalent to -n limegreen");
-	define("Z|no-zeros|no-zeroes=b",  "do not show zeros in analyses.");
-	define("pitch=s:eR",    "pitch to display for composite rhythm");
-	define("debug=b",       "print debugging information");
+	define("N=b",                             "equivalent to -n limegreen");
+	define("Z|no-zeros|no-zeroes=b",          "do not show zeros in analyses.");
+	define("pitch=s:eR",                      "pitch to display for composite rhythm");
+	define("debug=b",                         "print debugging information");
 }
 
 
@@ -71022,23 +71881,23 @@ string Tool_deg::ScaleDegree::m_forcedKey = "";
 //
 
 Tool_deg::Tool_deg(void) {
-	define("above=b", "Display scale degrees above analyzed staff");
-	define("arr|arrow|arrows=b", "Display scale degree alterations as arrows");
-	define("b|boxes|box=b", "Display scale degrees in boxes");
-	define("color=s", "Display color for scale degrees");
-	define("c|circ|circles|circle=b", "Display scale degrees in circles");
-	define("hat|caret|circumflex=b", "Display hats on scale degrees");
-	define("solf|solfege=b", "Display (relative) solfege syllables instead of scale degree numbers");
-	define("I|no-input=b", "Do not interleave **deg data with input score in output");
-	define("kern=b", "Prefix composite rhythm **kern spine with -I option");
-	define("k|kern-tracks=s", "Process only the specified kern spines");
-	define("kd|dk|key-default|default-key=s", "Default (initial) key if none specified in data");
-	define("kf|fk|key-force|force-key|forced-key|key-forced=s", "Use the given key for analysing deg data (ignore modulations)");
-	define("o|octave|octaves|degree=b", "Encode octave information int **degree spines");
-	define("r|recip=b", "Prefix output data with **recip spine with -I option");
-	define("t|ties=b", "Include scale degrees for tied notes");
-	define("s|spine-tracks|spine|spines|track|tracks=s", "Process only the specified spines");
-	define("0|O|z|zero|zeros=b", "Show rests as scale degree 0");
+	define("above=b",                                    "display scale degrees above analyzed staff");
+	define("arr|arrow|arrows=b",                         "display scale degree alterations as arrows");
+	define("b|boxes|box=b",                              "display scale degrees in boxes");
+	define("color=s",                                    "display color for scale degrees");
+	define("c|circ|circles|circle=b",                    "display scale degrees in circles");
+	define("hat|caret|circumflex=b",                     "display hats on scale degrees");
+	define("solf|solfege=b",                             "display (relative) solfege syllables instead of scale degree numbers");
+	define("I|no-input=b",                               "do not interleave **deg data with input score in output");
+	define("kern=b",                                     "prefix composite rhythm **kern spine with -I option");
+	define("k|kern-tracks=s",                            "process only the specified kern spines");
+	define("kd|dk|key-default|default-key=s",            "default (initial) key if none specified in data");
+	define("kf|fk|key-force|force-key=s",                "use the given key for analysing deg data (ignore modulations)");
+	define("o|octave|octaves|degree=b",                  "encode octave information int **degree spines");
+	define("r|recip=b",                                  "prefix output data with **recip spine with -I option");
+	define("t|ties=b",                                   "include scale degrees for tied notes");
+	define("s|spine-tracks|spine|spines|track|tracks=s", "process only the specified spines");
+	define("0|O|z|zero|zeros=b",                         "show rests as scale degree 0");
 }
 
 
@@ -73479,24 +74338,24 @@ ostream& operator<<(ostream& out, Tool_deg::ScaleDegree* degree) {
 //
 
 Tool_dissonant::Tool_dissonant(void) {
-	define("r|raw=b",                 "print raw grid");
-	define("p|percent=b",             "print counts as percentages");
-	define("s|suppress=b",            "suppress dissonant notes");
-	define("d|diatonic=b",            "print diatonic grid");
-	define("D|no-dissonant=b",        "don't do dissonance anaysis");
-	define("m|midi-pitch=b",          "print midi-pitch grid");
-	define("b|base-40=b",             "print base-40 grid");
-	define("l|metric-levels=b",       "use metric levels in analysis");
-	define("k|kern=b",                "print kern pitch grid");
-	define("V|voice-functions=b",     "do cadential-voice-function analysis");
-	define("v|voice-number=b",        "print voice number of dissonance");
-	define("f|self-number=b",         "print self voice number of dissonance");
-	define("debug=b",                 "print grid cell information");
-	define("u|undirected=b",          "use undirected dissonance labels");
-	define("c|count=b",               "count dissonances by category");
-	define("i|x|e|exinterp=s:**cdata-rdiss","specify exinterp for **diss spines");
-	define("color|colorize|color-by-rhythm=b", "color dissonant notes by beat level");
-	define("color2|colorize2|color-by-interval=b", "color dissonant notes by dissonant interval");
+	define("r|raw=b",                        "print raw grid");
+	define("p|percent=b",                    "print counts as percentages");
+	define("s|suppress=b",                   "suppress dissonant notes");
+	define("d|diatonic=b",                   "print diatonic grid");
+	define("D|no-dissonant=b",               "don't do dissonance anaysis");
+	define("m|midi-pitch=b",                 "print midi-pitch grid");
+	define("b|base-40=b",                    "print base-40 grid");
+	define("l|metric-levels=b",              "use metric levels in analysis");
+	define("k|kern=b",                       "print kern pitch grid");
+	define("V|voice-functions=b",            "do cadential-voice-function analysis");
+	define("v|voice-number=b",               "print voice number of dissonance");
+	define("f|self-number=b",                "print self voice number of dissonance");
+	define("debug=b",                        "print grid cell information");
+	define("u|undirected=b",                 "use undirected dissonance labels");
+	define("c|count=b",                      "count dissonances by category");
+	define("i|x|e|exinterp=s:**cdata-rdiss", "specify exinterp for **diss spines");
+	define("color|color-by-rhythm=b",        "color dissonant notes by beat level");
+	define("color2|color-by-interval=b",     "color dissonant notes by dissonant interval");
 }
 
 
@@ -76318,11 +77177,11 @@ void Tool_double::doubleRhythms(HumdrumFile& infile) {
 Tool_esac2hum::Tool_esac2hum(void) {
 	define("debug=b",            "print debug information");
 	define("v|verbose=b",        "verbose output");
-	define("h|header=s:",        "Header filename for placement in output");
-	define("t|trailer=s:",       "Trailer filename for placement in output");
-	define("s|split=s:file",     "Split song info into separate files");
-	define("x|extension=s:.krn", "Split filename extension");
-	define("f|first=i:1",        "Number of first split filename");
+	define("h|header=s:",        "header filename for placement in output");
+	define("t|trailer=s:",       "trailer filename for placement in output");
+	define("s|split=s:file",     "split song info into separate files");
+	define("x|extension=s:.krn", "split filename extension");
+	define("f|first=i:1",        "number of first split filename");
 	define("author=b",           "author of program");
 	define("version=b",          "compilation info");
 	define("example=b",          "example usages");
@@ -77973,36 +78832,34 @@ void Tool_esac2hum::printString(const string& string, ostream& out) {
 //
 
 Tool_extract::Tool_extract(void) {
-	define("P|F|S|x|exclude=s:", "Remove listed spines from output");
-	define("i=s:", "Exclusive interpretation list to extract from input");
-	define("I=s:", "Exclusive interpretation exclusion list");
-	define("f|p|s|field|path|spine=s:",
-			 "for extraction of particular spines");
-	define("C|count=b", "print a count of the number of spines in file");
-	define("c|cointerp=s:**kern", "Exclusive interpretation for cospines");
-	define("g|grep=s:", "Extract spines which match a given regex.");
-	define("r|reverse=b", "reverse order of spines by **kern group");
-	define("R=s:**kern", "reverse order of spine by exinterp group");
-	define("t|trace=s:", "use a trace file to extract data");
-	define("e|expand=b", "expand spines with subspines");
-	define("k|kern=s", "Extract by kern spine group");
-	define("K|reverse-kern=s", "Extract by kern spine group top to bottom numbering");
-	define("E|expand-interp=s:", "expand subspines limited to exinterp");
-	define("m|model|method=s:d", "method for extracting secondary spines");
-	define("M|cospine-model=s:d", "method for extracting cospines");
-	define("Y|no-editoral-rests=b",
-			"do not display yy marks on interpreted rests");
-	define("n|name|b|blank=s:**blank", "Name if exinterp added with 0");
-	define("no-empty|no-empties=b", "Suppress spines with only null data tokens");
-	define("empty|empties=b", "Only keep spines with only null data tokens");
-	define("spine-list=b", "Show spine list and then exit");
-	define("no-rest|no-rests=b", "remove **kern spines containing only rests (and their co-spines)");
+	define("P|F|S|x|exclude=s:",        "remove listed spines from output");
+	define("i=s:",                      "exclusive interpretation list to extract from input");
+	define("I=s:",                      "exclusive interpretation exclusion list");
+	define("f|p|s|field|path|spine=s:", "for extraction of particular spines");
+	define("C|count=b",                 "print a count of the number of spines in file");
+	define("c|cointerp=s:**kern",       "exclusive interpretation for cospines");
+	define("g|grep=s:",                 "extract spines which match a given regex.");
+	define("r|reverse=b",               "reverse order of spines by **kern group");
+	define("R=s:**kern",                "reverse order of spine by exinterp group");
+	define("t|trace=s:",                "use a trace file to extract data");
+	define("e|expand=b",                "expand spines with subspines");
+	define("k|kern=s",                  "extract by kern spine group");
+	define("K|reverse-kern=s",          "extract by kern spine group top to bottom numbering");
+	define("E|expand-interp=s:",        "expand subspines limited to exinterp");
+	define("m|model|method=s:d",        "method for extracting secondary spines");
+	define("M|cospine-model=s:d",       "method for extracting cospines");
+	define("Y|no-editoral-rests=b",     "do not display yy marks on interpreted rests");
+	define("n|name|b|blank=s:**blank",  "name if exinterp added with 0");
+	define("no-empty|no-empties=b",     "suppress spines with only null data tokens");
+	define("empty|empties=b",           "only keep spines with only null data tokens");
+	define("spine-list=b",              "show spine list and then exit");
+	define("no-rest|no-rests=b",        "remove **kern spines containing only rests (and their co-spines)");
 
-	define("debug=b", "print debugging information");
-	define("author=b");              // author of program
-	define("version=b");             // compilation info
-	define("example=b");             // example usages
-	define("h|help=b");              // short description
+	define("debug=b",                   "print debugging information");
+	define("author=b",                  "author of the program");
+	define("version=b",                 "compilation info");
+	define("example=b",                 "example usages");
+	define("h|help=b",                  "short description");
 }
 
 
@@ -80105,23 +80962,23 @@ string Tool_extract::reverseFieldString(const string& input, int maxval) {
 //
 
 Tool_fb::Tool_fb(void) {
-	define("c|compound=b",               "Output reasonable figured bass numbers within octave");
-	define("a|accidentals|accid|acc=b",  "Display accidentals in front of the numbers");
-	define("b|base|base-track=i:1",      "Number of the base kern track (compare with -k)");
-	define("i|intervallsatz=b",          "Display numbers under their voice instead of under the base staff");
-	define("o|sort|order=b",             "Sort figured bass numbers by size");
-	define("l|lowest=b",                 "Use lowest note as base note");
-	define("n|normalize=b",              "Remove number 8 and doubled numbers; adds -co");
-	define("r|reduce|abbreviate|abbr=b", "Use abbreviated figures; adds -nco");
-	define("t|ties=b",                   "Hide numbers without attack or changing base (needs -i)");
-	define("f|figuredbass=b",            "Shortcut for -acorn3");
-	define("3|hide-three=b",             "Hide number 3 if it has an accidental");
-	define("m|negative=b",               "Show negative numbers");
-	define("above=b",                    "Show numbers above the staff (**fba)");
-	define("rate=s:",                    "Rate to display the numbers (use a **recip value, e.g. 4, 4.)");
-	define("k|kern-tracks=s",            "Process only the specified kern spines");
+	define("c|compound=b",                               "output reasonable figured bass numbers within octave");
+	define("a|accidentals|accid|acc=b",                  "display accidentals in front of the numbers");
+	define("b|base|base-track=i:1",                      "number of the base kern track (compare with -k)");
+	define("i|intervallsatz=b",                          "display numbers under their voice instead of under the base staff");
+	define("o|sort|order=b",                             "sort figured bass numbers by size");
+	define("l|lowest=b",                                 "use lowest note as base note");
+	define("n|normalize=b",                              "remove number 8 and doubled numbers; adds -co");
+	define("r|reduce|abbreviate|abbr=b",                 "use abbreviated figures; adds -nco");
+	define("t|ties=b",                                   "hide numbers without attack or changing base (needs -i)");
+	define("f|figuredbass=b",                            "shortcut for -acorn3");
+	define("3|hide-three=b",                             "hide number 3 if it has an accidental");
+	define("m|negative=b",                               "show negative numbers");
+	define("above=b",                                    "show numbers above the staff (**fba)");
+	define("rate=s:",                                    "rate to display the numbers (use a **recip value, e.g. 4, 4.)");
+	define("k|kern-tracks=s",                            "process only the specified kern spines");
 	define("s|spine-tracks|spine|spines|track|tracks=s", "Process only the specified spines");
-	define("hint=b",                     "Determine harmonic intervals with interval quality");
+	define("hint=b",                                     "determine harmonic intervals with interval quality");
 }
 
 
@@ -81134,7 +81991,7 @@ const vector<FiguredBassAbbreviationMapping> FiguredBassAbbreviationMapping::s_m
 //
 
 Tool_filter::Tool_filter(void) {
-	define("debug=b", "print debug statement");
+	define("debug=b",      "print debug statement");
 	define("v|variant=s:", "Run filters labeled with the given variant");
 }
 
@@ -81194,6 +82051,15 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 
 	HumdrumFile& infile = infiles[0];
 
+	#ifdef __EMSCRIPTEN__
+	bool optionList = getBoolean("options");
+	if (optionList) {
+		cerr << "GOT HERE BEFORE PRINT EMSCDRIPTEN" << endl;
+		printEmscripten(m_humdrum_text);
+		m_humdrum_text << infile;
+	}
+	#endif
+
 	bool status = true;
 	vector<pair<string, string> > commands;
 	getCommandList(commands, infile);
@@ -81216,6 +82082,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(binroll, infile, commands[i].second, status);
 		} else if (commands[i].first == "chantize") {
 			RUNTOOL(chantize, infile, commands[i].second, status);
+		} else if (commands[i].first == "chint") {
+			RUNTOOL(chint, infile, commands[i].second, status);
 		} else if (commands[i].first == "chord") {
 			RUNTOOL(chord, infile, commands[i].second, status);
 		} else if (commands[i].first == "cint") {
@@ -81324,6 +82192,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(tremolo, infile, commands[i].second, status);
 		} else if (commands[i].first == "trillspell") {
 			RUNTOOL(trillspell, infile, commands[i].second, status);
+		} else if (commands[i].first == "vcross") {
+			RUNTOOL(vcross, infile, commands[i].second, status);
 
 		// filters with aliases:
 
@@ -81982,11 +82852,11 @@ void Tool_fixps::markEmptyVoices(HumdrumFile& infile) {
 //
 
 Tool_flipper::Tool_flipper(void) {
-	define("k|keep=b",         "keep *flip/*Xflip instructions");
-	define("a|all=b",          "flip globally, not just inside *flip/*Xflip regions");
-	define("s|strophe=b",      "flip inside of strophes as well");
+	define("k|keep=b",                      "keep *flip/*Xflip instructions");
+	define("a|all=b",                       "flip globally, not just inside *flip/*Xflip regions");
+	define("s|strophe=b",                   "flip inside of strophes as well");
 	define("S|strophe-only|only-strophe=b", "flip only inside of strophes as well");
-	define("i|interp=s:kern",  "flip only in this interpretation");
+	define("i|interp=s:kern",               "flip only in this interpretation");
 }
 
 
@@ -82254,25 +83124,25 @@ void Tool_flipper::extractFlipees(vector<vector<HTp>>& flipees,
 //
 
 Tool_gasparize::Tool_gasparize(void) {
-	define("R|no-reference-records=b", "Do not add reference records");
-	define("r|only-add-reference-records=b", "Only add reference records");
+	define("R|no-reference-records=b",                "do not add reference records");
+	define("r|only-add-reference-records=b",          "only add reference records");
 
-	define("B|do-not-delete-breaks=b", "Do not delete system/page break markers");
-	define("b|only-delete-breaks=b", "only delete breaks");
+	define("B|do-not-delete-breaks=b",                "do not delete system/page break markers");
+	define("b|only-delete-breaks=b",                  "only delete breaks");
 
-	define("A|do-not-fix-instrument-abbreviations=b", "Do not fix instrument abbreviations");
-	define("a|only-fix-instrument-abbreviations=b", "Only fix instrument abbreviations");
+	define("A|do-not-fix-instrument-abbreviations=b", "do not fix instrument abbreviations");
+	define("a|only-fix-instrument-abbreviations=b",   "only fix instrument abbreviations");
 
-	define("E|do-not-fix-editorial-accidentals=b", "Do not fix instrument abbreviations");
-	define("e|only-fix-editorial-accidentals=b", "Only fix editorial accidentals");
+	define("E|do-not-fix-editorial-accidentals=b",    "do not fix instrument abbreviations");
+	define("e|only-fix-editorial-accidentals=b",      "only fix editorial accidentals");
 
-	define("T|do-not-add-terminal-longs=b", "Do not add terminal long markers");
-	define("t|only-add-terminal-longs=b", "Only add terminal longs");
+	define("T|do-not-add-terminal-longs=b",           "do not add terminal long markers");
+	define("t|only-add-terminal-longs=b",             "only add terminal longs");
 
-	define("no-ties=b", "Do not fix tied notes");
+	define("no-ties=b",                               "do not fix tied notes");
 
-	define("N|do-not-remove-empty-transpositions=b", "Do not remove empty transposition instructions");
-	define ("n|only-remove-empty-transpositions=b", "Only remove empty transpositions");
+	define("N|do-not-remove-empty-transpositions=b",  "do not remove empty transposition instructions");
+	define ("n|only-remove-empty-transpositions=b",   "only remove empty transpositions");
 }
 
 
@@ -83900,8 +84770,8 @@ void Tool_gasparize::convertNextNoteToJAccidental(HTp current) {
 //
 
 Tool_grep::Tool_grep(void) {
-	define("v|remove-matching-lines=b", "Remove lines that match regex");
-	define("e|regex|regular-expression=s", "Regular expression to search with");
+	define("v|remove-matching-lines=b",    "remove lines that match regex");
+	define("e|regex|regular-expression=s", "regular expression to search with");
 }
 
 
@@ -84193,19 +85063,19 @@ void Tool_half::terminalLongToTerminalBreve(HumdrumFile& infile) {
 //
 
 Tool_homorhythm::Tool_homorhythm(void) {
-	define("a|append=b", "Append analysis to end of input data");
-	define("attacks=b", "Append attack counts for each sonority");
-	define("p|prepend=b", "Prepend analysis to end of input data");
-	define("r|raw-sonority=b", "Display individual sonority scores only");
-	define("raw-score=b", "Display accumulated scores");
-	define("M|no-marks=b", "Do not mark homorhythm section notes");
-	define("f|fraction=b", "calculate fraction of music that is homorhythm");
-	define("v|voice=b", "display voice information or fraction results");
-	define("F|filename=b", "show filename for f option");
-	define("n|t|threshold=d:4.0", "Threshold score sum required for homorhythm texture detection");
-	define("s|score=d:1.0", "Score assigned to a sonority with three or more attacks");
-	define("m|intermediate-score=d:0.5", "Score to give sonority between two adjacent attack sonoroties");
-	define("l|letter=b", "Display letter scoress before calculations");
+	define("a|append=b",                 "append analysis to end of input data");
+	define("attacks=b",                  "append attack counts for each sonority");
+	define("p|prepend=b",                "prepend analysis to end of input data");
+	define("r|raw-sonority=b",           "display individual sonority scores only");
+	define("raw-score=b",                "display accumulated scores");
+	define("M|no-marks=b",               "do not mark homorhythm section notes");
+	define("f|fraction=b",               "calculate fraction of music that is homorhythm");
+	define("v|voice=b",                  "display voice information or fraction results");
+	define("F|filename=b",               "show filename for f option");
+	define("n|t|threshold=d:4.0",        "threshold score sum required for homorhythm texture detection");
+	define("s|score=d:1.0",              "score assigned to a sonority with three or more attacks");
+	define("m|intermediate-score=d:0.5", "score to give sonority between two adjacent attack sonoroties");
+	define("l|letter=b",                 "display letter scoress before calculations");
 }
 
 
@@ -84635,11 +85505,11 @@ void Tool_homorhythm::analyzeLine(HumdrumFile& infile, int line) {
 //
 
 Tool_homorhythm2::Tool_homorhythm2(void) {
-	define("t|threshold=d:1.6", "Threshold score sum required for homorhythm texture detection");
-	define("u|threshold2=d:1.3", "Threshold score sum required for semi-homorhythm texture detection");
-	define("s|score=b", "Show numeric scores");
-	define("n|length=i:4", "Sonority length to calculate");
-	define("f|fraction=b", "Report fraction of music that is homorhythm");
+	define("t|threshold=d:1.6",  "threshold score sum required for homorhythm texture detection");
+	define("u|threshold2=d:1.3", "threshold score sum required for semi-homorhythm texture detection");
+	define("s|score=b",          "show numeric scores");
+	define("n|length=i:4",       "sonority length to calculate");
+	define("f|fraction=b",       "report fraction of music that is homorhythm");
 }
 
 
@@ -85029,11 +85899,11 @@ void Tool_hproof::markHarmonicTones(HTp tok, vector<int>& cts) {
 //
 
 Tool_humbreak::Tool_humbreak(void) {
-	define("m|measures=s", "Measures numbers to place linebreaks before");
-	define("p|page-breaks=s", "Measure numbers to place page breaks before");
-	define("g|group=s:original", "Line/page break group");
-	define("r|remove|remove-breaks=b", "Remove line/page breaks");
-	define("l|page-to-line-breaks=b", "Convert page breaks to line breaks");
+	define("m|measures=s",             "measures numbers to place linebreaks before");
+	define("p|page-breaks=s",          "measure numbers to place page breaks before");
+	define("g|group=s:original",       "line/page break group");
+	define("r|remove|remove-breaks=b", "remove line/page breaks");
+	define("l|page-to-line-breaks=b",  "convert page breaks to line breaks");
 }
 
 
@@ -85098,19 +85968,156 @@ void Tool_humbreak::initialize(void) {
 	vector<string> lbs;
 	vector<string> pbs;
 	HumRegex hre;
-	hre.split(lbs, systemMeasures, "[^\\d]+");
-	hre.split(pbs, pageMeasures, "[^\\d]+");
+	hre.split(lbs, systemMeasures, "[^\\da-z]+");
+	hre.split(pbs, pageMeasures, "[^\\da-z]+");
 
 	for (int i=0; i<(int)lbs.size(); i++) {
-		int number = std::stoi(lbs[i]);
-		m_lineMeasures[number] = 1;
+		if (hre.search(lbs[i], "^(p?)(\\d+)([a-z]?)")) {
+			int number = hre.getMatchInt(2);
+			if (!hre.getMatch(1).empty()) {
+				m_pageMeasures[number] = 1;
+				int offset = 0;
+				string letter;
+				if (!hre.getMatch(3).empty()) {
+					letter = hre.getMatch(3);
+					offset = letter.at(0) - 'a';
+				}
+				m_pageOffset[number] = offset;
+			} else {
+				m_lineMeasures[number] = 1;
+				int offset = 0;
+				if (!hre.getMatch(3).empty()) {
+					string letter = hre.getMatch(3);
+					offset = letter.at(0) - 'a';
+				}
+				m_lineOffset[number] = offset;
+			}
+		}
 	}
 
 	for (int i=0; i<(int)pbs.size(); i++) {
-		int number = std::stoi(lbs[i]);
-		m_pageMeasures[number] = 1;
+		if (hre.search(pbs[i], "^(\\d+)([a-z]?)")) {
+			int number = hre.getMatchInt(1);
+			m_pageMeasures[number] = 1;
+			int offset = 0;
+			if (!hre.getMatch(2).empty()) {
+				string letter = hre.getMatch(2);
+				offset = letter.at(0) - 'a';
+			}
+			m_pageOffset[number] = offset;
+		}
 	}
 }
+
+
+
+//////////////////////////////
+//
+// Tool_humbreak::markLineBreakMeasures --
+//
+
+void Tool_humbreak::markLineBreakMeasures(HumdrumFile& infile) {
+	vector<HLp> pbreak;
+	vector<HLp> lbreak;
+	HumRegex hre;
+	map<int, int> used;
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isCommentGlobal()) {
+			HTp token = infile[i].token(0);
+			if (hre.search(token, "^!!LO:LB:")) {
+				lbreak.push_back(&infile[i]);
+			} else if (hre.search(token, "^!!LO:PB:")) {
+				pbreak.push_back(&infile[i]);
+			}
+		}
+
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+
+		int barnum = infile[i].getBarNumber();
+		if (barnum < 0) {
+			lbreak.clear();
+			pbreak.clear();
+			continue;
+		}
+
+		int status = m_lineMeasures[barnum];
+		if (status) {
+			HLp line = &infile[i];
+			int offset = m_lineOffset[barnum];
+			if (offset && (used[barnum] == 0)) {
+				used[barnum] = offset;
+				int ocounter = 0;
+				lbreak.clear();
+				pbreak.clear();
+				for (int j=i+1; j<infile.getLineCount(); j++) {
+					if (infile[i].isCommentGlobal()) {
+						HTp token = infile.token(i, 0);
+						if (hre.search(token, "^!!LO:LB:")) {
+							lbreak.push_back(&infile[i]);
+						}
+						if (hre.search(token, "^!!LO:PB:")) {
+							pbreak.push_back(&infile[i]);
+						}
+					}
+					if (!infile[j].isBarline()) {
+						continue;
+					}
+					ocounter++;
+					if (ocounter == offset) {
+						line = &infile[j];
+					}
+				}
+				if (!lbreak.empty()) {
+					lbreak.back()->setValue("auto", "barnum", barnum + 1);
+				} else {
+					line->setValue("auto", "barnum", barnum + 1);
+				}
+			} else {
+				line->setValue("auto", "barnum", barnum + 1);
+			}
+		}
+
+		status = m_pageMeasures[barnum];
+		if (status) {
+			HLp line = &infile[i];
+			int offset = m_pageOffset[barnum];
+			if (offset) {
+				int ocounter = 0;
+				lbreak.clear();
+				pbreak.clear();
+				for (int j=i+1; j<infile.getLineCount(); j++) {
+					if (infile[i].isCommentGlobal()) {
+						HTp token = infile.token(i, 0);
+						if (hre.search(token, "^!!LO:LB:")) {
+							lbreak.push_back(&infile[i]);
+						}
+						if (hre.search(token, "^!!LO:PB:")) {
+							pbreak.push_back(&infile[i]);
+						}
+					}
+					if (!infile[j].isBarline()) {
+						continue;
+					}
+					ocounter++;
+					if (ocounter == offset) {
+						line = &infile[j];
+					}
+				}
+				if (!pbreak.empty()) {
+					pbreak.back()->setValue("auto", "barnum", barnum + 1);
+					pbreak.back()->setValue("auto", "page", 1);
+				}
+			} else {
+				line->setValue("auto", "barnum", barnum + 1);
+				line->setValue("auto", "page", 1);
+			}
+		}
+	}
+}
+
 
 
 //////////////////////////////
@@ -85119,76 +86126,78 @@ void Tool_humbreak::initialize(void) {
 //
 
 void Tool_humbreak::addBreaks(HumdrumFile& infile) {
+	markLineBreakMeasures(infile);
 
 	HumRegex hre;
 	for (int i=0; i<infile.getLineCount(); i++) {
-
-		if ((i<infile.getLineCount()-1) && (infile.token(i, 0)->compare(0, 8, "!!LO:PB:") == 0)) {
-			// Add group to existing LO:PB:
-			HTp token = infile.token(i, 0);
-			HTp barToken = infile.token(i+1, 0);
-			if (barToken->isBarline()) {
-				int measure = infile[i+1].getBarNumber();
-				int pbStatus = m_pageMeasures[measure];
-				if (pbStatus) {
-					string query = "\\b" + m_group + "\\b";
-					if (!hre.match(token, query)) {
-						m_humdrum_text << token << ", " << m_group << endl;
-					} else {
-						m_humdrum_text << token << endl;
-					}
-				} else {
-					m_humdrum_text << token << endl;
-				}
-				m_humdrum_text << infile[i+1] << endl;
-				i++;
-				continue;
-			}
-		}
-
-		if ((i<infile.getLineCount()-1) && (infile.token(i, 0)->compare(0, 8, "!!LO:LB:") == 0)) {
-			// Add group to existing LO:LB:
-			HTp token = infile.token(i, 0);
-			HTp barToken = infile.token(i+1, 0);
-			if (barToken->isBarline()) {
-				int measure = infile[i+1].getBarNumber();
-				int lbStatus = m_lineMeasures[measure];
-				if (lbStatus) {
-					string query = "\\b" + m_group + "\\b";
-					if (!hre.match(token, query)) {
-						m_humdrum_text << token << ", " << m_group << endl;
-					} else {
-						m_humdrum_text << token << endl;
-					}
-				} else {
-					m_humdrum_text << token << endl;
-				}
-				m_humdrum_text << infile[i+1] << endl;
-				i++;
-				continue;
-			}
-		}
-
-		if (!infile[i].isBarline()) {
+		if (!(infile[i].isBarline() || infile[i].isComment())) {
 			m_humdrum_text << infile[i] << endl;
 			continue;
 		}
-		
-		int measure = infile[i].getBarNumber();
-		int pbStatus = m_pageMeasures[measure];
-		int lbStatus = m_lineMeasures[measure];
 
+		int barnum = infile[i].getValueInt("auto", "barnum");
+		if (barnum < 1) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		barnum--;
+		int pageQ = infile[i].getValueInt("auto", "page");
 
-		if (pbStatus) {
-			m_humdrum_text << "!!LO:PB:g=" << m_group << endl;
-		} else if (lbStatus) {
-			m_humdrum_text << "!!LO:LB:g=" << m_group << endl;
+		if (pageQ && infile[i].isComment()) {
+			HTp token = infile.token(i, 0);
+			if (hre.search(token, "^!!LO:PB:")) {
+				// Add group to existing LO:PB:
+				HTp token = infile.token(i, 0);
+				HTp barToken = infile.token(i+1, 0);
+				if (barToken->isBarline()) {
+					int measure = infile[i+1].getBarNumber();
+					int pbStatus = m_pageMeasures[measure];
+					if (pbStatus) {
+						string query = "\\b" + m_group + "\\b";
+						if (!hre.match(token, query)) {
+							m_humdrum_text << token << ", " << m_group << endl;
+						} else {
+							m_humdrum_text << token << endl;
+						}
+					} else {
+						m_humdrum_text << token << endl;
+					}
+					m_humdrum_text << infile[i+1] << endl;
+					i++;
+					continue;
+				}
+			} else if (hre.search(token, "^!!LO:LB:")) {
+				// Add group to existing LO:LB:
+				HTp token = infile.token(i, 0);
+				HTp barToken = infile.token(i+1, 0);
+				if (barToken->isBarline()) {
+					int measure = infile[i+1].getBarNumber();
+					int lbStatus = m_lineMeasures[measure];
+					if (lbStatus) {
+						string query = "\\b" + m_group + "\\b";
+						if (!hre.match(token, query)) {
+							m_humdrum_text << token << ", " << m_group << endl;
+						} else {
+							m_humdrum_text << token << endl;
+						}
+					} else {
+						m_humdrum_text << token << endl;
+					}
+					m_humdrum_text << infile[i+1] << endl;
+					i++;
+					continue;
+				}
+			}
 		}
 
+		if (pageQ) {
+			m_humdrum_text << "!!LO:PB:g=" << m_group << endl;
+		} else {
+			m_humdrum_text << "!!LO:LB:g=" << m_group << endl;
+		}
 		m_humdrum_text << infile[i] << endl;
 	}
 }
-
 
 
 
@@ -85723,14 +86732,14 @@ ostream& operator<<(ostream& out, NotePoint& np) {
 //
 
 Tool_humsheet::Tool_humsheet(void) {
-	define("h|H|html|HTML=b", "output table in HTML wrapper");
-	define("i|id|ID=b", "include ID for each cell");
-	define("z|zebra=b", "add zebra striping by spine to style");
+	define("h|H|html|HTML=b",       "output table in HTML wrapper");
+	define("i|id|ID=b",             "include ID for each cell");
+	define("z|zebra=b",             "add zebra striping by spine to style");
 	define("y|z2|zebra2|zebra-2=b", "zebra striping by data type");
-	define("t|tab-index=b", "vertical tab indexing");
-	define("X|no-exinterp=b", "do not embed exclusive interp data");
-	define("J|no-javascript=b", "do not embed javascript code");
-	define("S|no-style=b", "do not embed CSS style element");
+	define("t|tab-index=b",         "vertical tab indexing");
+	define("X|no-exinterp=b",       "do not embed exclusive interp data");
+	define("J|no-javascript=b",     "do not embed javascript code");
+	define("S|no-style=b",          "do not embed CSS style element");
 }
 
 
@@ -86779,11 +87788,11 @@ void Tool_humsheet::analyzeTabIndex(HumdrumFile& infile) {
 
 Tool_humsort::Tool_humsort(void) {
 	// add options here
-	define("n|numeric=b", "Sort numerically");
-	define("r|reverse=b", "Sort in reversed order");
-	define("s|spine=i:1", "Spine to sort (1-indexed)");
-	define("I|do-not-ignore-case=b", "Do not ignore case when sorting alphabetically");
-	define("i|e|x|interp|exclusive-interpretation=s", "Exclusive interpretation to sort");
+	define("n|numeric=b",                             "sort numerically");
+	define("r|reverse=b",                             "sort in reversed order");
+	define("s|spine=i:1",                             "spine to sort (1-indexed)");
+	define("I|do-not-ignore-case=b",                  "do not ignore case when sorting alphabetically");
+	define("i|e|x|interp|exclusive-interpretation=s", "exclusive interpretation to sort");
 }
 
 
@@ -86947,25 +87956,25 @@ void Tool_humsort::processFile(HumdrumFile& infile) {
 //
 
 Tool_humtr::Tool_humtr(void) {
-	define("T|no-text|no-lyrics=b", "Do not convert lyrics in **text spines.");
-	define("L|no-local=b", "Do not convert local LO t parameters.");
-	define("G|no-global=b", "Do not convert global LO t parameters.");
-	define("R|no-reference=b", "Do not convert reference record values.");
+	define("T|no-text|no-lyrics=b",     "do not convert lyrics in **text spines.");
+	define("L|no-local=b",              "do not convert local LO t parameters.");
+	define("G|no-global=b",             "do not convert global LO t parameters.");
+	define("R|no-reference=b",          "do not convert reference record values.");
 
 	define("t|text-only|lyrics-only=b", "convert only lyrics in **text spines.");
-	define("l|local-only=b", "convert only local LO t parameters.");
-	define("g|global-only=b", "convert only global LO t parameters.");
-	define("r|reference-only=b", "convert only reference record values.");
+	define("l|local-only=b",            "convert only local LO t parameters.");
+	define("g|global-only=b",           "convert only global LO t parameters.");
+	define("r|reference-only=b",        "convert only reference record values.");
 
-	define("d|data-type=s", "process only given exclusive interpretations");
-	define("s|spines=s", "spines to process");
+	define("d|data-type=s",             "process only given exclusive interpretations");
+	define("s|spines=s",                "spines to process");
 
-	define("i|input=s", "Input characters to change");
-	define("o|output=s", "Output characters to change to");
+	define("i|input=s",                 "input characters to change");
+	define("o|output=s",                "output characters to change to");
 
-	define("m|replace-map=s", "Characters to change from and to");
-	define("M|display-mapping=b", "Display character transliterations mappings");
-	define("p|popc|popc2=b", "Add POPC2 character substitutions");
+	define("m|replace-map=s",           "characters to change from and to");
+	define("M|display-mapping=b",       "display character transliterations mappings");
+	define("p|popc|popc2=b",            "add POPC2 character substitutions");
 }
 
 
@@ -87462,41 +88471,41 @@ int Tool_imitation::Enumerator = 0;
 //
 
 Tool_imitation::Tool_imitation(void) {
-	define("debug=b",             "print grid cell information");
-	define("e|exinterp=s:**vvdata","specify exinterp for **vvdata spine");
+	define("debug=b",                   "print grid cell information");
+	define("e|exinterp=s:**vvdata",     "specify exinterp for **vvdata spine");
 
-	define("n|t|threshold=i:7",   "minimum number of notes to match");
-	define("f|first=b",           "only give info for first sequence of matched pair");
+	define("n|t|threshold=i:7",         "minimum number of notes to match");
+	define("f|first=b",                 "only give info for first sequence of matched pair");
 
-	define("q|quiet|no-info=b",   "do not add spines giving information about matches");
+	define("q|quiet|no-info=b",         "do not add spines giving information about matches");
 
-	define("N|no-enumeration=b",  "do not display enumeration number");
-	define("C|no-count=b",        "do not display note-count number");
-	define("D|no-distance=b",     "do not display distance between first notes of sequences");
-	define("I|no-interval=b",     "do not display interval transposite between sequences");
+	define("N|no-enumeration=b",        "do not display enumeration number");
+	define("C|no-count=b",              "do not display note-count number");
+	define("D|no-distance=b",           "do not display distance between first notes of sequences");
+	define("I|no-interval=b",           "do not display interval transposite between sequences");
 
-	define("NN|no-enumeration2=b", "do not display enumeration number on second sequence");
-	define("CC|no-count2=b",       "do not display note-count number on second sequence");
-	define("DD|no-distance2=b",    "do not display distance between first notes of sequences on second sequence");
-	define("II|no-interval2=b",    "do not display interval transposition between sequences on second sequence");
-	define("2|enumerate-second-only=b", "Display enumeration number on second sequence only (no count, distance, or interval");
+	define("NN|no-enumeration2=b",      "do not display enumeration number on second sequence");
+	define("CC|no-count2=b",            "do not display note-count number on second sequence");
+	define("DD|no-distance2=b",         "do not display distance between first notes of sequences on second sequence");
+	define("II|no-interval2=b",         "do not display interval transposition between sequences on second sequence");
+	define("2|enumerate-second-only=b", "display enumeration number on second sequence only (no count, distance, or interval");
 
-	define("p|no-duration=b",     "pitch only when matching: do not consider duration");
-	define("d|max-distance=d",    "maximum distance in quarter notes between imitations");
-	define("s|single-mark=b",     "place a single mark on matched notes (not one for each match pair");
-	define("r|rest=b",            "require match trigger to follow a rest");
-	define("R|rest2=b",           "require match target to also follow a rest");
-	define("i|intervals=s",       "require given interval sequence in imitation");
-	define("M|no-mark=b",         "do not mark matched sequences");
-	define("Z|no-zero=b",         "do not mark imitation starting at the same time");
-	define("z|only-zero=b",       "Mark only imitation starting at the same time (parallel motion)");
-	define("m|measure=b",         "Include measure number in imitation information");
-	define("b|beat=b",            "Include beat number (really quarter-note number) in imitation information");
-	define("l|length=b",          "Include length of imitation (in quarter-note units)");
+	define("p|no-duration=b",            "pitch only when matching: do not consider duration");
+	define("d|max-distance=d",           "maximum distance in quarter notes between imitations");
+	define("s|single-mark=b",            "place a single mark on matched notes (not one for each match pair");
+	define("r|rest=b",                   "require match trigger to follow a rest");
+	define("R|rest2=b",                  "require match target to also follow a rest");
+	define("i|intervals=s",              "require given interval sequence in imitation");
+	define("M|no-mark=b",                "do not mark matched sequences");
+	define("Z|no-zero=b",                "do not mark imitation starting at the same time");
+	define("z|only-zero=b",              "mark only imitation starting at the same time (parallel motion)");
+	define("m|measure=b",                "include measure number in imitation information");
+	define("b|beat=b",                   "include beat number (really quarter-note number) in imitation information");
+	define("l|length=b",                 "include length of imitation (in quarter-note units)");
 
-	define("a|add=b",             "add inversions, retrograde, etc. if specified to normal search");
-	define("v|inversion=b",       "match inversions");
-	define("g|retrograde=b",      "match retrograde");
+	define("a|add=b",                    "add inversions, retrograde, etc. if specified to normal search");
+	define("v|inversion=b",              "match inversions");
+	define("g|retrograde=b",             "match retrograde");
 }
 
 
@@ -88196,12 +89205,12 @@ int Tool_imitation::compareSequences(vector<NoteCell*>& attack1,
 //
 
 Tool_kern2mens::Tool_kern2mens(void) {
-	define("N|no-measure-numbers=b", "remove measure numbers");
-	define("M|no-measures=b",        "remove measures ");
-	define("I|not-invisible=b",      "keep measures visible");
-	define("D|no-double-bar=b",      "keep thick final barlines");
-	define("c|clef=s",               "clef to use in mensural notation");
-	define("V|no-verovio=b",         "don't add verovio styling");
+	define("N|no-measure-numbers=b",                "remove measure numbers");
+	define("M|no-measures=b",                       "remove measures ");
+	define("I|not-invisible=b",                     "keep measures visible");
+	define("D|no-double-bar=b",                     "keep thick final barlines");
+	define("c|clef=s",                              "clef to use in mensural notation");
+	define("V|no-verovio=b",                        "don't add verovio styling");
 	define("e|evenNoteSpacing|even-note-spacing=b", "add evenNoteSpacing option");
 }
 
@@ -88975,9 +89984,9 @@ string Tool_kernify::makeReverseLine(HumdrumLine& line) {
 //
 
 Tool_kernview::Tool_kernview(void) {
-	define("v|view|s|show=s", "view the list of spines");
-	define("g=s", "Regular expression of kern spines to view");
-	define("G=s", "Regular expression of kern spines to hide");
+	define("v|view|s|show=s",   "view the list of spines");
+	define("g=s",               "regular expression of kern spines to view");
+	define("G=s",               "regular expression of kern spines to hide");
 	define("h|hide|r|remove=s", "hide the list of spines");
 }
 
@@ -89209,10 +90218,10 @@ void Tool_kernview::processFile(HumdrumFile& infile) {
 
 Tool_mei2hum::Tool_mei2hum(void) {
 	define("app|app-label=s", "app label to follow");
-	define("r|recip=b", "output **recip spine");
-	define("s|stems=b", "include stems in output");
-	define("x|xmlids=b", "include xmlids in output");
-	define("P|no-place=b", "Do not convert placement attribute");
+	define("r|recip=b",       "output **recip spine");
+	define("s|stems=b",       "include stems in output");
+	define("x|xmlids=b",      "include xmlids in output");
+	define("P|no-place=b",    "do not convert placement attribute");
 
 	m_maxverse.resize(m_maxstaff);
 	fill(m_maxverse.begin(), m_maxverse.end(), 0);
@@ -94124,7 +95133,7 @@ Tool_melisma::Tool_melisma(void) {
 	define("r|replace=b",      "replace lyrics with note counts");
 	define("a|average|avg=b",  "calculate note-to-syllable ratio");
 	define("w|words=b",        "list words that contain a melisma");
-	define("p|part=b", "also calculate note-to-syllable ratios by part");
+	define("p|part=b",         "also calculate note-to-syllable ratios by part");
 }
 
 
@@ -95249,25 +96258,23 @@ string Tool_mens2kern::mens2kernRhythm(const string& rhythm, bool altera, bool p
 //
 
 Tool_meter::Tool_meter(void) {
-
-	define("c|comma=b", "display decimal points as commas");
-	define("d|denominator=b", "display denominator spine");
-	define("e|eighth=b", "metric positions in eighth notes rather than beats");
-	define("f|float=b", "floating-point beat values instead of rational numbers");
-	define("h|half=b", "metric positions in half notes rather than beats");
-	define("j|join=b", "join time signature information and metric positions into a single token");
-	define("n|numerator=b", "display numerator spine");
-	define("q|quarter=b", "metric positions in quarter notes rather than beats");
-	define("r|rest=b", "add meteric positions of rests");
-	define("s|sixteenth=b", "metric positions in sixteenth notes rather than beats");
+	define("c|comma=b",                       "display decimal points as commas");
+	define("d|denominator=b",                 "display denominator spine");
+	define("e|eighth=b",                      "metric positions in eighth notes rather than beats");
+	define("f|float=b",                       "floating-point beat values instead of rational numbers");
+	define("h|half=b",                        "metric positions in half notes rather than beats");
+	define("j|join=b",                        "join time signature information and metric positions into a single token");
+	define("n|numerator=b",                   "display numerator spine");
+	define("q|quarter=b",                     "metric positions in quarter notes rather than beats");
+	define("r|rest=b",                        "add meteric positions of rests");
+	define("s|sixteenth=b",                   "metric positions in sixteenth notes rather than beats");
 	define("t|time-signature|tsig|m|meter=b", "display active time signature for each note");
-	define("w|whole=b", "metric positions in whole notes rather than beats");
-	define("z|zero=b", "start of measure is beat 0 rather than beat 1");
+	define("w|whole=b",                       "metric positions in whole notes rather than beats");
+	define("z|zero=b",                        "start of measure is beat 0 rather than beat 1");
 
-	define("B|no-beat=b", "Do not display metric positions (beats)");
-	define("D|digits=i:0", "number of digits after decimal point");
-	define("L|no-label=b", "do not add labels to analysis spines");
-
+	define("B|no-beat=b",                     "Do not display metric positions (beats)");
+	define("D|digits=i:0",                    "number of digits after decimal point");
+	define("L|no-label=b",                    "do not add labels to analysis spines");
 }
 
 
@@ -96092,14 +97099,14 @@ void Tool_meter::processLine(HumdrumLine& line, vector<HumNum>& curNum,
 //
 
 Tool_metlev::Tool_metlev(void) {
-	define("a|append=b",          "append data analysis to input file");
-	define("p|prepend=b",         "prepend data analysis to input file");
-	define("c|composite=b",       "generate composite rhythm");
-	define("i|integer=b",         "quantize metric levels to int values");
-	define("x|attacks-only=b",    "only mark lines with note attacks");
-	define("G|no-grace-notes=b",  "do not mark grace note lines");
-	define("k|kern-spine=i:1",    "analyze only given kern spine");
-	define("e|exinterp=s:blev",   "exclusive interpretation type for output");
+	define("a|append=b",         "append data analysis to input file");
+	define("p|prepend=b",        "prepend data analysis to input file");
+	define("c|composite=b",      "generate composite rhythm");
+	define("i|integer=b",        "quantize metric levels to int values");
+	define("x|attacks-only=b",   "only mark lines with note attacks");
+	define("G|no-grace-notes=b", "do not mark grace note lines");
+	define("k|kern-spine=i:1",   "analyze only given kern spine");
+	define("e|exinterp=s:blev",  "exclusive interpretation type for output");
 }
 
 
@@ -96299,17 +97306,17 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 //
 
 Tool_modori::Tool_modori(void) {
-	define("m|modern=b",    "prepare score for modern style");
-	define("o|original=b", "prepare score for original style");
-	define("d|info=b", "display key/clef/mensuration information");
-	define("I|no-instrument-name|no-instrument-names=b", "Do not change part labels");
-	define("A|no-instrument-abbreviation|no-instrument-abbreviations=b", "Do not change part label abbreviations");
-	define("C|no-clef|no-clefs=b", "Do not change clefs");
-	define("K|no-key|no-keys=b", "Do not change key signatures");
-	define("L|no-lyrics=b", "Do not change **text exclusive interpretations");
-	define("M|no-mensuration|no-mensurations=b", "Do not change mensurations");
-	define("R|no-references=b", "Do not change reference records keys");
-	define("T|no-text=b",    "Do not change !LO:(TX|DY) layout parameters");
+	define("m|modern=b",                                                 "prepare score for modern style");
+	define("o|original=b",                                               "prepare score for original style");
+	define("d|info=b",                                                   "display key/clef/mensuration information");
+	define("I|no-instrument-name|no-instrument-names=b",                 "do not change part labels");
+	define("A|no-instrument-abbreviation|no-instrument-abbreviations=b", "do not change part label abbreviations");
+	define("C|no-clef|no-clefs=b",                                       "do not change clefs");
+	define("K|no-key|no-keys=b",                                         "do not change key signatures");
+	define("L|no-lyrics=b",                                              "do not change **text exclusive interpretations");
+	define("M|no-mensuration|no-mensurations=b",                         "do not change mensurations");
+	define("R|no-references=b",                                          "do not change reference records keys");
+	define("T|no-text=b",                                                "do not change !LO:(TX|DY) layout parameters");
 }
 
 
@@ -97906,18 +98913,18 @@ void MSearchQueryToken::parseHarmonicQuery(void) {
 //
 
 Tool_msearch::Tool_msearch(void) {
-	define("debug=b",               "diatonic search");
-	define("q|query=s:4c4d4e4f4g",  "combined rhythm/pitch query string");
-	define("p|pitch=s:cdefg",       "pitch query string");
-	define("i|interval=s:2222",     "interval query string");
+	define("debug=b",                     "diatonic search");
+	define("q|query=s:4c4d4e4f4g",        "combined rhythm/pitch query string");
+	define("p|pitch=s:cdefg",             "pitch query string");
+	define("i|interval=s:2222",           "interval query string");
 	define("r|d|rhythm|duration=s:44444", "rhythm query string");
-	define("t|text=s:",             "lyrical text query string");
-	define("O|no-overlap=b",        "do not allow matches to overlap");
-	define("x|cross=b",             "search across parts");
-	define("c|color=s",             "highlight color");
-	define("m|mark|marker=s:@",     "marking character");
-	define("M|no-mark|no-marker=b", "do not mark matches");
-	define("Q|quiet=b",             "quiet mode: do not summarize matches");
+	define("t|text=s:",                   "lyrical text query string");
+	define("O|no-overlap=b",              "do not allow matches to overlap");
+	define("x|cross=b",                   "search across parts");
+	define("c|color=s",                   "highlight color");
+	define("m|mark|marker=s:@",           "marking character");
+	define("M|no-mark|no-marker=b",       "do not mark matches");
+	define("Q|quiet=b",                   "quiet mode: do not summarize matches");
 }
 
 
@@ -99766,10 +100773,10 @@ Tool_musedata2hum::Tool_musedata2hum(void) {
 	// Options& options = m_options;
 	// options.define("k|kern=b","display corresponding **kern data");
 
-	define("g|group=s:score", "The data group to process");
-	define("r|recip=b",       "Output **recip spine");
-	define("s|stems=b",       "Include stems in output");
-	define("omv|no-omv=b",    "Exclude extracted OMV record in output data");
+	define("g|group=s:score", "the data group to process");
+	define("r|recip=b",       "output **recip spine");
+	define("s|stems=b",       "include stems in output");
+	define("omv|no-omv=b",    "exclude extracted OMV record in output data");
 }
 
 
@@ -99878,11 +100885,20 @@ bool Tool_musedata2hum::convert(ostream& out, MuseDataSet& mds) {
 
 	HumdrumFile outfile;
 	outdata.transferTokens(outfile);
+	outfile.generateLinesFromTokens();
+	stringstream sss;
+	sss << outfile;
+	outfile.readString(sss.str());
+
 	if (needsAboveBelowKernRdf()) {
 		outfile.appendLine("!!!RDF**kern: > = above");
 		outfile.appendLine("!!!RDF**kern: < = above");
 	}
+
 	outfile.createLinesFromTokens();
+
+	Tool_trillspell trillspell;
+	trillspell.run(outfile);
 
 	// Convert comments in header of first part:
 	int ii = groupMemberIndex[0];
@@ -100123,6 +101139,7 @@ bool Tool_musedata2hum::convertPart(HumGrid& outdata, MuseDataSet& mds, int inde
 	bool status = true;
 	int i = 0;
 	while (i < part.getLineCount()) {
+		m_measureLineIndex = i;
 		i = convertMeasure(outdata, part, partindex, i);
 	}
 
@@ -100286,6 +101303,10 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 		layer = layer - 1;
 	}
 
+	if (mr.isAnyNoteOrRest()) {
+		m_figureOffset = 0;
+	}
+
 	if (mr.isDirection()) {
 		return;
 	}
@@ -100310,6 +101331,10 @@ void Tool_musedata2hum::convertLine(GridMeasure* gm, MuseRecord& mr) {
 			} else {
 				setInitialOmd(mtempo);
 			}
+		}
+
+		if (!attributes["Q"].empty()) {
+			m_quarterDivisions = std::stoi(attributes["Q"]);
 		}
 
 		string mclef = attributes["C"];
@@ -100502,11 +101527,19 @@ void Tool_musedata2hum::addTextDirection(GridMeasure* gm, int part, int staff,
 void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 		HumNum timestamp, int part, int maxstaff) {
 	string fh = mr.getFigureString();
+	int figureDuration = mr.getFigureDuration();
 	fh = Convert::museFiguredBassToKernFiguredBass(fh);
+	if (m_figureOffset > 0) {
+		if (m_quarterDivisions > 0) {
+			HumNum offset(m_figureOffset, m_quarterDivisions);
+			timestamp + offset;
+		}
+	}
 	if (fh.find(":") == string::npos) {
 		HTp fhtok = new HumdrumToken(fh);
 		m_lastfigure = fhtok;
 		gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
+		m_figureOffset += figureDuration;
 		return;
 	}
 
@@ -100514,6 +101547,7 @@ void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 		HTp fhtok = new HumdrumToken(fh);
 		m_lastfigure = fhtok;
 		gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
+		m_figureOffset += figureDuration;
 		return;
 	}
 
@@ -100561,6 +101595,7 @@ void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 		HTp fhtok = new HumdrumToken(fh);
 		m_lastfigure = fhtok;
 		gm->addFiguredBass(fhtok, timestamp, part, maxstaff);
+		m_figureOffset += figureDuration;
 		return;
 	}
 
@@ -100579,6 +101614,7 @@ void Tool_musedata2hum::addFiguredHarmony(MuseRecord& mr, GridMeasure* gm,
 	HTp newtok = new HumdrumToken(fh);
 	m_lastfigure = newtok;
 	gm->addFiguredBass(newtok, timestamp, part, maxstaff);
+	m_figureOffset += figureDuration;
 }
 
 
@@ -106026,28 +107062,28 @@ void Tool_musicxml2hum::getChildrenVector(vector<xml_node>& children,
 //
 
 Tool_myank::Tool_myank(void) {
-	define("v|verbose=b",    "Verbose output of data");
-	define("debug=b",        "Debugging information");
-	define("inlist=b",       "Show input measure list");
-	define("outlist=b",      "Show output measure list");
-	define("mark|marks=b",   "Yank measure with marked notes");
-	define("T|M|bar-number-text=b", "print barnum with LO text above system ");
-	define("d|double|dm|md|mdsep|mdseparator=b", "Put double barline between non-consecutive measure segments");
-	define("m|b|measures|bars|measure|bar=s", "Measures to yank");
-	define("l|lines|line-range=s", "Line numbers range to yank (e.g. 40-50)");
-	define("I|i|instrument=b", "Include instrument codes from start of data");
-	define("visible|not-invisible=b", "Do not make initial measure invisible");
-	define("B|noendbar=b", "Do not print barline at end of data");
-	define("max=b",  "print maximum measure number");
-	define("min=b",  "print minimum measure number");
-	define("section-count=b", "count the number of sections, JRP style");
-	define("section=i:0", "extract given section number (indexed from 1");
-	define("author=b",        "Program author");
-	define("version=b",       "Program version");
-	define("example=b",       "Program examples");
-	define("h|help=b",        "Short description");
-	define("hide-starting=b", "Prevent printStarting");
-	define("hide-ending=b",   "Prevent printEnding");
+	define("v|verbose=b",                        "verbose output of data");
+	define("debug=b",                            "debugging information");
+	define("inlist=b",                           "show input measure list");
+	define("outlist=b",                          "show output measure list");
+	define("mark|marks=b",                       "yank measure with marked notes");
+	define("T|M|bar-number-text=b",              "print barnum with LO text above system ");
+	define("d|double|dm|md|mdsep|mdseparator=b", "put double barline between non-consecutive measure segments");
+	define("m|b|measures|bars|measure|bar=s",    "measures to yank");
+	define("l|lines|line-range=s",               "line numbers range to yank (e.g. 40-50)");
+	define("I|i|instrument=b",                   "Include instrument codes from start of data");
+	define("visible|not-invisible=b",            "do not make initial measure invisible");
+	define("B|noendbar=b",                       "do not print barline at end of data");
+	define("max=b",                              "print maximum measure number");
+	define("min=b",                              "print minimum measure number");
+	define("section-count=b",                    "count the number of sections, JRP style");
+	define("section=i:0",                        "extract given section number (indexed from 1");
+	define("author=b",                           "program author");
+	define("version=b",                          "program version");
+	define("example=b",                          "program examples");
+	define("h|help=b",                           "short description");
+	define("hide-starting=b",                    "prevent printStarting");
+	define("hide-ending=b",                      "prevent printEnding");
 }
 
 
@@ -108789,23 +109825,23 @@ void Tool_myank::usage(const string& ommand) {
 //
 
 Tool_nproof::Tool_nproof(void) {
-	define("B|no-blank|no-blanks=b", "Do not check for blank lines.\n");
-	define("b|only-blank|only-blanks=b", "Only check for blank lines.\n");
+	define("B|no-blank|no-blanks=b",                 "do not check for blank lines.\n");
+	define("b|only-blank|only-blanks=b",             "only check for blank lines.\n");
 
-	define("I|no-instrument|no-instruments=b", "Do not check instrument interpretations.\n");
-	define("i|only-instrument|only-instruments=b", "Only check instrument interpretations.\n");
+	define("I|no-instrument|no-instruments=b",       "do not check instrument interpretations.\n");
+	define("i|only-instrument|only-instruments=b",   "only check instrument interpretations.\n");
 
-	define("K|no-key=b", "Do not check for !!!key: manual initial key designation.\n");
-	define("k|only-key=b", "Only check for !!!key: manual initial key designation.\n");
+	define("K|no-key=b",                             "do not check for !!!key: manual initial key designation.\n");
+	define("k|only-key=b",                           "only check for !!!key: manual initial key designation.\n");
 
-	define("R|no-reference=b", "Do not check for reference records.\n");
-	define("r|only-reference=b", "Only check for reference records.\n");
+	define("R|no-reference=b",                       "do not check for reference records.\n");
+	define("r|only-reference=b",                     "only check for reference records.\n");
 
-	define("T|no-termination|no-terminations=b", "Do not check spine terminations.\n");
-	define("t|only-termination|only-terminations=b", "Only check spine terminations.\n");
+	define("T|no-termination|no-terminations=b",     "do not check spine terminations.\n");
+	define("t|only-termination|only-terminations=b", "only check spine terminations.\n");
 
-	define("file|filename=b", "Print filename with raw count (if available).\n");
-	define("raw=b", "Only print error count.\n");
+	define("file|filename=b",                        "print filename with raw count (if available).\n");
+	define("raw=b",                                  "only print error count.\n");
 }
 
 
@@ -109862,21 +110898,21 @@ void Tool_ordergps::printStaffLine(HumdrumFile& infile) {
 //
 
 Tool_pccount::Tool_pccount(void) {
-	define("a|attacks=b", "count attacks instead of durations");
-	define("d|data|vega-data=b", "display the vega-lite template.");
-	define("f|full=b", "full count attacks all single sharps and flats.");
-	define("ff|double-full=b", "full count attacks all double sharps and flats.");
-	define("h|html=b", "generate vega-lite HTML content");
-	define("i|id=s:id", "ID for use as variable and in plot title");
-	define("K|no-key|no-final=b", "Do not label key tonic or final");
-	define("m|maximum=b", "normalize by maximum count");
-	define("n|normalize=b", "normalize counts");
-	define("p|page=b", "generate vega-lite stand-alone HTML page");
+	define("a|attacks=b",                 "count attacks instead of durations");
+	define("d|data|vega-data=b",          "display the vega-lite template.");
+	define("f|full=b",                    "full count attacks all single sharps and flats.");
+	define("ff|double-full=b",            "full count attacks all double sharps and flats.");
+	define("h|html=b",                    "generate vega-lite HTML content");
+	define("i|id=s:id",                   "ID for use as variable and in plot title");
+	define("K|no-key|no-final=b",         "do not label key tonic or final");
+	define("m|maximum=b",                 "normalize by maximum count");
+	define("n|normalize=b",               "normalize counts");
+	define("p|page=b",                    "generate vega-lite stand-alone HTML page");
 	define("r|ratio|aspect-ratio=d:0.67", "width*ratio=height of vega-lite plot");
-	define("s|script|vega-script=b", "generate vega-lite javascript content");
-	define("title=s", "Title for plot");
-	define("t|template|vega-template=b", "display the vega-lite template.");
-	define("w|width=i:400", "width of vega-lite plot");
+	define("s|script|vega-script=b",      "generate vega-lite javascript content");
+	define("title=s",                     "title for plot");
+	define("t|template|vega-template=b",  "display the vega-lite template.");
+	define("w|width=i:400",               "width of vega-lite plot");
 }
 
 
@@ -110761,14 +111797,14 @@ string Tool_pccount::getPitchClassString(int b40) {
 //
 
 Tool_periodicity::Tool_periodicity(void) {
-	define("m|min=b", "minimum time unit (other than grace notes)");
+	define("m|min=b",         "minimum time unit (other than grace notes)");
 	define("n|max-rows=i:-1", "maxumum number of rows in svg analysis display");
-	define("t|track=i:0", "track to analyze");
-	define("attacks=b", "extract attack grid)");
-	define("raw=b", "show only raw period data");
-	define("s|svg=b", "output svg image");
-	define("p|power=d:2.0", "scaling power for visual display");
-	define("1|one=b", "composite rhythms are not weighted by attack");
+	define("t|track=i:0",     "track to analyze");
+	define("attacks=b",       "extract attack grid)");
+	define("raw=b",           "show only raw period data");
+	define("s|svg=b",         "output svg image");
+	define("p|power=d:2.0",   "scaling power for visual display");
+	define("1|one=b",         "composite rhythms are not weighted by attack");
 }
 
 
@@ -111154,10 +112190,10 @@ void Tool_periodicity::getColorMapping(double input, double& hue,
 
 Tool_phrase::Tool_phrase(void) {
 	define("A|no-average=b", "do not do average phrase-length analysis");
-	define("R|remove2=b", "remove phrase boundaries in data and do not do analysis");
-	define("m|mark=b", "mark phrase boundaries based on rests");
-	define("r|remove=b", "remove phrase boundaries in data");
-	define("c|color=s", "display color of analysis data");
+	define("R|remove2=b",    "remove phrase boundaries in data and do not do analysis");
+	define("m|mark=b",       "mark phrase boundaries based on rests");
+	define("r|remove=b",     "remove phrase boundaries in data");
+	define("c|color=s",      "display color of analysis data");
 }
 
 
@@ -111538,7 +112574,7 @@ bool Tool_phrase::hasPhraseMarks(HTp start) {
 //
 
 Tool_pline::Tool_pline(void) {
-	define("c|color=b", "color poetic lines (currently only by notes)");
+	define("c|color=b",   "color poetic lines (currently only by notes)");
 	define("o|overlap=b", "do overlap analysis/markup");
 }
 
@@ -111808,13 +112844,13 @@ void Tool_pline::getPlineInterpretations(HumdrumFile& infile, vector<HTp>& token
 //
 
 Tool_pnum::Tool_pnum(void) {
-	define("b|base=i:midi",      "numeric base of pitch to extract");
-	define("D|no-duration=b",    "do not include duration");
-	define("c|pitch-class=b",    "give numeric pitch-class rather than pitch");
-	define("o|octave=b",         "give octave rather than pitch");
-	define("r|rest=s:0",         "representation string for rests");
-	define("R|no-rests=b",       "do not include rests in conversion");
-	define("x|attacks-only=b",   "only mark lines with note attacks");
+	define("b|base=i:midi",    "numeric base of pitch to extract");
+	define("D|no-duration=b",  "do not include duration");
+	define("c|pitch-class=b",  "give numeric pitch-class rather than pitch");
+	define("o|octave=b",       "give octave rather than pitch");
+	define("r|rest=s:0",       "representation string for rests");
+	define("R|no-rests=b",     "do not include rests in conversion");
+	define("x|attacks-only=b", "only mark lines with note attacks");
 }
 
 
@@ -112274,8 +113310,8 @@ void Tool_recip::initialize(HumdrumFile& infile) {
 //
 
 Tool_restfill::Tool_restfill(void) {
-	define("y|hidden-rests=b",        "hide inserted rests");
-	define("i|exinterp=s:kern",       "type of spine to fill with rests");
+	define("y|hidden-rests=b",  "hide inserted rests");
+	define("i|exinterp=s:kern", "type of spine to fill with rests");
 }
 
 
@@ -112514,24 +113550,24 @@ HumNum Tool_restfill::getNextTime(HTp token) {
 
 Tool_rid::Tool_rid(void) {
    // Humdrum Toolkit classic rid options:
-   define("D|all-data=b", "remove all data records");
-   define("d|null-data=b", "remove null data records");
-   define("G|all-global=b", "remove all global comments");
-   define("g|null-global=b", "remove null global comments");
-   define("I|all-interpretation=b", "remove all interpretation records");
-   define("i|null-interpretation=b", "remove null interpretation records");
-   define("L|all-local-comment=b", "remove all local comments");
-   define("l|1|null-local-comment=b", "remove null local comments");
+   define("D|all-data=b",                  "remove all data records");
+   define("d|null-data=b",                 "remove null data records");
+   define("G|all-global=b",                "remove all global comments");
+   define("g|null-global=b",               "remove null global comments");
+   define("I|all-interpretation=b",        "remove all interpretation records");
+   define("i|null-interpretation=b",       "remove null interpretation records");
+   define("L|all-local-comment=b",         "remove all local comments");
+   define("l|1|null-local-comment=b",      "remove null local comments");
    define("T|all-tandem-interpretation=b", "remove all tandem interpretations");
-   define("U|u=b", "remove unnecessary (duplicate ex. interps.");
-   define("k|consider-kern-only=b", "for -d, only consider **kern spines.");
-   define("V=b","negate filtering effect of program.");
-   define("H|no-humdrum-syntax=b", "equivalent to -GLIMd.");
+   define("U|u=b",                         "remove unnecessary (duplicate ex. interps.");
+   define("k|consider-kern-only=b",        "for -d, only consider **kern spines.");
+   define("V=b",                           "negate filtering effect of program.");
+   define("H|no-humdrum-syntax=b",         "equivalent to -GLIMd.");
 
    // additional options
-   define("M|all-barlines=b", "remove measure lines");
-   define("C|all-comments=b", "remove all comment lines");
-   define("c=b", "remove global and local comment lines");
+   define("M|all-barlines=b",              "remove measure lines");
+   define("C|all-comments=b",              "remove all comment lines");
+   define("c=b",                           "remove global and local comment lines");
 }
 
 
@@ -112891,7 +113927,7 @@ void Tool_ruthfix::createTiedNote(HTp left, HTp right) {
 
 Tool_sab2gs::Tool_sab2gs(void) {
 	define("b|below=s:<", "Marker for displaying on next staff below");
-	define("d|down=b", "Use only *down/*Xdown interpretations");
+	define("d|down=b",    "Use only *down/*Xdown interpretations");
 }
 
 
@@ -113108,7 +114144,7 @@ void Tool_sab2gs::printSpineSplit(HumdrumFile& infile, int index, vector<int>& k
 	// Ignore the second kern spine as it does not exist yet in the
 	// output data.
 	nextIndex++;
-	// Then store any non-kern spines between the second and third kern spines to 
+	// Then store any non-kern spines between the second and third kern spines to
 	// append to the end of the data line later.
 	string postData;
 	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
@@ -113214,7 +114250,7 @@ void Tool_sab2gs::printSpineMerge(HumdrumFile& infile, int index, vector<int>& k
 	// output data.
 	// HTp savedKernToken = infile.token(index, nextIndex);
 	nextIndex++;
-	// Then store any non-kern spines between the second and third kern spines to 
+	// Then store any non-kern spines between the second and third kern spines to
 	// append to the end of the data line later.
 	string postData;
 	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
@@ -113325,7 +114361,7 @@ void Tool_sab2gs::printSwappedLine(HumdrumFile& infile, int index, vector<int>& 
 	// Save the second kern spine as it does not exist yet in the
 	// output data.
 	HTp savedKernToken = infile.token(index, nextIndex++);
-	// Then store any non-kern spines between the second and third kern spines to 
+	// Then store any non-kern spines between the second and third kern spines to
 	// append to the end of the data line later.
 	string postData;
 	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
@@ -113434,7 +114470,7 @@ void Tool_sab2gs::printReducedLine(HumdrumFile& infile, int index, vector<int>& 
 	// Ignore the second kern spine as it does not exist yet in the
 	// output data.
 	nextIndex++;
-	// Then store any non-kern spines between the second and third kern spines to 
+	// Then store any non-kern spines between the second and third kern spines to
 	// append to the end of the data line later.
 	string postData;
 	for (int i=nextIndex; i<infile[index].getFieldCount(); i++) {
@@ -113495,7 +114531,7 @@ void Tool_sab2gs::adjustMiddleVoice(HTp spineStart) {
 	// when on bottom staff add "<" marker after pitch (or rest) to move to
 	// bottom staff.  Staff choice is selected by clef: clefG2 is for top staff
 	// and staffF4 is for bottom staff. Chords are not expected.
-	int staff = 0; 
+	int staff = 0;
 	string replacement = "$1" + m_belowMarker;
 	HumRegex hre;
 	while (current) {
@@ -114237,16 +115273,16 @@ bool Tool_satb2gs::validateHeader(HumdrumFile& infile) {
 //
 
 Tool_scordatura::Tool_scordatura(void) {
-	define("s|sounding=b", "generate sounding score");
-	define("w|written=b", "generate written score");
+	define("s|sounding=b",      "generate sounding score");
+	define("w|written=b",       "generate written score");
 	define("m|mark|marker=s:@", "marker to add to score");
 	define("p|pitch|pitches=s", "list of pitches to mark");
-	define("i|interval=s", "musical interval of marked pitches");
-	define("I|is-sounding=s", "musical score is in sounding format for marks");
-	define("c|chromatic=i:0", "chromatic interval of marked pitches");
-	define("d|diatonic=i:0", "diatonic interval of marked pitches");
-	define("color=s", "color marked pitches");
-	define("string=s", "string number");
+	define("i|interval=s",      "musical interval of marked pitches");
+	define("I|is-sounding=s",   "musical score is in sounding format for marks");
+	define("c|chromatic=i:0",   "chromatic interval of marked pitches");
+	define("d|diatonic=i:0",    "diatonic interval of marked pitches");
+	define("color=s",           "color marked pitches");
+	define("string=s",          "string number");
 }
 
 
@@ -114749,27 +115785,27 @@ void Tool_scordatura::prepareTranspositionInterval(void) {
 //
 
 Tool_semitones::Tool_semitones(void) {
-	define("1|first=b", "mark only the first note of intervals");
-	define("2|second=b", "mark only the second note of intervals");
+	define("1|first=b",                   "mark only the first note of intervals");
+	define("2|second=b",                  "mark only the second note of intervals");
 	define("A|O|no-analysis|no-output=b", "do not print analysis spines");
-	define("I|no-input=b", "do not print input data spines");
-	define("M|no-mark|no-marks=b", "do not mark notes");
-	define("R|no-rests=b", "ignore rests");
-	define("T|no-ties=b", "do not mark ties");
-	define("X|include|only=s", "include only **kern tokens with given pattern");
-	define("color=s:red", "mark color");
-	define("c|cdata=b", "store resulting data as **cdata (allowing display in VHV");
-	define("d|down=b", "highlight notes that that have a negative semitone interval");
-	define("j|jump=i:3", "starting interval defining leaps");
-	define("l|leap=b", "highlight notes that have leap motion");
-	define("mark=s:@", "mark character");
-	define("m|midi=b", "show MIDI note number for pitches");
-	define("n|count=b", "output count of intervals being marked");
-	define("p|pc=b", "output pitch classes from C=0 instead of MIDI notes for -m option");
-	define("r|same|repeat|repeated=b", "highlight notes that are repeated ");
-	define("s|step=b", "highlight notes that have step-wise motion");
-	define("u|up=b", "highlight notes that that have a positive semitone interval");
-	define("x|exclude=s", "exclude **kern tokens with given pattern");
+	define("I|no-input=b",                "do not print input data spines");
+	define("M|no-mark|no-marks=b",        "do not mark notes");
+	define("R|no-rests=b",                "ignore rests");
+	define("T|no-ties=b",                 "do not mark ties");
+	define("X|include|only=s",            "include only **kern tokens with given pattern");
+	define("color=s:red",                 "mark color");
+	define("c|cdata=b",                   "store resulting data as **cdata (allowing display in VHV");
+	define("d|down=b",                    "highlight notes that that have a negative semitone interval");
+	define("j|jump=i:3",                  "starting interval defining leaps");
+	define("l|leap=b",                    "highlight notes that have leap motion");
+	define("mark=s:@",                    "mark character");
+	define("m|midi=b",                    "show MIDI note number for pitches");
+	define("n|count=b",                   "output count of intervals being marked");
+	define("p|pc=b",                      "output pitch classes from C=0 instead of MIDI notes for -m option");
+	define("r|same|repeat|repeated=b",    "highlight notes that are repeated ");
+	define("s|step=b",                    "highlight notes that have step-wise motion");
+	define("u|up=b",                      "highlight notes that that have a positive semitone interval");
+	define("x|exclude=s",                 "exclude **kern tokens with given pattern");
 }
 
 
@@ -115465,14 +116501,14 @@ HTp Tool_semitones::getNextNote(HTp token) {
 //
 
 Tool_shed::Tool_shed(void) {
-	define("s|spine|spines=s", "list of spines to process");
-	define("e|expression=s", "regular expression");
-	define("E|exclusion-expression=s", "regular expression to skip");
+	define("s|spine|spines=s",              "list of spines to process");
+	define("e|expression=s",                "regular expression");
+	define("E|exclusion-expression=s",      "regular expression to skip");
 	define("x|exclusive-interpretations=s", "apply only to spine types in list");
-	define("k|kern=b", "apply only to **kern data");
-	define("X=s", "defineable exclusive interpretation x");
-	define("Y=s", "defineable exclusive interpretation y");
-	define("Z=s", "defineable exclusive interpretation z");
+	define("k|kern=b",                      "apply only to **kern data");
+	define("X=s",                           "defineable exclusive interpretation x");
+	define("Y=s",                           "defineable exclusive interpretation y");
+	define("Z=s",                           "defineable exclusive interpretation z");
 }
 
 
@@ -116264,10 +117300,10 @@ bool Tool_shed::isValid(HTp token) {
 
 Tool_sic::Tool_sic(void) {
 	define("s|substitution=b", "insert substitutions into music");
-	define("o|original=b", "insert originals into music");
-	define("r|remove=b", "remove sic layout tokens");
-	define("v|verbose=b", "add verbose parameter");
-	define("q|quiet=b", "remove verbose parameter");
+	define("o|original=b",     "insert originals into music");
+	define("r|remove=b",       "remove sic layout tokens");
+	define("v|verbose=b",      "add verbose parameter");
+	define("q|quiet=b",        "remove verbose parameter");
 }
 
 
@@ -117486,7 +118522,7 @@ ostream& MeasureComparisonGrid::printSvgGrid(ostream& out) {
 //
 
 Tool_simat::Tool_simat(void) {
-	define("r|raw=b", "output raw correlation matrix");
+	define("r|raw=b",      "output raw correlation matrix");
 	define("d|diagonal=b", "output diagonal of correlation matrix");
 }
 
@@ -117594,8 +118630,8 @@ void Tool_simat::processFile(HumdrumFile& infile1, HumdrumFile& infile2) {
 
 Tool_slurcheck::Tool_slurcheck(void) {
 	// add options here
-	define("l|list=b", "list locations of unclosed slur endings");
-	define("c|count=b", "count unclosed slur endings");
+	define("l|list=b",     "list locations of unclosed slur endings");
+	define("c|count=b",    "count unclosed slur endings");
 	define("Z|no-zeros=b", "do not list files that have zero unclosed slurs in counts");
 	define("f|filename=b", "print filename for list and count options");
 }
@@ -117765,7 +118801,7 @@ void Tool_slurcheck::processFile(HumdrumFile& infile) {
 //
 
 Tool_spinetrace::Tool_spinetrace(void) {
-	define("a|append=b", "append analysis to input data lines");
+	define("a|append=b",  "append analysis to input data lines");
 	define("p|prepend=b", "prepend analysis to input data lines");
 }
 
@@ -118052,10 +119088,11 @@ void Tool_strophe::displayStropheVariants(HumdrumFile& infile) {
 
 Tool_synco::Tool_synco(void) {
 	define("c|color=s:skyblue", "SVG color to highlight syncopation notes");
-	define("i|info=b", "Display only statistics info");
-	define("f|filename=b", "Add filename to statistics info");
-	define("a|all=b", "Average all statistics info");
+	define("i|info=b",          "display only statistics info");
+	define("f|filename=b",      "add filename to statistics info");
+	define("a|all=b",           "average all statistics info");
 }
+
 
 
 /////////////////////////////////
@@ -118371,23 +119408,23 @@ void Tool_tabber::processFile(HumdrumFile& infile) {
 //
 
 Tool_tassoize::Tool_tassoize(void) {
-	define("R|no-reference-records=b", "Do not add reference records");
-	define("r|only-add-reference-records=b", "Only add reference records");
+	define("R|no-reference-records=b",                "do not add reference records");
+	define("r|only-add-reference-records=b",          "only add reference records");
 
-	define("B|do-not-delete-breaks=b", "Do not delete system/page break markers");
-	define("b|only-delete-breaks=b", "only delete breaks");
+	define("B|do-not-delete-breaks=b",                "do not delete system/page break markers");
+	define("b|only-delete-breaks=b",                  "only delete breaks");
 
-	define("A|do-not-fix-instrument-abbreviations=b", "Do not fix instrument abbreviations");
-	define("a|only-fix-instrument-abbreviations=b", "Only fix instrument abbreviations");
+	define("A|do-not-fix-instrument-abbreviations=b", "do not fix instrument abbreviations");
+	define("a|only-fix-instrument-abbreviations=b",   "only fix instrument abbreviations");
 
-	define("E|do-not-fix-editorial-accidentals=b", "Do not fix instrument abbreviations");
-	define("e|only-fix-editorial-accidentals=b", "Only fix editorial accidentals");
+	define("E|do-not-fix-editorial-accidentals=b",    "do not fix instrument abbreviations");
+	define("e|only-fix-editorial-accidentals=b",      "only fix editorial accidentals");
 
-	define("T|do-not-add-terminal-longs=b", "Do not add terminal long markers");
-	define("t|only-add-terminal-longs=b", "Only add terminal longs");
+	define("T|do-not-add-terminal-longs=b",           "do not add terminal long markers");
+	define("t|only-add-terminal-longs=b",             "only add terminal longs");
 
-	define("N|do-not-remove-empty-transpositions=b", "Do not remove empty transposition instructions");
-	define ("n|only-remove-empty-transpositions=b", "Only remove empty transpositions");
+	define("N|do-not-remove-empty-transpositions=b",  "do not remove empty transposition instructions");
+	define ("n|only-remove-empty-transpositions=b",   "only remove empty transpositions");
 }
 
 
@@ -119280,10 +120317,10 @@ string Tool_tassoize::getDate(void) {
 
 Tool_textdur::Tool_textdur(void) {
 	// add command-line options here
-	define("a|analysis=b", "calculate and display analyses");
-	define("m|melisma=b", "Count number of notes for each syllable");
-	define("d|duration=b", "Duration of each syllable");
-	define("i|interleave=b", "Preserve original text, and place analyses below text");
+	define("a|analysis=b",   "calculate and display analyses");
+	define("m|melisma=b",    "count number of notes for each syllable");
+	define("d|duration=b",   "duration of each syllable");
+	define("i|interleave=b", "preserve original text, and place analyses below text");
 }
 
 
@@ -120093,11 +121130,11 @@ HumNum Tool_textdur::getDuration(HTp tok1, HTp tok2) {
 //
 
 Tool_thru::Tool_thru(void) {
-	define("v|variation=s:",   "Choose the expansion variation");
-	define("l|list=b:",        "Print list of labels in file");
-	define("k|keep=b:",        "Keep variation interpretations");
-	define("i|info=b:",        "Print info list of labels in file");
-	define("r|realization=s:", "Alternate relaization label sequence");
+	define("v|variant|variation=s:", "choose the expansion variant");
+	define("l|list=b:",              "print list of labels in file");
+	define("k|keep=b:",              "keep variation interpretations");
+	define("i|info=b:",              "print info list of labels in file");
+	define("r|realization=s:",       "alternate relaization label sequence");
 }
 
 
@@ -120592,12 +121629,12 @@ void Tool_thru::getLabelSequence(vector<string>& labelsequence,
 //
 
 Tool_tie::Tool_tie(void) {
-	define("s|split=b", "split overfill notes into tied notes across barlines.");
-	define("m|merge=b", "merge tied notes into a single note.");
-	define("p|printable=b", "merge tied notes only if single note is a printable note.");
-	define("M|mark=b", "Mark overfill notes.");
-	define("i|invisible=b", "Mark overfill barlines invisible.");
-	define("I|skip-invisible=b", "Skip invisible measures when splitting overfill durations.");
+	define("s|split=b",          "split overfill notes into tied notes across barlines.");
+	define("m|merge=b",          "merge tied notes into a single note.");
+	define("p|printable=b",      "merge tied notes only if single note is a printable note.");
+	define("M|mark=b",           "mark overfill notes.");
+	define("i|invisible=b",      "mark overfill barlines invisible.");
+	define("I|skip-invisible=b", "skip invisible measures when splitting overfill durations.");
 }
 
 
@@ -121148,10 +122185,10 @@ HumNum Tool_tie::getDurationToNextBarline(HTp tok) {
 //
 
 Tool_timebase::Tool_timebase(void) {
-	define("g|grace=b",       "Keep grace notes");
-	define("m|min=b",         "Use minimum time in score for timebase");
-	define("t|timebase=s:16", "Timebase rhythm");
-	define("q|quiet=b",       "Quite mode: Do not output warnings");
+	define("g|grace=b",       "keep grace notes");
+	define("m|min=b",         "use minimum time in score for timebase");
+	define("t|timebase=s:16", "timebase rhythm");
+	define("q|quiet=b",       "quiet mode: Do not output warnings");
 }
 
 
@@ -121194,13 +122231,6 @@ bool Tool_timebase::run(HumdrumFile& infile) {
 //
 
 void Tool_timebase::processFile(HumdrumFile& infile) {
-	// Test code:
-	#ifdef __EMSCRIPTEN__
-	std::cout << "Compiled with Emscripten into WebAssembly or JavaScript." << std::endl;
-	#else
-	std::cout << "Compiled as a native OS executable." << std::endl;
-	#endif
-
 	m_grace   = getBoolean("grace");
 	m_quiet   = getBoolean("quiet");
 	if (!getBoolean("timebase")) {
@@ -121326,10 +122356,10 @@ Tool_transpose::Tool_transpose(void) {
 	define("n|negate=b",      "negate transposition indications");
 	define("rotation=b",      "display transposition in half-steps");
 
-	define("author=b",   "author of program");
-	define("version=b",  "compilation info");
-	define("example=b",  "example usages");
-	define("help=b",     "short description");
+	define("author=b",        "author of program");
+	define("version=b",       "compilation info");
+	define("example=b",       "example usages");
+	define("help=b",          "short description");
 }
 
 
@@ -122905,9 +123935,9 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 //
 
 Tool_tremolo::Tool_tremolo(void) {
-	define("k|keep=b", "Keep tremolo rhythm markup");
-	define("F|no-fill=b", "Do not fill in tremolo spaces");
-	define("T|no-tremolo-interpretation=b", "Do not add *tremolo/*Xtremolo marks");
+	define("k|keep=b",                      "keep tremolo rhythm markup");
+	define("F|no-fill=b",                   "do not fill in tremolo spaces");
+	define("T|no-tremolo-interpretation=b", "do not add *tremolo/*Xtremolo marks");
 }
 
 
@@ -123598,7 +124628,8 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 		}
 		if (infile[i].isInterpretation()) {
 			for (j=0; j<infile[i].getFieldCount(); j++) {
-				if (!infile[i].token(j)->isKern()) {
+				HTp token = infile.token(i, j);
+				if (!token->isKern()) {
 					continue;
 				}
 				if (infile[i].token(j)->compare(0, 3, "*k[") == 0) {
@@ -123632,23 +124663,24 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 		}
 
 		for (j=0; j<infile[i].getFieldCount(); j++) {
-			if (!infile[i].token(j)->isKern()) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
 				continue;
 			}
-			if (infile[i].token(j)->isNull()) {
+			if (token->isNull()) {
 				continue;
 			}
-			if (infile[i].token(j)->isRest()) {
+			if (token->isRest()) {
 				continue;
 			}
 
-			int subcount = infile[i].token(j)->getSubtokenCount();
-			track = infile[i].token(j)->getTrack();
+			int subcount = token->getSubtokenCount();
+			track = token->getTrack();
 
 			HumRegex hre;
 			int rindex = rtracks[track];
 			for (k=0; k<subcount; k++) {
-				string subtok = infile[i].token(j)->getSubtoken(k);
+				string subtok = token->getSubtoken(k);
 				int b40 = Convert::kernToBase40(subtok);
 				int diatonic = Convert::kernToBase7(subtok);
 				if (diatonic < 0) {
@@ -123670,12 +124702,12 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Tt]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					} else {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Tt]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					}
 				} else if ((subtok.find("T") != string::npos) && !hre.search(subtok, "[tT]x")) {
 					int nextup = getBase40(diatonic + 1, dstates[rindex][diatonic+1]);
@@ -123686,12 +124718,12 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Tt]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					} else {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Tt]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					}
 				} else if ((subtok.find("M") != string::npos) && !hre.search(subtok, "[Mm]x")) {
 					// major-second upper mordent
@@ -123703,12 +124735,12 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Mm]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					} else {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Mm]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					}
 				} else if ((subtok.find("m") != string::npos) && !hre.search(subtok, "[Mm]x")) {
 					// minor-second upper mordent
@@ -123720,12 +124752,12 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Mm]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					} else {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Mm]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					}
 				} else if ((subtok.find("W") != string::npos) && !hre.search(subtok, "[Ww]x")) {
 					// major-second lower mordent
@@ -123737,12 +124769,12 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Ww]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					} else {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Ww]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					}
 				} else if ((subtok.find("w") != string::npos) && !hre.search(subtok, "[Ww]x")) {
 					// minor-second lower mordent
@@ -123754,12 +124786,12 @@ bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Ww]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					} else {
 						if (m_xmark) {
 							hre.replaceDestructive(subtok, "$1x", "([Ww]+)", "g");
 						}
-						infile[i].token(j)->replaceSubtoken(k, subtok);
+						token->replaceSubtoken(k, subtok);
 					}
 				}
 				// deal with turns and inverted turns here.
@@ -123835,19 +124867,19 @@ int Tool_trillspell::getBase40(int diatonic, int accidental) {
 //
 
 Tool_tspos::Tool_tspos(void) {
-	define("d|double=b", "highlight only doubled notes in triads");
-	define("3|no-thirds=b", "do not color thirds");
-	define("5|no-fifths=b", "do not color fifths");
-	define("T|no-triads=b", "do not color full triads");
-	define("m|minor-triads=b", "only analyze major triad");
-	define("M|major-triads=b", "only analyze minor triads");
-	define("x|attacks=b", "only process sonorities with three unique triadic pitch classes attacking at once (sustains in additional voices are allowed)");
-	define("v|voice-count=i:0", "Only analyze sonorities with given voice count");
-	define("c|compressed=b", "Compress music to see more on each system");
-	define("top=b", "mark top voice in analysis output");
-	define("t|table=b", "add analysis table above score");
-	define("V|all-voices=b", "Require all voices in score to be sounding");
-	define("Q|no-question=b", "Do not show question mark in table header");
+	define("d|double=b",        "highlight only doubled notes in triads");
+	define("3|no-thirds=b",     "do not color thirds");
+	define("5|no-fifths=b",     "do not color fifths");
+	define("T|no-triads=b",     "do not color full triads");
+	define("m|minor-triads=b",  "only analyze major triad");
+	define("M|major-triads=b",  "only analyze minor triads");
+	define("x|attacks=b",       "only process sonorities with three unique triadic pitch classes attacking at once (sustains in additional voices are allowed)");
+	define("v|voice-count=i:0", "only analyze sonorities with given voice count");
+	define("c|compressed=b",    "compress music to see more on each system");
+	define("top=b",             "mark top voice in analysis output");
+	define("t|table=b",         "add analysis table above score");
+	define("V|all-voices=b",    "require all voices in score to be sounding");
+	define("Q|no-question=b",   "do not show question mark in table header");
 }
 
 
@@ -125195,6 +126227,267 @@ int Tool_tspos::logisticColorMap(double input, double max) {
 		output = 255;
 	}
 	return output;
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_vcross::Tool_vcross -- Set the recognized options for the tool.
+//
+
+Tool_vcross::Tool_vcross(void) {
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_vcross::run -- Do the main work of the tool.
+//
+
+bool Tool_vcross::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_vcross::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_vcross::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_vcross::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_vcross::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_vcross::initialize(void) {
+	m_redQ   = false;
+	m_greenQ = false;
+	m_blueQ  = false;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_vcross::processFile --
+//
+
+void Tool_vcross::processFile(HumdrumFile& infile) {
+	initialize();
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		processLine(infile, i);
+	}
+	if ((!m_redQ) && (!m_greenQ) && (!m_blueQ)) {
+		return;
+	}
+	infile.generateLinesFromTokens();
+	m_humdrum_text << infile;
+	if (m_redQ) {
+		m_humdrum_text << "!!!RDF**kern: 🟥 = marked note, color=\"crimson\", lower part's note is higher than higher part's note" << endl;
+	}
+	if (m_greenQ) {
+		m_humdrum_text << "!!!RDF**kern: 🟩 = marked note, color=\"limegreen\", lower part's note is equal to higher part's note" << endl;
+	}
+	if (m_blueQ) {
+		m_humdrum_text << "!!!RDF**kern: 🟦 = marked note, color=\"dodgerblue\", higher part's note is lower than lower part's note" << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_vcross::processLine --
+//
+
+void Tool_vcross::processLine(HumdrumFile& infile, int index) {
+	vector<vector<HTp>> tokens;
+	int ctrack = -1;
+	for (int j=0; j<infile[index].getFieldCount(); j++) {
+		HTp token = infile.token(index, j);
+		if (!token->isKern()) {
+			continue;
+		}
+		int track = token->getTrack();
+		if (ctrack == -1) {
+			tokens.resize(tokens.size() + 1);
+			ctrack = track;
+		} else if (ctrack != track) {
+			tokens.resize(tokens.size() + 1);
+			ctrack = track;
+		}
+		tokens.back().push_back(token);
+	}
+	for (int i=1; i<(int)tokens.size(); i++) {
+		compareVoices(tokens.at(i-1), tokens.at(i));
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_vcross::compareVoices --
+//
+
+void Tool_vcross::compareVoices(vector<HTp>& lower, vector<HTp>& higher) {
+	vector<vector<int>> midihi(higher.size());
+	vector<vector<int>> midilo(lower.size());
+
+	for (int i=0; i<(int)higher.size(); i++) {
+		getMidiInfo(midihi.at(i), higher.at(i));
+	}
+
+	for (int i=0; i<(int)lower.size(); i++) {
+		getMidiInfo(midilo.at(i), lower.at(i));
+	}
+
+	int highestLo = -1;
+	int lowestHi  = -1;
+
+	for (int i=0; i<(int)midihi.size(); i++) {
+		for (int j=0; j<(int)midihi.at(i).size(); j++) {
+			if (midihi[i][j] < 0) {
+				continue;
+			}
+			if (midihi[i][j] < 0) {
+				continue;
+			} else if (lowestHi < 0) {
+				lowestHi = midihi[i][j];
+			} else if (midihi[i][j] < lowestHi) {
+				lowestHi = midihi[i][j];
+			}
+		}
+	}
+
+	for (int i=0; i<(int)midilo.size(); i++) {
+		for (int j=0; j<(int)midilo.at(i).size(); j++) {
+			if (midilo[i][j] < 0) {
+				continue;
+			}
+			if (midilo[i][j] > highestLo) {
+				highestLo = midilo[i][j];
+			}
+		}
+	}
+
+	if (highestLo < 0) {
+		return;
+	}
+	if (lowestHi < 0) {
+		return;
+	}
+	if (highestLo < lowestHi) {
+		return;
+	}
+
+	for (int i=0; i<(int)midihi.size(); i++) {
+		for (int j=0; j<(int)midihi.at(i).size(); j++) {
+			if (midihi[i][j] < 0) {
+				continue;
+			}
+			if (midihi[i][j] < highestLo) {
+				if (!higher.at(i)->isNull()) {
+					string subtok = higher.at(i)->getSubtoken(j);
+					subtok += "🟦";
+					m_blueQ = true;
+					higher.at(i)->replaceSubtoken(j, subtok);
+				}
+			} else if (midihi[i][j] == highestLo) {
+				if (!higher.at(i)->isNull()) {
+					string subtok = higher.at(i)->getSubtoken(j);
+					subtok += "🟩";
+					m_greenQ = true;
+					higher.at(i)->replaceSubtoken(j, subtok);
+				}
+			}
+		}
+	}
+
+	for (int i=0; i<(int)midilo.size(); i++) {
+		for (int j=0; j<(int)midilo.at(i).size(); j++) {
+			if (midilo[i][j] < 0) {
+				continue;
+			}
+			if (midilo[i][j] > lowestHi) {
+				if (!lower.at(i)->isNull()) {
+					string subtok = lower.at(i)->getSubtoken(j);
+					subtok += "🟥";
+					m_redQ = true;
+					lower.at(i)->replaceSubtoken(j, subtok);
+				}
+			} else if (midilo[i][j] == lowestHi) {
+				if (!lower.at(i)->isNull()) {
+					string subtok = lower.at(i)->getSubtoken(j);
+					subtok += "🟩";
+					m_greenQ = true;
+					lower.at(i)->replaceSubtoken(j, subtok);
+				}
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_vcross::getMidiInfo --
+//
+
+void Tool_vcross::getMidiInfo(vector<int>& midis, HTp token) {
+	if (token->isNull()) {
+		token = token->resolveNull();
+		if (!token) {
+			midis.clear();
+			return;
+		}
+	}
+	vector<string> subtokens = token->getSubtokens();
+	midis.resize(subtokens.size());
+	for (int i=0; i<(int)subtokens.size(); i++) {
+		if (subtokens[i].find("r") != string::npos) {
+			midis.at(i) = -1;
+			continue;
+		}
+		midis.at(i) = Convert::kernToMidiNoteNumber(subtokens.at(i));
+	}
 }
 
 

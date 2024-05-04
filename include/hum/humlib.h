@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Apr 19 18:10:19 PDT 2024
+// Last Modified: Sat May  4 10:07:24 PDT 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -1638,6 +1638,9 @@ class HumdrumToken : public std::string, public HumHash {
 		HumNum   getBarlineDuration        (void);
 		HumNum   getBarlineDuration        (HumNum scale);
 
+		// metric-related functions:
+		HumNum   getBeat                   (HumNum scale = 1);
+
 		HLp      getOwner                  (void) const;
 		HLp      getLine                   (void) const { return getOwner(); }
 		bool     equalChar                 (int index, char ch) const;
@@ -2138,8 +2141,6 @@ class HumdrumFileBase : public HumHash {
 		HLp           back                     (void);
 		void          makeBooleanTrackList     (std::vector<bool>& spinelist,
 		                                        const std::string& spinestring);
-		bool          analyzeBaseFromLines     (void);
-		bool          analyzeBaseFromTokens    (void);
 
 
 		std::vector<HLp> getReferenceRecords(void);
@@ -2180,6 +2181,15 @@ class HumdrumFileBase : public HumHash {
 		static void   readStringFromHttpUri     (std::stringstream& inputdata,
 		                                         const std::string& webaddress);
 
+		bool          analyzeBaseFromLines     (void);
+		bool          analyzeBaseFromTokens    (void);
+
+		bool          analyzeTokens             (void);
+		bool          analyzeSpines             (void);
+		bool          analyzeLinks              (void);
+		bool          analyzeTracks             (void);
+		bool          analyzeLines              (void);
+
 	protected:
 		static int    getChunk                  (int socket_id,
 		                                         std::stringstream& inputdata,
@@ -2195,10 +2205,6 @@ class HumdrumFileBase : public HumHash {
 		                                         unsigned short int port);
 
 	protected:
-		bool          analyzeTokens             (void);
-		bool          analyzeSpines             (void);
-		bool          analyzeLinks              (void);
-		bool          analyzeTracks             (void);
 		bool          adjustSpines              (HumdrumLine& line,
 		                                         std::vector<std::string>& datatype,
 		                                         std::vector<std::string>& sinfo);
@@ -2216,7 +2222,6 @@ class HumdrumFileBase : public HumHash {
 		bool          setParseError             (std::stringstream& err);
 		bool          setParseError             (const std::string& err);
 		bool          setParseError             (const char* format, ...);
-		bool          analyzeLines              (void);
 //		void          fixMerges                 (int linei);
 
 	protected:
@@ -3378,16 +3383,17 @@ class MuseRecord : public MuseRecordBasic {
 
 		// columns 20-22: time modification
 		std::string      getTimeModificationField     (void);
-		std::string      getTimeModification          (void);
+		std::string      getTimeModificationString    (void);
+		HumNum           getTimeModification          (void);
 		std::string      getTimeModificationLeftField (void);
 		std::string      getTimeModificationLeftString(void);
 		int              getTimeModificationLeft      (void);
 		std::string      getTimeModificationRightField(void);
 		std::string      getTimeModificationRightString(void);
 		int              getTimeModificationRight     (void);
-		int              timeModificationQ            (void);
-		int              timeModificationLeftQ        (void);
-		int              timeModificationRightQ       (void);
+		bool             timeModificationQ            (void);
+		bool             timeModificationLeftQ        (void);
+		bool             timeModificationRightQ       (void);
 
 		// column 23: stem direction
 		std::string      getStemDirectionField        (void);
@@ -3464,9 +3470,13 @@ class MuseRecord : public MuseRecordBasic {
 		// columns 3-5: blank
 
 		// columns 6-8: figure division pointer advancement (duration)
+		// this is the offset to the next figure and is not part
+		// of the note pointer advancement
 		std::string      getFigurePointerField        (void);
+		std::string      getFigurePointer             (void);
 		int              figurePointerQ               (void);
-		// same as note records: getDuration
+		int              getFigureDuration            (void);
+
 
 		// columns 9-12: blank
 
@@ -3729,7 +3739,6 @@ class MuseData {
 		void              cleanLineEndings    (void);
 		std::string       getError            (void);
 		bool              hasError            (void);
-
 
 	private:
 		std::vector<MuseRecord*>    m_data;
@@ -5137,39 +5146,39 @@ class MxmlMeasure {
 
 class Option_register {
 	public:
-		         Option_register     (void);
-		         Option_register     (const string& aDefinition, char aType,
-		                                  const string& aDefaultOption);
-		         Option_register     (const string& aDefinition, char aType,
-		                                  const string& aDefaultOption,
-		                                  const string& aModifiedOption);
-		         Option_register     (const Option_register& reg);
-		        ~Option_register     ();
+		                 Option_register (void);
+		                 Option_register (const std::string& aDefinition, char aType,
+		                                  const std::string& aDefaultOption);
+		                 Option_register (const std::string& aDefinition, char aType,
+		                                  const std::string& aDefaultOption,
+		                                  const std::string& aModifiedOption);
+		                 Option_register (const Option_register& reg);
+		                ~Option_register ();
 
-		Option_register& operator=(const Option_register& reg);
-		void     clearModified      (void);
-		string   getDefinition      (void);
-		string   getDefault         (void);
-		string   getOption          (void);
-		string   getModified        (void);
-		string   getDescription     (void);
-		bool     isModified         (void);
-		char     getType            (void);
-		void     reset              (void);
-		void     setDefault         (const string& aString);
-		void     setDefinition      (const string& aString);
-		void     setDescription     (const string& aString);
-		void     setModified        (const string& aString);
-		void     setType            (char aType);
-		ostream& print              (ostream& out);
+		Option_register& operator=       (const Option_register& reg);
+		void             clearModified   (void);
+		std::string      getDefinition   (void);
+		std::string      getDefault      (void);
+		std::string      getOption       (void);
+		std::string      getModified     (void);
+		std::string      getDescription  (void);
+		bool             isModified      (void);
+		char             getType         (void);
+		void             reset           (void);
+		void             setDefault      (const std::string& aString);
+		void             setDefinition   (const std::string& aString);
+		void             setDescription  (const std::string& aString);
+		void             setModified     (const std::string& aString);
+		void             setType         (char aType);
+		std::ostream&    print           (std::ostream& out);
 
 	protected:
-		string       m_definition;
-		string       m_description;
-		string       m_defaultOption;
-		string       m_modifiedOption;
-		bool         m_modifiedQ;
-		char         m_type;
+		std::string      m_definition;
+		std::string      m_description;
+		std::string      m_defaultOption;
+		std::string      m_modifiedOption;
+		bool             m_modifiedQ;
+		char             m_type;
 };
 
 
@@ -5182,81 +5191,82 @@ class Options {
 
 		Options&        operator=         (const Options& options);
 		int             argc              (void) const;
-		const vector<string>& argv        (void) const;
-		int             define            (const string& aDefinition);
-		int             define            (const string& aDefinition,
-		                                   const string& description);
-		string          getArg            (int index);
-		string          getArgument       (int index);
+		const std::vector<std::string>& argv (void) const;
+		int             define            (const std::string& aDefinition);
+		int             define            (const std::string& aDefinition,
+		                                   const std::string& description);
+		std::string     getArg            (int index);
+		std::string     getArgument       (int index);
 		int             getArgCount       (void);
 		int             getArgumentCount  (void);
-		vector<string>& getArgList        (vector<string>& output);
-		vector<string>& getArgumentList   (vector<string>& output);
-		bool            getBoolean        (const string& optionName);
-		string          getCommand        (void);
-		string          getCommandLine    (void);
-		string          getDefinition     (const string& optionName);
-		double          getDouble         (const string& optionName);
+		std::vector<std::string>& getArgList        (std::vector<std::string>& output);
+		std::vector<std::string>& getArgumentList   (std::vector<std::string>& output);
+		bool            getBoolean        (const std::string& optionName);
+		std::string     getCommand        (void);
+		std::string     getCommandLine    (void);
+		std::string     getDefinition     (const std::string& optionName);
+		double          getDouble         (const std::string& optionName);
 		char            getFlag           (void);
-		char            getChar           (const string& optionName);
-		float           getFloat          (const string& optionName);
-		int             getInt            (const string& optionName);
-		int             getInteger        (const string& optionName);
-		string          getString         (const string& optionName);
-		char            getType           (const string& optionName);
+		char            getChar           (const std::string& optionName);
+		float           getFloat          (const std::string& optionName);
+		int             getInt            (const std::string& optionName);
+		int             getInteger        (const std::string& optionName);
+		std::string     getString         (const std::string& optionName);
+		char            getType           (const std::string& optionName);
 		int             optionsArg        (void);
-		ostream&        print             (ostream& out);
-		ostream&        printOptionList   (ostream& out);
-		ostream&        printOptionListBooleanState(ostream& out);
+		std::ostream&   print             (std::ostream& out);
+		std::ostream&   printEmscripten   (std::ostream& out);
+		std::ostream&   printOptionList   (std::ostream& out);
+		std::ostream&   printOptionListBooleanState(std::ostream& out);
 		bool            process           (int error_check = 1, int suppress = 0);
 		bool            process           (int argc, char** argv,
-		                                      int error_check = 1,
-		                                      int suppress = 0);
-		bool            process           (const vector<string>& argv,
-		                                      int error_check = 1,
-		                                      int suppress = 0);
-		bool            process           (const string& argv, int error_check = 1,
-		                                      int suppress = 0);
+		                                   int error_check = 1,
+		                                   int suppress = 0);
+		bool            process           (const std::vector<std::string>& argv,
+		                                   int error_check = 1,
+		                                   int suppress = 0);
+		bool            process           (const std::string& argv, int error_check = 1,
+		                                   int suppress = 0);
 		void            reset             (void);
 		void            xverify           (int argc, char** argv,
-		                                      int error_check = 1,
-		                                      int suppress = 0);
+		                                   int error_check = 1,
+		                                   int suppress = 0);
 		void            xverify           (int error_check = 1,
-		                                      int suppress = 0);
+		                                   int suppress = 0);
 		void            setFlag           (char aFlag);
-		void            setModified       (const string& optionName,
-		                                   const string& optionValue);
+		void            setModified       (const std::string& optionName,
+		                                   const std::string& optionValue);
 		void            setOptions        (int argc, char** argv);
-		void            setOptions        (const vector<string>& argv);
-		void            setOptions        (const string& args);
+		void            setOptions        (const std::vector<std::string>& argv);
+		void            setOptions        (const std::string& args);
 		void            appendOptions     (int argc, char** argv);
-		void            appendOptions     (string& args);
-		void            appendOptions     (vector<string>& argv);
-		ostream&        printRegister     (ostream& out);
-		int             isDefined         (const string& name);
-		static vector<string> tokenizeCommandLine(const string& args);
+		void            appendOptions     (std::string& args);
+		void            appendOptions     (std::vector<std::string>& argv);
+		std::ostream&   printRegister     (std::ostream& out);
+		int             isDefined         (const std::string& name);
+		static std::vector<std::string> tokenizeCommandLine(const std::string& args);
 		bool            hasParseError     (void);
-		string          getParseError     (void);
-		ostream&        getParseError     (ostream& out);
+		std::string     getParseError     (void);
+		std::ostream&   getParseError     (std::ostream& out);
 
 	protected:
 		// m_argv: the list of raw command line strings including
 		// a mix of options and non-option argument.
-		vector<string> m_argv;
+		std::vector<std::string> m_argv;
 
 		// m_arguments: list of parsed command-line arguments which
 		// are not options, or the command (argv[0]);
-		vector<string> m_arguments;
+		std::vector<std::string> m_arguments;
 
 		// m_optionRegister: store for the states/values of each option.
-		vector<Option_register*> m_optionRegister;
+		std::vector<Option_register*> m_optionRegister;
 
 		// m_optionFlag: the character which indicates an option.
 		// Generally a dash, but could be made a slash for Windows environments.
 		char m_optionFlag = '-';
 
 		// m_optionList:
-		map<string, int> m_optionList;
+		std::map<std::string, int> m_optionList;
 
 		//
 		// boolern options for object:
@@ -5278,12 +5288,13 @@ class Options {
 		bool m_optionsArgQ = false;
 
 		// m_error: used to store errors in parsing command-line options.
-		stringstream m_error;
+		std::stringstream m_error;
 
-	private:
-		int     getRegIndex    (const string& optionName);
-		bool    isOption       (const string& aString, int& argp);
+	protected:
+		int     getRegIndex    (const std::string& optionName);
+		bool    isOption       (const std::string& aString, int& argp);
 		int     storeOption    (int gargp, int& position, int& running);
+
 };
 
 #define OPTION_BOOLEAN_TYPE   'b'
@@ -5305,29 +5316,29 @@ class HumTool : public Options {
 
 		bool          hasAnyText      (void);
 		std::string   getAllText      (void);
-		ostream&      getAllText      (ostream& out);
+		std::ostream& getAllText      (std::ostream& out);
 
 		bool          hasHumdrumText  (void);
 		std::string   getHumdrumText  (void);
-		ostream&      getHumdrumText  (ostream& out);
+		std::ostream& getHumdrumText  (std::ostream& out);
 		void          suppressHumdrumFileOutput(void);
 
 		bool          hasJsonText     (void);
 		std::string   getJsonText     (void);
-		ostream&      getJsonText     (ostream& out);
+		std::ostream& getJsonText     (std::ostream& out);
 
 		bool          hasFreeText     (void);
 		std::string   getFreeText     (void);
-		ostream&      getFreeText     (ostream& out);
+		std::ostream& getFreeText     (std::ostream& out);
 
 		bool          hasWarning      (void);
 		std::string   getWarning      (void);
-		ostream&      getWarning      (ostream& out);
+		std::ostream& getWarning      (std::ostream& out);
 
 		bool          hasError        (void);
 		std::string   getError        (void);
-		ostream&      getError        (ostream& out);
-		void          setError        (const string& message);
+		std::ostream& getError        (std::ostream& out);
+		void          setError        (const std::string& message);
 
 		virtual void  finally         (void) { };
 
@@ -5508,9 +5519,9 @@ class HumdrumFileStream {
 		                HumdrumFileStream  (char** list);
 		                HumdrumFileStream  (const std::vector<std::string>& list);
 		                HumdrumFileStream  (Options& options);
-		                HumdrumFileStream  (const string& datastream);
+		                HumdrumFileStream  (const std::string& datastream);
 
-		void            loadString         (const string& data);
+		void            loadString         (const std::string& data);
 
 		int             setFileList        (char** list);
 		int             setFileList        (const std::vector<std::string>& list);
@@ -5580,7 +5591,7 @@ class HumdrumFileSet {
 		int                   appendHumdrumPointer(HumdrumFile* infile);
 
    protected:
-      vector<HumdrumFile*>  m_data;
+      std::vector<HumdrumFile*>  m_data;
 
       void                  appendHumdrumFileContent(const std::string& filename,
                                                std::stringstream& inbuffer);
@@ -5595,14 +5606,14 @@ class Tool_addic : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 		int      getInstrumentCodeIndex(HumdrumFile& infile);
 		int      getInstrumentClassIndex(HumdrumFile& infile);
 		void     updateInstrumentClassLine(HumdrumFile& infile, int codeIndex, int classIndex);
 		std::string makeClassLine(HumdrumFile& infile, int codeIndex);
-		std::string getInstrumentClass(const string& code);
+		std::string getInstrumentClass(const std::string& code);
 
 
 	protected:
@@ -5624,7 +5635,7 @@ class Tool_addkey : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
@@ -5633,8 +5644,8 @@ class Tool_addkey : public HumTool {
 		void    getLineIndexes     (HumdrumFile& infile);
 		void    insertReferenceKey (HumdrumFile& infile);
 		void    addInputKey        (HumdrumFile& infile);
-		void    insertKeyDesig     (HumdrumFile& infile, const string& keyDesig);
-		void    printKeyDesig      (HumdrumFile& infile, int index, const string& desig, int direction);
+		void    insertKeyDesig     (HumdrumFile& infile, const std::string& keyDesig);
+		void    printKeyDesig      (HumdrumFile& infile, int index, const std::string& desig, int direction);
 
 	private:
 		std::string m_key;
@@ -5657,7 +5668,7 @@ class Tool_addlabels : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
@@ -5686,49 +5697,46 @@ class Tool_addtempo : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void    processFile        (HumdrumFile& infile);
 		void    initialize         (void);
-		void    assignTempoChanges (std::vector<double>& tlist,
-		                            HumdrumFile& infile);
-		void    addTempo           (vector<double>& tlist,
-		                            HumdrumFile& infile,
-		                            int measure, double tempo);
-		void   addTempoToStart     (vector<double>& tlist,
-		                            HumdrumFile& infile, double tempo);
+		void    assignTempoChanges (std::vector<double>& tlist, HumdrumFile& infile);
+		void    addTempo           (std::vector<double>& tlist, HumdrumFile& infile, int measure, double tempo, int offset);
+		void    addTempoToStart    (std::vector<double>& tlist, HumdrumFile& infile, double tempo);
 
 	private:
-		std::vector<std::pair<int, double>> m_tempos;
+		// tuple<measure, tempo, mesure offset>
+		std::vector<std::tuple<int, double, int>> m_tempos;
 
 };
 
 
 class Tool_autoaccid : public HumTool {
 	public:
-		         Tool_autoaccid    (void);
-		        ~Tool_autoaccid    () {};
+		             Tool_autoaccid    (void);
+		            ~Tool_autoaccid    () {};
 
-		bool     run               (HumdrumFileSet& infiles);
-		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool         run               (HumdrumFileSet& infiles);
+		bool         run               (HumdrumFile& infile);
+		bool         run               (const std::string& indata, std::ostream& out);
+		bool         run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
-		void    processFile        (HumdrumFile& infile);
-		void    initialize         (void);
-		void    addAccidentalInfo  (HTp token);
-		void    removeAccidentalQualifications(HumdrumFile& infile);
-		void    addAccidentalQualifications(HumdrumFile& infile);
-		string  setVisualState     (const string& input, bool state);
+		void        processFile        (HumdrumFile& infile);
+		void        initialize         (void);
+		void        addAccidentalInfo  (HTp token);
+		void        removeAccidentalQualifications(HumdrumFile& infile);
+		void        addAccidentalQualifications(HumdrumFile& infile);
+		std::string setVisualState     (const std::string& input, bool state);
 
 	private:
-		bool    m_visualQ;
-		bool    m_hiddenQ;
-		bool    m_removeQ;
-		bool    m_cautionQ;
+		bool         m_visualQ;
+		bool         m_hiddenQ;
+		bool         m_removeQ;
+		bool         m_cautionQ;
 
 };
 
@@ -5736,39 +5744,39 @@ class Tool_autoaccid : public HumTool {
 
 class Tool_autobeam : public HumTool {
 	public:
-		         Tool_autobeam   (void);
-		        ~Tool_autobeam   () {};
+		             Tool_autobeam       (void);
+		            ~Tool_autobeam       () {};
 
-		bool     run             (HumdrumFile& infile);
-		bool     run             (HumdrumFileSet& infiles);
-		bool     run             (const string& indata, ostream& out);
-		bool     run             (HumdrumFile& infile, ostream& out);
+		bool         run                 (HumdrumFile& infile);
+		bool         run                 (HumdrumFileSet& infiles);
+		bool         run                 (const std::string& indata, std::ostream& out);
+		bool         run                 (HumdrumFile& infile, std::ostream& out);
 
 	protected:
-		void     initialize      (HumdrumFile& infile);
-		void     processStrand   (HTp strandstart, HTp strandend);
-		void     processMeasure  (vector<HTp>& measure);
-		void     addBeam         (HTp startnote, HTp endnote);
-		void     addBeams        (HumdrumFile& infile);
-		void     beamGraceNotes  (HumdrumFile& infile);
-		string   getBeamFromDur  (HTp token, const string& text);
-		void     removeQqMarks   (HTp stok, HTp etok);
-		void     removeQqMarks   (HTp tok);
-		void     removeBeams     (HumdrumFile& infile);
-		void     removeEdgeRests (HTp& startnote, HTp& endnote);
-		void     breakBeamsByLyrics(HumdrumFile& infile);
-		void     processStrandForLyrics(HTp stok, HTp etok);
-		bool     hasSyllable     (HTp token);
-		void     splitBeam       (HTp tok, HTp stok, HTp etok);
-		void     splitBeam2      (vector<HTp>& group, HTp tok);
-		void     getBeamedNotes(vector<HTp>& toks, HTp tok, HTp stok, HTp etok);
-		bool     isLazy          (vector<HTp>& group);
-		void     splitBeamLazy   (vector<HTp>& group, HTp tok);
-		void     splitBeamNotLazy(vector<HTp>& group, HTp tok);
-		void     removeBeamCharacters(HTp token);
+		void         initialize          (HumdrumFile& infile);
+		void         processStrand       (HTp strandstart, HTp strandend);
+		void         processMeasure      (std::vector<HTp>& measure);
+		void         addBeam             (HTp startnote, HTp endnote);
+		void         addBeams            (HumdrumFile& infile);
+		void         beamGraceNotes      (HumdrumFile& infile);
+		std::string  getBeamFromDur      (HTp token, const std::string& text);
+		void         removeQqMarks       (HTp stok, HTp etok);
+		void         removeQqMarks       (HTp tok);
+		void         removeBeams         (HumdrumFile& infile);
+		void         removeEdgeRests     (HTp& startnote, HTp& endnote);
+		void         breakBeamsByLyrics  (HumdrumFile& infile);
+		void         processStrandForLyrics(HTp stok, HTp etok);
+		bool         hasSyllable         (HTp token);
+		void         splitBeam           (HTp tok, HTp stok, HTp etok);
+		void         splitBeam2          (std::vector<HTp>& group, HTp tok);
+		void         getBeamedNotes      (std::vector<HTp>& toks, HTp tok, HTp stok, HTp etok);
+		bool         isLazy              (std::vector<HTp>& group);
+		void         splitBeamLazy       (std::vector<HTp>& group, HTp tok);
+		void         splitBeamNotLazy    (std::vector<HTp>& group, HTp tok);
+		void         removeBeamCharacters(HTp token);
 
 	private:
-		std::vector<std::vector<pair<int, HumNum> > > m_timesigs;
+		std::vector<std::vector<std::pair<int, HumNum> > > m_timesigs;
 		std::vector<HTp> m_kernspines;
 		bool        m_overwriteQ = false;
 		std::vector<bool> m_tracks;
@@ -5795,61 +5803,61 @@ class Tool_autostem : public HumTool {
 
 		bool     run                   (HumdrumFileSet& infiles);
 		bool     run                   (HumdrumFile& infile);
-		bool     run                   (const string& indata, ostream& out);
-		bool     run                   (HumdrumFile& infile, ostream& out);
+		bool     run                   (const std::string& indata, std::ostream& out);
+		bool     run                   (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize            (HumdrumFile& infile);
 		void      example              (void);
 		void      usage                (void);
 		bool      autostem             (HumdrumFile& infile);
-		void      getClefInfo          (vector<vector<int> >& baseline,
+		void      getClefInfo          (std::vector<std::vector<int>>& baseline,
 		                                HumdrumFile& infile);
-		void      addStem              (string& input, const string& piece);
+		void      addStem              (std::string& input, const std::string& piece);
 		void      processKernTokenStemsSimpleModel(HumdrumFile& infile,
-		                                vector<vector<int> >& baseline,
+		                                std::vector<std::vector<int>>& baseline,
 		                                int row, int col);
 		void      removeStems          (HumdrumFile& infile);
 		void      removeStem2          (HumdrumFile& infile, int row, int col);
 		int       getVoice             (HumdrumFile& infile, int row, int col);
-		void      getNotePositions     (vector<vector<vector<int> > >& notepos,
-		                                vector<vector<int> >& baseline,
+		void      getNotePositions     (std::vector<std::vector<std::vector<int>>>& notepos,
+		                                std::vector<std::vector<int>>& baseline,
 		                                HumdrumFile& infile);
 		void      printNotePositions   (HumdrumFile& infile,
-		                                vector<vector<vector<int> > >& notepos);
-		void      getVoiceInfo         (vector<vector<int> >& voice, HumdrumFile& infile);
-		void      printVoiceInfo       (HumdrumFile& infile, vector<vector<int> >& voice);
+		                                std::vector<std::vector<std::vector<int>>>& notepos);
+		void      getVoiceInfo         (std::vector<std::vector<int>>& voice, HumdrumFile& infile);
+		void      printVoiceInfo       (HumdrumFile& infile, std::vector<std::vector<int>>& voice);
 		void      processKernTokenStems(HumdrumFile& infile,
-		                                vector<vector<int> >& baseline, int row, int col);
-		void      getMaxLayers         (vector<int>& maxlayer, vector<vector<int> >& voice,
+		                                std::vector<std::vector<int>>& baseline, int row, int col);
+		void      getMaxLayers         (std::vector<int>& maxlayer, std::vector<std::vector<int>>& voice,
 		                                HumdrumFile& infile);
-		bool      assignStemDirections (vector<vector<int> >& stemdir,
-		                                vector<vector<int> > & voice,
-		                                vector<vector<vector<int> > >& notepos,
+		bool      assignStemDirections (std::vector<std::vector<int>>& stemdir,
+		                                std::vector<std::vector<int>> & voice,
+		                                std::vector<std::vector<std::vector<int>>>& notepos,
 		                                HumdrumFile& infile);
-		void      assignBasicStemDirections(vector<vector<int> >& stemdir,
-		                                vector<vector<int> >& voice,
-		                                vector<vector<vector<int> > >& notepos,
+		void      assignBasicStemDirections(std::vector<std::vector<int>>& stemdir,
+		                                std::vector<std::vector<int>>& voice,
+		                                std::vector<std::vector<std::vector<int>>>& notepos,
 		                                HumdrumFile& infile);
-		int       determineChordStem   (vector<vector<int> >& voice,
-		                                vector<vector<vector<int> > >& notepos,
+		int       determineChordStem   (std::vector<std::vector<int>>& voice,
+		                                std::vector<std::vector<std::vector<int>>>& notepos,
 		                                HumdrumFile& infile, int row, int col);
 		void      insertStems          (HumdrumFile& infile,
-		                                vector<vector<int> >& stemdir);
+		                                std::vector<std::vector<int>>& stemdir);
 		void      setStemDirection     (HumdrumFile& infile, int row, int col,
 		                                int direction);
-		bool      getBeamState         (vector<vector<string > >& beams,
+		bool      getBeamState         (std::vector<std::vector<std::string >>& beams,
 		                                HumdrumFile& infile);
-		void      countBeamStuff       (const string& token, int& start, int& stop,
+		void      countBeamStuff       (const std::string& token, int& start, int& stop,
 		                                int& flagr, int& flagl);
-		void      getBeamSegments      (vector<vector<Coord> >& beamednotes,
-		                                vector<vector<string > >& beamstates,
-		                                HumdrumFile& infile, vector<int> maxlayer);
-		int       getBeamDirection     (vector<Coord>& coords,
-		                                vector<vector<int> >& voice,
-		                                vector<vector<vector<int> > >& notepos);
-		void      setBeamDirection     (vector<vector<int> >& stemdir,
-		                                vector<Coord>& bnote, int direction);
+		void      getBeamSegments      (std::vector<std::vector<Coord>>& beamednotes,
+		                                std::vector<std::vector<std::string >>& beamstates,
+		                                HumdrumFile& infile, std::vector<int> maxlayer);
+		int       getBeamDirection     (std::vector<Coord>& coords,
+		                                std::vector<std::vector<int>>& voice,
+		                                std::vector<std::vector<std::vector<int>>>& notepos);
+		void      setBeamDirection     (std::vector<std::vector<int>>& stemdir,
+		                                std::vector<Coord>& bnote, int direction);
 
 	private:
 		int    debugQ        = 0;       // used with --debug option
@@ -5874,15 +5882,15 @@ class Tool_binroll : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
-		void     processStrand     (vector<vector<char>>& roll, HTp starting,
+		void     processStrand     (std::vector<std::vector<char>>& roll, HTp starting,
 		                            HTp ending);
 		void     printAnalysis     (HumdrumFile& infile,
-		                            vector<vector<char>>& roll);
+		                            std::vector<std::vector<char>>& roll);
 
 	private:
 		HumNum    m_duration;
@@ -5892,35 +5900,94 @@ class Tool_binroll : public HumTool {
 
 class Tool_chantize : public HumTool {
 	public:
-		         Tool_chantize      (void);
-		        ~Tool_chantize      () {};
+		                  Tool_chantize             (void);
+		                 ~Tool_chantize             () {};
 
-		bool     run                (HumdrumFileSet& infiles);
-		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool              run                       (HumdrumFileSet& infiles);
+		bool              run                       (HumdrumFile& infile);
+		bool              run                       (const std::string& indata, std::ostream& out);
+		bool              run                       (HumdrumFile& infile, std::ostream& out);
 
 	protected:
-		void     initialize         (HumdrumFile& infile);
-		void     processFile        (HumdrumFile& infile);
-		void     outputFile         (HumdrumFile& infile);
-		void     updateKeySignatures(HumdrumFile& infile, int lineindex);
-		void     checkDataLine      (HumdrumFile& infile, int lineindex);
-		void     clearStates        (void);
-		void     addBibliographicRecords(HumdrumFile& infile);
-		void     deleteBreaks       (HumdrumFile& infile);
-		void     fixEditorialAccidentals(HumdrumFile& infile);
-		void     fixInstrumentAbbreviations(HumdrumFile& infile);
-		void     deleteDummyTranspositions(HumdrumFile& infile);
-		string   getDate            (void);
-		vector<bool> getTerminalRestStates(HumdrumFile& infile);
-		bool     hasDiamondNotes    (HumdrumFile& infile);
+		void              initialize                (HumdrumFile& infile);
+		void              processFile               (HumdrumFile& infile);
+		void              outputFile                (HumdrumFile& infile);
+		void              updateKeySignatures       (HumdrumFile& infile, int lineindex);
+		void              checkDataLine             (HumdrumFile& infile, int lineindex);
+		void              clearStates               (void);
+		void              addBibliographicRecords   (HumdrumFile& infile);
+		void              deleteBreaks              (HumdrumFile& infile);
+		void              fixEditorialAccidentals   (HumdrumFile& infile);
+		void              fixInstrumentAbbreviations(HumdrumFile& infile);
+		void              deleteDummyTranspositions (HumdrumFile& infile);
+		std::string       getDate                   (void);
+		std::vector<bool> getTerminalRestStates      (HumdrumFile& infile);
+		bool              hasDiamondNotes           (HumdrumFile& infile);
 
 	private:
-		vector<vector<int>> m_pstates;
-		vector<vector<int>> m_kstates;
-		vector<vector<bool>> m_estates;
+		std::vector<std::vector<int>>  m_pstates;
+		std::vector<std::vector<int>>  m_kstates;
+		std::vector<std::vector<bool>> m_estates;
 		bool m_diamondQ = false;
+};
+
+
+class Tool_chint : public HumTool {
+	public:
+		         Tool_chint          (void);
+		        ~Tool_chint          () {};
+
+		bool     run                 (HumdrumFileSet& infiles);
+		bool     run                 (HumdrumFile& infile);
+		bool     run                 (const std::string& indata, std::ostream& out);
+		bool     run                 (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void    processFile          (HumdrumFile& infile);
+		void    initialize           (void);
+		void    fillIntervalNames    (void);
+		void    fillIntervalNamesDiatonic(void);
+		void    chromaticColoring    (void);
+		void    dissonanceColoring   (void);
+		void    getPartIntervals     (std::vector<int>& topInterval,
+		                              std::vector<int>& botInterval,
+		                              HTp botSpine, HTp topSpine, HumdrumFile& infile);
+		void    insertPartColors     (HumdrumFile& infile, std::vector<int>& botInterval,
+		                              std::vector<int>& topInterval, int botTrack, int topTrack);
+		std::string getColorToken    (int interval, HumdrumFile& infile, int line, HTp token);
+		std::string getIntervalToken (int interval, HumdrumFile& infile, int line);
+
+	private:
+		// m_color: Color mapping for notes, indexed by base-40:
+		std::vector<std::string> m_color;
+
+		// m_intervals: Names of intervals indexed by base-40:
+		std::vector<std::string> m_intervals;
+
+		// Used in particular to avoid adding interval when both
+		// staves have tied notes:
+		std::vector<std::string>  m_botPitch;
+		std::vector<std::string>  m_topPitch;
+
+		// m_intervalQ: Show interval numbers
+		bool m_intervalQ = false;
+
+		// m_octaveQ: Do not collapse octaves to unisons.
+		bool m_octaveQ = false;
+
+		// m_noColorBotQ: Do not colorize bottom analysis staff
+		bool m_noColorBotQ = false;
+
+		// m_noColortopQ: Do not colorize top analysis staff
+		bool m_noColorTopQ = false;
+
+		// m_negativeQ: Add minus sign to intervals
+		// when staff notes are crossed.
+		bool m_negativeQ = false;
+
+		// m_middle: Add intervals between analysis staves, or actually
+		// below top staff. (Only effective in JavaScript compiled code.)
+		bool m_middleQ = true;
 
 };
 
@@ -5931,18 +5998,18 @@ class Tool_chooser : public HumTool {
 		       	  ~Tool_chooser       () {};
 
 		bool        run                (HumdrumFileSet& infiles);
-		bool        run                (const string& indata);
+		bool        run                (const std::string& indata);
 		bool        run                (HumdrumFileStream& instream);
 
 	protected:
 		void        processFiles       (HumdrumFileSet& infiles);
 		void        initialize         (void);
 
-		void        expandSegmentList  (vector<int>& field, string& fieldstring,
+		void        expandSegmentList  (std::vector<int>& field, std::string& fieldstring,
 		                                int maximum);
-		void        processSegmentEntry(vector<int>& field,
-		                                const string& astring, int maximum);
-		void        removeDollarsFromString(string& buffer, int maximum);
+		void        processSegmentEntry(std::vector<int>& field,
+		                                const std::string& astring, int maximum);
+		void        removeDollarsFromString(std::string& buffer, int maximum);
 
 	private:
 
@@ -5956,15 +6023,15 @@ class Tool_chord : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile, int direction);
 		void     processChord      (HTp tok, int direction);
 		void     initialize        (void);
-		void     minimizeChordPitches(vector<string>& notes, vector<pair<int,int>>& pitches);
-		void     maximizeChordPitches(vector<string>& notes, vector<pair<int,int>>& pitches);
+		void     minimizeChordPitches(std::vector<std::string>& notes, std::vector<std::pair<int, int>>& pitches);
+		void     maximizeChordPitches(std::vector<std::string>& notes, std::vector<std::pair<int, int>>& pitches);
 
 	private:
 		int       m_direction = 0;
@@ -6178,7 +6245,7 @@ class cmr_note_info {
 		HumNum   getStartTime     (void);
 		HumNum   getEndTime       (void);
 		int      getMidiPitch     (void);
-		string   getPitch         (void);
+		std::string   getPitch         (void);
 		HTp      getToken         (void);
 		int      getLineIndex     (void);
 		double   getNoteStrength  (void);
@@ -6243,7 +6310,7 @@ class cmr_group_info {
 		int     getSyncopationCount(void);
 		void    makeInvalid        (void);
 		bool    isValid            (void);
-		string  getPitch           (void);
+		std::string  getPitch      (void);
 		HumNum  getEndTime         (void);
 		HumNum  getGroupDuration   (void);
 		HumNum  getStartTime       (void);
@@ -6312,7 +6379,7 @@ class Tool_cmr : public HumTool {
 		int              getGroupNoteCount       (void);
 		int 						 getStrengthScore        (void);
 		void             printStatistics         (HumdrumFile& infile);
-		string           getComposer             (HumdrumFile& infile);
+		std::string           getComposer             (HumdrumFile& infile);
 		void             printSummaryStatistics  (HumdrumFile& infile);
 		void             storeVegaData           (HumdrumFile& infile);
 		void             printVegaPlot           (void);
@@ -6425,8 +6492,8 @@ class Tool_colorgroups : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -6442,8 +6509,8 @@ class Tool_colortriads : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -6485,7 +6552,7 @@ class Tool_composite : public HumTool {
 		void        assignGroups              (HumdrumFile& infile);
 		void        analyzeLineGroups         (HumdrumFile& infile);
 		void        analyzeLineGroup          (HumdrumFile& infile, int line,
-		                                       const string& target);
+		                                       const std::string& target);
 		void        extractGroup              (HumdrumFile& infile, const std::string &target);
 		void        getNumericGroupStates     (std::vector<int>& states, HumdrumFile& infile, const std::string& tgroup);
 		int         getGroupNoteType          (HumdrumFile& infile, int line, const std::string& group);
@@ -6516,8 +6583,8 @@ class Tool_composite : public HumTool {
 		void        getGroupRhythms           (std::vector<std::string>& rhythms,
 		                                       std::vector<HumNum>& durs, std::vector<int>& states,
 		                                       HumdrumFile& infile);
-		int         typeStringToInt           (const string& value);
-		void        addNumericAnalyses        (ostream& output, HumdrumFile& infile, int line,
+		int         typeStringToInt           (const std::string& value);
+		void        addNumericAnalyses        (std::ostream& output, HumdrumFile& infile, int line,
 		                                       std::vector<std::vector<double>>&  rhythmIndex);
 		void        analyzeOutputVariables(HumdrumFile& infile);
 		std::string getTimeSignature          (HumdrumFile& infile, int line, const std::string& group);
@@ -6529,13 +6596,13 @@ class Tool_composite : public HumTool {
 		void        addTimeSignatureChanges   (HumdrumFile& output, HumdrumFile& infile);
 		void        addMeterSignatureChanges  (HumdrumFile& output, HumdrumFile& infile);
 		void        adjustBadCoincidenceRests (HumdrumFile& output, HumdrumFile& infile);
-		HTp         fixBadRestRhythm          (HTp token, string& rhythm, HumNum tstop, HumNum tsbot);
+		HTp         fixBadRestRhythm          (HTp token, std::string& rhythm, HumNum tstop, HumNum tsbot);
 		std::string generateSizeLine          (HumdrumFile& output, HumdrumFile& input, int line);
 		void        convertNotesToRhythms     (HumdrumFile& infile);
-		int         getEventCount             (std::vector<string>& data);
-		void        fixTiedNotes              (std::vector<string>& data, HumdrumFile& infile);
-		void        doOnsetAnalysisCoincidence(vector<double>& output,
-		                                       vector<double>& inputA, vector<double>& inputB);
+		int         getEventCount             (std::vector<std::string>& data);
+		void        fixTiedNotes              (std::vector<std::string>& data, HumdrumFile& infile);
+		void        doOnsetAnalysisCoincidence(std::vector<double>& output,
+		                                       std::vector<double>& inputA, std::vector<double>& inputB);
 		void        checkForAutomaticGrouping (HumdrumFile& infile);
 
 		// Numeric analysis functions:
@@ -6543,7 +6610,7 @@ class Tool_composite : public HumTool {
 		void        doOnsetAnalyses           (HumdrumFile& infile);
 		void        doOnsetAnalysis           (std::vector<double>& analysis,
 		                                       HumdrumFile& infile,
-		                                       const string& targetGroup);
+		                                       const std::string& targetGroup);
 
 		void        doAccentAnalyses          (HumdrumFile& infile);
 
@@ -6679,8 +6746,8 @@ class Tool_compositeold : public HumTool {
 
 		bool        run                  (HumdrumFileSet& infiles);
 		bool        run                  (HumdrumFile& infile);
-		bool        run                  (const std::string& indata, ostream& out);
-		bool        run                  (HumdrumFile& infile, ostream& out);
+		bool        run                  (const std::string& indata, std::ostream& out);
+		bool        run                  (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void        processFile          (HumdrumFile& infile);
@@ -6714,13 +6781,13 @@ class Tool_compositeold : public HumTool {
 		void        getBeamedNotes       (std::vector<HTp>& notes, HTp starting);
 		void        getPitches           (std::vector<int>& pitches, HTp token);
 		void        addLabelsAndStria    (HumdrumFile& infile);
-		void        addLabels            (HTp sstart, int labelIndex, const string& label,
-		                                  int abbrIndex, const string& abbr);
+		void        addLabels            (HTp sstart, int labelIndex, const std::string& label,
+		                                  int abbrIndex, const std::string& abbr);
 		void        addStria             (HumdrumFile& infile, HTp spinestart);
 		void        addVerseLabels       (HumdrumFile& infile, HTp spinestart);
 		void        addVerseLabels2      (HumdrumFile& infile, HTp spinestart);
-		bool        pitchesEqual         (vector<int>& pitches1, vector<int>& pitches2);
-		void        mergeTremoloGroup    (vector<HTp>& notes, vector<int> groups, int group);
+		bool        pitchesEqual         (std::vector<int>& pitches1, std::vector<int>& pitches2);
+		void        mergeTremoloGroup    (std::vector<HTp>& notes, std::vector<int> groups, int group);
 		bool        onlyAuxTremoloNotes  (HumdrumFile& infile, int line);
 		void        removeAuxTremolosFromCompositeRhythm(HumdrumFile& infile);
 		void        markTogether         (HumdrumFile& infile, int direction);
@@ -6731,41 +6798,41 @@ class Tool_compositeold : public HumTool {
 		void        analyzeNestingDataGroups(HumdrumFile& infile, int direction);
 		void        analyzeNestingDataAll(HumdrumFile& infile, int direction);
 		void        getNestData          (HTp spine, int& total, int& coincide);
-		void        getCoincidenceRhythms(vector<string>& rhythms, vector<int>& coincidences,
+		void        getCoincidenceRhythms(std::vector<std::string>& rhythms, std::vector<int>& coincidences,
 		                                  HumdrumFile& infile);
-		void        fillInCoincidenceRhythm(vector<int>& coincidences,
+		void        fillInCoincidenceRhythm(std::vector<int>& coincidences,
 		                                  HumdrumFile& infile, int direction);
 		void        processCoincidenceInterpretation(HumdrumFile& infile, HTp token);
 		bool        hasPipeRdf           (HumdrumFile& infile);
-		void        extractGroup         (HumdrumFile& infile, const string &target);
-		void        backfillGroup        (vector<vector<string>>& curgroup, HumdrumFile& infile,
-		                                  int line, int track, int subtrack, const string& group);
+		void        extractGroup         (HumdrumFile& infile, const std::string &target);
+		void        backfillGroup        (std::vector<std::vector<std::string>>& curgroup, HumdrumFile& infile,
+		                                  int line, int track, int subtrack, const std::string& group);
 
 		void        analyzeComposite      (HumdrumFile& infile);
-		void        analyzeCompositeOnsets(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
-		void        analyzeCompositeAccents(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
-		void        analyzeCompositeOrnaments(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
-		void        analyzeCompositeSlurs(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
-		void        analyzeCompositeTotal(HumdrumFile& infile, vector<HTp>& groups, vector<bool>& tracks);
+		void        analyzeCompositeOnsets(HumdrumFile& infile, std::vector<HTp>& groups, std::vector<bool>& tracks);
+		void        analyzeCompositeAccents(HumdrumFile& infile, std::vector<HTp>& groups, std::vector<bool>& tracks);
+		void        analyzeCompositeOrnaments(HumdrumFile& infile, std::vector<HTp>& groups, std::vector<bool>& tracks);
+		void        analyzeCompositeSlurs(HumdrumFile& infile, std::vector<HTp>& groups, std::vector<bool>& tracks);
+		void        analyzeCompositeTotal(HumdrumFile& infile, std::vector<HTp>& groups, std::vector<bool>& tracks);
 
 		void        getCompositeSpineStarts(std::vector<HTp>& groups, HumdrumFile& infile);
-		std::vector<int> getExpansionList(vector<bool>& tracks, int maxtrack, int count);
-		std::string makeExpansionString(vector<int>& tracks);
+		std::vector<int> getExpansionList(std::vector<bool>& tracks, int maxtrack, int count);
+		std::string makeExpansionString(std::vector<int>& tracks);
 		void        doCoincidenceAnalysis(HumdrumFile& outfile, HumdrumFile& infile,
 		                                  int ctrack, HTp compositeoldStart);
 		void        doTotalAnalysis(HumdrumFile& outfile, HumdrumFile& infile, int ctrack);
 		void        doGroupAnalyses(HumdrumFile& outfile, HumdrumFile& infile);
 		int         countNoteOnsets(HTp token);
-		void        doTotalOnsetAnalysis(vector<double>& analysis, HumdrumFile& infile,
-		                                  int track, vector<bool>& tracks);
-		void        doGroupOnsetAnalyses(vector<double>& analysisA,
-		                                  vector<double>& analysisB,
+		void        doTotalOnsetAnalysis(std::vector<double>& analysis, HumdrumFile& infile,
+		                                  int track, std::vector<bool>& tracks);
+		void        doGroupOnsetAnalyses(std::vector<double>& analysisA,
+		                                  std::vector<double>& analysisB,
 		                                  HumdrumFile& infile);
-		void        doCoincidenceOnsetAnalysis(vector<vector<double>>& analysis);
-		void        insertAnalysesIntoFile(HumdrumFile& outfile, vector<string>& spines,
-		                                   vector<int>& trackMap, vector<bool>& tracks);
-		void        assignAnalysesToVdataTracks(vector<vector<double>*>& data,
-		                                   vector<string>& spines, HumdrumFile& outfile);
+		void        doCoincidenceOnsetAnalysis(std::vector<std::vector<double>>& analysis);
+		void        insertAnalysesIntoFile(HumdrumFile& outfile, std::vector<std::string>& spines,
+		                                   std::vector<int>& trackMap, std::vector<bool>& tracks);
+		void        assignAnalysesToVdataTracks(std::vector<std::vector<double>*>& data,
+		                                   std::vector<std::string>& spines, HumdrumFile& outfile);
 
 	private:
 		std::string m_pitch       = "eR";   // pitch to display for compositeold rhythm
@@ -6797,11 +6864,11 @@ class Tool_compositeold : public HumTool {
 		bool        m_analysisTotalQ    = false;   // used with -T option
 		bool        m_analysisQ          = false;   // union of -paost options
 		bool        m_nozerosQ           = false;   // used with -Z option
-		vector<vector<double>> m_analysisOnsets;    // used with -P
-		vector<vector<double>> m_analysisAccents;   // used with -A
-		vector<vector<double>> m_analysisOrnaments; // used with -O
-		vector<vector<double>> m_analysisSlurs;     // used with -S
-		vector<vector<double>> m_analysisTotal;    // used with -T
+		std::vector<std::vector<double>> m_analysisOnsets;    // used with -P
+		std::vector<std::vector<double>> m_analysisAccents;   // used with -A
+		std::vector<std::vector<double>> m_analysisOrnaments; // used with -O
+		std::vector<std::vector<double>> m_analysisSlurs;     // used with -S
+		std::vector<std::vector<double>> m_analysisTotal;    // used with -T
 
 };
 
@@ -6851,7 +6918,7 @@ class Tool_deg : public HumTool {
 				static void     setShowTies    (bool state) { m_showTiesQ = state;  }
 				static void     setShowZeros   (bool state) { m_showZerosQ = state; }
 				static void     setShowOctaves (bool state) { m_octaveQ = state; }
-				static void     setForcedKey   (const string& key) { m_forcedKey = key; }
+				static void     setForcedKey   (const std::string& key) { m_forcedKey = key; }
 
 			protected:  // ScaleDegree class
 				std::string     generateDegDataToken     (void) const;
@@ -6955,16 +7022,16 @@ class Tool_deg : public HumTool {
 		void            initialize               (void);
 
 		bool            setupSpineInfo           (HumdrumFile& infile);
-		void            prepareDegSpine          (vector<vector<ScaleDegree>>& degspine, HTp kernstart, HumdrumFile& infil);
+		void            prepareDegSpine          (std::vector<std::vector<ScaleDegree>>& degspine, HTp kernstart, HumdrumFile& infil);
 		void            printDegScore            (HumdrumFile& infile);
 		void            printDegScoreInterleavedWithInputScore(HumdrumFile& infile);
 		std::string     createOutputHumdrumLine  (HumdrumFile& infile, int lineIndex);
       std::string     prepareMergerLine        (std::vector<std::vector<std::string>>& merge);
 		void            calculateManipulatorOutputForSpine(std::vector<std::string>& lineout, std::vector<std::string>& linein);
 		std::string     createRecipInterpretation(const std::string& starttok, int refLine);
-		std::string     createDegInterpretation  (const string& degtok, int refLine, bool addPreSpine);
-		std::string     printDegInterpretation   (const string& interp, HumdrumFile& infile, int lineIndex);
-		void            getModeAndTonic          (string& mode, int& b40tonic, const string& token);
+		std::string     createDegInterpretation  (const std::string& degtok, int refLine, bool addPreSpine);
+		std::string     printDegInterpretation   (const std::string& interp, HumdrumFile& infile, int lineIndex);
+		void            getModeAndTonic          (std::string& mode, int& b40tonic, const std::string& token);
 
 		bool            isDegAboveLine           (HumdrumFile& infile, int lineIndex);
 		bool            isDegArrowLine           (HumdrumFile& infile, int lineIndex);
@@ -6975,15 +7042,15 @@ class Tool_deg : public HumTool {
 		bool            isDegSolfegeLine         (HumdrumFile& infile, int lineIndex);
 		bool            isKeyDesignationLine     (HumdrumFile& infile, int lineIndex);
 
-		void            checkAboveStatus         (string& value, bool arrowStatus);
-		void            checkArrowStatus         (string& value, bool arrowStatus);
-		void            checkBoxStatus           (string& value, bool arrowStatus);
-		void            checkCircleStatus        (string& value, bool arrowStatus);
-		void            checkColorStatus         (string& value, bool arrowStatus);
-		void            checkHatStatus           (string& value, bool arrowStatus);
-		void            checkSolfegeStatus       (string& value, bool arrowStatus);
+		void            checkAboveStatus         (std::string& value, bool arrowStatus);
+		void            checkArrowStatus         (std::string& value, bool arrowStatus);
+		void            checkBoxStatus           (std::string& value, bool arrowStatus);
+		void            checkCircleStatus        (std::string& value, bool arrowStatus);
+		void            checkColorStatus         (std::string& value, bool arrowStatus);
+		void            checkHatStatus           (std::string& value, bool arrowStatus);
+		void            checkSolfegeStatus       (std::string& value, bool arrowStatus);
 
-		void            checkKeyDesignationStatus(string& value, int keyDesignationStatus);
+		void            checkKeyDesignationStatus(std::string& value, int keyDesignationStatus);
 
 	private: // Tool_deg class
 
@@ -7227,15 +7294,15 @@ class Tool_double : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool     run                (const std::string& indata, std::ostream& out);
+		bool     run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize         (HumdrumFile& infile);
 		void     processFile        (HumdrumFile& infile);
 		void     doubleRhythms      (HumdrumFile& infile);
 		void     terminalBreveToTerminalLong(HumdrumFile& infile);
-		void     processBeamsForMeasure(vector<HTp>& notes);
+		void     processBeamsForMeasure(std::vector<HTp>& notes);
 		void     adjustBeams        (HumdrumFile& infile);
 		void     adjustBeams        (HTp sstart, HTp send);
 
@@ -7268,7 +7335,7 @@ class NoteData {
 		int    phstart;   int    phend;    int phnum;
 		int    slstart;   int    slend;    int lyricnum;
 		int    tiestart;  int    tiecont;  int tieend;
-		string text;
+		std::string text;
 };
 
 
@@ -7278,62 +7345,62 @@ class Tool_esac2hum : public HumTool {
 		         Tool_esac2hum         (void);
 		        ~Tool_esac2hum         () {};
 
-		bool    convertFile          (ostream& out, const string& filename);
-		bool    convert              (ostream& out, const string& input);
-		bool    convert              (ostream& out, istream& input);
+		bool    convertFile          (std::ostream& out, const std::string& filename);
+		bool    convert              (std::ostream& out, const std::string& input);
+		bool    convert              (std::ostream& out, std::istream& input);
 
 	protected:
 		bool      initialize            (void);
 		void      checkOptions          (Options& opts, int argc, char** argv);
 		void      example               (void);
-		void      usage                 (const string& command);
-		void      convertEsacToHumdrum  (ostream& out, istream& input);
-		bool      getSong               (vector<string>& song, istream& infile,
+		void      usage                 (const std::string& command);
+		void      convertEsacToHumdrum  (std::ostream& out, std::istream& input);
+		bool      getSong               (std::vector<std::string>& song, std::istream& infile,
 		                                int init);
-		void      convertSong           (vector<string>& song, ostream& out);
-		bool      getKeyInfo            (vector<string>& song, string& key,
-		                                 double& mindur, int& tonic, string& meter,
-		                                 ostream& out);
-		void      printNoteData         (NoteData& data, int textQ, ostream& out);
-		bool      getNoteList           (vector<string>& song,
-		                                 vector<NoteData>& songdata, double mindur,
+		void      convertSong           (std::vector<std::string>& song, std::ostream& out);
+		bool      getKeyInfo            (std::vector<std::string>& song, std::string& key,
+		                                 double& mindur, int& tonic, std::string& meter,
+		                                 std::ostream& out);
+		void      printNoteData         (NoteData& data, int textQ, std::ostream& out);
+		bool      getNoteList           (std::vector<std::string>& song,
+		                                 std::vector<NoteData>& songdata, double mindur,
 		                                 int tonic);
-		void      getMeterInfo          (string& meter, vector<int>& numerator,
-		                                 vector<int>& denominator);
-		void      postProcessSongData   (vector<NoteData>& songdata,
-		                                 vector<int>& numerator,vector<int>& denominator);
-		void      printKeyInfo          (vector<NoteData>& songdata, int tonic,
-		                                 int textQ, ostream& out);
+		void      getMeterInfo          (std::string& meter, std::vector<int>& numerator,
+		                                 std::vector<int>& denominator);
+		void      postProcessSongData   (std::vector<NoteData>& songdata,
+		                                 std::vector<int>& numerator,std::vector<int>& denominator);
+		void      printKeyInfo          (std::vector<NoteData>& songdata, int tonic,
+		                                 int textQ, std::ostream& out);
 		int       getAccidentalMax      (int a, int b, int c);
-		bool      printTitleInfo        (vector<string>& song, ostream& out);
-		void      getLineRange          (vector<string>& song, const string& field,
+		bool      printTitleInfo        (std::vector<std::string>& song, std::ostream& out);
+		void      getLineRange          (std::vector<std::string>& song, const std::string& field,
 		                                 int& start, int& stop);
-		void      printChar             (unsigned char c, ostream& out);
-		void      printBibInfo          (vector<string>& song, ostream& out);
-		void      printString           (const string& string, ostream& out);
-		void      printSpecialChars     (ostream& out);
-		bool      placeLyrics           (vector<string>& song,
-		                                 vector<NoteData>& songdata);
-		bool      placeLyricPhrase      (vector<NoteData>& songdata,
-		                                 vector<string>& lyrics, int line);
-		void      getLyrics             (vector<string>& lyrics, const string& buffer);
-		void      cleanupLyrics         (vector<string>& lyrics);
-		bool      getFileContents       (vector<string>& array, const string& filename);
-		void      chopExtraInfo         (string& buffer);
-		void      printHumdrumHeaderInfo(ostream& out, vector<string>& song);
-		void      printHumdrumFooterInfo(ostream& out, vector<string>& song);
+		void      printChar             (unsigned char c, std::ostream& out);
+		void      printBibInfo          (std::vector<std::string>& song, std::ostream& out);
+		void      printString           (const std::string& string, std::ostream& out);
+		void      printSpecialChars     (std::ostream& out);
+		bool      placeLyrics           (std::vector<std::string>& song,
+		                                 std::vector<NoteData>& songdata);
+		bool      placeLyricPhrase      (std::vector<NoteData>& songdata,
+		                                 std::vector<std::string>& lyrics, int line);
+		void      getLyrics             (std::vector<std::string>& lyrics, const std::string& buffer);
+		void      cleanupLyrics         (std::vector<std::string>& lyrics);
+		bool      getFileContents       (std::vector<std::string>& array, const std::string& filename);
+		void      chopExtraInfo         (std::string& buffer);
+		void      printHumdrumHeaderInfo(std::ostream& out, std::vector<std::string>& song);
+		void      printHumdrumFooterInfo(std::ostream& out, std::vector<std::string>& song);
 
 	private:
 		int            debugQ = 0;        // used with --debug option
 		int            verboseQ = 0;      // used with -v option
 		int            splitQ = 0;        // used with -s option
 		int            firstfilenum = 1;  // used with -f option
-		vector<string> header;            // used with -h option
-		vector<string> trailer;           // used with -t option
-		string         fileextension;     // used with -x option
-		string         namebase;          // used with -s option
+		std::vector<std::string> header;            // used with -h option
+		std::vector<std::string> trailer;           // used with -t option
+		std::string         fileextension;     // used with -x option
+		std::string         namebase;          // used with -s option
 
-		vector<int>    chartable;  // used printChars() & printSpecialChars()
+		std::vector<int>    chartable;  // used printChars() & printSpecialChars()
 		int inputline = 0;
 
 };
@@ -7565,22 +7632,22 @@ class Tool_filter : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata);
+		bool     run                (const std::string& indata);
 
 		bool     runUniversal       (HumdrumFileSet& infiles);
 
 	protected:
-		void     getCommandList     (vector<pair<string, string> >& commands,
+		void     getCommandList     (std::vector<std::pair<std::string, std::string> >& commands,
 		                             HumdrumFile& infile);
 		void     getUniversalCommandList(std::vector<std::pair<std::string, std::string> >& commands,
 		                             HumdrumFileSet& infiles);
 		void     initialize         (HumdrumFile& infile);
 		void     removeGlobalFilterLines    (HumdrumFile& infile);
 		void     removeUniversalFilterLines (HumdrumFileSet& infiles);
-		void     splitPipeline      (vector<string>& clist, const string& command);
+		void     splitPipeline      (std::vector<std::string>& clist, const std::string& command);
 
 	private:
-		string   m_variant;        // used with -v option.
+		std::string   m_variant;        // used with -v option.
 		bool     m_debugQ = false; // used with --debug option
 
 };
@@ -7593,17 +7660,17 @@ class Tool_fixps : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool     run                (const std::string& indata, std::ostream& out);
+		bool     run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize         (HumdrumFile& infile);
 		void     processFile        (HumdrumFile& infile);
 		void     markEmptyVoices    (HumdrumFile& infile);
-		void     removeEmpties      (vector<vector<HTp>>& newlist, HumdrumFile& infile);
+		void     removeEmpties      (std::vector<std::vector<HTp>>& newlist, HumdrumFile& infile);
 		void     removeDuplicateDynamics(HumdrumFile& infile);
-		void     outputNewSpining   (vector<vector<HTp>>& newlist, HumdrumFile& infile);
-		void     printNewManipulator(HumdrumFile& infile, vector<vector<HTp>>& newlist, int line);
+		void     outputNewSpining   (std::vector<std::vector<HTp>>& newlist, HumdrumFile& infile);
+		void     printNewManipulator(HumdrumFile& infile, std::vector<std::vector<HTp>>& newlist, int line);
 
 	private:
 
@@ -7617,8 +7684,8 @@ class Tool_flipper : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -7626,9 +7693,9 @@ class Tool_flipper : public HumTool {
 
 		void     processLine        (HumdrumFile& infile, int index);
 		void     checkForFlipChanges(HumdrumFile& infile, int index);
-		bool     flipSubspines      (vector<vector<HTp>>& flipees);
-		void     flipSpineTokens    (vector<HTp>& subtokens);
-		void     extractFlipees     (vector<vector<HTp>>& flipees,
+		bool     flipSubspines      (std::vector<std::vector<HTp>>& flipees);
+		void     flipSpineTokens    (std::vector<HTp>& subtokens);
+		void     extractFlipees     (std::vector<std::vector<HTp>>& flipees,
 		                             HumdrumFile& infile, int index);
 
 	private:
@@ -7651,8 +7718,8 @@ class Tool_gasparize : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool     run                (const std::string& indata, std::ostream& out);
+		bool     run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize         (HumdrumFile& infile);
@@ -7663,7 +7730,7 @@ class Tool_gasparize : public HumTool {
 		void     fixInstrumentAbbreviations(HumdrumFile& infile);
 		void     addTerminalLongs   (HumdrumFile& infile);
 		void     deleteDummyTranspositions(HumdrumFile& infile);
-		string   getDate            (void);
+		std::string   getDate            (void);
 		void     adjustSystemDecoration(HumdrumFile& infile);
 		void     deleteBreaks       (HumdrumFile& infile);
 		void     updateKeySignatures(HumdrumFile& infile, int lineindex);
@@ -7678,8 +7745,8 @@ class Tool_gasparize : public HumTool {
 		void     addMensuration     (int top, HumdrumFile& infile, int i);
 		void     createEditText     (HumdrumFile& infile);
 		bool     addEditStylingForText(HumdrumFile& infile, HTp sstart, HTp send);
-		string   getEditLine        (const string& text, int fieldindex, HLp line);
-		bool     insertEditText     (const string& text, HumdrumFile& infile, int line, int field);
+		std::string   getEditLine        (const std::string& text, int fieldindex, HLp line);
+		bool     insertEditText     (const std::string& text, HumdrumFile& infile, int line, int field);
 		void     adjustIntrumentNames(HumdrumFile& infile);
 		void     removeKeyDesignations(HumdrumFile& infile);
 		void     fixBarlines        (HumdrumFile& infile);
@@ -7692,9 +7759,9 @@ class Tool_gasparize : public HumTool {
 		void     fixTiesStartEnd(HTp starts, HTp ends);
 
 	private:
-		vector<vector<int>> m_pstates;
-		vector<vector<int>> m_kstates;
-		vector<vector<bool>> m_estates;
+		std::vector<std::vector<int>> m_pstates;
+		std::vector<std::vector<int>> m_kstates;
+		std::vector<std::vector<bool>> m_estates;
 
 };
 
@@ -7706,8 +7773,8 @@ class Tool_grep : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void      processFile         (HumdrumFile& infile);
@@ -7727,8 +7794,8 @@ class Tool_half : public HumTool {
 
 		bool     run           (HumdrumFileSet& infiles);
 		bool     run           (HumdrumFile& infile);
-		bool     run           (const string& indata, ostream& out);
-		bool     run           (HumdrumFile& infile, ostream& out);
+		bool     run           (const std::string& indata, std::ostream& out);
+		bool     run           (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize    (HumdrumFile& infile);
@@ -7763,8 +7830,8 @@ class Tool_homorhythm : public HumTool {
 
 		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
-		bool        run                (const string& indata, ostream& out);
-		bool        run                (HumdrumFile& infile, ostream& out);
+		bool        run                (const std::string& indata, std::ostream& out);
+		bool        run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void        processFile        (HumdrumFile& infile);
@@ -7773,9 +7840,9 @@ class Tool_homorhythm : public HumTool {
 		void        markHomophonicNotes(void);
 		int         getExtantVoiceCount(HumdrumFile& infile);
 		int         getOriginalVoiceCount(HumdrumFile& infile);
-		void        addRawAnalysis     (HumdrumFile& infile, vector<double>& raw);
-		void        addAccumulatedScores(HumdrumFile& infile, vector<double>& score);
-		void        addAttacks         (HumdrumFile& infile, vector<int>& attacks);
+		void        addRawAnalysis     (HumdrumFile& infile, std::vector<double>& raw);
+		void        addAccumulatedScores(HumdrumFile& infile, std::vector<double>& score);
+		void        addAttacks         (HumdrumFile& infile, std::vector<int>& attacks);
 		void        addFractionAnalysis(HumdrumFile& infile, std::vector<double>& score);
 
 	private:
@@ -7798,8 +7865,8 @@ class Tool_homorhythm2 : public HumTool {
 
 		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
-		bool        run                (const string& indata, ostream& out);
-		bool        run                (HumdrumFile& infile, ostream& out);
+		bool        run                (const std::string& indata, std::ostream& out);
+		bool        run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void        processFile        (HumdrumFile& infile);
@@ -7808,7 +7875,7 @@ class Tool_homorhythm2 : public HumTool {
 	private:
 		double      m_threshold = 0.6;
 		double      m_threshold2 = 0.4;
-		vector<double> m_score;
+		std::vector<double> m_score;
 };
 
 
@@ -7819,18 +7886,18 @@ class Tool_hproof : public HumTool {
 
 		bool  run              (HumdrumFileSet& infiles);
 		bool  run              (HumdrumFile& infile);
-		bool  run              (const string& indata, ostream& out);
-		bool  run              (HumdrumFile& infile, ostream& out);
+		bool  run              (const std::string& indata, std::ostream& out);
+		bool  run              (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  markNonChordTones(HumdrumFile& infile);
 		void  processHarmSpine (HumdrumFile& infile, HTp hstart);
-		void  markNotesInRange (HumdrumFile& infile, HTp ctoken, HTp ntoken, const string& key);
-		void  markHarmonicTones(HTp tok, vector<int>& cts);
-		void  getNewKey        (HTp token, HTp ntoken, string& key);
+		void  markNotesInRange (HumdrumFile& infile, HTp ctoken, HTp ntoken, const std::string& key);
+		void  markHarmonicTones(HTp tok, std::vector<int>& cts);
+		void  getNewKey        (HTp token, HTp ntoken, std::string& key);
 
 	private:
-		vector<HTp> m_kernspines;
+		std::vector<HTp> m_kernspines;
 
 };
 
@@ -7843,7 +7910,7 @@ class Tool_humbreak : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
@@ -7852,10 +7919,15 @@ class Tool_humbreak : public HumTool {
 		void    addBreaks          (HumdrumFile& infile);
 		void    removeBreaks       (HumdrumFile& infile);
 		void    convertPageToLine  (HumdrumFile& infile);
+		void    markLineBreakMeasures(HumdrumFile& infile);
 
 	private:
 		std::map<int, int> m_lineMeasures;  // list of measures to add line breaks to
 		std::map<int, int> m_pageMeasures;  // list of measures to add page breaks to
+
+		std::map<int, int> m_lineOffset;  // measure offsets for measure breaks
+		std::map<int, int> m_pageOffset;  // measure offsets for page breaks
+
 		std::string m_group = "original";
 		bool m_removeQ = false;
 		bool m_page2lineQ = false;
@@ -7870,11 +7942,11 @@ class Tool_humbreak : public HumTool {
 class TimePoint {
 	public:
 		// file: pointers to the file in which the index refers to
-		vector<HumdrumFile*> file;
+		std::vector<HumdrumFile*> file;
 
 		// index :: A list of indexes for the lines at which the given timestamp
 		// occurs in each file.  The first index is for the reference work.
-		vector<int> index;
+		std::vector<int> index;
 
 		// timestamp :: The duration from the start of the score to given time in score.
 		HumNum timestamp = -1;
@@ -7896,7 +7968,7 @@ class TimePoint {
 class NotePoint {
 	public:
 		HTp         token          = NULL;   // Humdrum token that contains note
-		string      subtoken;                // string that represents not (token may be chord)
+		std::string subtoken;                // string that represents not (token may be chord)
 		int         subindex       = -1;     // subtoken index of note (in chord)
 		int         measure        = -1;     // measure number that note is found
 		HumNum      measurequarter = -1;     // distance from start of measure to note
@@ -7907,7 +7979,7 @@ class NotePoint {
 		int         processed      = 0;      // has note been processed/matched
 		int         sourceindex    = -1;     // source file index for note
 		int         tpindex        = -1;     // timepoint index of note in source
-		vector<int> matched;       // indexes to the location of the note in TimePoint list.
+		std::vector<int> matched;       // indexes to the location of the note in TimePoint list.
 		                           // the index indicate which score the match is related to,
 		                           // and a value of -1 means there is no equivalent timepoint.
 		void clear(void) {
@@ -7939,13 +8011,13 @@ class Tool_humdiff : public HumTool {
 	protected:
 		void     compareFiles       (HumdrumFile& reference, HumdrumFile& alternate);
 
-		void     compareTimePoints  (vector<vector<TimePoint>>& timepoints, HumdrumFile& reference, HumdrumFile& alternate);
-		void     extractTimePoints  (vector<TimePoint>& points, HumdrumFile& infile);
-		void     printTimePoints    (vector<TimePoint>& timepoints);
-		void     compareLines       (HumNum minval, vector<int>& indexes, vector<vector<TimePoint>>& timepoints, vector<HumdrumFile*> infiles);
-		void     getNoteList        (vector<NotePoint>& notelist, HumdrumFile& infile, int line, int measure, int sourceindex, int tpindex);
-		int      findNoteInList     (NotePoint& np, vector<NotePoint>& nps);
-		void     printNotePoints    (vector<NotePoint>& notelist);
+		void     compareTimePoints  (std::vector<std::vector<TimePoint>>& timepoints, HumdrumFile& reference, HumdrumFile& alternate);
+		void     extractTimePoints  (std::vector<TimePoint>& points, HumdrumFile& infile);
+		void     printTimePoints    (std::vector<TimePoint>& timepoints);
+		void     compareLines       (HumNum minval, std::vector<int>& indexes, std::vector<std::vector<TimePoint>>& timepoints, std::vector<HumdrumFile*> infiles);
+		void     getNoteList        (std::vector<NotePoint>& notelist, HumdrumFile& infile, int line, int measure, int sourceindex, int tpindex);
+		int      findNoteInList     (NotePoint& np, std::vector<NotePoint>& nps);
+		void     printNotePoints    (std::vector<NotePoint>& notelist);
 		void     markNote           (NotePoint& np);
 
 	private:
@@ -7954,8 +8026,8 @@ class Tool_humdiff : public HumTool {
 
 };
 
-ostream& operator<<(ostream& out, TimePoint& tp);
-ostream& operator<<(ostream& out, NotePoint& np);
+std::ostream& operator<<(std::ostream& out, TimePoint& tp);
+std::ostream& operator<<(std::ostream& out, NotePoint& np);
 
 
 
@@ -7966,8 +8038,8 @@ class Tool_humsheet : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 		void     printRowClasses   (HumdrumFile& infile, int row);
 		void     printRowContents  (HumdrumFile& infile, int row);
@@ -8013,8 +8085,8 @@ class Tool_humsort : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void    processFile        (HumdrumFile& infile);
@@ -8029,8 +8101,8 @@ class Tool_humtr : public HumTool {
 
 		bool        run               (HumdrumFileSet& infiles);
 		bool        run               (HumdrumFile& infile);
-		bool        run               (const std::string& indata, ostream& out);
-		bool        run               (HumdrumFile& infile, ostream& out);
+		bool        run               (const std::string& indata, std::ostream& out);
+		bool        run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void        processFile       (HumdrumFile& infile);
@@ -8185,8 +8257,8 @@ class Tool_kernify : public HumTool {
 
 		bool     run          (HumdrumFileSet& infiles);
 		bool     run          (HumdrumFile& infile);
-		bool     run          (const string& indata, ostream& out);
-		bool     run          (HumdrumFile& infile, ostream& out);
+		bool     run          (const std::string& indata, std::ostream& out);
+		bool     run          (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void        initialize             (void);
@@ -8208,8 +8280,8 @@ class Tool_kernview : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -8500,19 +8572,19 @@ class Tool_mei2hum : public HumTool {
 
 class WordInfo {
 	public:
-		string word;                 // text of word
+		std::string word;                 // text of word
 		int notes = 0;               // number of notes in word
 		HumNum starttime;            // start time of word
 		HumNum endtime;              // end time of word
 		int bar = 0;                 // starting barline number for word
-	  	vector<int> bars;            // starting barline number for each syllable
-		vector<string> syllables;    // list of syllables in word with melisma
-		vector<int> notecounts;      // list of note counts for each syllable in word
-		vector<HumNum> starttimes;   // list of start times for each syllable
-		vector<HumNum> endtimes;     // list of end times for each syllable
+	  	std::vector<int> bars;            // starting barline number for each syllable
+		std::vector<std::string> syllables;    // list of syllables in word with melisma
+		std::vector<int> notecounts;      // list of note counts for each syllable in word
+		std::vector<HumNum> starttimes;   // list of start times for each syllable
+		std::vector<HumNum> endtimes;     // list of end times for each syllable
 		HumNum duration(void) { return endtime - starttime; }
-		string name;
-		string abbreviation;
+		std::string name;
+		std::string abbreviation;
 		int partnum = 0;
 		void clear(void) {
 			starttime = 0;
@@ -8539,36 +8611,36 @@ class Tool_melisma : public HumTool {
 
 		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
-		bool  run                      (const string& indata, ostream& out);
-		bool  run                      (HumdrumFile& infile, ostream& out);
+		bool  run                      (const std::string& indata, std::ostream& out);
+		bool  run                      (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void   initialize              (HumdrumFile& infile);
 		void   processFile             (HumdrumFile& infile);
-		void   getNoteCounts           (HumdrumFile& infile, vector<vector<int>>& counts);
-		void   getNoteCountsForLyric   (vector<vector<int>>& counts, HTp lyricStart);
+		void   getNoteCounts           (HumdrumFile& infile, std::vector<std::vector<int>>& counts);
+		void   getNoteCountsForLyric   (std::vector<std::vector<int>>& counts, HTp lyricStart);
 		int    getCountForSyllable     (HTp token);
-		void   replaceLyrics           (HumdrumFile& infile, vector<vector<int>>& counts);
-		void   markMelismas            (HumdrumFile& infile, vector<vector<int>>& counts);
+		void   replaceLyrics           (HumdrumFile& infile, std::vector<std::vector<int>>& counts);
+		void   markMelismas            (HumdrumFile& infile, std::vector<std::vector<int>>& counts);
 		void   markMelismaNotes        (HTp text, int count);
-		void   extractWordlist         (vector<WordInfo>& wordinfo, map<string, int>& wordlist,
-		                                HumdrumFile& infile, vector<vector<int>>& notecount);
-		string extractWord             (WordInfo& winfo, HTp token, vector<vector<int>>& counts);
+		void   extractWordlist         (std::vector<WordInfo>& wordinfo, std::map<std::string, int>& wordlist,
+		                                HumdrumFile& infile, std::vector<std::vector<int>>& notecount);
+		std::string extractWord             (WordInfo& winfo, HTp token, std::vector<std::vector<int>>& counts);
 		HumNum getEndtime              (HTp text);
-		void   printWordlist           (HumdrumFile& infile, vector<WordInfo>& wordinfo,
-		                                map<string, int>);
+		void   printWordlist           (HumdrumFile& infile, std::vector<WordInfo>& wordinfo,
+		                                std::map<std::string, int>);
 		void   initializePartInfo      (HumdrumFile& infile);
-		void   getMelismaNoteCounts    (vector<int>& ncounts, vector<int>& mcounts,
+		void   getMelismaNoteCounts    (std::vector<int>& ncounts, std::vector<int>& mcounts,
 		                                HumdrumFile& infile);
 		double getScoreDuration        (HumdrumFile& infile);
 		void   initBarlines            (HumdrumFile& infile);
 
 	private:
-		vector<vector<HumNum>> m_endtimes;      // end time of syllables indexed by line/field
-		vector<string>         m_names;         // name of parts indexed by track
-		vector<string>         m_abbreviations; // abbreviation of parts indexed by track
-		vector<int>            m_partnums;      // part number index by track
-		vector<int>            m_measures;      // current measure number
+		std::vector<std::vector<HumNum>> m_endtimes;      // end time of syllables indexed by line/field
+		std::vector<std::string>         m_names;         // name of parts indexed by track
+		std::vector<std::string>         m_abbreviations; // abbreviation of parts indexed by track
+		std::vector<int>            m_partnums;      // part number index by track
+		std::vector<int>            m_measures;      // current measure number
 
 };
 
@@ -8581,13 +8653,13 @@ class Tool_mens2kern : public HumTool {
 
 		bool     run                 (HumdrumFileSet& infiles);
 		bool     run                 (HumdrumFile& infile);
-		bool     run                 (const string& indata, ostream& out);
-		bool     run                 (HumdrumFile& infile, ostream& out);
+		bool     run                 (const std::string& indata, std::ostream& out);
+		bool     run                 (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile         (HumdrumFile& infile);
 		void     initialize          (void);
-		void     processMelody       (vector<HTp>& melody);
+		void     processMelody       (std::vector<HTp>& melody);
 		std::string mens2kernRhythm  (const std::string& rhythm,
 		                              bool altera,  bool perfecta,
 		                              bool imperfecta, int maxima_def, int longa_def,
@@ -8611,7 +8683,7 @@ class Tool_meter : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 
@@ -8666,16 +8738,16 @@ class Tool_metlev : public HumTool {
 
 		bool  run              (HumdrumFileSet& infiles);
 		bool  run              (HumdrumFile& infile);
-		bool  run              (const string& indata, ostream& out);
-		bool  run              (HumdrumFile& infile, ostream& out);
+		bool  run              (const std::string& indata, std::ostream& out);
+		bool  run              (HumdrumFile& infile, std::ostream& out);
 
 	protected:
-		void  fillVoiceResults (vector<vector<double> >& results,
+		void  fillVoiceResults (std::vector<std::vector<double> >& results,
 		                        HumdrumFile& infile,
-		                        vector<double>& beatlev);
+		                        std::vector<double>& beatlev);
 
 	private:
-		vector<HTp> m_kernspines;
+		std::vector<HTp> m_kernspines;
 
 };
 
@@ -8688,8 +8760,8 @@ class Tool_modori : public HumTool {
 
 		bool     run                          (HumdrumFileSet& infiles);
 		bool     run                          (HumdrumFile& infile);
-		bool     run                          (const string& indata, ostream& out);
-		bool     run                          (HumdrumFile& infile, ostream& out);
+		bool     run                          (const std::string& indata, std::ostream& out);
+		bool     run                          (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile                  (HumdrumFile& infile);
@@ -8722,11 +8794,11 @@ class Tool_modori : public HumTool {
 		void     convertInstrumentAbbreviationToOriginal (HTp token);
 		void     convertInstrumentAbbreviationToRegular  (HTp token);
 
-		int      getPairedReference           (int index, vector<string>& keys);
+		int      getPairedReference           (int index, std::vector<std::string>& keys);
 		void     storeModOriReferenceRecords  (HumdrumFile& infile);
 		void     processExclusiveInterpretationLine(HumdrumFile& infile, int line);
 		bool     processStaffCompanionSpines  (std::vector<HTp> tokens);
-		bool     processStaffSpines           (vector<HTp>& tokens);
+		bool     processStaffSpines           (std::vector<HTp>& tokens);
 		void     updateLoMo                   (HumdrumFile& infile);
 		void     processLoMo                  (HTp lomo);
 		void     printModoriOutput            (HumdrumFile& infile);
@@ -9180,6 +9252,16 @@ class Tool_musedata2hum : public HumTool {
 		double m_tempo = 0.0;          // for initial tempo from MIDI settings
 		bool m_aboveBelowKernRdf = false; // output RDF**kern above/below markers
 
+		// m_measureLineIndex -- keep track of index for processed
+		// measure for debugging.
+		int m_measureLineIndex = -1;
+
+		// m_figuredOffset -- increment for the next figure bass offset.
+		int m_figureOffset = 0;
+
+		// m_quarterDivisions -- currently processed $Q value.
+		int m_quarterDivisions = 0;
+
 		std::map<std::string, bool> m_usedReferences;
 		std::vector<std::string> m_postReferences;
 
@@ -9482,8 +9564,8 @@ class MeasureInfo {
 			tracks = tcount;
 		}
 		int num;          // measure number
-		string stopStyle;  // styling for end of last measure
-		string startStyle; // styling for start of first measure
+		std::string stopStyle;  // styling for end of last measure
+		std::string startStyle; // styling for start of first measure
 		int seg;          // measure segment
 		int start;        // starting line of segment
 		int stop;         // ending line of segment
@@ -9491,20 +9573,20 @@ class MeasureInfo {
 		HumdrumFile* file;
 
 		// musical settings at start of measure
-		vector<MyCoord> sclef;     // starting clef of segment
-		vector<MyCoord> skeysig;   // starting keysig of segment
-		vector<MyCoord> skey;      // starting key of segment
-		vector<MyCoord> stimesig;  // starting timesig of segment
-		vector<MyCoord> smet;      // starting met of segment
-		vector<MyCoord> stempo;    // starting tempo of segment
+		std::vector<MyCoord> sclef;     // starting clef of segment
+		std::vector<MyCoord> skeysig;   // starting keysig of segment
+		std::vector<MyCoord> skey;      // starting key of segment
+		std::vector<MyCoord> stimesig;  // starting timesig of segment
+		std::vector<MyCoord> smet;      // starting met of segment
+		std::vector<MyCoord> stempo;    // starting tempo of segment
 
 		// musical settings at start of measure
-		vector<MyCoord> eclef;     // ending clef    of segment
-		vector<MyCoord> ekeysig;   // ending keysig  of segment
-		vector<MyCoord> ekey;      // ending key     of segment
-		vector<MyCoord> etimesig;  // ending timesig of segment
-		vector<MyCoord> emet;      // ending met     of segment
-		vector<MyCoord> etempo;    // ending tempo   of segment
+		std::vector<MyCoord> eclef;     // ending clef    of segment
+		std::vector<MyCoord> ekeysig;   // ending keysig  of segment
+		std::vector<MyCoord> ekey;      // ending key     of segment
+		std::vector<MyCoord> etimesig;  // ending timesig of segment
+		std::vector<MyCoord> emet;      // ending met     of segment
+		std::vector<MyCoord> etempo;    // ending tempo   of segment
 };
 
 
@@ -9516,62 +9598,62 @@ class Tool_myank : public HumTool {
 
 		bool     run                   (HumdrumFileSet& infiles);
 		bool     run                   (HumdrumFile& infile);
-		bool     run                   (const string& indata, ostream& out);
-		bool     run                   (HumdrumFile& infile, ostream& out);
+		bool     run                   (const std::string& indata, std::ostream& out);
+		bool     run                   (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void      initialize            (HumdrumFile& infile);
 		void      example              (void);
-		void      usage                (const string& command);
+		void      usage                (const std::string& command);
 		void      myank                (HumdrumFile& infile,
-		                                vector<MeasureInfo>& outmeasure);
-		void      removeDollarsFromString(string& buffer, int maxx);
-		void      processFieldEntry    (vector<MeasureInfo>& field,
-		                                const string& str,
+		                                std::vector<MeasureInfo>& outmeasure);
+		void      removeDollarsFromString(std::string& buffer, int maxx);
+		void      processFieldEntry    (std::vector<MeasureInfo>& field,
+		                                const std::string& str,
 		                                HumdrumFile& infile, int maxmeasure,
-		                                vector<MeasureInfo>& inmeasures,
-		                                vector<int>& inmap);
-		void      expandMeasureOutList (vector<MeasureInfo>& measureout,
-		                                vector<MeasureInfo>& measurein,
-		                                HumdrumFile& infile, const string& optionstring);
-		void      getMeasureStartStop  (vector<MeasureInfo>& measurelist,
+		                                std::vector<MeasureInfo>& inmeasures,
+		                                std::vector<int>& inmap);
+		void      expandMeasureOutList (std::vector<MeasureInfo>& measureout,
+		                                std::vector<MeasureInfo>& measurein,
+		                                HumdrumFile& infile, const std::string& optionstring);
+		void      getMeasureStartStop  (std::vector<MeasureInfo>& measurelist,
 		                                HumdrumFile& infile);
 		void      printEnding          (HumdrumFile& infile, int lastline, int adjlin);
 		void      printStarting        (HumdrumFile& infile);
 		void      reconcileSpineBoundary(HumdrumFile& infile, int index1, int index2);
 		void      reconcileStartingPosition(HumdrumFile& infile, int index2);
-		void      printJoinLine        (vector<int>& splits, int index, int count);
+		void      printJoinLine        (std::vector<int>& splits, int index, int count);
 		void      printInvisibleMeasure(HumdrumFile& infile, int line);
 		void      fillGlobalDefaults   (HumdrumFile& infile,
-		                                vector<MeasureInfo>& measurein,
-		                                vector<int>& inmap);
+		                                std::vector<MeasureInfo>& measurein,
+		                                std::vector<int>& inmap);
 		void      adjustGlobalInterpretations(HumdrumFile& infile, int ii,
-		                                vector<MeasureInfo>& outmeasures,
+		                                std::vector<MeasureInfo>& outmeasures,
 		                                int index);
 		void      adjustGlobalInterpretationsStart(HumdrumFile& infile, int ii,
-		                                vector<MeasureInfo>& outmeasures,
+		                                std::vector<MeasureInfo>& outmeasures,
 		                                int index);
-		void      getMarkString        (ostream& out, HumdrumFile& infile);
+		void      getMarkString        (std::ostream& out, HumdrumFile& infile);
 		void      printDoubleBarline   (HumdrumFile& infile, int line);
-		void      insertZerothMeasure  (vector<MeasureInfo>& measurelist,
+		void      insertZerothMeasure  (std::vector<MeasureInfo>& measurelist,
 		                                HumdrumFile& infile);
-		void      getMetStates         (vector<vector<MyCoord> >& metstates,
+		void      getMetStates         (std::vector<std::vector<MyCoord> >& metstates,
 		                                HumdrumFile& infile);
 		MyCoord   getLocalMetInfo      (HumdrumFile& infile, int row, int track);
 		int       atEndOfFile          (HumdrumFile& infile, int line);
 		void      processFile          (HumdrumFile& infile);
 		int       getSectionCount      (HumdrumFile& infile);
-		void      getSectionString     (string& sstring, HumdrumFile& infile,
+		void      getSectionString     (std::string& sstring, HumdrumFile& infile,
 		                                int sec);
 		void      collapseSpines       (HumdrumFile& infile, int line);
-		void      printMeasureStart    (HumdrumFile& infile, int line, const string& style);
-		std::string expandMultipliers  (const string& inputstring);
+		void      printMeasureStart    (HumdrumFile& infile, int line, const std::string& style);
+		std::string expandMultipliers  (const std::string& inputstring);
 
-		vector<int> analyzeBarNumbers  (HumdrumFile& infile);
+		std::vector<int> analyzeBarNumbers  (HumdrumFile& infile);
 		int         getBarNumberForLineNumber(int lineNumber);
 		int         getStartLineNumber (void);
 		int         getEndLineNumber   (void);
-		void        printDataLine      (HLp line, bool& startLineHandled, const vector<int>& lastLineResolvedTokenLineIndex, const vector<HumNum>& lastLineDurationsFromNoteStart);
+		void        printDataLine      (HLp line, bool& startLineHandled, const std::vector<int>& lastLineResolvedTokenLineIndex, const std::vector<HumNum>& lastLineDurationsFromNoteStart);
 
 	private:
 		int    m_debugQ      = 0;             // used with --debug option
@@ -9589,12 +9671,12 @@ class Tool_myank : public HumTool {
 		int    m_barnumtextQ = 0;             // used with -T option
 		int    m_section     = 0;             // used with --section option
 		int    m_sectionCountQ = 0;           // used with --section-count option
-		vector<MeasureInfo> m_measureOutList; // used with -m option
-		vector<MeasureInfo> m_measureInList;  // used with -m option
-		vector<vector<MyCoord> > m_metstates;
+		std::vector<MeasureInfo> m_measureOutList; // used with -m option
+		std::vector<MeasureInfo> m_measureInList;  // used with -m option
+		std::vector<std::vector<MyCoord> > m_metstates;
 
-		string      m_lineRange;              // used with -l option
-		vector<int> m_barNumbersPerLine;      // used with -l option
+		std::string m_lineRange;              // used with -l option
+		std::vector<int> m_barNumbersPerLine;      // used with -l option
 		bool m_hideStarting;                  // used with --hide-starting option
 		bool m_hideEnding;                    // used with --hide-ending option
 
@@ -9609,14 +9691,14 @@ class Tool_nproof : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 		void     checkForBlankLines(HumdrumFile& infile);
 		void     checkInstrumentInformation(HumdrumFile& infile);
 		void     checkKeyInformation(HumdrumFile& infile);
 		void     checkSpineTerminations(HumdrumFile& infile);
-		void     checkForValidInstrumentCode(HTp token, vector<pair<string, string>>& instrumentList);
+		void     checkForValidInstrumentCode(HTp token, std::vector<std::pair<std::string, std::string>>& instrumentList);
 		void     checkReferenceRecords(HumdrumFile& infile);
 
 	protected:
@@ -9647,8 +9729,8 @@ class Tool_ordergps : public HumTool {
 
 		bool  run            (HumdrumFileSet& infiles);
 		bool  run            (HumdrumFile& infile);
-		bool  run            (const string& indata, ostream& out);
-		bool  run            (HumdrumFile& infile, ostream& out);
+		bool  run            (const std::string& indata, std::ostream& out);
+		bool  run            (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  initialize     (void);
@@ -9677,8 +9759,8 @@ class Tool_pccount : public HumTool {
 
 		bool  run                       (HumdrumFileSet& infiles);
 		bool  run                       (HumdrumFile& infile);
-		bool  run                       (const string& indata, ostream& out);
-		bool  run                       (HumdrumFile& infile, ostream& out);
+		bool  run                       (const std::string& indata, std::ostream& out);
+		bool  run                       (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void   initialize               (HumdrumFile& infile);
@@ -9694,21 +9776,21 @@ class Tool_pccount : public HumTool {
 		void   printReverseVoiceList    (void);
 		void   printColorList           (void);
 		std::string getPitchClassString (int b40);
-		void   printVegaLiteScript      (const string& jsonvar,
-		                                 const string& target,
-		                                 const string& datavar,
+		void   printVegaLiteScript      (const std::string& jsonvar,
+		                                 const std::string& target,
+		                                 const std::string& datavar,
 		                                 HumdrumFile& infile);
-		void   printVegaLiteHtml        (const string& jsonvar,
-		                                 const string& target,
-		                                 const string& datavar,
+		void   printVegaLiteHtml        (const std::string& jsonvar,
+		                                 const std::string& target,
+		                                 const std::string& datavar,
 		                                 HumdrumFile& infile);
-		void   printVegaLitePage        (const string& jsonvar,
-		                                 const string& target,
-		                                 const string& datavar,
+		void   printVegaLitePage        (const std::string& jsonvar,
+		                                 const std::string& target,
+		                                 const std::string& datavar,
 		                                 HumdrumFile& infile);
 		std::string getFinal            (HumdrumFile& infile);
-		double  getPercent              (const string& pitchclass);
-		int     getCount                (const string& pitchclass);
+		double  getPercent              (const std::string& pitchclass);
+		int     getCount                (const std::string& pitchclass);
 		void    setFactorMaximum        (void);
 		void    setFactorNormalize      (void);
 
@@ -9750,18 +9832,18 @@ class Tool_periodicity : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool     run                (const std::string& indata, std::ostream& out);
+		bool     run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize         (HumdrumFile& infile);
 		void     processFile        (HumdrumFile& infile);
-		void     fillAttackGrids    (HumdrumFile& infile, vector<vector<double>>& grids, HumNum minrhy);
-		void     printAttackGrid    (ostream& out, HumdrumFile& infile, vector<vector<double>>& grids, HumNum minrhy);
-		void     doAnalysis         (vector<vector<double>>& analysis, int level, vector<double>& grid);
-		void     doPeriodicityAnalysis(vector<vector<double>> & analysis, vector<double>& grid, HumNum minrhy);
-		void     printPeriodicityAnalysis(ostream& out, vector<vector<double>>& analysis);
-		void     printSvgAnalysis(ostream& out, vector<vector<double>>& analysis, HumNum minrhy);
+		void     fillAttackGrids    (HumdrumFile& infile, std::vector<std::vector<double>>& grids, HumNum minrhy);
+		void     printAttackGrid    (std::ostream& out, HumdrumFile& infile, std::vector<std::vector<double>>& grids, HumNum minrhy);
+		void     doAnalysis         (std::vector<std::vector<double>>& analysis, int level, std::vector<double>& grid);
+		void     doPeriodicityAnalysis(std::vector<std::vector<double>> & analysis, std::vector<double>& grid, HumNum minrhy);
+		void     printPeriodicityAnalysis(std::ostream& out, std::vector<std::vector<double>>& analysis);
+		void     printSvgAnalysis(std::ostream& out, std::vector<std::vector<double>>& analysis, HumNum minrhy);
 		void     getColorMapping(double input, double& hue, double& saturation, double& lightness);
 
 	private:
@@ -9776,8 +9858,8 @@ class Tool_phrase : public HumTool {
 
 		bool  run                 (HumdrumFileSet& infiles);
 		bool  run                 (HumdrumFile& infile);
-		bool  run                 (const string& indata, ostream& out);
-		bool  run                 (HumdrumFile& infile, ostream& out);
+		bool  run                 (const std::string& indata, std::ostream& out);
+		bool  run                 (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  analyzeSpineByRests (int index);
@@ -9789,16 +9871,16 @@ class Tool_phrase : public HumTool {
 		void  removePhraseMarks   (HTp start);
 
 	private:
-		vector<vector<string>>    m_results;
-		vector<HTp>               m_starts;
+		std::vector<std::vector<std::string>>    m_results;
+		std::vector<HTp>               m_starts;
 		HumdrumFile               m_infile;
-		vector<int>               m_pcount;
-		vector<HumNum>            m_psum;
+		std::vector<int>               m_pcount;
+		std::vector<HumNum>            m_psum;
 		bool                      m_markQ;
 		bool                      m_removeQ;
 		bool                      m_remove2Q;
 		bool                      m_averageQ;
-		string                    m_color;
+		std::string               m_color;
 
 };
 
@@ -9811,15 +9893,15 @@ class Tool_pline : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 
 	protected:
 		void     initialize        (void);
 		void     processFile       (HumdrumFile& infile);
-		void     getPlineInterpretations(HumdrumFile& infile, vector<HTp>& tokens);
-		void     plineToColor      (HumdrumFile& infile, vector<HTp>& tokens);
+		void     getPlineInterpretations(HumdrumFile& infile, std::vector<HTp>& tokens);
+		void     plineToColor      (HumdrumFile& infile, std::vector<HTp>& tokens);
 		void     markRests         (HumdrumFile& infile);
 		void     markSpineRests    (HTp spineStop);
 		void     fillLineInfo      (HumdrumFile& infile, std::vector<std::vector<int>>& lineInfo);
@@ -9843,8 +9925,8 @@ class Tool_pnum : public HumTool {
 
 		bool  run                     (HumdrumFileSet& infiles);
 		bool  run                     (HumdrumFile& infile);
-		bool  run                     (const string& indata, ostream& out);
-		bool  run                     (HumdrumFile& infile, ostream& out);
+		bool  run                     (const std::string& indata, std::ostream& out);
+		bool  run                     (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  initialize              (HumdrumFile& infile);
@@ -9873,8 +9955,8 @@ class Tool_recip : public HumTool {
 
 		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
-		bool  run                      (const string& indata, ostream& out);
-		bool  run                      (HumdrumFile& infile, ostream& out);
+		bool  run                      (const std::string& indata, std::ostream& out);
+		bool  run                      (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  initialize               (HumdrumFile& infile);
@@ -9883,10 +9965,10 @@ class Tool_recip : public HumTool {
 		void  insertAnalysisSpines     (HumdrumFile& infile, HumdrumFile& cfile);
 
 	private:
-		vector<HTp> m_kernspines;
+		std::vector<HTp> m_kernspines;
 		bool        m_graceQ = true;
-		string      m_exinterp = "**recip";
-		string      m_kernpitch = "e";
+		std::string      m_exinterp = "**recip";
+		std::string      m_kernpitch = "e";
 
 };
 
@@ -9899,8 +9981,8 @@ class Tool_restfill : public HumTool {
 
 		bool        run                (HumdrumFileSet& infiles);
 		bool        run                (HumdrumFile& infile);
-		bool        run                (const string& indata, ostream& out);
-		bool        run                (HumdrumFile& infile, ostream& out);
+		bool        run                (const std::string& indata, std::ostream& out);
+		bool        run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void        processFile        (HumdrumFile& infile);
@@ -9924,8 +10006,8 @@ class Tool_rid : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -9979,7 +10061,7 @@ class Tool_sab2gs : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, std::ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
 		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
@@ -9998,7 +10080,7 @@ class Tool_sab2gs : public HumTool {
 	private:
 		bool    m_hasCrossStaff = false;   // Middle voice has notes/rests on bottom staff
 		bool    m_hasBelowMarker = false;  // Input data has RDF**kern down marker
-		string  m_belowMarker = "<";       // RDF**kern marker for staff down
+		std::string  m_belowMarker = "<";       // RDF**kern marker for staff down
 		bool    m_downQ = false;           // Used only *down/*Xdown for staff changes
 
 
@@ -10012,8 +10094,8 @@ class Tool_satb2gs : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void    processFile        (HumdrumFile& infile);
@@ -10030,7 +10112,7 @@ class Tool_satb2gs : public HumTool {
 		void    printHeaderLine    (HumdrumFile& infile, int line,
 		                            std::vector<std::vector<int>>& tracks);
 		bool    validateHeader     (HumdrumFile& infile);
-		vector<HTp> getClefs       (HumdrumFile& infile, int line);
+		std::vector<HTp> getClefs       (HumdrumFile& infile, int line);
 
 };
 
@@ -10042,21 +10124,21 @@ class Tool_scordatura : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
 		void     initialize        (void);
-		void     getScordaturaRdfs (vector<HTp>& rdfs, HumdrumFile& infile);
+		void     getScordaturaRdfs (std::vector<HTp>& rdfs, HumdrumFile& infile);
 		void     processScordatura (HumdrumFile& infile, HTp reference);
-		void     processScordaturas(HumdrumFile& infile, vector<HTp>& rdfs);
+		void     processScordaturas(HumdrumFile& infile, std::vector<HTp>& rdfs);
 		void     flipScordaturaInfo(HTp reference, int diatonic, int chromatic);
-		void     transposeStrand   (HTp sstart, HTp sstop, const string& marker);
-		void     transposeChord    (HTp token, const string& marker);
-		std::string transposeNote     (const string& note);
-		void     transposeMarker   (HumdrumFile& infile, const string& marker, int diatonic, int chromatic);
-		std::set<int> parsePitches(const string& input);
+		void     transposeStrand   (HTp sstart, HTp sstop, const std::string& marker);
+		void     transposeChord    (HTp token, const std::string& marker);
+		std::string transposeNote     (const std::string& note);
+		void     transposeMarker   (HumdrumFile& infile, const std::string& marker, int diatonic, int chromatic);
+		std::set<int> parsePitches(const std::string& input);
 		void     markPitches       (HumdrumFile& infile);
 		void     markPitches       (HTp sstart, HTp sstop);
 		void     markPitches       (HTp token);
@@ -10107,7 +10189,7 @@ class Tool_semitones : public HumTool {
 		int         filterData(HTp token);
 		std::vector<HTp> getTieGroup(HTp token);
 		HTp         getNextNote(HTp token);
-		bool        hasTieContinue(const string& value);
+		bool        hasTieContinue(const std::string& value);
 
 	private:
 
@@ -10147,8 +10229,8 @@ class Tool_shed : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void    processFile                      (HumdrumFile& infile);
@@ -10168,9 +10250,9 @@ class Tool_shed : public HumTool {
 		bool    isValidDataType    (HTp token);
 		bool    isValidSpine       (HTp token);
 		std::vector<std::string> addToExInterpList(void);
-		void    parseExpression    (const string& value);
+		void    parseExpression    (const std::string& value);
 		void    prepareSearch      (int index);
-		std::string getExInterp    (const string& value);
+		std::string getExInterp    (const std::string& value);
 
 	private:
 		std::vector<std::string> m_searches;  // search strings
@@ -10213,8 +10295,8 @@ class Tool_sic : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -10335,9 +10417,9 @@ class MeasureComparisonGrid {
 		std::string  getQoff2                  (int index);
 		double       getScoreDuration2         (void);
 
-		ostream&     printCorrelationGrid      (ostream& out = std::cout);
-		ostream&     printCorrelationDiagonal  (ostream& out = std::cout);
-		ostream&     printSvgGrid              (ostream& out = std::cout);
+		std::ostream&     printCorrelationGrid      (std::ostream& out = std::cout);
+		std::ostream&     printCorrelationDiagonal  (std::ostream& out = std::cout);
+		std::ostream&     printSvgGrid              (std::ostream& out = std::cout);
 		void         getColorMapping           (double input, double& hue, double& saturation,
 				 double& lightness);
 
@@ -10356,8 +10438,8 @@ class Tool_simat : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2);
-		bool     run                (const string& indata1, const string& indata2, ostream& out);
-		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2, ostream& out);
+		bool     run                (const std::string& indata1, const std::string& indata2, std::ostream& out);
+		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2, std::ostream& out);
 
 	protected:
 		void     initialize         (HumdrumFile& infile1, HumdrumFile& infile2);
@@ -10378,8 +10460,8 @@ class Tool_slurcheck : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -10397,8 +10479,8 @@ class Tool_spinetrace : public HumTool {
 
 		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
-		bool  run                      (const string& indata, ostream& out);
-		bool  run                      (HumdrumFile& infile, ostream& out);
+		bool  run                      (const std::string& indata, std::ostream& out);
+		bool  run                      (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  initialize               (HumdrumFile& infile);
@@ -10417,8 +10499,8 @@ class Tool_strophe : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     processFile       (HumdrumFile& infile);
@@ -10444,8 +10526,8 @@ class Tool_synco : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void      processFile      (HumdrumFile& infile);
@@ -10479,8 +10561,8 @@ class Tool_tabber : public HumTool {
 
 		bool  run                      (HumdrumFileSet& infiles);
 		bool  run                      (HumdrumFile& infile);
-		bool  run                      (const string& indata, ostream& out);
-		bool  run                      (HumdrumFile& infile, ostream& out);
+		bool  run                      (const std::string& indata, std::ostream& out);
+		bool  run                      (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  initialize               (HumdrumFile& infile);
@@ -10499,8 +10581,8 @@ class Tool_tassoize : public HumTool {
 
 		bool     run                (HumdrumFileSet& infiles);
 		bool     run                (HumdrumFile& infile);
-		bool     run                (const string& indata, ostream& out);
-		bool     run                (HumdrumFile& infile, ostream& out);
+		bool     run                (const std::string& indata, std::ostream& out);
+		bool     run                (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void     initialize         (HumdrumFile& infile);
@@ -10514,13 +10596,13 @@ class Tool_tassoize : public HumTool {
 		void     fixInstrumentAbbreviations(HumdrumFile& infile);
 		void     addTerminalLongs   (HumdrumFile& infile);
 		void     deleteDummyTranspositions(HumdrumFile& infile);
-		string   getDate            (void);
+		std::string   getDate            (void);
 		void     adjustSystemDecoration(HumdrumFile& infile);
 
 	private:
-		vector<vector<int>> m_pstates;
-		vector<vector<int>> m_kstates;
-		vector<vector<bool>> m_estates;
+		std::vector<std::vector<int>> m_pstates;
+		std::vector<std::vector<int>> m_kstates;
+		std::vector<std::vector<bool>> m_estates;
 
 };
 
@@ -10532,8 +10614,8 @@ class Tool_textdur : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 
 	protected:
@@ -10541,13 +10623,13 @@ class Tool_textdur : public HumTool {
 		void     processFile       (HumdrumFile& infile);
 		void     printMelismas     (HumdrumFile& infile);
 		void     printDurations     (HumdrumFile& infile);
-		void     getTextSpineStarts(HumdrumFile& infile, vector<HTp>& starts);
-		void     processTextSpine  (vector<HTp>& starts, int index);
+		void     getTextSpineStarts(HumdrumFile& infile, std::vector<HTp>& starts);
+		void     processTextSpine  (std::vector<HTp>& starts, int index);
 		int      getMelisma        (HTp tok1, HTp tok2);
 		HumNum   getDuration       (HTp tok1, HTp tok2);
 		HTp      getTandemKernToken(HTp token);
 		void     printInterleaved  (HumdrumFile& infile);
-		void     printInterleavedLine(HumdrumLine& line, vector<bool>& textTrack);
+		void     printInterleavedLine(HumdrumLine& line, std::vector<bool>& textTrack);
 		void     printTokenAnalysis(HTp token);
 		void     printAnalysis      (void);
 		void     printDurationAverage(void);
@@ -10562,7 +10644,7 @@ class Tool_textdur : public HumTool {
 	private:
 		std::vector<HTp>                 m_textStarts;
 		std::vector<int>                 m_track2column;
-		std::vector<string>              m_columnName;
+		std::vector<std::string>         m_columnName;
 
 		std::vector<std::vector<HTp>>    m_syllables;  // List of syllables in **text/**sylba
 		std::vector<std::vector<HumNum>> m_durations;  // List of durations excluding trailing rests
@@ -10584,8 +10666,8 @@ class Tool_thru : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void      processFile         (HumdrumFile& infile);
@@ -10595,9 +10677,9 @@ class Tool_thru : public HumTool {
 		void      example             (void);
 		void      processData         (HumdrumFile& infile);
 		void      usage               (const char* command);
-		void      getLabelSequence    (vector<string>& labelsequence,
-		                               const string& astring);
-		int       getLabelIndex       (vector<string>& labels, string& key);
+		void      getLabelSequence    (std::vector<std::string>& labelsequence,
+		                               const std::string& astring);
+		int       getLabelIndex       (std::vector<std::string>& labels, std::string& key);
 		void      printLabelList      (HumdrumFile& infile);
 		void      printLabelInfo      (HumdrumFile& infile);
 		int       getBarline          (HumdrumFile& infile, int line);
@@ -10608,8 +10690,8 @@ class Tool_thru : public HumTool {
 		bool      m_infoQ = false;    // used with -i option
 		bool      m_keepQ = false;    // used with -k option
 		bool      m_quietQ = false;   // used with -q option
-		string    m_variation = "";   // used with -v option
-		string    m_realization = ""; // used with -r option
+		std::string    m_variation = "";   // used with -v option
+		std::string    m_realization = ""; // used with -r option
 
 };
 
@@ -10621,7 +10703,7 @@ class Tool_tie : public HumTool {
 
 		bool     run                     (HumdrumFileSet& infiles);
 		bool     run                     (HumdrumFile& infile);
-		bool     run                     (const string& indata, std::ostream& out);
+		bool     run                     (const std::string& indata, std::ostream& out);
 		bool     run                     (HumdrumFile& infile, std::ostream& out);
 
 	protected:
@@ -10658,8 +10740,8 @@ class Tool_timebase : public HumTool {
 
 		bool  run                 (HumdrumFileSet& infiles);
 		bool  run                 (HumdrumFile& infile);
-		bool  run                 (const string& indata, ostream& out);
-		bool  run                 (HumdrumFile& infile, ostream& out);
+		bool  run                 (const std::string& indata, std::ostream& out);
+		bool  run                 (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void   processFile         (HumdrumFile& infile);
@@ -10682,8 +10764,8 @@ class Tool_transpose : public HumTool {
 
 		bool     run             (HumdrumFileSet& infiles);
 		bool     run             (HumdrumFile& infile);
-		bool     run             (const std::string& indata, ostream& out);
-		bool     run             (HumdrumFile& infile, ostream& out);
+		bool     run             (const std::string& indata, std::ostream& out);
+		bool     run             (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 
@@ -10691,14 +10773,14 @@ class Tool_transpose : public HumTool {
 		void     initialize             (HumdrumFile& infile);
 		void     convertScore           (HumdrumFile& infile, int style);
 		void     processFile            (HumdrumFile& infile,
-		                                 vector<bool>& spineprocess);
+		                                 std::vector<bool>& spineprocess);
 		void     convertToConcertPitches(HumdrumFile& infile, int line,
-		                                 vector<int>& tvals);
+		                                 std::vector<int>& tvals);
 		void     convertToWrittenPitches(HumdrumFile& infile, int line,
-		                                 vector<int>& tvals);
+		                                 std::vector<int>& tvals);
 		void     printNewKeySignature   (const std::string& keysig, int trans);
 		void     processInterpretationLine(HumdrumFile& infile, int line,
-		                                 vector<int>& tvals, int style);
+		                                 std::vector<int>& tvals, int style);
 		int      isKeyMarker            (const std::string& str);
 		void     printNewKeyInterpretation(HumdrumLine& aRecord,
 		                                 int index, int transval);
@@ -10712,54 +10794,54 @@ class Tool_transpose : public HumTool {
 		void     example                (void);
 		void     usage                  (const std::string& command);
 		void     printHumdrumDataRecord (HumdrumLine& record,
-		                                 vector<bool>& spineprocess);
+		                                 std::vector<bool>& spineprocess);
 
 		double   pearsonCorrelation     (int size, double* x, double* y);
 		void     doAutoTransposeAnalysis(HumdrumFile& infile);
-		void     addToHistogramDouble   (vector<vector<double> >& histogram,
+		void     addToHistogramDouble   (std::vector<std::vector<double> >& histogram,
 		                                 int pc, double start, double dur,
 		                                 double tdur, int segments);
-		double   storeHistogramForTrack (vector<vector<double> >& histogram,
+		double   storeHistogramForTrack (std::vector<std::vector<double> >& histogram,
 		                                 HumdrumFile& infile, int track,
 		                                 int segments);
-		void     printHistograms        (int segments, vector<int> ktracks,
-		                                vector<vector<vector<double> > >&
+		void     printHistograms        (int segments, std::vector<int> ktracks,
+		                                std::vector<std::vector<std::vector<double> > >&
 		                                 trackhist);
-		void     doAutoKeyAnalysis      (vector<vector<vector<double> > >&
+		void     doAutoKeyAnalysis      (std::vector<std::vector<std::vector<double> > >&
 		                                 analysis, int level, int hop, int count,
-		                                 int segments, vector<int>& ktracks,
-		                                 vector<vector<vector<double> > >&
+		                                 int segments, std::vector<int>& ktracks,
+		                                 std::vector<std::vector<std::vector<double> > >&
 		                                 trackhist);
-		void     doTrackKeyAnalysis     (vector<vector<double> >& analysis,
+		void     doTrackKeyAnalysis     (std::vector<std::vector<double> >& analysis,
 		                                 int level, int hop, int count,
-		                                 vector<vector<double> >& trackhist,
-		                                 vector<double>& majorweights,
-		                                 vector<double>& minorweights);
-		void     identifyKeyDouble      (vector<double>& correls,
-		                                 vector<double>& histogram,
-		                                 vector<double>& majorweights,
-		                                 vector<double>& minorweights);
-		void     fillWeightsWithKostkaPayne(vector<double>& maj,
-		                                 vector<double>& min);
-		void     printRawTrackAnalysis  (vector<vector<vector<double> > >&
-		                                 analysis, vector<int>& ktracks);
-		void     doSingleAnalysis       (vector<double>& analysis,
+		                                 std::vector<std::vector<double> >& trackhist,
+		                                 std::vector<double>& majorweights,
+		                                 std::vector<double>& minorweights);
+		void     identifyKeyDouble      (std::vector<double>& correls,
+		                                 std::vector<double>& histogram,
+		                                 std::vector<double>& majorweights,
+		                                 std::vector<double>& minorweights);
+		void     fillWeightsWithKostkaPayne(std::vector<double>& maj,
+		                                 std::vector<double>& min);
+		void     printRawTrackAnalysis  (std::vector<std::vector<std::vector<double> > >&
+		                                 analysis, std::vector<int>& ktracks);
+		void     doSingleAnalysis       (std::vector<double>& analysis,
 		                                 int startindex, int length,
-		                                 vector<vector<double> >& trackhist,
-		                                 vector<double>& majorweights,
-		                                 vector<double>& minorweights);
-		void     identifyKey            (vector<double>& correls,
-		                                 vector<double>& histogram,
-		                                 vector<double>& majorweights,
-		                                 vector<double>& minorweights);
-		void     doTranspositionAnalysis(vector<vector<vector<double> > >&
+		                                 std::vector<std::vector<double> >& trackhist,
+		                                 std::vector<double>& majorweights,
+		                                 std::vector<double>& minorweights);
+		void     identifyKey            (std::vector<double>& correls,
+		                                 std::vector<double>& histogram,
+		                                 std::vector<double>& majorweights,
+		                                 std::vector<double>& minorweights);
+		void     doTranspositionAnalysis(std::vector<std::vector<std::vector<double> > >&
 		                                 analysis);
 		int      calculateTranspositionFromKey(int targetkey,
 		                                 HumdrumFile& infile);
 		void     printTransposedToken   (HumdrumFile& infile, int row, int col,
 		                                 int transval);
 		void     printTransposeInformation(HumdrumFile& infile,
-		                                 vector<bool>& spineprocess,
+		                                 std::vector<bool>& spineprocess,
 		                                 int line, int transval);
 		int      getTransposeInfo       (HumdrumFile& infile, int row, int col);
 		void     printNewKernString     (const std::string& string, int transval);
@@ -10771,7 +10853,7 @@ class Tool_transpose : public HumTool {
 		int      currentkey   = 0;
 		int      autoQ        = 0;   // used with --auto option
 		int      debugQ       = 0;   // used with --debug option
-		string   spinestring  = "";  // used with -s option
+		std::string   spinestring  = "";  // used with -s option
 		int      octave       = 0;   // used with -o option
 		int      concertQ     = 0;   // used with -C option
 		int      writtenQ     = 0;   // used with -W option
@@ -10788,8 +10870,8 @@ class Tool_tremolo : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void    processFile        (HumdrumFile& infile);
@@ -10819,15 +10901,15 @@ class Tool_trillspell : public HumTool {
 
 		bool  run                 (HumdrumFileSet& infiles);
 		bool  run                 (HumdrumFile& infile);
-		bool  run                 (const string& indata, ostream& out);
-		bool  run                 (HumdrumFile& infile, ostream& out);
+		bool  run                 (const std::string& indata, std::ostream& out);
+		bool  run                 (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void  processFile         (HumdrumFile& infile);
 		bool  analyzeOrnamentAccidentals(HumdrumFile& infile);
-		void  resetDiatonicStatesWithKeySignature(vector<int>& states,
-		                                          vector<int>& signature);
-		void  fillKeySignature    (vector<int>& states, const string& keysig);
+		void  resetDiatonicStatesWithKeySignature(std::vector<int>& states,
+		                                          std::vector<int>& signature);
+		void  fillKeySignature    (std::vector<int>& states, const std::string& keysig);
 		int   getBase40           (int diatonic, int accidental);
 
 	private:
@@ -10844,8 +10926,8 @@ class Tool_tspos : public HumTool {
 
 		bool     run               (HumdrumFileSet& infiles);
 		bool     run               (HumdrumFile& infile);
-		bool     run               (const string& indata, ostream& out);
-		bool     run               (HumdrumFile& infile, ostream& out);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
 
 	protected:
 		void             initialize        (HumdrumFile& infile);
@@ -10903,7 +10985,7 @@ class Tool_tspos : public HumTool {
 		bool m_triadAttack = false;  // used with -x option
 
 		// Statistical data variables:
-		vector<bool> m_triadState;
+		std::vector<bool> m_triadState;
 
 		// m_partTriadPositions -- count the number of chordal positions by
 		// voice.  The first dimention is the track number of the part, and
@@ -10915,10 +10997,10 @@ class Tool_tspos : public HumTool {
 		// 4 = count of third positions in partial triadic chords
 		// 5 = count of root positions in partial triadic chords ("open fifths")
 		// 6 = count of fifth positions in partial triadic chords
-		std::vector<vector<int>> m_partTriadPositions;
+		std::vector<std::vector<int>> m_partTriadPositions;
 		int m_positionCount = 7; // entries in 2nd dim. of m_partTriadPositions
 
-		string m_toolName = "tspos";
+		std::string m_toolName = "tspos";
 
 		std::vector<int> m_voiceCount;
 		// m_voice: used with -v option to limit analysis to sonorities that
@@ -10933,7 +11015,33 @@ class Tool_tspos : public HumTool {
 		bool m_questionQ = true;
 		int  m_toolCount = 0;
 
-		std::vector<string> m_fullNames;
+		std::vector<std::string> m_fullNames;
+};
+
+
+class Tool_vcross : public HumTool {
+	public:
+		         Tool_vcross     (void);
+		        ~Tool_vcross     () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void    processFile        (HumdrumFile& infile);
+		void    initialize         (void);
+		void    getMidiInfo        (std::vector<int>& midis, HTp token);
+		void    compareVoices      (std::vector<HTp>& higher, std::vector<HTp>& lower);
+		void    processLine        (HumdrumFile& infile, int index);
+
+	private:
+		bool m_redQ = false;
+		bool m_greenQ = false;
+		bool m_blueQ = false;
+
+
 };
 
 
