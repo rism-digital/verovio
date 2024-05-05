@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "facsimile.h"
+#include "preparedatafunctor.h"
 #include "surface.h"
 #include "syllable.h"
 #include "view.h"
@@ -34,7 +35,9 @@ FacsimileInterface::~FacsimileInterface() {}
 void FacsimileInterface::Reset()
 {
     this->ResetFacsimile();
-    this->AttachZone(NULL);
+
+    m_zone = NULL;
+    m_surface = NULL;
 }
 
 int FacsimileInterface::GetDrawingX() const
@@ -79,12 +82,7 @@ int FacsimileInterface::GetSurfaceY() const
     assert(m_zone);
     Surface *surface = vrv_cast<Surface *>(m_zone->GetFirstAncestor(SURFACE));
     assert(surface);
-    if (surface->HasLry()) {
-        return surface->GetLry();
-    }
-    else {
-        return surface->GetMaxY();
-    }
+    return surface->GetMaxY();
 }
 
 void FacsimileInterface::AttachZone(Zone *zone)
@@ -102,6 +100,41 @@ void FacsimileInterface::AttachZone(Zone *zone)
     else {
         this->SetFacs("#" + m_zone->GetID());
     }
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+FunctorCode FacsimileInterface::InterfacePrepareFacsimile(PrepareFacsimileFunctor &functor, Object *object)
+{
+    assert(functor.GetFacsimile());
+    Facsimile *facsimile = functor.GetFacsimile();
+    std::string facsID = ExtractIDFragment(this->GetFacs());
+    Object *facsDescendant = facsimile->FindDescendantByID(facsID);
+    if (!facsDescendant) {
+        LogWarning("Could not find @facs '%s' in facsimile element", facsID.c_str());
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (facsDescendant->Is(ZONE)) {
+        m_zone = vrv_cast<Zone *>(facsDescendant);
+        assert(m_zone);
+    }
+    else if (facsDescendant->Is(SURFACE)) {
+        m_surface = vrv_cast<Surface *>(facsDescendant);
+        assert(m_surface);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode FacsimileInterface::InterfaceResetData(ResetDataFunctor &functor, Object *object)
+{
+    m_zone = NULL;
+    m_surface = NULL;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

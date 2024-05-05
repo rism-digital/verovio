@@ -3148,7 +3148,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // ties
-        ReadMusicXmlTies(notations.node(), layer, note, measureNum);
+        ReadMusicXmlTies(node, layer, note, measureNum);
 
         // articulation
         std::vector<data_ARTICULATION> artics;
@@ -3625,6 +3625,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 TabGrp *tabGrp = vrv_cast<TabGrp *>(element);
                 tabGrp->SetBreaksec(breakSec);
             }
+            if (element->Is(REST)) {
+                Rest *rest = vrv_cast<Rest *>(element);
+                rest->SetBreaksec(breakSec);
+            }
         }
         else {
             if (IsInStack(BEAM, layer)) {
@@ -3695,8 +3699,11 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(section);
 
     if (node.attribute("new-page").as_bool()) {
-        Pb *pb = new Pb();
-        section->AddChild(pb);
+        const int pageBreaks = node.attribute("blank-page").as_int() + 1;
+        for (int i = 0; i < pageBreaks; ++i) {
+            Pb *pb = new Pb();
+            section->AddChild(pb);
+        }
     }
 
     if (node.attribute("new-system").as_bool()) {
@@ -3827,7 +3834,9 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
 void MusicXmlInput::ReadMusicXmlTies(
     const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum)
 {
-    for (pugi::xml_node xmlTie : node.children("tied")) {
+    pugi::xpath_node_set xmlTies = node.select_nodes("notations/tied");
+    for (pugi::xpath_node_set::const_iterator it = xmlTies.begin(); it != xmlTies.end(); ++it) {
+        pugi::xml_node xmlTie = (*it).node();
         std::string tieType = xmlTie.attribute("type").as_string();
 
         if (tieType.empty()) {

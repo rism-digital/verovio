@@ -68,11 +68,18 @@ FunctorCode ScoreDefSetCurrentPageFunctor::VisitPageEnd(Page *page)
 {
     const Object *firstSystem = page->GetFirst(SYSTEM);
     const Object *reference = firstSystem ? firstSystem : page;
-    page->m_score = m_doc->GetCorrespondingScore(reference);
+    page->m_score = m_doc->GetCorrespondingScore(reference, m_scores);
 
     const Object *lastSystem = page->GetLast(SYSTEM);
     reference = lastSystem ? lastSystem : page;
-    page->m_scoreEnd = m_doc->GetCorrespondingScore(reference);
+    page->m_scoreEnd = m_doc->GetCorrespondingScore(reference, m_scores);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ScoreDefSetCurrentPageFunctor::VisitScore(Score *score)
+{
+    m_scores.push_back(score);
 
     return FUNCTOR_CONTINUE;
 }

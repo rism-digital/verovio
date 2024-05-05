@@ -207,7 +207,7 @@ public:
      * Special method for forcing bounding boxes to be updated
      * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
-    virtual void DrawPlaceholder(int x, int y){};
+    virtual void DrawPlaceholder(int x, int y) {};
 
     /**
      * @name Method for starting and ending a text
@@ -258,14 +258,14 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = ""){};
-    virtual void EndCustomGraphic(){};
+    virtual void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = "") {};
+    virtual void EndCustomGraphic() {};
     ///@}
 
     /**
      * Method for changing the color of a custom graphic
      */
-    virtual void SetCustomGraphicColor(const std::string &color){};
+    virtual void SetCustomGraphicColor(const std::string &color) {};
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
@@ -308,7 +308,7 @@ public:
      * @name Method for adding description element
      */
     ///@{
-    virtual void AddDescription(const std::string &text){};
+    virtual void AddDescription(const std::string &text) {};
     ///@}
 
     /**

@@ -13,8 +13,11 @@
 #include "interface.h"
 
 namespace vrv {
-class FunctorParams;
-class View;
+
+class Facsimile;
+class PrepareFacsimileFunctor;
+class ResetDataFunctor;
+class Surface;
 class Zone;
 
 //----------------------------------------------------------------------------
@@ -56,8 +59,23 @@ public:
     const Zone *GetZone() const { return m_zone; }
     ///@}
 
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * We have functor code in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the object (implementation) to
+     * the pseudo functor method.
+     */
+    ///@{
+    FunctorCode InterfacePrepareFacsimile(PrepareFacsimileFunctor &functor, Object *object);
+    FunctorCode InterfaceResetData(ResetDataFunctor &functor, Object *object);
+    ///@}
+
 private:
-    Zone *m_zone = NULL;
+    Zone *m_zone;
+    Surface *m_surface;
 };
 } // namespace vrv
 #endif

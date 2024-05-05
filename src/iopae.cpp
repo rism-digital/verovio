@@ -401,7 +401,12 @@ void PAEOutput::WriteMRest(MRest *mRest)
 
     if (m_skip) return;
 
+    bool fermata = this->HasFermata(mRest);
+    if (fermata) m_streamStringOutput << "(";
+
     m_streamStringOutput << "=";
+
+    if (fermata) m_streamStringOutput << ")";
 }
 
 void PAEOutput::WriteMultiRest(MultiRest *multiRest)
@@ -454,9 +459,7 @@ void PAEOutput::WriteNote(Note *note)
         m_streamStringOutput << accid;
     }
 
-    PointingToComparison pointingToComparisonFermata(FERMATA, note);
-    Fermata *fermata
-        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    bool fermata = this->HasFermata(note);
     if (fermata) m_streamStringOutput << "(";
 
     std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
@@ -481,7 +484,13 @@ void PAEOutput::WriteRest(Rest *rest)
     if (m_skip) return;
 
     this->WriteDur(rest);
+
+    bool fermata = this->HasFermata(rest);
+    if (fermata) m_streamStringOutput << "(";
+
     m_streamStringOutput << "-";
+
+    if (fermata) m_streamStringOutput << ")";
 }
 
 void PAEOutput::WriteSpace(Space *space)
@@ -533,6 +542,38 @@ void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
     m_streamStringOutput << ";" << tuplet->GetNum() << ")";
 }
 
+std::string PAEOutput::GetPaeDur(data_DURATION ndur, int ndots)
+{
+    std::string dur;
+    switch (ndur) {
+        case (DURATION_long): dur = "0"; break;
+        case (DURATION_breve): dur = "9"; break;
+        case (DURATION_1): dur = "1"; break;
+        case (DURATION_2): dur = "2"; break;
+        case (DURATION_4): dur = "4"; break;
+        case (DURATION_8): dur = "8"; break;
+        case (DURATION_16): dur = "6"; break;
+        case (DURATION_32): dur = "3"; break;
+        case (DURATION_64): dur = "5"; break;
+        case (DURATION_128): dur = "7"; break;
+        case (DURATION_maxima): dur = "0"; break;
+        case (DURATION_longa): dur = "0"; break;
+        case (DURATION_brevis): dur = "9"; break;
+        case (DURATION_semibrevis): dur = "1"; break;
+        case (DURATION_minima): dur = "2"; break;
+        case (DURATION_semiminima): dur = "4"; break;
+        case (DURATION_fusa): dur = "8"; break;
+        case (DURATION_semifusa): dur = "6"; break;
+        default: LogWarning("Unsupported duration"); dur = "4";
+    }
+
+    if (ndots > 0) {
+        dur += std::string(ndots, '.');
+    }
+
+    return dur;
+}
+
 void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
@@ -541,30 +582,7 @@ void PAEOutput::WriteDur(DurationInterface *interface)
     if ((interface->GetDur() != m_currentDur) || (ndots != m_currentDots)) {
         m_currentDur = interface->GetDur();
         m_currentDots = ndots;
-        std::string dur;
-        switch (m_currentDur) {
-            case (DURATION_long): dur = "0"; break;
-            case (DURATION_breve): dur = "9"; break;
-            case (DURATION_1): dur = "1"; break;
-            case (DURATION_2): dur = "2"; break;
-            case (DURATION_4): dur = "4"; break;
-            case (DURATION_8): dur = "8"; break;
-            case (DURATION_16): dur = "6"; break;
-            case (DURATION_32): dur = "3"; break;
-            case (DURATION_64): dur = "5"; break;
-            case (DURATION_128): dur = "7"; break;
-            case (DURATION_maxima): dur = "0"; break;
-            case (DURATION_longa): dur = "0"; break;
-            case (DURATION_brevis): dur = "9"; break;
-            case (DURATION_semibrevis): dur = "1"; break;
-            case (DURATION_minima): dur = "2"; break;
-            case (DURATION_semiminima): dur = "4"; break;
-            case (DURATION_fusa): dur = "8"; break;
-            case (DURATION_semifusa): dur = "6"; break;
-            default: LogWarning("Unsupported duration"); dur = "4";
-        }
-        m_streamStringOutput << dur;
-        m_streamStringOutput << std::string(m_currentDots, '.');
+        m_streamStringOutput << PAEOutput::GetPaeDur(interface->GetDur(), m_currentDots);
     }
 }
 
@@ -581,6 +599,14 @@ void PAEOutput::WriteGrace(AttGraced *attGraced)
     else if (attGraced->HasGrace()) {
         m_streamStringOutput << "q";
     }
+}
+
+bool PAEOutput::HasFermata(Object *object)
+{
+    PointingToComparison pointingToComparisonFermata(FERMATA, object);
+    Fermata *fermata
+        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    return (fermata);
 }
 
 //----------------------------------------------------------------------------
@@ -3438,6 +3464,13 @@ bool PAEInput::ConvertRepeatedFigure()
                 figure.push_back(*token);
             }
         }
+        // We are starting a new figure to be repeated
+        else if (token->m_char == '!') {
+            token->m_char = 0;
+            figureToken = &(*token);
+            figure.clear();
+            status = pae::FIGURE_START;
+        }
         // We have completed a figure and will be repeating it
         else if (status == pae::FIGURE_END || status == pae::FIGURE_REPEAT) {
             // Repeat the figure. That is simply add it to the map
@@ -3452,8 +3485,8 @@ bool PAEInput::ConvertRepeatedFigure()
                 --token;
                 status = pae::FIGURE_REPEAT;
             }
-            // End of repetitions - this includes the end of a measure
-            else {
+            // End of repetitions - this does not include the end of a measure
+            else if (!this->Was(*token, pae::MEASURE)) {
                 // Make sure we repeated the figure at least once (is this too pedantic?)
                 if (status == pae::FIGURE_END) {
                     LogPAE(ERR_010_REP_UNUSED, *figureToken);
@@ -3463,13 +3496,6 @@ bool PAEInput::ConvertRepeatedFigure()
                 figureToken = NULL;
                 figure.clear();
             }
-        }
-        // We are starting a new figure to be repeated
-        else if (token->m_char == '!') {
-            token->m_char = 0;
-            figureToken = &(*token);
-            figure.clear();
-            status = pae::FIGURE_START;
         }
         // We should not have a repeat sign not after a figure end
         else if (token->m_char == 'f') {

@@ -1640,8 +1640,8 @@ void MEIOutput::WriteSystem(pugi::xml_node currentNode, System *system)
     currentNode.append_attribute("system.rightmar")
         = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
     // y positions
-    if (system->m_yAbs != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
+    if (system->m_drawingFacsY != VRV_UNSET) {
+        currentNode.append_attribute("uly") = StringFormat("%d", system->m_drawingFacsY / DEFINITION_FACTOR).c_str();
     }
     system->WriteTyped(currentNode);
 }
@@ -1698,6 +1698,7 @@ void MEIOutput::WritePb(pugi::xml_node currentNode, Pb *pb)
     assert(pb);
 
     this->WriteSystemElement(currentNode, pb);
+    this->WriteFacsimileInterface(currentNode, pb);
     pb->WriteNNumberLike(currentNode);
 }
 
@@ -1706,6 +1707,7 @@ void MEIOutput::WriteSb(pugi::xml_node currentNode, Sb *sb)
     assert(sb);
 
     this->WriteSystemElement(currentNode, sb);
+    this->WriteFacsimileInterface(currentNode, sb);
     sb->WriteNNumberLike(currentNode);
 }
 
@@ -1883,6 +1885,8 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     assert(measure);
 
     this->WriteXmlId(currentNode, measure);
+    this->WriteFacsimileInterface(currentNode, measure);
+
     measure->WriteBarring(currentNode);
     measure->WriteMeasureLog(currentNode);
     measure->WriteMeterConformanceBar(currentNode);
@@ -1890,9 +1894,9 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
     // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_xAbs != VRV_UNSET) && (measure->m_xAbs2 != VRV_UNSET)) {
-        measure->SetCoordX1(measure->m_xAbs / DEFINITION_FACTOR);
-        measure->SetCoordX2(measure->m_xAbs2 / DEFINITION_FACTOR);
+    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET)) {
+        measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
+        measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
         measure->WriteCoordX1(currentNode);
         measure->WriteCoordX2(currentNode);
     }
@@ -2216,14 +2220,14 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     assert(staff);
 
     this->WriteXmlId(currentNode, staff);
-    staff->WriteFacsimile(currentNode);
+    this->WriteFacsimileInterface(currentNode, staff);
     staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
     staff->WriteVisibility(currentNode);
 
     // y position
-    if (staff->m_yAbs != VRV_UNSET) {
-        staff->SetCoordY1(staff->m_yAbs / DEFINITION_FACTOR);
+    if (staff->m_drawingFacsY != VRV_UNSET) {
+        staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
 }
@@ -2298,11 +2302,12 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     assert(element);
 
     this->WriteXmlId(currentNode, element);
+    this->WriteFacsimileInterface(currentNode, element);
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
-    if (element->m_xAbs != VRV_UNSET) {
-        element->SetCoordX1(element->m_xAbs / DEFINITION_FACTOR);
+    if (element->m_drawingFacsX != VRV_UNSET) {
+        element->SetCoordX1(element->m_drawingFacsX / DEFINITION_FACTOR);
         element->WriteCoordX1(currentNode);
     }
 }
@@ -2320,7 +2325,6 @@ void MEIOutput::WriteAccid(pugi::xml_node currentNode, Accid *accid)
     }
 
     WriteLayerElement(currentNode, accid);
-    WriteFacsimileInterface(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidentalGes(currentNode);
@@ -2433,7 +2437,6 @@ void MEIOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     }
 
     this->WriteLayerElement(currentNode, clef);
-    this->WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefLog(currentNode);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
@@ -2451,7 +2454,6 @@ void MEIOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
 
-    this->WriteFacsimileInterface(currentNode, custos);
     this->WritePitchInterface(currentNode, custos);
     this->WritePositionInterface(currentNode, custos);
     this->WriteLayerElement(currentNode, custos);
@@ -2465,7 +2467,6 @@ void MEIOutput::WriteDivLine(pugi::xml_node currentNode, DivLine *divLine)
     assert(divLine);
 
     this->WriteLayerElement(currentNode, divLine);
-    this->WriteFacsimileInterface(currentNode, divLine);
     divLine->WriteDivLineLog(currentNode);
     divLine->WriteColor(currentNode);
     divLine->WriteVisibility(currentNode);
@@ -2628,6 +2629,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     }
 
     this->WriteLayerElement(currentNode, meterSig);
+    meterSig->WriteColor(currentNode);
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
@@ -2698,7 +2700,6 @@ void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     this->WriteLayerElement(currentNode, nc);
     this->WriteDurationInterface(currentNode, nc);
-    this->WriteFacsimileInterface(currentNode, nc);
     this->WritePitchInterface(currentNode, nc);
     this->WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
@@ -2711,7 +2712,6 @@ void MEIOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     this->WriteLayerElement(currentNode, neume);
-    this->WriteFacsimileInterface(currentNode, neume);
     neume->WriteColor(currentNode);
 }
 
@@ -2830,7 +2830,6 @@ void MEIOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     this->WriteLayerElement(currentNode, syl);
-    this->WriteFacsimileInterface(currentNode, syl);
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
@@ -2878,6 +2877,7 @@ void MEIOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     assert(surface);
     this->WriteXmlId(currentNode, surface);
     surface->WriteCoordinated(currentNode);
+    surface->WriteCoordinatedUl(currentNode);
     surface->WriteTyped(currentNode);
 
     for (Object *child = surface->GetFirst(); child != NULL; child = surface->GetNext()) {
@@ -2900,6 +2900,7 @@ void MEIOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
     assert(zone);
     this->WriteXmlId(currentNode, zone);
     zone->WriteCoordinated(currentNode);
+    zone->WriteCoordinatedUl(currentNode);
     zone->WriteTyped(currentNode);
 }
 
@@ -3532,6 +3533,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "clef") {
             return true;
         }
+        else if (element == "fTrem") {
+            return true;
+        }
         else if (element == "graceGrp") {
             return true;
         }
@@ -3905,6 +3909,11 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
             m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
         }
+        // Temporary solution to set the document type to Transcription when using <facsimile>
+        else if (m_doc->HasFacsimile() && !m_doc->GetFacsimile()->GetType().empty()) {
+            m_doc->SetType(StrToDocType(m_doc->GetFacsimile()->GetType()));
+            // Facsimile data eventually sync with Doc::SyncFromFacsimileDoc below
+        }
         if (facsimile.next_sibling("facsimile")) {
             LogWarning("Only first <facsimile> is processed");
         }
@@ -4141,7 +4150,7 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     Page *vrvPage = new Page();
     this->SetMeiID(page, vrvPage);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
@@ -4180,12 +4189,12 @@ bool MEIInput::ReadPage(Object *parent, pugi::xml_node page)
     parent->AddChild(vrvPage);
     bool success = this->ReadPageChildren(vrvPage, page);
 
-    if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
+    if (success && m_doc->IsTranscription() && (vrvPage->GetPPUFactor() != 1.0)) {
         ApplyPPUFactorFunctor applyPPUFactor;
         vrvPage->Process(applyPPUFactor);
     }
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradePageTo_5_0(vrvPage);
     }
 
@@ -4472,6 +4481,13 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <section>", current.name());
         }
     }
+
+    // New <measure> for blank files in neume notation
+    if (!unmeasured && parent->Is(SECTION) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+        unmeasured = new Measure(false);
+        m_doc->SetMensuralMusicOnly(true);
+        parent->AddChild(unmeasured);
+    }
     return success;
 }
 
@@ -4521,6 +4537,7 @@ bool MEIInput::ReadPb(Object *parent, pugi::xml_node pb)
 
     Pb *vrvPb = new Pb();
     this->ReadSystemElement(pb, vrvPb);
+    this->ReadFacsimileInterface(pb, vrvPb);
 
     vrvPb->ReadNNumberLike(pb);
 
@@ -4537,6 +4554,7 @@ bool MEIInput::ReadSb(Object *parent, pugi::xml_node sb)
 
     Sb *vrvSb = new Sb();
     this->ReadSystemElement(sb, vrvSb);
+    this->ReadFacsimileInterface(sb, vrvSb);
 
     vrvSb->ReadNNumberLike(sb);
 
@@ -4563,8 +4581,8 @@ bool MEIInput::ReadSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_systemRightMar = system.attribute("system.rightmar").as_int();
         system.remove_attribute("system.rightmar");
     }
-    if (system.attribute("uly") && (m_doc->GetType() == Transcription)) {
-        vrvSystem->m_yAbs = system.attribute("uly").as_int() * DEFINITION_FACTOR;
+    if (system.attribute("uly") && m_doc->IsTranscription()) {
+        vrvSystem->m_drawingFacsY = system.attribute("uly").as_int() * DEFINITION_FACTOR;
         system.remove_attribute("uly");
     }
 
@@ -4612,7 +4630,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     assert(system);
                     unmeasured = new Measure(false);
                     m_doc->SetMensuralMusicOnly(true);
-                    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+                    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
                     system->AddChild(unmeasured);
@@ -5340,6 +5358,7 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
         m_doc->SetMensuralMusicOnly(false);
     }
     this->SetMeiID(measure, vrvMeasure);
+    this->ReadFacsimileInterface(measure, vrvMeasure);
 
     vrvMeasure->ReadBarring(measure);
     vrvMeasure->ReadMeasureLog(measure);
@@ -5348,15 +5367,15 @@ bool MEIInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeMeasureTo_5_0(measure);
     }
 
-    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && (m_doc->GetType() == Transcription)) {
+    if (measure.attribute("coord.x1") && measure.attribute("coord.x2") && m_doc->IsTranscription()) {
         vrvMeasure->ReadCoordX1(measure);
         vrvMeasure->ReadCoordX2(measure);
-        vrvMeasure->m_xAbs = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
-        vrvMeasure->m_xAbs2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
+        vrvMeasure->m_drawingFacsX1 = vrvMeasure->GetCoordX1() * DEFINITION_FACTOR;
+        vrvMeasure->m_drawingFacsX2 = vrvMeasure->GetCoordX2() * DEFINITION_FACTOR;
     }
 
     parent->AddChild(vrvMeasure);
@@ -6036,19 +6055,19 @@ bool MEIInput::ReadStaff(Object *parent, pugi::xml_node staff)
 {
     Staff *vrvStaff = new Staff();
     this->SetMeiID(staff, vrvStaff);
+    this->ReadFacsimileInterface(staff, vrvStaff);
 
-    vrvStaff->ReadFacsimile(staff);
     vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeStaffTo_5_0(staff);
     }
 
-    if (staff.attribute("coord.y1") && (m_doc->GetType() == Transcription)) {
+    if (staff.attribute("coord.y1") && m_doc->IsTranscription()) {
         vrvStaff->ReadCoordY1(staff);
-        vrvStaff->m_yAbs = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
+        vrvStaff->m_drawingFacsY = vrvStaff->GetCoordY1() * DEFINITION_FACTOR;
     }
 
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
@@ -6277,17 +6296,18 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
 bool MEIInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
     this->SetMeiID(element, object);
+    this->ReadFacsimileInterface(element, object);
     this->ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
-    if ((m_doc->GetType() == Transcription) && (m_meiversion == meiVersion_MEIVERSION_2013)) {
+    if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
         UpgradeLayerElementTo_5_0(element);
     }
 
-    if (element.attribute("coord.x1") && (m_doc->GetType() == Transcription)) {
+    if (element.attribute("coord.x1") && m_doc->IsTranscription()) {
         object->ReadCoordX1(element);
-        object->m_xAbs = object->GetCoordX1() * DEFINITION_FACTOR;
+        object->m_drawingFacsX = object->GetCoordX1() * DEFINITION_FACTOR;
     }
 
     return true;
@@ -6299,7 +6319,6 @@ bool MEIInput::ReadAccid(Object *parent, pugi::xml_node accid)
     this->ReadLayerElement(accid, vrvAccid);
 
     ReadPositionInterface(accid, vrvAccid);
-    ReadFacsimileInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidentalGes(accid);
     vrvAccid->ReadAccidLog(accid);
@@ -6444,7 +6463,6 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
 {
     Clef *vrvClef = new Clef();
     this->ReadLayerElement(clef, vrvClef);
-    this->ReadFacsimileInterface(clef, vrvClef);
 
     vrvClef->ReadClefLog(clef);
     vrvClef->ReadClefShape(clef);
@@ -6456,6 +6474,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadOctave(clef);
     vrvClef->ReadOctaveDisplacement(clef);
     vrvClef->ReadStaffIdent(clef);
+    vrvClef->ReadTypography(clef);
     vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
@@ -6502,7 +6521,6 @@ bool MEIInput::ReadDivLine(Object *parent, pugi::xml_node divLine)
     DivLine *vrvDivLine = new DivLine();
     this->ReadLayerElement(divLine, vrvDivLine);
 
-    this->ReadFacsimileInterface(divLine, vrvDivLine);
     vrvDivLine->ReadDivLineLog(divLine);
     vrvDivLine->ReadColor(divLine);
     vrvDivLine->ReadVisibility(divLine);
@@ -6672,9 +6690,12 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
         this->UpgradeMeterSigTo_5_0(meterSig, vrvMeterSig);
     }
 
+    vrvMeterSig->ReadColor(meterSig);
     vrvMeterSig->ReadEnclosingChars(meterSig);
+    vrvMeterSig->ReadExtSymNames(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
+    vrvMeterSig->ReadTypography(meterSig);
     vrvMeterSig->ReadVisibility(meterSig);
 
     parent->AddChild(vrvMeterSig);
@@ -6785,7 +6806,6 @@ bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
     this->ReadLayerElement(nc, vrvNc);
 
     this->ReadDurationInterface(nc, vrvNc);
-    this->ReadFacsimileInterface(nc, vrvNc);
     this->ReadPitchInterface(nc, vrvNc);
     this->ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
@@ -6800,7 +6820,6 @@ bool MEIInput::ReadNeume(Object *parent, pugi::xml_node neume)
 {
     Neume *vrvNeume = new Neume();
     this->ReadLayerElement(neume, vrvNeume);
-    this->ReadFacsimileInterface(neume, vrvNeume);
 
     vrvNeume->ReadColor(neume);
 
@@ -6940,7 +6959,7 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
     // Add empty text node for empty syl element for invisible bbox in neume notation
-    if (!syl.first_child() && (m_doc->GetType() == Facs) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+    if (!syl.first_child() && m_doc->IsFacs() && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
         syl.text().set("");
     }
     Syl *vrvSyl = new Syl();
@@ -8460,14 +8479,14 @@ void MEIInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     assert(system);
     assert(!measure->IsMeasuredMusic());
 
-    if (system->m_yAbs == VRV_UNSET) return;
+    if (system->m_drawingFacsY == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
 
     Page *page = vrv_cast<Page *>(system->GetFirstAncestor(PAGE));
     assert(page);
-    measure->m_xAbs = system->m_systemLeftMar;
-    measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
+    measure->m_drawingFacsX1 = system->m_systemLeftMar;
+    measure->m_drawingFacsX2 = page->m_pageWidth - system->m_systemRightMar;
 }
 
 void MEIInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
@@ -8501,6 +8520,7 @@ bool MEIInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
     Surface *vrvSurface = new Surface();
     this->SetMeiID(surface, vrvSurface);
     vrvSurface->ReadCoordinated(surface);
+    vrvSurface->ReadCoordinatedUl(surface);
     vrvSurface->ReadTyped(surface);
 
     for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
@@ -8524,6 +8544,7 @@ bool MEIInput::ReadZone(Surface *parent, pugi::xml_node zone)
     Zone *vrvZone = new Zone();
     this->SetMeiID(zone, vrvZone);
     vrvZone->ReadCoordinated(zone);
+    vrvZone->ReadCoordinatedUl(zone);
     vrvZone->ReadTyped(zone);
     parent->AddChild(vrvZone);
     return true;

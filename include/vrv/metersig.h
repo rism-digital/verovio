@@ -8,6 +8,7 @@
 #ifndef __VRV_METERSIG_H__
 #define __VRV_METERSIG_H__
 
+#include "atts_externalsymbols.h"
 #include "atts_shared.h"
 #include "atts_visual.h"
 #include "layerelement.h"
@@ -24,9 +25,12 @@ class ScoreDefInterface;
  * This class models the MEI <meterSig> element.
  */
 class MeterSig : public LayerElement,
+                 public AttColor,
                  public AttEnclosingChars,
+                 public AttExtSymNames,
                  public AttMeterSigLog,
                  public AttMeterSigVis,
+                 public AttTypography,
                  public AttVisibility {
 public:
     /**

@@ -48,7 +48,7 @@ if(MSVC)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
     add_definitions(-DUSE_PAE_OLD_PARSER)
-    add_definitions(/std:c++17)
+    add_definitions(/std:c++20)
     include_directories(../include/win32)
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -60,7 +60,7 @@ else()
     # jsonxx raises -Wdollar-in-identifier-extension
     # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
-    add_definitions(-std=c++17)
+    add_definitions(-std=c++20)
 
     # extra warnings similar to Xcode compiling settings (most probably covered by -Wall):
     # https://github.com/llvm-mirror/clang/blob/master/include/clang/Basic/DiagnosticGroups.td
@@ -175,7 +175,12 @@ set(all_SRC
 
 if (BUILD_AS_LIBRARY OR  BUILD_AS_ANDROID_LIBRARY)
     message(STATUS "***** Building Verovio as shared library *****")
-    add_library(verovio SHARED ../tools/c_wrapper.cpp ${all_SRC})
+    if(WIN32)
+		add_definitions(-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
+    endif()
+    add_library(verovio SHARED "../tools/c_wrapper.cpp" ${all_SRC})
+    # list all headers to be copied for all installation
+    file(GLOB_RECURSE all_HEADERS "../include/*/*.h*" "../libmei/*/*.h*" "../tools/c_wrapper.h")
 
 ###########
 # WASM BC #
@@ -242,11 +247,22 @@ if (BUILD_AS_ANDROID_LIBRARY)
     target_link_libraries(verovio ${log-lib})
 endif()
 
-install(
-    TARGETS verovio DESTINATION bin
+install(TARGETS verovio
+        # for executables and dll on Win
+        RUNTIME DESTINATION bin
+        # shared libraries
+        LIBRARY DESTINATION lib
+        # for static libraries
+        ARCHIVE DESTINATION lib
+        # public headers
+        INCLUDES DESTINATION include
 )
 install(
     DIRECTORY ../data/
     DESTINATION share/verovio
     FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg" PATTERN "*.css"
 )
+# install all headers in /usr/local/include/verovio
+if (BUILD_AS_LIBRARY)
+    install(FILES ${all_HEADERS} DESTINATION include/verovio)
+endif()

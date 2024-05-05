@@ -296,7 +296,7 @@ public:
     /**
      * Helper function to set shortening for elements with beam interface
      */
-    virtual void SetElementShortening(int shortening){};
+    virtual void SetElementShortening(int shortening) {};
 
     /**
      * Get the stem mod for the element (if any)
@@ -386,7 +386,7 @@ private:
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
-    int m_xAbs;
+    int m_drawingFacsX;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
      * See PrepareCrossStaffFunctor

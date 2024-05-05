@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 4
-#define VERSION_MINOR 1
+#define VERSION_MINOR 2
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
@@ -61,11 +61,8 @@ namespace vrv {
 #ifdef VRV_DYNAMIC_CAST
 // To be used for all cases where type is cheched through Object::m_type
 #define vrv_cast dynamic_cast
-// To be used for all FunctorParams casts within Functors
-#define vrv_params_cast dynamic_cast
 #else
 #define vrv_cast static_cast
-#define vrv_params_cast static_cast
 #endif
 
 //----------------------------------------------------------------------------

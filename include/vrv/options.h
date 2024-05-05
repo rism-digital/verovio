@@ -67,6 +67,8 @@ enum option_ELISION {
     ELISION_unicode = UNICODE_UNDERTIE
 };
 
+enum option_FONT_FALLBACK { FONT_FALLBACK_Leipzig = 0, FONT_FALLBACK_Bravura };
+
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
@@ -122,6 +124,7 @@ public:
     void SetShortOption(char shortOption, bool isCmdOnly);
     char GetShortOption() const { return m_shortOption; }
     bool IsCmdOnly() const { return m_isCmdOnly; }
+    virtual bool IsArgumentRequired() const { return true; }
 
     /**
      * Return a JSON object for the option
@@ -139,6 +142,7 @@ public:
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
     static const std::map<int, std::string> s_elision;
+    static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_multiRestStyle;
@@ -185,6 +189,8 @@ public:
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool value);
+
+    bool IsArgumentRequired() const override { return false; }
 
 private:
     //
@@ -593,7 +599,7 @@ public:
     // These options are only given for documentation - except for m_scale
     // They are ordered by short option alphabetical order
     OptionBool m_standardOutput;
-    OptionBool m_help;
+    OptionString m_help;
     OptionBool m_allPages;
     OptionString m_inputFrom;
     OptionString m_logLevel;
@@ -646,6 +652,7 @@ public:
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_scaleToPageSize;
+    OptionBool m_setLocale;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionIntMap m_smuflTextFont;
@@ -686,6 +693,9 @@ public:
     OptionDbl m_extenderLineMinSpace;
     OptionDbl m_fingeringScale;
     OptionString m_font;
+    OptionArray m_fontAddCustom;
+    OptionIntMap m_fontFallback;
+    OptionBool m_fontLoadAll;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;

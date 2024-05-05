@@ -82,13 +82,15 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.1
+        uses: pypa/cibuildwheel@v2.16.5
         with:
           output-dir: wheelhouse
         env:
           CIBW_SKIP: cp37-macosx_arm64
           CIBW_BUILD: ${{ env.CIBW_BUILD_IDENTIFIER }}
           CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ENVIRONMENT_MACOS:
+            MACOSX_DEPLOYMENT_TARGET=10.15
           CIBW_TEST_SKIP: cp*-macosx_arm64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014

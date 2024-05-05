@@ -301,12 +301,12 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (notationType == NOTATIONTYPE_neume) {
         int rotateOffset = 0;
-        if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
             double deg = staff->GetDrawingRotate();
             int xDiff = x - staff->GetDrawingX();
             rotateOffset = int(xDiff * tan(deg * M_PI / 180.0));
         }
-        if (accid->HasFacs() && (m_doc->GetType() == Facs)) {
+        if (accid->HasFacs() && m_doc->IsFacs()) {
             y = ToLogicalY(y);
         }
         y -= rotateOffset;
@@ -653,7 +653,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     int x, y;
-    if (m_doc->GetType() == Facs && clef->HasFacs()) {
+    if (m_doc->IsFacs() && clef->HasFacs()) {
         y = ToLogicalY(staff->GetDrawingY());
         x = clef->GetDrawingX();
     }
@@ -671,7 +671,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (clef->HasLine()) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
-        if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+        if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
             double deg = staff->GetDrawingRotate();
             int xDiff = x - staff->GetDrawingX();
             y -= int(xDiff * tan(deg * M_PI / 180.0));
@@ -687,9 +687,16 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
+    std::string previousFont = "";
+    if (clef->HasFontname()) {
+        Resources &resources = m_doc->GetResourcesForModification();
+        previousFont = resources.GetCurrentFont();
+        resources.SetCurrentFont(clef->GetFontname());
+    }
+
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
-    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
+    if (m_doc->IsFacs() && element->HasFacs()) {
         const int noteHeight
             = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
         const int noteWidth
@@ -704,6 +711,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     // Possibly draw enclosing brackets
     this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
+
+    if (!previousFont.empty()) {
+        Resources &resources = m_doc->GetResourcesForModification();
+        resources.SetCurrentFont(previousFont);
+    }
 
     dc->EndGraphic(element, this);
 }
@@ -748,7 +760,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
 
     int x, y;
-    if (custos->HasFacs() && m_doc->GetType() == Facs) {
+    if (custos->HasFacs() && m_doc->IsFacs()) {
         x = custos->GetDrawingX();
         // Recalculate y from pitch to prevent visual/meaning mismatch
         Clef *clef = layer->GetClef(element);
@@ -777,7 +789,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    if ((m_doc->GetType() == Facs) && (staff->GetDrawingRotate() != 0)) {
+    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
         double deg = staff->GetDrawingRotate();
         int xDiff = x - staff->GetDrawingX();
         y -= int(xDiff * tan(deg * M_PI / 180.0));
@@ -785,7 +797,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
-    if ((m_doc->GetType() == Facs) && element->HasFacs()) {
+    if (m_doc->IsFacs() && element->HasFacs()) {
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
@@ -1123,6 +1135,13 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
 
     dc->StartGraphic(meterSig, "", meterSig->GetID());
 
+    std::string previousFont;
+    if (meterSig->HasFontname()) {
+        Resources &resources = m_doc->GetResourcesForModification();
+        previousFont = resources.GetCurrentFont();
+        resources.SetCurrentFont(meterSig->GetFontname());
+    }
+
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = meterSig->GetDrawingX() + horizOffset;
 
@@ -1133,7 +1152,7 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
         x += m_doc->GetGlyphWidth(enclosingFront, glyphSize, false);
     }
 
-    if (meterSig->HasSym()) {
+    if (meterSig->HasSym() || meterSig->HasGlyphNum() || meterSig->HasGlyphName()) {
         const char32_t code = meterSig->GetSymbolGlyph();
         this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
         x += m_doc->GetGlyphWidth(code, glyphSize, false);
@@ -1147,6 +1166,11 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
 
     if (enclosingBack) {
         this->DrawSmuflCode(dc, x, y, enclosingBack, glyphSize, false);
+    }
+
+    if (!previousFont.empty()) {
+        Resources &resources = m_doc->GetResourcesForModification();
+        resources.SetCurrentFont(previousFont);
     }
 
     dc->EndGraphic(meterSig, this);
@@ -1464,8 +1488,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             }
             drawingDur = DUR_4;
         }
-        drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-
         if (drawingDur < DUR_BR) {
             this->DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
@@ -1473,7 +1495,15 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // Whole notes
             char32_t fontNo;
             if (note->GetColored() == BOOLEAN_true) {
-                fontNo = (drawingDur == DUR_1) ? SMUFL_E0FA_noteheadWholeFilled : SMUFL_E0A3_noteheadHalf;
+                if (DUR_1 == drawingDur) {
+                    fontNo = SMUFL_E0FA_noteheadWholeFilled;
+                }
+                else if (DUR_2 == drawingDur) {
+                    fontNo = SMUFL_E0FB_noteheadHalfFilled;
+                }
+                else {
+                    fontNo = SMUFL_E0A3_noteheadHalf;
+                }
             }
             else {
                 fontNo = note->GetNoteheadGlyph(drawingDur);
@@ -1770,7 +1800,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
-    if (m_doc->GetType() == Facs) {
+    if (m_doc->IsFacs()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }
@@ -1792,7 +1822,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
             FontInfo vrvTxt;
             assert(dc->HasFont());
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
             std::u32string str;
             str.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);

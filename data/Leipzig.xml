@@ -89,7 +89,7 @@
   <g c="E4C1" x="0.0" y="-320.0" w="600.0" h="323.0" h-a-x="600" n="fermataBelow" />
   <g c="E0FA" x="0.0" y="-133.0" w="405.0" h="266.0" h-a-x="405" n="noteheadWholeFilled">
     <a n="cutOutNW" x="0.2" y="0.4" />
-    <a n="cutOutSE" x="1.42" y="-0.4" />
+    <a n="cutOutSE" x="1.4" y="-0.4" />
   </g>
   <g c="E240" x="0.0" y="-694.0" w="276.0" h="694.0" h-a-x="277" n="flag8thUp" />
   <g c="E241" x="0.0" y="0.0" w="276.0" h="694.0" h-a-x="277" n="flag8thDown" />
@@ -776,7 +776,7 @@
   <g c="E8F5" x="0.0" y="-375.0" w="14.0" h="750.0" h-a-x="14" n="chantDivisioMaxima" />
   <g c="E8F6" x="0.0" y="-375.0" w="114.0" h="750.0" h-a-x="114" n="chantDivisioFinalis" />
   <g c="E8F7" x="0.0" y="264.0" w="85.0" h="234.0" h-a-x="85" n="chantVirgula" />
-  <g c="E8F8" x="-0.11" y="263.68" w="137.45" h="234.59" h-a-x="138" n="chantCaesura" />
+  <g c="E8F8" x="-0.0" y="264.0" w="137.34" h="234.27" h-a-x="138" n="chantCaesura" />
   <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise1" />
   <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise2" />
   <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise3" />
@@ -792,4 +792,11 @@
   <g c="EB9C" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower5" />
   <g c="EB9D" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower6" />
   <g c="EB9E" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower7" />
+  <g c="EB9F" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="0" n="staffPosLower8" />
+  <g c="E0FB" x="0.0" y="-132.0" w="314.0" h="270.0" h-a-x="314" n="noteheadHalfFilled">
+    <a n="cutOutNW" x="0.14" y="0.24" />
+    <a n="cutOutSE" x="1.08" y="-0.24" />
+    <a n="stemDownNW" x="0.0" y="-0.14" />
+    <a n="stemUpSE" x="1.26" y="0.16" />
+  </g>
 </bounding-boxes>

@@ -1,6 +1,19 @@
 
 import { createEmscriptenProxy } from "./emscripten-proxy.js";
 
+async function solve(options) {      
+    const res = await fetch(
+      `https://raw.githubusercontent.com/lpugin/test-font/main/GoldenAge.zip`,
+       {
+            method: "GET",
+       }
+    );
+    const data = await res.blob();
+    console.log( res );
+    console.log( options );
+    return options;
+}
+
 export class VerovioToolkit {
 
     constructor(VerovioModule) {
@@ -183,6 +196,7 @@ export class VerovioToolkit {
     }
 
     setOptions(options) {
+        options = this.preprocessOptions(options);
         return this.proxy.setOptions(this.ptr, JSON.stringify(options));
     }
 
@@ -193,6 +207,30 @@ export class VerovioToolkit {
         return JSON.parse(this.proxy.validatePAE(this.ptr, data));
     }
 
+    preprocessOptions(options) {
+        // Nothing to do if we do not have 'fontAddCustom' set
+        if (!Object.hasOwn(options, 'fontAddCustom')) {
+            return options;
+        }
+        const filenames = options['fontAddCustom'];
+        let filesInBase64 = [];
+        // Get all the files and convert them to a base64 string
+        for (let i = 0; i < filenames.length; i++ ) {
+            const request = new XMLHttpRequest();
+            request.open("GET", filenames[i], false); // `false` makes the request synchronous
+            request.send(null);
+
+            if (request.status === 200) {
+                filesInBase64.push(request.responseText);
+            }
+            else {
+                console.error(`${filenames[i]} could not be retrieved`);
+            }
+        }
+        options["fontAddCustom"] = filesInBase64;
+        //console.log( options );
+        return options;
+    }
 }
 
 // A pointer to the object - only one instance can be created for now

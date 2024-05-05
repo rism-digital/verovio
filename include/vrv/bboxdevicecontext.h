@@ -50,7 +50,7 @@ public:
      */
     ///@{
     void SetBackground(int color, int style = AxSOLID) override;
-    void SetBackgroundImage(void *image, double opacity = 1.0) override{};
+    void SetBackgroundImage(void *image, double opacity = 1.0) override {};
     void SetBackgroundMode(int mode) override;
     void SetTextForeground(int color) override;
     void SetTextBackground(int color) override;
@@ -87,7 +87,7 @@ public:
     void DrawSpline(int n, Point points[]) override;
     void DrawGraphicUri(int x, int y, int width, int height, const std::string &uri) override;
     void DrawSvgShape(int x, int y, int width, int height, double scale, pugi::xml_node svg) override;
-    void DrawBackgroundImage(int x = 0, int y = 0) override{};
+    void DrawBackgroundImage(int x = 0, int y = 0) override {};
     ///@}
 
     /**
@@ -150,7 +150,7 @@ public:
      * @name Method for adding description element
      */
     ///@{
-    void AddDescription(const std::string &text) override{};
+    void AddDescription(const std::string &text) override {};
     ///@}
 
 private:

@@ -103,7 +103,7 @@
 		4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
 		4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
 		4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
-		4D1694021E3A44F300569BF4 /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		4D1694021E3A44F300569BF4 /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
 		4D1694031E3A44F300569BF4 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D1694041E3A44F300569BF4 /* space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3072E1AC9ED2500EE0982 /* space.cpp */; };
 		4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
@@ -182,6 +182,12 @@
 		4D16945A1E3A44F300569BF4 /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
 		4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
 		4D1694741E3A455200569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
+		4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC97A2B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
+		4D1AC97C2B6A9BD000434023 /* filereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1AC97B2B6A9BD000434023 /* filereader.h */; };
+		4D1AC97D2B6A9BD000434023 /* filereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1AC97B2B6A9BD000434023 /* filereader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
 		4D1BD1B621908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
 		4D1BD1B721908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
@@ -800,6 +806,12 @@
 		4DE96E3B21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
 		4DE96E3C21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
 		4DE96E3D21C4373200CB85BE /* bracketspan.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE96E3A21C4373200CB85BE /* bracketspan.cpp */; };
+		4DEBE6E12B36E78900B67DFB /* facsimilefunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEBE6E02B36E78900B67DFB /* facsimilefunctor.h */; };
+		4DEBE6E22B36E78900B67DFB /* facsimilefunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEBE6E02B36E78900B67DFB /* facsimilefunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DEBE6E42B36E79600B67DFB /* facsimilefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */; };
+		4DEBE6E52B36E79600B67DFB /* facsimilefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */; };
+		4DEBE6E62B36E9B300B67DFB /* facsimilefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */; };
+		4DEBE6E72B36E9B400B67DFB /* facsimilefunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */; };
 		4DEC4D5A21C800A000D1D273 /* abbr.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEC4D5921C8009600D1D273 /* abbr.h */; };
 		4DEC4D7A21C8048700D1D273 /* abbr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEC4D7921C8048700D1D273 /* abbr.cpp */; };
 		4DEC4D7B21C8048700D1D273 /* abbr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEC4D7921C8048700D1D273 /* abbr.cpp */; };
@@ -914,7 +926,7 @@
 		8F086EE9188539540037FD8E /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
 		8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
 		8F086EEB188539540037FD8E /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
-		8F086EEC188539540037FD8E /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		8F086EEC188539540037FD8E /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
 		8F086EED188539540037FD8E /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
 		8F086EEE188539540037FD8E /* iomei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC2188539540037FD8E /* iomei.cpp */; };
 		8F086EEF188539540037FD8E /* iomusxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC3188539540037FD8E /* iomusxml.cpp */; };
@@ -948,7 +960,7 @@
 		8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
 		8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
 		8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
-		8F3DD32418854B090051330C /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		8F3DD32418854B090051330C /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
 		8F3DD32618854B090051330C /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
 		8F3DD32818854B090051330C /* iomei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC2188539540037FD8E /* iomei.cpp */; };
 		8F3DD32A18854B090051330C /* iomusxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC3188539540037FD8E /* iomusxml.cpp */; };
@@ -994,7 +1006,7 @@
 		8F59293B18854BF800FE51AD /* doc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291418854BF800FE51AD /* doc.h */; };
 		8F59293C18854BF800FE51AD /* durationinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291518854BF800FE51AD /* durationinterface.h */; };
 		8F59293D18854BF800FE51AD /* toolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291618854BF800FE51AD /* toolkit.h */; };
-		8F59293E18854BF800FE51AD /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* io.h */; };
+		8F59293E18854BF800FE51AD /* iobase.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* iobase.h */; };
 		8F59293F18854BF800FE51AD /* iodarms.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291818854BF800FE51AD /* iodarms.h */; };
 		8F59294018854BF800FE51AD /* iomei.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291918854BF800FE51AD /* iomei.h */; };
 		8F59294118854BF800FE51AD /* iomusxml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291A18854BF800FE51AD /* iomusxml.h */; };
@@ -1056,8 +1068,8 @@
 		BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D797B041A67C55F007637BD /* devicecontextbase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AAB22A932A0001F6AF0 /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
 		BB4C4AAC22A932A0001F6AF0 /* svgdevicecontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292C18854BF800FE51AD /* svgdevicecontext.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
-		BB4C4AAE22A932A6001F6AF0 /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* io.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BB4C4AAD22A932A6001F6AF0 /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
+		BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* iobase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AAF22A932A6001F6AF0 /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
 		BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 402197921F2E09CB00182DF1 /* ioabc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AB122A932A6001F6AF0 /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
@@ -1757,6 +1769,8 @@
 		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
 		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D1AC9762B6A9BB200434023 /* filereader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filereader.cpp; path = src/filereader.cpp; sourceTree = "<group>"; };
+		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
 		4D1BD1B821908D78000D35B2 /* halfmrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = halfmrpt.h; path = include/vrv/halfmrpt.h; sourceTree = "<group>"; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
@@ -2014,6 +2028,8 @@
 		4DE644F41EDBEA01002FBE6C /* breath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = breath.cpp; path = src/breath.cpp; sourceTree = "<group>"; };
 		4DE96E3821C4370E00CB85BE /* bracketspan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bracketspan.h; path = include/vrv/bracketspan.h; sourceTree = "<group>"; };
 		4DE96E3A21C4373200CB85BE /* bracketspan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bracketspan.cpp; path = src/bracketspan.cpp; sourceTree = "<group>"; };
+		4DEBE6E02B36E78900B67DFB /* facsimilefunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = facsimilefunctor.h; path = include/vrv/facsimilefunctor.h; sourceTree = "<group>"; };
+		4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = facsimilefunctor.cpp; path = src/facsimilefunctor.cpp; sourceTree = "<group>"; };
 		4DEC4D5921C8009600D1D273 /* abbr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = abbr.h; path = include/vrv/abbr.h; sourceTree = "<group>"; };
 		4DEC4D7921C8048700D1D273 /* abbr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abbr.cpp; path = src/abbr.cpp; sourceTree = "<group>"; };
 		4DEC4D7D21C804C500D1D273 /* add.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = add.cpp; path = src/add.cpp; sourceTree = "<group>"; };
@@ -2077,7 +2093,7 @@
 		8F086EBD188539540037FD8E /* doc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = doc.cpp; path = src/doc.cpp; sourceTree = "<group>"; };
 		8F086EBE188539540037FD8E /* durationinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = durationinterface.cpp; path = src/durationinterface.cpp; sourceTree = "<group>"; };
 		8F086EBF188539540037FD8E /* toolkit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toolkit.cpp; path = src/toolkit.cpp; sourceTree = "<group>"; };
-		8F086EC0188539540037FD8E /* io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = io.cpp; path = src/io.cpp; sourceTree = "<group>"; };
+		8F086EC0188539540037FD8E /* iobase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iobase.cpp; path = src/iobase.cpp; sourceTree = "<group>"; };
 		8F086EC1188539540037FD8E /* iodarms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iodarms.cpp; path = src/iodarms.cpp; sourceTree = "<group>"; };
 		8F086EC2188539540037FD8E /* iomei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = iomei.cpp; path = src/iomei.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EC3188539540037FD8E /* iomusxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iomusxml.cpp; path = src/iomusxml.cpp; sourceTree = "<group>"; };
@@ -2118,7 +2134,7 @@
 		8F59291418854BF800FE51AD /* doc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = doc.h; path = include/vrv/doc.h; sourceTree = "<group>"; };
 		8F59291518854BF800FE51AD /* durationinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = durationinterface.h; path = include/vrv/durationinterface.h; sourceTree = "<group>"; };
 		8F59291618854BF800FE51AD /* toolkit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toolkit.h; path = include/vrv/toolkit.h; sourceTree = "<group>"; };
-		8F59291718854BF800FE51AD /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = io.h; path = include/vrv/io.h; sourceTree = "<group>"; };
+		8F59291718854BF800FE51AD /* iobase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iobase.h; path = include/vrv/iobase.h; sourceTree = "<group>"; };
 		8F59291818854BF800FE51AD /* iodarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iodarms.h; path = include/vrv/iodarms.h; sourceTree = "<group>"; };
 		8F59291918854BF800FE51AD /* iomei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = iomei.h; path = include/vrv/iomei.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59291A18854BF800FE51AD /* iomusxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iomusxml.h; path = include/vrv/iomusxml.h; sourceTree = "<group>"; };
@@ -2768,6 +2784,8 @@
 				36E0442D2347A9290054F141 /* expansionmap.h */,
 				4D79643826C6B3520026288B /* featureextractor.cpp */,
 				4D79643026C6AA720026288B /* featureextractor.h */,
+				4D1AC9762B6A9BB200434023 /* filereader.cpp */,
+				4D1AC97B2B6A9BD000434023 /* filereader.h */,
 				4DF28A041A754DF000BA9F7D /* floatingobject.cpp */,
 				4D95D4F41D7185DE00B2B856 /* floatingobject.h */,
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
@@ -2815,8 +2833,8 @@
 		8F086F37188539C50037FD8E /* io */ = {
 			isa = PBXGroup;
 			children = (
-				8F086EC0188539540037FD8E /* io.cpp */,
-				8F59291718854BF800FE51AD /* io.h */,
+				8F086EC0188539540037FD8E /* iobase.cpp */,
+				8F59291718854BF800FE51AD /* iobase.h */,
 				402197931F2E09DA00182DF1 /* ioabc.cpp */,
 				402197921F2E09CB00182DF1 /* ioabc.h */,
 				8F086EC1188539540037FD8E /* iodarms.cpp */,
@@ -3012,6 +3030,8 @@
 				E7265E6D29DC6FD200D11F41 /* castofffunctor.h */,
 				E763EF4129E939FB0029E56D /* convertfunctor.cpp */,
 				E763EF3E29E939C00029E56D /* convertfunctor.h */,
+				4DEBE6E32B36E79600B67DFB /* facsimilefunctor.cpp */,
+				4DEBE6E02B36E78900B67DFB /* facsimilefunctor.h */,
 				E74A806028BC9111005274E7 /* findfunctor.cpp */,
 				E74A806528BC97D5005274E7 /* findfunctor.h */,
 				E722106528F856C4002CD6E9 /* findlayerelementsfunctor.cpp */,
@@ -3174,7 +3194,7 @@
 				4DEC4DD621C8295700D1D273 /* del.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
-				8F59293E18854BF800FE51AD /* io.h in Headers */,
+				8F59293E18854BF800FE51AD /* iobase.h in Headers */,
 				4DF092A22497706600239195 /* phrase.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
@@ -3378,12 +3398,14 @@
 				E79320642991452100D80975 /* calcstemfunctor.h in Headers */,
 				4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */,
 				4DACC9F42990F29A00B55913 /* atts_visual.h in Headers */,
+				4D1AC97C2B6A9BD000434023 /* filereader.h in Headers */,
 				4DA0EADD22BB77AF00A7EBEB /* zone.h in Headers */,
 				E71EF3C32975E4DC00D36264 /* resetfunctor.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 				40DA9C3720905CEB006BED92 /* ioabc.h in Headers */,
 				4DB3D8CD1F83D11100B5FC2B /* harm.h in Headers */,
 				40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */,
+				4DEBE6E12B36E78900B67DFB /* facsimilefunctor.h in Headers */,
 				4D94E0E22995411100F49F89 /* meibasic.h in Headers */,
 				BD2E4D9B2875882200B04350 /* stem.h in Headers */,
 				4DACC9EA2990F29A00B55913 /* attmodule.h in Headers */,
@@ -3420,7 +3442,7 @@
 				4DACC9E92990F29A00B55913 /* atts_fingering.h in Headers */,
 				BB4C4A9422A9328F001F6AF0 /* doc.h in Headers */,
 				BB4C4A9922A9328F001F6AF0 /* horizontalaligner.h in Headers */,
-				BB4C4AAE22A932A6001F6AF0 /* io.h in Headers */,
+				BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */,
 				BB4C4BAA22A932EB001F6AF0 /* view.h in Headers */,
 				4DACC9DD2990F29A00B55913 /* atts_header.h in Headers */,
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
@@ -3441,6 +3463,7 @@
 				E7908EA0298582090004C1F9 /* alignfunctor.h in Headers */,
 				BB4C4B9822A932E5001F6AF0 /* durationinterface.h in Headers */,
 				BB4C4BB722A932F6001F6AF0 /* jsonxx.h in Headers */,
+				4DEBE6E22B36E78900B67DFB /* facsimilefunctor.h in Headers */,
 				BB4C4B1622A932C8001F6AF0 /* systemelement.h in Headers */,
 				BB4C4AC622A932B6001F6AF0 /* measure.h in Headers */,
 				E741AD00299A3D3500854426 /* calcslurdirectionfunctor.h in Headers */,
@@ -3694,6 +3717,7 @@
 				BBC19FBF22B37CA000100F42 /* all.h in Headers */,
 				4DA0EAE222BB77AF00A7EBEB /* editortoolkit_mensural.h in Headers */,
 				E79C87C8269440810098FE85 /* lv.h in Headers */,
+				4D1AC97D2B6A9BD000434023 /* filereader.h in Headers */,
 				BB4C4B5822A932D7001F6AF0 /* layerelement.h in Headers */,
 				BB4C4B9422A932E5001F6AF0 /* areaposinterface.h in Headers */,
 			);
@@ -3861,6 +3885,7 @@
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
 				E7901661298BCB2C008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */,
+				4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
@@ -3895,7 +3920,7 @@
 				E722106828F85981002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */,
 				4DA0EAEF22BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
-				4D1694021E3A44F300569BF4 /* io.cpp in Sources */,
+				4D1694021E3A44F300569BF4 /* iobase.cpp in Sources */,
 				4D1694031E3A44F300569BF4 /* harm.cpp in Sources */,
 				4D79641926C1522B0026288B /* pageelement.cpp in Sources */,
 				4DB3D8DE1F83D15200B5FC2B /* btrem.cpp in Sources */,
@@ -3926,6 +3951,7 @@
 				E7F39C6229A62B430055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
 				E79320682991454000D80975 /* calcstemfunctor.cpp in Sources */,
 				4DED4F18294733140073E504 /* altsyminterface.cpp in Sources */,
+				4DEBE6E72B36E9B400B67DFB /* facsimilefunctor.cpp in Sources */,
 				4DEF8A6521B7AAF90093A76B /* f.cpp in Sources */,
 				4D2073F922A3BCE000E0765F /* tabdursym.cpp in Sources */,
 				4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */,
@@ -4140,6 +4166,7 @@
 			files = (
 				4DEF8A6421B7AAF90093A76B /* f.cpp in Sources */,
 				4DB3D89E1F7E7FAA00B5FC2B /* fig.cpp in Sources */,
+				4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
 				4DEC4D9621C81E3B00D1D273 /* expan.cpp in Sources */,
@@ -4187,7 +4214,7 @@
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				E75EA9FD29CC3A88003A97A7 /* calcarticfunctor.cpp in Sources */,
 				35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */,
-				8F086EEC188539540037FD8E /* io.cpp in Sources */,
+				8F086EEC188539540037FD8E /* iobase.cpp in Sources */,
 				E75A69A029CCF8A200414819 /* adjustbeamsfunctor.cpp in Sources */,
 				4DACC9762990F29A00B55913 /* atts_neumes.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
@@ -4206,6 +4233,7 @@
 				8F086EF1188539540037FD8E /* keysig.cpp in Sources */,
 				E74A806C28BC98B2005274E7 /* functorinterface.cpp in Sources */,
 				E7870357299CF06D00156DC4 /* adjustarpegfunctor.cpp in Sources */,
+				4DEBE6E62B36E9B300B67DFB /* facsimilefunctor.cpp in Sources */,
 				4DEC4D9E21C81E9400D1D273 /* orig.cpp in Sources */,
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
@@ -4424,6 +4452,7 @@
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
 				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
+				4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D766F0220ACAD6E006875D8 /* nc.cpp in Sources */,
 				4DEC4D9821C81E3B00D1D273 /* expan.cpp in Sources */,
 				4D3C3F0E294B89AF009993E6 /* ornam.cpp in Sources */,
@@ -4489,6 +4518,7 @@
 				4DB3D8D51F83D12B00B5FC2B /* tempo.cpp in Sources */,
 				4DEC4DA021C81E9400D1D273 /* orig.cpp in Sources */,
 				E7F39C6329A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
+				4DEBE6E42B36E79600B67DFB /* facsimilefunctor.cpp in Sources */,
 				E79320692991454000D80975 /* calcstemfunctor.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				4DED4F19294733140073E504 /* altsyminterface.cpp in Sources */,
@@ -4608,7 +4638,7 @@
 				E7E9C11729B0A20400CFCE2F /* adjustaccidxfunctor.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,
 				4D72A5E1208A37F0009DEC1E /* mnum.cpp in Sources */,
-				8F3DD32418854B090051330C /* io.cpp in Sources */,
+				8F3DD32418854B090051330C /* iobase.cpp in Sources */,
 				4DACC9D62990F29A00B55913 /* atts_pagebased.cpp in Sources */,
 				4DA0EACD22BB779400A7EBEB /* zone.cpp in Sources */,
 				4DEC4DBC21C8288900D1D273 /* choice.cpp in Sources */,
@@ -4706,6 +4736,7 @@
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
 				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
+				4D1AC97A2B6A9BB200434023 /* filereader.cpp in Sources */,
 				BB4C4B2F22A932CF001F6AF0 /* pedal.cpp in Sources */,
 				4D2E759222BC2B80004C51F0 /* tuning.cpp in Sources */,
 				BB4C4B4922A932D7001F6AF0 /* clef.cpp in Sources */,
@@ -4760,7 +4791,7 @@
 				BB4C4A9322A9328F001F6AF0 /* doc.cpp in Sources */,
 				4D8135212322C41800F59C01 /* keyaccid.cpp in Sources */,
 				BB4C4B9922A932E5001F6AF0 /* linkinginterface.cpp in Sources */,
-				BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */,
+				BB4C4AAD22A932A6001F6AF0 /* iobase.cpp in Sources */,
 				E74A806A28BC9843005274E7 /* functorinterface.cpp in Sources */,
 				4DD7C0FD27A55CEA00B9C017 /* timemap.cpp in Sources */,
 				E78833632994EC7E00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
@@ -4771,6 +4802,7 @@
 				E793206A2991454100D80975 /* calcstemfunctor.cpp in Sources */,
 				BB4C4AD722A932B6001F6AF0 /* staff.cpp in Sources */,
 				4DED4F1A294733140073E504 /* altsyminterface.cpp in Sources */,
+				4DEBE6E52B36E79600B67DFB /* facsimilefunctor.cpp in Sources */,
 				BB4C4B9F22A932E5001F6AF0 /* positioninterface.cpp in Sources */,
 				BB4C4B5322A932D7001F6AF0 /* halfmrpt.cpp in Sources */,
 				BB4C4B8722A932DF001F6AF0 /* num.cpp in Sources */,
@@ -4987,7 +5019,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -4998,7 +5030,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5008,7 +5040,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -5056,7 +5088,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -5067,7 +5099,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -5108,7 +5140,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					./include/vrv/,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -5124,7 +5156,7 @@
 					"$(inherited)",
 					NO_HUMDRUM_SUPPORT,
 				);
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5136,7 +5168,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5150,7 +5182,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "";
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -5164,7 +5196,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "";
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -5175,7 +5207,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_COMMA = YES;
@@ -5211,7 +5243,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rism.VerovioFramework;
@@ -5230,7 +5262,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_COMMA = YES;
@@ -5264,7 +5296,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rism.VerovioFramework;

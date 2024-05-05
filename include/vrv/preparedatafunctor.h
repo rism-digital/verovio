@@ -219,6 +219,11 @@ public:
     const ListOfObjects &GetZonelessSyls() const { return m_zonelessSyls; }
 
     /*
+     * Getter for the facsimile
+     */
+    Facsimile *GetFacsimile() const { return m_facsimile; }
+
+    /*
      * Functor interface
      */
     ///@{
@@ -488,18 +493,23 @@ public:
     FunctorCode VisitF(F *f) override;
     FunctorCode VisitFloatingObject(FloatingObject *floatingObject) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMeasureEnd(Measure *measure) override;
     ///@}
 
 protected:
     //
 private:
-    //
+    // Delegates to the pseudo functor of the interface
+    FunctorCode CallPseudoFunctor(Object *timeSpanningObject);
+
 public:
     //
 private:
     // The interface list that holds the current elements to match
     ListOfSpanningInterOwnerPairs m_timeSpanningInterfaces;
+    // Indicates whether we currently traverse a measure
+    bool m_insideMeasure;
 };
 
 //----------------------------------------------------------------------------
