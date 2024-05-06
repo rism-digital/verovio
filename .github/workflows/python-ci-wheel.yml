@@ -53,6 +53,7 @@ jobs:
           fetch-depth: 0
 
       - uses: nuget/setup-nuget@v1
+        if: always() && runner.os == 'Windows'
         with:
           nuget-version: "latest"
 
@@ -82,7 +83,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.5
+        uses: pypa/cibuildwheel@v2.17.0
         with:
           output-dir: wheelhouse
         env:
