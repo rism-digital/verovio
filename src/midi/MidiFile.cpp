@@ -15,14 +15,14 @@
 #include "MidiFile.h"
 #include "Binasc.h"
 
+#include <algorithm>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <iterator>
-#include <algorithm>
 
 
 namespace smf {
@@ -71,21 +71,21 @@ const char* MidiFile::GMinstrument[128] = {
 
 //////////////////////////////
 //
-// MidiFile::MidiFile -- Constuctor.
+// MidiFile::MidiFile -- Constructor.
 //
 
 MidiFile::MidiFile(void) {
 	m_events.resize(1);
-	for (int i=0; i<(int)m_events.size(); i++) {
-		m_events[i] = new MidiEventList;
+	for (auto &event : m_events) {
+		event = new MidiEventList;
 	}
 }
 
 
 MidiFile::MidiFile(const std::string& filename) {
 	m_events.resize(1);
-	for (int i=0; i<(int)m_events.size(); i++) {
-		m_events[i] = new MidiEventList;
+	for (auto &event : m_events) {
+		event = new MidiEventList;
 	}
 	read(filename);
 }
@@ -93,8 +93,8 @@ MidiFile::MidiFile(const std::string& filename) {
 
 MidiFile::MidiFile(std::istream& input) {
 	m_events.resize(1);
-	for (int i=0; i<(int)m_events.size(); i++) {
-		m_events[i] = new MidiEventList;
+	for (auto &event : m_events) {
+		event = new MidiEventList;
 	}
 	read(input);
 }
@@ -507,7 +507,7 @@ bool MidiFile::readSmf(std::istream& input) {
 		m_events[i]->clear();
 
 		// Read MIDI events in the track, which are pairs of VLV values
-		// and then the bytes for the MIDI message.  Running status messags
+		// and then the bytes for the MIDI message.  Running status messages
 		// will be filled in with their implicit command byte.
 		// The timestamps are converted from delta ticks to absolute ticks,
 		// with the absticks variable accumulating the VLV tick values.
@@ -597,7 +597,7 @@ bool MidiFile::write(std::ostream& out) {
 	shortdata = static_cast<ushort>(getNumTracks());
 	writeBigEndianUShort(out, shortdata);
 
-	// 5. write out the number of ticks per quarternote. (avoiding SMTPE for now)
+	// 5. write out the number of ticks per quarternote. (avoiding SMPTE for now)
 	shortdata = static_cast<ushort>(getTicksPerQuarterNote());
 	writeBigEndianUShort(out, shortdata);
 
@@ -774,7 +774,7 @@ bool MidiFile::writeHex(std::ostream& out, int width) {
 	int wordcount = 1;
 	int linewidth = width >= 0 ? width : 25;
 	for (int i=0; i<len; i++) {
-		int value = (unsigned char)tempstream.str()[i];
+		int value = (uchar)tempstream.str()[i];
 		out << std::hex << std::setw(2) << std::setfill('0') << value;
 		if (linewidth) {
 			if (i < len - 1) {
@@ -836,7 +836,7 @@ bool MidiFile::writeBinasc(std::ostream& output) {
 
 //////////////////////////////
 //
-// MidiFile::writeBinascWithComents -- write a standard MIDI
+// MidiFile::writeBinascWithComments -- write a standard MIDI
 //    file from data into the binasc format (ASCII version
 //    of the MIDI file), including commentary about the MIDI messages.
 //
@@ -939,8 +939,8 @@ int MidiFile::size(void) const {
 //
 
 void MidiFile::removeEmpties(void) {
-	for (int i=0; i<(int)m_events.size(); i++) {
-		m_events[i]->removeEmpties();
+	for (auto &event : m_events) {
+		event->removeEmpties();
 	}
 }
 
@@ -954,7 +954,7 @@ void MidiFile::removeEmpties(void) {
 //   a track when they occur at the same tick time.  Particularly
 //   for use with joinTracks() or sortTracks().  markSequence will
 //   be done automatically when a MIDI file is read, in case the
-//   ordering of m_events occuring at the same time is important.
+//   ordering of m_events occurring at the same time is important.
 //   Use clearSequence() to use the default sorting behavior of
 //   sortTracks().
 //
@@ -982,7 +982,7 @@ void MidiFile::markSequence(int track, int sequence) {
 
 //////////////////////////////
 //
-// MidiFile::clearSequence -- Remove any seqence serial numbers from
+// MidiFile::clearSequence -- Remove any sequence serial numbers from
 //   MidiEvents in the MidiFile.  This will cause the default ordering by
 //   sortTracks() to be used, in which case the ordering of MidiEvents
 //   occurring at the same tick may switch their ordering.
@@ -1311,7 +1311,7 @@ void MidiFile::deltaTicks(void) {
 //    absolute time, which means that the time field
 //    in the MidiEvent struct represents the exact tick
 //    time to play the event rather than the time since
-//    the last event to wait untill playing the current
+//    the last event to wait until playing the current
 //    event.
 //
 
@@ -1422,7 +1422,7 @@ int MidiFile::getFileDurationInTicks(void) {
 //    in units of quarter notes.  If the MidiFile is in delta tick mode,
 //    then temporarily got into absolute tick mode to do the calculations.
 //    Note that this is expensive, so you should normally call this function
-//    while in aboslute tick (default) mode.
+//    while in absolute tick (default) mode.
 //
 
 double MidiFile::getFileDurationInQuarters(void) {
@@ -1434,7 +1434,7 @@ double MidiFile::getFileDurationInQuarters(void) {
 //////////////////////////////
 //
 // MidiFile::getFileDurationInSeconds -- returns the duration of the
-//    logest track in the file.  The tracks must be sorted before
+//    longest track in the file.  The tracks must be sorted before
 //    calling this function, since this function assumes that the
 //    last MidiEvent in the track has the highest timestamp.
 //    The file state can be in delta ticks since this function
@@ -1906,7 +1906,7 @@ MidiEvent* MidiFile::addTimeSignature(int aTrack, int aTick, int top, int bottom
 //
 // MidiFile::addCompoundTimeSignature -- Add a time signature meta message
 //      (meta #0x58), where the clocksPerClick parameter is set to three
-//      eighth notes for compount meters such as 6/8 which represents
+//      eighth notes for compound meters such as 6/8 which represents
 //      two beats per measure.
 //
 // Default values:
@@ -2347,7 +2347,7 @@ int MidiFile::getTicksPerQuarterNote(void) const {
 		// setting for 25 frames a second with 40 subframes
 		// which means one tick per millisecond.  When SMPTE is
 		// being used, there is no real concept of the quarter note,
-		// so presume 60 bpm as a simiplification here.
+		// so presume 60 bpm as a simplification here.
 		// return 1000;
 	}
 	return m_ticksPerQuarterNote;
@@ -2696,7 +2696,7 @@ double MidiFile::linearSecondInterpolationAtTick(int ticktime) {
 // MidiFile::buildTimeMap -- build an index of the absolute tick values
 //      found in a MIDI file, and their corresponding time values in
 //      seconds, taking into consideration tempo change messages.  If no
-//      tempo messages are given (or untill they are given, then the
+//      tempo messages are given (or until they are given, then the
 //      tempo is set to 120 beats per minute).  If SMPTE time code is
 //      used, then ticks are actually time values.  So don't build
 //      a time map for SMPTE ticks, and just calculate the time in
@@ -2956,15 +2956,17 @@ int MidiFile::extractMidiData(std::istream& input, std::vector<uchar>& array,
 ulong MidiFile::readVLValue(std::istream& input) {
 	uchar b[5] = {0};
 
-	for (int i=0; i<5; i++) {
-		b[i] = readByte(input);
-		if (!status()) { return m_rwstatus; }
-		if (b[i] < 0x80) {
-			break;
-		}
-	}
+    for (uchar &item : b) {
+            item = readByte(input);
+            if (!status()) {
+                    return m_rwstatus;
+            }
+            if (item < 0x80) {
+                    break;
+            }
+    }
 
-	return unpackVLV(b[0], b[1], b[2], b[3], b[4]);
+    return unpackVLV(b[0], b[1], b[2], b[3], b[4]);
 }
 
 
@@ -3005,7 +3007,7 @@ ulong MidiFile::unpackVLV(uchar a, uchar b, uchar c, uchar d, uchar e) {
 //
 // MidiFile::writeVLValue -- write a number to the midifile
 //    as a variable length value which segments a file into 7-bit
-//    values and adds a contination bit to each.  Maximum size of input
+//    values and adds a continuation bit to each.  Maximum size of input
 //    aValue is 0x0FFFffff.
 //
 
@@ -3392,7 +3394,7 @@ std::string MidiFile::base64Encode(const std::string& input) {
 	output.reserve(((input.size()/3) + (input.size() % 3 > 0)) * 4);
 	int vala = 0;
 	int valb = -6;
-	for (unsigned char c : input) {
+	for (uchar c : input) {
 		vala = (vala << 8) + c;
 		valb += 8;
 		while (valb >=0) {
@@ -3423,7 +3425,7 @@ std::string MidiFile::base64Decode(const std::string& input) {
 	std::string output;
 	int vala = 0;
 	int valb = -8;
-	for (unsigned char c : input) {
+	for (uchar c : input) {
 		if (c == '=') {
 			break;
 		} else if (MidiFile::decodeLookup[c] == -1) {

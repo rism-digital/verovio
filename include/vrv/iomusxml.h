@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
-#include "io.h"
+#include "iobase.h"
 #include "metersig.h"
 #include "vrvdef.h"
 
