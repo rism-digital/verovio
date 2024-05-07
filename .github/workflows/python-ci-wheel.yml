@@ -48,9 +48,13 @@ jobs:
           - os: ubuntu-latest
             architecture: x86
           - os: macos-14
-            architecture: ["x86", "x64"]
+            architecture: "x86"
           - os: macos-14
-            python-version: ["3.8", "3.9"]
+            architecture: "x64"
+          - os: macos-14
+            python-version: "3.8"
+          - os: macos-14
+            python-version: "3.9"
 
     steps:
       #===============================================#
