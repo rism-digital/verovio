@@ -21,6 +21,7 @@
 #include "editortoolkit_cmn.h"
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
+#include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -47,10 +48,6 @@
 #include "MidiFile.h"
 #include "crc.h"
 #include "jsonxx.h"
-
-#ifndef NO_MXL_SUPPORT
-#include "zip_file.hpp"
-#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
@@ -88,6 +85,8 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
+    this->ResetLocale();
+
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
@@ -117,13 +116,26 @@ bool Toolkit::SetResourcePath(const std::string &path)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
-    return resources.InitFonts();
+    bool success = resources.InitFonts();
+    if (m_options->m_fontAddCustom.IsSet()) {
+        success = success && resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    }
+    if (m_options->m_font.IsSet()) {
+        success = success && this->SetFont(m_options->m_font.GetValue());
+    }
+    if (m_options->m_fontFallback.IsSet()) {
+        success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    }
+    if (m_options->m_fontLoadAll.IsSet()) {
+        success = success && resources.LoadAll();
+    }
+    return success;
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
 {
     Resources &resources = m_doc.GetResourcesForModification();
-    const bool ok = resources.SetFont(fontName);
+    const bool ok = resources.SetCurrentFont(fontName, true);
     if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
     return ok;
 }
@@ -423,26 +435,24 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
 #ifndef NO_MXL_SUPPORT
-    miniz_cpp::zip_file file(bytes);
+    ZipFileReader zipFileReader;
+    zipFileReader.Load(bytes);
 
-    std::string filename;
-    // Look for the meta file in the zip
-    for (miniz_cpp::zip_info &member : file.infolist()) {
-        if (member.filename == "META-INF/container.xml") {
-            std::string container = file.read(member.filename);
-            // Find the file name with an xpath query
-            pugi::xml_document doc;
-            doc.load_buffer(container.c_str(), container.size());
-            pugi::xml_node root = doc.first_child();
-            pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
-            filename = rootfile.attribute("full-path").value();
-            break;
-        }
+    const std::string metaInf = "META-INF/container.xml";
+    if (!zipFileReader.HasFile(metaInf)) {
+        LogError("No '%s' file to load found in the archive", metaInf.c_str());
+        return false;
     }
+    std::string containerXml = zipFileReader.ReadTextFile("META-INF/container.xml");
+    pugi::xml_document doc;
+    doc.load_buffer(containerXml.c_str(), containerXml.size());
+    pugi::xml_node root = doc.first_child();
+    pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
+    std::string filename = rootfile.attribute("full-path").value();
 
     if (!filename.empty()) {
         LogInfo("Loading file '%s' in the archive", filename.c_str());
-        return this->LoadData(file.read(filename));
+        return this->LoadData(zipFileReader.ReadTextFile(filename));
     }
     else {
         LogError("No file to load found in the archive");
@@ -1128,8 +1138,24 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
+    this->SetLocale();
+
     // Forcing font resource to be reset if the font is given in the options
-    if (json.has<jsonxx::String>("font")) this->SetFont(m_options->m_font.GetValue());
+    if (json.has<jsonxx::Array>("fontAddCustom")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    }
+    if (json.has<jsonxx::String>("font")) {
+        this->SetFont(m_options->m_font.GetValue());
+    }
+    if (json.has<jsonxx::String>("fontFallback")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    }
+    if (json.has<jsonxx::Boolean>("fontLoadAll")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.LoadAll();
+    }
 
     return true;
 }
@@ -2127,6 +2153,21 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
 #else
     return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #endif
+}
+
+void Toolkit::SetLocale()
+{
+    if (m_options->m_setLocale.GetValue() && !m_previousLocale) {
+        // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+        m_previousLocale = std::locale::global(std::locale::classic());
+    }
+}
+
+void Toolkit::ResetLocale()
+{
+    if (m_previousLocale) {
+        std::locale::global(*m_previousLocale);
+    }
 }
 
 void Toolkit::InitClock()

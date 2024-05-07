@@ -333,9 +333,8 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(const BeamDrawingInterface
     const auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
 
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
-    const auto isNoteOrChord = [](BeamElementCoord *coord) {
-        return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
-    };
+    const auto isNoteOrChord
+        = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
 
     using CoordIt = ArrayOfBeamElementCoords::const_iterator;
     for (CoordIt it = m_beamElementCoordRefs.begin(); it != m_beamElementCoordRefs.end(); ++it) {
@@ -460,9 +459,8 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
     // set to store durations of relevant notes (it's ordered, so min duration is going to be first)
     std::set<int> noteDurations;
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
-    const auto isNoteOrChord = [](BeamElementCoord *coord) {
-        return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
-    };
+    const auto isNoteOrChord
+        = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
     // iterators
     using CoordIt = ArrayOfBeamElementCoords::iterator;
     using CoordReverseIt = ArrayOfBeamElementCoords::reverse_iterator;

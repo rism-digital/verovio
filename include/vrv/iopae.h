@@ -27,7 +27,7 @@
 
 #include "atts_cmn.h"
 #include "clef.h"
-#include "io.h"
+#include "iobase.h"
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -90,6 +90,11 @@ public:
      * Writing object method that must be overridden in the child class.
      */
     bool WriteObjectEnd(Object *object) override;
+
+    /**
+     * Helper method to return a string representation of the PAE duration.
+     */
+    static std::string GetPaeDur(data_DURATION dur, int ndots);
 
 private:
     /**
@@ -166,6 +171,7 @@ private:
     ///@{
     void WriteDur(DurationInterface *interface);
     void WriteGrace(AttGraced *attGraced);
+    bool HasFermata(Object *object);
     ///@}
 
 public:

@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "io.h"
+#include "iobase.h"
 #include "pugixml.hpp"
 #include "vrvdef.h"
 

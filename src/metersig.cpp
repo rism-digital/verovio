@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "functor.h"
+#include "resources.h"
 #include "scoredefinterface.h"
 #include "smufl.h"
 #include "vrv.h"
@@ -29,11 +30,21 @@ namespace vrv {
 static const ClassRegistrar<MeterSig> s_factory("meterSig", METERSIG);
 
 MeterSig::MeterSig()
-    : LayerElement(METERSIG, "msig-"), AttEnclosingChars(), AttMeterSigLog(), AttMeterSigVis(), AttVisibility()
+    : LayerElement(METERSIG, "msig-")
+    , AttColor()
+    , AttEnclosingChars()
+    , AttExtSymNames()
+    , AttMeterSigLog()
+    , AttMeterSigVis()
+    , AttTypography()
+    , AttVisibility()
 {
+    this->RegisterAttClass(ATT_COLOR);
     this->RegisterAttClass(ATT_ENCLOSINGCHARS);
+    this->RegisterAttClass(ATT_EXTSYMNAMES);
     this->RegisterAttClass(ATT_METERSIGLOG);
     this->RegisterAttClass(ATT_METERSIGVIS);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
@@ -44,9 +55,12 @@ MeterSig::~MeterSig() {}
 void MeterSig::Reset()
 {
     LayerElement::Reset();
+    this->ResetColor();
     this->ResetEnclosingChars();
+    this->ResetExtSymNames();
     this->ResetMeterSigLog();
     this->ResetMeterSigVis();
+    this->ResetTypography();
     this->ResetVisibility();
 }
 
@@ -97,6 +111,19 @@ int MeterSig::GetTotalCount() const
 char32_t MeterSig::GetSymbolGlyph() const
 {
     char32_t glyph = 0;
+    const Resources *resources = this->GetDocResources();
+
+    // If there is glyph.num, prioritize it
+    if (this->HasGlyphNum()) {
+        glyph = this->GetGlyphNum();
+        if (NULL != resources->GetGlyph(glyph)) return glyph;
+    }
+    // If there is glyph.name (second priority)
+    else if (this->HasGlyphName()) {
+        glyph = resources->GetGlyphCode(this->GetGlyphName());
+        if (NULL != resources->GetGlyph(glyph)) return glyph;
+    }
+
     switch (this->GetSym()) {
         case METERSIGN_common: glyph = SMUFL_E08A_timeSigCommon; break;
         case METERSIGN_cut: glyph = SMUFL_E08B_timeSigCutCommon; break;

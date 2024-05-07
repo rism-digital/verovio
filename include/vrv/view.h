@@ -122,7 +122,7 @@ public:
     virtual void DoRefresh() {}
     virtual void DoResize() {}
     virtual void DoReset() {}
-    virtual void OnPageChange(){};
+    virtual void OnPageChange() {};
     ///@}
 
     /**
@@ -567,6 +567,9 @@ protected:
         DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength = 0, int gapLength = 0);
     void DrawSmuflCode(
         DeviceContext *dc, int x, int y, char32_t code, int staffSize, bool dimin, bool setBBGlyph = false);
+    // void DrawSmuflCodeWithCustomFont(DeviceContext *dc, const std::string &customFont, int x, int y, char32_t code,
+    //     int staffSize, bool dimin, bool setBBGlyph = false);
+
     void DrawThickBezierCurve(
         DeviceContext *dc, Point bezier[4], int thickness, int staffSize, int penWidth, int penStyle = AxSOLID);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);

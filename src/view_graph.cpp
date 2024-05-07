@@ -276,6 +276,26 @@ void View::DrawEnclosingBrackets(DeviceContext *dc, int x, int y, int height, in
         horizontalThickness, verticalThickness);
 }
 
+/*
+void View::DrawSmuflCodeWithCustomFont(DeviceContext *dc, const std::string &customFont, int x, int y, char32_t code,
+    int staffSize, bool dimin, bool setBBGlyph)
+{
+    if (customFont.empty()) {
+        this->DrawSmuflCode(dc, x, y, code, staffSize, dimin, setBBGlyph);
+        return;
+    }
+
+    Resources &resources = m_doc->GetResourcesForModification();
+    const std::string prevFont = resources.GetCurrentFont();
+
+    resources.SetCurrentFont(customFont);
+
+    DrawSmuflCode(dc, x, y, code, staffSize, dimin, setBBGlyph);
+
+    resources.SetCurrentFont(prevFont);
+}
+*/
+
 void View::DrawSmuflCode(DeviceContext *dc, int x, int y, char32_t code, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);

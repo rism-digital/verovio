@@ -17,6 +17,7 @@
 #include "chord.h"
 #include "doc.h"
 #include "gracegrp.h"
+#include "iopae.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -70,10 +71,16 @@ void FeatureExtractor::Extract(const Object *object)
         }
 
         std::stringstream pitch;
+        std::stringstream pitchWithDuration;
+
+        pitchWithDuration << PAEOutput::GetPaeDur(note->GetDur(), note->GetDots());
+
         data_OCTAVE oct = note->GetOct();
         char octSign = (oct > 3) ? '\'' : ',';
         int signCount = (oct > 3) ? (oct - 3) : (4 - oct);
-        pitch << std::string(signCount, octSign);
+        std::string octaves = std::string(signCount, octSign);
+        pitch << octaves;
+        pitchWithDuration << octaves;
 
         const Accid *accid = vrv_cast<const Accid *>(note->FindDescendantByType(ACCID));
         if (accid) {
@@ -98,13 +105,16 @@ void FeatureExtractor::Extract(const Object *object)
                 default: accidStr = accidStrWritten;
             }
             pitch << accidStr;
+            pitchWithDuration << accidStr;
         }
 
         std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
         std::transform(pname.begin(), pname.end(), pname.begin(), ::toupper);
         pitch << pname;
+        pitchWithDuration << pname;
 
         m_pitchesChromatic << pitch.str();
+        m_pitchesChromaticWithDuration << pitchWithDuration.str();
         m_pitchesDiatonic << pname;
         jsonxx::Array pitchesIds;
         pitchesIds << note->GetID();
@@ -145,6 +155,7 @@ void FeatureExtractor::ToJson(std::string &output)
 {
     jsonxx::Object o;
 
+    o << "pitchesChromaticWithDuration" << m_pitchesChromaticWithDuration;
     o << "pitchesChromatic" << m_pitchesChromatic;
     o << "pitchesDiatonic" << m_pitchesDiatonic;
     o << "pitchesIds" << m_pitchesIds;

@@ -2630,6 +2630,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     }
 
     this->WriteLayerElement(currentNode, meterSig);
+    meterSig->WriteColor(currentNode);
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
@@ -6477,6 +6478,7 @@ bool MEIInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadOctave(clef);
     vrvClef->ReadOctaveDisplacement(clef);
     vrvClef->ReadStaffIdent(clef);
+    vrvClef->ReadTypography(clef);
     vrvClef->ReadVisibility(clef);
 
     parent->AddChild(vrvClef);
@@ -6692,9 +6694,12 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
         this->UpgradeMeterSigTo_5_0(meterSig, vrvMeterSig);
     }
 
+    vrvMeterSig->ReadColor(meterSig);
     vrvMeterSig->ReadEnclosingChars(meterSig);
+    vrvMeterSig->ReadExtSymNames(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
     vrvMeterSig->ReadMeterSigVis(meterSig);
+    vrvMeterSig->ReadTypography(meterSig);
     vrvMeterSig->ReadVisibility(meterSig);
 
     parent->AddChild(vrvMeterSig);

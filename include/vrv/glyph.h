@@ -106,6 +106,18 @@ public:
      */
     const Point *GetAnchor(SMuFLGlyphAnchor anchor) const;
 
+    /**
+     * Set the XML (content) of the glyph.
+     * This is used only for glyph added from zip archive custom fonts.
+     */
+    void SetXML(const std::string &xml) { m_xml = xml; }
+
+    /**
+     * Return the XML (content) of the glyph.
+     * Return the stored XML or load it from the path.
+     */
+    std::string GetXML() const;
+
 private:
     //
 public:
@@ -124,6 +136,8 @@ private:
     std::string m_codeStr;
     /** Path to the glyph XML file */
     std::string m_path;
+    /** XML of the content for files loaded from zip archive custom font */
+    std::string m_xml;
     /** A map of the available anchors */
     std::map<SMuFLGlyphAnchor, Point> m_anchors;
     /** A flag indicating it is a fallback */

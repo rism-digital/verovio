@@ -100,6 +100,7 @@
 #import <VerovioFramework/featureextractor.h>
 #import <VerovioFramework/fermata.h>
 #import <VerovioFramework/fig.h>
+#import <VerovioFramework/filereader.h>
 #import <VerovioFramework/findfunctor.h>
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/fing.h>
@@ -120,7 +121,7 @@
 #import <VerovioFramework/humlib.h>
 #import <VerovioFramework/instrdef.h>
 #import <VerovioFramework/interface.h>
-#import <VerovioFramework/io.h>
+#import <VerovioFramework/iobase.h>
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/iodarms.h>
 #import <VerovioFramework/iohumdrum.h>

@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.86",
+    "fontVersion": "5.2.88",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1078,8 +1078,8 @@
                 1.9931
             ],
             "bBoxSW": [
-                -0.0005,
-                1.0547
+                0.0,
+                1.056
             ]
         },
         "chantCclef": {
@@ -4972,6 +4972,16 @@
                 -0.528
             ]
         },
+        "noteheadHalfFilled": {
+            "bBoxNE": [
+                1.256,
+                0.552
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.528
+            ]
+        },
         "noteheadHalfWithX": {
             "bBoxNE": [
                 1.256,
@@ -6452,6 +6462,16 @@
                 0.0
             ]
         },
+        "staffPosLower8": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "staffPosRaise1": {
             "bBoxNE": [
                 0.0,
@@ -7756,6 +7776,24 @@
                 0.164
             ]
         },
+        "noteheadHalfFilled": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
         "noteheadHalfWithX": {
             "cutOutNW": [
                 0.14,
@@ -7850,7 +7888,7 @@
                 0.4
             ],
             "cutOutSE": [
-                1.42,
+                1.4,
                 -0.4
             ]
         },

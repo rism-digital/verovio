@@ -41,6 +41,7 @@ Clef::Clef()
     , AttOctave()
     , AttOctaveDisplacement()
     , AttStaffIdent()
+    , AttTypography()
     , AttVisibility()
 {
     this->RegisterAttClass(ATT_CLEFLOG);
@@ -53,6 +54,7 @@ Clef::Clef()
     this->RegisterAttClass(ATT_OCTAVE);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     this->RegisterAttClass(ATT_STAFFIDENT);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
@@ -73,6 +75,7 @@ void Clef::Reset()
     this->ResetOctave();
     this->ResetOctaveDisplacement();
     this->ResetStaffIdent();
+    this->ResetTypography();
     this->ResetVisibility();
 }
 

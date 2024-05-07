@@ -55,6 +55,7 @@ public:
     std::list<const Note *> m_previousNotes;
 
     jsonxx::Array m_pitchesChromatic;
+    jsonxx::Array m_pitchesChromaticWithDuration;
     jsonxx::Array m_pitchesDiatonic;
     jsonxx::Array m_pitchesIds;
 

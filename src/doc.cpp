@@ -1843,7 +1843,7 @@ double Doc::GetCueScaling() const
 
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
-    m_drawingSmuflFont.SetFaceName(m_options->m_font.GetValue().c_str());
+    m_drawingSmuflFont.SetFaceName(this->GetResources().GetCurrentFont().c_str());
     int value = m_drawingSmuflFontSize * staffSize / 100;
     if (graceSize) value = value * m_options->m_graceFactor.GetValue();
     m_drawingSmuflFont.SetPointSize(value);

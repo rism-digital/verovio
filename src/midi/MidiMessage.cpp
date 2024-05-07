@@ -14,10 +14,10 @@
 #include "MidiMessage.h"
 
 #include <cmath>
+#include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
-#include <stdlib.h>
-
 
 
 namespace smf {
@@ -315,11 +315,13 @@ bool MidiMessage::isMetaMessage(void) const {
 //
 
 bool MidiMessage::isNoteOff(void) const {
-	if (size() != 3) {
+	const MidiMessage& message = *this;
+	const vector<uchar>& chars = message;
+	if (message.size() != 3) {
 		return false;
-	} else if (((*this)[0] & 0xf0) == 0x80) {
+	} else if ((chars[0] & 0xf0) == 0x80) {
 		return true;
-	} else if ((((*this)[0] & 0xf0) == 0x90) && ((*this)[2] == 0)) {
+	} else if (((chars[0] & 0xf0) == 0x90) && (chars[2] == 0x00)) {
 		return true;
 	} else {
 		return false;
@@ -676,7 +678,7 @@ bool MidiMessage::isInstrumentName(void) const {
 //////////////////////////////
 //
 // MidiMessage::isLyricText -- Returns true if message is a meta message
-//      describing some lyric text (for karakoke MIDI files)
+//      describing some lyric text (for karaoke MIDI files)
 //      (meta message type 0x05).
 //
 
@@ -857,7 +859,7 @@ int MidiMessage::getKeyNumber(void) const {
 
 //////////////////////////////
 //
-// MidiMessage::getVelocity -- Return the key veolocity.  If the message
+// MidiMessage::getVelocity -- Return the key velocity.  If the message
 //   is not a note-on or a note-off, then return -1.  If the value is
 //   out of the range 0-127, then chop off the high-bits.
 //
@@ -961,7 +963,7 @@ void MidiMessage::setP1(int value) {
 
 //////////////////////////////
 //
-// MidiMessage::setP2 -- Set the second paramter value.
+// MidiMessage::setP2 -- Set the second paramater value.
 //     If the MidiMessage is too short, add extra spaces
 //     to allow for P2.  The command byte and/or the P1 value
 //     will be undefined if extra space needs to be added and
@@ -980,7 +982,7 @@ void MidiMessage::setP2(int value) {
 
 //////////////////////////////
 //
-// MidiMessage::setP3 -- Set the third paramter value.
+// MidiMessage::setP3 -- Set the third paramater value.
 //     If the MidiMessage is too short, add extra spaces
 //     to allow for P3.  The command byte and/or the P1/P2 values
 //     will be undefined if extra space needs to be added and
@@ -1364,7 +1366,7 @@ void MidiMessage::setSpelling(int base7, int accidental) {
 //        pc + octave * 7
 //     where pc is the numbers 0 through 6 representing the pitch classes
 //     C through B, the octave is MIDI octave (not the scientific pitch
-//     octave which is one less than the MIDI ocatave, such as C4 = middle C).
+//     octave which is one less than the MIDI octave, such as C4 = middle C).
 //     The second number is the accidental for the base-7 pitch.
 //
 
@@ -1544,8 +1546,8 @@ void MidiMessage::setMetaContent(const std::string& content) {
 	// add the size of the meta message data (VLV)
 	int dsize = (int)content.size();
 	std::vector<uchar> vlv = intToVlv(dsize);
-	for (int i=0; i<(int)vlv.size(); i++) {
-		this->push_back(vlv[i]);
+	for (uchar item : vlv) {
+		this->push_back(item);
 	}
 	std::copy(content.begin(), content.end(), std::back_inserter(*this));
 }
@@ -1760,6 +1762,61 @@ void MidiMessage::makeController(int channel, int num, int value) {
 	push_back(0xb0 | (0x0f & channel));
 	push_back(0x7f & num);
 	push_back(0x7f & value);
+}
+
+
+
+/////////////////////////////
+//
+// MidiMessage::makePitchBend -- Create a pitch-bend message.  lsb is
+//     least-significant 7 bits of the 14-bit range, and msb is the
+//     most-significant 7 bits of the 14-bit range.  The range depth
+//     is determined by a setting in the synthesizer.  Typically it is
+//     +/- two semitones by default.  See MidiFile::setPitchBendRange()
+//     to change the default (or change to the typical default).
+//
+
+void MidiMessage::makePitchBend(int channel, int lsb, int msb) {
+	resize(0);
+	push_back(0xe0 | (0x0e & channel));
+	push_back(0x7f & lsb);
+	push_back(0x7f & msb);
+}
+
+//
+// value is a 14-bit number, where 0 is the lowest pitch of the range, and
+//    2^15-1 is the highest pitch of the range.
+//
+
+void MidiMessage::makePitchBend(int channel, int value) {
+	resize(0);
+	int lsb = value & 0x7f;
+	int msb = (value >> 7) & 0x7f;
+	push_back(0xe0 | (0x7f & channel));
+	push_back(lsb);
+	push_back(msb);
+}
+
+//
+// Input value is a number between -1.0 and +1.0.
+//
+
+void MidiMessage::makePitchBendDouble(int channel, double value) {
+	// value is in the range from -1 for minimum and 2^18 - 1 for the maximum
+	resize(0);
+	double dvalue = (value + 1.0) * (pow(2.0, 15.0));
+	if (dvalue < 0.0) {
+		dvalue = 0.0;
+	}
+	if (dvalue > pow(2.0, 15.0) - 1.0) {
+		dvalue = pow(2.0, 15.0) - 1.0;
+	}
+	ulong uivalue = (ulong)dvalue;
+	uchar lsb = uivalue & 0x7f;
+	uchar msb = (uivalue >> 7) & 0x7f;
+	push_back(0xe0 | (0x7f & channel));
+	push_back(lsb);
+	push_back(msb);
 }
 
 
@@ -1999,8 +2056,8 @@ void MidiMessage::makeSysExMessage(const std::vector<uchar>& data) {
 
 	int msize = endindex - startindex + 2;
 	std::vector<uchar> vlv = intToVlv(msize);
-	for (int i=0; i<(int)vlv.size(); i++) {
-		this->push_back(vlv[i]);
+	for (uchar item : vlv) {
+		this->push_back(item);
 	}
 	for (int i=startindex; i<=endindex; i++) {
 		this->push_back(data.at(i));
@@ -2095,18 +2152,18 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 	data.push_back((uchar)0x02);  // sub-ID#2 (note change)
 	data.push_back((uchar)program);  // tuning program number (0 - 127)
 	std::vector<uchar> vlv = intToVlv((int)mapping.size());
-	for (int i=0; i<(int)vlv.size(); i++) {
-		data.push_back(vlv[i]);
+	for (uchar item : vlv) {
+		data.push_back(item);
 	}
-	for (int i=0; i<(int)mapping.size(); i++) {
-		int keynum = mapping[i].first;
+	for (auto &item : mapping) {
+		int keynum = item.first;
 		if (keynum < 0) {
 			keynum = 0;
 		} else if (keynum > 127) {
 			keynum = 127;
 		}
 		data.push_back((uchar)keynum);
-		double semitones = mapping[i].second;
+		double semitones = item.second;
 		int sint = (int)semitones;
 		if (sint < 0) {
 			sint = 0;
@@ -2120,8 +2177,8 @@ void MidiMessage::makeMts2_KeyTuningsBySemitone(std::vector<std::pair<int, doubl
 		uchar msb = (value >> 7) & 0x7f;
 		data.push_back(msb);
 		data.push_back(lsb);
-	}
-	this->makeSysExMessage(data);
+    }
+    this->makeSysExMessage(data);
 }
 
 
@@ -2204,8 +2261,8 @@ void MidiMessage::makeTemperamentBad(double maxDeviationCents, int referencePitc
 		maxDeviationCents = 100.0;
 	}
 	std::vector<double> temperament(12);
-	for (int i=0; i<(int)temperament.size(); i++) {
-		temperament[i] = ((rand() / (double)RAND_MAX) * 2.0 - 1.0) * maxDeviationCents;
+	for (double &item : temperament) {
+		item = ((rand() / (double)RAND_MAX) * 2.0 - 1.0) * maxDeviationCents;
 	}
 	this->makeMts9_TemperamentByCentsDeviationFromET(temperament, referencePitchClass, channelMask);
 }
@@ -2291,6 +2348,30 @@ void MidiMessage::makeTemperamentMeantoneCommaThird(int referencePitchClass, int
 
 void MidiMessage::makeTemperamentMeantoneCommaHalf(int referencePitchClass, int channelMask) {
 	this->makeTemperamentMeantone(1.0 / 2.0, referencePitchClass, channelMask);
+}
+
+
+
+//////////////////////////////
+//
+// operator<<(MidiMessage) -- Print MIDI messages as text.  0x80 and above
+//    are printed as hex, below as dec (will look strange for meta messages
+//    and system exclusives which could be dealt with later).
+//
+
+std::ostream& operator<<(std::ostream& out, MidiMessage& message) {
+	for (int i=0; i<(int)message.size(); i++) {
+		if (message[i] >= 0x80) {
+			out << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int)message[i];
+			out << std::dec << std::setw(0) << std::setfill(' ');
+		} else {
+			out << (int)message[i];
+		}
+		if (i<(int)message.size() - 1) {
+			out << ' ';
+		}
+	}
+	return out;
 }
 
 
