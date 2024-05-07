@@ -1901,7 +1901,7 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
     // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET)) {
+    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET) && !m_doc->IsNeumeLines()) {
         measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
         measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
         measure->WriteCoordX1(currentNode);
@@ -2233,7 +2233,7 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     staff->WriteVisibility(currentNode);
 
     // y position
-    if (staff->m_drawingFacsY != VRV_UNSET) {
+    if (staff->m_drawingFacsY != VRV_UNSET && !(m_doc->IsNeumeLines())) {
         staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
@@ -2313,7 +2313,7 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
-    if (element->m_drawingFacsX != VRV_UNSET) {
+    if (element->m_drawingFacsX != VRV_UNSET && !(m_doc->IsNeumeLines())) {
         element->SetCoordX1(element->m_drawingFacsX / DEFINITION_FACTOR);
         element->WriteCoordX1(currentNode);
     }
@@ -2710,6 +2710,7 @@ void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     this->WritePitchInterface(currentNode, nc);
     this->WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
+    nc->WriteCurvatureDirection(currentNode);
     nc->WriteIntervalMelodic(currentNode);
     nc->WriteNcForm(currentNode);
 }
@@ -6833,6 +6834,7 @@ bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
     this->ReadPitchInterface(nc, vrvNc);
     this->ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
+    vrvNc->ReadCurvatureDirection(nc);
     vrvNc->ReadIntervalMelodic(nc);
     vrvNc->ReadNcForm(nc);
 

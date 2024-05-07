@@ -40,11 +40,14 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ CLEF, CUSTOS, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
     assert(zone);
     layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+    if (layerElement->Is({ ACCID, SYL })) {
+        layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -187,10 +190,13 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
+    if (layerElement->Is({ ACCID, SYL })) {
+        zone->SetUly(m_view.ToDeviceContextY(layerElement->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
+    }
 
     return FUNCTOR_CONTINUE;
 }

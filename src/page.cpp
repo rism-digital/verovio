@@ -33,6 +33,7 @@
 #include "adjustxposfunctor.h"
 #include "adjustxrelfortranscriptionfunctor.h"
 #include "adjustyposfunctor.h"
+#include "adjustyrelfortranscriptionfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "cachehorizontallayoutfunctor.h"
@@ -270,6 +271,8 @@ void Page::LayOutTranscription(bool force)
 
     AdjustXRelForTranscriptionFunctor adjustXRelForTranscription;
     this->Process(adjustXRelForTranscription);
+    AdjustYRelForTranscriptionFunctor adjustYRelForTranscription;
+    this->Process(adjustYRelForTranscription);
 
     CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);

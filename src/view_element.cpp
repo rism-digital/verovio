@@ -113,7 +113,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         this->DrawCustos(dc, element, layer, staff, measure);
     }
     else if (element->Is(DIVLINE)) {
-        DrawDivLine(dc, element, layer, staff, measure);
+        this->DrawDivLine(dc, element, layer, staff, measure);
     }
     else if (element->Is(DOT)) {
         this->DrawDot(dc, element, layer, staff, measure);
@@ -138,6 +138,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(LIGATURE)) {
         this->DrawLigature(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(LIQUESCENT)) {
+        this->DrawLiquescent(dc, element, layer, staff, measure);
     }
     else if (element->Is(MENSUR)) {
         this->DrawMensur(dc, element, layer, staff, measure);
@@ -297,22 +300,6 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         dc->GetSmuflTextExtent(accid->GetSymbolStr(notationType), &extend);
         dc->ResetFont();
         y = (accid->GetPlace() == STAFFREL_below) ? y - extend.m_ascent - unit : y + extend.m_descent + unit;
-    }
-
-    if (notationType == NOTATIONTYPE_neume) {
-        int rotationOffset = 0;
-        if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-            double deg = staff->GetDrawingRotate();
-            int xDiff = x - staff->GetDrawingX();
-            rotationOffset = int(xDiff * tan(deg * M_PI / 180.0));
-        }
-        else if (staff->HasDrawingRotation()) {
-            rotationOffset = staff->GetDrawingRotationOffsetFor(x);
-        }
-        if (accid->HasFacs() && m_doc->IsFacs()) {
-            y = ToLogicalY(y);
-        }
-        y -= rotationOffset;
     }
 
     this->DrawSmuflString(
@@ -656,14 +643,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     int x, y;
-    if (m_doc->IsFacs() && clef->HasFacs()) {
-        y = ToLogicalY(staff->GetDrawingY());
-        x = clef->GetDrawingX();
-    }
-    else {
-        y = staff->GetDrawingY();
-        x = element->GetDrawingX();
-    }
+    y = staff->GetDrawingY();
+    x = element->GetDrawingX();
 
     char32_t sym = clef->GetClefGlyph(staff->m_drawingNotationType);
 
@@ -674,12 +655,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (clef->HasLine()) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
-        if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-            double deg = staff->GetDrawingRotate();
-            int xDiff = x - staff->GetDrawingX();
-            y -= int(xDiff * tan(deg * M_PI / 180.0));
-        }
-        else if (staff->HasDrawingRotation()) {
+        if (staff->HasDrawingRotation()) {
             y -= staff->GetDrawingRotationOffsetFor(x);
         }
     }
@@ -701,19 +677,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
-
-    if (m_doc->IsFacs() && element->HasFacs()) {
-        const int noteHeight
-            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth
-            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-
-        FacsimileInterface *fi = element->GetFacsimileInterface();
-        fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(ToDeviceContextY(y));
-        fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
-    }
 
     // Possibly draw enclosing brackets
     this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
@@ -796,27 +759,14 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    if (m_doc->IsFacs() && (staff->GetDrawingRotate() != 0)) {
-        double deg = staff->GetDrawingRotate();
-        int xDiff = x - staff->GetDrawingX();
-        y -= int(xDiff * tan(deg * M_PI / 180.0));
+    if (staff->HasDrawingRotation()) {
+        y -= staff->GetDrawingRotationOffsetFor(x);
     }
     else if (staff->HasDrawingRotation()) {
         y -= staff->GetDrawingRotationOffsetFor(x);
     }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
-
-    if (m_doc->IsFacs() && element->HasFacs()) {
-        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
-        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-
-        FacsimileInterface *fi = element->GetFacsimileInterface();
-        fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(ToDeviceContextY(y));
-        fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
-    }
 
     /************ Draw children (accidentals, etc) ************/
     // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
@@ -1778,14 +1728,14 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = vrv_cast<Syl *>(element);
     assert(syl);
 
-    bool isNeume = (staff->m_drawingNotationType == NOTATIONTYPE_neume);
-
-    if (!syl->GetStart() && !isNeume) {
+    if (!syl->GetStart() && !(staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
 
-    syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+    if (m_doc->IsFacs()) {
+        syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
+    }
 
     dc->StartGraphic(syl, "", syl->GetID());
     dc->DeactivateGraphicY();
@@ -1810,7 +1760,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
-    if (m_doc->IsFacs()) {
+    if (m_doc->IsFacs() || m_doc->IsNeumeLines()) {
         params.m_width = syl->GetDrawingWidth();
         params.m_height = syl->GetDrawingHeight();
     }

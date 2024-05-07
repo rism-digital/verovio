@@ -142,13 +142,6 @@ int Staff::GetDrawingX() const
 
 int Staff::GetDrawingY() const
 {
-    if (this->HasFacs()) {
-        const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
-        assert(DOC);
-        if (doc->IsFacs()) {
-            return FacsimileInterface::GetDrawingY();
-        }
-    }
 
     if (m_drawingFacsY != VRV_UNSET) return m_drawingFacsY;
 
@@ -180,7 +173,7 @@ void Staff::AdjustDrawingStaffSize()
     if (this->HasFacs()) {
         Doc *doc = vrv_cast<Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->IsFacs()) {
+        if (doc->IsFacs() || doc->IsNeumeLines()) {
             double rotate = this->GetDrawingRotate();
             Zone *zone = this->GetZone();
             assert(zone);
