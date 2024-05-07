@@ -678,19 +678,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
-    if (m_doc->IsTranscription() && element->HasFacs()) {
-        const int noteHeight
-            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth
-            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-
-        FacsimileInterface *fi = element->GetFacsimileInterface();
-        fi->GetZone()->SetUlx(x);
-        fi->GetZone()->SetUly(ToDeviceContextY(y));
-        fi->GetZone()->SetLrx(x + noteWidth);
-        fi->GetZone()->SetLry(ToDeviceContextY(y - noteHeight));
-    }
-
     // Possibly draw enclosing brackets
     this->DrawClefEnclosing(dc, clef, staff, sym, x, y);
 
