@@ -1825,10 +1825,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
         success = true;
     else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
-    if (success && m_doc->HasFacsimile()) {
-        m_doc->PrepareData();
-        m_doc->GetDrawingPage()->LayOut(true);
-    }
+
     m_editInfo.import("status", success ? "OK" : "FAILURE");
     m_editInfo.import("message", success ? "" : "Could not set attribute '" + attrType + "' to '" + attrValue + "'.");
     return success;
@@ -1991,10 +1988,6 @@ bool EditorToolkitNeume::SetClef(std::string elementId, std::string shape)
             assert(pi);
             pi->AdjustPitchByOffset(shift);
         }
-    }
-    if (success && m_doc->HasFacsimile()) {
-        m_doc->PrepareData();
-        m_doc->GetDrawingPage()->LayOut(true);
     }
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
@@ -3359,8 +3352,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     bool success2 = false;
     Facsimile *facsimile = m_doc->GetFacsimile();
     assert(facsimile);
-    Surface *surface = vrv_cast<Surface *>(facsimile->FindDescendantByType(SURFACE));
-    assert(surface);
     std::string firstNcId = elementIds[0];
     std::string secondNcId = elementIds[1];
     // Check if you can get drawing page
@@ -3386,79 +3377,66 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
-    bool isLigature;
+    bool isLigature = false;
     if (firstNc->HasAttribute("ligated", "true") && secondNc->HasAttribute("ligated", "true")) {
         isLigature = true;
     }
     else {
-        isLigature = false;
-        Set(firstNc->GetID(), "tilt", "");
-        Set(secondNc->GetID(), "tilt", "");
-        Set(firstNc->GetID(), "curve", "");
-        Set(secondNc->GetID(), "curve", "");
+        Set(firstNcId, "tilt", "");
+        Set(secondNcId, "tilt", "");
+        Set(firstNcId, "curve", "");
+        Set(secondNcId, "curve", "");
     }
 
-    Zone *zone = new Zone();
+    Zone *firstNcZone = firstNc->GetZone();
+    Zone *secondNcZone = secondNc->GetZone();
+
+    int ligUlx = firstNcZone->GetUlx();
+    int ligUly = firstNcZone->GetUly();
+    int ligLrx = firstNcZone->GetLrx();
+    int ligLry = firstNcZone->GetLry();
+
+    Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
+    assert(staff);
+    const int noteHeight
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
+    const int noteWidth
+        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
+
     // set ligature to false and update zone of second Nc
     if (isLigature) {
-        if (AttModule::SetNeumes(firstNc, "ligated", "false")) success1 = true;
+        if (Set(firstNcId, "ligated", "false")) success1 = true;
 
-        int ligUlx = firstNc->GetZone()->GetUlx();
-        int ligUly = firstNc->GetZone()->GetUly();
-        int ligLrx = firstNc->GetZone()->GetLrx();
-        int ligLry = firstNc->GetZone()->GetLry();
+        secondNcZone->SetUlx(ligUlx + noteWidth);
+        secondNcZone->SetUly(ligUly + noteHeight);
+        secondNcZone->SetLrx(ligLrx + noteWidth);
+        secondNcZone->SetLry(ligLry + noteHeight);
 
-        Staff *staff = dynamic_cast<Staff *>(firstNc->GetFirstAncestor(STAFF));
-        assert(staff);
-
-        const int noteHeight
-            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-        const int noteWidth
-            = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-
-        zone->SetUlx(ligUlx + noteWidth);
-        zone->SetUly(ligUly + noteHeight);
-        zone->SetLrx(ligLrx + noteWidth);
-        zone->SetLry(ligLry + noteHeight);
-
-        secondNc->AttachZone(zone);
-
-        if (AttModule::SetNeumes(secondNc, "ligated", "false")) success2 = true;
+        if (Set(secondNcId, "ligated", "false")) success2 = true;
     }
     // set ligature to true and update zones to be the same
-    else if (!isLigature) {
-        if (AttModule::SetNeumes(firstNc, "ligated", "true")) success1 = true;
+    else {
+        if (Set(firstNcId, "ligated", "true")) success1 = true;
 
-        zone->SetUlx(firstNc->GetZone()->GetUlx());
-        zone->SetUly(firstNc->GetZone()->GetUly());
-        zone->SetLrx(firstNc->GetZone()->GetLrx());
-        zone->SetLry(firstNc->GetZone()->GetLry());
+        secondNcZone->SetUlx(ligUlx);
+        secondNcZone->SetUly(ligUly + noteHeight);
+        secondNcZone->SetLrx(ligLrx);
+        secondNcZone->SetLry(ligLry + noteHeight);
 
-        secondNc->AttachZone(zone);
-
-        if (AttModule::SetNeumes(secondNc, "ligated", "true")) success2 = true;
+        if (Set(secondNcId, "ligated", "true")) success2 = true;
     }
-    // else {
-    //     LogError("isLigature is invalid!");
-    //     m_editInfo.import("status", "FAILURE");
-    //     m_editInfo.import("message", "isLigature value '" + isLigature + "' is invalid.");
-    //     return false;
-    // }
-    if (success1 && success2 && m_doc->HasFacsimile()) {
-        m_doc->PrepareData();
-        m_doc->GetDrawingPage()->LayOut(true);
-    }
-    m_editInfo.import("status", "OK");
-    m_editInfo.import("message", "");
+
     if (!(success1 && success2)) {
         LogWarning("Unable to update ligature attribute");
         m_editInfo.import("message", "Unable to update ligature attribute.");
         m_editInfo.import("status", "WARNING");
+        return false;
     }
 
-    surface->AddChild(zone);
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
+    m_editInfo.import("status", "OK");
+    m_editInfo.import("message", "");
     return success1 && success2;
 }
 
