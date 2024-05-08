@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: FranzDiebold/github-env-vars-action@v2.7.0
+      - uses: FranzDiebold/github-env-vars-action@v2.8.0
       - name: Get Short SHA
         run: |
           echo "SHORT_SHA=`echo ${{ github.event.pull_request.head.sha }} | cut -c1-7`" >> $GITHUB_ENV
@@ -109,14 +109,14 @@ jobs:
           ls -al
 
       - name: Upload results as artefacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
       - name: Check existence of the log.md file
         id: check_files
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
 
