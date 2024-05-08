@@ -203,7 +203,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
             const double scale = 0.8 * 9 / DEFINITION_FACTOR;
             const std::string scale_string = StringFormat("scale(%f,-%f)", scale, scale);
-            
+
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
                 child.attribute("id").set_value(entry.second.GetRefId().c_str());
