@@ -63,7 +63,6 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext(SVG_DEVICE_CONTEXT)
     m_svgNode.append_attribute("xmlns") = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
     m_svgNode.append_attribute("xmlns:mei") = "http://www.music-encoding.org/ns/mei";
-    m_svgNode.append_attribute("overflow") = "visible";
 
     // start the stack
     m_svgNodeStack.push_back(m_svgNode);
@@ -202,9 +201,13 @@ void SvgDeviceContext::Commit(bool xml_declaration)
             // load the XML as a pugi::xml_document
             sourceDoc.load_string(entry.first->GetXML().c_str());
 
+            const double scale = 0.8 * 9 / DEFINITION_FACTOR;
+            const std::string scale_string = StringFormat("scale(%f,-%f)", scale, scale);
+            
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
                 child.attribute("id").set_value(entry.second.GetRefId().c_str());
+                child.append_attribute("transform") = scale_string.c_str();
                 defs.append_copy(child);
             }
         }
@@ -1052,8 +1055,6 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", id.c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
-        useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-        useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         if (m_fontStack.top()->GetWidthToHeightRatio() != 1.0f) {
             useChild.append_attribute("transform") = StringFormat("matrix(%f,0,0,1,%f,0)",
                 m_fontStack.top()->GetWidthToHeightRatio(), x * (1. - m_fontStack.top()->GetWidthToHeightRatio()))
