@@ -33,6 +33,7 @@ FunctorCode ApplyPPUFactorFunctor::VisitLayerElement(LayerElement *layerElement)
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     if (layerElement->m_drawingFacsX != VRV_UNSET) layerElement->m_drawingFacsX /= m_page->GetPPUFactor();
+    if (layerElement->m_drawingFacsY != VRV_UNSET) layerElement->m_drawingFacsY /= m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }

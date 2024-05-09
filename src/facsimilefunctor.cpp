@@ -12,6 +12,7 @@
 #include "doc.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "miscfunctor.h"
 #include "page.h"
 #include "pb.h"
 #include "sb.h"
@@ -39,29 +40,65 @@ SyncFromFacsimileFunctor::SyncFromFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncFromFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
 
     Zone *zone = layerElement->GetZone();
     assert(zone);
     layerElement->m_drawingFacsX = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+    if (layerElement->Is({ ACCID, SYL })) {
+        layerElement->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
+    }
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncFromFacsimileFunctor::VisitMeasure(Measure *measure)
 {
-    Zone *zone = measure->GetZone();
-    assert(zone);
-    measure->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
-    measure->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
+    // neon specific code - measure have no zone, we will use the staff one in VisitStaff
+    if (measure->IsNeumeLine()) {
+        m_currentNeumeLine = measure;
+    }
+    else {
+        Zone *zone = measure->GetZone();
+        assert(zone);
+        measure->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+        measure->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
+    }
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncFromFacsimileFunctor::VisitPage(Page *page)
 {
+    m_staffZones.clear();
     m_currentPage = page;
     m_doc->SetDrawingPage(m_currentPage->GetIdx());
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode SyncFromFacsimileFunctor::VisitPageEnd(Page *page)
+{
+    // Used for adjusting staff size in neon - filled in VisitStaff
+    if (m_staffZones.empty()) return FUNCTOR_CONTINUE;
+
+    // The staff size is calculated based on the zone height and takes into acocunt the rotation
+    for (auto &[staff, zone] : m_staffZones) {
+        double rotate = (zone->HasRotate()) ? zone->GetRotate() : 0.0;
+        int yDiff
+            = zone->GetLry() - zone->GetUly() - (zone->GetLrx() - zone->GetUlx()) * tan(abs(rotate) * M_PI / 180.0);
+        staff->m_drawingStaffSize
+            = 100 * yDiff / (m_doc->GetOptions()->m_unit.GetValue() * 2 * (staff->m_drawingLines - 1));
+        staff->SetDrawingRotation(rotate);
+    }
+
+    // Since we multiply all values by the DEFINITION_FACTOR, set it as PPU
+    m_currentPage->SetPPUFactor(DEFINITION_FACTOR);
+    if (m_currentPage->GetPPUFactor() != 1.0) {
+        ApplyPPUFactorFunctor applyPPUFactor;
+        m_currentPage->Process(applyPPUFactor);
+        m_doc->UpdatePageDrawingSizes();
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -72,9 +109,11 @@ FunctorCode SyncFromFacsimileFunctor::VisitPb(Pb *pb)
     assert(m_currentPage);
 
     Zone *zone = pb->GetZone();
-    assert(zone && zone->GetParent());
-    Surface *surface = (zone->GetParent()->Is(SURFACE)) ? vrv_cast<Surface *>(zone->GetParent()) : NULL;
-    // Use the parent surface attributes if given
+    Surface *surface = pb->GetSurface();
+    if (!surface && zone && zone->GetParent())
+        surface = (zone->GetParent()->Is(SURFACE)) ? vrv_cast<Surface *>(zone->GetParent()) : NULL;
+    assert(zone || surface);
+    // Use the (parent) surface attributes if given
     if (surface && surface->HasLrx() && surface->HasLry()) {
         m_currentPage->m_pageHeight = surface->GetLry() * DEFINITION_FACTOR;
         m_currentPage->m_pageWidth = surface->GetLrx() * DEFINITION_FACTOR;
@@ -109,12 +148,27 @@ FunctorCode SyncFromFacsimileFunctor::VisitStaff(Staff *staff)
     assert(zone);
     staff->m_drawingFacsY = m_view.ToLogicalY(zone->GetUly() * DEFINITION_FACTOR);
 
+    // neon specific code - set the position of the pseudo measure (neume line)
+    if (m_currentNeumeLine) {
+        m_currentNeumeLine->m_drawingFacsX1 = m_view.ToLogicalX(zone->GetUlx() * DEFINITION_FACTOR);
+        m_currentNeumeLine->m_drawingFacsX2 = m_view.ToLogicalX(zone->GetLrx() * DEFINITION_FACTOR);
+        m_staffZones[staff] = zone;
+
+        // The staff slope is going up. The y left position needs to be adjusted accordingly
+        if (zone->GetRotate() < 0) {
+            staff->m_drawingFacsY = staff->m_drawingFacsY
+                + (m_currentNeumeLine->m_drawingFacsX2 - m_currentNeumeLine->m_drawingFacsX1)
+                    * tan(zone->GetRotate() * M_PI / 180.0);
+        }
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode SyncFromFacsimileFunctor::VisitSystem(System *system)
 {
     m_currentSystem = system;
+    m_currentNeumeLine = NULL;
 
     return FUNCTOR_CONTINUE;
 }
@@ -136,10 +190,13 @@ SyncToFacsimileFunctor::SyncToFacsimileFunctor(Doc *doc) : Functor()
 
 FunctorCode SyncToFacsimileFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (!layerElement->Is({ NOTE, REST })) return FUNCTOR_CONTINUE;
+    if (!layerElement->Is({ ACCID, CLEF, CUSTOS, DIVLINE, LIQUESCENT, NC, NOTE, REST, SYL })) return FUNCTOR_CONTINUE;
 
     Zone *zone = this->GetZone(layerElement, layerElement->GetClassName());
     zone->SetUlx(m_view.ToDeviceContextX(layerElement->GetDrawingX()) / DEFINITION_FACTOR + m_pageMarginLeft);
+    if (layerElement->Is({ ACCID, SYL })) {
+        zone->SetUly(m_view.ToDeviceContextY(layerElement->GetDrawingY()) / DEFINITION_FACTOR + m_pageMarginTop);
+    }
 
     return FUNCTOR_CONTINUE;
 }
