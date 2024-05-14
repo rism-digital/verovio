@@ -1834,7 +1834,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
 
         section->AddChild(scoreDef);
-    } else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
+    }
+    else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
         m_meterUnit = time.child("beat-type").text().as_int();
     }
 
