@@ -57,6 +57,10 @@ else()
         add_definitions(-DDEBUG)
     endif()
 
+    if(WIN32)
+        include_directories(../include/win32)
+    endif()
+
     # jsonxx raises -Wdollar-in-identifier-extension
     # gcc 8.3.1 does not like -Wdollar-in-identifier-extension option.
     add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
