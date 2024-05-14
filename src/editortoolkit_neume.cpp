@@ -2685,7 +2685,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     // if there are no full parents we need to make a new one to attach everything to
     if (fullParents.empty()) {
-        LogError("empty");
         if (elementClass == NC) {
             parent = new Neume();
         }
@@ -2812,8 +2811,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    LogError("2");
-
     // change the pitch of any pitched elements whose clef may have changed
     assert(newClef);
     ListOfObjects pitchedChildren;
@@ -2828,7 +2825,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
     }
-    LogError("3");
 
     // Delete any empty parents
     for (auto it = parents.begin(); it != parents.end(); ++it) {
