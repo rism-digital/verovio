@@ -122,8 +122,8 @@ struct ClosestBB {
         int offset = (x - ulx) * tan(rotate * M_PI / 180.0);
         uly = uly + offset;
         lry = lry + offset;
-        int xDiff = std::max((ulx > x ? ulx - x : 0), (x > lrx ? x - lrx : 0));
-        int yDiff = std::max((uly > y ? uly - y : 0), (y > lry ? y - lry : 0));
+        int xDiff = std::abs(x - ulx);
+        int yDiff = std::abs(y - uly);
 
         return sqrt(xDiff * xDiff + yDiff * yDiff);
     }
@@ -143,6 +143,7 @@ struct ClosestBB {
 };
 
 // To be used with std::stable_sort to find the position to insert a new accid / divLine
+// TODO: use closesBB instead
 struct ClosestNeume {
     int x;
     int y;
