@@ -1,8 +1,16 @@
 # Changelog
 
 ## [unreleased]
+
+## [4.2.1] - 2024-05-07
+* Fix GitHub actions (Python release only)
+
+## [4.2.0] - 2024-05-05
 * Support for `fTrem@unitdur` (@eNote-GmbH)
 * Upgrade to C++20
+* Update of the Midifile library
+* Fix lyric position in MIDI output
+* Fix string formatting output with some locale configurations (@ammatwain)
 
 ## [4.1.0] - 2023-12-15
 * Support for staves ordered by `scoreDef`
