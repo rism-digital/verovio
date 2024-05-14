@@ -521,7 +521,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         zone->ShiftByXY(x, -y);
 
         AdjustPitchFromPosition(element);
-        ChangeStaff(elementId);
     }
     else if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
@@ -714,7 +713,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
-        ChangeStaff(elementId);
     }
     else if (element->Is(DIVLINE)) {
         DivLine *divLine = dynamic_cast<DivLine *>(element);
