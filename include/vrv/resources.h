@@ -66,6 +66,8 @@ public:
     bool LoadAll();
     /** Set the fallback font (Leipzig or Bravura) when some glyphs are missing in the current font */
     bool SetFallback(const std::string &fontName);
+    /** Get the fallback font name */
+    std::string GetFallbackFont() const { return m_defaultFontName; }
     /** Init the text font (bounding boxes and ASCII only) */
     bool InitTextFont(const std::string &fontName, const StyleAttributes &style);
 

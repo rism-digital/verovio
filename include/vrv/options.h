@@ -124,7 +124,7 @@ public:
     void SetShortOption(char shortOption, bool isCmdOnly);
     char GetShortOption() const { return m_shortOption; }
     bool IsCmdOnly() const { return m_isCmdOnly; }
-    bool IsArgumentRequired() const { return true; }
+    virtual bool IsArgumentRequired() const { return true; }
 
     /**
      * Return a JSON object for the option
@@ -190,7 +190,7 @@ public:
     bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool value);
 
-    bool IsArgumentRequired() const { return false; }
+    bool IsArgumentRequired() const override { return false; }
 
 private:
     //
@@ -652,6 +652,7 @@ public:
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_scaleToPageSize;
+    OptionBool m_setLocale;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionIntMap m_smuflTextFont;

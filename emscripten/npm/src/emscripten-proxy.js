@@ -109,7 +109,7 @@ function getToolkitFunction(VerovioModule, method) {
     mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number", "string"]);
 
     // char *renderToPAE(Toolkit *ic)
-    mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string");
+    mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string", ["number"]);
 
     // char *renderToSvg(Toolkit *ic, int pageNo, int xmlDeclaration)
     mapping.renderToSVG = VerovioModule.cwrap("vrvToolkit_renderToSVG", "string", ["number", "number", "number"]);

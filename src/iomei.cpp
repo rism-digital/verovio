@@ -445,7 +445,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteSymbolTable(m_currentNode, vrv_cast<SymbolTable *>(object));
     }
     else if (object->Is(MEASURE)) {
-        m_currentNode = m_currentNode.append_child("measure");
+        Measure *measure = vrv_cast<Measure *>(object);
+        assert(measure);
+        std::string name = "measure";
+        if (measure->IsNeumeLine()) {
+            name = "section";
+            measure->SetType(NEUME_LINE_TYPE);
+        }
+        m_currentNode = m_currentNode.append_child(name.c_str());
         this->WriteMeasure(m_currentNode, vrv_cast<Measure *>(object));
     }
     else if (object->Is(STAFF)) {
@@ -1894,7 +1901,7 @@ void MEIOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
     // For now we copy the adjusted value of coord.x1 and coord.x2 to xAbs and xAbs2 respectively
-    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET)) {
+    if ((measure->m_drawingFacsX1 != VRV_UNSET) && (measure->m_drawingFacsX2 != VRV_UNSET) && !m_doc->IsNeumeLines()) {
         measure->SetCoordX1(measure->m_drawingFacsX1 / DEFINITION_FACTOR);
         measure->SetCoordX2(measure->m_drawingFacsX2 / DEFINITION_FACTOR);
         measure->WriteCoordX1(currentNode);
@@ -2226,7 +2233,7 @@ void MEIOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     staff->WriteVisibility(currentNode);
 
     // y position
-    if (staff->m_drawingFacsY != VRV_UNSET) {
+    if (staff->m_drawingFacsY != VRV_UNSET && !(m_doc->IsNeumeLines())) {
         staff->SetCoordY1(staff->m_drawingFacsY / DEFINITION_FACTOR);
         staff->WriteCoordY1(currentNode);
     }
@@ -2306,7 +2313,7 @@ void MEIOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     this->WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
-    if (element->m_drawingFacsX != VRV_UNSET) {
+    if (element->m_drawingFacsX != VRV_UNSET && !(m_doc->IsNeumeLines())) {
         element->SetCoordX1(element->m_drawingFacsX / DEFINITION_FACTOR);
         element->WriteCoordX1(currentNode);
     }
@@ -2629,6 +2636,7 @@ void MEIOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
     }
 
     this->WriteLayerElement(currentNode, meterSig);
+    meterSig->WriteColor(currentNode);
     meterSig->WriteEnclosingChars(currentNode);
     meterSig->WriteMeterSigLog(currentNode);
     meterSig->WriteMeterSigVis(currentNode);
@@ -2702,6 +2710,7 @@ void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     this->WritePitchInterface(currentNode, nc);
     this->WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
+    nc->WriteCurvatureDirection(currentNode);
     nc->WriteIntervalMelodic(currentNode);
     nc->WriteNcForm(currentNode);
 }
@@ -4393,7 +4402,13 @@ bool MEIInput::ReadScore(Object *parent, pugi::xml_node score)
 bool MEIInput::ReadSection(Object *parent, pugi::xml_node section)
 {
     Section *vrvSection = new Section();
-    this->SetMeiID(section, vrvSection);
+    this->ReadSystemElement(section, vrvSection);
+
+    if (vrvSection->GetType() == NEUME_LINE_TYPE) {
+        delete vrvSection;
+        m_doc->SetNeumeLines(true);
+        return ReadSectionChildren(parent, section);
+    }
 
     vrvSection->ReadNNumberLike(section);
     vrvSection->ReadSectionVis(section);
@@ -4453,8 +4468,13 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is(SECTION)) {
-                    unmeasured = new Measure(false);
-                    m_doc->SetMensuralMusicOnly(true);
+                    if (m_doc->IsNeumeLines()) {
+                        unmeasured = new Measure(NEUMELINE);
+                    }
+                    else {
+                        unmeasured = new Measure(UNMEASURED);
+                        m_doc->SetMensuralMusicOnly(true);
+                    }
                     parent->AddChild(unmeasured);
                 }
                 else {
@@ -4482,9 +4502,15 @@ bool MEIInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
     }
 
     // New <measure> for blank files in neume notation
-    if (!unmeasured && parent->Is(SECTION) && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
-        unmeasured = new Measure(false);
-        m_doc->SetMensuralMusicOnly(true);
+    if (!unmeasured && parent->Is(SECTION) && (m_doc->m_notationType == NOTATIONTYPE_neume)
+        && !parent->FindDescendantByType(MEASURE)) {
+        if (m_doc->IsNeumeLines()) {
+            unmeasured = new Measure(NEUMELINE);
+        }
+        else {
+            unmeasured = new Measure(UNMEASURED);
+            m_doc->SetMensuralMusicOnly(true);
+        }
         parent->AddChild(unmeasured);
     }
     return success;
@@ -4627,7 +4653,7 @@ bool MEIInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                 if (parent->Is(SYSTEM)) {
                     System *system = vrv_cast<System *>(parent);
                     assert(system);
-                    unmeasured = new Measure(false);
+                    unmeasured = new Measure(UNMEASURED);
                     m_doc->SetMensuralMusicOnly(true);
                     if (m_doc->IsTranscription() && (m_meiversion == meiVersion_MEIVERSION_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
@@ -6689,6 +6715,7 @@ bool MEIInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
         this->UpgradeMeterSigTo_5_0(meterSig, vrvMeterSig);
     }
 
+    vrvMeterSig->ReadColor(meterSig);
     vrvMeterSig->ReadEnclosingChars(meterSig);
     vrvMeterSig->ReadExtSymNames(meterSig);
     vrvMeterSig->ReadMeterSigLog(meterSig);
@@ -6807,6 +6834,7 @@ bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
     this->ReadPitchInterface(nc, vrvNc);
     this->ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
+    vrvNc->ReadCurvatureDirection(nc);
     vrvNc->ReadIntervalMelodic(nc);
     vrvNc->ReadNcForm(nc);
 
@@ -8181,12 +8209,14 @@ void MEIInput::UpgradePageTo_5_0(Page *page)
 
     PageMilestoneEnd *scoreEnd = new PageMilestoneEnd(score);
     page->AddChild(scoreEnd);
+    score->SetEnd(scoreEnd);
 
     Mdiv *mdiv = new Mdiv();
     page->InsertChild(mdiv, 0);
 
     PageMilestoneEnd *mdivEnd = new PageMilestoneEnd(mdiv);
     page->AddChild(mdivEnd);
+    mdiv->SetEnd(mdivEnd);
 }
 
 void MEIInput::UpgradePgHeadFootTo_5_0(pugi::xml_node element)

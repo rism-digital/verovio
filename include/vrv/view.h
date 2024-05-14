@@ -122,7 +122,7 @@ public:
     virtual void DoRefresh() {}
     virtual void DoResize() {}
     virtual void DoReset() {}
-    virtual void OnPageChange(){};
+    virtual void OnPageChange() {};
     ///@}
 
     /**
@@ -416,6 +416,7 @@ protected:
     ///@{
     void DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}

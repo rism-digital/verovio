@@ -93,6 +93,8 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
+    this->ResetLocale();
+
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
@@ -111,10 +113,6 @@ Toolkit::~Toolkit()
         m_runtimeClock = NULL;
     }
 #endif
-
-#ifndef NO_POINTING
-    // curl_global_cleanup();
-#endif
 }
 
 std::string Toolkit::GetResourcePath() const
@@ -127,12 +125,17 @@ bool Toolkit::SetResourcePath(const std::string &path)
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
     bool success = resources.InitFonts();
-    success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
-    if (m_options->m_fontLoadAll.GetValue()) {
-        success = success && resources.LoadAll();
-    }
-    if (!m_options->m_fontAddCustom.GetValue().empty()) {
+    if (m_options->m_fontAddCustom.IsSet()) {
         success = success && resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    }
+    if (m_options->m_font.IsSet()) {
+        success = success && this->SetFont(m_options->m_font.GetValue());
+    }
+    if (m_options->m_fontFallback.IsSet()) {
+        success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    }
+    if (m_options->m_fontLoadAll.IsSet()) {
+        success = success && resources.LoadAll();
     }
     return success;
 }
@@ -1211,6 +1214,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
+    this->SetLocale();
+
     // Forcing font resource to be reset if the font is given in the options
     if (json.has<jsonxx::Array>("fontAddCustom")) {
         Resources &resources = m_doc.GetResourcesForModification();
@@ -1596,7 +1601,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         std::swap(height, width);
     }
 
-    double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
+    double userScale = m_options->m_scale.GetValue() / 100.0;
     assert(userScale != 0.0);
 
     if (m_options->m_scaleToPageSize.GetValue()) {
@@ -1608,6 +1613,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetUserScale(userScale, userScale);
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
+    deviceContext->SetViewBoxFactor(m_view.GetPPUFactor());
 
     if (m_doc.IsFacs()) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
@@ -2224,6 +2230,21 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
 #else
     return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #endif
+}
+
+void Toolkit::SetLocale()
+{
+    if (m_options->m_setLocale.GetValue() && !m_previousLocale) {
+        // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+        m_previousLocale = std::locale::global(std::locale::classic());
+    }
+}
+
+void Toolkit::ResetLocale()
+{
+    if (m_previousLocale) {
+        std::locale::global(*m_previousLocale);
+    }
 }
 
 void Toolkit::InitClock()

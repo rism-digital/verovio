@@ -103,7 +103,7 @@
 		4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
 		4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
 		4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
-		4D1694021E3A44F300569BF4 /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		4D1694021E3A44F300569BF4 /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
 		4D1694031E3A44F300569BF4 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D1694041E3A44F300569BF4 /* space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3072E1AC9ED2500EE0982 /* space.cpp */; };
 		4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
@@ -926,7 +926,7 @@
 		8F086EE9188539540037FD8E /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
 		8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
 		8F086EEB188539540037FD8E /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
-		8F086EEC188539540037FD8E /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		8F086EEC188539540037FD8E /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
 		8F086EED188539540037FD8E /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
 		8F086EEE188539540037FD8E /* iomei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC2188539540037FD8E /* iomei.cpp */; };
 		8F086EEF188539540037FD8E /* iomusxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC3188539540037FD8E /* iomusxml.cpp */; };
@@ -960,7 +960,7 @@
 		8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
 		8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
 		8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
-		8F3DD32418854B090051330C /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		8F3DD32418854B090051330C /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
 		8F3DD32618854B090051330C /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
 		8F3DD32818854B090051330C /* iomei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC2188539540037FD8E /* iomei.cpp */; };
 		8F3DD32A18854B090051330C /* iomusxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC3188539540037FD8E /* iomusxml.cpp */; };
@@ -1006,7 +1006,7 @@
 		8F59293B18854BF800FE51AD /* doc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291418854BF800FE51AD /* doc.h */; };
 		8F59293C18854BF800FE51AD /* durationinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291518854BF800FE51AD /* durationinterface.h */; };
 		8F59293D18854BF800FE51AD /* toolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291618854BF800FE51AD /* toolkit.h */; };
-		8F59293E18854BF800FE51AD /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* io.h */; };
+		8F59293E18854BF800FE51AD /* iobase.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* iobase.h */; };
 		8F59293F18854BF800FE51AD /* iodarms.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291818854BF800FE51AD /* iodarms.h */; };
 		8F59294018854BF800FE51AD /* iomei.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291918854BF800FE51AD /* iomei.h */; };
 		8F59294118854BF800FE51AD /* iomusxml.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291A18854BF800FE51AD /* iomusxml.h */; };
@@ -1068,8 +1068,8 @@
 		BB4C4AAA22A932A0001F6AF0 /* devicecontextbase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D797B041A67C55F007637BD /* devicecontextbase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AAB22A932A0001F6AF0 /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
 		BB4C4AAC22A932A0001F6AF0 /* svgdevicecontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292C18854BF800FE51AD /* svgdevicecontext.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
-		BB4C4AAE22A932A6001F6AF0 /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* io.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BB4C4AAD22A932A6001F6AF0 /* iobase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* iobase.cpp */; };
+		BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* iobase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AAF22A932A6001F6AF0 /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
 		BB4C4AB022A932A6001F6AF0 /* ioabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 402197921F2E09CB00182DF1 /* ioabc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BB4C4AB122A932A6001F6AF0 /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
@@ -2093,7 +2093,7 @@
 		8F086EBD188539540037FD8E /* doc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = doc.cpp; path = src/doc.cpp; sourceTree = "<group>"; };
 		8F086EBE188539540037FD8E /* durationinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = durationinterface.cpp; path = src/durationinterface.cpp; sourceTree = "<group>"; };
 		8F086EBF188539540037FD8E /* toolkit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toolkit.cpp; path = src/toolkit.cpp; sourceTree = "<group>"; };
-		8F086EC0188539540037FD8E /* io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = io.cpp; path = src/io.cpp; sourceTree = "<group>"; };
+		8F086EC0188539540037FD8E /* iobase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iobase.cpp; path = src/iobase.cpp; sourceTree = "<group>"; };
 		8F086EC1188539540037FD8E /* iodarms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iodarms.cpp; path = src/iodarms.cpp; sourceTree = "<group>"; };
 		8F086EC2188539540037FD8E /* iomei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = iomei.cpp; path = src/iomei.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EC3188539540037FD8E /* iomusxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iomusxml.cpp; path = src/iomusxml.cpp; sourceTree = "<group>"; };
@@ -2134,7 +2134,7 @@
 		8F59291418854BF800FE51AD /* doc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = doc.h; path = include/vrv/doc.h; sourceTree = "<group>"; };
 		8F59291518854BF800FE51AD /* durationinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = durationinterface.h; path = include/vrv/durationinterface.h; sourceTree = "<group>"; };
 		8F59291618854BF800FE51AD /* toolkit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toolkit.h; path = include/vrv/toolkit.h; sourceTree = "<group>"; };
-		8F59291718854BF800FE51AD /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = io.h; path = include/vrv/io.h; sourceTree = "<group>"; };
+		8F59291718854BF800FE51AD /* iobase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iobase.h; path = include/vrv/iobase.h; sourceTree = "<group>"; };
 		8F59291818854BF800FE51AD /* iodarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iodarms.h; path = include/vrv/iodarms.h; sourceTree = "<group>"; };
 		8F59291918854BF800FE51AD /* iomei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = iomei.h; path = include/vrv/iomei.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59291A18854BF800FE51AD /* iomusxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iomusxml.h; path = include/vrv/iomusxml.h; sourceTree = "<group>"; };
@@ -2833,8 +2833,8 @@
 		8F086F37188539C50037FD8E /* io */ = {
 			isa = PBXGroup;
 			children = (
-				8F086EC0188539540037FD8E /* io.cpp */,
-				8F59291718854BF800FE51AD /* io.h */,
+				8F086EC0188539540037FD8E /* iobase.cpp */,
+				8F59291718854BF800FE51AD /* iobase.h */,
 				402197931F2E09DA00182DF1 /* ioabc.cpp */,
 				402197921F2E09CB00182DF1 /* ioabc.h */,
 				8F086EC1188539540037FD8E /* iodarms.cpp */,
@@ -3194,7 +3194,7 @@
 				4DEC4DD621C8295700D1D273 /* del.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
-				8F59293E18854BF800FE51AD /* io.h in Headers */,
+				8F59293E18854BF800FE51AD /* iobase.h in Headers */,
 				4DF092A22497706600239195 /* phrase.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
@@ -3442,7 +3442,7 @@
 				4DACC9E92990F29A00B55913 /* atts_fingering.h in Headers */,
 				BB4C4A9422A9328F001F6AF0 /* doc.h in Headers */,
 				BB4C4A9922A9328F001F6AF0 /* horizontalaligner.h in Headers */,
-				BB4C4AAE22A932A6001F6AF0 /* io.h in Headers */,
+				BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */,
 				BB4C4BAA22A932EB001F6AF0 /* view.h in Headers */,
 				4DACC9DD2990F29A00B55913 /* atts_header.h in Headers */,
 				BB4C4BC422A9330D001F6AF0 /* pugixml.hpp in Headers */,
@@ -3920,7 +3920,7 @@
 				E722106828F85981002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */,
 				4DA0EAEF22BB77C300A7EBEB /* editortoolkit_cmn.cpp in Sources */,
-				4D1694021E3A44F300569BF4 /* io.cpp in Sources */,
+				4D1694021E3A44F300569BF4 /* iobase.cpp in Sources */,
 				4D1694031E3A44F300569BF4 /* harm.cpp in Sources */,
 				4D79641926C1522B0026288B /* pageelement.cpp in Sources */,
 				4DB3D8DE1F83D15200B5FC2B /* btrem.cpp in Sources */,
@@ -4214,7 +4214,7 @@
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				E75EA9FD29CC3A88003A97A7 /* calcarticfunctor.cpp in Sources */,
 				35FDEBD124B6DC5B00AC1696 /* fing.cpp in Sources */,
-				8F086EEC188539540037FD8E /* io.cpp in Sources */,
+				8F086EEC188539540037FD8E /* iobase.cpp in Sources */,
 				E75A69A029CCF8A200414819 /* adjustbeamsfunctor.cpp in Sources */,
 				4DACC9762990F29A00B55913 /* atts_neumes.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
@@ -4638,7 +4638,7 @@
 				E7E9C11729B0A20400CFCE2F /* adjustaccidxfunctor.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,
 				4D72A5E1208A37F0009DEC1E /* mnum.cpp in Sources */,
-				8F3DD32418854B090051330C /* io.cpp in Sources */,
+				8F3DD32418854B090051330C /* iobase.cpp in Sources */,
 				4DACC9D62990F29A00B55913 /* atts_pagebased.cpp in Sources */,
 				4DA0EACD22BB779400A7EBEB /* zone.cpp in Sources */,
 				4DEC4DBC21C8288900D1D273 /* choice.cpp in Sources */,
@@ -4791,7 +4791,7 @@
 				BB4C4A9322A9328F001F6AF0 /* doc.cpp in Sources */,
 				4D8135212322C41800F59C01 /* keyaccid.cpp in Sources */,
 				BB4C4B9922A932E5001F6AF0 /* linkinginterface.cpp in Sources */,
-				BB4C4AAD22A932A6001F6AF0 /* io.cpp in Sources */,
+				BB4C4AAD22A932A6001F6AF0 /* iobase.cpp in Sources */,
 				E74A806A28BC9843005274E7 /* functorinterface.cpp in Sources */,
 				4DD7C0FD27A55CEA00B9C017 /* timemap.cpp in Sources */,
 				E78833632994EC7E00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,

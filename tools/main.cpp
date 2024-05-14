@@ -259,6 +259,8 @@ int main(int argc, char **argv)
     }
     options->Sync();
 
+    toolkit.SetLocale();
+
     if (show_version) {
         display_version();
         exit(0);
@@ -290,12 +292,6 @@ int main(int argc, char **argv)
     if (!toolkit.SetResourcePath(resourcePath)) {
         std::cerr << "The music font could not be loaded; please check the contents of the resource directory."
                   << std::endl;
-        exit(1);
-    }
-
-    // Load a specified font
-    if (!toolkit.SetOptions(vrv::StringFormat("{\"font\": \"%s\" }", options->m_font.GetValue().c_str()))) {
-        std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
         exit(1);
     }
 

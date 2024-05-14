@@ -1,4 +1,7 @@
-## About
+## Documentation for Android
+
+> [!WARNING]  
+> This documentation has not been updated and might be obsolete
 
 This allows verovio to be built as a native library for Android. It does not include any Java bindings.
 

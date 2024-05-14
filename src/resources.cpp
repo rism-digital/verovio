@@ -115,7 +115,9 @@ bool Resources::AddCustom(const std::vector<std::string> &extraFonts)
     // options supplied fonts
     for (const std::string &fontFile : extraFonts) {
         ZipFileReader zipFile;
-        zipFile.Load(fontFile);
+        if (!zipFile.Load(fontFile)) {
+            continue;
+        }
         std::string fontName = GetCustomFontname("", zipFile);
         if (fontName.empty() || IsFontLoaded(fontName)) {
             continue;
@@ -195,8 +197,7 @@ bool Resources::IsSmuflFallbackNeeded(const std::u32string &text) const
         return false;
     }
     for (char32_t c : text) {
-        const Glyph *glyph = this->GetGlyph(c);
-        if (glyph == NULL) return true;
+        if (!GetCurrentGlyphTable().contains(c)) return true;
     }
     return false;
 }

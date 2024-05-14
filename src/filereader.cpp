@@ -62,6 +62,7 @@ bool ZipFileReader::Load(const std::string &filename)
 #else
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
+        LogError("File archive '%s' could not be opened.", filename.c_str());
         return false;
     }
 
@@ -95,7 +96,7 @@ std::list<std::string> ZipFileReader::GetFileList() const
     assert(m_file);
 
     std::list<std::string> list;
-    for (miniz_cpp::zip_info &member : m_file->infolist()) {
+    for (const miniz_cpp::zip_info &member : m_file->infolist()) {
         list.push_back(member.filename);
     }
     return list;
@@ -106,13 +107,9 @@ bool ZipFileReader::HasFile(const std::string &filename)
     assert(m_file);
 
     // Look for the file in the zip
-    for (miniz_cpp::zip_info &member : m_file->infolist()) {
-        if (member.filename == filename) {
-            return true;
-        }
-    }
-
-    return true;
+    const std::vector<miniz_cpp::zip_info> &fileInfoList = m_file->infolist();
+    return std::any_of(fileInfoList.cbegin(), fileInfoList.cend(),
+        [&filename](const auto &info) { return info.filename == filename; });
 }
 
 std::string ZipFileReader::ReadTextFile(const std::string &filename)
@@ -120,7 +117,7 @@ std::string ZipFileReader::ReadTextFile(const std::string &filename)
     assert(m_file);
 
     // Look for the meta file in the zip
-    for (miniz_cpp::zip_info &member : m_file->infolist()) {
+    for (const miniz_cpp::zip_info &member : m_file->infolist()) {
         if (member.filename == filename) {
             return m_file->read(member.filename);
         }

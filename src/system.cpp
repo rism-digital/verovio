@@ -341,7 +341,7 @@ void System::AddToDrawingListIfNecessary(Object *object)
     else if (object->Is(DYNAM)) {
         Dynam *dynam = vrv_cast<Dynam *>(object);
         assert(dynam);
-        if (dynam->GetEnd() || (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true))) {
+        if ((dynam->GetEnd() || dynam->GetNextLink()) && (dynam->GetExtender() == BOOLEAN_true)) {
             this->AddToDrawingList(dynam);
         }
     }
