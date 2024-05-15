@@ -383,9 +383,9 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
     if (clef->HasFacs()) {
         Zone *zone = clef->GetZone();
         assert(zone);
-        zone->ShiftByXY(x,
-            (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
-                - x * tan(staff->GetDrawingRotate() * M_PI / 180.0));
+        int y = (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
+            - x * tan(staff->GetDrawingRotate() * M_PI / 180.0);
+        zone->ShiftByXY(x, -y);
     }
 
     layer->ReorderByXPos();
