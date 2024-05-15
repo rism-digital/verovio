@@ -1420,6 +1420,9 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (note->IsMensuralDur()) {
         this->DrawMensuralNote(dc, element, layer, staff, measure);
+        if (note->FindDescendantByType(DOTS)) {
+            this->DrawLayerChildren(dc, note, layer, staff, measure);
+        }
         return;
     }
     if (note->IsTabGrpNote()) {
