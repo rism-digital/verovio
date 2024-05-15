@@ -333,10 +333,8 @@ void Page::ResetAligners()
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    if (IsMensuralType(doc->m_notationType)) {
-        CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
-        this->Process(calcLigatureNotePos);
-    }
+    CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
+    this->Process(calcLigatureNotePos);
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
