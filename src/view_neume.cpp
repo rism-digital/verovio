@@ -63,9 +63,6 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
     assert(staff);
     assert(measure);
 
-    Liquescent *liquescent = dynamic_cast<Liquescent *>(element);
-    assert(liquescent);
-
     struct drawingParams {
         wchar_t fontNo = SMUFL_E990_chantPunctum;
         wchar_t fontNoLiq[5] = {};
@@ -83,7 +80,6 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
     int clefLine = clef->GetLine();
 
     Nc *nc = dynamic_cast<Nc *>(element->GetParent());
-    assert(liquescent);
 
     if (nc->GetCurve() == curvatureDirection_CURVE_c) {
         params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;

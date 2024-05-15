@@ -3344,8 +3344,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     assert(elementIds.size() == 2);
     bool success1 = false;
     bool success2 = false;
-    Facsimile *facsimile = m_doc->GetFacsimile();
-    assert(facsimile);
     std::string firstNcId = elementIds[0];
     std::string secondNcId = elementIds[1];
     // Check if you can get drawing page
