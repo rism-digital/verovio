@@ -1525,7 +1525,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         std::swap(height, width);
     }
 
-    double userScale = m_options->m_scale.GetValue() / 100.0;
+    double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
     assert(userScale != 0.0);
 
     if (m_options->m_scaleToPageSize.GetValue()) {
@@ -1537,7 +1537,6 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetUserScale(userScale, userScale);
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
-    deviceContext->SetViewBoxFactor(m_view.GetPPUFactor());
 
     if (m_doc.IsFacs()) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());

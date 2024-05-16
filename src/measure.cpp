@@ -54,7 +54,7 @@ namespace vrv {
 
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
-Measure::Measure(MeasureType measureMusic, int logMeasureNb)
+Measure::Measure(bool measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
     , FacsimileInterface()
     , AttBarring()
@@ -76,7 +76,7 @@ Measure::Measure(MeasureType measureMusic, int logMeasureNb)
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
 
-    m_measureType = measureMusic;
+    m_measuredMusic = measureMusic;
 
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
@@ -211,6 +211,14 @@ void Measure::AddChildBack(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (!this->IsMeasuredMusic()) {
+        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
+        assert(system);
+        if (system->m_drawingFacsY != VRV_UNSET) {
+            return (system->m_systemLeftMar);
+        }
+    }
+
     if (m_drawingFacsX1 != VRV_UNSET) return m_drawingFacsX1;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
@@ -343,6 +351,17 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
+    if (!this->IsMeasuredMusic()) {
+        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
+        assert(system);
+        if (system->m_drawingFacsY != VRV_UNSET) {
+            const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
+            assert(page);
+            // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
+            return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
+        }
+    }
+
     if (m_drawingFacsX2 != VRV_UNSET) return (m_drawingFacsX2 - m_drawingFacsX1);
 
     assert(m_measureAligner.GetRightAlignment());

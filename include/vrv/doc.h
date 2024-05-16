@@ -452,14 +452,6 @@ public:
     ///@}
 
     /**
-     * @name Setter for and getter for neume-line flag
-     */
-    ///@{
-    void SetNeumeLines(bool isNeumeLines) { m_isNeumeLines = isNeumeLines; }
-    bool IsNeumeLines() const { return m_isNeumeLines; }
-    ///@}
-
-    /**
      * @name Setter and getter for facsimile
      */
     ///@{
@@ -667,12 +659,6 @@ private:
      * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
      */
     bool m_isMensuralMusicOnly;
-
-    /**
-     * A flag to indicate that the document contains neume lines.
-     * This is a special document type where neume lines are encoded with <section type="neon-neume-line">
-     */
-    bool m_isNeumeLines;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

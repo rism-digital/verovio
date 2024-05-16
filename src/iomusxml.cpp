@@ -1835,6 +1835,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
 
         section->AddChild(scoreDef);
     }
+    else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
+        m_meterUnit = time.child("beat-type").text().as_int();
+    }
 
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
     pugi::xpath_node measureSlash = node.select_node("measure-style/slash");

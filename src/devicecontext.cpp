@@ -129,11 +129,6 @@ const Resources *DeviceContext::GetResources(bool showWarning) const
     return m_resources;
 }
 
-void DeviceContext::SetViewBoxFactor(double ppuFactor)
-{
-    m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
-}
-
 void DeviceContext::SetPen(int color, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
 {
     float opacityValue;
