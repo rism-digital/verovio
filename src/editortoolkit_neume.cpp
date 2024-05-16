@@ -2307,7 +2307,60 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_editInfo.import("message", "");
         return true;
     }
-    else if (element->Is(SYLLABLE)) {
+    else if (element->Is(STAFF)) {
+        Object *page = m_doc->GetDrawingPage();
+        Object *system = element->GetFirstAncestor(SYSTEM);
+
+        if (page->GetChildCount(SYSTEM) > 1) {
+            if (system == page->GetFirst(SYSTEM)) {
+                // if the target staff is in the first system,
+                // move pb and section to the next system
+                Object *nextSystem = page->GetNext(system, SYSTEM);
+                Object *section = system->FindDescendantByType(SECTION);
+                Object *pb = system->FindDescendantByType(PB);
+                assert(pb);
+                assert(section);
+
+                int sectionIdx = system->GetChildIndex(section);
+                int pbIdx = system->GetChildIndex(pb);
+                section = system->DetachChild(sectionIdx);
+                pb = system->DetachChild(pbIdx);
+
+                nextSystem->InsertChild(section, 0);
+                nextSystem->InsertChild(pb, 1);
+            }
+            else if (system == page->GetLast(SYSTEM)) {
+                // if the target staff in is the last system,
+                // move system-milestone-end to the previous system
+                Object *previousSystem = page->GetPrevious(system, SYSTEM);
+                Object *milestoneEnd = system->FindDescendantByType(SYSTEM_MILESTONE_END);
+                assert(milestoneEnd);
+
+                int milestoneEndIdx = system->GetChildIndex(milestoneEnd);
+                milestoneEnd = system->DetachChild(milestoneEndIdx);
+
+                previousSystem->InsertChild(milestoneEnd, previousSystem->GetChildCount());
+            }
+        }
+
+        // delete system to delete staff
+        result = page->DeleteChild(system);
+
+        if (!result) {
+            LogError("Failed to delete the desired element (%s)", elementId.c_str());
+            m_editInfo.reset();
+            m_editInfo.import("status", "FAILURE");
+            m_editInfo.import("message", "Failed to delete the desired element (" + elementId + ").");
+            return false;
+        }
+
+        m_editInfo.import("uuid", elementId);
+        m_editInfo.import("status", "OK");
+        m_editInfo.import("message", "");
+        return true;
+    }
+
+    if (element->Is(SYLLABLE)) {
         Syllable *syllable = dynamic_cast<Syllable *>(element);
         assert(syllable);
         if (syllable->HasPrecedes() || syllable->HasFollows()) {
