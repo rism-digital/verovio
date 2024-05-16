@@ -187,9 +187,12 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitBarLine(BarLine *barLine)
     bool nextIsBarline = (next && next->Is(BARLINE));
 
     // See if we create proper measures and what to do with the barLine
-    bool convertToMeasured = m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
+    MeasureType convertToMeasured = UNMEASURED;
+    if (m_doc->GetOptions()->m_mensuralToMeasure.GetValue()) {
+        convertToMeasured = MEASURED;
+    }
 
-    if (convertToMeasured) {
+    if (convertToMeasured == MEASURED) {
         // barLine object will be deleted
         m_targetMeasure->SetRight(barLine->GetForm());
     }
@@ -212,7 +215,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitBarLine(BarLine *barLine)
     // First case: add a new measure segment (e.g., first pass)
     if (m_targetSubSystem->GetChildCount() <= m_segmentIdx) {
         m_targetMeasure = new Measure(convertToMeasured);
-        if (convertToMeasured) {
+        if (convertToMeasured == MEASURED) {
             m_targetMeasure->SetN(StringFormat("%d", m_segmentTotal + 1 + m_segmentIdx));
         }
         m_targetSubSystem->AddChild(m_targetMeasure);
@@ -277,7 +280,10 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
         return FUNCTOR_CONTINUE;
     }
 
-    bool convertToMeasured = m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
+    MeasureType convertToMeasured = UNMEASURED;
+    if (m_doc->GetOptions()->m_mensuralToMeasure.GetValue()) {
+        convertToMeasured = MEASURED;
+    }
 
     assert(m_targetSystem);
     assert(m_layerTree);
@@ -289,7 +295,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitMeasure(Measure *measure)
     // Create the first measure segment - problem: we are dropping the section element - we should create a score-based
     // MEI file instead
     Measure *targetMeasure = new Measure(convertToMeasured);
-    if (convertToMeasured) {
+    if (convertToMeasured == MEASURED) {
         targetMeasure->SetN(StringFormat("%d", m_segmentTotal + 1));
     }
     m_targetSubSystem->AddChild(targetMeasure);
@@ -375,7 +381,7 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitSyllable(Syllable *syllable)
     // Make a segment break
     // First case: add a new measure segment (e.g., first pass)
     if (m_targetSubSystem->GetChildCount() <= m_segmentIdx) {
-        m_targetMeasure = new Measure(false);
+        m_targetMeasure = new Measure(UNMEASURED);
         m_targetSubSystem->AddChild(m_targetMeasure);
         // Add a staff with same attributes as in the previous segment
         m_targetStaff = new Staff(*m_targetStaff);

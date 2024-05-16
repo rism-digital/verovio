@@ -1161,17 +1161,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         }
     }
 
-    /************ dots ***********/
-
-    Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
-
-    const bool shouldHaveDots = (note->GetDots() > 0);
-    if (shouldHaveDots && chord && (chord->GetDots() == note->GetDots())) {
-        LogWarning("Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
-    }
-    currentDots = this->ProcessDots(currentDots, note, shouldHaveDots);
-
-    // We don't care about flags in mensural notes
+    // We don't care about flags or dots in mensural notes
     if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
 
     if (currentStem) {
@@ -1181,6 +1171,16 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
 
         if (!chord) note->SetDrawingStem(currentStem);
     }
+
+    /************ dots ***********/
+
+    Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
+
+    const bool shouldHaveDots = (note->GetDots() > 0);
+    if (shouldHaveDots && chord && (chord->GetDots() == note->GetDots())) {
+        LogWarning("Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
+    }
+    currentDots = this->ProcessDots(currentDots, note, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
 

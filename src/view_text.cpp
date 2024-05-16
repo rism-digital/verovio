@@ -271,21 +271,21 @@ void View::DrawLyricString(
     std::u32string syl = U"";
     std::u32string lyricStr = str;
 
-    const int x = (params) ? params->m_x : VRV_UNSET;
-    const int y = (params) ? params->m_y : VRV_UNSET;
+    const int dcX = (params) ? ToDeviceContextX(params->m_x) : VRV_UNSET;
+    const int dcY = (params) ? ToDeviceContextY(params->m_y) : VRV_UNSET;
     const int width = (params) ? params->m_width : VRV_UNSET;
     const int height = (params) ? params->m_height : VRV_UNSET;
 
     if (m_doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
         std::replace(lyricStr.begin(), lyricStr.end(), U'_', UNICODE_UNDERTIE);
-        dc->DrawText(UTF32to8(lyricStr), lyricStr, x, y, width, height);
+        dc->DrawText(UTF32to8(lyricStr), lyricStr, dcX, dcY, width, height);
     }
     else {
         while (lyricStr.compare(syl) != 0) {
             wroteText = true;
             auto index = lyricStr.find_first_of(U"_");
             syl = lyricStr.substr(0, index);
-            dc->DrawText(UTF32to8(syl), syl, x, y, width, height);
+            dc->DrawText(UTF32to8(syl), syl, dcX, dcY, width, height);
 
             // no _
             if (index == std::string::npos) break;
@@ -298,7 +298,7 @@ void View::DrawLyricString(
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(elision);
             vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
             dc->SetFont(&vrvTxt);
-            dc->DrawText(UTF32to8(elision), elision, x, y, width, height);
+            dc->DrawText(UTF32to8(elision), elision, dcX, dcY, width, height);
             dc->ResetFont();
 
             // next syllable
@@ -310,7 +310,8 @@ void View::DrawLyricString(
     // This should only be called in facsimile mode where a zone is specified but there is
     // no text. This draws the bounds of the zone but leaves the space blank.
     if (!wroteText && params) {
-        dc->DrawText("", U"", params->m_x, params->m_y, params->m_width, params->m_height);
+        dc->DrawText(
+            "", U"", ToDeviceContextX(params->m_x), ToDeviceContextY(params->m_y), params->m_width, params->m_height);
     }
 }
 
