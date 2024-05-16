@@ -2238,22 +2238,21 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_editInfo.import("message", "Could not get the drawing page.");
         return false;
     }
-    Object *obj = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
-    assert(obj);
-    bool result = false;
-    bool isNeumeOrNc, isNc, isClef, isSyllable;
-    isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
-    isNc = obj->Is(NC);
-    isClef = obj->Is(CLEF);
-    isSyllable = obj->Is(SYLLABLE);
-    Object *parent = obj->GetParent();
+
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
+    assert(element);
+    Object *parent = element->GetParent();
     assert(parent);
-    m_editInfo.import("uuid", elementId);
+
+    bool result = false;
+    bool isNc = element->Is(NC);
+    bool isNeumeOrNc = (element->Is(NEUME) || element->Is(NC));
+
     // Remove Zone for element (if any)
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     ListOfObjects fiChildren;
-    obj->FindAllDescendantsByComparison(&fiChildren, &ic);
-    FacsimileInterface *fi = obj->GetFacsimileInterface();
+    element->FindAllDescendantsByComparison(&fiChildren, &ic);
+    FacsimileInterface *fi = element->GetFacsimileInterface();
     if (fi != NULL && fi->HasFacs()) {
         fi->AttachZone(NULL);
     }
@@ -2263,7 +2262,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             fi->AttachZone(NULL);
         }
     }
-    if (isClef) {
+
+    if (element->Is(CLEF)) {
         // y position of pitched elements (like neumes) is determined by their pitches
         // so when deleting a clef, the position on a page that a pitch value is associated with could change
         // so we need to change the pitch value of any elements whose clef is going to change
@@ -2285,7 +2285,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_doc->GetDrawingPage()->FindAllDescendantsBetween(
             &elements, &ic, clef, (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
-        result = parent->DeleteChild(obj);
+        result = parent->DeleteChild(element);
 
         if (!result) {
             LogError("Failed to delete the desired element (%s)", elementId.c_str());
@@ -2301,9 +2301,14 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             // removing the current clef, and so the new clef for all of these elements is previousClef
             pi->AdjustPitchForNewClef(clef, previousClef);
         }
+
+        m_editInfo.import("uuid", elementId);
+        m_editInfo.import("status", "OK");
+        m_editInfo.import("message", "");
+        return true;
     }
-    else if (isSyllable) {
-        Syllable *syllable = dynamic_cast<Syllable *>(obj);
+    else if (element->Is(SYLLABLE)) {
+        Syllable *syllable = dynamic_cast<Syllable *>(element);
         assert(syllable);
         if (syllable->HasPrecedes() || syllable->HasFollows()) {
             UnlinkSyllable(syllable);
@@ -2311,7 +2316,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
 
     if (!result) {
-        result = parent->DeleteChild(obj);
+        result = parent->DeleteChild(element);
     }
 
     if (!result) {
@@ -2321,15 +2326,16 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_editInfo.import("message", "Failed to delete the desired element (" + elementId + ").");
         return false;
     }
+
     // Check if this leaves any containers empty and delete them
     if (isNc) {
         assert(parent->Is(NEUME));
-        obj = parent;
+        element = parent;
         parent = parent->GetParent();
-        if (obj->FindDescendantByType(NC) == NULL) {
+        if (element->FindDescendantByType(NC) == NULL) {
             // Delete the empty neume
-            std::string neumeId = obj->GetID();
-            result &= parent->DeleteChild(obj);
+            std::string neumeId = element->GetID();
+            result &= parent->DeleteChild(element);
             if (!result) {
                 LogError("Failed to delete empty neume (%s)", neumeId.c_str());
                 m_editInfo.reset();
@@ -2341,18 +2347,18 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     if (isNeumeOrNc) {
         assert(parent->Is(SYLLABLE));
-        obj = parent;
+        element = parent;
         parent = parent->GetParent();
-        if (obj->FindDescendantByType(NC) == NULL) {
+        if (element->FindDescendantByType(NC) == NULL) {
             // Check if it is part of a linked/split syllable and unlink
-            Syllable *li = dynamic_cast<Syllable *>(obj);
+            Syllable *li = dynamic_cast<Syllable *>(element);
             assert(li);
             if (li->HasPrecedes() || li->HasFollows()) {
                 UnlinkSyllable(li);
             }
             // Delete the syllable empty of neumes
-            std::string syllableId = obj->GetID();
-            result &= parent->DeleteChild(obj);
+            std::string syllableId = element->GetID();
+            result &= parent->DeleteChild(element);
             if (!result) {
                 LogError("Failed to delete empty syllable (%s)", syllableId.c_str());
                 m_editInfo.reset();
@@ -2363,6 +2369,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }
     }
 
+    m_editInfo.import("uuid", elementId);
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     return true;
