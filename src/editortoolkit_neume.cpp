@@ -2046,6 +2046,7 @@ bool EditorToolkitNeume::SortStaves()
     }
 
     Object *page = m_doc->GetDrawingPage();
+    if (page->GetChildCount(SYSTEM) <= 1) return true;
 
     page->StableSort(StaffSort());
 
