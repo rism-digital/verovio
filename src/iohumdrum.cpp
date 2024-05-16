@@ -29294,7 +29294,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     if (hasMensuralStaff(&infile[startline])) {
-        m_measure = new Measure(UNMEASURED);
+        m_measure = new Measure(false);
     }
     else {
         m_measure = new Measure();
