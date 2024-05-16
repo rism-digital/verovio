@@ -74,7 +74,6 @@ public:
         m_baseWidth = 0;
         m_baseHeight = 0;
         m_pushBack = false;
-        m_viewBoxFactor = (double)DEFINITION_FACTOR;
     }
     DeviceContext(ClassId classId)
     {
@@ -90,7 +89,6 @@ public:
         m_baseWidth = 0;
         m_baseHeight = 0;
         m_pushBack = false;
-        m_viewBoxFactor = (double)DEFINITION_FACTOR;
     }
     virtual ~DeviceContext(){};
     ClassId GetClassId() const { return m_classId; }
@@ -126,14 +124,12 @@ public:
         m_baseWidth = width;
         m_baseHeight = height;
     }
-    void SetViewBoxFactor(double ppuFactor);
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
     int GetContentHeight() const { return m_contentHeight; }
     double GetUserScaleX() { return m_userScaleX; }
     double GetUserScaleY() { return m_userScaleY; }
     std::pair<int, int> GetBaseSize() const { return std::make_pair(m_baseWidth, m_baseHeight); }
-    double GetViewBoxFactor() const { return m_viewBoxFactor; }
     ///@}
 
     /**
@@ -369,9 +365,6 @@ private:
     /** stores the scale as requested by the used */
     double m_userScaleX;
     double m_userScaleY;
-
-    /** stores the viewbox factor taking into account the DEFINTION_FACTOR and the PPU */
-    double m_viewBoxFactor;
 };
 
 } // namespace vrv

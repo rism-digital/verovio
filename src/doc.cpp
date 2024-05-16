@@ -132,7 +132,6 @@ void Doc::Reset()
     m_timemapTempo = 0.0;
     m_markup = MARKUP_DEFAULT;
     m_isMensuralMusicOnly = false;
-    m_isNeumeLines = false;
     m_isCastOff = false;
     m_visibleScores.clear();
 
@@ -1408,8 +1407,6 @@ void Doc::SyncToFacsimileDoc()
     if (!m_facsimile->FindDescendantByType(SURFACE)) {
         m_facsimile->AddChild(new Surface());
     }
-    this->ScoreDefSetCurrentDoc();
-
     m_facsimile->SetType("transcription");
     m_facsimile->ClearChildren();
 
@@ -2131,10 +2128,8 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    // Take into account the PPU when getting the page height in facsimile
     if (this->IsTranscription() || this->IsFacs()) {
-        const int factor = DEFINITION_FACTOR / m_drawingPage->GetPPUFactor();
-        return m_drawingPage->m_pageHeight / factor;
+        return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
     }
 
     int contentHeight = m_drawingPage->GetContentHeight();
@@ -2145,10 +2140,8 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    // Take into account the PPU when getting the page width in facsimile
     if (this->IsTranscription() || this->IsFacs()) {
-        const int factor = DEFINITION_FACTOR / m_drawingPage->GetPPUFactor();
-        return m_drawingPage->m_pageWidth / factor;
+        return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
     }
 
     int contentWidth = m_drawingPage->GetContentWidth();
