@@ -60,10 +60,6 @@ FunctorCode CalcDotsFunctor::VisitChord(Chord *chord)
 
 FunctorCode CalcDotsFunctor::VisitNote(Note *note)
 {
-    // We currently have no dots object with mensural notes
-    if (note->IsMensuralDur()) {
-        return FUNCTOR_SIBLINGS;
-    }
     if (!note->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
