@@ -2296,7 +2296,8 @@ enum {
     ERR_062_LIGATURE_NOTE_AFTER,
     ERR_063_LIGATURE_PITCH,
     ERR_064_LIGATURE_DURATION,
-    ERR_065_MREST_INVALID_MEASURE
+    ERR_065_MREST_INVALID_MEASURE,
+    ERR_066_EMPTY_CONTAINER
 };
 
 // clang-format off
@@ -2365,7 +2366,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_062_LIGATURE_NOTE_AFTER, "To indicate a ligature, a '+' must be followed by a note." },
     { ERR_063_LIGATURE_PITCH, "A ligature cannot have two consecutive notes with the same pitch." },
     { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
-    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." }
+    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." },
+    { ERR_066_EMPTY_CONTAINER, "A grace group or a beam cannot be empty." }
 };
 // clang-format on
 
@@ -2419,6 +2421,7 @@ namespace pae {
         m_inputChar = c;
         m_position = position;
         m_object = object;
+        m_treeObject = NULL;
         m_isError = false;
     }
 
@@ -2455,6 +2458,12 @@ namespace pae {
         std::string name = m_object->GetClassName();
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         return name;
+    }
+
+    void Token::SetInTree()
+    {
+        m_treeObject = m_object;
+        m_object = NULL;
     }
 
 } // namespace pae
@@ -2966,8 +2975,6 @@ bool PAEInput::Parse()
 
     if (success) success = this->CheckHierarchy();
 
-    LogDebugTokens();
-
     if (m_pedanticMode && !success) {
         this->ClearTokenObjects();
         return false;
@@ -3046,7 +3053,7 @@ bool PAEInput::Parse()
         if (token.Is(MEASURE)) {
             currentMeasure = vrv_cast<Measure *>(token.m_object);
             assert(currentMeasure);
-            token.m_object = NULL;
+            token.SetInTree();
 
             section->AddChild(currentMeasure);
             Staff *staff = new Staff(1);
@@ -3092,7 +3099,7 @@ bool PAEInput::Parse()
                 }
             }
             // Object are own by the scoreDef
-            token.m_object = NULL;
+            token.SetInTree();
             continue;
         }
         else if (token.m_object->IsLayerElement()) {
@@ -3100,7 +3107,7 @@ bool PAEInput::Parse()
             LayerElement *element = vrv_cast<LayerElement *>(token.m_object);
             assert(element);
             // The object is either a container end, or will be added to the layerElementContainers.back()
-            token.m_object = NULL;
+            token.SetInTree();
 
             // For a container end, no object to add to the doc.
             if (token.m_char == pae::CONTAINER_END) {
@@ -3144,11 +3151,13 @@ bool PAEInput::Parse()
                     tie->SetTstamp2({ 0, tstamp2 });
                 }
             }
-            token.m_object = NULL;
+            token.SetInTree();
         }
     }
 
     CheckContentPostBuild();
+
+    LogDebugTokens();
 
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
@@ -4728,6 +4737,22 @@ bool PAEInput::CheckContentPostBuild()
     // * graceGrp should not be empty
     // * keySig / meterSig change more than once in a measure
 
+    ClassIdsComparison comparison({ BEAM, GRACEGRP });
+    ClassIdsComparison noteOrRest({ NOTE, REST });
+    ListOfObjects containers;
+    m_doc->FindAllDescendantsByComparison(&containers, &comparison);
+    for (auto &container : containers) {
+        ListOfObjects notesOrRests;
+        container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
+        if ((int)notesOrRests.size() < 1) {
+            pae::Token *token = this->GetTokenForTreeObject(container);
+            if (token) {
+                LogPAE(ERR_066_EMPTY_CONTAINER, *token);
+                if (m_pedanticMode) return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -4748,6 +4773,14 @@ void PAEInput::RemoveContainerToken(Object *object)
             token.m_object = NULL;
         }
     }
+}
+
+pae::Token *PAEInput::GetTokenForTreeObject(Object *object)
+{
+    for (pae::Token &token : m_pae) {
+        if (token.m_treeObject == object) return &token;
+    }
+    return NULL;
 }
 
 bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token)
