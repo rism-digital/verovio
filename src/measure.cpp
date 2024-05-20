@@ -95,7 +95,7 @@ Measure::Measure(MeasureType measureMusic, int logMeasureNb)
 
     this->Reset();
 
-    if (!this->IsMeasuredMusic()) this->SetRight(BARRENDITION_invis);
+    if (!this->IsMeasuredMusic() && !this->IsNeumeLine()) this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
