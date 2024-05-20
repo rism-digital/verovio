@@ -2060,13 +2060,10 @@ bool EditorToolkitNeume::SortStaves()
     Object *pbParent = pb->GetParent();
     Object *milestoneEndParent = milestoneEnd->GetParent();
     Object *sectionParent = section->GetParent();
-    int pbIdx = pbParent->GetChildIndex(pb);
-    int milestoneEndIdx = milestoneEndParent->GetChildIndex(milestoneEnd);
-    int sectionIdx = sectionParent->GetChildIndex(section);
 
-    pb = pbParent->DetachChild(pbIdx);
-    milestoneEnd = milestoneEndParent->DetachChild(milestoneEndIdx);
-    section = sectionParent->DetachChild(sectionIdx);
+    pb = pbParent->DetachChild(pb->GetIdx());
+    milestoneEnd = milestoneEndParent->DetachChild(milestoneEnd->GetIdx());
+    section = sectionParent->DetachChild(section->GetIdx());
 
     Object *firstSystem = page->GetFirst(SYSTEM);
     Object *lastSystem = page->GetLast(SYSTEM);
@@ -2322,10 +2319,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
                 assert(pb);
                 assert(section);
 
-                int sectionIdx = system->GetChildIndex(section);
-                int pbIdx = system->GetChildIndex(pb);
-                section = system->DetachChild(sectionIdx);
-                pb = system->DetachChild(pbIdx);
+                section = system->DetachChild(section->GetIdx());
+                pb = system->DetachChild(pb->GetIdx());
 
                 nextSystem->InsertChild(section, 0);
                 nextSystem->InsertChild(pb, 1);
