@@ -1882,7 +1882,7 @@ FunctorCode PrepareBeamSpanElementsFunctor::VisitBeamSpan(BeamSpan *beamSpan)
         if (!elementStaff) continue;
         if (elementStaff->GetN() != staff->GetN()) {
             Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
-            if (!elementStaff || !elementLayer) continue;
+            if (!elementLayer) continue;
             layerElem->m_crossStaff = elementStaff;
             layerElem->m_crossLayer = elementLayer;
         }

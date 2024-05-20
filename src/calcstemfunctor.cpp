@@ -607,7 +607,7 @@ data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int ve
         else if (middlePoint > verticalCenter) {
             return STEMDIRECTION_down;
         }
-        else if (middlePoint < verticalCenter) {
+        else {
             return STEMDIRECTION_up;
         }
     }
