@@ -1736,7 +1736,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         return;
     }
 
-    if (!m_doc->IsFacs()) {
+    if (!m_doc->IsFacs() && !m_doc->IsNeumeLines()) {
         syl->SetDrawingYRel(this->GetSylYRel(syl->m_drawingVerse, staff));
     }
 
