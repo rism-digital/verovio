@@ -1588,17 +1588,24 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
         clef->SetDisPlace(octaveDis > 0 ? STAFFREL_basic_above : STAFFREL_basic_below);
     }
 
-    // Set new octaves for affected neume components
+    // Set new octaves for affected neume components and custodes
     ClassIdComparison equalsClef(CLEF);
     Clef *nextClef = dynamic_cast<Clef *>(page->FindNextChild(&equalsClef, clef));
 
     ClassIdComparison equalsNcs(NC);
     ListOfObjects ncs;
     page->FindAllDescendantsBetween(&ncs, &equalsNcs, clef, nextClef);
-
     std::for_each(ncs.begin(), ncs.end(), [&](Object *ncObj) {
         Nc *nc = dynamic_cast<Nc *>(ncObj);
         nc->SetOct(nc->GetOct() + move);
+    });
+
+    ClassIdComparison equalsCustodes(CUSTOS);
+    ListOfObjects custodes;
+    page->FindAllDescendantsBetween(&custodes, &equalsCustodes, clef, nextClef);
+    std::for_each(custodes.begin(), custodes.end(), [&](Object *custosObj) {
+        Custos *custos = dynamic_cast<Custos *>(custosObj);
+        custos->SetOct(custos->GetOct() + move);
     });
 
     m_editInfo.import("status", "OK");
