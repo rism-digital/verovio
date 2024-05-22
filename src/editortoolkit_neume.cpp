@@ -1588,17 +1588,24 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
         clef->SetDisPlace(octaveDis > 0 ? STAFFREL_basic_above : STAFFREL_basic_below);
     }
 
-    // Set new octaves for affected neume components
+    // Set new octaves for affected neume components and custodes
     ClassIdComparison equalsClef(CLEF);
     Clef *nextClef = dynamic_cast<Clef *>(page->FindNextChild(&equalsClef, clef));
 
     ClassIdComparison equalsNcs(NC);
     ListOfObjects ncs;
     page->FindAllDescendantsBetween(&ncs, &equalsNcs, clef, nextClef);
-
     std::for_each(ncs.begin(), ncs.end(), [&](Object *ncObj) {
         Nc *nc = dynamic_cast<Nc *>(ncObj);
         nc->SetOct(nc->GetOct() + move);
+    });
+
+    ClassIdComparison equalsCustodes(CUSTOS);
+    ListOfObjects custodes;
+    page->FindAllDescendantsBetween(&custodes, &equalsCustodes, clef, nextClef);
+    std::for_each(custodes.begin(), custodes.end(), [&](Object *custosObj) {
+        Custos *custos = dynamic_cast<Custos *>(custosObj);
+        custos->SetOct(custos->GetOct() + move);
     });
 
     m_editInfo.import("status", "OK");
@@ -2060,13 +2067,10 @@ bool EditorToolkitNeume::SortStaves()
     Object *pbParent = pb->GetParent();
     Object *milestoneEndParent = milestoneEnd->GetParent();
     Object *sectionParent = section->GetParent();
-    int pbIdx = pbParent->GetChildIndex(pb);
-    int milestoneEndIdx = milestoneEndParent->GetChildIndex(milestoneEnd);
-    int sectionIdx = sectionParent->GetChildIndex(section);
 
-    pb = pbParent->DetachChild(pbIdx);
-    milestoneEnd = milestoneEndParent->DetachChild(milestoneEndIdx);
-    section = sectionParent->DetachChild(sectionIdx);
+    pb = pbParent->DetachChild(pb->GetIdx());
+    milestoneEnd = milestoneEndParent->DetachChild(milestoneEnd->GetIdx());
+    section = sectionParent->DetachChild(section->GetIdx());
 
     Object *firstSystem = page->GetFirst(SYSTEM);
     Object *lastSystem = page->GetLast(SYSTEM);
@@ -2322,10 +2326,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
                 assert(pb);
                 assert(section);
 
-                int sectionIdx = system->GetChildIndex(section);
-                int pbIdx = system->GetChildIndex(pb);
-                section = system->DetachChild(sectionIdx);
-                pb = system->DetachChild(pbIdx);
+                section = system->DetachChild(section->GetIdx());
+                pb = system->DetachChild(pb->GetIdx());
 
                 nextSystem->InsertChild(section, 0);
                 nextSystem->InsertChild(pb, 1);
