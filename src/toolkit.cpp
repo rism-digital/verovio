@@ -436,7 +436,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
 #ifndef NO_MXL_SUPPORT
     ZipFileReader zipFileReader;
-    zipFileReader.Load(bytes);
+    zipFileReader.LoadBytes(bytes);
 
     const std::string metaInf = "META-INF/container.xml";
     if (!zipFileReader.HasFile(metaInf)) {
