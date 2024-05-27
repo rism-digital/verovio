@@ -97,6 +97,7 @@
 #include "num.h"
 #include "octave.h"
 #include "orig.h"
+#include "oriscus.h"
 #include "ornam.h"
 #include "page.h"
 #include "pagemilestone.h"
@@ -711,6 +712,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(NOTE)) {
             m_currentNode = m_currentNode.append_child("note");
             this->WriteNote(m_currentNode, vrv_cast<Note *>(object));
+        }
+        else if (object->Is(ORISCUS)) {
+            m_currentNode = m_currentNode.append_child("oriscus");
+            this->WriteOriscus(m_currentNode, vrv_cast<Oriscus *>(object));
         }
         else if (object->Is(PLICA)) {
             m_currentNode = m_currentNode.append_child("plica");
@@ -2754,6 +2759,15 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteVisibility(currentNode);
 }
 
+void MEIOutput::WriteOriscus(pugi::xml_node currentNode, Oriscus *oriscus)
+{
+    assert(oriscus);
+
+    this->WriteLayerElement(currentNode, oriscus);
+    this->WritePitchInterface(currentNode, oriscus);
+    oriscus->WriteColor(currentNode);
+}
+
 void MEIOutput::WritePlica(pugi::xml_node currentNode, Plica *plica)
 {
     assert(plica);
@@ -3721,6 +3735,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     // filter for nc
     else if (filterParent->Is(NC)) {
         if (element == "liquescent") {
+            return true;
+        }
+        else if (element == "oriscus") {
             return true;
         }
         else if (element == "quilisma") {
@@ -6273,6 +6290,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "note") {
             success = this->ReadNote(parent, xmlElement);
         }
+        else if (elementName == "oriscus") {
+            success = this->ReadOriscus(parent, xmlElement);
+        }
         else if (elementName == "quilisma") {
             success = this->ReadQuilisma(parent, xmlElement);
         }
@@ -6976,6 +6996,20 @@ bool MEIInput::ReadProport(Object *parent, pugi::xml_node proport)
 
     parent->AddChild(vrvProport);
     this->ReadUnsupportedAttr(proport, vrvProport);
+    return true;
+}
+
+bool MEIInput::ReadOriscus(Object *parent, pugi::xml_node oriscus)
+{
+    Oriscus *vrvOriscus = new Oriscus();
+    this->ReadLayerElement(oriscus, vrvOriscus);
+    this->ReadPositionInterface(oriscus, vrvOriscus);
+    
+    vrvOriscus->ReadColor(oriscus);
+
+    parent->AddChild(vrvOriscus);
+    this->ReadUnsupportedAttr(oriscus, vrvOriscus);
+    
     return true;
 }
 
