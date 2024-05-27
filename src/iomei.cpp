@@ -7004,12 +7004,12 @@ bool MEIInput::ReadOriscus(Object *parent, pugi::xml_node oriscus)
     Oriscus *vrvOriscus = new Oriscus();
     this->ReadLayerElement(oriscus, vrvOriscus);
     this->ReadPositionInterface(oriscus, vrvOriscus);
-    
+
     vrvOriscus->ReadColor(oriscus);
 
     parent->AddChild(vrvOriscus);
     this->ReadUnsupportedAttr(oriscus, vrvOriscus);
-    
+
     return true;
 }
 
@@ -7018,12 +7018,12 @@ bool MEIInput::ReadQuilisma(Object *parent, pugi::xml_node quilisma)
     Quilisma *vrvQuilisma = new Quilisma();
     this->ReadLayerElement(quilisma, vrvQuilisma);
     this->ReadPositionInterface(quilisma, vrvQuilisma);
-    
+
     vrvQuilisma->ReadColor(quilisma);
 
     parent->AddChild(vrvQuilisma);
     this->ReadUnsupportedAttr(quilisma, vrvQuilisma);
-    
+
     return true;
 }
 
