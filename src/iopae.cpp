@@ -3494,8 +3494,8 @@ bool PAEInput::ConvertRepeatedFigure()
                 --token;
                 status = pae::FIGURE_REPEAT;
             }
-            // End of repetitions - this does not include the end of a measure
-            else if (!this->Was(*token, pae::MEASURE)) {
+            // End of repetitions
+            else {
                 // Make sure we repeated the figure at least once (is this too pedantic?)
                 if (status == pae::FIGURE_END) {
                     LogPAE(ERR_010_REP_UNUSED, *figureToken);
