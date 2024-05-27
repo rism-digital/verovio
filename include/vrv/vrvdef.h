@@ -238,6 +238,7 @@ enum ClassId : uint16_t {
     NC,
     NOTE,
     NEUME,
+    ORISCUS,
     PLICA,
     PROPORT,
     QUILISMA,
