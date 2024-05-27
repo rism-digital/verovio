@@ -6672,6 +6672,8 @@ bool MEIInput::ReadLiquescent(Object *parent, pugi::xml_node liquescent)
     this->ReadLayerElement(liquescent, vrvLiquescent);
     this->ReadPositionInterface(liquescent, vrvLiquescent);
 
+    vrvLiquescent->ReadColor(liquescent);
+
     parent->AddChild(vrvLiquescent);
     this->ReadUnsupportedAttr(liquescent, vrvLiquescent);
     return true;
