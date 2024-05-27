@@ -1376,6 +1376,7 @@
 		BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768727CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
 		BD87768827CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
+		BD96F7CD2C04A708001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
 		BDA81C21268B38760065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C22268B38770065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
@@ -2181,6 +2182,8 @@
 		BD2E4D992875881B00B04350 /* stem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stem.h; path = include/vrv/stem.h; sourceTree = "<group>"; };
 		BD87768127CE89FA005B97EA /* layerdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerdef.h; path = include/vrv/layerdef.h; sourceTree = "<group>"; };
 		BD87768227CE8A11005B97EA /* layerdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerdef.cpp; path = src/layerdef.cpp; sourceTree = "<group>"; };
+		BD96F7CB2C04A708001CFF6F /* quilisma.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = quilisma.cpp; path = src/quilisma.cpp; sourceTree = "<group>"; };
+		BD96F7CE2C04A76F001CFF6F /* quilisma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quilisma.h; path = include/vrv/quilisma.h; sourceTree = "<group>"; };
 		BDA81C20268B386C0065B802 /* metersiggrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersiggrp.h; path = include/vrv/metersiggrp.h; sourceTree = "<group>"; };
 		BDA81C23268B38A10065B802 /* metersiggrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersiggrp.cpp; path = src/metersiggrp.cpp; sourceTree = "<group>"; };
 		BDC366C52576AF9300E4D826 /* grpsym.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grpsym.cpp; path = src/grpsym.cpp; sourceTree = "<group>"; };
@@ -2991,6 +2994,8 @@
 				4D674B3E255F40AC008AEF4C /* plica.h */,
 				1579B3421B15033100B16F5C /* proport.cpp */,
 				1579B3411B15031D00B16F5C /* proport.h */,
+				BD96F7CB2C04A708001CFF6F /* quilisma.cpp */,
+				BD96F7CE2C04A76F001CFF6F /* quilisma.h */,
 				8F086ED1188539540037FD8E /* rest.cpp */,
 				8F59292818854BF800FE51AD /* rest.h */,
 				4DB3072E1AC9ED2500EE0982 /* space.cpp */,
@@ -4399,6 +4404,7 @@
 				4DEC4D8221C804E000D1D273 /* app.cpp in Sources */,
 				4DB787632022F0B700394520 /* jsonxx.cc in Sources */,
 				4DACCA132990F2E600B55913 /* att.cpp in Sources */,
+				BD96F7CD2C04A708001CFF6F /* quilisma.cpp in Sources */,
 				4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
 				BDC366C72576AF9300E4D826 /* grpsym.cpp in Sources */,
