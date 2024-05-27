@@ -102,6 +102,7 @@ private:
      */
     ///@{
     void WriteMdiv(Mdiv *mDiv);
+    void WriteMdivEnd(Mdiv *mDiv);
     void WriteScoreDef(ScoreDef *scoreDef);
     void WriteStaffDef(StaffDef *staffDef);
     void WriteMeasure(Measure *measure);

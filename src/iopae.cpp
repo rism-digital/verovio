@@ -162,7 +162,10 @@ bool PAEOutput::WriteObject(Object *object)
 
 bool PAEOutput::WriteObjectEnd(Object *object)
 {
-    if (object->Is(MEASURE)) {
+    if (object->Is(MDIV)) {
+        this->WriteMdivEnd(vrv_cast<Mdiv *>(object));
+    }
+    else if (object->Is(MEASURE)) {
         this->WriteMeasureEnd(vrv_cast<Measure *>(object));
     }
     else if (object->Is(BEAM)) {
@@ -180,6 +183,13 @@ void PAEOutput::WriteMdiv(Mdiv *mdiv)
     assert(mdiv);
 
     m_streamStringOutput << "@data:";
+}
+
+void PAEOutput::WriteMdivEnd(Mdiv *mdiv)
+{
+    assert(mdiv);
+
+    m_streamStringOutput << "\n";
 }
 
 void PAEOutput::WriteScoreDef(ScoreDef *scoreDef) {}
