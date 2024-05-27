@@ -109,6 +109,7 @@
 #include "pitchinflection.h"
 #include "plica.h"
 #include "proport.h"
+#include "quilisma.h"
 #include "rdg.h"
 #include "ref.h"
 #include "reg.h"
@@ -718,6 +719,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(PROPORT)) {
             m_currentNode = m_currentNode.append_child("proport");
             this->WriteProport(m_currentNode, vrv_cast<Proport *>(object));
+        }
+        else if (object->Is(QUILISMA)) {
+            m_currentNode = m_currentNode.append_child("quilisma");
+            this->WriteQuilisma(m_currentNode, vrv_cast<Quilisma *>(object));
         }
         else if (object->Is(REST)) {
             m_currentNode = m_currentNode.append_child("rest");
@@ -2748,20 +2753,6 @@ void MEIOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteVisibility(currentNode);
 }
 
-void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
-{
-    assert(rest);
-
-    this->WriteLayerElement(currentNode, rest);
-    this->WriteDurationInterface(currentNode, rest);
-    this->WritePositionInterface(currentNode, rest);
-    rest->WriteColor(currentNode);
-    rest->WriteCue(currentNode);
-    rest->WriteExtSymAuth(currentNode);
-    rest->WriteExtSymNames(currentNode);
-    rest->WriteRestVisMensural(currentNode);
-}
-
 void MEIOutput::WritePlica(pugi::xml_node currentNode, Plica *plica)
 {
     assert(plica);
@@ -2775,6 +2766,29 @@ void MEIOutput::WriteProport(pugi::xml_node currentNode, Proport *proport)
     assert(proport);
 
     this->WriteLayerElement(currentNode, proport);
+}
+
+void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
+{
+    assert(quilisma);
+
+    this->WriteLayerElement(currentNode, quilisma);
+    this->WritePitchInterface(currentNode, quilisma);
+    quilisma->WriteColor(currentNode);
+}
+
+void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
+{
+    assert(rest);
+
+    this->WriteLayerElement(currentNode, rest);
+    this->WriteDurationInterface(currentNode, rest);
+    this->WritePositionInterface(currentNode, rest);
+    rest->WriteColor(currentNode);
+    rest->WriteCue(currentNode);
+    rest->WriteExtSymAuth(currentNode);
+    rest->WriteExtSymNames(currentNode);
+    rest->WriteRestVisMensural(currentNode);
 }
 
 void MEIOutput::WriteSpace(pugi::xml_node currentNode, Space *space)
@@ -3706,6 +3720,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     // filter for nc
     else if (filterParent->Is(NC)) {
         if (element == "liquescent") {
+            return true;
+        }
+        else if (element == "quilisma") {
             return true;
         }
         else {
@@ -6255,6 +6272,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "note") {
             success = this->ReadNote(parent, xmlElement);
         }
+        else if (elementName == "quilisma") {
+            success = this->ReadQuilisma(parent, xmlElement);
+        }
         else if (elementName == "rest") {
             success = this->ReadRest(parent, xmlElement);
         }
@@ -6955,6 +6975,20 @@ bool MEIInput::ReadProport(Object *parent, pugi::xml_node proport)
 
     parent->AddChild(vrvProport);
     this->ReadUnsupportedAttr(proport, vrvProport);
+    return true;
+}
+
+bool MEIInput::ReadQuilisma(Object *parent, pugi::xml_node quilisma)
+{
+    Quilisma *vrvQuilisma = new Quilisma();
+    this->ReadLayerElement(quilisma, vrvQuilisma);
+    this->ReadPositionInterface(quilisma, vrvQuilisma);
+    
+    vrvQuilisma->ReadColor(quilisma);
+
+    parent->AddChild(vrvQuilisma);
+    this->ReadUnsupportedAttr(quilisma, vrvQuilisma);
+    
     return true;
 }
 

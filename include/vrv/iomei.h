@@ -121,6 +121,7 @@ class Plica;
 class PlistInterface;
 class PositionInterface;
 class Proport;
+class Quilisma;
 class Rdg;
 class Ref;
 class Reg;
@@ -412,6 +413,7 @@ private:
     void WriteNote(pugi::xml_node currentNode, Note *note);
     void WritePlica(pugi::xml_node currentNode, Plica *plica);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
+    void WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteStem(pugi::xml_node currentNode, Stem *stem);
@@ -723,6 +725,7 @@ private:
     bool ReadNote(Object *parent, pugi::xml_node note);
     bool ReadPlica(Object *parent, pugi::xml_node plica);
     bool ReadProport(Object *parent, pugi::xml_node proport);
+    bool ReadQuilisma(Object *parent, pugi::xml_node quilisma);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadStem(Object *parent, pugi::xml_node stem);
