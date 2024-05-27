@@ -240,6 +240,7 @@ enum ClassId : uint16_t {
     NEUME,
     PLICA,
     PROPORT,
+    QUILISMA,
     REST,
     SPACE,
     STEM,
