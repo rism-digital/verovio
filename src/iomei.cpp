@@ -2585,6 +2585,7 @@ void MEIOutput::WriteLiquescent(pugi::xml_node currentNode, Liquescent *liquesce
 
     WriteLayerElement(currentNode, liquescent);
     WritePositionInterface(currentNode, liquescent);
+    liquescent->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)

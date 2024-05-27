@@ -105,6 +105,7 @@ class Note;
 class Num;
 class Octave;
 class Orig;
+class Oriscus;
 class Ornam;
 class Page;
 class PageElement;
@@ -411,6 +412,7 @@ private:
     void WriteNc(pugi::xml_node currentNode, Nc *nc);
     void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteNote(pugi::xml_node currentNode, Note *note);
+    void WriteOriscus(pugi::xml_node currentNode, Oriscus *oriscus);
     void WritePlica(pugi::xml_node currentNode, Plica *plica);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma);
@@ -723,6 +725,7 @@ private:
     bool ReadNc(Object *parent, pugi::xml_node nc);
     bool ReadNeume(Object *parent, pugi::xml_node note);
     bool ReadNote(Object *parent, pugi::xml_node note);
+    bool ReadOriscus(Object *parent, pugi::xml_node oriscus);
     bool ReadPlica(Object *parent, pugi::xml_node plica);
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadQuilisma(Object *parent, pugi::xml_node quilisma);
