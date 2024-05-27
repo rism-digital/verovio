@@ -1376,6 +1376,18 @@
 		BD87768627CE8A1A005B97EA /* layerdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD87768227CE8A11005B97EA /* layerdef.cpp */; };
 		BD87768727CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
 		BD87768827CE8A21005B97EA /* layerdef.h in Headers */ = {isa = PBXBuildFile; fileRef = BD87768127CE89FA005B97EA /* layerdef.h */; };
+		BD96F7CD2C04A708001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
+		BD96F7D12C04B297001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
+		BD96F7D22C04B2B2001CFF6F /* quilisma.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CE2C04A76F001CFF6F /* quilisma.h */; };
+		BD96F7D32C04B2B3001CFF6F /* quilisma.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CE2C04A76F001CFF6F /* quilisma.h */; };
+		BD96F7D42C04B2B6001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
+		BD96F7D52C04B2B6001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
+		BD96F7D62C04B2B7001CFF6F /* quilisma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7CB2C04A708001CFF6F /* quilisma.cpp */; };
+		BD96F7D72C04B2EE001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
+		BD96F7D82C04B2EE001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
+		BD96F7D92C04B2EF001CFF6F /* oriscus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD96F7D02C04B297001CFF6F /* oriscus.cpp */; };
+		BD96F7DA2C04B2F2001CFF6F /* oriscus.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CF2C04B26D001CFF6F /* oriscus.h */; };
+		BD96F7DB2C04B2F2001CFF6F /* oriscus.h in Headers */ = {isa = PBXBuildFile; fileRef = BD96F7CF2C04B26D001CFF6F /* oriscus.h */; };
 		BDA81C21268B38760065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C22268B38770065B802 /* metersiggrp.h in Headers */ = {isa = PBXBuildFile; fileRef = BDA81C20268B386C0065B802 /* metersiggrp.h */; };
 		BDA81C24268B38A10065B802 /* metersiggrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDA81C23268B38A10065B802 /* metersiggrp.cpp */; };
@@ -2181,6 +2193,10 @@
 		BD2E4D992875881B00B04350 /* stem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stem.h; path = include/vrv/stem.h; sourceTree = "<group>"; };
 		BD87768127CE89FA005B97EA /* layerdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerdef.h; path = include/vrv/layerdef.h; sourceTree = "<group>"; };
 		BD87768227CE8A11005B97EA /* layerdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerdef.cpp; path = src/layerdef.cpp; sourceTree = "<group>"; };
+		BD96F7CB2C04A708001CFF6F /* quilisma.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = quilisma.cpp; path = src/quilisma.cpp; sourceTree = "<group>"; };
+		BD96F7CE2C04A76F001CFF6F /* quilisma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quilisma.h; path = include/vrv/quilisma.h; sourceTree = "<group>"; };
+		BD96F7CF2C04B26D001CFF6F /* oriscus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = oriscus.h; path = include/vrv/oriscus.h; sourceTree = "<group>"; };
+		BD96F7D02C04B297001CFF6F /* oriscus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oriscus.cpp; path = src/oriscus.cpp; sourceTree = "<group>"; };
 		BDA81C20268B386C0065B802 /* metersiggrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersiggrp.h; path = include/vrv/metersiggrp.h; sourceTree = "<group>"; };
 		BDA81C23268B38A10065B802 /* metersiggrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersiggrp.cpp; path = src/metersiggrp.cpp; sourceTree = "<group>"; };
 		BDC366C52576AF9300E4D826 /* grpsym.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grpsym.cpp; path = src/grpsym.cpp; sourceTree = "<group>"; };
@@ -2987,10 +3003,14 @@
 				4D766EF420ACAD41006875D8 /* neume.h */,
 				8F086ECC188539540037FD8E /* note.cpp */,
 				8F59292318854BF800FE51AD /* note.h */,
+				BD96F7D02C04B297001CFF6F /* oriscus.cpp */,
+				BD96F7CF2C04B26D001CFF6F /* oriscus.h */,
 				4D674B45255F40B7008AEF4C /* plica.cpp */,
 				4D674B3E255F40AC008AEF4C /* plica.h */,
 				1579B3421B15033100B16F5C /* proport.cpp */,
 				1579B3411B15031D00B16F5C /* proport.h */,
+				BD96F7CB2C04A708001CFF6F /* quilisma.cpp */,
+				BD96F7CE2C04A76F001CFF6F /* quilisma.h */,
 				8F086ED1188539540037FD8E /* rest.cpp */,
 				8F59292818854BF800FE51AD /* rest.h */,
 				4DB3072E1AC9ED2500EE0982 /* space.cpp */,
@@ -3185,6 +3205,7 @@
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
 				4DA0EADB22BB77AF00A7EBEB /* editortoolkit_neume.h in Headers */,
 				BD6E5C41290007CE0039B0F1 /* graphic.h in Headers */,
+				BD96F7DA2C04B2F2001CFF6F /* oriscus.h in Headers */,
 				4DB3D89A1F7C326800B5FC2B /* fb.h in Headers */,
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
 				E7908E9F298582090004C1F9 /* alignfunctor.h in Headers */,
@@ -3307,6 +3328,7 @@
 				E7A1640A29AF344B0099BD6A /* adjustharmgrpsspacingfunctor.h in Headers */,
 				E7770F8329D0D9F600A9BECF /* adjustslursfunctor.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
+				BD96F7D22C04B2B2001CFF6F /* quilisma.h in Headers */,
 				4DBDD67B2939E1D7009EC466 /* symboltable.h in Headers */,
 				4DACC9402990ED2600B55913 /* libmei.h in Headers */,
 				4D89F90C201771A700A4D336 /* num.h in Headers */,
@@ -3499,6 +3521,7 @@
 				BB4C4B1422A932C8001F6AF0 /* section.h in Headers */,
 				BB4C4B8022A932DF001F6AF0 /* fb.h in Headers */,
 				BB4C4AF622A932BC001F6AF0 /* ref.h in Headers */,
+				BD96F7DB2C04B2F2001CFF6F /* oriscus.h in Headers */,
 				BB4C4B6022A932D7001F6AF0 /* mrest.h in Headers */,
 				4D723AF525E8DB0B0062E0A2 /* zip_file.hpp in Headers */,
 				E765675A28BBFBA400BC6490 /* functorinterface.h in Headers */,
@@ -3610,6 +3633,7 @@
 				4DFD83012A38399C00A3E20B /* repeatmark.h in Headers */,
 				BB4C4B7622A932D7001F6AF0 /* syl.h in Headers */,
 				E73E86262A069C640089DF74 /* transposefunctor.h in Headers */,
+				BD96F7D32C04B2B3001CFF6F /* quilisma.h in Headers */,
 				BB4C4AEA22A932BC001F6AF0 /* del.h in Headers */,
 				BB4C4B3422A932CF001F6AF0 /* tempo.h in Headers */,
 				4DACC9E12990F29A00B55913 /* attconverter.h in Headers */,
@@ -3928,6 +3952,7 @@
 				4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */,
 				4DACC99B2990F29A00B55913 /* atts_header.cpp in Sources */,
 				4DACC9A32990F29A00B55913 /* atts_cmnornaments.cpp in Sources */,
+				BD96F7D72C04B2EE001CFF6F /* oriscus.cpp in Sources */,
 				4DEC4D9F21C81E9400D1D273 /* orig.cpp in Sources */,
 				E722106828F85981002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
 				4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */,
@@ -4099,6 +4124,7 @@
 				4D3C3F0D294B89AF009993E6 /* ornam.cpp in Sources */,
 				4DACC9972990F29A00B55913 /* atts_facsimile.cpp in Sources */,
 				E7231E0629B64B33000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */,
+				BD96F7D42C04B2B6001CFF6F /* quilisma.cpp in Sources */,
 				4D16943C1E3A44F300569BF4 /* view_beam.cpp in Sources */,
 				E7BCFFBA281298620012513D /* resources.cpp in Sources */,
 				40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */,
@@ -4399,6 +4425,7 @@
 				4DEC4D8221C804E000D1D273 /* app.cpp in Sources */,
 				4DB787632022F0B700394520 /* jsonxx.cc in Sources */,
 				4DACCA132990F2E600B55913 /* att.cpp in Sources */,
+				BD96F7CD2C04A708001CFF6F /* quilisma.cpp in Sources */,
 				4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
 				BDC366C72576AF9300E4D826 /* grpsym.cpp in Sources */,
@@ -4419,6 +4446,7 @@
 				4D1EB6A12A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
 				4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */,
 				4DEC4DA221C81EB300D1D273 /* rdg.cpp in Sources */,
+				BD96F7D12C04B297001CFF6F /* oriscus.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				E76046C328D496B400C36204 /* calcledgerlinesfunctor.cpp in Sources */,
 				E76A9D4A29A74E4B0044682D /* adjustdotsfunctor.cpp in Sources */,
@@ -4497,6 +4525,7 @@
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
 				4DACC99C2990F29A00B55913 /* atts_header.cpp in Sources */,
 				4DACC9A42990F29A00B55913 /* atts_cmnornaments.cpp in Sources */,
+				BD96F7D82C04B2EE001CFF6F /* oriscus.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				4DB3D8E11F83D15900B5FC2B /* chord.cpp in Sources */,
 				40C2E4252052A6FA0003625F /* sb.cpp in Sources */,
@@ -4668,6 +4697,7 @@
 				4DA0EAEC22BB77C300A7EBEB /* editortoolkit_neume.cpp in Sources */,
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				4DACC9982990F29A00B55913 /* atts_facsimile.cpp in Sources */,
+				BD96F7D52C04B2B6001CFF6F /* quilisma.cpp in Sources */,
 				E7231E0729B64B33000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */,
 				4DB3D8F31F83D1C600B5FC2B /* scoredefinterface.cpp in Sources */,
 				4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */,
@@ -4782,6 +4812,7 @@
 				BB4C4BBC22A932FC001F6AF0 /* MidiEventList.cpp in Sources */,
 				4DACC99D2990F29A00B55913 /* atts_header.cpp in Sources */,
 				4DACC9A52990F29A00B55913 /* atts_cmnornaments.cpp in Sources */,
+				BD96F7D92C04B2EF001CFF6F /* oriscus.cpp in Sources */,
 				BB4C4B9122A932DF001F6AF0 /* textelement.cpp in Sources */,
 				BB4C4B0922A932C3001F6AF0 /* pghead.cpp in Sources */,
 				E722106728F856C4002CD6E9 /* findlayerelementsfunctor.cpp in Sources */,
@@ -4953,6 +4984,7 @@
 				4DACC9992990F29A00B55913 /* atts_facsimile.cpp in Sources */,
 				BB4C4AB922A932A6001F6AF0 /* iopae.cpp in Sources */,
 				E7231E0829B64B34000A2BF3 /* adjustxoverflowfunctor.cpp in Sources */,
+				BD96F7D62C04B2B7001CFF6F /* quilisma.cpp in Sources */,
 				BB4C4ABB22A932B6001F6AF0 /* instrdef.cpp in Sources */,
 				BB4C4AB722A932A6001F6AF0 /* iomusxml.cpp in Sources */,
 				4DACC9EF2990F29A00B55913 /* atts_shared.cpp in Sources */,

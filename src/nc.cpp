@@ -18,6 +18,8 @@
 #include "elementpart.h"
 #include "functor.h"
 #include "liquescent.h"
+#include "oriscus.h"
+#include "quilisma.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -89,6 +91,12 @@ bool Nc::IsSupportedChild(Object *child)
 {
     if (child->Is(LIQUESCENT)) {
         assert(dynamic_cast<Liquescent *>(child));
+    }
+    else if (child->Is(ORISCUS)) {
+        assert(dynamic_cast<Oriscus *>(child));
+    }
+    else if (child->Is(QUILISMA)) {
+        assert(dynamic_cast<Quilisma *>(child));
     }
     else {
         return false;
