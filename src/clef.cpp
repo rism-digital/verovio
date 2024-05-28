@@ -101,6 +101,12 @@ int Clef::GetClefLocOffset() const
         defaultOct = 3;
         offset = 4;
     }
+    else if (this->GetShape() == CLEFSHAPE_C) {
+        const Staff *staff = this->GetAncestorStaff();
+        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+            offset = 7;
+        }
+    }
 
     if (this->HasOct()) {
         int oct = this->GetOct();
