@@ -74,11 +74,6 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
 
     dc->StartGraphic(element, "", element->GetID());
 
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
-
     Nc *nc = dynamic_cast<Nc *>(element->GetParent());
 
     if (nc->GetCurve() == curvatureDirection_CURVE_c) {
@@ -106,44 +101,17 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
     const int noteWidth
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-    int noteY, noteX;
-    int yValue;
-    if (nc->HasFacs() && m_doc->IsNeumeLines()) {
-        noteY = staff->GetDrawingY();
-        noteX = nc->GetDrawingX();
-    }
-    else {
-        noteX = element->GetDrawingX();
-        noteY = element->GetDrawingY();
-    }
 
-    // Calculating proper y offset based on pname, clef, staff, and staff rotate
-    int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset = 0;
+    int noteX = nc->GetDrawingX();
+    int noteY = nc->GetDrawingY();
 
-    // The default octave = 3, but the actual octave is calculated by
-    // taking into account the displacement of the clef
-    int clefOctave = 3;
-    if (clef->GetDis() && clef->GetDisPlace()) {
-        clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
-    }
-    int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
-    int rotateOffset = 0;
     if (staff->HasDrawingRotation()) {
-        rotateOffset = staff->GetDrawingRotationOffsetFor(noteX);
+        noteY -= staff->GetDrawingRotationOffsetFor(noteX);
     }
-
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-    }
-    yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
 
     for (auto it = params.begin(); it != params.end(); it++) {
         for (int i = 0; i < static_cast<int>(sizeof(params.at(0).fontNoLiq)); i++) {
-            DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight,
+            DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, noteY + it->yOffsetLiq[i] * noteHeight,
                 it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
         }
     }
@@ -178,12 +146,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
-
-    // Intializing necessary variables
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
 
     Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
     assert(neume);
@@ -249,53 +211,26 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
     const int noteWidth
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-    int noteY, noteX;
-    int yValue;
+
+    int noteX = nc->GetDrawingX();
+    int noteY = nc->GetDrawingY();
+
     if (nc->HasFacs() && m_doc->IsNeumeLines()) {
-        noteY = staff->GetDrawingY();
-        noteX = nc->GetDrawingX();
         params.at(0).xOffset = 0;
     }
+    // Not sure about this if - the nc pname and oct are going to be ignored
     else if (neume->HasFacs() && m_doc->IsNeumeLines()) {
         noteY = staff->GetDrawingY();
         noteX = neume->GetDrawingX() + position * noteWidth;
     }
-    else {
-        noteX = element->GetDrawingX();
-        noteY = element->GetDrawingY();
-    }
-    // Calculating proper y offset based on pname, clef, staff, and staff rotate
-    int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
 
-    // The default octave = 3, but the actual octave is calculated by
-    // taking into account the displacement of the clef
-    int clefOctave = 3;
-    if (clef->GetDis() && clef->GetDisPlace()) {
-        clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
-    }
-    int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
-    int rotationOffset = 0;
     if (staff->HasDrawingRotation()) {
-        rotationOffset = staff->GetDrawingRotationOffsetFor(noteX);
-    }
-
-    if (nc->HasLoc()) {
-        yValue = noteY + (nc->GetLoc() - 2 * (staffLineNumber - 1)) * (staffSize / 2);
-    }
-    else {
-        int pitchOffset = 0;
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-        }
-        yValue = clefYPosition + pitchOffset + octaveOffset - rotationOffset;
+        noteY -= staff->GetDrawingRotationOffsetFor(noteX);
     }
 
     if (!nc->HasCurve()) {
         for (auto it = params.begin(); it != params.end(); it++) {
-            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
+            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, noteY + it->yOffset * noteHeight, it->fontNo,
                 staff->m_drawingStaffSize, false, true);
         }
     }
