@@ -311,7 +311,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         }
         layerElement->SetDrawingYRel(yRel);
     }
-    else if (layerElement->Is(NC) && m_doc->GetOptions()->m_neumeAsNote.GetValue()) {
+    else if (layerElement->Is(NC)) {
         Nc *nc = vrv_cast<Nc *>(layerElement);
         assert(nc);
         int loc = 0;
