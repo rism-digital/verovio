@@ -284,6 +284,12 @@
 		4D4C26EE1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26EF1EF7E75400681770 /* label.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C26EC1EF7E75400681770 /* label.cpp */; };
 		4D4C26F01EF7E75E00681770 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */; };
+		4D4CDEA72C079026005621E9 /* adjustneumexfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */; };
+		4D4CDEA82C079026005621E9 /* adjustneumexfunctor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D4CDEA92C07902C005621E9 /* adjustneumexfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */; };
+		4D4CDEAA2C07902E005621E9 /* adjustneumexfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */; };
+		4D4CDEAB2C07902F005621E9 /* adjustneumexfunctor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */; };
 		4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4FCD091F5455F10009C455 /* staffgrp.h */; };
 		4D4FCD0C1F5455FF0009C455 /* staffgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FCD0B1F5455FF0009C455 /* staffgrp.cpp */; };
 		4D4FCD0D1F5455FF0009C455 /* staffgrp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FCD0B1F5455FF0009C455 /* staffgrp.cpp */; };
@@ -1835,6 +1841,8 @@
 		4D49924E2926B4DD007E3431 /* toolkitdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toolkitdef.h; path = include/vrv/toolkitdef.h; sourceTree = "<group>"; };
 		4D4C26EB1EF7E73000681770 /* label.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = label.h; path = include/vrv/label.h; sourceTree = "<group>"; };
 		4D4C26EC1EF7E75400681770 /* label.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = label.cpp; path = src/label.cpp; sourceTree = "<group>"; };
+		4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = adjustneumexfunctor.cpp; path = src/adjustneumexfunctor.cpp; sourceTree = "<group>"; };
+		4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adjustneumexfunctor.h; path = include/vrv/adjustneumexfunctor.h; sourceTree = "<group>"; };
 		4D4FCD091F5455F10009C455 /* staffgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staffgrp.h; path = include/vrv/staffgrp.h; sourceTree = "<group>"; };
 		4D4FCD0B1F5455FF0009C455 /* staffgrp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = staffgrp.cpp; path = src/staffgrp.cpp; sourceTree = "<group>"; };
 		4D4FCD0F1F5457020009C455 /* staffdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staffdef.h; path = include/vrv/staffdef.h; sourceTree = "<group>"; };
@@ -3104,6 +3112,8 @@
 				E7A1640829AF343F0099BD6A /* adjustharmgrpsspacingfunctor.h */,
 				E7E1698529A898C700FFF482 /* adjustlayersfunctor.cpp */,
 				E7E1698229A8987200FFF482 /* adjustlayersfunctor.h */,
+				4D4CDEA42C078FF9005621E9 /* adjustneumexfunctor.cpp */,
+				4D4CDEA62C079008005621E9 /* adjustneumexfunctor.h */,
 				E7876F1729C07F16002147DC /* adjustsylspacingfunctor.cpp */,
 				E7876F1429C07EE1002147DC /* adjustsylspacingfunctor.h */,
 				E7E9C11C29B0EFB400CFCE2F /* adjusttempofunctor.cpp */,
@@ -3334,6 +3344,7 @@
 				4D89F90C201771A700A4D336 /* num.h in Headers */,
 				4DA0EAE322BB77AF00A7EBEB /* surface.h in Headers */,
 				4DACC9E62990F29A00B55913 /* atttypes.h in Headers */,
+				4D4CDEA72C079026005621E9 /* adjustneumexfunctor.h in Headers */,
 				4DB3D8FE1F83D20100B5FC2B /* horizontalaligner.h in Headers */,
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
 				4DACC9DC2990F29A00B55913 /* atts_header.h in Headers */,
@@ -3536,6 +3547,7 @@
 				BB4C4B3822A932CF001F6AF0 /* trill.h in Headers */,
 				BB4C4B6422A932D7001F6AF0 /* mrpt2.h in Headers */,
 				E797C462298EC2E700CAD67E /* calcalignmentpitchposfunctor.h in Headers */,
+				4D4CDEA82C079026005621E9 /* adjustneumexfunctor.h in Headers */,
 				BB4C4B5222A932D7001F6AF0 /* ftrem.h in Headers */,
 				E7E9C11329B0A1E200CFCE2F /* adjustaccidxfunctor.h in Headers */,
 				4D88AD0B289673F50006D7DA /* symbol.h in Headers */,
@@ -3983,6 +3995,7 @@
 				4DD7C10127A5650600B9C017 /* timemap.cpp in Sources */,
 				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
 				E78833612994EC7C00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
+				4D4CDEA92C07902C005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
 				4DB3D8981F7C325C00B5FC2B /* lb.cpp in Sources */,
 				E7F39C6229A62B430055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
@@ -4329,6 +4342,7 @@
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
 				4DD7C10227A5650600B9C017 /* timemap.cpp in Sources */,
+				4D4CDEA52C078FF9005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				E797C460298EC2C600CAD67E /* calcalignmentpitchposfunctor.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
@@ -4556,6 +4570,7 @@
 				403BEFF9206C00FF00D022D5 /* beatrpt.cpp in Sources */,
 				E74A806928BC9843005274E7 /* functorinterface.cpp in Sources */,
 				4DD7C0FC27A55CEA00B9C017 /* timemap.cpp in Sources */,
+				4D4CDEAA2C07902E005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				E78833622994EC7D00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				4DB3D8D51F83D12B00B5FC2B /* tempo.cpp in Sources */,
@@ -4843,6 +4858,7 @@
 				E78833632994EC7E00D44B01 /* calcchordnoteheadsfunctor.cpp in Sources */,
 				BB4C4B2322A932CF001F6AF0 /* dynam.cpp in Sources */,
 				BB4C4B6522A932D7001F6AF0 /* multirest.cpp in Sources */,
+				4D4CDEAB2C07902F005621E9 /* adjustneumexfunctor.cpp in Sources */,
 				BB4C4AB322A932A6001F6AF0 /* iohumdrum.cpp in Sources */,
 				E7F39C6429A62B440055DBE0 /* adjustclefchangesfunctor.cpp in Sources */,
 				E793206A2991454100D80975 /* calcstemfunctor.cpp in Sources */,
