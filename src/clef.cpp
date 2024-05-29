@@ -79,12 +79,12 @@ void Clef::Reset()
     this->ResetVisibility();
 }
 
-int Clef::GetClefLocOffset() const
+int Clef::GetClefLocOffset(data_NOTATIONTYPE notationType) const
 {
     // Only resolve simple sameas links to avoid infinite recursion
     const Clef *sameas = dynamic_cast<const Clef *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
-        return sameas->GetClefLocOffset();
+        return sameas->GetClefLocOffset(notationType);
     }
 
     int offset = 0;
@@ -102,8 +102,7 @@ int Clef::GetClefLocOffset() const
         offset = 4;
     }
     else if (this->GetShape() == CLEFSHAPE_C) {
-        const Staff *staff = this->GetAncestorStaff();
-        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+        if (notationType == NOTATIONTYPE_neume) {
             offset = 7;
         }
     }

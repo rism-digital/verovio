@@ -4225,7 +4225,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
                 - m_view->ToLogicalY(fi->GetZone()->GetUly()))
                 / staffSize
-            - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset()));
+            - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset(staff->m_drawingNotationType)));
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
     }
@@ -4292,7 +4292,7 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
                 (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
                     - m_view->ToLogicalY(fi->GetZone()->GetUly()))
                     / staffSize
-                - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset()));
+                - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset(staff->m_drawingNotationType)));
             pi->AdjustPitchByOffset(-pitchDifference);
         }
 
