@@ -1201,6 +1201,18 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
     return const_cast<Object *>(findPreviousChildByComparison.GetElement());
 }
 
+void Object::LogDebugTree(int maxDepth, int level)
+{
+    std::string indent(level, '\t');
+    LogDebug("%s%s", indent.c_str(), this->LogDebugTreeMsg().c_str());
+
+    if (maxDepth == level) return;
+
+    for (auto &child : this->GetChildren()) {
+        child->LogDebugTree(maxDepth, level + 1);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Static methods for Object
 //----------------------------------------------------------------------------
