@@ -1882,9 +1882,16 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
 
     m_stem->SetDrawingStemDir(stemDir);
     m_yBeam = m_element->GetDrawingY();
-    m_x += (STEMDIRECTION_up == stemDir)
-        ? 2 * m_element->GetDrawingRadius(doc) - doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2
-        : doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+
+    // Move and take into account the glyph cut-outs
+    if (STEMDIRECTION_up == stemDir) {
+        m_x += stemInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, interface->m_cueSize).x;
+        m_x -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    }
+    else {
+        m_x += stemInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, interface->m_cueSize).x;
+        m_x += doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    }
 
     if (m_tabDurSym && !m_closestNote) {
         m_yBeam = m_tabDurSym->GetDrawingY();
