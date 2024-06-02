@@ -54,7 +54,7 @@
 #import <VerovioFramework/calcchordnoteheadsfunctor.h>
 #import <VerovioFramework/calcdotsfunctor.h>
 #import <VerovioFramework/calcledgerlinesfunctor.h>
-#import <VerovioFramework/calcligaturenoteposfunctor.h>
+#import <VerovioFramework/calcligatureorneumeposfunctor.h>
 #import <VerovioFramework/calcslurdirectionfunctor.h>
 #import <VerovioFramework/calcspanningbeamspansfunctor.h>
 #import <VerovioFramework/calcstemfunctor.h>
