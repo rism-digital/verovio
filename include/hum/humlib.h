@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May  4 10:07:24 PDT 2024
+// Last Modified: Tue May 14 03:29:40 PDT 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -1551,6 +1551,7 @@ class HumdrumToken : public std::string, public HumHash {
 		bool     isInstrumentCode          (void) { return isInstrumentDesignation(); }
 		bool     isInstrumentClass         (void);
 		bool     isInstrumentGroup         (void);
+		bool     isInstrumentNumber        (void);
 		bool     isModernInstrumentName    (void);
 		bool     isModernInstrumentAbbreviation(void);
 		bool     isOriginalInstrumentName    (void);
@@ -8206,6 +8207,40 @@ class Tool_imitation : public HumTool {
 		bool m_retrograde = false;
 
 		vector<int> m_barlines;
+};
+
+
+class Tool_instinfo : public HumTool {
+	public:
+		         Tool_instinfo      (void);
+		        ~Tool_instinfo      () {};
+
+		bool     run                (HumdrumFileSet& infiles);
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const std::string& indata, std::ostream& out);
+		bool     run                (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void    processFile         (HumdrumFile& infile);
+		void    initialize          (HumdrumFile& infile);
+		void    updateInstrumentLine(HumdrumFile& infile, int inumIndex,
+		                             std::map<int, std::string>& value,
+		                             std::map<int, int>& track2kindex,
+		                             const std::string& prefix);
+		void    insertInstrumentInfo(HumdrumFile& infile, int index,
+		                             std::map<int, std::string>& info, const std::string& prefix,
+		                             const std::string& key, std::map<int, int>& track2kindex);
+		void    printLine           (HumdrumFile& infile, int index);
+		void    printLine           (HumdrumFile& infile, int index,
+		                             const std::string& key);
+
+	private:
+		std::map<int, std::string> m_icode;  // instrument code, e.g., *Iflt
+		std::map<int, std::string> m_iclass; // instrument class, e.g., *Iww
+		std::map<int, std::string> m_iname;  // instrument name, e.g., *I"flute
+		std::map<int, std::string> m_iabbr;  // instrument name, e.g., *I'flt.
+		std::map<int, std::string> m_inum;   // instrument number, e.g., *I#2
+
 };
 
 
