@@ -44,7 +44,7 @@
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
-#include "calcligaturenoteposfunctor.h"
+#include "calcligatureorneumeposfunctor.h"
 #include "calcslurdirectionfunctor.h"
 #include "calcspanningbeamspansfunctor.h"
 #include "calcstemfunctor.h"
@@ -336,8 +336,8 @@ void Page::ResetAligners()
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
-    this->Process(calcLigatureNotePos);
+    CalcLigatureOrNeumePosFunctor calcLigatureOrNeumePos(doc);
+    this->Process(calcLigatureOrNeumePos);
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
