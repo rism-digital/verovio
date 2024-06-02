@@ -1658,9 +1658,17 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // first check if there is a multi measure rest
         if (it->select_node(".//multiple-rest")) {
-            const int multiRestLength = it->select_node(".//multiple-rest").node().text().as_int();
+            const pugi::xml_node multiRestNode = it->select_node(".//multiple-rest").node();
+            const int multiRestLength = multiRestNode.text().as_int();
+            const std::string symbols = multiRestNode.attribute("use-symbols").as_string();
             MultiRest *multiRest = new MultiRest;
-            if (it->select_node(".//multiple-rest[@use-symbols='yes']")) multiRest->SetBlock(BOOLEAN_false);
+            if (symbols == "no") {
+                // default by MusicXML specification
+                multiRest->SetBlock(BOOLEAN_true);
+            }
+            else if (symbols == "yes") {
+                multiRest->SetBlock(BOOLEAN_false);
+            }
             multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
@@ -1826,6 +1834,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
 
         section->AddChild(scoreDef);
+    }
+    else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
+        m_meterUnit = time.child("beat-type").text().as_int();
     }
 
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");

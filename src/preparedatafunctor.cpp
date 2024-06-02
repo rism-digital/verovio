@@ -1161,17 +1161,6 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         }
     }
 
-    // We don't care about flags or dots in mensural notes
-    if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
-
-    if (currentStem) {
-        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
-            && !note->IsChordTone() && !note->IsTabGrpNote());
-        currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
-
-        if (!chord) note->SetDrawingStem(currentStem);
-    }
-
     /************ dots ***********/
 
     Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
@@ -1181,6 +1170,17 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         LogWarning("Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
     }
     currentDots = this->ProcessDots(currentDots, note, shouldHaveDots);
+
+    // We don't care about flags in mensural notes
+    if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
+
+    if (currentStem) {
+        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
+            && !note->IsChordTone() && !note->IsTabGrpNote());
+        currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
+
+        if (!chord) note->SetDrawingStem(currentStem);
+    }
 
     /************ Prepare the drawing cue size ************/
 
@@ -1882,7 +1882,7 @@ FunctorCode PrepareBeamSpanElementsFunctor::VisitBeamSpan(BeamSpan *beamSpan)
         if (!elementStaff) continue;
         if (elementStaff->GetN() != staff->GetN()) {
             Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
-            if (!elementStaff || !elementLayer) continue;
+            if (!elementLayer) continue;
             layerElem->m_crossStaff = elementStaff;
             layerElem->m_crossLayer = elementLayer;
         }

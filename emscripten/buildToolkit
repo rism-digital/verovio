@@ -230,7 +230,7 @@ $exports .= "'_malloc',";
 $exports .= "'_free'";
 $exports .= "]\"";
 
-my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
+my $extra_exports = "-s EXPORTED_RUNTIME_METHODS='[\"cwrap\", \"HEAPU8\"]'";
 
 my $modularize = $modularizeQ ? "-s MODULARIZE=1 -s EXPORT_ES6=1 -s EXPORT_NAME=\"'createVerovioModule'\"" : "";
 

@@ -33,6 +33,7 @@
 #include "adjustxposfunctor.h"
 #include "adjustxrelfortranscriptionfunctor.h"
 #include "adjustyposfunctor.h"
+#include "adjustyrelfortranscriptionfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "cachehorizontallayoutfunctor.h"
@@ -270,6 +271,8 @@ void Page::LayOutTranscription(bool force)
 
     AdjustXRelForTranscriptionFunctor adjustXRelForTranscription;
     this->Process(adjustXRelForTranscription);
+    AdjustYRelForTranscriptionFunctor adjustYRelForTranscription;
+    this->Process(adjustYRelForTranscription);
 
     CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);
@@ -333,10 +336,8 @@ void Page::ResetAligners()
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    if (IsMensuralType(doc->m_notationType)) {
-        CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
-        this->Process(calcLigatureNotePos);
-    }
+    CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
+    this->Process(calcLigatureNotePos);
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);

@@ -29489,7 +29489,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     if (hasMensuralStaff(&infile[startline])) {
-        m_measure = new Measure(false);
+        m_measure = new Measure(UNMEASURED);
     }
     else {
         m_measure = new Measure();
@@ -31805,6 +31805,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
     doc->ConvertMarkupDoc();
 
     if (m_mens) {
+        doc->PrepareData();
         doc->SetMensuralMusicOnly(true);
         doc->m_notationType = NOTATIONTYPE_mensural;
         doc->ConvertToCastOffMensuralDoc(true);

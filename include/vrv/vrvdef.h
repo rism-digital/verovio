@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 4
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -238,8 +238,10 @@ enum ClassId : uint16_t {
     NC,
     NOTE,
     NEUME,
+    ORISCUS,
     PLICA,
     PROPORT,
+    QUILISMA,
     REST,
     SPACE,
     STEM,
@@ -660,6 +662,14 @@ enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
 //----------------------------------------------------------------------------
 
 enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
+
+//----------------------------------------------------------------------------
+// Measure type
+//----------------------------------------------------------------------------
+
+enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+#define NEUME_LINE_TYPE "neon-neume-line"
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

@@ -136,9 +136,6 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
 
     m_beamStaff = staff;
 
-    // duration variables
-    int lastDur, currentDur;
-
     m_beamElementCoords.reserve(childList.size());
     for ([[maybe_unused]] auto child : childList) {
         m_beamElementCoords.push_back(new BeamElementCoord());
@@ -149,7 +146,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
-    lastDur = (current->GetDurationInterface())->GetActualDur();
+    int lastDur = (current->GetDurationInterface())->GetActualDur();
 
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -165,7 +162,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
-        currentDur = (current->GetDurationInterface())->GetActualDur();
+        const int currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
             m_beamHasChord = true;

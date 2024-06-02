@@ -679,7 +679,7 @@ void ABCInput::parseKey(std::string &keyString)
             posStart = pitch.size() - posEnd;
             keyPitchAlterAmount = -1;
         }
-        else if (accidNum > 0) {
+        else {
             keySig = StringFormat("%ds", accidNum);
             keyPitchAlterAmount = 1;
         }
