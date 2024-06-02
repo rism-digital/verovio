@@ -96,6 +96,12 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
 
 FunctorCode CalcAlignmentXPosFunctor::VisitMeasure(Measure *measure)
 {
+    // We start a new Measure
+    // Reset the previous time position and x_rel to 0;
+    m_previousTime = 0.0;
+    // We un-measured music we never have a left barline, so do not add a default space
+    m_previousXRel = (measure->IsMeasuredMusic()) ? m_doc->GetDrawingUnit(100) : 0;
+
     measure->m_measureAligner.Process(*this);
 
     return FUNCTOR_SIBLINGS;
@@ -103,10 +109,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode CalcAlignmentXPosFunctor::VisitMeasureAligner(MeasureAligner *measureAligner)
 {
-    // We start a new MeasureAligner
-    // Reset the previous time position and x_rel to 0;
-    m_previousTime = 0.0;
-    m_previousXRel = m_doc->GetDrawingUnit(100);
+
     m_lastNonTimestamp = measureAligner->GetLeftBarLineAlignment();
     m_measureAligner = measureAligner;
 
