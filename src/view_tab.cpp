@@ -177,8 +177,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     if (!tabGrp->IsInBeam() && !staff->IsTabGuitar()) {
         int symc = 0;
         switch (drawingDur) {
-                // TODO SMUFL_EBA6_luteDurationDoubleWhole is defined by SMUFL but not yet implemented in Verovio
-                /* case DUR_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag */
+            case DUR_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag */
             case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break; // 0 flags
             case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break; // 1 flag
             case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break; // 2 flags
