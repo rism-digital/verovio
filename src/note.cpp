@@ -584,6 +584,18 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
     }
 
     if (DUR_BR == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
+
+    // pseudo mensural notation
+    const Staff *staff = this->GetAncestorStaff();
+    if (staff->IsMensural()) {
+        if ((DUR_1 == duration) || (DUR_2 == duration)) {
+            return SMUFL_E93C_mensuralNoteheadMinimaWhite;
+        }
+        else {
+            return SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+        }
+    }
+
     if (DUR_1 == duration) return SMUFL_E0A2_noteheadWhole;
     // We support solid on half notes or void on quarter and shorter notes
     if (DUR_2 == duration) {
