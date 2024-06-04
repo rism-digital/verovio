@@ -891,8 +891,27 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetID());
 
-    char32_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
-    this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
+    // pseudo mensural notation - use lines instead of glyphs
+    if (staff->IsMensural()) {
+        const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        const bool stemUp = (stem->GetDrawingStemDir() == STEMDIRECTION_up);
+        x += stemWidth / 2;
+        y += (stemUp) ? -stemWidth / 3 : stemWidth / 3;
+        const int xOffset = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int yOffset = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
+        yOffset *= stemUp ? -1 : 1;
+        const int ySpace = yOffset * 2 / 3;
+
+        for (int i = 0; i < flag->m_drawingNbFlags; ++i) {
+            this->DrawObliqueLine(
+                dc, x, x + xOffset, y, y + yOffset, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+            y += ySpace;
+        }
+    }
+    else {
+        char32_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
+        this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
+    }
 
     dc->EndGraphic(element, this);
 }
