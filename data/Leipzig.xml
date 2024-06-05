@@ -805,4 +805,13 @@
     <a n="stemDownNW" x="0.0" y="-0.14" />
     <a n="stemUpSE" x="1.26" y="0.16" />
   </g>
+  <g c="E926" x="-0.14" y="-200.0" w="180.14" h="390.0" h-a-x="180" n="mensuralProportion1" />
+  <g c="E928" x="1.0" y="-201.0" w="215.0" h="391.0" h-a-x="216" n="mensuralProportion3" />
+  <g c="E927" x="-0.0" y="-200.0" w="254.04" h="390.02" h-a-x="254" n="mensuralProportion2" />
+  <g c="E929" x="0.0" y="-202.0" w="254.0" h="382.0" h-a-x="254" n="mensuralProportion4" />
+  <g c="EE90" x="-2.0" y="-200.02" w="256.0" h="392.02" h-a-x="254" n="mensuralProportion5" />
+  <g c="EE91" x="-5.34" y="-200.0" w="233.34" h="390.0" h-a-x="227" n="mensuralProportion6" />
+  <g c="EE94" x="-5.34" y="-200.0" w="233.34" h="390.0" h-a-x="227" n="mensuralProportion9" />
+  <g c="EE93" x="0.0" y="-200.0" w="233.0" h="390.0" h-a-x="233" n="mensuralProportion8" />
+  <g c="EE92" x="0.0" y="-200.0" w="233.0" h="390.0" h-a-x="233" n="mensuralProportion7" />
 </bounding-boxes>
