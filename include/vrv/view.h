@@ -617,6 +617,7 @@ private:
     data_STEMDIRECTION GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Point *start, Point *end, Point *center);
     std::u32string IntToTupletFigures(unsigned short number);
     std::u32string IntToTimeSigFigures(unsigned short number);
+    std::u32string IntToProlationFigures(unsigned short number);
     std::u32string IntToSmuflFigures(unsigned short number, int offset);
     int NestedTuplets(Object *object);
     int GetSylYRel(int verseN, Staff *staff);

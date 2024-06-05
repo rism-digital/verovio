@@ -162,6 +162,22 @@ std::u32string View::IntToTimeSigFigures(unsigned short number)
     return IntToSmuflFigures(number, 0xE080);
 }
 
+std::u32string View::IntToProlationFigures(unsigned short number)
+{
+    std::ostringstream stream;
+    stream << number;
+    std::u32string str = UTF8to32(stream.str());
+    
+    for (char32_t &c : str) {
+        switch (c) {
+            case 49: c = SMUFL_E928_mensuralProportion3; break;
+            default:
+                c = SMUFL_E928_mensuralProportion1
+        }
+    }
+    return str;
+}
+
 std::u32string View::IntToSmuflFigures(unsigned short number, int offset)
 {
     std::ostringstream stream;
