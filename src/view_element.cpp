@@ -1135,6 +1135,11 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
         const char32_t code = meterSig->GetSymbolGlyph();
         this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
         x += m_doc->GetGlyphWidth(code, glyphSize, false);
+        if (meterSig->GetForm() == METERFORM_symplusnorm) {
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            const int unit = meterSig->HasUnit() ? meterSig->GetUnit() : 0;
+            x += this->DrawMeterSigFigures(dc, x, y, meterSig, unit, staff);
+        }
     }
     else if (meterSig->GetForm() == METERFORM_num) {
         x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
@@ -1179,6 +1184,8 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         : element->GetDrawingY();
     char32_t rest
         = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
+    // pseudo mensural notation
+    if (staff->IsMensural()) rest = SMUFL_E9F4_mensuralRestSemibrevis;
 
     x -= m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize) / 2;
 
@@ -1328,7 +1335,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
     int y1 = y2 + multiRestThickness;
 
-    if (multiRest->UseBlockStyle(m_doc)) {
+    // Always use block style for pseudo mensural
+    if (multiRest->UseBlockStyle(m_doc) || staff->IsMensural()) {
         // This is 1/2 the length of the black rectangle
         int width = measureWidth - 2 * m_doc->GetDrawingDoubleUnit(staffNotationSize);
         if (multiRest->HasWidth() && multiRest->AttWidth::GetWidth().GetType() == MEASUREMENTTYPE_vu) {
@@ -1974,6 +1982,8 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
     assert(dc);
     assert(staff);
 
+    const bool isMensural = staff->IsMensural();
+
     const auto [numSummands, numSign] = meterSig->GetCount();
     std::u32string timeSigCombNumerator, timeSigCombDenominator;
     for (int summand : numSummands) {
@@ -1987,9 +1997,9 @@ int View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, MeterSig *meterSi
                 default: break;
             }
         }
-        timeSigCombNumerator += IntToTimeSigFigures(summand);
+        timeSigCombNumerator += isMensural ? this->IntToProlationFigures(summand) : this->IntToTimeSigFigures(summand);
     }
-    if (den) timeSigCombDenominator = this->IntToTimeSigFigures(den);
+    if (den) timeSigCombDenominator = (isMensural) ? this->IntToProlationFigures(den) : this->IntToTimeSigFigures(den);
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
 
