@@ -2433,6 +2433,7 @@ namespace pae {
         m_object = object;
         m_treeObject = NULL;
         m_isError = false;
+        m_repetitionOf = -1;
     }
 
     Token::~Token() {}
@@ -2666,9 +2667,33 @@ void PAEInput::AddToken(char c, int &position)
 void PAEInput::PrepareInsertion(int position, std::list<pae::Token> &insertion)
 {
     for (pae::Token &token : insertion) {
+        // We can have insertions (measure) of insertions (figures) - make sure we point to the original
+        token.m_repetitionOf = (token.IsInsertion()) ? token.m_repetitionOf : token.m_position;
         token.m_position = position;
         if (token.m_object) {
             token.m_object = token.m_object->Clone();
+        }
+    }
+}
+
+void PAEInput::AdjustInsertions()
+{
+    for (pae::Token &token : m_pae) {
+        if (token.IsInsertion() && ((token.Is(NOTE) || token.Is(CHORD)) || token.Is(REST))) {
+            pae::Token *orig = this->GetTokenForPosition(token.m_repetitionOf);
+            if (!orig || !orig->m_object) {
+                continue;
+            }
+            DurationInterface *tokenDur = token.m_object->GetDurationInterface();
+            DurationInterface *origDur = orig->m_object->GetDurationInterface();
+            if (tokenDur && origDur) {
+                tokenDur->SetDur(origDur->GetDur());
+            }
+            PitchInterface *tokenPitch = token.m_object->GetPitchInterface();
+            PitchInterface *origPitch = orig->m_object->GetPitchInterface();
+            if (tokenPitch && origPitch) {
+                tokenPitch->SetOct(origPitch->GetOct());
+            }
         }
     }
 }
@@ -3495,11 +3520,13 @@ bool PAEInput::ConvertRepeatedFigure()
             // Repeat the figure. That is simply add it to the map
             if (token->m_char == 'f') {
                 token->m_char = 0;
+                // Make a copy of the original figure in case it is inserted more than one time
+                std::list<pae::Token> figureToInsert = figure;
                 // Set position and clone objects
-                PrepareInsertion(token->m_position, figure);
+                PrepareInsertion(token->m_position, figureToInsert);
                 // Move to the next token because we insert before it
                 ++token;
-                m_pae.insert(token, figure.begin(), figure.end());
+                m_pae.insert(token, figureToInsert.begin(), figureToInsert.end());
                 // Move back to the previous token (now the end of the figure)
                 --token;
                 status = pae::FIGURE_REPEAT;
@@ -3560,11 +3587,13 @@ bool PAEInput::ConvertRepeatedMeasure()
                 if (m_pedanticMode) return false;
             }
             else {
+                // Make a copy of the original measure in case it is inserted more than one time
+                std::list<pae::Token> measureToInsert = measure;
                 // Set position and clone objects
-                PrepareInsertion(token->m_position, measure);
+                PrepareInsertion(token->m_position, measureToInsert);
                 // Move to the next token because we insert before it
                 ++token;
-                m_pae.insert(token, measure.begin(), measure.end());
+                m_pae.insert(token, measureToInsert.begin(), measureToInsert.end());
                 // Move back to the previous token (now the end of the measure)
                 --token;
                 repeat = true;
@@ -4360,6 +4389,10 @@ bool PAEInput::ConvertDuration()
         ++token;
     }
 
+    // Once we have converted octave and duration, we need to adjust the insertion repetitions for cases where the
+    // octave and duration is changed within the insertion
+    AdjustInsertions();
+
     return true;
 }
 
@@ -4783,6 +4816,14 @@ void PAEInput::RemoveContainerToken(Object *object)
             token.m_object = NULL;
         }
     }
+}
+
+pae::Token *PAEInput::GetTokenForPosition(int position)
+{
+    for (pae::Token &token : m_pae) {
+        if (token.m_position == position) return &token;
+    }
+    return NULL;
 }
 
 pae::Token *PAEInput::GetTokenForTreeObject(Object *object)
