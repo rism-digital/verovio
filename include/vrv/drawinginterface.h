@@ -243,7 +243,9 @@ public:
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() const
     {
-        return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym()));
+        return (m_drawMeterSig
+            && (m_currentMeterSig.HasCount() || m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym()
+                || m_currentMeterSig.HasGlyphNum() || m_currentMeterSig.HasGlyphName()));
     }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     bool DrawMeterSigGrp() const;

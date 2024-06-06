@@ -242,7 +242,9 @@ char32_t Rest::GetRestGlyph(const int duration) const
         if (NULL != resources->GetGlyph(code)) return code;
     }
 
-    if (this->IsMensuralDur()) {
+    const Staff *staff = this->GetAncestorStaff();
+    // mensural rests and rests in pseudo mensural notation
+    if (this->IsMensuralDur() || staff->IsMensural()) {
         switch (duration) {
             case DUR_MX: return SMUFL_E9F0_mensuralRestMaxima; break;
             case DUR_LG: return SMUFL_E9F2_mensuralRestLongaImperfecta; break;

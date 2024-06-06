@@ -167,12 +167,20 @@ std::u32string View::IntToProlationFigures(unsigned short number)
     std::ostringstream stream;
     stream << number;
     std::u32string str = UTF8to32(stream.str());
-    
+
     for (char32_t &c : str) {
         switch (c) {
-            case 49: c = SMUFL_E928_mensuralProportion3; break;
-            default:
-                c = SMUFL_E928_mensuralProportion1
+            case 48: c = SMUFL_E080_timeSig0; break; // No 0 in SMuFL, use CMW one...
+            case 49: c = SMUFL_E926_mensuralProportion1; break;
+            case 50: c = SMUFL_E927_mensuralProportion2; break;
+            case 51: c = SMUFL_E928_mensuralProportion3; break;
+            case 52: c = SMUFL_E929_mensuralProportion4; break;
+            case 53: c = SMUFL_EE90_mensuralProportion5; break;
+            case 54: c = SMUFL_EE91_mensuralProportion6; break;
+            case 55: c = SMUFL_EE92_mensuralProportion7; break;
+            case 56: c = SMUFL_EE93_mensuralProportion8; break;
+            case 57: c = SMUFL_EE94_mensuralProportion9; break;
+            default: c = SMUFL_E926_mensuralProportion1;
         }
     }
     return str;
