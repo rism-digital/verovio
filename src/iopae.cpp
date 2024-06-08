@@ -2688,6 +2688,7 @@ void PAEInput::AdjustInsertions()
             DurationInterface *origDur = orig->m_object->GetDurationInterface();
             if (tokenDur && origDur) {
                 tokenDur->SetDur(origDur->GetDur());
+                tokenDur->SetDots(origDur->GetDots());
             }
             PitchInterface *tokenPitch = token.m_object->GetPitchInterface();
             PitchInterface *origPitch = orig->m_object->GetPitchInterface();
