@@ -5146,7 +5146,7 @@ bool PAEInput::ParseDuration(
     for (char c : paeStr) {
         if (isdigit(c)) {
             data_DURATION duration = DURATION_4;
-            if (m_isMensural) {
+            if (this->IsMensural()) {
                 switch (c) {
                     case '0': duration = DURATION_longa; break;
                     case '1': duration = DURATION_semibrevis; break;
