@@ -2418,7 +2418,8 @@ namespace pae {
     static const char KEYSIG_START = '$';
     static const std::string KEYSIG = "xnb[]ABCDEFG";
     static const char CLEF_START = '%';
-    static const std::string CLEF = "GCFg-+12345";
+    static const std::string CLEFv1 = "GCFg-+12345";
+    static const std::string CLEFv2 = "GCFg-:*12345[]";
     static const char METERSIG_START = '@';
     static const std::string METERSIG = "/o.c0123456789";
     static const std::string GRACE = "qg";
@@ -2833,7 +2834,7 @@ bool PAEInput::Import(const std::string &input)
     // Eventually this should be made a --pae-pedantic option
     m_pedanticMode = false;
 
-    m_isMensural = false;
+    m_notationType = pae::CMN;
 
     m_hasClef = false;
     m_hasKeySig = false;
@@ -2884,7 +2885,7 @@ bool PAEInput::Import(const std::string &input)
     if (!clefStr.empty()) {
         pae::Token staffDefToken(0, pae::CLEF_POS);
         m_hasClef = true;
-        if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, &m_isMensural);
+        if (success) success = this->ParseClef(&m_clef, clefStr, staffDefToken, true);
     }
     else {
         pae::Token staffDefToken(0, pae::CLEF_POS);
@@ -2902,7 +2903,7 @@ bool PAEInput::Import(const std::string &input)
 
     if (!meterSigOrMensurStr.empty()) {
         pae::Token staffDefToken(0, pae::TIMESIG_POS);
-        if (m_isMensural) {
+        if (this->IsMensural()) {
             m_hasMensur = true;
             if (success) success = this->ParseMensur(&m_mensur, meterSigOrMensurStr, staffDefToken);
         }
@@ -3020,7 +3021,7 @@ bool PAEInput::Parse()
     }
 
     // Set the notation type
-    if (m_isMensural) m_doc->m_notationType = NOTATIONTYPE_mensural;
+    if (this->IsMensural()) m_doc->m_notationType = NOTATIONTYPE_mensural;
     // The mdiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
@@ -3040,7 +3041,7 @@ bool PAEInput::Parse()
     staffGrp->AddChild(staffDef);
     score->GetScoreDef()->AddChild(staffGrp);
 
-    if (m_isMensural) {
+    if (this->IsMensural()) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
     }
     if (m_hasClef) {
@@ -3351,7 +3352,7 @@ bool PAEInput::ConvertClef()
             paeStr.clear();
         }
         else if (clefToken) {
-            if (this->Is(token, pae::CLEF)) {
+            if (this->Is(token, pae::CLEFv1)) {
                 paeStr.push_back(token.m_char);
                 token.m_char = 0;
                 continue;
@@ -3403,7 +3404,7 @@ bool PAEInput::ConvertMeterSigOrMensur()
             }
             meterSigOrMensurToken->m_char = 0;
             // LogDebug("MeterSig %s", paeStr.c_str());
-            if (m_isMensural) {
+            if (this->IsMensural()) {
                 Mensur *mensur = new Mensur();
                 meterSigOrMensurToken->m_object = mensur;
                 // Will fail in pedantic mode
@@ -3984,7 +3985,7 @@ bool PAEInput::ConvertBeam()
 
         if (token->m_char == '{') {
             token->m_char = 0;
-            if (m_isMensural) {
+            if (this->IsMensural()) {
                 LogPAE(ERR_022_BEAM_MENSURAL, *token);
                 if (m_pedanticMode) return false;
                 ++token;
@@ -4017,7 +4018,7 @@ bool PAEInput::ConvertBeam()
         }
         else if (token->m_char == '}') {
             token->m_char = 0;
-            if (m_isMensural) {
+            if (this->IsMensural()) {
                 // Not warning necessary here because we must had one before already
                 ++token;
                 continue;
@@ -4296,7 +4297,7 @@ bool PAEInput::ConvertDuration()
     // The stack of durations for handling patterns
     std::list<std::pair<data_DURATION, int>> durations;
     // Add a default quarter note duration
-    if (m_isMensural) {
+    if (this->IsMensural()) {
         durations.push_back({ DURATION_semibrevis, 0 });
     }
     else {
@@ -4365,7 +4366,7 @@ bool PAEInput::ConvertDuration()
                     assert(note);
                     note->SetDur(DURATION_NONE);
                 }
-                else if (m_isMensural) {
+                else if (this->IsMensural()) {
                     if (currentDur->second > 1) {
                         LogPAE(ERR_059_DOUBLE_DOTS_MENS, *token);
                         if (m_pedanticMode) return false;
@@ -4411,7 +4412,7 @@ bool PAEInput::ConvertTie()
             assert(tokenNote);
             if (tie && note) {
                 if (note->GetOct() != tokenNote->GetOct() || note->GetPname() != tokenNote->GetPname()) {
-                    if (m_isMensural && tieToken) {
+                    if (this->IsMensural() && tieToken) {
                         // This is probably a ligature - reset it back
                         tieToken->m_char = '+';
                     }
@@ -4470,7 +4471,7 @@ bool PAEInput::ConvertLigature()
     // No ligatures in non mensural
     // Since now we use the same symbol just return
     // Eventually, once we have a distinct symbol we will want to check them in pedantic mode
-    if (!m_isMensural) return true;
+    if (!this->IsMensural()) return true;
 
     if (!this->HasInput('+')) return true;
 
@@ -4908,14 +4909,14 @@ bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token
     return true;
 }
 
-bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool *mensuralScoreDef)
+bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool mensuralScoreDef)
 {
     assert(clef);
 
     clef->Reset();
 
     std::string invalidChars;
-    if (!this->CheckPAEChars(paeStr, invalidChars, pae::CLEF)) {
+    if (!this->CheckPAEChars(paeStr, invalidChars, pae::CLEFv1)) {
         LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
         if (m_pedanticMode) return false;
     }
@@ -4925,7 +4926,7 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
         if (m_pedanticMode) return false;
         clef->SetLine(2);
         clef->SetShape(CLEFSHAPE_G);
-        if (mensuralScoreDef) *mensuralScoreDef = false;
+        if (mensuralScoreDef) m_notationType = pae::CMN;
         return true;
     }
 
@@ -4944,9 +4945,9 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
     bool isMensural = (paeStr.at(1) == '+');
 
     if (mensuralScoreDef) {
-        *mensuralScoreDef = isMensural;
+        m_notationType = (isMensural) ? pae::MENSURAL : pae::CMN;
     }
-    else if (m_isMensural != isMensural) {
+    else if (this->IsMensural() != isMensural) {
         LogPAE(ERR_044_CLEF_MENS, token);
         if (m_pedanticMode) return false;
     }

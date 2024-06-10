@@ -482,6 +482,8 @@ private:
 
 namespace pae {
 
+    enum notation_TYPE { CMN = 0, MENSURAL, NEUME };
+
     class Token {
     public:
         Token(char c, int position, Object *object = NULL);
@@ -613,6 +615,8 @@ private:
     bool Is(pae::Token &token, const std::string &map);
     bool Was(pae::Token &token, const std::string &map);
     bool HasInput(char inputChar);
+    bool IsMensural() const { return (m_notationType == pae::MENSURAL); }
+    bool IsNeume() const { return (m_notationType == pae::NEUME); }
     ///@}
 
     /**
@@ -620,7 +624,7 @@ private:
      */
     ///@{
     bool ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token);
-    bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool *mensuralScoreDef = NULL);
+    bool ParseClef(Clef *clef, const std::string &paeStr, pae::Token &token, bool scoreDef = false);
     bool ParseMeterSig(MeterSig *meterSig, const std::string &paeStr, pae::Token &token);
     bool ParseMensur(Mensur *mensur, const std::string &paeStr, pae::Token &token);
     bool ParseMeasure(Measure *measure, const std::string &paeStr, pae::Token &token);
@@ -711,7 +715,7 @@ private:
      * A flag indicating the incipit is mensural.
      * Based on the \@clef of the input.
      */
-    bool m_isMensural;
+    pae::notation_TYPE m_notationType;
 
     /**
      * A flag that makes parsing fails when an error is encountered.
@@ -757,7 +761,7 @@ private:
     jsonxx::Object m_inputLog;
     jsonxx::Array m_dataLog;
     ///@}
-    
+
     /** Version 2 flag */
     bool m_v2;
 };
