@@ -757,6 +757,9 @@ private:
     jsonxx::Object m_inputLog;
     jsonxx::Array m_dataLog;
     ///@}
+    
+    /** Version 2 flag */
+    bool m_v2;
 };
 
 //----------------------------------------------------------------------------

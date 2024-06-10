@@ -2490,6 +2490,7 @@ namespace pae {
 
 PAEInput::PAEInput(Doc *doc) : Input(doc)
 {
+    m_v2 = false;
     m_scoreBased = false;
 }
 
@@ -2705,6 +2706,9 @@ jsonxx::Object PAEInput::InputKeysToJson(const std::string &inputKeys)
         else if (line.rfind("@data:", 0) != std::string::npos) {
             jsonInput << "data" << line.substr(line.find(":") + 1);
         }
+        else if (line.rfind("@version:", 0) != std::string::npos) {
+            jsonInput << "version" << line.substr(line.find(":") + 1);
+        }
     }
     // LogDebug("%s", jsonInput.json().c_str());
 
@@ -2715,13 +2719,20 @@ jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
 {
     jsonxx::Object jsonInput;
 
-    std::string scoreDef = singleLine.substr(0, singleLine.find(' '));
+    int startPos = 0;
+    bool v2 = false;
+    if (singleLine.starts_with(";pe2")) {
+        startPos = 4;
+        v2 = true;
+    }
+
+    std::string scoreDef = singleLine.substr(startPos, singleLine.find(' '));
     // We need at least a clef - something is missing
     if (scoreDef.size() < 4) return jsonInput;
 
     // First detect the end of the scoreDef. Because we can have spaces between scoreDef elements,
     // we look for the first character after a space that is not a scoreDef element delimiter
-    std::string::const_iterator start = singleLine.begin();
+    std::string::const_iterator start = singleLine.begin() + startPos;
     std::string::const_iterator scoreDefEnd;
     while ((scoreDefEnd = std::find(start, singleLine.end(), ' ')) != singleLine.end()) {
         if (*(scoreDefEnd + 1) != '@' || *(scoreDefEnd + 1) != '$') break;
@@ -2761,6 +2772,7 @@ jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
     jsonInput << "timesig" << timesig.erase(timesig.find_last_not_of(' ') + 1);
     jsonInput << "keysig" << keysig.erase(keysig.find_last_not_of(' ') + 1);
     jsonInput << "data" << data;
+    if (v2) jsonInput << "version" << "pe2";
 
     return jsonInput;
 }
@@ -2845,6 +2857,13 @@ bool PAEInput::Import(const std::string &input)
     if (jsonInput.has<jsonxx::Object>("x-header")) {
         header = jsonInput.get<jsonxx::Object>("x-header");
         ParseHeader(header);
+    }
+
+    std::string versionStr;
+    if (jsonInput.has<jsonxx::String>("version")) versionStr = jsonInput.get<jsonxx::String>("version");
+
+    if (!versionStr.empty()) {
+        this->m_v2 = (versionStr == "pe2");
     }
 
     std::string keySigStr;
