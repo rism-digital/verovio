@@ -2399,8 +2399,8 @@ namespace pae {
         0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0 // 112-127
     };
 
-    static const char CONTAINER_END = '~';
-    static const char VOID = '_';
+    static const char CONTAINER_END = 23; // ASCII End of Transmission Block
+    static const char VOID = 6; // ASCII Acknowledge
     static const std::string INTERNAL_CHARS = "QXY";
     static const std::string OCTAVE = "\',";
     static const char OCTAVEUP = '\'';
