@@ -270,6 +270,9 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
     if (data[0] == '%' && data.size() > 1) {
         return (data[1] == 'a') ? ABC : PAE;
     }
+    if (data[0] == ';') {
+        return PAE;
+    }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
         std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;

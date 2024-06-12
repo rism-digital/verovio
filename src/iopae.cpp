@@ -2307,7 +2307,8 @@ enum {
     ERR_063_LIGATURE_PITCH,
     ERR_064_LIGATURE_DURATION,
     ERR_065_MREST_INVALID_MEASURE,
-    ERR_066_EMPTY_CONTAINER
+    ERR_066_EMPTY_CONTAINER,
+    ERR_067_SPACE_IN_SCOREDEF
 };
 
 // clang-format off
@@ -2377,7 +2378,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_063_LIGATURE_PITCH, "A ligature cannot have two consecutive notes with the same pitch." },
     { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
     { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." },
-    { ERR_066_EMPTY_CONTAINER, "A grace group or a beam cannot be empty." }
+    { ERR_066_EMPTY_CONTAINER, "A grace group or a beam cannot be empty." },
+    { ERR_067_SPACE_IN_SCOREDEF, "Single-line input should have no space within the score definition."}
 };
 // clang-format on
 
@@ -2736,18 +2738,26 @@ jsonxx::Object PAEInput::SingleLineToJson(const std::string &singleLine)
     std::string::const_iterator start = singleLine.begin() + startPos;
     std::string::const_iterator scoreDefEnd;
     while ((scoreDefEnd = std::find(start, singleLine.end(), ' ')) != singleLine.end()) {
-        if (*(scoreDefEnd + 1) != '@' || *(scoreDefEnd + 1) != '$') break;
+        if (*(scoreDefEnd + 1) != '@' && *(scoreDefEnd + 1) != '$') break;
         start = scoreDefEnd + 1;
     }
 
+    if (std::find(singleLine.begin(), scoreDefEnd, ' ') != scoreDefEnd) {
+        if (v2) {
+            pae::Token inputToken(0, pae::INPUT_POS);
+            LogPAE(ERR_067_SPACE_IN_SCOREDEF, inputToken);
+            if (m_pedanticMode) return jsonInput;
+        }
+    }
+
     // Extract the beginning of each scoreDef element and add flags indicating existence
-    std::string::const_iterator clefStart = singleLine.begin();
-    std::string::const_iterator keysigStart = std::find(singleLine.begin(), scoreDefEnd, '$');
+    std::string::const_iterator clefStart = singleLine.begin() + startPos;
+    std::string::const_iterator keysigStart = std::find(clefStart, scoreDefEnd, '$');
     const bool hasKeysig = (keysigStart != scoreDefEnd);
-    std::string::const_iterator timesigStart = std::find(singleLine.begin(), scoreDefEnd, '@');
+    std::string::const_iterator timesigStart = std::find(clefStart, scoreDefEnd, '@');
     const bool hasTimesig = (timesigStart != scoreDefEnd);
 
-    std::string::const_iterator clefEnd = singleLine.begin() + 4;
+    std::string::const_iterator clefEnd = clefStart + 4;
     std::string clef = std::string(clefStart + 1, clefEnd);
 
     std::string keysig;
@@ -2824,7 +2834,7 @@ bool PAEInput::Import(const std::string &input)
             return false;
         }
     }
-    else if (input.at(0) == '%') {
+    else if (input.at(0) == '%' || input.at(0) == ';') {
         jsonInput = this->SingleLineToJson(input);
     }
     else {
