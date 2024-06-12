@@ -501,6 +501,8 @@ namespace pae {
         bool IsVoid();
         /** Set the object as being inserted in the MEI tree */
         void SetInTree();
+        /** Return true if the token is repeated from an insertion */
+        bool IsInsertion() const { return (m_repetitionOf != -1); }
 
         /* Helper to the a lowercase version of the Object classname (if any) */
         std::string GetName();
@@ -517,6 +519,8 @@ namespace pae {
         int m_position;
         /** a flag indicating that an error occured at this position */
         bool m_isError;
+        /** the position of an original also indicating that the token is a repetition from an insertion */
+        int m_repetitionOf;
     };
 
 } // namespace pae
@@ -649,6 +653,12 @@ private:
     void PrepareInsertion(int position, std::list<pae::Token> &insertion);
 
     /**
+     * Adjust the insertions making sure the context previous them is applied to the repeated content.
+     * This means copying duration and octave values from the insertion to the repeated content.
+     */
+    void AdjustInsertions();
+
+    /**
      * Check that the token list is a valid opening / closing tag successing.
      * Also check that every element is supported by is containing element.
      * Remove invalid opening / closing successions or invalid elements in non pedantic mode.
@@ -670,6 +680,12 @@ private:
      * A helper to remove a token when checking the hierarchy and it is not valid
      */
     void RemoveContainerToken(Object *object);
+
+    /**
+     * Return the token corresponding to an input position.
+     * Return NULL if not found.
+     */
+    pae::Token *GetTokenForPosition(int position);
 
     /**
      * Return the token corresponding to an object in the tree.
