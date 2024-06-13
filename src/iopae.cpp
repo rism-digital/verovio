@@ -2818,6 +2818,8 @@ bool PAEInput::CheckPAEChars(const std::string &input, std::string &invalidChars
 {
     invalidChars = "";
     bool status = true;
+    // The corresponding comparison value to use with pae::PAEChars
+    int vComparison = (m_v2) ? 2 : 1;
     for (const char &ch : input) {
         if (ch < 0) {
             invalidChars.push_back(ch);
@@ -2825,7 +2827,8 @@ bool PAEInput::CheckPAEChars(const std::string &input, std::string &invalidChars
             continue;
         }
         // Use the entire pae::PAEChars set unless we are testing against another one
-        bool invalid = (validChars.empty()) ? (!pae::PAEChars[ch]) : (validChars.find(ch) == std::string::npos);
+        bool invalid
+            = (validChars.empty()) ? (!(pae::PAEChars[ch] & vComparison)) : (validChars.find(ch) == std::string::npos);
         if (invalid) {
             invalidChars.push_back(ch);
             status = false;
@@ -4968,7 +4971,8 @@ bool PAEInput::ParseClef(Clef *clef, const std::string &paeStr, pae::Token &toke
     clef->Reset();
 
     std::string invalidChars;
-    if (!this->CheckPAEChars(paeStr, invalidChars, pae::CLEFv1)) {
+    std::string clefChars = (m_v2) ? pae::CLEFv2 : pae::CLEFv1;
+    if (!this->CheckPAEChars(paeStr, invalidChars, clefChars)) {
         LogPAE(ERR_050_INVALID_CHAR, token, invalidChars);
         if (m_pedanticMode) return false;
     }
