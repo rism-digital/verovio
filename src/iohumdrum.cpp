@@ -27696,7 +27696,8 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         // Restore the tuplet factors before calling setRhythmFromDuration
         // as they will be removed (again) in getDurAndDots().
         newdur /= m_tupletscaling;
-        setRhythmFromDuration(element, newdur);
+        // Do not run the following function since it somehow removes @dur:
+        // setRhythmFromDuration(element, newdur);
         return newdur;
     }
 
