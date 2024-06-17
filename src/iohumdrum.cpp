@@ -10812,6 +10812,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             int line = token->getLineIndex();
             int field = token->getFieldIndex();
             std::string ccolor = getSpineColor(line, field);
+            size_t norest = ccolor.find("NOREST");
+            if (norest != std::string::npos) {
+                ccolor = ccolor.substr(0, norest);
+            }
             if (!ccolor.empty()) {
                 harmRend->SetColor(ccolor);
                 if (token->getValueInt("auto", "circle")) {
@@ -16444,8 +16448,16 @@ void HumdrumInput::embedTieInformation(Note *note, const std::string &token)
 void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subtoken, int line, int field)
 {
     std::string spinecolor = getSpineColor(line, field);
-    if (spinecolor != "") {
-        note->SetColor(spinecolor);
+    if (!spinecolor.empty()) {
+        size_t norest = spinecolor.find("NOREST");
+        bool isRest = false;
+        if (norest != std::string::npos) {
+            isRest = true;
+            spinecolor = spinecolor.substr(0, norest);
+        }
+        if ((!spinecolor.empty()) && !isRest) {
+            note->SetColor(spinecolor);
+        }
     }
 
     if (m_mens) {
@@ -16593,6 +16605,9 @@ void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int
     std::string spinecolor;
     if ((line >= 0) && (field >= 0)) {
         spinecolor = getSpineColor(line, field);
+        if (spinecolor.find("NOREST") != std::string::npos) {
+            spinecolor = "";
+        }
     }
     if (spinecolor != "") {
         rest->SetColor(spinecolor);
@@ -16665,7 +16680,8 @@ string HumdrumInput::getSpineColor(int line, int field)
         return output;
     }
     for (int i = field + 1; i < infile[line].getFieldCount(); ++i) {
-        if (!infile.token(line, i)->isDataType("**color")) {
+        hum::HTp token = infile.token(line, i);
+        if (!(token->isDataType("**color") || token->isDataType("**coloR"))) {
             continue;
         }
         output = *infile.token(line, i)->resolveNull();
@@ -16680,6 +16696,9 @@ string HumdrumInput::getSpineColor(int line, int field)
         }
         else if (output == "#000") {
             output = "";
+        }
+        if (token->isDataType("**coloR")) {
+            output += "NOREST";
         }
         break;
     }
