@@ -540,7 +540,9 @@ int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
     int duration = this->GetActualDur();
-    if (duration > DURATION_128) duration = DURATION_128;
+    // Make sure we are in the boundaries of g_defaultRests
+    if (duration > DUR_128) duration = DUR_128;
+    if (duration < DUR_LG) duration = DUR_LG;
     return g_defaultRests.at(layer)
         .at(RL_sameLayer == layer ? location.second : RA_none)
         .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
