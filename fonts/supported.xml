@@ -2236,10 +2236,10 @@
         <glyph glyph-code="E923" smufl-name="mensuralProlationCombiningThreeDotsTri" />
         <glyph glyph-code="E924" smufl-name="mensuralProlationCombiningDotVoid" />
         <glyph glyph-code="E925" smufl-name="mensuralProlationCombiningStroke" />
-        <!--<glyph glyph-code="E926" smufl-name="mensuralProportion1" />-->
-        <!--<glyph glyph-code="E927" smufl-name="mensuralProportion2" />-->
-        <!--<glyph glyph-code="E928" smufl-name="mensuralProportion3" />-->
-        <!--<glyph glyph-code="E929" smufl-name="mensuralProportion4" />-->
+        <glyph glyph-code="E926" smufl-name="mensuralProportion1" />
+        <glyph glyph-code="E927" smufl-name="mensuralProportion2" />
+        <glyph glyph-code="E928" smufl-name="mensuralProportion3" />
+        <glyph glyph-code="E929" smufl-name="mensuralProportion4" />
         <!--<glyph glyph-code="E92A" smufl-name="mensuralProportionMinor" />-->
         <!--<glyph glyph-code="E92B" smufl-name="mensuralProportionMajor" />-->
         <!--<glyph glyph-code="E92C" smufl-name="mensuralModusPerfectumVert" />-->
@@ -3190,11 +3190,11 @@
     </fingeringSupplement>
     <medievalAndRenaissanceProlationsSupplement>
         <description>Medieval and Renaissance prolations supplement</description>
-        <!--<glyph glyph-code="EE90" smufl-name="mensuralProportion5" />-->
-        <!--<glyph glyph-code="EE91" smufl-name="mensuralProportion6" />-->
-        <!--<glyph glyph-code="EE92" smufl-name="mensuralProportion7" />-->
-        <!--<glyph glyph-code="EE93" smufl-name="mensuralProportion8" />-->
-        <!--<glyph glyph-code="EE94" smufl-name="mensuralProportion9" />-->
+        <glyph glyph-code="EE90" smufl-name="mensuralProportion5" />
+        <glyph glyph-code="EE91" smufl-name="mensuralProportion6" />
+        <glyph glyph-code="EE92" smufl-name="mensuralProportion7" />
+        <glyph glyph-code="EE93" smufl-name="mensuralProportion8" />
+        <glyph glyph-code="EE94" smufl-name="mensuralProportion9" />
         <range_end>U+EE9F</range_end>
         <range_start>U+EE90</range_start>
     </medievalAndRenaissanceProlationsSupplement>

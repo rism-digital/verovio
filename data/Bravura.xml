@@ -679,6 +679,10 @@
   <g c="E923" x="0.0" y="-125.0" w="266.0" h="251.0" h-a-x="266" n="mensuralProlationCombiningThreeDotsTri" />
   <g c="E924" x="0.0" y="-162.0" w="324.0" h="324.0" h-a-x="324" n="mensuralProlationCombiningDotVoid" />
   <g c="E925" x="0.0" y="-371.0" w="48.0" h="743.0" h-a-x="48" n="mensuralProlationCombiningStroke" />
+  <g c="E926" x="0.0" y="-250.0" w="249.0" h="503.0" h-a-x="249" n="mensuralProportion1" />
+  <g c="E927" x="0.0" y="-250.0" w="331.0" h="503.0" h-a-x="331" n="mensuralProportion2" />
+  <g c="E928" x="0.0" y="-250.0" w="294.0" h="503.0" h-a-x="293" n="mensuralProportion3" />
+  <g c="E929" x="0.0" y="-250.0" w="379.0" h="500.0" h-a-x="379" n="mensuralProportion4" />
   <g c="E938" x="0.0" y="-141.0" w="282.0" h="282.0" h-a-x="282" n="mensuralNoteheadSemibrevisBlack" />
   <g c="E939" x="1.0" y="-141.0" w="282.0" h="282.0" h-a-x="283" n="mensuralNoteheadSemibrevisVoid" />
   <g c="E93C" x="0.0" y="-184.0" w="320.0" h="369.0" h-a-x="320" n="mensuralNoteheadMinimaWhite">
@@ -1005,6 +1009,7 @@
   <g c="F433" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoAboveGerman" />
   <g c="F434" x="0.0" y="-8.0" w="923.0" h="563.0" h-a-x="922" n="keyboardPedalPedNoDot" />
   <g c="F435" x="0.0" y="-15.0" w="1014.0" h="606.0" h-a-x="1014" n="keyboardPedalSostNoDot" />
+  <g c="F43D" x="0.0" y="-251.0" w="455.0" h="504.0" h-a-x="455" n="mensuralProportion4Old" />
   <g c="F43F" x="0.0" y="-169.0" w="529.0" h="338.0" h-a-x="529" n="noteheadDoubleWholeAlt">
     <a n="noteheadOrigin" x="0.14" y="0.0" />
   </g>

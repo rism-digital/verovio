@@ -432,6 +432,10 @@ enum {
     SMUFL_E923_mensuralProlationCombiningThreeDotsTri = 0xE923,
     SMUFL_E924_mensuralProlationCombiningDotVoid = 0xE924,
     SMUFL_E925_mensuralProlationCombiningStroke = 0xE925,
+    SMUFL_E926_mensuralProportion1 = 0xE926,
+    SMUFL_E927_mensuralProportion2 = 0xE927,
+    SMUFL_E928_mensuralProportion3 = 0xE928,
+    SMUFL_E929_mensuralProportion4 = 0xE929,
     SMUFL_E938_mensuralNoteheadSemibrevisBlack = 0xE938,
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
@@ -642,10 +646,15 @@ enum {
     SMUFL_ECB7_metAugmentationDot = 0xECB7,
     SMUFL_ED40_articSoftAccentAbove = 0xED40,
     SMUFL_ED41_articSoftAccentBelow = 0xED41,
+    SMUFL_EE90_mensuralProportion5 = 0xEE90,
+    SMUFL_EE91_mensuralProportion6 = 0xEE91,
+    SMUFL_EE92_mensuralProportion7 = 0xEE92,
+    SMUFL_EE93_mensuralProportion8 = 0xEE93,
+    SMUFL_EE94_mensuralProportion9 = 0xEE94,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 620
+#define SMUFL_COUNT 629
 
 } // namespace vrv
 
