@@ -6985,7 +6985,7 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 bool MEIInput::ReadSyl(Object *parent, pugi::xml_node syl)
 {
     // Add empty text node for empty syl element for invisible bbox in neume notation
-    if (!syl.first_child() && m_doc->IsFacs() && (m_doc->m_notationType == NOTATIONTYPE_neume)) {
+    if (!syl.first_child() && m_doc->HasFacsimile() && m_doc->IsNeumeLines()) {
         syl.text().set("");
     }
     Syl *vrvSyl = new Syl();
