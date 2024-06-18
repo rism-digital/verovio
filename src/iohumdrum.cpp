@@ -24332,40 +24332,48 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
     int staffindex = m_currentstaff - 1;
 
     if (*token == "*8va") {
-        // turn on ottava
-        ss[staffindex].ottavameasure = m_measure;
-        ss[staffindex].ottavanotestart = NULL;
-        ss[staffindex].ottavanoteend = NULL;
-        ss[staffindex].ottavaendtimestamp = token->getDurationFromStart();
-        // When a new note is read, check if ottavameasure
-        // is non-null, and if so, store the new note in ottavanotestart.
+        if (ss[staffindex].ottavameasure == NULL) {
+            // turn on ottava
+            ss[staffindex].ottavameasure = m_measure;
+            ss[staffindex].ottavanotestart = NULL;
+            ss[staffindex].ottavanoteend = NULL;
+            ss[staffindex].ottavaendtimestamp = token->getDurationFromStart();
+            // When a new note is read, check if ottavameasure
+            // is non-null, and if so, store the new note in ottavanotestart.
+        }
     }
     else if (*token == "*8ba") {
-        // turn on ottava down
-        ss[staffindex].ottavadownmeasure = m_measure;
-        ss[staffindex].ottavadownnotestart = NULL;
-        ss[staffindex].ottavadownnoteend = NULL;
-        ss[staffindex].ottavadownendtimestamp = token->getDurationFromStart();
-        // When a new note is read, check if ottavadownmeasure
-        // is non-null, and if so, store the new note in ottavadownnotestart.
+        if (ss[staffindex].ottavadownmeasure == NULL) {
+            // turn on ottava down
+            ss[staffindex].ottavadownmeasure = m_measure;
+            ss[staffindex].ottavadownnotestart = NULL;
+            ss[staffindex].ottavadownnoteend = NULL;
+            ss[staffindex].ottavadownendtimestamp = token->getDurationFromStart();
+            // When a new note is read, check if ottavadownmeasure
+            // is non-null, and if so, store the new note in ottavadownnotestart.
+        }
     }
     else if (*token == "*15ba") {
-        // turn on two ottava down
-        ss[staffindex].ottava2downmeasure = m_measure;
-        ss[staffindex].ottava2downnotestart = NULL;
-        ss[staffindex].ottava2downnoteend = NULL;
-        ss[staffindex].ottava2downendtimestamp = token->getDurationFromStart();
-        // When a new note is read, check if ottava2downmeasure
-        // is non-null, and if so, store the new note in ottava2downnotestart.
+        if (ss[staffindex].ottava2downmeasure == NULL) {
+            // turn on two ottava down
+            ss[staffindex].ottava2downmeasure = m_measure;
+            ss[staffindex].ottava2downnotestart = NULL;
+            ss[staffindex].ottava2downnoteend = NULL;
+            ss[staffindex].ottava2downendtimestamp = token->getDurationFromStart();
+            // When a new note is read, check if ottava2downmeasure
+            // is non-null, and if so, store the new note in ottava2downnotestart.
+        }
     }
     else if (*token == "*15ma") {
-        // turn on ottava
-        ss[staffindex].ottava2measure = m_measure;
-        ss[staffindex].ottava2notestart = NULL;
-        ss[staffindex].ottava2noteend = NULL;
-        ss[staffindex].ottava2endtimestamp = token->getDurationFromStart();
-        // When a new note is read, check if ottava2measure
-        // is non-null, and if so, store the new note in ottava2notestart.
+        if (ss[staffindex].ottava2measure == NULL) {
+            // turn on ottava
+            ss[staffindex].ottava2measure = m_measure;
+            ss[staffindex].ottava2notestart = NULL;
+            ss[staffindex].ottava2noteend = NULL;
+            ss[staffindex].ottava2endtimestamp = token->getDurationFromStart();
+            // When a new note is read, check if ottava2measure
+            // is non-null, and if so, store the new note in ottava2notestart.
+        }
     }
     else if (*token == "*X8va") {
         // turn off ottava
