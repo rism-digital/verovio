@@ -688,7 +688,7 @@ double LayerElement::GetAlignmentDuration(
             ListOfConstObjects objects;
             ClassIdsComparison ids({ CHORD, NOTE, REST, SPACE });
             tuplet->FindAllDescendantsByComparison(&objects, &ids);
-            if (objects.size() > 1) {
+            if (objects.size() > 0) {
                 num = tuplet->GetNum();
                 numbase = tuplet->GetNumbase();
                 // 0 is not valid in MEI anyway - just correct it silently
