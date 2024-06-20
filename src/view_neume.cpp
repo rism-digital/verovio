@@ -33,6 +33,12 @@
 
 namespace vrv {
 
+struct NcDrawingParams {
+    wchar_t fontNo = SMUFL_E990_chantPunctum;
+    float xOffset = 0;
+    float yOffset = 0;
+};
+
 void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -63,38 +69,27 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
     assert(staff);
     assert(measure);
 
-    struct drawingParams {
-        wchar_t fontNo = SMUFL_E990_chantPunctum;
-        wchar_t fontNoLiq[5] = {};
-        float xOffsetLiq[5] = { 0, 0, 0, 0, 0 };
-        float yOffsetLiq[5] = { 0, 0, 0, 0, 0 };
-    };
-    std::vector<drawingParams> params;
-    params.push_back(drawingParams());
+    NcDrawingParams params[3];
 
     dc->StartGraphic(element, "", element->GetID());
 
     Nc *nc = dynamic_cast<Nc *>(element->GetParent());
 
     if (nc->GetCurve() == curvatureDirection_CURVE_c) {
-        params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).fontNoLiq[1] = SMUFL_EB92_staffPosRaise3;
-        params.at(0).fontNoLiq[2] = SMUFL_E995_chantAuctumDesc;
-        params.at(0).fontNoLiq[3] = SMUFL_EB91_staffPosRaise2;
-        params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).xOffsetLiq[4] = 0.8;
-        params.at(0).yOffsetLiq[0] = -1.5;
-        params.at(0).yOffsetLiq[4] = -1.75;
+        params[0].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[1].fontNo = SMUFL_E995_chantAuctumDesc;
+        params[2].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[2].xOffset = 0.8;
+        params[0].yOffset = -1.5;
+        params[2].yOffset = -1.75;
     }
     else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
-        params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).fontNoLiq[1] = SMUFL_EB98_staffPosLower1;
-        params.at(0).fontNoLiq[2] = SMUFL_E994_chantAuctumAsc;
-        params.at(0).fontNoLiq[3] = SMUFL_EB99_staffPosLower2;
-        params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).xOffsetLiq[4] = 0.8;
-        params.at(0).yOffsetLiq[0] = 0.5;
-        params.at(0).yOffsetLiq[4] = 0.75;
+        params[0].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[1].fontNo = SMUFL_E994_chantAuctumAsc;
+        params[2].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[2].xOffset = 0.8;
+        params[0].yOffset = 0.5;
+        params[2].yOffset = 0.75;
     }
 
     const int noteHeight
@@ -109,11 +104,9 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
         noteY -= staff->GetDrawingRotationOffsetFor(noteX);
     }
 
-    for (auto it = params.begin(); it != params.end(); it++) {
-        for (int i = 0; i < static_cast<int>(sizeof(params.at(0).fontNoLiq)); i++) {
-            DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, noteY + it->yOffsetLiq[i] * noteHeight,
-                it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
-        }
+    for (int i = 0; i < static_cast<int>(sizeof(params)); ++i) {
+        DrawSmuflCode(dc, noteX + params[i].xOffset * noteWidth, noteY + params[i].yOffset * noteHeight,
+            params[i].fontNo, staff->m_drawingStaffSize, false, true);
     }
 
     dc->EndGraphic(element, this);
@@ -134,14 +127,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         return;
     }
 
-    struct drawingParams {
-        wchar_t fontNo = SMUFL_E990_chantPunctum;
-        wchar_t fontNoLiq[5] = {};
-        float xOffset = 0;
-        float yOffset = 0;
-    };
-    std::vector<drawingParams> params;
-    params.push_back(drawingParams());
+    NcDrawingParams params;
 
     dc->StartGraphic(element, "", element->GetID());
 
@@ -153,7 +139,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // Check if nc is part of a ligature or is an inclinatum
     if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
-        params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
+        params.fontNo = SMUFL_E991_chantPunctumInclinatum;
     }
     else if (nc->GetLigated() == BOOLEAN_true) {
         int pitchDifference = 0;
@@ -165,8 +151,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
             Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
             assert(lastNc);
             pitchDifference = nc->PitchDifferenceTo(lastNc);
-            params.at(0).xOffset = -1;
-            params.at(0).yOffset = -pitchDifference;
+            params.xOffset = -1;
+            params.yOffset = -pitchDifference;
         }
         else {
             isFirst = true;
@@ -175,36 +161,28 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
                 Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
                 assert(nextNc);
                 pitchDifference = nextNc->PitchDifferenceTo(nc);
-                params.at(0).yOffset = pitchDifference;
+                params.yOffset = pitchDifference;
             }
         }
 
         // set the glyph
         switch (pitchDifference) {
-            case -1:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
-                break;
-            case -2:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
-                break;
-            case -3:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
-                break;
-            case -4:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
-                break;
+            case -1: params.fontNo = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd; break;
+            case -2: params.fontNo = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd; break;
+            case -3: params.fontNo = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th; break;
+            case -4: params.fontNo = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th; break;
             default: break;
         }
     }
 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
-        params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
+    if (nc->GetTilt() == COMPASSDIRECTION_s && params.fontNo == SMUFL_E990_chantPunctum) {
+        params.fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
-    else if (nc->GetTilt() == COMPASSDIRECTION_n && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
-        params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
+    else if (nc->GetTilt() == COMPASSDIRECTION_n && params.fontNo == SMUFL_E990_chantPunctum) {
+        params.fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
 
     const int noteHeight
@@ -216,7 +194,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int noteY = nc->GetDrawingY();
 
     if (nc->HasFacs() && m_doc->IsNeumeLines()) {
-        params.at(0).xOffset = 0;
+        params.xOffset = 0;
     }
     // Not sure about this if - the nc pname and oct are going to be ignored
     else if (neume->HasFacs() && m_doc->IsNeumeLines()) {
@@ -229,10 +207,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     }
 
     if (!nc->HasCurve()) {
-        for (auto it = params.begin(); it != params.end(); it++) {
-            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, noteY + it->yOffset * noteHeight, it->fontNo,
-                staff->m_drawingStaffSize, false, true);
-        }
+        DrawSmuflCode(dc, noteX + params.xOffset * noteWidth, noteY + params.yOffset * noteHeight, params.fontNo,
+            staff->m_drawingStaffSize, false, true);
     }
 
     // Draw the children
