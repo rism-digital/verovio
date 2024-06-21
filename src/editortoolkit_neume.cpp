@@ -739,6 +739,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+    m_doc->GetDrawingPage()->LayOutPitchPos();
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
@@ -4221,11 +4222,11 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        const int pitchDifference = round(
-            (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                - m_view->ToLogicalY(fi->GetZone()->GetUly()))
-                / staffSize
-            - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset(staff->m_drawingNotationType)));
+        const int pitchDifference
+            = round((double)((staff->GetDrawingY()
+                        - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                        - m_view->ToLogicalY(fi->GetZone()->GetUly())))
+                / (double)(staffSize));
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
     }
@@ -4288,11 +4289,11 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             }
             pi->SetOct(octave);
 
-            const int pitchDifference = round(
-                (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                    - m_view->ToLogicalY(fi->GetZone()->GetUly()))
-                    / staffSize
-                - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset(staff->m_drawingNotationType)));
+            const int pitchDifference
+                = round((double)((staff->GetDrawingY()
+                            - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                            - m_view->ToLogicalY(fi->GetZone()->GetUly())))
+                    / (double)(staffSize));
             pi->AdjustPitchByOffset(-pitchDifference);
         }
 
