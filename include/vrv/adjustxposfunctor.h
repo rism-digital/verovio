@@ -125,6 +125,8 @@ private:
     AdjustXPosAlignmentOffset m_currentAlignment;
     // The preceeding alignment
     AdjustXPosAlignmentOffset m_previousAlignment;
+    // The current measure
+    Measure *m_measure;
 };
 
 } // namespace vrv

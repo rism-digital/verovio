@@ -33,6 +33,12 @@
 
 namespace vrv {
 
+struct NcDrawingParams {
+    wchar_t fontNo = SMUFL_E990_chantPunctum;
+    float xOffset = 0;
+    float yOffset = 0;
+};
+
 void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -63,89 +69,44 @@ void View::DrawLiquescent(DeviceContext *dc, LayerElement *element, Layer *layer
     assert(staff);
     assert(measure);
 
-    struct drawingParams {
-        wchar_t fontNo = SMUFL_E990_chantPunctum;
-        wchar_t fontNoLiq[5] = {};
-        float xOffsetLiq[5] = { 0, 0, 0, 0, 0 };
-        float yOffsetLiq[5] = { 0, 0, 0, 0, 0 };
-    };
-    std::vector<drawingParams> params;
-    params.push_back(drawingParams());
+    NcDrawingParams params[3];
 
     dc->StartGraphic(element, "", element->GetID());
-
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
 
     Nc *nc = dynamic_cast<Nc *>(element->GetParent());
 
     if (nc->GetCurve() == curvatureDirection_CURVE_c) {
-        params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).fontNoLiq[1] = SMUFL_EB92_staffPosRaise3;
-        params.at(0).fontNoLiq[2] = SMUFL_E995_chantAuctumDesc;
-        params.at(0).fontNoLiq[3] = SMUFL_EB91_staffPosRaise2;
-        params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).xOffsetLiq[4] = 0.8;
-        params.at(0).yOffsetLiq[0] = -1.5;
-        params.at(0).yOffsetLiq[4] = -1.75;
+        params[0].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[1].fontNo = SMUFL_E995_chantAuctumDesc;
+        params[2].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[2].xOffset = 0.8;
+        params[0].yOffset = -1.5;
+        params[2].yOffset = -1.75;
     }
     else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
-        params.at(0).fontNoLiq[0] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).fontNoLiq[1] = SMUFL_EB98_staffPosLower1;
-        params.at(0).fontNoLiq[2] = SMUFL_E994_chantAuctumAsc;
-        params.at(0).fontNoLiq[3] = SMUFL_EB99_staffPosLower2;
-        params.at(0).fontNoLiq[4] = SMUFL_E9BE_chantConnectingLineAsc3rd;
-        params.at(0).xOffsetLiq[4] = 0.8;
-        params.at(0).yOffsetLiq[0] = 0.5;
-        params.at(0).yOffsetLiq[4] = 0.75;
+        params[0].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[1].fontNo = SMUFL_E994_chantAuctumAsc;
+        params[2].fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+        params[2].xOffset = 0.8;
+        params[0].yOffset = 0.5;
+        params[2].yOffset = 0.75;
     }
 
     const int noteHeight
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
     const int noteWidth
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-    int noteY, noteX;
-    int yValue;
-    if (nc->HasFacs() && m_doc->IsNeumeLines()) {
-        noteY = staff->GetDrawingY();
-        noteX = nc->GetDrawingX();
-    }
-    else {
-        noteX = element->GetDrawingX();
-        noteY = element->GetDrawingY();
-    }
 
-    // Calculating proper y offset based on pname, clef, staff, and staff rotate
-    int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset = 0;
+    int noteX = nc->GetDrawingX();
+    int noteY = nc->GetDrawingY();
 
-    // The default octave = 3, but the actual octave is calculated by
-    // taking into account the displacement of the clef
-    int clefOctave = 3;
-    if (clef->GetDis() && clef->GetDisPlace()) {
-        clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
-    }
-    int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
-    int rotateOffset = 0;
     if (staff->HasDrawingRotation()) {
-        rotateOffset = staff->GetDrawingRotationOffsetFor(noteX);
+        noteY -= staff->GetDrawingRotationOffsetFor(noteX);
     }
 
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-    }
-    yValue = clefYPosition + pitchOffset + octaveOffset - rotateOffset;
-
-    for (auto it = params.begin(); it != params.end(); it++) {
-        for (int i = 0; i < static_cast<int>(sizeof(params.at(0).fontNoLiq)); i++) {
-            DrawSmuflCode(dc, noteX + it->xOffsetLiq[i] * noteWidth, yValue + it->yOffsetLiq[i] * noteHeight,
-                it->fontNoLiq[i], staff->m_drawingStaffSize, false, true);
-        }
+    for (int i = 0; i < static_cast<int>(sizeof(params)); ++i) {
+        DrawSmuflCode(dc, noteX + params[i].xOffset * noteWidth, noteY + params[i].yOffset * noteHeight,
+            params[i].fontNo, staff->m_drawingStaffSize, false, true);
     }
 
     dc->EndGraphic(element, this);
@@ -166,24 +127,11 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         return;
     }
 
-    struct drawingParams {
-        wchar_t fontNo = SMUFL_E990_chantPunctum;
-        wchar_t fontNoLiq[5] = {};
-        float xOffset = 0;
-        float yOffset = 0;
-    };
-    std::vector<drawingParams> params;
-    params.push_back(drawingParams());
+    NcDrawingParams params;
 
     dc->StartGraphic(element, "", element->GetID());
 
     /******************************************************************/
-
-    // Intializing necessary variables
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
 
     Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
     assert(neume);
@@ -191,7 +139,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // Check if nc is part of a ligature or is an inclinatum
     if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
-        params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
+        params.fontNo = SMUFL_E991_chantPunctumInclinatum;
     }
     else if (nc->GetLigated() == BOOLEAN_true) {
         int pitchDifference = 0;
@@ -203,8 +151,8 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
             Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
             assert(lastNc);
             pitchDifference = nc->PitchDifferenceTo(lastNc);
-            params.at(0).xOffset = -1;
-            params.at(0).yOffset = -pitchDifference;
+            params.xOffset = -1;
+            params.yOffset = -pitchDifference;
         }
         else {
             isFirst = true;
@@ -213,91 +161,54 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
                 Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
                 assert(nextNc);
                 pitchDifference = nextNc->PitchDifferenceTo(nc);
-                params.at(0).yOffset = pitchDifference;
+                params.yOffset = pitchDifference;
             }
         }
 
         // set the glyph
         switch (pitchDifference) {
-            case -1:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
-                break;
-            case -2:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
-                break;
-            case -3:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
-                break;
-            case -4:
-                params.at(0).fontNo = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
-                break;
+            case -1: params.fontNo = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd; break;
+            case -2: params.fontNo = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd; break;
+            case -3: params.fontNo = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th; break;
+            case -4: params.fontNo = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th; break;
             default: break;
         }
     }
 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->GetTilt() == COMPASSDIRECTION_s && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
-        params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
+    if (nc->GetTilt() == COMPASSDIRECTION_s && params.fontNo == SMUFL_E990_chantPunctum) {
+        params.fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
-    else if (nc->GetTilt() == COMPASSDIRECTION_n && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
-        params.at(0).fontNo = SMUFL_E997_chantPunctumVirgaReversed;
+    else if (nc->GetTilt() == COMPASSDIRECTION_n && params.fontNo == SMUFL_E990_chantPunctum) {
+        params.fontNo = SMUFL_E997_chantPunctumVirgaReversed;
     }
 
     const int noteHeight
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
     const int noteWidth
         = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-    int noteY, noteX;
-    int yValue;
+
+    int noteX = nc->GetDrawingX();
+    int noteY = nc->GetDrawingY();
+
     if (nc->HasFacs() && m_doc->IsNeumeLines()) {
-        noteY = staff->GetDrawingY();
-        noteX = nc->GetDrawingX();
-        params.at(0).xOffset = 0;
+        params.xOffset = 0;
     }
+    // Not sure about this if - the nc pname and oct are going to be ignored
     else if (neume->HasFacs() && m_doc->IsNeumeLines()) {
         noteY = staff->GetDrawingY();
         noteX = neume->GetDrawingX() + position * noteWidth;
     }
-    else {
-        noteX = element->GetDrawingX();
-        noteY = element->GetDrawingY();
-    }
-    // Calculating proper y offset based on pname, clef, staff, and staff rotate
-    int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
 
-    // The default octave = 3, but the actual octave is calculated by
-    // taking into account the displacement of the clef
-    int clefOctave = 3;
-    if (clef->GetDis() && clef->GetDisPlace()) {
-        clefOctave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
-    }
-    int octaveOffset = (nc->GetOct() - clefOctave) * ((staffSize / 2) * 7);
-    int rotationOffset = 0;
     if (staff->HasDrawingRotation()) {
-        rotationOffset = staff->GetDrawingRotationOffsetFor(noteX);
-    }
-
-    if (nc->HasLoc()) {
-        yValue = noteY + (nc->GetLoc() - 2 * (staffLineNumber - 1)) * (staffSize / 2);
-    }
-    else {
-        int pitchOffset = 0;
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-        }
-        yValue = clefYPosition + pitchOffset + octaveOffset - rotationOffset;
+        noteY -= staff->GetDrawingRotationOffsetFor(noteX);
     }
 
     if (!nc->HasCurve()) {
-        for (auto it = params.begin(); it != params.end(); it++) {
-            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight, it->fontNo,
-                staff->m_drawingStaffSize, false, true);
-        }
+        DrawSmuflCode(dc, noteX + params.xOffset * noteWidth, noteY + params.yOffset * noteHeight, params.fontNo,
+            staff->m_drawingStaffSize, false, true);
     }
 
     // Draw the children

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcligaturenoteposfunctor.cpp
+// Name:        calcligaturorneumeposfunctor.cpp
 // Author:      David Bauer
 // Created:     2023
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "calcligaturenoteposfunctor.h"
+#include "calcligatureorneumeposfunctor.h"
 
 //----------------------------------------------------------------------------
 
@@ -18,12 +18,12 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcLigatureNotePosFunctor
+// CalcLigatureOrNeumePosFunctor
 //----------------------------------------------------------------------------
 
-CalcLigatureNotePosFunctor::CalcLigatureNotePosFunctor(Doc *doc) : DocFunctor(doc) {}
+CalcLigatureOrNeumePosFunctor::CalcLigatureOrNeumePosFunctor(Doc *doc) : DocFunctor(doc) {}
 
-FunctorCode CalcLigatureNotePosFunctor::VisitLigature(Ligature *ligature)
+FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
 {
     if (m_doc->GetOptions()->m_ligatureAsBracket.GetValue()) return FUNCTOR_CONTINUE;
 

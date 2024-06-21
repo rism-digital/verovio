@@ -423,7 +423,7 @@ protected:
 
     /**
      * @name Methods for drawing parts of neume LayerElement child classes.
-     * Defined in view_neumes.cpp
+     * Defined in view_neume.cpp
      */
     ///@{
     void DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure);
