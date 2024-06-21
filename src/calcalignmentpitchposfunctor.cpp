@@ -60,8 +60,9 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     if (layerElement->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(layerElement);
         assert(accid);
-        if (!accid->GetFirstAncestor(NOTE) && !accid->GetFirstAncestor(CUSTOS)) {
+        if (!accid->GetFirstAncestor(NOTE) && !accid->GetFirstAncestor(CUSTOS) && !m_doc->IsNeumeLines()) {
             // do something for accid that are not children of a note - e.g., mensural?
+            // skip for neume-lines mode as accid doesn't have a pitch in this case
             accid->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
         }
         // override if staff position is set explicitly
