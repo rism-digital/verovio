@@ -449,18 +449,22 @@ namespace humaux {
         righthalfstem = false;
 
         ottavanotestart = ottavanoteend = NULL;
+        ottavanotestartid = "";
         ottavaendtimestamp = 0;
         ottavameasure = NULL;
 
         ottavadownnotestart = ottavadownnoteend = NULL;
+        ottavadownnotestartid = "";
         ottavadownendtimestamp = 0;
         ottavadownmeasure = NULL;
 
         ottava2notestart = ottava2noteend = NULL;
+        ottava2notestartid = "";
         ottava2endtimestamp = 0;
         ottava2measure = NULL;
 
         ottava2downnotestart = ottava2downnoteend = NULL;
+        ottava2downnotestartid = "";
         ottava2downendtimestamp = 0;
         ottava2downmeasure = NULL;
 
@@ -24336,6 +24340,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             // turn on ottava
             ss[staffindex].ottavameasure = m_measure;
             ss[staffindex].ottavanotestart = NULL;
+            ss[staffindex].ottavanotestartid = getStartIdForOttava(token);
             ss[staffindex].ottavanoteend = NULL;
             ss[staffindex].ottavaendtimestamp = token->getDurationFromStart();
             // When a new note is read, check if ottavameasure
@@ -24347,6 +24352,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             // turn on ottava down
             ss[staffindex].ottavadownmeasure = m_measure;
             ss[staffindex].ottavadownnotestart = NULL;
+            ss[staffindex].ottavadownnotestartid = getStartIdForOttava(token);
             ss[staffindex].ottavadownnoteend = NULL;
             ss[staffindex].ottavadownendtimestamp = token->getDurationFromStart();
             // When a new note is read, check if ottavadownmeasure
@@ -24358,6 +24364,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             // turn on two ottava down
             ss[staffindex].ottava2downmeasure = m_measure;
             ss[staffindex].ottava2downnotestart = NULL;
+            ss[staffindex].ottava2downnotestartid = getStartIdForOttava(token);
             ss[staffindex].ottava2downnoteend = NULL;
             ss[staffindex].ottava2downendtimestamp = token->getDurationFromStart();
             // When a new note is read, check if ottava2downmeasure
@@ -24369,6 +24376,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             // turn on ottava
             ss[staffindex].ottava2measure = m_measure;
             ss[staffindex].ottava2notestart = NULL;
+            ss[staffindex].ottava2notestartid = getStartIdForOttava(token);
             ss[staffindex].ottava2noteend = NULL;
             ss[staffindex].ottava2endtimestamp = token->getDurationFromStart();
             // When a new note is read, check if ottava2measure
@@ -24383,7 +24391,13 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             ss[staffindex].ottavameasure->AddChild(octave);
             setStaff(octave, staffindex + 1);
             octave->SetDis(OCTAVE_DIS_8);
-            octave->SetStartid("#" + ss[staffindex].ottavanotestart->GetID());
+            std::string startid = ss[staffindex].ottavanotestartid;
+            if (startid != "") {
+                octave->SetStartid("#" + startid);
+            }
+            else {
+                octave->SetStartid("#" + ss[staffindex].ottavanotestart->GetID());
+            }
             std::string endid = getEndIdForOttava(token);
             if (endid != "") {
                 octave->SetEndid("#" + endid);
@@ -24394,6 +24408,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             octave->SetDisPlace(STAFFREL_basic_above);
         }
         ss[staffindex].ottavanotestart = NULL;
+        ss[staffindex].ottavanotestartid = "";
         ss[staffindex].ottavanoteend = NULL;
         ss[staffindex].ottavameasure = NULL;
         ss[staffindex].ottavaendtimestamp = 0;
@@ -24406,7 +24421,13 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             ss[staffindex].ottavadownmeasure->AddChild(octave);
             setStaff(octave, staffindex + 1);
             octave->SetDis(OCTAVE_DIS_8);
-            octave->SetStartid("#" + ss[staffindex].ottavadownnotestart->GetID());
+            std::string startid = ss[staffindex].ottavadownnotestartid;
+            if (startid != "") {
+                octave->SetStartid("#" + startid);
+            }
+            else {
+                octave->SetStartid("#" + ss[staffindex].ottavadownnotestart->GetID());
+            }
             std::string endid = getEndIdForOttava(token);
             if (endid != "") {
                 octave->SetEndid("#" + endid);
@@ -24417,6 +24438,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             octave->SetDisPlace(STAFFREL_basic_below);
         }
         ss[staffindex].ottavadownnotestart = NULL;
+        ss[staffindex].ottavadownnotestartid = "";
         ss[staffindex].ottavadownnoteend = NULL;
         ss[staffindex].ottavadownmeasure = NULL;
         ss[staffindex].ottavadownendtimestamp = 0;
@@ -24429,8 +24451,13 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             ss[staffindex].ottava2measure->AddChild(octave);
             setStaff(octave, staffindex + 1);
             octave->SetDis(OCTAVE_DIS_15);
-            octave->SetStartid("#" + ss[staffindex].ottava2notestart->GetID());
-            octave->SetEndid("#" + ss[staffindex].ottava2noteend->GetID());
+            std::string startid = ss[staffindex].ottava2notestartid;
+            if (startid != "") {
+                octave->SetStartid("#" + startid);
+            }
+            else {
+                octave->SetStartid("#" + ss[staffindex].ottava2notestart->GetID());
+            }
             std::string endid = getEndIdForOttava(token);
             if (endid != "") {
                 octave->SetEndid("#" + endid);
@@ -24441,6 +24468,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             octave->SetDisPlace(STAFFREL_basic_above);
         }
         ss[staffindex].ottava2notestart = NULL;
+        ss[staffindex].ottava2notestartid = "";
         ss[staffindex].ottava2noteend = NULL;
         ss[staffindex].ottava2measure = NULL;
         ss[staffindex].ottava2endtimestamp = 0;
@@ -24453,7 +24481,13 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             ss[staffindex].ottava2downmeasure->AddChild(octave);
             setStaff(octave, staffindex + 1);
             octave->SetDis(OCTAVE_DIS_15);
-            octave->SetStartid("#" + ss[staffindex].ottava2downnotestart->GetID());
+            std::string startid = ss[staffindex].ottava2downnotestartid;
+            if (startid != "") {
+                octave->SetStartid("#" + startid);
+            }
+            else {
+                octave->SetStartid("#" + ss[staffindex].ottava2downnotestart->GetID());
+            }
             std::string endid = getEndIdForOttava(token);
             if (endid != "") {
                 octave->SetEndid("#" + endid);
@@ -24464,6 +24498,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             octave->SetDisPlace(STAFFREL_basic_below);
         }
         ss[staffindex].ottava2downnotestart = NULL;
+        ss[staffindex].ottava2downnotestartid = "";
         ss[staffindex].ottava2downnoteend = NULL;
         ss[staffindex].ottava2downmeasure = NULL;
         ss[staffindex].ottava2downendtimestamp = 0;
@@ -24527,6 +24562,88 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
     int bestindex = 0;
     for (int i = 1; i < (int)notes.size(); ++i) {
         if (timestamps[i] > timestamps[bestindex]) {
+            bestindex = i;
+        }
+    }
+
+    hum::HTp target = notes[bestindex];
+    if (!target) {
+        return "";
+    }
+
+    std::string prefix = "note";
+    if (target->isRest()) {
+        if (target->find("yy") != std::string::npos) {
+            prefix = "space";
+        }
+        else {
+            prefix = "rest";
+        }
+    }
+    else if (target->isChord()) {
+        prefix = "chord";
+    }
+
+    return getLocationId(prefix, target);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getStartIdForOttava -- Find the first note after an ottava
+//     line start across multiple layers.  If there is a tie between the
+//     durations of the notes in different layers, choose the note from
+//     a lower layer.  Do this by searching forward in the token's strand
+//     to find the first data token, then search accross all subspines
+//     for the latest note.  It is assumed that the ottava marking is
+//     placed in the position of the first layer (this is similar to
+//     the assumption for clef changes).
+//
+
+std::string HumdrumInput::getStartIdForOttava(hum::HTp token)
+{
+    hum::HTp tok = token->getNextToken();
+    while (tok && !tok->isData()) {
+        tok = tok->getNextToken();
+    }
+    if (!tok) {
+        // couldn't find a next data line
+        return "";
+    }
+    int track = tok->getTrack();
+    int ttrack = track;
+    std::vector<hum::HTp> notes;
+    std::vector<hum::HumNum> timestamps;
+    // for now counting rests as notes.
+    while (ttrack == track) {
+        hum::HTp xtok = tok;
+        if (xtok->isNull()) {
+            xtok = xtok->resolveNull();
+        }
+        if (!xtok) {
+            tok = tok->getNextFieldToken();
+            if (!tok) {
+                break;
+            }
+            ttrack = tok->getTrack();
+            continue;
+        }
+        notes.push_back(xtok);
+        hum::HumNum timestamp = xtok->getDurationFromStart();
+        timestamps.push_back(timestamp);
+        tok = tok->getNextFieldToken();
+        if (!tok) {
+            break;
+        }
+        ttrack = tok->getTrack();
+    }
+
+    if (notes.empty()) {
+        return "";
+    }
+
+    int bestindex = 0;
+    for (int i = 1; i < (int)notes.size(); ++i) {
+        if (timestamps[i] < timestamps[bestindex]) {
             bestindex = i;
         }
     }
