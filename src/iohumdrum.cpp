@@ -24617,9 +24617,6 @@ std::string HumdrumInput::getStartIdForOttava(hum::HTp token)
     while (ttrack == track) {
         hum::HTp xtok = tok;
         if (xtok->isNull()) {
-            xtok = xtok->resolveNull();
-        }
-        if (!xtok) {
             tok = tok->getNextFieldToken();
             if (!tok) {
                 break;
