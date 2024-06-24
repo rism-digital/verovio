@@ -24594,7 +24594,7 @@ std::string HumdrumInput::getEndIdForOttava(hum::HTp token)
 //     durations of the notes in different layers, choose the note from
 //     a lower layer.  Do this by searching forward in the token's strand
 //     to find the first data token, then search accross all subspines
-//     for the latest note.  It is assumed that the ottava marking is
+//     for the earliest note.  It is assumed that the ottava marking is
 //     placed in the position of the first layer (this is similar to
 //     the assumption for clef changes).
 //
