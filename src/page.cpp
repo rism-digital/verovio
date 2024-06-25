@@ -23,6 +23,7 @@
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
+#include "adjustneumexfunctor.h"
 #include "adjustslursfunctor.h"
 #include "adjuststaffoverlapfunctor.h"
 #include "adjustsylspacingfunctor.h"
@@ -396,6 +397,10 @@ void Page::LayOutHorizontally()
     // otherwise keep their relative positioning
     AdjustDotsFunctor adjustDots(doc, scoreDef->GetStaffNs());
     this->Process(adjustDots);
+
+    // Adjust the X position of the neume and syllables
+    AdjustNeumeXFunctor adjustNeumeX(doc);
+    this->Process(adjustNeumeX);
 
     // Adjust layers again, this time including dots positioning
     AdjustLayersFunctor adjustLayersWithDots(doc, scoreDef->GetStaffNs());

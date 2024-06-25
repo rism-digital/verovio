@@ -32,13 +32,19 @@ public:
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
      */
     ///@{
+    ///
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitLayerEnd(Layer *layer) override;
+    FunctorCode VisitStaff(Staff *staff) override;
     FunctorCode VisitNeume(Neume *neume) override;
+    FunctorCode VisitSyl(Syl *syl) override;
+
     ///@}
 
 protected:
@@ -48,7 +54,8 @@ private:
 public:
     //
 private:
-    //
+    /** The minimu position of the next syl */
+    int m_minPos;
 };
 
 } // namespace vrv
