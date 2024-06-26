@@ -74,6 +74,9 @@ namespace vrv {
 // Large spacing between syllables is a quarter note space
 // MAX_DURATION / pow(2.0, (DUR_4 - 2.0))
 #define NEUME_LARGE_SPACE 256
+// Medium spacing between neume is a 8th note space
+// MAX_DURATION / pow(2.0, (DUR_5 - 2.0))
+#define NEUME_MEDIUM_SPACE 128
 // Small spacing between neume components is a 16th note space
 // MAX_DURATION / pow(2.0, (DUR_6 - 2.0))
 #define NEUME_SMALL_SPACE 64
@@ -702,13 +705,14 @@ double LayerElement::GetAlignmentDuration(
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         if (this->Is(NC)) {
+            // This is called only with --neume-as-note
             const Object *neume = this->GetFirstAncestor(NEUME);
             assert(neume);
             const Object *syllable = neume->GetFirstAncestor(SYLLABLE);
             assert(syllable);
-            // Add a gap after the last nc of the last neume in the syllable
-            if ((neume->GetLast() == this) && (syllable->GetLast() == neume)) {
-                return NEUME_LARGE_SPACE;
+            // Add a larger gap after the last nc of the last neume in the syllable
+            if (neume->GetLast() == this) {
+                return (syllable->GetLast() == neume) ? NEUME_LARGE_SPACE : NEUME_MEDIUM_SPACE;
             }
             else {
                 return NEUME_SMALL_SPACE;
@@ -749,6 +753,13 @@ double LayerElement::GetAlignmentDuration(
         else {
             return DUR_MAX / meterUnit * meterCount;
         }
+    }
+    // This is not called with --neume-as-note since otherwise each nc has an aligner
+    else if (this->Is(NEUME)) {
+        const Object *syllable = this->GetFirstAncestor(SYLLABLE);
+        assert(syllable);
+        // Add a larger gap after the last neume of the syllable
+        return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
     }
     else {
         return 0.0;

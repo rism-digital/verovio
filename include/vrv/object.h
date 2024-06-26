@@ -659,6 +659,14 @@ public:
     virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 
+    /**
+     * Output the class name of the object (or a custom msg) and of its children recursively
+     */
+    ///@{
+    void LogDebugTree(int maxDepth = UNLIMITED_DEPTH, int level = 0);
+    virtual std::string LogDebugTreeMsg() { return this->GetClassName(); }
+    ///@}
+
     //----------------//
     // Static methods //
     //----------------//
