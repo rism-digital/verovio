@@ -1250,6 +1250,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     layer->ReorderByXPos();
 
+    m_doc->GetDrawingPage()->LayOutPitchPos();
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", status);
