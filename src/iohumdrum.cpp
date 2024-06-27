@@ -12419,6 +12419,10 @@ void HumdrumInput::setMxHarmContent(Rend *rend, const std::string &content)
         kind = U"+";
         replacing = true;
     }
+    else if (kind == U"maj6") {
+        kind = U"6";
+        replacing = true;
+    }
     else if (kind == U"minor-seventh") {
         kind = U"m7";
         replacing = true;
