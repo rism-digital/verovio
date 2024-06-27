@@ -328,4 +328,33 @@ void View::DrawDivLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     dc->EndGraphic(element, this);
 }
+
+void View::DrawOriscus(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    NcDrawingParams params[3];
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawQuilisma(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    NcDrawingParams params[3];
+
+    dc->StartGraphic(element, "", element->GetID());
+
+    dc->EndGraphic(element, this);
+}
+
 } // namespace vrv

@@ -175,11 +175,17 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NEUME)) {
         this->DrawNeume(dc, element, layer, staff, measure);
     }
+    else if (element->Is(ORISCUS)) {
+        this->DrawOriscus(dc, element, layer, staff, measure);
+    }
     else if (element->Is(PLICA)) {
         this->DrawPlica(dc, element, layer, staff, measure);
     }
     else if (element->Is(PROPORT)) {
         this->DrawProport(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(QUILISMA)) {
+        this->DrawQuilisma(dc, element, layer, staff, measure);
     }
     else if (element->Is(REST)) {
         this->DrawDurationElement(dc, element, layer, staff, measure);
