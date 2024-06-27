@@ -664,18 +664,17 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
 
         // Move staff and all staff children with facsimiles
+        Zone *staffZone = staff->GetZone();
+        assert(staffZone);
+        staffZone->ShiftByXY(x, -y);
         ListOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
         staff->FindAllDescendantsByComparison(&children, &ic);
-        std::set<Zone *> zones;
-        zones.insert(staff->GetZone());
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             assert(fi);
-            if (fi->GetZone() != NULL) zones.insert(fi->GetZone());
-        }
-        for (auto it = zones.begin(); it != zones.end(); ++it) {
-            (*it)->ShiftByXY(x, -y);
+            Zone *zone = fi->GetZone();
+            if (zone) zone->ShiftByXY(x, -y);
         }
 
         SortStaves();
