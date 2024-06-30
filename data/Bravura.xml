@@ -716,6 +716,7 @@
   <g c="E99B" x="0.0" y="-115.0" w="154.0" h="230.0" h-a-x="154" n="chantQuilisma" />
   <g c="E99E" x="0.0" y="-246.0" w="153.0" h="360.0" h-a-x="153" n="chantOriscusLiquescens" />
   <g c="E99F" x="0.0" y="-92.0" w="124.0" h="185.0" h-a-x="124" n="chantStrophicus" />
+  <g c="E9A1" x="0.0" y="-57.0" w="91.0" h="115.0" h-a-x="91" n="chantPunctumDeminutum" />
   <g c="E9B0" x="0.0" y="0.0" w="154.0" h="164.0" h-a-x="139" n="chantPodatusLower" />
   <g c="E9B1" x="-127.0" y="-3.0" w="141.0" h="198.0" h-a-x="0" n="chantPodatusUpper" />
   <g c="E9B2" x="-62.0" y="-121.0" w="76.0" h="188.0" h-a-x="14" n="chantDeminutumUpper" />
@@ -749,6 +750,7 @@
   <g c="E9F8" x="0.0" y="0.0" w="138.0" h="165.0" h-a-x="138" n="mensuralRestSemifusa" />
   <g c="EA02" x="1.0" y="0.0" w="613.0" h="411.0" h-a-x="615" n="mensuralCustosUp" />
   <g c="EA06" x="0.0" y="-101.0" w="60.0" h="416.0" h-a-x="60" n="chantCustosStemUpPosMiddle" />
+  <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="263.0" h-a-x="319" n="medRenOriscusCMN" />
   <g c="EA50" x="20.0" y="-1.0" w="215.0" h="252.0" h-a-x="255" n="figbass0" />
   <g c="EA51" x="20.0" y="0.0" w="117.0" h="254.0" h-a-x="157" n="figbass1" />
   <g c="EA52" x="20.0" y="-3.0" w="202.0" h="256.0" h-a-x="242" n="figbass2" />
