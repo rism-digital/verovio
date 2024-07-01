@@ -175,11 +175,17 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NEUME)) {
         this->DrawNeume(dc, element, layer, staff, measure);
     }
+    else if (element->Is(ORISCUS)) {
+        this->DrawOriscus(dc, element, layer, staff, measure);
+    }
     else if (element->Is(PLICA)) {
         this->DrawPlica(dc, element, layer, staff, measure);
     }
     else if (element->Is(PROPORT)) {
         this->DrawProport(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(QUILISMA)) {
+        this->DrawQuilisma(dc, element, layer, staff, measure);
     }
     else if (element->Is(REST)) {
         this->DrawDurationElement(dc, element, layer, staff, measure);
@@ -728,48 +734,23 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Select glyph to use for this custos
     const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
 
-    int x, y;
-    // For neume notation we ignore the value set in CalcAlignmentPitchPosFunctor
-    if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
-        x = custos->GetDrawingX();
-        // Recalculate y from pitch to prevent visual/meaning mismatch
-        Clef *clef = layer->GetClef(element);
-        y = staff->GetDrawingY();
-        PitchInterface pi;
-        // Neume notation uses C3 for C clef rather than C4.
-        // Take this into account when determining location.
-        // However this doesn't affect the value for F clef.
-        pi.SetPname(PITCHNAME_c);
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            pi.SetOct(3);
-        }
-        else {
-            pi.SetOct(4);
-        }
-        // Convert from lines & spaces from bottom to from top
-        int CClefOffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
-        int custosOffsetFromTop = CClefOffsetFromTop + pi.PitchDifferenceTo(custos);
-        y -= custosOffsetFromTop * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        x = element->GetDrawingX();
-        y = element->GetDrawingY();
-        // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
-        // This will remain approximate
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
+
+    // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
+    // This will remain approximate
+    if (staff->m_drawingNotationType != NOTATIONTYPE_neume) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     if (staff->HasDrawingRotation()) {
         y -= staff->GetDrawingRotationOffsetFor(x);
     }
-    else if (staff->HasDrawingRotation()) {
-        y -= staff->GetDrawingRotationOffsetFor(x);
-    }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
     /************ Draw children (accidentals, etc) ************/
-    // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
+
     this->DrawLayerChildren(dc, custos, layer, staff, measure);
 
     dc->EndGraphic(element, this);

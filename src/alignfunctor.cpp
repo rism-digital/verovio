@@ -15,6 +15,8 @@
 #include "fig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "nc.h"
+#include "neume.h"
 #include "page.h"
 #include "rend.h"
 #include "rest.h"
@@ -22,6 +24,7 @@
 #include "section.h"
 #include "staff.h"
 #include "svg.h"
+#include "syllable.h"
 #include "system.h"
 #include "tabgrp.h"
 #include "verse.h"
@@ -140,6 +143,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     Rest *restParent = vrv_cast<Rest *>(layerElement->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
     TabGrp *tabGrpParent = vrv_cast<TabGrp *>(layerElement->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
+    const bool neumeAsNote = m_doc->GetOptions()->m_neumeAsNote.GetValue();
 
     if (chordParent) {
         layerElement->SetAlignment(chordParent->GetAlignment());
@@ -263,20 +267,40 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         layerElement->SetAlignment(note->GetAlignment());
     }
     else if (layerElement->Is(SYL)) {
-        Staff *staff = layerElement->GetAncestorStaff();
         Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
-        if (!note || (staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
-            type = ALIGNMENT_DEFAULT;
-        }
-        else {
+        if (note) {
             layerElement->SetAlignment(note->GetAlignment());
         }
+        else {
+            Syllable *syllable = vrv_cast<Syllable *>(layerElement->GetFirstAncestor(SYLLABLE));
+            if (syllable) layerElement->SetAlignment(syllable->GetAlignment());
+        }
+        // Else add a default
     }
     else if (layerElement->Is(VERSE)) {
         // Idem
         Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
         assert(note);
         layerElement->SetAlignment(note->GetAlignment());
+    }
+    else if (layerElement->Is(NC)) {
+        // Align with the neume
+        if (!neumeAsNote) {
+            Neume *neume = vrv_cast<Neume *>(layerElement->GetFirstAncestor(NEUME));
+            assert(neume);
+            layerElement->SetAlignment(neume->GetAlignment());
+        }
+        // Otherwise each nc has its own aligner
+    }
+    else if (layerElement->Is(NEUME)) {
+        // Align with the syllable
+        if (neumeAsNote) {
+            Syllable *syllable = vrv_cast<Syllable *>(layerElement->GetFirstAncestor(SYLLABLE));
+            assert(syllable);
+            layerElement->SetAlignment(syllable->GetAlignment());
+            return FUNCTOR_CONTINUE;
+        }
+        // Otherwise each neume has its own aligner
     }
     else if (layerElement->Is(GRACEGRP)) {
         return FUNCTOR_CONTINUE;
@@ -369,6 +393,8 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
     m_isFirstMeasure = false;
 
     if (m_hasMultipleLayer) measure->HasAlignmentRefWithMultipleLayers(true);
+
+    // measure->m_measureAligner.LogDebugTree(3);
 
     return FUNCTOR_CONTINUE;
 }

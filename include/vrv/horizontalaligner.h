@@ -10,6 +10,7 @@
 
 #include "atts_shared.h"
 #include "object.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -183,6 +184,11 @@ public:
      * Return true if the alignment contains only references to timestamp attributes.
      */
     bool HasTimestampOnly() const;
+
+    /**
+     * Debug message
+     */
+    std::string LogDebugTreeMsg() override { return StringFormat("%d %f", this->GetXRel(), this->GetTime()); }
 
     //----------------//
     // Static methods //

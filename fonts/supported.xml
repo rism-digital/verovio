@@ -2363,7 +2363,7 @@
         <glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens" />
         <glyph glyph-code="E99F" smufl-name="chantStrophicus" />
         <!--<glyph glyph-code="E9A0" smufl-name="chantStrophicusAuctus" />-->
-        <!--<glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum" />-->
+        <glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum" />
         <range_end>U+E9AF</range_end>
         <range_start>U+E990</range_start>
     </medievalAndRenaissancePlainchantSingleNoteForms>
@@ -2468,7 +2468,7 @@
         <!--<glyph glyph-code="EA27" smufl-name="medRenLiquescentDescCMN" />-->
         <!--<glyph glyph-code="EA28" smufl-name="medRenQuilismaCMN" />-->
         <!--<glyph glyph-code="EA29" smufl-name="medRenStrophicusCMN" />-->
-        <!--<glyph glyph-code="EA2A" smufl-name="medRenOriscusCMN" />-->
+        <glyph glyph-code="EA2A" smufl-name="medRenOriscusCMN" />
         <range_end>U+EA2F</range_end>
         <range_start>U+EA20</range_start>
     </medievalAndRenaissanceSymbolsInCmn>

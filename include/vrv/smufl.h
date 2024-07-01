@@ -466,6 +466,7 @@ enum {
     SMUFL_E99B_chantQuilisma = 0xE99B,
     SMUFL_E99E_chantOriscusLiquescens = 0xE99E,
     SMUFL_E99F_chantStrophicus = 0xE99F,
+    SMUFL_E9A1_chantPunctumDeminutum = 0xE9A1,
     SMUFL_E9B0_chantPodatusLower = 0xE9B0,
     SMUFL_E9B1_chantPodatusUpper = 0xE9B1,
     SMUFL_E9B2_chantDeminutumUpper = 0xE9B2,
@@ -499,6 +500,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA2A_medRenOriscusCMN = 0xEA2A,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
     SMUFL_EA52_figbass2 = 0xEA52,
@@ -654,7 +656,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 629
+#define SMUFL_COUNT 631
 
 } // namespace vrv
 

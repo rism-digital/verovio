@@ -1107,6 +1107,16 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     if (measure->GetDrawingEnding()) {
         system->AddToDrawingList(measure->GetDrawingEnding());
     }
+
+    /*
+    //Debug code for displaying aligner positions
+    for (auto &child : measure->m_measureAligner.GetChildren()) {
+        Alignment *alignment = vrv_cast<Alignment *>(child);
+        int x = alignment->GetXRel() + measure->GetDrawingX();
+        int y = system->GetDrawingY() - m_doc->GetDrawingStaffSize(100);
+        this->DrawVerticalLine(dc, y, y + m_doc->GetDrawingUnit(100), x, 20);
+    }
+    */
 }
 
 void View::DrawMeterSigGrp(DeviceContext *dc, Layer *layer, Staff *staff)
@@ -1476,7 +1486,8 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        yb += (clef->GetClefLocOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
+        yb += (clef->GetClefLocOffset(parentStaff->m_drawingNotationType))
+            * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave
 
