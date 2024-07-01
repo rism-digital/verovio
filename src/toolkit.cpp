@@ -1325,6 +1325,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
+        // This will also look in the score/scoreDef
         FindElementInLayerStaffDefFunctor findElementInLayerStaffDef(xmlId);
         // Check drawing page elements first
         if (m_doc.GetDrawingPage()) {
