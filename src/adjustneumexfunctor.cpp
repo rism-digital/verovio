@@ -74,7 +74,7 @@ FunctorCode AdjustNeumeXFunctor::VisitSyl(Syl *syl)
         alignment->SetXRel(alignment->GetXRel() + adjust);
     }
 
-    m_minPos = syl->GetContentRight();
+    m_minPos = syl->GetContentRight() + m_doc->GetDrawingUnit(100);
 
     return FUNCTOR_CONTINUE;
 }
