@@ -664,22 +664,22 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
 
         // Move staff and all staff children with facsimiles
+        Zone *staffZone = staff->GetZone();
+        assert(staffZone);
+        staffZone->ShiftByXY(x, -y);
         ListOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
         staff->FindAllDescendantsByComparison(&children, &ic);
-        std::set<Zone *> zones;
-        zones.insert(staff->GetZone());
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             assert(fi);
-            if (fi->GetZone() != NULL) zones.insert(fi->GetZone());
-        }
-        for (auto it = zones.begin(); it != zones.end(); ++it) {
-            (*it)->ShiftByXY(x, -y);
+            Zone *zone = fi->GetZone();
+            if (zone) zone->ShiftByXY(x, -y);
         }
 
         SortStaves();
 
+        m_doc->GetDrawingPage()->ResetAligners();
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         return true; // Can't reorder by layer since staves contain layers
@@ -1250,6 +1250,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     layer->ReorderByXPos();
 
+    m_doc->GetDrawingPage()->LayOutPitchPos();
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", status);
@@ -1710,6 +1711,8 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
     if (!m_doc->GetDrawingPage()) return false;
+    Object *page = m_doc->GetDrawingPage();
+
     ListOfObjects staves;
 
     // Get the staves by element ID and fail if a staff does not exist.
@@ -1776,8 +1779,35 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         Layer *sourceLayer = vrv_cast<Layer *>(sourceStaff->GetFirst(LAYER));
         fillLayer->MoveChildrenFrom(sourceLayer);
         assert(sourceLayer->GetChildCount() == 0);
-        Object *parent = sourceStaff->GetParent();
-        parent->DeleteChild(sourceStaff);
+
+        // Delete empty staff with its system parent
+        // Move SECTION, PB, and SYSTEM_MILESTONE_END if any
+        Object *system = sourceStaff->GetFirstAncestor(SYSTEM);
+        if (system->FindDescendantByType(SECTION)) {
+            Object *section = system->FindDescendantByType(SECTION);
+            Object *nextSystem = page->GetNext(system, SYSTEM);
+            if (nextSystem) {
+                section = system->DetachChild(section->GetIdx());
+                nextSystem->InsertChild(section, 0);
+            }
+        }
+        if (system->FindDescendantByType(PB)) {
+            Object *pb = system->FindDescendantByType(PB);
+            Object *nextSystem = page->GetNext(system, SYSTEM);
+            if (nextSystem) {
+                pb = system->DetachChild(pb->GetIdx());
+                nextSystem->InsertChild(pb, 1);
+            }
+        }
+        if (system->FindDescendantByType(SYSTEM_MILESTONE_END)) {
+            Object *milestoneEnd = system->FindDescendantByType(SYSTEM_MILESTONE_END);
+            Object *previousSystem = page->GetPrevious(system, SYSTEM);
+            if (previousSystem) {
+                milestoneEnd = system->DetachChild(milestoneEnd->GetIdx());
+                previousSystem->InsertChild(milestoneEnd, previousSystem->GetChildCount());
+            }
+        }
+        page->DeleteChild(system);
     }
     // Set the bounding box for the staff to the new bounds
     Zone *staffZone = fillStaff->GetZone();
@@ -1789,13 +1819,11 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     fillLayer->ReorderByXPos();
 
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("uuid", fillStaff->GetID());
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
-
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
-
-    // TODO change zones for staff children
 
     return true;
 }
