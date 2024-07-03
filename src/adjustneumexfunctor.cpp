@@ -11,6 +11,7 @@
 
 #include "doc.h"
 #include "layer.h"
+#include "neume.h"
 #include "score.h"
 #include "staff.h"
 #include "syl.h"
@@ -54,6 +55,22 @@ FunctorCode AdjustNeumeXFunctor::VisitLayerEnd(Layer *layer)
 
 FunctorCode AdjustNeumeXFunctor::VisitNeume(Neume *neume)
 {
+    // It is 0 when we process the first neume of the syllable
+    if (m_neumeMinPos != VRV_UNSET) {
+        Alignment *alignment = neume->GetAlignment();
+
+        int selfLeft = neume->GetContentLeft();
+        if (selfLeft < m_neumeMinPos) {
+            const int adjust = m_neumeMinPos - selfLeft;
+            alignment->SetXRel(alignment->GetXRel() + adjust);
+        }
+    }
+
+    m_neumeMinPos = neume->GetContentRight() + m_doc->GetDrawingUnit(100);
+
+    // Check if the neume takes more space the the syllable text
+    if (m_neumeMinPos > m_minPos) m_minPos = m_neumeMinPos;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -67,6 +84,9 @@ FunctorCode AdjustNeumeXFunctor::VisitStaff(Staff *staff)
 FunctorCode AdjustNeumeXFunctor::VisitSyl(Syl *syl)
 {
     Alignment *alignment = syl->GetAlignment();
+
+    // Indicates that the neume will be the first of the syllable
+    m_neumeMinPos = VRV_UNSET;
 
     int selfLeft = syl->GetContentLeft();
     if (selfLeft < m_minPos) {

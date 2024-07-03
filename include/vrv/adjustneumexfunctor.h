@@ -54,8 +54,10 @@ private:
 public:
     //
 private:
-    /** The minimu position of the next syl */
+    /** The minimum position of the next syl */
     int m_minPos;
+    /** The minimum position of the next neume */
+    int m_neumeMinPos;
 };
 
 } // namespace vrv

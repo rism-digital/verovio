@@ -39,6 +39,7 @@ public:
      */
     ///@{
     FunctorCode VisitLigature(Ligature *ligature) override;
+    FunctorCode VisitNeume(Neume *neume) override;
     ///@}
 
 protected:
