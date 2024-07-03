@@ -11,6 +11,8 @@
 
 #include "doc.h"
 #include "ligature.h"
+#include "nc.h"
+#include "neume.h"
 #include "staff.h"
 
 //----------------------------------------------------------------------------
@@ -218,6 +220,130 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
         }
         previousNote = note;
         ++n1;
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
+{
+    if (m_doc->GetOptions()->m_neumeAsNote.GetValue()) return FUNCTOR_SIBLINGS;
+
+    ListOfObjects ncs = neume->FindAllDescendantsByType(NC);
+
+    int xRel = 0;
+
+    for (Object *object : ncs) {
+
+        Nc *nc = vrv_cast<Nc *>(object);
+        assert(nc);
+
+        const bool hasLiquescent = (nc->FindDescendantByType(LIQUESCENT));
+        const bool hasOriscus = (nc->FindDescendantByType(ORISCUS));
+        const bool hasQuilisma = (nc->FindDescendantByType(QUILISMA));
+
+        // Make sure we have at least one glyph
+        nc->m_drawingGlyphs.resize(1);
+
+        if (hasLiquescent) {
+            nc->m_drawingGlyphs.resize(3);
+            if (nc->GetCurve() == curvatureDirection_CURVE_c) {
+                nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E995_chantAuctumDesc;
+                nc->m_drawingGlyphs[1].m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs[2].m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs[2].m_xOffset = 0.8;
+                nc->m_drawingGlyphs[1].m_yOffset = -1.5;
+                nc->m_drawingGlyphs[2].m_yOffset = -1.75;
+            }
+            else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
+                nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E994_chantAuctumAsc;
+                nc->m_drawingGlyphs[1].m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs[2].m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs[2].m_xOffset = 0.8;
+                nc->m_drawingGlyphs[1].m_yOffset = 0.5;
+                nc->m_drawingGlyphs[2].m_yOffset = 0.75;
+            }
+            else {
+                nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E9A1_chantPunctumDeminutum;
+            }
+        }
+        else if (hasOriscus) {
+            nc->m_drawingGlyphs[0].m_fontNo = SMUFL_EA2A_medRenOriscusCMN;
+        }
+        else if (hasQuilisma) {
+            nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E99B_chantQuilisma;
+        }
+        else {
+            nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E990_chantPunctum;
+
+            Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
+            assert(neume);
+            int position = neume->GetChildIndex(nc);
+
+            // Check if nc is part of a ligature or is an inclinatum
+            if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
+                nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E991_chantPunctumInclinatum;
+            }
+            else if (nc->GetLigated() == BOOLEAN_true) {
+                int pitchDifference = 0;
+                bool isFirst;
+                int ligCount = neume->GetLigatureCount(position);
+
+                if (ligCount % 2 == 0) {
+                    isFirst = false;
+                    Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
+                    assert(lastNc);
+                    pitchDifference = nc->PitchDifferenceTo(lastNc);
+                    nc->m_drawingGlyphs[0].m_yOffset = -pitchDifference;
+                }
+                else {
+                    isFirst = true;
+                    Object *nextSibling = neume->GetChild(position + 1);
+                    if (nextSibling != NULL) {
+                        Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
+                        assert(nextNc);
+                        pitchDifference = nextNc->PitchDifferenceTo(nc);
+                        nc->m_drawingGlyphs[0].m_yOffset = pitchDifference;
+                    }
+                }
+
+                // set the glyph
+                switch (pitchDifference) {
+                    case -1:
+                        nc->m_drawingGlyphs[0].m_fontNo
+                            = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
+                        break;
+                    case -2:
+                        nc->m_drawingGlyphs[0].m_fontNo
+                            = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
+                        break;
+                    case -3:
+                        nc->m_drawingGlyphs[0].m_fontNo
+                            = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
+                        break;
+                    case -4:
+                        nc->m_drawingGlyphs[0].m_fontNo
+                            = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
+                        break;
+                    default: break;
+                }
+            }
+
+            // If the nc is supposed to be a virga and currently is being rendered as a punctum
+            // change it to a virga
+            if (nc->GetTilt() == COMPASSDIRECTION_s && nc->m_drawingGlyphs[0].m_fontNo == SMUFL_E990_chantPunctum) {
+                nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E996_chantPunctumVirga;
+            }
+
+            else if (nc->GetTilt() == COMPASSDIRECTION_n
+                && nc->m_drawingGlyphs[0].m_fontNo == SMUFL_E990_chantPunctum) {
+                nc->m_drawingGlyphs[0].m_fontNo = SMUFL_E997_chantPunctumVirgaReversed;
+            }
+        }
+
+        nc->SetDrawingXRel(xRel);
+        // The first glyph set the spacing
+        xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs[0].m_fontNo, 100, false);
     }
 
     return FUNCTOR_SIBLINGS;

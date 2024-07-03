@@ -429,6 +429,7 @@ protected:
      */
     ///@{
     void DrawNcAsNotehead(DeviceContext *dc, Nc *nc, Layer *layer, Staff *staff, Measure *measure);
+    void DrawNcGlyphs(DeviceContext *dc, Nc *nc, Staff *staff);
     ///@}
 
     /**

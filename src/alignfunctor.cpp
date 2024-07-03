@@ -394,7 +394,7 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
 
     if (m_hasMultipleLayer) measure->HasAlignmentRefWithMultipleLayers(true);
 
-    // measure->m_measureAligner.LogDebugTree(3);
+    measure->m_measureAligner.LogDebugTree(3);
 
     return FUNCTOR_CONTINUE;
 }
