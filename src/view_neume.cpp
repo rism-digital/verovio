@@ -33,12 +33,6 @@
 
 namespace vrv {
 
-struct NcDrawingParams {
-    wchar_t fontNo = 0;
-    float xOffset = 0;
-    float yOffset = 0;
-};
-
 void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -220,8 +214,6 @@ void View::DrawOriscus(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff);
     assert(measure);
 
-    NcDrawingParams params;
-
     dc->StartGraphic(element, "", element->GetID());
 
     dc->EndGraphic(element, this);
@@ -233,8 +225,6 @@ void View::DrawQuilisma(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(layer);
     assert(staff);
     assert(measure);
-
-    NcDrawingParams params;
 
     dc->StartGraphic(element, "", element->GetID());
 
