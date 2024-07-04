@@ -230,10 +230,12 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
     if (m_doc->GetOptions()->m_neumeAsNote.GetValue()) return FUNCTOR_SIBLINGS;
 
     ListOfObjects ncs = neume->FindAllDescendantsByType(NC);
-    
+
     Staff *staff = neume->GetAncestorStaff();
 
     int xRel = 0;
+    Nc *previousNc = NULL;
+    bool previousLig = false;
 
     for (Object *object : ncs) {
 
@@ -278,65 +280,53 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         else {
             nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
 
-            Neume *neume = vrv_cast<Neume *>(nc->GetFirstAncestor(NEUME));
-            assert(neume);
-            int position = neume->GetChildIndex(nc);
-
-            // Check if nc is part of a ligature or is an inclinatum
-            if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
-                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E991_chantPunctumInclinatum;
-            }
-            else if (nc->GetLigated() == BOOLEAN_true) {
-                int pitchDifference = 0;
-                bool isFirst;
-                int ligCount = neume->GetLigatureCount(position);
-
-                if (ligCount % 2 == 0) {
-                    isFirst = false;
-                    Nc *lastNc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
-                    assert(lastNc);
-                    pitchDifference = nc->PitchDifferenceTo(lastNc);
-                    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference;
+            if (nc->GetLigated() == BOOLEAN_true) {
+                // This is the first nc of a ligature
+                if (!previousLig) {
+                    // Temporarily set a second line glyph
+                    nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+                    previousLig = true;
                 }
+                // This is the second
                 else {
-                    isFirst = true;
-                    Object *nextSibling = neume->GetChild(position + 1);
-                    if (nextSibling != NULL) {
-                        Nc *nextNc = dynamic_cast<Nc *>(nextSibling);
-                        assert(nextNc);
-                        pitchDifference = nextNc->PitchDifferenceTo(nc);
-                        nc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference;
+                    assert(previousNc);
+                    previousLig = false;
+                    const int pitchDifference = nc->PitchDifferenceTo(previousNc);
+                    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference;
+                    previousNc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference;
+
+                    // set the glyph for both the current and previous nc
+                    switch (pitchDifference) {
+                        case -1:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+                            break;
+                        case -2:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B5_chantEntryLineAsc3rd;
+                            break;
+                        case -3:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BB_chantLigaturaDesc4th;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B6_chantEntryLineAsc4th;
+                            break;
+                        case -4:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BC_chantLigaturaDesc5th;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B7_chantEntryLineAsc5th;
+                            break;
+                        default: break;
                     }
                 }
-
-                // set the glyph
-                switch (pitchDifference) {
-                    case -1:
-                        nc->m_drawingGlyphs.at(0).m_fontNo
-                            = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
-                        break;
-                    case -2:
-                        nc->m_drawingGlyphs.at(0).m_fontNo
-                            = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
-                        break;
-                    case -3:
-                        nc->m_drawingGlyphs.at(0).m_fontNo
-                            = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
-                        break;
-                    case -4:
-                        nc->m_drawingGlyphs.at(0).m_fontNo
-                            = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
-                        break;
-                    default: break;
-                }
             }
-
+            // Check if nc is part of a ligature or is an inclinatum
+            else if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E991_chantPunctumInclinatum;
+            }
             // If the nc is supposed to be a virga and currently is being rendered as a punctum
             // change it to a virga
-            if (nc->GetTilt() == COMPASSDIRECTION_s && nc->m_drawingGlyphs.at(0).m_fontNo == SMUFL_E990_chantPunctum) {
+            else if (nc->GetTilt() == COMPASSDIRECTION_s
+                && nc->m_drawingGlyphs.at(0).m_fontNo == SMUFL_E990_chantPunctum) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E996_chantPunctumVirga;
             }
-
             else if (nc->GetTilt() == COMPASSDIRECTION_n
                 && nc->m_drawingGlyphs.at(0).m_fontNo == SMUFL_E990_chantPunctum) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E997_chantPunctumVirgaReversed;
@@ -344,8 +334,12 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         }
 
         nc->SetDrawingXRel(xRel);
-        // The first glyph set the spacing
-        xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staff->m_drawingStaffSize, false);
+        // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be added
+        // between the two nc
+        if (!previousLig)
+            xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staff->m_drawingStaffSize, false);
+
+        previousNc = nc;
     }
 
     return FUNCTOR_SIBLINGS;
