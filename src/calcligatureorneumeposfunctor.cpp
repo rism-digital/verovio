@@ -254,7 +254,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         // Make sure we have at least one glyph
         nc->m_drawingGlyphs.resize(1);
 
-        const int pitchDifference = (previousNc) ? nc->PitchDifferenceTo(previousNc) : 0;
+        int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
         bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
 
         if (hasLiquescent) {
