@@ -319,6 +319,9 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         if (nc->HasPname() && nc->HasOct()) {
             loc = PitchInterface::CalcLoc(nc->GetPname(), nc->GetOct(), layerY->GetClefLocOffset(nc));
         }
+        else if (nc->HasLoc()) {
+            loc = nc->GetLoc();
+        }
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
         nc->SetDrawingLoc(loc);
         nc->SetDrawingYRel(yRel);

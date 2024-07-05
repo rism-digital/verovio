@@ -67,6 +67,15 @@ void Nc::Reset()
     this->ResetNcForm();
 }
 
+int Nc::PitchOrLocDifferenceTo(const Nc *nc) const
+{
+    int difference = this->PitchDifferenceTo(nc);
+    if ((difference == 0) && this->HasLoc() && nc->HasLoc()) {
+        difference = this->GetLoc() - nc->GetLoc();
+    }
+    return difference;
+}
+
 FunctorCode Nc::Accept(Functor &functor)
 {
     return functor.VisitNc(this);

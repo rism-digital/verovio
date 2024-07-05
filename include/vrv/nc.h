@@ -65,6 +65,16 @@ public:
     ///@}
 
     /**
+     * Calclulate the pitch or loc difference between to nc.
+     * The Pitch difference takes precedence over the loc difference.
+     */
+    int PitchOrLocDifferenceTo(const Nc *nc) const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
      * Interface for class functor visitation
      */
     ///@{
