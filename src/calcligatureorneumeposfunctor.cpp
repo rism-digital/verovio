@@ -232,6 +232,9 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
     ListOfObjects ncs = neume->FindAllDescendantsByType(NC);
 
     Staff *staff = neume->GetAncestorStaff();
+    assert(staff);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int unit = m_doc->GetDrawingUnit(staffSize);
 
     int xRel = 0;
     Nc *previousNc = NULL;
@@ -246,26 +249,34 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
         const bool hasOriscus = (nc->FindDescendantByType(ORISCUS));
         const bool hasQuilisma = (nc->FindDescendantByType(QUILISMA));
 
+        const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
+
         // Make sure we have at least one glyph
         nc->m_drawingGlyphs.resize(1);
 
+        const int pitchDifference = (previousNc) ? nc->PitchDifferenceTo(previousNc) : 0;
+        bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
+
         if (hasLiquescent) {
             nc->m_drawingGlyphs.resize(3);
+            const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize, false);
+            const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
+
             if (nc->GetCurve() == curvatureDirection_CURVE_c) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E995_chantAuctumDesc;
                 nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
                 nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                nc->m_drawingGlyphs.at(2).m_xOffset = 0.8;
-                nc->m_drawingGlyphs.at(1).m_yOffset = -1.5;
-                nc->m_drawingGlyphs.at(2).m_yOffset = -1.75;
+                nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
+                nc->m_drawingGlyphs.at(1).m_yOffset = -1.75 * unit;
+                nc->m_drawingGlyphs.at(2).m_yOffset = -1.9 * unit;
             }
             else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E994_chantAuctumAsc;
                 nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
                 nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                nc->m_drawingGlyphs.at(2).m_xOffset = 0.8;
-                nc->m_drawingGlyphs.at(1).m_yOffset = 0.5;
-                nc->m_drawingGlyphs.at(2).m_yOffset = 0.75;
+                nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
+                nc->m_drawingGlyphs.at(1).m_yOffset = 0.5 * unit;
+                nc->m_drawingGlyphs.at(2).m_yOffset = 0.75 * unit;
             }
             else {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9A1_chantPunctumDeminutum;
@@ -289,11 +300,12 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
                 }
                 // This is the second
                 else {
+                    // No overlap in this case since the second starts at the same position as the first
+                    overlapWithPrevious = false;
                     assert(previousNc);
                     previousLig = false;
-                    const int pitchDifference = nc->PitchDifferenceTo(previousNc);
-                    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference;
-                    previousNc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference;
+                    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference * unit;
+                    previousNc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference * unit;
 
                     // set the glyph for both the current and previous nc
                     switch (pitchDifference) {
@@ -320,6 +332,8 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
             // Check if nc is part of a ligature or is an inclinatum
             else if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
                 nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E991_chantPunctumInclinatum;
+                // No overlap with this shape
+                overlapWithPrevious = false;
             }
             // If the nc is supposed to be a virga and currently is being rendered as a punctum
             // change it to a virga
@@ -333,11 +347,17 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
             }
         }
 
+        // If the nc overlaps with the previous, move it back from a line width
+        if (overlapWithPrevious) {
+            xRel -= lineWidth;
+        }
+
         nc->SetDrawingXRel(xRel);
         // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be added
         // between the two nc
-        if (!previousLig)
-            xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staff->m_drawingStaffSize, false);
+        if (!previousLig) {
+            xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
+        }
 
         previousNc = nc;
     }
