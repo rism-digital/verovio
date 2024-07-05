@@ -126,7 +126,7 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (layerElement->GetAlignment()->GetType() == ALIGNMENT_CLEF) {
+    if ((layerElement->GetAlignment()->GetType() == ALIGNMENT_CLEF) && !m_isNeumeStaff) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -232,6 +232,7 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
         m_currentAlignment.Reset();
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
+        m_isNeumeStaff = (staffAlignment && staffAlignment->GetStaff()) ? staffAlignment->GetStaff()->IsNeume() : false;
 
         // Prevent collisions of scoredef clefs with thick barlines
         if (hasSystemStartLine) {
