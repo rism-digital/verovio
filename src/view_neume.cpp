@@ -237,21 +237,16 @@ void View::DrawNcGlyphs(DeviceContext *dc, Nc *nc, Staff *staff)
     assert(nc);
     assert(staff);
 
-    const int noteHeight
-        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_HEIGHT_TO_STAFF_SIZE_RATIO);
-    const int noteWidth
-        = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / NOTE_WIDTH_TO_STAFF_SIZE_RATIO);
-
-    int noteX = nc->GetDrawingX();
-    int noteY = nc->GetDrawingY();
+    int ncX = nc->GetDrawingX();
+    int ncY = nc->GetDrawingY();
 
     if (staff->HasDrawingRotation()) {
-        noteY -= staff->GetDrawingRotationOffsetFor(noteX);
+        ncY -= staff->GetDrawingRotationOffsetFor(ncX);
     }
 
     for (auto &glyph : nc->m_drawingGlyphs) {
-        DrawSmuflCode(dc, noteX + glyph.m_xOffset * noteWidth, noteY + glyph.m_yOffset * noteHeight, glyph.m_fontNo,
-            staff->m_drawingStaffSize, false, true);
+        DrawSmuflCode(
+            dc, ncX + glyph.m_xOffset, ncY + glyph.m_yOffset, glyph.m_fontNo, staff->m_drawingStaffSize, false, true);
     }
 }
 
