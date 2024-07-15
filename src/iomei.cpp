@@ -2747,6 +2747,7 @@ void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
     assert(rest);
 
     this->WriteLayerElement(currentNode, rest);
+    this->WriteAltSymInterface(currentNode, rest);
     this->WriteDurationInterface(currentNode, rest);
     this->WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
@@ -3774,6 +3775,9 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         if (element == "note") {
+            return true;
+        }
+        if (element == "rest") {
             return true;
         }
         else {
@@ -6898,6 +6902,7 @@ bool MEIInput::ReadRest(Object *parent, pugi::xml_node rest)
         }
     }
 
+    this->ReadAltSymInterface(rest, vrvRest);
     this->ReadDurationInterface(rest, vrvRest);
     this->ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
