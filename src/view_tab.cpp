@@ -22,6 +22,7 @@
 #include "rend.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "stem.h"
 #include "system.h"
 #include "tabdursym.h"
@@ -103,11 +104,13 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int glyphSize = staff->GetDrawingStaffNotationSize();
     bool drawingCueSize = false;
-    bool overline = false;
+    int overline = 0;
+    int strike = 0;
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline);
+        std::u32string fret = note->GetTabFretString(
+            staff->m_drawingNotationType, staff->m_drawingStaffDef->GetNotationsubtype(), overline, strike);
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
@@ -133,7 +136,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline);
+        std::u32string fret = note->GetTabFretString(
+            staff->m_drawingNotationType, staff->m_drawingStaffDef->GetNotationsubtype(), overline, strike);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
@@ -151,8 +155,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
 
-        // Add overline if required
-        if (overline && !fret.empty()) {
+        // Add overlines or strikethoughs if required
+        if ((overline > 0 || strike > 0) && !fret.empty()) {
             const int lineThickness
                 = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             const int widthFront = m_doc->GetGlyphWidth(fret.front(), glyphSize, drawingCueSize);
@@ -163,13 +167,24 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             const int x1 = x - widthFront / 2;
             const int x2 = x + extend.m_width - widthBack * 3 / 10; // trim right hand overhang on last character
 
-            const int y1 = y + extend.m_ascent + lineThickness;
-            const int y2 = y1;
+            dc->SetPen(m_currentColor, lineThickness, AxSOLID);
+            dc->SetBrush(m_currentColor, AxSOLID);
 
-            dc->SetPen(m_currentColour, lineThickness, AxSOLID);
-            dc->SetBrush(m_currentColour, AxSOLID);
+            // overlines
+            int y1 = y + extend.m_ascent + lineThickness;
 
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+            for (int i = 0; i < overline; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 += 2 * lineThickness;
+            }
+
+            // strikethroughs
+            y1 = y + extend.m_ascent / 2 - (strike - 1) * lineThickness;
+
+            for (int i = 0; i < strike; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 += 2 * lineThickness;
+            }
 
             dc->ResetPen();
             dc->ResetBrush();
@@ -195,6 +210,12 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert(tabGrp);
 
     dc->StartGraphic(tabDurSym, "", tabDurSym->GetID());
+
+    if (tabDurSym->HasLoc()) {
+        const int yRel = ((staff->m_drawingLines - 1) * 2 - tabDurSym->GetLoc())
+            * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
+    }
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();

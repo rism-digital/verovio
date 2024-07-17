@@ -31,9 +31,11 @@ namespace vrv {
 
 static const ClassRegistrar<TabDurSym> s_factory("tabDurSym", TABDURSYM);
 
-TabDurSym::TabDurSym() : LayerElement(TABDURSYM, "tabdursym-"), StemmedDrawingInterface(), AttNNumberLike()
+TabDurSym::TabDurSym()
+    : LayerElement(TABDURSYM, "tabdursym-"), StemmedDrawingInterface(), AttNNumberLike(), AttStaffLoc()
 {
     this->RegisterAttClass(ATT_NNUMBERLIKE);
+    this->RegisterAttClass(ATT_STAFFLOC);
 
     this->Reset();
 }
@@ -45,6 +47,7 @@ void TabDurSym::Reset()
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
     this->ResetNNumberLike();
+    this->ResetStaffLoc();
 }
 
 bool TabDurSym::IsSupportedChild(Object *child)

@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <tabDurSym> element.
  */
-class TabDurSym : public LayerElement, public StemmedDrawingInterface, public AttNNumberLike {
+class TabDurSym : public LayerElement, public StemmedDrawingInterface, public AttNNumberLike, public AttStaffLoc {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
