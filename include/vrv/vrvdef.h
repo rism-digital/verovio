@@ -686,6 +686,7 @@ enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 //----------------------------------------------------------------------------
 
 #define TABLATURE_STAFF_RATIO 1.75
+#define GERMAN_TAB_STAFF_RATIO 2.2
 
 #define SUPER_SCRIPT_FACTOR 0.58
 #define SUPER_SCRIPT_POSITION -0.20 // lowered down from the midline

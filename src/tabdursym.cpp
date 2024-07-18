@@ -89,7 +89,7 @@ void TabDurSym::AdjustDrawingYRel(const Staff *staff, const Doc *doc)
 
     // For stems outside add a margin to the tabDurSym - otherwise attached to the staff line
     if (staff->IsTabWithStemsOutside()) {
-        double spacingRatio = (staff->IsTabLuteFrench()) ? 2.0 : 1.0;
+        double spacingRatio = (staff->IsTabLuteFrench() || staff->IsTabLuteGerman()) ? 2.0 : 1.0;
         yRel += doc->GetDrawingUnit(staff->m_drawingStaffSize) * spacingRatio;
     }
 
@@ -116,8 +116,11 @@ int TabDurSym::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION st
 
     int baseStem = STANDARD_STEMLENGTH_TAB * 3;
 
+    // Shorter for german lute tablature to match ryhthm glyphs
+    if (staff->IsTabLuteGerman()) baseStem -= 3;
     // One unit longer for guitar tablature
-    if (staff->IsTabGuitar()) baseStem += 3;
+    else if (staff->IsTabGuitar())
+        baseStem += 3;
 
     // One unit longer for stems inside the staff
     if (!staff->IsTabWithStemsOutside()) baseStem += 3;

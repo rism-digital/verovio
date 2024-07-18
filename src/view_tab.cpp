@@ -103,10 +103,11 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     int glyphSize = staff->GetDrawingStaffNotationSize();
     bool drawingCueSize = false;
+    bool overline = false;
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline);
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
@@ -132,7 +133,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
@@ -142,9 +143,32 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                 - m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
         }
+        // Center for German tablature
+        else if (staff->IsTabLuteGerman()) {
+            y -= m_doc->GetGlyphHeight(SMUFL_EC17_luteGermanAUpper, glyphSize, drawingCueSize) / 2;
+        }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
+
+        // Add overline if required
+        // TODO is this the correct way to add an overline?
+        if (overline && !fret.empty()) {
+            const int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+            const int width = m_doc->GetGlyphWidth(fret.at(0), glyphSize, drawingCueSize);
+            const int x1 = x - width / 2;
+            const int x2 = x + (fret.size() - 1) * width + width * 8 / 10; // trim right hand overhang on last character
+            const int y1 = y + m_doc->GetGlyphHeight(fret.at(0), glyphSize, drawingCueSize) + lineWidth;
+            const int y2 = y1;
+
+            dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
+            dc->SetBrush(m_currentColour, AxSOLID);
+
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+
+            dc->ResetPen();
+            dc->ResetBrush();
+        }
         dc->ResetFont();
     }
 
@@ -171,6 +195,7 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     int y = element->GetDrawingY();
 
     const int glyphSize = staff->GetDrawingStaffNotationSize();
+
     const int drawingDur = (tabGrp->GetDurGes() != DURATION_NONE) ? tabGrp->GetActualDurGes() : tabGrp->GetActualDur();
 
     // For beam and guitar notation, stem are drawn through the child Stem

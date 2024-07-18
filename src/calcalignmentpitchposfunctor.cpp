@@ -17,6 +17,7 @@
 #include "rest.h"
 #include "score.h"
 #include "staff.h"
+#include "tabgrp.h"
 #include "tuning.h"
 
 //----------------------------------------------------------------------------
@@ -105,8 +106,8 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         TabGrp *tabGrp = note->IsTabGrpNote();
         if (tabGrp) {
             assert(staffY->m_drawingTuning);
-            loc = staffY->m_drawingTuning->CalcPitchPos(
-                note->GetTabCourse(), staffY->m_drawingNotationType, staffY->m_drawingLines);
+            loc = staffY->m_drawingTuning->CalcPitchPos(note->GetTabCourse(), staffY->m_drawingNotationType,
+                staffY->m_drawingLines, tabGrp->GetListSize(tabGrp), tabGrp->GetListIndex(note));
         }
         else if ((note->HasPname() && (note->HasOct() || note->HasOctDefault())) || note->HasLoc()) {
             loc = PitchInterface::CalcLoc(note, layerY, layerElementY);
@@ -307,7 +308,7 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     else if (layerElement->Is(TABDURSYM)) {
         int yRel = 0;
         if (staffY->IsTabWithStemsOutside()) {
-            double spacingRatio = (staffY->IsTabLuteFrench()) ? 2.0 : 1.0;
+            double spacingRatio = (staffY->IsTabLuteFrench() || staffY->IsTabLuteGerman()) ? 2.0 : 1.0;
             yRel += m_doc->GetDrawingUnit(staffY->m_drawingStaffSize) * spacingRatio;
         }
         layerElement->SetDrawingYRel(yRel);
