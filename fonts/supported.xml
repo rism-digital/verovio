@@ -1365,8 +1365,8 @@
         <!--<glyph glyph-code="E591" smufl-name="ornamentTopLeftConvexStroke" />-->
         <!--<glyph glyph-code="E592" smufl-name="ornamentHighLeftConcaveStroke" />-->
         <!--<glyph glyph-code="E593" smufl-name="ornamentHighLeftConvexStroke" />-->
-        <!--<glyph glyph-code="E594" smufl-name="ornamentLeftVerticalStroke" />-->
-        <!--<glyph glyph-code="E595" smufl-name="ornamentLeftVerticalStrokeWithCross" />-->
+        <glyph glyph-code="E594" smufl-name="ornamentLeftVerticalStroke" />
+        <glyph glyph-code="E595" smufl-name="ornamentLeftVerticalStrokeWithCross" />
         <!--<glyph glyph-code="E596" smufl-name="ornamentLeftShakeT" />-->
         <!--<glyph glyph-code="E597" smufl-name="ornamentLeftPlus" />-->
         <!--<glyph glyph-code="E598" smufl-name="ornamentLowLeftConcaveStroke" />-->

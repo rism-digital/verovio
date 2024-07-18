@@ -312,6 +312,8 @@ enum {
     SMUFL_E56F_ornamentHaydn = 0xE56F,
     SMUFL_E583_ornamentVerticalLine = 0xE583,
     SMUFL_E587_ornamentSchleifer = 0xE587,
+    SMUFL_E594_ornamentLeftVerticalStroke = 0xE594,
+    SMUFL_E595_ornamentLeftVerticalStrokeWithCross = 0xE595,
     SMUFL_E59D_ornamentZigZagLineNoRightEnd = 0xE59D,
     SMUFL_E59E_ornamentZigZagLineWithRightEnd = 0xE59E,
     SMUFL_E5B0_ornamentPrecompSlide = 0xE5B0,
@@ -656,7 +658,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 631
+#define SMUFL_COUNT 633
 
 } // namespace vrv
 
