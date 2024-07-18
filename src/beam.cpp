@@ -1619,6 +1619,15 @@ void Beam::Reset()
     m_stemSameas = NULL;
 }
 
+void Beam::CloneReset()
+{
+    // Since these are owned by the beam we cloned from, empty the list
+    // Do it before Object::CloneReset since that one will reset the coord list
+    m_beamElementCoords.clear();
+
+    LayerElement::CloneReset();
+}
+
 bool Beam::IsSupportedChild(Object *child)
 {
     if (child->Is(BEAM)) {
