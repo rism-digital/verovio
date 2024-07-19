@@ -29,6 +29,7 @@
 #include "iomei.h"
 #include "iomusxml.h"
 #include "iopae.h"
+#include "iovolpiano.h"
 #include "layer.h"
 #include "measure.h"
 #include "nc.h"
@@ -199,6 +200,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "darms") {
         m_inputFrom = DARMS;
+    }
+    else if (inputFrom == "volpiano") {
+        m_inputFrom = VOLPIANO;
     }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
@@ -520,6 +524,9 @@ bool Toolkit::LoadData(const std::string &data)
         LogError("DARMS import is not supported in this build.");
         return false;
 #endif
+    }
+    else if (inputFormat == VOLPIANO) {
+        input = new VolpianoInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
