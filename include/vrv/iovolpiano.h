@@ -32,9 +32,7 @@ public:
     bool Import(const std::string &volpiano) override;
 
 private:
-    /** Parse the file */
-    void ParseVolpiano(std::istream &infile);
-
+    //
 public:
     //
 private:
