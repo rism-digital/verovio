@@ -116,7 +116,7 @@ bool VolpianoInput::Import(const std::string &volpiano)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffDef->SetLines(5);
-    // Arbitray clef
+    // Arbitrary clef
     Clef *clef = new Clef();
     clef->IsAttribute(true);
     clef->SetLine(2);
