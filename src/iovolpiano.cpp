@@ -88,8 +88,6 @@ bool VolpianoInput::Import(const std::string &volpiano)
                 ch = liquescents.at(ch);
             }
             Note *note = new Note();
-            note->SetDur(DURATION_4);
-            note->SetStemLen(0.0);
             auto [pname, oct] = notes.at(ch);
             note->SetPname(pname);
             note->SetOct(oct);
@@ -101,7 +99,7 @@ bool VolpianoInput::Import(const std::string &volpiano)
                 accidVal = ACCIDENTAL_WRITTEN_NONE;
             }
             if (liquescent) {
-                note->SetGrace(GRACE_unknown);
+                note->SetCue(BOOLEAN_true);
             }
             layer->AddChild(note);
         }
