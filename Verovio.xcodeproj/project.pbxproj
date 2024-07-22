@@ -811,6 +811,12 @@
 		4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */; };
 		4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
+		4DE0198C2C495DB800B5B6BF /* iovolpiano.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */; };
+		4DE0198D2C495E6300B5B6BF /* iovolpiano.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0198A2C495D1F00B5B6BF /* iovolpiano.h */; };
+		4DE0198E2C495E6500B5B6BF /* iovolpiano.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0198A2C495D1F00B5B6BF /* iovolpiano.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4DE0198F2C495E7400B5B6BF /* iovolpiano.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */; };
+		4DE019902C495E7600B5B6BF /* iovolpiano.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */; };
+		4DE019912C495E7700B5B6BF /* iovolpiano.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */; };
 		4DE0B9A12988070C00D4C939 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0B9A02988070C00D4C939 /* interface.h */; };
 		4DE0B9A22988070C00D4C939 /* interface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DE0B9A02988070C00D4C939 /* interface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE644F41EDBEA01002FBE6C /* breath.cpp */; };
@@ -2051,6 +2057,8 @@
 		4DDBBB591C7AE45900054AFF /* dynam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynam.cpp; path = src/dynam.cpp; sourceTree = "<group>"; };
 		4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hairpin.cpp; path = src/hairpin.cpp; sourceTree = "<group>"; };
 		4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_text.cpp; path = src/view_text.cpp; sourceTree = "<group>"; };
+		4DE0198A2C495D1F00B5B6BF /* iovolpiano.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iovolpiano.h; path = include/vrv/iovolpiano.h; sourceTree = "<group>"; };
+		4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iovolpiano.cpp; path = src/iovolpiano.cpp; sourceTree = "<group>"; };
 		4DE0B9A02988070C00D4C939 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interface.h; path = include/vrv/interface.h; sourceTree = "<group>"; };
 		4DE644F31EDBE9F8002FBE6C /* breath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = breath.h; path = include/vrv/breath.h; sourceTree = "<group>"; };
 		4DE644F41EDBEA01002FBE6C /* breath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = breath.cpp; path = src/breath.cpp; sourceTree = "<group>"; };
@@ -2879,6 +2887,8 @@
 				8F59291A18854BF800FE51AD /* iomusxml.h */,
 				8F086EC4188539540037FD8E /* iopae.cpp */,
 				8F59291B18854BF800FE51AD /* iopae.h */,
+				4DE0198B2C495DB800B5B6BF /* iovolpiano.cpp */,
+				4DE0198A2C495D1F00B5B6BF /* iovolpiano.h */,
 			);
 			name = io;
 			sourceTree = "<group>";
@@ -3378,6 +3388,7 @@
 				4DEC4DD821C8295700D1D273 /* unclear.h in Headers */,
 				4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */,
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
+				4DE0198D2C495E6300B5B6BF /* iovolpiano.h in Headers */,
 				E78833652995007700D44B01 /* calcspanningbeamspansfunctor.h in Headers */,
 				E75EA9FA29CC3A6B003A97A7 /* calcarticfunctor.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
@@ -3612,6 +3623,7 @@
 				BB4C4ABE22A932B6001F6AF0 /* label.h in Headers */,
 				E71EF3C42975E4DC00D36264 /* resetfunctor.h in Headers */,
 				403B0515244F3E4D00EE4F71 /* gliss.h in Headers */,
+				4DE0198E2C495E6500B5B6BF /* iovolpiano.h in Headers */,
 				BB4C4B0A22A932C3001F6AF0 /* pghead.h in Headers */,
 				4DFB3E8B23ABDFDA00D688C7 /* pitchinflection.h in Headers */,
 				E7C3AED729550190002DE5AB /* preparedatafunctor.h in Headers */,
@@ -3933,6 +3945,7 @@
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
 				E7901661298BCB2C008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				400FEDD6206FA74D000D3233 /* gracegrp.cpp in Sources */,
+				4DE0198F2C495E7400B5B6BF /* iovolpiano.cpp in Sources */,
 				4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
@@ -4307,6 +4320,7 @@
 				4DACC9902990F29A00B55913 /* atts_critapp.cpp in Sources */,
 				406916DC23833770009E6B04 /* mspace.cpp in Sources */,
 				E7A1640C29AF34750099BD6A /* adjustharmgrpsspacingfunctor.cpp in Sources */,
+				4DE0198C2C495DB800B5B6BF /* iovolpiano.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4D1EB6A92A2A7C5100AF2F98 /* div.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
@@ -4508,6 +4522,7 @@
 				4DB3D8F01F83D1A700B5FC2B /* fig.cpp in Sources */,
 				E790165F298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
+				4DE019902C495E7600B5B6BF /* iovolpiano.cpp in Sources */,
 				4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */,
 				4D766F0220ACAD6E006875D8 /* nc.cpp in Sources */,
 				4DEC4D9821C81E3B00D1D273 /* expan.cpp in Sources */,
@@ -4796,6 +4811,7 @@
 				BB4C4B9322A932E5001F6AF0 /* areaposinterface.cpp in Sources */,
 				E7901660298BCB27008FDB4E /* calcalignmentxposfunctor.cpp in Sources */,
 				BB4C4AA122A9328F001F6AF0 /* verticalaligner.cpp in Sources */,
+				4DE019912C495E7700B5B6BF /* iovolpiano.cpp in Sources */,
 				4D1AC97A2B6A9BB200434023 /* filereader.cpp in Sources */,
 				BB4C4B2F22A932CF001F6AF0 /* pedal.cpp in Sources */,
 				4D2E759222BC2B80004C51F0 /* tuning.cpp in Sources */,

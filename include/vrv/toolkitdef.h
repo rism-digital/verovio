@@ -20,6 +20,7 @@ enum FileFormat {
     PAE,
     ABC,
     DARMS,
+    VOLPIANO,
     MUSICXML,
     MUSICXMLHUM,
     MEIHUM,
