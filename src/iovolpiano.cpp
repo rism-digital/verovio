@@ -59,7 +59,7 @@ bool VolpianoInput::Import(const std::string &volpiano)
     score->AddChild(section);
 
     Staff *staff = new Staff(1);
-    Measure *measure = new Measure(MEASURED, 1);
+    Measure *measure = new Measure(UNMEASURED, 1);
     Layer *layer = new Layer();
     layer->SetN(1);
 
