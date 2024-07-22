@@ -67,6 +67,8 @@ bool VolpianoInput::Import(const std::string &volpiano)
     measure->AddChild(staff);
     section->AddChild(measure);
 
+    data_ACCIDENTAL_WRITTEN accidVal = ACCIDENTAL_WRITTEN_NONE;
+
     static std::map<char, std::pair<data_PITCHNAME, int>> notes = { { '9', { PITCHNAME_g, 3 } },
         { 'a', { PITCHNAME_a, 3 } }, { 'b', { PITCHNAME_b, 3 } }, { 'c', { PITCHNAME_c, 4 } },
         { 'd', { PITCHNAME_d, 4 } }, { 'e', { PITCHNAME_e, 4 } }, { 'f', { PITCHNAME_f, 4 } },
@@ -91,10 +93,23 @@ bool VolpianoInput::Import(const std::string &volpiano)
             auto [pname, oct] = notes.at(ch);
             note->SetPname(pname);
             note->SetOct(oct);
+            if (accidVal != ACCIDENTAL_WRITTEN_NONE) {
+                Accid *accid = new Accid();
+                accid->SetAccid(accidVal);
+                accid->IsAttribute(true);
+                note->AddChild(accid);
+                accidVal = ACCIDENTAL_WRITTEN_NONE;
+            }
             if (liquescent) {
                 note->SetGrace(GRACE_unknown);
             }
             layer->AddChild(note);
+        }
+        else if (ch == 'y' || ch == 'i' || ch == 'z') {
+            accidVal = ACCIDENTAL_WRITTEN_f;
+        }
+        else if (ch == 'Y' || ch == 'I' || ch == 'Z') {
+            accidVal = ACCIDENTAL_WRITTEN_n;
         }
     }
 
