@@ -69,17 +69,18 @@ bool VolpianoInput::Import(const std::string &volpiano)
 
     data_ACCIDENTAL_WRITTEN accidVal = ACCIDENTAL_WRITTEN_NONE;
 
-    static std::map<char, std::pair<data_PITCHNAME, int>> notes = { { '9', { PITCHNAME_g, 3 } },
-        { 'a', { PITCHNAME_a, 3 } }, { 'b', { PITCHNAME_b, 3 } }, { 'c', { PITCHNAME_c, 4 } },
-        { 'd', { PITCHNAME_d, 4 } }, { 'e', { PITCHNAME_e, 4 } }, { 'f', { PITCHNAME_f, 4 } },
-        { 'g', { PITCHNAME_g, 4 } }, { 'h', { PITCHNAME_a, 4 } }, { 'j', { PITCHNAME_b, 4 } },
-        { 'k', { PITCHNAME_c, 5 } }, { 'l', { PITCHNAME_d, 5 } }, { 'm', { PITCHNAME_e, 5 } },
-        { 'n', { PITCHNAME_f, 5 } }, { 'o', { PITCHNAME_g, 5 } }, { 'p', { PITCHNAME_a, 5 } },
-        { 'q', { PITCHNAME_b, 5 } }, { 'r', { PITCHNAME_c, 6 } }, { 's', { PITCHNAME_d, 6 } } };
+    static std::map<char, std::pair<data_PITCHNAME, int>> notes
+        = { { '8', { PITCHNAME_a, 3 } }, { '9', { PITCHNAME_g, 3 } }, { 'a', { PITCHNAME_a, 3 } },
+              { 'b', { PITCHNAME_b, 3 } }, { 'c', { PITCHNAME_c, 4 } }, { 'd', { PITCHNAME_d, 4 } },
+              { 'e', { PITCHNAME_e, 4 } }, { 'f', { PITCHNAME_f, 4 } }, { 'g', { PITCHNAME_g, 4 } },
+              { 'h', { PITCHNAME_a, 4 } }, { 'j', { PITCHNAME_b, 4 } }, { 'k', { PITCHNAME_c, 5 } },
+              { 'l', { PITCHNAME_d, 5 } }, { 'm', { PITCHNAME_e, 5 } }, { 'n', { PITCHNAME_f, 5 } },
+              { 'o', { PITCHNAME_g, 5 } }, { 'p', { PITCHNAME_a, 5 } }, { 'q', { PITCHNAME_b, 5 } },
+              { 'r', { PITCHNAME_c, 6 } }, { 's', { PITCHNAME_d, 6 } } };
 
-    static std::map<char, char> liquescents = { { ')', '9' }, { 'A', 'a' }, { 'B', 'b' }, { 'C', 'c' }, { 'D', 'd' },
-        { 'E', 'e' }, { 'F', 'f' }, { 'G', 'g' }, { 'H', 'h' }, { 'J', 'j' }, { 'K', 'k' }, { 'L', 'l' }, { 'M', 'm' },
-        { 'N', 'n' }, { 'O', 'o' }, { 'P', 'p' }, { 'Q', 'q' }, { 'R', 'r' }, { 'S', 's' } };
+    static std::map<char, char> liquescents = { { '(', '8' }, { ')', '9' }, { 'A', 'a' }, { 'B', 'b' }, { 'C', 'c' },
+        { 'D', 'd' }, { 'E', 'e' }, { 'F', 'f' }, { 'G', 'g' }, { 'H', 'h' }, { 'J', 'j' }, { 'K', 'k' }, { 'L', 'l' },
+        { 'M', 'm' }, { 'N', 'n' }, { 'O', 'o' }, { 'P', 'p' }, { 'Q', 'q' }, { 'R', 'r' }, { 'S', 's' } };
 
     for (char ch : volpiano) {
         if (notes.contains(ch) || liquescents.contains(ch)) {
@@ -103,10 +104,10 @@ bool VolpianoInput::Import(const std::string &volpiano)
             }
             layer->AddChild(note);
         }
-        else if (ch == 'y' || ch == 'i' || ch == 'z') {
+        else if (ch == 'i' || ch == 'w' || ch == 'x' || ch == 'y' || ch == 'z') {
             accidVal = ACCIDENTAL_WRITTEN_f;
         }
-        else if (ch == 'Y' || ch == 'I' || ch == 'Z') {
+        else if (ch == 'I' || ch == 'W' || ch == 'X' || ch == 'Y' || ch == 'Z') {
             accidVal = ACCIDENTAL_WRITTEN_n;
         }
     }
