@@ -900,6 +900,7 @@ protected:
     bool checkIfReversedSpineOrder(std::vector<hum::HTp> &staffstarts);
     bool hasOmdText(int startline, int endline);
     void processMeiOptions(hum::HumdrumFile &infile);
+    std::string getInstrumentNumber(hum::HTp icode);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
