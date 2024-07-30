@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 30 19:51:54 WEST 2024
+// Last Modified: Mon Jul 29 23:24:23 PDT 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -24163,7 +24163,7 @@ void HumdrumFileContent::markBeamSpanMembers(HTp beamstart, HTp beamend) {
 bool HumdrumFileContent::doHandAnalysis(bool attacksOnlyQ) {
 	HumdrumFileContent& infile = *this;
 	vector<HTp> kstarts = infile.getKernSpineStartList();
-	bool status = 0; 
+	bool status = 0;
 	for (int i=0; i<(int)kstarts.size(); i++) {
 		status |= doHandAnalysis(kstarts[i], attacksOnlyQ);
 	}
@@ -24426,7 +24426,7 @@ void HumdrumFileContent::fillMidiInfo(vector<vector<vector<pair<HTp, int>>>>& tr
 //
 // HumdrumFileContent::processStrandNotesForMidi -- store strand tokens/subtokens by MIDI note
 //     in the midi track entry.
-//    
+//
 //     First index if track info is the MIDI note number, second is a list
 //     of tokens for that note number, with the second value of the pair
 //     giving the subtoken index of the note in the token.
@@ -39785,7 +39785,7 @@ void MuseData::linkMusicDirections(void) {
 //
 // MuseData::getMeasureNumber -- If index == 0, return the next barnumber
 //     minus 1.  If on a measure record, return the number on that line.
-//     If neither, then search backwards for the last measure line (or 0 
+//     If neither, then search backwards for the last measure line (or 0
 //     index) and return the measure number for that barline (or 0 index).
 //
 
@@ -39819,7 +39819,7 @@ string MuseData::getMeasureNumber(int index) {
 				string number = md[i].getMeasureNumber();
 				return number;
 			} else {
-				// first measure is not numbered, so return next 
+				// first measure is not numbered, so return next
 				// measure number minus 1.
 				for (int j=index; j<md.getLineCount(); j++) {
 					if (md[j].isMeasure()) {
@@ -41010,7 +41010,7 @@ string MuseRecord::getFigure(int index) {
 
 //////////////////////////////
 //
-// MuseRecord::getPartName -- return the name line in the 
+// MuseRecord::getPartName -- return the name line in the
 //     MuseData part's header.  This is the 9th non-comment
 //     line in a part file.
 //
@@ -52456,13 +52456,16 @@ void Options::xverify(int error_check, int suppress) {
 	bool optionend = false;
 	int i          = 1;
 	int oldi;
-	int terminate = 1000; // for malformed options (missing arguments)
+	int terminate = 15000; // for malformed options (missing arguments)
 	int tcount = 0;
 
 	while ((i < (int)m_argv.size()) && !optionend) {
 		tcount++;
 		if (tcount > terminate) {
 			m_error << "Error: missing option argument" << endl;
+			m_error << "ARGV count: " << m_argv.size()  << endl;
+			m_error << "terminate: "  << terminate      << endl;
+			m_error << "tcount: "     << tcount         << endl;
 			break;
 		}
 		if (isOption(m_argv[i], i)) {
@@ -80160,7 +80163,7 @@ void Tool_extract::fillFieldDataByNoRest(vector<int>& field, vector<int>& subfie
 	}
 
 	// Go back and mark any empty spines as non-empty if they
-   // are in a part that contains multiple staves. I.e., only
+	// are in a part that contains multiple staves. I.e., only
 	// delete a staff if all staves for the part are empty.
 	// There should be a single *part# line at the start of the
 	// score.
@@ -80397,12 +80400,8 @@ void Tool_extract::expandSpines(vector<int>& field, vector<int>& subfield, vecto
 	model.reserve(infile.getMaxTrack()*2);
 	model.resize(0);
 
-	int allQ = 0;
-	if (interp.size() == 0) {
-		allQ = 1;
-	}
+	bool allQ = interp.empty();
 
-	// ggg
 	vector<int> dummyfield;
 	vector<int> dummysubfield;
 	vector<int> dummymodel;
@@ -80606,25 +80605,25 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 
 		if ((firstone < 1) && (firstone != 0)) {
 			m_error_text << "Error: range token: \"" << astring << "\""
-				  << " contains too small a number at start: " << firstone << endl;
+			             << " contains too small a number at start: " << firstone << endl;
 			m_error_text << "Minimum number allowed is " << 1 << endl;
 			return;
 		}
 		if ((lastone < 1) && (lastone != 0)) {
 			m_error_text << "Error: range token: \"" << astring << "\""
-				  << " contains too small a number at end: " << lastone << endl;
+			             << " contains too small a number at end: " << lastone << endl;
 			m_error_text << "Minimum number allowed is " << 1 << endl;
 			return;
 		}
 		if (firstone > maxtrack) {
 			m_error_text << "Error: range token: \"" << astring << "\""
-				  << " contains number too large at start: " << firstone << endl;
+			             << " contains number too large at start: " << firstone << endl;
 			m_error_text << "Maximum number allowed is " << maxtrack << endl;
 			return;
 		}
 		if (lastone > maxtrack) {
 			m_error_text << "Error: range token: \"" << astring << "\""
-				  << " contains number too large at end: " << lastone << endl;
+			             << " contains number too large at end: " << lastone << endl;
 			m_error_text << "Maximum number allowed is " << maxtrack << endl;
 			return;
 		}
@@ -80667,13 +80666,13 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 
 		if ((value < 1) && (value != 0)) {
 			m_error_text << "Error: range token: \"" << astring << "\""
-				  << " contains too small a number at end: " << value << endl;
+			             << " contains too small a number at end: " << value << endl;
 			m_error_text << "Minimum number allowed is " << 1 << endl;
 			return;
 		}
 		if (value > maxtrack) {
 			m_error_text << "Error: range token: \"" << astring << "\""
-				  << " contains number too large at start: " << value << endl;
+			             << " contains number too large at start: " << value << endl;
 			m_error_text << "Maximum number allowed is " << maxtrack << endl;
 			return;
 		}
@@ -80698,11 +80697,10 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 
 	vector<HTp> trackstarts;
 	infile.getTrackStartList(trackstarts);
-	int i, j;
 	int spine;
 
 	// convert kern tracks into spine tracks:
-	for (i=finitsize; i<(int)field.size(); i++) {
+	for (int i=finitsize; i<(int)field.size(); i++) {
 		if (field[i] > 0) {
 			spine = ktracks[field[i]-1]->getTrack();
 		   field[i] = spine;
@@ -80710,7 +80708,7 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 	}
 
 	int startspineindex, stopspineindex;
-	for (i=0; i<(int)field.size(); i++) {
+	for (int i=0; i<(int)field.size(); i++) {
 		newfield.push_back(field[i]); // copy **kern spine index into new list
 		newsubfield.push_back(subfield[i]);
 		newmodel.push_back(model[i]);
@@ -80718,7 +80716,7 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 		// search for non **kern spines after specified **kern spine:
 		startspineindex = field[i] + 1 - 1;
 		stopspineindex = maxtrack;
-		for (j=startspineindex; j<stopspineindex; j++) {
+		for (int j=startspineindex; j<stopspineindex; j++) {
 			if (trackstarts[j]->isKern()) {
 				break;
 			}
@@ -80818,6 +80816,7 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 	int subtarget;
 	int modeltarget;
 	string spat;
+	bool foundBarline = true;
 
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].hasSpines()) {
@@ -80830,6 +80829,10 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 			continue;
 		}
 
+		if (infile[i].isBarline()) {
+			foundBarline = true;
+		}
+
 		start = 0;
 		for (int t=0; t<(int)field.size(); t++) {
 			target = field[t];
@@ -80837,17 +80840,17 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 			modeltarget = model[t];
 			if (modeltarget == 0) {
 				switch (subtarget) {
-					 case 'a':
-					 case 'b':
-					    modeltarget = submodel;
-					    break;
-					 case 'c':
-					    modeltarget = comodel;
+					case 'a':
+					case 'b':
+						modeltarget = submodel;
+						break;
+					case 'c':
+						modeltarget = comodel;
 				}
 			}
 			if (target == 0) {
 				if (start != 0) {
-					 m_humdrum_text << '\t';
+					m_humdrum_text << '\t';
 				}
 				start = 1;
 				if (!infile[i].isManipulator()) {
@@ -80856,70 +80859,155 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 					} else if (infile[i].isBarline()) {
 						m_humdrum_text << infile[i].token(0);
 					} else if (infile[i].isData()) {
-				       m_humdrum_text << ".";
-					    // interpretations handled in dealWithSpineManipulators()
-					    // [obviously not, so adding a blank one here
+						if (foundBarline) {
+							if (addRestsQ) {
+								HumNum dur = infile[i].getDurationToBarline();
+								m_humdrum_text << Convert::durationToRecip(dur);
+							} else {
+								m_humdrum_text << ".";
+							}
+						} else {
+							m_humdrum_text << ".";
+						}
+						// interpretations handled in dealWithSpineManipulators()
+						// [obviously not, so adding a blank one here
 					} else if (infile[i].isInterpretation()) {
-					    m_humdrum_text << "*";
-					 }
+						HTp token = infile.token(i, 0);
+						if (token->isExpansionLabel()) {
+							m_humdrum_text << token;
+						} else if (token->isExpansionList()) {
+							m_humdrum_text << token;
+						} else {
+							if (addRestsQ) {
+								printInterpretationForKernSpine(infile, i);
+							} else {
+								m_humdrum_text << "*";
+							}
+						}
+					}
 				}
 			} else {
 				for (int j=0; j<infile[i].getFieldCount(); j++) {
-					 if (infile[i].token(j)->getTrack() != target) {
-					    continue;
-					 }
-					 switch (subtarget) {
-					 case 'a':
-					    getSearchPat(spat, target, "a");
-					    if (hre.search(infile.token(i,j)->getSpineInfo(), spat) ||
-					          !hre.search(infile.token(i, j)->getSpineInfo(), "\\(")) {
-					       if (start != 0) {
-					          m_humdrum_text << '\t';
-					       }
-					       start = 1;
-					       m_humdrum_text << infile.token(i, j);
-					    }
-					    break;
-					 case 'b':
-					    getSearchPat(spat, target, "b");
-					    if (hre.search(infile.token(i, j)->getSpineInfo(), spat)) {
-					       if (start != 0) {
-					          m_humdrum_text << '\t';
-					       }
-					       start = 1;
-					       m_humdrum_text << infile.token(i, j);
-					    } else if (!hre.search(infile.token(i, j)->getSpineInfo(),
-					          "\\(")) {
-					       if (start != 0) {
-					          m_humdrum_text << '\t';
-					       }
-					       start = 1;
-					       dealWithSecondarySubspine(field, subfield, model, t,
-					             infile, i, j, modeltarget);
-					    }
-					    break;
-					 case 'c':
-					    if (start != 0) {
-					       m_humdrum_text << '\t';
-					    }
-					    start = 1;
-					    dealWithCospine(field, subfield, model, t, infile, i, j,
-					       modeltarget, modeltarget, cointerp);
-					    break;
-					 default:
-					    if (start != 0) {
-					       m_humdrum_text << '\t';
-					    }
-					    start = 1;
-					    m_humdrum_text << infile.token(i, j);
-					 }
+					if (infile[i].token(j)->getTrack() != target) {
+						continue;
+					}
+					switch (subtarget) {
+					case 'a':
+						getSearchPat(spat, target, "a");
+						if (hre.search(infile.token(i,j)->getSpineInfo(), spat) ||
+								!hre.search(infile.token(i, j)->getSpineInfo(), "\\(")) {
+							if (start != 0) {
+								m_humdrum_text << '\t';
+							}
+							start = 1;
+							m_humdrum_text << infile.token(i, j);
+						}
+						break;
+					case 'b':
+						getSearchPat(spat, target, "b");
+						if (hre.search(infile.token(i, j)->getSpineInfo(), spat)) {
+							if (start != 0) {
+								m_humdrum_text << '\t';
+							}
+							start = 1;
+							m_humdrum_text << infile.token(i, j);
+						} else if (!hre.search(infile.token(i, j)->getSpineInfo(),
+								"\\(")) {
+							if (start != 0) {
+								m_humdrum_text << '\t';
+							}
+							start = 1;
+							dealWithSecondarySubspine(field, subfield, model, t,
+									infile, i, j, modeltarget);
+						}
+						break;
+					case 'c':
+						if (start != 0) {
+							m_humdrum_text << '\t';
+						}
+						start = 1;
+						dealWithCospine(field, subfield, model, t, infile, i, j,
+								modeltarget, modeltarget, cointerp);
+						break;
+					default:
+						if (start != 0) {
+							m_humdrum_text << '\t';
+						}
+						start = 1;
+						m_humdrum_text << infile.token(i, j);
+					}
 				}
 			}
 		}
+
+		if (infile[i].isData()) {
+			foundBarline = false;
+		}
+
 		if (start != 0) {
 			m_humdrum_text << endl;
 		}
 	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_extract::printInterpretationForKernSpine --
+//
+
+void Tool_extract::printInterpretationForKernSpine(HumdrumFile& infile, int index) {
+	HTp kerntok = NULL;
+	for (int j=0; j<infile[index].getFieldCount(); j++) {
+		HTp token = infile.token(index, j);
+		if (!token->isKern()) {
+			continue;
+		}
+		kerntok = token;
+		break;
+	}
+
+	if (kerntok == NULL) {
+		m_humdrum_text << "*";
+		return;
+	}
+
+	if (*kerntok == "*") {
+		m_humdrum_text << kerntok;
+		return;
+	}
+
+	if (kerntok->isKeySignature()) {
+		m_humdrum_text << kerntok;
+		return;
+	}
+	if (kerntok->isKeyDesignation()) {
+		m_humdrum_text << kerntok;
+		return;
+	}
+	if (kerntok->isTimeSignature()) {
+		m_humdrum_text << kerntok;
+		return;
+	}
+	if (kerntok->isMensurationSymbol()) {
+		m_humdrum_text << kerntok;
+		return;
+	}
+	if (kerntok->isTempo()) {
+		m_humdrum_text << kerntok;
+		return;
+	}
+	if (kerntok->isInstrumentName()) {
+		m_humdrum_text << "*I\"";
+		return;
+	}
+	if (kerntok->isInstrumentAbbreviation()) {
+		m_humdrum_text << "*I'";
+		return;
+	}
+
+	m_humdrum_text << "*";
 }
 
 
@@ -81024,7 +81112,7 @@ void Tool_extract::dealWithCospine(vector<int>& field, vector<int>& subfield, ve
 				if ((strchr(infile.token(line, j)->getSpineInfo().c_str(), '(') == NULL) ||
 					(infile.token(line, j)->getSpineInfo().find(buff) != string::npos)) {
 					printCotokenInfo(start, infile, line, j, cotokens, spineindex,
-							 subspineindex);
+							subspineindex);
 				}
 			} else if (subfield[i] == 'b') {
 				// this section may need more work...
@@ -81032,7 +81120,7 @@ void Tool_extract::dealWithCospine(vector<int>& field, vector<int>& subfield, ve
 				if ((strchr(infile.token(line, j)->getSpineInfo().c_str(), '(') == NULL) ||
 					(strstr(infile.token(line, j)->getSpineInfo().c_str(), buff.c_str()) != NULL)) {
 					printCotokenInfo(start, infile, line, j, cotokens, spineindex,
-							 subspineindex);
+							subspineindex);
 				}
 			} else {
 				printCotokenInfo(start, infile, line, j, cotokens, spineindex,
@@ -81306,18 +81394,18 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 				if (infile[line].token(j)->getTrack() != target) {
 					continue;
 				}
-		 // filter by subfield
-		 if (subtarget == 'a') {
-					getSearchPat(spat, target, "b");
-			 if (hre.search(infile.token(line, j)->getSpineInfo(), spat)) {
+		// filter by subfield
+		if (subtarget == 'a') {
+			getSearchPat(spat, target, "b");
+			if (hre.search(infile.token(line, j)->getSpineInfo(), spat)) {
 						continue;
-			 }
-		 } else if (subtarget == 'b') {
-					getSearchPat(spat, target, "a");
-			 if (hre.search(infile.token(line, j)->getSpineInfo(), spat)) {
-						continue;
-					}
-				}
+			}
+		} else if (subtarget == 'b') {
+			getSearchPat(spat, target, "a");
+			if (hre.search(infile.token(line, j)->getSpineInfo(), spat)) {
+				continue;
+			}
+		}
 
 				switch (subtarget) {
 				case 'a':
@@ -81338,14 +81426,14 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 							    (spinepat == spat)) {
 							 storeToken(tempout, "*");
 						} else {
-							 getSearchPat(spat, target, "b");
-							 if ((spinepat == spat) &&
-							       (*infile.token(line, j) ==  "*v")) {
-							    // do nothing
-							    suppress = 1;
-							 } else {
-							    storeToken(tempout, *infile.token(line, j));
-							 }
+							getSearchPat(spat, target, "b");
+							if ((spinepat == spat) &&
+									(*infile.token(line, j) ==  "*v")) {
+								// do nothing
+								suppress = 1;
+							} else {
+								storeToken(tempout, *infile.token(line, j));
+							}
 						}
 					}
 
@@ -81354,9 +81442,9 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 
 					if (!hre.search(infile.token(line, j)->getSpineInfo(), "\\(")) {
 						if (*infile.token(line, j) == "*^") {
-							 storeToken(tempout, "*");
+							storeToken(tempout, "*");
 						} else {
-							 storeToken(tempout, *infile.token(line, j));
+							storeToken(tempout, *infile.token(line, j));
 						}
 					} else {
 						getSearchPat(spat, target, "b");
@@ -81365,17 +81453,17 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 						hre.replaceDestructive(spinepat, "\\)", "\\)", "g");
 
 						if ((*infile.token(line, j) ==  "*v") &&
-							    (spinepat == spat)) {
-							 storeToken(tempout, "*");
+								(spinepat == spat)) {
+							storeToken(tempout, "*");
 						} else {
-							 getSearchPat(spat, target, "a");
-							 if ((spinepat == spat) &&
-							       (*infile.token(line, j) == "*v")) {
-							    // do nothing
-							    suppress = 1;
-							 } else {
-							    storeToken(tempout, *infile.token(line, j));
-							 }
+							getSearchPat(spat, target, "a");
+							if ((spinepat == spat) &&
+									(*infile.token(line, j) == "*v")) {
+								// do nothing
+								suppress = 1;
+							} else {
+								storeToken(tempout, *infile.token(line, j));
+							}
 						}
 					}
 
@@ -81878,19 +81966,19 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	}
 
 	if (interpQ) {
-		fieldQ = 1;
+		fieldQ = true;
 	}
 
 	if (emptyQ) {
-		fieldQ = 1;
+		fieldQ = true;
 	}
 
 	if (noEmptyQ) {
-		fieldQ = 1;
+		fieldQ = true;
 	}
 
 	if (expandQ) {
-		fieldQ = 1;
+		fieldQ = true;
 		expandInterp = getString("expand-interp");
 	}
 
@@ -81902,7 +81990,7 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	}
 
 	if (reverseQ) {
-		fieldQ = 1;
+		fieldQ = true;
 	}
 
 	if (excludeQ) {
@@ -81911,15 +81999,15 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 		fieldstring = getString("f");
 	} else if (kernQ) {
 		fieldstring = getString("k");
-		fieldQ = 1;
+		fieldQ = true;
 	} else if (rkernQ) {
 		fieldstring = getString("K");
-		fieldQ = 1;
+		fieldQ = true;
 		fieldstring = reverseFieldString(fieldstring, infile.getMaxTrack());
 	}
 
 	spineListQ = getBoolean("spine-list");
-	grepQ = getBoolean("grep");
+	grepQ      = getBoolean("grep");
 	grepString = getString("grep");
 
 	if (getBoolean("name")) {
@@ -81932,6 +82020,9 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 			} else {
 				blankName = "*" + blankName;
 			}
+		}
+		if (blankName == "**kern") {
+			addRestsQ = true;
 		}
 	}
 
@@ -83159,6 +83250,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(nproof, infile, commands[i].second, status);
 		} else if (commands[i].first == "ordergps") {
 			RUNTOOL(ordergps, infile, commands[i].second, status);
+		} else if (commands[i].first == "pbar") {
+			RUNTOOL(pbar, infile, commands[i].second, status);
 		} else if (commands[i].first == "phrase") {
 			RUNTOOL(phrase, infile, commands[i].second, status);
 		} else if (commands[i].first == "pline") {
@@ -112714,6 +112807,274 @@ void Tool_ordergps::printStaffLine(HumdrumFile& infile) {
 
 /////////////////////////////////
 //
+// Tool_pbar::Tool_pbar -- Set the recognized options for the tool.
+//
+
+Tool_pbar::Tool_pbar(void) {
+	define("i|invisible-barlines=b", "make barlines invisible");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pbar::initialize --  Initializations that only have to be done once
+//    for all HumdrumFile segments.
+//
+
+void Tool_pbar::initialize(void) {
+	m_invisibleQ = getBoolean("invisible-barlines");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_pbar::run -- Do the main work of the tool.
+//
+
+bool Tool_pbar::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+
+bool Tool_pbar::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_pbar::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_pbar::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pbar::processFile --
+//
+
+void Tool_pbar::processFile(HumdrumFile& infile) {
+	vector<HTp> kstarts = infile.getKernSpineStartList();
+	for (int i=0; i<(int)kstarts.size(); i++) {
+		processSpine(kstarts[i]);
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << endl;
+			continue;
+		}
+		if (infile[i].isData()) {
+			printDataLine(infile, i);
+		} else if (infile[i].isCommentLocal()) {
+			printLocalCommentLine(infile, i);
+		} else if (infile[i].isBarline()) {
+			printBarLine(infile, i);
+			if (m_invisibleQ) {
+				printInvisibleBarlines(infile, i);
+			} else {
+				m_humdrum_text << infile[i] << endl;
+			}
+		} else {
+			m_humdrum_text << infile[i] << endl;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pbar::printInvisibleBarlines --
+//
+
+void Tool_pbar::printInvisibleBarlines(HumdrumFile& infile, int index) {
+	HumRegex hre;
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (hre.search(token, "-")) {
+			m_humdrum_text << token;
+		} else if (hre.search(token, "==")) {
+			m_humdrum_text << token;
+		} else if (hre.search(token, "\\|\\|")) {
+			m_humdrum_text << token;
+		} else {
+			m_humdrum_text << token << "-";
+		}
+		if (i < infile[index].getFieldCount() - 1) {
+			m_humdrum_text << "\t";
+		}
+	}
+	m_humdrum_text << "\n";
+}
+
+
+
+///////////////////////////////
+//
+// Tool_pbar::printDataLine --
+//
+
+void Tool_pbar::printDataLine(HumdrumFile& infile, int index) {
+	printBarLine(infile, index);
+	m_humdrum_text << infile[index] << endl;
+}
+
+
+
+///////////////////////////////
+//
+// Tool_pbar::printBarLine -- Add *bar line.
+//
+
+void Tool_pbar::printBarLine(HumdrumFile& infile, int index) {
+	bool hasBarline = false;
+	for (int j=0; j<infile[index].getFieldCount(); j++) {
+		HTp token = infile.token(index, j);
+		string value = token->getValue("auto", "pbar");
+		if (value == "true") {
+			hasBarline = true;
+			break;
+		}
+	}
+
+	if (hasBarline) {
+		for (int j=0; j<infile[index].getFieldCount(); j++) {
+			HTp token = infile.token(index, j);
+			string value = token->getValue("auto", "pbar");
+			if (value == "true") {
+				m_humdrum_text << "*bar";
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (j < infile[index].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+}
+
+
+
+///////////////////////////////
+//
+// Tool_pbar::printLocalCommentLine --
+//
+
+void Tool_pbar::printLocalCommentLine(HumdrumFile& infile, int index) {
+	HumRegex hre;
+	bool hasKp = false;
+	bool hasOther = false;
+	for (int i=0; i<infile[index].getFieldCount(); i++) {
+		HTp token = infile.token(index, i);
+		if (hre.search(token, "kreska pseudotaktowa")) {
+			hasKp = true;
+		} else if (*token != "!") {
+			hasOther = true;
+		}
+	}
+
+	if (!hasKp) {
+		m_humdrum_text << infile[index] << endl;
+		return;
+	}
+
+	if (hasOther) {
+		for (int i=0; i<infile[index].getFieldCount(); i++) {
+			HTp token = infile.token(index, i);
+			if (hre.search(token, "kreska pseudotaktowa")) {
+				m_humdrum_text << "!";
+			} else {
+				m_humdrum_text << token;
+			}
+			if (i < infile[index].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pbar::processSpine --
+//
+
+void Tool_pbar::processSpine(HTp spineStart) {
+	HTp current = spineStart;
+	HumRegex hre;
+	while (current) {
+		if (!current->isLocalComment()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (hre.search(current, "kreska\\s*pseudotaktowa")) {
+			addBarLineToFollowingNoteOrRest(current);
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_pbar::addBarLineToFollowingNoteOrRest --
+//
+
+void Tool_pbar::addBarLineToFollowingNoteOrRest(HTp token) {
+	HTp current = token->getNextToken();
+	int counter = 0;
+	while (current) {
+		if (!current->isBarline()) {
+			if (!current->isData() || current->isNull()) {
+				current = current->getNextToken();
+				continue;
+			}
+		}
+		counter++;
+		if (counter == 2) {
+			current->setValue("auto", "pbar", "true");
+			break;
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_gridtest::Tool_pccount -- Set the recognized options for the tool.
 //
 
@@ -117731,6 +118092,795 @@ void Tool_rid::processFile(HumdrumFile& infile) {
    }
 }
 
+
+
+
+
+/////////////////////////////////
+//
+// Tool_rphrase::Tool_rphrase -- Set the recognized options for the tool.
+//
+
+Tool_rphrase::Tool_rphrase(void) {
+	// add command-line options here
+	define("a|average=b",            "calculate average length of rest-phrases by score");
+	define("A|all-average=b",        "calculate average length of rest-phrases for all scores");
+	define("c|composite|collapse=b", "collapse all voices into single part");
+	define("f|filename=b",           "include filename in output analysis");
+	define("F|full-filename=b",      "include full filename location in output analysis");
+	define("l|longa=b",              "display minim length of longas");
+	define("m|b|measure|barline=b",  "include barline numbers in output analysis");
+	define("mark=b",                 "mark starts of phrases in score");
+	define("s|sort=b",               "sort phrases by short to long length");
+	define("S|reverse-sort=b",       "sort phrases by long to short length");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_rphrase::run -- Do the main work of the tool.
+//
+
+bool Tool_rphrase::run(HumdrumFileSet& infiles) {
+	bool status = true;
+	for (int i=0; i<infiles.getCount(); i++) {
+		status &= run(infiles[i]);
+	}
+	return status;
+}
+
+
+bool Tool_rphrase::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_rphrase::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_rphrase::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::finally --
+//
+
+void Tool_rphrase::finally(void) {
+	if (!m_markQ) {
+		if (m_allAverageQ) {
+			if (m_collapseQ) {
+				double average = m_sumCollapse / m_pcountCollapse;
+				m_free_text << "Composite average phrase length: " << average << " minims" << endl;
+			} else {
+				double average = m_sum / m_pcount;
+				m_free_text << "All average phrase length: " << average << " minims" << endl;
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::initialize --
+//
+
+void Tool_rphrase::initialize(void) {
+	m_averageQ      = getBoolean("average");
+	m_barlineQ      = getBoolean("measure");
+	m_allAverageQ   = getBoolean("all-average");
+	#ifndef __EMSCRIPTEN__
+		m_collapseQ     = !getBoolean("collapse");
+	#else
+		m_collapseQ     = getBoolean("collapse");
+	#endif
+	m_filenameQ     = getBoolean("filename");
+	m_fullFilenameQ = getBoolean("full-filename");
+	m_longaQ        = getBoolean("longa");
+	#ifndef __EMSCRIPTEN__
+		m_markQ         = getBoolean("mark");
+	#else
+		m_markQ         = !getBoolean("mark");
+	#endif
+	m_sortQ         = getBoolean("sort");
+	m_reverseSortQ  = getBoolean("reverse-sort");
+	m_longaQ        = getBoolean("longa");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::processFile --
+//
+
+void Tool_rphrase::processFile(HumdrumFile& infile) {
+	if (m_filenameQ) {
+		m_filename = infile.getFilename();
+		HumRegex hre;
+		hre.replaceDestructive(m_filename, "", ".*\\/");
+		hre.replaceDestructive(m_filename, "", "\\.krn$");
+	} else if (m_fullFilenameQ) {
+		m_filename = infile.getFilename();
+	}
+	vector<HTp> kernStarts = infile.getKernSpineStartList();
+	vector<Tool_rphrase::VoiceInfo> voiceInfo(kernStarts.size());
+	Tool_rphrase::VoiceInfo collapseInfo;
+
+	if (m_collapseQ) {
+		fillCollapseInfo(collapseInfo, infile);
+	} else {
+		fillVoiceInfo(voiceInfo, kernStarts, infile);
+	}
+
+
+	if (m_longaQ) {
+		markLongaDurations(infile);
+	}
+
+	if (!m_allAverageQ) {
+		if (m_collapseQ) {
+			printVoiceInfo(collapseInfo);
+		} else {
+			printVoiceInfo(voiceInfo);
+		}
+	}
+
+	if (m_markQ) {
+		outputMarkedFile(infile);
+	}
+
+}
+
+
+
+//////////////////////////
+//
+// Tool_rphrase::markLongaDuratios --
+//
+
+void Tool_rphrase::markLongaDurations(HumdrumFile& infile) {
+	string longrdf;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].hasSpines()) {
+			continue;
+		}
+		if (!infile[i].isReferenceRecord()) {
+			continue;
+		}
+		string key = infile[i].getReferenceKey();
+		if (key != "RDF**kern") {
+			continue;
+		}
+		string value = infile[i].getReferenceValue();
+		HumRegex hre;
+		if (hre.search(value, "^\\s*([^\\s=]+)\\s*=.*long")) {
+			longrdf = hre.getMatch(1);
+			break;
+		}
+	}
+
+	if (longrdf.empty()) {
+		return;
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->find(longrdf) != string::npos) {
+				HumNum duration = token->getTiedDuration();
+				stringstream value;
+				value.str("");
+				value << duration.getFloat() / 2.0;
+				token->setValue("auto", "rphrase-longa", value.str());
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::outputMarkedFile --
+//
+
+void Tool_rphrase::outputMarkedFile(HumdrumFile& infile) {
+	m_free_text.clear();
+	m_free_text.str("");
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			m_humdrum_text << infile[i] << endl;
+		} else {
+			printDataLine(infile, i);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::printDataLine --
+//
+
+void Tool_rphrase::printDataLine(HumdrumFile& infile, int index) {
+
+	bool hasLonga = false;
+	if (m_longaQ) {
+		for (int j=0; j<infile[index].getFieldCount(); j++) {
+			HTp token = infile.token(index, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			string lotext = token->getValue("auto", "rphrase-longa");
+			if (!lotext.empty()) {
+				hasLonga = true;
+				break;
+			}
+		}
+	}
+
+
+	bool hasLo = false;
+	for (int j=0; j<infile[index].getFieldCount(); j++) {
+		HTp token = infile.token(index, j);
+		if (!token->isKern()) {
+			continue;
+		}
+		string lotext = token->getValue("auto", "rphrase-start");
+		if (!lotext.empty()) {
+			hasLo = true;
+			break;
+		}
+	}
+
+	if (hasLonga) {
+		for (int j=0; j<infile[index].getFieldCount(); j++) {
+			HTp token = infile.token(index, j);
+			if (!token->isKern()) {
+				m_humdrum_text << "!";
+			} else {
+				string value = token->getValue("auto", "rphrase-longa");
+				if (value.empty()) {
+					m_humdrum_text << "!";
+				} else {
+					m_humdrum_text << "!LO:TX:a:B:color=silver:t=" << value;
+				}
+			}
+			if (j < infile[index].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
+
+	if (hasLo) {
+		for (int j=0; j<infile[index].getFieldCount(); j++) {
+			HTp token = infile.token(index, j);
+			if (!token->isKern()) {
+				m_humdrum_text << "!";
+			} else {
+				string value = token->getValue("auto", "rphrase-start");
+				if (value.empty()) {
+					m_humdrum_text << "!";
+				} else {
+					m_humdrum_text << "!LO:TX:a:B:color=red:t=" << value;
+				}
+			}
+			if (j < infile[index].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << endl;
+	}
+
+	m_humdrum_text << infile[index] << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::getCompositeStates --
+//
+
+void Tool_rphrase::getCompositeStates(vector<int>& noteStates, HumdrumFile& infile) {
+	noteStates.resize(infile.getLineCount());
+	fill(noteStates.begin(), noteStates.end(), -1);
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		int value = 0;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isRest()) {
+				continue;
+			} else if (token->isNull()) {
+				HTp resolve = token->resolveNull();
+				if (!resolve) {
+					continue;
+				} else if (resolve->isRest()) {
+					continue;
+				} else {
+					value = 1;
+					break;
+				}
+			} else {
+				value = 1;
+				break;
+			}
+		}
+		noteStates[i] = value;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::printVoiceInfo --
+//
+
+void Tool_rphrase::printVoiceInfo(vector<Tool_rphrase::VoiceInfo>& voiceInfo) {
+	for (int i=(int)voiceInfo.size() - 1; i>=0; i--) {
+		printVoiceInfo(voiceInfo[i]);
+	}
+}
+
+
+void Tool_rphrase::printVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo) {
+	if (m_filenameQ) {
+		m_free_text << m_filename << "\t";
+	}
+	m_free_text << voiceInfo.name << "\t";
+
+	if (m_averageQ) {
+		double sum = 0;
+		int count = 0;
+		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+			count++;
+			sum += voiceInfo.phraseDurs.at(i);
+		}
+		m_free_text << int(sum / count * 100.0 + 0.5)/100.0 << "\t";
+	}
+
+	if (m_sortQ || m_reverseSortQ) {
+		vector<pair<double, int>> sortList;
+		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+			sortList.emplace_back(voiceInfo.phraseDurs[i], i);
+		}
+		if (m_sortQ) {
+			sort(sortList.begin(), sortList.end(),
+				[](const std::pair<double, int>& a, const std::pair<double, int>& b) {
+					return a.first < b.first;
+			});
+		} else if (m_reverseSortQ) {
+			sort(sortList.begin(), sortList.end(),
+				[](const std::pair<double, int>& a, const std::pair<double, int>& b) {
+					return a.first > b.first;
+			});
+		}
+
+		for (int i=0; i<(int)sortList.size(); i++) {
+			int ii = sortList[i].second;
+			if (m_barlineQ) {
+				m_free_text << "m" << voiceInfo.barStarts.at(ii) << ":";
+			}
+			m_free_text << voiceInfo.phraseDurs.at(ii);
+			if (i < (int)sortList.size() - 1) {
+				m_free_text << " ";
+			}
+		}
+	} else {
+		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+			if (voiceInfo.restsBefore.at(i) > 0) {
+				m_free_text << "r:" << voiceInfo.restsBefore.at(i) << " ";
+			}
+			if (m_barlineQ) {
+				m_free_text << "m" << voiceInfo.barStarts.at(i) << ":";
+			}
+			m_free_text << voiceInfo.phraseDurs.at(i);
+			if (i < (int)voiceInfo.phraseDurs.size() - 1) {
+				m_free_text << " ";
+			}
+		}
+	}
+
+	m_free_text << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::fillCollapseInfo --
+//
+
+void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, HumdrumFile& infile) {
+	collapseInfo.name = getCompositeLabel(infile);
+	vector<int> noteStates;
+	getCompositeStates(noteStates, infile);
+
+	bool inPhraseQ       = false;
+	int currentBarline   = 0;
+	int startBarline     = 1;
+	HumNum startTime     = 0;
+
+	HumNum restBefore    = 0;
+	HumNum startTimeRest = 0;
+
+	HumNum scoreDur = infile.getScoreDuration();
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+
+		// Split phrases at double barlines (medial cadences):
+		if (infile[i].isBarline()) {
+			HTp token = infile.token(i, 0);
+			if (token->find("||") != string::npos) {
+				HumNum tdur = token->getDurationFromStart();
+				if (tdur != scoreDur) {
+					// Only process if double barline is not at the end of the score.
+
+					if (inPhraseQ) {
+						// In phrase, so continue if still notes, otherwise
+						// if a rest, then record the currently active phrase
+						// that has ended.
+
+						// ending a phrase
+						HumNum endTime = infile[i].getDurationFromStart();
+						HumNum duration = endTime - startTime;
+						startTime = -1;
+						inPhraseQ = false;
+						collapseInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+						collapseInfo.barStarts.push_back(startBarline);
+						m_sumCollapse += duration.getFloat() / 2.0;
+						m_pcountCollapse++;
+						collapseInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+
+						// record rest start
+						startTimeRest = endTime;
+					} else {
+						// Not in phrase, so not splitting a rest region.
+						// This case should be rare (starting a medial cadence
+						// with rests and potentially starting new section with rests.
+					}
+
+				}
+			}
+		}
+
+		if (infile[i].isBarline()) {
+			HTp token = infile.token(i, 0);
+			HumRegex hre;
+			if (hre.search(token, "(\\d+)")) {
+				currentBarline = hre.getMatchInt(1);
+				continue;
+			}
+		}
+
+
+		if (!infile[i].isData()) {
+			continue;
+		}
+
+		if (inPhraseQ) {
+			// In phrase, so continue if still notes, otherwise
+			// if a rest, then record the currently active phrase
+			// that has ended.
+			if (noteStates[i] == 0) {
+				// ending a phrase
+				HumNum endTime = infile[i].getDurationFromStart();
+				HumNum duration = endTime - startTime;
+				startTime = -1;
+				inPhraseQ = false;
+				collapseInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+				collapseInfo.barStarts.push_back(startBarline);
+				m_sumCollapse += duration.getFloat() / 2.0;
+				m_pcountCollapse++;
+				collapseInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+				// record rest start
+				startTimeRest = endTime;
+			} else {
+				// continuing a phrase, so do nothing
+			}
+		} else {
+			// Not in phrase, so continue if rest; otherwise,
+			// if a note, then record a phrase start.
+			if (noteStates[i] == 0) {
+				// continuing a non-phrase, so do nothing
+			} else {
+				// starting a phrase
+				startTime = infile[i].getDurationFromStart();
+				startBarline = currentBarline;
+				inPhraseQ = true;
+				// check if there are rests before the phrase
+				// The rest duration will be stored when the
+				// end of the next phrase is encountered.
+				if (startTimeRest >= 0) {
+					restBefore = startTime - startTimeRest;
+				} else {
+					restBefore = 0;
+				}
+			}
+		}
+
+	}
+
+	if (inPhraseQ) {
+		// process last phrase
+		HumNum endTime = infile.getScoreDuration();
+		HumNum duration = endTime - startTime;
+		collapseInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+		collapseInfo.barStarts.push_back(startBarline);
+		m_sumCollapse += duration.getFloat() / 2.0;
+		m_pcountCollapse++;
+		collapseInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::getCompositeLabel --
+//
+
+string Tool_rphrase::getCompositeLabel(HumdrumFile& infile) {
+	string voices;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isReferenceRecord()) {
+			continue;
+		}
+		string key = infile[i].getReferenceKey();
+		if (key != "voices") {
+			continue;
+		}
+		voices = infile[i].getReferenceValue();
+		break;
+	}
+
+	if (voices.empty()) {
+		return "composite";
+	}
+
+	vector<HTp> kstarts = infile.getKernSpineStartList();
+
+	string output = "composite ";
+	output += voices;
+
+
+	HumRegex hre;
+
+	if (hre.search(voices, "^\\d+$")) {
+		int vint = stoi(voices);
+		if (vint != (int)kstarts.size()) {
+			output += "(";
+			output += to_string(kstarts.size());
+			output += ")";
+		}
+	} else {
+		output += "(";
+		output += to_string(kstarts.size());
+		output += ")";
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::fillVoiceInfo --
+//
+
+void Tool_rphrase::fillVoiceInfo(vector<Tool_rphrase::VoiceInfo>& voiceInfo,
+		vector<HTp>& kstarts, HumdrumFile& infile) {
+	for (int i=0; i<(int)kstarts.size(); i++) {
+		fillVoiceInfo(voiceInfo.at(i), kstarts.at(i), infile);
+	}
+}
+
+
+
+void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart, HumdrumFile& infile) {
+	HTp current = kstart;
+
+	bool inPhraseQ       = false;
+	int currentBarline   = 0;
+	int startBarline     = 1;
+	HumNum startTime     = 0;
+
+	HumNum restBefore    = 0;
+	HumNum startTimeRest = 0;
+
+	HumNum scoreDur = infile.getScoreDuration();
+	HTp phraseStartTok = NULL;
+
+	while (current) {
+
+		// Split phrases at double barlines (medial cadences):
+		if (infile[current->getLineIndex()].isBarline()) {
+			HTp token = infile.token(current->getLineIndex(), 0);
+			if (token->find("||") != string::npos) {
+				HumNum tdur = token->getDurationFromStart();
+				if (tdur != scoreDur) {
+					// Only process if double barline is not at the end of the score.
+
+					if (inPhraseQ) {
+						// In phrase, so continue if still notes, otherwise
+						// if a rest, then record the currently active phrase
+						// that has ended.
+
+						HumNum endTime = current->getDurationFromStart();
+						HumNum duration = endTime - startTime;
+						startTime = -1;
+						inPhraseQ = false;
+						voiceInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+						voiceInfo.barStarts.push_back(startBarline);
+						voiceInfo.phraseStartToks.push_back(phraseStartTok);
+						phraseStartTok = NULL;
+						m_sum += duration.getFloat() / 2.0;
+						m_pcount++;
+						voiceInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+
+						// record rest start
+						startTimeRest = endTime;
+					} else {
+						// Not in phrase, so not splitting a rest region.
+						// This case should be rare (starting a medial cadence
+						// with rests and potentially starting new section with rests.
+					}
+
+				}
+			}
+		}
+
+		if (current->isBarline()) {
+			HumRegex hre;
+			if (hre.search(current, "(\\d+)")) {
+				currentBarline = hre.getMatchInt(1);
+				current = current->getNextToken();
+				continue;
+			}
+		}
+
+		if (current->isInstrumentName()) {
+			voiceInfo.name = current->substr(3);
+		}
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+
+		if (inPhraseQ) {
+			// In phrase, so continue if still notes, otherwise
+			// if a rest, then record the currently active phrase
+			// that has ended.
+			if (current->isRest()) {
+				// ending a phrase
+				HumNum endTime = current->getDurationFromStart();
+				HumNum duration = endTime - startTime;
+				startTime = -1;
+				inPhraseQ = false;
+				voiceInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+				voiceInfo.barStarts.push_back(startBarline);
+				voiceInfo.phraseStartToks.push_back(phraseStartTok);
+				phraseStartTok = NULL;
+				m_sum += duration.getFloat() / 2.0;
+				m_pcount++;
+				voiceInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+				// record rest start
+				startTimeRest = endTime;
+			} else {
+				// continuing a phrase, so do nothing
+			}
+		} else {
+			// Not in phrase, so continue if rest; otherwise,
+			// if a note, then record a phrase start.
+			if (current->isRest()) {
+				// continuing a non-phrase, so do nothing
+			} else {
+				// starting a phrase
+				startTime = current->getDurationFromStart();
+				startBarline = currentBarline;
+				inPhraseQ = true;
+				// check if there are rests before the phrase
+				// The rest duration will be stored when the
+				// end of the next phrase is encountered.
+				if (startTimeRest >= 0) {
+					restBefore = startTime - startTimeRest;
+				} else {
+					restBefore = 0;
+				}
+				phraseStartTok = current;
+			}
+		}
+
+		current = current->getNextToken();
+	}
+	if (inPhraseQ) {
+		// process last phrase
+		HumNum endTime = kstart->getLine()->getOwner()->getScoreDuration();
+		HumNum duration = endTime - startTime;
+		voiceInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+		voiceInfo.barStarts.push_back(startBarline);
+		voiceInfo.phraseStartToks.push_back(phraseStartTok);
+		m_sum += duration.getFloat() / 2.0;
+		m_pcount++;
+		voiceInfo.restsBefore.push_back(0.0);
+		voiceInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+	}
+
+	if (m_markQ) {
+		markPhraseStartsInScore(infile, voiceInfo);
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_rphrase::markPhraseStartsInScore --
+//
+
+void Tool_rphrase::markPhraseStartsInScore(HumdrumFile& infile, Tool_rphrase::VoiceInfo& voiceInfo) {
+	stringstream buffer;
+	for (int i=0; i<(int)voiceInfo.phraseStartToks.size(); i++) {
+		HTp tok = voiceInfo.phraseStartToks.at(i);
+		string measure = "";
+		if (m_barlineQ) {
+			measure = to_string(voiceInfo.barStarts.at(i));
+		}
+		double duration = voiceInfo.phraseDurs.at(i);
+		buffer.str("");
+		if (!measure.empty()) {
+			buffer << "m" << measure << "&colon;";
+		}
+		buffer << duration;
+		tok->setValue("auto", "rphrase-start", buffer.str());
+	}
+}
 
 
 
