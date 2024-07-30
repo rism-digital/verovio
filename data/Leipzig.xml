@@ -458,6 +458,7 @@
   <g c="E5C6" x="1.0" y="-2.0" w="1104.0" h="370.0" h-a-x="1105" n="ornamentPrecompMordentUpperPrefix" />
   <g c="E5C7" x="1.0" y="-80.0" w="1104.0" h="448.0" h-a-x="1105" n="ornamentPrecompInvertedMordentUpperPrefix" />
   <g c="E5C8" x="0.0" y="-243.0" w="756.0" h="483.0" h-a-x="756" n="ornamentPrecompTrillLowerSuffix" />
+  <g c="E594" x="0.0" y="0.0" w="30.0" h="400.0" h-a-x="30" n="ornamentLeftVerticalStroke" />
   <g c="E56F" x="0.0" y="-107.0" w="500.0" h="397.0" h-a-x="500" n="ornamentHaydn" />
   <g c="E587" x="0.0" y="-2.0" w="999.0" h="374.0" h-a-x="1000" n="ornamentSchleifer" />
   <g c="E651" x="0.0" y="0.0" w="320.0" h="514.0" h-a-x="320" n="keyboardPedalP" />
@@ -816,4 +817,5 @@
   <g c="EE93" x="20.0" y="-200.0" w="233.0" h="390.0" h-a-x="273" n="mensuralProportion8" />
   <g c="EE92" x="20.0" y="-201.0" w="233.0" h="391.0" h-a-x="273" n="mensuralProportion7" />
   <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="261.0" h-a-x="319" n="medRenOriscusCMN" />
+  <g c="E595" x="0.0" y="0.0" w="210.0" h="400.0" h-a-x="210" n="ornamentLeftVerticalStrokeWithCross" />
 </bounding-boxes>
