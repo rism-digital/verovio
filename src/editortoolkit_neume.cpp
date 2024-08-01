@@ -3518,6 +3518,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", "OK");
