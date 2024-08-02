@@ -4251,6 +4251,14 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         }
         pi->SetOct(3);
 
+        // The default octave = 3, but the actual octave is calculated by
+        // taking into account the displacement of the clef
+        int octave = 3;
+        if (clef->GetDis() && clef->GetDisPlace()) {
+            octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+        }
+        pi->SetOct(octave);
+
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         const int pitchDifference
