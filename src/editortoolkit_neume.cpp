@@ -680,6 +680,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         SortStaves();
 
         m_doc->GetDrawingPage()->LayOutTranscription(true);
+      
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         return true; // Can't reorder by layer since staves contain layers
