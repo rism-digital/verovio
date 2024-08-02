@@ -501,7 +501,8 @@ void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, Pl
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
     if (this->IsCollectingData()) {
-        if (object->HasInterface(INTERFACE_PLIST)) {
+        // Skip expansion elements because these are handled in Doc::ExpandExpansions
+        if (object->HasInterface(INTERFACE_PLIST) && !object->Is(EXPANSION)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
             return interface->InterfacePreparePlist(*this, object);
