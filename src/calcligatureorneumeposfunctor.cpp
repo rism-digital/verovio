@@ -347,16 +347,19 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
             }
         }
 
-        // If the nc overlaps with the previous, move it back from a line width
-        if (overlapWithPrevious) {
-            xRel -= lineWidth;
-        }
+        // xRel remains unset with facsimile
+        if (!m_doc->HasFacsimile()) {
+            // If the nc overlaps with the previous, move it back from a line width
+            if (overlapWithPrevious) {
+                xRel -= lineWidth;
+            }
 
-        nc->SetDrawingXRel(xRel);
-        // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be added
-        // between the two nc
-        if (!previousLig) {
-            xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
+            nc->SetDrawingXRel(xRel);
+            // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be
+            // added between the two nc
+            if (!previousLig) {
+                xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
+            }
         }
 
         previousNc = nc;
