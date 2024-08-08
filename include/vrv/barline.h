@@ -9,6 +9,7 @@
 #define __VRV_BARLINE_H__
 
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -27,6 +28,7 @@ enum class BarLinePosition { None, Left, Right };
  */
 class BarLine : public LayerElement,
                 public AttBarLineLog,
+                public AttBarLineVis,
                 public AttColor,
                 public AttNNumberLike,
                 public AttVisibility {
