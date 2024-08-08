@@ -428,7 +428,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
         LogWarning("Hat Methode!");
         method = barLine->AttBarLineVis::GetMethod();
     }
-    
+
     dc->StartGraphic(element, "", element->GetID());
 
     int yTop = staff->GetDrawingY();
