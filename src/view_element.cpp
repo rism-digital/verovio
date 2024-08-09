@@ -425,7 +425,6 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(drawingStaffDef);
     auto [hasMethod, method] = barLine->GetMethod(drawingStaffDef);
     if (barLine->HasMethod()) {
-        LogWarning("Hat Methode!");
         method = barLine->AttBarLineVis::GetMethod();
     }
 
