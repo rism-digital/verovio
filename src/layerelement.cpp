@@ -901,13 +901,16 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
 
     // Special treatment for two layers
     if (layerCount == 2) {
-        // Find the first note on the other layer
+        // Find the first note on the other layer, but in the same staff
         Alignment *alignment = this->GetAlignment();
+        const Staff *currentStaff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         const int currentLayerN = abs(this->GetAlignmentLayerN());
         ListOfObjects notes = alignment->FindAllDescendantsByType(NOTE, false);
-        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
-            const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
-            return (currentLayerN != otherLayerN);
+        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN, currentStaff](Object *obj) {
+            const Note *otherNote = vrv_cast<Note *>(obj);
+            const Staff *otherStaff = otherNote->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const int otherLayerN = abs(otherNote->GetAlignmentLayerN());
+            return ((currentLayerN != otherLayerN) && (currentStaff == otherStaff));
         });
 
         if (noteIt != notes.cend()) {
