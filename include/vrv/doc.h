@@ -373,6 +373,11 @@ public:
     void ConvertMarkupDoc(bool permanent = true);
 
     /**
+     * Calls the scoringUpFunctor and applies it.
+     */
+    void ScoringUpDoc();
+    
+    /**
      * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.
      * Call the SyncToFacsimile functor.
      */
