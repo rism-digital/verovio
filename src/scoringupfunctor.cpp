@@ -57,9 +57,9 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             dur = rest->GetDur();
         } LogDebug("the dur is: ", dur);
     } else if (element->Is(MENSUR)) {
-        Mensur *currentMensur = vrv_cast<Mensur *>(layerElement);
-        data_TEMPUS tempus = currentMensur->GetTempus();
-        LogDebug("the mensur is:", tempus);
+        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
+        data_TEMPUS m_tempus = m_currentMensur->GetTempus();
+        LogDebug("the mensur is:", m_tempus);
     }return FUNCTOR_CONTINUE;
 }
 
