@@ -253,6 +253,9 @@ void Page::LayOutTranscription(bool force)
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
+    CalcLigatureOrNeumePosFunctor calcLigatureOrNeumePos(doc);
+    this->Process(calcLigatureOrNeumePos);
+
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
 
@@ -262,13 +265,15 @@ void Page::LayOutTranscription(bool force)
     CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
 
-    // Render it for filling the bounding box
-    View view;
-    view.SetDoc(doc);
-    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
-    // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
-    view.DrawCurrentPage(&bBoxDC, false);
+    if (!m_layoutDone) {
+        // Render it for filling the bounding box
+        View view;
+        view.SetDoc(doc);
+        BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
+        // Do not do the layout in this view - otherwise we will loop...
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
 
     AdjustXRelForTranscriptionFunctor adjustXRelForTranscription;
     this->Process(adjustXRelForTranscription);
