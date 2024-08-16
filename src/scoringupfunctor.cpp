@@ -51,6 +51,7 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             Note *note = vrv_cast<Note *>(element);
             assert(note);
             dur = note->GetDur();
+            note->SetDurQuality(DURQUALITY_mensural_imperfecta);
         } else {
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
