@@ -525,7 +525,7 @@ Mensur *Layer::GetCurrentMensur()
 const Mensur *Layer::GetCurrentMensur() const
 {
     const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
-    assert(staff && staff->m_drawingStaffDef);
+    //assert(staff && staff->m_drawingStaffDef);
     return staff->m_drawingStaffDef->GetCurrentMensur();
 }
 

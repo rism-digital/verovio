@@ -44,14 +44,22 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     LayerElement *element = layerElement->ThisOrSameasLink();
-    Note note;
 
     if (element->Is(REST) || element->Is(NOTE)) {
-        double dur = element->GetAlignmentDuration(m_currentMensur, NULL, true, NOTATIONTYPE_mensural);
-        LogDebug("the dur is: ", dur);
+        data_DURATION dur;
+        if (element->Is(NOTE)) {
+            Note *note = vrv_cast<Note *>(element);
+            assert(note);
+            dur = note->GetDur();
+        } else {
+            Rest *rest = vrv_cast<Rest *>(element);
+            assert(rest);
+            dur = rest->GetDur();
+        } LogDebug("the dur is: ", dur);
     } else if (element->Is(MENSUR)) {
-        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
-        LogDebug("the mensur is:", m_currentMensur);
+        Mensur *currentMensur = vrv_cast<Mensur *>(layerElement);
+        data_TEMPUS tempus = currentMensur->GetTempus();
+        LogDebug("the mensur is:", tempus);
     }return FUNCTOR_CONTINUE;
 }
 
