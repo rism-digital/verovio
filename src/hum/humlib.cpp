@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 30 20:12:26 PDT 2024
+// Last Modified: Thu Aug  8 21:55:11 PDT 2024
 // Filename:      min/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.cpp
 // Syntax:        C++11
@@ -83262,6 +83262,8 @@ bool Tool_filter::run(HumdrumFileSet& infiles) {
 			RUNTOOL(recip, infile, commands[i].second, status);
 		} else if (commands[i].first == "restfill") {
 			RUNTOOL(restfill, infile, commands[i].second, status);
+		} else if (commands[i].first == "rphrase") {
+			RUNTOOL(rphrase, infile, commands[i].second, status);
 		} else if (commands[i].first == "sab2gs") {
 			RUNTOOL(sab2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "scordatura") {
@@ -91672,6 +91674,7 @@ bool Tool_kernify::run(HumdrumFile& infile, ostream& out) {
 
 bool Tool_kernify::run(HumdrumFile& infile) {
 	initialize();
+	m_hasDataInterpretations = prepareDataSpines(infile);
 	processFile(infile);
 	return true;
 }
@@ -91699,6 +91702,71 @@ void Tool_kernify::initialize(void) {
 
 void Tool_kernify::processFile(HumdrumFile& infile) {
 	generateDummyKernSpine(infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::prepareDataSpines --
+// 
+
+bool Tool_kernify::prepareDataSpines(HumdrumFile& infile) {
+	vector<HTp> spinestarts;
+	infile.getSpineStartList(spinestarts);
+	bool output = false;
+	for (int i=0; i<(int)spinestarts.size(); i++) {
+		output |= prepareDataSpine(spinestarts[i]);
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kernify::prepareDataSpine -- check to see if *[abcv]data interpretation and if so process
+//    and return true;
+//
+
+bool Tool_kernify::prepareDataSpine(HTp spinestart) {
+	HumRegex hre;
+	if (hre.search(spinestart, "^\\*\\*[abcv]data-")) {
+		return false;
+	}
+
+	string prefix;
+	HTp current = spinestart->getNextToken();
+	while (current && !current->isData()) {
+		if (current->isInterpretation()) {
+			if (*current == "*adata") {
+				prefix = "adata";
+				break;
+			} else if (*current == "*bdata") {
+				prefix = "bdata";
+				break;
+			} else if (*current == "*cdata") {
+				prefix = "cdata";
+				break;
+			} else if (*current == "*vdata") {
+				prefix = "vdata";
+				break;
+			}
+		}
+		current = current->getNextToken();
+	}
+
+	if (prefix.empty()) {
+		return false;
+	}
+
+	string text = "**";
+	text += prefix;
+	text += "-";
+	text += spinestart->substr(2);
+	spinestart->setText(text);
+
+	return true;
 }
 
 
@@ -91776,18 +91844,22 @@ void Tool_kernify::generateDummyKernSpine(HumdrumFile& infile) {
 				} else if (token->find("**kern") != std::string::npos) {
 					string value = *token;
 					hre.replaceDestructive(value, "nrek", "kern", "g");
-					hre.replaceDestructive(value, "**cdata-", "^\\*\\*");
+					hre.replaceDestructive(value, "**zcdata-", "^\\*\\*");
 					m_humdrum_text << "\t" << value;
 				} else if (token->find("**mens") != std::string::npos) {
 					string value = *token;
 					hre.replaceDestructive(value, "snem", "mens", "g");
-					hre.replaceDestructive(value, "**cdata-", "^\\*\\*");
+					hre.replaceDestructive(value, "**ycdata-", "^\\*\\*");
 					m_humdrum_text << "\t" << value;
 				} else if (token->find("**cdata") == std::string::npos) {
-					string value = token->substr(2);
-					hre.replaceDestructive(value, "nrek", "kern", "g");
-					hre.replaceDestructive(value, "snem", "snem", "g");
-					m_humdrum_text << "\t**cdata-" << value;
+					if (!m_hasDataInterpretations) {
+						string value = token->substr(2);
+						hre.replaceDestructive(value, "nrek", "kern", "g");
+						hre.replaceDestructive(value, "snem", "snem", "g");
+						m_humdrum_text << "\t**xcdata-" << value;
+					} else {
+						m_humdrum_text << "\t" << token;
+					}
 				} else {
 					m_humdrum_text << "\t" << token;
 				}
@@ -91842,7 +91914,12 @@ void Tool_kernify::generateDummyKernSpine(HumdrumFile& infile) {
 					m_humdrum_text << "*clefXyy" << "\t" << makeReverseLine(infile[i]);
 					clefIndex = -1;
 				} else {
-					m_humdrum_text << "*" << "\t" << makeReverseLine(infile[i]);
+					HTp token = infile[i].token(0);
+					if (token->compare(0, 2, "*>") == 0) {
+						m_humdrum_text << token << "\t" << makeReverseLine(infile[i]);
+					} else {
+						m_humdrum_text << "*" << "\t" << makeReverseLine(infile[i]);
+					}
 				}
 		} else {
 			m_humdrum_text << "!!UNKNONWN LINE TYPE FOR LINE " << i+1 << ":\t" << infile[i];
@@ -118102,17 +118179,22 @@ void Tool_rid::processFile(HumdrumFile& infile) {
 //
 
 Tool_rphrase::Tool_rphrase(void) {
-	// add command-line options here
 	define("a|average=b",            "calculate average length of rest-phrases by score");
 	define("A|all-average=b",        "calculate average length of rest-phrases for all scores");
+	define("B|no-breath=b",          "ignore breath interpretations");
 	define("c|composite|collapse=b", "collapse all voices into single part");
+	define("d|duration-unit=d:2.0",  "duration units, default: 2.0 (minims/half notes)");
 	define("f|filename=b",           "include filename in output analysis");
 	define("F|full-filename=b",      "include full filename location in output analysis");
+	define("I|no-info=b",            "do not display summary info");
 	define("l|longa=b",              "display minim length of longas");
 	define("m|b|measure|barline=b",  "include barline numbers in output analysis");
 	define("mark=b",                 "mark starts of phrases in score");
 	define("s|sort=b",               "sort phrases by short to long length");
 	define("S|reverse-sort=b",       "sort phrases by long to short length");
+	define("u|url-type=s",           "URL type (jrp, 1520s) for hyperlink");
+	define("z|squeeze=b",            "squeeze notation");
+	define("close=b",                "close details element initially");
 }
 
 
@@ -118170,8 +118252,8 @@ bool Tool_rphrase::run(HumdrumFile& infile) {
 void Tool_rphrase::finally(void) {
 	if (!m_markQ) {
 		if (m_allAverageQ) {
-			if (m_collapseQ) {
-				double average = m_sumCollapse / m_pcountCollapse;
+			if (m_compositeQ) {
+				double average = m_sumComposite / m_pcountComposite;
 				m_free_text << "Composite average phrase length: " << average << " minims" << endl;
 			} else {
 				double average = m_sum / m_pcount;
@@ -118189,25 +118271,27 @@ void Tool_rphrase::finally(void) {
 //
 
 void Tool_rphrase::initialize(void) {
-	m_averageQ      = getBoolean("average");
 	m_barlineQ      = getBoolean("measure");
 	m_allAverageQ   = getBoolean("all-average");
-	#ifndef __EMSCRIPTEN__
-		m_collapseQ     = !getBoolean("collapse");
-	#else
-		m_collapseQ     = getBoolean("collapse");
-	#endif
+	m_breathQ       = !getBoolean("no-breath");
+	m_compositeQ    = getBoolean("collapse");
 	m_filenameQ     = getBoolean("filename");
 	m_fullFilenameQ = getBoolean("full-filename");
+	m_urlType       = getString("url-type");
 	m_longaQ        = getBoolean("longa");
 	#ifndef __EMSCRIPTEN__
 		m_markQ         = getBoolean("mark");
+		m_averageQ      = getBoolean("average");
 	#else
 		m_markQ         = !getBoolean("mark");
+		m_averageQ      = !getBoolean("average");
 	#endif
 	m_sortQ         = getBoolean("sort");
 	m_reverseSortQ  = getBoolean("reverse-sort");
-	m_longaQ        = getBoolean("longa");
+	m_durUnit       = getDouble("duration-unit");
+	m_infoQ         = !getDouble("no-info");
+	m_squeezeQ      = getBoolean("squeeze");
+	m_closeQ        = getBoolean("close");
 }
 
 
@@ -118228,29 +118312,64 @@ void Tool_rphrase::processFile(HumdrumFile& infile) {
 	}
 	vector<HTp> kernStarts = infile.getKernSpineStartList();
 	vector<Tool_rphrase::VoiceInfo> voiceInfo(kernStarts.size());
-	Tool_rphrase::VoiceInfo collapseInfo;
+	Tool_rphrase::VoiceInfo compositeInfo;
 
-	if (m_collapseQ) {
-		fillCollapseInfo(collapseInfo, infile);
+	if (m_compositeQ) {
+		fillCompositeInfo(compositeInfo, infile);
 	} else {
 		fillVoiceInfo(voiceInfo, kernStarts, infile);
 	}
-
 
 	if (m_longaQ) {
 		markLongaDurations(infile);
 	}
 
-	if (!m_allAverageQ) {
-		if (m_collapseQ) {
-			printVoiceInfo(collapseInfo);
+	if ((!m_allAverageQ) && (!m_markQ)) {
+		if (m_line == 1) {
+			if (m_compositeQ) {
+				m_free_text << "Filename";
+				if (!m_urlType.empty()) {
+					m_free_text << "\tVHV";
+				}
+				m_free_text << "\tVoice";
+				m_free_text << "\tComp seg count";
+				if (m_averageQ) {
+					m_free_text << "\tAvg comp seg dur";
+				}
+				m_free_text << "\tComposite seg durs";
+				m_free_text << endl;
+			} else {
+				m_free_text << "Filename";
+				if (!m_urlType.empty()) {
+					m_free_text << "\tVHV";
+				}
+				m_free_text << "\tVoice";
+				m_free_text << "\tSounding dur";
+				m_free_text << "\tResting dur";
+				m_free_text << "\tTotal dur";
+				m_free_text << "\tSeg count";
+				if (m_averageQ) {
+					m_free_text << "\tSeg dur average";
+				}
+				m_free_text << "\tSegment durs";
+				m_free_text << endl;
+			}
+		}
+		if (m_compositeQ) {
+			if (m_compositeQ) {
+				m_line++;
+			}
+			printVoiceInfo(compositeInfo);
 		} else {
 			printVoiceInfo(voiceInfo);
 		}
 	}
 
 	if (m_markQ) {
-		outputMarkedFile(infile);
+		outputMarkedFile(infile, voiceInfo, compositeInfo);
+		if (m_squeezeQ) {
+			m_humdrum_text << "!!!verovio: evenNoteSpacing" << endl;
+		}
 	}
 
 }
@@ -118303,7 +118422,7 @@ void Tool_rphrase::markLongaDurations(HumdrumFile& infile) {
 				HumNum duration = token->getTiedDuration();
 				stringstream value;
 				value.str("");
-				value << duration.getFloat() / 2.0;
+				value << duration.getFloat() / m_durUnit;
 				token->setValue("auto", "rphrase-longa", value.str());
 			}
 		}
@@ -118317,7 +118436,8 @@ void Tool_rphrase::markLongaDurations(HumdrumFile& infile) {
 // Tool_rphrase::outputMarkedFile --
 //
 
-void Tool_rphrase::outputMarkedFile(HumdrumFile& infile) {
+void Tool_rphrase::outputMarkedFile(HumdrumFile& infile, vector<Tool_rphrase::VoiceInfo>& voiceInfo,
+		Tool_rphrase::VoiceInfo& compositeInfo) {
 	m_free_text.clear();
 	m_free_text.str("");
 	for (int i=0; i<infile.getLineCount(); i++) {
@@ -118326,6 +118446,10 @@ void Tool_rphrase::outputMarkedFile(HumdrumFile& infile) {
 		} else {
 			printDataLine(infile, i);
 		}
+	}
+
+	if (m_infoQ) {
+		printEmbeddedVoiceInfo(voiceInfo, compositeInfo, infile);
 	}
 }
 
@@ -118367,6 +118491,20 @@ void Tool_rphrase::printDataLine(HumdrumFile& infile, int index) {
 		}
 	}
 
+	// search for composite phrase info
+	bool hasGlo = false;
+	if (infile[index].isData()) {
+		string glotext = infile[index].getValue("auto", "rphrase-composite-start");
+		if (!glotext.empty()) {
+			hasGlo = true;
+		}
+	}
+
+	if (hasGlo) {
+		string glotext = infile[index].getValue("auto", "rphrase-composite-start");
+		m_humdrum_text << "!!LO:TX:b:B:color=" << m_compositeLengthColor << ":t=" << glotext << endl;
+	}
+
 	if (hasLonga) {
 		for (int j=0; j<infile[index].getFieldCount(); j++) {
 			HTp token = infile.token(index, j);
@@ -118397,7 +118535,7 @@ void Tool_rphrase::printDataLine(HumdrumFile& infile, int index) {
 				if (value.empty()) {
 					m_humdrum_text << "!";
 				} else {
-					m_humdrum_text << "!LO:TX:a:B:color=red:t=" << value;
+					m_humdrum_text << "!LO:TX:a:B:color=" << m_voiceLengthColor << ":t=" << value;
 				}
 			}
 			if (j < infile[index].getFieldCount() - 1) {
@@ -118460,16 +118598,87 @@ void Tool_rphrase::getCompositeStates(vector<int>& noteStates, HumdrumFile& infi
 
 void Tool_rphrase::printVoiceInfo(vector<Tool_rphrase::VoiceInfo>& voiceInfo) {
 	for (int i=(int)voiceInfo.size() - 1; i>=0; i--) {
+		if (!m_compositeQ) {
+			m_line++;
+		}
 		printVoiceInfo(voiceInfo[i]);
 	}
 }
 
 
+//////////////////////////////
+//
+// Tool_rphrase::printHyperlink --
+//
+
+void Tool_rphrase::printHyperlink(const string& urlType) {
+	string command = "rphrase";
+	string options;
+	options += "l";
+	options+= "z";
+	if (m_compositeQ) {
+		options += "c";
+	}
+	if (m_sortQ) {
+		options += "s";
+	} else if (m_reverseSortQ) {
+		options += "S";
+	}
+	if (!options.empty()) {
+		command += "%20-";
+		command += options;
+	}
+
+	if (urlType == "jrp") {
+		m_free_text << "=HYPERLINK(\"https://verovio.humdrum.org/?file=jrp/\" & ";
+		m_free_text << "LEFT(A" << m_line << ", 3) & \"/\" & A" << m_line << " & ";
+		m_free_text << "\".krn&filter=" << command << "&k=ey\", LEFT(A" << m_line;
+		m_free_text << ", FIND(\"-\", A" << m_line << ") - 1))";
+	} else if (urlType == "1520s") {
+		m_free_text << "=HYPERLINK(\"https://verovio.humdrum.org/?file=1520s/\" & A";
+		m_free_text << m_line << " & \".krn&filter=" << command << "&k=ey\", LEFT(A";
+		m_free_text << m_line << ", FIND(\"-\", A" << m_line << ") - 1))";
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::printVoiceInfo --
+//
+
 void Tool_rphrase::printVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo) {
 	if (m_filenameQ) {
 		m_free_text << m_filename << "\t";
 	}
+	if (!m_urlType.empty()) {
+		printHyperlink(m_urlType);
+		m_free_text << "\t";
+	}
 	m_free_text << voiceInfo.name << "\t";
+
+	if (!m_compositeQ) {
+		double sounding = 0.0;
+		double resting = 0.0;
+		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+			if (voiceInfo.phraseDurs[i] > 0.0) {
+				sounding += voiceInfo.phraseDurs[i];
+			}
+			if (voiceInfo.restsBefore[i] > 0.0) {
+				resting += voiceInfo.restsBefore[i];
+			}
+		}
+		double total = sounding + resting;
+		// double sounding_percent = int (sounding/total * 100.0 + 0.5);
+		// double resting_percent = int (sounding/total * 100.0 + 0.5);
+
+		m_free_text << twoDigitRound(sounding) << "\t";
+		m_free_text << twoDigitRound(resting) << "\t";
+		m_free_text << twoDigitRound(total) << "\t";
+	}
+
+	m_free_text << voiceInfo.phraseDurs.size() << "\t";
 
 	if (m_averageQ) {
 		double sum = 0;
@@ -118503,7 +118712,7 @@ void Tool_rphrase::printVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo) {
 			if (m_barlineQ) {
 				m_free_text << "m" << voiceInfo.barStarts.at(ii) << ":";
 			}
-			m_free_text << voiceInfo.phraseDurs.at(ii);
+			m_free_text << twoDigitRound(voiceInfo.phraseDurs.at(ii));
 			if (i < (int)sortList.size() - 1) {
 				m_free_text << " ";
 			}
@@ -118511,12 +118720,15 @@ void Tool_rphrase::printVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo) {
 	} else {
 		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
 			if (voiceInfo.restsBefore.at(i) > 0) {
-				m_free_text << "r:" << voiceInfo.restsBefore.at(i) << " ";
+				m_free_text << "r:" << twoDigitRound(voiceInfo.restsBefore.at(i)) << " ";
+			} else if (i > 0) {
+				// force display r:0 for section boundaries.
+				m_free_text << "r:" << twoDigitRound(voiceInfo.restsBefore.at(i)) << " ";
 			}
 			if (m_barlineQ) {
 				m_free_text << "m" << voiceInfo.barStarts.at(i) << ":";
 			}
-			m_free_text << voiceInfo.phraseDurs.at(i);
+			m_free_text << twoDigitRound(voiceInfo.phraseDurs.at(i));
 			if (i < (int)voiceInfo.phraseDurs.size() - 1) {
 				m_free_text << " ";
 			}
@@ -118530,11 +118742,362 @@ void Tool_rphrase::printVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo) {
 
 //////////////////////////////
 //
-// Tool_rphrase::fillCollapseInfo --
+// Tool_rphrase::printEmbeddedVoiceInfo --
 //
 
-void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, HumdrumFile& infile) {
-	collapseInfo.name = getCompositeLabel(infile);
+void Tool_rphrase::printEmbeddedVoiceInfo(vector<Tool_rphrase::VoiceInfo>& voiceInfo, Tool_rphrase::VoiceInfo& compositeInfo, HumdrumFile& infile) {
+
+	m_humdrum_text << "!!@@BEGIN: PREHTML" << endl;;
+
+	m_humdrum_text << "!!@SCRIPT:" << endl;
+	m_humdrum_text << "!!   function rphraseGotoMeasure(measure) {" << endl;
+	m_humdrum_text << "!!      let target = `svg .measure.m-${measure}`;" << endl;
+	m_humdrum_text << "!!      let element = document.querySelector(target);" << endl;
+	m_humdrum_text << "!!      if (element) {" << endl;
+	m_humdrum_text << "!!         element.scrollIntoViewIfNeeded({ behavior: 'smooth' });" << endl;
+	m_humdrum_text << "!!     }" << endl;
+	m_humdrum_text << "!!   }" << endl;
+
+	m_humdrum_text << "!!@CONTENT:\n";
+	if (m_compositeQ) {
+		m_humdrum_text << "!!<style> .PREHTML .composite ul .rest { color: #ccc; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML .composite ul .measure { color: #ccc; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML .composite ul .length { cursor: pointer; font-weight: bold; color: " << m_compositeLengthColor << "; } </style>" << endl;
+	} else {
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase .rest { color: #ccc; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase .measure { color: #ccc; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase .length { cursor: pointer; font-weight: bold; color: " << m_voiceLengthColor << "; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase { border-collapse: collapse; </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase th, .PREHTML table.rphrase td { vertical-align: top; padding-right: 10px; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase tr { border-bottom: 1px solid #ccc; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase tr th:last-child, .PREHTML table.rphrase tr td:last-child { padding-right: 0; } </style>" << endl;
+
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase th.average { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase th.segments { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase th.sounding { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase th.resting { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase td.average { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase td.segments { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase td.sounding { text-align: right; } </style>" << endl;
+		m_humdrum_text << "!!<style> .PREHTML table.rphrase td.resting { text-align: right; } </style>" << endl;
+	}
+	m_humdrum_text << "!!<style> .PREHTML details { position: relative; padding-left: 20px; } </style>" << endl;
+	m_humdrum_text << "!!<style> .PREHTML summary { font-size: 1.5rem; cursor: pointer; list-style: none; } </style>" << endl;
+	m_humdrum_text << "!!<style> .PREHTML summary::before { content: '▶'; display: inline-block; width: 2em; margin-left: -1.5em; text-align: center; } </style>" << endl;
+	m_humdrum_text << "!!<style> .PREHTML details[open] summary::before { content: '▼'; } </style>" << endl;
+
+	if (m_compositeQ) {
+		m_humdrum_text << "!!<details";
+		if (!m_closeQ) {
+			m_humdrum_text << " open";
+		}
+		m_humdrum_text << "><summary>Composite rest phrasing</summary>\n";
+	} else {
+		m_humdrum_text << "!!<details";
+		if (!m_closeQ) {
+			m_humdrum_text << " open";
+		}
+		m_humdrum_text << "><summary>Voice rest phrasing</summary>\n";
+	}
+	if (m_compositeQ) {
+		printEmbeddedCompositeInfo(compositeInfo, infile);
+	} else {
+		if (voiceInfo.size() > 0) {
+			m_humdrum_text << "!!<table class='rphrase'>" << endl;
+			m_humdrum_text << "!!<tr><th class='voice'>Voice</th><th class='sounding'>Sounding</th><th class='resting'>Resting</th><th class='segments'>Segments</th><th class='average'>Average</th><th class='segment-durations'>Segment durations</th></tr>" << endl;
+			for (int i=(int)voiceInfo.size() - 1; i>=0; i--) {
+				printEmbeddedIndividualVoiceInfo(voiceInfo[i], infile);
+			}
+			m_humdrum_text << "!!</table>" << endl;
+			printEmbeddedVoiceInfoSummary(voiceInfo, infile);
+		}
+	}
+	m_humdrum_text << "!!</details>" << endl;
+	m_humdrum_text << "!!@@END: PREHTML" << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::printEmbeddedCompositeInfo --
+//
+
+void Tool_rphrase::printEmbeddedCompositeInfo(Tool_rphrase::VoiceInfo& compositeInfo, HumdrumFile& infile) {
+
+	m_humdrum_text << "!!<div class='composite'>" << endl;
+	m_humdrum_text << "!!<ul>" << endl;
+	m_humdrum_text << "!!<li>Composite segment count: " << compositeInfo.phraseDurs.size() << "</li>" << endl;
+
+	if (!compositeInfo.phraseDurs.empty()) {
+		m_humdrum_text << "!!<li>Composite segment duration";
+		if (compositeInfo.phraseDurs.size() != 1) {
+			m_humdrum_text << "s";
+		}
+		m_humdrum_text << ": ";
+		if (m_sortQ || m_reverseSortQ) {
+			vector<pair<double, int>> sortList;
+			for (int i=0; i<(int)compositeInfo.phraseDurs.size(); i++) {
+				sortList.emplace_back(compositeInfo.phraseDurs[i], i);
+			}
+			if (m_sortQ) {
+				sort(sortList.begin(), sortList.end(),
+					[](const std::pair<double, int>& a, const std::pair<double, int>& b) {
+						return a.first < b.first;
+				});
+			} else if (m_reverseSortQ) {
+				sort(sortList.begin(), sortList.end(),
+					[](const std::pair<double, int>& a, const std::pair<double, int>& b) {
+						return a.first > b.first;
+				});
+			}
+
+			for (int i=0; i<(int)sortList.size(); i++) {
+				int ii = sortList[i].second;
+				if (m_barlineQ) {
+					m_humdrum_text << "m" << compositeInfo.barStarts.at(ii) << ":";
+				}
+				m_humdrum_text << "<span class='length' title='measure " << compositeInfo.barStarts.at(ii)
+				               << "' onclick='rphraseGotoMeasure(" << compositeInfo.barStarts.at(ii)
+				               << ")' >" << twoDigitRound(compositeInfo.phraseDurs.at(ii)) << "</span>";
+				if (i < (int)sortList.size() - 1) {
+					m_humdrum_text << " ";
+				}
+			}
+		} else {
+			for (int i=0; i<(int)compositeInfo.phraseDurs.size(); i++) {
+				if (compositeInfo.restsBefore.at(i) > 0) {
+					m_humdrum_text << "<span title='inter-phrase rest' class='rest'>" << twoDigitRound(compositeInfo.restsBefore.at(i)) << "</span> ";
+				} else if (i > 0) {
+					// force display r:0 for section boundaries.
+					m_humdrum_text << "<span title='inter-phrase rest' class='rest'>" << twoDigitRound(compositeInfo.restsBefore.at(i)) << "</span> ";
+				}
+				if (m_barlineQ) {
+					m_humdrum_text << "<span class='measure'>m" << compositeInfo.barStarts.at(i) << ":</span>";
+				}
+				m_humdrum_text << "<span class='length' title='measure " << compositeInfo.barStarts.at(i)
+				               << "' onclick='rphraseGotoMeasure(" << compositeInfo.barStarts.at(i)
+				               << ")' >" << twoDigitRound(compositeInfo.phraseDurs.at(i)) << "</span>";
+				if (i < (int)compositeInfo.phraseDurs.size() - 1) {
+					m_humdrum_text << " ";
+				}
+			}
+		}
+		m_humdrum_text << "</li>" << endl;
+
+		if (m_averageQ && (compositeInfo.phraseDurs.size() > 1)) {
+			double sum = 0;
+			int count = 0;
+			for (int i=0; i<(int)compositeInfo.phraseDurs.size(); i++) {
+				count++;
+				sum += compositeInfo.phraseDurs.at(i);
+			}
+			double average = int(sum / count * 100.0 + 0.5)/100.0;
+			m_humdrum_text << "!!<li>Average composite segment durations: " << average << "</li>" << endl;
+		}
+
+		m_humdrum_text << "!!<li>Voices: " << getVoiceInfo(infile) << "</li>" << endl;
+
+		if (m_durUnit != 2.0) {
+			m_humdrum_text << "!!<li>Duration unit: " << m_durUnit << "</li>" << endl;
+		}
+	}
+
+	m_humdrum_text << "!!</ul>" << endl;
+	m_humdrum_text << "!!</div>" << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::getVoiceInfo --
+//
+
+string Tool_rphrase::getVoiceInfo(HumdrumFile& infile) {
+	vector<HTp> kspines = infile.getKernSpineStartList();
+	string vcount = to_string(kspines.size());
+	string ocount;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			break;
+		}
+		if (infile[i].isReferenceRecord()) {
+			string key = infile[i].getReferenceKey();
+			if (key == "voices") {
+				ocount = infile[i].getReferenceValue();
+			}
+		}
+	}
+
+	if (ocount.empty()) {
+		return vcount;
+	}
+
+	if (ocount != vcount) {
+		string output = ocount;
+		output += "(";
+		output += vcount;
+		output += ")";
+		return output;
+	} else {
+		return vcount;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::printEmbeddedVoiceInfoSummary --
+//
+
+void Tool_rphrase::printEmbeddedVoiceInfoSummary(vector<Tool_rphrase::VoiceInfo>& voiceInfo, HumdrumFile& infile) {
+	m_humdrum_text << "!!<ul>" << endl;
+
+	double total = 0.0;
+	for (int i=0; i<(int)voiceInfo[0].phraseDurs.size(); i++) {
+		if (voiceInfo[0].phraseDurs[i] > 0.0) {
+			total += voiceInfo[0].phraseDurs[i];
+		}
+		if (voiceInfo[0].restsBefore[i] > 0.0) {
+			total += voiceInfo[0].restsBefore[i];
+		}
+	}
+	m_humdrum_text << "!!<li>Score duration: " << twoDigitRound(total) << "</li>" << endl;
+
+	int countSum = 0;
+	for (int i=0; i<(int)voiceInfo.size(); i++) {
+		countSum += (int)voiceInfo[i].phraseDurs.size();
+	}
+	m_humdrum_text << "!!<li>Total segments: " << countSum << "</li>" << endl;
+
+	double averageCount = countSum / (double)voiceInfo.size();
+	averageCount = (int)(averageCount * 10 + 0.5) / 10.0;
+	m_humdrum_text << "!!<li>Average voice segments: " << averageCount << "</li>" << endl;
+
+	double durSum = 0.0;
+	for (int i=0; i<(int)voiceInfo.size(); i++) {
+		for (int j=0; j<(int)voiceInfo[i].phraseDurs.size(); j++) {
+			durSum += voiceInfo[i].phraseDurs[j];
+		}
+	}
+	double averageDur = durSum / countSum;
+	averageDur = (int)(averageDur * 10 + 0.5) / 10.0;
+	m_humdrum_text << "!!<li>Average segment duration: " << averageDur << "</li>" << endl;
+
+	m_humdrum_text << "!!<li>Voices: " << getVoiceInfo(infile) << "</li>" << endl;
+
+	m_humdrum_text << "!!</ul>" << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::printEmbeddedIndividualVoiceInfo --
+//
+
+void Tool_rphrase::printEmbeddedIndividualVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HumdrumFile& infile) {
+	m_humdrum_text << "!!<tr>" << endl;
+
+	m_humdrum_text << "!!<td class='voice'>" << voiceInfo.name << "</td>" << endl;
+
+	double sounding = 0.0;
+	double resting = 0.0;
+	for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+		if (voiceInfo.phraseDurs[i] > 0.0) {
+			sounding += voiceInfo.phraseDurs[i];
+		}
+		if (voiceInfo.restsBefore[i] > 0.0) {
+			resting += voiceInfo.restsBefore[i];
+		}
+	}
+	double total = sounding + resting;
+	double spercent = int(sounding/total * 100.0 + 0.5);
+	double rpercent = int(resting/total * 100.0 + 0.5);
+	m_humdrum_text << "!!<td class='sounding'>" << sounding << "(" << spercent << "%)</td>" << endl;
+	m_humdrum_text << "!!<td class='resting'>" << resting << "(" << rpercent << "%)</td>" << endl;
+
+	// Segment count
+	m_humdrum_text << "!!<td class='segments'>";
+	m_humdrum_text << voiceInfo.phraseDurs.size();
+	m_humdrum_text << "</td>" << endl;
+
+	// Segment duration average
+	m_humdrum_text << "!!<td class='average'>";
+	double sum = 0;
+	int count = 0;
+	for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+		count++;
+		sum += voiceInfo.phraseDurs.at(i);
+	}
+	double average = int(sum / count * 100.0 + 0.5)/100.0;
+	m_humdrum_text << average;
+	m_humdrum_text << "</td>" << endl;
+
+	// Segments
+	m_humdrum_text << "!!<td class='segment-durations'>";
+	if (m_sortQ || m_reverseSortQ) {
+		vector<pair<double, int>> sortList;
+		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+			sortList.emplace_back(voiceInfo.phraseDurs[i], i);
+		}
+		if (m_sortQ) {
+			sort(sortList.begin(), sortList.end(),
+				[](const std::pair<double, int>& a, const std::pair<double, int>& b) {
+					return a.first < b.first;
+			});
+		} else if (m_reverseSortQ) {
+			sort(sortList.begin(), sortList.end(),
+				[](const std::pair<double, int>& a, const std::pair<double, int>& b) {
+					return a.first > b.first;
+			});
+		}
+		for (int i=0; i<(int)sortList.size(); i++) {
+			int ii = sortList[i].second;
+			if (m_barlineQ) {
+				m_humdrum_text << "<span class='measure'>m" << voiceInfo.barStarts.at(ii) << ":</span>";
+			}
+			m_humdrum_text << "<span class='length' title='measure " << voiceInfo.barStarts.at(ii)
+			               << ")' >" << twoDigitRound(voiceInfo.phraseDurs.at(ii)) << "</span>";
+			if (i < (int)sortList.size() - 1) {
+				m_humdrum_text << " ";
+			}
+		}
+	} else {
+		for (int i=0; i<(int)voiceInfo.phraseDurs.size(); i++) {
+			if (voiceInfo.restsBefore.at(i) > 0) {
+				m_humdrum_text << "<span title='inter-phrase rest' class='rest'>" << twoDigitRound(voiceInfo.restsBefore.at(i)) << "</span> ";
+			} else if (i > 0) {
+				// force display r:0 for section boundaries.
+				m_humdrum_text << "<span title='inter-phrase rest' class='rest'>" << twoDigitRound(voiceInfo.restsBefore.at(i)) << "</span> ";
+			}
+			if (m_barlineQ) {
+				m_humdrum_text << "<span class='measure'>m" << voiceInfo.barStarts.at(i) << ":</span>";
+			}
+			m_humdrum_text << "<span class='length' title='measure " << voiceInfo.barStarts.at(i)
+			               << "' onclick='rphraseGotoMeasure(" << voiceInfo.barStarts.at(i)
+			               << ")' >" << twoDigitRound(voiceInfo.phraseDurs.at(i)) << "</span>";
+			if (i < (int)voiceInfo.phraseDurs.size() - 1) {
+				m_humdrum_text << " ";
+			}
+		}
+	}
+
+	m_humdrum_text << "</td>" << endl;
+	m_humdrum_text << "!!</tr>" << endl;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::fillCompositeInfo --
+//
+
+void Tool_rphrase::fillCompositeInfo(Tool_rphrase::VoiceInfo& compositeInfo, HumdrumFile& infile) {
+	compositeInfo.name = getCompositeLabel(infile);
 	vector<int> noteStates;
 	getCompositeStates(noteStates, infile);
 
@@ -118542,11 +119105,10 @@ void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, Humdr
 	int currentBarline   = 0;
 	int startBarline     = 1;
 	HumNum startTime     = 0;
-
 	HumNum restBefore    = 0;
 	HumNum startTimeRest = 0;
-
-	HumNum scoreDur = infile.getScoreDuration();
+	HumNum scoreDur      = infile.getScoreDuration();
+	HTp phraseStartTok   = NULL;
 
 	for (int i=0; i<infile.getLineCount(); i++) {
 
@@ -118568,11 +119130,15 @@ void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, Humdr
 						HumNum duration = endTime - startTime;
 						startTime = -1;
 						inPhraseQ = false;
-						collapseInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
-						collapseInfo.barStarts.push_back(startBarline);
-						m_sumCollapse += duration.getFloat() / 2.0;
-						m_pcountCollapse++;
-						collapseInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+						double value = duration.getFloat() / m_durUnit;
+						compositeInfo.phraseDurs.push_back(value);
+						compositeInfo.barStarts.push_back(startBarline);
+						compositeInfo.phraseStartToks.push_back(phraseStartTok);
+						phraseStartTok = NULL;
+						m_sumComposite += duration.getFloat() / m_durUnit;
+						m_pcountComposite++;
+						double rvalue = restBefore.getFloat() / m_durUnit;
+						compositeInfo.restsBefore.push_back(rvalue);
 
 						// record rest start
 						startTimeRest = endTime;
@@ -118610,11 +119176,15 @@ void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, Humdr
 				HumNum duration = endTime - startTime;
 				startTime = -1;
 				inPhraseQ = false;
-				collapseInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
-				collapseInfo.barStarts.push_back(startBarline);
-				m_sumCollapse += duration.getFloat() / 2.0;
-				m_pcountCollapse++;
-				collapseInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+				double value = duration.getFloat() / m_durUnit;
+				compositeInfo.phraseDurs.push_back(value);
+				compositeInfo.barStarts.push_back(startBarline);
+				compositeInfo.phraseStartToks.push_back(phraseStartTok);
+				phraseStartTok = NULL;
+				m_sumComposite += duration.getFloat() / m_durUnit;
+				m_pcountComposite++;
+				double rvalue = restBefore.getFloat() / m_durUnit;
+				compositeInfo.restsBefore.push_back(rvalue);
 				// record rest start
 				startTimeRest = endTime;
 			} else {
@@ -118638,6 +119208,7 @@ void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, Humdr
 				} else {
 					restBefore = 0;
 				}
+				phraseStartTok = infile.token(i, 0);
 			}
 		}
 
@@ -118647,11 +119218,18 @@ void Tool_rphrase::fillCollapseInfo(Tool_rphrase::VoiceInfo& collapseInfo, Humdr
 		// process last phrase
 		HumNum endTime = infile.getScoreDuration();
 		HumNum duration = endTime - startTime;
-		collapseInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
-		collapseInfo.barStarts.push_back(startBarline);
-		m_sumCollapse += duration.getFloat() / 2.0;
-		m_pcountCollapse++;
-		collapseInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+		double value = duration.getFloat() / m_durUnit;
+		compositeInfo.phraseDurs.push_back(value);
+		compositeInfo.barStarts.push_back(startBarline);
+		compositeInfo.phraseStartToks.push_back(phraseStartTok);
+		m_sumComposite += duration.getFloat() / m_durUnit;
+		m_pcountComposite++;
+		double rvalue = restBefore.getFloat() / m_durUnit;
+		compositeInfo.restsBefore.push_back(rvalue);
+	}
+
+	if (m_markQ) {
+		markCompositePhraseStartsInScore(infile, compositeInfo);
 	}
 }
 
@@ -118719,7 +119297,6 @@ void Tool_rphrase::fillVoiceInfo(vector<Tool_rphrase::VoiceInfo>& voiceInfo,
 }
 
 
-
 void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart, HumdrumFile& infile) {
 	HTp current = kstart;
 
@@ -118753,13 +119330,15 @@ void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart
 						HumNum duration = endTime - startTime;
 						startTime = -1;
 						inPhraseQ = false;
-						voiceInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+						double value = duration.getFloat() / m_durUnit;
+						voiceInfo.phraseDurs.push_back(value);
 						voiceInfo.barStarts.push_back(startBarline);
 						voiceInfo.phraseStartToks.push_back(phraseStartTok);
 						phraseStartTok = NULL;
-						m_sum += duration.getFloat() / 2.0;
+						m_sum += duration.getFloat() / m_durUnit;
 						m_pcount++;
-						voiceInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+						double rvalue = restBefore.getFloat() / m_durUnit;
+						voiceInfo.restsBefore.push_back(rvalue);
 
 						// record rest start
 						startTimeRest = endTime;
@@ -118785,7 +119364,7 @@ void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart
 		if (current->isInstrumentName()) {
 			voiceInfo.name = current->substr(3);
 		}
-		if (!current->isData()) {
+		if (!(current->isData() || (m_breathQ && (*current == "*breath")))) {
 			current = current->getNextToken();
 			continue;
 		}
@@ -118798,19 +119377,21 @@ void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart
 			// In phrase, so continue if still notes, otherwise
 			// if a rest, then record the currently active phrase
 			// that has ended.
-			if (current->isRest()) {
+			if (current->isRest() || (*current == "*breath")) {
 				// ending a phrase
 				HumNum endTime = current->getDurationFromStart();
 				HumNum duration = endTime - startTime;
 				startTime = -1;
 				inPhraseQ = false;
-				voiceInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+				double value = duration.getFloat() / m_durUnit;
+				voiceInfo.phraseDurs.push_back(value);
 				voiceInfo.barStarts.push_back(startBarline);
 				voiceInfo.phraseStartToks.push_back(phraseStartTok);
 				phraseStartTok = NULL;
-				m_sum += duration.getFloat() / 2.0;
+				m_sum += duration.getFloat() / m_durUnit;
 				m_pcount++;
-				voiceInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+				double rvalue = restBefore.getFloat() / m_durUnit;
+				voiceInfo.restsBefore.push_back(rvalue);
 				// record rest start
 				startTimeRest = endTime;
 			} else {
@@ -118819,7 +119400,7 @@ void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart
 		} else {
 			// Not in phrase, so continue if rest; otherwise,
 			// if a note, then record a phrase start.
-			if (current->isRest()) {
+			if (current->isRest() || (*current == "*breath")) {
 				// continuing a non-phrase, so do nothing
 			} else {
 				// starting a phrase
@@ -118844,19 +119425,58 @@ void Tool_rphrase::fillVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart
 		// process last phrase
 		HumNum endTime = kstart->getLine()->getOwner()->getScoreDuration();
 		HumNum duration = endTime - startTime;
-		voiceInfo.phraseDurs.push_back(duration.getFloat() / 2.0);
+		double value = duration.getFloat() / m_durUnit;
+		voiceInfo.phraseDurs.push_back(value);
 		voiceInfo.barStarts.push_back(startBarline);
 		voiceInfo.phraseStartToks.push_back(phraseStartTok);
-		m_sum += duration.getFloat() / 2.0;
+		m_sum += duration.getFloat() / m_durUnit;
 		m_pcount++;
-		voiceInfo.restsBefore.push_back(0.0);
-		voiceInfo.restsBefore.push_back(restBefore.getFloat() / 2.0);
+		double rvalue = restBefore.getFloat() / m_durUnit;
+		voiceInfo.restsBefore.push_back(rvalue);
 	}
 
 	if (m_markQ) {
 		markPhraseStartsInScore(infile, voiceInfo);
 	}
 }
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::markCompositePhraseStartsInScore --
+//
+
+void Tool_rphrase::markCompositePhraseStartsInScore(HumdrumFile& infile, Tool_rphrase::VoiceInfo& compositeInfo) {
+	stringstream buffer;
+	for (int i=0; i<(int)compositeInfo.phraseStartToks.size(); i++) {
+		HTp tok = compositeInfo.phraseStartToks.at(i);
+		string measure = "";
+		if (m_barlineQ) {
+			measure = to_string(compositeInfo.barStarts.at(i));
+		}
+		double duration = compositeInfo.phraseDurs.at(i);
+		buffer.str("");
+		if (!measure.empty()) {
+			buffer << "m" << measure << "&colon;";
+		}
+		buffer << twoDigitRound(duration);
+		int lineIndex = tok->getLineIndex();
+		infile[lineIndex].setValue("auto", "rphrase-composite-start", buffer.str());
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_rphrase::twoDigitRound --
+//
+
+double Tool_rphrase::twoDigitRound(double input) {
+	return int(input * 100.0 + 0.499999) / 100.0;
+}
+
 
 
 //////////////////////////////
