@@ -45,6 +45,7 @@ public:
     ///@{
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode GetLayerElements(std::vector<data_DURATION> layer_children);
     ///@}
     ///
 
