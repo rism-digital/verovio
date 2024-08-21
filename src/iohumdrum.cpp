@@ -19340,7 +19340,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
 //////////////////////////////
 //
-// HumdrumInput::addDynamicsMark -- Add dynamics marks such as p, f, sfz, rfz.
+// HumdrumInput::addDynamicsMark -- Add dynamics marks such as p, f, sfz, rz, rfz.
 //     The dynamics marking will be added at a tstamp rather than a startid.
 //
 
@@ -19384,6 +19384,9 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
         dynamic = letters;
     }
     else if (hre.search(letters, "^s?f+z?p+$")) {
+        dynamic = letters;
+    }
+    else if (letters == "rz") {
         dynamic = letters;
     }
 
@@ -19633,9 +19636,14 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
 //////////////////////////////
 //
 // HumdrumInput::addSforzandoToNote -- A "z" on a note/chord indicates
-//    a sforzando mark ("sf", or use "zz" for "sfz").  This will be
-//    inserted into the floating elements as a <dynam> with a @startid
-//    pointing to the note/chord.  Other dynamics are placed using @tstamp.
+//    a sforzando mark.  Repeated z's will choose one of the following accents:
+//        z    = sf
+//        zz   = sfz
+//        zzz  = rz
+//        zzzz = rfz
+//    This accent be inserted into the floating elements as a <dynam> with
+//    a @startid pointing to the note/chord.  Other dynamics are placed
+//    using @tstamp.
 //
 
 void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
@@ -19767,7 +19775,13 @@ void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_large);
         rend->SetFontsize(fs);
-        if (token->find("zz") != std::string::npos) {
+        if (token->find("zzzz") != std::string::npos) {
+            addTextElement(rend, "rfz&#160;");
+        }
+        else if (token->find("zzzz") != std::string::npos) {
+            addTextElement(rend, "rz&#160;");
+        }
+        else if (token->find("zz") != std::string::npos) {
             addTextElement(rend, "sfz&#160;");
         }
         else {
@@ -19784,7 +19798,13 @@ void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
         }
     }
     else {
-        if (token->find("zz") != std::string::npos) {
+        if (token->find("zzzz") != std::string::npos) {
+            addTextElement(dynam, "rfz");
+        }
+        else if (token->find("zzz") != std::string::npos) {
+            addTextElement(dynam, "rz");
+        }
+        else if (token->find("zz") != std::string::npos) {
             addTextElement(dynam, "sfz");
         }
         else {
