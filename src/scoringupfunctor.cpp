@@ -80,6 +80,7 @@ void subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoice
     for(std::pair<std::string, data_DURATION> xmlIdDurPair : dursInVoiceSameMensur){
         data_DURATION dur = xmlIdDurPair.second;
         if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
+            subsequence.insert(subsequence.end(), xmlIdDurPair);
             sequence.insert(sequence.end(), subsequence);
             subsequence = {xmlIdDurPair};
         } else {
