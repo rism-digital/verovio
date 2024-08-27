@@ -25,8 +25,8 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
-///std::vector<data_DURATION> dursInVoiceSameMensur = {};
-///void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
+std::vector<data_DURATION> dursInVoiceSameMensur = {};
+void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -73,7 +73,6 @@ void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur)
 {
     for(data_DURATION dur: dursInVoiceSameMensur){
         LogDebug("dur is:", dur);
-        std::cout << dur << std::endl;
     }
 }
 

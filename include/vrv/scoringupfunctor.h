@@ -53,8 +53,8 @@ protected:
 private:
     //
 public:
-    std::vector<data_DURATION> dursInVoiceSameMensur = {};
-    void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
+    //std::vector<data_DURATION> dursInVoiceSameMensur = {};
+    //void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
 private:
     // The current score time in the measure (incremented by each element)
     double m_currentScoreTime;
