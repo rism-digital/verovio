@@ -26,8 +26,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur = {};
-//std::vector<data_DURATION> dursInVoiceSameMensur = {};
-void subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
+std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence;
+std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence);
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence);
+double durNumberValue(data_DURATION dur);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -41,7 +44,8 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentScoreTime = 0.0;
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
-        subdivideSeq(dursInVoiceSameMensur);
+        sequence = subdivideSeq(dursInVoiceSameMensur);
+        findDurQuals(sequence);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
@@ -73,7 +77,7 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     }return FUNCTOR_CONTINUE;
 }
 
-void subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur)
+std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur)
 {
     std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence = {};
     std::vector<std::pair<std::string, data_DURATION>> subsequence = {};
@@ -87,6 +91,52 @@ void subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoice
             subsequence.insert(subsequence.end(), xmlIdDurPair);
         }LogDebug("dur is:", dur);
     }
+    return sequence;
 }
+
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence){
+    for (std::vector<std::pair<std::string, data_DURATION>> subseq: sequence){
+        findDurQuals(subseq);
+    }
+}
+
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence){
+    double sum = 0;
+    for (std::pair<std::string, data_DURATION> xmlIdDurPair : subsequence){
+        data_DURATION dur = xmlIdDurPair.second;
+        sum += durNumberValue(dur);
+    }
+
+    int remainder = (int)sum % 3;
+    if (remainder == 1) {
+        // Imperfection a.p.p.
+    } else if (remainder == 2) {
+        // Alteration
+    } else {
+        // Regular values
+    }
+}
+
+double durNumberValue(data_DURATION dur) {
+    double durnum = 0;
+    switch(dur) {
+        case DURATION_semibrevis:
+            durnum = 1;
+            break;
+        case DURATION_minima:
+            durnum = 0.5;
+            break;
+        case DURATION_semiminima:
+            durnum = 0.25;
+            break;
+        case DURATION_fusa:
+            durnum = 0.125;
+            break;
+        case DURATION_semifusa:
+            durnum = 0.0625;
+            break;
+    } return durnum;
+}
+
 
 } // namespace vrv
