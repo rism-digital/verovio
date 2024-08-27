@@ -25,9 +25,9 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
-//std::vector<std::pair<int, data_DURATION>> dursInVoiceSameMensur = {};
-std::vector<data_DURATION> dursInVoiceSameMensur = {};
-void subdivideSeq(std::vector<data_DURATION> dursInVoiceSameMensur);
+std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur = {};
+//std::vector<data_DURATION> dursInVoiceSameMensur = {};
+void subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -67,22 +67,23 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             assert(rest);
             xmlid = rest->GetID();
             dur = rest->GetDur();
-        } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), dur);
+        } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), {xmlid, dur});
     } else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
     }return FUNCTOR_CONTINUE;
 }
 
-void subdivideSeq(std::vector<data_DURATION> dursInVoiceSameMensur)
+void subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur)
 {
-    std::vector<std::vector<data_DURATION>> sequence = {};
-    std::vector<data_DURATION> subsequence = {};
-    for(data_DURATION dur: dursInVoiceSameMensur){
+    std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence = {};
+    std::vector<std::pair<std::string, data_DURATION>> subsequence = {};
+    for(std::pair<std::string, data_DURATION> xmlIdDurPair : dursInVoiceSameMensur){
+        data_DURATION dur = xmlIdDurPair.second;
         if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
             sequence.insert(sequence.end(), subsequence);
-            subsequence = {dur};
+            subsequence = {xmlIdDurPair};
         } else {
-            subsequence.insert(subsequence.end(), dur);
+            subsequence.insert(subsequence.end(), xmlIdDurPair);
         }LogDebug("dur is:", dur);
     }
 }
