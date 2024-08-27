@@ -45,16 +45,17 @@ public:
     ///@{
     FunctorCode VisitLayer(Layer *layer) override;
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
-    FunctorCode GetLayerElements(std::vector<data_DURATION> layer_children);
+    //FunctorCode GetLayerElements();
     ///@}
     ///
 
 protected:
     //
 private:
-    //
+    //std::vector<data_DURQUALITY_mensural> GetLayerElementsDurQuals(data_MODUSMAIOR, data_MODUSMINOR, data_TEMPUS, data_PROLATIO, std::vector<data_DURATION> layer_children_durs);
 public:
-    //
+    std::vector<data_DURATION> dursInVoiceSameMensur = {};
+    void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
 private:
     // The current score time in the measure (incremented by each element)
     double m_currentScoreTime;

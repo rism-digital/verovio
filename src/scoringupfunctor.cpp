@@ -25,8 +25,9 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
-std::vector<data_DURATION> layer_children;
-
+//std::vector<std::vector<data_DURATION>> layer_children_durs = {};
+///std::vector<data_DURATION> dursInVoiceSameMensur = {};
+///void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -39,7 +40,10 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
 {
     m_currentScoreTime = 0.0;
     m_currentMensur = layer->GetCurrentMensur();
-    layer_children = {};
+    if (!dursInVoiceSameMensur.empty()){
+        findQuals(dursInVoiceSameMensur);
+        dursInVoiceSameMensur = {}; //restart for next voice (layer)
+    }
     return FUNCTOR_CONTINUE;
 }
 
@@ -60,21 +64,34 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
             dur = rest->GetDur();
-        } LogDebug("the dur is: ", dur);
-        layer_children.insert(layer_children.end(), dur);
+        } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), dur);
     } else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
-        data_TEMPUS m_tempus = m_currentMensur->GetTempus();
-        LogDebug("the mensur is:", m_tempus);
+        //GetLayerElementsDurQuals(m_currentMensur->GetModusmaior(),  m_currentMensur->GetModusminor(), m_currentMensur->GetTempus(),  m_currentMensur->GetProlatio(), dursInVoiceSameMensur);
     }return FUNCTOR_CONTINUE;
 }
 
-FunctorCode ScoringUpFunctor::GetLayerElements(std::vector<data_DURATION> layer_children)
+/*std::vector<data_DURQUALITY_mensural> GetLayerElementsDurQuals(data_MODUSMAIOR, data_MODUSMINOR, data_TEMPUS, data_PROLATIO, std::vector<data_DURATION> dursInVoiceSameMensur){
+    
+    std::vector<data_DURQUALITY_mensural> layer_children_durquals = {};
+    
+    return layer_children_durquals;
+}*/
+
+/*FunctorCode ScoringUpFunctor::GetLayerElements()
 {
-    for(data_DURATION dur: layer_children){
+    for(data_DURATION dur: dursInVoiceSameMensur){
         LogDebug("dur is:", dur);
         std::cout << dur << std::endl;
     }return FUNCTOR_CONTINUE;
+}*/
+
+void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur)
+{
+    for(data_DURATION dur: dursInVoiceSameMensur){
+        LogDebug("dur is:", dur);
+        std::cout << dur << std::endl;
+    }
 }
 
 } // namespace vrv
