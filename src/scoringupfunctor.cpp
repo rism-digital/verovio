@@ -25,6 +25,7 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
+//std::vector<std::pair<int, data_DURATION>> dursInVoiceSameMensur = {};
 std::vector<data_DURATION> dursInVoiceSameMensur = {};
 void subdivideSeq(std::vector<data_DURATION> dursInVoiceSameMensur);
 
@@ -54,14 +55,17 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
 
     if (element->Is(REST) || element->Is(NOTE)) {
         data_DURATION dur;
+        std::string xmlid;
         if (element->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(element);
             assert(note);
+            xmlid = note->GetID();
             dur = note->GetDur();
             //note->SetDurQuality(DURQUALITY_mensural_imperfecta);
         } else {
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
+            xmlid = rest->GetID();
             dur = rest->GetDur();
         } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), dur);
     } else if (element->Is(MENSUR)) {
