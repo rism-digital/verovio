@@ -26,7 +26,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 std::vector<data_DURATION> dursInVoiceSameMensur = {};
-void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur);
+void subdivideSeq(std::vector<data_DURATION> dursInVoiceSameMensur);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -40,7 +40,7 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentScoreTime = 0.0;
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
-        findQuals(dursInVoiceSameMensur);
+        subdivideSeq(dursInVoiceSameMensur);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
@@ -69,10 +69,17 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     }return FUNCTOR_CONTINUE;
 }
 
-void findQuals(std::vector<data_DURATION> dursInVoiceSameMensur)
+void subdivideSeq(std::vector<data_DURATION> dursInVoiceSameMensur)
 {
+    std::vector<std::vector<data_DURATION>> sequence = {};
+    std::vector<data_DURATION> subsequence = {};
     for(data_DURATION dur: dursInVoiceSameMensur){
-        LogDebug("dur is:", dur);
+        if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
+            sequence.insert(sequence.end(), subsequence);
+            subsequence = {dur};
+        } else {
+            subsequence.insert(subsequence.end(), dur);
+        }LogDebug("dur is:", dur);
     }
 }
 
