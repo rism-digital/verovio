@@ -188,21 +188,21 @@ double durNumberValue(data_DURATION dur) {
 }
 
 void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> subsequence){
-    std::string firstNoteID = subsequence.at(0).first;
-    Note *firstNote; // still need to find this based on the ID (or to pass to the function the element itself
-    firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+    //std::string firstNoteID = subsequence.at(0).first;
+    //Note *firstNote; // still need to find this based on the ID (or to pass to the function the element itself
+    //firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
 }
 
 void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> subsequence){
-    std::string lastNoteID = subsequence.at(-1).first;
-    Note *lastNote; // still need to find this based on the ID (or to pass to the function the element itself
-    lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+    //std::string lastNoteID = subsequence.at(-1).first;
+    //Note *lastNote; // still need to find this based on the ID (or to pass to the function the element itself
+    //lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
 }
 
 void alteration(std::vector<std::pair<std::string, data_DURATION>> subsequence){
-    std::string penultNoteID = subsequence.at(-2).first;
-    Note *penultNote; // still need to find this based on the ID (or to pass to the function the element itself
-    penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+    //std::string penultNoteID = subsequence.at(-2).first;
+    //Note *penultNote; // still need to find this based on the ID (or to pass to the function the element itself
+    //penultNote->SetDurQuality(DURQUALITY_mensural_altera);
 }
 
 
