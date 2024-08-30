@@ -25,15 +25,18 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
+std::vector<std::pair<std::string, Note>> notes = {};
+std::vector<std::pair<std::string, Rest>> rests = {};
 std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur = {};
-std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence;
+
+std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences;
 std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence);
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence);
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
 double durNumberValue(data_DURATION dur);
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> subsequence);
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> subsequence);
-void alteration(std::vector<std::pair<std::string, data_DURATION>> subsequence);
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
+void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -47,9 +50,11 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentScoreTime = 0.0;
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
-        sequence = subdivideSeq(dursInVoiceSameMensur);
-        findDurQuals(sequence);
+        listOfSequences = subdivideSeq(dursInVoiceSameMensur);
+        findDurQuals(listOfSequences, notes, rests);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
+        notes = {};
+        rests = {};
     }
     return FUNCTOR_CONTINUE;
 }
@@ -68,12 +73,14 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             assert(note);
             xmlid = note->GetID();
             dur = note->GetDur();
+            notes.insert(notes.end(), {xmlid, *note});
             //note->SetDurQuality(DURQUALITY_mensural_imperfecta);
         } else {
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
             xmlid = rest->GetID();
             dur = rest->GetDur();
+            rests.insert(rests.end(), {xmlid, *rest});
         } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), {xmlid, dur});
     } else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
@@ -82,30 +89,30 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
 
 std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur)
 {
-    std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence = {};
-    std::vector<std::pair<std::string, data_DURATION>> subsequence = {};
+    std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences = {};
+    std::vector<std::pair<std::string, data_DURATION>> sequence = {};
     for(std::pair<std::string, data_DURATION> xmlIdDurPair : dursInVoiceSameMensur){
         data_DURATION dur = xmlIdDurPair.second;
         if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
-            subsequence.insert(subsequence.end(), xmlIdDurPair);
-            sequence.insert(sequence.end(), subsequence);
-            subsequence = {xmlIdDurPair};
+            sequence.insert(sequence.end(), xmlIdDurPair);
+            listOfSequences.insert(listOfSequences.end(), sequence);
+            sequence = {xmlIdDurPair};
         } else {
-            subsequence.insert(subsequence.end(), xmlIdDurPair);
+            sequence.insert(sequence.end(), xmlIdDurPair);
         }LogDebug("dur is:", dur);
     }
-    return sequence;
+    return listOfSequences;
 }
 
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence){
-    for (std::vector<std::pair<std::string, data_DURATION>> subseq: sequence){
-        findDurQuals(subseq);
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+    for (std::vector<std::pair<std::string, data_DURATION>> subseq: listOfSequences){
+        findDurQuals(subseq, notes, rests);
     }
 }
 
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence){
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
     double sum = 0;
-    for (std::pair<std::string, data_DURATION> xmlIdDurPair : subsequence){
+    for (std::pair<std::string, data_DURATION> xmlIdDurPair : sequence){
         data_DURATION dur = xmlIdDurPair.second;
         sum += durNumberValue(dur);
     }
@@ -113,8 +120,8 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence
     int remainder = (int)sum % 3;
     bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
-    bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the subsequence. When true, it doesn't allow for alteration
-    bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the subsequence, checking if it is greater or equal to the last note of the subsequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
+    bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the sequence. When true, it doesn't allow for alteration
+    bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the sequence, checking if it is greater or equal to the last note of the sequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
 
     // Principles of imperfection and alteration (and their exceptions).
     // The implementation is based on the rules outlined by Willi Apel, with perfect groupings of notes and the remainder:
@@ -124,18 +131,18 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence
                 break; //No modifications
             case 1:
                 if (dotOfPerf) {
-                    imperfectionAPA(subsequence);
+                    imperfectionAPA(sequence, notes, rests);
                     break;
                 }//Other, the default case:
-                imperfectionAPP(subsequence);
+                imperfectionAPP(sequence, notes, rests);
                 break;
             case 2:
                 if (dotOfImperf || smallNoteValue) {
-                    imperfectionAPP(subsequence);
-                    imperfectionAPA(subsequence);
+                    imperfectionAPP(sequence, notes, rests);
+                    imperfectionAPA(sequence, notes, rests);
                     break;
                 }//Other, the default case:
-                alteration(subsequence);
+                alteration(sequence, notes, rests);
                 break;
         }
     } else { // For sum > 3
@@ -144,23 +151,23 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence
                 if (dotOfPerf || smallNoteValue) {
                     break; //No modifications
                 }//Other, the default case:
-                imperfectionAPP(subsequence);
-                alteration(subsequence);
+                imperfectionAPP(sequence, notes, rests);
+                alteration(sequence, notes, rests);
                 break;
             case 1:
                 if (dotOfPerf) {
-                    imperfectionAPA(subsequence);
+                    imperfectionAPA(sequence, notes, rests);
                     break;
                 }//Other, the default case:
-                imperfectionAPP(subsequence);
+                imperfectionAPP(sequence, notes, rests);
                 break;
             case 2:
                 if (dotOfPerf || simileAnteSimile) {
-                    alteration(subsequence);
+                    alteration(sequence, notes, rests);
                     break;
                 }//Other, the default case:
-                imperfectionAPP(subsequence);
-                imperfectionAPA(subsequence);
+                imperfectionAPP(sequence, notes, rests);
+                imperfectionAPA(sequence, notes, rests);
                 break;
         }
     }// Missing "rest at" conditions
@@ -187,20 +194,23 @@ double durNumberValue(data_DURATION dur) {
     } return durnum;
 }
 
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> subsequence){
-    //std::string firstNoteID = subsequence.at(0).first;
-    //Note *firstNote; // still need to find this based on the ID (or to pass to the function the element itself
-    //firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+    std::string firstNoteID = sequence.at(0).first;
+    for(std::pair<std::string, Note> note : notes){
+        if(note.first == firstNoteID){
+            note.second.SetDurQuality(DURQUALITY_mensural_imperfecta);
+        }
+    }
 }
 
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> subsequence){
-    //std::string lastNoteID = subsequence.at(-1).first;
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+    //std::string lastNoteID = sequence.at(-1).first;
     //Note *lastNote; // still need to find this based on the ID (or to pass to the function the element itself
     //lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
 }
 
-void alteration(std::vector<std::pair<std::string, data_DURATION>> subsequence){
-    //std::string penultNoteID = subsequence.at(-2).first;
+void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+    //std::string penultNoteID = sequence.at(-2).first;
     //Note *penultNote; // still need to find this based on the ID (or to pass to the function the element itself
     //penultNote->SetDurQuality(DURQUALITY_mensural_altera);
 }
