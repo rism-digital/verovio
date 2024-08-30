@@ -198,7 +198,10 @@ void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence
     std::string firstNoteID = sequence.at(0).first;
     for(std::pair<std::string, Note> note : notes){
         if(note.first == firstNoteID){
-            note.second.SetDurQuality(DURQUALITY_mensural_imperfecta);
+            Note theNote = note.second;
+            theNote.SetDurQuality(DURQUALITY_mensural_imperfecta);
+            LogDebug("the note");
+            break;
         }
     }
 }
@@ -210,9 +213,15 @@ void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence
 }
 
 void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
-    //std::string penultNoteID = sequence.at(-2).first;
-    //Note *penultNote; // still need to find this based on the ID (or to pass to the function the element itself
-    //penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+    std::string penultNoteID = sequence.at(sequence.size()-2).first;
+    for(std::pair<std::string, Note> note : notes){
+        if(note.first == penultNoteID){
+            Note theNote = note.second;
+            theNote.SetDurQuality(DURQUALITY_mensural_altera);
+            LogDebug("the note");
+            break;
+        }
+    }
 }
 
 
