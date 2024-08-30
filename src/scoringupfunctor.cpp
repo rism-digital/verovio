@@ -31,6 +31,9 @@ std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std
 void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> sequence);
 void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence);
 double durNumberValue(data_DURATION dur);
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> subsequence);
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> subsequence);
+void alteration(std::vector<std::pair<std::string, data_DURATION>> subsequence);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -108,13 +111,42 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence
     }
 
     int remainder = (int)sum % 3;
-    if (remainder == 1) {
+    if (sum <= 3) {
+        switch (remainder) {
+            case 0:
+                break;
+            case 1:
+                imperfectionAPP(subsequence);
+                break;
+            case 2:
+                alteration(subsequence);
+                break;
+        }
+    } else {
+        switch (remainder) {
+            case 0:
+                imperfectionAPP(subsequence);
+                alteration(subsequence);
+                break;
+            case 1:
+                imperfectionAPP(subsequence);
+                break;
+            case 2:
+                imperfectionAPP(subsequence);
+                imperfectionAPA(subsequence);
+                break;
+        }
+    }
+
+/*    if (remainder == 1) {
         // Imperfection a.p.p.
+        imperfectionAPP(subsequence);
     } else if (remainder == 2) {
         // Alteration
+        alteration(subsequence);
     } else {
         // Regular values
-    }
+    }*/
 }
 
 double durNumberValue(data_DURATION dur) {
@@ -136,6 +168,16 @@ double durNumberValue(data_DURATION dur) {
             durnum = 0.0625;
             break;
     } return durnum;
+}
+
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> subsequence){
+    
+}
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> subsequence){
+    
+}
+void alteration(std::vector<std::pair<std::string, data_DURATION>> subsequence){
+    
 }
 
 
