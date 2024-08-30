@@ -111,42 +111,59 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> subsequence
     }
 
     int remainder = (int)sum % 3;
-    if (sum <= 3) {
+    bool dotOfPerf = false;         //When true, it forces a perfect value
+    bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
+    bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the subsequence. When true, it doesn't allow for alteration
+    bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the subsequence, checking if it is greater or equal to the last note of the subsequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
+
+    // Principles of imperfection and alteration (and their exceptions).
+    // The implementation is based on the rules outlined by Willi Apel, with perfect groupings of notes and the remainder:
+    if (sum <= 3) { // For sum = 0, 1, 2, or 3
         switch (remainder) {
             case 0:
-                break;
+                break; //No modifications
             case 1:
+                if (dotOfPerf) {
+                    imperfectionAPA(subsequence);
+                    break;
+                }//Other, the default case:
                 imperfectionAPP(subsequence);
                 break;
             case 2:
+                if (dotOfImperf || smallNoteValue) {
+                    imperfectionAPP(subsequence);
+                    imperfectionAPA(subsequence);
+                    break;
+                }//Other, the default case:
                 alteration(subsequence);
                 break;
         }
-    } else {
+    } else { // For sum > 3
         switch (remainder) {
             case 0:
+                if (dotOfPerf || smallNoteValue) {
+                    break; //No modifications
+                }//Other, the default case:
                 imperfectionAPP(subsequence);
                 alteration(subsequence);
                 break;
             case 1:
+                if (dotOfPerf) {
+                    imperfectionAPA(subsequence);
+                    break;
+                }//Other, the default case:
                 imperfectionAPP(subsequence);
                 break;
             case 2:
+                if (dotOfPerf || simileAnteSimile) {
+                    alteration(subsequence);
+                    break;
+                }//Other, the default case:
                 imperfectionAPP(subsequence);
                 imperfectionAPA(subsequence);
                 break;
         }
     }
-
-/*    if (remainder == 1) {
-        // Imperfection a.p.p.
-        imperfectionAPP(subsequence);
-    } else if (remainder == 2) {
-        // Alteration
-        alteration(subsequence);
-    } else {
-        // Regular values
-    }*/
 }
 
 double durNumberValue(data_DURATION dur) {
