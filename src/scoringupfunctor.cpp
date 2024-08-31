@@ -16,6 +16,7 @@
 #include "staff.h"
 #include "system.h"
 #include "vrv.h"
+#include <map>
 
 //----------------------------------------------------------------------------
 
@@ -25,18 +26,18 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
-std::vector<std::pair<std::string, Note>> notes = {};
-std::vector<std::pair<std::string, Rest>> rests = {};
+std::map<std::string, Note*> notesDictionary;
+std::map<std::string, Rest*> restsDictionary;
 std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur = {};
 
 std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences;
 std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
 double durNumberValue(data_DURATION dur);
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
-void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
+void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -51,10 +52,8 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
         listOfSequences = subdivideSeq(dursInVoiceSameMensur);
-        findDurQuals(listOfSequences, &notes, &rests);
+        findDurQuals(listOfSequences, notesDictionary, restsDictionary);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
-        notes = {};
-        rests = {};
     }
     return FUNCTOR_CONTINUE;
 }
@@ -73,14 +72,14 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             assert(note);
             xmlid = note->GetID();
             dur = note->GetDur();
-            notes.insert(notes.end(), {xmlid, *note});
+            notesDictionary[xmlid] = note;
             //note->SetDurQuality(DURQUALITY_mensural_imperfecta);
         } else {
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
             xmlid = rest->GetID();
             dur = rest->GetDur();
-            rests.insert(rests.end(), {xmlid, *rest});
+            restsDictionary[xmlid] = rest;
         } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), {xmlid, dur});
     } else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
@@ -104,13 +103,13 @@ std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std
     return listOfSequences;
 }
 
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     for (std::vector<std::pair<std::string, data_DURATION>> subseq: listOfSequences){
-        findDurQuals(subseq, notes, rests);
+        findDurQuals(subseq, notesDictionary, restsDictionary);
     }
 }
 
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     double sum = 0;
     for (std::pair<std::string, data_DURATION> xmlIdDurPair : sequence){
         data_DURATION dur = xmlIdDurPair.second;
@@ -131,18 +130,18 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
                 break; //No modifications
             case 1:
                 if (dotOfPerf) {
-                    imperfectionAPA(sequence, notes, rests);
+                    imperfectionAPA(sequence, notesDictionary, restsDictionary);
                     break;
                 }//Other, the default case:
-                imperfectionAPP(sequence, notes, rests);
+                imperfectionAPP(sequence, notesDictionary, restsDictionary);
                 break;
             case 2:
                 if (dotOfImperf || smallNoteValue) {
-                    imperfectionAPP(sequence, notes, rests);
-                    imperfectionAPA(sequence, notes, rests);
+                    imperfectionAPP(sequence, notesDictionary, restsDictionary);
+                    imperfectionAPA(sequence, notesDictionary, restsDictionary);
                     break;
                 }//Other, the default case:
-                alteration(sequence, notes, rests);
+                alteration(sequence, notesDictionary, restsDictionary);
                 break;
         }
     } else { // For sum > 3
@@ -151,23 +150,23 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
                 if (dotOfPerf || smallNoteValue) {
                     break; //No modifications
                 }//Other, the default case:
-                imperfectionAPP(sequence, notes, rests);
-                alteration(sequence, notes, rests);
+                imperfectionAPP(sequence, notesDictionary, restsDictionary);
+                alteration(sequence, notesDictionary, restsDictionary);
                 break;
             case 1:
                 if (dotOfPerf) {
-                    imperfectionAPA(sequence, notes, rests);
+                    imperfectionAPA(sequence, notesDictionary, restsDictionary);
                     break;
                 }//Other, the default case:
-                imperfectionAPP(sequence, notes, rests);
+                imperfectionAPP(sequence, notesDictionary, restsDictionary);
                 break;
             case 2:
                 if (dotOfPerf || simileAnteSimile) {
-                    alteration(sequence, notes, rests);
+                    alteration(sequence, notesDictionary, restsDictionary);
                     break;
                 }//Other, the default case:
-                imperfectionAPP(sequence, notes, rests);
-                imperfectionAPA(sequence, notes, rests);
+                imperfectionAPP(sequence, notesDictionary, restsDictionary);
+                imperfectionAPA(sequence, notesDictionary, restsDictionary);
                 break;
         }
     }// Missing "rest at" conditions
@@ -194,34 +193,24 @@ double durNumberValue(data_DURATION dur) {
     } return durnum;
 }
 
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     std::string firstNoteID = sequence.at(0).first;
-    for(std::pair<std::string, Note> note : *notes){
-        if(note.first == firstNoteID){
-            Note *theNote = &note.second;
-            theNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-            LogDebug("the note");
-            break;
-        }
-    }
+    Note *firstNote = notesDictionary[firstNoteID];
+    firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+    LogDebug("thenote!");
 }
 
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     //std::string lastNoteID = sequence.at(-1).first;
     //Note *lastNote; // still need to find this based on the ID (or to pass to the function the element itself
     //lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
 }
 
-void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
+void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     std::string penultNoteID = sequence.at(sequence.size()-2).first;
-    for(std::pair<std::string, Note> note : *notes){
-        if(note.first == penultNoteID){
-            Note *theNote = &note.second;
-            theNote->SetDurQuality(DURQUALITY_mensural_altera);
-            LogDebug("the note");
-            break;
-        }
-    }
+    Note *penultNote = notesDictionary[penultNoteID];
+    penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+    LogDebug("thenote!");
 }
 
 
