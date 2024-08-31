@@ -31,12 +31,12 @@ std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur = {};
 
 std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences;
 std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
 double durNumberValue(data_DURATION dur);
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
-void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests);
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
+void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -51,7 +51,7 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
         listOfSequences = subdivideSeq(dursInVoiceSameMensur);
-        findDurQuals(listOfSequences, notes, rests);
+        findDurQuals(listOfSequences, &notes, &rests);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
         notes = {};
         rests = {};
@@ -104,13 +104,13 @@ std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std
     return listOfSequences;
 }
 
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
     for (std::vector<std::pair<std::string, data_DURATION>> subseq: listOfSequences){
         findDurQuals(subseq, notes, rests);
     }
 }
 
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
     double sum = 0;
     for (std::pair<std::string, data_DURATION> xmlIdDurPair : sequence){
         data_DURATION dur = xmlIdDurPair.second;
@@ -194,30 +194,30 @@ double durNumberValue(data_DURATION dur) {
     } return durnum;
 }
 
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
     std::string firstNoteID = sequence.at(0).first;
-    for(std::pair<std::string, Note> note : notes){
+    for(std::pair<std::string, Note> note : *notes){
         if(note.first == firstNoteID){
-            Note theNote = note.second;
-            theNote.SetDurQuality(DURQUALITY_mensural_imperfecta);
+            Note *theNote = &note.second;
+            theNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
             LogDebug("the note");
             break;
         }
     }
 }
 
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
     //std::string lastNoteID = sequence.at(-1).first;
     //Note *lastNote; // still need to find this based on the ID (or to pass to the function the element itself
     //lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
 }
 
-void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> notes, std::vector<std::pair<std::string, Rest>> rests){
+void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::vector<std::pair<std::string, Note>> *notes, std::vector<std::pair<std::string, Rest>> *rests){
     std::string penultNoteID = sequence.at(sequence.size()-2).first;
-    for(std::pair<std::string, Note> note : notes){
+    for(std::pair<std::string, Note> note : *notes){
         if(note.first == penultNoteID){
-            Note theNote = note.second;
-            theNote.SetDurQuality(DURQUALITY_mensural_altera);
+            Note *theNote = &note.second;
+            theNote->SetDurQuality(DURQUALITY_mensural_altera);
             LogDebug("the note");
             break;
         }
