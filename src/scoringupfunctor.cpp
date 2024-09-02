@@ -26,20 +26,17 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
-std::map<std::string, Note*> notesDictionary;
-std::map<std::string, Rest*> restsDictionary;
-std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur = {};
+std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur = {};
 
-std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences;
-std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur);
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
+std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences;
+std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> subdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur);
+
+void findDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences);
+void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 double durNumberValue(data_DURATION dur);
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
-void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
-bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Rest*> restsDictionary);
-bool isPenultimateValueShort(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary);
+bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -54,7 +51,7 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
         listOfSequences = subdivideSeq(dursInVoiceSameMensur);
-        findDurQuals(listOfSequences, notesDictionary, restsDictionary);
+        findDurQuals(listOfSequences);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
@@ -66,58 +63,54 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
 
     LayerElement *element = layerElement->ThisOrSameasLink();
 
-    if (element->Is(REST) || element->Is(NOTE)) {
-        data_DURATION dur;
-        std::string xmlid;
+    if (element->Is(REST) || element->Is(NOTE) || element->Is(DOT)) {
+        data_DURATION dur = DURATION_NONE;
         if (element->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(element);
             assert(note);
-            xmlid = note->GetID();
             dur = note->GetDur();
-            notesDictionary[xmlid] = note;
-        } else {
+        } else if (element->Is(REST)) {
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
-            xmlid = rest->GetID();
             dur = rest->GetDur();
-            restsDictionary[xmlid] = rest;
-        } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), {xmlid, dur});
+        } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), {element, dur});
     } else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
     }return FUNCTOR_CONTINUE;
 }
 
-std::vector<std::vector<std::pair<std::string, data_DURATION>>> subdivideSeq(std::vector<std::pair<std::string, data_DURATION>> dursInVoiceSameMensur)
+std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> subdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur)
 {
-    std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences = {};
-    std::vector<std::pair<std::string, data_DURATION>> sequence = {};
-    for(std::pair<std::string, data_DURATION> xmlIdDurPair : dursInVoiceSameMensur){
-        data_DURATION dur = xmlIdDurPair.second;
+    std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences = {};
+    std::vector<std::pair<LayerElement*, data_DURATION>> sequence = {};
+    for(std::pair<LayerElement*, data_DURATION> elementDurPair : dursInVoiceSameMensur){
+        data_DURATION dur = elementDurPair.second;
         if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
-            sequence.insert(sequence.end(), xmlIdDurPair);
+            sequence.insert(sequence.end(), elementDurPair);
             listOfSequences.insert(listOfSequences.end(), sequence);
-            sequence = {xmlIdDurPair};
+            sequence = {elementDurPair};
         } else {
-            sequence.insert(sequence.end(), xmlIdDurPair);
+            sequence.insert(sequence.end(), elementDurPair);
         }LogDebug("dur is:", dur);
     }
     return listOfSequences;
 }
 
-void findDurQuals(std::vector<std::vector<std::pair<std::string, data_DURATION>>> listOfSequences, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
-    for (std::vector<std::pair<std::string, data_DURATION>> subseq: listOfSequences){
-        findDurQuals(subseq, notesDictionary, restsDictionary);
+void findDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences){
+    for (std::vector<std::pair<LayerElement*, data_DURATION>> subseq: listOfSequences){
+        findDurQuals(subseq);
     }
 }
 
-void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
+void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     double sum = 0;
-    for (std::pair<std::string, data_DURATION> xmlIdDurPair : sequence){
-        data_DURATION dur = xmlIdDurPair.second;
+    for (std::pair<LayerElement*, data_DURATION> elementDurPair : sequence){
+        data_DURATION dur = elementDurPair.second;
         sum += durNumberValue(dur);
     }
 
     int remainder = (int)sum % 3;
+    bool alterationFlag, impappFlag, impapaFlag;
     bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
     bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the sequence. When true, it doesn't allow for alteration
@@ -131,49 +124,44 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
             case 0:
                 break; //No modifications
             case 1:
-                if (dotOfPerf) {
-                    imperfectionAPA(sequence, notesDictionary, restsDictionary);
+                impappFlag = imperfectionAPP(sequence);
+                if (!impappFlag || dotOfPerf) {
+                    imperfectionAPA(sequence);
                     break;
-                }//Other, the default case:
-                imperfectionAPP(sequence, notesDictionary, restsDictionary);
-                break;
+                } break;
             case 2:
-                smallNoteValue = isPenultimateValueShort(sequence, notesDictionary);
-                restValue = isPenultimateValueARest(sequence, restsDictionary);
-                if (dotOfImperf || smallNoteValue || restValue) {
-                    imperfectionAPP(sequence, notesDictionary, restsDictionary);
-                    imperfectionAPA(sequence, notesDictionary, restsDictionary);
+                //smallNoteValue = isPenultimateValueShort(sequence);
+                //restValue = isPenultimateValueARest(sequence);
+                alterationFlag = alteration(sequence);
+                if (!alterationFlag || dotOfImperf) {
+                    imperfectionAPP(sequence);
+                    imperfectionAPA(sequence);
                     break;
-                }//Other, the default case:
-                alteration(sequence, notesDictionary, restsDictionary);
-                break;
+                } break;
         }
     } else { // For sum > 3
         switch (remainder) {
             case 0:
-                smallNoteValue = isPenultimateValueShort(sequence, notesDictionary);
-                restValue = isPenultimateValueARest(sequence, restsDictionary);
-                if (dotOfPerf || smallNoteValue || restValue) {
+                //smallNoteValue = isPenultimateValueShort(sequence);
+                //restValue = isPenultimateValueARest(sequence);
+                impappFlag = imperfectionAPP(sequence);
+                alterationFlag = alteration(sequence);
+                if (!alterationFlag || dotOfPerf) {
                     break; //No modifications
-                }//Other, the default case:
-                imperfectionAPP(sequence, notesDictionary, restsDictionary);
-                alteration(sequence, notesDictionary, restsDictionary);
-                break;
+                } break;
             case 1:
-                if (dotOfPerf) {
-                    imperfectionAPA(sequence, notesDictionary, restsDictionary);
+                impappFlag = imperfectionAPP(sequence);
+                if (!impappFlag || dotOfPerf) {
+                    imperfectionAPA(sequence);
                     break;
-                }//Other, the default case:
-                imperfectionAPP(sequence, notesDictionary, restsDictionary);
-                break;
+                } break;
             case 2:
-                if (dotOfPerf || simileAnteSimile) {
-                    alteration(sequence, notesDictionary, restsDictionary);
+                impappFlag = imperfectionAPP(sequence);
+                impapaFlag = imperfectionAPA(sequence);
+                if (!impappFlag || !impapaFlag ||dotOfPerf || simileAnteSimile) {
+                    alteration(sequence);
                     break;
-                }//Other, the default case:
-                imperfectionAPP(sequence, notesDictionary, restsDictionary);
-                imperfectionAPA(sequence, notesDictionary, restsDictionary);
-                break;
+                } break;
         }
     }
 }
@@ -199,40 +187,45 @@ double durNumberValue(data_DURATION dur) {
     } return durnum;
 }
 
-void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
-    std::string firstNoteID = sequence.at(0).first;
-    Note *firstNote = notesDictionary[firstNoteID];
-    firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
+    LayerElement* firstElement = sequence.at(0).first;
+    if (firstElement->Is(NOTE)){
+        Note *firstNote = vrv_cast<Note *>(firstElement);
+        assert(firstNote);
+        firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+        return true;
+    } else {
+        return false;
+    }
 }
 
-void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
-    std::string lastNoteID = sequence.at(sequence.size()-1).first;
-    Note *lastNote = notesDictionary[lastNoteID];
-    lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
+    LayerElement* lastElement = sequence.at(sequence.size()-1).first;
+    if (lastElement->Is(NOTE)){
+        Note *lastNote = vrv_cast<Note *>(lastElement);
+        assert(lastNote);
+        lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+        return true;
+    } else {
+        return false;
+    }
 }
 
-void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
-    std::string penultNoteID = sequence.at(sequence.size()-2).first;
-    Note *penultNote = notesDictionary[penultNoteID];
-    penultNote->SetDurQuality(DURQUALITY_mensural_altera);
-}
-
-bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Rest*> restsDictionary){
-    std::string penultNoteID = sequence.at(sequence.size()-2).first;
-    if (restsDictionary[penultNoteID]) {return true;}
-    else {return false;}
-}
-
-bool isPenultimateValueShort(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary){
-    std::string penultNoteID = sequence.at(sequence.size()-2).first;
-    bool smallNoteValue = false;
-    if (notesDictionary[penultNoteID]) {
-        Note *penultNote = notesDictionary[penultNoteID];
+bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+    LayerElement* penultElement = sequence.at(sequence.size()-2).first;
+    if (penultElement->Is(NOTE)) {
+        Note *penultNote = vrv_cast<Note *>(penultElement);
+        assert(penultNote);
         data_DURATION dur = penultNote->GetDur();
-        if (dur == DURATION_fusa || dur == DURATION_semifusa || dur == DURATION_minima || dur == DURATION_semiminima){
-            smallNoteValue = true;
+        if (dur == DURATION_fusa || dur == DURATION_semifusa || dur == DURATION_minima || dur == DURATION_semiminima) {
+            return false;
+        } else {
+            penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+            return true;
         }
-    } return smallNoteValue;
+    } else {
+        return false;
+    }
 }
 
 } // namespace vrv
