@@ -120,6 +120,14 @@ bool VolpianoInput::Import(const std::string &volpiano)
             dbl->SetForm(BARRENDITION_dbl);
             layer->AddChild(dbl);
         }
+        else if (ch == '5') {
+            BarLine *end = new BarLine();
+            end->SetForm(BARRENDITION_end);
+            layer->AddChild(end);
+        }
+        else if (ch == '6') {
+            // not supported yet
+        }
         else if (ch == '7') {
             BarLine *takt = new BarLine();
             takt->SetMethod(BARMETHOD_takt);
