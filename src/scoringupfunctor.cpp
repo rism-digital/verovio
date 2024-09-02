@@ -33,7 +33,7 @@ std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> subdivideSeq(s
 
 void findDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences);
 void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-double durNumberValue(data_DURATION dur);
+double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair);
 bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
@@ -103,10 +103,13 @@ void findDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION
 }
 
 void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+    std::vector<std::pair<LayerElement*, data_DURATION>> middleSeq = {};
+    if (sequence.size() > 2) {
+        middleSeq = {sequence.begin() + 1, sequence.end() - 1};
+    }
     double sum = 0;
-    for (std::pair<LayerElement*, data_DURATION> elementDurPair : sequence){
-        data_DURATION dur = elementDurPair.second;
-        sum += durNumberValue(dur);
+    for (std::pair<LayerElement*, data_DURATION> elementDurPair : middleSeq){
+        sum += durNumberValue(elementDurPair);
     } sum = sum/2;
 
     int remainder = (int)sum % 3;
@@ -164,32 +167,41 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     }
 }
 
-double durNumberValue(data_DURATION dur) {
-    double durnum = 0;
-    int prolatio = 2;
-    int tempus = 3;
+double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
+    data_DURQUALITY_mensural durquality;
+    data_DURATION dur = elementDurPair.second;
+    LayerElement* element = elementDurPair.first;
+    if (element->Is(NOTE)){
+        Note *note = vrv_cast<Note *>(element);
+        assert(note);
+        durquality = note->GetDurQuality();
+    }
     int modusminor = 2;
+    int tempus = 3;
+    int prolatio = 2;
+    int longaDefaultVal = modusminor * tempus * prolatio;
+    int brevisDefaultVal = tempus * prolatio;
+    int semibrevisDefaultVal = prolatio;
+    double durnum = 0;
     switch(dur) {
         case DURATION_longa:
-            if (modusminor == 2 && tempus == 2 && prolatio == 2) {durnum = 8;}
-            else if (modusminor == 3 && tempus == 2 && prolatio == 2) {durnum = 12;}
-            else if (modusminor == 2 && tempus == 3 && prolatio == 2) {durnum = 12;}
-            else if (modusminor == 2 && tempus == 2 && prolatio == 3) {durnum = 12;}
-            else if (modusminor == 3 && tempus == 3 && prolatio == 2) {durnum = 18;}
-            else if (modusminor == 3 && tempus == 2 && prolatio == 3) {durnum = 18;}
-            else if (modusminor == 2 && tempus == 3 && prolatio == 3) {durnum = 18;}
-            else {durnum = 27;}
-            break;
+            if (modusminor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2 * brevisDefaultVal;
+            } else if (modusminor == 3 || durquality == DURQUALITY_mensural_perfecta) {
+                durnum = 3 * brevisDefaultVal;
+            } break;
         case DURATION_brevis:
-            if (tempus == 2 && prolatio == 2) {durnum = 4;}
-            else if (tempus == 3 && prolatio == 2) {durnum = 6;}
-            else if (tempus == 2 && prolatio == 3) {durnum = 6;}
-            else {durnum = 9;}
-            break;
+            if (tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2 * semibrevisDefaultVal;
+            } else if (tempus == 3 || durquality == DURQUALITY_mensural_perfecta) {
+                durnum = 3 * semibrevisDefaultVal;
+            } break;
         case DURATION_semibrevis:
-            if (prolatio == 2) {durnum = 2;}
-            else {durnum = 3;}
-            break;
+            if (prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2;
+            } else if (prolatio == 3 || durquality == DURQUALITY_mensural_perfecta) {
+                durnum = 3;
+            } break;
         case DURATION_minima:
             durnum = 1;
             break;
