@@ -75,7 +75,6 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             xmlid = note->GetID();
             dur = note->GetDur();
             notesDictionary[xmlid] = note;
-            //note->SetDurQuality(DURQUALITY_mensural_imperfecta);
         } else {
             Rest *rest = vrv_cast<Rest *>(element);
             assert(rest);
@@ -204,21 +203,18 @@ void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence
     std::string firstNoteID = sequence.at(0).first;
     Note *firstNote = notesDictionary[firstNoteID];
     firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-    LogDebug("thenote!");
 }
 
 void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     std::string lastNoteID = sequence.at(sequence.size()-1).first;
     Note *lastNote = notesDictionary[lastNoteID];
     lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-    LogDebug("thenote!");
 }
 
 void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
     std::string penultNoteID = sequence.at(sequence.size()-2).first;
     Note *penultNote = notesDictionary[penultNoteID];
     penultNote->SetDurQuality(DURQUALITY_mensural_altera);
-    LogDebug("thenote!");
 }
 
 bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Rest*> restsDictionary){
