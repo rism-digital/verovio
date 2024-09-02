@@ -1,6 +1,10 @@
 # Changelog
 
 ## [unreleased]
+* Support (initial) for Volpiano input
+* Support for neumatic notation oriscus and quilisma
+* Support for neume layout without facsimile
+* Support for numeral harmonics in MusicXML importer (@eNote-GmBH)
 
 ## [4.2.1] - 2024-05-07
 * Fix GitHub actions (Python release only)
