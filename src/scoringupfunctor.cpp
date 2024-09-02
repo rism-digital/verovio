@@ -189,6 +189,7 @@ bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     std::pair<LayerElement*, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement* firstElement = firstElementDurPair.first;
     data_DURATION firstDur = firstElementDurPair.second;
+    /// Evaluates if the first note in the sequence is a brevis. If it is, then it imperfects it (and returns true). If it is a rest or a larger note, then it forbids imperfection (and returns false).
     if (firstElement->Is(NOTE) && firstDur == DURATION_brevis){
         Note *firstNote = vrv_cast<Note *>(firstElement);
         assert(firstNote);
@@ -203,6 +204,7 @@ bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     std::pair<LayerElement*, data_DURATION> lastElementDurPair = sequence.at(sequence.size()-1);
     LayerElement* lastElement = lastElementDurPair.first;
     data_DURATION lastDur = lastElementDurPair.second;
+    /// Evaluates if the last note in the sequence is a brevis. If it is, then it imperfects it (and returns true). If it is a rest or a larger note, then it forbids imperfection (and returns false).
     if (lastElement->Is(NOTE) && lastDur == DURATION_brevis){
         Note *lastNote = vrv_cast<Note *>(lastElement);
         assert(lastNote);
@@ -216,18 +218,13 @@ bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
 bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     std::pair<LayerElement*, data_DURATION> penultElementDurPair = sequence.at(sequence.size()-2);
     LayerElement* penultElement = penultElementDurPair.first;
-    //Evaluates what is the type of the penultimate element in the sequence; when it is a rest, it forbids alteration (return false).
-    if (penultElement->Is(NOTE)) {
+    data_DURATION penultDur = penultElementDurPair.second;
+    ///Evaluates what is the type of the penultimate element in the sequence. If it is a rest, it forbids alteration (returns false). If it is a note, and the note is a 'semibrevis', it alters the note (and returns true).
+    if (penultElement->Is(NOTE) && penultDur == DURATION_semibrevis) {
         Note *penultNote = vrv_cast<Note *>(penultElement);
         assert(penultNote);
-        data_DURATION penultDur = penultNote->GetDur();
-        //Evaluates the value of the penultimate note in the sequence; when it is a small note value, it forbids alteration (return false); and when it is a larger note value, it alters the note (and returns true).
-        if (penultDur == DURATION_semibrevis) {
-            penultNote->SetDurQuality(DURQUALITY_mensural_altera);
-            return true;
-        } else {
-            return false;
-        }
+        penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+        return true;
     } else {
         return false;
     }
