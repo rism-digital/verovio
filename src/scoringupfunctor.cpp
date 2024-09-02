@@ -38,6 +38,7 @@ double durNumberValue(data_DURATION dur);
 void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
 void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
 void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
+bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Rest*> restsDictionary);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -136,7 +137,7 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
                 imperfectionAPP(sequence, notesDictionary, restsDictionary);
                 break;
             case 2:
-                if (dotOfImperf || smallNoteValue) {
+                if (dotOfImperf || smallNoteValue || isPenultimateValueARest(sequence, restsDictionary)) {
                     imperfectionAPP(sequence, notesDictionary, restsDictionary);
                     imperfectionAPA(sequence, notesDictionary, restsDictionary);
                     break;
@@ -147,7 +148,7 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
     } else { // For sum > 3
         switch (remainder) {
             case 0:
-                if (dotOfPerf || smallNoteValue) {
+                if (dotOfPerf || smallNoteValue || isPenultimateValueARest(sequence, restsDictionary)) {
                     break; //No modifications
                 }//Other, the default case:
                 imperfectionAPP(sequence, notesDictionary, restsDictionary);
@@ -211,6 +212,13 @@ void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std
     std::string penultNoteID = sequence.at(sequence.size()-2).first;
     Note *penultNote = notesDictionary[penultNoteID];
     penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+    LogDebug("thenote!");
+}
+
+bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Rest*> restsDictionary){
+    std::string penultNoteID = sequence.at(sequence.size()-2).first;
+    if (restsDictionary[penultNoteID]) {return true;}
+    else {return false;}
     LogDebug("thenote!");
 }
 
