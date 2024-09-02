@@ -26,6 +26,7 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
+std::map<std::string, int> mensuration;
 std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur = {};
 
 std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences;
@@ -75,7 +76,15 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             dur = rest->GetDur();
         } dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), {element, dur});
     } else if (element->Is(MENSUR)) {
-        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
+        this->m_currentMensur = vrv_cast<Mensur *>(element);
+        if (m_currentMensur->GetModusmaior() == MODUSMAIOR_3) {mensuration["modusmaior"] = 3;}
+        else {mensuration["modusmaior"] = 2;}
+        if (m_currentMensur->GetModusminor() == MODUSMINOR_3) {mensuration["modusminor"] = 3;}
+        else {mensuration["modusminor"] = 2;}
+        if (m_currentMensur->GetTempus() == TEMPUS_3) {mensuration["tempus"] = 3;}
+        else {mensuration["tempus"] = 2;}
+        if (m_currentMensur->GetProlatio() == PROLATIO_3) {mensuration["prolatio"] = 3;}
+        else {mensuration["prolatio"] = 2;}
     }return FUNCTOR_CONTINUE;
 }
 
@@ -107,12 +116,15 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     if (sequence.size() > 2) {
         middleSeq = {sequence.begin() + 1, sequence.end() - 1};
     }
+
+    // Value in minims:
     double sum = 0;
     for (std::pair<LayerElement*, data_DURATION> elementDurPair : middleSeq){
         sum += durNumberValue(elementDurPair);
     } sum = sum/2;
-
     int remainder = (int)sum % 3;
+
+    // Flags:
     bool alterationFlag, impappFlag, impapaFlag;
     bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
@@ -131,8 +143,6 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
                     break;
                 } break;
             case 2:
-                //smallNoteValue = isPenultimateValueShort(sequence);
-                //restValue = isPenultimateValueARest(sequence);
                 alterationFlag = alteration(sequence);
                 if (!alterationFlag || dotOfImperf) {
                     imperfectionAPP(sequence);
@@ -143,8 +153,6 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     } else { // For sum > 3
         switch (remainder) {
             case 0:
-                //smallNoteValue = isPenultimateValueShort(sequence);
-                //restValue = isPenultimateValueARest(sequence);
                 impappFlag = imperfectionAPP(sequence);
                 alterationFlag = alteration(sequence);
                 if (!alterationFlag || dotOfPerf) {
@@ -176,9 +184,9 @@ double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
         assert(note);
         durquality = note->GetDurQuality();
     }
-    int modusminor = 2;
-    int tempus = 3;
-    int prolatio = 2;
+    int modusminor = mensuration["modusminor"];
+    int tempus = mensuration["tempus"];
+    int prolatio = mensuration["prolatio"];
     int longaDefaultVal = modusminor * tempus * prolatio;
     int brevisDefaultVal = tempus * prolatio;
     int semibrevisDefaultVal = prolatio;
