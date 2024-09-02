@@ -39,6 +39,7 @@ void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence
 void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
 void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary);
 bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Rest*> restsDictionary);
+bool isPenultimateValueShort(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -121,6 +122,7 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
     bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
     bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the sequence. When true, it doesn't allow for alteration
+    bool restValue = false;
     bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the sequence, checking if it is greater or equal to the last note of the sequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
 
     // Principles of imperfection and alteration (and their exceptions).
@@ -137,7 +139,9 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
                 imperfectionAPP(sequence, notesDictionary, restsDictionary);
                 break;
             case 2:
-                if (dotOfImperf || smallNoteValue || isPenultimateValueARest(sequence, restsDictionary)) {
+                smallNoteValue = isPenultimateValueShort(sequence, notesDictionary);
+                restValue = isPenultimateValueARest(sequence, restsDictionary);
+                if (dotOfImperf || smallNoteValue || restValue) {
                     imperfectionAPP(sequence, notesDictionary, restsDictionary);
                     imperfectionAPA(sequence, notesDictionary, restsDictionary);
                     break;
@@ -219,8 +223,18 @@ bool isPenultimateValueARest(std::vector<std::pair<std::string, data_DURATION>> 
     std::string penultNoteID = sequence.at(sequence.size()-2).first;
     if (restsDictionary[penultNoteID]) {return true;}
     else {return false;}
-    LogDebug("thenote!");
 }
 
+bool isPenultimateValueShort(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary){
+    std::string penultNoteID = sequence.at(sequence.size()-2).first;
+    bool smallNoteValue = false;
+    if (notesDictionary[penultNoteID]) {
+        Note *penultNote = notesDictionary[penultNoteID];
+        data_DURATION dur = penultNote->GetDur();
+        if (dur == DURATION_fusa || dur == DURATION_semifusa || dur == DURATION_minima || dur == DURATION_semiminima){
+            smallNoteValue = true;
+        }
+    } return smallNoteValue;
+}
 
 } // namespace vrv
