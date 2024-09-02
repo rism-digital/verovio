@@ -126,7 +126,7 @@ bool VolpianoInput::Import(const std::string &volpiano)
             layer->AddChild(end);
         }
         else if (ch == '6') {
-            // not supported yet
+            LogWarning("Volpiano '6' barline is not supported");
         }
         else if (ch == '7') {
             BarLine *takt = new BarLine();
