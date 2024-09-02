@@ -122,7 +122,7 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
     bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
     bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the sequence. When true, it doesn't allow for alteration
-    bool restValue = false;
+    bool restValue = false;         //Flag that evaluates if the penultimate value in the sequence is a rest. When true, it doesn't allow for alteration
     bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the sequence, checking if it is greater or equal to the last note of the sequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
 
     // Principles of imperfection and alteration (and their exceptions).
@@ -152,7 +152,9 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
     } else { // For sum > 3
         switch (remainder) {
             case 0:
-                if (dotOfPerf || smallNoteValue || isPenultimateValueARest(sequence, restsDictionary)) {
+                smallNoteValue = isPenultimateValueShort(sequence, notesDictionary);
+                restValue = isPenultimateValueARest(sequence, restsDictionary);
+                if (dotOfPerf || smallNoteValue || restValue) {
                     break; //No modifications
                 }//Other, the default case:
                 imperfectionAPP(sequence, notesDictionary, restsDictionary);
