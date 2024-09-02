@@ -113,8 +113,6 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     bool alterationFlag, impappFlag, impapaFlag;
     bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
-    bool smallNoteValue = false;    //Flag that evaluates the value of the penultimate note in the sequence. When true, it doesn't allow for alteration
-    bool restValue = false;         //Flag that evaluates if the penultimate value in the sequence is a rest. When true, it doesn't allow for alteration
     bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the sequence, checking if it is greater or equal to the last note of the sequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
 
     // Principles of imperfection and alteration (and their exceptions).
@@ -188,8 +186,10 @@ double durNumberValue(data_DURATION dur) {
 }
 
 bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
-    LayerElement* firstElement = sequence.at(0).first;
-    if (firstElement->Is(NOTE)){
+    std::pair<LayerElement*, data_DURATION> firstElementDurPair = sequence.at(0);
+    LayerElement* firstElement = firstElementDurPair.first;
+    data_DURATION firstDur = firstElementDurPair.second;
+    if (firstElement->Is(NOTE) && firstDur == DURATION_brevis){
         Note *firstNote = vrv_cast<Note *>(firstElement);
         assert(firstNote);
         firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
@@ -200,8 +200,10 @@ bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
 }
 
 bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
-    LayerElement* lastElement = sequence.at(sequence.size()-1).first;
-    if (lastElement->Is(NOTE)){
+    std::pair<LayerElement*, data_DURATION> lastElementDurPair = sequence.at(sequence.size()-1);
+    LayerElement* lastElement = lastElementDurPair.first;
+    data_DURATION lastDur = lastElementDurPair.second;
+    if (lastElement->Is(NOTE) && lastDur == DURATION_brevis){
         Note *lastNote = vrv_cast<Note *>(lastElement);
         assert(lastNote);
         lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
@@ -212,16 +214,19 @@ bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
 }
 
 bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
-    LayerElement* penultElement = sequence.at(sequence.size()-2).first;
+    std::pair<LayerElement*, data_DURATION> penultElementDurPair = sequence.at(sequence.size()-2);
+    LayerElement* penultElement = penultElementDurPair.first;
+    //Evaluates what is the type of the penultimate element in the sequence; when it is a rest, it forbids alteration (return false).
     if (penultElement->Is(NOTE)) {
         Note *penultNote = vrv_cast<Note *>(penultElement);
         assert(penultNote);
-        data_DURATION dur = penultNote->GetDur();
-        if (dur == DURATION_fusa || dur == DURATION_semifusa || dur == DURATION_minima || dur == DURATION_semiminima) {
-            return false;
-        } else {
+        data_DURATION penultDur = penultNote->GetDur();
+        //Evaluates the value of the penultimate note in the sequence; when it is a small note value, it forbids alteration (return false); and when it is a larger note value, it alters the note (and returns true).
+        if (penultDur == DURATION_semibrevis) {
             penultNote->SetDurQuality(DURQUALITY_mensural_altera);
             return true;
+        } else {
+            return false;
         }
     } else {
         return false;
