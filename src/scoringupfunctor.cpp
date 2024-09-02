@@ -201,9 +201,10 @@ void imperfectionAPP(std::vector<std::pair<std::string, data_DURATION>> sequence
 }
 
 void imperfectionAPA(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
-    //std::string lastNoteID = sequence.at(-1).first;
-    //Note *lastNote; // still need to find this based on the ID (or to pass to the function the element itself
-    //lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+    std::string lastNoteID = sequence.at(sequence.size()-1).first;
+    Note *lastNote = notesDictionary[lastNoteID];
+    lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+    LogDebug("thenote!");
 }
 
 void alteration(std::vector<std::pair<std::string, data_DURATION>> sequence, std::map<std::string, Note*> notesDictionary, std::map<std::string, Rest*> restsDictionary){
