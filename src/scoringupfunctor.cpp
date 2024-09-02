@@ -107,7 +107,7 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     for (std::pair<LayerElement*, data_DURATION> elementDurPair : sequence){
         data_DURATION dur = elementDurPair.second;
         sum += durNumberValue(dur);
-    }
+    } sum = sum/2;
 
     int remainder = (int)sum % 3;
     bool alterationFlag, impappFlag, impapaFlag;
@@ -166,21 +166,43 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
 
 double durNumberValue(data_DURATION dur) {
     double durnum = 0;
+    int prolatio = 2;
+    int tempus = 3;
+    int modusminor = 2;
     switch(dur) {
+        case DURATION_longa:
+            if (modusminor == 2 && tempus == 2 && prolatio == 2) {durnum = 8;}
+            else if (modusminor == 3 && tempus == 2 && prolatio == 2) {durnum = 12;}
+            else if (modusminor == 2 && tempus == 3 && prolatio == 2) {durnum = 12;}
+            else if (modusminor == 2 && tempus == 2 && prolatio == 3) {durnum = 12;}
+            else if (modusminor == 3 && tempus == 3 && prolatio == 2) {durnum = 18;}
+            else if (modusminor == 3 && tempus == 2 && prolatio == 3) {durnum = 18;}
+            else if (modusminor == 2 && tempus == 3 && prolatio == 3) {durnum = 18;}
+            else {durnum = 27;}
+            break;
+        case DURATION_brevis:
+            if (tempus == 2 && prolatio == 2) {durnum = 4;}
+            else if (tempus == 3 && prolatio == 2) {durnum = 6;}
+            else if (tempus == 2 && prolatio == 3) {durnum = 6;}
+            else {durnum = 9;}
+            break;
         case DURATION_semibrevis:
-            durnum = 1;
+            if (prolatio == 2) {durnum = 2;}
+            else {durnum = 3;}
             break;
         case DURATION_minima:
-            durnum = 0.5;
+            durnum = 1;
             break;
         case DURATION_semiminima:
-            durnum = 0.25;
+            durnum = 0.5;
             break;
         case DURATION_fusa:
-            durnum = 0.125;
+            durnum = 0.25;
             break;
         case DURATION_semifusa:
-            durnum = 0.0625;
+            durnum = 0.125;
+            break;
+        default:
             break;
     } return durnum;
 }
