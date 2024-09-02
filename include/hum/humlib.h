@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 30 19:51:54 WEST 2024
+// Last Modified: Thu Aug  8 21:55:11 PDT 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -5431,6 +5431,7 @@ int main(int argc, char** argv) {                      \
 		infile.readNoRhythm(std::cin);                   \
 	}                                                   \
 	int status = interface.run(infile, std::cout);      \
+	interface.finally();                                \
 	if (interface.hasWarning()) {                       \
 		interface.getWarning(std::cerr);                 \
 		return 0;                                        \
@@ -5439,7 +5440,6 @@ int main(int argc, char** argv) {                      \
 		interface.getError(std::cerr);                   \
 		return -1;                                       \
 	}                                                   \
-	interface.finally();                                \
 	return !status;                                     \
 }
 
@@ -5463,24 +5463,24 @@ int main(int argc, char** argv) {                                          \
 	bool status = true;                                                     \
 	while (instream.readSingleSegment(infiles)) {                           \
 		status &= interface.run(infiles);                                    \
-		if (interface.hasWarning()) {                                        \
-			interface.getWarning(std::cerr);                                  \
-		}                                                                    \
-		if (interface.hasAnyText()) {                                        \
-		   interface.getAllText(std::cout);                                  \
-		}                                                                    \
-		if (interface.hasError()) {                                          \
-			interface.getError(std::cerr);                                    \
-         return -1;                                                        \
-		}                                                                    \
-		if (!interface.hasAnyText()) {                                       \
-			for (int i=0; i<infiles.getCount(); i++) {                        \
-				cout << infiles[i];                                            \
-			}                                                                 \
-		}                                                                    \
-		interface.clearOutput();                                             \
 	}                                                                       \
 	interface.finally();                                                    \
+	if (interface.hasWarning()) {                                           \
+		interface.getWarning(std::cerr);                                     \
+	}                                                                       \
+	if (interface.hasAnyText()) {                                           \
+	   interface.getAllText(std::cout);                                     \
+	}                                                                       \
+	if (interface.hasError()) {                                             \
+		interface.getError(std::cerr);                                       \
+        return -1;                                                         \
+	}                                                                       \
+	if (!interface.hasAnyText()) {                                          \
+		for (int i=0; i<infiles.getCount(); i++) {                           \
+			cout << infiles[i];                                               \
+		}                                                                    \
+	}                                                                       \
+	interface.clearOutput();                                                \
 	return !status;                                                         \
 }
 
@@ -5502,6 +5502,7 @@ int main(int argc, char** argv) {                                          \
 	}                                                                       \
 	hum::HumdrumFileStream instream(static_cast<hum::Options&>(interface)); \
 	bool status = interface.run(instream);                                  \
+	interface.finally();                                                    \
 	if (interface.hasWarning()) {                                           \
 		interface.getWarning(std::cerr);                                     \
 	}                                                                       \
@@ -5512,7 +5513,6 @@ int main(int argc, char** argv) {                                          \
 		interface.getError(std::cerr);                                       \
         return -1;                                                         \
 	}                                                                       \
-	interface.finally();                                                    \
 	interface.clearOutput();                                                \
 	return !status;                                                         \
 }
@@ -5536,6 +5536,7 @@ int main(int argc, char** argv) {                                          \
 	hum::HumdrumFileSet infiles;                                            \
 	instream.read(infiles);                                                 \
 	bool status = interface.run(infiles);                                   \
+	interface.finally();                                                    \
 	if (interface.hasWarning()) {                                           \
 		interface.getWarning(std::cerr);                                     \
 	}                                                                       \
@@ -5551,7 +5552,6 @@ int main(int argc, char** argv) {                                          \
 			std::cout << infiles[i];                                          \
 		}                                                                    \
 	}                                                                       \
-	interface.finally();                                                    \
 	interface.clearOutput();                                                \
 	return !status;                                                         \
 }
@@ -7536,27 +7536,28 @@ class Tool_extract : public HumTool {
 		void fillFieldDataByNoRest      (std::vector<int>& field, std::vector<int>& subfield,
 		                                 std::vector<int>& model, const std::string& searchstring,
 		                                 HumdrumFile& infile, int state);
+		void printInterpretationForKernSpine(HumdrumFile& infile, int index);
 
 	private:
 
 		// global variables
-		int         excludeQ = 0;        // used with -x option
-		int         expandQ  = 0;        // used with -e option
-		std::string expandInterp = "";   // used with -E option
-		int         interpQ  = 0;        // used with -i option
-		std::string interps  = "";       // used with -i option
-		int         debugQ   = 0;        // used with --debug option
-		int         kernQ    = 0;        // used with -k option
-		int         rkernQ  = 0;         // used with -K option
-		int         fieldQ   = 0;        // used with -f or -p option
-		std::string fieldstring = "";    // used with -f or -p option
+		bool        excludeQ     = false;     // used with -x option
+		bool        expandQ      = false;     // used with -e option
+		std::string expandInterp = "";        // used with -E option
+		bool        interpQ      = false;     // used with -i option
+		std::string interps      = "";        // used with -i option
+		bool        debugQ       = false;     // used with --debug option
+		bool        kernQ        = false;     // used with -k option
+		bool        rkernQ       = false;     // used with -K option
+		bool        fieldQ       = false;     // used with -f or -p option
+		std::string fieldstring  = "";        // used with -f or -p option
 		std::vector<int> field;               // used with -f or -p option
 		std::vector<int> subfield;            // used with -f or -p option
 		std::vector<int> model;               // used with -p, or -e options and similar
-		int         countQ   = 0;        // used with -C option
-		int         traceQ   = 0;        // used with -t option
-		std::string tracefile = "";      // used with -t option
-		int         reverseQ = 0;        // used with -r option
+		bool        countQ        = false;    // used with -C option
+		bool        traceQ        = false;    // used with -t option
+		std::string tracefile     = "";       // used with -t option
+		bool        reverseQ      = false;    // used with -r option
 		std::string reverseInterp = "**kern"; // used with -r and -R options.
 		// sub-spine "b" expansion model: how to generate data for a secondary
 		// spine if the primary spine is not divided.  Models are:
@@ -7566,17 +7567,18 @@ class Tool_extract : public HumTool {
 		//         data.  'n' will be used for non-kern spines when 'r' is used.
 		int          submodel = 'd';       // used with -m option
 		std::string editorialInterpretation = "yy";
-		std::string cointerp = "**kern";   // used with -c option
-		int         comodel  = 0;          // used with -M option
+		std::string cointerp    = "**kern";  // used with -c option
+		int         comodel     = 0;         // used with -M option
 		std::string subtokenseparator = " "; // used with a future option
-		int         interpstate = 0;       // used -I or with -i
-		int         grepQ       = 0;       // used with -g option
-		std::string grepString  = "";      // used with -g option
+		int         interpstate = 0;         // used -I or with -i
+		bool        grepQ       = false;     // used with -g option
+		std::string grepString  = "";        // used with -g option
 		std::string blankName   = "**blank"; // used with -n option
-		int         noEmptyQ    = 0;       // used with --no-empty option
-		int         emptyQ      = 0;       // used with --empty option
-		int         spineListQ  = 0;       // used with --spine option
-		int         removerestQ = 0;       // used with --no-rest option
+ 		bool        addRestsQ   = false;     // used with -n option
+		bool        noEmptyQ    = false;     // used with --no-empty option
+		bool        emptyQ      = false;     // used with --empty option
+		bool        spineListQ  = false;     // used with --spine option
+		bool        removerestQ = false;     // used with --no-rest option
 
 };
 
@@ -8384,9 +8386,12 @@ class Tool_kernify : public HumTool {
 		void        generateDummyKernSpine (HumdrumFile& infile);
 		std::string makeNullLine           (HumdrumLine& line);
 		std::string makeReverseLine        (HumdrumLine& line);
+		bool        prepareDataSpines      (HumdrumFile& infile);
+		bool        prepareDataSpine       (HTp spinestart);
 
 	private:
 		bool m_forceQ = false;  // used with -f option
+		bool m_hasDataInterpretations = false;
 
 };
 
@@ -9869,6 +9874,32 @@ class Tool_ordergps : public HumTool {
 };
 
 
+class Tool_pbar : public HumTool {
+	public:
+		            Tool_pbar        (void);
+		           ~Tool_pbar        () {};
+
+		bool        run               (HumdrumFileSet& infiles);
+		bool        run               (HumdrumFile& infile);
+		bool        run               (const std::string& indata, std::ostream& out);
+		bool        run               (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void        processFile       (HumdrumFile& infile);
+		void        initialize        (void);
+		void        processSpine      (HTp spineStart);
+		void        printDataLine                   (HumdrumFile& infile, int index);
+		void        printLocalCommentLine           (HumdrumFile& infile, int index);
+		void        addBarLineToFollowingNoteOrRest (HTp token);
+		void        printInvisibleBarlines          (HumdrumFile& infile, int index);
+		void        printBarLine                    (HumdrumFile& infile, int index);
+
+	private:
+		bool        m_invisibleQ = false;   // used with -i option
+
+};
+
+
 
 class Tool_pccount : public HumTool {
 	public:
@@ -10289,6 +10320,83 @@ class Tool_rid : public HumTool {
 		int      option_c = 0;   // used with -c option
 		int      option_k = 0;   // used with -k option
 		int      option_V = 0;   // used with -V option
+
+};
+
+
+class Tool_rphrase : public HumTool {
+	public:
+
+	class VoiceInfo {
+		public:
+			std::string name;
+			std::vector<double> restsBefore;
+			std::vector<double> phraseDurs;
+			std::vector<int>    barStarts;
+			std::vector<HTp>    phraseStartToks;
+	};
+
+		         Tool_rphrase      (void);
+		        ~Tool_rphrase      () {};
+
+		bool     run               (HumdrumFileSet& infiles);
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const std::string& indata, std::ostream& out);
+		bool     run               (HumdrumFile& infile, std::ostream& out);
+		void     finally           (void);
+
+	protected:
+		void     initialize        (void);
+		void     processFile       (HumdrumFile& infile);
+		void     fillVoiceInfo     (std::vector<Tool_rphrase::VoiceInfo>& voiceInfo, std::vector<HTp>& kstarts, HumdrumFile& infile);
+		void     fillVoiceInfo     (Tool_rphrase::VoiceInfo& voiceInfo, HTp& kstart, HumdrumFile& infile);
+		void     fillCompositeInfo  (Tool_rphrase::VoiceInfo& collapseInfo, HumdrumFile& infile);
+		void     printVoiceInfo    (std::vector<Tool_rphrase::VoiceInfo>& voiceInfo);
+		void     printVoiceInfo    (Tool_rphrase::VoiceInfo& voiceInfo);
+
+		void     printEmbeddedVoiceInfo(std::vector<Tool_rphrase::VoiceInfo>& voiceInfo, Tool_rphrase::VoiceInfo& collapseInfo, HumdrumFile& infile);
+		void     printEmbeddedIndividualVoiceInfo(Tool_rphrase::VoiceInfo& voiceInfo, HumdrumFile& infile);
+		void     printEmbeddedCompositeInfo(Tool_rphrase::VoiceInfo& compositeInfo, HumdrumFile& infile);
+
+		void     getCompositeStates(std::vector<int>& noteStates, HumdrumFile& infile);
+		std::string getCompositeLabel(HumdrumFile& infile);
+		void     markPhraseStartsInScore(HumdrumFile& infile, Tool_rphrase::VoiceInfo& voiceInfo);
+		void     markCompositePhraseStartsInScore(HumdrumFile& infile, Tool_rphrase::VoiceInfo& collapseInfo);
+		void     outputMarkedFile  (HumdrumFile& infile, std::vector<Tool_rphrase::VoiceInfo>& voiceInfo,
+		                            Tool_rphrase::VoiceInfo& compositeInfo);
+		void     printDataLine     (HumdrumFile& infile, int index);
+		void     markLongaDurations(HumdrumFile& infile);
+		std::string getVoiceInfo(HumdrumFile& infile);
+		void     printEmbeddedVoiceInfoSummary(std::vector<Tool_rphrase::VoiceInfo>& voiceInfo, HumdrumFile& infile);
+		double   twoDigitRound(double input);
+		void     printHyperlink(const std::string& urlType);
+
+	private:
+		bool        m_averageQ        = false; // for -a option
+		bool        m_allAverageQ     = false; // for -A option
+		bool        m_breathQ         = true;  // for -B option
+		bool        m_barlineQ        = false; // for -m option
+		bool        m_compositeQ      = false; // for -c option
+		bool        m_longaQ          = false; // for -l option
+		bool        m_filenameQ       = false; // for -f option
+		bool        m_fullFilenameQ   = false; // for -F option
+		std::string m_filename;                // for -f or -F option
+		bool        m_sortQ           = false; // for -s option
+		bool        m_reverseSortQ    = false; // for -S option
+		int         m_pcount          = 0;     // for -a option
+		double      m_sum             = 0.0;   // for -a option
+		int         m_pcountComposite = 0;     // for -c option
+		double      m_sumComposite    = 0.0;   // for -c option
+		bool        m_markQ           = false; // for --mark option
+		double      m_durUnit         = 2.0;   // for -d option
+		bool        m_infoQ           = false; // for -i option (when --mark is active)
+		bool        m_squeezeQ        = false; // for -z option
+		bool        m_closeQ          = false; // for --close option
+		std::string m_urlType;                 // for -u option
+
+		int         m_line = 1;
+		std::string m_voiceLengthColor     = "crimson";
+		std::string m_compositeLengthColor = "limegreen";
 
 };
 

@@ -8070,76 +8070,238 @@ bool HumdrumInput::isBlackNotation(hum::HTp starting)
 
 std::string HumdrumInput::getLabelFromInstrumentCode(hum::HTp icode, const std::string &transpose)
 {
-    std::string output;
-    std::string name = icode->substr(2);
 
-    if (name == "piano") {
-        output = "Piano";
+    static std::map<std::string, std::string> codeToLabel;
+    if (codeToLabel.empty()) {
+        codeToLabel["piano"] = "Piano";
+        codeToLabel["accor"] = "Accordion";
+        codeToLabel["alto"] = "Alto";
+        codeToLabel["anvil"] = "Anvil";
+        codeToLabel["archl"] = "Archlute";
+        codeToLabel["armon"] = "Harmonic";
+        codeToLabel["arpa"] = "Harp";
+        codeToLabel["bagpI"] = "Irish bagpipe";
+        codeToLabel["bagpS"] = "Scottish bagpipe";
+        codeToLabel["banjo"] = "Banjo";
+        codeToLabel["bansu"] = "Bansuri";
+        codeToLabel["barit"] = "Baritone";
+        codeToLabel["mbari"] = "High baritone";
+        codeToLabel["baset"] = "Bassett horn";
+        codeToLabel["bass"] = "Bass";
+        codeToLabel["bdrum"] = "Bass drum";
+        codeToLabel["bongo"] = "Bongo";
+        codeToLabel["bguit"] = "Bass guitar";
+        codeToLabel["biwa"] = "Biwa";
+        codeToLabel["bscan"] = "Singing bass";
+        codeToLabel["bspro"] = "Basso profondo";
+        codeToLabel["brush"] = "Brush";
+        codeToLabel["calam"] = "Chalumeau";
+        codeToLabel["calpe"] = "Calliope";
+        codeToLabel["calto"] = "Contralto";
+        codeToLabel["campn"] = "Bells";
+        codeToLabel["cangl"] = "English horn";
+        codeToLabel["canto"] = "Canto";
+        codeToLabel["caril"] = "Carillon";
+        codeToLabel["castr"] = "Castrato";
+        codeToLabel["casts"] = "Castanets";
+        codeToLabel["cbass"] = "Contrabass";
+        codeToLabel["cello"] = "Violoncello";
+        codeToLabel["cemba"] = "Harpsichord";
+        codeToLabel["cetra"] = "Cittern";
+        codeToLabel["chain"] = "Chain";
+        codeToLabel["chime"] = "Tubular bells";
+        codeToLabel["chcym"] = "China cymbal";
+        codeToLabel["chlma"] = "Soprano shawm";
+        codeToLabel["chlmt"] = "Tenor shawm";
+        codeToLabel["clap"] = "Hand clap";
+        codeToLabel["clara"] = "Alto Clarinet";
+        codeToLabel["clarb"] = "Bass Clarinet";
+        codeToLabel["claro"] = "Sopranino clarinet";
+        codeToLabel["clarp"] = "Piccolo clarinet";
+        codeToLabel["clars"] = "Clarinet";
+        codeToLabel["clave"] = "Claves";
+        codeToLabel["clavi"] = "Clavichord";
+        codeToLabel["clest"] = "Celesta";
+        codeToLabel["clrno"] = "Clarino";
+        codeToLabel["colsp"] = "Coloratura soprano";
+        codeToLabel["conga"] = "Conga";
+        codeToLabel["cor"] = "Horn";
+        codeToLabel["cornm"] = "Cornemuse";
+        codeToLabel["corno"] = "Cornett";
+        codeToLabel["cornt"] = "Cornet";
+        codeToLabel["coro"] = "Chorus";
+        codeToLabel["crshc"] = "Crash cymbal";
+        codeToLabel["ctenor"] = "Contratenor";
+        codeToLabel["ctina"] = "concertina";
+        codeToLabel["drmsp"] = "Dramatic soprano";
+        codeToLabel["drum"] = "Drum";
+        codeToLabel["drumP"] = "Small drum";
+        codeToLabel["dulc"] = "Dulcimer";
+        codeToLabel["eguit"] = "Electric guitar";
+        codeToLabel["fag_c"] = "Contrabassoon";
+        codeToLabel["fagot"] = "Bassoon";
+        codeToLabel["false"] = "Falsetto";
+        codeToLabel["feme"] = "Female voice";
+        codeToLabel["fife"] = "Fife";
+        codeToLabel["fingc"] = "Finger Cymbals";
+        codeToLabel["flex"] = "Flexatone";
+        codeToLabel["flt"] = "Flute";
+        codeToLabel["flt_a"] = "Alto flute";
+        codeToLabel["flt_b"] = "Bass flute";
+        codeToLabel["fltda"] = "Alto recorder";
+        codeToLabel["fltdb"] = "Bass recorder";
+        codeToLabel["fltdn"] = "Sopranino recorder";
+        codeToLabel["fltds"] = "Soprano recorder";
+        codeToLabel["fltdt"] = "Tenor recorder";
+        codeToLabel["flugh"] = "Flugelhorn";
+        codeToLabel["forte"] = "Fortepiano";
+        codeToLabel["glock"] = "Glockenspiel";
+        codeToLabel["gen"] = "Generic instrument";
+        codeToLabel["genT"] = "Generic treble instrument";
+        codeToLabel["genB"] = "Generic bass instrument";
+        codeToLabel["gong"] = "Gong";
+        codeToLabel["guitr"] = "Guitar";
+        codeToLabel["hammd"] = "Hammond eletronic organ";
+        codeToLabel["hbell"] = "Hand bells";
+        codeToLabel["heck"] = "Heckelphone";
+        codeToLabel["heltn"] = "Heroic tenor";
+        codeToLabel["hichi"] = "Hichiriki";
+        codeToLabel["hurdy"] = "Hurdy-gurdy";
+        codeToLabel["kitv"] = "Kit violin";
+        codeToLabel["klav"] = "Generic keyboard";
+        codeToLabel["kokyu"] = "Kokyu";
+        codeToLabel["komun"] = "Koumngo";
+        codeToLabel["koto"] = "Koto";
+        codeToLabel["kruma"] = "Alto crumhorn";
+        codeToLabel["krumb"] = "Bass crumhorn";
+        codeToLabel["krums"] = "Crumhorn";
+        codeToLabel["krumt"] = "Tenor crumhorn";
+        codeToLabel["lion"] = "Lion's roar";
+        codeToLabel["liuto"] = "Lute";
+        codeToLabel["lyrsp"] = "Lyric soprano";
+        codeToLabel["lyrtn"] = "Lyric tenor";
+        codeToLabel["male"] = "Male voice";
+        codeToLabel["mando"] = "Mandolin";
+        codeToLabel["marac"] = "Maracas";
+        codeToLabel["marim"] = "Marimba";
+        codeToLabel["mezzo"] = "Mezzo soprano";
+        codeToLabel["nfant"] = "Child's voice";
+        codeToLabel["nokan"] = "Nokan";
+        codeToLabel["oboe"] = "Oboe";
+        codeToLabel["oboeD"] = "Oboe d'amore";
+        codeToLabel["ocari"] = "Ocarina";
+        codeToLabel["ondes"] = "Ondes Martenot";
+        codeToLabel["ophic"] = "Ophicleide";
+        codeToLabel["organ"] = "Organ";
+        codeToLabel["oud"] = "Oud";
+        codeToLabel["panpi"] = "Panpipes";
+        codeToLabel["paila"] = "Timbales";
+        codeToLabel["pbell"] = "Bell plate";
+        codeToLabel["pguit"] = "Portuguese guitar";
+        codeToLabel["physh"] = "Physharmonica";
+        codeToLabel["piano"] = "Piano";
+        codeToLabel["piatt"] = "Cymbales";
+        codeToLabel["picco"] = "Piccolo";
+        codeToLabel["pipa"] = "Pipa";
+        codeToLabel["piri"] = "Piri";
+        codeToLabel["porta"] = "Portative organ";
+        codeToLabel["psalt"] = "Psaltery";
+        codeToLabel["qin"] = "Qin";
+        codeToLabel["quinto"] = "Quinto";
+        codeToLabel["quitr"] = "Gittern";
+        codeToLabel["rackt"] = "Rackett";
+        codeToLabel["ratch"] = "Ratchet";
+        codeToLabel["ratl"] = "Rattle";
+        codeToLabel["rebec"] = "Rebec";
+        codeToLabel["recit"] = "Recitativo";
+        codeToLabel["reedo"] = "Reed organ";
+        codeToLabel["rhode"] = "Rhodes piano";
+        codeToLabel["ridec"] = "Ride cymbal";
+        codeToLabel["sarod"] = "Sarod";
+        codeToLabel["sarus"] = "Sarrusophone";
+        codeToLabel["saxA"] = "Alto saxophone";
+        codeToLabel["saxB"] = "Bass saxophone";
+        codeToLabel["saxN"] = "Sopranino saxophone";
+        codeToLabel["saxR"] = "Baritone saxophone";
+        codeToLabel["saxS"] = "Saxophone";
+        codeToLabel["saxT"] = "Tenor saxophone";
+        codeToLabel["sbell"] = "Sleigh bells";
+        codeToLabel["sdrum"] = "Snare drum";
+        codeToLabel["serp"] = "Serpent";
+        codeToLabel["sesto"] = "Sesto";
+        codeToLabel["shaku"] = "Shakuhachi";
+        codeToLabel["shami"] = "Shamisen";
+        codeToLabel["sheng"] = "Sheng";
+        codeToLabel["sho"] = "Sho";
+        codeToLabel["siren"] = "Siren";
+        codeToLabel["sitar"] = "Sitar";
+        codeToLabel["slap"] = "Slapstick";
+        codeToLabel["soprn"] = "Soprano";
+        codeToLabel["spshc"] = "Splash cymbal";
+        codeToLabel["spok"] = "Spoken voice";
+        codeToLabel["spokF"] = "Female spoken voice";
+        codeToLabel["spokM"] = "Male spoken voice";
+        codeToLabel["steel"] = "Steel drum";
+        codeToLabel["stim"] = "Sprechstimme";
+        codeToLabel["stimS"] = "Soprano Sprechstimme";
+        codeToLabel["stimA"] = "Alto Sprechstimme";
+        codeToLabel["stimC"] = "Contralto Sprechstimme";
+        codeToLabel["stimR"] = "Baritone Sprechstimme";
+        codeToLabel["stimB"] = "Bass Sprechstimme";
+        codeToLabel["strdr"] = "String drum";
+        codeToLabel["sxhA"] = "Alto saxhorn";
+        codeToLabel["sxhB"] = "Bass saxhorn";
+        codeToLabel["sxhC"] = "Contrabass saxhorn";
+        codeToLabel["sxhR"] = "Baritons saxhorn";
+        codeToLabel["sxhS"] = "Saxhorn";
+        codeToLabel["sxhT"] = "Tenor saxhorn";
+        codeToLabel["synth"] = "Synthesizer";
+        codeToLabel["tabla"] = "Tabla";
+        codeToLabel["tambn"] = "Tambourine";
+        codeToLabel["tambu"] = "Tambura";
+        codeToLabel["tambr"] = "Tambur";
+        codeToLabel["tblok"] = "Temple blocks";
+        codeToLabel["tdrum"] = "Tenor drum";
+        codeToLabel["tenor"] = "Tenor";
+        codeToLabel["timpa"] = "Timpani";
+        codeToLabel["tiorb"] = "Theorbo";
+        codeToLabel["tom"] = "Tom-tom";
+        codeToLabel["trngl"] = "Triangle";
+        codeToLabel["troma"] = "Alto trombone";
+        codeToLabel["tromb"] = "Bass trombone";
+        codeToLabel["tromp"] = "Trumpet";
+        codeToLabel["tromP"] = "Piccolo trumpet";
+        codeToLabel["tromB"] = "Bass trumpet";
+        codeToLabel["tromt"] = "Trombone";
+        codeToLabel["tuba"] = "Tuba";
+        codeToLabel["tubaB"] = "Bass Tuba";
+        codeToLabel["tubaC"] = "Contrabass Tuba";
+        codeToLabel["tubaT"] = "Tenor Tuba";
+        codeToLabel["tubaU"] = "Subcontrabass Tuba";
+        codeToLabel["ukule"] = "Ukulele";
+        codeToLabel["vibra"] = "Vibraphone";
+        codeToLabel["vina"] = "Vina";
+        codeToLabel["viola"] = "Viola";
+        codeToLabel["violb"] = "Bass viola da gamba";
+        codeToLabel["viold"] = "Viola d'amore";
+        codeToLabel["viole"] = "violone";
+        codeToLabel["violn"] = "Violin";
+        codeToLabel["violp"] = "Piccolo violin";
+        codeToLabel["viols"] = "Viola da gamba";
+        codeToLabel["violt"] = "Tenor viola da gamba";
+        codeToLabel["vox"] = "Voice";
+        codeToLabel["wblok"] = "Woodblock";
+        codeToLabel["xylo"] = "Xylophone";
+        codeToLabel["zithr"] = "Zither";
+        codeToLabel["zurna"] = "Zurna";
     }
-    else if (name == "flt") {
-        output = "Flute";
-    }
-    else if (name == "picco") {
-        output = "Piccolo";
-    }
-    else if (name == "oboe") {
-        output = "Oboe";
-    }
-    else if (name == "clars") {
-        output = "Clarinet";
-    }
-    else if (name == "clara") {
-        output = "Alto Clarinet";
-    }
-    else if (name == "clarb") {
-        output = "Bass Clarinet";
-    }
-    else if (name == "fagot") {
-        output = "Bassoon";
-    }
-    else if (name == "fagot") {
-        output = "Bassoon";
-    }
-    else if (name == "tromp") {
-        output = "Trumpet";
-    }
-    else if (name == "tromb") {
-        output = "Trombone";
-    }
-    else if (name == "violin") {
-        // Deal with Violin 1 versus Violin 2, but need more info to do that.
-        output = "Violin";
-    }
-    else if (name == "viola") {
-        output = "Viola";
-    }
-    else if (name == "cello") {
-        output = "Violoncello";
-    }
-    else if (name == "cemba") {
-        output = "Harpsichord";
-    }
-    else if (name == "organ") {
-        output = "Organ";
-    }
-    else if (name == "clavi") {
-        output = "Clavichord";
-    }
-    else if (name == "forte") {
-        output = "Fortepiano";
-    }
-    else if (name == "guitr") {
-        output = "Guitar";
-    }
-    else if (name == "cbass") {
-        output = "Contrabass";
-    }
-    else if (name == "koto") {
-        output = "Koto";
-    }
+
+    std::string code = icode->substr(2);
+
+    std::string output = codeToLabel[code];
 
     if (output.empty()) {
-        // could not find an automatic name for the instrument.
+        // Could not find an automatic name for the instrument.
         return output;
     }
 
@@ -8158,13 +8320,44 @@ std::string HumdrumInput::getLabelFromInstrumentCode(hum::HTp icode, const std::
     else if (transpose == "*ITrd-5c-9") {
         output += " in E-flat";
     }
+    // Add other keys here.
+
+    // Add instrument number
+    string number = getInstrumentNumber(icode);
+    if (!number.empty()) {
+        output += " ";
+        output += number;
+    }
 
     return output;
 }
 
 //////////////////////////////
 //
-// hasIndent -- true if *indent tandem interpretation before first data token.
+// HumdrumInput::getInstrumentNumber -- search until data has been found
+//    for an interpretation in the form *I#4 for instrument 4.
+//
+
+std::string HumdrumInput::getInstrumentNumber(hum::HTp icode)
+{
+    hum::HTp current = icode->getNextToken();
+    while (current && !current->isData()) {
+        if (!current->isInterpretation()) {
+            current = current->getNextToken();
+            continue;
+        }
+        hum::HumRegex hre;
+        if (hre.search(current, "^\\*I#(\\d+)")) {
+            return hre.getMatch(1);
+        }
+        current = current->getNextToken();
+    }
+    return "";
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasIndent -- true if *indent tandem interpretation before first data token.
 //
 
 bool HumdrumInput::hasIndent(hum::HTp tok)
@@ -13489,7 +13682,8 @@ void HumdrumInput::checkForVerseLabels(hum::HTp token)
         current = current->getNextFieldToken();
     }
     while (current && !current->isStaff()) {
-        if (!(current->isDataTypeLike("**text") || current->isDataTypeLike("**vdata"))) {
+        if (!(current->isDataTypeLike("**text") || current->isDataTypeLike("**silbe")
+                || current->isDataTypeLike("**vdata"))) {
             current = current->getNextFieldToken();
             continue;
         }
@@ -18070,11 +18264,11 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
     }
 
     if (symbol.empty()) {
-        addTextElement(label, name2);
+        insertTextWithNewlines(label, name2);
     }
     else {
         if (!prestring.empty()) {
-            addTextElement(label, prestring);
+            insertTextWithNewlines(label, prestring);
         }
         Rend *rend = new Rend();
         Text *text = new Text();
@@ -18083,13 +18277,37 @@ bool HumdrumInput::setLabelContent(Label *label, const std::string &name)
         label->AddChild(rend);
         rend->SetGlyphAuth("smufl");
         if (!poststring.empty()) {
-            addTextElement(label, poststring);
+            insertTextWithNewlines(label, poststring);
         }
         // verovio probably eats the space surronding the
         // rend, so may need to force to be non-breaking space.
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertTextWithNewlines --
+//
+
+void HumdrumInput::insertTextWithNewlines(Label *label, const std::string &text)
+{
+    vector<string> pieces;
+    hum::HumRegex hre;
+    hre.split(pieces, text, "\\\\n");
+    if (pieces.size() == 1) {
+        addTextElement(label, text);
+    }
+    else {
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            addTextElement(label, pieces.at(i));
+            if (i < (int)pieces.size() - 1) {
+                Lb *lb = new Lb();
+                label->AddChild(lb);
+            }
+        }
+    }
 }
 
 //////////////////////////////
@@ -19122,7 +19340,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
 //////////////////////////////
 //
-// HumdrumInput::addDynamicsMark -- Add dynamics marks such as p, f, sfz, rfz.
+// HumdrumInput::addDynamicsMark -- Add dynamics marks such as p, f, sfz, rz, rfz.
 //     The dynamics marking will be added at a tstamp rather than a startid.
 //
 
@@ -19166,6 +19384,9 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
         dynamic = letters;
     }
     else if (hre.search(letters, "^s?f+z?p+$")) {
+        dynamic = letters;
+    }
+    else if (letters == "rz") {
         dynamic = letters;
     }
 
@@ -19415,9 +19636,14 @@ void HumdrumInput::addDynamicsMark(hum::HTp dyntok, hum::HTp token, hum::HLp lin
 //////////////////////////////
 //
 // HumdrumInput::addSforzandoToNote -- A "z" on a note/chord indicates
-//    a sforzando mark ("sf", or use "zz" for "sfz").  This will be
-//    inserted into the floating elements as a <dynam> with a @startid
-//    pointing to the note/chord.  Other dynamics are placed using @tstamp.
+//    a sforzando mark.  Repeated z's will choose one of the following accents:
+//        z    = sf
+//        zz   = sfz
+//        zzz  = rz
+//        zzzz = rfz
+//    This accent be inserted into the floating elements as a <dynam> with
+//    a @startid pointing to the note/chord.  Other dynamics are placed
+//    using @tstamp.
 //
 
 void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
@@ -19549,7 +19775,13 @@ void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
         data_FONTSIZE fs;
         fs.SetTerm(FONTSIZETERM_large);
         rend->SetFontsize(fs);
-        if (token->find("zz") != std::string::npos) {
+        if (token->find("zzzz") != std::string::npos) {
+            addTextElement(rend, "rfz&#160;");
+        }
+        else if (token->find("zzzz") != std::string::npos) {
+            addTextElement(rend, "rz&#160;");
+        }
+        else if (token->find("zz") != std::string::npos) {
             addTextElement(rend, "sfz&#160;");
         }
         else {
@@ -19566,7 +19798,13 @@ void HumdrumInput::addSforzandoToNote(hum::HTp token, int staffindex)
         }
     }
     else {
-        if (token->find("zz") != std::string::npos) {
+        if (token->find("zzzz") != std::string::npos) {
+            addTextElement(dynam, "rfz");
+        }
+        else if (token->find("zzz") != std::string::npos) {
+            addTextElement(dynam, "rz");
+        }
+        else if (token->find("zz") != std::string::npos) {
             addTextElement(dynam, "sfz");
         }
         else {
