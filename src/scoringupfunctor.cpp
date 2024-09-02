@@ -176,7 +176,7 @@ void findDurQuals(std::vector<std::pair<std::string, data_DURATION>> sequence, s
                 imperfectionAPA(sequence, notesDictionary, restsDictionary);
                 break;
         }
-    }// Missing "rest at" conditions
+    }
 }
 
 double durNumberValue(data_DURATION dur) {
