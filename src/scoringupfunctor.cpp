@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "dot.h"
 #include "layer.h"
 #include "page.h"
 #include "note.h"
@@ -240,8 +241,12 @@ bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
         /// Before imperfecting the starting brevis, check if it is followed by a dot. If it is, this would be a dot of perfectio, i.e., a dot that forces perfection (forbidding the imperfection and returning false). Otherwise, if there is no dot following the starting brevis, proceed to perform the imperfection a.p.p. and return true.
         nextElement = sequence.at(1).first;
         if (nextElement->Is(DOT)) {
+            /// Dot of perfection (type of dot of division)
+            Dot *dot = vrv_cast<Dot *>(nextElement);
+            dot->SetForm(dotLog_FORM_div);
             return false;
         } else {
+            /// Imperfection a.p.p. (i.e., imperfection by the following notes)
             Note *firstNote = vrv_cast<Note *>(firstElement);
             assert(firstNote);
             firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
