@@ -95,7 +95,7 @@ bool BarLine::IsDrawnThrough(const StaffGrp *staffGrp) const
     return false;
 }
 
-std::pair<bool, double> BarLine::GetLength(const StaffDef *staffDef) const
+std::pair<bool, double> BarLine::GetLengthFromContext(const StaffDef *staffDef) const
 {
     // First check the parent measure
     const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
@@ -120,7 +120,7 @@ std::pair<bool, double> BarLine::GetLength(const StaffDef *staffDef) const
     return { false, 0.0 };
 }
 
-std::pair<bool, data_BARMETHOD> BarLine::GetMethod(const StaffDef *staffDef) const
+std::pair<bool, data_BARMETHOD> BarLine::GetMethodFromContext(const StaffDef *staffDef) const
 {
     // First check the parent measure
     const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());
@@ -145,7 +145,7 @@ std::pair<bool, data_BARMETHOD> BarLine::GetMethod(const StaffDef *staffDef) con
     return { false, BARMETHOD_NONE };
 }
 
-std::pair<bool, int> BarLine::GetPlace(const StaffDef *staffDef) const
+std::pair<bool, int> BarLine::GetPlaceFromContext(const StaffDef *staffDef) const
 {
     // First check the parent measure
     const Measure *measure = dynamic_cast<const Measure *>(this->GetParent());

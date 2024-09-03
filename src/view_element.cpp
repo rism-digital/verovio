@@ -423,9 +423,9 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     StaffDef *drawingStaffDef = staff->m_drawingStaffDef;
     // Determine the method
     assert(drawingStaffDef);
-    auto [hasMethod, method] = barLine->GetMethod(drawingStaffDef);
+    auto [hasMethod, method] = barLine->GetMethodFromContext(drawingStaffDef);
     if (barLine->HasMethod()) {
-        method = barLine->AttBarLineVis::GetMethod();
+        method = barLine->GetMethod();
     }
 
     dc->StartGraphic(element, "", element->GetID());
