@@ -127,7 +127,6 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
 
     // Flags:
     bool alterationFlag, impappFlag, impapaFlag;
-    bool dotOfPerf = false;         //When true, it forces a perfect value
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
     bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the sequence, checking if it is greater or equal to the last note of the sequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
 
