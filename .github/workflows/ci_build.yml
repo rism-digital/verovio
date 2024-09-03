@@ -366,7 +366,7 @@ jobs:
           path: ${{ env.GH_PAGES_DIR }}
 
       - name: Download TOOLKIT_BUILD artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ env.TOOLKIT_BUILD }}
           path: artifacts/${{ env.TOOLKIT_BUILD }}
@@ -485,7 +485,7 @@ jobs:
           path: ${{ env.DOXYGEN_DIR }}
 
       - name: Download DOC_BUILD artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ env.DOC_BUILD }}
           path: artifacts/${{ env.DOC_BUILD }}
