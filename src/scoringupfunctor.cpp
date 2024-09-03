@@ -139,7 +139,7 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
                 break; //No modifications
             case 1:
                 impappFlag = imperfectionAPP(sequence);
-                if (!impappFlag || dotOfPerf) {
+                if (!impappFlag) {
                     imperfectionAPA(sequence);
                     break;
                 } break;
@@ -159,19 +159,19 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
             case 0:
                 impappFlag = imperfectionAPP(sequence);
                 alterationFlag = alteration(sequence);
-                if (!alterationFlag || dotOfPerf) {
+                if (!alterationFlag || !impappFlag) {
                     break; //No modifications
                 } break;
             case 1:
                 impappFlag = imperfectionAPP(sequence);
-                if (!impappFlag || dotOfPerf) {
+                if (!impappFlag) {
                     imperfectionAPA(sequence);
                     break;
                 } break;
             case 2:
                 impappFlag = imperfectionAPP(sequence);
                 impapaFlag = imperfectionAPA(sequence);
-                if (!impappFlag || !impapaFlag || dotOfPerf || simileAnteSimile) {
+                if (!impappFlag || !impapaFlag || simileAnteSimile) {
                     alteration(sequence);
                     break;
                 } break;
@@ -235,12 +235,19 @@ bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     std::pair<LayerElement*, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement* firstElement = firstElementDurPair.first;
     data_DURATION firstDur = firstElementDurPair.second;
+    LayerElement* nextElement;
     /// Evaluates if the first note in the sequence is a brevis. If it is, then it imperfects it (and returns true). If it is a rest or a larger note, then it forbids imperfection (and returns false).
-    if (firstElement->Is(NOTE) && firstDur == DURATION_brevis){
-        Note *firstNote = vrv_cast<Note *>(firstElement);
-        assert(firstNote);
-        firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-        return true;
+    if (firstElement->Is(NOTE) && firstDur == DURATION_brevis) {
+        /// Before imperfecting the starting brevis, check if it is followed by a dot. If it is, this would be a dot of perfectio, i.e., a dot that forces perfection (forbidding the imperfection and returning false). Otherwise, if there is no dot following the starting brevis, proceed to perform the imperfection a.p.p. and return true.
+        nextElement = sequence.at(1).first;
+        if (nextElement->Is(DOT)) {
+            return false;
+        } else {
+            Note *firstNote = vrv_cast<Note *>(firstElement);
+            assert(firstNote);
+            firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+            return true;
+        }
     } else {
         return false;
     }
