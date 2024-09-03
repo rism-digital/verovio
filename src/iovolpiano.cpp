@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "barline.h"
 #include "clef.h"
 #include "doc.h"
 #include "layer.h"
@@ -109,6 +110,28 @@ bool VolpianoInput::Import(const std::string &volpiano)
         }
         else if (ch == 'I' || ch == 'W' || ch == 'X' || ch == 'Y' || ch == 'Z') {
             accidVal = ACCIDENTAL_WRITTEN_n;
+        }
+        else if (ch == '3') {
+            BarLine *single = new BarLine();
+            layer->AddChild(single);
+        }
+        else if (ch == '4') {
+            BarLine *dbl = new BarLine();
+            dbl->SetForm(BARRENDITION_dbl);
+            layer->AddChild(dbl);
+        }
+        else if (ch == '5') {
+            BarLine *end = new BarLine();
+            end->SetForm(BARRENDITION_end);
+            layer->AddChild(end);
+        }
+        else if (ch == '6') {
+            LogWarning("Volpiano '6' barline is not supported");
+        }
+        else if (ch == '7') {
+            BarLine *takt = new BarLine();
+            takt->SetMethod(BARMETHOD_takt);
+            layer->AddChild(takt);
         }
     }
 

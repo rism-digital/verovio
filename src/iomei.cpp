@@ -2381,6 +2381,7 @@ void MEIOutput::WriteBarLine(pugi::xml_node currentNode, BarLine *barLine)
 
     this->WriteLayerElement(currentNode, barLine);
     barLine->WriteBarLineLog(currentNode);
+    barLine->WriteBarLineVis(currentNode);
     barLine->WriteColor(currentNode);
     barLine->WriteNNumberLike(currentNode);
     barLine->WriteVisibility(currentNode);
@@ -6428,6 +6429,7 @@ bool MEIInput::ReadBarLine(Object *parent, pugi::xml_node barLine)
     this->ReadLayerElement(barLine, vrvBarLine);
 
     vrvBarLine->ReadBarLineLog(barLine);
+    vrvBarLine->ReadBarLineVis(barLine);
     vrvBarLine->ReadColor(barLine);
     vrvBarLine->ReadNNumberLike(barLine);
     vrvBarLine->ReadVisibility(barLine);
