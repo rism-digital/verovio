@@ -38,6 +38,7 @@ double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair);
 bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+bool leavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -132,7 +133,7 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
 
     // Principles of imperfection and alteration (and their exceptions).
     // The implementation is based on the rules outlined by Willi Apel, with perfect groupings of notes and the remainder:
-    if (sum <= 3) { // For sum = 0, 1, 2, or 3
+    if (sum < 3) { // For sum = 0, 1, 2, or 3
         switch (remainder) {
             case 0:
                 break; //No modifications
@@ -150,6 +151,9 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
                     break;
                 } break;
         }
+    } else if (sum == 3){
+        bool leavePerfectFlag = leavePerfect(sequence);
+        if (!leavePerfectFlag || dotOfImperf) {}
     } else { // For sum > 3
         switch (remainder) {
             case 0:
@@ -167,7 +171,7 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
             case 2:
                 impappFlag = imperfectionAPP(sequence);
                 impapaFlag = imperfectionAPA(sequence);
-                if (!impappFlag || !impapaFlag ||dotOfPerf || simileAnteSimile) {
+                if (!impappFlag || !impapaFlag || dotOfPerf || simileAnteSimile) {
                     alteration(sequence);
                     break;
                 } break;
@@ -187,7 +191,7 @@ double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
     int modusminor = mensuration["modusminor"];
     int tempus = mensuration["tempus"];
     int prolatio = mensuration["prolatio"];
-    int longaDefaultVal = modusminor * tempus * prolatio;
+    //int longaDefaultVal = modusminor * tempus * prolatio;
     int brevisDefaultVal = tempus * prolatio;
     int semibrevisDefaultVal = prolatio;
     double durnum = 0;
@@ -270,6 +274,10 @@ bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     } else {
         return false;
     }
+}
+
+bool leavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+    return true;
 }
 
 } // namespace vrv
