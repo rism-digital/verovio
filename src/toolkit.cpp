@@ -298,10 +298,16 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
+        // Case where there are empty lines before content in Humdrum files.
         return HUMDRUM;
     }
     if (initial.find("\n**") != std::string::npos) {
+        // Case where there are empty lines before content in Humdrum files.
         return HUMDRUM;
+    }
+    if (initial.find("\nCUT[") != std::string::npos) {
+        // Title record for a melody in EsAC format.
+        return ESAC;
     }
 
     // Assume that the input is MEI if other input types were not detected.
