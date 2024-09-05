@@ -11105,10 +11105,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 place = "above";
             }
             else {
-                int belowQ = token->getValueInt("auto", "below");
-                if (belowQ) {
-                    place = "below";
-                }
+                place = "below";
             }
             if (place.size() > 0) {
                 setPlaceRelStaff(harm, place, false);
