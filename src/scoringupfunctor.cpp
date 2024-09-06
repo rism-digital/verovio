@@ -30,20 +30,6 @@ namespace vrv {
 // ScoringUpFunctor
 //----------------------------------------------------------------------------
 
-std::map<std::string, int> mensuration;
-std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur = {};
-
-std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences;
-std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> SubdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur);
-
-void FindDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences);
-void FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair);
-bool ImperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-bool ImperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-bool Alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-bool LeavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
     m_currentScoreTime = 0.0;
@@ -93,7 +79,7 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     }return FUNCTOR_CONTINUE;
 }
 
-std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> SubdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur)
+std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> ScoringUpFunctor::SubdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur)
 {
     std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences = {};
     std::vector<std::pair<LayerElement*, data_DURATION>> sequence = {};
@@ -110,13 +96,13 @@ std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> SubdivideSeq(s
     return listOfSequences;
 }
 
-void FindDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences){
+void ScoringUpFunctor::FindDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences){
     for (std::vector<std::pair<LayerElement*, data_DURATION>> subseq: listOfSequences){
         FindDurQuals(subseq);
     }
 }
 
-void FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     std::vector<std::pair<LayerElement*, data_DURATION>> middleSeq = {};
     if (sequence.size() > 2) {
         middleSeq = {sequence.begin() + 1, sequence.end() - 1};
@@ -182,7 +168,7 @@ void FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     }
 }
 
-double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
+double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
     data_DURQUALITY_mensural durquality;
     data_DURATION dur = elementDurPair.second;
     LayerElement* element = elementDurPair.first;
@@ -234,7 +220,7 @@ double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair)
     } return durnum;
 }
 
-bool ImperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
+bool ScoringUpFunctor::ImperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
     std::pair<LayerElement*, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement* firstElement = firstElementDurPair.first;
     data_DURATION firstDur = firstElementDurPair.second;
@@ -260,7 +246,7 @@ bool ImperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     }
 }
 
-bool ImperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
+bool ScoringUpFunctor::ImperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
     std::pair<LayerElement*, data_DURATION> lastElementDurPair = sequence.at(sequence.size()-1);
     LayerElement* lastElement = lastElementDurPair.first;
     data_DURATION lastDur = lastElementDurPair.second;
@@ -275,7 +261,7 @@ bool ImperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     }
 }
 
-bool Alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+bool ScoringUpFunctor::Alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     std::pair<LayerElement*, data_DURATION> penultElementDurPair = sequence.at(sequence.size()-2);
     LayerElement* penultElement = penultElementDurPair.first;
     data_DURATION penultDur = penultElementDurPair.second;
@@ -290,7 +276,7 @@ bool Alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     }
 }
 
-bool LeavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+bool ScoringUpFunctor::LeavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     return true;
 }
 
