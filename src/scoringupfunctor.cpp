@@ -109,8 +109,13 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::vector<std::pair<LayerEleme
 
 void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     std::vector<std::pair<LayerElement*, data_DURATION>> middleSeq = {};
-    if (sequence.size() > 2) {
-        middleSeq = {sequence.begin() + 1, sequence.end() - 1};
+    if (sequence.size() >= 2) {
+        data_DURATION firstNoteDur = sequence.at(0).second;
+        if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima || firstNoteDur == DURATION_semiminima || firstNoteDur == DURATION_fusa || firstNoteDur == DURATION_semifusa) {
+            middleSeq = {sequence.begin(), sequence.end() - 1};
+        } else {
+            middleSeq = {sequence.begin() + 1, sequence.end() - 1};
+        }
     }
 
     // Value in minims:
