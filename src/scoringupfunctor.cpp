@@ -9,15 +9,18 @@
 
 //----------------------------------------------------------------------------
 
+#include <map>
+
+//----------------------------------------------------------------------------
+
 #include "dot.h"
 #include "layer.h"
-#include "page.h"
 #include "note.h"
+#include "page.h"
 #include "rest.h"
 #include "staff.h"
 #include "system.h"
 #include "vrv.h"
-#include <map>
 
 //----------------------------------------------------------------------------
 
@@ -31,15 +34,15 @@ std::map<std::string, int> mensuration;
 std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur = {};
 
 std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences;
-std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> subdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur);
+std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> SubdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur);
 
-void findDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences);
-void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair);
-bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
-bool leavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+void FindDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences);
+void FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair);
+bool ImperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+bool ImperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+bool Alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
+bool LeavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence);
 
 ScoringUpFunctor::ScoringUpFunctor() : Functor()
 {
@@ -53,8 +56,8 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     m_currentScoreTime = 0.0;
     m_currentMensur = layer->GetCurrentMensur();
     if (!dursInVoiceSameMensur.empty()){
-        listOfSequences = subdivideSeq(dursInVoiceSameMensur);
-        findDurQuals(listOfSequences);
+        listOfSequences = SubdivideSeq(dursInVoiceSameMensur);
+        FindDurQuals(listOfSequences);
         dursInVoiceSameMensur = {}; //restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
@@ -90,7 +93,7 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     }return FUNCTOR_CONTINUE;
 }
 
-std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> subdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur)
+std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> SubdivideSeq(std::vector<std::pair<LayerElement*, data_DURATION>> dursInVoiceSameMensur)
 {
     std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences = {};
     std::vector<std::pair<LayerElement*, data_DURATION>> sequence = {};
@@ -107,13 +110,13 @@ std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> subdivideSeq(s
     return listOfSequences;
 }
 
-void findDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences){
+void FindDurQuals(std::vector<std::vector<std::pair<LayerElement*, data_DURATION>>> listOfSequences){
     for (std::vector<std::pair<LayerElement*, data_DURATION>> subseq: listOfSequences){
-        findDurQuals(subseq);
+        FindDurQuals(subseq);
     }
 }
 
-void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+void FindDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     std::vector<std::pair<LayerElement*, data_DURATION>> middleSeq = {};
     if (sequence.size() > 2) {
         middleSeq = {sequence.begin() + 1, sequence.end() - 1};
@@ -122,7 +125,7 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     // Value in minims:
     double sum = 0;
     for (std::pair<LayerElement*, data_DURATION> elementDurPair : middleSeq){
-        sum += durNumberValue(elementDurPair);
+        sum += GetDurNumberValue(elementDurPair);
     } sum = sum/2;
     int remainder = (int)sum % 3;
 
@@ -131,55 +134,55 @@ void findDurQuals(std::vector<std::pair<LayerElement*, data_DURATION>> sequence)
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
     bool simileAnteSimile = false;  //Flag that evaluates the value of the note following the last note of the sequence, checking if it is greater or equal to the last note of the sequence. When true, it doesn't allow for Imperfection a parte ante (a.p.a.)
 
-    // Principles of imperfection and alteration (and their exceptions).
+    // Principles of imperfection and Alteration (and their exceptions).
     // The implementation is based on the rules outlined by Willi Apel, with perfect groupings of notes and the remainder:
     if (sum < 3) { // For sum = 0, 1, 2, or 3
         switch (remainder) {
             case 0:
                 break; //No modifications
             case 1:
-                impappFlag = imperfectionAPP(sequence);
+                impappFlag = ImperfectionAPP(sequence);
                 if (!impappFlag) {
-                    imperfectionAPA(sequence);
+                    ImperfectionAPA(sequence);
                     break;
                 } break;
             case 2:
-                alterationFlag = alteration(sequence);
+                alterationFlag = Alteration(sequence);
                 if (!alterationFlag || dotOfImperf) {
-                    imperfectionAPP(sequence);
-                    imperfectionAPA(sequence);
+                    ImperfectionAPP(sequence);
+                    ImperfectionAPA(sequence);
                     break;
                 } break;
         }
     } else if (sum == 3){
-        bool leavePerfectFlag = leavePerfect(sequence);
+        bool leavePerfectFlag = LeavePerfect(sequence);
         if (!leavePerfectFlag || dotOfImperf) {}
     } else { // For sum > 3
         switch (remainder) {
             case 0:
-                impappFlag = imperfectionAPP(sequence);
-                alterationFlag = alteration(sequence);
+                impappFlag = ImperfectionAPP(sequence);
+                alterationFlag = Alteration(sequence);
                 if (!alterationFlag || !impappFlag) {
                     break; //No modifications
                 } break;
             case 1:
-                impappFlag = imperfectionAPP(sequence);
+                impappFlag = ImperfectionAPP(sequence);
                 if (!impappFlag) {
-                    imperfectionAPA(sequence);
+                    ImperfectionAPA(sequence);
                     break;
                 } break;
             case 2:
-                impappFlag = imperfectionAPP(sequence);
-                impapaFlag = imperfectionAPA(sequence);
+                impappFlag = ImperfectionAPP(sequence);
+                impapaFlag = ImperfectionAPA(sequence);
                 if (!impappFlag || !impapaFlag || simileAnteSimile) {
-                    alteration(sequence);
+                    Alteration(sequence);
                     break;
                 } break;
         }
     }
 }
 
-double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
+double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
     data_DURQUALITY_mensural durquality;
     data_DURATION dur = elementDurPair.second;
     LayerElement* element = elementDurPair.first;
@@ -231,7 +234,7 @@ double durNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
     } return durnum;
 }
 
-bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
+bool ImperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
     std::pair<LayerElement*, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement* firstElement = firstElementDurPair.first;
     data_DURATION firstDur = firstElementDurPair.second;
@@ -257,7 +260,7 @@ bool imperfectionAPP(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     }
 }
 
-bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
+bool ImperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequence) {
     std::pair<LayerElement*, data_DURATION> lastElementDurPair = sequence.at(sequence.size()-1);
     LayerElement* lastElement = lastElementDurPair.first;
     data_DURATION lastDur = lastElementDurPair.second;
@@ -272,11 +275,11 @@ bool imperfectionAPA(std::vector<std::pair<LayerElement*, data_DURATION>> sequen
     }
 }
 
-bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+bool Alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     std::pair<LayerElement*, data_DURATION> penultElementDurPair = sequence.at(sequence.size()-2);
     LayerElement* penultElement = penultElementDurPair.first;
     data_DURATION penultDur = penultElementDurPair.second;
-    ///Evaluates what is the type of the penultimate element in the sequence. If it is a rest, it forbids alteration (returns false). If it is a note, and the note is a 'semibrevis', it alters the note (and returns true).
+    ///Evaluates what is the type of the penultimate element in the sequence. If it is a rest, it forbids Alteration (returns false). If it is a note, and the note is a 'semibrevis', it alters the note (and returns true).
     if (penultElement->Is(NOTE) && penultDur == DURATION_semibrevis) {
         Note *penultNote = vrv_cast<Note *>(penultElement);
         assert(penultNote);
@@ -287,7 +290,7 @@ bool alteration(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     }
 }
 
-bool leavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
+bool LeavePerfect(std::vector<std::pair<LayerElement*, data_DURATION>> sequence){
     return true;
 }
 
