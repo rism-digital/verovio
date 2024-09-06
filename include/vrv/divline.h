@@ -39,7 +39,7 @@ public:
     virtual ~DivLine();
     Object *Clone() const override { return new DivLine(*this); }
     void Reset() override;
-    virtual std::string GetClassName() const { return "DivLine"; }
+    std::string GetClassName() const override { return "DivLine"; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -85,7 +85,7 @@ public:
     DivLineAttr();
     virtual ~DivLineAttr();
     Object *Clone() const override { return new DivLineAttr(*this); }
-    virtual std::string GetClassName() const { return "DivLineAttr"; }
+    std::string GetClassName() const override { return "DivLineAttr"; }
     ///@}
 
     // void SetLeft() { m_isLeft = true; }
