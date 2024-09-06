@@ -37,7 +37,7 @@ public:
     ///@{
     DivLine();
     virtual ~DivLine();
-    virtual Object *Clone() const { return new DivLine(*this); }
+    Object *Clone() const override { return new DivLine(*this); }
     void Reset() override;
     virtual std::string GetClassName() const { return "DivLine"; }
     ///@}
@@ -84,7 +84,7 @@ public:
     ///@{
     DivLineAttr();
     virtual ~DivLineAttr();
-    virtual Object *Clone() const { return new DivLineAttr(*this); }
+    Object *Clone() const override { return new DivLineAttr(*this); }
     virtual std::string GetClassName() const { return "DivLineAttr"; }
     ///@}
 

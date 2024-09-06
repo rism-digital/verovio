@@ -29,7 +29,7 @@ public:
     ///@{
     Liquescent();
     virtual ~Liquescent();
-    virtual Object *Clone() const { return new Liquescent(*this); }
+    Object *Clone() const override { return new Liquescent(*this); }
     void Reset() override;
     virtual std::string GetClassName() const { return "Liquescent"; }
     ///@}

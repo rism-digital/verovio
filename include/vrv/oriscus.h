@@ -29,7 +29,7 @@ public:
     ///@{
     Oriscus();
     virtual ~Oriscus();
-    virtual Object *Clone() const { return new Oriscus(*this); }
+    Object *Clone() const override { return new Oriscus(*this); }
     void Reset() override;
     virtual std::string GetClassName() const { return "Oriscus"; }
     ///@}
