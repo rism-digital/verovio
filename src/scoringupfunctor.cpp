@@ -245,11 +245,17 @@ bool ScoringUpFunctor::ImperfectionAPP(std::vector<std::pair<LayerElement*, data
             dot->SetForm(dotLog_FORM_div);
             return false;
         } else {
-            /// Imperfection a.p.p. (i.e., imperfection by the following notes)
+            /// Imperfection a.p.p. (i.e., imperfection by the following notes), unless the note has already been modified by the previous sequence
             Note *firstNote = vrv_cast<Note *>(firstElement);
             assert(firstNote);
-            firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-            return true;
+            if (firstNote->HasDurQuality()){
+                /// Already modified before
+                return false;
+            } else {
+                /// Imperfection a.p.p.
+                firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                return true;
+            }
         }
     } else {
         return false;
