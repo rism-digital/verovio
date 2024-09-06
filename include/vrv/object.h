@@ -165,7 +165,7 @@ public:
     const Resources *GetDocResources() const;
 
     /**
-     * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
+     * Reset the object, that is 1) removing all children and 2) resetting all attributes.
      * The method is virtual, so _always_ call the parent in the method overriding it.
      */
     virtual void Reset();

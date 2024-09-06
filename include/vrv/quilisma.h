@@ -30,7 +30,7 @@ public:
     Quilisma();
     virtual ~Quilisma();
     virtual Object *Clone() const { return new Quilisma(*this); }
-    virtual void Reset();
+    void Reset() override;
     virtual std::string GetClassName() const { return "Quilisma"; }
     ///@}
 

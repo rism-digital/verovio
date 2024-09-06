@@ -38,7 +38,7 @@ public:
     DivLine();
     virtual ~DivLine();
     virtual Object *Clone() const { return new DivLine(*this); }
-    virtual void Reset();
+    void Reset() override;
     virtual std::string GetClassName() const { return "DivLine"; }
     ///@}
 
