@@ -121,7 +121,7 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
     // Value in minims:
     double sum = 0;
     bool followedByDot = false;
-    LayerElement* nextElement;
+    LayerElement* nextElement = NULL;
     for (int i = 0; i < middleSeq.size(); i++) {
         std::pair<LayerElement*, data_DURATION> elementDurPair = middleSeq.at(i);
         // Check if there is a dot after the element being evaluated
@@ -130,7 +130,7 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
             followedByDot = nextElement->Is(DOT);
         } else {
             followedByDot = false;
-        } sum += GetDurNumberValue(elementDurPair, followedByDot);
+        } sum += GetDurNumberValue(elementDurPair, followedByDot, nextElement);
     } sum = sum/2;
     int remainder = (int)sum % 3;
 
@@ -187,12 +187,13 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
     }
 }
 
-double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair, bool followedByDot) {
+double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair, bool followedByDot, LayerElement* nextElement) {
     data_DURQUALITY_mensural durquality;
     data_DURATION dur = elementDurPair.second;
     LayerElement* element = elementDurPair.first;
+    Note *note;
     if (element->Is(NOTE)){
-        Note *note = vrv_cast<Note *>(element);
+        note = vrv_cast<Note *>(element);
         assert(note);
         durquality = note->GetDurQuality();
     }
@@ -225,18 +226,27 @@ double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATIO
         case DURATION_minima:
             if (followedByDot) {
                 durnum = 1.5;
+                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                Dot *dot = vrv_cast<Dot *>(nextElement);
+                dot->SetForm(dotLog_FORM_aug);
             } else {
                 durnum = 1;
             } break;
         case DURATION_semiminima:
             if (followedByDot) {
                 durnum = 0.75;
+                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                Dot *dot = vrv_cast<Dot *>(nextElement);
+                dot->SetForm(dotLog_FORM_aug);
             } else {
                 durnum = 0.5;
             } break;
         case DURATION_fusa:
             if (followedByDot) {
                 durnum = 0.375;
+                note->SetDurQuality(DURQUALITY_mensural_perfecta);
+                Dot *dot = vrv_cast<Dot *>(nextElement);
+                dot->SetForm(dotLog_FORM_aug);
             } else {
                 durnum = 0.25;
             } break;

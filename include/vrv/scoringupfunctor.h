@@ -54,7 +54,7 @@ public:
     * @name: Find the duration value of the note in minims
     */
     ///@{
-    double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair, bool followedByDot);
+    double GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair, bool followedByDot, LayerElement* nextElement);
     ///@}
     /**
      * @name Apply principles of imperfection and alteration
