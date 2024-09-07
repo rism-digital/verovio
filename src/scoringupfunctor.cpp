@@ -120,8 +120,17 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
 
     // Value in minims:
     double sum = 0;
-    for (std::pair<LayerElement*, data_DURATION> elementDurPair : middleSeq){
-        sum += GetDurNumberValue(elementDurPair);
+    bool followedByDot = false;
+    LayerElement* nextElement;
+    for (int i = 0; i < middleSeq.size(); i++) {
+        std::pair<LayerElement*, data_DURATION> elementDurPair = middleSeq.at(i);
+        // Check if there is a dot after the element being evaluated
+        if (i + 1 < middleSeq.size()) {
+            nextElement = middleSeq.at(i+1).first;
+            followedByDot = nextElement->Is(DOT);
+        } else {
+            followedByDot = false;
+        } sum += GetDurNumberValue(elementDurPair, followedByDot);
     } sum = sum/2;
     int remainder = (int)sum % 3;
 
@@ -178,7 +187,7 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
     }
 }
 
-double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair) {
+double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATION> elementDurPair, bool followedByDot) {
     data_DURQUALITY_mensural durquality;
     data_DURATION dur = elementDurPair.second;
     LayerElement* element = elementDurPair.first;
@@ -198,30 +207,39 @@ double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATIO
         case DURATION_longa:
             if (modusminor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * brevisDefaultVal;
-            } else if (modusminor == 3 || durquality == DURQUALITY_mensural_perfecta) {
+            } else if (modusminor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * brevisDefaultVal;
             } break;
         case DURATION_brevis:
             if (tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2 * semibrevisDefaultVal;
-            } else if (tempus == 3 || durquality == DURQUALITY_mensural_perfecta) {
+            } else if (tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * semibrevisDefaultVal;
             } break;
         case DURATION_semibrevis:
             if (prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
                 durnum = 2;
-            } else if (prolatio == 3 || durquality == DURQUALITY_mensural_perfecta) {
+            } else if (prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3;
             } break;
         case DURATION_minima:
-            durnum = 1;
-            break;
+            if (followedByDot) {
+                durnum = 1.5;
+            } else {
+                durnum = 1;
+            } break;
         case DURATION_semiminima:
-            durnum = 0.5;
-            break;
+            if (followedByDot) {
+                durnum = 0.75;
+            } else {
+                durnum = 0.5;
+            } break;
         case DURATION_fusa:
-            durnum = 0.25;
-            break;
+            if (followedByDot) {
+                durnum = 0.375;
+            } else {
+                durnum = 0.25;
+            } break;
         case DURATION_semifusa:
             durnum = 0.125;
             break;
