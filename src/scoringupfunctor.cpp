@@ -134,6 +134,9 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
     } sum = sum/2;
     int remainder = (int)sum % 3;
 
+    // CHECK SUM --> IS IT INTEGER when dot of division???
+    // CHECK REMAINDER
+
     // Flags:
     bool alterationFlag, impappFlag, impapaFlag;
     bool dotOfImperf = false;       //When true, it forces imperfection a parte post (a.p.p.)
@@ -161,7 +164,9 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
         }
     } else if (sum == 3){
         bool leavePerfectFlag = LeavePerfect(sequence);
-        if (!leavePerfectFlag || dotOfImperf) {}
+        if (!leavePerfectFlag || dotOfImperf) {
+            
+        }
     } else { // For sum > 3
         switch (remainder) {
             case 0:
@@ -206,22 +211,22 @@ double ScoringUpFunctor::GetDurNumberValue(std::pair<LayerElement*, data_DURATIO
     double durnum = 0;
     switch(dur) {
         case DURATION_longa:
-            if (modusminor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
-                durnum = 2 * brevisDefaultVal;
-            } else if (modusminor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (modusminor == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * brevisDefaultVal;
+            } else if (modusminor == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2 * brevisDefaultVal;
             } break;
         case DURATION_brevis:
-            if (tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
-                durnum = 2 * semibrevisDefaultVal;
-            } else if (tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (tempus == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3 * semibrevisDefaultVal;
+            } else if (tempus == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2 * semibrevisDefaultVal;
             } break;
         case DURATION_semibrevis:
-            if (prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
-                durnum = 2;
-            } else if (prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
+            if (prolatio == 3 || durquality == DURQUALITY_mensural_perfecta || followedByDot) {
                 durnum = 3;
+            } else if (prolatio == 2 || durquality == DURQUALITY_mensural_imperfecta) {
+                durnum = 2;
             } break;
         case DURATION_minima:
             if (followedByDot) {
