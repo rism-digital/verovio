@@ -118,6 +118,18 @@ void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement*, data_DU
         }
     }
 
+    // Check if there are dots in the middleSeq and how many. The dots in the middleSeq are the only ones that have the possibility of being a dot of imperfection (or alteration) or a dot of augmentation---the dots of perfection are not in the middleSeq.
+    int numberOfDots = 0;
+    for (std::pair<LayerElement*, data_DURATION> elementDurPair : middleSeq) {
+        if (elementDurPair.first->Is(DOT)){
+            numberOfDots=+1;
+        }
+    } if (numberOfDots >= 1) {
+        // Take first dot and evaluate if it is a dot of imperfection (check if it is "integer number of semibreves" away from the beginning of the sequence, and if the rest of the sequence still sums an integer number)
+        // Take last dot and evaluate if it is a dot of division (check if it is "integer number of semibreves" away from the end of the sequence, and if the rest of the sequence still sums an integer number)
+        // If neither, all dots are dots of augmentation
+    }
+
     // Value in minims:
     double sum = 0;
     bool followedByDot = false;
