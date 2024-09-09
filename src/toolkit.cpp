@@ -311,6 +311,8 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
 
 bool Toolkit::LoadFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     if (this->IsUTF16(filename)) {
         return this->LoadUTF16File(filename);
     }
@@ -332,7 +334,7 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
-    return this->LoadData(content);
+    return this->LoadData(content, false);
 }
 
 bool Toolkit::IsUTF16(const std::string &filename)
@@ -393,7 +395,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
     std::string utf8line = convert.to_bytes(u16data);
 
-    return this->LoadData(utf8line);
+    return this->LoadData(utf8line, false);
 }
 
 bool Toolkit::IsZip(const std::string &filename)
@@ -438,6 +440,7 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+    this->ResetLogBuffer();
 #ifndef NO_MXL_SUPPORT
     ZipFileReader zipFileReader;
     zipFileReader.LoadBytes(bytes);
@@ -456,7 +459,7 @@ bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 
     if (!filename.empty()) {
         LogInfo("Loading file '%s' in the archive", filename.c_str());
-        return this->LoadData(zipFileReader.ReadTextFile(filename));
+        return this->LoadData(zipFileReader.ReadTextFile(filename), false);
     }
     else {
         LogError("No file to load found in the archive");
@@ -482,8 +485,17 @@ bool Toolkit::LoadZipDataBuffer(const unsigned char *data, int length)
 
 bool Toolkit::LoadData(const std::string &data)
 {
+    return this->LoadData(data, true);
+}
+
+bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
+{
     std::string newData;
     Input *input = NULL;
+
+    if (resetLogBuffer) {
+        this->ResetLogBuffer();
+    }
 
     m_doc.m_expansionMap.Reset();
 
@@ -1423,6 +1435,7 @@ std::string Toolkit::GetLog()
     for (const std::string &logStr : logBuffer) {
         str += logStr;
     }
+    this->ResetLogBuffer();
     return str;
 }
 
@@ -1560,7 +1573,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderData(const std::string &data, const std::string &jsonOptions)
 {
-    if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
+    if (this->SetOptions(jsonOptions) && this->LoadData(data, false)) return this->RenderToSVG(1);
 
     // Otherwise just return an empty string.
     return "";
