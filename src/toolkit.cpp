@@ -610,16 +610,12 @@ bool Toolkit::LoadData(const std::string &data)
         xmlfile.load_string(data.c_str());
         stringstream conversion;
 
-        // Temporarily redirect cerr:
-        std::stringstream captured_cerr;
-        std::streambuf *cerr_buf = std::cerr.rdbuf();
-        std::cerr.rdbuf(captured_cerr.rdbuf());
-
+        LogRedirectStart();
         bool status = converter.convert(conversion, xmlfile);
-        LogWarning(captured_cerr.str().c_str());
-
-        // Restore cerr:
-        std::cerr.rdbuf(cerr_buf);
+        LogRedirectEnd();
+        if (!status) {
+            LogWarning("Problem converting MusicXML to Humdrum (see warning above this line for possible reasons");
+        }
 
         if (!status) {
             LogError("Error converting MusicXML data");
@@ -669,16 +665,12 @@ bool Toolkit::LoadData(const std::string &data)
         hum::Tool_musedata2hum converter;
         stringstream conversion;
 
-        // Temporarily redirect cerr:
-        std::stringstream captured_cerr;
-        std::streambuf *cerr_buf = std::cerr.rdbuf();
-        std::cerr.rdbuf(captured_cerr.rdbuf());
-
+        LogRedirectStart();
         bool status = converter.convertString(conversion, data);
-        LogWarning(captured_cerr.str().c_str());
-
-        // Restore cerr:
-        std::cerr.rdbuf(cerr_buf);
+        LogRedirectEnd();
+        if (!status) {
+            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
+        }
 
         if (!status) {
             LogError("Error converting MuseData data");
@@ -706,18 +698,14 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
+        std::stringstream conversion;
 
-        // Temporarily redirect cerr:
-        std::stringstream captured_cerr;
-        std::streambuf *cerr_buf = std::cerr.rdbuf();
-        std::cerr.rdbuf(captured_cerr.rdbuf());
-        stringstream conversion;
-
+        LogRedirectStart();
         bool status = converter.convert(conversion, data);
-        LogWarning(captured_cerr.str().c_str());
-
-        // Restore cerr:
-        std::cerr.rdbuf(cerr_buf);
+        LogRedirectEnd();
+        if (!status) {
+            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
+        }
 
         if (!status) {
             LogError("Error converting EsAC data");
@@ -1481,6 +1469,35 @@ void Toolkit::ResetLogBuffer()
     logBuffer.clear();
 }
 
+void Toolkit::LogRedirectStart()
+{
+    if (m_original_cerr_buf) {
+        vrv::LogError("In Toolkit::LogRedirectStart: Only one log redirect can be active at a time.");
+        return;
+    }
+    if (!m_captured_cerr.str().empty()) {
+        vrv::LogWarning("In Toolkit::LogRedirectStart: Log capture buffer not empty, sending current contents to "
+                        "LogWarning and resetting.");
+        vrv::LogWarning(m_captured_cerr.str().c_str());
+        m_captured_cerr.str("");
+    }
+    m_original_cerr_buf = std::cerr.rdbuf();
+    std::cerr.rdbuf(m_captured_cerr.rdbuf());
+}
+
+void Toolkit::LogRedirectEnd()
+{
+    if (!m_captured_cerr.str().empty()) {
+        vrv::LogWarning(m_captured_cerr.str().c_str());
+        m_captured_cerr.str("");
+    }
+
+    if (m_original_cerr_buf) {
+        std::cerr.rdbuf(m_original_cerr_buf);
+        m_original_cerr_buf = NULL;
+    }
+}
+
 void Toolkit::RedoLayout(const std::string &jsonOptions)
 {
     bool resetCache = true;
@@ -2074,16 +2091,12 @@ const char *Toolkit::GetHumdrumBuffer()
         stringstream out;
         hum::Tool_mei2hum converter;
 
-        // Temporarily redirect cerr:
-        std::stringstream captured_cerr;
-        std::streambuf *cerr_buf = std::cerr.rdbuf();
-        std::cerr.rdbuf(captured_cerr.rdbuf());
-
-        converter.convert(out, infile);
-        LogWarning(captured_cerr.str().c_str());
-
-        // Restore cerr:
-        std::cerr.rdbuf(cerr_buf);
+        LogRedirectStart();
+        bool status = converter.convert(out, infile);
+        LogRedirectEnd();
+        if (!status) {
+            LogWarning("Problem converting MEI to Humdrum (see warning above this line for possible reasons");
+        }
 
         this->SetHumdrumBuffer(out.str().c_str());
 #endif
@@ -2146,16 +2159,9 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     xmlfile.load_string(meiData.c_str());
     std::stringstream conversion;
 
-    // Temporarily redirect cerr:
-    std::stringstream captured_cerr;
-    std::streambuf *cerr_buf = std::cerr.rdbuf();
-    std::cerr.rdbuf(captured_cerr.rdbuf());
-
+    LogRedirectStart();
     bool status = converter.convert(conversion, xmlfile);
-    LogWarning(captured_cerr.str().c_str());
-
-    // Restore cerr:
-    std::cerr.rdbuf(cerr_buf);
+    LogRedirectEnd();
 
     if (!status) {
         LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
