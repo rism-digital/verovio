@@ -420,11 +420,23 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
         barLine->SetEmptyBB();
         return;
     }
+    StaffDef *drawingStaffDef = staff->m_drawingStaffDef;
+    // Determine the method
+    assert(drawingStaffDef);
+    auto [hasMethod, method] = barLine->GetMethodFromContext(drawingStaffDef);
+    if (barLine->HasMethod()) {
+        method = barLine->GetMethod();
+    }
 
     dc->StartGraphic(element, "", element->GetID());
 
-    const int yTop = staff->GetDrawingY();
-    const int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int yTop = staff->GetDrawingY();
+    int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    if (method == BARMETHOD_takt) {
+        yTop += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        yBottom = yTop - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    }
 
     const int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
 

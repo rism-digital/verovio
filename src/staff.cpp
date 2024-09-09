@@ -298,18 +298,6 @@ int Staff::GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL pla
 // LedgerLine
 //----------------------------------------------------------------------------
 
-LedgerLine::LedgerLine()
-{
-    this->Reset();
-}
-
-LedgerLine::~LedgerLine() {}
-
-void LedgerLine::Reset()
-{
-    m_dashes.clear();
-}
-
 void LedgerLine::AddDash(int left, int right, int extension)
 {
     assert(left < right);

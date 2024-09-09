@@ -80,7 +80,7 @@ public:
 
     /**
      * Return true if the element has to be aligned horizontally
-     * It typically set to false for mRest, mRpt, etc.
+     * It is typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
 

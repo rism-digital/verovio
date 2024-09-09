@@ -772,7 +772,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         // Determine the method
-        const auto [hasMethod, method] = barLine->GetMethod(staffDef);
+        const auto [hasMethod, method] = barLine->GetMethodFromContext(staffDef);
         const bool methodMensur = hasMethod && (method == BARMETHOD_mensur);
         const bool methodTakt = hasMethod && (method == BARMETHOD_takt);
 
@@ -798,7 +798,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Adjust start and length
         if (!methodMensur && !methodTakt) {
-            const auto [hasPlace, place] = barLine->GetPlace(staffDef);
+            const auto [hasPlace, place] = barLine->GetPlaceFromContext(staffDef);
             if (hasPlace) {
                 // bar.place counts upwards (note order).
                 yBottom += place * unit;
@@ -808,7 +808,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 yBottom -= 2 * unit;
             }
 
-            const auto [hasLength, length] = barLine->GetLength(staffDef);
+            const auto [hasLength, length] = barLine->GetLengthFromContext(staffDef);
             if (hasLength) {
                 yLength = length * unit;
             }
