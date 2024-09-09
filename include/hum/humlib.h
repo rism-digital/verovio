@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep  7 13:38:03 PDT 2024
+// Last Modified: Sun Sep  8 23:07:16 PDT 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -7502,6 +7502,9 @@ class Tool_esac2hum : public HumTool {
 		void        processSong         (void);
 		void        printScoreContents  (std::ostream& output);
 		void        embedAnalyses       (std::ostream& output);
+		void        printPdfUrl         (std::ostream& output);
+		std::string getKolbergUrl       (int volume);
+      void        printKolbergPdfUrl  (std::ostream& output);
 
 	private:
 		bool        m_debugQ     = false;  // used with --debug option
@@ -7524,43 +7527,28 @@ class Tool_esac2hum : public HumTool {
 		std::string m_cutline;
 		std::vector<std::string> m_globalComments;
 
+		bool m_initialized = false;
 		int m_minrhy = 0;
 
 		Tool_esac2hum::Score m_score;
 
-		std::map<std::string, std::string> m_bem_translation = {
-			{"Czwarta zwrotka pieśni Niech będzie Jezus Chrystus pochwalony", "Fourth verse of the song \"Let Jesus Christ be praised\""},
-			{"Do oczepin, zakodować w A?", "For the unveiling, encode in A?"},
-			{"Do oczepin", "For the unveiling"},
-			{"Druga zwrotka poprzedniej pieśni", "Second verse of the previous song"},
-			{"Gdy zdejmują wianek", "When they remove the wreath"},
-			{"Jak do ślubu odjeżdżają (na wozie)", "As they depart for the wedding (on a wagon)"},
-			{"Krakowiak", "Krakowiak"},
-			{"Marsz (konfederatów Barskich) Przygrywka na trąbie", "March (of the Bar Confederates) Prelude on trumpet"},
-			{"Marsz konfederatów Barskich", "March of the Bar Confederates"},
-			{"Mazur", "Mazur"},
-			{"Na przodziek", "At the front"},
-			{"Owczarek gładki, szybko tańczony", "Smooth shepherd's dance, danced quickly"},
-			{"Owczarek", "Shepherd's dance"},
-			{"Piosenka żniwiarska", "Harvest song"},
-			{"Polonez (pokutującego wojaka)", "Polonaise (of the penitent soldier)"},
-			{"Polonez", "Polonaise"},
-			{"Polski chodzony", "Polish walking dance"},
-			{"Prawdopodobnie ośmiomiar 2+3+3", "Probably an eight-measure 2+3+3"},
-			{"Prawdopodobnie rytm jambiczny", "Probably iambic rhythm"},
-			{"Przy przenosinach", "During the moving"},
-			{"Tańczy na przodziek (na weselu)", "Dances at the front (at the wedding)"},
-			{"W sobotę gdy wianki wiją", "On Saturday when they weave the wreaths"},
-			{"Wesele do ślubu", "Wedding to the church"},
-			{"Wesele", "Wedding"},
-			{"Weselna gdy zbierają składkę", "Wedding song when collecting contributions"},
-			{"Weselna", "Wedding song"},
-			{"Wielkanoc", "Easter"},
-			{"Wieniec", "Wreath"},
-			{"Zakodować w C?", "Encode in C?"},
-			{"w t. 10 wpisany tryl dziadowski 43b21", "in measure 10, a beggar's trill written 43b21"},
-			{"żniwiarska", "Harvest song"}
+		class KolbergInfo {
+			public:
+				std::string titlePL;
+				std::string titleEN;
+				int firstPrintPage;
+				int firstScanPage;
+				std::vector<int> plates;
+
+				KolbergInfo(void) { firstPrintPage = 0; firstScanPage = 0; }
+				KolbergInfo(
+					const std::string& pl, const std::string& en, int fpp, int fsp, const std::vector<int>& plts)
+        				: titlePL(pl), titleEN(en), firstPrintPage(fpp), firstScanPage(fsp), plates(plts) {}
 		};
+		std::map<int, KolbergInfo> m_kinfo;
+		KolbergInfo getKolbergInfo(int volume);
+		std::string getKolbergUrl(int volume, int printPage);
+		int calculateScanPage(int inputPrintPage, int printPage, int scanPage, const std::vector<int>& platePages);
 
 
 };
