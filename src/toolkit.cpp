@@ -70,6 +70,8 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
+    m_original_cerr_buf = NULL;
+
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.InitFonts();
@@ -298,10 +300,16 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
+        // Case where there are empty lines before content in Humdrum files.
         return HUMDRUM;
     }
     if (initial.find("\n**") != std::string::npos) {
+        // Case where there are empty lines before content in Humdrum files.
         return HUMDRUM;
+    }
+    if (initial.find("\nCUT[") != std::string::npos) {
+        // Title record for a melody in EsAC format.
+        return ESAC;
     }
 
     // Assume that the input is MEI if other input types were not detected.
@@ -615,7 +623,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         pugi::xml_document xmlfile;
         xmlfile.load_string(data.c_str());
         stringstream conversion;
+
+        LogRedirectStart();
         bool status = converter.convert(conversion, xmlfile);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting MusicXML to Humdrum (see warning above this line for possible reasons");
+        }
+
         if (!status) {
             LogError("Error converting MusicXML data");
             return false;
@@ -663,7 +678,14 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
         // This is the indirect converter from MuseData to MEI using iohumdrum:
         hum::Tool_musedata2hum converter;
         stringstream conversion;
+
+        LogRedirectStart();
         bool status = converter.convertString(conversion, data);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
+        }
+
         if (!status) {
             LogError("Error converting MuseData data");
             return false;
@@ -690,8 +712,15 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     else if (inputFormat == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
-        stringstream conversion;
+        std::stringstream conversion;
+
+        LogRedirectStart();
         bool status = converter.convert(conversion, data);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
+        }
+
         if (!status) {
             LogError("Error converting EsAC data");
             return false;
@@ -1455,6 +1484,35 @@ void Toolkit::ResetLogBuffer()
     logBuffer.clear();
 }
 
+void Toolkit::LogRedirectStart()
+{
+    if (m_original_cerr_buf) {
+        vrv::LogError("In Toolkit::LogRedirectStart: Only one log redirect can be active at a time.");
+        return;
+    }
+    if (!m_captured_cerr.str().empty()) {
+        vrv::LogWarning("In Toolkit::LogRedirectStart: Log capture buffer not empty, sending current contents to "
+                        "LogWarning and resetting.");
+        vrv::LogWarning(m_captured_cerr.str().c_str());
+        m_captured_cerr.str("");
+    }
+    m_original_cerr_buf = std::cerr.rdbuf();
+    std::cerr.rdbuf(m_captured_cerr.rdbuf());
+}
+
+void Toolkit::LogRedirectStop()
+{
+    if (!m_captured_cerr.str().empty()) {
+        vrv::LogWarning(m_captured_cerr.str().c_str());
+        m_captured_cerr.str("");
+    }
+
+    if (m_original_cerr_buf) {
+        std::cerr.rdbuf(m_original_cerr_buf);
+        m_original_cerr_buf = NULL;
+    }
+}
+
 void Toolkit::RedoLayout(const std::string &jsonOptions)
 {
     bool resetCache = true;
@@ -2047,7 +2105,14 @@ const char *Toolkit::GetHumdrumBuffer()
         infile.load_string(meidata.c_str());
         stringstream out;
         hum::Tool_mei2hum converter;
-        converter.convert(out, infile);
+
+        LogRedirectStart();
+        bool status = converter.convert(out, infile);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting MEI to Humdrum (see warning above this line for possible reasons");
+        }
+
         this->SetHumdrumBuffer(out.str().c_str());
 #endif
         if (m_humdrumBuffer) {
@@ -2108,7 +2173,11 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     pugi::xml_document xmlfile;
     xmlfile.load_string(meiData.c_str());
     std::stringstream conversion;
+
+    LogRedirectStart();
     bool status = converter.convert(conversion, xmlfile);
+    LogRedirectStop();
+
     if (!status) {
         LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
     }
