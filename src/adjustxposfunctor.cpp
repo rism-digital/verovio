@@ -33,6 +33,7 @@ AdjustXPosFunctor::AdjustXPosFunctor(Doc *doc, const std::vector<int> &staffNs) 
     m_staffNs = staffNs;
     m_staffSize = 100;
     m_rightBarLinesOnly = false;
+    m_measure = NULL;
 }
 
 FunctorCode AdjustXPosFunctor::VisitAlignment(Alignment *alignment)
@@ -125,7 +126,7 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
         return FUNCTOR_SIBLINGS;
     }
 
-    if (layerElement->GetAlignment()->GetType() == ALIGNMENT_CLEF) {
+    if ((layerElement->GetAlignment()->GetType() == ALIGNMENT_CLEF) && !m_isNeumeStaff) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -145,8 +146,9 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
     int selfRight = layerElement->GetAlignment()->GetXRel();
     if (!layerElement->HasSelfBB() || layerElement->HasEmptyBB()) {
         selfRight = layerElement->GetAlignment()->GetXRel();
-        // Still add the right margin for the barlines
-        if (layerElement->Is(BARLINE)) selfRight += m_doc->GetRightMargin(layerElement) * drawingUnit;
+        // Still add the right margin for the barlines but not with non measure music
+        if (layerElement->Is(BARLINE) && m_measure->IsMeasuredMusic())
+            selfRight += m_doc->GetRightMargin(layerElement) * drawingUnit;
     }
     else {
         selfRight = layerElement->GetSelfRight() + m_doc->GetRightMargin(layerElement) * drawingUnit;
@@ -210,6 +212,8 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
     m_upcomingMinPos = VRV_UNSET;
     m_cumulatedXShift = 0;
 
+    m_measure = measure;
+
     System *system = vrv_cast<System *>(measure->GetFirstAncestor(SYSTEM));
     assert(system);
 
@@ -228,6 +232,7 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
         m_currentAlignment.Reset();
         StaffAlignment *staffAlignment = system->m_systemAligner.GetStaffAlignmentForStaffN(staffN);
         m_staffSize = (staffAlignment) ? staffAlignment->GetStaffSize() : 100;
+        m_isNeumeStaff = (staffAlignment && staffAlignment->GetStaff()) ? staffAlignment->GetStaff()->IsNeume() : false;
 
         // Prevent collisions of scoredef clefs with thick barlines
         if (hasSystemStartLine) {
@@ -249,6 +254,9 @@ FunctorCode AdjustXPosFunctor::VisitMeasure(Measure *measure)
     }
 
     this->SetFilters(previousFilters);
+
+    // There is no reason to adjust a minimum width with mensural music
+    if (!measure->IsMeasuredMusic()) return FUNCTOR_SIBLINGS;
 
     int minMeasureWidth = m_doc->GetOptions()->m_unit.GetValue() * m_doc->GetOptions()->m_measureMinWidth.GetValue();
     // First try to see if we have a double measure length element

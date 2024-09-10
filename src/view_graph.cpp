@@ -52,6 +52,20 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
     return;
 }
 
+void View::DrawObliqueLine(DeviceContext *dc, int x1, int x2, int y1, int y2, int width, int dashLength, int gapLength)
+{
+    assert(dc);
+
+    dc->SetPen(m_currentColor, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength, gapLength);
+    dc->SetBrush(m_currentColor, AxSOLID);
+
+    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+
+    dc->ResetPen();
+    dc->ResetBrush();
+    return;
+}
+
 void View::DrawVerticalSegmentedLine(
     DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength, int gapLength)
 {

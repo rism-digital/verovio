@@ -555,6 +555,12 @@
   <g c="E56F" x="0.0" y="-40.0" w="499.0" h="253.0" h-a-x="500" n="ornamentHaydn" />
   <g c="E583" x="1.0" y="109.0" w="24.0" h="280.0" h-a-x="27" n="ornamentVerticalLine" />
   <g c="E587" x="0.0" y="0.0" w="1143.0" h="660.0" h-a-x="1143" n="ornamentSchleifer" />
+  <g c="E594" x="0.0" y="-1.0" w="170.0" h="481.0" h-a-x="185" n="ornamentLeftVerticalStroke">
+    <a n="repeatOffset" x="0.74" y="0.0" />
+  </g>
+  <g c="E595" x="-30.0" y="-1.0" w="343.0" h="501.0" h-a-x="288" n="ornamentLeftVerticalStrokeWithCross">
+    <a n="repeatOffset" x="1.15" y="0.0" />
+  </g>
   <g c="E59D" x="-52.0" y="0.0" w="337.0" h="245.0" h-a-x="262" n="ornamentZigZagLineNoRightEnd">
     <a n="repeatOffset" x="1.05" y="0.0" />
   </g>
@@ -679,6 +685,10 @@
   <g c="E923" x="0.0" y="-125.0" w="266.0" h="251.0" h-a-x="266" n="mensuralProlationCombiningThreeDotsTri" />
   <g c="E924" x="0.0" y="-162.0" w="324.0" h="324.0" h-a-x="324" n="mensuralProlationCombiningDotVoid" />
   <g c="E925" x="0.0" y="-371.0" w="48.0" h="743.0" h-a-x="48" n="mensuralProlationCombiningStroke" />
+  <g c="E926" x="0.0" y="-250.0" w="249.0" h="503.0" h-a-x="249" n="mensuralProportion1" />
+  <g c="E927" x="0.0" y="-250.0" w="331.0" h="503.0" h-a-x="331" n="mensuralProportion2" />
+  <g c="E928" x="0.0" y="-250.0" w="294.0" h="503.0" h-a-x="293" n="mensuralProportion3" />
+  <g c="E929" x="0.0" y="-250.0" w="379.0" h="500.0" h-a-x="379" n="mensuralProportion4" />
   <g c="E938" x="0.0" y="-141.0" w="282.0" h="282.0" h-a-x="282" n="mensuralNoteheadSemibrevisBlack" />
   <g c="E939" x="1.0" y="-141.0" w="282.0" h="282.0" h-a-x="283" n="mensuralNoteheadSemibrevisVoid" />
   <g c="E93C" x="0.0" y="-184.0" w="320.0" h="369.0" h-a-x="320" n="mensuralNoteheadMinimaWhite">
@@ -712,6 +722,7 @@
   <g c="E99B" x="0.0" y="-115.0" w="154.0" h="230.0" h-a-x="154" n="chantQuilisma" />
   <g c="E99E" x="0.0" y="-246.0" w="153.0" h="360.0" h-a-x="153" n="chantOriscusLiquescens" />
   <g c="E99F" x="0.0" y="-92.0" w="124.0" h="185.0" h-a-x="124" n="chantStrophicus" />
+  <g c="E9A1" x="0.0" y="-57.0" w="91.0" h="115.0" h-a-x="91" n="chantPunctumDeminutum" />
   <g c="E9B0" x="0.0" y="0.0" w="154.0" h="164.0" h-a-x="139" n="chantPodatusLower" />
   <g c="E9B1" x="-127.0" y="-3.0" w="141.0" h="198.0" h-a-x="0" n="chantPodatusUpper" />
   <g c="E9B2" x="-62.0" y="-121.0" w="76.0" h="188.0" h-a-x="14" n="chantDeminutumUpper" />
@@ -745,6 +756,7 @@
   <g c="E9F8" x="0.0" y="0.0" w="138.0" h="165.0" h-a-x="138" n="mensuralRestSemifusa" />
   <g c="EA02" x="1.0" y="0.0" w="613.0" h="411.0" h-a-x="615" n="mensuralCustosUp" />
   <g c="EA06" x="0.0" y="-101.0" w="60.0" h="416.0" h-a-x="60" n="chantCustosStemUpPosMiddle" />
+  <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="263.0" h-a-x="319" n="medRenOriscusCMN" />
   <g c="EA50" x="20.0" y="-1.0" w="215.0" h="252.0" h-a-x="255" n="figbass0" />
   <g c="EA51" x="20.0" y="0.0" w="117.0" h="254.0" h-a-x="157" n="figbass1" />
   <g c="EA52" x="20.0" y="-3.0" w="202.0" h="256.0" h-a-x="242" n="figbass2" />
@@ -1005,6 +1017,7 @@
   <g c="F433" x="0.0" y="0.0" w="200.0" h="300.0" h-a-x="200" n="pluckedSnapPizzicatoAboveGerman" />
   <g c="F434" x="0.0" y="-8.0" w="923.0" h="563.0" h-a-x="922" n="keyboardPedalPedNoDot" />
   <g c="F435" x="0.0" y="-15.0" w="1014.0" h="606.0" h-a-x="1014" n="keyboardPedalSostNoDot" />
+  <g c="F43D" x="0.0" y="-251.0" w="455.0" h="504.0" h-a-x="455" n="mensuralProportion4Old" />
   <g c="F43F" x="0.0" y="-169.0" w="529.0" h="338.0" h-a-x="529" n="noteheadDoubleWholeAlt">
     <a n="noteheadOrigin" x="0.14" y="0.0" />
   </g>

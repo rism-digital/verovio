@@ -96,12 +96,12 @@ FunctorCode SaveFunctor::VisitMdivEnd(Mdiv *mdiv)
 
 FunctorCode SaveFunctor::VisitMeasure(Measure *measure)
 {
-    return (measure->IsMeasuredMusic()) ? this->VisitObject(measure) : FUNCTOR_CONTINUE;
+    return (measure->IsMeasuredMusic() || measure->IsNeumeLine()) ? this->VisitObject(measure) : FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitMeasureEnd(Measure *measure)
 {
-    return (measure->IsMeasuredMusic()) ? this->VisitObjectEnd(measure) : FUNCTOR_CONTINUE;
+    return (measure->IsMeasuredMusic() || measure->IsNeumeLine()) ? this->VisitObjectEnd(measure) : FUNCTOR_CONTINUE;
 }
 
 FunctorCode SaveFunctor::VisitMNum(MNum *mNum)

@@ -156,8 +156,14 @@
   <g c="E56B" x="0.0" y="0.0" w="244.0" h="468.0" h-a-x="244" n="ornamentTurnUpS" />
   <g c="E938" x="0.0" y="-141.0" w="282.0" h="282.0" h-a-x="282" n="mensuralNoteheadSemibrevisBlack" />
   <g c="E939" x="0.0" y="-141.0" w="282.0" h="282.0" h-a-x="282" n="mensuralNoteheadSemibrevisVoid" />
-  <g c="E93C" x="0.0" y="-195.0" w="312.0" h="390.0" h-a-x="312" n="mensuralNoteheadMinimaWhite" />
-  <g c="E93D" x="0.0" y="-195.0" w="312.0" h="390.0" h-a-x="312" n="mensuralNoteheadSemiminimaWhite" />
+  <g c="E93C" x="0.0" y="-195.0" w="312.0" h="390.0" h-a-x="312" n="mensuralNoteheadMinimaWhite">
+    <a n="stemDownNW" x="0.58" y="-0.7" />
+    <a n="stemUpSE" x="0.66" y="0.7" />
+  </g>
+  <g c="E93D" x="0.0" y="-195.0" w="312.0" h="390.0" h-a-x="312" n="mensuralNoteheadSemiminimaWhite">
+    <a n="stemDownNW" x="0.58" y="-0.7" />
+    <a n="stemUpSE" x="0.66" y="0.7" />
+  </g>
   <g c="E101" x="0.0" y="-250.0" w="460.0" h="500.0" h-a-x="460" n="noteheadSlashHorizontalEnds">
     <a n="stemDownNW" x="0.0" y="-1.0" />
     <a n="stemUpSE" x="1.84" y="1.0" />
@@ -452,6 +458,7 @@
   <g c="E5C6" x="1.0" y="-2.0" w="1104.0" h="370.0" h-a-x="1105" n="ornamentPrecompMordentUpperPrefix" />
   <g c="E5C7" x="1.0" y="-80.0" w="1104.0" h="448.0" h-a-x="1105" n="ornamentPrecompInvertedMordentUpperPrefix" />
   <g c="E5C8" x="0.0" y="-243.0" w="756.0" h="483.0" h-a-x="756" n="ornamentPrecompTrillLowerSuffix" />
+  <g c="E594" x="0.0" y="0.0" w="30.0" h="400.0" h-a-x="30" n="ornamentLeftVerticalStroke" />
   <g c="E56F" x="0.0" y="-107.0" w="500.0" h="397.0" h-a-x="500" n="ornamentHaydn" />
   <g c="E587" x="0.0" y="-2.0" w="999.0" h="374.0" h-a-x="1000" n="ornamentSchleifer" />
   <g c="E651" x="0.0" y="0.0" w="320.0" h="514.0" h-a-x="320" n="keyboardPedalP" />
@@ -703,6 +710,7 @@
   <g c="E996" x="0.0" y="-401.0" w="144.0" h="503.0" h-a-x="144" n="chantPunctumVirga" />
   <g c="E997" x="0.0" y="-401.0" w="144.0" h="503.0" h-a-x="144" n="chantPunctumVirgaReversed" />
   <g c="E99E" x="0.0" y="-250.0" w="145.0" h="364.0" h-a-x="145" n="chantOriscusLiquescens" />
+  <g c="E9A1" x="0.0" y="-57.0" w="91.0" h="115.0" h-a-x="91" n="chantPunctumDeminutum" />
   <g c="E99B" x="0.0" y="-115.0" w="139.0" h="230.0" h-a-x="140" n="chantQuilisma" />
   <g c="E9B1" x="-113.0" y="-3.0" w="127.0" h="198.0" h-a-x="14" n="chantPodatusUpper" />
   <g c="E9B2" x="-56.0" y="-121.0" w="69.0" h="188.0" h-a-x="13" n="chantDeminutumUpper" />
@@ -799,4 +807,15 @@
     <a n="stemDownNW" x="0.0" y="-0.14" />
     <a n="stemUpSE" x="1.26" y="0.16" />
   </g>
+  <g c="E926" x="19.86" y="-200.0" w="180.14" h="390.0" h-a-x="220" n="mensuralProportion1" />
+  <g c="E928" x="23.0" y="-201.0" w="215.0" h="391.0" h-a-x="256" n="mensuralProportion3" />
+  <g c="E927" x="20.0" y="-200.0" w="254.04" h="390.02" h-a-x="294" n="mensuralProportion2" />
+  <g c="E929" x="20.0" y="-202.0" w="254.0" h="382.0" h-a-x="294" n="mensuralProportion4" />
+  <g c="EE90" x="13.0" y="-200.02" w="247.0" h="392.02" h-a-x="280" n="mensuralProportion5" />
+  <g c="EE91" x="14.66" y="-200.0" w="232.34" h="390.0" h-a-x="267" n="mensuralProportion6" />
+  <g c="EE94" x="15.66" y="-200.0" w="232.34" h="390.0" h-a-x="267" n="mensuralProportion9" />
+  <g c="EE93" x="20.0" y="-200.0" w="233.0" h="390.0" h-a-x="273" n="mensuralProportion8" />
+  <g c="EE92" x="20.0" y="-201.0" w="233.0" h="391.0" h-a-x="273" n="mensuralProportion7" />
+  <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="261.0" h-a-x="319" n="medRenOriscusCMN" />
+  <g c="E595" x="0.0" y="0.0" w="210.0" h="400.0" h-a-x="210" n="ornamentLeftVerticalStrokeWithCross" />
 </bounding-boxes>

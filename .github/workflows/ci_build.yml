@@ -78,7 +78,7 @@ jobs:
             compiler: g++
             version: "10"
 
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             compiler: g++
             version: "11"
 
@@ -106,7 +106,7 @@ jobs:
             compiler: xcode
             version: "15.3"
 
-          - os: macos-11
+          - os: macos-latest
             compiler: g++
             version: "12"
 

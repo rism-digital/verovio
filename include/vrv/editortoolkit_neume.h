@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "editortoolkit.h"
+#include "measure.h"
 #include "view.h"
 #include "vrv.h"
 #include "zone.h"
@@ -50,6 +51,8 @@ public:
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool SetText(std::string elementId, const std::string &text);
     bool SetClef(std::string elementId, std::string shape);
+    bool SetLiquescent(std::string elementId, std::string shape);
+    bool SortStaves();
     bool Split(std::string elementId, int x);
     bool SplitNeume(std::string elementId, std::string ncId);
     bool Remove(std::string elementId);
@@ -80,6 +83,7 @@ protected:
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
     bool ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape);
+    bool ParseSetLiquescentAction(jsonxx::Object param, std::string *elementId, std::string *shape);
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
     bool ParseSplitNeumeAction(jsonxx::Object param, std::string *elementId, std::string *ncId);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
@@ -139,6 +143,7 @@ struct ClosestBB {
 };
 
 // To be used with std::stable_sort to find the position to insert a new accid / divLine
+// TODO: use closesBB instead
 struct ClosestNeume {
     int x;
     int y;
@@ -177,11 +182,26 @@ struct ClosestNeume {
 struct StaffSort {
     // Sort staves left-to-right and top-to-bottom
     // Sort by y if there is no intersection, by x if there is x intersection is smaller than half length of staff line
+
+    // Update 2024-04:
+    // Used only in neume lines,
+    // System->(Measure->Staff)
+    // Need to sort Measure to sort staff
     bool operator()(Object *a, Object *b)
     {
-        if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
-        Zone *zoneA = a->GetFacsimileInterface()->GetZone();
-        Zone *zoneB = b->GetFacsimileInterface()->GetZone();
+        if (!a->Is(SYSTEM) || !b->Is(SYSTEM)) return false;
+        if (!a->FindDescendantByType(MEASURE) || !b->FindDescendantByType(MEASURE)) return false;
+        Measure *measureA = dynamic_cast<Measure *>(a->FindDescendantByType(MEASURE));
+        Measure *measureB = dynamic_cast<Measure *>(b->FindDescendantByType(MEASURE));
+        if (!measureA->IsNeumeLine() || !measureB->IsNeumeLine()) return true;
+        Object *staffA = a->FindDescendantByType(STAFF);
+        Object *staffB = b->FindDescendantByType(STAFF);
+        assert(staffA);
+        assert(staffB);
+        Zone *zoneA = staffA->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = staffB->GetFacsimileInterface()->GetZone();
+        assert(zoneA);
+        assert(zoneB);
 
         int aLowest, bLowest, aHighest, bHighest;
 

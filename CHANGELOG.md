@@ -1,12 +1,22 @@
 # Changelog
 
+## [unreleased]
+* Support (initial) for Volpiano input
+* Support for neumatic notation oriscus and quilisma
+* Support for neume layout without facsimile
+* Support for numeral harmonics in MusicXML importer (@eNote-GmBH)
+
+## [4.2.1] - 2024-05-07
+* Fix GitHub actions (Python release only)
+
 ## [4.2.0] - 2024-05-05
 * Support for `fTrem@unitdur` (@eNote-GmbH)
 * Upgrade to C++20
 * Update of the Midifile library
+* Improved logging
 * Fix lyric position in MIDI output
 * Fix string formatting output with some locale configurations (@ammatwain)
- 
+
 ## [4.1.0] - 2023-12-15
 * Support for staves ordered by `scoreDef`
 * Support for `rend@letterspacing` and `syl@letterspacing` in MEI vu

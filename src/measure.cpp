@@ -54,7 +54,7 @@ namespace vrv {
 
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
-Measure::Measure(bool measureMusic, int logMeasureNb)
+Measure::Measure(MeasureType measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
     , FacsimileInterface()
     , AttBarring()
@@ -76,7 +76,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     this->RegisterAttClass(ATT_TYPED);
     this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
 
-    m_measuredMusic = measureMusic;
+    m_measureType = measureMusic;
 
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
@@ -95,7 +95,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
 
     this->Reset();
 
-    if (!measureMusic) this->SetRight(BARRENDITION_invis);
+    if (!this->IsMeasuredMusic() && !this->IsNeumeLine()) this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
@@ -149,10 +149,8 @@ void Measure::Reset()
     m_rightBarLine.SetForm(this->GetRight());
     m_leftBarLine.SetForm(this->GetLeft());
 
-    if (!m_measuredMusic) {
-        m_drawingFacsX1 = VRV_UNSET;
-        m_drawingFacsX2 = VRV_UNSET;
-    }
+    m_drawingFacsX1 = VRV_UNSET;
+    m_drawingFacsX2 = VRV_UNSET;
 
     m_drawingEnding = NULL;
     m_hasAlignmentRefWithMultipleLayers = false;
@@ -213,14 +211,6 @@ void Measure::AddChildBack(Object *child)
 
 int Measure::GetDrawingX() const
 {
-    if (!this->IsMeasuredMusic()) {
-        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
-        assert(system);
-        if (system->m_drawingFacsY != VRV_UNSET) {
-            return (system->m_systemLeftMar);
-        }
-    }
-
     if (m_drawingFacsX1 != VRV_UNSET) return m_drawingFacsX1;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
@@ -353,17 +343,6 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
-    if (!this->IsMeasuredMusic()) {
-        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
-        assert(system);
-        if (system->m_drawingFacsY != VRV_UNSET) {
-            const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
-            assert(page);
-            // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
-            return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
-        }
-    }
-
     if (m_drawingFacsX2 != VRV_UNSET) return (m_drawingFacsX2 - m_drawingFacsX1);
 
     assert(m_measureAligner.GetRightAlignment());

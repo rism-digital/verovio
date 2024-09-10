@@ -1,16 +1,18 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcligaturenoteposfunctor.cpp
+// Name:        calcligaturorneumeposfunctor.cpp
 // Author:      David Bauer
 // Created:     2023
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "calcligaturenoteposfunctor.h"
+#include "calcligatureorneumeposfunctor.h"
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
 #include "ligature.h"
+#include "nc.h"
+#include "neume.h"
 #include "staff.h"
 
 //----------------------------------------------------------------------------
@@ -18,12 +20,12 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcLigatureNotePosFunctor
+// CalcLigatureOrNeumePosFunctor
 //----------------------------------------------------------------------------
 
-CalcLigatureNotePosFunctor::CalcLigatureNotePosFunctor(Doc *doc) : DocFunctor(doc) {}
+CalcLigatureOrNeumePosFunctor::CalcLigatureOrNeumePosFunctor(Doc *doc) : DocFunctor(doc) {}
 
-FunctorCode CalcLigatureNotePosFunctor::VisitLigature(Ligature *ligature)
+FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
 {
     if (m_doc->GetOptions()->m_ligatureAsBracket.GetValue()) return FUNCTOR_CONTINUE;
 
@@ -218,6 +220,149 @@ FunctorCode CalcLigatureNotePosFunctor::VisitLigature(Ligature *ligature)
         }
         previousNote = note;
         ++n1;
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+FunctorCode CalcLigatureOrNeumePosFunctor::VisitNeume(Neume *neume)
+{
+    if (m_doc->GetOptions()->m_neumeAsNote.GetValue()) return FUNCTOR_SIBLINGS;
+
+    ListOfObjects ncs = neume->FindAllDescendantsByType(NC);
+
+    Staff *staff = neume->GetAncestorStaff();
+    assert(staff);
+    const int staffSize = staff->m_drawingStaffSize;
+    const int unit = m_doc->GetDrawingUnit(staffSize);
+
+    int xRel = 0;
+    Nc *previousNc = NULL;
+    bool previousLig = false;
+
+    for (Object *object : ncs) {
+
+        Nc *nc = vrv_cast<Nc *>(object);
+        assert(nc);
+
+        const bool hasLiquescent = (nc->FindDescendantByType(LIQUESCENT));
+        const bool hasOriscus = (nc->FindDescendantByType(ORISCUS));
+        const bool hasQuilisma = (nc->FindDescendantByType(QUILISMA));
+
+        const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
+
+        // Make sure we have at least one glyph
+        nc->m_drawingGlyphs.resize(1);
+
+        int pitchDifference = (previousNc) ? nc->PitchOrLocDifferenceTo(previousNc) : 0;
+        bool overlapWithPrevious = (pitchDifference == 0) ? false : true;
+
+        if (hasLiquescent) {
+            nc->m_drawingGlyphs.resize(3);
+            const int ncWidth = m_doc->GetGlyphWidth(SMUFL_E995_chantAuctumDesc, staffSize, false);
+            const int lineWidth = m_doc->GetGlyphWidth(SMUFL_E9BE_chantConnectingLineAsc3rd, staffSize, false);
+
+            if (nc->GetCurve() == curvatureDirection_CURVE_c) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E995_chantAuctumDesc;
+                nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
+                nc->m_drawingGlyphs.at(1).m_yOffset = -1.75 * unit;
+                nc->m_drawingGlyphs.at(2).m_yOffset = -1.9 * unit;
+            }
+            else if (nc->GetCurve() == curvatureDirection_CURVE_a) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E994_chantAuctumAsc;
+                nc->m_drawingGlyphs.at(1).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs.at(2).m_fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                nc->m_drawingGlyphs.at(2).m_xOffset = ncWidth - lineWidth;
+                nc->m_drawingGlyphs.at(1).m_yOffset = 0.5 * unit;
+                nc->m_drawingGlyphs.at(2).m_yOffset = 0.75 * unit;
+            }
+            else {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9A1_chantPunctumDeminutum;
+            }
+        }
+        else if (hasOriscus) {
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_EA2A_medRenOriscusCMN;
+        }
+        else if (hasQuilisma) {
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E99B_chantQuilisma;
+        }
+        else {
+            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E990_chantPunctum;
+
+            if (nc->GetLigated() == BOOLEAN_true) {
+                // This is the first nc of a ligature
+                if (!previousLig) {
+                    // Temporarily set a second line glyph
+                    nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+                    previousLig = true;
+                }
+                // This is the second
+                else {
+                    // No overlap in this case since the second starts at the same position as the first
+                    overlapWithPrevious = false;
+                    assert(previousNc);
+                    previousLig = false;
+                    nc->m_drawingGlyphs.at(0).m_yOffset = -pitchDifference * unit;
+                    previousNc->m_drawingGlyphs.at(0).m_yOffset = pitchDifference * unit;
+
+                    // set the glyph for both the current and previous nc
+                    switch (pitchDifference) {
+                        case -1:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B4_chantEntryLineAsc2nd;
+                            break;
+                        case -2:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B5_chantEntryLineAsc3rd;
+                            break;
+                        case -3:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BB_chantLigaturaDesc4th;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B6_chantEntryLineAsc4th;
+                            break;
+                        case -4:
+                            nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9BC_chantLigaturaDesc5th;
+                            previousNc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E9B7_chantEntryLineAsc5th;
+                            break;
+                        default: break;
+                    }
+                }
+            }
+            // Check if nc is part of a ligature or is an inclinatum
+            else if (nc->HasTilt() && nc->GetTilt() == COMPASSDIRECTION_se) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E991_chantPunctumInclinatum;
+                // No overlap with this shape
+                overlapWithPrevious = false;
+            }
+            // If the nc is supposed to be a virga and currently is being rendered as a punctum
+            // change it to a virga
+            else if (nc->GetTilt() == COMPASSDIRECTION_s
+                && nc->m_drawingGlyphs.at(0).m_fontNo == SMUFL_E990_chantPunctum) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E996_chantPunctumVirga;
+            }
+            else if (nc->GetTilt() == COMPASSDIRECTION_n
+                && nc->m_drawingGlyphs.at(0).m_fontNo == SMUFL_E990_chantPunctum) {
+                nc->m_drawingGlyphs.at(0).m_fontNo = SMUFL_E997_chantPunctumVirgaReversed;
+            }
+        }
+
+        // xRel remains unset with facsimile
+        if (!m_doc->HasFacsimile()) {
+            // If the nc overlaps with the previous, move it back from a line width
+            if (overlapWithPrevious) {
+                xRel -= lineWidth;
+            }
+
+            nc->SetDrawingXRel(xRel);
+            // The first glyph set the spacing - unless we are starting a ligature, in which case no spacing should be
+            // added between the two nc
+            if (!previousLig) {
+                xRel += m_doc->GetGlyphWidth(nc->m_drawingGlyphs.at(0).m_fontNo, staffSize, false);
+            }
+        }
+
+        previousNc = nc;
     }
 
     return FUNCTOR_SIBLINGS;

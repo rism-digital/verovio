@@ -53,7 +53,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Measure(bool measuredMusic = true, int logMeasureNb = -1);
+    Measure(MeasureType measuredMusic = MEASURED, int logMeasureNb = -1);
     virtual ~Measure();
     Object *Clone() const override { return new Measure(*this); };
     void Reset() override;
@@ -79,7 +79,12 @@ public:
     /**
      * Return true if measured music (otherwise we have fake measures)
      */
-    bool IsMeasuredMusic() const { return m_measuredMusic; }
+    bool IsMeasuredMusic() const { return (m_measureType == MEASURED); }
+
+    /**
+     * Return true if the measure represents a neume (section) line
+     */
+    bool IsNeumeLine() const { return (m_measureType == NEUMELINE); }
 
     /**
      * Get and set the measure index
@@ -404,9 +409,10 @@ protected:
 
 private:
     /**
-     * Indicates measured music (otherwise we have fake measures)
+     * Indicate measured music (CMN), unmeasured (fake measures for mensural or neumes) or neume lines
+     * Neume line measure are created from <section type="neon-neume-line">
      */
-    bool m_measuredMusic;
+    MeasureType m_measureType;
 
     /**
      * The unique measure index
