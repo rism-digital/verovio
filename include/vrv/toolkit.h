@@ -770,6 +770,11 @@ protected:
      */
     void ResetLogBuffer();
 
+    /**
+     * Load a string data with or without resetting the log buffer
+     */
+    bool LoadData(const std::string &data, bool resetLogBuffer);
+
 private:
     bool SetFont(const std::string &fontName);
     bool IsUTF16(const std::string &filename);
