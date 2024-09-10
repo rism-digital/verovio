@@ -70,6 +70,8 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
+    m_original_cerr_buf = NULL;
+
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.InitFonts();

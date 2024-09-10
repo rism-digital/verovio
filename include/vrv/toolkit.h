@@ -831,7 +831,7 @@ private:
      * Temporary storage of the std::cerr read buffer during LogCapture. NULL when not in use.
      * Used to coordinate between LogRedirectStart()/LogRedirectStop().
      */
-    std::streambuf *m_original_cerr_buf = NULL;
+    std::streambuf *m_original_cerr_buf;
 
     EditorToolkit *m_editorToolkit;
 
