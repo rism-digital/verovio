@@ -70,7 +70,7 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
-    m_original_cerr_buf = NULL;
+    m_cerrOriginalBuf = NULL;
 
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
@@ -1486,30 +1486,30 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::LogRedirectStart()
 {
-    if (m_original_cerr_buf) {
+    if (m_cerrOriginalBuf) {
         vrv::LogError("In Toolkit::LogRedirectStart: Only one log redirect can be active at a time.");
         return;
     }
-    if (!m_captured_cerr.str().empty()) {
+    if (!m_cerrCaptured.str().empty()) {
         vrv::LogWarning("In Toolkit::LogRedirectStart: Log capture buffer not empty, sending current contents to "
                         "LogWarning and resetting.");
-        vrv::LogWarning(m_captured_cerr.str().c_str());
-        m_captured_cerr.str("");
+        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        m_cerrCaptured.str("");
     }
-    m_original_cerr_buf = std::cerr.rdbuf();
-    std::cerr.rdbuf(m_captured_cerr.rdbuf());
+    m_cerrOriginalBuf = std::cerr.rdbuf();
+    std::cerr.rdbuf(m_cerrCaptured.rdbuf());
 }
 
 void Toolkit::LogRedirectStop()
 {
-    if (!m_captured_cerr.str().empty()) {
-        vrv::LogWarning(m_captured_cerr.str().c_str());
-        m_captured_cerr.str("");
+    if (!m_cerrCaptured.str().empty()) {
+        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        m_cerrCaptured.str("");
     }
 
-    if (m_original_cerr_buf) {
-        std::cerr.rdbuf(m_original_cerr_buf);
-        m_original_cerr_buf = NULL;
+    if (m_cerrOriginalBuf) {
+        std::cerr.rdbuf(m_cerrOriginalBuf);
+        m_cerrOriginalBuf = NULL;
     }
 }
 
