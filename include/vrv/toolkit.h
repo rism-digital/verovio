@@ -772,14 +772,14 @@ protected:
 
     /**
      * Start capturing std::cerr from an external codebase for redirection to vrv::logBuffer.
-     * Only one capture should be active at a given time.  Finish by calling LogRedirectEnd.
+     * Only one capture should be active at a given time.  Finish by calling LogRedirectStop.
      */
     void LogRedirectStart();
 
     /**
      * End capturing std::cerr from an external codebase for redirection to vrv::logBuffer.
      */
-    void LogRedirectEnd();
+    void LogRedirectStop();
 
 private:
     bool SetFont(const std::string &fontName);
@@ -818,13 +818,13 @@ private:
 
     /**
      * Temporary capture buffer for redirecting std::cerr to vrv::LogWarning.
-     * Used to coordinate between LogRedirectStart()/LogRedirectEnd().
+     * Used to coordinate between LogRedirectStart()/LogRedirectStop().
      */
     std::stringstream m_captured_cerr;
 
     /**
      * Temporary storage of the std::cerr read buffer during LogCapture. NULL when not in use.
-     * Used to coordinate between LogRedirectStart()/LogRedirectEnd().
+     * Used to coordinate between LogRedirectStart()/LogRedirectStop().
      */
     std::streambuf *m_original_cerr_buf = NULL;
 
