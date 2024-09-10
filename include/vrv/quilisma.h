@@ -29,20 +29,20 @@ public:
     ///@{
     Quilisma();
     virtual ~Quilisma();
-    virtual Object *Clone() const { return new Quilisma(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Quilisma"; }
+    Object *Clone() const override { return new Quilisma(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "Quilisma"; }
     ///@}
 
     /**
      * @name Getter to interfaces
      */
     ///@{
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    PitchInterface *GetPitchInterface() override { return dynamic_cast<PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
 private:
     //

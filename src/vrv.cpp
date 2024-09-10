@@ -76,7 +76,7 @@ void LogElapsedTimeStart()
     gettimeofday(&start, NULL);
 }
 
-void LogElapsedTimeEnd(const char *msg)
+void LogElapsedTimeStop(const char *msg)
 {
     double elapsedTime;
     struct timeval end;

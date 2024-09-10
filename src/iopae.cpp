@@ -431,7 +431,6 @@ void PAEOutput::WriteMultiRest(MultiRest *multiRest)
 void PAEOutput::WriteNote(Note *note)
 {
     assert(note);
-    assert(m_currentMeasure);
 
     if (m_skip) return;
 
@@ -478,13 +477,15 @@ void PAEOutput::WriteNote(Note *note)
 
     if (fermata) m_streamStringOutput << ")";
 
-    PointingToComparison pointingToComparisonTrill(TRILL, note);
-    Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
-    if (trill) m_streamStringOutput << "t";
+    if (m_currentMeasure) {
+        PointingToComparison pointingToComparisonTrill(TRILL, note);
+        Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
+        if (trill) m_streamStringOutput << "t";
 
-    PointingToComparison pointingToComparisonTie(TIE, note);
-    Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
-    if (tie) m_streamStringOutput << "+";
+        PointingToComparison pointingToComparisonTie(TIE, note);
+        Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
+        if (tie) m_streamStringOutput << "+";
+    }
 }
 
 void PAEOutput::WriteRest(Rest *rest)
@@ -613,6 +614,8 @@ void PAEOutput::WriteGrace(AttGraced *attGraced)
 
 bool PAEOutput::HasFermata(Object *object)
 {
+    if (!m_currentMeasure) return false;
+
     PointingToComparison pointingToComparisonFermata(FERMATA, object);
     Fermata *fermata
         = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));

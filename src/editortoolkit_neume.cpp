@@ -679,7 +679,8 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
 
         SortStaves();
 
-        m_doc->GetDrawingPage()->ResetAligners();
+        m_doc->GetDrawingPage()->LayOutTranscription(true);
+
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
         return true; // Can't reorder by layer since staves contain layers
@@ -1250,7 +1251,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
     }
     layer->ReorderByXPos();
 
-    m_doc->GetDrawingPage()->LayOutPitchPos();
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
+
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", status);
@@ -1860,6 +1862,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
     else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
     m_editInfo.import("status", success ? "OK" : "FAILURE");
     m_editInfo.import("message", success ? "" : "Could not set attribute '" + attrType + "' to '" + attrValue + "'.");
     return success;
@@ -3517,6 +3520,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", "OK");
@@ -4247,6 +4251,14 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             return false;
         }
         pi->SetOct(3);
+
+        // The default octave = 3, but the actual octave is calculated by
+        // taking into account the displacement of the clef
+        int octave = 3;
+        if (clef->GetDis() && clef->GetDisPlace()) {
+            octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+        }
+        pi->SetOct(octave);
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 

@@ -9,6 +9,7 @@
 #define __VRV_BARLINE_H__
 
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -27,6 +28,7 @@ enum class BarLinePosition { None, Left, Right };
  */
 class BarLine : public LayerElement,
                 public AttBarLineLog,
+                public AttBarLineVis,
                 public AttColor,
                 public AttNNumberLike,
                 public AttVisibility {
@@ -76,9 +78,9 @@ public:
      * @return First entry is true if the attribute was found, second entry contains the value
      */
     ///@{
-    std::pair<bool, double> GetLength(const StaffDef *staffDef) const;
-    std::pair<bool, data_BARMETHOD> GetMethod(const StaffDef *staffDef) const;
-    std::pair<bool, int> GetPlace(const StaffDef *staffDef) const;
+    std::pair<bool, double> GetLengthFromContext(const StaffDef *staffDef) const;
+    std::pair<bool, data_BARMETHOD> GetMethodFromContext(const StaffDef *staffDef) const;
+    std::pair<bool, int> GetPlaceFromContext(const StaffDef *staffDef) const;
     ///@}
 
     //----------//

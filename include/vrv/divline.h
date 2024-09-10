@@ -37,13 +37,13 @@ public:
     ///@{
     DivLine();
     virtual ~DivLine();
-    virtual Object *Clone() const { return new DivLine(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "DivLine"; }
+    Object *Clone() const override { return new DivLine(*this); }
+    void Reset() override;
+    std::string GetClassName() const override { return "DivLine"; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    bool HasToBeAligned() const override { return true; }
 
     /**
      * Use to set the alignment for the Measure BarLine members.
@@ -84,8 +84,8 @@ public:
     ///@{
     DivLineAttr();
     virtual ~DivLineAttr();
-    virtual Object *Clone() const { return new DivLineAttr(*this); }
-    virtual std::string GetClassName() const { return "DivLineAttr"; }
+    Object *Clone() const override { return new DivLineAttr(*this); }
+    std::string GetClassName() const override { return "DivLineAttr"; }
     ///@}
 
     // void SetLeft() { m_isLeft = true; }
