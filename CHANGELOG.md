@@ -13,6 +13,7 @@
 * Support for `fTrem@unitdur` (@eNote-GmbH)
 * Upgrade to C++20
 * Update of the Midifile library
+* Improved logging
 * Fix lyric position in MIDI output
 * Fix string formatting output with some locale configurations (@ammatwain)
 
