@@ -39,6 +39,7 @@ Options:
 -X      Disable MusicXML importer
 -M      Clean existing makefile
 -m      Modularize emscripten build
+-d      Debug mode (for Webassembly only)
 
 EOT
 }
@@ -51,7 +52,7 @@ die "ERROR: emscripten cmake (emcmake) not found.\n" unless $EMCMAKE;
 die "ERROR: emscripten make (emmake) not found.\n" unless $EMMAKE;
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ);
+my ($lightQ, $version, $chattyQ, $helpQ, $exclusion, $wasmQ, $makeQ, $modularizeQ, $debug);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
@@ -73,7 +74,8 @@ GetOptions (
 	'H|no-humdrum'  => \$nohumdrum,
 	'P|no-pae'      => \$nopae,
 	'X|no-musicxml' => \$nomusicxml,
-	'M|make' => \$makeQ
+	'M|make' => \$makeQ,
+	'd|debug' => \$debug
 );
 
 # Default compiling uses ASM and large file support.
@@ -103,9 +105,9 @@ if ($wasmQ) {
 
 	# Debugging flags, see:
 	#    https://emscripten.org/docs/porting/Debugging.html
-
-	# We can try to find the cause of integer overflow runtime errors with
-	# $FLAGS = " -g4 -O0 --emit-symbol-map";
+	if ($debug) {
+		$FLAGS = " -gsource-map -O2 --minify=0 -fsanitize=address";
+	}
 
 	# SAFEHEAP=1 :: Adds additional memory access checks,
 	# and will give clear errors for problems like
@@ -122,6 +124,9 @@ if ($wasmQ) {
 	$LFLAGS .= " -s STACK_SIZE=256MB";
 	$LFLAGS .= " -s SINGLE_FILE=1";
 	$LFLAGS .= " -s INCOMING_MODULE_JS_API=onRuntimeInitialized";
+	if ($debug) {
+		$LFLAGS .= " --emit-symbol-map -sASSERTIONS";
+	}
 	$FLAGS_NAME = "-wasm";
 }
 
@@ -237,8 +242,10 @@ if ($makeQ) {
 	system("rm CMakeCache.txt");
 }
 
+my $build_type = $debug ? "-DCMAKE_BUILD_TYPE=Debug" : "";
+
 print "*************\nBuilding makefile...\n";
-my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\"";
+my $cmakeCmd = "$EMCMAKE cmake ../cmake $cmake -DCMAKE_CXX_FLAGS=\"$FLAGS\" $build_type";
 print "$cmakeCmd\n" if $CHATTY;
 system($cmakeCmd) == 0 or die "system $cmakeCmd failed: $?";
 
