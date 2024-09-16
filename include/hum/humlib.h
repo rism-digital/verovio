@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Sep  8 23:07:16 PDT 2024
+// Last Modified: Thu Sep 12 14:59:38 PDT 2024
 // Filename:      min/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/min/humlib.h
 // Syntax:        C++11
@@ -5645,6 +5645,40 @@ class HumdrumFileSet {
                                                std::stringstream& inbuffer);
 };
 
+
+
+class Tool_1520ify : public HumTool {
+	public:
+		            Tool_1520ify       (void);
+		           ~Tool_1520ify       () {};
+
+		bool        run                (HumdrumFileSet& infiles);
+		bool        run                (HumdrumFile& infile);
+		bool        run                (const std::string& indata, std::ostream& out);
+		bool        run                (HumdrumFile& infile, std::ostream& out);
+
+	protected:
+		void        initialize         (HumdrumFile& infile);
+		void        processFile        (HumdrumFile& infile);
+		void        updateKeySignatures(HumdrumFile& infile, int lineindex);
+		void        checkDataLine      (HumdrumFile& infile, int lineindex);
+		void        clearStates        (void);
+		void        addBibliographicRecords(HumdrumFile& infile);
+		void        deleteBreaks       (HumdrumFile& infile);
+		void        fixEditorialAccidentals(HumdrumFile& infile);
+		void        fixInstrumentAbbreviations(HumdrumFile& infile);
+		void        addTerminalLongs   (HumdrumFile& infile);
+		void        deleteDummyTranspositions(HumdrumFile& infile);
+		std::string getDate            (void);
+		int         getYear            (void);
+		void        adjustSystemDecoration(HumdrumFile& infile);
+
+	private:
+		std::vector<std::vector<int>>  m_pstates;
+		std::vector<std::vector<int>>  m_kstates;
+		std::vector<std::vector<bool>> m_estates;
+
+};
 
 
 class Tool_addic : public HumTool {
