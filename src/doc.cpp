@@ -415,7 +415,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     else if (scoreDef->HasMm()) {
         tempo = Tempo::CalcTempo(scoreDef);
     }
-    midiFile->addTempo(0, 0, tempo);
+
+    if (tempo != MIDI_TEMPO) {
+        midiFile->addTempo(0, 0, tempo);
+    }
 
     // Capture information for MIDI generation, i.e. from control elements
     InitMIDIFunctor initMIDI;
