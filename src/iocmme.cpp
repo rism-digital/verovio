@@ -281,7 +281,7 @@ void CmmeInput::MakeMensuration(pugi::xml_node mensurationNode)
 
 void CmmeInput::MakeNote(pugi::xml_node noteNode)
 {
-    static const std::map<std::string, data_PITCHNAME> Step2PitchName{
+    static const std::map<std::string, data_PITCHNAME> pitchMap{
         { "C", PITCHNAME_c }, //
         { "D", PITCHNAME_d }, //
         { "E", PITCHNAME_e }, //
@@ -295,7 +295,7 @@ void CmmeInput::MakeNote(pugi::xml_node noteNode)
 
     Note *note = new Note();
     std::string step = this->ChildAsString(noteNode, "LetterName");
-    data_PITCHNAME pname = Step2PitchName.contains(step) ? Step2PitchName.at(step) : PITCHNAME_c;
+    data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
     note->SetPname(pname);
 
     int num;
