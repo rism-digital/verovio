@@ -411,12 +411,10 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
+        midiFile->addTempo(0, 0, tempo);
     }
     else if (scoreDef->HasMm()) {
         tempo = Tempo::CalcTempo(scoreDef);
-    }
-
-    if (tempo != MIDI_TEMPO) {
         midiFile->addTempo(0, 0, tempo);
     }
 
