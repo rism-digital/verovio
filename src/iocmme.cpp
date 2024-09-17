@@ -141,6 +141,7 @@ void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
     section->SetType(sectionType);
     m_score->AddChild(section);
 
+    // the current section is a invisible measure
     m_currentSection = new Measure(UNMEASURED, 1);
     section->AddChild(m_currentSection);
 
