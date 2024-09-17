@@ -26,7 +26,14 @@ class Score;
 
 namespace cmme {
 
-}
+    struct mensuration {
+        int prolatio = 2;
+        int tempus = 2;
+        int modusminor = 2;
+        int modusmaior = 2;
+    };
+
+} // namespace cmme
 
 //----------------------------------------------------------------------------
 // CmmeInput
@@ -67,6 +74,8 @@ private:
     Score *m_score;
     Measure *m_currentSection;
     Layer *m_currentLayer;
+    std::vector<cmme::mensuration> m_mensurations;
+    cmme::mensuration *m_currentMensuration;
 
     int m_numVoices;
     std::vector<std::string> m_voices;

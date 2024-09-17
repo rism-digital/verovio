@@ -23,6 +23,7 @@
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
+#include "mensur.h"
 #include "note.h"
 #include "rest.h"
 #include "score.h"
@@ -45,6 +46,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_score = NULL;
     m_currentSection = NULL;
     m_currentLayer = NULL;
+    m_currentMensuration = NULL;
 }
 
 CmmeInput::~CmmeInput() {}
@@ -75,6 +77,7 @@ bool CmmeInput::Import(const std::string &cmme)
             std::string name = ChildAsString(voiceNode.node(), "Name");
             m_voices.push_back(name);
         }
+        m_mensurations.resize(m_numVoices);
 
         pugi::xpath_node_set musicSections = root.select_nodes("/Piece/MusicSection/*");
 
@@ -88,7 +91,15 @@ bool CmmeInput::Import(const std::string &cmme)
             StaffDef *staffDef = new StaffDef();
             staffDef->SetN(i + 1);
             staffDef->SetLines(5);
+            staffDef->SetNotationtype(NOTATIONTYPE_mensural);
             staffGrp->AddChild(staffDef);
+            // Default mensur with everything binary in CMME
+            Mensur *mensur = new Mensur();
+            mensur->SetProlatio(PROLATIO_2);
+            mensur->SetTempus(TEMPUS_2);
+            mensur->SetModusminor(MODUSMINOR_2);
+            mensur->SetModusmaior(MODUSMAIOR_2);
+            staffDef->AddChild(mensur);
         }
 
         m_score->GetScoreDef()->AddChild(staffGrp);
@@ -143,6 +154,8 @@ void CmmeInput::MakeStaff(pugi::xml_node voiceNode)
     Staff *staff = new Staff(numVoice);
     m_currentLayer = new Layer();
     m_currentLayer->SetN(1);
+
+    m_currentMensuration = &m_mensurations.at(numVoice - 1);
 
     pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
 
@@ -218,6 +231,30 @@ void CmmeInput::MakeDot(pugi::xml_node dotNode)
 
 void CmmeInput::MakeMensuration(pugi::xml_node mensurationNode)
 {
+    pugi::xml_node mensInfo = mensurationNode.child("MensInfo");
+    if (mensInfo) {
+        m_currentMensuration->prolatio = this->ChildAsInt(mensInfo, "Prolatio");
+        m_currentMensuration->tempus = this->ChildAsInt(mensInfo, "Tempus");
+        m_currentMensuration->modusminor = this->ChildAsInt(mensInfo, "ModusMinor");
+        m_currentMensuration->modusmaior = this->ChildAsInt(mensInfo, "ModusMaior");
+    }
+
+    Mensur *mensur = new Mensur();
+    data_PROLATIO prolatio = (m_currentMensuration->prolatio == 3) ? PROLATIO_3 : PROLATIO_2;
+    mensur->SetProlatio(prolatio);
+    data_TEMPUS tempus = (m_currentMensuration->tempus == 3) ? TEMPUS_3 : TEMPUS_2;
+    mensur->SetTempus(tempus);
+    data_MODUSMINOR modusminor = (m_currentMensuration->modusminor == 3) ? MODUSMINOR_3 : MODUSMINOR_2;
+    mensur->SetModusminor(modusminor);
+    data_MODUSMAIOR modusmaior = (m_currentMensuration->modusmaior == 3) ? MODUSMAIOR_3 : MODUSMAIOR_2;
+    mensur->SetModusmaior(modusmaior);
+    data_MENSURATIONSIGN sign = (m_currentMensuration->tempus == 3) ? MENSURATIONSIGN_O : MENSURATIONSIGN_C;
+    mensur->SetSign(sign);
+    data_BOOLEAN dot = (m_currentMensuration->prolatio == 3) ? BOOLEAN_true : BOOLEAN_false;
+    mensur->SetDot(dot);
+
+    m_currentLayer->AddChild(mensur);
+
     return;
 }
 
@@ -270,7 +307,8 @@ void CmmeInput::MakeRest(pugi::xml_node restNode)
     Rest *rest = new Rest();
     int num;
     int numbase;
-    rest->SetDur(this->ReadDuration(restNode, num, numbase));
+    data_DURATION duration = this->ReadDuration(restNode, num, numbase);
+    rest->SetDur(duration);
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
         rest->SetNumbase(num);
         rest->SetNum(numbase);
@@ -300,22 +338,36 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
     num = VRV_UNSET;
     numbase = VRV_UNSET;
 
-    static const std::map<std::string, std::pair<int, int>> fractionMap{
-        { "Maxima", { 16, 1 } }, //
-        { "Longa", { 8, 1 } }, //
-        { "Brevis", { 4, 1 } }, //
-        { "Semibrevis", { 2, 1 } }, //
-        { "Minima", { 1, 1 } }, //
-        { "Semiminima", { 1, 2 } }, //
-        { "Fusa", { 1, 4 } }, //
-        { "Semifusa", { 1, 8 } } //
-    };
-
     if (durationNode.child("Length")) {
         num = this->ChildAsInt(durationNode.child("Length"), "Num");
         numbase = this->ChildAsInt(durationNode.child("Length"), "Den");
 
-        auto ratio = fractionMap.at(type);
+        std::pair<int, int> ratio = { 1, 1 };
+
+        if (type == "Maxima") {
+            ratio.first *= m_currentMensuration->modusmaior * m_currentMensuration->modusminor
+                * m_currentMensuration->tempus * m_currentMensuration->prolatio;
+        }
+        else if (type == "Longa") {
+            ratio.first
+                *= m_currentMensuration->modusminor * m_currentMensuration->tempus * m_currentMensuration->prolatio;
+        }
+        else if (type == "Brevis") {
+            ratio.first *= m_currentMensuration->tempus * m_currentMensuration->prolatio;
+        }
+        else if (type == "Semibrevis") {
+            ratio.first *= m_currentMensuration->prolatio;
+        }
+        else if (type == "Semiminima") {
+            ratio.second = 2;
+        }
+        else if (type == "Fusa") {
+            ratio.second = 4;
+        }
+        else if (type == "Semifusa") {
+            ratio.second = 8;
+        }
+
         if (ratio.first != num || ratio.second != numbase) {
             num *= ratio.second;
             numbase *= ratio.first;
