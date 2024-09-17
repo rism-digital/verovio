@@ -216,6 +216,8 @@ void CmmeInput::MakeClef(pugi::xml_node clefNode)
         { "Frnd", CLEFSHAPE_F }, //
     };
 
+    assert(m_currentLayer);
+
     std::string appearance = this->ChildAsString(clefNode, "Appearance");
     if (!shapeMap.contains(appearance)) {
         LogWarning("Unknown clef '%s", appearance.c_str());
@@ -237,6 +239,8 @@ void CmmeInput::MakeClef(pugi::xml_node clefNode)
 
 void CmmeInput::MakeDot(pugi::xml_node dotNode)
 {
+    assert(m_currentLayer);
+
     Dot *dot = new Dot();
     m_currentLayer->AddChild(dot);
 
@@ -245,6 +249,9 @@ void CmmeInput::MakeDot(pugi::xml_node dotNode)
 
 void CmmeInput::MakeMensuration(pugi::xml_node mensurationNode)
 {
+    assert(m_currentLayer);
+    assert(m_currentMensuration);
+
     pugi::xml_node mensInfo = mensurationNode.child("MensInfo");
     if (mensInfo) {
         m_currentMensuration->prolatio = this->ChildAsInt(mensInfo, "Prolatio");
@@ -284,6 +291,8 @@ void CmmeInput::MakeNote(pugi::xml_node noteNode)
         { "B", PITCHNAME_b } //
     };
 
+    assert(m_currentLayer);
+
     Note *note = new Note();
     std::string step = this->ChildAsString(noteNode, "LetterName");
     data_PITCHNAME pname = Step2PitchName.contains(step) ? Step2PitchName.at(step) : PITCHNAME_c;
@@ -318,6 +327,8 @@ void CmmeInput::MakeOriginalText(pugi::xml_node originalTextNode)
 
 void CmmeInput::MakeRest(pugi::xml_node restNode)
 {
+    assert(m_currentLayer);
+
     Rest *rest = new Rest();
     int num;
     int numbase;
@@ -345,6 +356,8 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         { "Fusa", DURATION_fusa }, //
         { "Semifusa", DURATION_semifusa } //
     };
+
+    assert(m_currentMensuration);
 
     std::string type = this->ChildAsString(durationNode, "Type");
     data_DURATION duration = durationMap.contains(type) ? durationMap.at(type) : DURATION_brevis;
@@ -397,7 +410,7 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
 
 std::string CmmeInput::AsString(const pugi::xml_node node) const
 {
-    assert(node);
+    if (!node) return "";
 
     if (node.text()) {
         return std::string(node.text().as_string());
@@ -407,6 +420,8 @@ std::string CmmeInput::AsString(const pugi::xml_node node) const
 
 std::string CmmeInput::ChildAsString(const pugi::xml_node node, const std::string &child) const
 {
+    if (!node) return "";
+
     pugi::xpath_node childNode = node.select_node(child.c_str());
     if (childNode.node()) {
         return this->AsString(childNode.node());
@@ -416,7 +431,7 @@ std::string CmmeInput::ChildAsString(const pugi::xml_node node, const std::strin
 
 int CmmeInput::AsInt(const pugi::xml_node node) const
 {
-    assert(node);
+    if (!node) return VRV_UNSET;
 
     if (node.text()) {
         return (node.text().as_int());
@@ -426,6 +441,8 @@ int CmmeInput::AsInt(const pugi::xml_node node) const
 
 int CmmeInput::ChildAsInt(const pugi::xml_node node, const std::string &child) const
 {
+    if (!node) return VRV_UNSET;
+
     pugi::xpath_node childNode = node.select_node(child.c_str());
     if (childNode.node()) {
         return this->AsInt(childNode.node());
