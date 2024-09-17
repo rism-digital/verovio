@@ -22,6 +22,7 @@ namespace vrv {
 class Clef;
 class Layer;
 class Measure;
+class Note;
 class Score;
 
 namespace cmme {
@@ -58,6 +59,8 @@ private:
     void CreateNote(pugi::xml_node noteNode);
     void CreateRest(pugi::xml_node restNode);
 
+    void CreateVerse(pugi::xml_node verseNode);
+
     data_DURATION ReadDuration(pugi::xml_node durationNode, int &num, int &numbase) const;
     bool IsClef(pugi::xml_node clefNode) const;
 
@@ -76,6 +79,7 @@ private:
     Score *m_score;
     Measure *m_currentSection;
     Layer *m_currentLayer;
+    Note *m_currentNote;
     std::vector<cmme::mensInfo> m_mensInfos;
     cmme::mensInfo *m_mensInfo;
 

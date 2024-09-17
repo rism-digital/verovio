@@ -33,7 +33,9 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "syl.h"
 #include "text.h"
+#include "verse.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -49,6 +51,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_score = NULL;
     m_currentSection = NULL;
     m_currentLayer = NULL;
+    m_currentNote = NULL;
     m_mensInfo = NULL;
 }
 
@@ -313,6 +316,12 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         note->SetColored(BOOLEAN_true);
     }
 
+    if (noteNode.child("ModernText")) {
+        m_currentNote = note;
+        CreateVerse(noteNode.child("ModernText"));
+        m_currentNote = NULL;
+    }
+
     m_currentLayer->AddChild(note);
 
     return;
@@ -340,6 +349,21 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     m_currentLayer->AddChild(rest);
 
     return;
+}
+
+void CmmeInput::CreateVerse(pugi::xml_node verseNode)
+{
+    assert(m_currentNote);
+
+    Verse *verse = new Verse();
+    verse->SetN(1);
+    Syl *syl = new Syl();
+    Text *text = new Text();
+    std::string sylText = this->ChildAsString(verseNode, "Syllable");
+    text->SetText(UTF8to32(sylText));
+    syl->AddChild(text);
+    verse->AddChild(syl);
+    m_currentNote->AddChild(verse);
 }
 
 data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int &numbase) const
