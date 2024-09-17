@@ -19,6 +19,15 @@
 
 namespace vrv {
 
+class Clef;
+class Layer;
+class Measure;
+class Score;
+
+namespace cmme {
+
+}
+
 //----------------------------------------------------------------------------
 // CmmeInput
 //----------------------------------------------------------------------------
@@ -32,11 +41,35 @@ public:
     bool Import(const std::string &cmme) override;
 
 private:
-    //
+    void MakeSection(pugi::xml_node musicSectionNode);
+
+    void MakeStaff(pugi::xml_node voiceNode);
+
+    void MakeClef(pugi::xml_node clefNode);
+    void MakeDot(pugi::xml_node dotNode);
+    void MakeMensuration(pugi::xml_node mensurationNode);
+    void MakeOriginalText(pugi::xml_node originalTextNode);
+    void MakeNote(pugi::xml_node noteNode);
+    void MakeRest(pugi::xml_node restNode);
+
+    data_DURATION ReadDuration(pugi::xml_node durationNode, int &num, int &numbase);
+    // std::pair<int, int> ReadNumNumbase(pugi::xml_node durationNode);
+
+    std::string AsString(const pugi::xml_node node) const;
+    std::string ChildAsString(const pugi::xml_node node, const std::string &child) const;
+    int AsInt(const pugi::xml_node node) const;
+    int ChildAsInt(const pugi::xml_node node, const std::string &child) const;
+
 public:
     //
 private:
     //
+    Score *m_score;
+    Measure *m_currentSection;
+    Layer *m_currentLayer;
+
+    int m_numVoices;
+    std::vector<std::string> m_voices;
 };
 
 } // namespace vrv
