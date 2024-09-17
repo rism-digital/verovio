@@ -26,7 +26,7 @@ class Score;
 
 namespace cmme {
 
-    struct mensuration {
+    struct mensInfo {
         int prolatio = 2;
         int tempus = 2;
         int modusminor = 2;
@@ -58,7 +58,8 @@ private:
     void MakeNote(pugi::xml_node noteNode);
     void MakeRest(pugi::xml_node restNode);
 
-    data_DURATION ReadDuration(pugi::xml_node durationNode, int &num, int &numbase);
+    data_DURATION ReadDuration(pugi::xml_node durationNode, int &num, int &numbase) const;
+    bool IsClef(pugi::xml_node clefNode) const;
 
     /**
      * Helper methods for accessing and converting text in elements
@@ -75,8 +76,8 @@ private:
     Score *m_score;
     Measure *m_currentSection;
     Layer *m_currentLayer;
-    std::vector<cmme::mensuration> m_mensurations;
-    cmme::mensuration *m_currentMensuration;
+    std::vector<cmme::mensInfo> m_mensInfos;
+    cmme::mensInfo *m_mensInfo;
 
     int m_numVoices;
     std::vector<std::string> m_voices;

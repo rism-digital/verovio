@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <sstream>
@@ -48,7 +49,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_score = NULL;
     m_currentSection = NULL;
     m_currentLayer = NULL;
-    m_currentMensuration = NULL;
+    m_mensInfo = NULL;
 }
 
 CmmeInput::~CmmeInput() {}
@@ -80,7 +81,7 @@ bool CmmeInput::Import(const std::string &cmme)
             std::string name = ChildAsString(voiceNode.node(), "Name");
             m_voices.push_back(name);
         }
-        m_mensurations.resize(m_numVoices);
+        m_mensInfos.resize(m_numVoices);
 
         pugi::xpath_node_set musicSections = root.select_nodes("/Piece/MusicSection/*");
 
@@ -169,7 +170,7 @@ void CmmeInput::MakeStaff(pugi::xml_node voiceNode)
     m_currentLayer = new Layer();
     m_currentLayer->SetN(1);
 
-    m_currentMensuration = &m_mensurations.at(numVoice - 1);
+    m_mensInfo = &m_mensInfos.at(numVoice - 1);
 
     pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
 
@@ -177,10 +178,10 @@ void CmmeInput::MakeStaff(pugi::xml_node voiceNode)
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
         if (name == "Clef") {
-            if (eventNode.select_node("./Signature")) {
+            if (this->IsClef(eventNode)) {
+                MakeClef(eventNode);
             }
             else {
-                MakeClef(eventNode);
             }
         }
         else if (name == "Dot") {
@@ -214,22 +215,18 @@ void CmmeInput::MakeClef(pugi::xml_node clefNode)
         { "F", CLEFSHAPE_F }, //
         { "G", CLEFSHAPE_G }, //
         { "Frnd", CLEFSHAPE_F }, //
+        { "Fsqr", CLEFSHAPE_F }, //
     };
 
     assert(m_currentLayer);
-
-    std::string appearance = this->ChildAsString(clefNode, "Appearance");
-    if (!shapeMap.contains(appearance)) {
-        LogWarning("Unknown clef '%s", appearance.c_str());
-        return;
-    }
 
     Clef *clef = new Clef();
     int staffLoc = this->ChildAsInt(clefNode, "StaffLoc");
     staffLoc = (staffLoc + 1) / 2;
     clef->SetLine(staffLoc);
 
-    data_CLEFSHAPE shape = shapeMap.at(appearance);
+    std::string appearance = this->ChildAsString(clefNode, "Appearance");
+    data_CLEFSHAPE shape = shapeMap.contains(appearance) ? shapeMap.at(appearance) : CLEFSHAPE_C;
     clef->SetShape(shape);
 
     m_currentLayer->AddChild(clef);
@@ -250,28 +247,28 @@ void CmmeInput::MakeDot(pugi::xml_node dotNode)
 void CmmeInput::MakeMensuration(pugi::xml_node mensurationNode)
 {
     assert(m_currentLayer);
-    assert(m_currentMensuration);
+    assert(m_mensInfo);
 
     pugi::xml_node mensInfo = mensurationNode.child("MensInfo");
     if (mensInfo) {
-        m_currentMensuration->prolatio = this->ChildAsInt(mensInfo, "Prolatio");
-        m_currentMensuration->tempus = this->ChildAsInt(mensInfo, "Tempus");
-        m_currentMensuration->modusminor = this->ChildAsInt(mensInfo, "ModusMinor");
-        m_currentMensuration->modusmaior = this->ChildAsInt(mensInfo, "ModusMaior");
+        m_mensInfo->prolatio = this->ChildAsInt(mensInfo, "Prolatio");
+        m_mensInfo->tempus = this->ChildAsInt(mensInfo, "Tempus");
+        m_mensInfo->modusminor = this->ChildAsInt(mensInfo, "ModusMinor");
+        m_mensInfo->modusmaior = this->ChildAsInt(mensInfo, "ModusMaior");
     }
 
     Mensur *mensur = new Mensur();
-    data_PROLATIO prolatio = (m_currentMensuration->prolatio == 3) ? PROLATIO_3 : PROLATIO_2;
+    data_PROLATIO prolatio = (m_mensInfo->prolatio == 3) ? PROLATIO_3 : PROLATIO_2;
     mensur->SetProlatio(prolatio);
-    data_TEMPUS tempus = (m_currentMensuration->tempus == 3) ? TEMPUS_3 : TEMPUS_2;
+    data_TEMPUS tempus = (m_mensInfo->tempus == 3) ? TEMPUS_3 : TEMPUS_2;
     mensur->SetTempus(tempus);
-    data_MODUSMINOR modusminor = (m_currentMensuration->modusminor == 3) ? MODUSMINOR_3 : MODUSMINOR_2;
+    data_MODUSMINOR modusminor = (m_mensInfo->modusminor == 3) ? MODUSMINOR_3 : MODUSMINOR_2;
     mensur->SetModusminor(modusminor);
-    data_MODUSMAIOR modusmaior = (m_currentMensuration->modusmaior == 3) ? MODUSMAIOR_3 : MODUSMAIOR_2;
+    data_MODUSMAIOR modusmaior = (m_mensInfo->modusmaior == 3) ? MODUSMAIOR_3 : MODUSMAIOR_2;
     mensur->SetModusmaior(modusmaior);
-    data_MENSURATIONSIGN sign = (m_currentMensuration->tempus == 3) ? MENSURATIONSIGN_O : MENSURATIONSIGN_C;
+    data_MENSURATIONSIGN sign = (m_mensInfo->tempus == 3) ? MENSURATIONSIGN_O : MENSURATIONSIGN_C;
     mensur->SetSign(sign);
-    data_BOOLEAN dot = (m_currentMensuration->prolatio == 3) ? BOOLEAN_true : BOOLEAN_false;
+    data_BOOLEAN dot = (m_mensInfo->prolatio == 3) ? BOOLEAN_true : BOOLEAN_false;
     mensur->SetDot(dot);
 
     m_currentLayer->AddChild(mensur);
@@ -344,7 +341,7 @@ void CmmeInput::MakeRest(pugi::xml_node restNode)
     return;
 }
 
-data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int &numbase)
+data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int &numbase) const
 {
     static const std::map<std::string, data_DURATION> durationMap{
         { "Maxima", DURATION_maxima }, //
@@ -357,7 +354,7 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         { "Semifusa", DURATION_semifusa } //
     };
 
-    assert(m_currentMensuration);
+    assert(m_mensInfo);
 
     std::string type = this->ChildAsString(durationNode, "Type");
     data_DURATION duration = durationMap.contains(type) ? durationMap.at(type) : DURATION_brevis;
@@ -372,18 +369,16 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         std::pair<int, int> ratio = { 1, 1 };
 
         if (type == "Maxima") {
-            ratio.first *= m_currentMensuration->modusmaior * m_currentMensuration->modusminor
-                * m_currentMensuration->tempus * m_currentMensuration->prolatio;
+            ratio.first *= m_mensInfo->modusmaior * m_mensInfo->modusminor * m_mensInfo->tempus * m_mensInfo->prolatio;
         }
         else if (type == "Longa") {
-            ratio.first
-                *= m_currentMensuration->modusminor * m_currentMensuration->tempus * m_currentMensuration->prolatio;
+            ratio.first *= m_mensInfo->modusminor * m_mensInfo->tempus * m_mensInfo->prolatio;
         }
         else if (type == "Brevis") {
-            ratio.first *= m_currentMensuration->tempus * m_currentMensuration->prolatio;
+            ratio.first *= m_mensInfo->tempus * m_mensInfo->prolatio;
         }
         else if (type == "Semibrevis") {
-            ratio.first *= m_currentMensuration->prolatio;
+            ratio.first *= m_mensInfo->prolatio;
         }
         else if (type == "Semiminima") {
             ratio.second = 2;
@@ -406,6 +401,16 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
     }
 
     return duration;
+}
+
+bool CmmeInput::IsClef(const pugi::xml_node clefNode) const
+{
+    static std::vector<std::string> clefs = { "C", "F", "Fsqr", "Frnd", "G" };
+
+    if (clefNode.select_node("./Signature")) return false;
+
+    std::string appearance = this->ChildAsString(clefNode, "Appearance");
+    return (std::find(clefs.begin(), clefs.end(), appearance) != clefs.end());
 }
 
 std::string CmmeInput::AsString(const pugi::xml_node node) const
