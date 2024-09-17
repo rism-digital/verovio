@@ -48,15 +48,15 @@ public:
     bool Import(const std::string &cmme) override;
 
 private:
-    void MakeSection(pugi::xml_node musicSectionNode);
-    void MakeStaff(pugi::xml_node voiceNode);
+    void CreateSection(pugi::xml_node musicSectionNode);
+    void CreateStaff(pugi::xml_node voiceNode);
 
-    void MakeClef(pugi::xml_node clefNode);
-    void MakeDot(pugi::xml_node dotNode);
-    void MakeMensuration(pugi::xml_node mensurationNode);
-    void MakeOriginalText(pugi::xml_node originalTextNode);
-    void MakeNote(pugi::xml_node noteNode);
-    void MakeRest(pugi::xml_node restNode);
+    void CreateClef(pugi::xml_node clefNode);
+    void CreateDot(pugi::xml_node dotNode);
+    void CreateMensuration(pugi::xml_node mensurationNode);
+    void CreateOriginalText(pugi::xml_node originalTextNode);
+    void CreateNote(pugi::xml_node noteNode);
+    void CreateRest(pugi::xml_node restNode);
 
     data_DURATION ReadDuration(pugi::xml_node durationNode, int &num, int &numbase) const;
     bool IsClef(pugi::xml_node clefNode) const;

@@ -86,7 +86,7 @@ bool CmmeInput::Import(const std::string &cmme)
         pugi::xpath_node_set musicSections = root.select_nodes("/Piece/MusicSection/*");
 
         for (pugi::xpath_node musicSectionNode : musicSections) {
-            MakeSection(musicSectionNode.node());
+            CreateSection(musicSectionNode.node());
         }
 
         // add minimal scoreDef
@@ -130,7 +130,7 @@ bool CmmeInput::Import(const std::string &cmme)
     return true;
 }
 
-void CmmeInput::MakeSection(pugi::xml_node musicSectionNode)
+void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
 {
     assert(m_score);
 
@@ -150,7 +150,7 @@ void CmmeInput::MakeSection(pugi::xml_node musicSectionNode)
         std::string xpath = StringFormat("./Voice[VoiceNum[text()='%d']]", i + 1);
         pugi::xpath_node voice = musicSectionNode.select_node(xpath.c_str());
         if (voice) {
-            MakeStaff(voice.node());
+            CreateStaff(voice.node());
         }
         else {
             Staff *staff = new Staff(i + 1);
@@ -160,7 +160,7 @@ void CmmeInput::MakeSection(pugi::xml_node musicSectionNode)
     }
 }
 
-void CmmeInput::MakeStaff(pugi::xml_node voiceNode)
+void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
 {
     assert(m_currentSection);
 
@@ -179,25 +179,25 @@ void CmmeInput::MakeStaff(pugi::xml_node voiceNode)
         std::string name = eventNode.name();
         if (name == "Clef") {
             if (this->IsClef(eventNode)) {
-                MakeClef(eventNode);
+                CreateClef(eventNode);
             }
             else {
             }
         }
         else if (name == "Dot") {
-            MakeDot(eventNode);
+            CreateDot(eventNode);
         }
         else if (name == "Mensuration") {
-            MakeMensuration(eventNode);
+            CreateMensuration(eventNode);
         }
         else if (name == "Note") {
-            MakeNote(eventNode);
+            CreateNote(eventNode);
         }
         else if (name == "OriginalText") {
-            MakeOriginalText(eventNode);
+            CreateOriginalText(eventNode);
         }
         else if (name == "Rest") {
-            MakeRest(eventNode);
+            CreateRest(eventNode);
         }
         else {
             LogWarning("Unsupported event '%s'", name.c_str());
@@ -208,7 +208,7 @@ void CmmeInput::MakeStaff(pugi::xml_node voiceNode)
     m_currentSection->AddChild(staff);
 }
 
-void CmmeInput::MakeClef(pugi::xml_node clefNode)
+void CmmeInput::CreateClef(pugi::xml_node clefNode)
 {
     static const std::map<std::string, data_CLEFSHAPE> shapeMap{
         { "C", CLEFSHAPE_C }, //
@@ -234,7 +234,7 @@ void CmmeInput::MakeClef(pugi::xml_node clefNode)
     return;
 }
 
-void CmmeInput::MakeDot(pugi::xml_node dotNode)
+void CmmeInput::CreateDot(pugi::xml_node dotNode)
 {
     assert(m_currentLayer);
 
@@ -244,7 +244,7 @@ void CmmeInput::MakeDot(pugi::xml_node dotNode)
     return;
 }
 
-void CmmeInput::MakeMensuration(pugi::xml_node mensurationNode)
+void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
 {
     assert(m_currentLayer);
     assert(m_mensInfo);
@@ -276,7 +276,7 @@ void CmmeInput::MakeMensuration(pugi::xml_node mensurationNode)
     return;
 }
 
-void CmmeInput::MakeNote(pugi::xml_node noteNode)
+void CmmeInput::CreateNote(pugi::xml_node noteNode)
 {
     static const std::map<std::string, data_PITCHNAME> pitchMap{
         { "C", PITCHNAME_c }, //
@@ -317,12 +317,12 @@ void CmmeInput::MakeNote(pugi::xml_node noteNode)
     return;
 }
 
-void CmmeInput::MakeOriginalText(pugi::xml_node originalTextNode)
+void CmmeInput::CreateOriginalText(pugi::xml_node originalTextNode)
 {
     return;
 }
 
-void CmmeInput::MakeRest(pugi::xml_node restNode)
+void CmmeInput::CreateRest(pugi::xml_node restNode)
 {
     assert(m_currentLayer);
 
