@@ -914,7 +914,8 @@ Options::Options()
     m_baseOptions.AddOption(&m_allPages);
 
     m_inputFrom.SetInfo("Input from",
-        "Select input format from: \"abc\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", \"volpiano\", \"xml\" "
+        "Select input format from: \"abc\", \"cmme.xml\", \"darms\", \"esac\", \"humdrum\", \"mei\", \"pae\", "
+        "\"volpiano\", \"xml\" "
         "(musicxml), \"musicxml-hum\" (musicxml via humdrum)");
     m_inputFrom.Init("mei");
     m_inputFrom.SetKey("inputFrom");

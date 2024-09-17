@@ -24,6 +24,7 @@
 #include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
+#include "iocmme.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -205,6 +206,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "volpiano") {
         m_inputFrom = VOLPIANO;
+    }
+    else if (inputFrom == "cmme.xml") {
+        m_inputFrom = CMME;
     }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
@@ -547,6 +551,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
     }
     else if (inputFormat == VOLPIANO) {
         input = new VolpianoInput(&m_doc);
+    }
+    else if (inputFormat == CMME) {
+        input = new CmmeInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
