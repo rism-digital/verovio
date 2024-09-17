@@ -825,13 +825,13 @@ private:
      * Temporary capture buffer for redirecting std::cerr to vrv::LogWarning.
      * Used to coordinate between LogRedirectStart()/LogRedirectStop().
      */
-    std::stringstream m_captured_cerr;
+    std::stringstream m_cerrCaptured;
 
     /**
      * Temporary storage of the std::cerr read buffer during LogCapture. NULL when not in use.
      * Used to coordinate between LogRedirectStart()/LogRedirectStop().
      */
-    std::streambuf *m_original_cerr_buf;
+    std::streambuf *m_cerrOriginalBuf;
 
     EditorToolkit *m_editorToolkit;
 
