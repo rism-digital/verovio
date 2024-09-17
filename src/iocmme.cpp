@@ -20,6 +20,7 @@
 #include "clef.h"
 #include "doc.h"
 #include "dot.h"
+#include "label.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -31,6 +32,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "text.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -74,6 +76,7 @@ bool CmmeInput::Import(const std::string &cmme)
 
         for (pugi::xpath_node voiceNode : voices) {
             m_numVoices++;
+            // Get the voice name if any
             std::string name = ChildAsString(voiceNode.node(), "Name");
             m_voices.push_back(name);
         }
@@ -87,12 +90,23 @@ bool CmmeInput::Import(const std::string &cmme)
 
         // add minimal scoreDef
         StaffGrp *staffGrp = new StaffGrp();
+        GrpSym *grpSym = new GrpSym();
+        grpSym->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+        staffGrp->AddChild(grpSym);
         for (int i = 0; i < m_numVoices; ++i) {
             StaffDef *staffDef = new StaffDef();
             staffDef->SetN(i + 1);
             staffDef->SetLines(5);
             staffDef->SetNotationtype(NOTATIONTYPE_mensural);
             staffGrp->AddChild(staffDef);
+            // Label
+            if (!m_voices.at(i).empty()) {
+                Label *label = new Label();
+                Text *text = new Text();
+                text->SetText(UTF8to32(m_voices.at(i)));
+                label->AddChild(text);
+                staffDef->AddChild(label);
+            }
             // Default mensur with everything binary in CMME
             Mensur *mensur = new Mensur();
             mensur->SetProlatio(PROLATIO_2);

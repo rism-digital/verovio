@@ -49,7 +49,6 @@ public:
 
 private:
     void MakeSection(pugi::xml_node musicSectionNode);
-
     void MakeStaff(pugi::xml_node voiceNode);
 
     void MakeClef(pugi::xml_node clefNode);
@@ -60,8 +59,10 @@ private:
     void MakeRest(pugi::xml_node restNode);
 
     data_DURATION ReadDuration(pugi::xml_node durationNode, int &num, int &numbase);
-    // std::pair<int, int> ReadNumNumbase(pugi::xml_node durationNode);
 
+    /**
+     * Helper methods for accessing and converting text in elements
+     */
     std::string AsString(const pugi::xml_node node) const;
     std::string ChildAsString(const pugi::xml_node node, const std::string &child) const;
     int AsInt(const pugi::xml_node node) const;
