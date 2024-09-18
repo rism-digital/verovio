@@ -577,13 +577,9 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
+
     pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
-    if (dotNode) {
-        mensur->SetDot(BOOLEAN_true);
-    }
-    else {
-        mensur->SetDot(BOOLEAN_false);
-    }
+    mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
 
     this->ReadEditorialCommentary(mensurationNode, mensur);
 
