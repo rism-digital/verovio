@@ -406,15 +406,18 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
 
     double tempo = MIDI_TEMPO;
+    std::set<int> tempoEventTicks; // track the ticks of added tempo events
 
     // set MIDI tempo
     ScoreDef *scoreDef = this->GetFirstVisibleScore()->GetScoreDef();
     if (scoreDef->HasMidiBpm()) {
         tempo = scoreDef->GetMidiBpm();
+        tempoEventTicks.insert(0);
         midiFile->addTempo(0, 0, tempo);
     }
     else if (scoreDef->HasMm()) {
         tempo = Tempo::CalcTempo(scoreDef);
+        tempoEventTicks.insert(0);
         midiFile->addTempo(0, 0, tempo);
     }
 
@@ -522,6 +525,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             generateMIDI.SetChannel(midiChannel);
             generateMIDI.SetTrack(midiTrack);
             generateMIDI.SetStaffN(staves->first);
+            generateMIDI.SetTempoEventTicks(tempoEventTicks);
             generateMIDI.SetTransSemi(transSemi);
             generateMIDI.SetCurrentTempo(tempo);
             generateMIDI.SetDeferredNotes(initMIDI.GetDeferredNotes());
@@ -529,6 +533,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(generateMIDI);
+
+            tempoEventTicks = generateMIDI.GetTempoEventTicks();
         }
     }
 }
