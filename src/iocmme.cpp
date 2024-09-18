@@ -308,6 +308,13 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         { 3, ACCIDENTAL_WRITTEN_sx }, //
     };
 
+    static const std::map<std::string, data_STEMDIRECTION> stemDirMap{
+        { "Up", STEMDIRECTION_up }, //
+        { "Down", STEMDIRECTION_down }, //
+        { "Left", STEMDIRECTION_left }, //
+        { "Right", STEMDIRECTION_right }, //
+    };
+
     assert(m_currentLayer);
 
     Note *note = new Note();
@@ -353,6 +360,23 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         accid->SetAccid(accidWritten);
         accid->SetFunc(accidLog_FUNC_edit);
         note->AddChild(accid);
+    }
+
+    if (noteNode.child("Stem")) {
+        std::string dir = this->ChildAsString(noteNode.child("Stem"), "Dir");
+        if (dir == "Barline") {
+            LogWarning("Unsupported 'Barline' stem direction");
+        }
+        data_STEMDIRECTION stemDir = stemDirMap.contains(dir) ? stemDirMap.at(dir) : STEMDIRECTION_NONE;
+        note->SetStemDir(STEMDIRECTION_down);
+
+        std::string side = this->ChildAsString(noteNode.child("Stem"), "Side");
+        if (side == "Left") {
+            note->SetStemPos(STEMPOSITION_left);
+        }
+        else if (side == "Right") {
+            note->SetStemPos(STEMPOSITION_right);
+        }
     }
 
     m_currentLayer->AddChild(note);
