@@ -92,7 +92,7 @@ public:
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
     }
-    virtual ~DeviceContext(){};
+    virtual ~DeviceContext() {}
     ClassId GetClassId() const { return m_classId; }
     bool Is(ClassId classId) const { return (m_classId == classId); }
     ///@}
@@ -262,14 +262,14 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = ""){};
-    virtual void EndCustomGraphic(){};
+    virtual void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = "") {}
+    virtual void EndCustomGraphic() {}
     ///@}
 
     /**
      * Method for changing the color of a custom graphic
      */
-    virtual void SetCustomGraphicColor(const std::string &color){};
+    virtual void SetCustomGraphicColor(const std::string &color) {}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
@@ -312,7 +312,7 @@ public:
      * @name Method for adding description element
      */
     ///@{
-    virtual void AddDescription(const std::string &text){};
+    virtual void AddDescription(const std::string &text) {}
     ///@}
 
     /**
