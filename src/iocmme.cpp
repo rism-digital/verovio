@@ -21,6 +21,8 @@
 #include "clef.h"
 #include "doc.h"
 #include "dot.h"
+#include "keyaccid.h"
+#include "keysig.h"
 #include "label.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -190,6 +192,7 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
                 CreateClef(eventNode);
             }
             else {
+                CreateKeySig(eventNode);
             }
         }
         else if (name == "Dot") {
@@ -251,6 +254,49 @@ void CmmeInput::CreateDot(pugi::xml_node dotNode)
     m_currentLayer->AddChild(dot);
 
     return;
+}
+
+void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
+{
+    assert(m_currentLayer);
+
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
+        { "Bmol", ACCIDENTAL_WRITTEN_f }, //
+        { "BmolDouble", ACCIDENTAL_WRITTEN_f }, //
+        { "Bqua", ACCIDENTAL_WRITTEN_n }, //
+        { "Diesis", ACCIDENTAL_WRITTEN_s }, //
+    };
+
+    KeySig *keysig = new KeySig();
+    KeyAccid *keyaccid = new KeyAccid();
+    std::string appearance = this->ChildAsString(keyNode, "Appearance");
+    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
+    keyaccid->SetAccid(accid);
+
+    static const std::map<std::string, data_PITCHNAME> pitchMap{
+        { "C", PITCHNAME_c }, //
+        { "D", PITCHNAME_d }, //
+        { "E", PITCHNAME_e }, //
+        { "F", PITCHNAME_f }, //
+        { "G", PITCHNAME_g }, //
+        { "A", PITCHNAME_a }, //
+        { "B", PITCHNAME_b } //
+    };
+
+    std::string step = this->ChildAsString(keyNode, "Pitch/LetterName");
+    // Default pitch to C
+    data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
+    keyaccid->SetPname(pname);
+
+    int oct = this->ChildAsInt(keyNode, "Pitch/OctaveNum");
+    if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
+    keyaccid->SetOct(oct);
+
+    int staffLoc = this->ChildAsInt(keyNode, "StaffLoc");
+    keyaccid->SetLoc(staffLoc - 1);
+
+    m_currentLayer->AddChild(keysig);
+    keysig->AddChild(keyaccid);
 }
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)

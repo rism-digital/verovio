@@ -54,6 +54,7 @@ private:
 
     void CreateClef(pugi::xml_node clefNode);
     void CreateDot(pugi::xml_node dotNode);
+    void CreateKeySig(pugi::xml_node keyNode);
     void CreateMensuration(pugi::xml_node mensurationNode);
     void CreateOriginalText(pugi::xml_node originalTextNode);
     void CreateNote(pugi::xml_node noteNode);
