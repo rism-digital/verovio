@@ -448,7 +448,11 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     }
 
     if (noteNode.child("Corona")) {
-        note->SetFermata(STAFFREL_basic_above);
+        data_STAFFREL_basic position = STAFFREL_basic_above;
+        if (noteNode.select_node("Corona/Orientation[text()='Down']")) {
+            position = STAFFREL_basic_below;
+        }
+        note->SetFermata(position);
     }
 
     if (noteNode.child("ModernAccidental")) {
