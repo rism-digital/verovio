@@ -565,20 +565,23 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     mensur->SetModusminor(modusminor);
     data_MODUSMAIOR modusmaior = (m_mensInfo->modusmaior == 3) ? MODUSMAIOR_3 : MODUSMAIOR_2;
     mensur->SetModusmaior(modusmaior);
-    
+
     pugi::xml_node signNode = mensurationNode.child("Sign");
     std::string signValue = this->ChildAsString(signNode, "MainSymbol");
     if (signValue == "O") {
         mensur->SetSign(MENSURATIONSIGN_O);
-    } else if (signValue == "C") {
+    }
+    else if (signValue == "C") {
         mensur->SetSign(MENSURATIONSIGN_C);
-    } else {
+    }
+    else {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
     pugi::xml_node dotNode = signNode.child("Dot");
     if (dotNode) {
         mensur->SetDot(BOOLEAN_true);
-    } else {
+    }
+    else {
         mensur->SetDot(BOOLEAN_false);
     }
 
