@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "barline.h"
 #include "clef.h"
 #include "custos.h"
@@ -444,6 +445,23 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         { "B", PITCHNAME_b } //
     };
 
+    static const std::map<int, data_ACCIDENTAL_WRITTEN> accidMap{
+        { -3, ACCIDENTAL_WRITTEN_tf }, //
+        { -2, ACCIDENTAL_WRITTEN_ff }, //
+        { -1, ACCIDENTAL_WRITTEN_f }, //
+        { 0, ACCIDENTAL_WRITTEN_n }, //
+        { 1, ACCIDENTAL_WRITTEN_s }, //
+        { 2, ACCIDENTAL_WRITTEN_ss }, //
+        { 3, ACCIDENTAL_WRITTEN_sx }, //
+    };
+
+    static const std::map<std::string, data_STEMDIRECTION> stemDirMap{
+        { "Up", STEMDIRECTION_up }, //
+        { "Down", STEMDIRECTION_down }, //
+        { "Left", STEMDIRECTION_left }, //
+        { "Right", STEMDIRECTION_right }, //
+    };
+
     assert(m_currentLayer);
 
     Note *note = new Note();
@@ -476,7 +494,40 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     }
 
     if (noteNode.child("Corona")) {
-        note->SetFermata(STAFFREL_basic_above);
+        data_STAFFREL_basic position = STAFFREL_basic_above;
+        if (noteNode.select_node("Corona/Orientation[text()='Down']")) {
+            position = STAFFREL_basic_below;
+        }
+        note->SetFermata(position);
+    }
+
+    if (noteNode.child("ModernAccidental")) {
+        Accid *accid = new Accid();
+        int offset = this->ChildAsInt(noteNode.child("ModernAccidental"), "PitchOffset");
+        offset = std::min(3, offset);
+        offset = std::max(-3, offset);
+        // Default pitch to C
+        data_ACCIDENTAL_WRITTEN accidWritten = accidMap.contains(offset) ? accidMap.at(offset) : ACCIDENTAL_WRITTEN_n;
+        accid->SetAccid(accidWritten);
+        accid->SetFunc(accidLog_FUNC_edit);
+        note->AddChild(accid);
+    }
+
+    if (noteNode.child("Stem")) {
+        std::string dir = this->ChildAsString(noteNode.child("Stem"), "Dir");
+        if (dir == "Barline") {
+            LogWarning("Unsupported 'Barline' stem direction");
+        }
+        data_STEMDIRECTION stemDir = stemDirMap.contains(dir) ? stemDirMap.at(dir) : STEMDIRECTION_NONE;
+        note->SetStemDir(STEMDIRECTION_down);
+
+        std::string side = this->ChildAsString(noteNode.child("Stem"), "Side");
+        if (side == "Left") {
+            note->SetStemPos(STEMPOSITION_left);
+        }
+        else if (side == "Right") {
+            note->SetStemPos(STEMPOSITION_right);
+        }
     }
 
     m_currentLayer->AddChild(note);

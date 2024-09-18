@@ -62,7 +62,7 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
         if (m_adjustedAccids.count(accid) > 0) continue;
         // Skip accid not descendant of a note (e.g., mensural)
         if (!accid->GetFirstAncestor(NOTE)) continue;
-        
+
         auto range = octaveEquivalence.equal_range(accid);
         // Handle at least two octave accids without unisons
         int octaveAccidCount = 0;
