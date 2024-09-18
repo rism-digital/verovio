@@ -56,6 +56,7 @@ private:
     void CreateLemOrRdg(pugi::xml_node lemOrRdgNode, bool isFirst);
 
     void ReadEvents(pugi::xml_node eventsNode);
+    void ReadEditorialCommentary(pugi::xml_node evenNode, Object *object);
 
     void CreateAccid(pugi::xml_node accidNode);
     void CreateClef(pugi::xml_node clefNode);

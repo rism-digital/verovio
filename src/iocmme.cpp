@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "annot.h"
 #include "app.h"
 #include "barline.h"
 #include "clef.h"
@@ -191,11 +192,11 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     m_isInSyllable = false;
     m_currentSignature = NULL;
 
-    // Loop through the event lists
-    ReadEvents(voiceNode.child("EventList"));
-
     staff->AddChild(m_currentContainer);
     m_currentSection->AddChild(staff);
+
+    // Loop through the event lists
+    ReadEvents(voiceNode.child("EventList"));
 }
 
 void CmmeInput::CreateApp(pugi::xml_node appNode)
@@ -318,6 +319,22 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
     }
 }
 
+void CmmeInput::ReadEditorialCommentary(pugi::xml_node eventNode, Object *object)
+{
+    std::string commentary = this->ChildAsString(eventNode, "EditorialCommentary");
+
+    if (!commentary.empty()) {
+        Annot *annot = new Annot();
+        Text *text = new Text();
+        text->SetText(UTF8to32(commentary));
+        annot->AddChild(text);
+        xsdAnyURI_List list;
+        list.push_back("#" + object->GetID());
+        annot->SetPlist(list);
+        m_currentSection->AddChild(annot);
+    }
+}
+
 void CmmeInput::CreateAccid(pugi::xml_node accidNode)
 {
     static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
@@ -339,24 +356,27 @@ void CmmeInput::CreateAccid(pugi::xml_node accidNode)
 
     assert(m_currentContainer);
 
-    Accid *accidElement = new Accid();
+    Accid *accid = new Accid();
     std::string appearance = this->ChildAsString(accidNode, "Appearance");
-    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
-    accidElement->SetAccid(accid);
+    data_ACCIDENTAL_WRITTEN accidWritten
+        = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
+    accid->SetAccid(accidWritten);
 
     std::string step = this->ChildAsString(accidNode, "Pitch/LetterName");
     // Default pitch to C
     data_PITCHNAME ploc = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
-    accidElement->SetPloc(ploc);
+    accid->SetPloc(ploc);
 
     int oct = this->ChildAsInt(accidNode, "Pitch/OctaveNum");
     if ((ploc != PITCHNAME_a) && (ploc != PITCHNAME_b)) oct += 1;
-    accidElement->SetOloc(oct);
+    accid->SetOloc(oct);
 
     int staffLoc = this->ChildAsInt(accidNode, "StaffLoc");
-    accidElement->SetLoc(staffLoc - 1);
+    accid->SetLoc(staffLoc - 1);
 
-    m_currentContainer->AddChild(accidElement);
+    this->ReadEditorialCommentary(accidNode, accid);
+
+    m_currentContainer->AddChild(accid);
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
@@ -381,6 +401,8 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     data_CLEFSHAPE shape = shapeMap.contains(appearance) ? shapeMap.at(appearance) : CLEFSHAPE_C;
     clef->SetShape(shape);
 
+    this->ReadEditorialCommentary(clefNode, clef);
+
     m_currentContainer->AddChild(clef);
 
     return;
@@ -398,7 +420,7 @@ void CmmeInput::CreateCustos(pugi::xml_node custosNode)
         { "B", PITCHNAME_b } //
     };
 
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     Custos *custos = new Custos();
     std::string step = this->ChildAsString(custosNode, "LetterName");
@@ -410,7 +432,9 @@ void CmmeInput::CreateCustos(pugi::xml_node custosNode)
     if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
     custos->SetOct(oct);
 
-    m_currentLayer->AddChild(custos);
+    this->ReadEditorialCommentary(custosNode, custos);
+
+    m_currentContainer->AddChild(custos);
 
     return;
 }
@@ -421,6 +445,8 @@ void CmmeInput::CreateDot(pugi::xml_node dotNode)
 
     Dot *dot = new Dot();
     m_currentContainer->AddChild(dot);
+
+    this->ReadEditorialCommentary(dotNode, dot);
 
     return;
 }
@@ -451,24 +477,26 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
         m_currentContainer->AddChild(m_currentSignature);
     }
 
-    KeyAccid *keyaccid = new KeyAccid();
+    KeyAccid *keyAccid = new KeyAccid();
     std::string appearance = this->ChildAsString(keyNode, "Appearance");
     data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
-    keyaccid->SetAccid(accid);
+    keyAccid->SetAccid(accid);
 
     std::string step = this->ChildAsString(keyNode, "Pitch/LetterName");
     // Default pitch to C
     data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
-    keyaccid->SetPname(pname);
+    keyAccid->SetPname(pname);
 
     int oct = this->ChildAsInt(keyNode, "Pitch/OctaveNum");
     if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
-    keyaccid->SetOct(oct);
+    keyAccid->SetOct(oct);
 
     int staffLoc = this->ChildAsInt(keyNode, "StaffLoc");
-    keyaccid->SetLoc(staffLoc - 1);
+    keyAccid->SetLoc(staffLoc - 1);
 
-    m_currentSignature->AddChild(keyaccid);
+    this->ReadEditorialCommentary(keyNode, keyAccid);
+
+    m_currentSignature->AddChild(keyAccid);
 }
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
@@ -497,6 +525,8 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     mensur->SetSign(sign);
     data_BOOLEAN dot = (m_mensInfo->prolatio == 3) ? BOOLEAN_true : BOOLEAN_false;
     mensur->SetDot(dot);
+
+    this->ReadEditorialCommentary(mensurationNode, mensur);
 
     m_currentContainer->AddChild(mensur);
 
@@ -619,6 +649,8 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         }
     }
 
+    this->ReadEditorialCommentary(noteNode, note);
+
     m_currentContainer->AddChild(note);
 
     // We have processed the last note of a ligature
@@ -647,6 +679,8 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
         rest->SetNumbase(num);
         rest->SetNum(numbase);
     }
+
+    this->ReadEditorialCommentary(restNode, rest);
 
     m_currentContainer->AddChild(rest);
 
