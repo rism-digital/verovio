@@ -388,36 +388,39 @@ void CmmeInput::CreateAccid(pugi::xml_node accidNode)
 
 void CmmeInput::CreateBarline(pugi::xml_node barlineNode)
 {
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
-    BarLine *barline = new BarLine();
+    BarLine *barLine = new BarLine();
 
-    /// Determine the barLine/@form based on the CMME <Barline>'s <NumLines> and <RepeatSign>
+    // Determine the barLine/@form based on the CMME <Barline>'s <NumLines> and <RepeatSign>
     int formNumLines = this->ChildAsInt(barlineNode, "NumLines");
     if (formNumLines == 1) {
-        barline->SetForm(BARRENDITION_single);
+        barLine->SetForm(BARRENDITION_single);
     }
     else if (formNumLines == 2) {
-        barline->SetForm(BARRENDITION_dbl);
+        barLine->SetForm(BARRENDITION_dbl);
     }
     else if (formNumLines != VRV_UNSET) {
         LogWarning("Unsupported barline (with more than 2 lines)");
-    } ///@form is overwritten to 'rptboth' when <RepeatSign> is used
-    if (barlineNode.select_node("./RepeatSign")) {
-        barline->SetForm(BARRENDITION_rptboth);
     }
-    /// Determine the barLine/@place
+
+    // `@form` is overwritten to 'rptboth' when <RepeatSign> is used
+    if (barlineNode.select_node("./RepeatSign")) {
+        barLine->SetForm(BARRENDITION_rptboth);
+    }
+    // Determine the barLine/@place
     int bottomLine = this->ChildAsInt(barlineNode, "BottomStaffLine");
     if (bottomLine != VRV_UNSET) {
         int place = bottomLine * 2;
-        barline->SetPlace(place);
+        barLine->SetPlace(place);
     }
-    /// Determine the barLine/@len
+    // Determine the barLine/@len
     int numSpaces = this->ChildAsInt(barlineNode, "NumSpaces");
     if (numSpaces != VRV_UNSET) {
-        barline->SetLen(numSpaces * 2);
+        barLine->SetLen(numSpaces * 2);
     }
-    m_currentLayer->AddChild(barline);
+
+    m_currentContainer->AddChild(barLine);
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
