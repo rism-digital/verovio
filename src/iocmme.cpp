@@ -27,6 +27,7 @@
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
+#include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -54,7 +55,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
 {
     m_score = NULL;
     m_currentSection = NULL;
-    m_currentLayer = NULL;
+    m_currentContainer = NULL;
     m_currentSignature = NULL;
     m_currentNote = NULL;
     m_isInSyllable = false;
@@ -177,8 +178,9 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     int numVoice = this->ChildAsInt(voiceNode, "VoiceNum");
 
     Staff *staff = new Staff(numVoice);
-    m_currentLayer = new Layer();
-    m_currentLayer->SetN(1);
+    Layer *layer = new Layer();
+    layer->SetN(1);
+    m_currentContainer = layer;
 
     // (Re)-set the current mens info to the corresponding voice
     m_mensInfo = &m_mensInfos.at(numVoice - 1);
@@ -244,7 +246,9 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         }
         keySigFound = false;
     }
-    staff->AddChild(m_currentLayer);
+
+    staff->AddChild(m_currentContainer);
+  
     m_currentSection->AddChild(staff);
 }
 
@@ -267,7 +271,7 @@ void CmmeInput::CreateAccid(pugi::xml_node accidNode)
         { "B", PITCHNAME_b } //
     };
 
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     Accid *accidElement = new Accid();
     std::string appearance = this->ChildAsString(accidNode, "Appearance");
@@ -286,7 +290,7 @@ void CmmeInput::CreateAccid(pugi::xml_node accidNode)
     int staffLoc = this->ChildAsInt(accidNode, "StaffLoc");
     accidElement->SetLoc(staffLoc - 1);
 
-    m_currentLayer->AddChild(accidElement);
+    m_currentContainer->AddChild(accidElement);
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
@@ -299,7 +303,7 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
         { "Fsqr", CLEFSHAPE_F }, //
     };
 
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     Clef *clef = new Clef();
     int staffLoc = this->ChildAsInt(clefNode, "StaffLoc");
@@ -311,7 +315,7 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     data_CLEFSHAPE shape = shapeMap.contains(appearance) ? shapeMap.at(appearance) : CLEFSHAPE_C;
     clef->SetShape(shape);
 
-    m_currentLayer->AddChild(clef);
+    m_currentContainer->AddChild(clef);
 
     return;
 }
@@ -347,10 +351,10 @@ void CmmeInput::CreateCustos(pugi::xml_node custosNode)
 
 void CmmeInput::CreateDot(pugi::xml_node dotNode)
 {
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     Dot *dot = new Dot();
-    m_currentLayer->AddChild(dot);
+    m_currentContainer->AddChild(dot);
 
     return;
 }
@@ -374,11 +378,11 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
         { "B", PITCHNAME_b } //
     };
 
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     if (!m_currentSignature) {
         m_currentSignature = new KeySig();
-        m_currentLayer->AddChild(m_currentSignature);
+        m_currentContainer->AddChild(m_currentSignature);
     }
 
     KeyAccid *keyaccid = new KeyAccid();
@@ -403,7 +407,7 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
 {
-    assert(m_currentLayer);
+    assert(m_currentContainer);
     assert(m_mensInfo);
 
     pugi::xml_node mensInfo = mensurationNode.child("MensInfo");
@@ -428,7 +432,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     data_BOOLEAN dot = (m_mensInfo->prolatio == 3) ? BOOLEAN_true : BOOLEAN_false;
     mensur->SetDot(dot);
 
-    m_currentLayer->AddChild(mensur);
+    m_currentContainer->AddChild(mensur);
 
     return;
 }
@@ -462,7 +466,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         { "Right", STEMDIRECTION_right }, //
     };
 
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     Note *note = new Note();
     std::string step = this->ChildAsString(noteNode, "LetterName");
@@ -519,7 +523,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
             LogWarning("Unsupported 'Barline' stem direction");
         }
         data_STEMDIRECTION stemDir = stemDirMap.contains(dir) ? stemDirMap.at(dir) : STEMDIRECTION_NONE;
-        note->SetStemDir(STEMDIRECTION_down);
+        note->SetStemDir(stemDir);
 
         std::string side = this->ChildAsString(noteNode.child("Stem"), "Side");
         if (side == "Left") {
@@ -530,7 +534,31 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         }
     }
 
-    m_currentLayer->AddChild(note);
+    if (noteNode.child("Lig")) {
+        std::string lig = this->ChildAsString(noteNode, "Lig");
+        if (lig == "Retrorsum") {
+            LogWarning("Unsupported 'Retrorsum' ligature");
+        }
+        data_LIGATUREFORM form = (lig == "Obliqua") ? LIGATUREFORM_obliqua : LIGATUREFORM_recta;
+        // First note of the ligature, create the ligature element
+        if (!m_currentContainer->Is(LIGATURE)) {
+            Ligature *ligature = new Ligature();
+            ligature->SetForm(form);
+            m_currentContainer->AddChild(ligature);
+            m_currentContainer = ligature;
+        }
+        // Otherwise simply add the `@lig` to the note
+        else {
+            note->SetLig(form);
+        }
+    }
+
+    m_currentContainer->AddChild(note);
+
+    // We have processed the last note of a ligature
+    if (m_currentContainer->Is(LIGATURE) && !noteNode.child("Lig")) {
+        m_currentContainer = m_currentContainer->GetParent();
+    }
 
     return;
 }
@@ -542,7 +570,7 @@ void CmmeInput::CreateOriginalText(pugi::xml_node originalTextNode)
 
 void CmmeInput::CreateRest(pugi::xml_node restNode)
 {
-    assert(m_currentLayer);
+    assert(m_currentContainer);
 
     Rest *rest = new Rest();
     int num;
@@ -554,7 +582,7 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
         rest->SetNum(numbase);
     }
 
-    m_currentLayer->AddChild(rest);
+    m_currentContainer->AddChild(rest);
 
     return;
 }

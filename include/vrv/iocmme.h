@@ -87,7 +87,7 @@ private:
     /** The current un-measured measure acting a a MEI section */
     Measure *m_currentSection;
     /** The current layer (or container) to which the layer elements have to be added */
-    Layer *m_currentLayer;
+    Object *m_currentContainer;
     /** The current key signature to which extra flats might be added */
     KeySig *m_currentSignature;
     /** The current note */
