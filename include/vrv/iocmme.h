@@ -55,6 +55,7 @@ private:
 
     void CreateAccid(pugi::xml_node accidNode);
     void CreateClef(pugi::xml_node clefNode);
+    void CreateCustos(pugi::xml_node custosNode);
     void CreateDot(pugi::xml_node dotNode);
     void CreateKeySig(pugi::xml_node keyNode);
     void CreateMensuration(pugi::xml_node mensurationNode);
