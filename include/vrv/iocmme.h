@@ -20,6 +20,7 @@
 namespace vrv {
 
 class Clef;
+class KeySig;
 class Layer;
 class Measure;
 class Note;
@@ -52,8 +53,10 @@ private:
     void CreateSection(pugi::xml_node musicSectionNode);
     void CreateStaff(pugi::xml_node voiceNode);
 
+    void CreateAccid(pugi::xml_node accidNode);
     void CreateClef(pugi::xml_node clefNode);
     void CreateDot(pugi::xml_node dotNode);
+    void CreateKeySig(pugi::xml_node keyNode);
     void CreateMensuration(pugi::xml_node mensurationNode);
     void CreateOriginalText(pugi::xml_node originalTextNode);
     void CreateNote(pugi::xml_node noteNode);
@@ -84,6 +87,8 @@ private:
     Measure *m_currentSection;
     /** The current layer (or container) to which the layer elements have to be added */
     Layer *m_currentLayer;
+    /** The current key signature to which extra flats might be added */
+    KeySig *m_currentSignature;
     /** The current note */
     Note *m_currentNote;
     /** The syllable is not the first */

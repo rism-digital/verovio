@@ -22,6 +22,8 @@
 #include "clef.h"
 #include "doc.h"
 #include "dot.h"
+#include "keyaccid.h"
+#include "keysig.h"
 #include "label.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -52,6 +54,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_score = NULL;
     m_currentSection = NULL;
     m_currentLayer = NULL;
+    m_currentSignature = NULL;
     m_currentNote = NULL;
     m_isInSyllable = false;
     m_mensInfo = NULL;
@@ -180,6 +183,8 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     m_mensInfo = &m_mensInfos.at(numVoice - 1);
     // Reset the syllable position
     m_isInSyllable = false;
+    bool keySigFound = false;
+    m_currentSignature = NULL;
 
     // Loop through the event lists
     pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
@@ -190,7 +195,12 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
             if (this->IsClef(eventNode)) {
                 CreateClef(eventNode);
             }
+            else if (eventNode.select_node("./Signature")) {
+                keySigFound = true;
+                CreateKeySig(eventNode);
+            }
             else {
+                CreateAccid(eventNode);
             }
         }
         else if (name == "Dot") {
@@ -211,10 +221,55 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         else {
             LogWarning("Unsupported event '%s'", name.c_str());
         }
+        if (!keySigFound) {
+            m_currentSignature = NULL;
+        }
+        keySigFound = false;
     }
 
     staff->AddChild(m_currentLayer);
     m_currentSection->AddChild(staff);
+}
+
+void CmmeInput::CreateAccid(pugi::xml_node accidNode)
+{
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
+        { "Bmol", ACCIDENTAL_WRITTEN_f }, //
+        { "BmolDouble", ACCIDENTAL_WRITTEN_f }, //
+        { "Bqua", ACCIDENTAL_WRITTEN_n }, //
+        { "Diesis", ACCIDENTAL_WRITTEN_s }, //
+    };
+
+    static const std::map<std::string, data_PITCHNAME> pitchMap{
+        { "C", PITCHNAME_c }, //
+        { "D", PITCHNAME_d }, //
+        { "E", PITCHNAME_e }, //
+        { "F", PITCHNAME_f }, //
+        { "G", PITCHNAME_g }, //
+        { "A", PITCHNAME_a }, //
+        { "B", PITCHNAME_b } //
+    };
+
+    assert(m_currentLayer);
+
+    Accid *accidElement = new Accid();
+    std::string appearance = this->ChildAsString(accidNode, "Appearance");
+    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
+    accidElement->SetAccid(accid);
+
+    std::string step = this->ChildAsString(accidNode, "Pitch/LetterName");
+    // Default pitch to C
+    data_PITCHNAME ploc = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
+    accidElement->SetPloc(ploc);
+
+    int oct = this->ChildAsInt(accidNode, "Pitch/OctaveNum");
+    if ((ploc != PITCHNAME_a) && (ploc != PITCHNAME_b)) oct += 1;
+    accidElement->SetOloc(oct);
+
+    int staffLoc = this->ChildAsInt(accidNode, "StaffLoc");
+    accidElement->SetLoc(staffLoc - 1);
+
+    m_currentLayer->AddChild(accidElement);
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
@@ -252,6 +307,52 @@ void CmmeInput::CreateDot(pugi::xml_node dotNode)
     m_currentLayer->AddChild(dot);
 
     return;
+}
+
+void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
+{
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
+        { "Bmol", ACCIDENTAL_WRITTEN_f }, //
+        { "BmolDouble", ACCIDENTAL_WRITTEN_f }, //
+        { "Bqua", ACCIDENTAL_WRITTEN_n }, //
+        { "Diesis", ACCIDENTAL_WRITTEN_s }, //
+    };
+
+    static const std::map<std::string, data_PITCHNAME> pitchMap{
+        { "C", PITCHNAME_c }, //
+        { "D", PITCHNAME_d }, //
+        { "E", PITCHNAME_e }, //
+        { "F", PITCHNAME_f }, //
+        { "G", PITCHNAME_g }, //
+        { "A", PITCHNAME_a }, //
+        { "B", PITCHNAME_b } //
+    };
+
+    assert(m_currentLayer);
+
+    if (!m_currentSignature) {
+        m_currentSignature = new KeySig();
+        m_currentLayer->AddChild(m_currentSignature);
+    }
+
+    KeyAccid *keyaccid = new KeyAccid();
+    std::string appearance = this->ChildAsString(keyNode, "Appearance");
+    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
+    keyaccid->SetAccid(accid);
+
+    std::string step = this->ChildAsString(keyNode, "Pitch/LetterName");
+    // Default pitch to C
+    data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
+    keyaccid->SetPname(pname);
+
+    int oct = this->ChildAsInt(keyNode, "Pitch/OctaveNum");
+    if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
+    keyaccid->SetOct(oct);
+
+    int staffLoc = this->ChildAsInt(keyNode, "StaffLoc");
+    keyaccid->SetLoc(staffLoc - 1);
+
+    m_currentSignature->AddChild(keyaccid);
 }
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
