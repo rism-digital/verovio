@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "barline.h"
 #include "clef.h"
 #include "doc.h"
@@ -297,6 +298,16 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         { "B", PITCHNAME_b } //
     };
 
+    static const std::map<int, data_ACCIDENTAL_WRITTEN> accidMap{
+        { -3, ACCIDENTAL_WRITTEN_tf }, //
+        { -2, ACCIDENTAL_WRITTEN_ff }, //
+        { -1, ACCIDENTAL_WRITTEN_f }, //
+        { 0, ACCIDENTAL_WRITTEN_n }, //
+        { 1, ACCIDENTAL_WRITTEN_s }, //
+        { 2, ACCIDENTAL_WRITTEN_ss }, //
+        { 3, ACCIDENTAL_WRITTEN_sx }, //
+    };
+
     assert(m_currentLayer);
 
     Note *note = new Note();
@@ -327,9 +338,21 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         CreateVerse(noteNode.child("ModernText"));
         m_currentNote = NULL;
     }
-    
+
     if (noteNode.child("Corona")) {
         note->SetFermata(STAFFREL_basic_above);
+    }
+
+    if (noteNode.child("ModernAccidental")) {
+        Accid *accid = new Accid();
+        int offset = this->ChildAsInt(noteNode.child("ModernAccidental"), "PitchOffset");
+        offset = std::min(3, offset);
+        offset = std::max(-3, offset);
+        // Default pitch to C
+        data_ACCIDENTAL_WRITTEN accidWritten = accidMap.contains(offset) ? accidMap.at(offset) : ACCIDENTAL_WRITTEN_n;
+        accid->SetAccid(accidWritten);
+        accid->SetFunc(accidLog_FUNC_edit);
+        note->AddChild(accid);
     }
 
     m_currentLayer->AddChild(note);
