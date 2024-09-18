@@ -191,8 +191,11 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
             if (this->IsClef(eventNode)) {
                 CreateClef(eventNode);
             }
-            else {
+            else if (eventNode.select_node("./Signature")) {
                 CreateKeySig(eventNode);
+            }
+            else {
+                CreateAccid(eventNode);
             }
         }
         else if (name == "Dot") {
@@ -217,6 +220,47 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
 
     staff->AddChild(m_currentLayer);
     m_currentSection->AddChild(staff);
+}
+
+void CmmeInput::CreateAccid(pugi::xml_node accidNode)
+{
+    static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
+        { "Bmol", ACCIDENTAL_WRITTEN_f }, //
+        { "BmolDouble", ACCIDENTAL_WRITTEN_f }, //
+        { "Bqua", ACCIDENTAL_WRITTEN_n }, //
+        { "Diesis", ACCIDENTAL_WRITTEN_s }, //
+    };
+
+    static const std::map<std::string, data_PITCHNAME> pitchMap{
+        { "C", PITCHNAME_c }, //
+        { "D", PITCHNAME_d }, //
+        { "E", PITCHNAME_e }, //
+        { "F", PITCHNAME_f }, //
+        { "G", PITCHNAME_g }, //
+        { "A", PITCHNAME_a }, //
+        { "B", PITCHNAME_b } //
+    };
+
+    assert(m_currentLayer);
+
+    Accid *accidElement = new Accid();
+    std::string appearance = this->ChildAsString(accidNode, "Appearance");
+    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
+    accidElement->SetAccid(accid);
+
+    std::string step = this->ChildAsString(accidNode, "Pitch/LetterName");
+    // Default pitch to C
+    data_PITCHNAME ploc = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
+    accidElement->SetPloc(ploc);
+
+    int oct = this->ChildAsInt(accidNode, "Pitch/OctaveNum");
+    if ((ploc != PITCHNAME_a) && (ploc != PITCHNAME_b)) oct += 1;
+    accidElement->SetOloc(oct);
+
+    int staffLoc = this->ChildAsInt(accidNode, "StaffLoc");
+    accidElement->SetLoc(staffLoc - 1);
+
+    m_currentLayer->AddChild(accidElement);
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
@@ -258,20 +302,12 @@ void CmmeInput::CreateDot(pugi::xml_node dotNode)
 
 void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
 {
-    assert(m_currentLayer);
-
     static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
         { "Bmol", ACCIDENTAL_WRITTEN_f }, //
         { "BmolDouble", ACCIDENTAL_WRITTEN_f }, //
         { "Bqua", ACCIDENTAL_WRITTEN_n }, //
         { "Diesis", ACCIDENTAL_WRITTEN_s }, //
     };
-
-    KeySig *keysig = new KeySig();
-    KeyAccid *keyaccid = new KeyAccid();
-    std::string appearance = this->ChildAsString(keyNode, "Appearance");
-    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
-    keyaccid->SetAccid(accid);
 
     static const std::map<std::string, data_PITCHNAME> pitchMap{
         { "C", PITCHNAME_c }, //
@@ -282,6 +318,14 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
         { "A", PITCHNAME_a }, //
         { "B", PITCHNAME_b } //
     };
+
+    assert(m_currentLayer);
+
+    KeySig *keysig = new KeySig();
+    KeyAccid *keyaccid = new KeyAccid();
+    std::string appearance = this->ChildAsString(keyNode, "Appearance");
+    data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
+    keyaccid->SetAccid(accid);
 
     std::string step = this->ChildAsString(keyNode, "Pitch/LetterName");
     // Default pitch to C

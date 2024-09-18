@@ -52,6 +52,7 @@ private:
     void CreateSection(pugi::xml_node musicSectionNode);
     void CreateStaff(pugi::xml_node voiceNode);
 
+    void CreateAccid(pugi::xml_node accidNode);
     void CreateClef(pugi::xml_node clefNode);
     void CreateDot(pugi::xml_node dotNode);
     void CreateKeySig(pugi::xml_node keyNode);
