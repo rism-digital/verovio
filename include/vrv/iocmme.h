@@ -65,25 +65,35 @@ private:
     bool IsClef(pugi::xml_node clefNode) const;
 
     /**
-     * Helper methods for accessing and converting text in elements
+     * Helper methods for accessing and converting text in elements.
+     * Return "" or VRV_UNSET if the node is NULL or the node or the text not found
      */
+    ///@{
     std::string AsString(const pugi::xml_node node) const;
     std::string ChildAsString(const pugi::xml_node node, const std::string &child) const;
     int AsInt(const pugi::xml_node node) const;
     int ChildAsInt(const pugi::xml_node node, const std::string &child) const;
+    ///@}
 
 public:
     //
 private:
-    //
+    /** The current score (only one) */
     Score *m_score;
+    /** The current un-measured measure acting a a MEI section */
     Measure *m_currentSection;
+    /** The current layer (or container) to which the layer elements have to be added */
     Layer *m_currentLayer;
+    /** The current note */
     Note *m_currentNote;
+    /** The mensural infos for all voices */
     std::vector<cmme::mensInfo> m_mensInfos;
+    /** The mensural info for the current voice */
     cmme::mensInfo *m_mensInfo;
 
+    /** The number of voices as given in the general data */
     int m_numVoices;
+    /** The name of the voices - if any */
     std::vector<std::string> m_voices;
 };
 

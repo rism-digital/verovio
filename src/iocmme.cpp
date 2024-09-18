@@ -76,14 +76,15 @@ bool CmmeInput::Import(const std::string &cmme)
         m_score = new Score();
         mdiv->AddChild(m_score);
 
+        // We asssume that there is always as many Voice elements than given in NumVoices
         pugi::xpath_node_set voices = root.select_nodes("/Piece/VoiceData/Voice");
-
         for (pugi::xpath_node voiceNode : voices) {
             m_numVoices++;
             // Get the voice name if any
             std::string name = ChildAsString(voiceNode.node(), "Name");
             m_voices.push_back(name);
         }
+        // Allocatate the mensural infos initialized with everything binary
         m_mensInfos.resize(m_numVoices);
 
         pugi::xpath_node_set musicSections = root.select_nodes("/Piece/MusicSection/*");
@@ -123,7 +124,6 @@ bool CmmeInput::Import(const std::string &cmme)
         m_score->GetScoreDef()->AddChild(staffGrp);
 
         m_doc->ConvertToPageBasedDoc();
-        // return this->ReadDoc(root);
     }
     catch (char *str) {
         LogError("%s", str);
@@ -139,17 +139,17 @@ void CmmeInput::CreateSection(pugi::xml_node musicSectionNode)
 
     std::string sectionType = musicSectionNode.name();
 
-    // the section
+    // Create a new section
     Section *section = new Section();
+    // Add the section type (MensuralMusic, Plainchant) to `@type`
     section->SetType(sectionType);
     m_score->AddChild(section);
 
-    // the current section is a invisible measure
+    // Set the current section to an invisible unmeasured measure
     m_currentSection = new Measure(UNMEASURED, 1);
     section->AddChild(m_currentSection);
 
-    pugi::xpath_node_set voices = musicSectionNode.select_nodes("./Voice");
-
+    // Loop through the number of voices and parse Voice or create an empty staff if not given
     for (int i = 0; i < m_numVoices; ++i) {
         std::string xpath = StringFormat("./Voice[VoiceNum[text()='%d']]", i + 1);
         pugi::xpath_node voice = musicSectionNode.select_node(xpath.c_str());
@@ -174,10 +174,11 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     m_currentLayer = new Layer();
     m_currentLayer->SetN(1);
 
+    // (Re)-set the current mens info to the corresponding voice
     m_mensInfo = &m_mensInfos.at(numVoice - 1);
 
+    // Loop through the event lists
     pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
-
     for (pugi::xpath_node event : events) {
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
@@ -230,6 +231,7 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     clef->SetLine(staffLoc);
 
     std::string appearance = this->ChildAsString(clefNode, "Appearance");
+    // Default clef to C
     data_CLEFSHAPE shape = shapeMap.contains(appearance) ? shapeMap.at(appearance) : CLEFSHAPE_C;
     clef->SetShape(shape);
 
@@ -296,6 +298,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
 
     Note *note = new Note();
     std::string step = this->ChildAsString(noteNode, "LetterName");
+    // Default pitch to C
     data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
     note->SetPname(pname);
 
@@ -382,6 +385,7 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
     assert(m_mensInfo);
 
     std::string type = this->ChildAsString(durationNode, "Type");
+    // Default duration to brevis
     data_DURATION duration = durationMap.contains(type) ? durationMap.at(type) : DURATION_brevis;
 
     num = VRV_UNSET;
@@ -432,8 +436,10 @@ bool CmmeInput::IsClef(const pugi::xml_node clefNode) const
 {
     static std::vector<std::string> clefs = { "C", "F", "Fsqr", "Frnd", "G" };
 
+    // Checking this is not enough since it is somethimes missing in CMME files
     if (clefNode.select_node("./Signature")) return false;
 
+    // Also check the clef appearance
     std::string appearance = this->ChildAsString(clefNode, "Appearance");
     return (std::find(clefs.begin(), clefs.end(), appearance) != clefs.end());
 }
