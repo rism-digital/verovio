@@ -53,6 +53,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_score = NULL;
     m_currentSection = NULL;
     m_currentLayer = NULL;
+    m_currentSignature = NULL;
     m_currentNote = NULL;
     m_isInSyllable = false;
     m_mensInfo = NULL;
@@ -181,6 +182,8 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     m_mensInfo = &m_mensInfos.at(numVoice - 1);
     // Reset the syllable position
     m_isInSyllable = false;
+    bool keySigFound = false;
+    m_currentSignature = NULL;
 
     // Loop through the event lists
     pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
@@ -192,6 +195,7 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
                 CreateClef(eventNode);
             }
             else if (eventNode.select_node("./Signature")) {
+                keySigFound = true;
                 CreateKeySig(eventNode);
             }
             else {
@@ -216,6 +220,10 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         else {
             LogWarning("Unsupported event '%s'", name.c_str());
         }
+        if (!keySigFound) {
+            m_currentSignature = NULL;
+        }
+        keySigFound = false;
     }
 
     staff->AddChild(m_currentLayer);
@@ -321,7 +329,11 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
 
     assert(m_currentLayer);
 
-    KeySig *keysig = new KeySig();
+    if (!m_currentSignature) {
+        m_currentSignature = new KeySig();
+        m_currentLayer->AddChild(m_currentSignature);
+    }
+
     KeyAccid *keyaccid = new KeyAccid();
     std::string appearance = this->ChildAsString(keyNode, "Appearance");
     data_ACCIDENTAL_WRITTEN accid = shapeMap.contains(appearance) ? shapeMap.at(appearance) : ACCIDENTAL_WRITTEN_f;
@@ -339,8 +351,7 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
     int staffLoc = this->ChildAsInt(keyNode, "StaffLoc");
     keyaccid->SetLoc(staffLoc - 1);
 
-    m_currentLayer->AddChild(keysig);
-    keysig->AddChild(keyaccid);
+    m_currentSignature->AddChild(keyaccid);
 }
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
@@ -417,7 +428,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         CreateVerse(noteNode.child("ModernText"));
         m_currentNote = NULL;
     }
-    
+
     if (noteNode.child("Corona")) {
         note->SetFermata(STAFFREL_basic_above);
     }

@@ -20,6 +20,7 @@
 namespace vrv {
 
 class Clef;
+class KeySig;
 class Layer;
 class Measure;
 class Note;
@@ -86,6 +87,8 @@ private:
     Measure *m_currentSection;
     /** The current layer (or container) to which the layer elements have to be added */
     Layer *m_currentLayer;
+    /** The current key signature to which extra flats might be added */
+    KeySig *m_currentSignature;
     /** The current note */
     Note *m_currentNote;
     /** The syllable is not the first */
