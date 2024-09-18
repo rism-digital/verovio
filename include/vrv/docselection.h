@@ -29,7 +29,7 @@ public:
      */
     ///@{
     DocSelection();
-    virtual ~DocSelection(){};
+    virtual ~DocSelection() {};
     ///@}
 
     /**

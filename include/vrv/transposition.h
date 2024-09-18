@@ -43,7 +43,7 @@ public:
     // octave number of pitch: 4 = middle-C octave
     int m_oct;
 
-    TransPitch(){};
+    TransPitch() {};
     TransPitch(int aPname, int anAccid, int anOct);
     TransPitch(data_PITCHNAME pname, data_ACCIDENTAL_GESTURAL accidG, data_ACCIDENTAL_WRITTEN accidW, int oct);
     TransPitch(const TransPitch &pitch);

@@ -92,7 +92,7 @@ public:
         m_pushBack = false;
         m_viewBoxFactor = (double)DEFINITION_FACTOR;
     }
-    virtual ~DeviceContext(){};
+    virtual ~DeviceContext() {};
     ClassId GetClassId() const { return m_classId; }
     bool Is(ClassId classId) const { return (m_classId == classId); }
     ///@}

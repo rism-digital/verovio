@@ -33,7 +33,7 @@ public:
     // constructors and destructors
     Output(Doc *doc, std::string filename);
     Output(Doc *doc);
-    Output(){};
+    Output() {};
     virtual ~Output();
 
     /**

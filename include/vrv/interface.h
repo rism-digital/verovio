@@ -37,8 +37,8 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Interface(){};
-    virtual ~Interface(){};
+    Interface() {};
+    virtual ~Interface() {};
     ///@}
 
     /**

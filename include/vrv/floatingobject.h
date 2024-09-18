@@ -167,7 +167,7 @@ class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
     FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
-    virtual ~FloatingPositioner(){};
+    virtual ~FloatingPositioner() {};
     ClassId GetClassId() const override { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
@@ -485,7 +485,7 @@ public:
         m_discarded = false;
         m_isBelow = true;
     }
-    virtual ~CurveSpannedElement(){};
+    virtual ~CurveSpannedElement() {};
 
     Point m_rotatedPoints[4];
     const BoundingBox *m_boundingBox;
