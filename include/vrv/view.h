@@ -122,7 +122,7 @@ public:
     virtual void DoRefresh() {}
     virtual void DoResize() {}
     virtual void DoReset() {}
-    virtual void OnPageChange() {};
+    virtual void OnPageChange() {}
     ///@}
 
     /**
