@@ -417,6 +417,10 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         CreateVerse(noteNode.child("ModernText"));
         m_currentNote = NULL;
     }
+    
+    if (noteNode.child("Corona")) {
+        note->SetFermata(STAFFREL_basic_above);
+    }
 
     m_currentLayer->AddChild(note);
 
