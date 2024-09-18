@@ -225,7 +225,7 @@ public:
 class BeamSpanSegment : public BeamSegment {
 public:
     BeamSpanSegment();
-    virtual ~BeamSpanSegment(){};
+    virtual ~BeamSpanSegment() {};
 
     /**
      * Set/get methods for member variables

@@ -156,7 +156,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FunctorInterface(){};
+    FunctorInterface() {};
     virtual ~FunctorInterface() = default;
     ///@}
 
@@ -513,7 +513,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConstFunctorInterface(){};
+    ConstFunctorInterface() {};
     virtual ~ConstFunctorInterface() = default;
     ///@}
 

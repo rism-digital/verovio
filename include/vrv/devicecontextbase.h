@@ -144,7 +144,7 @@ public:
         m_widthToHeightRatio = 1.0;
         m_smuflFont = SMUFL_NONE;
     }
-    virtual ~FontInfo(){};
+    virtual ~FontInfo() {};
 
     // accessors and modifiers for the font elements
     int GetPointSize() const { return m_pointSize; }

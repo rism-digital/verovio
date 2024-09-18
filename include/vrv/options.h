@@ -417,8 +417,8 @@ private:
 class OptionStaffrel : public Option {
 public:
     // constructors and destructors
-    OptionStaffrel(){};
-    virtual ~OptionStaffrel(){};
+    OptionStaffrel() {};
+    virtual ~OptionStaffrel() {};
     void CopyTo(Option *option) override;
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
