@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "app.h"
 #include "barline.h"
 #include "clef.h"
 #include "custos.h"
@@ -27,11 +28,13 @@
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
+#include "lem.h"
 #include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
+#include "rdg.h"
 #include "rest.h"
 #include "score.h"
 #include "section.h"
@@ -186,11 +189,75 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     m_mensInfo = &m_mensInfos.at(numVoice - 1);
     // Reset the syllable position
     m_isInSyllable = false;
-    bool keySigFound = false;
     m_currentSignature = NULL;
 
     // Loop through the event lists
-    pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
+    ReadEvents(voiceNode.child("EventList"));
+
+    staff->AddChild(m_currentContainer);
+    m_currentSection->AddChild(staff);
+}
+
+void CmmeInput::CreateApp(pugi::xml_node appNode)
+{
+    assert(m_currentContainer);
+
+    App *app = new App(EDITORIAL_LAYER);
+    m_currentContainer->AddChild(app);
+    m_currentContainer = app;
+
+    // Loop through the event lists
+    pugi::xpath_node_set lemOrRdgs = appNode.select_nodes("./Reading");
+    bool isFirst = true;
+    for (pugi::xpath_node lemOrRdg : lemOrRdgs) {
+        pugi::xml_node lemOrRdgNode = lemOrRdg.node();
+        this->CreateLemOrRdg(lemOrRdgNode, isFirst);
+        isFirst = false;
+    }
+
+    m_currentContainer = m_currentContainer->GetParent();
+}
+
+void CmmeInput::CreateLemOrRdg(pugi::xml_node lemOrRdgNode, bool isFirst)
+{
+    assert(m_currentContainer);
+    std::string versionId = this->ChildAsString(lemOrRdgNode, "VariantVersionID");
+
+    EditorialElement *lemOrRdg = NULL;
+    if (isFirst && (lemOrRdgNode.child("PreferredReading") || (versionId == "DEFAULT"))) {
+        lemOrRdg = new Lem();
+    }
+    else {
+        lemOrRdg = new Rdg();
+    }
+    lemOrRdg->m_visibility = (isFirst) ? Visible : Hidden;
+
+    if (lemOrRdg->Is(RDG)) lemOrRdg->SetLabel(versionId);
+
+    if (lemOrRdgNode.child("Error")) {
+        lemOrRdg->SetType("Error");
+    }
+    else if (lemOrRdgNode.child("Lacuna")) {
+        lemOrRdg->SetType("Lacuna");
+    }
+
+    m_currentContainer->AddChild(lemOrRdg);
+
+    m_currentContainer = lemOrRdg;
+
+    ReadEvents(lemOrRdgNode.child("Music"));
+
+    m_currentContainer = m_currentContainer->GetParent();
+}
+
+void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
+{
+    assert(m_currentContainer);
+
+    bool keySigFound = false;
+
+    // Loop through the event lists
+    pugi::xpath_node_set events = eventsNode.select_nodes("./*");
     for (pugi::xpath_node event : events) {
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
@@ -238,6 +305,9 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         else if (name == "Rest") {
             CreateRest(eventNode);
         }
+        else if (name == "VariantReadings") {
+            CreateApp(eventNode);
+        }
         else {
             LogWarning("Unsupported event '%s'", name.c_str());
         }
@@ -246,10 +316,6 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         }
         keySigFound = false;
     }
-
-    staff->AddChild(m_currentContainer);
-  
-    m_currentSection->AddChild(staff);
 }
 
 void CmmeInput::CreateAccid(pugi::xml_node accidNode)

@@ -52,6 +52,10 @@ public:
 private:
     void CreateSection(pugi::xml_node musicSectionNode);
     void CreateStaff(pugi::xml_node voiceNode);
+    void CreateApp(pugi::xml_node appNode);
+    void CreateLemOrRdg(pugi::xml_node lemOrRdgNode, bool isFirst);
+
+    void ReadEvents(pugi::xml_node eventsNode);
 
     void CreateAccid(pugi::xml_node accidNode);
     void CreateClef(pugi::xml_node clefNode);
