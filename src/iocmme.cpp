@@ -20,6 +20,7 @@
 #include "accid.h"
 #include "barline.h"
 #include "clef.h"
+#include "custos.h"
 #include "doc.h"
 #include "dot.h"
 #include "keyaccid.h"
@@ -205,11 +206,28 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
                 CreateAccid(eventNode);
             }
         }
+        else if (name == "Custos") {
+            CreateCustos(eventNode);
+        }
         else if (name == "Dot") {
             CreateDot(eventNode);
         }
         else if (name == "Mensuration") {
             CreateMensuration(eventNode);
+        }
+        else if (name == "MultiEvent") {
+            /// Assuming that a multievent contains a key signature, all events are key signatures
+            if (eventNode.select_node("./Clef/Signature")) {
+                m_currentSignature = NULL;
+                pugi::xpath_node_set clefs = eventNode.select_nodes("./Clef");
+                for (pugi::xpath_node clef : clefs) {
+                    pugi::xml_node clefNode = clef.node();
+                    CreateKeySig(clefNode);
+                }
+            }
+            else {
+                LogWarning("Unsupported event '%s'", name.c_str());
+            }
         }
         else if (name == "Note") {
             CreateNote(eventNode);
@@ -230,6 +248,7 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
     }
 
     staff->AddChild(m_currentContainer);
+  
     m_currentSection->AddChild(staff);
 }
 
@@ -297,6 +316,35 @@ void CmmeInput::CreateClef(pugi::xml_node clefNode)
     clef->SetShape(shape);
 
     m_currentContainer->AddChild(clef);
+
+    return;
+}
+
+void CmmeInput::CreateCustos(pugi::xml_node custosNode)
+{
+    static const std::map<std::string, data_PITCHNAME> pitchMap{
+        { "C", PITCHNAME_c }, //
+        { "D", PITCHNAME_d }, //
+        { "E", PITCHNAME_e }, //
+        { "F", PITCHNAME_f }, //
+        { "G", PITCHNAME_g }, //
+        { "A", PITCHNAME_a }, //
+        { "B", PITCHNAME_b } //
+    };
+
+    assert(m_currentLayer);
+
+    Custos *custos = new Custos();
+    std::string step = this->ChildAsString(custosNode, "LetterName");
+    // Default pitch to C
+    data_PITCHNAME pname = pitchMap.contains(step) ? pitchMap.at(step) : PITCHNAME_c;
+    custos->SetPname(pname);
+
+    int oct = this->ChildAsInt(custosNode, "OctaveNum");
+    if ((pname != PITCHNAME_a) && (pname != PITCHNAME_b)) oct += 1;
+    custos->SetOct(oct);
+
+    m_currentLayer->AddChild(custos);
 
     return;
 }
