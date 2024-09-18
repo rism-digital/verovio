@@ -59,6 +59,7 @@ private:
     void ReadEditorialCommentary(pugi::xml_node evenNode, Object *object);
 
     void CreateAccid(pugi::xml_node accidNode);
+    void CreateBarline(pugi::xml_node barlineNode);
     void CreateClef(pugi::xml_node clefNode);
     void CreateCustos(pugi::xml_node custosNode);
     void CreateDot(pugi::xml_node dotNode);
