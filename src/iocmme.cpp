@@ -208,6 +208,20 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         else if (name == "Mensuration") {
             CreateMensuration(eventNode);
         }
+        else if (name == "MultiEvent") {
+            /// Assuming that a multievent contains a key signature, all events are key signatures
+            if (eventNode.select_node("./Clef/Signature")) {
+                m_currentSignature = NULL;
+                pugi::xpath_node_set clefs = eventNode.select_nodes("./Clef");
+                for (pugi::xpath_node clef : clefs) {
+                    pugi::xml_node clefNode = clef.node();
+                    CreateKeySig(clefNode);
+                }
+            }
+            else {
+                LogWarning("Unsupported event '%s'", name.c_str());
+            }
+        }
         else if (name == "Note") {
             CreateNote(eventNode);
         }
@@ -225,7 +239,6 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         }
         keySigFound = false;
     }
-
     staff->AddChild(m_currentLayer);
     m_currentSection->AddChild(staff);
 }
