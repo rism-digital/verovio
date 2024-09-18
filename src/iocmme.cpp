@@ -52,6 +52,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_currentSection = NULL;
     m_currentLayer = NULL;
     m_currentNote = NULL;
+    m_isInSyllable = false;
     m_mensInfo = NULL;
 }
 
@@ -176,6 +177,8 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
 
     // (Re)-set the current mens info to the corresponding voice
     m_mensInfo = &m_mensInfos.at(numVoice - 1);
+    // Reset the syllable position
+    m_isInSyllable = false;
 
     // Loop through the event lists
     pugi::xpath_node_set events = voiceNode.select_nodes("./EventList/*");
@@ -364,6 +367,22 @@ void CmmeInput::CreateVerse(pugi::xml_node verseNode)
     Text *text = new Text();
     std::string sylText = this->ChildAsString(verseNode, "Syllable");
     text->SetText(UTF8to32(sylText));
+
+    if (verseNode.child("WordEnd")) {
+        syl->SetWordpos(sylLog_WORDPOS_t);
+        m_isInSyllable = false;
+    }
+    else {
+        if (m_isInSyllable) {
+            syl->SetWordpos(sylLog_WORDPOS_m);
+        }
+        else {
+            syl->SetWordpos(sylLog_WORDPOS_i);
+        }
+        m_isInSyllable = true;
+        syl->SetCon(sylLog_CON_d);
+    }
+
     syl->AddChild(text);
     verse->AddChild(syl);
     m_currentNote->AddChild(verse);

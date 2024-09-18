@@ -86,6 +86,8 @@ private:
     Layer *m_currentLayer;
     /** The current note */
     Note *m_currentNote;
+    /** The syllable is not the first */
+    bool m_isInSyllable;
     /** The mensural infos for all voices */
     std::vector<cmme::mensInfo> m_mensInfos;
     /** The mensural info for the current voice */
