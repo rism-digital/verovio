@@ -212,6 +212,13 @@ void CmmeInput::CreateStaff(pugi::xml_node voiceNode)
         else if (name == "Mensuration") {
             CreateMensuration(eventNode);
         }
+        else if (name == "MiscItem") {
+            /// Assuming that a MiscItem contains only one child
+            if (eventNode.select_node("./Barline")) {
+                pugi::xml_node barlineNode = eventNode.select_node("./Barline").node();
+                CreateBarline(barlineNode);
+            }
+        }
         else if (name == "MultiEvent") {
             /// Assuming that a multievent contains a key signature, all events are key signatures
             if (eventNode.select_node("./Clef/Signature")) {
@@ -286,6 +293,40 @@ void CmmeInput::CreateAccid(pugi::xml_node accidNode)
     accidElement->SetLoc(staffLoc - 1);
 
     m_currentLayer->AddChild(accidElement);
+}
+
+void CmmeInput::CreateBarline(pugi::xml_node barlineNode)
+{
+    assert(m_currentLayer);
+
+    BarLine *barline = new BarLine();
+
+    /// Determine the barLine/@form based on the CMME <Barline>'s <NumLines> and <RepeatSign>
+    int formNumLines = this->ChildAsInt(barlineNode, "NumLines");
+    if (formNumLines == 1) {
+        barline->SetForm(BARRENDITION_single);
+    }
+    else if (formNumLines == 2) {
+        barline->SetForm(BARRENDITION_dbl);
+    }
+    else if (formNumLines != VRV_UNSET) {
+        LogWarning("Unsupported barline (with more than 2 lines)");
+    } ///@form is overwritten to 'rptboth' when <RepeatSign> is used
+    if (barlineNode.select_node("./RepeatSign")) {
+        barline->SetForm(BARRENDITION_rptboth);
+    }
+    /// Determine the barLine/@place
+    int bottomLine = this->ChildAsInt(barlineNode, "BottomStaffLine");
+    if (bottomLine != VRV_UNSET) {
+        int place = bottomLine * 2;
+        barline->SetPlace(place);
+    }
+    /// Determine the barLine/@len
+    int numSpaces = this->ChildAsInt(barlineNode, "NumSpaces");
+    if (numSpaces != VRV_UNSET) {
+        barline->SetLen(numSpaces * 2);
+    }
+    m_currentLayer->AddChild(barline);
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
