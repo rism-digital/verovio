@@ -668,6 +668,12 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         mensur->m_unsupported.push_back(std::make_pair("fontsize", "small"));
     }
 
+    /// Mesuration/NoScoreEffect to @type = cmme_no_score_effect
+    pugi::xml_node noScoreEffect = mensurationNode.child("NoScoreEffect");
+    if (noScoreEffect != NULL) {
+        mensur->SetType("cmme_no_score_effect");
+    }
+
     /// Mensuration/Number/Num to @num and Number/Den to @numbase
     /// However, Number/Den cannot be entered in the CMME Editor.
     /// It can only be added in the XML manually and imported into the CMME Editor,
