@@ -21,6 +21,7 @@
 #include "annot.h"
 #include "app.h"
 #include "barline.h"
+#include "chord.h"
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
@@ -300,6 +301,10 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                     CreateKeySig(clefNode);
                 }
             }
+            else if (eventNode.select_node("./Note")) {
+                // Assuming that this only contains notes (and is a chord)
+                CreateChord(eventNode);
+            }
             else {
                 LogWarning("Unsupported event '%s'", name.c_str());
             }
@@ -421,6 +426,27 @@ void CmmeInput::CreateBarline(pugi::xml_node barlineNode)
     }
 
     m_currentContainer->AddChild(barLine);
+}
+
+void CmmeInput::CreateChord(pugi::xml_node chordNode)
+{
+    assert(m_currentContainer);
+
+    Chord *chord = new Chord();
+    m_currentContainer->AddChild(chord);
+    m_currentContainer = chord;
+    pugi::xpath_node_set events = chordNode.select_nodes("./*");
+    for (pugi::xpath_node event : events) {
+        pugi::xml_node eventNode = event.node();
+        std::string name = eventNode.name();
+        if (name == "Note") {
+            CreateNote(eventNode);
+        }
+        else {
+            LogWarning("Unsupported chord component: '%s'", name.c_str());
+        }
+    }
+    m_currentContainer = m_currentContainer->GetParent();
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
