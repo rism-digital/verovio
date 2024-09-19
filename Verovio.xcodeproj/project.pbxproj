@@ -326,6 +326,12 @@
 		4D64137E2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D64137F2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D6413802035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
+		4D64793F2C9C0F1C00CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
+		4D6479412C9C0F4200CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
+		4D6479422C9C0F4300CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
+		4D6479432C9C0F4400CD9539 /* genericlayerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */; };
+		4D6479442C9C0F4700CD9539 /* genericlayerelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6479402C9C0F2D00CD9539 /* genericlayerelement.h */; };
+		4D6479452C9C0F4800CD9539 /* genericlayerelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6479402C9C0F2D00CD9539 /* genericlayerelement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D674B3F255F40AC008AEF4C /* plica.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D674B3E255F40AC008AEF4C /* plica.h */; };
 		4D674B40255F40AC008AEF4C /* plica.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D674B3E255F40AC008AEF4C /* plica.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D674B46255F40B7008AEF4C /* plica.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D674B45255F40B7008AEF4C /* plica.cpp */; };
@@ -1871,6 +1877,8 @@
 		4D6413772035F58200BB630E /* pages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pages.cpp; path = src/pages.cpp; sourceTree = "<group>"; };
 		4D64137B2035F67C00BB630E /* mdiv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mdiv.h; path = include/vrv/mdiv.h; sourceTree = "<group>"; };
 		4D64137D2035F68600BB630E /* mdiv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mdiv.cpp; path = src/mdiv.cpp; sourceTree = "<group>"; };
+		4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = genericlayerelement.cpp; path = src/genericlayerelement.cpp; sourceTree = "<group>"; };
+		4D6479402C9C0F2D00CD9539 /* genericlayerelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = genericlayerelement.h; path = include/vrv/genericlayerelement.h; sourceTree = "<group>"; };
 		4D674B3E255F40AC008AEF4C /* plica.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plica.h; path = include/vrv/plica.h; sourceTree = "<group>"; };
 		4D674B45255F40B7008AEF4C /* plica.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plica.cpp; path = src/plica.cpp; sourceTree = "<group>"; };
 		4D6DF9F420E1071E00C12BBD /* subst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = subst.cpp; path = src/subst.cpp; sourceTree = "<group>"; };
@@ -2983,6 +2991,8 @@
 				4DEEDE621E617C880087E8BC /* elementpart.h */,
 				409B3DD81F2D1C2A0098A265 /* ftrem.cpp */,
 				409B3DD71F2D1C0C0098A265 /* ftrem.h */,
+				4D64793E2C9C0F1C00CD9539 /* genericlayerelement.cpp */,
+				4D6479402C9C0F2D00CD9539 /* genericlayerelement.h */,
 				400FEDD2206FA743000D3233 /* gracegrp.cpp */,
 				400FEDD1206FA742000D3233 /* gracegrp.h */,
 				4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */,
@@ -3338,6 +3348,7 @@
 				4DB3D8FB1F83D1F700B5FC2B /* floatingobject.h in Headers */,
 				4D49924F2926B4E9007E3431 /* toolkitdef.h in Headers */,
 				4D94721D20CA701000C780C8 /* linkinginterface.h in Headers */,
+				4D6479442C9C0F4700CD9539 /* genericlayerelement.h in Headers */,
 				403BEFF7206C00F800D022D5 /* multirpt.h in Headers */,
 				4DC12A751F73FF92000440E9 /* runningelement.h in Headers */,
 				4DB3D8DD1F83D14B00B5FC2B /* artic.h in Headers */,
@@ -3496,6 +3507,7 @@
 				BB4C4B9C22A932E5001F6AF0 /* pitchinterface.h in Headers */,
 				4DACC9E92990F29A00B55913 /* atts_fingering.h in Headers */,
 				BB4C4A9422A9328F001F6AF0 /* doc.h in Headers */,
+				4D6479452C9C0F4800CD9539 /* genericlayerelement.h in Headers */,
 				BB4C4A9922A9328F001F6AF0 /* horizontalaligner.h in Headers */,
 				BB4C4AAE22A932A6001F6AF0 /* iobase.h in Headers */,
 				BB4C4BAA22A932EB001F6AF0 /* view.h in Headers */,
@@ -4155,6 +4167,7 @@
 				E7BCFFBA281298620012513D /* resources.cpp in Sources */,
 				40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */,
 				4DACC9ED2990F29A00B55913 /* atts_shared.cpp in Sources */,
+				4D6479412C9C0F4200CD9539 /* genericlayerelement.cpp in Sources */,
 				4D16943D1E3A44F300569BF4 /* view_element.cpp in Sources */,
 				4DACC9AB2990F29A00B55913 /* attmodule.cpp in Sources */,
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
@@ -4431,6 +4444,7 @@
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				E7876F2029C0A702002147DC /* adjusttupletsxfunctor.cpp in Sources */,
 				E79C87C3269440570098FE85 /* lv.cpp in Sources */,
+				4D64793F2C9C0F1C00CD9539 /* genericlayerelement.cpp in Sources */,
 				4D7AFDC72A5554A100835ED1 /* divline.cpp in Sources */,
 				4DEC4DA621C81ED400D1D273 /* reg.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
@@ -4732,6 +4746,7 @@
 				4DB3D8F31F83D1C600B5FC2B /* scoredefinterface.cpp in Sources */,
 				4D2461DD246BE2E8002BBCCD /* expansionmap.cpp in Sources */,
 				E7BCFFB5281297980012513D /* resources.cpp in Sources */,
+				4D6479422C9C0F4300CD9539 /* genericlayerelement.cpp in Sources */,
 				4DACC9EE2990F29A00B55913 /* atts_shared.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				4DACC9AC2990F29A00B55913 /* attmodule.cpp in Sources */,
@@ -5021,6 +5036,7 @@
 				BB4C4AB722A932A6001F6AF0 /* iomusxml.cpp in Sources */,
 				4DACC9EF2990F29A00B55913 /* atts_shared.cpp in Sources */,
 				BB4C4BC322A9330D001F6AF0 /* pugixml.cpp in Sources */,
+				4D6479432C9C0F4400CD9539 /* genericlayerelement.cpp in Sources */,
 				4DACC9AD2990F29A00B55913 /* attmodule.cpp in Sources */,
 				4D2E758B22BC2B5B004C51F0 /* tabgrp.cpp in Sources */,
 				4D2E758D22BC2B5B004C51F0 /* tabdursym.cpp in Sources */,
