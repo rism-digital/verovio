@@ -2803,6 +2803,8 @@ void MEIOutput::WriteProport(pugi::xml_node currentNode, Proport *proport)
     assert(proport);
 
     this->WriteLayerElement(currentNode, proport);
+
+    proport->WriteDurationRatio(currentNode);
 }
 
 void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
