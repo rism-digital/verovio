@@ -546,38 +546,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
 
 void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
+    assert(element);
     assert(layer);
     assert(staff);
-    assert(dynamic_cast<Proport *>(element)); // Element must be a Proport"
-
-    int x1, x2, y1, y2;
-
-    Proport *proport = dynamic_cast<Proport *>(element);
 
     dc->StartGraphic(element, "", element->GetID());
-
-    int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
-    int x = element->GetDrawingX();
-
-    x1 = x + 120;
-    x2 = x1 + 150; // ??TEST: JUST DRAW AN ARBITRARY RECTANGLE
-    y1 = y;
-    y2 = y + 50 + (50 * proport->GetNum());
-    // DrawFilledRectangle(dc,x1,y1,x2,y2);
-    this->DrawPartFilledRectangle(dc, x1, y1, x2, y2, 0);
-
-    if (proport->HasNum()) {
-        x = element->GetDrawingX();
-        // if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
-        {
-            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                * 5; // step forward because we have a sign or a meter symbol
-        }
-        int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
-        this->DrawProportFigures(dc, x,
-            staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1),
-            proport->GetNum(), numbase, staff);
-    }
 
     dc->EndGraphic(element, this);
 }
