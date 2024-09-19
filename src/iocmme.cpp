@@ -628,6 +628,9 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     mensur->SetOrient(orient);
 
     /// Mensuration/Number/Num to @num and Number/Den to @numbase
+    /// However, Number/Den cannot be entered in the CMME Editor.
+    /// It can only be added in the XML manually and imported into the CMME Editor,
+    /// where it won't render, but one can see it in the "Event Inspector."
     pugi::xml_node numberNode = mensurationNode.child("Number");
     if (numberNode != NULL) {
         int numValue = this->ChildAsInt(numberNode, "Num");
