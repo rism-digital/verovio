@@ -66,7 +66,6 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_currentNote = NULL;
     m_isInSyllable = false;
     m_mensInfo = NULL;
-    m_lastNoteDuration = std::make_pair(nullptr, 0.0);
 }
 
 CmmeInput::~CmmeInput() {}
@@ -78,6 +77,15 @@ bool CmmeInput::Import(const std::string &cmme)
     try {
         m_doc->Reset();
         m_doc->SetType(Raw);
+
+        // Genereate the header and add a comment to the project description
+        m_doc->GenerateMEIHeader(false);
+        pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
+        if (projectDesc) {
+            pugi::xml_node p1 = projectDesc.append_child("p");
+            p1.text().set("Converted from CMME XML");
+        }
+
         pugi::xml_document doc;
         doc.load_string(cmme.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
@@ -447,15 +455,6 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
         std::string name = eventNode.name();
         if (name == "Note") {
             CreateNote(eventNode);
-            // If this is the longest note, we will need it to add duration
-            // info to chord
-            if ((m_lastNoteDuration.second > longestDuration)) {
-                longestDuration = m_lastNoteDuration.second;
-                Note *note = m_lastNoteDuration.first;
-                chord->SetDur(note->GetDur());
-                chord->SetNum(note->GetNum());
-                chord->SetNumbase(note->GetNumbase());
-            }
         }
         else {
             LogWarning("Unsupported chord component: '%s'", name.c_str());
@@ -733,7 +732,6 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
         note->SetNumbase(num);
         note->SetNum(numbase);
-        m_lastNoteDuration = std::make_pair(note, num / numbase);
     }
 
     int oct = this->ChildAsInt(noteNode, "OctaveNum");
@@ -795,10 +793,15 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         data_LIGATUREFORM form = (lig == "Obliqua") ? LIGATUREFORM_obliqua : LIGATUREFORM_recta;
         // First note of the ligature, create the ligature element
         if (!m_currentContainer->Is(LIGATURE)) {
-            Ligature *ligature = new Ligature();
-            ligature->SetForm(form);
-            m_currentContainer->AddChild(ligature);
-            m_currentContainer = ligature;
+            if (m_currentContainer->Is(CHORD)) {
+                LogWarning("Ligature within chord is not supported");
+            }
+            else {
+                Ligature *ligature = new Ligature();
+                ligature->SetForm(form);
+                m_currentContainer->AddChild(ligature);
+                m_currentContainer = ligature;
+            }
         }
         // Otherwise simply add the `@lig` to the note
         else {
