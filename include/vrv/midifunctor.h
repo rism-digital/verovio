@@ -279,6 +279,13 @@ public:
     bool ImplementsEndInterface() const override { return true; }
 
     /*
+     * Getter for properties
+     */
+    ///@{
+    std::set<int> GetTempoEventTicks() const { return m_tempoEventTicks; }
+    ///@}
+
+    /*
      * Setter for various properties
      */
     ///@{
@@ -287,6 +294,7 @@ public:
     void SetCurrentTempo(double tempo) { m_currentTempo = tempo; }
     void SetDeferredNotes(const std::map<const Note *, double> &deferredNotes) { m_deferredNotes = deferredNotes; }
     void SetStaffN(int staffN) { m_staffN = staffN; }
+    void SetTempoEventTicks(const std::set<int> &ticks) { m_tempoEventTicks = ticks; }
     void SetTrack(int track) { m_midiTrack = track; }
     void SetTransSemi(int transSemi) { m_transSemi = transSemi; }
     ///@}
@@ -345,6 +353,9 @@ private:
     int m_transSemi;
     // The current tempo
     double m_currentTempo;
+    // Tempo events are always added on track 0
+    // This set contains the ticks of all added tempo events to avoid multiple events at the same time
+    std::set<int> m_tempoEventTicks;
     // The last (non grace) note that was performed
     const Note *m_lastNote;
     // Expanded notes due to ornaments and tremolandi
