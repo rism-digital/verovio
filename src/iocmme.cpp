@@ -36,6 +36,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
+#include "proport.h"
 #include "rdg.h"
 #include "rest.h"
 #include "score.h"
@@ -323,6 +324,9 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
         }
         else if (name == "OriginalText") {
             CreateOriginalText(eventNode);
+        }
+        else if (name == "Proportion") {
+            CreateProport(eventNode);
         }
         else if (name == "Rest") {
             CreateRest(eventNode);
@@ -621,7 +625,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
     mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
 
-    /// Sign/Strokes to @slash
+    /// Mensuration/Sign/Strokes to @slash
     int strokes = this->ChildAsInt(signNode, "Strokes");
     if (strokes != VRV_UNSET) {
         mensur->SetSlash(strokes);
@@ -636,6 +640,14 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     std::string orientation = this->ChildAsString(signNode, "Orientation");
     data_ORIENTATION orient = orientationMap.contains(orientation) ? orientationMap.at(orientation) : ORIENTATION_NONE;
     mensur->SetOrient(orient);
+
+    /// Mensuration/Small to @fontsize=small (not yet rendered in Verovio).
+    /// In the long run, we should add @size to att.mensur.vis because we have @mensur.size for <staffDef>, see class
+    /// att.mensural.vis
+    pugi::xml_node smallNode = mensurationNode.child("Small");
+    if (smallNode != NULL) {
+        mensur->m_unsupported.push_back(std::make_pair("fontsize", "small"));
+    }
 
     /// Mensuration/Number/Num to @num and Number/Den to @numbase
     /// However, Number/Den cannot be entered in the CMME Editor.
@@ -653,7 +665,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         }
     }
 
-    /// Menusration/StaffLoc to @loc
+    /// Mensuration/StaffLoc to @loc
     int staffLoc = this->ChildAsInt(mensurationNode, "StaffLoc");
     if (staffLoc != VRV_UNSET) {
         mensur->SetLoc(staffLoc);
@@ -662,6 +674,24 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     this->ReadEditorialCommentary(mensurationNode, mensur);
 
     m_currentContainer->AddChild(mensur);
+
+    /// Proportion part coming from CMME <TempoChange> in <MensInfo> in <Mensuration>. In this case, create an MEI
+    /// <proport> element that follows the MEI <mensuration> element and that contains the proport/@num and
+    /// proport/@numbase values of 'num' and 'den'
+    pugi::xml_node tempoChangeNode = mensInfo.child("TempoChange");
+    if (tempoChangeNode != NULL) {
+        Proport *proport = new Proport();
+        int numVal = this->ChildAsInt(tempoChangeNode, "Num");
+        int denVal = this->ChildAsInt(tempoChangeNode, "Den");
+        if (numVal != VRV_UNSET) {
+            proport->SetNum(numVal);
+        }
+        if (denVal != VRV_UNSET) {
+            proport->SetNumbase(denVal);
+        }
+        proport->SetType("cmme_tempo_change");
+        m_currentContainer->AddChild(proport);
+    }
 
     return;
 }
@@ -801,6 +831,26 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
 
 void CmmeInput::CreateOriginalText(pugi::xml_node originalTextNode)
 {
+    return;
+}
+
+void CmmeInput::CreateProport(pugi::xml_node proportNode)
+{
+    assert(m_currentContainer);
+
+    /// Proportion part coming from CMME <Proportion>. In this case, create an MEI <proport> element is created alone
+    /// (not following an MEI <mensuration> element)
+    Proport *proport = new Proport();
+    int numVal = this->ChildAsInt(proportNode, "Num");
+    int denVal = this->ChildAsInt(proportNode, "Den");
+    if (numVal != VRV_UNSET) {
+        proport->SetNum(numVal);
+    }
+    if (denVal != VRV_UNSET) {
+        proport->SetNumbase(denVal);
+    }
+    proport->SetType("cmme_proportion");
+    m_currentContainer->AddChild(proport);
     return;
 }
 
