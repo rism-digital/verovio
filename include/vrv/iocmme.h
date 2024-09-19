@@ -69,6 +69,7 @@ private:
     void CreateKeySig(pugi::xml_node keyNode);
     void CreateMensuration(pugi::xml_node mensurationNode);
     void CreateOriginalText(pugi::xml_node originalTextNode);
+    void CreateProport(pugi::xml_node proportNode);
     void CreateNote(pugi::xml_node noteNode);
     void CreateRest(pugi::xml_node restNode);
 
