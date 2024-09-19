@@ -556,6 +556,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         m_mensInfo->modusmaior = this->ChildAsInt(mensInfo, "ModusMaior");
     }
 
+    /// Mensuration: logical domain
     Mensur *mensur = new Mensur();
     data_PROLATIO prolatio = (m_mensInfo->prolatio == 3) ? PROLATIO_3 : PROLATIO_2;
     mensur->SetProlatio(prolatio);
@@ -566,6 +567,8 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     data_MODUSMAIOR modusmaior = (m_mensInfo->modusmaior == 3) ? MODUSMAIOR_3 : MODUSMAIOR_2;
     mensur->SetModusmaior(modusmaior);
 
+    /// Mensuration: visual domain
+    /// Sign/MainSymbol to @sign
     pugi::xml_node signNode = mensurationNode.child("Sign");
     std::string signValue = this->ChildAsString(signNode, "MainSymbol");
     if (signValue == "O") {
@@ -577,9 +580,28 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
-
+    /// Sign/Dot to @dot
     pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
     mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
+    /// Sign/Strokes to @slash
+    int strokes = this->ChildAsInt(signNode, "Strokes");
+    if (strokes != VRV_UNSET) {
+        mensur->SetSlash(strokes);
+    }
+    /// Sign/Orientation to @orient
+    std::string orientation = this->ChildAsString(signNode, "Orientation");
+    if (orientation == "Reversed") {
+        mensur->SetOrient(ORIENTATION_reversed);
+    }
+    else if (orientation == "90CW") {
+        mensur->SetOrient(ORIENTATION_90CW);
+    }
+    else if (orientation == "90CCW") {
+        mensur->SetOrient(ORIENTATION_90CCW);
+    }
+    else {
+        LogWarning("Unsupported mesuration orientation in CMME (not 'Reversed' or '90CW' or '90CCW')");
+    }
 
     this->ReadEditorialCommentary(mensurationNode, mensur);
 
