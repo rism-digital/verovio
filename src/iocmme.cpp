@@ -77,6 +77,15 @@ bool CmmeInput::Import(const std::string &cmme)
     try {
         m_doc->Reset();
         m_doc->SetType(Raw);
+
+        // Genereate the header and add a comment to the project description
+        m_doc->GenerateMEIHeader(false);
+        pugi::xml_node projectDesc = m_doc->m_header.first_child().select_node("//projectDesc").node();
+        if (projectDesc) {
+            pugi::xml_node p1 = projectDesc.append_child("p");
+            p1.text().set("Converted from CMME XML");
+        }
+
         pugi::xml_document doc;
         doc.load_string(cmme.c_str(), (pugi::parse_comments | pugi::parse_default) & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
