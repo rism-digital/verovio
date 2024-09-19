@@ -677,6 +677,18 @@ double LayerElement::GetAlignmentDuration(
         return 0.0;
     }
 
+    // Mensural chords are aligned looking at the duration of the notes
+    if (this->Is(CHORD) && IsMensuralType(notationType)) {
+        double duration = 0.0;
+        ListOfConstObjects notes = this->FindAllDescendantsByType(NOTE);
+        for (const Object *object : notes) {
+            const Note *note = vrv_cast<const Note *>(object);
+            double noteDuration = note->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+            duration = std::max(duration, noteDuration);
+        }
+        return duration;
+    }
+
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {

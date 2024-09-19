@@ -220,6 +220,7 @@ enum ClassId : uint16_t {
     DOTS,
     FLAG,
     FTREM,
+    GENERIC_ELEMENT,
     GRACEGRP,
     HALFMRPT,
     KEYSIG,
