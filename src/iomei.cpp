@@ -2522,6 +2522,13 @@ void MEIOutput::WriteGenericLayerElement(pugi::xml_node currentNode, GenericLaye
 
     currentNode.set_name(element->GetMEIName().c_str());
 
+    // Reparse the original content stored as a string document
+    pugi::xml_document content;
+    content.load_string(element->GetContent().c_str());
+    for (pugi::xml_node child : content.first_child().children()) {
+        currentNode.append_copy(child);
+    }
+
     this->WriteLayerElement(currentNode, element);
 }
 
@@ -6655,6 +6662,13 @@ bool MEIInput::ReadGenericLayerElement(Object *parent, pugi::xml_node element)
 {
     GenericLayerElement *vrvElement = new GenericLayerElement(element.name());
     this->ReadLayerElement(element, vrvElement);
+
+    // Store the content as a string document
+    pugi::xml_document content;
+    content.append_copy(element);
+    std::ostringstream oss;
+    content.save(oss);
+    vrvElement->SetContent(oss.str());
 
     parent->AddChild(vrvElement);
     this->ReadUnsupportedAttr(element, vrvElement);
