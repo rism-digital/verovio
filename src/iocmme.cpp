@@ -640,6 +640,11 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
             mensur->SetNumbase(denValue);
         }
     }
+    /// Menusration/StaffLoc to @loc
+    int staffLoc = this->ChildAsInt(mensurationNode, "StaffLoc");
+    if (staffLoc != VRV_UNSET) {
+        mensur->SetLoc(staffLoc);
+    }
 
     this->ReadEditorialCommentary(mensurationNode, mensur);
 
