@@ -618,19 +618,14 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     }
 
     /// Mensuration/Sign/Orientation to @orient
+    static const std::map<std::string, data_ORIENTATION> orientationMap{
+        { "Reversed", ORIENTATION_reversed }, //
+        { "90CW", ORIENTATION_90CW }, //
+        { "90CCW", ORIENTATION_90CCW } //
+    };
     std::string orientation = this->ChildAsString(signNode, "Orientation");
-    if (orientation == "Reversed") {
-        mensur->SetOrient(ORIENTATION_reversed);
-    }
-    else if (orientation == "90CW") {
-        mensur->SetOrient(ORIENTATION_90CW);
-    }
-    else if (orientation == "90CCW") {
-        mensur->SetOrient(ORIENTATION_90CCW);
-    }
-    else if (orientation != "") {
-        LogWarning("Unsupported mesuration orientation in CMME (not 'Reversed' or '90CW' or '90CCW')");
-    }
+    data_ORIENTATION orient = orientationMap.contains(orientation) ? orientationMap.at(orientation) : ORIENTATION_NONE;
+    mensur->SetOrient(orient);
 
     /// Mensuration/Number/Num to @num and Number/Den to @numbase
     pugi::xml_node numberNode = mensurationNode.child("Number");
