@@ -292,9 +292,9 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
         else if (name == "Dot") {
             CreateDot(eventNode);
         }
-	else if (name == "LineEnd") {
-	  CreateBreak(eventNode);
-	}
+        else if (name == "LineEnd") {
+            CreateBreak(eventNode);
+        }
         else if (name == "Mensuration") {
             CreateMensuration(eventNode);
         }
@@ -303,6 +303,13 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             if (eventNode.select_node("./Barline")) {
                 pugi::xml_node barlineNode = eventNode.select_node("./Barline").node();
                 CreateBarline(barlineNode);
+            }
+            else if (eventNode.select_node("./Ellipsis")) {
+                CreateEllipsis();
+            }
+            else
+            {
+                LogWarning("Unsupported MiscItem content");
             }
         }
         else if (name == "MultiEvent") {
@@ -449,12 +456,13 @@ void CmmeInput::CreateBreak(pugi::xml_node breakNode)
 {
     assert(m_currentContainer);
 
-    // This is either a system or page break (usually only 
+    // This is either a system or page break (usually only
     // in one part, so not easy to visualise in score)
-    if (breakNode.select_node("./PageEnd")){
+    if (breakNode.select_node("./PageEnd")) {
         GenericLayerElement *pb = new GenericLayerElement("pb");
         m_currentContainer->AddChild(pb);
-    } else {
+    }
+    else {
         GenericLayerElement *sb = new GenericLayerElement("sb");
         m_currentContainer->AddChild(sb);
     }
@@ -551,6 +559,16 @@ void CmmeInput::CreateDot(pugi::xml_node dotNode)
     this->ReadEditorialCommentary(dotNode, dot);
 
     return;
+}
+
+void CmmeInput::CreateEllipsis()
+{
+    assert(m_currentContainer);
+
+    GenericLayerElement *gap = new GenericLayerElement("gap");
+    gap->SetType("cmme_ellipsis");
+    gap->m_unsupported.push_back(std::make_pair("reason", "incipit"));
+    m_currentContainer->AddChild(gap);
 }
 
 void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
