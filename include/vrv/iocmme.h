@@ -9,6 +9,7 @@
 #define __VRV_IOCMME_H__
 
 #include <string>
+#include <utility>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -19,6 +20,7 @@
 
 namespace vrv {
 
+class Chord;
 class Clef;
 class KeySig;
 class Layer;
@@ -60,6 +62,7 @@ private:
 
     void CreateAccid(pugi::xml_node accidNode);
     void CreateBarline(pugi::xml_node barlineNode);
+    void CreateChord(pugi::xml_node chordNode);
     void CreateClef(pugi::xml_node clefNode);
     void CreateCustos(pugi::xml_node custosNode);
     void CreateDot(pugi::xml_node dotNode);
@@ -104,6 +107,8 @@ private:
     std::vector<cmme::mensInfo> m_mensInfos;
     /** The mensural info for the current voice */
     cmme::mensInfo *m_mensInfo;
+    /** Latest note and its absolute duration (in minims) */
+    std::pair<Note *, double> m_lastNoteDuration;
 
     /** The number of voices as given in the general data */
     int m_numVoices;

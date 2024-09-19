@@ -21,6 +21,7 @@
 #include "annot.h"
 #include "app.h"
 #include "barline.h"
+#include "chord.h"
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
@@ -64,6 +65,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_currentNote = NULL;
     m_isInSyllable = false;
     m_mensInfo = NULL;
+    m_lastNoteDuration = std::make_pair(nullptr, 0.0);
 }
 
 CmmeInput::~CmmeInput() {}
@@ -300,6 +302,10 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                     CreateKeySig(clefNode);
                 }
             }
+            else if (eventNode.select_node("./Note")) {
+                // Assuming that this only contains notes (and is a chord)
+                CreateChord(eventNode);
+            }
             else {
                 LogWarning("Unsupported event '%s'", name.c_str());
             }
@@ -421,6 +427,37 @@ void CmmeInput::CreateBarline(pugi::xml_node barlineNode)
     }
 
     m_currentContainer->AddChild(barLine);
+}
+
+void CmmeInput::CreateChord(pugi::xml_node chordNode)
+{
+    assert(m_currentContainer);
+
+    Chord *chord = new Chord();
+    m_currentContainer->AddChild(chord);
+    m_currentContainer = chord;
+    pugi::xpath_node_set events = chordNode.select_nodes("./*");
+    double longestDuration = 0;
+    for (pugi::xpath_node event : events) {
+        pugi::xml_node eventNode = event.node();
+        std::string name = eventNode.name();
+        if (name == "Note") {
+            CreateNote(eventNode);
+            // If this is the longest note, we will need it to add duration
+            // info to chord
+            if ((m_lastNoteDuration.second > longestDuration)) {
+                longestDuration = m_lastNoteDuration.second;
+                Note *note = m_lastNoteDuration.first;
+                chord->SetDur(note->GetDur());
+                chord->SetNum(note->GetNum());
+                chord->SetNumbase(note->GetNumbase());
+            }
+        }
+        else {
+            LogWarning("Unsupported chord component: '%s'", name.c_str());
+        }
+    }
+    m_currentContainer = m_currentContainer->GetParent();
 }
 
 void CmmeInput::CreateClef(pugi::xml_node clefNode)
@@ -556,6 +593,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         m_mensInfo->modusmaior = this->ChildAsInt(mensInfo, "ModusMaior");
     }
 
+    /// Mensuration: logical domain
     Mensur *mensur = new Mensur();
     data_PROLATIO prolatio = (m_mensInfo->prolatio == 3) ? PROLATIO_3 : PROLATIO_2;
     mensur->SetProlatio(prolatio);
@@ -566,6 +604,8 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     data_MODUSMAIOR modusmaior = (m_mensInfo->modusmaior == 3) ? MODUSMAIOR_3 : MODUSMAIOR_2;
     mensur->SetModusmaior(modusmaior);
 
+    /// Mensuration: visual domain
+    /// Mensuration/Sign/MainSymbol to @sign
     pugi::xml_node signNode = mensurationNode.child("Sign");
     std::string signValue = this->ChildAsString(signNode, "MainSymbol");
     if (signValue == "O") {
@@ -574,12 +614,51 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else if (signValue == "C") {
         mensur->SetSign(MENSURATIONSIGN_C);
     }
-    else {
+    else if (signValue != "") {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
 
+    /// Mensuration/Sign/Dot to @dot
     pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
     mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
+
+    /// Sign/Strokes to @slash
+    int strokes = this->ChildAsInt(signNode, "Strokes");
+    if (strokes != VRV_UNSET) {
+        mensur->SetSlash(strokes);
+    }
+
+    /// Mensuration/Sign/Orientation to @orient
+    static const std::map<std::string, data_ORIENTATION> orientationMap{
+        { "Reversed", ORIENTATION_reversed }, //
+        { "90CW", ORIENTATION_90CW }, //
+        { "90CCW", ORIENTATION_90CCW } //
+    };
+    std::string orientation = this->ChildAsString(signNode, "Orientation");
+    data_ORIENTATION orient = orientationMap.contains(orientation) ? orientationMap.at(orientation) : ORIENTATION_NONE;
+    mensur->SetOrient(orient);
+
+    /// Mensuration/Number/Num to @num and Number/Den to @numbase
+    /// However, Number/Den cannot be entered in the CMME Editor.
+    /// It can only be added in the XML manually and imported into the CMME Editor,
+    /// where it won't render, but one can see it in the "Event Inspector."
+    pugi::xml_node numberNode = mensurationNode.child("Number");
+    if (numberNode != NULL) {
+        int numValue = this->ChildAsInt(numberNode, "Num");
+        int denValue = this->ChildAsInt(numberNode, "Den");
+        if (numValue != VRV_UNSET and numValue != 0) {
+            mensur->SetNum(numValue);
+        }
+        if (denValue != VRV_UNSET and denValue != 0) {
+            mensur->SetNumbase(denValue);
+        }
+    }
+
+    /// Menusration/StaffLoc to @loc
+    int staffLoc = this->ChildAsInt(mensurationNode, "StaffLoc");
+    if (staffLoc != VRV_UNSET) {
+        mensur->SetLoc(staffLoc);
+    }
 
     this->ReadEditorialCommentary(mensurationNode, mensur);
 
@@ -632,6 +711,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
         note->SetNumbase(num);
         note->SetNum(numbase);
+        m_lastNoteDuration = std::make_pair(note, num / numbase);
     }
 
     int oct = this->ChildAsInt(noteNode, "OctaveNum");
