@@ -27,11 +27,17 @@ public:
      */
     ///@{
     GenericLayerElement();
+    GenericLayerElement(const std::string &name);
     virtual ~GenericLayerElement();
     Object *Clone() const override { return new GenericLayerElement(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "Space"; }
+    std::string GetClassName() const override { return m_className; }
     ///@}
+
+    /**
+     * Return the MEI element original name
+     */
+    std::string GetMEIName() const { return m_meiName; }
 
     //----------//
     // Functors //
@@ -48,7 +54,11 @@ public:
     ///@}
 
 private:
-    //
+    /** The class name */
+    std::string m_className;
+    /** The MEI element name */
+    std::string m_meiName;
+
 public:
     //
 private:

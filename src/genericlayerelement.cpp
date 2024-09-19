@@ -26,6 +26,16 @@ namespace vrv {
 
 GenericLayerElement::GenericLayerElement() : LayerElement(GENERIC_ELEMENT, "generic-")
 {
+    LogError("Creating generic element without name");
+    m_className = "[unspecified]";
+    this->Reset();
+}
+
+GenericLayerElement::GenericLayerElement(const std::string &name) : LayerElement(GENERIC_ELEMENT, name + "-")
+{
+    m_meiName = name;
+    m_className = name;
+    std::transform(m_className.begin(), m_className.begin() + 1, m_className.begin(), ::toupper);
     this->Reset();
 }
 
