@@ -641,6 +641,14 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     data_ORIENTATION orient = orientationMap.contains(orientation) ? orientationMap.at(orientation) : ORIENTATION_NONE;
     mensur->SetOrient(orient);
 
+    /// Mensuration/Small to @fontsize=small (not yet rendered in Verovio).
+    /// In the long run, we should add @size to att.mensur.vis because we have @mensur.size for <staffDef>, see class
+    /// att.mensural.vis
+    pugi::xml_node smallNode = mensurationNode.child("Small");
+    if (smallNode != NULL) {
+        mensur->m_unsupported.push_back(std::make_pair("fontsize", "small"));
+    }
+
     /// Mensuration/Number/Num to @num and Number/Den to @numbase
     /// However, Number/Den cannot be entered in the CMME Editor.
     /// It can only be added in the XML manually and imported into the CMME Editor,
