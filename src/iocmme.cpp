@@ -464,7 +464,6 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
     m_currentContainer->AddChild(chord);
     m_currentContainer = chord;
     pugi::xpath_node_set events = chordNode.select_nodes("./*");
-    double longestDuration = 0;
     for (pugi::xpath_node event : events) {
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
