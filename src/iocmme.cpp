@@ -606,14 +606,17 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else if (signValue != "") {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
+
     /// Mensuration/Sign/Dot to @dot
     pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
     mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
+
     /// Sign/Strokes to @slash
     int strokes = this->ChildAsInt(signNode, "Strokes");
     if (strokes != VRV_UNSET) {
         mensur->SetSlash(strokes);
     }
+
     /// Mensuration/Sign/Orientation to @orient
     std::string orientation = this->ChildAsString(signNode, "Orientation");
     if (orientation == "Reversed") {
@@ -628,6 +631,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else if (orientation != "") {
         LogWarning("Unsupported mesuration orientation in CMME (not 'Reversed' or '90CW' or '90CCW')");
     }
+
     /// Mensuration/Number/Num to @num and Number/Den to @numbase
     pugi::xml_node numberNode = mensurationNode.child("Number");
     if (numberNode != NULL) {
@@ -640,6 +644,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
             mensur->SetNumbase(denValue);
         }
     }
+
     /// Menusration/StaffLoc to @loc
     int staffLoc = this->ChildAsInt(mensurationNode, "StaffLoc");
     if (staffLoc != VRV_UNSET) {
