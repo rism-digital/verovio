@@ -127,6 +127,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FLAG)) {
         this->DrawFlag(dc, element, layer, staff, measure);
     }
+    else if (element->Is(GENERIC_ELEMENT)) {
+        this->DrawGenericLayerElement(dc, element, layer, staff, measure);
+    }
     else if (element->Is(GRACEGRP)) {
         this->DrawGraceGrp(dc, element, layer, staff, measure);
     }
@@ -886,6 +889,20 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     char32_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
     this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawGenericLayerElement(
+    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetID());
 
     dc->EndGraphic(element, this);
 }
