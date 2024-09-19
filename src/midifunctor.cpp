@@ -562,7 +562,11 @@ FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
 
     if (measure->GetCurrentTempo() != m_currentTempo) {
         m_currentTempo = measure->GetCurrentTempo();
-        m_midiFile->addTempo(0, m_totalTime * m_midiFile->getTPQ(), m_currentTempo);
+        const int tick = m_totalTime * m_midiFile->getTPQ();
+        // Check if there was already a tempo event added for the given tick
+        if (m_tempoEventTicks.insert(tick).second) {
+            m_midiFile->addTempo(0, tick, m_currentTempo);
+        }
     }
 
     return FUNCTOR_CONTINUE;
