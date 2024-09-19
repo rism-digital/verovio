@@ -26,6 +26,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
+#include "genericlayerelement.h"
 #include "keyaccid.h"
 #include "keysig.h"
 #include "label.h"
@@ -290,6 +291,9 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
         else if (name == "Dot") {
             CreateDot(eventNode);
         }
+	else if (name == "LineEnd") {
+	  CreateBreak(eventNode);
+	}
         else if (name == "Mensuration") {
             CreateMensuration(eventNode);
         }
@@ -435,6 +439,21 @@ void CmmeInput::CreateBarline(pugi::xml_node barlineNode)
     }
 
     m_currentContainer->AddChild(barLine);
+}
+
+void CmmeInput::CreateBreak(pugi::xml_node breakNode)
+{
+    assert(m_currentContainer);
+
+    // This is either a system or page break (usually only 
+    // in one part, so not easy to visualise in score)
+    if (breakNode.select_node("./PageEnd")){
+        GenericLayerElement *pb = new GenericLayerElement("pb");
+        m_currentContainer->AddChild(pb);
+    } else {
+        GenericLayerElement *sb = new GenericLayerElement("sb");
+        m_currentContainer->AddChild(sb);
+    }
 }
 
 void CmmeInput::CreateChord(pugi::xml_node chordNode)

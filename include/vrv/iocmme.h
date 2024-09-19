@@ -62,6 +62,7 @@ private:
 
     void CreateAccid(pugi::xml_node accidNode);
     void CreateBarline(pugi::xml_node barlineNode);
+    void CreateBreak(pugi::xml_node breakNode);
     void CreateChord(pugi::xml_node chordNode);
     void CreateClef(pugi::xml_node clefNode);
     void CreateCustos(pugi::xml_node custosNode);
