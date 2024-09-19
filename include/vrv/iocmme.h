@@ -9,6 +9,7 @@
 #define __VRV_IOCMME_H__
 
 #include <string>
+#include <utility>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -106,6 +107,8 @@ private:
     std::vector<cmme::mensInfo> m_mensInfos;
     /** The mensural info for the current voice */
     cmme::mensInfo *m_mensInfo;
+    /** Latest note and its absolute duration (in minims) */
+    std::pair<Note *, double> m_lastNoteDuration;
 
     /** The number of voices as given in the general data */
     int m_numVoices;

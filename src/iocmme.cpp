@@ -65,6 +65,7 @@ CmmeInput::CmmeInput(Doc *doc) : Input(doc)
     m_currentNote = NULL;
     m_isInSyllable = false;
     m_mensInfo = NULL;
+    m_lastNoteDuration = std::make_pair(nullptr, 0.0);
 }
 
 CmmeInput::~CmmeInput() {}
@@ -436,11 +437,21 @@ void CmmeInput::CreateChord(pugi::xml_node chordNode)
     m_currentContainer->AddChild(chord);
     m_currentContainer = chord;
     pugi::xpath_node_set events = chordNode.select_nodes("./*");
+    double longestDuration = 0;
     for (pugi::xpath_node event : events) {
         pugi::xml_node eventNode = event.node();
         std::string name = eventNode.name();
         if (name == "Note") {
             CreateNote(eventNode);
+            // If this is the longest note, we will need it to add duration
+            // info to chord
+            if ((m_lastNoteDuration.second > longestDuration)) {
+                longestDuration = m_lastNoteDuration.second;
+                Note *note = m_lastNoteDuration.first;
+                chord->SetDur(note->GetDur());
+                chord->SetNum(note->GetNum());
+                chord->SetNumbase(note->GetNumbase());
+            }
         }
         else {
             LogWarning("Unsupported chord component: '%s'", name.c_str());
@@ -697,6 +708,7 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
         note->SetNumbase(num);
         note->SetNum(numbase);
+        m_lastNoteDuration = std::make_pair(note, num / numbase);
     }
 
     int oct = this->ChildAsInt(noteNode, "OctaveNum");
