@@ -594,7 +594,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     mensur->SetModusmaior(modusmaior);
 
     /// Mensuration: visual domain
-    /// Sign/MainSymbol to @sign
+    /// Mensuration/Sign/MainSymbol to @sign
     pugi::xml_node signNode = mensurationNode.child("Sign");
     std::string signValue = this->ChildAsString(signNode, "MainSymbol");
     if (signValue == "O") {
@@ -606,7 +606,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else if (signValue != "") {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
-    /// Sign/Dot to @dot
+    /// Mensuration/Sign/Dot to @dot
     pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
     mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
     /// Sign/Strokes to @slash
@@ -614,7 +614,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     if (strokes != VRV_UNSET) {
         mensur->SetSlash(strokes);
     }
-    /// Sign/Orientation to @orient
+    /// Mensuration/Sign/Orientation to @orient
     std::string orientation = this->ChildAsString(signNode, "Orientation");
     if (orientation == "Reversed") {
         mensur->SetOrient(ORIENTATION_reversed);
@@ -627,6 +627,18 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     }
     else if (orientation != "") {
         LogWarning("Unsupported mesuration orientation in CMME (not 'Reversed' or '90CW' or '90CCW')");
+    }
+    /// Mensuration/Number/Num to @num and Number/Den to @numbase
+    pugi::xml_node numberNode = mensurationNode.child("Number");
+    if (numberNode != NULL) {
+        int numValue = this->ChildAsInt(numberNode, "Num");
+        int denValue = this->ChildAsInt(numberNode, "Den");
+        if (numValue != VRV_UNSET and numValue != 0) {
+            mensur->SetNum(numValue);
+        }
+        if (denValue != VRV_UNSET and denValue != 0) {
+            mensur->SetNumbase(denValue);
+        }
     }
 
     this->ReadEditorialCommentary(mensurationNode, mensur);
