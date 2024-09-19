@@ -577,7 +577,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else if (signValue == "C") {
         mensur->SetSign(MENSURATIONSIGN_C);
     }
-    else {
+    else if (signValue != "") {
         LogWarning("Unsupported mesuration sign in CMME (not 'O' or 'C')");
     }
     /// Sign/Dot to @dot
@@ -599,7 +599,7 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     else if (orientation == "90CCW") {
         mensur->SetOrient(ORIENTATION_90CCW);
     }
-    else {
+    else if (orientation != "") {
         LogWarning("Unsupported mesuration orientation in CMME (not 'Reversed' or '90CW' or '90CCW')");
     }
 
