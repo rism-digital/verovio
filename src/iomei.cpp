@@ -56,6 +56,7 @@
 #include "findfunctor.h"
 #include "fing.h"
 #include "ftrem.h"
+#include "genericlayerelement.h"
 #include "gliss.h"
 #include "gracegrp.h"
 #include "graphic.h"
@@ -638,6 +639,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(FTREM)) {
             m_currentNode = m_currentNode.append_child("fTrem");
             this->WriteFTrem(m_currentNode, vrv_cast<FTrem *>(object));
+        }
+        else if (object->Is(GENERIC_ELEMENT)) {
+            m_currentNode = m_currentNode.append_child("generic");
+            this->WriteGenericLayerElement(m_currentNode, vrv_cast<GenericLayerElement *>(object));
         }
         else if (object->Is(GRACEGRP)) {
             m_currentNode = m_currentNode.append_child("graceGrp");
@@ -2509,6 +2514,15 @@ void MEIOutput::WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     this->WriteLayerElement(currentNode, fTrem);
     fTrem->WriteFTremVis(currentNode);
     fTrem->WriteTremMeasured(currentNode);
+}
+
+void MEIOutput::WriteGenericLayerElement(pugi::xml_node currentNode, GenericLayerElement *element)
+{
+    assert(element);
+
+    currentNode.set_name(element->GetMEIName().c_str());
+
+    this->WriteLayerElement(currentNode, element);
 }
 
 void MEIOutput::WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp)
@@ -6318,11 +6332,17 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = this->ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "pb") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
+        }
         else if (elementName == "plica") {
             success = this->ReadPlica(parent, xmlElement);
         }
         else if (elementName == "proport") {
             success = this->ReadProport(parent, xmlElement);
+        }
+        else if (elementName == "sb") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
         }
         else if (elementName == "space") {
             success = this->ReadSpace(parent, xmlElement);
@@ -6629,6 +6649,16 @@ bool MEIInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     parent->AddChild(vrvFTrem);
     this->ReadUnsupportedAttr(fTrem, vrvFTrem);
     return this->ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
+}
+
+bool MEIInput::ReadGenericLayerElement(Object *parent, pugi::xml_node element)
+{
+    GenericLayerElement *vrvElement = new GenericLayerElement(element.name());
+    this->ReadLayerElement(element, vrvElement);
+
+    parent->AddChild(vrvElement);
+    this->ReadUnsupportedAttr(element, vrvElement);
+    return true;
 }
 
 bool MEIInput::ReadGraceGrp(Object *parent, pugi::xml_node graceGrp)
