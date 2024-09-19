@@ -202,10 +202,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         else if (layerElement->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
         else {
-            // type = ALIGNMENT_KEYSIG;
-            // We force this because they should appear only at the beginning of a measure and should be non-justifiable
-            // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
-            type = ALIGNMENT_SCOREDEF_KEYSIG;
+            type = ALIGNMENT_KEYSIG;
         }
     }
     else if (layerElement->Is(MENSUR)) {
