@@ -253,6 +253,9 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_DOT;
         }
     }
+    else if (layerElement->Is(CUSTOS)) {
+        type = ALIGNMENT_CUSTOS;
+    }
     else if (layerElement->Is(ACCID)) {
         // accid within note was already taken into account by noteParent
         type = ALIGNMENT_ACCID;
