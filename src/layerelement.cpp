@@ -684,7 +684,7 @@ double LayerElement::GetAlignmentDuration(
         ListOfConstObjects notes = this->FindAllDescendantsByType(NOTE);
         for (const Object *object : notes) {
             const Note *note = vrv_cast<const Note *>(object);
-            double noteDuration = note->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+            double noteDuration = note->GetAlignmentDuration(params, notGraceOnly, notationType);
             duration = std::max(duration, noteDuration);
         }
         return duration;
