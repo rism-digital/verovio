@@ -689,12 +689,16 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     if (numberNode != NULL) {
         int numValue = this->ChildAsInt(numberNode, "Num");
         int denValue = this->ChildAsInt(numberNode, "Den");
+        std::string mensurType;
         if (numValue != VRV_UNSET and numValue != 0) {
-            mensur->SetNum(numValue);
+            // mensur->SetNum(numValue);
+            mensurType += StringFormat("cmme_mensur_num_%d", numValue);
         }
         if (denValue != VRV_UNSET and denValue != 0) {
-            mensur->SetNumbase(denValue);
+            // mensur->SetNumbase(denValue);
+            mensurType += StringFormat(" cmme_mensur_den_%d", denValue);
         }
+        mensur->SetType(mensurType);
     }
 
     /// Mensuration/StaffLoc to @loc
