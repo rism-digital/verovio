@@ -397,7 +397,7 @@ void GraceAligner::AlignStack()
         LayerElement *element = vrv_cast<LayerElement *>(m_graceStack.at(i - 1));
         assert(element);
         // get the duration of the event
-        double duration = element->GetAlignmentDuration(NULL, NULL, false);
+        double duration = element->GetAlignmentDuration(false);
         // Time goes backward with grace notes
         time -= duration;
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);

@@ -22,7 +22,7 @@ class TupletNum;
 //----------------------------------------------------------------------------
 
 /**
- * This class models a group of dots as a layer element part and has not direct MEI equivlatent.
+ * This class models a group of dots as a layer element part and has no direct MEI equivalent.
  */
 class Dots : public LayerElement, public AttAugmentDots {
 public:
@@ -92,7 +92,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a stem as a layer element part and has not direct MEI equivlatent.
+ * This class models a stem as a layer element part and has no direct MEI equivalent.
  */
 class Flag : public LayerElement {
 public:
@@ -144,7 +144,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a bracket as a layer element part and has not direct MEI equivlatent.
+ * This class models a bracket as a layer element part and has no direct MEI equivalent.
  * It is used to represent tuplet brackets.
  */
 class TupletBracket : public LayerElement, public AttTupletVis {
@@ -243,7 +243,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a tuplet num as a layer element part and has not direct MEI equivlatent.
+ * This class models a tuplet num as a layer element part and has no direct MEI equivalent.
  * It is used to represent tuplet number
  */
 class TupletNum : public LayerElement, public AttNumberPlacement, public AttTupletVis {

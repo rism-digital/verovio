@@ -1862,6 +1862,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
     else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
     m_editInfo.import("status", success ? "OK" : "FAILURE");
     m_editInfo.import("message", success ? "" : "Could not set attribute '" + attrType + "' to '" + attrValue + "'.");
     return success;

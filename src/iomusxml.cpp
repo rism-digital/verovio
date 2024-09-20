@@ -2591,6 +2591,11 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
+    if (harmText.empty()) {
+        pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
+        harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
+        alter = node.select_node("numeral/numeral-alter");
+    }
     if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xml_node kind = node.child("kind");
     if (kind) {

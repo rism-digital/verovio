@@ -36,13 +36,8 @@ class LedgerLine {
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
      */
-    ///@{
-    LedgerLine();
-    virtual ~LedgerLine();
-    virtual void Reset();
-    ///@}
+    LedgerLine() = default;
 
     /**
      * Add a dash to the ledger line object.

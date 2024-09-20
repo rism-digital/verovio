@@ -48,6 +48,7 @@ class Fig;
 class Flag;
 class FloatingObject;
 class FTrem;
+class GenericLayerElement;
 class Gliss;
 class GraceAligner;
 class GraceGrp;
@@ -156,7 +157,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    FunctorInterface(){};
+    FunctorInterface() {}
     virtual ~FunctorInterface() = default;
     ///@}
 
@@ -361,6 +362,8 @@ public:
     virtual FunctorCode VisitFlagEnd(Flag *flag);
     virtual FunctorCode VisitFTrem(FTrem *fTrem);
     virtual FunctorCode VisitFTremEnd(FTrem *fTrem);
+    virtual FunctorCode VisitGenericLayerElement(GenericLayerElement *genericLayerElement);
+    virtual FunctorCode VisitGenericLayerElementEnd(GenericLayerElement *genericLayerElement);
     virtual FunctorCode VisitGraceGrp(GraceGrp *graceGrp);
     virtual FunctorCode VisitGraceGrpEnd(GraceGrp *graceGrp);
     virtual FunctorCode VisitHalfmRpt(HalfmRpt *halfmRpt);
@@ -513,7 +516,7 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    ConstFunctorInterface(){};
+    ConstFunctorInterface() {}
     virtual ~ConstFunctorInterface() = default;
     ///@}
 
@@ -718,6 +721,8 @@ public:
     virtual FunctorCode VisitFlagEnd(const Flag *flag);
     virtual FunctorCode VisitFTrem(const FTrem *fTrem);
     virtual FunctorCode VisitFTremEnd(const FTrem *fTrem);
+    virtual FunctorCode VisitGenericLayerElement(const GenericLayerElement *genericLayerElement);
+    virtual FunctorCode VisitGenericLayerElementEnd(const GenericLayerElement *genericLayerElement);
     virtual FunctorCode VisitGraceGrp(const GraceGrp *graceGrp);
     virtual FunctorCode VisitGraceGrpEnd(const GraceGrp *graceGrp);
     virtual FunctorCode VisitHalfmRpt(const HalfmRpt *halfmRpt);
