@@ -842,6 +842,12 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         note->AddChild(accid);
     }
 
+    if (noteNode.child("Signum")) {
+        // MEI currently lacks signum congruentiae, so we warn and set not type
+        LogWarning("Signum Congruentiae in CMME mapped to @type");
+        note->SetType("cmme_signum_congruentiae");
+    }
+
     if (noteNode.child("Stem")) {
         std::string dir = this->ChildAsString(noteNode.child("Stem"), "Dir");
         if (dir == "Barline") {
@@ -935,6 +941,12 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     }
 
     this->ReadEditorialCommentary(restNode, rest);
+
+    if (restNode.child("Signum")) {
+        // MEI currently lacks signum congruentiae, so we warn and set not type
+        LogWarning("Signum Congruentiae in CMME mapped to @type");
+        rest->SetType("cmme_signum_congruentiae");
+    }
 
     m_currentContainer->AddChild(rest);
 
