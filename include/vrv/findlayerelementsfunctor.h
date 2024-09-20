@@ -10,6 +10,10 @@
 
 #include "functor.h"
 
+//----------------------------------------------------------------------------
+
+#include "alignfunctor.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -66,10 +70,8 @@ private:
     double m_duration;
     // The layers (layerN) found
     std::set<int> m_layers;
-    // The current meter signature
-    const MeterSig *m_meterSig;
-    // The current mensur
-    const Mensur *m_mensur;
+    // The current time alignment parameters
+    AlignMeterParams m_meterParams;
 };
 
 //----------------------------------------------------------------------------
@@ -129,10 +131,8 @@ private:
     double m_duration;
     // The list of layer elements found
     ListOfConstObjects m_elements;
-    // The current meter signature
-    const MeterSig *m_meterSig;
-    // The current mensur
-    const Mensur *m_mensur;
+    // The current time alignment parameters
+    AlignMeterParams m_meterParams;
     // The layer to consider
     const Layer *m_layer;
     // ... or to ignore

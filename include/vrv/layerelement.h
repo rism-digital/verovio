@@ -20,6 +20,7 @@
 namespace vrv {
 
 class Alignment;
+class AlignMeterParams;
 class Beam;
 class BeamElementCoord;
 class FTrem;
@@ -258,19 +259,28 @@ public:
     ///@}
 
     /**
-     * Returns the duration if the element has a DurationInterface
+     * Return the duration if the element has a DurationInterface.
      */
-    double GetAlignmentDuration(const Mensur *mensur = NULL, const MeterSig *meterSig = NULL, bool notGraceOnly = true,
+    double GetAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
-     * Returns the duration if the content of the layer element with a @sameas attribute.
+     * Return the duration if the element has a DurationInterface.
+     * Shortcut assigning default values for AlignParameter.
+     */
+    double GetAlignmentDuration(bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+
+    /**
+     * Return the duration if the content of the layer element with a @sameas attribute.
      * Used only on beam, tuplet or ftrem have.
      */
-    double GetSameAsContentAlignmentDuration(const Mensur *mensur = NULL, const MeterSig *meterSig = NULL,
-        bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+    double GetSameAsContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
-    double GetContentAlignmentDuration(const Mensur *mensur = NULL, const MeterSig *meterSig = NULL,
+    double GetContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+
+    double GetContentAlignmentDuration(
         bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
