@@ -35,6 +35,8 @@ namespace cmme {
         int tempus = 2;
         int modusminor = 2;
         int modusmaior = 2;
+        int proportNum = 1;
+        int proportDen = 1;
     };
 
 } // namespace cmme

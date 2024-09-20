@@ -873,6 +873,7 @@ void CmmeInput::CreateOriginalText(pugi::xml_node originalTextNode)
 void CmmeInput::CreateProport(pugi::xml_node proportNode)
 {
     assert(m_currentContainer);
+    assert(m_mensInfo);
 
     /// Proportion part coming from CMME <Proportion>. In this case, create an MEI <proport> element is created alone
     /// (not following an MEI <mensuration> element)
@@ -881,10 +882,15 @@ void CmmeInput::CreateProport(pugi::xml_node proportNode)
     int denVal = this->ChildAsInt(proportNode, "Den");
     if (numVal != VRV_UNSET) {
         proport->SetNum(numVal);
+        // Cumulated it
+        m_mensInfo->proportNum *= numVal;
     }
     if (denVal != VRV_UNSET) {
         proport->SetNumbase(denVal);
+        // Cumulated it
+        m_mensInfo->proportDen *= denVal;
     }
+    vrv::Reduce(m_mensInfo->proportNum, m_mensInfo->proportDen);
     proport->SetType("cmme_proportion");
     m_currentContainer->AddChild(proport);
     return;
@@ -968,6 +974,10 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         num = this->ChildAsInt(durationNode.child("Length"), "Num");
         numbase = this->ChildAsInt(durationNode.child("Length"), "Den");
 
+        // Apply the proportion
+        num *= m_mensInfo->proportNum;
+        numbase *= m_mensInfo->proportDen;
+
         std::pair<int, int> ratio = { 1, 1 };
 
         if (type == "Maxima") {
@@ -992,11 +1002,11 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
             ratio.second = 8;
         }
 
-        if (ratio.first != num || ratio.second != numbase) {
-            num *= ratio.second;
-            numbase *= ratio.first;
-        }
-        else {
+        num *= ratio.second;
+        numbase *= ratio.first;
+        vrv::Reduce(numbase, num);
+
+        if (num == numbase) {
             num = VRV_UNSET;
             numbase = VRV_UNSET;
         }
