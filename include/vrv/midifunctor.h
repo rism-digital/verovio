@@ -10,6 +10,10 @@
 
 #include "functor.h"
 
+//----------------------------------------------------------------------------
+
+#include "alignfunctor.h"
+
 namespace smf {
 class MidiFile;
 }
@@ -64,10 +68,8 @@ private:
     double m_currentScoreTime;
     // The current real time in seconds in the measure (incremented by each element)
     double m_currentRealTimeSeconds;
-    // The current Mensur
-    Mensur *m_currentMensur;
-    // The current MeterSig
-    MeterSig *m_currentMeterSig;
+    // The current time alignment parameters
+    AlignMeterParams m_meterParams;
     // The current notation type
     data_NOTATIONTYPE m_notationType;
     // The current tempo
