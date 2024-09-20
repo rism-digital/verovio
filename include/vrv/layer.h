@@ -167,6 +167,8 @@ public:
     const Mensur *GetCurrentMensur() const;
     MeterSig *GetCurrentMeterSig();
     const MeterSig *GetCurrentMeterSig() const;
+    Proport *GetCurrentProport();
+    const Proport *GetCurrentProport() const;
     ///@}
 
     void ResetStaffDefObjects();

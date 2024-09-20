@@ -650,6 +650,14 @@ void StaffDefDrawingInterface::AlternateCurrentMeterSig(const Measure *measure)
     }
 }
 
+void StaffDefDrawingInterface::SetCurrentProport(const Proport *proport)
+{
+    if (proport) {
+        m_currentProport = *proport;
+        m_currentProport.CloneReset();
+    }
+}
+
 //----------------------------------------------------------------------------
 // StemmedDrawingInterface
 //----------------------------------------------------------------------------

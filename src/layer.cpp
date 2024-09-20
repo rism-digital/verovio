@@ -541,6 +541,18 @@ const MeterSig *Layer::GetCurrentMeterSig() const
     return staff->m_drawingStaffDef->GetCurrentMeterSig();
 }
 
+Proport *Layer::GetCurrentProport()
+{
+    return const_cast<Proport *>(std::as_const(*this).GetCurrentProport());
+}
+
+const Proport *Layer::GetCurrentProport() const
+{
+    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff && staff->m_drawingStaffDef);
+    return staff->m_drawingStaffDef->GetCurrentProport();
+}
+
 void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
