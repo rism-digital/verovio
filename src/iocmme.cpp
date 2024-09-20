@@ -42,9 +42,11 @@
 #include "rest.h"
 #include "score.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "supplied.h"
 #include "syl.h"
 #include "text.h"
 #include "verse.h"
@@ -307,8 +309,11 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             else if (eventNode.select_node("./Ellipsis")) {
                 CreateEllipsis();
             }
-            else
-            {
+            else if (eventNode.select_node("./Lacuna")) {
+                pugi::xml_node lacunaNode = eventNode.select_node("./Lacuna").node();
+                CreateLacuna(lacunaNode);
+            }
+            else {
                 LogWarning("Unsupported MiscItem content");
             }
         }
@@ -617,6 +622,25 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
     this->ReadEditorialCommentary(keyNode, keyAccid);
 
     m_currentSignature->AddChild(keyAccid);
+}
+
+void CmmeInput::CreateLacuna(pugi::xml_node lacunaNode)
+{
+    // A lacuna is used in CMME to pad a part where
+    // the scribe's version is temporally incomplete.
+    // We use mei:space, but since this is not explicit
+    // in the source, we wrap it in mei:supplied
+    assert(m_currentContainer);
+    Space *space = new Space();
+    Supplied *supplied = new Supplied();
+    supplied->addChild(space);
+    int num;
+    int numbase;
+    data_DURATION duration = this->ReadDuration(lacunaNode, num, numbase);
+    space->SetDur(duration);
+    space->SetType("cmme_lacuna");
+    supplied->SetType("cmme_lacuna");
+    m_currentContainer->AddChild(supplied);
 }
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
