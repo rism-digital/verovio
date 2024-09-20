@@ -18,6 +18,7 @@
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
+#include "proport.h"
 #include "rend.h"
 #include "rest.h"
 #include "runningelement.h"
@@ -51,6 +52,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
     m_currentParams.mensur = layer->GetCurrentMensur();
     m_currentParams.meterSig = layer->GetCurrentMeterSig();
+    m_currentParams.proport = layer->GetCurrentProport();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
@@ -231,6 +233,16 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
             type = ALIGNMENT_SCOREDEF_METERSIG;
         }
+    }
+    else if (layerElement->Is(PROPORT)) {
+        // replace the current proport
+        const Proport *previous = (m_currentParams.proport) ? (m_currentParams.proport) : NULL;
+        m_currentParams.proport = vrv_cast<Proport *>(layerElement);
+        assert(m_currentParams.proport);
+        if (previous) {
+            m_currentParams.proport->Cumulate(previous);
+        }
+        type = ALIGNMENT_PROPORT;
     }
     else if (layerElement->Is({ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;

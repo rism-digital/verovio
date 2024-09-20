@@ -12,10 +12,6 @@
 
 namespace vrv {
 
-class Mensur;
-class MeterSig;
-class Proport;
-
 //----------------------------------------------------------------------------
 // AlignmentParams
 //----------------------------------------------------------------------------
@@ -25,7 +21,8 @@ class Proport;
 struct AlignMeterParams {
     const MeterSig *meterSig = NULL;
     const Mensur *mensur = NULL;
-    const Proport *proport = NULL;
+    // Not const since we are cumulating proportion
+    Proport *proport = NULL;
 };
 
 //----------------------------------------------------------------------------

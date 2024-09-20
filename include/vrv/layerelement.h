@@ -20,7 +20,7 @@
 namespace vrv {
 
 class Alignment;
-class AlignMeterParams;
+struct AlignMeterParams;
 class Beam;
 class BeamElementCoord;
 class FTrem;

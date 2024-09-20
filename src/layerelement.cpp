@@ -50,6 +50,7 @@
 #include "neume.h"
 #include "note.h"
 #include "page.h"
+#include "proport.h"
 #include "rest.h"
 #include "slur.h"
 #include "smufl.h"
@@ -699,6 +700,12 @@ double LayerElement::GetAlignmentDuration(
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
+
+        if (params.proport) {
+            if (params.proport->HasNum()) num *= params.proport->GetCumulatedNum();
+            if (params.proport->HasNumbase()) numbase *= params.proport->GetCumulatedNumbase();
+        }
+
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
         if (tuplet) {
             ListOfConstObjects objects;
