@@ -614,6 +614,13 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
         m_mensInfo->modusminor = this->ChildAsInt(mensInfo, "ModusMinor");
         m_mensInfo->modusmaior = this->ChildAsInt(mensInfo, "ModusMaior");
     }
+    // If there is no <MensInfo> then resets everything to binary
+    else {
+        m_mensInfo->prolatio = 2;
+        m_mensInfo->tempus = 2;
+        m_mensInfo->modusminor = 2;
+        m_mensInfo->modusmaior = 2;
+    }
 
     /// Mensuration: logical domain
     Mensur *mensur = new Mensur();
