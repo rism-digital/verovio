@@ -782,8 +782,6 @@ double LayerElement::GetAlignmentDuration(
 double LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetAlignmentDuration(params, notGraceOnly, notationType);
 }
 
@@ -825,8 +823,6 @@ double LayerElement::GetContentAlignmentDuration(
 double LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
-    params.meterSig = NULL;
-    params.mensur = NULL;
     return this->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 

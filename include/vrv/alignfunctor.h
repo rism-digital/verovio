@@ -14,6 +14,7 @@ namespace vrv {
 
 class Mensur;
 class MeterSig;
+class Proport;
 
 //----------------------------------------------------------------------------
 // AlignmentParams
@@ -22,8 +23,9 @@ class MeterSig;
  * Regroup pointers to meterSig, mensur and proport objects
  */
 struct AlignMeterParams {
-    const MeterSig *meterSig;
-    const Mensur *mensur;
+    const MeterSig *meterSig = NULL;
+    const Mensur *mensur = NULL;
+    const Proport *proport = NULL;
 };
 
 //----------------------------------------------------------------------------

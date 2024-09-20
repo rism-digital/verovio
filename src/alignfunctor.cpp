@@ -41,8 +41,6 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_measureAligner = NULL;
     m_time = 0.0;
-    m_currentParams.mensur = NULL;
-    m_currentParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
