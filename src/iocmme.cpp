@@ -633,7 +633,7 @@ void CmmeInput::CreateLacuna(pugi::xml_node lacunaNode)
     assert(m_currentContainer);
     Space *space = new Space();
     Supplied *supplied = new Supplied();
-    supplied->addChild(space);
+    supplied->AddChild(space);
     int num;
     int numbase;
     data_DURATION duration = this->ReadDuration(lacunaNode, num, numbase);
