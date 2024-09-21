@@ -774,8 +774,8 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     data_DURATION duration = this->ReadDuration(noteNode, num, numbase);
     note->SetDur(duration);
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
-        note->SetNumbase(num);
-        note->SetNum(numbase);
+        note->SetNum(num);
+        note->SetNumbase(numbase);
     }
 
     int oct = this->ChildAsInt(noteNode, "OctaveNum");
@@ -906,8 +906,8 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     data_DURATION duration = this->ReadDuration(restNode, num, numbase);
     rest->SetDur(duration);
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
-        rest->SetNumbase(num);
-        rest->SetNum(numbase);
+        rest->SetNum(num);
+        rest->SetNumbase(numbase);
     }
 
     this->ReadEditorialCommentary(restNode, rest);
@@ -1004,7 +1004,7 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
 
         num *= ratio.second;
         numbase *= ratio.first;
-        vrv::Reduce(numbase, num);
+        vrv::Reduce(num, numbase);
 
         if (num == numbase) {
             num = VRV_UNSET;
