@@ -245,7 +245,18 @@ void CmmeInput::CreateLemOrRdg(pugi::xml_node lemOrRdgNode, bool isFirst)
     }
     lemOrRdg->m_visibility = (isFirst) ? Visible : Hidden;
 
-    if (lemOrRdg->Is(RDG)) lemOrRdg->SetLabel(versionId);
+    if (lemOrRdg->Is(RDG)) {
+        std::string label;
+        // Loop through the event lists
+        pugi::xpath_node_set variants = lemOrRdgNode.select_nodes("./VariantVersionID");
+        bool isFirst = true;
+        for (pugi::xpath_node variant : variants) {
+            if (!isFirst) label += "; ";
+            label += this->AsString(variant.node());
+            isFirst = false;
+        }
+        lemOrRdg->SetLabel(label);
+    }
 
     if (lemOrRdgNode.child("Error")) {
         lemOrRdg->SetType("Error");
