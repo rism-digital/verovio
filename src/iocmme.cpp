@@ -306,7 +306,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 pugi::xml_node barlineNode = eventNode.select_node("./Barline").node();
                 CreateBarline(barlineNode);
             }
-            else if (eventNode.select_node("./Ellipsis")) {
+            else if (eventNode.child("Ellipsis")) {
                 CreateEllipsis();
             }
             else if (eventNode.select_node("./Lacuna")) {
