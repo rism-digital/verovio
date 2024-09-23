@@ -309,7 +309,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
             else if (eventNode.child("Ellipsis")) {
                 CreateEllipsis();
             }
-            else if (eventNode.select_node("./Lacuna")) {
+            else if (eventNode.child("Lacuna")) {
                 pugi::xml_node lacunaNode = eventNode.select_node("./Lacuna").node();
                 CreateLacuna(lacunaNode);
             }
