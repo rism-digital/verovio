@@ -133,9 +133,6 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     } // Any other case (minor, perfecta in tempus perfectum, and imperfecta in tempus imperfectum) follows the
       // mensuration and has no @num and @numbase attributes
 
-    if (currentMensur->HasNum()) num *= currentMensur->GetNum();
-    if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
-
     double ratio = 0.0;
     double duration = (double)DUR_MENSURAL_REF;
     switch (noteDur) {

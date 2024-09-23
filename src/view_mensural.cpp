@@ -85,7 +85,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     Mensur *mensur = vrv_cast<Mensur *>(element);
     assert(mensur);
 
-    if (!mensur->HasSign()) {
+    if (!mensur->HasSign() && !mensur->HasNum()) {
         // only react to visual attributes
         return;
     }
