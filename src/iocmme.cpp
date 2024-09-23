@@ -648,8 +648,9 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     }
 
     /// Mensuration/Sign/Dot to @dot
-    pugi::xml_node dotNode = (signNode) ? signNode.child("Dot") : pugi::xml_node(NULL);
-    mensur->SetDot(((dotNode) ? BOOLEAN_true : BOOLEAN_false));
+    if (signNode.child("Dot")) {
+        mensur->SetDot(BOOLEAN_true);
+    }
 
     /// Mensuration/Sign/Strokes to @slash
     int strokes = this->ChildAsInt(signNode, "Strokes");
@@ -689,16 +690,12 @@ void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
     if (numberNode != NULL) {
         int numValue = this->ChildAsInt(numberNode, "Num");
         int denValue = this->ChildAsInt(numberNode, "Den");
-        std::string mensurType;
         if (numValue != VRV_UNSET and numValue != 0) {
-            // mensur->SetNum(numValue);
-            mensurType += StringFormat("cmme_mensur_num_%d", numValue);
+            mensur->SetNum(numValue);
         }
         if (denValue != VRV_UNSET and denValue != 0) {
-            // mensur->SetNumbase(denValue);
-            mensurType += StringFormat(" cmme_mensur_den_%d", denValue);
+            mensur->SetNumbase(denValue);
         }
-        mensur->SetType(mensurType);
     }
 
     /// Mensuration/StaffLoc to @loc
