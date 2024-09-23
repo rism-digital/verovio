@@ -42,9 +42,11 @@
 #include "rest.h"
 #include "score.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "supplied.h"
 #include "syl.h"
 #include "text.h"
 #include "verse.h"
@@ -315,6 +317,15 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 pugi::xml_node barlineNode = eventNode.select_node("./Barline").node();
                 CreateBarline(barlineNode);
             }
+            else if (eventNode.child("Ellipsis")) {
+                CreateEllipsis();
+            }
+            else if (eventNode.child("Lacuna")) {
+                CreateLacuna(lacunaNode);
+            }
+            else {
+                LogWarning("Unsupported MiscItem content");
+            }
         }
         else if (name == "MultiEvent") {
             /// Assuming that a multievent contains a key signature, all events are key signatures
@@ -565,6 +576,16 @@ void CmmeInput::CreateDot(pugi::xml_node dotNode)
     return;
 }
 
+void CmmeInput::CreateEllipsis()
+{
+    assert(m_currentContainer);
+
+    GenericLayerElement *gap = new GenericLayerElement("gap");
+    gap->SetType("cmme_ellipsis");
+    gap->m_unsupported.push_back(std::make_pair("reason", "incipit"));
+    m_currentContainer->AddChild(gap);
+}
+
 void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
 {
     static const std::map<std::string, data_ACCIDENTAL_WRITTEN> shapeMap{
@@ -611,6 +632,25 @@ void CmmeInput::CreateKeySig(pugi::xml_node keyNode)
     this->ReadEditorialCommentary(keyNode, keyAccid);
 
     m_currentSignature->AddChild(keyAccid);
+}
+
+void CmmeInput::CreateLacuna(pugi::xml_node lacunaNode)
+{
+    // A lacuna is used in CMME to pad a part where
+    // the scribe's version is temporally incomplete.
+    // We use mei:space, but since this is not explicit
+    // in the source, we wrap it in mei:supplied
+    assert(m_currentContainer);
+    Space *space = new Space();
+    Supplied *supplied = new Supplied();
+    supplied->AddChild(space);
+    int num;
+    int numbase;
+    data_DURATION duration = this->ReadDuration(lacunaNode, num, numbase);
+    space->SetDur(duration);
+    space->SetType("cmme_lacuna");
+    supplied->SetType("cmme_lacuna");
+    m_currentContainer->AddChild(supplied);
 }
 
 void CmmeInput::CreateMensuration(pugi::xml_node mensurationNode)
@@ -820,6 +860,12 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
         note->AddChild(accid);
     }
 
+    if (noteNode.child("Signum")) {
+        // MEI currently lacks signum congruentiae, so we warn and set not type
+        LogWarning("Signum Congruentiae in CMME mapped to @type");
+        note->SetType("cmme_signum_congruentiae");
+    }
+
     if (noteNode.child("Stem")) {
         std::string dir = this->ChildAsString(noteNode.child("Stem"), "Dir");
         if (dir == "Barline") {
@@ -919,6 +965,12 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     }
 
     this->ReadEditorialCommentary(restNode, rest);
+
+    if (restNode.child("Signum")) {
+        // MEI currently lacks signum congruentiae, so we warn and set not type
+        LogWarning("Signum Congruentiae in CMME mapped to @type");
+        rest->SetType("cmme_signum_congruentiae");
+    }
 
     m_currentContainer->AddChild(rest);
 

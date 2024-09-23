@@ -69,7 +69,9 @@ private:
     void CreateClef(pugi::xml_node clefNode);
     void CreateCustos(pugi::xml_node custosNode);
     void CreateDot(pugi::xml_node dotNode);
+    void CreateEllipsis();
     void CreateKeySig(pugi::xml_node keyNode);
+    void CreateLacuna(pugi::xml_node lacunaNode);
     void CreateMensuration(pugi::xml_node mensurationNode);
     void CreateOriginalText(pugi::xml_node originalTextNode);
     void CreateProport(pugi::xml_node proportNode);

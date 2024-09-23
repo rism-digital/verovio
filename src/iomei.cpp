@@ -6272,6 +6272,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "fTrem") {
             success = this->ReadFTrem(parent, xmlElement);
         }
+        else if (elementName == "gap") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
+        }
         else if (elementName == "graceGrp") {
             success = this->ReadGraceGrp(parent, xmlElement);
         }
