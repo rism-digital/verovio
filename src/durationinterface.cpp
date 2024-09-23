@@ -111,8 +111,8 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
             || ((this->GetDur() == DURATION_semibrevis) && (currentMensur->GetProlatio() == PROLATIO_2))
             || (this->GetDur() == DURATION_minima) || (this->GetDur() == DURATION_semiminima)
             || (this->GetDur() == DURATION_fusa) || (this->GetDur() == DURATION_semifusa)) {
-            num *= 3;
-            numBase *= 2;
+            num *= 2;
+            numBase *= 3;
         }
     }
     // imperfecta in perfect mensuration (three imperfectas in the place of the two original perfectas)
@@ -120,16 +120,16 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
         if (((this->GetDur() == DURATION_longa) && (currentMensur->GetModusminor() != MODUSMINOR_2))
             || ((this->GetDur() == DURATION_brevis) && (currentMensur->GetTempus() != TEMPUS_2))
             || ((this->GetDur() == DURATION_semibrevis) && (currentMensur->GetProlatio() != PROLATIO_2))) {
-            num *= 2;
-            numBase *= 3;
+            num *= 3;
+            numBase *= 2;
         }
     }
     // altera, maior, or duplex
     else if (this->HasDurQuality()
         && (this->GetDurQuality() == DURQUALITY_mensural_altera || this->GetDurQuality() == DURQUALITY_mensural_maior
             || this->GetDurQuality() == DURQUALITY_mensural_duplex)) {
-        num *= 2;
-        numBase *= 1;
+        num *= 1;
+        numBase *= 2;
     } // Any other case (minor, perfecta in tempus perfectum, and imperfecta in tempus imperfectum) follows the
       // mensuration and has no @num and @numbase attributes
 
@@ -150,7 +150,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
             duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
             break;
     }
-    duration *= (double)num / (double)numBase;
+    duration *= (double)numBase / (double)num;
     // LogDebug("Duration %d; %d/%d; Alignment %f; Ratio %f", noteDur, num, numbase, duration, ratio);
     duration = durRound(duration);
     return duration;

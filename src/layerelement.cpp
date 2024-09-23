@@ -703,8 +703,8 @@ double LayerElement::GetAlignmentDuration(
 
         if (params.proport) {
             // Proportion are applied reversly - higher ratio means shorter values
-            if (params.proport->HasNum()) numbase *= params.proport->GetCumulatedNum();
-            if (params.proport->HasNumbase()) num *= params.proport->GetCumulatedNumbase();
+            if (params.proport->HasNum()) num *= params.proport->GetCumulatedNum();
+            if (params.proport->HasNumbase()) numbase *= params.proport->GetCumulatedNumbase();
         }
 
         const Tuplet *tuplet = vrv_cast<const Tuplet *>(this->GetFirstAncestor(TUPLET, MAX_TUPLET_DEPTH));
