@@ -822,8 +822,8 @@ void CmmeInput::CreateNote(pugi::xml_node noteNode)
     data_DURATION duration = this->ReadDuration(noteNode, num, numbase);
     note->SetDur(duration);
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
-        note->SetNumbase(num);
-        note->SetNum(numbase);
+        note->SetNum(num);
+        note->SetNumbase(numbase);
     }
 
     int oct = this->ChildAsInt(noteNode, "OctaveNum");
@@ -960,8 +960,8 @@ void CmmeInput::CreateRest(pugi::xml_node restNode)
     data_DURATION duration = this->ReadDuration(restNode, num, numbase);
     rest->SetDur(duration);
     if (num != VRV_UNSET && numbase != VRV_UNSET) {
-        rest->SetNumbase(num);
-        rest->SetNum(numbase);
+        rest->SetNum(num);
+        rest->SetNumbase(numbase);
     }
 
     this->ReadEditorialCommentary(restNode, rest);
@@ -1031,12 +1031,16 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
     numbase = VRV_UNSET;
 
     if (durationNode.child("Length")) {
-        num = this->ChildAsInt(durationNode.child("Length"), "Num");
-        numbase = this->ChildAsInt(durationNode.child("Length"), "Den");
+        int cmmeNum = this->ChildAsInt(durationNode.child("Length"), "Num");
+        int cmmeDen = this->ChildAsInt(durationNode.child("Length"), "Den");
+
+        if ((cmmeNum == VRV_UNSET) || (cmmeDen == VRV_UNSET)) {
+            return duration;
+        }
 
         // Apply the proportion
-        num *= m_mensInfo->proportNum;
-        numbase *= m_mensInfo->proportDen;
+        cmmeNum *= m_mensInfo->proportNum;
+        cmmeDen *= m_mensInfo->proportDen;
 
         std::pair<int, int> ratio = { 1, 1 };
 
@@ -1062,9 +1066,14 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
             ratio.second = 8;
         }
 
-        num *= ratio.second;
-        numbase *= ratio.first;
-        vrv::Reduce(numbase, num);
+        cmmeNum *= ratio.second;
+        cmmeDen *= ratio.first;
+
+        // MEI num and numabase are cmme den and num respectively
+        num = cmmeDen;
+        numbase = cmmeNum;
+
+        vrv::Reduce(num, numbase);
 
         if (num == numbase) {
             num = VRV_UNSET;
