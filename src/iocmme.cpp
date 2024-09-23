@@ -321,7 +321,7 @@ void CmmeInput::ReadEvents(pugi::xml_node eventsNode)
                 CreateEllipsis();
             }
             else if (eventNode.child("Lacuna")) {
-                CreateLacuna(lacunaNode);
+                CreateLacuna(eventNode.child("Lacuna"));
             }
             else {
                 LogWarning("Unsupported MiscItem content");
