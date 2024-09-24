@@ -215,6 +215,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const int strokeWidth = 2.8 * stemWidth;
+    const int staffSize = staff->m_drawingStaffSize;
 
     int shape = LIGATURE_DEFAULT;
     if (note->GetActualDur() != DUR_BR) {
