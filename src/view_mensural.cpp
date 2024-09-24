@@ -223,9 +223,15 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         if (note->GetStemDir() != STEMDIRECTION_NONE) {
             up = (note->GetStemDir() == STEMDIRECTION_up);
         }
+        // For CMN we rely on the drawing stem dir interface pre-calculated in functors
         else if (staff->m_drawingNotationType == NOTATIONTYPE_NONE
             || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
+        }
+        // For mensural just calculate it here
+        else {
+            int verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
+            up = (note->GetDrawingY() < verticalCenter);
         }
         shape = (up) ? LIGATURE_STEM_RIGHT_UP : LIGATURE_STEM_RIGHT_DOWN;
     }
