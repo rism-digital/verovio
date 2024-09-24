@@ -792,13 +792,13 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         int y = element->GetDrawingY();
 
         if (m_doc->GetType() != Transcription) {
-            // Use the note to which the points to for position
-            if (dot->m_drawingPreviousElement && !dot->m_drawingNextElement) {
+            // Use the note to which the points to for position if no next element or for augmentation dots
+            if (dot->m_drawingPreviousElement && (!dot->m_drawingNextElement || dot->GetForm() == dotLog_FORM_aug)) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
                 y = dot->m_drawingPreviousElement->GetDrawingY();
                 this->DrawDotsPart(dc, x, y, 1, staff);
             }
-            if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
+            else if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
                 // Do not take into account the spacing since it is place in-between
                 dc->DeactivateGraphicX();
                 x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingPreviousElement->GetDrawingX()) / 2);
