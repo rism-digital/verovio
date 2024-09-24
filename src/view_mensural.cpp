@@ -99,6 +99,9 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y = staff->GetDrawingY()
             - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
+    else if (mensur->HasNumbase() && !mensur->HasNum()) {
+        y += 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
 
     if (mensur->GetSign() == MENSURATIONSIGN_O) {
         code = SMUFL_E911_mensuralProlation2;
@@ -140,6 +143,12 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
         this->DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
+    }
+    // It is sure we have a sign - draw the numbase underneath the sign
+    else if (mensur->HasNumbase()) {
+        // Draw a single figure but passing numbase - adjust the y accordingly
+        y -= 4 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        this->DrawProportFigures(dc, x, y, mensur->GetNumbase(), 0, staff);
     }
 
     dc->EndGraphic(element, this);

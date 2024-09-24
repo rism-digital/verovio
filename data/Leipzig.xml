@@ -639,7 +639,7 @@
   <g c="E4D2" x="0.0" y="0.0" w="450.0" h="500.0" h-a-x="450" n="caesuraThick" />
   <g c="E4D3" x="0.0" y="0.0" w="150.0" h="500.0" h-a-x="150" n="caesuraShort" />
   <g c="E4D4" x="0.0" y="0.0" w="250.0" h="500.0" h-a-x="250" n="caesuraCurved" />
-  <g c="E4D7" x="0.0" y="0.0" w="36.0" h="500.0" h-a-x="36" n="caesuraSingleStroke" />
+  <g c="E4D7" x="0.0" y="0.0" w="36.0" h="300.0" h-a-x="36" n="caesuraSingleStroke" />
   <g c="266D" x="28.0" y="56.0" w="220.0" h="714.0" h-a-x="269" n="musicFlatSign" />
   <g c="266E" x="28.0" y="-140.0" w="174.0" h="779.0" h-a-x="225" n="musicNaturalSign" />
   <g c="266F" x="28.0" y="-127.0" w="218.0" h="771.0" h-a-x="272" n="musicSharpSign" />
@@ -784,7 +784,7 @@
   <g c="E8F5" x="0.0" y="-375.0" w="14.0" h="750.0" h-a-x="14" n="chantDivisioMaxima" />
   <g c="E8F6" x="0.0" y="-375.0" w="114.0" h="750.0" h-a-x="114" n="chantDivisioFinalis" />
   <g c="E8F7" x="0.0" y="264.0" w="85.0" h="234.0" h-a-x="85" n="chantVirgula" />
-  <g c="E8F8" x="-0.0" y="264.0" w="137.34" h="234.27" h-a-x="138" n="chantCaesura" />
+  <g c="E8F8" x="0.0" y="264.0" w="137.0" h="234.0" h-a-x="138" n="chantCaesura" />
   <g c="EB90" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise1" />
   <g c="EB91" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise2" />
   <g c="EB92" x="0.0" y="0.0" w="0.0" h="0.0" h-a-x="1000" n="staffPosRaise3" />
@@ -807,15 +807,15 @@
     <a n="stemDownNW" x="0.0" y="-0.14" />
     <a n="stemUpSE" x="1.26" y="0.16" />
   </g>
-  <g c="E926" x="19.86" y="-200.0" w="180.14" h="390.0" h-a-x="220" n="mensuralProportion1" />
+  <g c="E926" x="20.0" y="-200.0" w="180.0" h="390.0" h-a-x="220" n="mensuralProportion1" />
   <g c="E928" x="23.0" y="-201.0" w="215.0" h="391.0" h-a-x="256" n="mensuralProportion3" />
-  <g c="E927" x="20.0" y="-200.0" w="254.04" h="390.02" h-a-x="294" n="mensuralProportion2" />
+  <g c="E927" x="20.0" y="-200.0" w="254.0" h="390.0" h-a-x="294" n="mensuralProportion2" />
   <g c="E929" x="20.0" y="-202.0" w="254.0" h="382.0" h-a-x="294" n="mensuralProportion4" />
-  <g c="EE90" x="13.0" y="-200.02" w="247.0" h="392.02" h-a-x="280" n="mensuralProportion5" />
-  <g c="EE91" x="14.66" y="-200.0" w="232.34" h="390.0" h-a-x="267" n="mensuralProportion6" />
-  <g c="EE94" x="15.66" y="-200.0" w="232.34" h="390.0" h-a-x="267" n="mensuralProportion9" />
+  <g c="EE90" x="13.0" y="-200.0" w="247.0" h="392.0" h-a-x="280" n="mensuralProportion5" />
+  <g c="EE91" x="15.0" y="-200.0" w="232.0" h="390.0" h-a-x="267" n="mensuralProportion6" />
+  <g c="EE94" x="16.0" y="-200.0" w="232.0" h="390.0" h-a-x="267" n="mensuralProportion9" />
   <g c="EE93" x="20.0" y="-200.0" w="233.0" h="390.0" h-a-x="273" n="mensuralProportion8" />
   <g c="EE92" x="20.0" y="-201.0" w="233.0" h="391.0" h-a-x="273" n="mensuralProportion7" />
-  <g c="EA2A" x="0.0" y="-131.0" w="319.0" h="261.0" h-a-x="319" n="medRenOriscusCMN" />
+  <g c="EA2A" x="0.0" y="-130.0" w="319.0" h="260.0" h-a-x="319" n="medRenOriscusCMN" />
   <g c="E595" x="0.0" y="0.0" w="210.0" h="400.0" h-a-x="210" n="ornamentLeftVerticalStrokeWithCross" />
 </bounding-boxes>
