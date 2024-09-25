@@ -299,6 +299,8 @@ bool Rest::DetermineRestPosition(const Staff *staff, const Layer *layer, bool &i
         if (!firstElement) firstElement = layerElement;
     }
 
+    if (!firstElement) return false;
+
     // handle rest positioning for 2 layers. 3 layers and more are much more complex to solve
     if (layers.size() == 1) {
         if (m_crossStaff) {

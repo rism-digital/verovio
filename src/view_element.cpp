@@ -1700,8 +1700,9 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         note = vrv_cast<Note *>(childElement);
     }
     else if (childElement->Is(CHORD)) {
-        note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
-                                             : vrv_cast<Chord *>(childElement)->GetBottomNote();
+        Chord *chord = vrv_cast<Chord *>(childElement);
+        assert(chord);
+        note = (stemDir == STEMDIRECTION_up) ? chord->GetTopNote() : chord->GetBottomNote();
     }
     if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 

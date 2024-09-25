@@ -619,7 +619,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         else {
             layerRef = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
             if (layerRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
-            if (staffRef) {
+            if (staffRef && layerRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
             }
