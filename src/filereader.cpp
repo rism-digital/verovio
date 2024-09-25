@@ -58,7 +58,7 @@ bool ZipFileReader::Load(const std::string &filename)
         data = data.substr(data.find("base64,") + 7);
     }
     std::vector<unsigned char> bytes = Base64Decode(data);
-    return this->Load(bytes);
+    return this->LoadBytes(bytes);
 #else
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -78,11 +78,11 @@ bool ZipFileReader::Load(const std::string &filename)
     while (fin.read((char *)&buffer, sizeof(unsigned char))) {
         bytes.push_back(buffer);
     }
-    return this->Load(bytes);
+    return this->LoadBytes(bytes);
 #endif
 }
 
-bool ZipFileReader::Load(const std::vector<unsigned char> &bytes)
+bool ZipFileReader::LoadBytes(const std::vector<unsigned char> &bytes)
 {
     this->Reset();
 

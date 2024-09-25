@@ -1835,6 +1835,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
 
         section->AddChild(scoreDef);
     }
+    else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
+        m_meterUnit = time.child("beat-type").text().as_int();
+    }
 
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
     pugi::xpath_node measureSlash = node.select_node("measure-style/slash");
@@ -2588,6 +2591,11 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
+    if (harmText.empty()) {
+        pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
+        harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
+        alter = node.select_node("numeral/numeral-alter");
+    }
     if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xml_node kind = node.child("kind");
     if (kind) {

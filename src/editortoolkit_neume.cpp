@@ -383,9 +383,9 @@ bool EditorToolkitNeume::ClefMovementHandler(Clef *clef, int x, int y)
     if (clef->HasFacs()) {
         Zone *zone = clef->GetZone();
         assert(zone);
-        zone->ShiftByXY(x,
-            (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
-                - x * tan(staff->GetDrawingRotate() * M_PI / 180.0));
+        int y = (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize
+            - x * tan(staff->GetDrawingRotate() * M_PI / 180.0);
+        zone->ShiftByXY(x, -y);
     }
 
     layer->ReorderByXPos();
@@ -521,7 +521,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         zone->ShiftByXY(x, -y);
 
         AdjustPitchFromPosition(element);
-        ChangeStaff(elementId);
     }
     else if (element->HasInterface(INTERFACE_PITCH) || element->Is(NEUME) || element->Is(SYLLABLE)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstAncestor(LAYER));
@@ -665,21 +664,22 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
         }
 
         // Move staff and all staff children with facsimiles
+        Zone *staffZone = staff->GetZone();
+        assert(staffZone);
+        staffZone->ShiftByXY(x, -y);
         ListOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
         staff->FindAllDescendantsByComparison(&children, &ic);
-        std::set<Zone *> zones;
-        zones.insert(staff->GetZone());
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             assert(fi);
-            if (fi->GetZone() != NULL) zones.insert(fi->GetZone());
-        }
-        for (auto it = zones.begin(); it != zones.end(); ++it) {
-            (*it)->ShiftByXY(x, -y);
+            Zone *zone = fi->GetZone();
+            if (zone) zone->ShiftByXY(x, -y);
         }
 
         SortStaves();
+
+        m_doc->GetDrawingPage()->LayOutTranscription(true);
 
         if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
@@ -714,7 +714,6 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, -y);
         }
-        ChangeStaff(elementId);
     }
     else if (element->Is(DIVLINE)) {
         DivLine *divLine = dynamic_cast<DivLine *>(element);
@@ -741,6 +740,7 @@ bool EditorToolkitNeume::Drag(std::string elementId, int x, int y)
     }
     Layer *layer = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
     layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+    m_doc->GetDrawingPage()->LayOutPitchPos();
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
     m_editInfo.import("status", status);
     m_editInfo.import("message", message);
@@ -1147,6 +1147,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
             LogError("A accid type must be specified.");
             delete accid;
+            delete zone;
 
             m_editInfo.import("status", "FAILURE");
             m_editInfo.import("message", "A accid type must be specified.");
@@ -1212,6 +1213,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (divLineTypeW == divLineLog_FORM_NONE) {
             LogError("A divLine type must be specified.");
             delete divLine;
+            delete zone;
 
             m_editInfo.import("status", "FAILURE");
             m_editInfo.import("message", "A divLine type must be specified.");
@@ -1250,6 +1252,8 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         return false;
     }
     layer->ReorderByXPos();
+
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
 
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
@@ -1590,17 +1594,24 @@ bool EditorToolkitNeume::DisplaceClefOctave(std::string elementId, std::string d
         clef->SetDisPlace(octaveDis > 0 ? STAFFREL_basic_above : STAFFREL_basic_below);
     }
 
-    // Set new octaves for affected neume components
+    // Set new octaves for affected neume components and custodes
     ClassIdComparison equalsClef(CLEF);
     Clef *nextClef = dynamic_cast<Clef *>(page->FindNextChild(&equalsClef, clef));
 
     ClassIdComparison equalsNcs(NC);
     ListOfObjects ncs;
     page->FindAllDescendantsBetween(&ncs, &equalsNcs, clef, nextClef);
-
     std::for_each(ncs.begin(), ncs.end(), [&](Object *ncObj) {
         Nc *nc = dynamic_cast<Nc *>(ncObj);
         nc->SetOct(nc->GetOct() + move);
+    });
+
+    ClassIdComparison equalsCustodes(CUSTOS);
+    ListOfObjects custodes;
+    page->FindAllDescendantsBetween(&custodes, &equalsCustodes, clef, nextClef);
+    std::for_each(custodes.begin(), custodes.end(), [&](Object *custosObj) {
+        Custos *custos = dynamic_cast<Custos *>(custosObj);
+        custos->SetOct(custos->GetOct() + move);
     });
 
     m_editInfo.import("status", "OK");
@@ -1704,6 +1715,8 @@ bool EditorToolkitNeume::MatchHeight(std::string elementId)
 bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 {
     if (!m_doc->GetDrawingPage()) return false;
+    Object *page = m_doc->GetDrawingPage();
+
     ListOfObjects staves;
 
     // Get the staves by element ID and fail if a staff does not exist.
@@ -1770,8 +1783,35 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
         Layer *sourceLayer = vrv_cast<Layer *>(sourceStaff->GetFirst(LAYER));
         fillLayer->MoveChildrenFrom(sourceLayer);
         assert(sourceLayer->GetChildCount() == 0);
-        Object *parent = sourceStaff->GetParent();
-        parent->DeleteChild(sourceStaff);
+
+        // Delete empty staff with its system parent
+        // Move SECTION, PB, and SYSTEM_MILESTONE_END if any
+        Object *system = sourceStaff->GetFirstAncestor(SYSTEM);
+        if (system->FindDescendantByType(SECTION)) {
+            Object *section = system->FindDescendantByType(SECTION);
+            Object *nextSystem = page->GetNext(system, SYSTEM);
+            if (nextSystem) {
+                section = system->DetachChild(section->GetIdx());
+                nextSystem->InsertChild(section, 0);
+            }
+        }
+        if (system->FindDescendantByType(PB)) {
+            Object *pb = system->FindDescendantByType(PB);
+            Object *nextSystem = page->GetNext(system, SYSTEM);
+            if (nextSystem) {
+                pb = system->DetachChild(pb->GetIdx());
+                nextSystem->InsertChild(pb, 1);
+            }
+        }
+        if (system->FindDescendantByType(SYSTEM_MILESTONE_END)) {
+            Object *milestoneEnd = system->FindDescendantByType(SYSTEM_MILESTONE_END);
+            Object *previousSystem = page->GetPrevious(system, SYSTEM);
+            if (previousSystem) {
+                milestoneEnd = system->DetachChild(milestoneEnd->GetIdx());
+                previousSystem->InsertChild(milestoneEnd, previousSystem->GetChildCount());
+            }
+        }
+        page->DeleteChild(system);
     }
     // Set the bounding box for the staff to the new bounds
     Zone *staffZone = fillStaff->GetZone();
@@ -1783,13 +1823,11 @@ bool EditorToolkitNeume::Merge(std::vector<std::string> elementIds)
 
     fillLayer->ReorderByXPos();
 
+    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
+
     m_editInfo.import("uuid", fillStaff->GetID());
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
-
-    if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
-
-    // TODO change zones for staff children
 
     return true;
 }
@@ -1826,6 +1864,7 @@ bool EditorToolkitNeume::Set(std::string elementId, std::string attrType, std::s
     else if (AttModule::SetVisual(element, attrType, attrValue))
         success = true;
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
     m_editInfo.import("status", success ? "OK" : "FAILURE");
     m_editInfo.import("message", success ? "" : "Could not set attribute '" + attrType + "' to '" + attrValue + "'.");
     return success;
@@ -2048,6 +2087,7 @@ bool EditorToolkitNeume::SortStaves()
     }
 
     Object *page = m_doc->GetDrawingPage();
+    if (page->GetChildCount(SYSTEM) <= 1) return true;
 
     page->StableSort(StaffSort());
 
@@ -2061,13 +2101,10 @@ bool EditorToolkitNeume::SortStaves()
     Object *pbParent = pb->GetParent();
     Object *milestoneEndParent = milestoneEnd->GetParent();
     Object *sectionParent = section->GetParent();
-    int pbIdx = pbParent->GetChildIndex(pb);
-    int milestoneEndIdx = milestoneEndParent->GetChildIndex(milestoneEnd);
-    int sectionIdx = sectionParent->GetChildIndex(section);
 
-    pb = pbParent->DetachChild(pbIdx);
-    milestoneEnd = milestoneEndParent->DetachChild(milestoneEndIdx);
-    section = sectionParent->DetachChild(sectionIdx);
+    pb = pbParent->DetachChild(pb->GetIdx());
+    milestoneEnd = milestoneEndParent->DetachChild(milestoneEnd->GetIdx());
+    section = sectionParent->DetachChild(section->GetIdx());
 
     Object *firstSystem = page->GetFirst(SYSTEM);
     Object *lastSystem = page->GetLast(SYSTEM);
@@ -2240,22 +2277,21 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_editInfo.import("message", "Could not get the drawing page.");
         return false;
     }
-    Object *obj = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
-    assert(obj);
-    bool result = false;
-    bool isNeumeOrNc, isNc, isClef, isSyllable;
-    isNeumeOrNc = (obj->Is(NC) || obj->Is(NEUME));
-    isNc = obj->Is(NC);
-    isClef = obj->Is(CLEF);
-    isSyllable = obj->Is(SYLLABLE);
-    Object *parent = obj->GetParent();
+
+    Object *element = m_doc->GetDrawingPage()->FindDescendantByID(elementId);
+    assert(element);
+    Object *parent = element->GetParent();
     assert(parent);
-    m_editInfo.import("uuid", elementId);
+
+    bool result = false;
+    bool isNc = element->Is(NC);
+    bool isNeumeOrNc = (element->Is(NEUME) || element->Is(NC));
+
     // Remove Zone for element (if any)
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     ListOfObjects fiChildren;
-    obj->FindAllDescendantsByComparison(&fiChildren, &ic);
-    FacsimileInterface *fi = obj->GetFacsimileInterface();
+    element->FindAllDescendantsByComparison(&fiChildren, &ic);
+    FacsimileInterface *fi = element->GetFacsimileInterface();
     if (fi != NULL && fi->HasFacs()) {
         fi->AttachZone(NULL);
     }
@@ -2265,7 +2301,8 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             fi->AttachZone(NULL);
         }
     }
-    if (isClef) {
+
+    if (element->Is(CLEF)) {
         // y position of pitched elements (like neumes) is determined by their pitches
         // so when deleting a clef, the position on a page that a pitch value is associated with could change
         // so we need to change the pitch value of any elements whose clef is going to change
@@ -2287,7 +2324,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_doc->GetDrawingPage()->FindAllDescendantsBetween(
             &elements, &ic, clef, (nextClef != NULL) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
-        result = parent->DeleteChild(obj);
+        result = parent->DeleteChild(element);
 
         if (!result) {
             LogError("Failed to delete the desired element (%s)", elementId.c_str());
@@ -2303,9 +2340,65 @@ bool EditorToolkitNeume::Remove(std::string elementId)
             // removing the current clef, and so the new clef for all of these elements is previousClef
             pi->AdjustPitchForNewClef(clef, previousClef);
         }
+
+        m_editInfo.import("uuid", elementId);
+        m_editInfo.import("status", "OK");
+        m_editInfo.import("message", "");
+        return true;
     }
-    else if (isSyllable) {
-        Syllable *syllable = dynamic_cast<Syllable *>(obj);
+    else if (element->Is(STAFF)) {
+        Object *page = m_doc->GetDrawingPage();
+        Object *system = element->GetFirstAncestor(SYSTEM);
+
+        if (page->GetChildCount(SYSTEM) > 1) {
+            if (system == page->GetFirst(SYSTEM)) {
+                // if the target staff is in the first system,
+                // move pb and section to the next system
+                Object *nextSystem = page->GetNext(system, SYSTEM);
+                Object *section = system->FindDescendantByType(SECTION);
+                Object *pb = system->FindDescendantByType(PB);
+                assert(pb);
+                assert(section);
+
+                section = system->DetachChild(section->GetIdx());
+                pb = system->DetachChild(pb->GetIdx());
+
+                nextSystem->InsertChild(section, 0);
+                nextSystem->InsertChild(pb, 1);
+            }
+            else if (system == page->GetLast(SYSTEM)) {
+                // if the target staff in is the last system,
+                // move system-milestone-end to the previous system
+                Object *previousSystem = page->GetPrevious(system, SYSTEM);
+                Object *milestoneEnd = system->FindDescendantByType(SYSTEM_MILESTONE_END);
+                assert(milestoneEnd);
+
+                int milestoneEndIdx = system->GetChildIndex(milestoneEnd);
+                milestoneEnd = system->DetachChild(milestoneEndIdx);
+
+                previousSystem->InsertChild(milestoneEnd, previousSystem->GetChildCount());
+            }
+        }
+
+        // delete system to delete staff
+        result = page->DeleteChild(system);
+
+        if (!result) {
+            LogError("Failed to delete the desired element (%s)", elementId.c_str());
+            m_editInfo.reset();
+            m_editInfo.import("status", "FAILURE");
+            m_editInfo.import("message", "Failed to delete the desired element (" + elementId + ").");
+            return false;
+        }
+
+        m_editInfo.import("uuid", elementId);
+        m_editInfo.import("status", "OK");
+        m_editInfo.import("message", "");
+        return true;
+    }
+
+    if (element->Is(SYLLABLE)) {
+        Syllable *syllable = dynamic_cast<Syllable *>(element);
         assert(syllable);
         if (syllable->HasPrecedes() || syllable->HasFollows()) {
             UnlinkSyllable(syllable);
@@ -2313,7 +2406,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
 
     if (!result) {
-        result = parent->DeleteChild(obj);
+        result = parent->DeleteChild(element);
     }
 
     if (!result) {
@@ -2323,15 +2416,16 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         m_editInfo.import("message", "Failed to delete the desired element (" + elementId + ").");
         return false;
     }
+
     // Check if this leaves any containers empty and delete them
     if (isNc) {
         assert(parent->Is(NEUME));
-        obj = parent;
+        element = parent;
         parent = parent->GetParent();
-        if (obj->FindDescendantByType(NC) == NULL) {
+        if (element->FindDescendantByType(NC) == NULL) {
             // Delete the empty neume
-            std::string neumeId = obj->GetID();
-            result &= parent->DeleteChild(obj);
+            std::string neumeId = element->GetID();
+            result &= parent->DeleteChild(element);
             if (!result) {
                 LogError("Failed to delete empty neume (%s)", neumeId.c_str());
                 m_editInfo.reset();
@@ -2343,18 +2437,18 @@ bool EditorToolkitNeume::Remove(std::string elementId)
     }
     if (isNeumeOrNc) {
         assert(parent->Is(SYLLABLE));
-        obj = parent;
+        element = parent;
         parent = parent->GetParent();
-        if (obj->FindDescendantByType(NC) == NULL) {
+        if (element->FindDescendantByType(NC) == NULL) {
             // Check if it is part of a linked/split syllable and unlink
-            Syllable *li = dynamic_cast<Syllable *>(obj);
+            Syllable *li = dynamic_cast<Syllable *>(element);
             assert(li);
             if (li->HasPrecedes() || li->HasFollows()) {
                 UnlinkSyllable(li);
             }
             // Delete the syllable empty of neumes
-            std::string syllableId = obj->GetID();
-            result &= parent->DeleteChild(obj);
+            std::string syllableId = element->GetID();
+            result &= parent->DeleteChild(element);
             if (!result) {
                 LogError("Failed to delete empty syllable (%s)", syllableId.c_str());
                 m_editInfo.reset();
@@ -2365,6 +2459,7 @@ bool EditorToolkitNeume::Remove(std::string elementId)
         }
     }
 
+    m_editInfo.import("uuid", elementId);
     m_editInfo.import("status", "OK");
     m_editInfo.import("message", "");
     return true;
@@ -2685,7 +2780,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
 
     // if there are no full parents we need to make a new one to attach everything to
     if (fullParents.empty()) {
-        LogError("empty");
         if (elementClass == NC) {
             parent = new Neume();
         }
@@ -2812,8 +2906,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
         }
     }
 
-    LogError("2");
-
     // change the pitch of any pitched elements whose clef may have changed
     assert(newClef);
     ListOfObjects pitchedChildren;
@@ -2828,7 +2920,6 @@ bool EditorToolkitNeume::Group(std::string groupType, std::vector<std::string> e
             }
         }
     }
-    LogError("3");
 
     // Delete any empty parents
     for (auto it = parents.begin(); it != parents.end(); ++it) {
@@ -3350,8 +3441,6 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
     assert(elementIds.size() == 2);
     bool success1 = false;
     bool success2 = false;
-    Facsimile *facsimile = m_doc->GetFacsimile();
-    assert(facsimile);
     std::string firstNcId = elementIds[0];
     std::string secondNcId = elementIds[1];
     // Check if you can get drawing page
@@ -3433,6 +3522,7 @@ bool EditorToolkitNeume::ToggleLigature(std::vector<std::string> elementIds)
         return false;
     }
 
+    m_doc->GetDrawingPage()->LayOutTranscription(true);
     if (m_doc->IsTranscription() && m_doc->HasFacsimile()) m_doc->SyncFromFacsimileDoc();
 
     m_editInfo.import("status", "OK");
@@ -4164,13 +4254,21 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
         }
         pi->SetOct(3);
 
+        // The default octave = 3, but the actual octave is calculated by
+        // taking into account the displacement of the clef
+        int octave = 3;
+        if (clef->GetDis() && clef->GetDisPlace()) {
+            octave += (clef->GetDisPlace() == STAFFREL_basic_above ? 1 : -1) * (clef->GetDis() / 7);
+        }
+        pi->SetOct(octave);
+
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        const int pitchDifference = round(
-            (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                - m_view->ToLogicalY(fi->GetZone()->GetUly()))
-                / staffSize
-            - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset()));
+        const int pitchDifference
+            = round((double)((staff->GetDrawingY()
+                        - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                        - m_view->ToLogicalY(fi->GetZone()->GetUly())))
+                / (double)(staffSize));
         pi->AdjustPitchByOffset(-pitchDifference);
         return true;
     }
@@ -4233,11 +4331,11 @@ bool EditorToolkitNeume::AdjustPitchFromPosition(Object *obj, Clef *clef)
             }
             pi->SetOct(octave);
 
-            const int pitchDifference = round(
-                (staff->GetDrawingY() - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
-                    - m_view->ToLogicalY(fi->GetZone()->GetUly()))
-                    / staffSize
-                - (((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset()));
+            const int pitchDifference
+                = round((double)((staff->GetDrawingY()
+                            - staff->GetDrawingRotationOffsetFor(m_view->ToLogicalX(fi->GetZone()->GetUlx()))
+                            - m_view->ToLogicalY(fi->GetZone()->GetUly())))
+                    / (double)(staffSize));
             pi->AdjustPitchByOffset(-pitchDifference);
         }
 

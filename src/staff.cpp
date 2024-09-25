@@ -161,7 +161,7 @@ double Staff::GetDrawingRotate() const
     if (this->HasFacs()) {
         const Doc *doc = vrv_cast<const Doc *>(this->GetFirstAncestor(DOC));
         assert(doc);
-        if (doc->IsFacs()) {
+        if (doc->IsFacs() || doc->IsTranscription()) {
             return FacsimileInterface::GetDrawingRotate();
         }
     }
@@ -297,18 +297,6 @@ int Staff::GetNearestInterStaffPosition(int y, const Doc *doc, data_STAFFREL pla
 //----------------------------------------------------------------------------
 // LedgerLine
 //----------------------------------------------------------------------------
-
-LedgerLine::LedgerLine()
-{
-    this->Reset();
-}
-
-LedgerLine::~LedgerLine() {}
-
-void LedgerLine::Reset()
-{
-    m_dashes.clear();
-}
 
 void LedgerLine::AddDash(int left, int right, int extension)
 {

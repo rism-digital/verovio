@@ -145,7 +145,7 @@ extern bool loggingToBuffer;
  */
 extern struct timeval start;
 void LogElapsedTimeStart();
-void LogElapsedTimeEnd(const char *msg = "unspecified operation");
+void LogElapsedTimeStop(const char *msg = "unspecified operation");
 
 //----------------------------------------------------------------------------
 // Notation type checks

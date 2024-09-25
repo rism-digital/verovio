@@ -225,7 +225,7 @@ public:
 class BeamSpanSegment : public BeamSegment {
 public:
     BeamSpanSegment();
-    virtual ~BeamSpanSegment(){};
+    virtual ~BeamSpanSegment() {}
 
     /**
      * Set/get methods for member variables
@@ -294,6 +294,11 @@ public:
     void Reset() override;
     std::string GetClassName() const override { return "Beam"; }
     ///@}
+
+    /**
+     * Overriding CloneReset() method to be called after copy / assignment calls.
+     */
+    void CloneReset() override;
 
     /**
      * @name Getter to interfaces

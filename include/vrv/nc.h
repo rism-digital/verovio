@@ -65,6 +65,16 @@ public:
     ///@}
 
     /**
+     * Calclulate the pitch or loc difference between to nc.
+     * The Pitch difference takes precedence over the loc difference.
+     */
+    int PitchOrLocDifferenceTo(const Nc *nc) const;
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
      * Interface for class functor visitation
      */
     ///@{
@@ -74,7 +84,25 @@ public:
     FunctorCode AcceptEnd(ConstFunctor &functor) const override;
     ///@}
 
+    /**
+     * A Structure holding a glyph paramter for the nc.
+     * One single nc might need more than one glyph (e.g., liquescent).
+     * Set in CalcLigatureOrNeumePosFunctor::VisitNeume
+     */
+    struct DrawingGlyph {
+        wchar_t m_fontNo = 0;
+        float m_xOffset = 0.0;
+        float m_yOffset = 0.0;
+    };
+
 private:
+    //
+public:
+    /** Drawing glyphs */
+    std::vector<DrawingGlyph> m_drawingGlyphs;
+
+private:
+    //
 };
 
 } // namespace vrv

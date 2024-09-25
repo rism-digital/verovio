@@ -13,6 +13,7 @@
 #include "layer.h"
 #include "object.h"
 #include "plistinterface.h"
+#include "score.h"
 
 namespace vrv {
 
@@ -332,6 +333,18 @@ FunctorCode FindElementInLayerStaffDefFunctor::VisitLayer(const Layer *layer)
     }
 
     return m_element ? FUNCTOR_STOP : FUNCTOR_SIBLINGS;
+}
+
+FunctorCode FindElementInLayerStaffDefFunctor::VisitScore(const Score *score)
+{
+    if (score->GetScoreDef()->GetID() == m_id) {
+        m_element = score->GetScoreDef();
+    }
+    else {
+        m_element = score->GetScoreDef()->FindDescendantByID(m_id);
+    }
+
+    return (m_element) ? FUNCTOR_STOP : FUNCTOR_CONTINUE;
 }
 
 //----------------------------------------------------------------------------

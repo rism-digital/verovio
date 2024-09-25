@@ -53,7 +53,7 @@ public:
     /**
      * Load a vector into memory
      */
-    bool Load(const std::vector<unsigned char> &bytes);
+    bool LoadBytes(const std::vector<unsigned char> &bytes);
 
     /**
      * Check if the archive contains the file

@@ -143,6 +143,7 @@ struct ClosestBB {
 };
 
 // To be used with std::stable_sort to find the position to insert a new accid / divLine
+// TODO: use closesBB instead
 struct ClosestNeume {
     int x;
     int y;

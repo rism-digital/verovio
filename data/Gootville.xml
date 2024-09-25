@@ -395,6 +395,9 @@
   <g c="E56C" x="0.0" y="-128.0" w="606.0" h="256.0" h-a-x="606" n="ornamentShortTrill" />
   <g c="E56D" x="0.0" y="-200.0" w="606.0" h="400.0" h-a-x="606" n="ornamentMordent" />
   <g c="E56E" x="0.0" y="-128.0" w="852.0" h="256.0" h-a-x="852" n="ornamentTremblement" />
+  <g c="E594" x="0.0" y="-64.0" w="30.0" h="324.0" h-a-x="77" n="ornamentLeftVerticalStroke">
+    <a n="repeatOffset" x="0.74" y="0.0" />
+  </g>
   <g c="E59D" x="-77.0" y="-128.0" w="360.0" h="256.0" h-a-x="246" n="ornamentZigZagLineNoRightEnd">
     <a n="repeatOffset" x="1.05" y="0.0" />
   </g>

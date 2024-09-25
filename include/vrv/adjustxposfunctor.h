@@ -107,6 +107,8 @@ private:
     int m_staffN;
     // The current staff size
     int m_staffSize;
+    // The current staff is neume
+    bool m_isNeumeStaff;
     // The list of staffN in the top-level scoreDef
     std::vector<int> m_staffNs;
     // The bounding boxes in the previous aligner
@@ -125,6 +127,8 @@ private:
     AdjustXPosAlignmentOffset m_currentAlignment;
     // The preceeding alignment
     AdjustXPosAlignmentOffset m_previousAlignment;
+    // The current measure
+    Measure *m_measure;
 };
 
 } // namespace vrv

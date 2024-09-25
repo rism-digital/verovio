@@ -607,7 +607,7 @@ data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int ve
         else if (middlePoint > verticalCenter) {
             return STEMDIRECTION_down;
         }
-        else if (middlePoint < verticalCenter) {
+        else {
             return STEMDIRECTION_up;
         }
     }
@@ -654,7 +654,9 @@ void CalcStemFunctor::AdjustFlagPlacement(
         note = vrv_cast<Note *>(parent);
     }
     else if (parent->Is(CHORD)) {
-        note = vrv_cast<Chord *>(parent)->GetTopNote();
+        Chord *chord = vrv_cast<Chord *>(parent);
+        assert(chord);
+        note = chord->GetTopNote();
     }
     int ledgerAbove = 0;
     int ledgerBelow = 0;

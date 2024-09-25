@@ -15,6 +15,8 @@
 #include "fig.h"
 #include "layer.h"
 #include "ligature.h"
+#include "nc.h"
+#include "neume.h"
 #include "page.h"
 #include "rend.h"
 #include "rest.h"
@@ -22,6 +24,7 @@
 #include "section.h"
 #include "staff.h"
 #include "svg.h"
+#include "syllable.h"
 #include "system.h"
 #include "tabgrp.h"
 #include "verse.h"
@@ -38,8 +41,8 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_measureAligner = NULL;
     m_time = 0.0;
-    m_currentMensur = NULL;
-    m_currentMeterSig = NULL;
+    m_currentParams.mensur = NULL;
+    m_currentParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_scoreDefRole = SCOREDEF_NONE;
     m_isFirstMeasure = false;
@@ -48,8 +51,8 @@ AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 
 FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 {
-    m_currentMensur = layer->GetCurrentMensur();
-    m_currentMeterSig = layer->GetCurrentMeterSig();
+    m_currentParams.mensur = layer->GetCurrentMensur();
+    m_currentParams.meterSig = layer->GetCurrentMeterSig();
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
@@ -140,6 +143,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     Rest *restParent = vrv_cast<Rest *>(layerElement->GetFirstAncestor(REST, MAX_NOTE_DEPTH));
     TabGrp *tabGrpParent = vrv_cast<TabGrp *>(layerElement->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
     const bool ligatureAsBracket = m_doc->GetOptions()->m_ligatureAsBracket.GetValue();
+    const bool neumeAsNote = m_doc->GetOptions()->m_neumeAsNote.GetValue();
 
     if (chordParent) {
         layerElement->SetAlignment(chordParent->GetAlignment());
@@ -165,16 +169,14 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             Alignment *alignment = firstNote->GetAlignment();
             layerElement->SetAlignment(alignment);
             alignment->AddLayerElementRef(layerElement);
-            double duration
-                = layerElement->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+            double duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
             m_time += duration;
             return FUNCTOR_CONTINUE;
         }
     }
     // We do not align these (container). Any other?
     else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
-        double duration
-            = layerElement->GetSameAsContentAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+        double duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
         m_time += duration;
         return FUNCTOR_CONTINUE;
     }
@@ -198,10 +200,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         else if (layerElement->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
         else {
-            // type = ALIGNMENT_KEYSIG;
-            // We force this because they should appear only at the beginning of a measure and should be non-justifiable
-            // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
-            type = ALIGNMENT_SCOREDEF_KEYSIG;
+            type = ALIGNMENT_KEYSIG;
         }
     }
     else if (layerElement->Is(MENSUR)) {
@@ -212,8 +211,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_CAUTION_MENSUR;
         else {
             // replace the current mensur
-            m_currentMensur = vrv_cast<Mensur *>(layerElement);
-            assert(m_currentMensur);
+            m_currentParams.mensur = vrv_cast<Mensur *>(layerElement);
+            assert(m_currentParams.mensur);
             type = ALIGNMENT_MENSUR;
         }
     }
@@ -227,8 +226,8 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             type = ALIGNMENT_SCOREDEF_METERSIG;
         else {
             // replace the current meter signature
-            m_currentMeterSig = vrv_cast<MeterSig *>(layerElement);
-            assert(m_currentMeterSig);
+            m_currentParams.meterSig = vrv_cast<MeterSig *>(layerElement);
+            assert(m_currentParams.meterSig);
             // type = ALIGNMENT_METERSIG
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
@@ -263,20 +262,40 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         layerElement->SetAlignment(note->GetAlignment());
     }
     else if (layerElement->Is(SYL)) {
-        Staff *staff = layerElement->GetAncestorStaff();
         Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
-        if (!note || (staff->m_drawingNotationType == NOTATIONTYPE_neume)) {
-            type = ALIGNMENT_DEFAULT;
-        }
-        else {
+        if (note) {
             layerElement->SetAlignment(note->GetAlignment());
         }
+        else {
+            Syllable *syllable = vrv_cast<Syllable *>(layerElement->GetFirstAncestor(SYLLABLE));
+            if (syllable) layerElement->SetAlignment(syllable->GetAlignment());
+        }
+        // Else add a default
     }
     else if (layerElement->Is(VERSE)) {
         // Idem
         Note *note = vrv_cast<Note *>(layerElement->GetFirstAncestor(NOTE));
         assert(note);
         layerElement->SetAlignment(note->GetAlignment());
+    }
+    else if (layerElement->Is(NC)) {
+        // Align with the neume
+        if (!neumeAsNote) {
+            Neume *neume = vrv_cast<Neume *>(layerElement->GetFirstAncestor(NEUME));
+            assert(neume);
+            layerElement->SetAlignment(neume->GetAlignment());
+        }
+        // Otherwise each nc has its own aligner
+    }
+    else if (layerElement->Is(NEUME)) {
+        // Align with the syllable
+        if (neumeAsNote) {
+            Syllable *syllable = vrv_cast<Syllable *>(layerElement->GetFirstAncestor(SYLLABLE));
+            assert(syllable);
+            layerElement->SetAlignment(syllable->GetAlignment());
+            return FUNCTOR_CONTINUE;
+        }
+        // Otherwise each neume has its own aligner
     }
     else if (layerElement->Is(GRACEGRP)) {
         return FUNCTOR_CONTINUE;
@@ -289,7 +308,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
     // We have already an alignment with grace note children - skip this
     if (!layerElement->GetAlignment()) {
         // get the duration of the event
-        duration = layerElement->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+        duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
 
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
@@ -357,7 +376,7 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
 {
-    int meterUnit = m_currentMeterSig ? m_currentMeterSig->GetUnit() : 4;
+    int meterUnit = m_currentParams.meterSig ? m_currentParams.meterSig->GetUnit() : 4;
     measure->m_measureAligner.SetInitialTstamp(meterUnit);
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
@@ -369,6 +388,8 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
     m_isFirstMeasure = false;
 
     if (m_hasMultipleLayer) measure->HasAlignmentRefWithMultipleLayers(true);
+
+    // measure->m_measureAligner.LogDebugTree(3);
 
     return FUNCTOR_CONTINUE;
 }

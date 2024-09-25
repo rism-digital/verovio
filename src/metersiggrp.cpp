@@ -130,15 +130,17 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
                     const int ratio = maxUnit / currentUnit;
                     currentCount += meterSig->GetTotalCount() * ratio;
                 }
-                else if (maxUnit < currentUnit) {
+                else {
                     const int ratio = currentUnit / maxUnit;
                     currentCount *= ratio;
                     currentCount += meterSig->GetTotalCount();
                     maxUnit = currentUnit;
                 }
             }
-            newMeterSig->SetUnit(maxUnit);
-            newMeterSig->SetCount({ { currentCount }, MeterCountSign::None });
+            if (newMeterSig) {
+                newMeterSig->SetUnit(maxUnit);
+                newMeterSig->SetCount({ { currentCount }, MeterCountSign::None });
+            }
             break;
         }
         default: {

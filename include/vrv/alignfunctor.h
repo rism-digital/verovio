@@ -12,6 +12,20 @@
 
 namespace vrv {
 
+class Mensur;
+class MeterSig;
+
+//----------------------------------------------------------------------------
+// AlignmentParams
+//----------------------------------------------------------------------------
+/**
+ * Regroup pointers to meterSig, mensur and proport objects
+ */
+struct AlignMeterParams {
+    const MeterSig *meterSig;
+    const Mensur *mensur;
+};
+
 //----------------------------------------------------------------------------
 // AlignHorizontallyFunctor
 //----------------------------------------------------------------------------
@@ -62,10 +76,8 @@ private:
     MeasureAligner *m_measureAligner;
     // The time
     double m_time;
-    // The current Mensur
-    Mensur *m_currentMensur;
-    // The current MeterSig
-    MeterSig *m_currentMeterSig;
+    // The current MeterSig, Mensur and Proport
+    AlignMeterParams m_currentParams;
     // The current notation type
     data_NOTATIONTYPE m_notationType;
     // Indicates the state in processing the caution scoreDef

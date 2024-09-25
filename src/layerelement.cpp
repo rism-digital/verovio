@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "alignfunctor.h"
 #include "barline.h"
 #include "beam.h"
 #include "beamspan.h"
@@ -74,6 +75,9 @@ namespace vrv {
 // Large spacing between syllables is a quarter note space
 // MAX_DURATION / pow(2.0, (DUR_4 - 2.0))
 #define NEUME_LARGE_SPACE 256
+// Medium spacing between neume is a 8th note space
+// MAX_DURATION / pow(2.0, (DUR_5 - 2.0))
+#define NEUME_MEDIUM_SPACE 128
 // Small spacing between neume components is a 16th note space
 // MAX_DURATION / pow(2.0, (DUR_6 - 2.0))
 #define NEUME_SMALL_SPACE 64
@@ -668,7 +672,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
 }
 
 double LayerElement::GetAlignmentDuration(
-    const Mensur *mensur, const MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
+    const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
@@ -677,7 +681,7 @@ double LayerElement::GetAlignmentDuration(
     // Only resolve simple sameas links to avoid infinite recursion
     const LayerElement *sameas = dynamic_cast<const LayerElement *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
-        return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+        return sameas->GetAlignmentDuration(params, notGraceOnly, notationType);
     }
 
     if (this->HasInterface(INTERFACE_DURATION)) {
@@ -688,7 +692,7 @@ double LayerElement::GetAlignmentDuration(
             ListOfConstObjects objects;
             ClassIdsComparison ids({ CHORD, NOTE, REST, SPACE });
             tuplet->FindAllDescendantsByComparison(&objects, &ids);
-            if (objects.size() > 1) {
+            if (objects.size() > 0) {
                 num = tuplet->GetNum();
                 numbase = tuplet->GetNumbase();
                 // 0 is not valid in MEI anyway - just correct it silently
@@ -699,16 +703,17 @@ double LayerElement::GetAlignmentDuration(
         const DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
         if (duration->IsMensuralDur() && (notationType != NOTATIONTYPE_cmn)) {
-            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
+            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, params.mensur);
         }
         if (this->Is(NC)) {
+            // This is called only with --neume-as-note
             const Object *neume = this->GetFirstAncestor(NEUME);
             assert(neume);
             const Object *syllable = neume->GetFirstAncestor(SYLLABLE);
             assert(syllable);
-            // Add a gap after the last nc of the last neume in the syllable
-            if ((neume->GetLast() == this) && (syllable->GetLast() == neume)) {
-                return NEUME_LARGE_SPACE;
+            // Add a larger gap after the last nc of the last neume in the syllable
+            if (neume->GetLast() == this) {
+                return (syllable->GetLast() == neume) ? NEUME_LARGE_SPACE : NEUME_MEDIUM_SPACE;
             }
             else {
                 return NEUME_SMALL_SPACE;
@@ -726,22 +731,22 @@ double LayerElement::GetAlignmentDuration(
         const BeatRpt *beatRpt = vrv_cast<const BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
         const TimestampAttr *timestampAttr = vrv_cast<const TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
-        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
     else if (this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
-        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
-        if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetTotalCount();
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        if (params.meterSig && params.meterSig->HasCount()) meterCount = params.meterSig->GetTotalCount();
 
         if (this->Is(HALFMRPT)) {
             return (DUR_MAX / meterUnit * meterCount) / 2;
@@ -750,13 +755,28 @@ double LayerElement::GetAlignmentDuration(
             return DUR_MAX / meterUnit * meterCount;
         }
     }
+    // This is not called with --neume-as-note since otherwise each nc has an aligner
+    else if (this->Is(NEUME)) {
+        const Object *syllable = this->GetFirstAncestor(SYLLABLE);
+        assert(syllable);
+        // Add a larger gap after the last neume of the syllable
+        return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
+    }
     else {
         return 0.0;
     }
 }
 
+double LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
+{
+    AlignMeterParams params;
+    params.meterSig = NULL;
+    params.mensur = NULL;
+    return this->GetAlignmentDuration(params, notGraceOnly, notationType);
+}
+
 double LayerElement::GetSameAsContentAlignmentDuration(
-    const Mensur *mensur, const MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
+    const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -765,11 +785,11 @@ double LayerElement::GetSameAsContentAlignmentDuration(
     const LayerElement *sameas = vrv_cast<const LayerElement *>(this->GetSameasLink());
     assert(sameas);
 
-    return sameas->GetContentAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+    return sameas->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
 double LayerElement::GetContentAlignmentDuration(
-    const Mensur *mensur, const MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType) const
+    const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
         return 0.0;
@@ -784,10 +804,18 @@ double LayerElement::GetContentAlignmentDuration(
         }
         const LayerElement *element = vrv_cast<const LayerElement *>(child);
         assert(element);
-        duration += element->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
+        duration += element->GetAlignmentDuration(params, notGraceOnly, notationType);
     }
 
     return duration;
+}
+
+double LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
+{
+    AlignMeterParams params;
+    params.meterSig = NULL;
+    params.mensur = NULL;
+    return this->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
 bool LayerElement::GenerateZoneBounds(int *ulx, int *uly, int *lrx, int *lry) const
@@ -890,13 +918,16 @@ MapOfDotLocs LayerElement::CalcOptimalDotLocations()
 
     // Special treatment for two layers
     if (layerCount == 2) {
-        // Find the first note on the other layer
+        // Find the first note on the other layer, but in the same staff
         Alignment *alignment = this->GetAlignment();
+        const Staff *currentStaff = this->GetAncestorStaff(RESOLVE_CROSS_STAFF);
         const int currentLayerN = abs(this->GetAlignmentLayerN());
         ListOfObjects notes = alignment->FindAllDescendantsByType(NOTE, false);
-        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN](Object *obj) {
-            const int otherLayerN = abs(vrv_cast<Note *>(obj)->GetAlignmentLayerN());
-            return (currentLayerN != otherLayerN);
+        auto noteIt = std::find_if(notes.cbegin(), notes.cend(), [currentLayerN, currentStaff](Object *obj) {
+            const Note *otherNote = vrv_cast<Note *>(obj);
+            const Staff *otherStaff = otherNote->GetAncestorStaff(RESOLVE_CROSS_STAFF);
+            const int otherLayerN = abs(otherNote->GetAlignmentLayerN());
+            return ((currentLayerN != otherLayerN) && (currentStaff == otherStaff));
         });
 
         if (noteIt != notes.cend()) {

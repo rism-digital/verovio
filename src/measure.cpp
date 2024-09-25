@@ -95,7 +95,7 @@ Measure::Measure(MeasureType measureMusic, int logMeasureNb)
 
     this->Reset();
 
-    if (!measureMusic) this->SetRight(BARRENDITION_invis);
+    if (!this->IsMeasuredMusic() && !this->IsNeumeLine()) this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
@@ -149,10 +149,8 @@ void Measure::Reset()
     m_rightBarLine.SetForm(this->GetRight());
     m_leftBarLine.SetForm(this->GetLeft());
 
-    if (!m_measureType) {
-        m_drawingFacsX1 = VRV_UNSET;
-        m_drawingFacsX2 = VRV_UNSET;
-    }
+    m_drawingFacsX1 = VRV_UNSET;
+    m_drawingFacsX2 = VRV_UNSET;
 
     m_drawingEnding = NULL;
     m_hasAlignmentRefWithMultipleLayers = false;
