@@ -143,7 +143,7 @@ FunctorCode AdjustXPosFunctor::VisitLayerElement(LayerElement *layerElement)
         m_upcomingMinPos += (-offset);
     }
 
-    int selfRight = layerElement->GetAlignment()->GetXRel();
+    int selfRight;
     if (!layerElement->HasSelfBB() || layerElement->HasEmptyBB()) {
         selfRight = layerElement->GetAlignment()->GetXRel();
         // Still add the right margin for the barlines but not with non measure music
@@ -354,6 +354,7 @@ std::pair<int, int> AdjustXPosFunctor::CalculateXPosOffset(LayerElement *layerEl
         int margin = (m_doc->GetRightMargin(bboxElement) + selfLeftMargin) * drawingUnit;
         if (bboxElement->Is(NOTE)) {
             Note *note = vrv_cast<Note *>(bboxElement);
+            assert(note);
             if (note->HasStemMod() && note->GetStemMod() < STEMMODIFIER_MAX) {
                 const int tremWidth = m_doc->GetGlyphWidth(SMUFL_E220_tremolo1, m_staffSize, false);
                 margin = std::max(margin, drawingUnit / 3 + tremWidth / 2);
@@ -386,6 +387,7 @@ std::pair<int, int> AdjustXPosFunctor::CalculateXPosOffset(LayerElement *layerEl
         }
         else if (layerElement->Is(ACCID) && bboxElement->Is(REST)) {
             Rest *rest = vrv_cast<Rest *>(bboxElement);
+            assert(rest);
             const bool hasExplicitLoc = ((rest->HasOloc() && rest->HasPloc()) || rest->HasLoc());
             if (rest->IsInBeam() && !hasExplicitLoc) {
                 overlap = std::max(overlap, bboxElement->GetSelfRight() - layerElement->GetSelfLeft() + margin);

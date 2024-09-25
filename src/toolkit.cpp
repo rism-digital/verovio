@@ -1088,6 +1088,7 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
         for (Option *option : *options) {
+            assert(option);
             // Reading json from file is not supported in toolkit
             const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
             if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
