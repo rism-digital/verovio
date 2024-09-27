@@ -202,8 +202,8 @@
         <glyph glyph-code="E0B5" smufl-name="noteheadWholeWithX" />
         <glyph glyph-code="E0B6" smufl-name="noteheadHalfWithX" />
         <glyph glyph-code="E0B7" smufl-name="noteheadVoidWithX" />
-        <!--<glyph glyph-code="E0B8" smufl-name="noteheadSquareWhite" />-->
-        <!--<glyph glyph-code="E0B9" smufl-name="noteheadSquareBlack" />-->
+        <glyph glyph-code="E0B8" smufl-name="noteheadSquareWhite" />
+        <glyph glyph-code="E0B9" smufl-name="noteheadSquareBlack" />
         <!--<glyph glyph-code="E0BA" smufl-name="noteheadTriangleUpDoubleWhole" />-->
         <!--<glyph glyph-code="E0BB" smufl-name="noteheadTriangleUpWhole" />-->
         <!--<glyph glyph-code="E0BC" smufl-name="noteheadTriangleUpHalf" />-->
