@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.92",
+    "fontVersion": "5.2.93",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1035,7 +1035,7 @@
         "caesuraSingleStroke": {
             "bBoxNE": [
                 0.144,
-                2.0
+                1.2
             ],
             "bBoxSW": [
                 0.0,
@@ -1074,8 +1074,8 @@
         },
         "chantCaesura": {
             "bBoxNE": [
-                0.5493,
-                1.9931
+                0.548,
+                1.992
             ],
             "bBoxSW": [
                 0.0,
@@ -3639,7 +3639,7 @@
             ],
             "bBoxSW": [
                 0.0,
-                -0.524
+                -0.52
             ]
         },
         "medRenSharpCroix": {
@@ -4478,14 +4478,14 @@
                 0.76
             ],
             "bBoxSW": [
-                0.0794,
+                0.08,
                 -0.8
             ]
         },
         "mensuralProportion2": {
             "bBoxNE": [
-                1.0961,
-                0.7601
+                1.096,
+                0.76
             ],
             "bBoxSW": [
                 0.08,
@@ -4519,7 +4519,7 @@
             ],
             "bBoxSW": [
                 0.052,
-                -0.8001
+                -0.8
             ]
         },
         "mensuralProportion6": {
@@ -4528,7 +4528,7 @@
                 0.76
             ],
             "bBoxSW": [
-                0.0587,
+                0.06,
                 -0.8
             ]
         },
@@ -4558,7 +4558,7 @@
                 0.76
             ],
             "bBoxSW": [
-                0.0627,
+                0.064,
                 -0.8
             ]
         },
@@ -5170,6 +5170,26 @@
             "bBoxSW": [
                 0.0,
                 -1.0
+            ]
+        },
+        "noteheadSquareBlack": {
+            "bBoxNE": [
+                1.2,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
+        "noteheadSquareWhite": {
+            "bBoxNE": [
+                1.2,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
             ]
         },
         "noteheadVoidWithX": {

@@ -99,6 +99,9 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         y = staff->GetDrawingY()
             - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
+    else if (mensur->HasNumbase() && !mensur->HasNum()) {
+        y += 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
 
     if (mensur->GetSign() == MENSURATIONSIGN_O) {
         code = SMUFL_E911_mensuralProlation2;
@@ -140,6 +143,12 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
         this->DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
+    }
+    // It is sure we have a sign - draw the numbase underneath the sign
+    else if (mensur->HasNumbase()) {
+        // Draw a single figure but passing numbase - adjust the y accordingly
+        y -= 4 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        this->DrawProportFigures(dc, x, y, mensur->GetNumbase(), 0, staff);
     }
 
     dc->EndGraphic(element, this);
@@ -206,6 +215,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const int strokeWidth = 2.8 * stemWidth;
+    const int staffSize = staff->m_drawingStaffSize;
 
     int shape = LIGATURE_DEFAULT;
     if (note->GetActualDur() != DUR_BR) {
@@ -214,9 +224,15 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         if (note->GetStemDir() != STEMDIRECTION_NONE) {
             up = (note->GetStemDir() == STEMDIRECTION_up);
         }
+        // For CMN we rely on the drawing stem dir interface pre-calculated in functors
         else if (staff->m_drawingNotationType == NOTATIONTYPE_NONE
             || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
+        }
+        // For mensural just calculate it here
+        else {
+            int verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
+            up = (note->GetDrawingY() < verticalCenter);
         }
         shape = (up) ? LIGATURE_STEM_RIGHT_UP : LIGATURE_STEM_RIGHT_DOWN;
     }

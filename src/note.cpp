@@ -561,7 +561,15 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         // case HEADSHAPE_oval: return SMUFL_noteheadOval;
         // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
-        // case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
+        case HEADSHAPE_rectangle:
+            if (duration < DUR_4) {
+                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
+                                                           : SMUFL_E0B8_noteheadSquareWhite;
+            }
+            else {
+                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
+                                                          : SMUFL_E0B9_noteheadSquareBlack;
+            }
         // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
         case HEADSHAPE_slash: {

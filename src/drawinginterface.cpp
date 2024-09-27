@@ -189,6 +189,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
         // Check if some beam chord has cross staff content
         else if (current->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(current);
+            assert(chord);
             for (Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
                 if (note->m_crossStaff && (note->m_crossStaff != m_beamStaff)) {
                     m_crossStaffContent = note->m_crossStaff;

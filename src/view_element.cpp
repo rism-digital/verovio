@@ -127,6 +127,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FLAG)) {
         this->DrawFlag(dc, element, layer, staff, measure);
     }
+    else if (element->Is(GENERIC_ELEMENT)) {
+        this->DrawGenericLayerElement(dc, element, layer, staff, measure);
+    }
     else if (element->Is(GRACEGRP)) {
         this->DrawGraceGrp(dc, element, layer, staff, measure);
     }
@@ -789,13 +792,13 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         int y = element->GetDrawingY();
 
         if (m_doc->GetType() != Transcription) {
-            // Use the note to which the points to for position
-            if (dot->m_drawingPreviousElement && !dot->m_drawingNextElement) {
+            // Use the note to which the points to for position if no next element or for augmentation dots
+            if (dot->m_drawingPreviousElement && (!dot->m_drawingNextElement || dot->GetForm() == dotLog_FORM_aug)) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
                 y = dot->m_drawingPreviousElement->GetDrawingY();
                 this->DrawDotsPart(dc, x, y, 1, staff);
             }
-            if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
+            else if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
                 // Do not take into account the spacing since it is place in-between
                 dc->DeactivateGraphicX();
                 x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingPreviousElement->GetDrawingX()) / 2);
@@ -886,6 +889,20 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     char32_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
     this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawGenericLayerElement(
+    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetID());
 
     dc->EndGraphic(element, this);
 }
@@ -1683,8 +1700,9 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         note = vrv_cast<Note *>(childElement);
     }
     else if (childElement->Is(CHORD)) {
-        note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
-                                             : vrv_cast<Chord *>(childElement)->GetBottomNote();
+        Chord *chord = vrv_cast<Chord *>(childElement);
+        assert(chord);
+        note = (stemDir == STEMDIRECTION_up) ? chord->GetTopNote() : chord->GetBottomNote();
     }
     if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 

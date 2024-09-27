@@ -1147,6 +1147,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (accidTypeW == ACCIDENTAL_WRITTEN_NONE) {
             LogError("A accid type must be specified.");
             delete accid;
+            delete zone;
 
             m_editInfo.import("status", "FAILURE");
             m_editInfo.import("message", "A accid type must be specified.");
@@ -1212,6 +1213,7 @@ bool EditorToolkitNeume::Insert(std::string elementType, std::string staffId, in
         if (divLineTypeW == divLineLog_FORM_NONE) {
             LogError("A divLine type must be specified.");
             delete divLine;
+            delete zone;
 
             m_editInfo.import("status", "FAILURE");
             m_editInfo.import("message", "A divLine type must be specified.");

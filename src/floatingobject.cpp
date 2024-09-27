@@ -417,6 +417,8 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
 
 bool FloatingPositioner::HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const
 {
+    assert(bbox);
+
     int bboxExtenderWidth = 0;
     const FloatingPositioner *bboxPositioner = dynamic_cast<const FloatingPositioner *>(bbox);
     if (bboxPositioner) {

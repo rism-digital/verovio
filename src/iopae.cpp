@@ -521,7 +521,7 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 
     Staff *staff = tuplet->GetAncestorStaff();
 
-    double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
+    double content = tuplet->GetContentAlignmentDuration(true, staff->m_drawingNotationType);
     // content = DUR_MAX / 2^(dur - 2)
     int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
     // We should be looking for dotted values

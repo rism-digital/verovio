@@ -211,7 +211,7 @@ def generate_css(opts: Namespace) -> bool:
     Et.register_namespace("", SVG_NS["svg"])
     svg_font: Et.ElementTree = Et.parse(str(font_pth))
     font_el: Optional[Et.Element] = svg_font.find(".//svg:defs/svg:font", SVG_NS)
-    if not font_el:
+    if font_el is None:
         log.error("Could not find a font element in %s", font_pth.resolve())
         return False
 
@@ -482,7 +482,7 @@ def __read_svg_font_file(
 ) -> Optional[tuple[str, str, str, list[Et.Element]]]:
     font_xml: Et.ElementTree = Et.parse(fontfile)
     font_el: Optional[Et.Element] = font_xml.find("svg:defs/svg:font", SVG_NS)
-    if not font_el:
+    if font_el is None:
         log.error("Could not find a font definition in %s.", fontfile)
         return None
 

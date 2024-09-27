@@ -44,8 +44,8 @@ InitOnsetOffsetFunctor::InitOnsetOffsetFunctor() : Functor()
 {
     m_currentScoreTime = 0.0;
     m_currentRealTimeSeconds = 0.0;
-    m_currentMensur = NULL;
-    m_currentMeterSig = NULL;
+    m_meterParams.mensur = NULL;
+    m_meterParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
     m_currentTempo = MIDI_TEMPO;
 }
@@ -54,7 +54,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)
 {
     LayerElement *element = chord->ThisOrSameasLink();
 
-    double incrementScoreTime = element->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+    double incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType);
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / m_currentTempo;
 
@@ -69,8 +69,8 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayer(Layer *layer)
     m_currentScoreTime = 0.0;
     m_currentRealTimeSeconds = 0.0;
 
-    m_currentMensur = layer->GetCurrentMensur();
-    m_currentMeterSig = layer->GetCurrentMeterSig();
+    m_meterParams.mensur = layer->GetCurrentMensur();
+    m_meterParams.meterSig = layer->GetCurrentMeterSig();
 
     return FUNCTOR_CONTINUE;
 }
@@ -84,7 +84,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     double incrementScoreTime;
 
     if (element->Is(REST) || element->Is(SPACE)) {
-        incrementScoreTime = element->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+        incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         // For rests to be possibly added to the timemap
         if (element->Is(REST)) {
@@ -111,13 +111,13 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         // If the note has a @dur or a @dur.ges, take it into account
         // This means that overwriting only @dots or @dots.ges will not be taken into account
         if (chord && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = chord->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+            incrementScoreTime = chord->GetAlignmentDuration(m_meterParams, true, m_notationType);
         }
         else if (tabGrp && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = tabGrp->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+            incrementScoreTime = tabGrp->GetAlignmentDuration(m_meterParams, true, m_notationType);
         }
         else {
-            incrementScoreTime = note->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+            incrementScoreTime = note->GetAlignmentDuration(m_meterParams, true, m_notationType);
         }
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / m_currentTempo;
@@ -145,24 +145,23 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         BeatRpt *rpt = vrv_cast<BeatRpt *>(element);
         assert(rpt);
 
-        incrementScoreTime = rpt->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+        incrementScoreTime = rpt->GetAlignmentDuration(m_meterParams, true, m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         rpt->SetScoreTimeOnset(m_currentScoreTime);
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
     }
     else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && layerElement->HasSameasLink()) {
-        incrementScoreTime
-            = layerElement->GetSameAsContentAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+        incrementScoreTime = layerElement->GetSameAsContentAlignmentDuration(m_meterParams, true, m_notationType);
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
     }
     else if (layerElement->Is(MENSUR)) {
-        this->m_currentMensur = vrv_cast<Mensur *>(layerElement);
+        this->m_meterParams.mensur = vrv_cast<Mensur *>(layerElement);
     }
     else if (layerElement->Is(METERSIG)) {
-        this->m_currentMeterSig = vrv_cast<MeterSig *>(layerElement);
+        this->m_meterParams.meterSig = vrv_cast<MeterSig *>(layerElement);
     }
 
     return FUNCTOR_CONTINUE;
@@ -189,7 +188,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitTabGrpEnd(TabGrp *tabGrp)
 {
     LayerElement *element = tabGrp->ThisOrSameasLink();
 
-    double incrementScoreTime = element->GetAlignmentDuration(m_currentMensur, m_currentMeterSig, true, m_notationType);
+    double incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType);
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / m_currentTempo;
 
@@ -362,7 +361,8 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
 {
     // Sameas not taken into account for now
-    double beatLength = beatRpt->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+    AlignMeterParams params;
+    double beatLength = beatRpt->GetAlignmentDuration(params) / (DUR_MAX / DURATION_4);
     double startTime = m_totalTime + beatRpt->GetScoreTimeOnset();
     int tpq = m_midiFile->getTPQ();
 
@@ -562,7 +562,11 @@ FunctorCode GenerateMIDIFunctor::VisitMeasure(const Measure *measure)
 
     if (measure->GetCurrentTempo() != m_currentTempo) {
         m_currentTempo = measure->GetCurrentTempo();
-        m_midiFile->addTempo(0, m_totalTime * m_midiFile->getTPQ(), m_currentTempo);
+        const int tick = m_totalTime * m_midiFile->getTPQ();
+        // Check if there was already a tempo event added for the given tick
+        if (m_tempoEventTicks.insert(tick).second) {
+            m_midiFile->addTempo(0, tick, m_currentTempo);
+        }
     }
 
     return FUNCTOR_CONTINUE;
