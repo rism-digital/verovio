@@ -20,7 +20,6 @@
 namespace vrv {
 
 class Alignment;
-struct AlignMeterParams;
 class Beam;
 class BeamElementCoord;
 class FTrem;
@@ -30,6 +29,8 @@ class Mensur;
 class MeterSig;
 class Staff;
 class StaffAlignment;
+
+struct AlignMeterParams;
 
 // Helper enums
 enum StaffSearch { ANCESTOR_ONLY = 0, RESOLVE_CROSS_STAFF };

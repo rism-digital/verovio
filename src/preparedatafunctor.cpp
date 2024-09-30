@@ -273,12 +273,13 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
             crossElement->GetStaff().at(0), layerElement->GetID().c_str());
         layerElement->m_crossStaff = NULL;
     }
-
-    if (direction == FORWARD) {
-        layerElement->m_crossLayer->SetCrossStaffFromAbove(true);
-    }
     else {
-        layerElement->m_crossLayer->SetCrossStaffFromBelow(true);
+        if (direction == FORWARD) {
+            layerElement->m_crossLayer->SetCrossStaffFromAbove(true);
+        }
+        else {
+            layerElement->m_crossLayer->SetCrossStaffFromBelow(true);
+        }
     }
 
     m_currentCrossStaff = layerElement->m_crossStaff;

@@ -199,7 +199,9 @@ void Stem::CalculateStemModRelY(const Doc *doc, const Staff *staff)
         note = vrv_cast<Note *>(parent);
     }
     else if (parent->Is(CHORD)) {
-        note = (sign > 0) ? vrv_cast<Chord *>(parent)->GetTopNote() : vrv_cast<Chord *>(parent)->GetBottomNote();
+        Chord *chord = vrv_cast<Chord *>(parent);
+        assert(chord);
+        note = (sign > 0) ? chord->GetTopNote() : chord->GetBottomNote();
     }
     if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 

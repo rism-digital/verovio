@@ -137,8 +137,10 @@ MeterSig *MeterSigGrp::GetSimplifiedMeterSig() const
                     maxUnit = currentUnit;
                 }
             }
-            newMeterSig->SetUnit(maxUnit);
-            newMeterSig->SetCount({ { currentCount }, MeterCountSign::None });
+            if (newMeterSig) {
+                newMeterSig->SetUnit(maxUnit);
+                newMeterSig->SetCount({ { currentCount }, MeterCountSign::None });
+            }
             break;
         }
         default: {

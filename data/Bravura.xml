@@ -179,6 +179,14 @@
     <a n="stemDownNW" x="0.0" y="-0.15" />
     <a n="stemUpSE" x="1.16" y="0.15" />
   </g>
+  <g c="E0B8" x="0.0" y="-125.0" w="313.0" h="250.0" h-a-x="313" n="noteheadSquareWhite">
+    <a n="stemDownNW" x="0.0" y="-0.5" />
+    <a n="stemUpSE" x="1.25" y="0.5" />
+  </g>
+  <g c="E0B9" x="0.0" y="-125.0" w="313.0" h="250.0" h-a-x="313" n="noteheadSquareBlack">
+    <a n="stemDownNW" x="0.0" y="-0.5" />
+    <a n="stemUpSE" x="1.25" y="0.5" />
+  </g>
   <g c="E0D9" x="0.0" y="-125.0" w="251.0" h="250.0" h-a-x="251" n="noteheadDiamondHalf">
     <a n="stemDownNW" x="0.0" y="0.0" />
     <a n="stemUpSE" x="1.0" y="0.0" />

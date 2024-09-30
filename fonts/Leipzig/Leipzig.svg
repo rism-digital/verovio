@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20230101 at Wed Sep 18 17:04:39 2024
- By Klaus Rettinghaus
+Created by FontForge 20220308 at Fri Sep 27 08:46:55 2024
+ By Laurent Pugin
 Created by Etienne Darbellay, Jean-Francois Marti, Laurent Pugin, and Klaus Rettinghaus.
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.92
+Version 5.2.93
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="624" >
@@ -2463,5 +2463,9 @@ d="M20 190h233v-40l-195 -351l-37 1l188 350s-94 -1 -151 -2c-17 0 -37 -33 -37 -33z
 d="M0 -75c0 44 12 114 34 205h22l1 -12c0 -16 1 -31 2 -44c2 -40 8 -68 27 -68c32 0 171 124 210 124c16 0 23 -17 23 -53c0 -44 -11 -115 -34 -207h-20l1 12s1 31 1 44c0 40 -14 68 -33 68c-32 0 -171 -124 -210 -124c-16 0 -24 18 -24 55z" />
     <glyph glyph-name="uniE595" unicode="&#xe595;" horiz-adv-x="210" 
 d="M90 270h-90v30h90v100h30v-100h90v-30h-90v-270h-30v270z" />
+    <glyph glyph-name="uniE0B8" unicode="&#xe0b8;" horiz-adv-x="300" 
+d="M300 -125h-300v250h300v-250zM23 -101h254v203h-254v-203z" />
+    <glyph glyph-name="uniE0B9" unicode="&#xe0b9;" horiz-adv-x="300" 
+d="M300 -125h-300v250h300v-250z" />
   </font>
 </defs></svg>

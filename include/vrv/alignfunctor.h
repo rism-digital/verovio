@@ -13,7 +13,7 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AlignmentParams
+// AlignMeterParams
 //----------------------------------------------------------------------------
 /**
  * Regroup pointers to meterSig, mensur and proport objects
