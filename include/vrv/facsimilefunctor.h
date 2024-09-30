@@ -75,6 +75,11 @@ private:
     Measure *m_currentNeumeLine;
     /** map to store the zone corresponding to a staff */
     std::map<Staff *, Zone *> m_staffZones;
+    //
+    int m_pageMarginTop;
+    int m_pageMarginLeft;
+    //
+    double m_ppuFactor;
 };
 
 //----------------------------------------------------------------------------
@@ -90,14 +95,14 @@ public:
      * @name Constructors, destructors
      */
     ///@{
-    SyncToFacsimileFunctor(Doc *doc);
+    SyncToFacsimileFunctor(Doc *doc, double ppuFactor);
     virtual ~SyncToFacsimileFunctor() = default;
     ///@}
 
     /*
      * Abstract base implementation
      */
-    bool ImplementsEndInterface() const override { return false; }
+    bool ImplementsEndInterface() const override { return true; }
 
     /*
      * Functor interface
@@ -106,6 +111,7 @@ public:
     FunctorCode VisitLayerElement(LayerElement *layerElement) override;
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitPageEnd(Page *page) override;
     FunctorCode VisitPb(Pb *pb) override;
     FunctorCode VisitSb(Sb *sb) override;
     FunctorCode VisitStaff(Staff *staff) override;
@@ -133,6 +139,8 @@ private:
     //
     int m_pageMarginTop;
     int m_pageMarginLeft;
+    //
+    double m_ppuFactor;
 };
 
 } // namespace vrv
