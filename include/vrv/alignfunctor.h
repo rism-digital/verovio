@@ -16,7 +16,7 @@ class Mensur;
 class MeterSig;
 
 //----------------------------------------------------------------------------
-// AlignmentParams
+// AlignMeterParams
 //----------------------------------------------------------------------------
 /**
  * Regroup pointers to meterSig, mensur and proport objects
