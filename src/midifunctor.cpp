@@ -775,8 +775,14 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     // set MIDI time signature
     if (scoreDef->HasMeterSigInfo()) {
         const MeterSig *meterSig = vrv_cast<const MeterSig *>(scoreDef->GetMeterSig());
-        if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
-            m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
+        if (meterSig) {
+            if (meterSig->HasSym() && meterSig->GetSym() != METERSIGN_open) {
+                m_midiFile->addTimeSignature(
+                    m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetTotalCount());
+            }
+            else if (meterSig->HasCount() && meterSig->HasUnit()) {
+                m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
+            }
         }
     }
 

@@ -500,8 +500,13 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (!meterSig && (scoreDef->HasMeterSigInfo())) {
                 meterSig = vrv_cast<MeterSig *>(scoreDef->GetMeterSig());
             }
-            if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
-                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
+            if (meterSig) {
+                if (meterSig->HasSym() && meterSig->GetSym() != METERSIGN_open) {
+                    midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetTotalCount());
+                }
+                else if (meterSig->HasCount() && meterSig->HasUnit()) {
+                    midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
+                }
             }
         }
 
