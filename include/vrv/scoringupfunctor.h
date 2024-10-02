@@ -41,15 +41,15 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
-    std::vector<ArrayOfElementDurPairs> SubdivideSeq(ArrayOfElementDurPairs dursInVoiceSameMensur);
+    std::vector<ArrayOfElementDurPairs> SubdivideSeq(const ArrayOfElementDurPairs &dursInVoiceSameMensur);
     ///@}
 
     /**
      * @name: Find @dur.quality of notes (perfecta / imperfecta / altera)
      */
     ///@{
-    void FindDurQuals(std::vector<ArrayOfElementDurPairs> listOfSequences);
-    void FindDurQuals(ArrayOfElementDurPairs sequence);
+    void FindDurQuals(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
+    void FindDurQuals(const ArrayOfElementDurPairs &sequence);
     ///@}
 
     /**
@@ -64,10 +64,10 @@ public:
      * @name Apply principles of imperfection and alteration
      */
     ///@{
-    bool ImperfectionAPP(ArrayOfElementDurPairs sequence);
-    bool ImperfectionAPA(ArrayOfElementDurPairs sequence);
-    bool Alteration(ArrayOfElementDurPairs sequence);
-    bool LeavePerfect(ArrayOfElementDurPairs sequence);
+    bool ImperfectionAPP(const ArrayOfElementDurPairs &sequence);
+    bool ImperfectionAPA(const ArrayOfElementDurPairs &sequence);
+    bool Alteration(const ArrayOfElementDurPairs &sequence);
+    bool LeavePerfect(const ArrayOfElementDurPairs &sequence);
     ///@}
 
     /*
