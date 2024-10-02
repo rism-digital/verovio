@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
-#include <codecvt>
 #include <locale>
 #include <regex>
 
@@ -400,10 +399,26 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
         u16data.erase(0, 1);
     }
 
-    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
-    std::string utf8line = convert.to_bytes(u16data);
+    // std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
+    std::string utf8line = vrv::UTF16to8(u16data); // convert.to_bytes(u16data);
 
     return this->LoadData(utf8line, false);
+}
+
+std::string UTF16toUTF8(const std::u16string &input)
+{
+    std::string output;
+    // Placeholder for manual conversion logic
+    // Real conversion logic here should handle actual UTF-16 to UTF-8 conversion
+    for (char16_t c : input) {
+        if (c < 0x80) { // Handle basic ASCII conversion
+            output.push_back(static_cast<char8_t>(c));
+        }
+        else {
+            // Extend this block to handle non-ASCII characters
+        }
+    }
+    return output;
 }
 
 bool Toolkit::IsZip(const std::string &filename)

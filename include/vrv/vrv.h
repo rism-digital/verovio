@@ -87,6 +87,11 @@ std::string UTF32to8(const std::u32string &in);
 std::u32string UTF8to32(const std::string &in);
 
 /**
+ * Utility for converting UTF16 (std::u16string) to UTF-8
+ */
+std::string UTF16to8(const std::u16string &in);
+
+/**
  * Format a string using vsnprintf.
  * The maximum length is giving by STRING_FORMAT_MAX_LEN
  */

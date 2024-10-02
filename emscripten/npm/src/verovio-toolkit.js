@@ -209,7 +209,7 @@ export class VerovioToolkit {
 
     preprocessOptions(options) {
         // Nothing to do if we do not have 'fontAddCustom' set
-        if (!Object.hasOwn(options, 'fontAddCustom')) {
+        if (!options.hasOwnProperty('fontAddCustom')) {
             return options;
         }
         const filenames = options['fontAddCustom'];
