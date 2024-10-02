@@ -310,7 +310,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         // get the duration of the event
         duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
 
-        //LogDebug("duration %s %f", duration.ToString().c_str(), duration.ToDouble());
+        // LogDebug("duration %s %f", duration.ToString().c_str(), duration.ToDouble());
 
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
