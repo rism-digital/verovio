@@ -397,6 +397,8 @@ typedef std::vector<std::pair<LayerElement *, LayerElement *>> MeasureTieEndpoin
 
 typedef bool (*NotePredicate)(const Note *);
 
+typedef std::vector<std::pair<LayerElement *, data_DURATION>> ArrayOfElementDurPairs;
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff

@@ -41,16 +41,15 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
-    std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> SubdivideSeq(
-        std::vector<std::pair<LayerElement *, data_DURATION>> dursInVoiceSameMensur);
+    std::vector<ArrayOfElementDurPairs> SubdivideSeq(ArrayOfElementDurPairs dursInVoiceSameMensur);
     ///@}
 
     /**
      * @name: Find @dur.quality of notes (perfecta / imperfecta / altera)
      */
     ///@{
-    void FindDurQuals(std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> listOfSequences);
-    void FindDurQuals(std::vector<std::pair<LayerElement *, data_DURATION>> sequence);
+    void FindDurQuals(std::vector<ArrayOfElementDurPairs> listOfSequences);
+    void FindDurQuals(ArrayOfElementDurPairs sequence);
     ///@}
 
     /**
@@ -65,10 +64,10 @@ public:
      * @name Apply principles of imperfection and alteration
      */
     ///@{
-    bool ImperfectionAPP(std::vector<std::pair<LayerElement *, data_DURATION>> sequence);
-    bool ImperfectionAPA(std::vector<std::pair<LayerElement *, data_DURATION>> sequence);
-    bool Alteration(std::vector<std::pair<LayerElement *, data_DURATION>> sequence);
-    bool LeavePerfect(std::vector<std::pair<LayerElement *, data_DURATION>> sequence);
+    bool ImperfectionAPP(ArrayOfElementDurPairs sequence);
+    bool ImperfectionAPA(ArrayOfElementDurPairs sequence);
+    bool Alteration(ArrayOfElementDurPairs sequence);
+    bool LeavePerfect(ArrayOfElementDurPairs sequence);
     ///@}
 
     /*
@@ -86,8 +85,8 @@ private:
     //
 public:
     std::map<std::string, int> mensuration;
-    std::vector<std::pair<LayerElement *, data_DURATION>> dursInVoiceSameMensur = {};
-    std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> listOfSequences;
+    ArrayOfElementDurPairs dursInVoiceSameMensur = {};
+    std::vector<ArrayOfElementDurPairs> listOfSequences;
 
 private:
     // The current score time in the measure (incremented by each element)

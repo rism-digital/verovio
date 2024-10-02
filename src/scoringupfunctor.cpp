@@ -104,11 +104,10 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
-std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> ScoringUpFunctor::SubdivideSeq(
-    std::vector<std::pair<LayerElement *, data_DURATION>> dursInVoiceSameMensur)
+std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideSeq(ArrayOfElementDurPairs dursInVoiceSameMensur)
 {
-    std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> listOfSequences = {};
-    std::vector<std::pair<LayerElement *, data_DURATION>> sequence = {};
+    std::vector<ArrayOfElementDurPairs> listOfSequences = {};
+    ArrayOfElementDurPairs sequence = {};
     for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
         data_DURATION dur = elementDurPair.second;
         if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
@@ -124,16 +123,16 @@ std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> ScoringUpFunc
     return listOfSequences;
 }
 
-void ScoringUpFunctor::FindDurQuals(std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> listOfSequences)
+void ScoringUpFunctor::FindDurQuals(std::vector<ArrayOfElementDurPairs> listOfSequences)
 {
-    for (std::vector<std::pair<LayerElement *, data_DURATION>> subseq : listOfSequences) {
+    for (ArrayOfElementDurPairs subseq : listOfSequences) {
         FindDurQuals(subseq);
     }
 }
 
-void ScoringUpFunctor::FindDurQuals(std::vector<std::pair<LayerElement *, data_DURATION>> sequence)
+void ScoringUpFunctor::FindDurQuals(ArrayOfElementDurPairs sequence)
 {
-    std::vector<std::pair<LayerElement *, data_DURATION>> middleSeq = {};
+    ArrayOfElementDurPairs middleSeq = {};
     if (sequence.size() >= 2) {
         data_DURATION firstNoteDur = sequence.at(0).second;
         if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
@@ -337,7 +336,7 @@ double ScoringUpFunctor::GetDurNumberValue(
     return durnum;
 }
 
-bool ScoringUpFunctor::ImperfectionAPP(std::vector<std::pair<LayerElement *, data_DURATION>> sequence)
+bool ScoringUpFunctor::ImperfectionAPP(ArrayOfElementDurPairs sequence)
 {
     std::pair<LayerElement *, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement *firstElement = firstElementDurPair.first;
@@ -378,7 +377,7 @@ bool ScoringUpFunctor::ImperfectionAPP(std::vector<std::pair<LayerElement *, dat
     }
 }
 
-bool ScoringUpFunctor::ImperfectionAPA(std::vector<std::pair<LayerElement *, data_DURATION>> sequence)
+bool ScoringUpFunctor::ImperfectionAPA(ArrayOfElementDurPairs sequence)
 {
     std::pair<LayerElement *, data_DURATION> lastElementDurPair = sequence.at(sequence.size() - 1);
     LayerElement *lastElement = lastElementDurPair.first;
@@ -396,7 +395,7 @@ bool ScoringUpFunctor::ImperfectionAPA(std::vector<std::pair<LayerElement *, dat
     }
 }
 
-bool ScoringUpFunctor::Alteration(std::vector<std::pair<LayerElement *, data_DURATION>> sequence)
+bool ScoringUpFunctor::Alteration(ArrayOfElementDurPairs sequence)
 {
     std::pair<LayerElement *, data_DURATION> penultElementDurPair = sequence.at(sequence.size() - 2);
     LayerElement *penultElement = penultElementDurPair.first;
@@ -414,7 +413,7 @@ bool ScoringUpFunctor::Alteration(std::vector<std::pair<LayerElement *, data_DUR
     }
 }
 
-bool ScoringUpFunctor::LeavePerfect(std::vector<std::pair<LayerElement *, data_DURATION>> sequence)
+bool ScoringUpFunctor::LeavePerfect(ArrayOfElementDurPairs sequence)
 {
     return true;
 }
