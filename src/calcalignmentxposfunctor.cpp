@@ -36,7 +36,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
     if (alignment->GetType() <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
-    double intervalTime = alignment->GetTime() - m_previousTime;
+    Fraction intervalTime = alignment->GetTime() - m_previousTime;
 
     if (alignment->GetType() > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
@@ -68,22 +68,22 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
     // alignments, then we now need to move them appropriately
     if (!m_timestamps.empty() && m_lastNonTimestamp) {
         int startXRel = m_lastNonTimestamp->GetXRel();
-        double startTime = m_lastNonTimestamp->GetTime();
-        double endTime = alignment->GetTime();
+        Fraction startTime = m_lastNonTimestamp->GetTime();
+        Fraction endTime = alignment->GetTime();
         // We have timestamp alignments between the left barline and the first beat. We need
         // to use the MeasureAligner::m_initialTstampDur to calculate the time (percentage) position
         if (m_lastNonTimestamp->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
             startTime = m_measureAligner->GetInitialTstampDur();
         }
         // The duration since the last alignment and the current one
-        double duration = endTime - startTime;
+        Fraction duration = endTime - startTime;
         int space = alignment->GetXRel() - m_lastNonTimestamp->GetXRel();
         // For each timestamp alignment, move them proportionally to the space we currently have
         for (auto &tsAlignment : m_timestamps) {
             // Avoid division by zero (nothing to move with the alignment anyway
             if (duration == 0.0) break;
-            double percent = (tsAlignment->GetTime() - startTime) / duration;
-            tsAlignment->SetXRel(startXRel + space * percent);
+            Fraction percent = (tsAlignment->GetTime() - startTime) / duration;
+            tsAlignment->SetXRel(startXRel + space * percent.ToDouble());
         }
         m_timestamps.clear();
     }
