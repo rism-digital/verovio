@@ -61,7 +61,7 @@ public:
     //
 private:
     // The previous time position
-    double m_previousTime;
+    Fraction m_previousTime;
     // The previous x rel position
     int m_previousXRel;
     // Duration of the longest note

@@ -671,11 +671,11 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
-double LayerElement::GetAlignmentDuration(
+Fraction LayerElement::GetAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (this->IsGraceNote() && notGraceOnly) {
-        return 0.0;
+        return Fraction(0, 1);
     }
 
     // Only resolve simple sameas links to avoid infinite recursion
@@ -719,11 +719,11 @@ double LayerElement::GetAlignmentDuration(
                 return NEUME_SMALL_SPACE;
             }
         }
-        double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
+        Fraction durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         const FTrem *fTrem = vrv_cast<const FTrem *>(this->GetFirstAncestor(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {
-            durationValue /= 2.0;
+            durationValue = durationValue * Fraction(1, 2);
         }
         return durationValue;
     }
@@ -763,11 +763,11 @@ double LayerElement::GetAlignmentDuration(
         return (syllable->GetLast() == this) ? NEUME_MEDIUM_SPACE : NEUME_SMALL_SPACE;
     }
     else {
-        return 0.0;
+        return Fraction(0, 1);
     }
 }
 
-double LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
+Fraction LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
     params.meterSig = NULL;
@@ -775,11 +775,11 @@ double LayerElement::GetAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE n
     return this->GetAlignmentDuration(params, notGraceOnly, notationType);
 }
 
-double LayerElement::GetSameAsContentAlignmentDuration(
+Fraction LayerElement::GetSameAsContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->HasSameasLink() || !this->GetSameasLink()->Is({ BEAM, FTREM, TUPLET })) {
-        return 0.0;
+        return Fraction(0, 1);
     }
 
     const LayerElement *sameas = vrv_cast<const LayerElement *>(this->GetSameasLink());
@@ -788,14 +788,14 @@ double LayerElement::GetSameAsContentAlignmentDuration(
     return sameas->GetContentAlignmentDuration(params, notGraceOnly, notationType);
 }
 
-double LayerElement::GetContentAlignmentDuration(
+Fraction LayerElement::GetContentAlignmentDuration(
     const AlignMeterParams &params, bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     if (!this->Is({ BEAM, FTREM, TUPLET })) {
-        return 0.0;
+        return Fraction(0, 1);
     }
 
-    double duration = 0.0;
+    Fraction duration;
 
     for (const Object *child : this->GetChildren()) {
         // Skip everything that does not have a duration interface and notes in chords
@@ -804,13 +804,13 @@ double LayerElement::GetContentAlignmentDuration(
         }
         const LayerElement *element = vrv_cast<const LayerElement *>(child);
         assert(element);
-        duration += element->GetAlignmentDuration(params, notGraceOnly, notationType);
+        duration = duration + element->GetAlignmentDuration(params, notGraceOnly, notationType);
     }
 
     return duration;
 }
 
-double LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
+Fraction LayerElement::GetContentAlignmentDuration(bool notGraceOnly, data_NOTATIONTYPE notationType) const
 {
     AlignMeterParams params;
     params.meterSig = NULL;

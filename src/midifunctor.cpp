@@ -54,7 +54,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitChordEnd(Chord *chord)
 {
     LayerElement *element = chord->ThisOrSameasLink();
 
-    double incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType);
+    double incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / m_currentTempo;
 
@@ -84,7 +84,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
     double incrementScoreTime;
 
     if (element->Is(REST) || element->Is(SPACE)) {
-        incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType);
+        incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         // For rests to be possibly added to the timemap
         if (element->Is(REST)) {
@@ -111,13 +111,13 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         // If the note has a @dur or a @dur.ges, take it into account
         // This means that overwriting only @dots or @dots.ges will not be taken into account
         if (chord && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = chord->GetAlignmentDuration(m_meterParams, true, m_notationType);
+            incrementScoreTime = chord->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
         }
         else if (tabGrp && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = tabGrp->GetAlignmentDuration(m_meterParams, true, m_notationType);
+            incrementScoreTime = tabGrp->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
         }
         else {
-            incrementScoreTime = note->GetAlignmentDuration(m_meterParams, true, m_notationType);
+            incrementScoreTime = note->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
         }
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / m_currentTempo;
@@ -145,14 +145,15 @@ FunctorCode InitOnsetOffsetFunctor::VisitLayerElement(LayerElement *layerElement
         BeatRpt *rpt = vrv_cast<BeatRpt *>(element);
         assert(rpt);
 
-        incrementScoreTime = rpt->GetAlignmentDuration(m_meterParams, true, m_notationType);
+        incrementScoreTime = rpt->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         rpt->SetScoreTimeOnset(m_currentScoreTime);
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
     }
     else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET }) && layerElement->HasSameasLink()) {
-        incrementScoreTime = layerElement->GetSameAsContentAlignmentDuration(m_meterParams, true, m_notationType);
+        incrementScoreTime
+            = layerElement->GetSameAsContentAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         m_currentScoreTime += incrementScoreTime;
         m_currentRealTimeSeconds += incrementScoreTime * 60.0 / m_currentTempo;
@@ -188,7 +189,7 @@ FunctorCode InitOnsetOffsetFunctor::VisitTabGrpEnd(TabGrp *tabGrp)
 {
     LayerElement *element = tabGrp->ThisOrSameasLink();
 
-    double incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType);
+    double incrementScoreTime = element->GetAlignmentDuration(m_meterParams, true, m_notationType).ToDouble();
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / m_currentTempo;
 
@@ -238,8 +239,8 @@ FunctorCode InitMaxMeasureDurationFunctor::VisitMeasureEnd(Measure *measure)
     const double tempo = this->GetAdjustedTempo();
     measure->SetCurrentTempo(tempo);
 
-    const double scoreTimeIncrement = measure->m_measureAligner.GetRightAlignment()->GetTime() * m_multiRestFactor
-        * static_cast<int>(DURATION_4) / DUR_MAX;
+    const double scoreTimeIncrement = measure->m_measureAligner.GetRightAlignment()->GetTime().ToDouble()
+        * m_multiRestFactor * static_cast<int>(DURATION_4) / DUR_MAX;
     m_currentScoreTime += scoreTimeIncrement;
     m_currentRealTimeSeconds += scoreTimeIncrement * 60.0 / tempo;
     m_multiRestFactor = 1;
@@ -362,7 +363,7 @@ FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
 {
     // Sameas not taken into account for now
     AlignMeterParams params;
-    double beatLength = beatRpt->GetAlignmentDuration(params) / (DUR_MAX / DURATION_4);
+    double beatLength = beatRpt->GetAlignmentDuration(params).ToDouble() / (DUR_MAX / DURATION_4);
     double startTime = m_totalTime + beatRpt->GetScoreTimeOnset();
     int tpq = m_midiFile->getTPQ();
 
@@ -702,7 +703,7 @@ FunctorCode GenerateMIDIFunctor::VisitPedal(const Pedal *pedal)
 {
     if (!pedal->HasDir()) return FUNCTOR_CONTINUE;
 
-    double pedalTime = pedal->GetStart()->GetAlignment()->GetTime() * static_cast<int>(DURATION_4) / DUR_MAX;
+    double pedalTime = pedal->GetStart()->GetAlignment()->GetTime().ToDouble() * static_cast<int>(DURATION_4) / DUR_MAX;
     double startTime = m_totalTime + pedalTime;
     int tpq = m_midiFile->getTPQ();
 

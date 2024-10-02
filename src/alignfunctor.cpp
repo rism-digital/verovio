@@ -169,15 +169,15 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
             Alignment *alignment = firstNote->GetAlignment();
             layerElement->SetAlignment(alignment);
             alignment->AddLayerElementRef(layerElement);
-            double duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
-            m_time += duration;
+            Fraction duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
+            m_time = m_time + duration;
             return FUNCTOR_CONTINUE;
         }
     }
     // We do not align these (container). Any other?
     else if (layerElement->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
-        double duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
-        m_time += duration;
+        Fraction duration = layerElement->GetSameAsContentAlignmentDuration(m_currentParams, true, m_notationType);
+        m_time = m_time + duration;
         return FUNCTOR_CONTINUE;
     }
     else if (layerElement->Is(BARLINE)) {
@@ -304,11 +304,13 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
         type = ALIGNMENT_GRACENOTE;
     }
 
-    double duration = 0.0;
+    Fraction duration;
     // We have already an alignment with grace note children - skip this
     if (!layerElement->GetAlignment()) {
         // get the duration of the event
         duration = layerElement->GetAlignmentDuration(m_currentParams, true, m_notationType);
+
+        //LogDebug("duration %s %f", duration.ToString().c_str(), duration.ToDouble());
 
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
@@ -350,7 +352,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayerElement(LayerElement *layerEleme
 
     if (!layerElement->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
-        m_time += duration;
+        m_time = m_time + duration;
     }
 
     return FUNCTOR_CONTINUE;
