@@ -46,10 +46,10 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     data_TEMPUS tempus = m_currentMensur->GetTempus();
     data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
-    if (!dursInVoiceSameMensur.empty()) {
-        listOfSequences = SubdivideSeq(dursInVoiceSameMensur);
-        FindDurQuals(listOfSequences);
-        dursInVoiceSameMensur = {}; // restart for next voice (layer)
+    if (!m_dursInVoiceSameMensur.empty()) {
+        m_listOfSequences = SubdivideSeq(m_dursInVoiceSameMensur);
+        FindDurQuals(m_listOfSequences);
+        m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
 }
@@ -72,33 +72,33 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
             assert(rest);
             dur = rest->GetDur();
         }
-        dursInVoiceSameMensur.insert(dursInVoiceSameMensur.end(), { element, dur });
+        m_dursInVoiceSameMensur.insert(m_dursInVoiceSameMensur.end(), { element, dur });
     }
     else if (element->Is(MENSUR)) {
         this->m_currentMensur = vrv_cast<Mensur *>(element);
         if (m_currentMensur->GetModusmaior() == MODUSMAIOR_3) {
-            mensuration["modusmaior"] = 3;
+            m_mensuration["modusmaior"] = 3;
         }
         else {
-            mensuration["modusmaior"] = 2;
+            m_mensuration["modusmaior"] = 2;
         }
         if (m_currentMensur->GetModusminor() == MODUSMINOR_3) {
-            mensuration["modusminor"] = 3;
+            m_mensuration["modusminor"] = 3;
         }
         else {
-            mensuration["modusminor"] = 2;
+            m_mensuration["modusminor"] = 2;
         }
         if (m_currentMensur->GetTempus() == TEMPUS_3) {
-            mensuration["tempus"] = 3;
+            m_mensuration["tempus"] = 3;
         }
         else {
-            mensuration["tempus"] = 2;
+            m_mensuration["tempus"] = 2;
         }
         if (m_currentMensur->GetProlatio() == PROLATIO_3) {
-            mensuration["prolatio"] = 3;
+            m_mensuration["prolatio"] = 3;
         }
         else {
-            mensuration["prolatio"] = 2;
+            m_mensuration["prolatio"] = 2;
         }
     }
     return FUNCTOR_CONTINUE;
@@ -265,9 +265,9 @@ double ScoringUpFunctor::GetDurNumberValue(
         assert(note);
         durquality = note->GetDurQuality();
     }
-    int modusminor = mensuration["modusminor"];
-    int tempus = mensuration["tempus"];
-    int prolatio = mensuration["prolatio"];
+    int modusminor = m_mensuration["modusminor"];
+    int tempus = m_mensuration["tempus"];
+    int prolatio = m_mensuration["prolatio"];
     // int longaDefaultVal = modusminor * tempus * prolatio;
     int brevisDefaultVal = tempus * prolatio;
     int semibrevisDefaultVal = prolatio;

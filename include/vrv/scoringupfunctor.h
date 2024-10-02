@@ -84,9 +84,9 @@ protected:
 private:
     //
 public:
-    std::map<std::string, int> mensuration;
-    ArrayOfElementDurPairs dursInVoiceSameMensur;
-    std::vector<ArrayOfElementDurPairs> listOfSequences;
+    std::map<std::string, int> m_mensuration;
+    ArrayOfElementDurPairs m_dursInVoiceSameMensur;
+    std::vector<ArrayOfElementDurPairs> m_listOfSequences;
 
 private:
     // The current score time in the measure (incremented by each element)
