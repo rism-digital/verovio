@@ -44,6 +44,7 @@ public:
     std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> SubdivideSeq(
         std::vector<std::pair<LayerElement *, data_DURATION>> dursInVoiceSameMensur);
     ///@}
+
     /**
      * @name: Find @dur.quality of notes (perfecta / imperfecta / altera)
      */
@@ -51,6 +52,7 @@ public:
     void FindDurQuals(std::vector<std::vector<std::pair<LayerElement *, data_DURATION>>> listOfSequences);
     void FindDurQuals(std::vector<std::pair<LayerElement *, data_DURATION>> sequence);
     ///@}
+
     /**
      * @name: Find the duration value of the note in minims
      */
@@ -58,6 +60,7 @@ public:
     double GetDurNumberValue(
         std::pair<LayerElement *, data_DURATION> elementDurPair, bool followedByDot, LayerElement *nextElement);
     ///@}
+
     /**
      * @name Apply principles of imperfection and alteration
      */
