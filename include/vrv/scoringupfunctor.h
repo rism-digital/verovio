@@ -85,7 +85,7 @@ private:
     //
 public:
     std::map<std::string, int> mensuration;
-    ArrayOfElementDurPairs dursInVoiceSameMensur = {};
+    ArrayOfElementDurPairs dursInVoiceSameMensur;
     std::vector<ArrayOfElementDurPairs> listOfSequences;
 
 private:
