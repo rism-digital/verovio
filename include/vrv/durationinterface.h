@@ -12,6 +12,7 @@
 #include "atts_gestural.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "horizontalaligner.h"
 #include "interface.h"
 
 namespace vrv {
@@ -57,12 +58,12 @@ public:
     ///@}
 
     /**
-     * Returns the duration (in double) for the element.
-     * It returns 0.0 for grace notes.
+     * Returns the duration (in Fraction) for the element.
+     * It returns 0/1 for grace notes.
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    double GetInterfaceAlignmentDuration(int num, int numBase) const;
+    Fraction GetInterfaceAlignmentDuration(int num, int numBase) const;
 
     /**
      * Returns the duration (in double) for the element for mensural notation

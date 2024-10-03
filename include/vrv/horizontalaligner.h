@@ -12,8 +12,6 @@
 #include "object.h"
 #include "vrv.h"
 
-#include <numeric>
-
 namespace vrv {
 
 class Accid;
