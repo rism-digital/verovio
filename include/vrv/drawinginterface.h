@@ -186,7 +186,7 @@ public:
     Staff *m_crossStaffContent;
     data_STAFFREL_basic m_crossStaffRel;
     bool m_isSpanningElement;
-    int m_shortestDur;
+    data_DURATION m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
     Staff *m_beamStaff;

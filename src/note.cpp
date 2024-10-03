@@ -239,7 +239,7 @@ const Chord *Note::IsChordTone() const
     return vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
-int Note::GetDrawingDur() const
+data_DURATION Note::GetDrawingDur() const
 {
     const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
@@ -491,7 +491,7 @@ char32_t Note::GetMensuralNoteheadGlyph() const
 {
     assert(this->IsMensuralDur());
 
-    int drawingDur = this->GetDrawingDur();
+    data_DURATION drawingDur = this->GetDrawingDur();
 
     // No SMuFL code used for these values
     if (drawingDur < DURATION_1) {
@@ -526,7 +526,7 @@ char32_t Note::GetMensuralNoteheadGlyph() const
     return code;
 }
 
-char32_t Note::GetNoteheadGlyph(const int duration) const
+char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
 {
     static std::map<std::string, char32_t> additionalNoteheadSymbols
         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },

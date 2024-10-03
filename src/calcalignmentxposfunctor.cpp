@@ -24,7 +24,7 @@ CalcAlignmentXPosFunctor::CalcAlignmentXPosFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_previousTime = 0.0;
     m_previousXRel = 0;
-    m_longestActualDur = 0;
+    m_longestActualDur = DURATION_NONE;
     m_estimatedJustificationRatio = 1.0;
     m_lastNonTimestamp = NULL;
     m_measureAligner = NULL;

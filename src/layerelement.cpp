@@ -616,7 +616,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
     if (!this->Is({ CHORD, NC, NOTE, REST })) return 0;
 
     char32_t code = 0;
-    int dur = DURATION_4;
+    data_DURATION dur = DURATION_4;
     const Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
     if (this->Is(NOTE)) {
@@ -1200,7 +1200,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
             isUnisonElement = currentNote->IsUnisonWith(previousNote, true);
             // Unisson, look at the duration for the note heads
             if (unison && currentNote->IsUnisonWith(previousNote, false)) {
-                int previousDuration = previousNote->GetDrawingDur();
+                data_DURATION previousDuration = previousNote->GetDrawingDur();
                 assert(previousNote->GetParent());
                 const bool isPreviousChord = previousNote->GetParent()->Is(CHORD);
                 bool isEdgeElement = false;

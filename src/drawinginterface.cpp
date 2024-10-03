@@ -94,7 +94,7 @@ void BeamDrawingInterface::Reset()
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
     m_isSpanningElement = false;
-    m_shortestDur = 0;
+    m_shortestDur = DURATION_NONE;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
     m_beamStaff = NULL;
@@ -148,7 +148,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
-    int lastDur = (current->GetDurationInterface())->GetActualDur();
+    data_DURATION lastDur = (current->GetDurationInterface())->GetActualDur();
 
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -164,7 +164,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
-        const int currentDur = (current->GetDurationInterface())->GetActualDur();
+        const data_DURATION currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
             m_beamHasChord = true;

@@ -150,7 +150,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
     // We look only at the first one for the duration since both are expected to be the same
     AttDurationLog *durationElement = dynamic_cast<AttDurationLog *>(firstElement->m_element);
     if (!durationElement) return;
-    const int dur = durationElement->GetDur();
+    const data_DURATION dur = durationElement->GetDur();
 
     if (dur > DURATION_1) {
         // Adjust the x position of the first and last element for taking into account the stem width
@@ -289,8 +289,8 @@ void View::DrawBeamSegment(
     }
     int noteCount = (int)noteIndexes.size();
 
-    int durRef = DURATION_8;
-    int durRef2 = DURATION_16;
+    data_DURATION durRef = DURATION_8;
+    data_DURATION durRef2 = DURATION_16;
 
     if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
         durRef = DURATION_4;

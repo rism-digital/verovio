@@ -457,7 +457,7 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
     assert(beamInterface);
 
     // set to store durations of relevant notes (it's ordered, so min duration is going to be first)
-    std::set<int> noteDurations;
+    std::set<data_DURATION> noteDurations;
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
     const auto isNoteOrChord
         = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
@@ -470,7 +470,9 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
         if (!isNoteOrChord(*it)) continue;
 
         // get current element duration
-        const int val = (*it)->m_breaksec ? std::min((*it)->m_breaksec + DURATION_4, (*it)->m_dur) : (*it)->m_dur;
+        const data_DURATION val = (*it)->m_breaksec
+            ? vrv::DurationMin(static_cast<data_DURATION>((*it)->m_breaksec + DURATION_4), (*it)->m_dur)
+            : (*it)->m_dur;
         noteDurations.insert(val);
         // get next element duration
         CoordIt nextElement = std::find_if(it + 1, m_beamElementCoordRefs.end(), isNoteOrChord);
@@ -481,8 +483,9 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
         CoordReverseIt reverse = std::make_reverse_iterator(it);
         CoordReverseIt prevElement = std::find_if(reverse, m_beamElementCoordRefs.rend(), isNoteOrChord);
         if (prevElement != m_beamElementCoordRefs.rend()) {
-            const int prevVal = (*prevElement)->m_breaksec
-                ? std::min((*prevElement)->m_breaksec + DURATION_4, (*prevElement)->m_dur)
+            const data_DURATION prevVal = (*prevElement)->m_breaksec
+                ? vrv::DurationMin(
+                      static_cast<data_DURATION>((*prevElement)->m_breaksec + DURATION_4), (*prevElement)->m_dur)
                 : (*prevElement)->m_dur;
             noteDurations.insert(prevVal);
         }
@@ -884,7 +887,7 @@ int BeamSegment::CalcBeamSlopeStep(
     }
 
     // duration
-    const int dur = beamInterface->m_shortestDur;
+    const data_DURATION dur = beamInterface->m_shortestDur;
     // Prevent short step with values not shorter than a 16th
     if (shortStep && (dur >= DURATION_32)) {
         step = unit * 2;
@@ -1212,7 +1215,7 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
         // skip current element if it's longer that minDuration and is not a part of fTrem
         if ((coord->m_dur < noteDur) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
         // adjust stem length if location matches
-        const int dur = (preferredDur != 0) ? preferredDur : coord->m_dur;
+        const data_DURATION dur = (preferredDur != 0) ? preferredDur : coord->m_dur;
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal, dur);
         if (coord->m_closestNote->GetDrawingLoc() == noteLoc) {
             m_uniformStemLength = coordStemLength;
@@ -1266,11 +1269,11 @@ int BeamSegment::CalcMixedBeamCenterY(int step, int unit) const
     return centerY;
 }
 
-std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
+std::tuple<int, int, data_DURATION> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
 {
-    int shortestDuration = DURATION_4;
+    data_DURATION shortestDuration = DURATION_4;
     int shortestLoc = VRV_UNSET;
-    int relevantDuration = DURATION_4;
+    data_DURATION relevantDuration = DURATION_4;
     int relevantLoc = VRV_UNSET;
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
@@ -1313,7 +1316,7 @@ std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, 
         }
     }
 
-    int adjusted_duration = 0;
+    data_DURATION adjusted_duration = DURATION_NONE;
     // if shortest note location does not offset its duration (shorter notes need more space for additional beams) then
     // give preference to the its location
     if ((shortestDuration - relevantDuration) > (std::abs(relevantLoc - shortestLoc) + 1)) {
@@ -1328,7 +1331,7 @@ std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, 
         }
     }
     else if ((shortestDuration - relevantDuration) == std::abs(relevantLoc - shortestLoc)) {
-        adjusted_duration = (relevantDuration + shortestDuration) / 2;
+        adjusted_duration = static_cast<data_DURATION>((relevantDuration + shortestDuration) / 2);
     }
 
     return { relevantLoc, relevantDuration, adjusted_duration };
@@ -2081,14 +2084,14 @@ void BeamElementCoord::UpdateStemLength(
 
 std::pair<int, int> Beam::GetAdditionalBeamCount() const
 {
-    int topShortestDur = DURATION_8;
-    int bottomShortestDur = DURATION_8;
+    data_DURATION topShortestDur = DURATION_8;
+    data_DURATION bottomShortestDur = DURATION_8;
     std::for_each(m_beamElementCoords.begin(), m_beamElementCoords.end(), [&](BeamElementCoord *coord) {
         if (coord->m_partialFlagPlace == BEAMPLACE_above) {
-            topShortestDur = std::max(topShortestDur, coord->m_dur);
+            topShortestDur = vrv::DurationMax(topShortestDur, coord->m_dur);
         }
         else if (coord->m_partialFlagPlace == BEAMPLACE_below) {
-            bottomShortestDur = std::max(bottomShortestDur, coord->m_dur);
+            bottomShortestDur = vrv::DurationMax(bottomShortestDur, coord->m_dur);
         }
     });
 

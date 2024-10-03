@@ -275,7 +275,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         // look at the note position and adjust it if necessary
         Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
-            const int drawingDur = note->GetDrawingDur();
+            const data_DURATION drawingDur = note->GetDrawingDur();
             int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             int noteBottom = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             bool onStaff = (accid->GetOnstaff() == BOOLEAN_true);
@@ -1454,7 +1454,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
-        int drawingDur = note->GetDrawingDur();
+        data_DURATION drawingDur = note->GetDrawingDur();
         if (drawingDur == DURATION_NONE) {
             if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
                 LogWarning("Missing duration for note '%s' in beam", note->GetID().c_str());
@@ -1539,7 +1539,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
-    int drawingDur = rest->GetActualDur();
+    data_DURATION drawingDur = rest->GetActualDur();
     if (drawingDur == DURATION_NONE) {
         if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
             LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());

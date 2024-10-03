@@ -621,7 +621,7 @@ data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int ve
 }
 
 void CalcStemFunctor::AdjustFlagPlacement(
-    const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, int duration) const
+    const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, data_DURATION duration) const
 {
     assert(stem->GetParent());
     assert(stem->GetParent()->IsLayerElement());

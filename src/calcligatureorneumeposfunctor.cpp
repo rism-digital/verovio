@@ -62,8 +62,8 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
 
         // Look at the @lig attribute on the previous note
         if (previousNote->GetLig() == LIGATUREFORM_obliqua) oblique = true;
-        int dur1 = previousNote->GetActualDur();
-        int dur2 = note->GetActualDur();
+        data_DURATION dur1 = previousNote->GetActualDur();
+        data_DURATION dur2 = note->GetActualDur();
         // Same treatment for Mx and LG except for positioning, which is done above
         // We still need to avoid oblique, so keep a flag.
         bool isMaxima = false;
