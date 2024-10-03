@@ -80,6 +80,8 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
 
+    // Fraction duration(noteDur);
+    // duration = duration * numBase / num;
     Fraction duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
 
     int noteDots = (this->HasDotsGes()) ? this->GetDotsGes() : this->GetDots();
