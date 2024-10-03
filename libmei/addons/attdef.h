@@ -33,12 +33,6 @@ typedef double data_VU;
 // Durations
 //----------------------------------------------------------------------------
 
-/**
- * These duration values are used for internal calculation and differ from the
- * MEI data.DURATION types (see below)
- */
-#define DUR_NONE -32
-#define DUR_MX -1 // maxima
 // used for alignement
 #define DUR_MAX 1024
 // mensural duration
@@ -88,13 +82,13 @@ typedef std::vector<std::pair<double, double>> data_BULGE;
  * MEI data.DURATION
  */
 enum data_DURATION {
-    DURATION_NONE = DUR_NONE,
-    DURATION_maxima = DUR_MX,
-    DURATION_long,
+    DURATION_NONE = -2,
+    DURATION_maxima, // -1
+    DURATION_long, // 0
     DURATION_breve,
     DURATION_1,
     DURATION_2,
-    DURATION_4,
+    DURATION_4, // 4
     DURATION_8,
     DURATION_16,
     DURATION_32,
