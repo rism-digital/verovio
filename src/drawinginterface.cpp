@@ -421,7 +421,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
         // Could this be an overflow with 32 bits?
-        items.push_back(coord->m_closestNote->GetDrawingY() * DUR_MAX + coord->m_dur);
+        items.push_back(coord->m_closestNote->GetDrawingY() + DUR_MAX * coord->m_dur);
     }
     int itemCount = (int)items.size();
 
