@@ -1455,7 +1455,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
         int drawingDur = note->GetDrawingDur();
-        if (drawingDur == DUR_NONE) {
+        if (drawingDur == DURATION_NONE) {
             if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
                 LogWarning("Missing duration for note '%s' in beam", note->GetID().c_str());
             }
@@ -1540,7 +1540,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
     int drawingDur = rest->GetActualDur();
-    if (drawingDur == DUR_NONE) {
+    if (drawingDur == DURATION_NONE) {
         if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
             LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         }

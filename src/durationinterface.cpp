@@ -74,8 +74,8 @@ void DurationInterface::Reset()
 
 Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) const
 {
-    int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
-    if (noteDur == DUR_NONE) noteDur = DURATION_4;
+    data_DURATION noteDur = (this->GetDurGes() != DURATION_NONE) ? this->GetActualDurGes() : this->GetActualDur();
+    if (noteDur == DURATION_NONE) noteDur = DURATION_4;
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
@@ -93,7 +93,7 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
-    if (noteDur == DUR_NONE) noteDur = DURATION_4;
+    if (noteDur == DURATION_NONE) noteDur = DURATION_4;
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -174,36 +174,37 @@ bool DurationInterface::IsLastInBeam(const LayerElement *noteOrRest) const
     return (noteOrRest == beam->GetListBack());
 }
 
-int DurationInterface::GetActualDur() const
+data_DURATION DurationInterface::GetActualDur() const
 {
     const data_DURATION dur = this->HasDur() ? this->GetDur() : this->GetDurDefault();
     return this->CalcActualDur(dur);
 }
 
-int DurationInterface::GetActualDurGes() const
+data_DURATION DurationInterface::GetActualDurGes() const
 {
     const data_DURATION dur = this->HasDurGes() ? this->GetDurGes() : DURATION_NONE;
     return this->CalcActualDur(dur);
 }
 
-int DurationInterface::CalcActualDur(data_DURATION dur) const
+data_DURATION DurationInterface::CalcActualDur(data_DURATION dur) const
 {
-    if (dur == DURATION_NONE) return DUR_NONE;
+    if (dur == DURATION_NONE) return DURATION_NONE;
     // maxima (-1) is a mensural only value
     if (dur == DURATION_maxima) return DURATION_maxima;
-    return (dur & DUR_MENSURAL_MASK);
+    // return (dur & DUR_MENSURAL_MASK);
+    return DURATION_breve;
 }
 
-int DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
+data_DURATION DurationInterface::GetNoteOrChordDur(const LayerElement *element) const
 {
     if (element->Is(CHORD)) {
-        int duration = this->GetActualDur();
-        if (duration != DUR_NONE) return duration;
+        data_DURATION duration = this->GetActualDur();
+        if (duration != DURATION_NONE) return duration;
 
         const Chord *chord = vrv_cast<const Chord *>(element);
         for (const Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
             duration = note->GetActualDur();
-            if (duration != DUR_NONE) {
+            if (duration != DURATION_NONE) {
                 return duration;
             }
         }
