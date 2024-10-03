@@ -1215,7 +1215,7 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
         // skip current element if it's longer that minDuration and is not a part of fTrem
         if ((coord->m_dur < noteDur) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
         // adjust stem length if location matches
-        const data_DURATION dur = (preferredDur != 0) ? preferredDur : coord->m_dur;
+        const data_DURATION dur = (preferredDur != DURATION_NONE) ? preferredDur : coord->m_dur;
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal, dur);
         if (coord->m_closestNote->GetDrawingLoc() == noteLoc) {
             m_uniformStemLength = coordStemLength;
@@ -1942,7 +1942,7 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
 }
 
 int BeamElementCoord::CalculateStemLength(
-    const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, int preferredDur) const
+    const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, data_DURATION preferredDur) const
 {
     if (!m_closestNote) return 0;
 

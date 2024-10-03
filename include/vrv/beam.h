@@ -429,7 +429,8 @@ public:
     void SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff);
 
     /** Helper for calculating the stem length for staff notation and tablature beams within the staff */
-    int CalculateStemLength(const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, int preferredDur) const;
+    int CalculateStemLength(
+        const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, data_DURATION preferredDur) const;
 
     /** Helper for calculating the stem length for tablature beam placed outside the staff */
     int CalculateStemLengthTab(const Staff *staff, data_STEMDIRECTION stemDir) const;
