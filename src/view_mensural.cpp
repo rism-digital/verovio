@@ -50,7 +50,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
 
     /************** Noteheads: **************/
 
@@ -161,7 +161,7 @@ void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_ST
     assert(note);
 
     const int staffSize = staff->m_drawingStaffSize;
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
     const int radius = note->GetDrawingRadius(m_doc);
     // Cue size is currently disabled
     const bool drawingCueSize = false;
@@ -710,7 +710,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
 data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter)
 {
     // constants
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
     const int yNote = note->GetDrawingY();
 
     data_STEMDIRECTION layerStemDir;

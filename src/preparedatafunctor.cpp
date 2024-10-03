@@ -1101,7 +1101,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     currentStem->AttGraced::operator=(*chord);
     currentStem->FillAttributes(*chord);
 
-    int duration = chord->GetNoteOrChordDur(chord);
+    data_DURATION duration = chord->GetNoteOrChordDur(chord);
     if ((duration < DURATION_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }

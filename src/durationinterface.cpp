@@ -188,11 +188,19 @@ data_DURATION DurationInterface::GetActualDurGes() const
 
 data_DURATION DurationInterface::CalcActualDur(data_DURATION dur) const
 {
-    if (dur == DURATION_NONE) return DURATION_NONE;
     // maxima (-1) is a mensural only value
-    if (dur == DURATION_maxima) return DURATION_maxima;
-    // return (dur & DUR_MENSURAL_MASK);
-    return DURATION_breve;
+    if (dur < DUR_MAX) return dur;
+    // Mensural duration (except maxima)
+    switch (dur) {
+        case (DURATION_longa): return DURATION_long;
+        case (DURATION_brevis): return DURATION_breve;
+        case (DURATION_semibrevis): return DURATION_1;
+        case (DURATION_minima): return DURATION_2;
+        case (DURATION_semiminima): return DURATION_4;
+        case (DURATION_fusa): return DURATION_8;
+        case (DURATION_semifusa): return DURATION_16;
+        default: return DURATION_NONE;
+    }
 }
 
 data_DURATION DurationInterface::GetNoteOrChordDur(const LayerElement *element) const

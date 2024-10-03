@@ -459,6 +459,16 @@ std::string ToCamelCase(const std::string &s)
     return result;
 }
 
+data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2)
+{
+    return (dur1 < dur2) ? dur1 : dur2;
+}
+
+data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2)
+{
+    return (dur1 > dur2) ? dur1 : dur2;
+}
+
 //----------------------------------------------------------------------------
 // Notation type checks
 //----------------------------------------------------------------------------

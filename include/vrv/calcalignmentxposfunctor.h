@@ -40,7 +40,7 @@ public:
      */
     ///@{
     int GetLongestActualDur() const { return m_longestActualDur; }
-    void SetLongestActualDur(int dur) { m_longestActualDur = dur; }
+    void SetLongestActualDur(data_DURATION dur) { m_longestActualDur = dur; }
     ///@}
 
     /*
@@ -65,7 +65,7 @@ private:
     // The previous x rel position
     int m_previousXRel;
     // Duration of the longest note
-    int m_longestActualDur;
+    data_DURATION m_longestActualDur;
     // The estimated justification ratio of the system
     double m_estimatedJustificationRatio;
     // The last alignment that was not timestamp-only

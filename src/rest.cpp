@@ -244,7 +244,7 @@ char32_t Rest::GetRestGlyph() const
     return this->GetRestGlyph(this->GetActualDur());
 }
 
-char32_t Rest::GetRestGlyph(const int duration) const
+char32_t Rest::GetRestGlyph(const data_DURATION duration) const
 {
     const Resources *resources = this->GetDocResources();
     if (!resources) return 0;
@@ -559,7 +559,7 @@ int Rest::GetMarginLayerLocation(bool isTopLayer, bool restOverlap) const
 int Rest::GetRestOffsetFromOptions(
     RestLayer layer, const std::pair<int, RestAccidental> &location, bool isTopLayer) const
 {
-    int duration = this->GetActualDur();
+    data_DURATION duration = this->GetActualDur();
     // Make sure we are in the boundaries of g_defaultRests
     if (duration > DURATION_128) duration = DURATION_128;
     if (duration < DURATION_long) duration = DURATION_long;
