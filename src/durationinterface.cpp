@@ -72,7 +72,7 @@ void DurationInterface::Reset()
     m_scoreTimeTiedDuration = 0.0;
 }
 
-double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) const
+Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
     if (noteDur == DUR_NONE) noteDur = DUR_4;
@@ -80,11 +80,11 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) co
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
 
-    double duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
+    Fraction duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
 
     int noteDots = (this->HasDotsGes()) ? this->GetDotsGes() : this->GetDots();
     if (noteDots != VRV_UNSET) {
-        duration = 2 * duration - (duration / pow(2, noteDots));
+        duration = duration * 2 - (duration / pow(2, noteDots));
     }
     // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, this->GetDots(), duration);
     return duration;
