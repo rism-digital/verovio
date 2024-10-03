@@ -270,6 +270,7 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
             case DURATION_4: return SMUFL_E9F6_mensuralRestSemiminima; break;
             case DURATION_8: return SMUFL_E9F7_mensuralRestFusa; break;
             case DURATION_16: return SMUFL_E9F8_mensuralRestSemifusa; break;
+            default: return 0;
         }
     }
     else {
@@ -287,6 +288,7 @@ char32_t Rest::GetRestGlyph(const data_DURATION duration) const
             case DURATION_256: return SMUFL_E4EB_rest256th; break;
             case DURATION_512: return SMUFL_E4EC_rest512th; break;
             case DURATION_1024: return SMUFL_E4ED_rest1024th; break;
+            default: return 0;
         }
     }
 
