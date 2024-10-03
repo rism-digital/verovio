@@ -66,7 +66,7 @@ public:
     Fraction GetInterfaceAlignmentDuration(int num, int numBase) const;
 
     /**
-     * Returns the duration (in double) for the element for mensural notation
+     * Returns the duration (in Fraction) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
      * need to be modified for shorter equality in later repertoire.
      */

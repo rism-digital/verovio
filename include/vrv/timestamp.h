@@ -39,7 +39,7 @@ public:
     ///@}
 
     /**
-     * Returns the duration (in double) for the Timestamp.
+     * Returns the duration (in Fraction) for the Timestamp.
      */
     Fraction GetTimestampAttrAlignmentDuration(data_DURATION meterUnit) const;
 

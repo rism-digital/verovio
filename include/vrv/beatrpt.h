@@ -40,7 +40,7 @@ public:
     bool HasToBeAligned() const override { return true; }
 
     /**
-     * Returns the duration (in double) for the BeatRpt.
+     * Returns the duration (in Fraction) for the BeatRpt.
      */
 
     Fraction GetBeatRptAlignmentDuration(data_DURATION meterUnit) const;
