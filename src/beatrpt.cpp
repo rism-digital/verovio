@@ -54,11 +54,11 @@ void BeatRpt::Reset()
     m_scoreTimeOnset = 0.0;
 }
 
-double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
+Fraction BeatRpt::GetBeatRptAlignmentDuration(data_DURATION meterUnit) const
 {
-    double dur = DUR_MAX / meterUnit;
-    if (this->HasBeatdef()) dur *= this->GetBeatdef();
-    return dur;
+    Fraction duration(meterUnit);
+    if (this->HasBeatdef()) duration = duration * Fraction(this->GetBeatdef() * DUR_MAX, DUR_MAX);
+    return duration;
 }
 
 void BeatRpt::SetScoreTimeOnset(double scoreTime)

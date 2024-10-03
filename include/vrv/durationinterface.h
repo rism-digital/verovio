@@ -70,7 +70,7 @@ public:
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
      * need to be modified for shorter equality in later repertoire.
      */
-    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
+    Fraction GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
 
     /**
      * Return true if the note or rest is the first of a beam.

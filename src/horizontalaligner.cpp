@@ -49,6 +49,8 @@ Fraction::Fraction(int num, int denom) : m_numerator(num), m_denominator(denom)
 
 Fraction::Fraction(data_DURATION duration)
 {
+    duration = vrv::DurationMin(duration, DURATION_1024);
+    duration = vrv::DurationMax(duration, DURATION_NONE);
     int den = pow(2, (duration + 1));
     m_numerator = 8;
     m_denominator = den;
@@ -232,16 +234,16 @@ void MeasureAligner::Reset()
 {
     HorizontalAligner::Reset();
     m_nonJustifiableLeftMargin = 0;
-    m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
+    m_leftAlignment = new Alignment(-1, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
-    m_leftBarLineAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_LEFT_BARLINE);
+    m_leftBarLineAlignment = new Alignment(-1, ALIGNMENT_MEASURE_LEFT_BARLINE);
     AddAlignment(m_leftBarLineAlignment);
-    m_rightBarLineAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_RIGHT_BARLINE);
+    m_rightBarLineAlignment = new Alignment(0, ALIGNMENT_MEASURE_RIGHT_BARLINE);
     AddAlignment(m_rightBarLineAlignment);
-    m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
+    m_rightAlignment = new Alignment(0, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
 
-    m_initialTstampDur = -DUR_MAX;
+    m_initialTstampDur = -1;
 }
 
 bool MeasureAligner::IsSupportedChild(Object *child)
@@ -302,11 +304,9 @@ Fraction MeasureAligner::GetMaxTime() const
     return m_rightAlignment->GetTime();
 }
 
-void MeasureAligner::SetInitialTstamp(int meterUnit)
+void MeasureAligner::SetInitialTstamp(data_DURATION meterUnit)
 {
-    if (meterUnit != 0) {
-        m_initialTstampDur = DUR_MAX / meterUnit * -1;
-    }
+    m_initialTstampDur = Fraction(meterUnit) * -1;
 }
 
 void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
@@ -836,14 +836,15 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
 }
 
 int Alignment::HorizontalSpaceForDuration(
-    const Fraction &intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+    const Fraction &intervalTime, data_DURATION maxActualDur, double spacingLinear, double spacingNonLinear)
 {
     double doubleIntervalTime = intervalTime.ToDouble();
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
      that interval gets the space a semibreve would ordinarily get. */
     if (maxActualDur < DURATION_1) doubleIntervalTime /= pow(2.0, DURATION_1 - maxActualDur);
 
-    return pow(doubleIntervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
+    return pow(doubleIntervalTime * 1024, spacingNonLinear) * spacingLinear
+        * 10.0; // numbers are experimental constants
 }
 
 FunctorCode Alignment::Accept(Functor &functor)
