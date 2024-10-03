@@ -108,7 +108,7 @@ void BeamDrawingInterface::Reset()
 
 int BeamDrawingInterface::GetTotalBeamWidth() const
 {
-    return m_beamWidthBlack + (m_shortestDur - DUR_8) * m_beamWidth;
+    return m_beamWidthBlack + (m_shortestDur - DURATION_8) * m_beamWidth;
 }
 
 void BeamDrawingInterface::ClearCoords()
@@ -459,7 +459,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
 
 bool BeamDrawingInterface::HasOneStepHeight() const
 {
-    if (m_shortestDur < DUR_32) return false;
+    if (m_shortestDur < DURATION_32) return false;
 
     int top = -128;
     int bottom = 128;

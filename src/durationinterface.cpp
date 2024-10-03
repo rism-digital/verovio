@@ -75,7 +75,7 @@ void DurationInterface::Reset()
 Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
-    if (noteDur == DUR_NONE) noteDur = DUR_4;
+    if (noteDur == DUR_NONE) noteDur = DURATION_4;
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
@@ -93,7 +93,7 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
-    if (noteDur == DUR_NONE) noteDur = DUR_4;
+    if (noteDur == DUR_NONE) noteDur = DURATION_4;
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -139,14 +139,14 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     double ratio = 0.0;
     double duration = (double)DUR_MENSURAL_REF;
     switch (noteDur) {
-        case DUR_MX:
+        case DURATION_maxima:
             duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior());
             break;
-        case DUR_LG: duration *= (double)abs(currentMensur->GetModusminor()); break;
-        case DUR_BR: break;
-        case DUR_1: duration /= (double)abs(currentMensur->GetTempus()); break;
+        case DURATION_long: duration *= (double)abs(currentMensur->GetModusminor()); break;
+        case DURATION_breve: break;
+        case DURATION_1: duration /= (double)abs(currentMensur->GetTempus()); break;
         default:
-            ratio = pow(2.0, (double)(noteDur - DUR_2));
+            ratio = pow(2.0, (double)(noteDur - DURATION_2));
             duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
             break;
     }
@@ -190,7 +190,7 @@ int DurationInterface::CalcActualDur(data_DURATION dur) const
 {
     if (dur == DURATION_NONE) return DUR_NONE;
     // maxima (-1) is a mensural only value
-    if (dur == DURATION_maxima) return DUR_MX;
+    if (dur == DURATION_maxima) return DURATION_maxima;
     return (dur & DUR_MENSURAL_MASK);
 }
 
