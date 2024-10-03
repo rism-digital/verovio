@@ -69,6 +69,7 @@ class Fraction {
 public:
     // Constructors
     Fraction(int num = 0, int denom = 1);
+    Fraction(data_DURATION duration);
 
     /** Addition operator */
     Fraction operator+(const Fraction &other) const;
