@@ -64,9 +64,9 @@ public:
      * @name Apply principles of imperfection and alteration
      */
     ///@{
-    bool ImperfectionAPP(const ArrayOfElementDurPairs &sequence);
-    bool ImperfectionAPA(const ArrayOfElementDurPairs &sequence);
-    bool Alteration(const ArrayOfElementDurPairs &sequence);
+    Note *ImperfectionAPP(const ArrayOfElementDurPairs &sequence);
+    Note *ImperfectionAPA(const ArrayOfElementDurPairs &sequence);
+    Note *Alteration(const ArrayOfElementDurPairs &sequence);
     bool LeavePerfect(const ArrayOfElementDurPairs &sequence);
     ///@}
 

@@ -190,8 +190,16 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
     // CHECK SUM --> IS IT INTEGER when dot of division???
     // CHECK REMAINDER
 
-    // Flags:
-    bool alterationFlag, impappFlag, impapaFlag;
+    // Candidates and Flags:
+    /// The following 'candidate' variables are used to evaluate whether a note is a candidate for a given context-based
+    /// modification (i.e., imperfection app, imperfection apa, or alteration). When the 'candidate' variable is NULL,
+    /// then the note is not candidate for that given type of modification (e.g., when alterationCandidate is NULL, the
+    /// penultimate note of the sequence is not a candidate for alteration; when the impappCandidate is NULL, the first
+    /// note of the sequence is not candidate for an imperfection a parte post; and when the impapaCandidate is NULL,
+    /// the last note of the sequence is not candidate for an imperfection a parte ante).
+    Note *impappCandidate;
+    Note *impapaCandidate;
+    Note *alterationCandidate;
     bool dotOfImperf = false; // When true, it forces imperfection a parte post (a.p.p.)
     bool simileAnteSimile = false; // Flag that evaluates the value of the note following the last note of the sequence,
                                    // checking if it is greater or equal to the last note of the sequence. When true, it
@@ -204,19 +212,38 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
         switch (remainder) {
             case 0: break; // No modifications
             case 1:
-                impappFlag = ImperfectionAPP(sequence);
-                if (!impappFlag) {
-                    ImperfectionAPA(sequence);
+                // Evaluate 'default' case: Imperfection APP
+                impappCandidate = ImperfectionAPP(sequence);
+                if (impappCandidate) {
+                    impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
+                // Evaluate 'alternative' case: Imperfection APA
+                impapaCandidate = ImperfectionAPA(sequence);
+                if (impapaCandidate) {
+                    impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                    break;
+                }
+                // No case
+                std::cout << "NO OPTION!" << std::endl;
                 break;
             case 2:
-                alterationFlag = Alteration(sequence);
-                if (!alterationFlag || dotOfImperf) {
-                    ImperfectionAPP(sequence);
-                    ImperfectionAPA(sequence);
+                // Evaluate 'default' case: Alteration
+                alterationCandidate = Alteration(sequence);
+                if (alterationCandidate && !dotOfImperf) {
+                    alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
                     break;
                 }
+                // Evaluate 'alternative' case: Imperfection APP and Imperfection APA
+                impappCandidate = ImperfectionAPP(sequence);
+                impapaCandidate = ImperfectionAPA(sequence);
+                if (impappCandidate && impapaCandidate) {
+                    impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                    impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                    break;
+                }
+                // No case
+                std::cout << "NO OPTION!" << std::endl;
                 break;
         }
     }
@@ -228,26 +255,48 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
     else { // For sum > 3
         switch (remainder) {
             case 0:
-                impappFlag = ImperfectionAPP(sequence);
-                alterationFlag = Alteration(sequence);
-                if (!alterationFlag || !impappFlag) {
-                    break; // No modifications
+                // Evaluate 'default' case: Imperfection APP and Alteration
+                impappCandidate = ImperfectionAPP(sequence);
+                alterationCandidate = Alteration(sequence);
+                if (impappCandidate && alterationCandidate) {
+                    impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                    alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
+                    break;
                 }
+                // Evaluate 'alternative' case: No modifications
                 break;
             case 1:
-                impappFlag = ImperfectionAPP(sequence);
-                if (!impappFlag) {
-                    ImperfectionAPA(sequence);
+                // Evaluate 'default' case: Imperfection APP
+                impappCandidate = ImperfectionAPP(sequence);
+                if (impappCandidate) {
+                    impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
+                // Evaluate 'alternative' case: Imperfection APA
+                impapaCandidate = ImperfectionAPA(sequence);
+                if (impapaCandidate) {
+                    impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                    break;
+                } // No case
+                std::cout << "NO OPTION!" << std::endl;
                 break;
             case 2:
-                impappFlag = ImperfectionAPP(sequence);
-                impapaFlag = ImperfectionAPA(sequence);
-                if (!impappFlag || !impapaFlag || simileAnteSimile) {
-                    Alteration(sequence);
+                // Evaluate 'default' case: Imperfection APP and Imperfection APA
+                impappCandidate = ImperfectionAPP(sequence);
+                impapaCandidate = ImperfectionAPA(sequence);
+                if (impappCandidate && impapaCandidate && !simileAnteSimile) {
+                    impappCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                    impapaCandidate->SetDurQuality(DURQUALITY_mensural_imperfecta);
                     break;
                 }
+                // Evaluate 'alternative' case: Alteration
+                alterationCandidate = Alteration(sequence);
+                if (alterationCandidate) {
+                    alterationCandidate->SetDurQuality(DURQUALITY_mensural_altera);
+                    break;
+                }
+                // No case
+                std::cout << "NO OPTION!" << std::endl;
                 break;
         }
     }
@@ -336,7 +385,7 @@ double ScoringUpFunctor::GetDurNumberValue(
     return durnum;
 }
 
-bool ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
+Note *ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
 {
     std::pair<LayerElement *, data_DURATION> firstElementDurPair = sequence.at(0);
     LayerElement *firstElement = firstElementDurPair.first;
@@ -354,7 +403,7 @@ bool ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
             /// Dot of perfection (type of dot of division)
             Dot *dot = vrv_cast<Dot *>(nextElement);
             dot->SetForm(dotLog_FORM_div);
-            return false;
+            return NULL;
         }
         else {
             /// Imperfection a.p.p. (i.e., imperfection by the following notes), unless the note has already been
@@ -363,21 +412,21 @@ bool ScoringUpFunctor::ImperfectionAPP(const ArrayOfElementDurPairs &sequence)
             assert(firstNote);
             if (firstNote->HasDurQuality()) {
                 /// Already modified before
-                return false;
+                return NULL;
             }
             else {
                 /// Imperfection a.p.p.
-                firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-                return true;
+                // firstNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+                return firstNote;
             }
         }
     }
     else {
-        return false;
+        return NULL;
     }
 }
 
-bool ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
+Note *ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
 {
     std::pair<LayerElement *, data_DURATION> lastElementDurPair = sequence.at(sequence.size() - 1);
     LayerElement *lastElement = lastElementDurPair.first;
@@ -387,15 +436,15 @@ bool ScoringUpFunctor::ImperfectionAPA(const ArrayOfElementDurPairs &sequence)
     if (lastElement->Is(NOTE) && lastDur == DURATION_brevis) {
         Note *lastNote = vrv_cast<Note *>(lastElement);
         assert(lastNote);
-        lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
-        return true;
+        // lastNote->SetDurQuality(DURQUALITY_mensural_imperfecta);
+        return lastNote;
     }
     else {
-        return false;
+        return NULL;
     }
 }
 
-bool ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
+Note *ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
 {
     std::pair<LayerElement *, data_DURATION> penultElementDurPair = sequence.at(sequence.size() - 2);
     LayerElement *penultElement = penultElementDurPair.first;
@@ -405,11 +454,11 @@ bool ScoringUpFunctor::Alteration(const ArrayOfElementDurPairs &sequence)
     if (penultElement->Is(NOTE) && penultDur == DURATION_semibrevis) {
         Note *penultNote = vrv_cast<Note *>(penultElement);
         assert(penultNote);
-        penultNote->SetDurQuality(DURQUALITY_mensural_altera);
-        return true;
+        // penultNote->SetDurQuality(DURQUALITY_mensural_altera);
+        return penultNote;
     }
     else {
-        return false;
+        return NULL;
     }
 }
 
