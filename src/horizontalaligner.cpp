@@ -838,13 +838,12 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
 int Alignment::HorizontalSpaceForDuration(
     const Fraction &intervalTime, data_DURATION maxActualDur, double spacingLinear, double spacingNonLinear)
 {
-    double doubleIntervalTime = intervalTime.ToDouble();
+    double intervalTimeDbl = intervalTime.ToDouble();
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
      that interval gets the space a semibreve would ordinarily get. */
-    if (maxActualDur < DURATION_1) doubleIntervalTime /= pow(2.0, DURATION_1 - maxActualDur);
+    if (maxActualDur < DURATION_1) intervalTimeDbl /= pow(2.0, DURATION_1 - maxActualDur);
 
-    return pow(doubleIntervalTime * 1024, spacingNonLinear) * spacingLinear
-        * 10.0; // numbers are experimental constants
+    return pow(intervalTimeDbl * 1024, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
 FunctorCode Alignment::Accept(Functor &functor)
