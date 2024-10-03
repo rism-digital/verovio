@@ -43,7 +43,7 @@ public:
      * Returns the duration (in double) for the BeatRpt.
      */
 
-    double GetBeatRptAlignmentDuration(int meterUnit) const;
+    Fraction GetBeatRptAlignmentDuration(data_DURATION meterUnit) const;
 
     /**
      * MIDI timing information

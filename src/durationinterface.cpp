@@ -80,26 +80,29 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numBase *= this->GetNumbase();
 
-    // Fraction duration(noteDur);
-    // duration = duration * numBase / num;
-    Fraction duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
+    Fraction duration(noteDur);
+    duration = duration * numBase / num;
+    // double old = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
+    // duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
 
     int noteDots = (this->HasDotsGes()) ? this->GetDotsGes() : this->GetDots();
     if (noteDots != VRV_UNSET) {
-        duration = duration * 2 - (duration / pow(2, noteDots));
+        Fraction durationReduction(duration.GetNumerator(), duration.GetDenominator() * pow(2, noteDots));
+        duration = duration * 2 - durationReduction;
     }
     // LogDebug("Duration %d; Dot %d; Alignment %f", noteDur, this->GetDots(), duration);
     return duration;
 }
 
-double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const
+Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
+    int num, int numBase, const Mensur *currentMensur) const
 {
     int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
     if (noteDur == DURATION_NONE) noteDur = DURATION_4;
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
-        return DUR_MENSURAL_REF;
+        return Fraction(1, 1);
     }
 
     if (this->HasNum() || this->HasNumbase()) {
@@ -155,7 +158,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     duration *= (double)numBase / (double)num;
     // LogDebug("Duration %d; %d/%d; Alignment %f; Ratio %f", noteDur, num, numbase, duration, ratio);
     duration = durRound(duration);
-    return duration;
+    return Fraction(DUR_MAX * duration, DUR_MAX * DUR_MAX);
 }
 
 bool DurationInterface::IsFirstInBeam(const LayerElement *noteOrRest) const

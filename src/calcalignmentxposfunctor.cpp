@@ -22,7 +22,7 @@ namespace vrv {
 
 CalcAlignmentXPosFunctor::CalcAlignmentXPosFunctor(Doc *doc) : DocFunctor(doc)
 {
-    m_previousTime = 0.0;
+    m_previousTime = 0;
     m_previousXRel = 0;
     m_longestActualDur = DURATION_NONE;
     m_estimatedJustificationRatio = 1.0;
@@ -39,7 +39,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
     Fraction intervalTime = alignment->GetTime() - m_previousTime;
 
     if (alignment->GetType() > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        intervalTime = 0.0;
+        intervalTime = 0;
     }
 
     // Do not move aligners that are only time-stamps at this stage but add it to the pending list
@@ -48,7 +48,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
         return FUNCTOR_CONTINUE;
     }
 
-    if (intervalTime > 0.0) {
+    if (intervalTime > 0) {
         intervalXRel = Alignment::HorizontalSpaceForDuration(intervalTime, m_longestActualDur,
             m_doc->GetOptions()->m_spacingLinear.GetValue(), m_doc->GetOptions()->m_spacingNonLinear.GetValue());
         // LogDebug("CalcAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
@@ -81,7 +81,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
         // For each timestamp alignment, move them proportionally to the space we currently have
         for (auto &tsAlignment : m_timestamps) {
             // Avoid division by zero (nothing to move with the alignment anyway
-            if (duration == 0.0) break;
+            if (duration == 0) break;
             Fraction percent = (tsAlignment->GetTime() - startTime) / duration;
             tsAlignment->SetXRel(startXRel + space * percent.ToDouble());
         }
@@ -98,7 +98,7 @@ FunctorCode CalcAlignmentXPosFunctor::VisitMeasure(Measure *measure)
 {
     // We start a new Measure
     // Reset the previous time position and x_rel to 0;
-    m_previousTime = 0.0;
+    m_previousTime = 0;
     // We un-measured music we never have a left barline, so do not add a default space
     m_previousXRel = (measure->IsMeasuredMusic()) ? m_doc->GetDrawingUnit(100) : 0;
 

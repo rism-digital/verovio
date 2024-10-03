@@ -76,11 +76,9 @@ namespace vrv {
 // MAX_DURATION / pow(2.0, (DURATION_4 - 2.0))
 #define NEUME_LARGE_SPACE 256
 // Medium spacing between neume is a 8th note space
-// MAX_DURATION / pow(2.0, (DUR_5 - 2.0))
-#define NEUME_MEDIUM_SPACE 128
+#define NEUME_MEDIUM_SPACE Fraction(1, 8)
 // Small spacing between neume components is a 16th note space
-// MAX_DURATION / pow(2.0, (DUR_6 - 2.0))
-#define NEUME_SMALL_SPACE 64
+#define NEUME_SMALL_SPACE Fraction(1, 16)
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -730,30 +728,25 @@ Fraction LayerElement::GetAlignmentDuration(
     else if (this->Is(BEATRPT)) {
         const BeatRpt *beatRpt = vrv_cast<const BeatRpt *>(this);
         assert(beatRpt);
-        int meterUnit = 4;
-        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        data_DURATION meterUnit = DURATION_4;
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
         const TimestampAttr *timestampAttr = vrv_cast<const TimestampAttr *>(this);
         assert(timestampAttr);
-        int meterUnit = 4;
-        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        data_DURATION meterUnit = DURATION_4;
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
     else if (this->Is({ HALFMRPT, MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
-        int meterUnit = 4;
+        data_DURATION meterUnit = DURATION_4;
         int meterCount = 4;
-        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnit();
+        if (params.meterSig && params.meterSig->HasUnit()) meterUnit = params.meterSig->GetUnitAsDur();
         if (params.meterSig && params.meterSig->HasCount()) meterCount = params.meterSig->GetTotalCount();
-
-        if (this->Is(HALFMRPT)) {
-            return (DUR_MAX / meterUnit * meterCount) / 2;
-        }
-        else {
-            return DUR_MAX / meterUnit * meterCount;
-        }
+        Fraction duration = Fraction(meterUnit) * meterCount;
+        return (this->Is(HALFMRPT)) ? (duration / 2) : duration;
     }
     // This is not called with --neume-as-note since otherwise each nc has an aligner
     else if (this->Is(NEUME)) {

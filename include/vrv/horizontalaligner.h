@@ -67,9 +67,15 @@ enum AlignmentType {
 class Fraction {
 
 public:
-    // Constructors
-    Fraction(int num = 0, int denom = 1);
-    Fraction(data_DURATION duration);
+    // Constructors - make them explicit to avoid type conversion
+    explicit Fraction(int num = 0, int denom = 1);
+    explicit Fraction(data_DURATION duration);
+
+    // Enable implicit conversion constructor for `int`
+    template <typename T, typename = std::enable_if_t<std::is_same_v<T, int>>>
+    Fraction(T num) : m_numerator(num), m_denominator(1)
+    {
+    }
 
     /** Addition operator */
     Fraction operator+(const Fraction &other) const;
@@ -90,6 +96,10 @@ public:
     bool operator>(const Fraction &other) const;
     /** Greater than or equal operator */
     bool operator>=(const Fraction &other) const;
+
+    /** Getters */
+    int GetNumerator() const { return m_numerator; }
+    int GetDenominator() const { return m_denominator; }
 
     /** Convert fraction to a double */
     double ToDouble() const;
@@ -261,7 +271,7 @@ public:
      * formula with parameters can come close and has other advantages.
      */
     static int HorizontalSpaceForDuration(
-        const Fraction &intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
+        const Fraction &intervalTime, data_DURATION maxActualDur, double spacingLinear, double spacingNonLinear);
 
     //----------//
     // Functors //
@@ -507,8 +517,8 @@ public:
      * Setter takes a meter unit parameter.
      */
     ///@{
-    void SetInitialTstamp(int meterUnit);
-    double GetInitialTstampDur() const { return m_initialTstampDur; }
+    void SetInitialTstamp(data_DURATION meterUnit);
+    Fraction GetInitialTstampDur() const { return m_initialTstampDur; }
     ///@}
 
     /**
@@ -593,7 +603,7 @@ private:
      * The time duration of the timestamp between 0.0 and 1.0.
      * This depends on the meter signature in the preceeding scoreDef
      */
-    double m_initialTstampDur;
+    Fraction m_initialTstampDur;
 };
 
 //----------------------------------------------------------------------------

@@ -90,8 +90,8 @@ LayerElementsInTimeSpanFunctor::LayerElementsInTimeSpanFunctor(
     const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
     : ConstFunctor()
 {
-    m_time = 0.0;
-    m_duration = 0.0;
+    m_time = 0;
+    m_duration = 0;
     m_meterParams.meterSig = meterSig;
     m_meterParams.mensur = mensur;
     m_layer = layer;

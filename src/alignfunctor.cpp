@@ -40,7 +40,7 @@ namespace vrv {
 AlignHorizontallyFunctor::AlignHorizontallyFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_measureAligner = NULL;
-    m_time = 0.0;
+    m_time = 0;
     m_currentParams.mensur = NULL;
     m_currentParams.meterSig = NULL;
     m_notationType = NOTATIONTYPE_cmn;
@@ -56,7 +56,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
 
     // We are starting a new layer, reset the time;
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
-    m_time = DUR_MAX * -1.0;
+    m_time = -1;
 
     m_scoreDefRole = m_isFirstMeasure ? SCOREDEF_SYSTEM : SCOREDEF_INTERMEDIATE;
 
@@ -87,7 +87,7 @@ FunctorCode AlignHorizontallyFunctor::VisitLayer(Layer *layer)
     m_scoreDefRole = SCOREDEF_NONE;
 
     // Now we have to set it to 0.0 since we will start aligning musical content
-    m_time = 0.0;
+    m_time = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -378,7 +378,9 @@ FunctorCode AlignHorizontallyFunctor::VisitMeasure(Measure *measure)
 
 FunctorCode AlignHorizontallyFunctor::VisitMeasureEnd(Measure *measure)
 {
-    int meterUnit = m_currentParams.meterSig ? m_currentParams.meterSig->GetUnit() : 4;
+    data_DURATION meterUnit = (m_currentParams.meterSig && m_currentParams.meterSig->HasUnit())
+        ? m_currentParams.meterSig->GetUnitAsDur()
+        : DURATION_4;
     measure->m_measureAligner.SetInitialTstamp(meterUnit);
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
