@@ -192,13 +192,13 @@ data_DURATION DurationInterface::CalcActualDur(data_DURATION dur) const
     if (dur < DUR_MAX) return dur;
     // Mensural duration (except maxima)
     switch (dur) {
-        case (DURATION_longa): return DURATION_long;
-        case (DURATION_brevis): return DURATION_breve;
-        case (DURATION_semibrevis): return DURATION_1;
-        case (DURATION_minima): return DURATION_2;
-        case (DURATION_semiminima): return DURATION_4;
-        case (DURATION_fusa): return DURATION_8;
-        case (DURATION_semifusa): return DURATION_16;
+        case DURATION_longa: return DURATION_long;
+        case DURATION_brevis: return DURATION_breve;
+        case DURATION_semibrevis: return DURATION_1;
+        case DURATION_minima: return DURATION_2;
+        case DURATION_semiminima: return DURATION_4;
+        case DURATION_fusa: return DURATION_8;
+        case DURATION_semifusa: return DURATION_16;
         default: return DURATION_NONE;
     }
 }
