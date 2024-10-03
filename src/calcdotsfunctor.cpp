@@ -80,7 +80,7 @@ FunctorCode CalcDotsFunctor::VisitNote(Note *note)
         assert(dots);
 
         // Stem up, shorter than 4th and not in beam
-        if ((note->GetDots() > 0) && (m_chordStemDir == STEMDIRECTION_up) && (note->GetDrawingDur() > DUR_4)
+        if ((note->GetDots() > 0) && (m_chordStemDir == STEMDIRECTION_up) && (note->GetDrawingDur() > DURATION_4)
             && !note->IsInBeam()) {
             // Shift according to the flag width if the top note is not flipped
             if ((note == chord->GetTopNote()) && !note->GetFlippedNotehead()) {
@@ -129,7 +129,7 @@ FunctorCode CalcDotsFunctor::VisitRest(Rest *rest)
     }
 
     // Nothing to do
-    if ((rest->GetDur() <= DUR_BR) || (rest->GetDots() < 1)) {
+    if ((rest->GetDur() <= DURATION_breve) || (rest->GetDots() < 1)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -150,12 +150,12 @@ FunctorCode CalcDotsFunctor::VisitRest(Rest *rest)
     }
 
     switch (rest->GetActualDur()) {
-        case DUR_32:
-        case DUR_64: loc += 2; break;
-        case DUR_128:
-        case DUR_256: loc += 4; break;
-        case DUR_512: loc += 6; break;
-        case DUR_1024: loc += 8; break;
+        case DURATION_32:
+        case DURATION_64: loc += 2; break;
+        case DURATION_128:
+        case DURATION_256: loc += 4; break;
+        case DURATION_512: loc += 6; break;
+        case DURATION_1024: loc += 8; break;
         default: break;
     }
 
@@ -164,7 +164,7 @@ FunctorCode CalcDotsFunctor::VisitRest(Rest *rest)
     // HARDCODED
     int xRel = m_doc->GetDrawingUnit(staffSize) * 2.5;
     if (drawingCueSize) xRel = m_doc->GetCueSize(xRel);
-    if (rest->GetDur() > DUR_2) {
+    if (rest->GetDur() > DURATION_2) {
         xRel = m_doc->GetGlyphWidth(rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
     }
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));

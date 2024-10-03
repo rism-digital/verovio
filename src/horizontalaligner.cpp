@@ -833,7 +833,7 @@ int Alignment::HorizontalSpaceForDuration(
     double doubleIntervalTime = intervalTime.ToDouble();
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
      that interval gets the space a semibreve would ordinarily get. */
-    if (maxActualDur < DUR_1) doubleIntervalTime /= pow(2.0, DUR_1 - maxActualDur);
+    if (maxActualDur < DURATION_1) doubleIntervalTime /= pow(2.0, DURATION_1 - maxActualDur);
 
     return pow(doubleIntervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }

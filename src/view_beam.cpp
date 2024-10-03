@@ -152,7 +152,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
     if (!durationElement) return;
     const int dur = durationElement->GetDur();
 
-    if (dur > DUR_1) {
+    if (dur > DURATION_1) {
         // Adjust the x position of the first and last element for taking into account the stem width
         firstElement->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
         secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -177,7 +177,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
 
     int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, fTrem->m_cueSize);
     // for non-stem notes the bar should be shortened
-    if (dur < DUR_2) {
+    if (dur < DURATION_2) {
         if (fTrem->m_drawingPlace == BEAMPLACE_below) x1 += 2 * space;
         y1 += 2 * space * fTrem->m_beamSegment.m_beamSlope;
         if (fTrem->m_drawingPlace == BEAMPLACE_above) x2 -= 2 * space;
@@ -186,7 +186,7 @@ void View::DrawFTremSegment(DeviceContext *dc, Staff *staff, FTrem *fTrem)
         fullBars = allBars;
         floatingBars = 0;
     }
-    else if ((dur > DUR_2) && !floatingBars) {
+    else if ((dur > DURATION_2) && !floatingBars) {
         fullBars = dur - 4;
         floatingBars = allBars - fullBars;
     }
@@ -289,12 +289,12 @@ void View::DrawBeamSegment(
     }
     int noteCount = (int)noteIndexes.size();
 
-    int durRef = DUR_8;
-    int durRef2 = DUR_16;
+    int durRef = DURATION_8;
+    int durRef2 = DURATION_16;
 
     if (staff->IsTabLuteFrench() || staff->IsTabLuteItalian()) {
-        durRef = DUR_4;
-        durRef2 = DUR_8;
+        durRef = DURATION_4;
+        durRef2 = DURATION_8;
     }
 
     int barY = 0;

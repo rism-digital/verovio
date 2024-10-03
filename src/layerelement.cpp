@@ -73,7 +73,7 @@
 namespace vrv {
 
 // Large spacing between syllables is a quarter note space
-// MAX_DURATION / pow(2.0, (DUR_4 - 2.0))
+// MAX_DURATION / pow(2.0, (DURATION_4 - 2.0))
 #define NEUME_LARGE_SPACE 256
 // Medium spacing between neume is a 8th note space
 // MAX_DURATION / pow(2.0, (DUR_5 - 2.0))
@@ -554,7 +554,7 @@ int LayerElement::GetDrawingTop(const Doc *doc, int staffSize, bool withArtic, A
     if (note) {
         const DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+        if (durationInterface->GetNoteOrChordDur(this) < DURATION_2) {
             return note->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         }
         // We should also take into account the stem shift to the right
@@ -592,7 +592,7 @@ int LayerElement::GetDrawingBottom(const Doc *doc, int staffSize, bool withArtic
     if (note) {
         const DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+        if (durationInterface->GetNoteOrChordDur(this) < DURATION_2) {
             return note->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         }
         // We should also take into account the stem shift to the right
@@ -616,7 +616,7 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
     if (!this->Is({ CHORD, NC, NOTE, REST })) return 0;
 
     char32_t code = 0;
-    int dur = DUR_4;
+    int dur = DURATION_4;
     const Staff *staff = this->GetAncestorStaff();
     bool isMensuralDur = false;
     if (this->Is(NOTE)) {
@@ -636,13 +636,13 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
         assert(chord);
         dur = chord->GetActualDur();
         isMensuralDur = chord->IsMensuralDur();
-        if (dur == DUR_BR) {
+        if (dur == DURATION_breve) {
             code = SMUFL_E0A1_noteheadDoubleWholeSquare;
         }
-        else if (dur == DUR_1) {
+        else if (dur == DURATION_1) {
             code = SMUFL_E0A2_noteheadWhole;
         }
-        else if (dur == DUR_2) {
+        else if (dur == DURATION_2) {
             code = SMUFL_E0A3_noteheadHalf;
         }
         else {
@@ -653,9 +653,9 @@ int LayerElement::GetDrawingRadius(const Doc *doc, bool isInLigature) const
         code = SMUFL_E0A4_noteheadBlack;
     }
 
-    // Mensural note shorter than DUR_BR
-    if ((isMensuralDur && (dur <= DUR_BR)) || ((dur == DUR_1) && isInLigature)) {
-        int widthFactor = (dur == DUR_MX) ? 2 : 1;
+    // Mensural note shorter than DURATION_breve
+    if ((isMensuralDur && (dur <= DURATION_breve)) || ((dur == DURATION_1) && isInLigature)) {
+        int widthFactor = (dur == DURATION_maxima) ? 2 : 1;
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
             return widthFactor * doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.7;
         }
@@ -1212,11 +1212,11 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                         || ((STEMDIRECTION_up == stemDir) && (parentChord->GetTopNote() == previousNote));
                 }
                 // Reduce the margin to 0 for whole notes unisson
-                else if ((currentNote->GetDrawingDur() == DUR_1) && (previousDuration == DUR_1)) {
+                else if ((currentNote->GetDrawingDur() == DURATION_1) && (previousDuration == DURATION_1)) {
                     horizontalMargin = 0;
                 }
                 if (!isPreviousChord || isEdgeElement || isChordElement) {
-                    if ((currentNote->GetDrawingDur() == DUR_2) && (previousDuration == DUR_2)) {
+                    if ((currentNote->GetDrawingDur() == DURATION_2) && (previousDuration == DURATION_2)) {
                         isInUnison = true;
                     }
                     else if ((!currentNote->IsGraceNote() && !currentNote->GetDrawingCueSize())
@@ -1232,7 +1232,7 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                         isInUnison = true;
                         continue;
                     }
-                    else if ((currentNote->GetDrawingDur() > DUR_2) && (previousDuration > DUR_2)) {
+                    else if ((currentNote->GetDrawingDur() > DURATION_2) && (previousDuration > DURATION_2)) {
                         isInUnison = true;
                     }
                     if (isInUnison && (currentNote->GetDots() == previousNote->GetDots())) {
@@ -1240,7 +1240,8 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                     }
                     else {
                         isInUnison = false;
-                        if ((currentNote->GetDrawingDur() <= DUR_1) || (previousNote->GetDrawingDur() <= DUR_1)) {
+                        if ((currentNote->GetDrawingDur() <= DURATION_1)
+                            || (previousNote->GetDrawingDur() <= DURATION_1)) {
                             horizontalMargin *= -1;
                         }
                         else {
@@ -1263,7 +1264,8 @@ std::pair<int, bool> LayerElement::CalcElementHorizontalOverlap(const Doc *doc,
                 if (previousNote->GetDrawingLoc() - currentNote->GetDrawingLoc() == -1) {
                     horizontalMargin *= -1;
                 }
-                else if ((currentNote->GetDrawingDur() <= DUR_1) && (previousNote->GetDrawingDur() <= DUR_1)) {
+                else if ((currentNote->GetDrawingDur() <= DURATION_1)
+                    && (previousNote->GetDrawingDur() <= DURATION_1)) {
                     continue;
                 }
                 else if (previousNote->m_crossStaff || m_crossStaff)

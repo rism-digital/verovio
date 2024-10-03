@@ -1102,11 +1102,11 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     currentStem->FillAttributes(*chord);
 
     int duration = chord->GetNoteOrChordDur(chord);
-    if ((duration < DUR_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
+    if ((duration < DURATION_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }
 
-    const bool shouldHaveFlag = ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
+    const bool shouldHaveFlag = ((duration > DURATION_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
     currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     chord->SetDrawingStem(currentStem);
@@ -1150,7 +1150,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         currentStem->AttGraced::operator=(*note);
         currentStem->FillAttributes(*note);
 
-        if (note->GetActualDur() < DUR_2 || (note->GetStemVisible() == BOOLEAN_false)) {
+        if (note->GetActualDur() < DURATION_2 || (note->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }
     }
@@ -1177,8 +1177,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
     if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
 
     if (currentStem) {
-        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
-            && !note->IsChordTone() && !note->IsTabGrpNote());
+        const bool shouldHaveFlag = ((note->GetActualDur() > DURATION_4) && !note->IsInBeam()
+            && !note->GetAncestorFTrem() && !note->IsChordTone() && !note->IsTabGrpNote());
         currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
         if (!chord) note->SetDrawingStem(currentStem);
@@ -1196,7 +1196,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
 {
     Dots *currentDots = vrv_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
 
-    const bool shouldHaveDots = (rest->GetDur() > DUR_BR) && (rest->GetDots() > 0);
+    const bool shouldHaveDots = (rest->GetDur() > DURATION_breve) && (rest->GetDots() > 0);
     currentDots = this->ProcessDots(currentDots, rest, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
@@ -1222,7 +1222,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     assert(tabGrp);
 
     // No flag within beam for durations longer than 8th notes
-    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DUR_4));
+    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DURATION_4));
     currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     return FUNCTOR_SIBLINGS;

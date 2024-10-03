@@ -37,100 +37,118 @@ RestOffsets g_defaultRests{
         { { RA_none,
               { { RLP_restOnTopLayer,
                     { { RNP_noteInSpace,
-                          { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
-                              { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                          { { DURATION_1, 3 }, { DURATION_2, 3 }, { DURATION_4, 5 }, { DURATION_8, 5 },
+                              { DURATION_16, 7 }, { DURATION_32, 7 }, { DURATION_64, 9 }, { DURATION_128, 9 },
+                              { DURATION_long, 5 }, { DURATION_breve, 5 } } },
                         { RNP_noteOnLine,
-                            { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 4 }, { DUR_16, 6 }, { DUR_32, 6 },
-                                { DUR_64, 8 }, { DUR_128, 8 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                            { { DURATION_1, 2 }, { DURATION_2, 4 }, { DURATION_4, 6 }, { DURATION_8, 4 },
+                                { DURATION_16, 6 }, { DURATION_32, 6 }, { DURATION_64, 8 }, { DURATION_128, 8 },
+                                { DURATION_long, 6 }, { DURATION_breve, 4 } } } } },
                   { RLP_restOnBottomLayer,
                       { { RNP_noteInSpace,
-                            { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
-                                { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                            { { DURATION_1, -5 }, { DURATION_2, -5 }, { DURATION_4, -5 }, { DURATION_8, -5 },
+                                { DURATION_16, -5 }, { DURATION_32, -7 }, { DURATION_64, -7 }, { DURATION_128, -9 },
+                                { DURATION_long, -5 }, { DURATION_breve, -5 } } },
                           { RNP_noteOnLine,
-                              { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
-                                  { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
-                                  { DUR_BR, -6 } } } } } } },
+                              { { DURATION_1, -6 }, { DURATION_2, -6 }, { DURATION_4, -6 }, { DURATION_8, -4 },
+                                  { DURATION_16, -4 }, { DURATION_32, -6 }, { DURATION_64, -6 }, { DURATION_128, -8 },
+                                  { DURATION_long, -6 }, { DURATION_breve, -6 } } } } } } },
             { RA_s,
                 { { RLP_restOnTopLayer,
                       { { RNP_noteInSpace,
-                            { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 7 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
-                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                            { { DURATION_1, 3 }, { DURATION_2, 5 }, { DURATION_4, 7 }, { DURATION_8, 5 },
+                                { DURATION_16, 7 }, { DURATION_32, 7 }, { DURATION_64, 9 }, { DURATION_128, 9 },
+                                { DURATION_long, 5 }, { DURATION_breve, 5 } } },
                           { RNP_noteOnLine,
-                              { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
-                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                              { { DURATION_1, 2 }, { DURATION_2, 4 }, { DURATION_4, 6 }, { DURATION_8, 6 },
+                                  { DURATION_16, 8 }, { DURATION_32, 8 }, { DURATION_64, 10 }, { DURATION_128, 10 },
+                                  { DURATION_long, 6 }, { DURATION_breve, 4 } } } } },
                     { RLP_restOnBottomLayer,
                         { { RNP_noteInSpace,
-                              { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
-                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                              { { DURATION_1, -5 }, { DURATION_2, -5 }, { DURATION_4, -5 }, { DURATION_8, -5 },
+                                  { DURATION_16, -5 }, { DURATION_32, -7 }, { DURATION_64, -7 }, { DURATION_128, -9 },
+                                  { DURATION_long, -5 }, { DURATION_breve, -5 } } },
                             { RNP_noteOnLine,
-                                { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 },
-                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
-                                    { DUR_BR, -6 } } } } } } },
+                                { { DURATION_1, -6 }, { DURATION_2, -6 }, { DURATION_4, -6 }, { DURATION_8, -6 },
+                                    { DURATION_16, -6 }, { DURATION_32, -6 }, { DURATION_64, -6 }, { DURATION_128, -8 },
+                                    { DURATION_long, -6 }, { DURATION_breve, -6 } } } } } } },
             { RA_f,
                 { { RLP_restOnTopLayer,
                       { { RNP_noteInSpace,
-                            { { DUR_1, 3 }, { DUR_2, 5 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
-                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                            { { DURATION_1, 3 }, { DURATION_2, 5 }, { DURATION_4, 5 }, { DURATION_8, 5 },
+                                { DURATION_16, 7 }, { DURATION_32, 7 }, { DURATION_64, 9 }, { DURATION_128, 9 },
+                                { DURATION_long, 5 }, { DURATION_breve, 5 } } },
                           { RNP_noteOnLine,
-                              { { DUR_1, 4 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
-                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                              { { DURATION_1, 4 }, { DURATION_2, 4 }, { DURATION_4, 6 }, { DURATION_8, 6 },
+                                  { DURATION_16, 8 }, { DURATION_32, 8 }, { DURATION_64, 10 }, { DURATION_128, 10 },
+                                  { DURATION_long, 6 }, { DURATION_breve, 4 } } } } },
                     { RLP_restOnBottomLayer,
                         { { RNP_noteInSpace,
-                              { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
-                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                              { { DURATION_1, -5 }, { DURATION_2, -5 }, { DURATION_4, -5 }, { DURATION_8, -5 },
+                                  { DURATION_16, -5 }, { DURATION_32, -7 }, { DURATION_64, -7 }, { DURATION_128, -9 },
+                                  { DURATION_long, -5 }, { DURATION_breve, -5 } } },
                             { RNP_noteOnLine,
-                                { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
-                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
-                                    { DUR_BR, -6 } } } } } } },
+                                { { DURATION_1, -6 }, { DURATION_2, -6 }, { DURATION_4, -6 }, { DURATION_8, -4 },
+                                    { DURATION_16, -4 }, { DURATION_32, -6 }, { DURATION_64, -6 }, { DURATION_128, -8 },
+                                    { DURATION_long, -6 }, { DURATION_breve, -6 } } } } } } },
             { RA_x,
                 { { RLP_restOnTopLayer,
                       { { RNP_noteInSpace,
-                            { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
-                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                            { { DURATION_1, 3 }, { DURATION_2, 3 }, { DURATION_4, 5 }, { DURATION_8, 5 },
+                                { DURATION_16, 7 }, { DURATION_32, 7 }, { DURATION_64, 9 }, { DURATION_128, 9 },
+                                { DURATION_long, 5 }, { DURATION_breve, 5 } } },
                           { RNP_noteOnLine,
-                              { { DUR_1, 2 }, { DUR_2, 4 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
-                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                              { { DURATION_1, 2 }, { DURATION_2, 4 }, { DURATION_4, 6 }, { DURATION_8, 6 },
+                                  { DURATION_16, 8 }, { DURATION_32, 8 }, { DURATION_64, 10 }, { DURATION_128, 10 },
+                                  { DURATION_long, 6 }, { DURATION_breve, 4 } } } } },
                     { RLP_restOnBottomLayer,
                         { { RNP_noteInSpace,
-                              { { DUR_1, -5 }, { DUR_2, -5 }, { DUR_4, -5 }, { DUR_8, -5 }, { DUR_16, -5 },
-                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                              { { DURATION_1, -5 }, { DURATION_2, -5 }, { DURATION_4, -5 }, { DURATION_8, -5 },
+                                  { DURATION_16, -5 }, { DURATION_32, -7 }, { DURATION_64, -7 }, { DURATION_128, -9 },
+                                  { DURATION_long, -5 }, { DURATION_breve, -5 } } },
                             { RNP_noteOnLine,
-                                { { DUR_1, -6 }, { DUR_2, -4 }, { DUR_4, -6 }, { DUR_8, -4 }, { DUR_16, -4 },
-                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
-                                    { DUR_BR, -6 } } } } } } },
+                                { { DURATION_1, -6 }, { DURATION_2, -4 }, { DURATION_4, -6 }, { DURATION_8, -4 },
+                                    { DURATION_16, -4 }, { DURATION_32, -6 }, { DURATION_64, -6 }, { DURATION_128, -8 },
+                                    { DURATION_long, -6 }, { DURATION_breve, -6 } } } } } } },
             { RA_n,
                 { { RLP_restOnTopLayer,
                       { { RNP_noteInSpace,
-                            { { DUR_1, 3 }, { DUR_2, 3 }, { DUR_4, 5 }, { DUR_8, 5 }, { DUR_16, 7 }, { DUR_32, 7 },
-                                { DUR_64, 9 }, { DUR_128, 9 }, { DUR_LG, 5 }, { DUR_BR, 5 } } },
+                            { { DURATION_1, 3 }, { DURATION_2, 3 }, { DURATION_4, 5 }, { DURATION_8, 5 },
+                                { DURATION_16, 7 }, { DURATION_32, 7 }, { DURATION_64, 9 }, { DURATION_128, 9 },
+                                { DURATION_long, 5 }, { DURATION_breve, 5 } } },
                           { RNP_noteOnLine,
-                              { { DUR_1, 2 }, { DUR_2, 6 }, { DUR_4, 6 }, { DUR_8, 6 }, { DUR_16, 8 }, { DUR_32, 8 },
-                                  { DUR_64, 10 }, { DUR_128, 10 }, { DUR_LG, 6 }, { DUR_BR, 4 } } } } },
+                              { { DURATION_1, 2 }, { DURATION_2, 6 }, { DURATION_4, 6 }, { DURATION_8, 6 },
+                                  { DURATION_16, 8 }, { DURATION_32, 8 }, { DURATION_64, 10 }, { DURATION_128, 10 },
+                                  { DURATION_long, 6 }, { DURATION_breve, 4 } } } } },
                     { RLP_restOnBottomLayer,
                         { { RNP_noteInSpace,
-                              { { DUR_1, -7 }, { DUR_2, -5 }, { DUR_4, -7 }, { DUR_8, -5 }, { DUR_16, -5 },
-                                  { DUR_32, -7 }, { DUR_64, -7 }, { DUR_128, -9 }, { DUR_LG, -5 }, { DUR_BR, -5 } } },
+                              { { DURATION_1, -7 }, { DURATION_2, -5 }, { DURATION_4, -7 }, { DURATION_8, -5 },
+                                  { DURATION_16, -5 }, { DURATION_32, -7 }, { DURATION_64, -7 }, { DURATION_128, -9 },
+                                  { DURATION_long, -5 }, { DURATION_breve, -5 } } },
                             { RNP_noteOnLine,
-                                { { DUR_1, -6 }, { DUR_2, -6 }, { DUR_4, -6 }, { DUR_8, -6 }, { DUR_16, -6 },
-                                    { DUR_32, -6 }, { DUR_64, -6 }, { DUR_128, -8 }, { DUR_LG, -6 },
-                                    { DUR_BR, -6 } } } } } } } } },
+                                { { DURATION_1, -6 }, { DURATION_2, -6 }, { DURATION_4, -6 }, { DURATION_8, -6 },
+                                    { DURATION_16, -6 }, { DURATION_32, -6 }, { DURATION_64, -6 }, { DURATION_128, -8 },
+                                    { DURATION_long, -6 }, { DURATION_breve, -6 } } } } } } } } },
     { RL_sameLayer,
         { { RA_none,
             { { RLP_restOnTopLayer,
                   { { RNP_noteInSpace,
-                        { { DUR_1, -1 }, { DUR_2, 1 }, { DUR_4, 1 }, { DUR_8, 1 }, { DUR_16, 3 }, { DUR_32, 3 },
-                            { DUR_64, 5 }, { DUR_128, 5 }, { DUR_LG, 3 }, { DUR_BR, 1 } } },
+                        { { DURATION_1, -1 }, { DURATION_2, 1 }, { DURATION_4, 1 }, { DURATION_8, 1 },
+                            { DURATION_16, 3 }, { DURATION_32, 3 }, { DURATION_64, 5 }, { DURATION_128, 5 },
+                            { DURATION_long, 3 }, { DURATION_breve, 1 } } },
                       { RNP_noteOnLine,
-                          { { DUR_1, 0 }, { DUR_2, 0 }, { DUR_4, 2 }, { DUR_8, 2 }, { DUR_16, 2 }, { DUR_32, 2 },
-                              { DUR_64, 4 }, { DUR_128, 4 }, { DUR_LG, 2 }, { DUR_BR, 2 } } } } },
+                          { { DURATION_1, 0 }, { DURATION_2, 0 }, { DURATION_4, 2 }, { DURATION_8, 2 },
+                              { DURATION_16, 2 }, { DURATION_32, 2 }, { DURATION_64, 4 }, { DURATION_128, 4 },
+                              { DURATION_long, 2 }, { DURATION_breve, 2 } } } } },
                 { RLP_restOnBottomLayer,
                     { { RNP_noteInSpace,
-                          { { DUR_1, -3 }, { DUR_2, -1 }, { DUR_4, -1 }, { DUR_8, -1 }, { DUR_16, -1 }, { DUR_32, -3 },
-                              { DUR_64, -3 }, { DUR_128, -5 }, { DUR_LG, -3 }, { DUR_BR, -3 } } },
+                          { { DURATION_1, -3 }, { DURATION_2, -1 }, { DURATION_4, -1 }, { DURATION_8, -1 },
+                              { DURATION_16, -1 }, { DURATION_32, -3 }, { DURATION_64, -3 }, { DURATION_128, -5 },
+                              { DURATION_long, -3 }, { DURATION_breve, -3 } } },
                         { RNP_noteOnLine,
-                            { { DUR_1, -2 }, { DUR_2, -2 }, { DUR_4, -2 }, { DUR_8, -2 }, { DUR_16, -2 },
-                                { DUR_32, -4 }, { DUR_64, -4 }, { DUR_128, -6 }, { DUR_LG, -2 },
-                                { DUR_BR, -2 } } } } } } } } }
+                            { { DURATION_1, -2 }, { DURATION_2, -2 }, { DURATION_4, -2 }, { DURATION_8, -2 },
+                                { DURATION_16, -2 }, { DURATION_32, -4 }, { DURATION_64, -4 }, { DURATION_128, -6 },
+                                { DURATION_long, -2 }, { DURATION_breve, -2 } } } } } } } } }
 };
 
 // helper function for conversion
@@ -244,31 +262,31 @@ char32_t Rest::GetRestGlyph(const int duration) const
 
     if (this->IsMensuralDur()) {
         switch (duration) {
-            case DUR_MX: return SMUFL_E9F0_mensuralRestMaxima; break;
-            case DUR_LG: return SMUFL_E9F2_mensuralRestLongaImperfecta; break;
-            case DUR_BR: return SMUFL_E9F3_mensuralRestBrevis; break;
-            case DUR_1: return SMUFL_E9F4_mensuralRestSemibrevis; break;
-            case DUR_2: return SMUFL_E9F5_mensuralRestMinima; break;
-            case DUR_4: return SMUFL_E9F6_mensuralRestSemiminima; break;
-            case DUR_8: return SMUFL_E9F7_mensuralRestFusa; break;
-            case DUR_16: return SMUFL_E9F8_mensuralRestSemifusa; break;
+            case DURATION_maxima: return SMUFL_E9F0_mensuralRestMaxima; break;
+            case DURATION_long: return SMUFL_E9F2_mensuralRestLongaImperfecta; break;
+            case DURATION_breve: return SMUFL_E9F3_mensuralRestBrevis; break;
+            case DURATION_1: return SMUFL_E9F4_mensuralRestSemibrevis; break;
+            case DURATION_2: return SMUFL_E9F5_mensuralRestMinima; break;
+            case DURATION_4: return SMUFL_E9F6_mensuralRestSemiminima; break;
+            case DURATION_8: return SMUFL_E9F7_mensuralRestFusa; break;
+            case DURATION_16: return SMUFL_E9F8_mensuralRestSemifusa; break;
         }
     }
     else {
         switch (duration) {
-            case DUR_LG: return SMUFL_E4E1_restLonga; break;
-            case DUR_BR: return SMUFL_E4E2_restDoubleWhole; break;
-            case DUR_1: return SMUFL_E4E3_restWhole; break;
-            case DUR_2: return SMUFL_E4E4_restHalf; break;
-            case DUR_4: return SMUFL_E4E5_restQuarter; break;
-            case DUR_8: return SMUFL_E4E6_rest8th; break;
-            case DUR_16: return SMUFL_E4E7_rest16th; break;
-            case DUR_32: return SMUFL_E4E8_rest32nd; break;
-            case DUR_64: return SMUFL_E4E9_rest64th; break;
-            case DUR_128: return SMUFL_E4EA_rest128th; break;
-            case DUR_256: return SMUFL_E4EB_rest256th; break;
-            case DUR_512: return SMUFL_E4EC_rest512th; break;
-            case DUR_1024: return SMUFL_E4ED_rest1024th; break;
+            case DURATION_long: return SMUFL_E4E1_restLonga; break;
+            case DURATION_breve: return SMUFL_E4E2_restDoubleWhole; break;
+            case DURATION_1: return SMUFL_E4E3_restWhole; break;
+            case DURATION_2: return SMUFL_E4E4_restHalf; break;
+            case DURATION_4: return SMUFL_E4E5_restQuarter; break;
+            case DURATION_8: return SMUFL_E4E6_rest8th; break;
+            case DURATION_16: return SMUFL_E4E7_rest16th; break;
+            case DURATION_32: return SMUFL_E4E8_rest32nd; break;
+            case DURATION_64: return SMUFL_E4E9_rest64th; break;
+            case DURATION_128: return SMUFL_E4EA_rest128th; break;
+            case DURATION_256: return SMUFL_E4EB_rest256th; break;
+            case DURATION_512: return SMUFL_E4EC_rest512th; break;
+            case DURATION_1024: return SMUFL_E4ED_rest1024th; break;
         }
     }
 
@@ -543,8 +561,8 @@ int Rest::GetRestOffsetFromOptions(
 {
     int duration = this->GetActualDur();
     // Make sure we are in the boundaries of g_defaultRests
-    if (duration > DUR_128) duration = DUR_128;
-    if (duration < DUR_LG) duration = DUR_LG;
+    if (duration > DURATION_128) duration = DURATION_128;
+    if (duration < DURATION_long) duration = DURATION_long;
     return g_defaultRests.at(layer)
         .at(RL_sameLayer == layer ? location.second : RA_none)
         .at(isTopLayer ? RLP_restOnTopLayer : RLP_restOnBottomLayer)
