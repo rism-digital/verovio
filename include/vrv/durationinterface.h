@@ -89,15 +89,15 @@ public:
      * For mensural, we need to apply the DUR_MENSURAL_MASK
      */
     ///@{
-    int GetActualDur() const;
-    int GetActualDurGes() const;
+    data_DURATION GetActualDur() const;
+    data_DURATION GetActualDurGes() const;
     ///@}
 
     /**
      * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.
      * Since we need to check what the element is, we need to pass it as parameter.
      */
-    int GetNoteOrChordDur(const LayerElement *element) const;
+    data_DURATION GetNoteOrChordDur(const LayerElement *element) const;
 
     /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
@@ -141,7 +141,7 @@ private:
     /**
      * Calculate the actual duration => translate mensural values
      */
-    int CalcActualDur(data_DURATION dur) const;
+    data_DURATION CalcActualDur(data_DURATION dur) const;
 
 public:
     //
