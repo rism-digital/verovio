@@ -107,6 +107,9 @@ public:
     /** Convert fraction to a string */
     std::string ToString() const;
 
+    /** Convert to data_DURATION and the remaining Fraction */
+    std::pair<data_DURATION, Fraction> ToDur() const;
+
 private:
     /** Reduce the fraction */
     void Reduce();

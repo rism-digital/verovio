@@ -135,6 +135,21 @@ void Fraction::Reduce()
     m_denominator /= gcdVal;
 }
 
+std::pair<data_DURATION, Fraction> Fraction::ToDur() const
+{
+    if (m_numerator == 0) return { DURATION_NONE, 0 };
+
+    int value = ceil(log2((double)m_denominator / (double)m_numerator * 8)) - 1;
+    data_DURATION dur = static_cast<data_DURATION>(value);
+    dur = vrv::DurationMax(DURATION_maxima, dur);
+    dur = vrv::DurationMin(DURATION_2048, dur);
+
+    Fraction remainder = *this - Fraction(dur);
+    // Making sure we would not be trigger an inifite loop when looping over the remainder
+    if ((remainder >= *this) || (remainder < 0)) remainder = 0;
+    return { dur, remainder };
+}
+
 //----------------------------------------------------------------------------
 // HorizontalAligner
 //----------------------------------------------------------------------------
