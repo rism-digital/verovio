@@ -65,11 +65,11 @@ void DurationInterface::Reset()
 
     m_durDefault = DURATION_NONE;
 
-    m_scoreTimeOnset = 0.0;
-    m_scoreTimeOffset = 0.0;
+    m_scoreTimeOnset = 0;
+    m_scoreTimeOffset = 0;
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
-    m_scoreTimeTiedDuration = 0.0;
+    m_scoreTimeTiedDuration = 0;
 }
 
 Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) const
@@ -251,7 +251,7 @@ bool DurationInterface::HasIdenticalDurationInterface(const DurationInterface *o
     */
 }
 
-void DurationInterface::SetScoreTimeOnset(double scoreTime)
+void DurationInterface::SetScoreTimeOnset(Fraction scoreTime)
 {
     m_scoreTimeOnset = scoreTime;
 }
@@ -262,7 +262,7 @@ void DurationInterface::SetRealTimeOnsetSeconds(double timeInSeconds)
     m_realTimeOnsetMilliseconds = timeInSeconds * 1000.0;
 }
 
-void DurationInterface::SetScoreTimeOffset(double scoreTime)
+void DurationInterface::SetScoreTimeOffset(Fraction scoreTime)
 {
     m_scoreTimeOffset = scoreTime;
 }
@@ -273,12 +273,12 @@ void DurationInterface::SetRealTimeOffsetSeconds(double timeInSeconds)
     m_realTimeOffsetMilliseconds = timeInSeconds * 1000.0;
 }
 
-void DurationInterface::SetScoreTimeTiedDuration(double scoreTime)
+void DurationInterface::SetScoreTimeTiedDuration(Fraction scoreTime)
 {
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-double DurationInterface::GetScoreTimeOnset() const
+Fraction DurationInterface::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }
@@ -288,7 +288,7 @@ double DurationInterface::GetRealTimeOnsetMilliseconds() const
     return m_realTimeOnsetMilliseconds;
 }
 
-double DurationInterface::GetScoreTimeOffset() const
+Fraction DurationInterface::GetScoreTimeOffset() const
 {
     return m_scoreTimeOffset;
 }
@@ -298,12 +298,12 @@ double DurationInterface::GetRealTimeOffsetMilliseconds() const
     return m_realTimeOffsetMilliseconds;
 }
 
-double DurationInterface::GetScoreTimeTiedDuration() const
+Fraction DurationInterface::GetScoreTimeTiedDuration() const
 {
     return m_scoreTimeTiedDuration;
 }
 
-double DurationInterface::GetScoreTimeDuration() const
+Fraction DurationInterface::GetScoreTimeDuration() const
 {
     return this->GetScoreTimeOffset() - this->GetScoreTimeOnset();
 }

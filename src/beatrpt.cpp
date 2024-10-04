@@ -51,7 +51,7 @@ void BeatRpt::Reset()
     this->ResetBeatRptVis();
     this->ResetColor();
 
-    m_scoreTimeOnset = 0.0;
+    m_scoreTimeOnset = 0;
 }
 
 Fraction BeatRpt::GetBeatRptAlignmentDuration(data_DURATION meterUnit) const
@@ -61,12 +61,12 @@ Fraction BeatRpt::GetBeatRptAlignmentDuration(data_DURATION meterUnit) const
     return duration;
 }
 
-void BeatRpt::SetScoreTimeOnset(double scoreTime)
+void BeatRpt::SetScoreTimeOnset(Fraction scoreTime)
 {
     m_scoreTimeOnset = scoreTime;
 }
 
-double BeatRpt::GetScoreTimeOnset() const
+Fraction BeatRpt::GetScoreTimeOnset() const
 {
     return m_scoreTimeOnset;
 }
