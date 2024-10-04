@@ -114,17 +114,17 @@ public:
      * MIDI timing information
      */
     ///@{
-    void SetScoreTimeOnset(double scoreTime);
+    void SetScoreTimeOnset(Fraction scoreTime);
     void SetRealTimeOnsetSeconds(double timeInSeconds);
-    void SetScoreTimeOffset(double scoreTime);
+    void SetScoreTimeOffset(Fraction scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
-    void SetScoreTimeTiedDuration(double timeInSeconds);
-    double GetScoreTimeOnset() const;
+    void SetScoreTimeTiedDuration(Fraction timeInSeconds);
+    Fraction GetScoreTimeOnset() const;
     double GetRealTimeOnsetMilliseconds() const;
-    double GetScoreTimeOffset() const;
-    double GetScoreTimeTiedDuration() const;
+    Fraction GetScoreTimeOffset() const;
+    Fraction GetScoreTimeTiedDuration() const;
     double GetRealTimeOffsetMilliseconds() const;
-    double GetScoreTimeDuration() const;
+    Fraction GetScoreTimeDuration() const;
     ///@}
 
     //-----------------//
@@ -150,7 +150,7 @@ private:
      * The score-time onset of the note in the measure (duration from the start of measure in
      * quarter notes).
      */
-    double m_scoreTimeOnset;
+    Fraction m_scoreTimeOnset;
 
     /**
      * The score-time off-time of the note in the measure (duration from the start of the measure
@@ -160,7 +160,7 @@ private:
      * of the printed note, and the m_scoreTimeTiedDuration is -1.0 to indicate that it should not
      * be exported when creating a MIDI file.
      */
-    double m_scoreTimeOffset;
+    Fraction m_scoreTimeOffset;
 
     /**
      * The time in milliseconds since the start of the measure element that contains the note.
@@ -180,7 +180,7 @@ private:
      * If the note is a secondary note in a tied group, then this variable is set to -1.0 to
      * indicate that it should not be written to MIDI output.
      */
-    double m_scoreTimeTiedDuration;
+    Fraction m_scoreTimeTiedDuration;
 
     /**
      * The default duration: extracted from scoreDef/staffDef and used when no duration attribute is given

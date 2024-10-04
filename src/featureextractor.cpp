@@ -59,7 +59,7 @@ void FeatureExtractor::Extract(const Object *object)
         if (chord && (note != chord->GetTopNote())) return;
 
         // Check if the note is tied to a previous one and skip it if yes
-        if (note->GetScoreTimeTiedDuration() == -1.0) {
+        if (note->GetScoreTimeTiedDuration() == -1) {
             // Check if we need to add it to the previous interval ids
             const int intervalsIdsSize = (int)m_intervalsIds.size();
             if (intervalsIdsSize > 0) m_intervalsIds.get<jsonxx::Array>(intervalsIdsSize - 1) << note->GetID();
