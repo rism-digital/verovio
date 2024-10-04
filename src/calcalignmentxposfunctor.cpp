@@ -82,8 +82,8 @@ FunctorCode CalcAlignmentXPosFunctor::VisitAlignment(Alignment *alignment)
         for (auto &tsAlignment : m_timestamps) {
             // Avoid division by zero (nothing to move with the alignment anyway
             if (duration == 0) break;
-            Fraction percent = (tsAlignment->GetTime() - startTime) / duration;
-            tsAlignment->SetXRel(startXRel + space * percent.ToDouble());
+            double percent = ((tsAlignment->GetTime() - startTime) / duration).ToDouble();
+            tsAlignment->SetXRel(startXRel + space * percent);
         }
         m_timestamps.clear();
     }
