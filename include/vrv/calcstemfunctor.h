@@ -62,7 +62,7 @@ private:
      * Adjusts the flag placement and stem length if they are crossing notehead or ledger lines
      */
     void AdjustFlagPlacement(
-        const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, int duration) const;
+        const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, data_DURATION duration) const;
 
 public:
     //
@@ -72,7 +72,7 @@ private:
     // The vertical center of the staff
     int m_verticalCenter;
     // The actual duration of the chord / note
-    int m_dur;
+    data_DURATION m_dur;
     // The flag for grace notes (stem is not extended)
     bool m_isGraceNote;
     // The flag for stem.sameas notes

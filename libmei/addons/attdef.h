@@ -33,25 +33,6 @@ typedef double data_VU;
 // Durations
 //----------------------------------------------------------------------------
 
-/**
- * These duration values are used for internal calculation and differ from the
- * MEI data.DURATION types (see below)
- */
-#define DUR_NONE -32
-#define DUR_MX -1 // maxima
-#define DUR_LG 0 // longa
-#define DUR_BR 1 // brevis
-#define DUR_1 2 // whole note (semibrevis)
-#define DUR_2 3 // half note (minima)
-#define DUR_4 4 // ...
-#define DUR_8 5
-#define DUR_16 6
-#define DUR_32 7
-#define DUR_64 8
-#define DUR_128 9
-#define DUR_256 10
-#define DUR_512 11
-#define DUR_1024 12 // this is it for now
 // used for alignement
 #define DUR_MAX 1024
 // mensural duration
@@ -101,12 +82,13 @@ typedef std::vector<std::pair<double, double>> data_BULGE;
  * MEI data.DURATION
  */
 enum data_DURATION {
-    DURATION_NONE = DUR_NONE,
-    DURATION_long = DUR_LG,
+    DURATION_NONE = -2,
+    DURATION_maxima, // -1
+    DURATION_long, // 0
     DURATION_breve,
     DURATION_1,
     DURATION_2,
-    DURATION_4,
+    DURATION_4, // 4
     DURATION_8,
     DURATION_16,
     DURATION_32,
@@ -114,10 +96,9 @@ enum data_DURATION {
     DURATION_128,
     DURATION_256,
     DURATION_512,
-    DURATION_1024,
+    DURATION_1024, // 12
     DURATION_2048,
-    DURATION_maxima = DUR_MX,
-    DURATION_longa = DUR_MENSURAL_OFFSET + DUR_LG,
+    DURATION_longa = DUR_MENSURAL_OFFSET + DURATION_long,
     DURATION_brevis,
     DURATION_semibrevis,
     DURATION_minima,

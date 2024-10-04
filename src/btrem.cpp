@@ -144,11 +144,11 @@ data_STEMMODIFIER BTrem::GetDrawingStemMod() const
     const int drawingDur = duration->GetActualDur();
 
     if (!this->HasUnitdur()) {
-        if (drawingDur < DUR_2) return STEMMODIFIER_3slash;
+        if (drawingDur < DURATION_2) return STEMMODIFIER_3slash;
         return STEMMODIFIER_NONE;
     }
     int slashDur = this->GetUnitdur() - drawingDur;
-    if (drawingDur < DUR_4) slashDur = this->GetUnitdur() - DUR_4;
+    if (drawingDur < DURATION_4) slashDur = this->GetUnitdur() - DURATION_4;
     switch (slashDur) {
         case 0: return STEMMODIFIER_NONE;
         case 1: return STEMMODIFIER_1slash;

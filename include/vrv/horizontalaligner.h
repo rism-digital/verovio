@@ -63,6 +63,67 @@ enum AlignmentType {
 #define TSTAMP_REFERENCES -2
 
 //----------------------------------------------------------------------------
+// Fraction
+//----------------------------------------------------------------------------
+
+class Fraction {
+
+public:
+    // Constructors - make them explicit to avoid type conversion
+    explicit Fraction(int num = 0, int denom = 1);
+    explicit Fraction(data_DURATION duration);
+
+    // Enable implicit conversion constructor for `int`
+    template <typename T, typename = std::enable_if_t<std::is_same_v<T, int>>>
+    Fraction(T num) : m_numerator(num), m_denominator(1)
+    {
+    }
+
+    /** Addition operator */
+    Fraction operator+(const Fraction &other) const;
+    /** Subtraction operator */
+    Fraction operator-(const Fraction &other) const;
+    /** Multiplication operator */
+    Fraction operator*(const Fraction &other) const;
+    /** Division operator */
+    Fraction operator/(const Fraction &other) const;
+
+    /** Equality operator */
+    bool operator==(const Fraction &other) const;
+    /** Less than operator */
+    bool operator<(const Fraction &other) const;
+    /** Less than or equal operator */
+    bool operator<=(const Fraction &other) const;
+    /** Greater than operator */
+    bool operator>(const Fraction &other) const;
+    /** Greater than or equal operator */
+    bool operator>=(const Fraction &other) const;
+
+    /** Getters */
+    int GetNumerator() const { return m_numerator; }
+    int GetDenominator() const { return m_denominator; }
+
+    /** Convert fraction to a double */
+    double ToDouble() const;
+
+    /** Convert fraction to a string */
+    std::string ToString() const;
+
+    /** Convert to data_DURATION and the remaining Fraction */
+    std::pair<data_DURATION, Fraction> ToDur() const;
+
+private:
+    /** Reduce the fraction */
+    void Reduce();
+
+public:
+    //
+private:
+    int m_numerator;
+    int m_denominator;
+};
+
+//----------------------------------------------------------------------------
 // Alignment
 //----------------------------------------------------------------------------
 
@@ -77,7 +138,7 @@ public:
      */
     ///@{
     Alignment();
-    Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
+    Alignment(const Fraction &time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
     void Reset() override;
     ///@}
@@ -104,8 +165,8 @@ public:
      * @name Set and get the time value of the alignment
      */
     ///@{
-    void SetTime(double time) { m_time = time; }
-    double GetTime() const { return m_time; }
+    void SetTime(const Fraction &time) { m_time = time; }
+    Fraction GetTime() const { return m_time; }
     ///@}
 
     /**
@@ -190,7 +251,10 @@ public:
     /**
      * Debug message
      */
-    std::string LogDebugTreeMsg() override { return StringFormat("%d %f", this->GetXRel(), this->GetTime()); }
+    std::string LogDebugTreeMsg() override
+    {
+        return StringFormat("%d %s", this->GetXRel(), this->GetTime().ToString().c_str());
+    }
 
     //----------------//
     // Static methods //
@@ -212,7 +276,7 @@ public:
      * formula with parameters can come close and has other advantages.
      */
     static int HorizontalSpaceForDuration(
-        double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
+        const Fraction &intervalTime, data_DURATION maxActualDur, double spacingLinear, double spacingNonLinear);
 
     //----------//
     // Functors //
@@ -249,7 +313,7 @@ private:
      * Stores the time at which the alignment occur.
      * It is set by the AlignHorizontallyFunctor.
      */
-    double m_time;
+    Fraction m_time;
     /**
      * Defines the type of alignment (see the AlignmentType enum).
      * We have different types because we want some events occuring at the same
@@ -386,8 +450,8 @@ protected:
      * If not, return in idx the position where it needs to be inserted (-1 if it is the end)
      */
     ///@{
-    Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx);
-    const Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const;
+    Alignment *SearchAlignmentAtTime(const Fraction &time, AlignmentType type, int &idx);
+    const Alignment *SearchAlignmentAtTime(const Fraction &time, AlignmentType type, int &idx) const;
     ///@}
 
     /**
@@ -432,19 +496,19 @@ public:
      * The alignment object is added if not found.
      * The maximum time position is also adjusted accordingly for end barline positioning
      */
-    Alignment *GetAlignmentAtTime(double time, AlignmentType type);
+    Alignment *GetAlignmentAtTime(const Fraction &time, AlignmentType type);
 
     /**
      * Keep the maximum time of the measure.
      * This corresponds to the whole duration of the measure and
      * should be the same for all staves/layers.
      */
-    void SetMaxTime(double time);
+    void SetMaxTime(const Fraction &time);
 
     /**
      * Return the max time of the measure (i.e., the right measure alignment time)
      */
-    double GetMaxTime() const;
+    Fraction GetMaxTime() const;
 
     /**
      * @name Set and Get the non-justifiable margin (right and left scoreDefs)
@@ -458,8 +522,8 @@ public:
      * Setter takes a meter unit parameter.
      */
     ///@{
-    void SetInitialTstamp(int meterUnit);
-    double GetInitialTstampDur() const { return m_initialTstampDur; }
+    void SetInitialTstamp(data_DURATION meterUnit);
+    Fraction GetInitialTstampDur() const { return m_initialTstampDur; }
     ///@}
 
     /**
@@ -544,7 +608,7 @@ private:
      * The time duration of the timestamp between 0.0 and 1.0.
      * This depends on the meter signature in the preceeding scoreDef
      */
-    double m_initialTstampDur;
+    Fraction m_initialTstampDur;
 };
 
 //----------------------------------------------------------------------------
@@ -571,7 +635,7 @@ public:
      * Retrieve the alignmnet of the type at that time.
      * The alignment object is added if not found.
      */
-    Alignment *GetAlignmentAtTime(double time, AlignmentType type);
+    Alignment *GetAlignmentAtTime(const Fraction &time, AlignmentType type);
 
     /**
      * Because the grace notes appear from left to right but need to be aligned
