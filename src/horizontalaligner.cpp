@@ -131,8 +131,10 @@ void Fraction::Reduce()
         m_denominator = -m_denominator;
     }
     int gcdVal = std::gcd(abs(m_numerator), abs(m_denominator));
-    m_numerator /= gcdVal;
-    m_denominator /= gcdVal;
+    if (gcdVal != 1) {
+        m_numerator /= gcdVal;
+        m_denominator /= gcdVal;
+    }
 }
 
 std::pair<data_DURATION, Fraction> Fraction::ToDur() const
