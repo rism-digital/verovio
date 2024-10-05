@@ -252,42 +252,6 @@ bool IsDigits(const std::string &value)
     return std::regex_match(value, re);
 }
 
-// Function to compute the Greatest Common Divisor (GCD)
-int GCD(int a, int b)
-{
-    if (b == 0) {
-        return std::abs(a);
-    }
-    return GCD(b, a % b);
-}
-
-// Function to reduce the fraction
-void Reduce(int &numerator, int &denominator)
-{
-    // Handle cases with zero denominator or numerator
-    if ((denominator == 0) || (denominator == VRV_UNSET)) {
-        return;
-    }
-
-    if ((numerator == 0) || (denominator == VRV_UNSET)) {
-        denominator = 1; // A fraction with 0 numerator is 0/1
-        return;
-    }
-
-    // Get the greatest common divisor
-    int divisor = GCD(numerator, denominator);
-
-    // Divide numerator and denominator by GCD
-    numerator /= divisor;
-    denominator /= divisor;
-
-    // Ensure denominator is always positive
-    if (denominator < 0) {
-        numerator = -numerator;
-        denominator = -denominator;
-    }
-}
-
 std::string ExtractIDFragment(std::string refID)
 {
     size_t pos = refID.find_last_of("#");

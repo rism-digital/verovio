@@ -57,7 +57,7 @@ void Proport::Cumulate(const Proport *proport)
         m_cumulatedNumbase = this->GetNumbase() * proport->GetCumulatedNumbase();
     }
     if ((m_cumulatedNum != VRV_UNSET) && (m_cumulatedNumbase != VRV_UNSET)) {
-        vrv::Reduce(m_cumulatedNum, m_cumulatedNumbase);
+        Fraction::Reduce(m_cumulatedNum, m_cumulatedNumbase);
     }
 }
 

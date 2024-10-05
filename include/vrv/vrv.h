@@ -73,11 +73,6 @@ bool IsValidDouble(const std::string &value);
 bool IsDigits(const std::string &value);
 
 /**
- * Utility to reduce are faction of two integers
- */
-void Reduce(int &numerator, int &denominator);
-
-/**
  * Extract the ID from any URI
  */
 std::string ExtractIDFragment(std::string refID);

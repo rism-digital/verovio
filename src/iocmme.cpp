@@ -944,7 +944,7 @@ void CmmeInput::CreateProport(pugi::xml_node proportNode)
         // Cumulated it
         m_mensInfo->proportDen *= denVal;
     }
-    vrv::Reduce(m_mensInfo->proportNum, m_mensInfo->proportDen);
+    Fraction::Reduce(m_mensInfo->proportNum, m_mensInfo->proportDen);
     proport->SetType("cmme_proportion");
     m_currentContainer->AddChild(proport);
     return;
@@ -1073,7 +1073,7 @@ data_DURATION CmmeInput::ReadDuration(pugi::xml_node durationNode, int &num, int
         num = cmmeDen;
         numbase = cmmeNum;
 
-        vrv::Reduce(num, numbase);
+        Fraction::Reduce(num, numbase);
 
         if (num == numbase) {
             num = VRV_UNSET;
