@@ -152,6 +152,13 @@ std::pair<data_DURATION, Fraction> Fraction::ToDur() const
     return { dur, remainder };
 }
 
+void Fraction::Reduce(int &numerator, int &denominator)
+{
+    Fraction fraction(numerator, denominator);
+    numerator = fraction.GetNumerator();
+    denominator = fraction.GetDenominator();
+}
+
 //----------------------------------------------------------------------------
 // HorizontalAligner
 //----------------------------------------------------------------------------

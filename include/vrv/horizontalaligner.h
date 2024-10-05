@@ -112,6 +112,13 @@ public:
     /** Convert to data_DURATION and the remaining Fraction */
     std::pair<data_DURATION, Fraction> ToDur() const;
 
+    //----------------//
+    // Static methods //
+    //----------------//
+
+    /** Reduce the faction represented by the two numbers */
+    static void Reduce(int &numerator, int &denominator);
+
 private:
     /** Reduce the fraction */
     void Reduce();
