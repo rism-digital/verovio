@@ -82,8 +82,6 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
 
     Fraction duration(noteDur);
     duration = duration * numBase / num;
-    // double old = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
-    // duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numBase / num;
 
     int noteDots = (this->HasDotsGes()) ? this->GetDotsGes() : this->GetDots();
     if (noteDots != VRV_UNSET) {
@@ -97,7 +95,7 @@ Fraction DurationInterface::GetInterfaceAlignmentDuration(int num, int numBase) 
 Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
     int num, int numBase, const Mensur *currentMensur) const
 {
-    int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    data_DURATION noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
     if (noteDur == DURATION_NONE) noteDur = DURATION_4;
 
     if (!currentMensur) {
@@ -141,24 +139,24 @@ Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
     if (currentMensur->HasNum()) num *= currentMensur->GetNum();
     if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
 
-    double ratio = 0.0;
-    double duration = (double)DUR_MENSURAL_REF;
+    int ratio = 0;
+    Fraction duration(DURATION_breve);
     switch (noteDur) {
         case DURATION_maxima:
-            duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior());
+            duration = duration * abs(currentMensur->GetModusminor()) * abs(currentMensur->GetModusmaior());
             break;
-        case DURATION_long: duration *= (double)abs(currentMensur->GetModusminor()); break;
+        case DURATION_long: duration = duration * abs(currentMensur->GetModusminor()); break;
         case DURATION_breve: break;
-        case DURATION_1: duration /= (double)abs(currentMensur->GetTempus()); break;
+        case DURATION_1: duration = duration / abs(currentMensur->GetTempus()); break;
         default:
             ratio = pow(2.0, (double)(noteDur - DURATION_2));
-            duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
+            assert(ratio);
+            duration = duration / abs(currentMensur->GetTempus()) / abs(currentMensur->GetProlatio()) / ratio;
             break;
     }
-    duration *= (double)numBase / (double)num;
-    // LogDebug("Duration %d; %d/%d; Alignment %f; Ratio %f", noteDur, num, numbase, duration, ratio);
-    duration = durRound(duration);
-    return Fraction(DUR_MAX * duration, DUR_MAX * DUR_MAX);
+    duration = duration * numBase / num;
+
+    return duration;
 }
 
 bool DurationInterface::IsFirstInBeam(const LayerElement *noteOrRest) const
@@ -193,9 +191,9 @@ data_DURATION DurationInterface::GetActualDurGes() const
 
 data_DURATION DurationInterface::CalcActualDur(data_DURATION dur) const
 {
-    // maxima (-1) is a mensural only value
-    if (dur < DUR_MAX) return dur;
-    // Mensural duration (except maxima)
+    // No mapping needed for values below, including maxima and NONE
+    if (dur < DURATION_longa) return dur;
+    // Mensural durations (except maxima)
     switch (dur) {
         case DURATION_longa: return DURATION_long;
         case DURATION_brevis: return DURATION_breve;
@@ -235,7 +233,7 @@ bool DurationInterface::IsMensuralDur() const
 {
     // maxima (-1) is a mensural only value
     if (this->GetDur() == DURATION_maxima) return true;
-    return (this->GetDur() > DUR_MENSURAL_MASK);
+    return (this->GetDur() >= DURATION_longa);
 }
 
 bool DurationInterface::HasIdenticalDurationInterface(const DurationInterface *otherDurationInterface) const
