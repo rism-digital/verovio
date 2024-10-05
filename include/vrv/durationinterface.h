@@ -67,7 +67,7 @@ public:
 
     /**
      * Returns the duration (in Fraction) for the element for mensural notation
-     * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
+     * Currently this assume brevis equality and would
      * need to be modified for shorter equality in later repertoire.
      */
     Fraction GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
@@ -85,8 +85,7 @@ public:
     /**
      * @name Return the actual (gestural) duration of the note, for both CMN and mensural durations
      * See data_DURATION
-     * For CMN, it is the same (DURATION_1 == DURATION_1)
-     * For mensural, we need to apply the DUR_MENSURAL_MASK
+     * For Mensural, it is the same (DURATION_2 == DURATION_minima)
      */
     ///@{
     data_DURATION GetActualDur() const;
