@@ -272,7 +272,6 @@ bool MeasureAligner::IsSupportedChild(Object *child)
 Alignment *MeasureAligner::GetAlignmentAtTime(const Fraction &time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    // time = durRound(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;

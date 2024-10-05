@@ -430,8 +430,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
-#define durRound(dur) round(dur *pow(10, 8)) / pow(10, 8)
-
 /**
  * Codes returned by Functors.
  * Default is FUNCTOR_CONTINUE.

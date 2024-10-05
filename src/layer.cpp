@@ -362,7 +362,6 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     else {
         duration = measure->m_measureAligner.GetRightAlignment()->GetTime() - time;
     }
-    // duration = durRound(duration);
 
     if (this->GetLayerCountInTimeSpan(time, duration, measure, staff->GetN()) < 2) {
         return STEMDIRECTION_NONE;

@@ -527,7 +527,7 @@ public:
     /**
      * Get left Alignment for the measure and for the left BarLine.
      * For each MeasureAligner, we keep and Alignment for the left position.
-     * The Alignment time will be always -1.0 * DUR_MAX and will appear first in the list.
+     * The Alignment time will be always -1.0 and will appear first in the list.
      */
     ///@{
     Alignment *GetLeftAlignment() { return m_leftAlignment; }

@@ -34,12 +34,7 @@ typedef double data_VU;
 //----------------------------------------------------------------------------
 
 // used for alignement
-#define DUR_MAX 1024
-// mensural duration
-#define DUR_MENSURAL_OFFSET (2 * DUR_MAX)
-#define DUR_MENSURAL_MASK (2 * DUR_MAX - 1)
-// used for mensural alignment
-#define DUR_MENSURAL_REF 1728
+#define DUR_MAX 2048
 
 //----------------------------------------------------------------------------
 // MEI data defines
@@ -98,8 +93,8 @@ enum data_DURATION {
     DURATION_512,
     DURATION_1024, // 12
     DURATION_2048,
-    DURATION_longa = DUR_MENSURAL_OFFSET + DURATION_long,
-    DURATION_brevis,
+    DURATION_longa = 100,
+    DURATION_brevis, // 101
     DURATION_semibrevis,
     DURATION_minima,
     DURATION_semiminima,
