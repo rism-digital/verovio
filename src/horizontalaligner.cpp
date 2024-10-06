@@ -49,8 +49,8 @@ Fraction::Fraction(int num, int denom) : m_numerator(num), m_denominator(denom)
 
 Fraction::Fraction(data_DURATION duration)
 {
-    duration = vrv::DurationMin(duration, DURATION_1024);
-    duration = vrv::DurationMax(duration, DURATION_NONE);
+    duration = vrv::DurationMin(duration, DURATION_2048);
+    duration = vrv::DurationMax(duration, DURATION_maxima);
     int den = pow(2, (duration + 1));
     m_numerator = 8;
     m_denominator = den;
