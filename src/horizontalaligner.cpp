@@ -91,7 +91,7 @@ Fraction Fraction::operator/(const Fraction &other) const
 
 bool Fraction::operator==(const Fraction &other) const
 {
-    return (m_numerator == other.m_numerator) && (m_denominator == other.m_denominator);
+    return m_numerator * other.m_denominator == other.m_numerator * m_denominator;
 }
 
 bool Fraction::operator<(const Fraction &other) const
