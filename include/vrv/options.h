@@ -847,7 +847,7 @@ public:
      */
     OptionGrp m_jsonCmdLineOptions;
 
-    OptionString m_timemap;
+    OptionString m_timemapOptions;
 
     /**
      * Deprecated options

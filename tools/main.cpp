@@ -447,9 +447,9 @@ int main(int argc, char **argv)
         outfile += ".json";
         if (std_output) {
             std::string output;
-            std::cout << toolkit.RenderToTimemap(options->m_timemap.GetValue());
+            std::cout << toolkit.RenderToTimemap(options->m_timemapOptions.GetValue());
         }
-        else if (!toolkit.RenderToTimemapFile(outfile, options->m_timemap.GetValue())) {
+        else if (!toolkit.RenderToTimemapFile(outfile, options->m_timemapOptions.GetValue())) {
             std::cerr << "Unable to write timemap to " << outfile << "." << std::endl;
             exit(1);
         }

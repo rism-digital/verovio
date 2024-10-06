@@ -1832,9 +1832,9 @@ Options::Options()
     m_jsonCmdLineOptions.SetCategory(OptionsCategory::Json);
     m_grps.push_back(&m_jsonCmdLineOptions);
 
-    m_timemap.SetInfo("Timemap options", "The JSON options to be passed when producing the timemap");
-    m_timemap.Init("{}");
-    this->Register(&m_timemap, "timemap", &m_jsonCmdLineOptions);
+    m_timemapOptions.SetInfo("Timemap options", "The JSON options to be passed when producing the timemap");
+    m_timemapOptions.Init("{}");
+    this->Register(&m_timemapOptions, "timemapOptions", &m_jsonCmdLineOptions);
 
     /********* Deprecated options *********/
 
