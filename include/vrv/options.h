@@ -88,7 +88,7 @@ enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SM
 // Option
 //----------------------------------------------------------------------------
 
-enum class OptionsCategory { None, Base, General, Layout, Mensural, Margins, Midi, Selectors, Full };
+enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Selectors, Full };
 
 /**
  * This class is a base class of each styling parameter
@@ -841,6 +841,13 @@ public:
 
     OptionBool m_ligatureAsBracket;
     OptionBool m_mensuralToMeasure;
+
+    /**
+     * Additional options for passing method JSON options to the command-line
+     */
+    OptionGrp m_jsonCmdLineOptions;
+
+    OptionString m_timemap;
 
     /**
      * Deprecated options
