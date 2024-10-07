@@ -88,14 +88,8 @@ public:
 
     /** Equality operator */
     bool operator==(const Fraction &other) const;
-    /** Less than operator */
-    bool operator<(const Fraction &other) const;
-    /** Less than or equal operator */
-    bool operator<=(const Fraction &other) const;
-    /** Greater than operator */
-    bool operator>(const Fraction &other) const;
-    /** Greater than or equal operator */
-    bool operator>=(const Fraction &other) const;
+    /** Ordering operator */
+    std::strong_ordering operator<=>(const Fraction &other) const;
 
     /** Getters */
     int GetNumerator() const { return m_numerator; }
@@ -114,7 +108,7 @@ public:
     // Static methods //
     //----------------//
 
-    /** Reduce the faction represented by the two numbers */
+    /** Reduce the fraction represented by the two numbers */
     static void Reduce(int &numerator, int &denominator);
 
 private:

@@ -94,24 +94,9 @@ bool Fraction::operator==(const Fraction &other) const
     return m_numerator * other.m_denominator == other.m_numerator * m_denominator;
 }
 
-bool Fraction::operator<(const Fraction &other) const
+std::strong_ordering Fraction::operator<=>(const Fraction &other) const
 {
-    return m_numerator * other.m_denominator < other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator<=(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator <= other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator>(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator > other.m_numerator * m_denominator;
-}
-
-bool Fraction::operator>=(const Fraction &other) const
-{
-    return m_numerator * other.m_denominator >= other.m_numerator * m_denominator;
+    return m_numerator * other.m_denominator <=> other.m_numerator * m_denominator;
 }
 
 double Fraction::ToDouble() const
