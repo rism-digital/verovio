@@ -108,6 +108,19 @@ int MeterSig::GetTotalCount() const
     return counts.front();
 }
 
+data_DURATION MeterSig::GetUnitAsDur() const
+{
+    switch (this->GetUnit()) {
+        case 1: return DURATION_1;
+        case 2: return DURATION_2;
+        case 4: return DURATION_4;
+        case 8: return DURATION_8;
+        case 16: return DURATION_16;
+        case 32: return DURATION_32;
+        default: return DURATION_4;
+    }
+}
+
 char32_t MeterSig::GetSymbolGlyph() const
 {
     char32_t glyph = 0;

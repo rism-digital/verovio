@@ -59,7 +59,7 @@ public:
     /**
      * Return the offset of the clef
      */
-    int GetClefLocOffset() const;
+    int GetClefLocOffset(data_NOTATIONTYPE notationType) const;
 
     //----------------//
     // Static methods //

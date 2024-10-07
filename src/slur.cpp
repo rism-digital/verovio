@@ -526,6 +526,10 @@ const Staff *Slur::CalculateExtremalStaff(const Staff *staff, int xMin, int xMax
 
 bool Slur::IsElementBelow(const LayerElement *element, const Staff *startStaff, const Staff *endStaff) const
 {
+    assert(element);
+    assert(startStaff);
+    assert(endStaff);
+
     switch (this->GetDrawingCurveDir()) {
         case SlurCurveDirection::Above: return true;
         case SlurCurveDirection::Below: return false;
@@ -539,6 +543,10 @@ bool Slur::IsElementBelow(const LayerElement *element, const Staff *startStaff, 
 
 bool Slur::IsElementBelow(const FloatingPositioner *positioner, const Staff *startStaff, const Staff *endStaff) const
 {
+    assert(positioner);
+    assert(startStaff);
+    assert(endStaff);
+
     switch (this->GetDrawingCurveDir()) {
         case SlurCurveDirection::Above: return true;
         case SlurCurveDirection::Below: return false;

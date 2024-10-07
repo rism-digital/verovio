@@ -60,8 +60,9 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
     if (layerElement->Is(ACCID)) {
         Accid *accid = vrv_cast<Accid *>(layerElement);
         assert(accid);
-        if (!accid->GetFirstAncestor(NOTE) && !accid->GetFirstAncestor(CUSTOS)) {
+        if (!accid->GetFirstAncestor(NOTE) && !accid->GetFirstAncestor(CUSTOS) && !m_doc->IsNeumeLines()) {
             // do something for accid that are not children of a note - e.g., mensural?
+            // skip for neume-lines mode as accid doesn't have a pitch in this case
             accid->SetDrawingYRel(staffY->CalcPitchPosYRel(m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
         }
         // override if staff position is set explicitly
@@ -168,10 +169,10 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
             // set default location to the middle of the staff
             Staff *staff = layerElement->GetAncestorStaff();
             loc = staff->m_drawingLines - 1;
-            if ((durInterface->GetDur() < DUR_4) && (loc % 2 != 0)) --loc;
+            if ((durInterface->GetDur() < DURATION_4) && (loc % 2 != 0)) --loc;
             // Adjust special cases
-            if ((durInterface->GetDur() == DUR_1) && (staff->m_drawingLines > 1)) loc += 2;
-            if ((durInterface->GetDur() == DUR_BR) && (staff->m_drawingLines < 2)) loc -= 2;
+            if ((durInterface->GetDur() == DURATION_1) && (staff->m_drawingLines > 1)) loc += 2;
+            if ((durInterface->GetDur() == DURATION_breve) && (staff->m_drawingLines < 2)) loc -= 2;
 
             // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
             Beam *beam = vrv_cast<Beam *>(layerElement->GetFirstAncestor(BEAM, 1));
@@ -311,12 +312,15 @@ FunctorCode CalcAlignmentPitchPosFunctor::VisitLayerElement(LayerElement *layerE
         }
         layerElement->SetDrawingYRel(yRel);
     }
-    else if (layerElement->Is(NC) && m_doc->GetOptions()->m_neumeAsNote.GetValue()) {
+    else if (layerElement->Is(NC)) {
         Nc *nc = vrv_cast<Nc *>(layerElement);
         assert(nc);
         int loc = 0;
         if (nc->HasPname() && nc->HasOct()) {
             loc = PitchInterface::CalcLoc(nc->GetPname(), nc->GetOct(), layerY->GetClefLocOffset(nc));
+        }
+        else if (nc->HasLoc()) {
+            loc = nc->GetLoc();
         }
         int yRel = staffY->CalcPitchPosYRel(m_doc, loc);
         nc->SetDrawingLoc(loc);

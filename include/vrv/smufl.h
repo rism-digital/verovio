@@ -97,6 +97,8 @@ enum {
     SMUFL_E0B5_noteheadWholeWithX = 0xE0B5,
     SMUFL_E0B6_noteheadHalfWithX = 0xE0B6,
     SMUFL_E0B7_noteheadVoidWithX = 0xE0B7,
+    SMUFL_E0B8_noteheadSquareWhite = 0xE0B8,
+    SMUFL_E0B9_noteheadSquareBlack = 0xE0B9,
     SMUFL_E0D9_noteheadDiamondHalf = 0xE0D9,
     SMUFL_E0DA_noteheadDiamondHalfWide = 0xE0DA,
     SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
@@ -312,6 +314,8 @@ enum {
     SMUFL_E56F_ornamentHaydn = 0xE56F,
     SMUFL_E583_ornamentVerticalLine = 0xE583,
     SMUFL_E587_ornamentSchleifer = 0xE587,
+    SMUFL_E594_ornamentLeftVerticalStroke = 0xE594,
+    SMUFL_E595_ornamentLeftVerticalStrokeWithCross = 0xE595,
     SMUFL_E59D_ornamentZigZagLineNoRightEnd = 0xE59D,
     SMUFL_E59E_ornamentZigZagLineWithRightEnd = 0xE59E,
     SMUFL_E5B0_ornamentPrecompSlide = 0xE5B0,
@@ -466,6 +470,7 @@ enum {
     SMUFL_E99B_chantQuilisma = 0xE99B,
     SMUFL_E99E_chantOriscusLiquescens = 0xE99E,
     SMUFL_E99F_chantStrophicus = 0xE99F,
+    SMUFL_E9A1_chantPunctumDeminutum = 0xE9A1,
     SMUFL_E9B0_chantPodatusLower = 0xE9B0,
     SMUFL_E9B1_chantPodatusUpper = 0xE9B1,
     SMUFL_E9B2_chantDeminutumUpper = 0xE9B2,
@@ -499,6 +504,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA2A_medRenOriscusCMN = 0xEA2A,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
     SMUFL_EA52_figbass2 = 0xEA52,
@@ -654,7 +660,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 629
+#define SMUFL_COUNT 635
 
 } // namespace vrv
 

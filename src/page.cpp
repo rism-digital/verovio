@@ -23,6 +23,7 @@
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
+#include "adjustneumexfunctor.h"
 #include "adjustslursfunctor.h"
 #include "adjuststaffoverlapfunctor.h"
 #include "adjustsylspacingfunctor.h"
@@ -44,7 +45,7 @@
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
-#include "calcligaturenoteposfunctor.h"
+#include "calcligatureorneumeposfunctor.h"
 #include "calcslurdirectionfunctor.h"
 #include "calcspanningbeamspansfunctor.h"
 #include "calcstemfunctor.h"
@@ -252,6 +253,9 @@ void Page::LayOutTranscription(bool force)
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
+    CalcLigatureOrNeumePosFunctor calcLigatureOrNeumePos(doc);
+    this->Process(calcLigatureOrNeumePos);
+
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
 
@@ -261,13 +265,15 @@ void Page::LayOutTranscription(bool force)
     CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
 
-    // Render it for filling the bounding box
-    View view;
-    view.SetDoc(doc);
-    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
-    // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
-    view.DrawCurrentPage(&bBoxDC, false);
+    if (!m_layoutDone) {
+        // Render it for filling the bounding box
+        View view;
+        view.SetDoc(doc);
+        BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
+        // Do not do the layout in this view - otherwise we will loop...
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
 
     AdjustXRelForTranscriptionFunctor adjustXRelForTranscription;
     this->Process(adjustXRelForTranscription);
@@ -312,7 +318,7 @@ void Page::ResetAligners()
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
-        int longestActualDur = DUR_4;
+        data_DURATION longestActualDur = DURATION_4;
 
         // Detect the longest duration in order to adjust the spacing (false by default)
         if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
@@ -336,8 +342,8 @@ void Page::ResetAligners()
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
-    this->Process(calcLigatureNotePos);
+    CalcLigatureOrNeumePosFunctor calcLigatureOrNeumePos(doc);
+    this->Process(calcLigatureOrNeumePos);
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
@@ -396,6 +402,10 @@ void Page::LayOutHorizontally()
     // otherwise keep their relative positioning
     AdjustDotsFunctor adjustDots(doc, scoreDef->GetStaffNs());
     this->Process(adjustDots);
+
+    // Adjust the X position of the neume and syllables
+    AdjustNeumeXFunctor adjustNeumeX(doc);
+    this->Process(adjustNeumeX);
 
     // Adjust layers again, this time including dots positioning
     AdjustLayersFunctor adjustLayersWithDots(doc, scoreDef->GetStaffNs());

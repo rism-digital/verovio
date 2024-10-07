@@ -165,7 +165,7 @@ public:
     const Resources *GetDocResources() const;
 
     /**
-     * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
+     * Reset the object, that is 1) removing all children and 2) resetting all attributes.
      * The method is virtual, so _always_ call the parent in the method overriding it.
      */
     virtual void Reset();
@@ -659,6 +659,14 @@ public:
     virtual FunctorCode AcceptEnd(ConstFunctor &functor) const;
     ///@}
 
+    /**
+     * Output the class name of the object (or a custom msg) and of its children recursively
+     */
+    ///@{
+    void LogDebugTree(int maxDepth = UNLIMITED_DEPTH, int level = 0);
+    virtual std::string LogDebugTreeMsg() { return this->GetClassName(); }
+    ///@}
+
     //----------------//
     // Static methods //
     //----------------//
@@ -812,8 +820,8 @@ private:
 class ObjectListInterface {
 public:
     // constructors and destructors
-    ObjectListInterface(){};
-    virtual ~ObjectListInterface(){};
+    ObjectListInterface() = default;
+    virtual ~ObjectListInterface() = default;
     ObjectListInterface(const ObjectListInterface &listInterface); // copy constructor;
     ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignment;
 
@@ -911,8 +919,8 @@ private:
 class TextListInterface : public ObjectListInterface {
 public:
     // constructors and destructors
-    TextListInterface(){};
-    virtual ~TextListInterface(){};
+    TextListInterface() = default;
+    virtual ~TextListInterface() = default;
 
     /**
      * Returns a contatenated version of all the text children

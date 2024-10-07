@@ -127,6 +127,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FLAG)) {
         this->DrawFlag(dc, element, layer, staff, measure);
     }
+    else if (element->Is(GENERIC_ELEMENT)) {
+        this->DrawGenericLayerElement(dc, element, layer, staff, measure);
+    }
     else if (element->Is(GRACEGRP)) {
         this->DrawGraceGrp(dc, element, layer, staff, measure);
     }
@@ -175,11 +178,17 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NEUME)) {
         this->DrawNeume(dc, element, layer, staff, measure);
     }
+    else if (element->Is(ORISCUS)) {
+        this->DrawOriscus(dc, element, layer, staff, measure);
+    }
     else if (element->Is(PLICA)) {
         this->DrawPlica(dc, element, layer, staff, measure);
     }
     else if (element->Is(PROPORT)) {
         this->DrawProport(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(QUILISMA)) {
+        this->DrawQuilisma(dc, element, layer, staff, measure);
     }
     else if (element->Is(REST)) {
         this->DrawDurationElement(dc, element, layer, staff, measure);
@@ -266,7 +275,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         // look at the note position and adjust it if necessary
         Note *note = vrv_cast<Note *>(accid->GetFirstAncestor(NOTE, MAX_ACCID_DEPTH));
         if (note) {
-            const int drawingDur = note->GetDrawingDur();
+            const data_DURATION drawingDur = note->GetDrawingDur();
             int noteTop = note->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             int noteBottom = note->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             bool onStaff = (accid->GetOnstaff() == BOOLEAN_true);
@@ -276,7 +285,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 if (accid->GetFunc() != accidLog_FUNC_edit) onStaff = (accid->GetOnstaff() != BOOLEAN_false);
                 const int verticalCenter = staffTop - (staff->m_drawingLines - 1) * unit;
                 const data_STEMDIRECTION stemDir = this->GetMensuralStemDir(layer, note, verticalCenter);
-                if ((drawingDur > DUR_1) || (drawingDur < DUR_BR)) {
+                if ((drawingDur > DURATION_1) || (drawingDur < DURATION_breve)) {
                     if (stemDir == STEMDIRECTION_up) {
                         noteTop = note->GetDrawingY() + unit * STANDARD_STEMLENGTH;
                         noteBottom -= unit;
@@ -414,11 +423,23 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
         barLine->SetEmptyBB();
         return;
     }
+    StaffDef *drawingStaffDef = staff->m_drawingStaffDef;
+    // Determine the method
+    assert(drawingStaffDef);
+    auto [hasMethod, method] = barLine->GetMethodFromContext(drawingStaffDef);
+    if (barLine->HasMethod()) {
+        method = barLine->GetMethod();
+    }
 
     dc->StartGraphic(element, "", element->GetID());
 
-    const int yTop = staff->GetDrawingY();
-    const int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int yTop = staff->GetDrawingY();
+    int yBottom = yTop - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    if (method == BARMETHOD_takt) {
+        yTop += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        yBottom = yTop - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    }
 
     const int offset = (yTop == yBottom) ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : 0;
 
@@ -579,7 +600,7 @@ void View::DrawChordCluster(DeviceContext *dc, Chord *chord, Layer *layer, Staff
 
     dc->StartCustomGraphic("notehead");
 
-    if (chord->GetActualDur() < DUR_4) {
+    if (chord->GetActualDur() < DURATION_4) {
         const int line = unit / 2;
         this->DrawNotFilledRectangle(dc, x + line / 2, y1 - line / 2, x + width - line / 2, y2 + line / 2, line, 0);
     }
@@ -728,48 +749,23 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Select glyph to use for this custos
     const int sym = custos->GetCustosGlyph(staff->m_drawingNotationType);
 
-    int x, y;
-    // For neume notation we ignore the value set in CalcAlignmentPitchPosFunctor
-    if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
-        x = custos->GetDrawingX();
-        // Recalculate y from pitch to prevent visual/meaning mismatch
-        Clef *clef = layer->GetClef(element);
-        y = staff->GetDrawingY();
-        PitchInterface pi;
-        // Neume notation uses C3 for C clef rather than C4.
-        // Take this into account when determining location.
-        // However this doesn't affect the value for F clef.
-        pi.SetPname(PITCHNAME_c);
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            pi.SetOct(3);
-        }
-        else {
-            pi.SetOct(4);
-        }
-        // Convert from lines & spaces from bottom to from top
-        int CClefOffsetFromTop = ((staff->m_drawingLines - 1) * 2) - clef->GetClefLocOffset();
-        int custosOffsetFromTop = CClefOffsetFromTop + pi.PitchDifferenceTo(custos);
-        y -= custosOffsetFromTop * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        x = element->GetDrawingX();
-        y = element->GetDrawingY();
-        // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
-        // This will remain approximate
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
+
+    // Because SMuFL does not have the origin correpsonding to the pitch as for notes, we need to correct it.
+    // This will remain approximate
+    if (staff->m_drawingNotationType != NOTATIONTYPE_neume) {
         y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     if (staff->HasDrawingRotation()) {
         y -= staff->GetDrawingRotationOffsetFor(x);
     }
-    else if (staff->HasDrawingRotation()) {
-        y -= staff->GetDrawingRotationOffsetFor(x);
-    }
 
     this->DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false, true);
 
     /************ Draw children (accidentals, etc) ************/
-    // Drawing the children should be done before ending the graphic. Otherwise the SVG tree will not match the MEI one
+
     this->DrawLayerChildren(dc, custos, layer, staff, measure);
 
     dc->EndGraphic(element, this);
@@ -796,13 +792,13 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         int y = element->GetDrawingY();
 
         if (m_doc->GetType() != Transcription) {
-            // Use the note to which the points to for position
-            if (dot->m_drawingPreviousElement && !dot->m_drawingNextElement) {
+            // Use the note to which the points to for position if no next element or for augmentation dots
+            if (dot->m_drawingPreviousElement && (!dot->m_drawingNextElement || dot->GetForm() == dotLog_FORM_aug)) {
                 x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
                 y = dot->m_drawingPreviousElement->GetDrawingY();
                 this->DrawDotsPart(dc, x, y, 1, staff);
             }
-            if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
+            else if (dot->m_drawingPreviousElement && dot->m_drawingNextElement) {
                 // Do not take into account the spacing since it is place in-between
                 dc->DeactivateGraphicX();
                 x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingPreviousElement->GetDrawingX()) / 2);
@@ -912,6 +908,20 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         char32_t code = flag->GetFlagGlyph(stem->GetDrawingStemDir());
         this->DrawSmuflCode(dc, x, y, code, staff->GetDrawingStaffNotationSize(), flag->GetDrawingCueSize());
     }
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawGenericLayerElement(
+    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    dc->StartGraphic(element, "", element->GetID());
 
     dc->EndGraphic(element, this);
 }
@@ -1179,12 +1189,9 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     const bool drawingCueSize = mRest->GetDrawingCueSize();
     int x = mRest->GetDrawingX();
-    int y = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2))
-        ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staffSize)
-        : element->GetDrawingY();
-    char32_t rest
-        = (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
-    // pseudo mensural notation
+    const bool isDouble = (measure->m_measureAligner.GetMaxTime() >= Fraction(2, 1));
+    int y = isDouble ? element->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staffSize) : element->GetDrawingY();
+    char32_t rest = isDouble ? SMUFL_E4E2_restDoubleWhole : SMUFL_E4E3_restWhole;
     if (staff->IsMensural()) rest = SMUFL_E9F4_mensuralRestSemibrevis;
 
     x -= m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize) / 2;
@@ -1192,7 +1199,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     this->DrawSmuflCode(dc, x, y, rest, staffSize, drawingCueSize);
 
     // single legder line for whole rest glyphs
-    if ((measure->m_measureAligner.GetMaxTime() < (DUR_MAX * 2))
+    if ((measure->m_measureAligner.GetMaxTime() < Fraction(DURATION_1))
         && (y > staff->GetDrawingY()
             || y < staff->GetDrawingY() - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staffSize))) {
         const int width = m_doc->GetGlyphWidth(rest, staffSize, drawingCueSize);
@@ -1471,24 +1478,24 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (!(note->GetHeadVisible() == BOOLEAN_false)) {
         /************** Noteheads: **************/
-        int drawingDur = note->GetDrawingDur();
-        if (drawingDur == DUR_NONE) {
+        data_DURATION drawingDur = note->GetDrawingDur();
+        if (drawingDur == DURATION_NONE) {
             if (note->IsInBeam() && !dc->Is(BBOX_DEVICE_CONTEXT)) {
                 LogWarning("Missing duration for note '%s' in beam", note->GetID().c_str());
             }
-            drawingDur = DUR_4;
+            drawingDur = DURATION_4;
         }
-        if (drawingDur < DUR_BR) {
+        if (drawingDur < DURATION_breve) {
             this->DrawMaximaToBrevis(dc, noteY, element, layer, staff);
         }
         else {
             // Whole notes
             char32_t fontNo;
             if (note->GetColored() == BOOLEAN_true) {
-                if (DUR_1 == drawingDur) {
+                if (DURATION_1 == drawingDur) {
                     fontNo = SMUFL_E0FA_noteheadWholeFilled;
                 }
-                else if (DUR_2 == drawingDur) {
+                else if (DURATION_2 == drawingDur) {
                     fontNo = SMUFL_E0FB_noteheadHalfFilled;
                 }
                 else {
@@ -1556,12 +1563,12 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     const bool drawingCueSize = rest->GetDrawingCueSize();
     const int staffSize = staff->GetDrawingStaffNotationSize();
-    int drawingDur = rest->GetActualDur();
-    if (drawingDur == DUR_NONE) {
+    data_DURATION drawingDur = rest->GetActualDur();
+    if (drawingDur == DURATION_NONE) {
         if (!dc->Is(BBOX_DEVICE_CONTEXT)) {
             LogWarning("Missing duration for rest '%s'", rest->GetID().c_str());
         }
-        drawingDur = DUR_4;
+        drawingDur = DURATION_4;
     }
     const char32_t drawingGlyph = rest->GetRestGlyph(drawingDur);
 
@@ -1570,7 +1577,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     this->DrawSmuflCode(dc, x, y, drawingGlyph, staffSize, drawingCueSize);
 
-    if ((drawingDur == DUR_1 || drawingDur == DUR_2 || drawingDur == DUR_BR)) {
+    if ((drawingDur == DURATION_1 || drawingDur == DURATION_2 || drawingDur == DURATION_breve)) {
         const int width = m_doc->GetGlyphWidth(drawingGlyph, staffSize, drawingCueSize);
         int ledgerLineThickness
             = m_doc->GetOptions()->m_ledgerLineThickness.GetValue() * m_doc->GetDrawingUnit(staffSize);
@@ -1586,14 +1593,14 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
         dc->StartCustomGraphic("ledgerLines");
         // single legder line for half and whole rests
-        if ((drawingDur == DUR_1 || drawingDur == DUR_2) && (y > topMargin || y < bottomMargin)) {
+        if ((drawingDur == DURATION_1 || drawingDur == DURATION_2) && (y > topMargin || y < bottomMargin)) {
             dc->DeactivateGraphicX();
             this->DrawHorizontalLine(
                 dc, x - ledgerLineExtension, x + width + ledgerLineExtension, y, ledgerLineThickness);
             dc->ReactivateGraphic();
         }
         // double ledger line for breve rests
-        else if (drawingDur == DUR_BR && (y >= topMargin || y <= bottomMargin)) {
+        else if (drawingDur == DURATION_breve && (y >= topMargin || y <= bottomMargin)) {
             const int height = m_doc->GetGlyphHeight(drawingGlyph, staffSize, drawingCueSize);
             dc->DeactivateGraphicX();
             if (y != topMargin) {
@@ -1640,7 +1647,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // We check if this belongs to a mensural note
     Note *parent = vrv_cast<Note *>(stem->GetFirstAncestor(NOTE));
     if (parent && parent->IsMensuralDur()) {
-        if (parent->GetDrawingDur() > DUR_1) {
+        if (parent->GetDrawingDur() > DURATION_1) {
             /************** Stem/notehead direction: **************/
             const int staffCenter
                 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
@@ -1717,8 +1724,9 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
         note = vrv_cast<Note *>(childElement);
     }
     else if (childElement->Is(CHORD)) {
-        note = (stemDir == STEMDIRECTION_up) ? vrv_cast<Chord *>(childElement)->GetTopNote()
-                                             : vrv_cast<Chord *>(childElement)->GetBottomNote();
+        Chord *chord = vrv_cast<Chord *>(childElement);
+        assert(chord);
+        note = (stemDir == STEMDIRECTION_up) ? chord->GetTopNote() : chord->GetBottomNote();
     }
     if (!note || note->IsGraceNote() || note->GetDrawingCueSize()) return;
 
@@ -1733,7 +1741,8 @@ void View::DrawStemMod(DeviceContext *dc, LayerElement *element, Staff *staff)
 
     // calculate position for the stem mod
     const int y = note->GetDrawingY() + stemRelY;
-    const int x = (drawingDur <= DUR_1) ? childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc) : stemX;
+    const int x
+        = (drawingDur <= DURATION_1) ? childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc) : stemX;
 
     if ((code != SMUFL_E645_vocalSprechgesang) || !element->Is(BTREM)) {
         int adjust = 0;

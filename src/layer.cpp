@@ -288,7 +288,9 @@ int Layer::GetClefLocOffset(const LayerElement *test) const
 {
     const Clef *clef = this->GetClef(test);
     if (!clef) return 0;
-    return clef->GetClefLocOffset();
+    const Staff *staff = vrv_cast<const Staff *>(this->GetFirstAncestor(STAFF));
+    assert(staff);
+    return clef->GetClefLocOffset(staff->m_drawingNotationType);
 }
 
 int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOffset) const
@@ -298,7 +300,7 @@ int Layer::GetCrossStaffClefLocOffset(const LayerElement *element, int currentOf
         if (!element->Is(CLEF)) {
             const Clef *clef = vrv_cast<const Clef *>(GetListFirstBackward(element, CLEF));
             if (clef && clef->m_crossStaff) {
-                return clef->GetClefLocOffset();
+                return clef->GetClefLocOffset(element->m_crossStaff->m_drawingNotationType);
             }
         }
     }
@@ -349,8 +351,8 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     // We are ignoring cross-staff situation here because this should not be called if we have one
     const Staff *staff = first->GetAncestorStaff();
 
-    double time = alignmentFirst->GetTime();
-    double duration = 0.0;
+    Fraction time = alignmentFirst->GetTime();
+    Fraction duration;
     // For the sake of counting number of layers consider only current measure. If first and last elements' layers are
     // different, take only time within current measure to run GetLayerCountInTimeSpan.
     const Measure *lastMeasure = vrv_cast<const Measure *>(last->GetFirstAncestor(MEASURE));
@@ -360,7 +362,6 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coor
     else {
         duration = measure->m_measureAligner.GetRightAlignment()->GetTime() - time;
     }
-    duration = durRound(duration);
 
     if (this->GetLayerCountInTimeSpan(time, duration, measure, staff->GetN()) < 2) {
         return STEMDIRECTION_NONE;
@@ -390,7 +391,8 @@ int Layer::GetLayerCountForTimeSpanOf(const LayerElement *element) const
     return static_cast<int>(this->GetLayersNForTimeSpanOf(element).size());
 }
 
-std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, const Measure *measure, int staff) const
+std::set<int> Layer::GetLayersNInTimeSpan(
+    const Fraction &time, const Fraction &duration, const Measure *measure, int staff) const
 {
     assert(measure);
 
@@ -407,7 +409,8 @@ std::set<int> Layer::GetLayersNInTimeSpan(double time, double duration, const Me
     return layersInTimeSpan.GetLayers();
 }
 
-int Layer::GetLayerCountInTimeSpan(double time, double duration, const Measure *measure, int staff) const
+int Layer::GetLayerCountInTimeSpan(
+    const Fraction &time, const Fraction &duration, const Measure *measure, int staff) const
 {
     return static_cast<int>(this->GetLayersNInTimeSpan(time, duration, measure, staff).size());
 }
@@ -428,8 +431,8 @@ ListOfConstObjects Layer::GetLayerElementsForTimeSpanOf(const LayerElement *elem
     const Measure *measure = vrv_cast<const Measure *>(this->GetFirstAncestor(MEASURE));
     assert(measure);
 
-    double time = 0.0;
-    double duration = 0.0;
+    Fraction time;
+    Fraction duration;
     const Alignment *alignment = element->GetAlignment();
     // Get duration and time if element has alignment
     if (alignment) {
@@ -447,7 +450,7 @@ ListOfConstObjects Layer::GetLayerElementsForTimeSpanOf(const LayerElement *elem
         if (!first || !last) return {};
 
         time = first->GetAlignment()->GetTime();
-        double lastTime = last->GetAlignment()->GetTime();
+        Fraction lastTime = last->GetAlignment()->GetTime();
         duration = lastTime - time + last->GetAlignmentDuration();
     }
     else {
@@ -460,7 +463,7 @@ ListOfConstObjects Layer::GetLayerElementsForTimeSpanOf(const LayerElement *elem
 }
 
 ListOfObjects Layer::GetLayerElementsInTimeSpan(
-    double time, double duration, const Measure *measure, int staff, bool excludeCurrent)
+    const Fraction &time, const Fraction &duration, const Measure *measure, int staff, bool excludeCurrent)
 {
     ListOfConstObjects elements
         = std::as_const(*this).GetLayerElementsInTimeSpan(time, duration, measure, staff, excludeCurrent);
@@ -471,7 +474,7 @@ ListOfObjects Layer::GetLayerElementsInTimeSpan(
 }
 
 ListOfConstObjects Layer::GetLayerElementsInTimeSpan(
-    double time, double duration, const Measure *measure, int staff, bool excludeCurrent) const
+    const Fraction &time, const Fraction &duration, const Measure *measure, int staff, bool excludeCurrent) const
 {
     assert(measure);
 

@@ -1761,11 +1761,11 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
-                && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
-                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
+                && (iter->m_note->GetRealTimeOnsetMilliseconds() < jter->m_note->GetRealTimeOnsetMilliseconds())
+                && (jter->m_note->GetRealTimeOnsetMilliseconds() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
-                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
+                lastScoreTimeOnset = jter->m_note->GetRealTimeOnsetMilliseconds();
                 tieMatched = true;
                 break;
             }
@@ -2591,6 +2591,11 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
+    if (harmText.empty()) {
+        pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
+        harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
+        alter = node.select_node("numeral/numeral-alter");
+    }
     if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xml_node kind = node.child("kind");
     if (kind) {
@@ -2825,7 +2830,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!noteID.empty()) {
             note->SetID(noteID);
         }
-        note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
+        note->SetRealTimeOnsetSeconds(onset); // remember the MIDI onset within that measure
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(
