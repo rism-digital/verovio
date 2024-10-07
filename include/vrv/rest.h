@@ -87,7 +87,7 @@ public:
      */
     ///@{
     char32_t GetRestGlyph() const;
-    char32_t GetRestGlyph(const int duration) const;
+    char32_t GetRestGlyph(const data_DURATION duration) const;
     ///@}
 
     /**

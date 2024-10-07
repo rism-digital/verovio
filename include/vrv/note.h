@@ -150,7 +150,7 @@ public:
     ///@{
     Chord *IsChordTone();
     const Chord *IsChordTone() const;
-    int GetDrawingDur() const;
+    data_DURATION GetDrawingDur() const;
     bool IsNoteGroupExtreme() const; // used to find if it is the highest or lowest note in a note group
     ///@}
 
@@ -215,7 +215,7 @@ public:
     /**
      * Return a SMuFL code for the notehead
      */
-    char32_t GetNoteheadGlyph(const int duration) const;
+    char32_t GetNoteheadGlyph(const data_DURATION duration) const;
 
     /**
      * Check whether current note is enharmonic with another

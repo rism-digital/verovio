@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "alignfunctor.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "staff.h"
@@ -21,13 +22,11 @@ namespace vrv {
 
 LayersInTimeSpanFunctor::LayersInTimeSpanFunctor(const MeterSig *meterSig, const Mensur *mensur) : ConstFunctor()
 {
-    m_time = 0.0;
-    m_duration = 0.0;
-    m_meterSig = meterSig;
-    m_mensur = mensur;
+    m_meterParams.meterSig = meterSig;
+    m_meterParams.mensur = mensur;
 }
 
-void LayersInTimeSpanFunctor::SetEvent(double time, double duration)
+void LayersInTimeSpanFunctor::SetEvent(const Fraction &time, const Fraction &duration)
 {
     m_time = time;
     m_duration = duration;
@@ -50,15 +49,15 @@ FunctorCode LayersInTimeSpanFunctor::VisitLayerElement(const LayerElement *layer
         return FUNCTOR_CONTINUE;
     if (layerElement->Is(NOTE) && layerElement->GetParent()->Is(CHORD)) return FUNCTOR_CONTINUE;
 
-    double duration = layerElement->GetAlignmentDuration(m_mensur, m_meterSig);
-    double time = layerElement->GetAlignment()->GetTime();
+    Fraction duration = layerElement->GetAlignmentDuration(m_meterParams);
+    Fraction time = layerElement->GetAlignment()->GetTime();
 
     // The event is starting after the end of the element
-    if (time + duration <= m_time) {
+    if ((time + duration) <= m_time) {
         return FUNCTOR_CONTINUE;
     }
     // The element is starting after the event end - we can stop here
-    else if (time >= m_time + m_duration) {
+    else if (time >= (m_time + m_duration)) {
         return FUNCTOR_STOP;
     }
 
@@ -71,14 +70,14 @@ FunctorCode LayersInTimeSpanFunctor::VisitLayerElement(const LayerElement *layer
 
 FunctorCode LayersInTimeSpanFunctor::VisitMensur(const Mensur *mensur)
 {
-    m_mensur = mensur;
+    m_meterParams.mensur = mensur;
 
     return FUNCTOR_CONTINUE;
 }
 
 FunctorCode LayersInTimeSpanFunctor::VisitMeterSig(const MeterSig *meterSig)
 {
-    m_meterSig = meterSig;
+    m_meterParams.meterSig = meterSig;
 
     return FUNCTOR_CONTINUE;
 }
@@ -91,15 +90,15 @@ LayerElementsInTimeSpanFunctor::LayerElementsInTimeSpanFunctor(
     const MeterSig *meterSig, const Mensur *mensur, const Layer *layer)
     : ConstFunctor()
 {
-    m_time = 0.0;
-    m_duration = 0.0;
-    m_meterSig = meterSig;
-    m_mensur = mensur;
+    m_time = 0;
+    m_duration = 0;
+    m_meterParams.meterSig = meterSig;
+    m_meterParams.mensur = mensur;
     m_layer = layer;
     m_allLayersButCurrent = false;
 }
 
-void LayerElementsInTimeSpanFunctor::SetEvent(double time, double duration)
+void LayerElementsInTimeSpanFunctor::SetEvent(const Fraction &time, const Fraction &duration)
 {
     m_time = time;
     m_duration = duration;
@@ -123,11 +122,11 @@ FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement
 
     if (!layerElement->GetDurationInterface() || layerElement->Is({ MSPACE, SPACE })) return FUNCTOR_CONTINUE;
 
-    const double duration = !layerElement->GetFirstAncestor(CHORD)
-        ? layerElement->GetAlignmentDuration(m_mensur, m_meterSig)
-        : vrv_cast<const Chord *>(layerElement->GetFirstAncestor(CHORD))->GetAlignmentDuration(m_mensur, m_meterSig);
+    Fraction duration = !layerElement->GetFirstAncestor(CHORD)
+        ? layerElement->GetAlignmentDuration(m_meterParams)
+        : vrv_cast<const Chord *>(layerElement->GetFirstAncestor(CHORD))->GetAlignmentDuration(m_meterParams);
 
-    const double time = layerElement->GetAlignment()->GetTime();
+    Fraction time = layerElement->GetAlignment()->GetTime();
 
     // The event is starting after the end of the element
     if ((time + duration) <= m_time) return FUNCTOR_CONTINUE;

@@ -318,7 +318,7 @@ void Page::ResetAligners()
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
-        int longestActualDur = DUR_4;
+        data_DURATION longestActualDur = DURATION_4;
 
         // Detect the longest duration in order to adjust the spacing (false by default)
         if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
