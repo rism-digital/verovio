@@ -90,7 +90,7 @@ public:
     bool operator==(const Fraction &other) const;
     /** Ordering operator */
     std::strong_ordering operator<=>(const Fraction &other) const;
-    
+
     /** Getters */
     int GetNumerator() const { return m_numerator; }
     int GetDenominator() const { return m_denominator; }
