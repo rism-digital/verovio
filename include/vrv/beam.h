@@ -156,7 +156,7 @@ private:
     int CalcMixedBeamCenterY(int step, int unit) const;
 
     // Helper to calculate location and duration of the note that would be setting highest/lowest point for the beam
-    std::tuple<int, int, int> CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const;
+    std::tuple<int, int, data_DURATION> CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const;
 
     // Calculate positioning for the horizontal beams
     void CalcHorizontalBeam(const Doc *doc, const Staff *staff, const BeamDrawingInterface *beamInterface);
@@ -429,7 +429,8 @@ public:
     void SetClosestNoteOrTabDurSym(data_STEMDIRECTION stemDir, bool outsideStaff);
 
     /** Helper for calculating the stem length for staff notation and tablature beams within the staff */
-    int CalculateStemLength(const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, int preferredDur) const;
+    int CalculateStemLength(
+        const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, data_DURATION preferredDur) const;
 
     /** Helper for calculating the stem length for tablature beam placed outside the staff */
     int CalculateStemLengthTab(const Staff *staff, data_STEMDIRECTION stemDir) const;
@@ -454,7 +455,7 @@ public:
 
     int m_x;
     int m_yBeam; // y value of stem top position
-    int m_dur; // drawing duration
+    data_DURATION m_dur; // drawing duration
     int m_breaksec;
     int m_overlapMargin;
     int m_maxShortening; // maximum allowed shortening in half units

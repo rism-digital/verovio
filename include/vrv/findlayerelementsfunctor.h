@@ -41,7 +41,7 @@ public:
     /*
      * Set the time and duration of the event
      */
-    void SetEvent(double time, double duration);
+    void SetEvent(const Fraction &time, const Fraction &duration);
 
     /*
      * Retrieve the search result
@@ -65,9 +65,9 @@ public:
     //
 private:
     // The time of the event
-    double m_time;
+    Fraction m_time;
     // The duration of the event
-    double m_duration;
+    Fraction m_duration;
     // The layers (layerN) found
     std::set<int> m_layers;
     // The current time alignment parameters
@@ -99,7 +99,7 @@ public:
     /*
      * Set the time and duration of the event
      */
-    void SetEvent(double time, double duration);
+    void SetEvent(const Fraction &time, const Fraction &duration);
 
     /*
      * Consider all layers except the current one
@@ -126,9 +126,9 @@ public:
     //
 private:
     // The time of the event
-    double m_time;
+    Fraction m_time;
     // The duration of the event
-    double m_duration;
+    Fraction m_duration;
     // The list of layer elements found
     ListOfConstObjects m_elements;
     // The current time alignment parameters

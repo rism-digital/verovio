@@ -22,6 +22,7 @@
 #include <time.h>
 #endif
 
+#include "attdef.h"
 #include "atttypes.h"
 #include "toolkitdef.h"
 
@@ -130,6 +131,12 @@ std::string FromCamelCase(const std::string &s);
  * Convert string to camelCase.
  */
 std::string ToCamelCase(const std::string &s);
+
+/*
+ * Min / Max for data_DURATION (std::min/max not possible)
+ */
+data_DURATION DurationMin(data_DURATION dur1, data_DURATION dur2);
+data_DURATION DurationMax(data_DURATION dur1, data_DURATION dur2);
 
 /**
  *
