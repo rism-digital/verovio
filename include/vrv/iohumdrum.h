@@ -278,6 +278,7 @@ namespace humaux {
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
         Note *ottavanotestart;
+        std::string ottavanotestartid;
         Note *ottavanoteend;
         hum::HumNum ottavaendtimestamp;
         Measure *ottavameasure;
@@ -286,6 +287,7 @@ namespace humaux {
         // an ottava down line which will be turned off later.  ottavadownmeasure == the
         // starting measure of the ottava down mark.
         Note *ottavadownnotestart;
+        std::string ottavadownnotestartid;
         Note *ottavadownnoteend;
         hum::HumNum ottavadownendtimestamp;
         Measure *ottavadownmeasure;
@@ -294,6 +296,7 @@ namespace humaux {
         // an ottava2 line which will be turned off later.  ottava2measure == the
         // starting measure of the ottava2 mark.
         Note *ottava2notestart;
+        std::string ottava2notestartid;
         Note *ottava2noteend;
         hum::HumNum ottava2endtimestamp;
         Measure *ottava2measure;
@@ -302,6 +305,7 @@ namespace humaux {
         // an ottava2 down line which will be turned off later.  ottava2downmeasure == the
         // starting measure of the ottava2 down mark.
         Note *ottava2downnotestart;
+        std::string ottava2downnotestartid;
         Note *ottava2downnoteend;
         hum::HumNum ottava2downendtimestamp;
         Measure *ottava2downmeasure;
@@ -710,6 +714,7 @@ protected:
     std::string getInstrumentClass(hum::HTp start);
     void removeInstrumentName(StaffDef *sd);
     void removeInstrumentAbbreviation(StaffDef *sd);
+    std::string getStartIdForOttava(hum::HTp token);
     std::string getEndIdForOttava(hum::HTp token);
     void prepareInitialOttavas(hum::HTp measure);
     void linkFingeringToNote(Fing *fing, hum::HTp token, int xstaffindex);
@@ -893,6 +898,10 @@ protected:
     int getKeySignatureNumber(const std::string &humkeysig);
     int getStaffNumForSpine(hum::HTp token);
     bool checkIfReversedSpineOrder(std::vector<hum::HTp> &staffstarts);
+    bool hasOmdText(int startline, int endline);
+    void processMeiOptions(hum::HumdrumFile &infile);
+    std::string getInstrumentNumber(hum::HTp icode);
+    void insertTextWithNewlines(Label *label, const std::string &text);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -926,6 +935,7 @@ protected:
     int getBestItem(const std::vector<HumdrumReferenceItem> &items, const std::string &requiredLanguage);
     bool isStandardHumdrumKey(const std::string &key);
     void appendText(pugi::xml_node element, std::string text);
+    void addDefaultTempoDist(double distance);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);

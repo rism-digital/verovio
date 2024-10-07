@@ -167,8 +167,8 @@ export class VerovioToolkit {
         return JSON.parse(this.proxy.renderToExpansionMap(this.ptr));
     }
 
-    renderToMIDI(options) {
-        return this.proxy.renderToMIDI(this.ptr, JSON.stringify(options));
+    renderToMIDI() {
+        return this.proxy.renderToMIDI(this.ptr);
     }
 
     renderToPAE() {
@@ -209,7 +209,7 @@ export class VerovioToolkit {
 
     preprocessOptions(options) {
         // Nothing to do if we do not have 'fontAddCustom' set
-        if (!Object.hasOwn(options, 'fontAddCustom')) {
+        if (!options.hasOwnProperty('fontAddCustom')) {
             return options;
         }
         const filenames = options['fontAddCustom'];

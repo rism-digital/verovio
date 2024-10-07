@@ -23,6 +23,7 @@
 #include "layer.h"
 #include "ligature.h"
 #include "mrest.h"
+#include "nc.h"
 #include "octave.h"
 #include "page.h"
 #include "repeatmark.h"
@@ -340,6 +341,18 @@ FunctorCode ResetDataFunctor::VisitNote(Note *note)
     note->SetStemSameasNote(NULL);
     note->SetStemSameasRole(SAMEAS_NONE);
 
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ResetDataFunctor::VisitNc(Nc *nc)
+{
+    // Call parent one too
+    this->VisitLayerElement(nc);
+
+    nc->m_drawingGlyphs.clear();
+
+    // We want the list of the ObjectListInterface to be regenerated
+    nc->Modify();
     return FUNCTOR_CONTINUE;
 }
 

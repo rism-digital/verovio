@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <math.h>
+#include <numeric>
 
 //----------------------------------------------------------------------------
 
@@ -34,6 +35,131 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Fraction
+//----------------------------------------------------------------------------
+
+Fraction::Fraction(int num, int denom) : m_numerator(num), m_denominator(denom)
+{
+    if (denom == 0) {
+        LogDebug("Denominator cannot be zero.");
+        denom = 1;
+    }
+    Reduce();
+}
+
+Fraction::Fraction(data_DURATION duration)
+{
+    duration = vrv::DurationMin(duration, DURATION_2048);
+    duration = vrv::DurationMax(duration, DURATION_maxima);
+    int den = pow(2, (duration + 1));
+    m_numerator = 8;
+    m_denominator = den;
+    Reduce();
+}
+
+Fraction Fraction::operator+(const Fraction &other) const
+{
+    int num = m_numerator * other.m_denominator + other.m_numerator * m_denominator;
+    int denom = m_denominator * other.m_denominator;
+    return Fraction(num, denom);
+}
+
+Fraction Fraction::operator-(const Fraction &other) const
+{
+    int num = m_numerator * other.m_denominator - other.m_numerator * m_denominator;
+    int denom = m_denominator * other.m_denominator;
+    return Fraction(num, denom);
+}
+
+Fraction Fraction::operator*(const Fraction &other) const
+{
+    int num = m_numerator * other.m_numerator;
+    int denom = m_denominator * other.m_denominator;
+    return Fraction(num, denom);
+}
+
+Fraction Fraction::operator/(const Fraction &other) const
+{
+    if (other.m_numerator == 0) {
+        LogDebug("Cannot divide by zero.");
+        return *this;
+    }
+    int num = m_numerator * other.m_denominator;
+    int denom = m_denominator * other.m_numerator;
+    return Fraction(num, denom);
+}
+
+bool Fraction::operator==(const Fraction &other) const
+{
+    return m_numerator * other.m_denominator == other.m_numerator * m_denominator;
+}
+
+bool Fraction::operator<(const Fraction &other) const
+{
+    return m_numerator * other.m_denominator < other.m_numerator * m_denominator;
+}
+
+bool Fraction::operator<=(const Fraction &other) const
+{
+    return m_numerator * other.m_denominator <= other.m_numerator * m_denominator;
+}
+
+bool Fraction::operator>(const Fraction &other) const
+{
+    return m_numerator * other.m_denominator > other.m_numerator * m_denominator;
+}
+
+bool Fraction::operator>=(const Fraction &other) const
+{
+    return m_numerator * other.m_denominator >= other.m_numerator * m_denominator;
+}
+
+double Fraction::ToDouble() const
+{
+    return static_cast<double>(m_numerator) / m_denominator;
+}
+
+std::string Fraction::ToString() const
+{
+    return StringFormat("%d/%d", m_numerator, m_denominator);
+}
+
+void Fraction::Reduce()
+{
+    if (m_denominator < 0) { // Keep the denominator positive
+        m_numerator = -m_numerator;
+        m_denominator = -m_denominator;
+    }
+    int gcdVal = std::gcd(abs(m_numerator), abs(m_denominator));
+    if (gcdVal != 1) {
+        m_numerator /= gcdVal;
+        m_denominator /= gcdVal;
+    }
+}
+
+std::pair<data_DURATION, Fraction> Fraction::ToDur() const
+{
+    if (m_numerator == 0) return { DURATION_NONE, 0 };
+
+    int value = ceil(log2((double)m_denominator / (double)m_numerator * 8)) - 1;
+    data_DURATION dur = static_cast<data_DURATION>(value);
+    dur = vrv::DurationMax(DURATION_maxima, dur);
+    dur = vrv::DurationMin(DURATION_2048, dur);
+
+    Fraction remainder = *this - Fraction(dur);
+    // Making sure we would not be trigger an inifite loop when looping over the remainder
+    if ((remainder >= *this) || (remainder < 0)) remainder = 0;
+    return { dur, remainder };
+}
+
+void Fraction::Reduce(int &numerator, int &denominator)
+{
+    Fraction fraction(numerator, denominator);
+    numerator = fraction.GetNumerator();
+    denominator = fraction.GetDenominator();
+}
+
+//----------------------------------------------------------------------------
 // HorizontalAligner
 //----------------------------------------------------------------------------
 
@@ -49,12 +175,12 @@ void HorizontalAligner::Reset()
     Object::Reset();
 }
 
-Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx)
+Alignment *HorizontalAligner::SearchAlignmentAtTime(const Fraction &time, AlignmentType type, int &idx)
 {
     return const_cast<Alignment *>(std::as_const(*this).SearchAlignmentAtTime(time, type, idx));
 }
 
-const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx) const
+const Alignment *HorizontalAligner::SearchAlignmentAtTime(const Fraction &time, AlignmentType type, int &idx) const
 {
     idx = -1; // the index if we reach the end.
     const Alignment *alignment = NULL;
@@ -63,8 +189,8 @@ const Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, Alignment
         alignment = vrv_cast<const Alignment *>(this->GetChild(i));
         assert(alignment);
 
-        double alignment_time = alignment->GetTime();
-        if (AreEqual(alignment_time, time)) {
+        Fraction alignment_time = alignment->GetTime();
+        if (alignment_time == time) {
             if (alignment->GetType() == type) {
                 return alignment;
             }
@@ -132,16 +258,16 @@ void MeasureAligner::Reset()
 {
     HorizontalAligner::Reset();
     m_nonJustifiableLeftMargin = 0;
-    m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
+    m_leftAlignment = new Alignment(-1, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
-    m_leftBarLineAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_LEFT_BARLINE);
+    m_leftBarLineAlignment = new Alignment(-1, ALIGNMENT_MEASURE_LEFT_BARLINE);
     AddAlignment(m_leftBarLineAlignment);
-    m_rightBarLineAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_RIGHT_BARLINE);
+    m_rightBarLineAlignment = new Alignment(0, ALIGNMENT_MEASURE_RIGHT_BARLINE);
     AddAlignment(m_rightBarLineAlignment);
-    m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
+    m_rightAlignment = new Alignment(0, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
 
-    m_initialTstampDur = -DUR_MAX;
+    m_initialTstampDur = -1;
 }
 
 bool MeasureAligner::IsSupportedChild(Object *child)
@@ -150,10 +276,9 @@ bool MeasureAligner::IsSupportedChild(Object *child)
     return true;
 }
 
-Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
+Alignment *MeasureAligner::GetAlignmentAtTime(const Fraction &time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    time = durRound(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -175,7 +300,7 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
     return newAlignment;
 }
 
-void MeasureAligner::SetMaxTime(double time)
+void MeasureAligner::SetMaxTime(const Fraction &time)
 {
     // we have to have a m_rightBarLineAlignment
     assert(m_rightBarLineAlignment);
@@ -194,7 +319,7 @@ void MeasureAligner::SetMaxTime(double time)
     }
 }
 
-double MeasureAligner::GetMaxTime() const
+Fraction MeasureAligner::GetMaxTime() const
 {
     // we have to have a m_rightBarLineAlignment
     assert(m_rightBarLineAlignment);
@@ -202,11 +327,9 @@ double MeasureAligner::GetMaxTime() const
     return m_rightAlignment->GetTime();
 }
 
-void MeasureAligner::SetInitialTstamp(int meterUnit)
+void MeasureAligner::SetInitialTstamp(data_DURATION meterUnit)
 {
-    if (meterUnit != 0) {
-        m_initialTstampDur = DUR_MAX / meterUnit * -1;
-    }
+    m_initialTstampDur = Fraction(meterUnit) * -1;
 }
 
 void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
@@ -360,10 +483,10 @@ void GraceAligner::Reset()
     m_totalWidth = 0;
 }
 
-Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
+Alignment *GraceAligner::GetAlignmentAtTime(const Fraction &time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    time = round(time);
+    // time = round(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -392,14 +515,14 @@ void GraceAligner::StackGraceElement(LayerElement *element)
 
 void GraceAligner::AlignStack()
 {
-    double time = 0.0;
+    Fraction time;
     for (int i = (int)m_graceStack.size(); i > 0; --i) {
         LayerElement *element = vrv_cast<LayerElement *>(m_graceStack.at(i - 1));
         assert(element);
         // get the duration of the event
-        double duration = element->GetAlignmentDuration(NULL, NULL, false);
+        Fraction duration = element->GetAlignmentDuration(false);
         // Time goes backward with grace notes
-        time -= duration;
+        time = time - duration;
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         element->SetGraceAlignment(alignment);
 
@@ -506,7 +629,7 @@ Alignment::Alignment() : Object(ALIGNMENT)
     this->Reset();
 }
 
-Alignment::Alignment(double time, AlignmentType type) : Object(ALIGNMENT)
+Alignment::Alignment(const Fraction &time, AlignmentType type) : Object(ALIGNMENT)
 {
     this->Reset();
     m_time = time;
@@ -518,7 +641,7 @@ void Alignment::Reset()
     Object::Reset();
 
     m_xRel = 0;
-    m_time = 0.0;
+    m_time = Fraction(0, 1);
     m_type = ALIGNMENT_DEFAULT;
 
     ClearGraceAligners();
@@ -619,7 +742,7 @@ bool Alignment::AddLayerElementRef(LayerElement *element)
         else {
             layerRef = vrv_cast<Layer *>(element->GetFirstAncestor(LAYER));
             if (layerRef) staffRef = vrv_cast<Staff *>(layerRef->GetFirstAncestor(STAFF));
-            if (staffRef) {
+            if (staffRef && layerRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
             }
@@ -736,13 +859,14 @@ std::pair<int, int> Alignment::GetAlignmentTopBottom() const
 }
 
 int Alignment::HorizontalSpaceForDuration(
-    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+    const Fraction &intervalTime, data_DURATION maxActualDur, double spacingLinear, double spacingNonLinear)
 {
+    double intervalTimeDbl = intervalTime.ToDouble();
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
      that interval gets the space a semibreve would ordinarily get. */
-    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
+    if (maxActualDur < DURATION_1) intervalTimeDbl /= pow(2.0, DURATION_1 - maxActualDur);
 
-    return pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
+    return pow(intervalTimeDbl * 1024, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
 }
 
 FunctorCode Alignment::Accept(Functor &functor)

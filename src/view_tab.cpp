@@ -177,13 +177,13 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     if (!tabGrp->IsInBeam() && !staff->IsTabGuitar()) {
         int symc = 0;
         switch (drawingDur) {
-            case DUR_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag */
-            case DUR_2: symc = SMUFL_EBA7_luteDurationWhole; break; // 0 flags
-            case DUR_4: symc = SMUFL_EBA8_luteDurationHalf; break; // 1 flag
-            case DUR_8: symc = SMUFL_EBA9_luteDurationQuarter; break; // 2 flags
-            case DUR_16: symc = SMUFL_EBAA_luteDuration8th; break; // 3 flags
-            case DUR_32: symc = SMUFL_EBAB_luteDuration16th; break; // 4 flags
-            case DUR_64: symc = SMUFL_EBAC_luteDuration32nd; break; // 5 flags
+            case DURATION_1: symc = SMUFL_EBA6_luteDurationDoubleWhole; break; // 1 back flag */
+            case DURATION_2: symc = SMUFL_EBA7_luteDurationWhole; break; // 0 flags
+            case DURATION_4: symc = SMUFL_EBA8_luteDurationHalf; break; // 1 flag
+            case DURATION_8: symc = SMUFL_EBA9_luteDurationQuarter; break; // 2 flags
+            case DURATION_16: symc = SMUFL_EBAA_luteDuration8th; break; // 3 flags
+            case DURATION_32: symc = SMUFL_EBAB_luteDuration16th; break; // 4 flags
+            case DURATION_64: symc = SMUFL_EBAC_luteDuration32nd; break; // 5 flags
             default: symc = SMUFL_EBA9_luteDurationQuarter; // 2 flags
         }
 
@@ -205,9 +205,11 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
         }
         else {
             // Vertical: the more flags the lower the dots
-            const int durfactor = DUR_64 - std::min(std::max(drawingDur, DUR_2), DUR_64) + 1;
-            static_assert(DUR_64 - DUR_2 + 1 == 6);
-            static_assert(DUR_64 - DUR_64 + 1 == 1);
+            int durOffset = (drawingDur > DURATION_2) ? drawingDur : DURATION_2;
+            durOffset = (durOffset < DURATION_64) ? durOffset : DURATION_64;
+            const int durfactor = DURATION_64 - durOffset + 1;
+            static_assert(DURATION_64 - DURATION_2 + 1 == 6);
+            static_assert(DURATION_64 - DURATION_64 + 1 == 1);
 
             y += m_doc->GetDrawingUnit(glyphSize) * stemDirFactor * durfactor * 2 / 5;
 

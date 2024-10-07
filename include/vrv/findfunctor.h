@@ -475,6 +475,7 @@ public:
      */
     ///@{
     FunctorCode VisitLayer(const Layer *layer) override;
+    FunctorCode VisitScore(const Score *score) override;
     ///@}
 
 protected:

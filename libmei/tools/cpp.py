@@ -461,8 +461,8 @@ class AttModule {{
 public:
     /** @name Constructors and destructor */
     ///@{{
-    AttModule(){{}};
-    virtual ~AttModule(){{}};
+    AttModule() {{}}
+    virtual ~AttModule() {{}}
     ///@}}
 
     /**

@@ -1,6 +1,14 @@
 # Changelog
 
-## [unreleased]
+## [4.3.1] - 2024-09-10
+* Fix JS builds (JavaScript release only)
+
+## [4.3.0] - 2024-09-10
+* Support (initial) for Volpiano input
+* Support for neumatic notation oriscus and quilisma
+* Support for neume layout without facsimile
+* Support for numeral harmonics in MusicXML importer (@eNote-GmBH)
+* Improved logging
 
 ## [4.2.1] - 2024-05-07
 * Fix GitHub actions (Python release only)

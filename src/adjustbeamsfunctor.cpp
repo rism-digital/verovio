@@ -69,7 +69,8 @@ FunctorCode AdjustBeamsFunctor::VisitBeam(Beam *beam)
     }
 
     int leftMargin = 0, rightMargin = 0;
-    const int beamCount = m_outerBeam->GetBeamPartDuration((*beamSegment.m_beamElementCoordRefs.begin())->m_x) - DUR_8;
+    const int beamCount
+        = m_outerBeam->GetBeamPartDuration((*beamSegment.m_beamElementCoordRefs.begin())->m_x) - DURATION_8;
     const int currentBeamYLeft = m_y1 + m_beamSlope * ((*beamSegment.m_beamElementCoordRefs.begin())->m_x - m_x1);
     const int currentBeamYRight = m_y1 + m_beamSlope * (beamSegment.m_beamElementCoordRefs.back()->m_x - m_x1);
     leftMargin = (*beamSegment.m_beamElementCoordRefs.begin())->m_yBeam - currentBeamYLeft
@@ -130,7 +131,7 @@ FunctorCode AdjustBeamsFunctor::VisitClef(Clef *clef)
 
     Staff *staff = clef->GetAncestorStaff();
     // find number of beams at current position
-    const int beams = m_outerBeam->GetBeamPartDuration(clef) - DUR_4;
+    const int beams = m_outerBeam->GetBeamPartDuration(clef) - DURATION_4;
     const int beamWidth = m_outerBeam->m_beamWidth;
     // find beam Y positions that are relevant to current clef
     const int currentBeamYLeft = m_y1 + m_beamSlope * (clef->GetContentLeft() - m_x1);
@@ -298,7 +299,7 @@ FunctorCode AdjustBeamsFunctor::VisitRest(Rest *rest)
     if (!m_outerBeam) return FUNCTOR_SIBLINGS;
 
     // Calculate possible overlap for the rest with beams
-    const int beams = m_outerBeam->GetBeamPartDuration(rest, false) - DUR_4;
+    const int beams = m_outerBeam->GetBeamPartDuration(rest, false) - DURATION_4;
     const int beamWidth = m_outerBeam->m_beamWidth;
     const int overlapMargin = rest->Intersects(m_outerBeam, SELF, beams * beamWidth, true) * m_directionBias;
 
