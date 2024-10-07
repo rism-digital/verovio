@@ -9,6 +9,7 @@
 #define __VRV_PB_H__
 
 #include "atts_shared.h"
+#include "facsimileinterface.h"
 #include "systemelement.h"
 
 namespace vrv {
@@ -21,7 +22,7 @@ namespace vrv {
  * This class represents a MEI pb in score-based MEI.
  * In page-based MEI, it remains as is as. Actual pages are represented by Page objects.
  */
-class Pb : public SystemElement, public AttNNumberLike {
+class Pb : public SystemElement, public FacsimileInterface, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -34,6 +35,16 @@ public:
     void Reset() override;
     std::string GetClassName() const override { return "Pb"; }
     ///@}
+
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
 
     //----------//
     // Functors //

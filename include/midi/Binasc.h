@@ -13,11 +13,11 @@
 #ifndef _BINASC_H_INCLUDED
 #define _BINASC_H_INCLUDED
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <cstdlib>
-#include <stdlib.h> /* needed for MinGW */
+#include <fstream>
+#include <iostream>
+#include <string>
+
 
 namespace smf {
 
@@ -148,6 +148,8 @@ class Binasc {
 		int  getVLV         (std::istream& infile, int& trackbytes);
 		int  getWord        (std::string& word, const std::string& input,
 		                     const std::string& terminators, int index);
+
+		static const char *GMinstrument[128];
 
 };
 

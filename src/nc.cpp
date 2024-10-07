@@ -18,6 +18,8 @@
 #include "elementpart.h"
 #include "functor.h"
 #include "liquescent.h"
+#include "oriscus.h"
+#include "quilisma.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -65,6 +67,15 @@ void Nc::Reset()
     this->ResetNcForm();
 }
 
+int Nc::PitchOrLocDifferenceTo(const Nc *nc) const
+{
+    int difference = this->PitchDifferenceTo(nc);
+    if ((difference == 0) && this->HasLoc() && nc->HasLoc()) {
+        difference = this->GetLoc() - nc->GetLoc();
+    }
+    return difference;
+}
+
 FunctorCode Nc::Accept(Functor &functor)
 {
     return functor.VisitNc(this);
@@ -89,6 +100,12 @@ bool Nc::IsSupportedChild(Object *child)
 {
     if (child->Is(LIQUESCENT)) {
         assert(dynamic_cast<Liquescent *>(child));
+    }
+    else if (child->Is(ORISCUS)) {
+        assert(dynamic_cast<Oriscus *>(child));
+    }
+    else if (child->Is(QUILISMA)) {
+        assert(dynamic_cast<Quilisma *>(child));
     }
     else {
         return false;

@@ -123,10 +123,11 @@ void View::DrawDynamString(DeviceContext *dc, const std::u32string &str, TextDra
                 std::u32string smuflStr = Dynam::GetSymbolStr(token.first, singleGlyphs);
                 FontInfo vrvTxt;
                 vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-                vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+                vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
                 bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflStr);
                 vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
                 vrvTxt.SetStyle(FONTSTYLE_normal);
+                vrvTxt.SetLetterSpacing(90);
                 dc->SetFont(&vrvTxt);
                 this->DrawTextString(dc, smuflStr, params);
                 dc->ResetFont();
@@ -196,7 +197,7 @@ void View::DrawHarmString(DeviceContext *dc, const std::u32string &str, TextDraw
 
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(smuflAccid);
             vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
             dc->SetFont(&vrvTxt);
@@ -270,34 +271,34 @@ void View::DrawLyricString(
     std::u32string syl = U"";
     std::u32string lyricStr = str;
 
-    const int x = (params) ? params->m_x : VRV_UNSET;
-    const int y = (params) ? params->m_y : VRV_UNSET;
+    const int dcX = (params) ? ToDeviceContextX(params->m_x) : VRV_UNSET;
+    const int dcY = (params) ? ToDeviceContextY(params->m_y) : VRV_UNSET;
     const int width = (params) ? params->m_width : VRV_UNSET;
     const int height = (params) ? params->m_height : VRV_UNSET;
 
     if (m_doc->GetOptions()->m_lyricElision.GetValue() == ELISION_unicode) {
         std::replace(lyricStr.begin(), lyricStr.end(), U'_', UNICODE_UNDERTIE);
-        dc->DrawText(UTF32to8(lyricStr), lyricStr, x, y, width, height);
+        dc->DrawText(UTF32to8(lyricStr), lyricStr, dcX, dcY, width, height);
     }
     else {
         while (lyricStr.compare(syl) != 0) {
             wroteText = true;
             auto index = lyricStr.find_first_of(U"_");
             syl = lyricStr.substr(0, index);
-            dc->DrawText(UTF32to8(syl), syl, x, y, width, height);
+            dc->DrawText(UTF32to8(syl), syl, dcX, dcY, width, height);
 
             // no _
             if (index == std::string::npos) break;
 
             FontInfo vrvTxt;
             vrvTxt.SetPointSize(dc->GetFont()->GetPointSize() * m_doc->GetMusicToLyricFontSizeRatio());
-            vrvTxt.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+            vrvTxt.SetFaceName(m_doc->GetResources().GetCurrentFont());
             std::u32string elision;
             elision.push_back(m_doc->GetOptions()->m_lyricElision.GetValue());
             bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(elision);
             vrvTxt.SetSmuflWithFallback(isFallbackNeeded);
             dc->SetFont(&vrvTxt);
-            dc->DrawText(UTF32to8(elision), elision, x, y, width, height);
+            dc->DrawText(UTF32to8(elision), elision, dcX, dcY, width, height);
             dc->ResetFont();
 
             // next syllable
@@ -309,7 +310,8 @@ void View::DrawLyricString(
     // This should only be called in facsimile mode where a zone is specified but there is
     // no text. This draws the bounds of the zone but leaves the space blank.
     if (!wroteText && params) {
-        dc->DrawText("", U"", params->m_x, params->m_y, params->m_width, params->m_height);
+        dc->DrawText(
+            "", U"", ToDeviceContextX(params->m_x), ToDeviceContextY(params->m_y), params->m_width, params->m_height);
     }
 }
 
@@ -406,7 +408,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         // Because we do not have the string at this stage we rely only on the selected font
         // This means fallback will not work for missing glyphs within <rend>
         rendFont.SetSmuflWithFallback(false);
-        rendFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+        rendFont.SetFaceName(m_doc->GetResources().GetCurrentFont());
         int pointSize = (rendFont.GetPointSize() != 0) ? rendFont.GetPointSize() : params.m_pointSize;
         rendFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
         customFont = true;
@@ -417,6 +419,10 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     }
     if (rend->HasFontweight()) {
         rendFont.SetWeight(rend->GetFontweight());
+        customFont = true;
+    }
+    if (rend->HasLetterspacing()) {
+        rendFont.SetLetterSpacing(rend->GetLetterspacing() * m_doc->GetDrawingUnit(100));
         customFont = true;
     }
 
@@ -614,7 +620,7 @@ void View::DrawSymbol(DeviceContext *dc, Symbol *symbol, TextDrawingParams &para
     if (symbol->HasGlyphAuth() && symbol->GetGlyphAuth() == "smufl") {
         bool isFallbackNeeded = (m_doc->GetResources()).IsSmuflFallbackNeeded(str);
         symbolFont.SetSmuflWithFallback(isFallbackNeeded);
-        symbolFont.SetFaceName(m_doc->GetOptions()->m_font.GetValue());
+        symbolFont.SetFaceName(m_doc->GetResources().GetCurrentFont());
         int pointSize = (symbolFont.GetPointSize() != 0) ? symbolFont.GetPointSize() : params.m_pointSize;
         symbolFont.SetPointSize(pointSize * m_doc->GetMusicToLyricFontSizeRatio());
     }

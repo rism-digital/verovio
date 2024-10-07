@@ -21,7 +21,7 @@ AdjustXRelForTranscriptionFunctor::AdjustXRelForTranscriptionFunctor() : Functor
 
 FunctorCode AdjustXRelForTranscriptionFunctor::VisitLayerElement(LayerElement *layerElement)
 {
-    if (layerElement->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
+    if (layerElement->m_drawingFacsX == VRV_UNSET) return FUNCTOR_CONTINUE;
 
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 

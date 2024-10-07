@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <cassert>
-#include <codecvt>
 #include <locale>
 #include <regex>
 
@@ -21,6 +20,7 @@
 #include "editortoolkit_cmn.h"
 #include "editortoolkit_mensural.h"
 #include "editortoolkit_neume.h"
+#include "filereader.h"
 #include "findfunctor.h"
 #include "ioabc.h"
 #include "iodarms.h"
@@ -28,6 +28,7 @@
 #include "iomei.h"
 #include "iomusxml.h"
 #include "iopae.h"
+#include "iovolpiano.h"
 #include "layer.h"
 #include "measure.h"
 #include "nc.h"
@@ -47,10 +48,6 @@
 #include "MidiFile.h"
 #include "crc.h"
 #include "jsonxx.h"
-
-#ifndef NO_MXL_SUPPORT
-#include "zip_file.hpp"
-#endif /* NO_MXL_SUPPORT */
 
 namespace vrv {
 
@@ -72,6 +69,8 @@ Toolkit::Toolkit(bool initFont)
     m_humdrumBuffer = NULL;
     m_cString = NULL;
 
+    m_cerrOriginalBuf = NULL;
+
     if (initFont) {
         Resources &resources = m_doc.GetResourcesForModification();
         resources.InitFonts();
@@ -88,6 +87,8 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
+    this->ResetLocale();
+
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
@@ -117,13 +118,26 @@ bool Toolkit::SetResourcePath(const std::string &path)
 {
     Resources &resources = m_doc.GetResourcesForModification();
     resources.SetPath(path);
-    return resources.InitFonts();
+    bool success = resources.InitFonts();
+    if (m_options->m_fontAddCustom.IsSet()) {
+        success = success && resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    }
+    if (m_options->m_font.IsSet()) {
+        success = success && this->SetFont(m_options->m_font.GetValue());
+    }
+    if (m_options->m_fontFallback.IsSet()) {
+        success = success && resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    }
+    if (m_options->m_fontLoadAll.IsSet()) {
+        success = success && resources.LoadAll();
+    }
+    return success;
 }
 
 bool Toolkit::SetFont(const std::string &fontName)
 {
     Resources &resources = m_doc.GetResourcesForModification();
-    const bool ok = resources.SetFont(fontName);
+    const bool ok = resources.SetCurrentFont(fontName, true);
     if (!ok) LogWarning("Font '%s' could not be loaded", fontName.c_str());
     return ok;
 }
@@ -150,6 +164,9 @@ bool Toolkit::SetOutputTo(std::string const &outputTo)
         m_outputTo = MEI;
     }
     else if (outputTo == "mei-pb") {
+        m_outputTo = MEI;
+    }
+    else if (outputTo == "mei-facs") {
         m_outputTo = MEI;
     }
     else if (outputTo == "midi") {
@@ -184,6 +201,9 @@ bool Toolkit::SetInputFrom(std::string const &inputFrom)
     }
     else if (inputFrom == "darms") {
         m_inputFrom = DARMS;
+    }
+    else if (inputFrom == "volpiano") {
+        m_inputFrom = VOLPIANO;
     }
     else if ((inputFrom == "humdrum") || (inputFrom == "hum")) {
         m_inputFrom = HUMDRUM;
@@ -279,10 +299,16 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
         return UNKNOWN;
     }
     if (initial.find("\n!!") != std::string::npos) {
+        // Case where there are empty lines before content in Humdrum files.
         return HUMDRUM;
     }
     if (initial.find("\n**") != std::string::npos) {
+        // Case where there are empty lines before content in Humdrum files.
         return HUMDRUM;
+    }
+    if (initial.find("\nCUT[") != std::string::npos) {
+        // Title record for a melody in EsAC format.
+        return ESAC;
     }
 
     // Assume that the input is MEI if other input types were not detected.
@@ -292,6 +318,8 @@ FileFormat Toolkit::IdentifyInputFrom(const std::string &data)
 
 bool Toolkit::LoadFile(const std::string &filename)
 {
+    this->ResetLogBuffer();
+
     if (this->IsUTF16(filename)) {
         return this->LoadUTF16File(filename);
     }
@@ -313,7 +341,7 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
-    return this->LoadData(content);
+    return this->LoadData(content, false);
 }
 
 bool Toolkit::IsUTF16(const std::string &filename)
@@ -371,10 +399,26 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
         u16data.erase(0, 1);
     }
 
-    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
-    std::string utf8line = convert.to_bytes(u16data);
+    // std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
+    std::string utf8line = vrv::UTF16to8(u16data); // convert.to_bytes(u16data);
 
-    return this->LoadData(utf8line);
+    return this->LoadData(utf8line, false);
+}
+
+std::string UTF16toUTF8(const std::u16string &input)
+{
+    std::string output;
+    // Placeholder for manual conversion logic
+    // Real conversion logic here should handle actual UTF-16 to UTF-8 conversion
+    for (char16_t c : input) {
+        if (c < 0x80) { // Handle basic ASCII conversion
+            output.push_back(static_cast<char8_t>(c));
+        }
+        else {
+            // Extend this block to handle non-ASCII characters
+        }
+    }
+    return output;
 }
 
 bool Toolkit::IsZip(const std::string &filename)
@@ -419,27 +463,26 @@ bool Toolkit::LoadZipFile(const std::string &filename)
 
 bool Toolkit::LoadZipData(const std::vector<unsigned char> &bytes)
 {
+    this->ResetLogBuffer();
 #ifndef NO_MXL_SUPPORT
-    miniz_cpp::zip_file file(bytes);
+    ZipFileReader zipFileReader;
+    zipFileReader.LoadBytes(bytes);
 
-    std::string filename;
-    // Look for the meta file in the zip
-    for (miniz_cpp::zip_info &member : file.infolist()) {
-        if (member.filename == "META-INF/container.xml") {
-            std::string container = file.read(member.filename);
-            // Find the file name with an xpath query
-            pugi::xml_document doc;
-            doc.load_buffer(container.c_str(), container.size());
-            pugi::xml_node root = doc.first_child();
-            pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
-            filename = rootfile.attribute("full-path").value();
-            break;
-        }
+    const std::string metaInf = "META-INF/container.xml";
+    if (!zipFileReader.HasFile(metaInf)) {
+        LogError("No '%s' file to load found in the archive", metaInf.c_str());
+        return false;
     }
+    std::string containerXml = zipFileReader.ReadTextFile("META-INF/container.xml");
+    pugi::xml_document doc;
+    doc.load_buffer(containerXml.c_str(), containerXml.size());
+    pugi::xml_node root = doc.first_child();
+    pugi::xml_node rootfile = root.select_node("/container/rootfiles/rootfile").node();
+    std::string filename = rootfile.attribute("full-path").value();
 
     if (!filename.empty()) {
         LogInfo("Loading file '%s' in the archive", filename.c_str());
-        return this->LoadData(file.read(filename));
+        return this->LoadData(zipFileReader.ReadTextFile(filename), false);
     }
     else {
         LogError("No file to load found in the archive");
@@ -465,8 +508,17 @@ bool Toolkit::LoadZipDataBuffer(const unsigned char *data, int length)
 
 bool Toolkit::LoadData(const std::string &data)
 {
+    return this->LoadData(data, true);
+}
+
+bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
+{
     std::string newData;
     Input *input = NULL;
+
+    if (resetLogBuffer) {
+        this->ResetLogBuffer();
+    }
 
     m_doc.m_expansionMap.Reset();
 
@@ -507,6 +559,9 @@ bool Toolkit::LoadData(const std::string &data)
         LogError("DARMS import is not supported in this build.");
         return false;
 #endif
+    }
+    else if (inputFormat == VOLPIANO) {
+        input = new VolpianoInput(&m_doc);
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -583,7 +638,14 @@ bool Toolkit::LoadData(const std::string &data)
         pugi::xml_document xmlfile;
         xmlfile.load_string(data.c_str());
         stringstream conversion;
+
+        LogRedirectStart();
         bool status = converter.convert(conversion, xmlfile);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting MusicXML to Humdrum (see warning above this line for possible reasons");
+        }
+
         if (!status) {
             LogError("Error converting MusicXML data");
             return false;
@@ -631,7 +693,14 @@ bool Toolkit::LoadData(const std::string &data)
         // This is the indirect converter from MuseData to MEI using iohumdrum:
         hum::Tool_musedata2hum converter;
         stringstream conversion;
+
+        LogRedirectStart();
         bool status = converter.convertString(conversion, data);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting MuseData to Humdrum (see warning above this line for possible reasons");
+        }
+
         if (!status) {
             LogError("Error converting MuseData data");
             return false;
@@ -658,8 +727,15 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
-        stringstream conversion;
+        std::stringstream conversion;
+
+        LogRedirectStart();
         bool status = converter.convert(conversion, data);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting EsAC to Humdrum (see warning above this line for possible reasons");
+        }
+
         if (!status) {
             LogError("Error converting EsAC data");
             return false;
@@ -749,9 +825,14 @@ bool Toolkit::LoadData(const std::string &data)
         breaks = BREAKS_none;
     }
 
-    // Always set breaks to 'none' with Transcription or Facs rendering - rendering them differenty requires the MEI
-    // to be converted
-    if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) breaks = BREAKS_none;
+    // Always set breaks to 'none' with Facs rendering
+    if (m_doc.IsFacs()) breaks = BREAKS_none;
+
+    // Always set breaks to 'none' or 'encoded' with Transcription rendering
+    // rendering them differenty requires the MEI
+    if (m_doc.IsTranscription()) {
+        breaks = (m_doc.HasFacsimile()) ? BREAKS_encoded : BREAKS_none;
+    }
 
     if (breaks != BREAKS_none) {
         if (input->GetLayoutInformation() == LAYOUT_ENCODED
@@ -782,6 +863,10 @@ bool Toolkit::LoadData(const std::string &data)
             m_doc.CastOffDoc();
             // LogElapsedTimeEnd("cast-off");
         }
+    }
+
+    if (m_doc.IsTranscription() && m_doc.HasFacsimile()) {
+        m_doc.SyncFromFacsimileDoc();
     }
 
     delete input;
@@ -816,6 +901,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     std::string firstMeasure;
     std::string lastMeasure;
     std::string mdiv;
+    bool generateFacs = false;
 
     jsonxx::Object json;
 
@@ -838,6 +924,7 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
             if (json.has<jsonxx::String>("firstMeasure")) firstMeasure = json.get<jsonxx::String>("firstMeasure");
             if (json.has<jsonxx::String>("lastMeasure")) lastMeasure = json.get<jsonxx::String>("lastMeasure");
             if (json.has<jsonxx::String>("mdiv")) mdiv = json.get<jsonxx::String>("mdiv");
+            if (json.has<jsonxx::Boolean>("generateFacs")) generateFacs = json.get<jsonxx::Boolean>("generateFacs");
         }
     }
 
@@ -872,6 +959,16 @@ std::string Toolkit::GetMEI(const std::string &jsonOptions)
     if (!firstMeasure.empty()) meioutput.SetFirstMeasure(firstMeasure);
     if (!lastMeasure.empty()) meioutput.SetLastMeasure(lastMeasure);
     if (!mdiv.empty()) meioutput.SetMdiv(mdiv);
+
+    if (generateFacs) {
+        if (meioutput.HasFilter() || !scoreBased || (m_options->m_breaks.GetValue() != BREAKS_encoded)
+            || m_doc.HasSelection()) {
+            LogError("Generating facsimile is only possible with all pages, encoded breaks, score-based output and "
+                     "without selection.");
+            return "";
+        }
+        m_doc.SyncToFacsimileDoc();
+    }
 
     std::string output = meioutput.GetOutput();
 
@@ -1006,6 +1103,7 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = optionGrp->GetOptions();
 
         for (Option *option : *options) {
+            assert(option);
             // Reading json from file is not supported in toolkit
             const OptionJson *optJson = dynamic_cast<const OptionJson *>(option);
             if (optJson && (optJson->GetSource() == JsonSource::FilePath)) continue;
@@ -1104,8 +1202,24 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
 
     m_options->Sync();
 
+    this->SetLocale();
+
     // Forcing font resource to be reset if the font is given in the options
-    if (json.has<jsonxx::String>("font")) this->SetFont(m_options->m_font.GetValue());
+    if (json.has<jsonxx::Array>("fontAddCustom")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.AddCustom(m_options->m_fontAddCustom.GetValue());
+    }
+    if (json.has<jsonxx::String>("font")) {
+        this->SetFont(m_options->m_font.GetValue());
+    }
+    if (json.has<jsonxx::String>("fontFallback")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.SetFallback(m_options->m_fontFallback.GetStrValue());
+    }
+    if (json.has<jsonxx::Boolean>("fontLoadAll")) {
+        Resources &resources = m_doc.GetResourcesForModification();
+        resources.LoadAll();
+    }
 
     return true;
 }
@@ -1190,8 +1304,9 @@ void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output
 {
     // map of all categories and expected string arguments for them
     const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
-        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Layout, "layout" },
-        { vrv::OptionsCategory::Margins, "margins" }, { vrv::OptionsCategory::Midi, "midi" },
+        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Json, "json" },
+        { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
+        { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
         { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
@@ -1274,6 +1389,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     }
     // If not found again, try looking in the layer staffdefs
     if (!element) {
+        // This will also look in the score/scoreDef
         FindElementInLayerStaffDefFunctor findElementInLayerStaffDef(xmlId);
         // Check drawing page elements first
         if (m_doc.GetDrawingPage()) {
@@ -1364,6 +1480,7 @@ std::string Toolkit::GetLog()
     for (const std::string &logStr : logBuffer) {
         str += logStr;
     }
+    this->ResetLogBuffer();
     return str;
 }
 
@@ -1381,6 +1498,35 @@ void Toolkit::ResetXmlIdSeed(int seed)
 void Toolkit::ResetLogBuffer()
 {
     logBuffer.clear();
+}
+
+void Toolkit::LogRedirectStart()
+{
+    if (m_cerrOriginalBuf) {
+        vrv::LogError("In Toolkit::LogRedirectStart: Only one log redirect can be active at a time.");
+        return;
+    }
+    if (!m_cerrCaptured.str().empty()) {
+        vrv::LogWarning("In Toolkit::LogRedirectStart: Log capture buffer not empty, sending current contents to "
+                        "LogWarning and resetting.");
+        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        m_cerrCaptured.str("");
+    }
+    m_cerrOriginalBuf = std::cerr.rdbuf();
+    std::cerr.rdbuf(m_cerrCaptured.rdbuf());
+}
+
+void Toolkit::LogRedirectStop()
+{
+    if (!m_cerrCaptured.str().empty()) {
+        vrv::LogWarning(m_cerrCaptured.str().c_str());
+        m_cerrCaptured.str("");
+    }
+
+    if (m_cerrOriginalBuf) {
+        std::cerr.rdbuf(m_cerrOriginalBuf);
+        m_cerrOriginalBuf = NULL;
+    }
 }
 
 void Toolkit::RedoLayout(const std::string &jsonOptions)
@@ -1401,7 +1547,7 @@ void Toolkit::RedoLayout(const std::string &jsonOptions)
 
     this->ResetLogBuffer();
 
-    if ((this->GetPageCount() == 0) || (m_doc.GetType() == Transcription) || (m_doc.GetType() == Facs)) {
+    if ((this->GetPageCount() == 0) || m_doc.IsTranscription() || m_doc.IsFacs()) {
         LogWarning("No data to re-layout");
         return;
     }
@@ -1464,7 +1610,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (adjustWidth || (breaks == BREAKS_none)) width = m_doc.GetAdjustedDrawingPageWidth();
     if (adjustHeight || (breaks == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
-    if (m_doc.GetType() == Transcription) {
+    if (m_doc.IsTranscription()) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
@@ -1474,7 +1620,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
         std::swap(height, width);
     }
 
-    double userScale = m_view.GetPPUFactor() * m_options->m_scale.GetValue() / 100;
+    double userScale = m_options->m_scale.GetValue() / 100.0;
     assert(userScale != 0.0);
 
     if (m_options->m_scaleToPageSize.GetValue()) {
@@ -1486,8 +1632,9 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     deviceContext->SetUserScale(userScale, userScale);
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
+    deviceContext->SetViewBoxFactor(m_view.GetPPUFactor());
 
-    if (m_doc.GetType() == Facs) {
+    if (m_doc.IsFacs()) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
         deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
     }
@@ -1500,7 +1647,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderData(const std::string &data, const std::string &jsonOptions)
 {
-    if (this->SetOptions(jsonOptions) && this->LoadData(data)) return this->RenderToSVG(1);
+    if (this->SetOptions(jsonOptions) && this->LoadData(data, false)) return this->RenderToSVG(1);
 
     // Otherwise just return an empty string.
     return "";
@@ -1523,7 +1670,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
         svg.SetMMOutput(true);
     }
 
-    if (m_doc.GetType() == Facs) {
+    if (m_doc.IsFacs()) {
         svg.SetFacsimile(true);
     }
 
@@ -1974,7 +2121,14 @@ const char *Toolkit::GetHumdrumBuffer()
         infile.load_string(meidata.c_str());
         stringstream out;
         hum::Tool_mei2hum converter;
-        converter.convert(out, infile);
+
+        LogRedirectStart();
+        bool status = converter.convert(out, infile);
+        LogRedirectStop();
+        if (!status) {
+            LogWarning("Problem converting MEI to Humdrum (see warning above this line for possible reasons");
+        }
+
         this->SetHumdrumBuffer(out.str().c_str());
 #endif
         if (m_humdrumBuffer) {
@@ -2035,7 +2189,11 @@ std::string Toolkit::ConvertMEIToHumdrum(const std::string &meiData)
     pugi::xml_document xmlfile;
     xmlfile.load_string(meiData.c_str());
     std::stringstream conversion;
+
+    LogRedirectStart();
     bool status = converter.convert(conversion, xmlfile);
+    LogRedirectStop();
+
     if (!status) {
         LogError("Error converting MEI data to Humdrum: %s", conversion.str().c_str());
     }
@@ -2102,6 +2260,21 @@ std::string Toolkit::ConvertHumdrumToMIDI(const std::string &humdrumData)
 #else
     return "TVRoZAAAAAYAAQAAAGRNVHJrAAAADQCQPHCBSJA8AAD/LwA=";
 #endif
+}
+
+void Toolkit::SetLocale()
+{
+    if (m_options->m_setLocale.GetValue() && !m_previousLocale) {
+        // Required for proper formatting, e.g., in StringFormat (see vrv.cpp)
+        m_previousLocale = std::locale::global(std::locale::classic());
+    }
+}
+
+void Toolkit::ResetLocale()
+{
+    if (m_previousLocale) {
+        std::locale::global(*m_previousLocale);
+    }
 }
 
 void Toolkit::InitClock()

@@ -417,6 +417,8 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel, bool force)
 
 bool FloatingPositioner::HasHorizontalOverlapWith(const BoundingBox *bbox, int unit) const
 {
+    assert(bbox);
+
     int bboxExtenderWidth = 0;
     const FloatingPositioner *bboxPositioner = dynamic_cast<const FloatingPositioner *>(bbox);
     if (bboxPositioner) {
@@ -445,7 +447,7 @@ int FloatingPositioner::GetAdmissibleHorizOverlapMargin(const BoundingBox *bbox,
 }
 
 void FloatingPositioner::CalcDrawingYRel(
-    Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
+    const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox)
 {
     assert(doc);
     assert(staffAlignment);
@@ -460,8 +462,7 @@ void FloatingPositioner::CalcDrawingYRel(
         int staffIndex = staffAlignment->GetStaff()->GetN();
 
         int minStaffDistance = 0.0;
-        data_MEASUREMENTSIGNED minStaffDistanceMeasurement
-            = doc->GetStaffDistance(m_object->GetClassId(), staffIndex, m_place);
+        data_MEASUREMENTSIGNED minStaffDistanceMeasurement = doc->GetStaffDistance(m_object, staffIndex, m_place);
 
         if (minStaffDistanceMeasurement.HasValue()) {
             if (minStaffDistanceMeasurement.GetType() == MEASUREMENTTYPE_px) {

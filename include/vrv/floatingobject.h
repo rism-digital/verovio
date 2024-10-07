@@ -167,7 +167,7 @@ class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
     FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
-    virtual ~FloatingPositioner(){};
+    virtual ~FloatingPositioner() {}
     ClassId GetClassId() const override { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
@@ -251,7 +251,7 @@ public:
     /**
      * Update the Y drawing relative position based on collision detection with the overlapping bounding box
      */
-    void CalcDrawingYRel(Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
+    void CalcDrawingYRel(const Doc *doc, const StaffAlignment *staffAlignment, const BoundingBox *horizOverlappingBBox);
 
     /**
      * Align extender elements across systems
@@ -485,7 +485,7 @@ public:
         m_discarded = false;
         m_isBelow = true;
     }
-    virtual ~CurveSpannedElement(){};
+    virtual ~CurveSpannedElement() {}
 
     Point m_rotatedPoints[4];
     const BoundingBox *m_boundingBox;

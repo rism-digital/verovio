@@ -30,7 +30,7 @@
         "tupletBracketThickness": 0.16
     },
     "fontName": "Leipzig",
-    "fontVersion": "5.2.86",
+    "fontVersion": "5.2.93",
     "glyphBBoxes": {
         "4stringTabClef": {
             "bBoxNE": [
@@ -1035,7 +1035,7 @@
         "caesuraSingleStroke": {
             "bBoxNE": [
                 0.144,
-                2.0
+                1.2
             ],
             "bBoxSW": [
                 0.0,
@@ -1074,12 +1074,12 @@
         },
         "chantCaesura": {
             "bBoxNE": [
-                0.5493,
-                1.9931
+                0.548,
+                1.992
             ],
             "bBoxSW": [
-                -0.0005,
-                1.0547
+                0.0,
+                1.056
             ]
         },
         "chantCclef": {
@@ -1414,12 +1414,12 @@
         },
         "chantPunctumDeminutum": {
             "bBoxNE": [
-                0.5,
-                0.352
+                0.364,
+                0.232
             ],
             "bBoxSW": [
-                0.012,
-                -0.348
+                0.0,
+                -0.228
             ]
         },
         "chantPunctumInclinatum": {
@@ -3632,6 +3632,16 @@
                 -1.016
             ]
         },
+        "medRenOriscusCMN": {
+            "bBoxNE": [
+                1.276,
+                0.52
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.52
+            ]
+        },
         "medRenSharpCroix": {
             "bBoxNE": [
                 1.168,
@@ -4462,6 +4472,96 @@
                 -0.188
             ]
         },
+        "mensuralProportion1": {
+            "bBoxNE": [
+                0.8,
+                0.76
+            ],
+            "bBoxSW": [
+                0.08,
+                -0.8
+            ]
+        },
+        "mensuralProportion2": {
+            "bBoxNE": [
+                1.096,
+                0.76
+            ],
+            "bBoxSW": [
+                0.08,
+                -0.8
+            ]
+        },
+        "mensuralProportion3": {
+            "bBoxNE": [
+                0.952,
+                0.76
+            ],
+            "bBoxSW": [
+                0.092,
+                -0.804
+            ]
+        },
+        "mensuralProportion4": {
+            "bBoxNE": [
+                1.096,
+                0.72
+            ],
+            "bBoxSW": [
+                0.08,
+                -0.808
+            ]
+        },
+        "mensuralProportion5": {
+            "bBoxNE": [
+                1.04,
+                0.768
+            ],
+            "bBoxSW": [
+                0.052,
+                -0.8
+            ]
+        },
+        "mensuralProportion6": {
+            "bBoxNE": [
+                0.988,
+                0.76
+            ],
+            "bBoxSW": [
+                0.06,
+                -0.8
+            ]
+        },
+        "mensuralProportion7": {
+            "bBoxNE": [
+                1.012,
+                0.76
+            ],
+            "bBoxSW": [
+                0.08,
+                -0.804
+            ]
+        },
+        "mensuralProportion8": {
+            "bBoxNE": [
+                1.012,
+                0.76
+            ],
+            "bBoxSW": [
+                0.08,
+                -0.8
+            ]
+        },
+        "mensuralProportion9": {
+            "bBoxNE": [
+                0.992,
+                0.76
+            ],
+            "bBoxSW": [
+                0.064,
+                -0.8
+            ]
+        },
         "mensuralProportionProportioDupla1": {
             "bBoxNE": [
                 2.2,
@@ -4972,6 +5072,16 @@
                 -0.528
             ]
         },
+        "noteheadHalfFilled": {
+            "bBoxNE": [
+                1.256,
+                0.552
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.528
+            ]
+        },
         "noteheadHalfWithX": {
             "bBoxNE": [
                 1.256,
@@ -5060,6 +5170,26 @@
             "bBoxSW": [
                 0.0,
                 -1.0
+            ]
+        },
+        "noteheadSquareBlack": {
+            "bBoxNE": [
+                1.2,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
+            ]
+        },
+        "noteheadSquareWhite": {
+            "bBoxNE": [
+                1.2,
+                0.5
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5
             ]
         },
         "noteheadVoidWithX": {
@@ -5225,6 +5355,16 @@
         "ornamentLeftVerticalStroke": {
             "bBoxNE": [
                 0.12,
+                1.6
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "ornamentLeftVerticalStrokeWithCross": {
+            "bBoxNE": [
+                0.84,
                 1.6
             ],
             "bBoxSW": [
@@ -6452,6 +6592,16 @@
                 0.0
             ]
         },
+        "staffPosLower8": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "staffPosRaise1": {
             "bBoxNE": [
                 0.0,
@@ -7660,6 +7810,26 @@
                 -0.5
             ]
         },
+        "mensuralNoteheadMinimaWhite": {
+            "stemDownNW": [
+                0.584,
+                -0.7
+            ],
+            "stemUpSE": [
+                0.664,
+                0.7
+            ]
+        },
+        "mensuralNoteheadSemiminimaWhite": {
+            "stemDownNW": [
+                0.584,
+                -0.7
+            ],
+            "stemUpSE": [
+                0.664,
+                0.7
+            ]
+        },
         "noteheadBlack": {
             "cutOutNW": [
                 0.144,
@@ -7739,6 +7909,24 @@
             ]
         },
         "noteheadHalf": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ],
+            "stemDownNW": [
+                0.0,
+                -0.144
+            ],
+            "stemUpSE": [
+                1.256,
+                0.164
+            ]
+        },
+        "noteheadHalfFilled": {
             "cutOutNW": [
                 0.14,
                 0.24
@@ -7850,7 +8038,7 @@
                 0.4
             ],
             "cutOutSE": [
-                1.42,
+                1.4,
                 -0.4
             ]
         },

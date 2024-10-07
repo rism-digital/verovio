@@ -39,7 +39,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 #define VERSION_MAJOR 4
-#define VERSION_MINOR 1
+#define VERSION_MINOR 4
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -61,11 +61,8 @@ namespace vrv {
 #ifdef VRV_DYNAMIC_CAST
 // To be used for all cases where type is cheched through Object::m_type
 #define vrv_cast dynamic_cast
-// To be used for all FunctorParams casts within Functors
-#define vrv_params_cast dynamic_cast
 #else
 #define vrv_cast static_cast
-#define vrv_params_cast static_cast
 #endif
 
 //----------------------------------------------------------------------------
@@ -223,6 +220,7 @@ enum ClassId : uint16_t {
     DOTS,
     FLAG,
     FTREM,
+    GENERIC_ELEMENT,
     GRACEGRP,
     HALFMRPT,
     KEYSIG,
@@ -241,8 +239,10 @@ enum ClassId : uint16_t {
     NC,
     NOTE,
     NEUME,
+    ORISCUS,
     PLICA,
     PROPORT,
+    QUILISMA,
     REST,
     SPACE,
     STEM,
@@ -429,8 +429,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 #define DEFINITION_FACTOR 10
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
-
-#define durRound(dur) round(dur *pow(10, 8)) / pow(10, 8)
 
 /**
  * Codes returned by Functors.
@@ -663,6 +661,24 @@ enum SmuflTextFont { SMUFL_NONE = 0, SMUFL_FONT_SELECTED, SMUFL_FONT_FALLBACK };
 //----------------------------------------------------------------------------
 
 enum GraphicID { PRIMARY = 0, SPANNING, SYMBOLREF };
+
+//----------------------------------------------------------------------------
+// Measure type
+//----------------------------------------------------------------------------
+
+enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
+
+//----------------------------------------------------------------------------
+// The score time unit (quarter note)
+//----------------------------------------------------------------------------
+
+#define SCORE_TIME_UNIT 4
+
+//----------------------------------------------------------------------------
+// Section representing a line in neon
+//----------------------------------------------------------------------------
+
+#define NEUME_LINE_TYPE "neon-neume-line"
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

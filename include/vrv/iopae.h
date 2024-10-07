@@ -27,7 +27,7 @@
 
 #include "atts_cmn.h"
 #include "clef.h"
-#include "io.h"
+#include "iobase.h"
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -91,12 +91,18 @@ public:
      */
     bool WriteObjectEnd(Object *object) override;
 
+    /**
+     * Helper method to return a string representation of the PAE duration.
+     */
+    static std::string GetPaeDur(data_DURATION dur, int ndots);
+
 private:
     /**
      * @name Methods for writing containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     void WriteMdiv(Mdiv *mDiv);
+    void WriteMdivEnd(Mdiv *mDiv);
     void WriteScoreDef(ScoreDef *scoreDef);
     void WriteStaffDef(StaffDef *staffDef);
     void WriteMeasure(Measure *measure);
@@ -166,6 +172,7 @@ private:
     ///@{
     void WriteDur(DurationInterface *interface);
     void WriteGrace(AttGraced *attGraced);
+    bool HasFermata(Object *object);
     ///@}
 
 public:
@@ -490,6 +497,8 @@ namespace pae {
         bool IsSpace();
         /** Return true is the token has to be ignore during parsing */
         bool IsVoid();
+        /** Set the object as being inserted in the MEI tree */
+        void SetInTree();
 
         /* Helper to the a lowercase version of the Object classname (if any) */
         std::string GetName();
@@ -498,6 +507,8 @@ namespace pae {
         char m_char;
         /** The Object to be added to the tree */
         Object *m_object;
+        /** The object added to the tree */
+        Object *m_treeObject;
         /** the input char preserved for debugging purposes */
         char m_inputChar;
         /** the position in the original input string for debuggin purposes */
@@ -648,7 +659,6 @@ private:
 
     /**
      * Some additional checked to be performed one the MEI tree has been build.
-     * Unimplemented
      */
     bool CheckContentPostBuild();
 
@@ -656,6 +666,12 @@ private:
      * A helper to remove a token when checking the hierarchy and it is not valid
      */
     void RemoveContainerToken(Object *object);
+
+    /**
+     * Return the token corresponding to an object in the tree.
+     * Return NULL if not found.
+     */
+    pae::Token *GetTokenForTreeObject(Object *object);
 
     /**
      * @name Some logging methods specific to the PAE parser

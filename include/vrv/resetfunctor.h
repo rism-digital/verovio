@@ -62,6 +62,8 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMRest(MRest *mRest) override;
     FunctorCode VisitNote(Note *note) override;
+    FunctorCode VisitNc(Nc *nc) override;
+    FunctorCode VisitObject(Object *object) override;
     FunctorCode VisitRepeatMark(RepeatMark *repeatMark) override;
     FunctorCode VisitRest(Rest *rest) override;
     FunctorCode VisitSection(Section *section) override;

@@ -54,8 +54,9 @@ namespace vrv {
 
 static const ClassRegistrar<Measure> s_factory("measure", MEASURE);
 
-Measure::Measure(bool measureMusic, int logMeasureNb)
+Measure::Measure(MeasureType measureMusic, int logMeasureNb)
     : Object(MEASURE, "measure-")
+    , FacsimileInterface()
     , AttBarring()
     , AttCoordX1()
     , AttCoordX2()
@@ -73,8 +74,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     this->RegisterAttClass(ATT_NNUMBERLIKE);
     this->RegisterAttClass(ATT_POINTING);
     this->RegisterAttClass(ATT_TYPED);
+    this->RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
 
-    m_measuredMusic = measureMusic;
+    m_measureType = measureMusic;
 
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
@@ -93,7 +95,7 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
 
     this->Reset();
 
-    if (!measureMusic) this->SetRight(BARRENDITION_invis);
+    if (!this->IsMeasuredMusic() && !this->IsNeumeLine()) this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
@@ -121,6 +123,7 @@ void Measure::CloneReset()
 void Measure::Reset()
 {
     Object::Reset();
+    FacsimileInterface::Reset();
     this->ResetCoordX1();
     this->ResetCoordX2();
     this->ResetMeasureLog();
@@ -134,8 +137,8 @@ void Measure::Reset()
     this->ResetDrawingScoreDef();
 
     m_timestampAligner.Reset();
-    m_xAbs = VRV_UNSET;
-    m_xAbs2 = VRV_UNSET;
+    m_drawingFacsX1 = VRV_UNSET;
+    m_drawingFacsX2 = VRV_UNSET;
     m_drawingXRel = 0;
 
     m_cachedXRel = VRV_UNSET;
@@ -146,10 +149,8 @@ void Measure::Reset()
     m_rightBarLine.SetForm(this->GetRight());
     m_leftBarLine.SetForm(this->GetLeft());
 
-    if (!m_measuredMusic) {
-        m_xAbs = VRV_UNSET;
-        m_xAbs2 = VRV_UNSET;
-    }
+    m_drawingFacsX1 = VRV_UNSET;
+    m_drawingFacsX2 = VRV_UNSET;
 
     m_drawingEnding = NULL;
     m_hasAlignmentRefWithMultipleLayers = false;
@@ -210,15 +211,7 @@ void Measure::AddChildBack(Object *child)
 
 int Measure::GetDrawingX() const
 {
-    if (!this->IsMeasuredMusic()) {
-        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
-        assert(system);
-        if (system->m_yAbs != VRV_UNSET) {
-            return (system->m_systemLeftMar);
-        }
-    }
-
-    if (m_xAbs != VRV_UNSET) return m_xAbs;
+    if (m_drawingFacsX1 != VRV_UNSET) return m_drawingFacsX1;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
@@ -350,18 +343,7 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
-    if (!this->IsMeasuredMusic()) {
-        const System *system = vrv_cast<const System *>(this->GetFirstAncestor(SYSTEM));
-        assert(system);
-        if (system->m_yAbs != VRV_UNSET) {
-            const Page *page = vrv_cast<const Page *>(system->GetFirstAncestor(PAGE));
-            assert(page);
-            // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
-            return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
-        }
-    }
-
-    if (m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    if (m_drawingFacsX2 != VRV_UNSET) return (m_drawingFacsX2 - m_drawingFacsX1);
 
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -494,7 +476,8 @@ int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
     double timeDuration
-        = m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5;
+        = m_measureAligner.GetRightAlignment()->GetTime().ToDouble() * SCORE_TIME_UNIT * 60.0 / m_currentTempo * 1000.0
+        + 0.5;
     std::vector<double>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;

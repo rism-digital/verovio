@@ -74,7 +74,7 @@ void View::SetPage(int pageIdx, bool doLayout)
         m_doc->ScoreDefSetCurrentDoc();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
-        if (m_doc->GetType() == Transcription || m_doc->GetType() == Facs) {
+        if (m_doc->IsTranscription() || m_doc->IsFacs()) {
             m_currentPage->LayOutTranscription();
         }
         else {

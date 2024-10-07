@@ -35,6 +35,7 @@ class Clef : public LayerElement,
              public AttOctave,
              public AttOctaveDisplacement,
              public AttStaffIdent,
+             public AttTypography,
              public AttVisibility {
 public:
     /**
@@ -58,7 +59,7 @@ public:
     /**
      * Return the offset of the clef
      */
-    int GetClefLocOffset() const;
+    int GetClefLocOffset(data_NOTATIONTYPE notationType) const;
 
     //----------------//
     // Static methods //

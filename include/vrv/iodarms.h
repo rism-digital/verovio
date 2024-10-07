@@ -11,7 +11,7 @@
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
-#include "io.h"
+#include "iobase.h"
 
 namespace vrv {
 

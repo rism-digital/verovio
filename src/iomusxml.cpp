@@ -888,23 +888,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             }
         }
         if (head) {
-            m_doc->GetCurrentScoreDef()->AddChild(head);
+            score->GetScoreDef()->AddChild(head);
         }
         if (foot) {
-            m_doc->GetCurrentScoreDef()->AddChild(foot);
+            score->GetScoreDef()->AddChild(foot);
         }
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    score->GetScoreDef()->AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
     short int staffOffset = 0;
     m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
-    if (scoreMidiBpm) m_doc->GetCurrentScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
+    if (scoreMidiBpm) score->GetScoreDef()->SetMidiBpm(scoreMidiBpm.node().attribute("tempo").as_double());
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -1658,9 +1658,17 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // first check if there is a multi measure rest
         if (it->select_node(".//multiple-rest")) {
-            const int multiRestLength = it->select_node(".//multiple-rest").node().text().as_int();
+            const pugi::xml_node multiRestNode = it->select_node(".//multiple-rest").node();
+            const int multiRestLength = multiRestNode.text().as_int();
+            const std::string symbols = multiRestNode.attribute("use-symbols").as_string();
             MultiRest *multiRest = new MultiRest;
-            if (it->select_node(".//multiple-rest[@use-symbols='yes']")) multiRest->SetBlock(BOOLEAN_false);
+            if (symbols == "no") {
+                // default by MusicXML specification
+                multiRest->SetBlock(BOOLEAN_true);
+            }
+            else if (symbols == "yes") {
+                multiRest->SetBlock(BOOLEAN_false);
+            }
             multiRest->SetNum(multiRestLength);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
@@ -1708,6 +1716,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 
     this->MatchTies(true);
     if (!m_tieStack.empty()) this->MatchTies(false);
+    for (auto openTie : m_tieStack) {
+        openTie.m_note->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
+    }
 
     // clear stop stacks after each measure
     m_hairpinStopStack.clear();
@@ -1750,11 +1761,11 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             // match tie stop with pitch/oct identity, with start note earlier than end note,
             // and with earliest end note.
             if ((iter->m_note->IsEnharmonicWith(jter->m_note))
-                && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
-                && (jter->m_note->GetScoreTimeOnset() < lastScoreTimeOnset)
+                && (iter->m_note->GetRealTimeOnsetMilliseconds() < jter->m_note->GetRealTimeOnsetMilliseconds())
+                && (jter->m_note->GetRealTimeOnsetMilliseconds() < lastScoreTimeOnset)
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
-                lastScoreTimeOnset = jter->m_note->GetScoreTimeOnset();
+                lastScoreTimeOnset = jter->m_note->GetRealTimeOnsetMilliseconds();
                 tieMatched = true;
                 break;
             }
@@ -1764,7 +1775,6 @@ void MusicXmlInput::MatchTies(bool matchLayers)
             m_tieStopStack.erase(jter);
         }
         else {
-            iter->m_note->SetScoreTimeOnset(-1); // make scoreTimeOnset small for next measure
             ++iter;
         }
     }
@@ -1824,6 +1834,9 @@ void MusicXmlInput::ReadMusicXmlAttributes(
         }
 
         section->AddChild(scoreDef);
+    }
+    else if (time && node.select_node("ancestor::part[(preceding-sibling::part)]")) {
+        m_meterUnit = time.child("beat-type").text().as_int();
     }
 
     pugi::xpath_node measureRepeat = node.select_node("measure-style/measure-repeat");
@@ -2578,6 +2591,11 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, c
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_node("root/root-alter");
+    if (harmText.empty()) {
+        pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
+        harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
+        alter = node.select_node("numeral/numeral-alter");
+    }
     if (alter) harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xml_node kind = node.child("kind");
     if (kind) {
@@ -2626,7 +2644,7 @@ void MusicXmlInput::ReadMusicXmlNote(
     // find staff's staffDef
     // TODO Tablature: is this the correct way to find a staff's staffDef?
     AttNIntegerComparison cnc(STAFFDEF, staff->GetN());
-    StaffDef *staffDef = vrv_cast<StaffDef *>(m_doc->GetCurrentScoreDef()->FindDescendantByComparison(&cnc));
+    StaffDef *staffDef = vrv_cast<StaffDef *>(m_doc->GetFirstScoreDef()->FindDescendantByComparison(&cnc));
     bool isTablature = false;
     Tuning *tuning = NULL;
 
@@ -2812,7 +2830,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         if (!noteID.empty()) {
             note->SetID(noteID);
         }
-        note->SetScoreTimeOnset(onset); // remember the MIDI onset within that measure
+        note->SetRealTimeOnsetSeconds(onset); // remember the MIDI onset within that measure
         // set @staff attribute, if existing and different from parent staff number
         if (noteStaffNum > 0 && noteStaffNum + staffOffset != staff->GetN())
             note->SetStaff(
@@ -3146,7 +3164,7 @@ void MusicXmlInput::ReadMusicXmlNote(
         }
 
         // ties
-        ReadMusicXmlTies(notations.node(), layer, note, measureNum);
+        ReadMusicXmlTies(node, layer, note, measureNum);
 
         // articulation
         std::vector<data_ARTICULATION> artics;
@@ -3623,6 +3641,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 TabGrp *tabGrp = vrv_cast<TabGrp *>(element);
                 tabGrp->SetBreaksec(breakSec);
             }
+            if (element->Is(REST)) {
+                Rest *rest = vrv_cast<Rest *>(element);
+                rest->SetBreaksec(breakSec);
+            }
         }
         else {
             if (IsInStack(BEAM, layer)) {
@@ -3693,8 +3715,11 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     assert(section);
 
     if (node.attribute("new-page").as_bool()) {
-        Pb *pb = new Pb();
-        section->AddChild(pb);
+        const int pageBreaks = node.attribute("blank-page").as_int() + 1;
+        for (int i = 0; i < pageBreaks; ++i) {
+            Pb *pb = new Pb();
+            section->AddChild(pb);
+        }
     }
 
     if (node.attribute("new-system").as_bool()) {
@@ -3703,7 +3728,7 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
     }
 
     if (std::string(node.child("measure-numbering").text().as_string()) == "none") {
-        m_doc->GetCurrentScoreDef()->SetMnumVisible(BOOLEAN_false);
+        m_doc->GetFirstScoreDef()->SetMnumVisible(BOOLEAN_false);
     }
 }
 
@@ -3825,7 +3850,9 @@ void MusicXmlInput::ReadMusicXmlBeamStart(const pugi::xml_node &node, const pugi
 void MusicXmlInput::ReadMusicXmlTies(
     const pugi::xml_node &node, Layer *layer, Note *note, const std::string &measureNum)
 {
-    for (pugi::xml_node xmlTie : node.children("tied")) {
+    pugi::xpath_node_set xmlTies = node.select_nodes("notations/tied");
+    for (pugi::xpath_node_set::const_iterator it = xmlTies.begin(); it != xmlTies.end(); ++it) {
+        pugi::xml_node xmlTie = (*it).node();
         std::string tieType = xmlTie.attribute("type").as_string();
 
         if (tieType.empty()) {

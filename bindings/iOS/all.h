@@ -54,7 +54,7 @@
 #import <VerovioFramework/calcchordnoteheadsfunctor.h>
 #import <VerovioFramework/calcdotsfunctor.h>
 #import <VerovioFramework/calcledgerlinesfunctor.h>
-#import <VerovioFramework/calcligaturenoteposfunctor.h>
+#import <VerovioFramework/calcligatureorneumeposfunctor.h>
 #import <VerovioFramework/calcslurdirectionfunctor.h>
 #import <VerovioFramework/calcspanningbeamspansfunctor.h>
 #import <VerovioFramework/calcstemfunctor.h>
@@ -94,11 +94,13 @@
 #import <VerovioFramework/expansionmap.h>
 #import <VerovioFramework/f.h>
 #import <VerovioFramework/facsimile.h>
+#import <VerovioFramework/facsimilefunctor.h>
 #import <VerovioFramework/facsimileinterface.h>
 #import <VerovioFramework/fb.h>
 #import <VerovioFramework/featureextractor.h>
 #import <VerovioFramework/fermata.h>
 #import <VerovioFramework/fig.h>
+#import <VerovioFramework/filereader.h>
 #import <VerovioFramework/findfunctor.h>
 #import <VerovioFramework/findlayerelementsfunctor.h>
 #import <VerovioFramework/fing.h>
@@ -119,7 +121,7 @@
 #import <VerovioFramework/humlib.h>
 #import <VerovioFramework/instrdef.h>
 #import <VerovioFramework/interface.h>
-#import <VerovioFramework/io.h>
+#import <VerovioFramework/iobase.h>
 #import <VerovioFramework/ioabc.h>
 #import <VerovioFramework/iodarms.h>
 #import <VerovioFramework/iohumdrum.h>

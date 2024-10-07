@@ -191,12 +191,12 @@ public:
      * The Y absolute position of the staff for facsimile (transcription) encodings.
      * This is the top left corner of the system.
      */
-    int m_yAbs;
+    int m_drawingFacsY;
     /**
      * The x absolute position of the  system for facsimile layouts.
      * This is the top left corner of the system.
      */
-    int m_xAbs;
+    int m_drawingFacsX;
     /**
      * The width used by the abbreviated labels at the left of the system.
      * It is used internally when calculating the layout and it is not stored in the file.

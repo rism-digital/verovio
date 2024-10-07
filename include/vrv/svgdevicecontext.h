@@ -9,10 +9,8 @@
 #define __VRV_SVG_DC_H__
 
 #include <fstream>
-#include <iostream>
 #include <list>
 #include <set>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -117,7 +115,7 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    void StartGraphic(Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY,
+    void StartGraphic(Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID = PRIMARY,
         bool prepend = false) override;
     void EndGraphic(Object *object, View *view) override;
     ///@}
@@ -126,9 +124,14 @@ public:
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
      */
     ///@{
-    void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "") override;
+    void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = "") override;
     void EndCustomGraphic() override;
     ///@}
+
+    /**
+     * Method for changing the color of a custom graphic
+     */
+    virtual void SetCustomGraphicColor(const std::string &color) override;
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
@@ -142,7 +145,7 @@ public:
      * @name Method for starting and ending a text (<tspan>) text graphic
      */
     ///@{
-    void StartTextGraphic(Object *object, std::string gClass, std::string gId) override;
+    void StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId) override;
     void EndTextGraphic(Object *object, View *view) override;
     ///@}
 
@@ -171,8 +174,8 @@ public:
     /**
      * Add id, data-id and class attributes
      */
-    void AppendIdAndClass(
-        std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID = PRIMARY);
+    void AppendIdAndClass(const std::string &gId, const std::string &baseClass, const std::string &addedClasses,
+        GraphicID graphicID = PRIMARY);
 
     /**
      * Append additional attributes, as given in m_svgAdditionalAttributes
@@ -225,7 +228,7 @@ public:
     /**
      * Setter for an additional CSS
      */
-    void SetCss(std::string css) { m_css = css; }
+    void SetCss(const std::string &css) { m_css = css; }
 
     /**
      *  Copies additional attributes of defined elements to the SVG, each string in the form "elementName@attribute"
@@ -323,9 +326,28 @@ private:
     bool m_committed; // did we flushed the file?
     int m_originX, m_originY;
 
-    // holds the list of glyphs from the smufl font used so far
-    // they will be added at the end of the file as <defs>
-    std::set<const Glyph *> m_smuflGlyphs;
+    // Here we hold references to all different glyphs used so far,
+    // including any glyph for the same code but from different fonts.
+    // They will be added at the end of the file as <defs>.
+    // With multiple font support we need to keep track of:
+    //  a) the glyph (to check if is has been already added)
+    //  b) the id assigned to glyphs on the (that is has been consumed by the already rendered elements)
+    // To keep things as similar as possible to previous versions we generate ids with as uuuu-ss (where uuuu is the
+    // Smulf code for the glyph and ss the per-session suffix) for most of the cases (single font usage). When the same
+    // glyph has been used from several fonts we use uuuu-n-ss where n indicates the collision count.
+    class GlyphRef {
+    public:
+        GlyphRef(const Glyph *glyph, int count, const std::string &postfix);
+        const Glyph *GetGlyph() const { return m_glyph; };
+        const std::string &GetRefId() const { return m_refId; };
+
+    private:
+        const Glyph *m_glyph;
+        std::string m_refId;
+    };
+    const std::string InsertGlyphRef(const Glyph *glyph);
+    std::map<const Glyph *, GlyphRef> m_smuflGlyphs;
+    std::map<std::string, int> m_glyphCodeFontCounter;
 
     // pugixml data
     pugi::xml_document m_svgDoc;
@@ -353,7 +375,7 @@ private:
     bool m_removeXlink;
     // indentation value (-1 for tabs)
     int m_indent;
-    // prefix to be added to font glyphs
+    // postfix to be added to font glyphs
     std::string m_glyphPostfixId;
     // embedding of the smufl text font
     option_SMUFLTEXTFONT m_smuflTextFont;

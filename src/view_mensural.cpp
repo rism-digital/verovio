@@ -50,7 +50,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     const int yNote = element->GetDrawingY();
     const int xNote = element->GetDrawingX();
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
 
     /************** Noteheads: **************/
 
@@ -58,7 +58,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     if (note->IsInLigature() && !m_options->m_ligatureAsBracket.GetValue()) {
         this->DrawLigatureNote(dc, element, layer, staff);
     }
-    else if (drawingDur < DUR_1) {
+    else if (drawingDur < DURATION_1) {
         this->DrawMaximaToBrevis(dc, yNote, element, layer, staff);
     }
     // Semibrevis and shorter
@@ -98,6 +98,9 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (mensur->HasLoc()) {
         y = staff->GetDrawingY()
             - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
+    }
+    else if (mensur->HasNumbase() && !mensur->HasNum()) {
+        y += 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     if (mensur->GetSign() == MENSURATIONSIGN_O) {
@@ -141,6 +144,12 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
         this->DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
     }
+    // It is sure we have a sign - draw the numbase underneath the sign
+    else if (mensur->HasNumbase()) {
+        // Draw a single figure but passing numbase - adjust the y accordingly
+        y -= 4 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        this->DrawProportFigures(dc, x, y, mensur->GetNumbase(), 0, staff);
+    }
 
     dc->EndGraphic(element, this);
 } // namespace vrv
@@ -152,7 +161,7 @@ void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_ST
     assert(note);
 
     const int staffSize = staff->m_drawingStaffSize;
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
     const int radius = note->GetDrawingRadius(m_doc);
     // Cue size is currently disabled
     const bool drawingCueSize = false;
@@ -160,7 +169,7 @@ void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_ST
 
     /* In black notation, the semiminima gets one flag; in white notation, it gets none.
         In both cases, as in CWMN, each shorter duration gets one additional flag. */
-    const int nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
+    const int nbFlags = (mensural_black ? drawingDur - DURATION_2 : drawingDur - DURATION_4);
 
     // SMuFL's mensural stems are not centered
     const int halfStemWidth
@@ -206,17 +215,24 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     const int strokeWidth = 2.8 * stemWidth;
+    const int staffSize = staff->m_drawingStaffSize;
 
     int shape = LIGATURE_DEFAULT;
-    if (note->GetActualDur() != DUR_BR) {
+    if (note->GetActualDur() != DURATION_breve) {
         bool up = false;
         // Mensural notes have no Stem child - rely on the MEI @stem.dir
         if (note->GetStemDir() != STEMDIRECTION_NONE) {
             up = (note->GetStemDir() == STEMDIRECTION_up);
         }
+        // For CMN we rely on the drawing stem dir interface pre-calculated in functors
         else if (staff->m_drawingNotationType == NOTATIONTYPE_NONE
             || staff->m_drawingNotationType == NOTATIONTYPE_cmn) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up);
+        }
+        // For mensural just calculate it here
+        else {
+            int verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
+            up = (note->GetDrawingY() < verticalCenter);
         }
         shape = (up) ? LIGATURE_STEM_RIGHT_UP : LIGATURE_STEM_RIGHT_DOWN;
     }
@@ -247,7 +263,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     // serifs and / or stem
     this->DrawFilledRectangle(dc, topLeft.x, sides[0], topLeft.x + stemWidth, sides[1]);
 
-    if (note->GetActualDur() != DUR_BR) {
+    if (note->GetActualDur() != DURATION_breve) {
         // Right side is a stem - end the notehead first
         dc->EndCustomGraphic();
         dc->StartCustomGraphic("stem");
@@ -433,7 +449,7 @@ void View::DrawDotInLigature(DeviceContext *dc, LayerElement *element, Layer *la
         isVerticalDot = !isLast && (shape & LIGATURE_OBLIQUE);
     }
     else {
-        if (note->GetActualDur() == DUR_1) shiftMultiplier = 3.5;
+        if (note->GetActualDur() == DURATION_1) shiftMultiplier = 3.5;
     }
 
     int y = note->GetDrawingY();
@@ -468,7 +484,7 @@ void View::DrawPlica(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     const bool isMensuralBlack = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     const int stemWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-    const bool isLonga = (note->GetActualDur() == DUR_LG);
+    const bool isLonga = (note->GetActualDur() == DURATION_long);
     const bool up = (plica->GetDir() == STEMDIRECTION_basic_up);
 
     int shape = LIGATURE_DEFAULT;
@@ -694,7 +710,7 @@ void View::CalcObliquePoints(Note *note1, Note *note2, Staff *staff, Point point
 data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int verticalCenter)
 {
     // constants
-    const int drawingDur = note->GetDrawingDur();
+    const data_DURATION drawingDur = note->GetDrawingDur();
     const int yNote = note->GetDrawingY();
 
     data_STEMDIRECTION layerStemDir;
@@ -706,7 +722,7 @@ data_STEMDIRECTION View::GetMensuralStemDir(Layer *layer, Note *note, int vertic
         stemDir = layerStemDir;
     }
     else {
-        if (drawingDur < DUR_1) {
+        if (drawingDur < DURATION_1) {
             stemDir = STEMDIRECTION_down;
         }
         else {

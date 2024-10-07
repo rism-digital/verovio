@@ -39,6 +39,15 @@ public:
     ///@}
 
     /**
+     * @name Set and get the default octave
+     */
+    ///@{
+    void SetOctDefault(data_OCTAVE oct) { m_octDefault = oct; }
+    data_OCTAVE GetOctDefault() const { return m_octDefault; }
+    bool HasOctDefault() const { return (m_octDefault != MEI_UNSET_OCT); }
+    ///@}
+
+    /**
      * Interface comparison operator.
      * Checks if the LayerElement has a PitchInterface and compares attributes
      */
@@ -90,7 +99,10 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The default octave: extracted from scoreDef/staffDef and used when no octave attribute is given
+     */
+    data_OCTAVE m_octDefault;
 };
 
 } // namespace vrv

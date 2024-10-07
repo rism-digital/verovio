@@ -23,6 +23,7 @@
 #include "adjustgracexposfunctor.h"
 #include "adjustharmgrpsspacingfunctor.h"
 #include "adjustlayersfunctor.h"
+#include "adjustneumexfunctor.h"
 #include "adjustslursfunctor.h"
 #include "adjuststaffoverlapfunctor.h"
 #include "adjustsylspacingfunctor.h"
@@ -33,6 +34,7 @@
 #include "adjustxposfunctor.h"
 #include "adjustxrelfortranscriptionfunctor.h"
 #include "adjustyposfunctor.h"
+#include "adjustyrelfortranscriptionfunctor.h"
 #include "alignfunctor.h"
 #include "bboxdevicecontext.h"
 #include "cachehorizontallayoutfunctor.h"
@@ -43,7 +45,7 @@
 #include "calcchordnoteheadsfunctor.h"
 #include "calcdotsfunctor.h"
 #include "calcledgerlinesfunctor.h"
-#include "calcligaturenoteposfunctor.h"
+#include "calcligatureorneumeposfunctor.h"
 #include "calcslurdirectionfunctor.h"
 #include "calcspanningbeamspansfunctor.h"
 #include "calcstemfunctor.h"
@@ -251,6 +253,9 @@ void Page::LayOutTranscription(bool force)
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
+    CalcLigatureOrNeumePosFunctor calcLigatureOrNeumePos(doc);
+    this->Process(calcLigatureOrNeumePos);
+
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
 
@@ -260,16 +265,20 @@ void Page::LayOutTranscription(bool force)
     CalcDotsFunctor calcDots(doc);
     this->Process(calcDots);
 
-    // Render it for filling the bounding box
-    View view;
-    view.SetDoc(doc);
-    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
-    // Do not do the layout in this view - otherwise we will loop...
-    view.SetPage(this->GetIdx(), false);
-    view.DrawCurrentPage(&bBoxDC, false);
+    if (!m_layoutDone) {
+        // Render it for filling the bounding box
+        View view;
+        view.SetDoc(doc);
+        BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
+        // Do not do the layout in this view - otherwise we will loop...
+        view.SetPage(this->GetIdx(), false);
+        view.DrawCurrentPage(&bBoxDC, false);
+    }
 
     AdjustXRelForTranscriptionFunctor adjustXRelForTranscription;
     this->Process(adjustXRelForTranscription);
+    AdjustYRelForTranscriptionFunctor adjustYRelForTranscription;
+    this->Process(adjustYRelForTranscription);
 
     CalcLedgerLinesFunctor calcLedgerLines(doc);
     this->Process(calcLedgerLines);
@@ -309,7 +318,7 @@ void Page::ResetAligners()
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
-        int longestActualDur = DUR_4;
+        data_DURATION longestActualDur = DURATION_4;
 
         // Detect the longest duration in order to adjust the spacing (false by default)
         if (doc->GetOptions()->m_spacingDurDetection.GetValue()) {
@@ -333,10 +342,8 @@ void Page::ResetAligners()
     CalcAlignmentPitchPosFunctor calcAlignmentPitchPos(doc);
     this->Process(calcAlignmentPitchPos);
 
-    if (IsMensuralType(doc->m_notationType)) {
-        CalcLigatureNotePosFunctor calcLigatureNotePos(doc);
-        this->Process(calcLigatureNotePos);
-    }
+    CalcLigatureOrNeumePosFunctor calcLigatureOrNeumePos(doc);
+    this->Process(calcLigatureOrNeumePos);
 
     CalcStemFunctor calcStem(doc);
     this->Process(calcStem);
@@ -378,6 +385,9 @@ void Page::LayOutHorizontally()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Get the scoreDef at the beginning of the page
+    ScoreDef *scoreDef = m_score->GetScoreDef();
+
     // Adjust the position of outside articulations
     AdjustArticFunctor adjustArtic(doc);
     this->Process(adjustArtic);
@@ -385,16 +395,20 @@ void Page::LayOutHorizontally()
     // Adjust the x position of the LayerElement where multiple layers collide
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     // For the first iteration align elements without taking dots into consideration
-    AdjustLayersFunctor adjustLayers(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersFunctor adjustLayers(doc, scoreDef->GetStaffNs());
     this->Process(adjustLayers);
 
     // Adjust dots for the multiple layers. Try to align dots that can be grouped together when layers collide,
     // otherwise keep their relative positioning
-    AdjustDotsFunctor adjustDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustDotsFunctor adjustDots(doc, scoreDef->GetStaffNs());
     this->Process(adjustDots);
 
+    // Adjust the X position of the neume and syllables
+    AdjustNeumeXFunctor adjustNeumeX(doc);
+    this->Process(adjustNeumeX);
+
     // Adjust layers again, this time including dots positioning
-    AdjustLayersFunctor adjustLayersWithDots(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustLayersFunctor adjustLayersWithDots(doc, scoreDef->GetStaffNs());
     adjustLayersWithDots.IgnoreDots(false);
     this->Process(adjustLayersWithDots);
 
@@ -404,7 +418,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustXPosFunctor adjustXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustXPosFunctor adjustXPos(doc, scoreDef->GetStaffNs());
     adjustXPos.SetExcluded({ TABDURSYM });
     this->Process(adjustXPos);
 
@@ -416,7 +430,7 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    AdjustGraceXPosFunctor adjustGraceXPos(doc, doc->GetCurrentScoreDef()->GetStaffNs());
+    AdjustGraceXPosFunctor adjustGraceXPos(doc, scoreDef->GetStaffNs());
     this->Process(adjustGraceXPos);
 
     // Adjust the spacing of clef changes since they are skipped in AdjustXPos
@@ -551,8 +565,6 @@ void Page::LayOutVertically()
         view.DrawCurrentPage(&bBoxDC, false);
         this->Process(adjustSlurs);
     }
-
-    doc->SetCurrentScore(this->m_score);
 
     if (this->GetHeader()) {
         this->GetHeader()->AdjustRunningElementYPos();

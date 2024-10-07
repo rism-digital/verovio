@@ -97,6 +97,8 @@ enum {
     SMUFL_E0B5_noteheadWholeWithX = 0xE0B5,
     SMUFL_E0B6_noteheadHalfWithX = 0xE0B6,
     SMUFL_E0B7_noteheadVoidWithX = 0xE0B7,
+    SMUFL_E0B8_noteheadSquareWhite = 0xE0B8,
+    SMUFL_E0B9_noteheadSquareBlack = 0xE0B9,
     SMUFL_E0D9_noteheadDiamondHalf = 0xE0D9,
     SMUFL_E0DA_noteheadDiamondHalfWide = 0xE0DA,
     SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
@@ -106,6 +108,7 @@ enum {
     SMUFL_E0F5_noteheadParenthesisLeft = 0xE0F5,
     SMUFL_E0F6_noteheadParenthesisRight = 0xE0F6,
     SMUFL_E0FA_noteheadWholeFilled = 0xE0FA,
+    SMUFL_E0FB_noteheadHalfFilled = 0xE0FB,
     SMUFL_E101_noteheadSlashHorizontalEnds = 0xE101,
     SMUFL_E102_noteheadSlashWhiteWhole = 0xE102,
     SMUFL_E103_noteheadSlashWhiteHalf = 0xE103,
@@ -311,6 +314,8 @@ enum {
     SMUFL_E56F_ornamentHaydn = 0xE56F,
     SMUFL_E583_ornamentVerticalLine = 0xE583,
     SMUFL_E587_ornamentSchleifer = 0xE587,
+    SMUFL_E594_ornamentLeftVerticalStroke = 0xE594,
+    SMUFL_E595_ornamentLeftVerticalStrokeWithCross = 0xE595,
     SMUFL_E59D_ornamentZigZagLineNoRightEnd = 0xE59D,
     SMUFL_E59E_ornamentZigZagLineWithRightEnd = 0xE59E,
     SMUFL_E5B0_ornamentPrecompSlide = 0xE5B0,
@@ -431,6 +436,10 @@ enum {
     SMUFL_E923_mensuralProlationCombiningThreeDotsTri = 0xE923,
     SMUFL_E924_mensuralProlationCombiningDotVoid = 0xE924,
     SMUFL_E925_mensuralProlationCombiningStroke = 0xE925,
+    SMUFL_E926_mensuralProportion1 = 0xE926,
+    SMUFL_E927_mensuralProportion2 = 0xE927,
+    SMUFL_E928_mensuralProportion3 = 0xE928,
+    SMUFL_E929_mensuralProportion4 = 0xE929,
     SMUFL_E938_mensuralNoteheadSemibrevisBlack = 0xE938,
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
@@ -461,6 +470,7 @@ enum {
     SMUFL_E99B_chantQuilisma = 0xE99B,
     SMUFL_E99E_chantOriscusLiquescens = 0xE99E,
     SMUFL_E99F_chantStrophicus = 0xE99F,
+    SMUFL_E9A1_chantPunctumDeminutum = 0xE9A1,
     SMUFL_E9B0_chantPodatusLower = 0xE9B0,
     SMUFL_E9B1_chantPodatusUpper = 0xE9B1,
     SMUFL_E9B2_chantDeminutumUpper = 0xE9B2,
@@ -494,6 +504,7 @@ enum {
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
     SMUFL_EA02_mensuralCustosUp = 0xEA02,
     SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA2A_medRenOriscusCMN = 0xEA2A,
     SMUFL_EA50_figbass0 = 0xEA50,
     SMUFL_EA51_figbass1 = 0xEA51,
     SMUFL_EA52_figbass2 = 0xEA52,
@@ -641,10 +652,15 @@ enum {
     SMUFL_ECB7_metAugmentationDot = 0xECB7,
     SMUFL_ED40_articSoftAccentAbove = 0xED40,
     SMUFL_ED41_articSoftAccentBelow = 0xED41,
+    SMUFL_EE90_mensuralProportion5 = 0xEE90,
+    SMUFL_EE91_mensuralProportion6 = 0xEE91,
+    SMUFL_EE92_mensuralProportion7 = 0xEE92,
+    SMUFL_EE93_mensuralProportion8 = 0xEE93,
+    SMUFL_EE94_mensuralProportion9 = 0xEE94,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 619
+#define SMUFL_COUNT 635
 
 } // namespace vrv
 

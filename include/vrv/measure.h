@@ -11,6 +11,7 @@
 #include "atts_cmn.h"
 #include "atts_shared.h"
 #include "barline.h"
+#include "facsimileinterface.h"
 #include "horizontalaligner.h"
 #include "object.h"
 
@@ -34,6 +35,7 @@ class TimestampAttr;
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
 class Measure : public Object,
+                public FacsimileInterface,
                 public AttBarring,
                 public AttCoordX1,
                 public AttCoordX2,
@@ -51,7 +53,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Measure(bool measuredMusic = true, int logMeasureNb = -1);
+    Measure(MeasureType measuredMusic = MEASURED, int logMeasureNb = -1);
     virtual ~Measure();
     Object *Clone() const override { return new Measure(*this); };
     void Reset() override;
@@ -64,9 +66,25 @@ public:
     void CloneReset() override;
 
     /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    FacsimileInterface *GetFacsimileInterface() override { return vrv_cast<FacsimileInterface *>(this); }
+    const FacsimileInterface *GetFacsimileInterface() const override
+    {
+        return vrv_cast<const FacsimileInterface *>(this);
+    }
+    ///@}
+
+    /**
      * Return true if measured music (otherwise we have fake measures)
      */
-    bool IsMeasuredMusic() const { return m_measuredMusic; }
+    bool IsMeasuredMusic() const { return (m_measureType == MEASURED); }
+
+    /**
+     * Return true if the measure represents a neume (section) line
+     */
+    bool IsNeumeLine() const { return (m_measureType == NEUMELINE); }
 
     /**
      * Get and set the measure index
@@ -298,7 +316,7 @@ public:
     /**
      * Read only access to m_scoreTimeOffset
      */
-    double GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
+    Fraction GetLastTimeOffset() const { return m_scoreTimeOffset.back(); }
 
     /**
      * Return the real time offset in milliseconds
@@ -313,7 +331,7 @@ public:
      */
     ///@{
     void ClearScoreTimeOffset() { m_scoreTimeOffset.clear(); }
-    void AddScoreTimeOffset(double offset) { m_scoreTimeOffset.push_back(offset); }
+    void AddScoreTimeOffset(Fraction offset) { m_scoreTimeOffset.push_back(offset); }
     void ClearRealTimeOffset() { m_realTimeOffsetMilliseconds.clear(); }
     void AddRealTimeOffset(double milliseconds) { m_realTimeOffsetMilliseconds.push_back(milliseconds); }
     ///@}
@@ -358,8 +376,8 @@ public:
      * This is the left and right position of the measure.
      */
     ///@{
-    int m_xAbs;
-    int m_xAbs2;
+    int m_drawingFacsX1;
+    int m_drawingFacsX2;
     ///@}
 
     /**
@@ -391,9 +409,10 @@ protected:
 
 private:
     /**
-     * Indicates measured music (otherwise we have fake measures)
+     * Indicate measured music (CMN), unmeasured (fake measures for mensural or neumes) or neume lines
+     * Neume line measure are created from <section type="neon-neume-line">
      */
-    bool m_measuredMusic;
+    MeasureType m_measureType;
 
     /**
      * The unique measure index
@@ -429,7 +448,7 @@ private:
     /**
      * Start time state variables.
      */
-    std::vector<double> m_scoreTimeOffset;
+    std::vector<Fraction> m_scoreTimeOffset;
     std::vector<double> m_realTimeOffsetMilliseconds;
     double m_currentTempo;
 

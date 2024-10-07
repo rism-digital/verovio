@@ -84,6 +84,43 @@ bool SvgDeviceContext::CopyFileToStream(const std::string &filename, std::ostrea
     return true;
 }
 
+SvgDeviceContext::GlyphRef::GlyphRef(const Glyph *glyph, int count, const std::string &postfix) : m_glyph(glyph)
+{
+    // Add the counter only when necessary (more than one font for that glyph)
+    if (count == 0) {
+        m_refId = StringFormat("%s-%s", glyph->GetCodeStr().c_str(), postfix.c_str());
+    }
+    else {
+        m_refId = StringFormat("%s-%d-%s", glyph->GetCodeStr().c_str(), count, postfix.c_str());
+    }
+};
+
+const std::string SvgDeviceContext::InsertGlyphRef(const Glyph *glyph)
+{
+    const std::string code = glyph->GetCodeStr();
+
+    // We have already used this glyph
+    if (m_smuflGlyphs.find(glyph) != m_smuflGlyphs.end()) {
+        return m_smuflGlyphs.at(glyph).GetRefId();
+    }
+
+    int count;
+    // This is the first time we have a glyph with this code
+    if (m_glyphCodeFontCounter.find(code) == m_glyphCodeFontCounter.end()) {
+        count = 0;
+    }
+    // We used it but with another font
+    else {
+        count = m_glyphCodeFontCounter[(code)];
+    }
+    GlyphRef ref(glyph, count, m_glyphPostfixId);
+    const std::string id = ref.GetRefId();
+    m_smuflGlyphs.insert(std::pair<const Glyph *, GlyphRef>(glyph, ref));
+    m_glyphCodeFontCounter[code] = count + 1;
+
+    return id;
+}
+
 void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resources *resources)
 {
     assert(resources);
@@ -91,17 +128,7 @@ void SvgDeviceContext::IncludeTextFont(const std::string &fontname, const Resour
     std::string cssContent;
 
     if (m_smuflTextFont == SMUFLTEXTFONT_embedded) {
-        const std::string cssFontPath = StringFormat("%s/%s.css", resources->GetPath().c_str(), fontname.c_str());
-        std::ifstream cssFontFile(cssFontPath);
-        if (!cssFontFile.is_open()) {
-            LogWarning("The CSS font for '%s' could not be loaded and will not be embedded in the SVG",
-                resources->GetCurrentFontName().c_str());
-        }
-        else {
-            std::stringstream cssFontStream;
-            cssFontStream << cssFontFile.rdbuf();
-            cssContent = cssFontStream.str();
-        }
+        cssContent = resources->GetCSSFontFor(fontname);
     }
     else {
         std::string versionPath
@@ -156,11 +183,11 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         const Resources *resources = this->GetResources(true);
         // include the selected font
         if (m_vrvTextFont && resources) {
-            this->IncludeTextFont(resources->GetCurrentFontName(), resources);
+            this->IncludeTextFont(resources->GetCurrentFont(), resources);
         }
-        // include the Leipzig fallback font
+        // include the fallback font
         if (m_vrvTextFontFallback && resources) {
-            this->IncludeTextFont("Leipzig", resources);
+            this->IncludeTextFont(resources->GetFallbackFont(), resources);
         }
     }
 
@@ -171,15 +198,13 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
-        for (const Glyph *smuflGlyph : m_smuflGlyphs) {
-            // load the XML file that contains it as a pugi::xml_document
-            std::ifstream source(smuflGlyph->GetPath());
-            sourceDoc.load(source);
+        for (const std::pair<const Glyph *, const SvgDeviceContext::GlyphRef &> entry : m_smuflGlyphs) {
+            // load the XML as a pugi::xml_document
+            sourceDoc.load_string(entry.first->GetXML().c_str());
 
             // copy all the nodes inside into the master document
             for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
-                std::string id = StringFormat("%s-%s", child.attribute("id").value(), m_glyphPostfixId.c_str());
-                child.attribute("id").set_value(id.c_str());
+                child.attribute("id").set_value(entry.second.GetRefId().c_str());
                 defs.append_copy(child);
             }
         }
@@ -211,13 +236,15 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 }
 
 void SvgDeviceContext::StartGraphic(
-    Object *object, std::string gClass, std::string gId, GraphicID graphicID, bool prepend)
+    Object *object, const std::string &gClass, const std::string &gId, GraphicID graphicID, bool prepend)
 {
+    std::string gClassFull = gClass;
+
     if (object->HasAttClass(ATT_TYPED)) {
         AttTyped *att = dynamic_cast<AttTyped *>(object);
         assert(att);
         if (att->HasType()) {
-            gClass.append((gClass.empty() ? "" : " ") + att->GetType());
+            gClassFull.append((gClassFull.empty() ? "" : " ") + att->GetType());
         }
     }
 
@@ -228,7 +255,7 @@ void SvgDeviceContext::StartGraphic(
         m_currentNode = m_currentNode.append_child("g");
     }
     m_svgNodeStack.push_back(m_currentNode);
-    AppendIdAndClass(gId, object->GetClassName(), gClass, graphicID);
+    AppendIdAndClass(gId, object->GetClassName(), gClassFull, graphicID);
     AppendAdditionalAttributes(object);
 
     // this sets staffDef styles for lyrics
@@ -323,14 +350,14 @@ void SvgDeviceContext::StartGraphic(
     // this->GetColor(currentBrush.GetColor()).c_str(), currentBrush.GetOpacity()).c_str();
 }
 
-void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
+void SvgDeviceContext::StartCustomGraphic(const std::string &name, std::string gClass, std::string gId)
 {
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     AppendIdAndClass(gId, name, gClass);
 }
 
-void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId)
 {
     m_currentNode = AddChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
@@ -405,6 +432,12 @@ void SvgDeviceContext::EndCustomGraphic()
     m_currentNode = m_svgNodeStack.back();
 }
 
+void SvgDeviceContext::SetCustomGraphicColor(const std::string &color)
+{
+    m_currentNode.append_attribute("color") = color.c_str();
+    m_currentNode.append_attribute("fill") = color.c_str();
+}
+
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     m_svgNodeStack.pop_back();
@@ -463,8 +496,8 @@ void SvgDeviceContext::StartPage()
             = StringFormat("0 0 %d %d", this->GetWidth(), this->GetHeight()).c_str();
     }
     else {
-        m_currentNode.append_attribute("viewBox") = StringFormat(
-            "0 0 %d %d", this->GetWidth() * DEFINITION_FACTOR, this->GetContentHeight() * DEFINITION_FACTOR)
+        m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
+            int(this->GetWidth() * this->GetViewBoxFactor()), int(this->GetContentHeight() * this->GetViewBoxFactor()))
                                                         .c_str();
     }
 
@@ -961,6 +994,10 @@ void SvgDeviceContext::DrawText(
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
+    if (m_fontStack.top()->GetLetterSpacing() != 0.0) {
+        textChild.append_attribute("letter-spacing")
+            = StringFormat("%dpx", m_fontStack.top()->GetLetterSpacing()).c_str();
+    }
     textChild.text().set(svgText.c_str());
 
     if ((x != 0) && (y != 0) && (x != VRV_UNSET) && (y != VRV_UNSET) && (width != 0) && (height != 0)
@@ -1008,12 +1045,11 @@ void SvgDeviceContext::DrawMusicText(const std::u32string &text, int x, int y, b
         }
 
         // Add the glyph to the array for the <defs>
-        m_smuflGlyphs.insert(glyph);
+        const std::string id = InsertGlyphRef(glyph);
 
         // Write the char in the SVG
         pugi::xml_node useChild = AddChild("use");
-        useChild.append_attribute(hrefAttrib.c_str())
-            = StringFormat("#%s-%s", glyph->GetCodeStr().c_str(), m_glyphPostfixId.c_str()).c_str();
+        useChild.append_attribute(hrefAttrib.c_str()) = StringFormat("#%s", id.c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
@@ -1069,9 +1105,10 @@ void SvgDeviceContext::AddDescription(const std::string &text)
 }
 
 void SvgDeviceContext::AppendIdAndClass(
-    std::string gId, std::string baseClass, std::string addedClasses, GraphicID graphicID)
+    const std::string &gId, const std::string &baseClass, const std::string &addedClasses, GraphicID graphicID)
 {
-    std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
+    std::string baseClassFull = baseClass;
+    std::transform(baseClassFull.begin(), baseClassFull.begin() + 1, baseClassFull.begin(), ::tolower);
 
     if (gId.length() > 0) {
         if (m_html5) {
@@ -1085,17 +1122,17 @@ void SvgDeviceContext::AppendIdAndClass(
     }
 
     if (m_html5) {
-        m_currentNode.append_attribute("data-class") = baseClass.c_str();
+        m_currentNode.append_attribute("data-class") = baseClassFull.c_str();
     }
 
     if (graphicID != PRIMARY) {
         std::string addClass = (graphicID == SPANNING) ? " spanning" : " symbol-ref";
-        baseClass.append(" id-" + gId + addClass);
+        baseClassFull.append(" id-" + gId + addClass);
     }
     if (!addedClasses.empty()) {
-        baseClass.append(" " + addedClasses);
+        baseClassFull.append(" " + addedClasses);
     }
-    m_currentNode.append_attribute("class") = baseClass.c_str();
+    m_currentNode.append_attribute("class") = baseClassFull.c_str();
 }
 
 void SvgDeviceContext::AppendAdditionalAttributes(Object *object)

@@ -74,6 +74,7 @@ public:
         m_baseWidth = 0;
         m_baseHeight = 0;
         m_pushBack = false;
+        m_viewBoxFactor = (double)DEFINITION_FACTOR;
     }
     DeviceContext(ClassId classId)
     {
@@ -89,8 +90,9 @@ public:
         m_baseWidth = 0;
         m_baseHeight = 0;
         m_pushBack = false;
+        m_viewBoxFactor = (double)DEFINITION_FACTOR;
     }
-    virtual ~DeviceContext(){};
+    virtual ~DeviceContext() {}
     ClassId GetClassId() const { return m_classId; }
     bool Is(ClassId classId) const { return (m_classId == classId); }
     ///@}
@@ -124,12 +126,14 @@ public:
         m_baseWidth = width;
         m_baseHeight = height;
     }
+    void SetViewBoxFactor(double ppuFactor);
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
     int GetContentHeight() const { return m_contentHeight; }
     double GetUserScaleX() { return m_userScaleX; }
     double GetUserScaleY() { return m_userScaleY; }
     std::pair<int, int> GetBaseSize() const { return std::make_pair(m_baseWidth, m_baseHeight); }
+    double GetViewBoxFactor() const { return m_viewBoxFactor; }
     ///@}
 
     /**
@@ -207,7 +211,7 @@ public:
      * Special method for forcing bounding boxes to be updated
      * Used for invisible elements (e.g., <space>) that needs to be take into account in spacing
      */
-    virtual void DrawPlaceholder(int x, int y){};
+    virtual void DrawPlaceholder(int x, int y) {}
 
     /**
      * @name Method for starting and ending a text
@@ -247,8 +251,8 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartGraphic(
-        Object *object, std::string gClass, std::string gId, GraphicID graphicID = PRIMARY, bool preprend = false)
+    virtual void StartGraphic(Object *object, const std::string &gClass, const std::string &gId,
+        GraphicID graphicID = PRIMARY, bool preprend = false)
         = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
@@ -258,9 +262,14 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = ""){};
-    virtual void EndCustomGraphic(){};
+    virtual void StartCustomGraphic(const std::string &name, std::string gClass = "", std::string gId = "") {}
+    virtual void EndCustomGraphic() {}
     ///@}
+
+    /**
+     * Method for changing the color of a custom graphic
+     */
+    virtual void SetCustomGraphicColor(const std::string &color) {}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
@@ -276,7 +285,7 @@ public:
      * For example, in SVG, a text graphic is a <tspan> (and not a <g>)
      */
     ///@{
-    virtual void StartTextGraphic(Object *object, std::string gClass, std::string gId)
+    virtual void StartTextGraphic(Object *object, const std::string &gClass, const std::string &gId)
     {
         StartGraphic(object, gClass, gId);
     }
@@ -303,7 +312,7 @@ public:
      * @name Method for adding description element
      */
     ///@{
-    virtual void AddDescription(const std::string &text){};
+    virtual void AddDescription(const std::string &text) {}
     ///@}
 
     /**
@@ -360,6 +369,9 @@ private:
     /** stores the scale as requested by the used */
     double m_userScaleX;
     double m_userScaleY;
+
+    /** stores the viewbox factor taking into account the DEFINTION_FACTOR and the PPU */
+    double m_viewBoxFactor;
 };
 
 } // namespace vrv

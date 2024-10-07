@@ -1,5 +1,37 @@
 # Changelog
 
+## [4.3.1] - 2024-09-10
+* Fix JS builds (JavaScript release only)
+
+## [4.3.0] - 2024-09-10
+* Support (initial) for Volpiano input
+* Support for neumatic notation oriscus and quilisma
+* Support for neume layout without facsimile
+* Support for numeral harmonics in MusicXML importer (@eNote-GmBH)
+* Improved logging
+
+## [4.2.1] - 2024-05-07
+* Fix GitHub actions (Python release only)
+
+## [4.2.0] - 2024-05-05
+* Support for `fTrem@unitdur` (@eNote-GmbH)
+* Upgrade to C++20
+* Update of the Midifile library
+* Fix lyric position in MIDI output
+* Fix string formatting output with some locale configurations (@ammatwain)
+
+## [4.1.0] - 2023-12-15
+* Support for staves ordered by `scoreDef`
+* Support for `rend@letterspacing` and `syl@letterspacing` in MEI vu
+* Support for `nc@loc`
+* Support for `note@head.color`
+* Support for `note@head.fill` with `@headshape="diammond"`
+* Support for `staffDef@oct.default`
+* Improved metadata in the Humdrum importer (@gregchapman-dev)
+* Improved layout with labels in verses
+* Fix validity of the MEI header output in MEI Basic
+* Fix for the Java binding and cocoaPods
+
 ## [4.0.1] - 2023-09-05
 * Fix MEI version in output
 

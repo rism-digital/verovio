@@ -90,12 +90,12 @@ public:
     /**
      * Generate a document pgFoot if none is provided
      */
-    bool GenerateFooter();
+    void GenerateFooter();
 
     /**
      * Generate a document pgHead from the MEI header if none is provided
      */
-    bool GenerateHeader();
+    void GenerateHeader();
 
     /**
      * Generate measure numbers from measure attributes
@@ -109,22 +109,20 @@ public:
 
     /**
      * Getter and setter for the DocType.
-     * The setter resets the document.
      */
     ///@{
     DocType GetType() const { return m_type; }
     void SetType(DocType type);
+    bool IsFacs() const { return (m_type == Facs); }
+    bool IsRaw() const { return (m_type == Raw); }
+    bool IsRendering() const { return (m_type == Rendering); }
+    bool IsTranscription() const { return (m_type == Transcription); }
     ///@}
 
     /**
      * Check if the document has a page with the specified value
      */
     bool HasPage(int pageIdx) const;
-
-    /**
-     * Get all the Score in the visible Mdiv.
-     */
-    std::list<Score *> GetScores();
 
     /**
      * Get the Pages in the visible Mdiv.
@@ -140,6 +138,34 @@ public:
      * Get the total page count
      */
     int GetPageCount() const;
+
+    /**
+     * Get the first scoreDef
+     */
+    ///@{
+    ScoreDef *GetFirstScoreDef();
+    const ScoreDef *GetFirstScoreDef() const;
+    ///@}
+
+    /**
+     * Get all visible scores / the first visible score
+     * Lazily updates the visible scores, hence not const
+     */
+    ///@{
+    std::list<Score *> GetVisibleScores();
+    Score *GetFirstVisibleScore();
+    ///@}
+
+    /**
+     * Get the corresponding score for a node
+     */
+    ///@{
+    Score *GetCorrespondingScore(const Object *object);
+    const Score *GetCorrespondingScore(const Object *object) const;
+    // Generic version that does not necessarily rely on precalculated visible scores
+    Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores);
+    const Score *GetCorrespondingScore(const Object *object, const std::list<Score *> &scores) const;
+    ///@}
 
     /**
      * Return true if the MIDI generation is already done
@@ -225,7 +251,7 @@ public:
      * Get the default distance from the staff for the object
      * The distance is given in x * MEI UNIT
      */
-    data_MEASUREMENTSIGNED GetStaffDistance(const ClassId classId, int staffIndex, data_STAFFREL staffPosition);
+    data_MEASUREMENTSIGNED GetStaffDistance(const Object *object, int staffIndex, data_STAFFREL staffPosition) const;
 
     /**
      * Prepare the timemap for MIDI and timemap file export.
@@ -347,6 +373,18 @@ public:
     void ConvertMarkupDoc(bool permanent = true);
 
     /**
+     * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.
+     * Call the SyncToFacsimile functor.
+     */
+    void SyncFromFacsimileDoc();
+
+    /**
+     * Sync the coordinate provided in rendering to a <facsimile>.
+     * The document must have encoded layout and the option --break encoded must have enabled.
+     */
+    void SyncToFacsimileDoc();
+
+    /**
      * Transpose the content of the doc.
      */
     void TransposeDoc();
@@ -362,6 +400,11 @@ public:
      * If a page is given, the size of the page is taken.
      */
     Page *SetDrawingPage(int pageIdx);
+
+    /**
+     * Update the drawing page sizes when a page is set as drawing page.
+     */
+    void UpdatePageDrawingSizes();
 
     /**
      * Reset drawing page to NULL.
@@ -409,6 +452,14 @@ public:
     ///@}
 
     /**
+     * @name Setter for and getter for neume-line flag
+     */
+    ///@{
+    void SetNeumeLines(bool isNeumeLines) { m_isNeumeLines = isNeumeLines; }
+    bool IsNeumeLines() const { return m_isNeumeLines; }
+    ///@}
+
+    /**
      * @name Setter and getter for facsimile
      */
     ///@{
@@ -416,19 +467,6 @@ public:
     Facsimile *GetFacsimile() { return m_facsimile; }
     const Facsimile *GetFacsimile() const { return m_facsimile; }
     bool HasFacsimile() const { return m_facsimile != NULL; }
-    ///@}
-
-    /**
-     * @name Setter and getter for the current Score/ScoreDef.
-     * If not set, then looks for the first Score in the Document and use that.
-     * The currentScoreDef is also changed by the Object::Process whenever as Score is reached.
-     * When processing backward, the ScoreDef is changed when reaching the corresponding PageMilestoneEnd
-     */
-    ///@{
-    Score *GetCurrentScore();
-    ScoreDef *GetCurrentScoreDef();
-    void SetCurrentScore(Score *score);
-    bool HasCurrentScore() const { return m_currentScore != NULL; }
     ///@}
 
     /**
@@ -477,6 +515,11 @@ private:
      */
     void PrepareMeasureIndices();
 
+    /**
+     * Determine all visible scores
+     */
+    void CollectVisibleScores();
+
 public:
     Page *m_selectionPreceding;
     Page *m_selectionFollowing;
@@ -497,6 +540,11 @@ public:
      * A copy of the back tree stored as pugi::xml_document
      */
     pugi::xml_document m_back;
+
+    /**
+     * The music@decls value
+     */
+    std::string m_musicDecls;
 
     /** The current page height */
     int m_drawingPageHeight;
@@ -546,12 +594,10 @@ private:
     Resources m_resources;
 
     /**
-     * @name Holds a pointer to the current score/scoreDef.
-     * Set by Doc::GetCurrentScoreDef or explicitly through Doc::SetCurrentScoreDef
+     * The list of all visible scores
+     * Used in Doc::GetCorrespondingScore to quickly determine the score for an object
      */
-    ///@{
-    Score *m_currentScore;
-    ///@}
+    std::list<Score *> m_visibleScores;
 
     /**
      * A flag indicating if the document has been cast off or not.
@@ -621,6 +667,12 @@ private:
      * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
      */
     bool m_isMensuralMusicOnly;
+
+    /**
+     * A flag to indicate that the document contains neume lines.
+     * This is a special document type where neume lines are encoded with <section type="neon-neume-line">
+     */
+    bool m_isNeumeLines;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

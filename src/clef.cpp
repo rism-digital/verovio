@@ -41,6 +41,7 @@ Clef::Clef()
     , AttOctave()
     , AttOctaveDisplacement()
     , AttStaffIdent()
+    , AttTypography()
     , AttVisibility()
 {
     this->RegisterAttClass(ATT_CLEFLOG);
@@ -53,6 +54,7 @@ Clef::Clef()
     this->RegisterAttClass(ATT_OCTAVE);
     this->RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
     this->RegisterAttClass(ATT_STAFFIDENT);
+    this->RegisterAttClass(ATT_TYPOGRAPHY);
     this->RegisterAttClass(ATT_VISIBILITY);
 
     this->Reset();
@@ -73,15 +75,16 @@ void Clef::Reset()
     this->ResetOctave();
     this->ResetOctaveDisplacement();
     this->ResetStaffIdent();
+    this->ResetTypography();
     this->ResetVisibility();
 }
 
-int Clef::GetClefLocOffset() const
+int Clef::GetClefLocOffset(data_NOTATIONTYPE notationType) const
 {
     // Only resolve simple sameas links to avoid infinite recursion
     const Clef *sameas = dynamic_cast<const Clef *>(this->GetSameasLink());
     if (sameas && !sameas->HasSameasLink()) {
-        return sameas->GetClefLocOffset();
+        return sameas->GetClefLocOffset(notationType);
     }
 
     int offset = 0;
@@ -97,6 +100,11 @@ int Clef::GetClefLocOffset() const
     else if (this->GetShape() == CLEFSHAPE_F) {
         defaultOct = 3;
         offset = 4;
+    }
+    else if (this->GetShape() == CLEFSHAPE_C) {
+        if (notationType == NOTATIONTYPE_neume) {
+            offset = 7;
+        }
     }
 
     if (this->HasOct()) {

@@ -24,6 +24,44 @@ class TimeSpanningInterface;
 class Tuning;
 
 //----------------------------------------------------------------------------
+// LedgerLine
+//----------------------------------------------------------------------------
+
+/**
+ * This is a class with no MEI equivalent for representing legder lines.
+ * A ledger line is represented by a list of dashes.
+ * Each dash is represented by a pair of points (left - right).
+ */
+class LedgerLine {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     */
+    LedgerLine() = default;
+
+    /**
+     * Add a dash to the ledger line object.
+     * If necessary merges overlapping dashes.
+     */
+    void AddDash(int left, int right, int extension);
+
+protected:
+    //
+private:
+    //
+public:
+    /**
+     * A list of dashes relative to the staff position.
+     */
+    std::list<std::pair<int, int>> m_dashes;
+
+protected:
+    //
+private:
+    //
+};
+
+//----------------------------------------------------------------------------
 // Staff
 //----------------------------------------------------------------------------
 
@@ -67,6 +105,17 @@ public:
     {
         return vrv_cast<const FacsimileInterface *>(this);
     }
+    ///@}
+
+    /**
+     * @name Getters and setters for the rotation.
+     * Used only with facsimile rendering.
+     */
+    ///@{
+    void SetDrawingRotation(double drawingRotation) { m_drawingRotation = drawingRotation; }
+    double GetDrawingRotation() const { return m_drawingRotation; }
+    bool HasDrawingRotation() const { return (m_drawingRotation != 0.0); }
+    int GetDrawingRotationOffsetFor(int x);
     ///@}
 
     /**
@@ -226,7 +275,7 @@ public:
      * The Y absolute position of the staff for facsimile (transcription) encodings.
      * This is the top left corner of the staff (the X position is the position of the system).
      */
-    int m_yAbs;
+    int m_drawingFacsY;
 
     StaffDef *m_drawingStaffDef;
 
@@ -247,49 +296,12 @@ private:
     ArrayOfLedgerLines m_ledgerLinesAboveCue;
     ArrayOfLedgerLines m_ledgerLinesBelowCue;
     ///@}
-};
-
-//----------------------------------------------------------------------------
-// LedgerLine
-//----------------------------------------------------------------------------
-
-/**
- * This is a class with no MEI equivalent for representing legder lines.
- * A ledger line is represented by a list of dashes.
- * Each dash is represented by a pair of points (left - right).
- */
-class LedgerLine {
-public:
-    /**
-     * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    LedgerLine();
-    virtual ~LedgerLine();
-    virtual void Reset();
-    ///@}
 
     /**
-     * Add a dash to the ledger line object.
-     * If necessary merges overlapping dashes.
+     * The drawing rotation.
+     * Used only with facsimile rendering
      */
-    void AddDash(int left, int right, int extension);
-
-protected:
-    //
-private:
-    //
-public:
-    /**
-     * A list of dashes relative to the staff position.
-     */
-    std::list<std::pair<int, int>> m_dashes;
-
-protected:
-    //
-private:
-    //
+    double m_drawingRotation;
 };
 
 } // namespace vrv

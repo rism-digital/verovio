@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "editortoolkit.h"
+#include "measure.h"
 #include "view.h"
 #include "vrv.h"
 #include "zone.h"
@@ -31,8 +32,8 @@ namespace vrv {
 class EditorToolkitNeume : public EditorToolkit {
 public:
     EditorToolkitNeume(Doc *doc, View *view) : EditorToolkit(doc, view) {}
-    bool ParseEditorAction(const std::string &json_editorAction);
-    virtual std::string EditInfo() { return m_infoObject.json(); };
+    bool ParseEditorAction(const std::string &json_editorAction) override;
+    std::string EditInfo() override;
 
     /**
      * Experimental editor functions.
@@ -44,16 +45,20 @@ public:
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly, int lrx, int lry,
         std::vector<std::pair<std::string, std::string>> attributes);
     bool InsertToSyllable(std::string elementId);
+    bool MatchHeight(std::string elementId);
     bool Merge(std::vector<std::string> elementIds);
     bool MoveOutsideSyllable(std::string elementId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool SetText(std::string elementId, const std::string &text);
     bool SetClef(std::string elementId, std::string shape);
+    bool SetLiquescent(std::string elementId, std::string shape);
+    bool SortStaves();
     bool Split(std::string elementId, int x);
     bool SplitNeume(std::string elementId, std::string ncId);
     bool Remove(std::string elementId);
     bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry, float resize = NAN);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
+    void UnlinkSyllable(Syllable *syllable);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds);
@@ -72,11 +77,13 @@ protected:
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
         int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
     bool ParseInsertToSyllableAction(jsonxx::Object param, std::string *elementId);
+    bool ParseMatchHeightAction(jsonxx::Object param, std::string *elementId);
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseMoveOutsideSyllableAction(jsonxx::Object param, std::string *elementId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseSetTextAction(jsonxx::Object param, std::string *elementId, std::string *text);
     bool ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape);
+    bool ParseSetLiquescentAction(jsonxx::Object param, std::string *elementId, std::string *shape);
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
     bool ParseSplitNeumeAction(jsonxx::Object param, std::string *elementId, std::string *ncId);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
@@ -98,9 +105,6 @@ protected:
     bool AdjustPitchFromPosition(Object *obj, Clef *clef = NULL);
     bool AdjustClefLineFromPosition(Clef *clef, Staff *staff = NULL);
     ///@}
-
-private:
-    jsonxx::Object m_infoObject;
 };
 
 //--------------------------------------------------------------------------------
@@ -139,6 +143,7 @@ struct ClosestBB {
 };
 
 // To be used with std::stable_sort to find the position to insert a new accid / divLine
+// TODO: use closesBB instead
 struct ClosestNeume {
     int x;
     int y;
@@ -177,11 +182,26 @@ struct ClosestNeume {
 struct StaffSort {
     // Sort staves left-to-right and top-to-bottom
     // Sort by y if there is no intersection, by x if there is x intersection is smaller than half length of staff line
+
+    // Update 2024-04:
+    // Used only in neume lines,
+    // System->(Measure->Staff)
+    // Need to sort Measure to sort staff
     bool operator()(Object *a, Object *b)
     {
-        if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
-        Zone *zoneA = a->GetFacsimileInterface()->GetZone();
-        Zone *zoneB = b->GetFacsimileInterface()->GetZone();
+        if (!a->Is(SYSTEM) || !b->Is(SYSTEM)) return false;
+        if (!a->FindDescendantByType(MEASURE) || !b->FindDescendantByType(MEASURE)) return false;
+        Measure *measureA = dynamic_cast<Measure *>(a->FindDescendantByType(MEASURE));
+        Measure *measureB = dynamic_cast<Measure *>(b->FindDescendantByType(MEASURE));
+        if (!measureA->IsNeumeLine() || !measureB->IsNeumeLine()) return true;
+        Object *staffA = a->FindDescendantByType(STAFF);
+        Object *staffB = b->FindDescendantByType(STAFF);
+        assert(staffA);
+        assert(staffB);
+        Zone *zoneA = staffA->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = staffB->GetFacsimileInterface()->GetZone();
+        assert(zoneA);
+        assert(zoneB);
 
         int aLowest, bLowest, aHighest, bHighest;
 

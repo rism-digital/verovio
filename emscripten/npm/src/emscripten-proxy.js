@@ -105,11 +105,11 @@ function getToolkitFunction(VerovioModule, method) {
     // char *renderToExpansionMap(Toolkit *ic)
     mapping.renderToExpansionMap = VerovioModule.cwrap("vrvToolkit_renderToExpansionMap", "string", ["number"]);
 
-    // char *renderToMIDI(Toolkit *ic, const char *rendering_options)
-    mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number", "string"]);
+    // char *renderToMIDI(Toolkit *ic)
+    mapping.renderToMIDI = VerovioModule.cwrap("vrvToolkit_renderToMIDI", "string", ["number"]);
 
     // char *renderToPAE(Toolkit *ic)
-    mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string");
+    mapping.renderToPAE = VerovioModule.cwrap("vrvToolkit_renderToPAE", "string", ["number"]);
 
     // char *renderToSvg(Toolkit *ic, int pageNo, int xmlDeclaration)
     mapping.renderToSVG = VerovioModule.cwrap("vrvToolkit_renderToSVG", "string", ["number", "number", "number"]);

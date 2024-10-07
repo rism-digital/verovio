@@ -12,11 +12,11 @@
 #include "atts_gestural.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "horizontalaligner.h"
 #include "interface.h"
 
 namespace vrv {
 
-class FunctorParams;
 class Mensur;
 class Object;
 
@@ -58,19 +58,19 @@ public:
     ///@}
 
     /**
-     * Returns the duration (in double) for the element.
-     * It returns 0.0 for grace notes.
+     * Returns the duration (in Fraction) for the element.
+     * It returns 0/1 for grace notes.
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    double GetInterfaceAlignmentDuration(int num, int numBase) const;
+    Fraction GetInterfaceAlignmentDuration(int num, int numBase) const;
 
     /**
-     * Returns the duration (in double) for the element for mensural notation
-     * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
+     * Returns the duration (in Fraction) for the element for mensural notation
+     * Currently this assume brevis equality and would
      * need to be modified for shorter equality in later repertoire.
      */
-    double GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
+    Fraction GetInterfaceAlignmentMensuralDuration(int num, int numBase, const Mensur *currentMensur) const;
 
     /**
      * Return true if the note or rest is the first of a beam.
@@ -85,19 +85,18 @@ public:
     /**
      * @name Return the actual (gestural) duration of the note, for both CMN and mensural durations
      * See data_DURATION
-     * For CMN, it is the same (DURATION_1 == DUR_1)
-     * For mensural, we need to apply the DUR_MENSURAL_MASK
+     * For Mensural, it is the same (DURATION_2 == DURATION_minima)
      */
     ///@{
-    int GetActualDur() const;
-    int GetActualDurGes() const;
+    data_DURATION GetActualDur() const;
+    data_DURATION GetActualDurGes() const;
     ///@}
 
     /**
      * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.
      * Since we need to check what the element is, we need to pass it as parameter.
      */
-    int GetNoteOrChordDur(const LayerElement *element) const;
+    data_DURATION GetNoteOrChordDur(const LayerElement *element) const;
 
     /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
@@ -114,17 +113,17 @@ public:
      * MIDI timing information
      */
     ///@{
-    void SetScoreTimeOnset(double scoreTime);
+    void SetScoreTimeOnset(Fraction scoreTime);
     void SetRealTimeOnsetSeconds(double timeInSeconds);
-    void SetScoreTimeOffset(double scoreTime);
+    void SetScoreTimeOffset(Fraction scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
-    void SetScoreTimeTiedDuration(double timeInSeconds);
-    double GetScoreTimeOnset() const;
+    void SetScoreTimeTiedDuration(Fraction timeInSeconds);
+    Fraction GetScoreTimeOnset() const;
     double GetRealTimeOnsetMilliseconds() const;
-    double GetScoreTimeOffset() const;
-    double GetScoreTimeTiedDuration() const;
+    Fraction GetScoreTimeOffset() const;
+    Fraction GetScoreTimeTiedDuration() const;
     double GetRealTimeOffsetMilliseconds() const;
-    double GetScoreTimeDuration() const;
+    Fraction GetScoreTimeDuration() const;
     ///@}
 
     //-----------------//
@@ -141,7 +140,7 @@ private:
     /**
      * Calculate the actual duration => translate mensural values
      */
-    int CalcActualDur(data_DURATION dur) const;
+    data_DURATION CalcActualDur(data_DURATION dur) const;
 
 public:
     //
@@ -150,7 +149,7 @@ private:
      * The score-time onset of the note in the measure (duration from the start of measure in
      * quarter notes).
      */
-    double m_scoreTimeOnset;
+    Fraction m_scoreTimeOnset;
 
     /**
      * The score-time off-time of the note in the measure (duration from the start of the measure
@@ -160,7 +159,7 @@ private:
      * of the printed note, and the m_scoreTimeTiedDuration is -1.0 to indicate that it should not
      * be exported when creating a MIDI file.
      */
-    double m_scoreTimeOffset;
+    Fraction m_scoreTimeOffset;
 
     /**
      * The time in milliseconds since the start of the measure element that contains the note.
@@ -180,7 +179,7 @@ private:
      * If the note is a secondary note in a tied group, then this variable is set to -1.0 to
      * indicate that it should not be written to MIDI output.
      */
-    double m_scoreTimeTiedDuration;
+    Fraction m_scoreTimeTiedDuration;
 
     /**
      * The default duration: extracted from scoreDef/staffDef and used when no duration attribute is given

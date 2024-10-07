@@ -224,7 +224,7 @@ int ABCInput::SetBarLine(const std::string &musicCode, int i)
 
 void ABCInput::CalcUnitNoteLength()
 {
-    MeterSig *meterSig = vrv_cast<MeterSig *>(m_doc->GetCurrentScoreDef()->FindDescendantByType(METERSIG));
+    MeterSig *meterSig = vrv_cast<MeterSig *>(m_doc->GetFirstScoreDef()->FindDescendantByType(METERSIG));
     if (!meterSig || !meterSig->HasUnit() || double(meterSig->GetTotalCount()) / double(meterSig->GetUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
@@ -679,7 +679,7 @@ void ABCInput::parseKey(std::string &keyString)
             posStart = pitch.size() - posEnd;
             keyPitchAlterAmount = -1;
         }
-        else if (accidNum > 0) {
+        else {
             keySig = StringFormat("%ds", accidNum);
             keyPitchAlterAmount = 1;
         }

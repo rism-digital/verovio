@@ -129,6 +129,11 @@ const Resources *DeviceContext::GetResources(bool showWarning) const
     return m_resources;
 }
 
+void DeviceContext::SetViewBoxFactor(double ppuFactor)
+{
+    m_viewBoxFactor = double(DEFINITION_FACTOR) / ppuFactor;
+}
+
 void DeviceContext::SetPen(int color, int width, int style, int dashLength, int gapLength, int lineCap, int lineJoin)
 {
     float opacityValue;
@@ -315,6 +320,12 @@ void DeviceContext::AddGlyphToTextExtend(const Glyph *glyph, TextExtend *extend)
     advX = glyph->GetHorizAdvX();
     tmp = advX * m_fontStack.top()->GetPointSize();
     advX = ceil(tmp / (double)glyph->GetUnitsPerEm());
+
+    const int letterSpacing = m_fontStack.top()->GetLetterSpacing();
+    // This is not the first letter, add a letter spacing
+    if ((letterSpacing != 0) && (extend->m_width > 0)) {
+        extend->m_width += letterSpacing;
+    }
 
     // Changed because the width should only be the sum of advX
     // Alternatively we could add what is below 0 for the first and what is beyond the advx for the last

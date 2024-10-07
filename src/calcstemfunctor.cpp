@@ -32,7 +32,7 @@ CalcStemFunctor::CalcStemFunctor(Doc *doc) : DocFunctor(doc)
 {
     m_chordStemLength = 0;
     m_verticalCenter = 0;
-    m_dur = DUR_1;
+    m_dur = DURATION_1;
     m_isGraceNote = false;
     m_isStemSameasSecondary = false;
     m_tabGrpWithNoNote = false;
@@ -58,6 +58,7 @@ FunctorCode CalcStemFunctor::VisitBeam(Beam *beam)
     if (!beam->HasCoords()) {
         beam->InitCoords(beamChildren, staff, beam->GetPlace());
         const bool isCue = ((beam->GetCue() == BOOLEAN_true) || beam->GetFirstAncestor(GRACEGRP));
+        beam->InitGraceStemDir(beam->GetFirstAncestor(GRACEGRP));
         beam->InitCue(isCue);
     }
 
@@ -347,7 +348,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     const bool drawingCueSize = stem->GetDrawingCueSize();
 
     // For notes longer than half notes the stem is always 0
-    if (m_dur < DUR_2) {
+    if (m_dur < DURATION_2) {
         stem->SetDrawingXRel(0);
         stem->SetDrawingYRel(0);
         stem->SetDrawingStemLen(0);
@@ -408,7 +409,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     int flagOffset = 0;
     Flag *flag = NULL;
     // There is never a flag with a duration longer than 8th notes
-    if (m_dur > DUR_4) {
+    if (m_dur > DURATION_4) {
         flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
         assert(flag);
         // There is never a flag with stem sameas notes
@@ -416,7 +417,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
             flag->m_drawingNbFlags = 0;
         }
         else {
-            flag->m_drawingNbFlags = m_dur - DUR_4;
+            flag->m_drawingNbFlags = m_dur - DURATION_4;
             flagOffset = unit * (flag->m_drawingNbFlags + 1);
         }
     }
@@ -440,7 +441,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
     int flagHeight = 0;
 
     // SMUFL flags cover some additional stem length from the 32th only
-    if (m_dur > DUR_16) {
+    if (m_dur > DURATION_16) {
         assert(flag);
         Point stemEnd;
         if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
@@ -449,7 +450,7 @@ FunctorCode CalcStemFunctor::VisitStem(Stem *stem)
         else {
             stemEnd = flag->GetStemDownNW(m_doc, staffSize, drawingCueSize);
         }
-        // Trick for shortening the stem with DUR_8
+        // Trick for shortening the stem with DURATION_8
         flagHeight = stemEnd.y;
     }
 
@@ -495,7 +496,7 @@ FunctorCode CalcStemFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
     assert(stem);
 
     // Do not draw virtual (e.g., whole note) stems
-    if (m_dur < DUR_2 || m_tabGrpWithNoNote) {
+    if (m_dur < DURATION_2 || m_tabGrpWithNoNote) {
         stem->IsVirtual(true);
         return FUNCTOR_SIBLINGS;
     }
@@ -553,7 +554,7 @@ FunctorCode CalcStemFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
     int stemSize = tabDurSym->CalcStemLenInThirdUnits(m_staff, stemDir) * m_doc->GetDrawingUnit(staffSize);
     stemSize /= (3 * stemDirFactor);
 
-    if (m_dur == DUR_2) {
+    if (m_dur == DURATION_2) {
         // Stems for half notes twice shorter
         stemSize /= 2;
     }
@@ -564,7 +565,7 @@ FunctorCode CalcStemFunctor::VisitTabDurSym(TabDurSym *tabDurSym)
     if (m_staff->IsTabGuitar()) {
         Flag *flag = vrv_cast<Flag *>(stem->GetFirst(FLAG));
         if (flag) {
-            flag->m_drawingNbFlags = m_dur - DUR_4;
+            flag->m_drawingNbFlags = m_dur - DURATION_4;
             flag->SetDrawingYRel(-stemSize);
         }
     }
@@ -606,7 +607,7 @@ data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int ve
         else if (middlePoint > verticalCenter) {
             return STEMDIRECTION_down;
         }
-        else if (middlePoint < verticalCenter) {
+        else {
             return STEMDIRECTION_up;
         }
     }
@@ -620,7 +621,7 @@ data_STEMDIRECTION CalcStemFunctor::CalcStemDirection(const Chord *chord, int ve
 }
 
 void CalcStemFunctor::AdjustFlagPlacement(
-    const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, int duration) const
+    const Doc *doc, Stem *stem, Flag *flag, int staffSize, int verticalCenter, data_DURATION duration) const
 {
     assert(stem->GetParent());
     assert(stem->GetParent()->IsLayerElement());
@@ -653,7 +654,9 @@ void CalcStemFunctor::AdjustFlagPlacement(
         note = vrv_cast<Note *>(parent);
     }
     else if (parent->Is(CHORD)) {
-        note = vrv_cast<Chord *>(parent)->GetTopNote();
+        Chord *chord = vrv_cast<Chord *>(parent);
+        assert(chord);
+        note = chord->GetTopNote();
     }
     int ledgerAbove = 0;
     int ledgerBelow = 0;

@@ -19,6 +19,7 @@
 #include "btrem.h"
 #include "doc.h"
 #include "editorial.h"
+#include "ftrem.h"
 #include "functor.h"
 #include "gracegrp.h"
 #include "layer.h"
@@ -203,7 +204,7 @@ void BeamSegment::CalcSetStemValues(const Staff *staff, const Doc *doc, const Be
             int stemOffset = 0;
             const int unit = doc->GetDrawingUnit(staff->m_drawingStaffSize);
             if (coord->m_partialFlagPlace == coord->m_beamRelativePlace) {
-                stemOffset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth;
+                stemOffset = (coord->m_dur - DURATION_8) * beamInterface->m_beamWidth;
             }
             else if (el->GetIsInBeamSpan() && (coord->m_partialFlagPlace != BEAMPLACE_above)
                 && (coord->m_stem->GetDrawingStemDir() == STEMDIRECTION_up)) {
@@ -332,9 +333,8 @@ std::pair<int, int> BeamSegment::GetMinimalStemLength(const BeamDrawingInterface
     const auto [topOffset, bottomOffset] = this->GetVerticalOffset(beamInterface);
 
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
-    const auto isNoteOrChord = [](BeamElementCoord *coord) {
-        return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
-    };
+    const auto isNoteOrChord
+        = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
 
     using CoordIt = ArrayOfBeamElementCoords::const_iterator;
     for (CoordIt it = m_beamElementCoordRefs.begin(); it != m_beamElementCoordRefs.end(); ++it) {
@@ -457,11 +457,10 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
     assert(beamInterface);
 
     // set to store durations of relevant notes (it's ordered, so min duration is going to be first)
-    std::set<int> noteDurations;
+    std::set<data_DURATION> noteDurations;
     // lambda check whether coord has element set and whether that element is CHORD or NOTE
-    const auto isNoteOrChord = [](BeamElementCoord *coord) {
-        return (coord->m_element && coord->m_element->Is({ CHORD, NOTE }));
-    };
+    const auto isNoteOrChord
+        = [](BeamElementCoord *coord) { return (coord->m_element && coord->m_element->Is({ CHORD, NOTE })); };
     // iterators
     using CoordIt = ArrayOfBeamElementCoords::iterator;
     using CoordReverseIt = ArrayOfBeamElementCoords::reverse_iterator;
@@ -471,7 +470,9 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
         if (!isNoteOrChord(*it)) continue;
 
         // get current element duration
-        const int val = (*it)->m_breaksec ? std::min((*it)->m_breaksec + DURATION_4, (*it)->m_dur) : (*it)->m_dur;
+        const data_DURATION val = (*it)->m_breaksec
+            ? vrv::DurationMin(static_cast<data_DURATION>((*it)->m_breaksec + DURATION_4), (*it)->m_dur)
+            : (*it)->m_dur;
         noteDurations.insert(val);
         // get next element duration
         CoordIt nextElement = std::find_if(it + 1, m_beamElementCoordRefs.end(), isNoteOrChord);
@@ -482,8 +483,9 @@ void BeamSegment::AdjustBeamToFrenchStyle(const BeamDrawingInterface *beamInterf
         CoordReverseIt reverse = std::make_reverse_iterator(it);
         CoordReverseIt prevElement = std::find_if(reverse, m_beamElementCoordRefs.rend(), isNoteOrChord);
         if (prevElement != m_beamElementCoordRefs.rend()) {
-            const int prevVal = (*prevElement)->m_breaksec
-                ? std::min((*prevElement)->m_breaksec + DURATION_4, (*prevElement)->m_dur)
+            const data_DURATION prevVal = (*prevElement)->m_breaksec
+                ? vrv::DurationMin(
+                      static_cast<data_DURATION>((*prevElement)->m_breaksec + DURATION_4), (*prevElement)->m_dur)
                 : (*prevElement)->m_dur;
             noteDurations.insert(prevVal);
         }
@@ -548,7 +550,7 @@ void BeamSegment::AdjustBeamToTremolos(const Doc *doc, const Staff *staff, const
         if (!stemmedInterface) continue;
 
         Stem *stem = stemmedInterface->GetDrawingStem();
-        const int offset = (coord->m_dur - DUR_8) * beamInterface->m_beamWidth + beamInterface->m_beamWidthBlack;
+        const int offset = (coord->m_dur - DURATION_8) * beamInterface->m_beamWidth + beamInterface->m_beamWidthBlack;
         const int currentAdjustment = stem->CalculateStemModAdjustment(doc, staff, offset);
         if (std::abs(currentAdjustment) > std::abs(maxAdjustment)) maxAdjustment = currentAdjustment;
     }
@@ -591,7 +593,7 @@ void BeamSegment::CalcBeamInit(
     beamInterface->m_beamWidthBlack = doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
     beamInterface->m_beamWidthWhite
         = doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, beamInterface->m_cueSize);
-    if (beamInterface->m_shortestDur == DUR_64) {
+    if (beamInterface->m_shortestDur == DURATION_64) {
         beamInterface->m_beamWidthWhite *= 4;
         beamInterface->m_beamWidthWhite /= 3;
     }
@@ -885,9 +887,9 @@ int BeamSegment::CalcBeamSlopeStep(
     }
 
     // duration
-    const int dur = beamInterface->m_shortestDur;
+    const data_DURATION dur = beamInterface->m_shortestDur;
     // Prevent short step with values not shorter than a 16th
-    if (shortStep && (dur >= DUR_32)) {
+    if (shortStep && (dur >= DURATION_32)) {
         step = unit * 2;
         shortStep = false;
     }
@@ -1003,7 +1005,7 @@ void BeamSegment::CalcAdjustSlope(const Staff *staff, const Doc *doc, BeamDrawin
                 break;
             }
             // Here we should look at duration too because longer values in the middle could actually be OK as they are
-            else if (((coord != m_lastNoteOrChord) || (coord != m_firstNoteOrChord)) && (coord->m_dur > DUR_8)) {
+            else if (((coord != m_lastNoteOrChord) || (coord != m_firstNoteOrChord)) && (coord->m_dur > DURATION_8)) {
                 const int durLen = len - 0.9 * unit;
                 if (durLen < refLen) {
                     lengthen = true;
@@ -1213,7 +1215,7 @@ void BeamSegment::CalcBeamStemLength(const Staff *staff, data_BEAMPLACE place, b
         // skip current element if it's longer that minDuration and is not a part of fTrem
         if ((coord->m_dur < noteDur) && !(coord->m_element && coord->m_element->GetFirstAncestor(FTREM))) continue;
         // adjust stem length if location matches
-        const int dur = (preferredDur != 0) ? preferredDur : coord->m_dur;
+        const data_DURATION dur = (preferredDur != DURATION_NONE) ? preferredDur : coord->m_dur;
         const int coordStemLength = coord->CalculateStemLength(staff, stemDir, isHorizontal, dur);
         if (coord->m_closestNote->GetDrawingLoc() == noteLoc) {
             m_uniformStemLength = coordStemLength;
@@ -1267,11 +1269,11 @@ int BeamSegment::CalcMixedBeamCenterY(int step, int unit) const
     return centerY;
 }
 
-std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
+std::tuple<int, int, data_DURATION> BeamSegment::CalcStemDefiningNote(const Staff *staff, data_BEAMPLACE place) const
 {
-    int shortestDuration = DUR_4;
+    data_DURATION shortestDuration = DURATION_4;
     int shortestLoc = VRV_UNSET;
-    int relevantDuration = DUR_4;
+    data_DURATION relevantDuration = DURATION_4;
     int relevantLoc = VRV_UNSET;
     const data_STEMDIRECTION globalStemDir = (place == BEAMPLACE_below) ? STEMDIRECTION_down : STEMDIRECTION_up;
     for (BeamElementCoord *coord : m_beamElementCoordRefs) {
@@ -1314,7 +1316,7 @@ std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, 
         }
     }
 
-    int adjusted_duration = 0;
+    data_DURATION adjusted_duration = DURATION_NONE;
     // if shortest note location does not offset its duration (shorter notes need more space for additional beams) then
     // give preference to the its location
     if ((shortestDuration - relevantDuration) > (std::abs(relevantLoc - shortestLoc) + 1)) {
@@ -1329,7 +1331,7 @@ std::tuple<int, int, int> BeamSegment::CalcStemDefiningNote(const Staff *staff, 
         }
     }
     else if ((shortestDuration - relevantDuration) == std::abs(relevantLoc - shortestLoc)) {
-        adjusted_duration = (relevantDuration + shortestDuration) / 2;
+        adjusted_duration = static_cast<data_DURATION>((relevantDuration + shortestDuration) / 2);
     }
 
     return { relevantLoc, relevantDuration, adjusted_duration };
@@ -1411,9 +1413,10 @@ void BeamSegment::CalcMixedBeamPlace(const Staff *staff)
 
 void BeamSegment::CalcPartialFlagPlace()
 {
-    // Start from note that is shorter than DUR_8 - we do not care otherwise, since those do not have additional beams
+    // Start from note that is shorter than DURATION_8 - we do not care otherwise, since those do not have additional
+    // beams
     auto start = std::find_if(m_beamElementCoordRefs.begin(), m_beamElementCoordRefs.end(),
-        [](BeamElementCoord *coord) { return coord->m_dur >= DUR_16; });
+        [](BeamElementCoord *coord) { return coord->m_dur >= DURATION_16; });
     if (m_beamElementCoordRefs.end() == start) return;
     while (start != m_beamElementCoordRefs.end()) {
         auto subdivision = start;
@@ -1427,14 +1430,14 @@ void BeamSegment::CalcPartialFlagPlace()
             // Find first note longer than 8th or first note that is cross-staff
             auto found = std::find_if(subdivision, m_beamElementCoordRefs.end(), [&](BeamElementCoord *coord) {
                 if (coord->m_element->Is(REST)) return false;
-                return ((coord->m_beamRelativePlace != place) || (coord->m_dur <= DUR_8) || (coord->m_breaksec));
+                return ((coord->m_beamRelativePlace != place) || (coord->m_dur <= DURATION_8) || (coord->m_breaksec));
             });
             subdivision = found;
 
             // Handle different cases, where we either don't want to proceed (e.g. end of the beam reached) or we want
             // to process them separately (e.g. on direction change from shorter to longer notes, or vice versa, we do
             // not want last note of the subdivision to have additional beam, so that it's clearly distinguishable).
-            if ((m_beamElementCoordRefs.end() == found) || ((*found)->m_dur <= DUR_8)) break;
+            if ((m_beamElementCoordRefs.end() == found) || ((*found)->m_dur <= DURATION_8)) break;
             if (((*found)->m_breaksec)) breakSec = true;
             if ((m_beamElementCoordRefs.end() - 1) == found) {
                 subdivision = m_beamElementCoordRefs.end();
@@ -1468,14 +1471,14 @@ void BeamSegment::CalcSetValues()
 int BeamSegment::GetAdjacentElementsDuration(int elementX) const
 {
     if ((elementX < m_beamElementCoordRefs.front()->m_x) || (elementX > m_beamElementCoordRefs.back()->m_x)) {
-        return DUR_8;
+        return DURATION_8;
     }
     for (int i = 0; i < int(m_beamElementCoordRefs.size()) - 1; ++i) {
         if ((m_beamElementCoordRefs.at(i)->m_x < elementX) && (m_beamElementCoordRefs.at(i + 1)->m_x > elementX)) {
             return std::min(m_beamElementCoordRefs.at(i)->m_dur, m_beamElementCoordRefs.at(i + 1)->m_dur);
         }
     }
-    return DUR_8;
+    return DURATION_8;
 }
 
 int BeamSegment::GetStartingX() const
@@ -1620,6 +1623,15 @@ void Beam::Reset()
     m_stemSameas = NULL;
 }
 
+void Beam::CloneReset()
+{
+    // Since these are owned by the beam we cloned from, empty the list
+    // Do it before Object::CloneReset since that one will reset the coord list
+    m_beamElementCoords.clear();
+
+    LayerElement::CloneReset();
+}
+
 bool Beam::IsSupportedChild(Object *child)
 {
     if (child->Is(BEAM)) {
@@ -1633,6 +1645,9 @@ bool Beam::IsSupportedChild(Object *child)
     }
     else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is(FTREM)) {
+        assert(dynamic_cast<FTrem *>(child));
     }
     else if (child->Is(GRACEGRP)) {
         assert(dynamic_cast<GraceGrp *>(child));
@@ -1880,9 +1895,16 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
 
     m_stem->SetDrawingStemDir(stemDir);
     m_yBeam = m_element->GetDrawingY();
-    m_x += (STEMDIRECTION_up == stemDir)
-        ? 2 * m_element->GetDrawingRadius(doc) - doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2
-        : doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+
+    // Move and take into account the glyph cut-outs
+    if (STEMDIRECTION_up == stemDir) {
+        m_x += stemInterface->GetStemUpSE(doc, staff->m_drawingStaffSize, interface->m_cueSize).x;
+        m_x -= doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    }
+    else {
+        m_x += stemInterface->GetStemDownNW(doc, staff->m_drawingStaffSize, interface->m_cueSize).x;
+        m_x += doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    }
 
     if (m_tabDurSym && !m_closestNote) {
         m_yBeam = m_tabDurSym->GetDrawingY();
@@ -1920,7 +1942,7 @@ void BeamElementCoord::SetDrawingStemDir(data_STEMDIRECTION stemDir, const Staff
 }
 
 int BeamElementCoord::CalculateStemLength(
-    const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, int preferredDur) const
+    const Staff *staff, data_STEMDIRECTION stemDir, bool isHorizontal, data_DURATION preferredDur) const
 {
     if (!m_closestNote) return 0;
 
@@ -1942,7 +1964,7 @@ int BeamElementCoord::CalculateStemLength(
     const int directionBias = (stemDir == STEMDIRECTION_up) ? 1 : -1;
     int stemLen = directionBias;
     // For 8th notes, use the shortened stem (if shortened)
-    if (preferredDur == DUR_8) {
+    if (preferredDur == DURATION_8) {
         if (stemLenInHalfUnits != standardStemLen) {
             stemLen *= stemLenInHalfUnits;
         }
@@ -1953,13 +1975,13 @@ int BeamElementCoord::CalculateStemLength(
     else {
         const bool isOddLength = (extend || !isHorizontal);
         switch (m_dur) {
-            case (DUR_16): stemLen *= isOddLength ? 14 : 13; break;
-            case (DUR_32): stemLen *= isOddLength ? 18 : 16; break;
-            case (DUR_64): stemLen *= isOddLength ? 22 : 20; break;
-            case (DUR_128): stemLen *= isOddLength ? 26 : 24; break;
-            case (DUR_256): stemLen *= isOddLength ? 30 : 28; break;
-            case (DUR_512): stemLen *= isOddLength ? 34 : 32; break;
-            case (DUR_1024): stemLen *= isOddLength ? 38 : 36; break;
+            case (DURATION_16): stemLen *= isOddLength ? 14 : 13; break;
+            case (DURATION_32): stemLen *= isOddLength ? 18 : 16; break;
+            case (DURATION_64): stemLen *= isOddLength ? 22 : 20; break;
+            case (DURATION_128): stemLen *= isOddLength ? 26 : 24; break;
+            case (DURATION_256): stemLen *= isOddLength ? 30 : 28; break;
+            case (DURATION_512): stemLen *= isOddLength ? 34 : 32; break;
+            case (DURATION_1024): stemLen *= isOddLength ? 38 : 36; break;
             default: stemLen *= 14;
         }
     }
@@ -2062,18 +2084,18 @@ void BeamElementCoord::UpdateStemLength(
 
 std::pair<int, int> Beam::GetAdditionalBeamCount() const
 {
-    int topShortestDur = DUR_8;
-    int bottomShortestDur = DUR_8;
+    data_DURATION topShortestDur = DURATION_8;
+    data_DURATION bottomShortestDur = DURATION_8;
     std::for_each(m_beamElementCoords.begin(), m_beamElementCoords.end(), [&](BeamElementCoord *coord) {
         if (coord->m_partialFlagPlace == BEAMPLACE_above) {
-            topShortestDur = std::max(topShortestDur, coord->m_dur);
+            topShortestDur = vrv::DurationMax(topShortestDur, coord->m_dur);
         }
         else if (coord->m_partialFlagPlace == BEAMPLACE_below) {
-            bottomShortestDur = std::max(bottomShortestDur, coord->m_dur);
+            bottomShortestDur = vrv::DurationMax(bottomShortestDur, coord->m_dur);
         }
     });
 
-    return { topShortestDur - DUR_8, bottomShortestDur - DUR_8 };
+    return { topShortestDur - DURATION_8, bottomShortestDur - DURATION_8 };
 }
 
 void Beam::SetElementShortening(int shortening)
@@ -2091,7 +2113,7 @@ int Beam::GetBeamPartDuration(int x, bool includeRests) const
         });
     // handle cases when coordinate is outside of the beam
     if (it == m_beamSegment.m_beamElementCoordRefs.end()) {
-        return DUR_8;
+        return DURATION_8;
     }
     else if (it == m_beamSegment.m_beamElementCoordRefs.begin()) {
         return (*it)->m_dur;

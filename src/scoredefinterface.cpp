@@ -32,6 +32,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttMidiTempo()
     , AttMmTempo()
     , AttMultinumMeasures()
+    , AttOctaveDefault()
     , AttPianoPedals()
     , AttSpacing()
     , AttSystems()
@@ -40,11 +41,10 @@ ScoreDefInterface::ScoreDefInterface()
     this->RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
     this->RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     this->RegisterInterfaceAttClass(ATT_MEASURENUMBERS);
-    this->RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
-    this->RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
     this->RegisterInterfaceAttClass(ATT_MIDITEMPO);
     this->RegisterInterfaceAttClass(ATT_MMTEMPO);
     this->RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
+    this->RegisterInterfaceAttClass(ATT_OCTAVEDEFAULT);
     this->RegisterInterfaceAttClass(ATT_PIANOPEDALS);
     this->RegisterInterfaceAttClass(ATT_SPACING);
     this->RegisterInterfaceAttClass(ATT_SYSTEMS);
@@ -63,6 +63,7 @@ void ScoreDefInterface::Reset()
     this->ResetMidiTempo();
     this->ResetMmTempo();
     this->ResetMultinumMeasures();
+    this->ResetOctaveDefault();
     this->ResetPianoPedals();
     this->ResetSpacing();
     this->ResetSystems();

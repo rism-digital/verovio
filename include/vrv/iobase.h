@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        io.h
+// Name:        iobase.h
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_IO_H__
-#define __VRV_IO_H__
+#ifndef __VRV_IOBASE_H__
+#define __VRV_IOBASE_H__
 
 #include <string>
 #include <vector>
@@ -33,7 +33,7 @@ public:
     // constructors and destructors
     Output(Doc *doc, std::string filename);
     Output(Doc *doc);
-    Output(){};
+    Output() {}
     virtual ~Output();
 
     /**

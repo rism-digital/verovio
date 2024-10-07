@@ -67,6 +67,8 @@ enum option_ELISION {
     ELISION_unicode = UNICODE_UNDERTIE
 };
 
+enum option_FONT_FALLBACK { FONT_FALLBACK_Leipzig = 0, FONT_FALLBACK_Bravura };
+
 enum option_FOOTER { FOOTER_none = 0, FOOTER_auto, FOOTER_encoded, FOOTER_always };
 
 enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
@@ -86,7 +88,7 @@ enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SM
 // Option
 //----------------------------------------------------------------------------
 
-enum class OptionsCategory { None, Base, General, Layout, Margins, Midi, Selectors, Full };
+enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Selectors, Full };
 
 /**
  * This class is a base class of each styling parameter
@@ -122,6 +124,7 @@ public:
     void SetShortOption(char shortOption, bool isCmdOnly);
     char GetShortOption() const { return m_shortOption; }
     bool IsCmdOnly() const { return m_isCmdOnly; }
+    virtual bool IsArgumentRequired() const { return true; }
 
     /**
      * Return a JSON object for the option
@@ -139,6 +142,7 @@ public:
     static const std::map<int, std::string> s_breaks;
     static const std::map<int, std::string> s_condense;
     static const std::map<int, std::string> s_elision;
+    static const std::map<int, std::string> s_fontFallback;
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_multiRestStyle;
@@ -185,6 +189,8 @@ public:
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool value);
+
+    bool IsArgumentRequired() const override { return false; }
 
 private:
     //
@@ -411,8 +417,8 @@ private:
 class OptionStaffrel : public Option {
 public:
     // constructors and destructors
-    OptionStaffrel(){};
-    virtual ~OptionStaffrel(){};
+    OptionStaffrel() {}
+    virtual ~OptionStaffrel() {}
     void CopyTo(Option *option) override;
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
@@ -593,7 +599,7 @@ public:
     // These options are only given for documentation - except for m_scale
     // They are ordered by short option alphabetical order
     OptionBool m_standardOutput;
-    OptionBool m_help;
+    OptionString m_help;
     OptionBool m_allPages;
     OptionString m_inputFrom;
     OptionString m_logLevel;
@@ -626,8 +632,6 @@ public:
     OptionBool m_incip;
     OptionBool m_justifyVertically;
     OptionBool m_landscape;
-    OptionBool m_ligatureAsBracket;
-    OptionBool m_mensuralToMeasure;
     OptionDbl m_minLastJustification;
     OptionBool m_mmOutput;
     OptionBool m_moveScoreDefinitionToStaff;
@@ -648,6 +652,7 @@ public:
     OptionBool m_preserveAnalyticalMarkup;
     OptionBool m_removeIds;
     OptionBool m_scaleToPageSize;
+    OptionBool m_setLocale;
     OptionBool m_showRuntime;
     OptionBool m_shrinkToFit;
     OptionIntMap m_smuflTextFont;
@@ -688,6 +693,9 @@ public:
     OptionDbl m_extenderLineMinSpace;
     OptionDbl m_fingeringScale;
     OptionString m_font;
+    OptionArray m_fontAddCustom;
+    OptionIntMap m_fontFallback;
+    OptionBool m_fontLoadAll;
     OptionDbl m_graceFactor;
     OptionBool m_graceRhythmAlign;
     OptionBool m_graceRightAlign;
@@ -825,6 +833,21 @@ public:
 
     OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
+
+    /**
+     * Mensural
+     */
+    OptionGrp m_mensural;
+
+    OptionBool m_ligatureAsBracket;
+    OptionBool m_mensuralToMeasure;
+
+    /**
+     * Additional options for passing method JSON options to the command-line
+     */
+    OptionGrp m_jsonCmdLineOptions;
+
+    OptionString m_timemapOptions;
 
     /**
      * Deprecated options

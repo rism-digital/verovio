@@ -273,12 +273,13 @@ FunctorCode PrepareCrossStaffFunctor::VisitLayerElement(LayerElement *layerEleme
             crossElement->GetStaff().at(0), layerElement->GetID().c_str());
         layerElement->m_crossStaff = NULL;
     }
-
-    if (direction == FORWARD) {
-        layerElement->m_crossLayer->SetCrossStaffFromAbove(true);
-    }
     else {
-        layerElement->m_crossLayer->SetCrossStaffFromBelow(true);
+        if (direction == FORWARD) {
+            layerElement->m_crossLayer->SetCrossStaffFromAbove(true);
+        }
+        else {
+            layerElement->m_crossLayer->SetCrossStaffFromBelow(true);
+        }
     }
 
     m_currentCrossStaff = layerElement->m_crossStaff;
@@ -380,12 +381,7 @@ FunctorCode PrepareFacsimileFunctor::VisitObject(Object *object)
         FacsimileInterface *interface = object->GetFacsimileInterface();
         assert(interface);
         if (interface->HasFacs()) {
-            std::string facsID = ((interface->GetFacs().compare(0, 1, "#") == 0) ? interface->GetFacs().substr(1)
-                                                                                 : interface->GetFacs());
-            Zone *zone = m_facsimile->FindZoneByID(facsID);
-            if (zone != NULL) {
-                interface->AttachZone(zone);
-            }
+            interface->InterfacePrepareFacsimile(*this, object);
         }
         // Zoneless syl
         else if (object->Is(SYL)) {
@@ -506,7 +502,8 @@ void PreparePlistFunctor::InsertInterfaceIDPair(const std::string &elementID, Pl
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
     if (this->IsCollectingData()) {
-        if (object->HasInterface(INTERFACE_PLIST)) {
+        // Skip expansion elements because these are handled in Doc::ExpandExpansions
+        if (object->HasInterface(INTERFACE_PLIST) && !object->Is(EXPANSION)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
             return interface->InterfacePreparePlist(*this, object);
@@ -655,7 +652,10 @@ FunctorCode PrepareTimePointingFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareTimeSpanningFunctor
 //----------------------------------------------------------------------------
 
-PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor(), CollectAndProcess() {}
+PrepareTimeSpanningFunctor::PrepareTimeSpanningFunctor() : Functor(), CollectAndProcess()
+{
+    m_insideMeasure = false;
+}
 
 void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpanningInterface *interface)
 {
@@ -664,19 +664,16 @@ void PrepareTimeSpanningFunctor::InsertInterfaceOwnerPair(Object *owner, TimeSpa
 
 FunctorCode PrepareTimeSpanningFunctor::VisitF(F *f)
 {
-    // Pass it to the pseudo functor of the interface
-    TimeSpanningInterface *interface = f->GetTimeSpanningInterface();
-    assert(interface);
-    return interface->InterfacePrepareTimeSpanning(*this, f);
+    if (!m_insideMeasure) {
+        return this->CallPseudoFunctor(f);
+    }
+    return FUNCTOR_CONTINUE;
 }
 
 FunctorCode PrepareTimeSpanningFunctor::VisitFloatingObject(FloatingObject *floatingObject)
 {
-    // Pass it to the pseudo functor of the interface
-    if (floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = floatingObject->GetTimeSpanningInterface();
-        assert(interface);
-        return interface->InterfacePrepareTimeSpanning(*this, floatingObject);
+    if (!m_insideMeasure && floatingObject->HasInterface(INTERFACE_TIME_SPANNING)) {
+        return this->CallPseudoFunctor(floatingObject);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -704,26 +701,47 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
     return FUNCTOR_CONTINUE;
 }
 
-FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
+FunctorCode PrepareTimeSpanningFunctor::VisitMeasure(Measure *measure)
 {
-    if (this->IsProcessingData()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
-    while (iter != m_timeSpanningInterfaces.end()) {
-        // At the end of the measure (going backward) we remove elements for which we do not need to match the end (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
-        // midi output
-        if (iter->second->GetClassId() == HARM) {
-            iter = m_timeSpanningInterfaces.erase(iter);
-        }
-        else {
-            ++iter;
+    if (this->IsCollectingData()) {
+        ListOfObjects timeSpanningObjects;
+        InterfaceComparison ic(INTERFACE_TIME_SPANNING);
+        measure->FindAllDescendantsByComparison(&timeSpanningObjects, &ic);
+        for (Object *object : timeSpanningObjects) {
+            this->CallPseudoFunctor(object);
         }
     }
+    m_insideMeasure = true;
 
     return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::VisitMeasureEnd(Measure *measure)
+{
+    if (this->IsCollectingData()) {
+        ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
+        while (iter != m_timeSpanningInterfaces.end()) {
+            // At the end of the measure we remove elements for which we do not need to match the end (for now).
+            // Eventually, we could consider them, for example if we want to display their spanning or for
+            // improved midi output
+            if (iter->second->GetClassId() == HARM) {
+                iter = m_timeSpanningInterfaces.erase(iter);
+            }
+            else {
+                ++iter;
+            }
+        }
+    }
+    m_insideMeasure = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareTimeSpanningFunctor::CallPseudoFunctor(Object *timeSpanningObject)
+{
+    TimeSpanningInterface *interface = timeSpanningObject->GetTimeSpanningInterface();
+    assert(interface);
+    return interface->InterfacePrepareTimeSpanning(*this, timeSpanningObject);
 }
 
 //----------------------------------------------------------------------------
@@ -1083,12 +1101,12 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
     currentStem->AttGraced::operator=(*chord);
     currentStem->FillAttributes(*chord);
 
-    int duration = chord->GetNoteOrChordDur(chord);
-    if ((duration < DUR_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
+    data_DURATION duration = chord->GetNoteOrChordDur(chord);
+    if ((duration < DURATION_2) || (chord->GetStemVisible() == BOOLEAN_false)) {
         currentStem->IsVirtual(true);
     }
 
-    const bool shouldHaveFlag = ((duration > DUR_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
+    const bool shouldHaveFlag = ((duration > DURATION_4) && !chord->IsInBeam() && !chord->GetAncestorFTrem());
     currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     chord->SetDrawingStem(currentStem);
@@ -1132,7 +1150,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         currentStem->AttGraced::operator=(*note);
         currentStem->FillAttributes(*note);
 
-        if (note->GetActualDur() < DUR_2 || (note->GetStemVisible() == BOOLEAN_false)) {
+        if (note->GetActualDur() < DURATION_2 || (note->GetStemVisible() == BOOLEAN_false)) {
             currentStem->IsVirtual(true);
         }
     }
@@ -1145,17 +1163,6 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         }
     }
 
-    // We don't care about flags or dots in mensural notes
-    if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
-
-    if (currentStem) {
-        const bool shouldHaveFlag = ((note->GetActualDur() > DUR_4) && !note->IsInBeam() && !note->GetAncestorFTrem()
-            && !note->IsChordTone() && !note->IsTabGrpNote());
-        currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
-
-        if (!chord) note->SetDrawingStem(currentStem);
-    }
-
     /************ dots ***********/
 
     Dots *currentDots = vrv_cast<Dots *>(note->FindDescendantByType(DOTS, 1));
@@ -1165,6 +1172,17 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitNote(Note *note)
         LogWarning("Note '%s' with a @dots attribute with the same value as its chord parent", note->GetID().c_str());
     }
     currentDots = this->ProcessDots(currentDots, note, shouldHaveDots);
+
+    // We don't care about flags in mensural notes
+    if (note->IsMensuralDur()) return FUNCTOR_CONTINUE;
+
+    if (currentStem) {
+        const bool shouldHaveFlag = ((note->GetActualDur() > DURATION_4) && !note->IsInBeam()
+            && !note->GetAncestorFTrem() && !note->IsChordTone() && !note->IsTabGrpNote());
+        currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
+
+        if (!chord) note->SetDrawingStem(currentStem);
+    }
 
     /************ Prepare the drawing cue size ************/
 
@@ -1178,7 +1196,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitRest(Rest *rest)
 {
     Dots *currentDots = vrv_cast<Dots *>(rest->FindDescendantByType(DOTS, 1));
 
-    const bool shouldHaveDots = (rest->GetDur() > DUR_BR) && (rest->GetDots() > 0);
+    const bool shouldHaveDots = (rest->GetDur() > DURATION_breve) && (rest->GetDots() > 0);
     currentDots = this->ProcessDots(currentDots, rest, shouldHaveDots);
 
     /************ Prepare the drawing cue size ************/
@@ -1204,7 +1222,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTabDurSym(TabDurSym *tabDurSym
     assert(tabGrp);
 
     // No flag within beam for durations longer than 8th notes
-    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DUR_4));
+    const bool shouldHaveFlag = (!tabDurSym->IsInBeam() && (tabGrp->GetActualDur() > DURATION_4));
     currentFlag = this->ProcessFlag(currentFlag, currentStem, shouldHaveFlag);
 
     return FUNCTOR_SIBLINGS;
@@ -1370,10 +1388,10 @@ FunctorCode PrepareRptFunctor::VisitStaff(Staff *staff)
     }
 
     // This is happening only for the first staff element of the staff @n
-    if (StaffDef *staffDef = m_doc->GetCurrentScoreDef()->GetStaffDef(staff->GetN())) {
+    ScoreDef *scoreDef = m_doc->GetCorrespondingScore(staff)->GetScoreDef();
+    if (StaffDef *staffDef = scoreDef->GetStaffDef(staff->GetN())) {
         const bool hideNumber = (staffDef->GetMultiNumber() == BOOLEAN_false)
-            || ((staffDef->GetMultiNumber() != BOOLEAN_true)
-                && (m_doc->GetCurrentScoreDef()->GetMultiNumber() == BOOLEAN_false));
+            || ((staffDef->GetMultiNumber() != BOOLEAN_true) && (scoreDef->GetMultiNumber() == BOOLEAN_false));
         if (hideNumber) {
             // Set it just in case, but stopping the functor should do it for this staff @n
             m_multiNumber = BOOLEAN_false;
@@ -1866,7 +1884,7 @@ FunctorCode PrepareBeamSpanElementsFunctor::VisitBeamSpan(BeamSpan *beamSpan)
         if (!elementStaff) continue;
         if (elementStaff->GetN() != staff->GetN()) {
             Layer *elementLayer = vrv_cast<Layer *>(layerElem->GetFirstAncestor(LAYER));
-            if (!elementStaff || !elementLayer) continue;
+            if (!elementLayer) continue;
             layerElem->m_crossStaff = elementStaff;
             layerElem->m_crossLayer = elementLayer;
         }

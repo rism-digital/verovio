@@ -73,7 +73,7 @@ bool PAEOutput::Export(std::string &output)
     m_currentDots = -1;
     m_grace = false;
 
-    m_doc->GetCurrentScoreDef()->SaveObject(this, false);
+    m_doc->GetFirstScoreDef()->SaveObject(this, false);
 
     m_docScoreDef = false;
 
@@ -162,7 +162,10 @@ bool PAEOutput::WriteObject(Object *object)
 
 bool PAEOutput::WriteObjectEnd(Object *object)
 {
-    if (object->Is(MEASURE)) {
+    if (object->Is(MDIV)) {
+        this->WriteMdivEnd(vrv_cast<Mdiv *>(object));
+    }
+    else if (object->Is(MEASURE)) {
         this->WriteMeasureEnd(vrv_cast<Measure *>(object));
     }
     else if (object->Is(BEAM)) {
@@ -180,6 +183,13 @@ void PAEOutput::WriteMdiv(Mdiv *mdiv)
     assert(mdiv);
 
     m_streamStringOutput << "@data:";
+}
+
+void PAEOutput::WriteMdivEnd(Mdiv *mdiv)
+{
+    assert(mdiv);
+
+    m_streamStringOutput << "\n";
 }
 
 void PAEOutput::WriteScoreDef(ScoreDef *scoreDef) {}
@@ -401,7 +411,12 @@ void PAEOutput::WriteMRest(MRest *mRest)
 
     if (m_skip) return;
 
+    bool fermata = this->HasFermata(mRest);
+    if (fermata) m_streamStringOutput << "(";
+
     m_streamStringOutput << "=";
+
+    if (fermata) m_streamStringOutput << ")";
 }
 
 void PAEOutput::WriteMultiRest(MultiRest *multiRest)
@@ -416,7 +431,6 @@ void PAEOutput::WriteMultiRest(MultiRest *multiRest)
 void PAEOutput::WriteNote(Note *note)
 {
     assert(note);
-    assert(m_currentMeasure);
 
     if (m_skip) return;
 
@@ -454,9 +468,7 @@ void PAEOutput::WriteNote(Note *note)
         m_streamStringOutput << accid;
     }
 
-    PointingToComparison pointingToComparisonFermata(FERMATA, note);
-    Fermata *fermata
-        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    bool fermata = this->HasFermata(note);
     if (fermata) m_streamStringOutput << "(";
 
     std::string pname = note->AttPitch::PitchnameToStr(note->GetPname());
@@ -465,13 +477,15 @@ void PAEOutput::WriteNote(Note *note)
 
     if (fermata) m_streamStringOutput << ")";
 
-    PointingToComparison pointingToComparisonTrill(TRILL, note);
-    Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
-    if (trill) m_streamStringOutput << "t";
+    if (m_currentMeasure) {
+        PointingToComparison pointingToComparisonTrill(TRILL, note);
+        Trill *trill = vrv_cast<Trill *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTrill, 1));
+        if (trill) m_streamStringOutput << "t";
 
-    PointingToComparison pointingToComparisonTie(TIE, note);
-    Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
-    if (tie) m_streamStringOutput << "+";
+        PointingToComparison pointingToComparisonTie(TIE, note);
+        Tie *tie = vrv_cast<Tie *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonTie, 1));
+        if (tie) m_streamStringOutput << "+";
+    }
 }
 
 void PAEOutput::WriteRest(Rest *rest)
@@ -481,7 +495,13 @@ void PAEOutput::WriteRest(Rest *rest)
     if (m_skip) return;
 
     this->WriteDur(rest);
+
+    bool fermata = this->HasFermata(rest);
+    if (fermata) m_streamStringOutput << "(";
+
     m_streamStringOutput << "-";
+
+    if (fermata) m_streamStringOutput << ")";
 }
 
 void PAEOutput::WriteSpace(Space *space)
@@ -501,23 +521,24 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 
     Staff *staff = tuplet->GetAncestorStaff();
 
-    double content = tuplet->GetContentAlignmentDuration(NULL, NULL, true, staff->m_drawingNotationType);
-    // content = DUR_MAX / 2^(dur - 2)
-    int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
+    auto [tupletDur, remainder] = tuplet->GetContentAlignmentDuration(true, staff->m_drawingNotationType).ToDur();
     // We should be looking for dotted values
+    if (remainder != 0) {
+        LogWarning("The tuplet content is not a single non-dotted duration");
+    }
 
     std::string dur;
     switch (tupletDur) {
-        case (DUR_LG): dur = "0"; break;
-        case (DUR_BR): dur = "9"; break;
-        case (DUR_1): dur = "1"; break;
-        case (DUR_2): dur = "2"; break;
-        case (DUR_4): dur = "4"; break;
-        case (DUR_8): dur = "8"; break;
-        case (DUR_16): dur = "6"; break;
-        case (DUR_32): dur = "3"; break;
-        case (DUR_64): dur = "5"; break;
-        case (DUR_128): dur = "7"; break;
+        case (DURATION_long): dur = "0"; break;
+        case (DURATION_breve): dur = "9"; break;
+        case (DURATION_1): dur = "1"; break;
+        case (DURATION_2): dur = "2"; break;
+        case (DURATION_4): dur = "4"; break;
+        case (DURATION_8): dur = "8"; break;
+        case (DURATION_16): dur = "6"; break;
+        case (DURATION_32): dur = "3"; break;
+        case (DURATION_64): dur = "5"; break;
+        case (DURATION_128): dur = "7"; break;
         default: LogWarning("Unsupported tuplet duration"); dur = "4";
     }
 
@@ -533,6 +554,38 @@ void PAEOutput::WriteTupletEnd(Tuplet *tuplet)
     m_streamStringOutput << ";" << tuplet->GetNum() << ")";
 }
 
+std::string PAEOutput::GetPaeDur(data_DURATION ndur, int ndots)
+{
+    std::string dur;
+    switch (ndur) {
+        case (DURATION_long): dur = "0"; break;
+        case (DURATION_breve): dur = "9"; break;
+        case (DURATION_1): dur = "1"; break;
+        case (DURATION_2): dur = "2"; break;
+        case (DURATION_4): dur = "4"; break;
+        case (DURATION_8): dur = "8"; break;
+        case (DURATION_16): dur = "6"; break;
+        case (DURATION_32): dur = "3"; break;
+        case (DURATION_64): dur = "5"; break;
+        case (DURATION_128): dur = "7"; break;
+        case (DURATION_maxima): dur = "0"; break;
+        case (DURATION_longa): dur = "0"; break;
+        case (DURATION_brevis): dur = "9"; break;
+        case (DURATION_semibrevis): dur = "1"; break;
+        case (DURATION_minima): dur = "2"; break;
+        case (DURATION_semiminima): dur = "4"; break;
+        case (DURATION_fusa): dur = "8"; break;
+        case (DURATION_semifusa): dur = "6"; break;
+        default: LogWarning("Unsupported duration"); dur = "4";
+    }
+
+    if (ndots > 0) {
+        dur += std::string(ndots, '.');
+    }
+
+    return dur;
+}
+
 void PAEOutput::WriteDur(DurationInterface *interface)
 {
     assert(interface);
@@ -541,30 +594,7 @@ void PAEOutput::WriteDur(DurationInterface *interface)
     if ((interface->GetDur() != m_currentDur) || (ndots != m_currentDots)) {
         m_currentDur = interface->GetDur();
         m_currentDots = ndots;
-        std::string dur;
-        switch (m_currentDur) {
-            case (DURATION_long): dur = "0"; break;
-            case (DURATION_breve): dur = "9"; break;
-            case (DURATION_1): dur = "1"; break;
-            case (DURATION_2): dur = "2"; break;
-            case (DURATION_4): dur = "4"; break;
-            case (DURATION_8): dur = "8"; break;
-            case (DURATION_16): dur = "6"; break;
-            case (DURATION_32): dur = "3"; break;
-            case (DURATION_64): dur = "5"; break;
-            case (DURATION_128): dur = "7"; break;
-            case (DURATION_maxima): dur = "0"; break;
-            case (DURATION_longa): dur = "0"; break;
-            case (DURATION_brevis): dur = "9"; break;
-            case (DURATION_semibrevis): dur = "1"; break;
-            case (DURATION_minima): dur = "2"; break;
-            case (DURATION_semiminima): dur = "4"; break;
-            case (DURATION_fusa): dur = "8"; break;
-            case (DURATION_semifusa): dur = "6"; break;
-            default: LogWarning("Unsupported duration"); dur = "4";
-        }
-        m_streamStringOutput << dur;
-        m_streamStringOutput << std::string(m_currentDots, '.');
+        m_streamStringOutput << PAEOutput::GetPaeDur(interface->GetDur(), m_currentDots);
     }
 }
 
@@ -581,6 +611,16 @@ void PAEOutput::WriteGrace(AttGraced *attGraced)
     else if (attGraced->HasGrace()) {
         m_streamStringOutput << "q";
     }
+}
+
+bool PAEOutput::HasFermata(Object *object)
+{
+    if (!m_currentMeasure) return false;
+
+    PointingToComparison pointingToComparisonFermata(FERMATA, object);
+    Fermata *fermata
+        = vrv_cast<Fermata *>(m_currentMeasure->FindDescendantByComparison(&pointingToComparisonFermata, 1));
+    return (fermata);
 }
 
 //----------------------------------------------------------------------------
@@ -1019,20 +1059,20 @@ void PAEInput::parsePlainAndEasy(std::istream &infile)
         staffDef->AddChild(staffDefClef);
     }
     if (scoreDefKeySig) {
-        m_doc->GetCurrentScoreDef()->AddChild(scoreDefKeySig);
+        score->GetScoreDef()->AddChild(scoreDefKeySig);
     }
     if (scoreDefMeterSig) {
         // Make it an attribute for now
         scoreDefMeterSig->IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMeterSig);
+        score->GetScoreDef()->AddChild(scoreDefMeterSig);
     }
     if (scoreDefMensur) {
         // Make it an attribute for now
         scoreDefMensur->IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(scoreDefMensur);
+        score->GetScoreDef()->AddChild(scoreDefMensur);
     }
 
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    score->GetScoreDef()->AddChild(staffGrp);
 
     if (m_tie != NULL) {
         LogWarning("Open tie will not render because tstamp2 is missing");
@@ -2270,7 +2310,8 @@ enum {
     ERR_062_LIGATURE_NOTE_AFTER,
     ERR_063_LIGATURE_PITCH,
     ERR_064_LIGATURE_DURATION,
-    ERR_065_MREST_INVALID_MEASURE
+    ERR_065_MREST_INVALID_MEASURE,
+    ERR_066_EMPTY_CONTAINER
 };
 
 // clang-format off
@@ -2303,7 +2344,7 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_026_GRACE_NESTED, "The appoggiatura must be closed with 'r' before starting a new one." },
     { ERR_027_GRACE_CLOSING, "An extra 'r' is present to close an appoggiatura" },
     { ERR_028_GRACE_OPEN, "The appoggiatura must be closed with 'r' before the end of the measure." },
-    { ERR_029_GRACE_UNRESOLVED, "An appoggiatura cannot be started using 'q' before completing the previous one." },
+    { ERR_029_GRACE_UNRESOLVED, "A grace note cannot be started with 'g' or 'q' before completing the previous one." },
     { ERR_030_GRACE_DURATION, "No rhythmic value can be entered when using an acciaccatura with 'g'." },
     { ERR_031_GRACE_NO_NOTE, "A grace note using 'g' or 'q' must be followed by a note." },
     { ERR_032_TUPLET_NESTED, "A special rhythm group cannot be started with '(' before closing the previous one." },
@@ -2339,7 +2380,8 @@ const std::map<int, std::string> PAEInput::s_errCodes{
     { ERR_062_LIGATURE_NOTE_AFTER, "To indicate a ligature, a '+' must be followed by a note." },
     { ERR_063_LIGATURE_PITCH, "A ligature cannot have two consecutive notes with the same pitch." },
     { ERR_064_LIGATURE_DURATION, "The duration in a ligature cannot be shorter than a semibreve." },
-    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." }
+    { ERR_065_MREST_INVALID_MEASURE, "A measure with a measure rest cannot include anything else." },
+    { ERR_066_EMPTY_CONTAINER, "A grace group or a beam cannot be empty." }
 };
 // clang-format on
 
@@ -2393,6 +2435,7 @@ namespace pae {
         m_inputChar = c;
         m_position = position;
         m_object = object;
+        m_treeObject = NULL;
         m_isError = false;
     }
 
@@ -2429,6 +2472,12 @@ namespace pae {
         std::string name = m_object->GetClassName();
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         return name;
+    }
+
+    void Token::SetInTree()
+    {
+        m_treeObject = m_object;
+        m_object = NULL;
     }
 
 } // namespace pae
@@ -2858,7 +2907,7 @@ bool PAEInput::Import(const std::string &input)
     }
 
     // Add a measure at the beginning of the data because there is always at least one measure
-    Measure *measure = new Measure(true, 1);
+    Measure *measure = new Measure(MEASURED, 1);
     // By default there is no end barline on an incipit
     measure->SetRight(BARRENDITION_invis);
     m_pae.push_back(pae::Token(0, pae::UNKOWN_POS, measure));
@@ -2940,8 +2989,6 @@ bool PAEInput::Parse()
 
     if (success) success = this->CheckHierarchy();
 
-    LogDebugTokens();
-
     if (m_pedanticMode && !success) {
         this->ClearTokenObjects();
         return false;
@@ -2966,7 +3013,7 @@ bool PAEInput::Parse()
     staffDef->SetN(1);
     staffDef->SetLines(5);
     staffGrp->AddChild(staffDef);
-    m_doc->GetCurrentScoreDef()->AddChild(staffGrp);
+    score->GetScoreDef()->AddChild(staffGrp);
 
     if (m_isMensural) {
         staffDef->SetNotationtype(NOTATIONTYPE_mensural);
@@ -2977,17 +3024,17 @@ bool PAEInput::Parse()
         staffDef->AddChild(m_clef.Clone());
     }
     if (m_hasKeySig) {
-        m_doc->GetCurrentScoreDef()->AddChild(m_keySig.Clone());
+        score->GetScoreDef()->AddChild(m_keySig.Clone());
     }
     if (m_hasMeterSig) {
         // Make it an attribute for now
         m_meterSig.IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(m_meterSig.Clone());
+        score->GetScoreDef()->AddChild(m_meterSig.Clone());
     }
     if (m_hasMensur) {
         // Make it an attribute for now
         m_mensur.IsAttribute(true);
-        m_doc->GetCurrentScoreDef()->AddChild(m_mensur.Clone());
+        score->GetScoreDef()->AddChild(m_mensur.Clone());
     }
 
     // A stack to which layer element are added. At least a Layer, but then Beam, GraceGrp, Chord, etc.
@@ -3020,7 +3067,7 @@ bool PAEInput::Parse()
         if (token.Is(MEASURE)) {
             currentMeasure = vrv_cast<Measure *>(token.m_object);
             assert(currentMeasure);
-            token.m_object = NULL;
+            token.SetInTree();
 
             section->AddChild(currentMeasure);
             Staff *staff = new Staff(1);
@@ -3066,7 +3113,7 @@ bool PAEInput::Parse()
                 }
             }
             // Object are own by the scoreDef
-            token.m_object = NULL;
+            token.SetInTree();
             continue;
         }
         else if (token.m_object->IsLayerElement()) {
@@ -3074,7 +3121,7 @@ bool PAEInput::Parse()
             LayerElement *element = vrv_cast<LayerElement *>(token.m_object);
             assert(element);
             // The object is either a container end, or will be added to the layerElementContainers.back()
-            token.m_object = NULL;
+            token.SetInTree();
 
             // For a container end, no object to add to the doc.
             if (token.m_char == pae::CONTAINER_END) {
@@ -3118,11 +3165,13 @@ bool PAEInput::Parse()
                     tie->SetTstamp2({ 0, tstamp2 });
                 }
             }
-            token.m_object = NULL;
+            token.SetInTree();
         }
     }
 
     CheckContentPostBuild();
+
+    LogDebugTokens();
 
     // We should have no object left, just in case they need to be delete.
     this->ClearTokenObjects();
@@ -3377,7 +3426,7 @@ bool PAEInput::ConvertMeasure()
             // We can now create a new measure but not if we have reached the end of the data
             if (!token.IsEnd()) {
                 measureCount++;
-                currentMeasure = new Measure(true, measureCount);
+                currentMeasure = new Measure(MEASURED, measureCount);
                 currentMeasure->SetRight(BARRENDITION_invis);
                 measureToken->m_object = currentMeasure;
             }
@@ -3438,6 +3487,13 @@ bool PAEInput::ConvertRepeatedFigure()
                 figure.push_back(*token);
             }
         }
+        // We are starting a new figure to be repeated
+        else if (token->m_char == '!') {
+            token->m_char = 0;
+            figureToken = &(*token);
+            figure.clear();
+            status = pae::FIGURE_START;
+        }
         // We have completed a figure and will be repeating it
         else if (status == pae::FIGURE_END || status == pae::FIGURE_REPEAT) {
             // Repeat the figure. That is simply add it to the map
@@ -3452,7 +3508,7 @@ bool PAEInput::ConvertRepeatedFigure()
                 --token;
                 status = pae::FIGURE_REPEAT;
             }
-            // End of repetitions - this includes the end of a measure
+            // End of repetitions
             else {
                 // Make sure we repeated the figure at least once (is this too pedantic?)
                 if (status == pae::FIGURE_END) {
@@ -3463,13 +3519,6 @@ bool PAEInput::ConvertRepeatedFigure()
                 figureToken = NULL;
                 figure.clear();
             }
-        }
-        // We are starting a new figure to be repeated
-        else if (token->m_char == '!') {
-            token->m_char = 0;
-            figureToken = &(*token);
-            figure.clear();
-            status = pae::FIGURE_START;
         }
         // We should not have a repeat sign not after a figure end
         else if (token->m_char == 'f') {
@@ -4702,6 +4751,22 @@ bool PAEInput::CheckContentPostBuild()
     // * graceGrp should not be empty
     // * keySig / meterSig change more than once in a measure
 
+    ClassIdsComparison comparison({ BEAM, GRACEGRP });
+    ClassIdsComparison noteOrRest({ NOTE, REST });
+    ListOfObjects containers;
+    m_doc->FindAllDescendantsByComparison(&containers, &comparison);
+    for (auto &container : containers) {
+        ListOfObjects notesOrRests;
+        container->FindAllDescendantsByComparison(&notesOrRests, &noteOrRest);
+        if ((int)notesOrRests.size() < 1) {
+            pae::Token *token = this->GetTokenForTreeObject(container);
+            if (token) {
+                LogPAE(ERR_066_EMPTY_CONTAINER, *token);
+                if (m_pedanticMode) return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -4722,6 +4787,14 @@ void PAEInput::RemoveContainerToken(Object *object)
             token.m_object = NULL;
         }
     }
+}
+
+pae::Token *PAEInput::GetTokenForTreeObject(Object *object)
+{
+    for (pae::Token &token : m_pae) {
+        if (token.m_treeObject == object) return &token;
+    }
+    return NULL;
 }
 
 bool PAEInput::ParseKeySig(KeySig *keySig, const std::string &paeStr, pae::Token &token)

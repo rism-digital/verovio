@@ -28,7 +28,7 @@
 #include "editorial.h"
 #include "featureextractor.h"
 #include "findfunctor.h"
-#include "io.h"
+#include "iobase.h"
 #include "keysig.h"
 #include "layer.h"
 #include "linkinginterface.h"
@@ -118,7 +118,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // New id
     this->GenerateID();
     // For now do not copy them
-    // m_unsupported = object.m_unsupported;
+    m_unsupported = object.m_unsupported;
 
     if (!object.CopyChildren()) {
         return;
@@ -164,7 +164,7 @@ Object &Object::operator=(const Object &object)
         // New id
         this->GenerateID();
         // For now do now copy them
-        // m_unsupported = object.m_unsupported;
+        m_unsupported = object.m_unsupported;
         LinkingInterface *link = this->GetLinkingInterface();
         if (link) link->AddBackLink(&object);
 
@@ -1018,9 +1018,6 @@ void Object::Process(Functor &functor, int deepness, bool skipFirst)
         return;
     }
 
-    // Update the current score stored in the document
-    this->UpdateDocumentScore(functor.GetDirection());
-
     if (!skipFirst) {
         FunctorCode code = this->Accept(functor);
         functor.SetCode(code);
@@ -1074,9 +1071,6 @@ void Object::Process(ConstFunctor &functor, int deepness, bool skipFirst) const
     if (functor.GetCode() == FUNCTOR_STOP) {
         return;
     }
-
-    // Update the current score stored in the document
-    const_cast<Object *>(this)->UpdateDocumentScore(functor.GetDirection());
 
     if (!skipFirst) {
         FunctorCode code = this->Accept(functor);
@@ -1146,26 +1140,6 @@ FunctorCode Object::AcceptEnd(ConstFunctor &functor) const
     return functor.VisitObjectEnd(this);
 }
 
-void Object::UpdateDocumentScore(bool direction)
-{
-    // When we are starting a new score, we need to update the current score in the document
-    if (direction == FORWARD && this->Is(SCORE)) {
-        Score *score = vrv_cast<Score *>(this);
-        assert(score);
-        score->SetAsCurrent();
-    }
-    // We need to do the same in backward direction through the PageMilestoneEnd::m_start
-    else if (direction == BACKWARD && this->Is(PAGE_MILESTONE_END)) {
-        PageMilestoneEnd *elementEnd = vrv_cast<PageMilestoneEnd *>(this);
-        assert(elementEnd);
-        if (elementEnd->GetStart() && elementEnd->GetStart()->Is(SCORE)) {
-            Score *score = vrv_cast<Score *>(elementEnd->GetStart());
-            assert(score);
-            score->SetAsCurrent();
-        }
-    }
-}
-
 bool Object::SkipChildren(bool visibleOnly) const
 {
     if (visibleOnly) {
@@ -1225,6 +1199,18 @@ Object *Object::FindPreviousChild(Comparison *comp, Object *start)
     FindPreviousChildByComparisonFunctor findPreviousChildByComparison(comp, start);
     this->Process(findPreviousChildByComparison);
     return const_cast<Object *>(findPreviousChildByComparison.GetElement());
+}
+
+void Object::LogDebugTree(int maxDepth, int level)
+{
+    std::string indent(level, '\t');
+    LogDebug("%s%s", indent.c_str(), this->LogDebugTreeMsg().c_str());
+
+    if (maxDepth == level) return;
+
+    for (auto &child : this->GetChildren()) {
+        child->LogDebugTree(maxDepth, level + 1);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1298,7 +1284,12 @@ bool Object::sortByUlx(Object *a, Object *b)
     if (a->Is(NC) && b->Is(NC)) {
         Nc *nca = dynamic_cast<Nc *>(a);
         Nc *ncb = dynamic_cast<Nc *>(b);
-        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())) {
+        Zone *zonea = dynamic_cast<Zone *>(nca->GetFacsimileInterface()->GetZone());
+        assert(zonea);
+        Zone *zoneb = dynamic_cast<Zone *>(ncb->GetFacsimileInterface()->GetZone());
+        assert(zoneb);
+        if (nca->HasLigated() && ncb->HasLigated() && (a->GetParent() == b->GetParent())
+            && (zonea->GetUlx() == zoneb->GetUlx())) {
             Object *parent = a->GetParent();
             assert(parent);
             if (abs(parent->GetChildIndex(a) - parent->GetChildIndex(b)) == 1) {

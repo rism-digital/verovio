@@ -111,10 +111,16 @@ public:
     ///@}
 
     /**
-     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue/@grace
+     * Initialize m_cueSize value based on the @cue attribute and presence of child elements with @cue
      * attributes
      */
     void InitCue(bool beamCue);
+
+    /**
+     * Initialize m_notesStemDir value based on the @graceGrp attribute and presence of child elements with @grace
+     * attributes
+     */
+    void InitGraceStemDir(bool graceGrp);
 
     bool IsHorizontal() const;
 
@@ -180,7 +186,7 @@ public:
     Staff *m_crossStaffContent;
     data_STAFFREL_basic m_crossStaffRel;
     bool m_isSpanningElement;
-    int m_shortestDur;
+    data_DURATION m_shortestDur;
     data_STEMDIRECTION m_notesStemDir;
     data_BEAMPLACE m_drawingPlace;
     Staff *m_beamStaff;

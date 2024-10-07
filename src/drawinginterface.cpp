@@ -94,7 +94,7 @@ void BeamDrawingInterface::Reset()
     m_crossStaffContent = NULL;
     m_crossStaffRel = STAFFREL_basic_NONE;
     m_isSpanningElement = false;
-    m_shortestDur = 0;
+    m_shortestDur = DURATION_NONE;
     m_notesStemDir = STEMDIRECTION_NONE;
     m_drawingPlace = BEAMPLACE_NONE;
     m_beamStaff = NULL;
@@ -102,11 +102,13 @@ void BeamDrawingInterface::Reset()
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
+
+    ClearCoords();
 }
 
 int BeamDrawingInterface::GetTotalBeamWidth() const
 {
-    return m_beamWidthBlack + (m_shortestDur - DUR_8) * m_beamWidth;
+    return m_beamWidthBlack + (m_shortestDur - DURATION_8) * m_beamWidth;
 }
 
 void BeamDrawingInterface::ClearCoords()
@@ -136,9 +138,6 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
 
     m_beamStaff = staff;
 
-    // duration variables
-    int lastDur, currentDur;
-
     m_beamElementCoords.reserve(childList.size());
     for ([[maybe_unused]] auto child : childList) {
         m_beamElementCoords.push_back(new BeamElementCoord());
@@ -149,7 +148,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
-    lastDur = (current->GetDurationInterface())->GetActualDur();
+    data_DURATION lastDur = (current->GetDurationInterface())->GetActualDur();
 
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -165,7 +164,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
-        currentDur = (current->GetDurationInterface())->GetActualDur();
+        const data_DURATION currentDur = (current->GetDurationInterface())->GetActualDur();
 
         if (current->Is(CHORD)) {
             m_beamHasChord = true;
@@ -190,6 +189,7 @@ void BeamDrawingInterface::InitCoords(const ListOfObjects &childList, Staff *sta
         // Check if some beam chord has cross staff content
         else if (current->Is(CHORD)) {
             Chord *chord = vrv_cast<Chord *>(current);
+            assert(chord);
             for (Note *note : { chord->GetTopNote(), chord->GetBottomNote() }) {
                 if (note->m_crossStaff && (note->m_crossStaff != m_beamStaff)) {
                     m_crossStaffContent = note->m_crossStaff;
@@ -261,8 +261,21 @@ void BeamDrawingInterface::InitCue(bool beamCue)
         });
     }
 
+    return;
+}
+
+void BeamDrawingInterface::InitGraceStemDir(bool graceGrp)
+{
+    if (!graceGrp) {
+        graceGrp = std::all_of(m_beamElementCoords.begin(), m_beamElementCoords.end(), [](BeamElementCoord *coord) {
+            if (!coord->m_element) return false;
+            if (coord->m_element->IsGraceNote()) return true;
+            return false;
+        });
+    }
+
     // Always set stem direction to up for grace note beam unless stem direction is provided
-    if (m_cueSize && (m_notesStemDir == STEMDIRECTION_NONE)) {
+    if (graceGrp && (m_notesStemDir == STEMDIRECTION_NONE)) {
         m_notesStemDir = STEMDIRECTION_up;
     }
 }
@@ -407,8 +420,8 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
     for (BeamElementCoord *coord : m_beamElementCoords) {
         if (!coord->m_stem || !coord->m_closestNote) continue;
 
-        // Could this be an overflow with 32 bits?
-        items.push_back(coord->m_closestNote->GetDrawingY() * DUR_MAX + coord->m_dur);
+        // Could this be an overflow with 32 bits? Not sure why DUR_MAX is used here
+        items.push_back(coord->m_closestNote->GetDrawingY() + DUR_MAX * coord->m_dur);
     }
     int itemCount = (int)items.size();
 
@@ -446,7 +459,7 @@ bool BeamDrawingInterface::IsRepeatedPattern() const
 
 bool BeamDrawingInterface::HasOneStepHeight() const
 {
-    if (m_shortestDur < DUR_32) return false;
+    if (m_shortestDur < DURATION_32) return false;
 
     int top = -128;
     int bottom = 128;
