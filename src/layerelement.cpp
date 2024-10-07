@@ -693,9 +693,9 @@ Fraction LayerElement::GetAlignmentDuration(
             if (objects.size() > 0) {
                 num = tuplet->GetNum();
                 numbase = tuplet->GetNumbase();
-                // 0 is not valid in MEI anyway - just correct it silently
-                if (num == 0) num = 1;
-                if (numbase == 0) numbase = 1;
+                // Adjust VRV_UNSET and 0 - which is not valid in MEI anyway
+                num = std::max(1, num);
+                numbase = std::max(1, numbase);
             }
         }
         const DurationInterface *duration = this->GetDurationInterface();
