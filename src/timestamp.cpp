@@ -35,9 +35,10 @@ void TimestampAttr::Reset()
     m_actualDurPos = 0.0;
 }
 
-double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit) const
+Fraction TimestampAttr::GetTimestampAttrAlignmentDuration(data_DURATION meterUnit) const
 {
-    return DUR_MAX / meterUnit * m_actualDurPos;
+    Fraction duration(meterUnit);
+    return (duration * Fraction(m_actualDurPos * DUR_MAX, DUR_MAX));
 }
 
 FunctorCode TimestampAttr::Accept(Functor &functor)

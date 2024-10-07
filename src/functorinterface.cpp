@@ -40,6 +40,7 @@
 #include "fig.h"
 #include "fing.h"
 #include "ftrem.h"
+#include "genericlayerelement.h"
 #include "gliss.h"
 #include "gracegrp.h"
 #include "grpsym.h"
@@ -893,6 +894,16 @@ FunctorCode FunctorInterface::VisitGraceGrp(GraceGrp *graceGrp)
 FunctorCode FunctorInterface::VisitGraceGrpEnd(GraceGrp *graceGrp)
 {
     return this->VisitLayerElementEnd(graceGrp);
+}
+
+FunctorCode FunctorInterface::VisitGenericLayerElement(GenericLayerElement *genericLayerElement)
+{
+    return this->VisitLayerElement(genericLayerElement);
+}
+
+FunctorCode FunctorInterface::VisitGenericLayerElementEnd(GenericLayerElement *genericLayerElement)
+{
+    return this->VisitLayerElementEnd(genericLayerElement);
 }
 
 FunctorCode FunctorInterface::VisitHalfmRpt(HalfmRpt *halfmRpt)
@@ -2177,6 +2188,16 @@ FunctorCode ConstFunctorInterface::VisitGraceGrp(const GraceGrp *graceGrp)
 FunctorCode ConstFunctorInterface::VisitGraceGrpEnd(const GraceGrp *graceGrp)
 {
     return this->VisitLayerElementEnd(graceGrp);
+}
+
+FunctorCode ConstFunctorInterface::VisitGenericLayerElement(const GenericLayerElement *genericLayerElement)
+{
+    return this->VisitLayerElement(genericLayerElement);
+}
+
+FunctorCode ConstFunctorInterface::VisitGenericLayerElementEnd(const GenericLayerElement *genericLayerElement)
+{
+    return this->VisitLayerElementEnd(genericLayerElement);
 }
 
 FunctorCode ConstFunctorInterface::VisitHalfmRpt(const HalfmRpt *halfmRpt)

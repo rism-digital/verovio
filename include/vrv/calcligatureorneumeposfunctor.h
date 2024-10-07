@@ -1,32 +1,32 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        calcligaturenoteposfunctor.h
+// Name:        calcligatureorneumeposfunctor.h
 // Author:      David Bauer
 // Created:     2023
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_CALCLIGATURENOTEPOSFUNCTOR_H__
-#define __VRV_CALCLIGATURENOTEPOSFUNCTOR_H__
+#ifndef __VRV_CALCLIGATUREORNEUMEPOSFUNCTOR_H__
+#define __VRV_CALCLIGATUREORNEUMEPOSFUNCTOR_H__
 
 #include "functor.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// CalcLigatureNotePosFunctor
+// CalcLigatureOrNeumePosFunctor
 //----------------------------------------------------------------------------
 
 /**
  * This class sets the note position for each note in ligature.
  */
-class CalcLigatureNotePosFunctor : public DocFunctor {
+class CalcLigatureOrNeumePosFunctor : public DocFunctor {
 public:
     /**
      * @name Constructors, destructors
      */
     ///@{
-    CalcLigatureNotePosFunctor(Doc *doc);
-    virtual ~CalcLigatureNotePosFunctor() = default;
+    CalcLigatureOrNeumePosFunctor(Doc *doc);
+    virtual ~CalcLigatureOrNeumePosFunctor() = default;
     ///@}
 
     /*
@@ -39,6 +39,7 @@ public:
      */
     ///@{
     FunctorCode VisitLigature(Ligature *ligature) override;
+    FunctorCode VisitNeume(Neume *neume) override;
     ///@}
 
 protected:
@@ -53,4 +54,4 @@ private:
 
 } // namespace vrv
 
-#endif // __VRV_CALCLIGATURENOTEPOSFUNCTOR_H__
+#endif // __VRV_CALCLIGATUREORNEUMEPOSFUNCTOR_H__

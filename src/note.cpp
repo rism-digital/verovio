@@ -239,7 +239,7 @@ const Chord *Note::IsChordTone() const
     return vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
 }
 
-int Note::GetDrawingDur() const
+data_DURATION Note::GetDrawingDur() const
 {
     const Chord *chordParent = vrv_cast<const Chord *>(this->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH));
     if (chordParent && !this->HasDur()) {
@@ -473,7 +473,7 @@ int Note::CalcStemLenInThirdUnits(const Staff *staff, data_STEMDIRECTION stemDir
 
     // Limit shortening with duration shorter than quarter not when not in a beam
 
-    if ((this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+    if ((this->GetDrawingDur() > DURATION_4) && !this->IsInBeam()) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             shortening = std::min(4, shortening);
         }
@@ -491,10 +491,10 @@ char32_t Note::GetMensuralNoteheadGlyph() const
 {
     assert(this->IsMensuralDur());
 
-    int drawingDur = this->GetDrawingDur();
+    data_DURATION drawingDur = this->GetDrawingDur();
 
     // No SMuFL code used for these values
-    if (drawingDur < DUR_1) {
+    if (drawingDur < DURATION_1) {
         return 0;
     }
 
@@ -507,7 +507,7 @@ char32_t Note::GetMensuralNoteheadGlyph() const
     }
     else {
         if (this->GetColored() == BOOLEAN_true) {
-            if (drawingDur > DUR_2) {
+            if (drawingDur > DURATION_2) {
                 code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
             }
             else {
@@ -515,7 +515,7 @@ char32_t Note::GetMensuralNoteheadGlyph() const
             }
         }
         else {
-            if (drawingDur > DUR_2) {
+            if (drawingDur > DURATION_2) {
                 code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
             }
             else {
@@ -526,7 +526,7 @@ char32_t Note::GetMensuralNoteheadGlyph() const
     return code;
 }
 
-char32_t Note::GetNoteheadGlyph(const int duration) const
+char32_t Note::GetNoteheadGlyph(const data_DURATION duration) const
 {
     static std::map<std::string, char32_t> additionalNoteheadSymbols
         = { { "noteheadDiamondBlackWide", SMUFL_E0DC_noteheadDiamondBlackWide },
@@ -549,7 +549,7 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_circle: return SMUFL_E0B3_noteheadCircleX;
         case HEADSHAPE_plus: return SMUFL_E0AF_noteheadPlusBlack;
         case HEADSHAPE_diamond: {
-            if (duration < DUR_4) {
+            if (duration < DURATION_4) {
                 return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0DB_noteheadDiamondBlack
                                                            : SMUFL_E0D9_noteheadDiamondHalf;
             }
@@ -561,18 +561,26 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
         // case HEADSHAPE_isotriangle: return SMUFL_E0BC_noteheadTriangleUpHalf;
         // case HEADSHAPE_oval: return SMUFL_noteheadOval;
         // case HEADSHAPE_piewedge: return SMUFL_noteheadPieWedge;
-        // case HEADSHAPE_rectangle: return SMUFL_noteheadRectangle;
+        case HEADSHAPE_rectangle:
+            if (duration < DURATION_4) {
+                return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0B9_noteheadSquareBlack
+                                                           : SMUFL_E0B8_noteheadSquareWhite;
+            }
+            else {
+                return (this->GetHeadFill() == FILL_void) ? SMUFL_E0B8_noteheadSquareWhite
+                                                          : SMUFL_E0B9_noteheadSquareBlack;
+            }
         // case HEADSHAPE_rtriangle: return SMUFL_noteheadRTriangle;
         // case HEADSHAPE_semicircle: return SMUFL_noteheadSemicircle;
         case HEADSHAPE_slash: {
-            if (DUR_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
-            if (DUR_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
+            if (DURATION_1 >= duration) return SMUFL_E102_noteheadSlashWhiteWhole;
+            if (DURATION_2 == duration) return SMUFL_E103_noteheadSlashWhiteHalf;
             return SMUFL_E101_noteheadSlashHorizontalEnds;
         }
         // case HEADSHAPE_square: return SMUFL_noteheadSquare;
         case HEADSHAPE_x: {
-            if (DUR_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
-            if (DUR_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
+            if (DURATION_1 == duration) return SMUFL_E0B5_noteheadWholeWithX;
+            if (DURATION_2 == duration) return SMUFL_E0B6_noteheadHalfWithX;
             return SMUFL_E0A9_noteheadXBlack;
         }
         default: break;
@@ -583,10 +591,10 @@ char32_t Note::GetNoteheadGlyph(const int duration) const
         default: break;
     }
 
-    if (DUR_BR == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
-    if (DUR_1 == duration) return SMUFL_E0A2_noteheadWhole;
+    if (DURATION_breve == duration) return SMUFL_E0A1_noteheadDoubleWholeSquare;
+    if (DURATION_1 == duration) return SMUFL_E0A2_noteheadWhole;
     // We support solid on half notes or void on quarter and shorter notes
-    if (DUR_2 == duration) {
+    if (DURATION_2 == duration) {
         return (this->GetHeadFill() == FILL_solid) ? SMUFL_E0A4_noteheadBlack : SMUFL_E0A3_noteheadHalf;
     }
     else {

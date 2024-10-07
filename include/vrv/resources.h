@@ -136,8 +136,8 @@ private:
     class LoadedFont {
 
     public:
-        LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback){};
-        ~LoadedFont(){};
+        LoadedFont(const std::string &name, bool isFallback) : m_name(name), m_isFallback(isFallback) {}
+        ~LoadedFont() {}
         const std::string GetName() const { return m_name; };
         const GlyphTable &GetGlyphTable() const { return m_glyphTable; };
         GlyphTable &GetGlyphTableForModification() { return m_glyphTable; };
