@@ -525,6 +525,14 @@
   <g c="F417" x="0.0" y="-188.0" w="306.0" h="580.0" h-a-x="306" n="flag32ndDownStraight">
     <a n="stemDownSW" x="0.0" y="-0.71" />
   </g>
+  <g c="E0B8" x="0.0" y="-125.0" w="310.0" h="250.0" h-a-x="310" n="noteheadSquareWhite">
+    <a n="stemDownNW" x="0.0" y="0.0" />
+    <a n="stemUpSE" x="1.24" y="0.0" />
+  </g>
+  <g c="E0B9" x="0.0" y="-125.0" w="310.0" h="250.0" h-a-x="310" n="noteheadSquareBlack">
+    <a n="stemDownNW" x="0.0" y="0.0" />
+    <a n="stemUpSE" x="1.24" y="0.0" />
+  </g>
   <g c="E0F5" x="0.0" y="-210.0" w="98.0" h="421.0" h-a-x="98" n="noteheadParenthesisLeft" />
   <g c="E0F6" x="0.0" y="-210.0" w="98.0" h="421.0" h-a-x="98" n="noteheadParenthesisRight" />
   <g c="F418" x="0.0" y="-388.0" w="289.0" h="762.0" h-a-x="289" n="flag64thUpStraight">

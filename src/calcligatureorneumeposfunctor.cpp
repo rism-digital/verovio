@@ -62,23 +62,23 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
 
         // Look at the @lig attribute on the previous note
         if (previousNote->GetLig() == LIGATUREFORM_obliqua) oblique = true;
-        int dur1 = previousNote->GetActualDur();
-        int dur2 = note->GetActualDur();
+        data_DURATION dur1 = previousNote->GetActualDur();
+        data_DURATION dur2 = note->GetActualDur();
         // Same treatment for Mx and LG except for positioning, which is done above
         // We still need to avoid oblique, so keep a flag.
         bool isMaxima = false;
-        if (dur1 == DUR_MX) {
-            dur1 = DUR_LG;
+        if (dur1 == DURATION_maxima) {
+            dur1 = DURATION_long;
             isMaxima = true;
         }
-        if (dur2 == DUR_MX) dur2 = DUR_LG;
+        if (dur2 == DURATION_maxima) dur2 = DURATION_long;
 
         int diatonicStep = note->GetDiatonicPitch() - previousNote->GetDiatonicPitch();
         bool up = (diatonicStep > 0);
         bool isLastNote = (note == lastNote);
 
         // L - L
-        if ((dur1 == DUR_LG) && (dur2 == DUR_LG)) {
+        if ((dur1 == DURATION_long) && (dur2 == DURATION_long)) {
             if (up) {
                 ligature->m_drawingShapes.at(n1) = LIGATURE_STEM_RIGHT_DOWN;
                 ligature->m_drawingShapes.at(n2) = LIGATURE_STEM_RIGHT_DOWN;
@@ -88,7 +88,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
             }
         }
         // L - B
-        else if ((dur1 == DUR_LG) && (dur2 == DUR_BR)) {
+        else if ((dur1 == DURATION_long) && (dur2 == DURATION_breve)) {
             if (up) {
                 ligature->m_drawingShapes.at(n1) = LIGATURE_STEM_RIGHT_DOWN;
             }
@@ -102,7 +102,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
             }
         }
         // B - B
-        else if ((dur1 == DUR_BR) && (dur2 == DUR_BR)) {
+        else if ((dur1 == DURATION_breve) && (dur2 == DURATION_breve)) {
             if (up) {
                 // nothing to change
             }
@@ -119,7 +119,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
             }
         }
         // B - L
-        else if ((dur1 == DUR_BR) && (dur2 == DUR_LG)) {
+        else if ((dur1 == DURATION_breve) && (dur2 == DURATION_long)) {
             if (up) {
                 ligature->m_drawingShapes.at(n2) = LIGATURE_STEM_RIGHT_DOWN;
             }
@@ -133,11 +133,11 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
             }
         }
         // SB - SB
-        else if ((dur1 == DUR_1) && (dur2 == DUR_1)) {
+        else if ((dur1 == DURATION_1) && (dur2 == DURATION_1)) {
             ligature->m_drawingShapes.at(n1) = LIGATURE_STEM_LEFT_UP;
         }
         // SB - L (this should not happen on the first two notes, but this is an encoding problem)
-        else if ((dur1 == DUR_1) && (dur2 == DUR_LG)) {
+        else if ((dur1 == DURATION_1) && (dur2 == DURATION_long)) {
             if (up) {
                 ligature->m_drawingShapes.at(n2) = LIGATURE_STEM_RIGHT_DOWN;
             }
@@ -146,7 +146,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
             }
         }
         // SB - B (this should not happen on the first two notes, but this is an encoding problem)
-        else if ((dur1 == DUR_1) && (dur2 == DUR_BR)) {
+        else if ((dur1 == DURATION_1) && (dur2 == DURATION_breve)) {
             if (up) {
                 // nothing to change
             }
@@ -168,7 +168,7 @@ FunctorCode CalcLigatureOrNeumePosFunctor::VisitLigature(Ligature *ligature)
         }
 
         // With mensural black notation, stack longa going up
-        if (isLastNote && isMensuralBlack && (dur2 == DUR_LG) && up) {
+        if (isLastNote && isMensuralBlack && (dur2 == DURATION_long) && up) {
             // Stack only if at least a third
             int stackThreshold = 1;
             // If the previous was going down, adjust the threshold
