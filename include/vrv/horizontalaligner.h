@@ -68,7 +68,8 @@ class Fraction {
 
 public:
     // Constructors - make them explicit to avoid type conversion
-    explicit Fraction(int num = 0, int denom = 1);
+    explicit Fraction();
+    explicit Fraction(int num, int denom = 1);
     explicit Fraction(data_DURATION duration);
 
     // Enable implicit conversion constructor for `int`

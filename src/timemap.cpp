@@ -37,17 +37,22 @@ void Timemap::Reset()
     m_map.clear();
 }
 
-void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasures)
+void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
 {
     double currentTempo = -1000.0;
     double newTempo;
 
     jsonxx::Array timemap;
 
-    for (auto &[tstamp, entry] : m_map) {
+    for (auto &[qstamp, entry] : m_map) {
         jsonxx::Object o;
-        o << "tstamp" << tstamp;
-        o << "qstamp" << entry.qstamp;
+        if (useFractions) {
+            o << "qstamp" << Timemap::ToArray(qstamp);
+        }
+        else {
+            o << "qstamp" << qstamp.ToDouble();
+        }
+        o << "tstamp" << entry.tstamp;
 
         // on / off
         if (!entry.notesOn.empty()) {
@@ -92,6 +97,14 @@ void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasure
         timemap << o;
     }
     output = timemap.json();
+}
+
+jsonxx::Array Timemap::ToArray(const Fraction &fraction)
+{
+    jsonxx::Array array;
+    array << fraction.GetNumerator();
+    array << fraction.GetDenominator();
+    return array;
 }
 
 } // namespace vrv

@@ -539,7 +539,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     }
 }
 
-bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures)
+bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions)
 {
     if (!this->HasTimemap()) {
         // generate MIDI timemap before progressing
@@ -555,7 +555,7 @@ bool Doc::ExportTimemap(std::string &output, bool includeRests, bool includeMeas
     generateTimemap.SetCueExclusion(this->GetOptions()->m_midiNoCue.GetValue());
     this->Process(generateTimemap);
 
-    timemap.ToJson(output, includeRests, includeMeasures);
+    timemap.ToJson(output, includeRests, includeMeasures, useFractions);
 
     return true;
 }
