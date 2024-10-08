@@ -760,4 +760,77 @@ FunctorCode ConvertMarkupScoreDefFunctor::VisitScoreDefElementEnd(ScoreDefElemen
     return FUNCTOR_CONTINUE;
 }
 
+//----------------------------------------------------------------------------
+// ConvertToMensuralViewFunctor
+//----------------------------------------------------------------------------
+
+ConvertToMensuralViewFunctor::ConvertToMensuralViewFunctor(Doc *doc) : DocFunctor(doc)
+{
+    m_viewLayer = NULL;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitEditorialElement(EditorialElement *editorialElement)
+{
+    // We are not in a layer yet
+    if (!m_viewLayer) return FUNCTOR_CONTINUE;
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitLayer(Layer *layer)
+{
+    assert(!m_viewLayer);
+    assert(m_stack.empty());
+
+    m_viewLayer = new Layer();
+    m_viewLayer->SetN(layer->GetN());
+    m_stack.push_back(m_viewLayer);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitLayerEnd(Layer *layer)
+{
+    layer->GetParent()->ReplaceChild(layer, m_viewLayer);
+    // This will delete all editorial markup and ligatures in the old layer
+    delete layer;
+
+    // We should have only the m_layerView left
+    assert(m_stack.size() == 1);
+    m_viewLayer = NULL;
+    m_stack.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitLayerElement(LayerElement *layerElement)
+{
+    // The stack top it either the new layer or the parent element within editorial markup
+    if (m_stack.back() != layerElement->GetParent()) {
+        layerElement->MoveItselfTo(m_stack.back());
+    }
+
+    m_stack.push_back(layerElement);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitLayerElementEnd(LayerElement *layerElement)
+{
+    m_stack.pop_back();
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitLigature(Ligature *ligature)
+{
+    // For now simply skip them - eventually we might want to add brackets
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode ConvertToMensuralViewFunctor::VisitLigatureEnd(Ligature *ligature)
+{
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

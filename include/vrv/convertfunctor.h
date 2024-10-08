@@ -340,6 +340,55 @@ private:
     ScoreDefElement *m_currentScoreDef;
 };
 
+//----------------------------------------------------------------------------
+// ConvertToMensuralViewFunctor
+//----------------------------------------------------------------------------
+
+/**
+ * This class moves scoreDef clef, keySig, meterSig and mensur to staffDef.
+ * When a staffDef already has one, it is not replaced.
+ */
+class ConvertToMensuralViewFunctor : public DocFunctor {
+public:
+    /**
+     * @name Constructors, destructors
+     */
+    ///@{
+    ConvertToMensuralViewFunctor(Doc *doc);
+    virtual ~ConvertToMensuralViewFunctor() = default;
+    ///@}
+
+    /*
+     * Abstract base implementation
+     */
+    bool ImplementsEndInterface() const override { return true; }
+
+    /*
+     * Functor interface
+     */
+    ///@{
+    FunctorCode VisitEditorialElement(EditorialElement *editorialElement) override;
+    FunctorCode VisitLayer(Layer *layer) override;
+    FunctorCode VisitLayerEnd(Layer *layer) override;
+    FunctorCode VisitLayerElement(LayerElement *layerElement) override;
+    FunctorCode VisitLayerElementEnd(LayerElement *layerElement) override;
+    FunctorCode VisitLigature(Ligature *ligature) override;
+    FunctorCode VisitLigatureEnd(Ligature *ligature) override;
+    ///@}
+
+protected:
+    //
+private:
+    //
+public:
+    //
+private:
+    /** The layer view we are flattening the content to */
+    Layer *m_viewLayer;
+    /** The stack of current objects */
+    ListOfObjects m_stack;
+};
+
 } // namespace vrv
 
 #endif // __VRV_CONVERTFUNCTOR_H__

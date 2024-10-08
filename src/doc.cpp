@@ -1399,13 +1399,23 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 }
 
+void Doc::ConvertToMensuralViewDoc()
+{
+    if (this->IsCastOff()) {
+        LogDebug("Document is cast off");
+        return;
+    }
+
+    ConvertToMensuralViewFunctor convertToMensuralView(this);
+    this->Process(convertToMensuralView);
+}
+
 void Doc::ConvertMensuralToCmnDoc()
 {
     if (this->IsCastOff()) {
         LogDebug("Document is cast off");
         return;
     }
-    
 }
 
 void Doc::SyncFromFacsimileDoc()
