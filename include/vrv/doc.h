@@ -371,6 +371,11 @@ public:
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertMarkupDoc(bool permanent = true);
+    
+    /**
+     * Convert the doc from mensural to CMN.
+     */
+    void ConvertMensuralToCmnDoc();
 
     /**
      * Sync the coordinate provided trought <facsimile> to m_drawingFacsX/Y.

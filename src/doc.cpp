@@ -1396,6 +1396,15 @@ void Doc::ConvertMarkupDoc(bool permanent)
     }
 }
 
+void Doc::ConvertMensuralToCmnDoc()
+{
+    if (this->IsCastOff()) {
+        LogDebug("Document is cast off");
+        return;
+    }
+    
+}
+
 void Doc::SyncFromFacsimileDoc()
 {
     PrepareFacsimileFunctor prepareFacsimile(this->GetFacsimile());
