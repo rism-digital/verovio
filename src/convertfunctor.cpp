@@ -783,7 +783,7 @@ FunctorCode ConvertToMensuralViewFunctor::VisitLayer(Layer *layer)
     assert(m_stack.empty());
 
     m_viewLayer = new Layer();
-    m_viewLayer->SetN(layer->GetN());
+    layer->CopyAttributesTo(m_viewLayer);
     m_stack.push_back(m_viewLayer);
 
     return FUNCTOR_CONTINUE;
