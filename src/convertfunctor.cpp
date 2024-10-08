@@ -220,14 +220,14 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitBarLine(BarLine *barLine)
         }
         m_targetSubSystem->AddChild(m_targetMeasure);
         // Add a staff with same attributes as in the previous segment
-        m_targetStaff = new Staff(*m_targetStaff);
-        m_targetStaff->ClearChildren();
-        m_targetStaff->CloneReset();
+        Staff *staff = new Staff();
+        m_targetStaff->CopyAttributesTo(staff);
+        m_targetStaff = staff;
         m_targetMeasure->AddChild(m_targetStaff);
         // Add a layer also with the same attributes as in the previous segment
-        m_targetLayer = new Layer(*m_targetLayer);
-        m_targetLayer->ClearChildren();
-        m_targetLayer->CloneReset();
+        Layer *layer = new Layer();
+        m_targetLayer->CopyAttributesTo(layer);
+        m_targetLayer = layer;
         m_targetStaff->AddChild(m_targetLayer);
     }
     // Second case: retrieve the appropriate segment
@@ -240,17 +240,16 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitBarLine(BarLine *barLine)
         AttNIntegerComparison comparisonStaffN(STAFF, m_targetStaff->GetN());
         Staff *staff = vrv_cast<Staff *>(m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
         if (!staff) {
-            staff = new Staff(*m_targetStaff);
-            staff->ClearChildren();
-            staff->CloneReset();
+            staff = new Staff();
+            m_targetStaff->CopyAttributesTo(staff);
             m_targetMeasure->AddChild(staff);
         }
         m_targetStaff = staff;
 
         // Add a new layer as the new target
-        m_targetLayer = new Layer(*m_targetLayer);
-        m_targetLayer->ClearChildren();
-        m_targetLayer->CloneReset();
+        Layer *layer = new Layer();
+        m_targetLayer->CopyAttributesTo(layer);
+        m_targetLayer = layer;
         m_targetStaff->AddChild(m_targetLayer);
     }
     ++m_segmentIdx;
@@ -262,9 +261,8 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitLayer(Layer *layer)
 {
     m_contentLayer = layer;
 
-    m_targetLayer = new Layer(*layer);
-    m_targetLayer->ClearChildren();
-    m_targetLayer->CloneReset();
+    m_targetLayer = new Layer();
+    layer->CopyAttributesTo(m_targetLayer);
     // Keep the xml:id of the layer in the first segment
     m_targetLayer->SwapID(layer);
     assert(m_targetStaff);
@@ -353,9 +351,8 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitScoreDef(ScoreDef *scoreDef)
 
 FunctorCode ConvertToCastOffMensuralFunctor::VisitStaff(Staff *staff)
 {
-    m_targetStaff = new Staff(*staff);
-    m_targetStaff->ClearChildren();
-    m_targetStaff->CloneReset();
+    m_targetStaff = new Staff();
+    staff->CopyAttributesTo(m_targetStaff);
     // Keep the xml:id of the staff in the first staff segment
     m_targetStaff->SwapID(staff);
     assert(m_targetMeasure);
@@ -384,14 +381,14 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitSyllable(Syllable *syllable)
         m_targetMeasure = new Measure(UNMEASURED);
         m_targetSubSystem->AddChild(m_targetMeasure);
         // Add a staff with same attributes as in the previous segment
-        m_targetStaff = new Staff(*m_targetStaff);
-        m_targetStaff->ClearChildren();
-        m_targetStaff->CloneReset();
+        Staff *staff = new Staff();
+        m_targetStaff->CopyAttributesTo(staff);
+        m_targetStaff = staff;
         m_targetMeasure->AddChild(m_targetStaff);
         // Add a layer also with the same attributes as in the previous segment
-        m_targetLayer = new Layer(*m_targetLayer);
-        m_targetLayer->ClearChildren();
-        m_targetLayer->CloneReset();
+        Layer *layer = new Layer();
+        m_targetLayer->CopyAttributesTo(layer);
+        m_targetLayer = layer;
         m_targetStaff->AddChild(m_targetLayer);
     }
     // Second case: retrieve the appropriate segment
@@ -404,17 +401,16 @@ FunctorCode ConvertToCastOffMensuralFunctor::VisitSyllable(Syllable *syllable)
         AttNIntegerComparison comparisonStaffN(STAFF, m_targetStaff->GetN());
         Staff *staff = vrv_cast<Staff *>(m_targetMeasure->FindDescendantByComparison(&comparisonStaffN));
         if (!staff) {
-            staff = new Staff(*m_targetStaff);
-            staff->ClearChildren();
-            staff->CloneReset();
+            staff = new Staff();
+            m_targetStaff->CopyAttributesTo(staff);
             m_targetMeasure->AddChild(staff);
         }
         m_targetStaff = staff;
 
         // Add a new layer as the new target
-        m_targetLayer = new Layer(*m_targetLayer);
-        m_targetLayer->ClearChildren();
-        m_targetLayer->CloneReset();
+        Layer *layer = new Layer();
+        m_targetLayer->CopyAttributesTo(layer);
+        m_targetLayer = layer;
         m_targetStaff->AddChild(m_targetLayer);
     }
     syllable->MoveItselfTo(m_targetLayer);
