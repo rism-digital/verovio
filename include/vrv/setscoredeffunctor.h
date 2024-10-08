@@ -136,6 +136,7 @@ public:
     FunctorCode VisitMeasure(Measure *measure) override;
     FunctorCode VisitMensur(Mensur *mensur) override;
     FunctorCode VisitPage(Page *page) override;
+    FunctorCode VisitProport(Proport *proport) override;
     FunctorCode VisitScore(Score *score) override;
     FunctorCode VisitScoreDef(ScoreDef *scoreDef) override;
     FunctorCode VisitStaff(Staff *staff) override;

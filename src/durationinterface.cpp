@@ -136,9 +136,6 @@ Fraction DurationInterface::GetInterfaceAlignmentMensuralDuration(
     } // Any other case (minor, perfecta in tempus perfectum, and imperfecta in tempus imperfectum) follows the
       // mensuration and has no @num and @numbase attributes
 
-    if (currentMensur->HasNum()) num *= currentMensur->GetNum();
-    if (currentMensur->HasNumbase()) numBase *= currentMensur->GetNumbase();
-
     int ratio = 0;
     Fraction duration(DURATION_breve);
     switch (noteDur) {

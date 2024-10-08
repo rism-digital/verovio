@@ -230,6 +230,15 @@ FunctorCode ScoreDefSetCurrentFunctor::VisitPage(Page *page)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode ScoreDefSetCurrentFunctor::VisitProport(Proport *proport)
+{
+    assert(m_currentStaffDef);
+    StaffDef *upcomingStaffDef = m_upcomingScoreDef.GetStaffDef(m_currentStaffDef->GetN());
+    assert(upcomingStaffDef);
+    upcomingStaffDef->SetCurrentProport(proport);
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode ScoreDefSetCurrentFunctor::VisitScore(Score *score)
 {
     m_currentScore = score;

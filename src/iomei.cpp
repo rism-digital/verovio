@@ -2522,6 +2522,13 @@ void MEIOutput::WriteGenericLayerElement(pugi::xml_node currentNode, GenericLaye
 
     currentNode.set_name(element->GetMEIName().c_str());
 
+    // Reparse the original content stored as a string document
+    pugi::xml_document content;
+    content.load_string(element->GetContent().c_str());
+    for (pugi::xml_node child : content.first_child().children()) {
+        currentNode.append_copy(child);
+    }
+
     this->WriteLayerElement(currentNode, element);
 }
 
@@ -2796,6 +2803,8 @@ void MEIOutput::WriteProport(pugi::xml_node currentNode, Proport *proport)
     assert(proport);
 
     this->WriteLayerElement(currentNode, proport);
+
+    proport->WriteDurationRatio(currentNode);
 }
 
 void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
@@ -6263,6 +6272,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "fTrem") {
             success = this->ReadFTrem(parent, xmlElement);
         }
+        else if (elementName == "gap") {
+            success = this->ReadGenericLayerElement(parent, xmlElement);
+        }
         else if (elementName == "graceGrp") {
             success = this->ReadGraceGrp(parent, xmlElement);
         }
@@ -6655,6 +6667,13 @@ bool MEIInput::ReadGenericLayerElement(Object *parent, pugi::xml_node element)
 {
     GenericLayerElement *vrvElement = new GenericLayerElement(element.name());
     this->ReadLayerElement(element, vrvElement);
+
+    // Store the content as a string document
+    pugi::xml_document content;
+    content.append_copy(element);
+    std::ostringstream oss;
+    content.save(oss);
+    vrvElement->SetContent(oss.str());
 
     parent->AddChild(vrvElement);
     this->ReadUnsupportedAttr(element, vrvElement);
