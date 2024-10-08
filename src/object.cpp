@@ -394,6 +394,36 @@ int Object::GetDescendantCount(const ClassId classId) const
     return (int)objects.size();
 }
 
+void Object::CopyAttributesTo(Object *target) const
+{
+    assert(this->GetClassId() == target->GetClassId());
+    
+    AttModule::CopyAnalytical(this, target);
+    AttModule::CopyCmn(this, target);
+    AttModule::CopyCmnornaments(this, target);
+    AttModule::CopyCritapp(this, target);
+    // AttModule::CopyEdittrans(this, target);
+    AttModule::CopyExternalsymbols(this, target);
+    AttModule::CopyFrettab(this, target);
+    AttModule::CopyFacsimile(this, target);
+    // AttModule::CopyFigtable(this, target);
+    // AttModule::CopyFingering(this, target);
+    AttModule::CopyGestural(this, target);
+    // AttModule::CopyHarmony(this, target);
+    // AttModule::CopyHeader(this, target);
+    AttModule::CopyMei(this, target);
+    AttModule::CopyMensural(this, target);
+    AttModule::CopyMidi(this, target);
+    AttModule::CopyNeumes(this, target);
+    AttModule::CopyPagebased(this, target);
+    // AttModule::CopyPerformance(this, target);
+    AttModule::CopyShared(this, target);
+    // AttModule::CopyUsersymbols(this, target);
+    AttModule::CopyVisual(this, target);
+    
+    target->m_unsupported = this->m_unsupported;
+}
+
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
