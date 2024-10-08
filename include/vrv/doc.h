@@ -371,7 +371,12 @@ public:
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
     void ConvertMarkupDoc(bool permanent = true);
-    
+
+    /**
+     * Convert the doc from mensural to a flattened version with no ligatures and the selected editorial markup.
+     */
+    void ConvertToMensuralViewDoc();
+
     /**
      * Convert the doc from mensural to CMN.
      */
