@@ -4065,6 +4065,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
             m_doc->ExpandExpansions();
         }
 
+        if (success && m_doc->IsMensuralMusicOnly() && m_doc->GetOptions()->m_mensuralReducedView.GetValue()) {
+            m_doc->ConvertToMensuralViewDoc();
+        }
+
         if (success) {
             m_doc->ConvertToPageBasedDoc();
             m_doc->ConvertMarkupDoc(!m_doc->GetOptions()->m_preserveAnalyticalMarkup.GetValue());

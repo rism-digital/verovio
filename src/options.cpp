@@ -1823,6 +1823,11 @@ Options::Options()
     m_ligatureAsBracket.Init(false);
     this->Register(&m_ligatureAsBracket, "ligatureAsBracket", &m_mensural);
 
+    m_mensuralReducedView.SetInfo(
+        "Mensural reduced view", "Convert mensural content to a view reduced to the seleceted markup");
+    m_mensuralReducedView.Init(false);
+    this->Register(&m_mensuralReducedView, "mensuralReducedView", &m_mensural);
+
     m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);

@@ -840,6 +840,7 @@ public:
     OptionGrp m_mensural;
 
     OptionBool m_ligatureAsBracket;
+    OptionBool m_mensuralReducedView;
     OptionBool m_mensuralToMeasure;
 
     /**
