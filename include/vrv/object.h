@@ -293,6 +293,13 @@ public:
     ArrayOfObjects &GetChildrenForModification() { return m_children; }
 
     /**
+     * Copy all the attributes of an obejct to target.
+     * The object must be of the same ClassId.
+     * Unsupported attrbutes are also copied.
+     */
+    void CopyAttributesTo(Object *target) const;
+    
+    /**
      * Fill an array of pairs with all attributes and their values.
      * Return the number of attributes found.
      */
