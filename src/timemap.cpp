@@ -47,7 +47,7 @@ void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasure
     for (auto &[qstamp, entry] : m_map) {
         jsonxx::Object o;
         if (useFractions) {
-            o << "qstamp" << Timemap::ToArray(qstamp);
+            o << "qfrac" << Timemap::ToArray(qstamp);
         }
         else {
             o << "qstamp" << qstamp.ToDouble();
@@ -85,7 +85,7 @@ void Timemap::ToJson(std::string &output, bool includeRests, bool includeMeasure
             newTempo = entry.tempo;
             if (newTempo != currentTempo) {
                 currentTempo = newTempo;
-                o << "tempo" << std::to_string(currentTempo);
+                o << "tempo" << currentTempo;
             }
         }
 
