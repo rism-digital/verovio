@@ -503,6 +503,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
                 midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetUnit());
             }
+            else if (meterSig && meterSig->HasSym()) {
+                midiFile->addTimeSignature(midiTrack, 0, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+            }
         }
 
         // Set initial scoreDef values for tuning

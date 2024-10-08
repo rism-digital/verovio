@@ -776,6 +776,10 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
         if (meterSig && meterSig->HasCount() && meterSig->HasUnit()) {
             m_midiFile->addTimeSignature(m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetUnit());
         }
+        else if (meterSig && meterSig->HasUnit()) {
+            m_midiFile->addTimeSignature(
+                m_midiTrack, currentTick, meterSig->GetTotalCount(), meterSig->GetSymImplicitUnit());
+        }
     }
 
     return FUNCTOR_CONTINUE;
