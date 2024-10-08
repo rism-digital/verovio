@@ -239,7 +239,7 @@ public:
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
     bool DrawKeySig() const { return (m_drawKeySig); }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() const { return (m_drawMensur && (m_currentMensur.HasSign() || m_currentMensur.HasNum())); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() const
     {
