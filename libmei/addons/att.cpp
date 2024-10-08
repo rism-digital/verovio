@@ -32,7 +32,9 @@ std::string Att::StrToStr(std::string str) const
 
 std::string Att::DblToStr(double data) const
 {
-    return StringFormat("%.10g", round(data * 10000.0) / 10000.0);
+    std::stringstream sstream;
+    sstream << round(data * 10000.0) / 10000.0;
+    return sstream.str();
 }
 
 std::string Att::IntToStr(int data) const
@@ -365,7 +367,9 @@ data_KEYSIGNATURE Att::StrToKeysignature(const std::string &value, bool logWarni
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 {
-    return StringFormat("%dm+%.10g", data.first, round(data.second * 10000.0) / 10000.0);
+    std::stringstream sstream;
+    sstream << data.first << "m+" << round(data.second * 10000.0) / 10000.0;
+    return sstream.str();
 }
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool) const
