@@ -397,7 +397,7 @@ int Object::GetDescendantCount(const ClassId classId) const
 void Object::CopyAttributesTo(Object *target) const
 {
     assert(this->GetClassId() == target->GetClassId());
-    
+
     AttModule::CopyAnalytical(this, target);
     AttModule::CopyCmn(this, target);
     AttModule::CopyCmnornaments(this, target);
@@ -420,7 +420,7 @@ void Object::CopyAttributesTo(Object *target) const
     AttModule::CopyShared(this, target);
     // AttModule::CopyUsersymbols(this, target);
     AttModule::CopyVisual(this, target);
-    
+
     target->m_unsupported = this->m_unsupported;
 }
 

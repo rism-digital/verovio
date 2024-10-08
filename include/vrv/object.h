@@ -298,7 +298,7 @@ public:
      * Unsupported attrbutes are also copied.
      */
     void CopyAttributesTo(Object *target) const;
-    
+
     /**
      * Fill an array of pairs with all attributes and their values.
      * Return the number of attributes found.
