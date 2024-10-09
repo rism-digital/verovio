@@ -1300,7 +1300,7 @@ void Doc::ConvertToCastOffMensuralDoc(bool castOff)
     }
 
     // Make sure the document is not cast-off
-    this->UnCastOffDoc();
+    if (this->IsCastOff()) this->UnCastOffDoc();
 
     this->ScoreDefSetCurrentDoc();
 
