@@ -816,6 +816,9 @@ bool Toolkit::LoadData(const std::string &data, bool resetLogBuffer)
 
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
+        if (m_options->m_mensuralResponsiveView.GetValue()) {
+            m_doc.ConvertToMensuralViewDoc();
+        }
         m_doc.ConvertToCastOffMensuralDoc(true);
     }
 
