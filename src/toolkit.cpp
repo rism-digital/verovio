@@ -367,7 +367,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     /// Loading a UTF-16 file with basic conversion ot UTF-8
     /// This is called after checking if the file has a UTF-16 BOM
 
-    LogWarning("The file seems to be UTF-16 - trying to convert to UTF-8");
+    LogInfo("The file seems to be UTF-16 - trying to convert to UTF-8");
 
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -385,7 +385,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
     // order of the bytes has to be flipped
     if (u16data.at(0) == u'\uFFFE') {
-        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        LogInfo("The file seems to have been loaded as little endian - trying to convert to big endian");
         // convert to big endian (swap bytes)
         std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
             auto p = reinterpret_cast<char *>(&c);
