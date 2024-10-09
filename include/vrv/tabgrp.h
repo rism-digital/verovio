@@ -29,6 +29,7 @@ public:
     ///@{
     TabGrp();
     virtual ~TabGrp();
+    Object *Clone() const override { return new TabGrp(*this); }
     void Reset() override;
     std::string GetClassName() const override { return "TabGrp"; }
     ///@}

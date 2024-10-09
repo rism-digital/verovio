@@ -1252,9 +1252,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
         staff->SetFromFacsimile(m_doc);
     }
 
-    if (staffDef && (staffDef->GetLinesVisible() != BOOLEAN_false)) {
-        this->DrawStaffLines(dc, staff, measure, system);
-    }
+    this->DrawStaffLines(dc, staff, staffDef, measure, system);
 
     if (staffDef && (m_doc->GetType() != Facs)) {
         this->DrawStaffDef(dc, staff, measure);
@@ -1284,7 +1282,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     dc->EndGraphic(staff, this);
 }
 
-void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system)
+void View::DrawStaffLines(DeviceContext *dc, Staff *staff, StaffDef *staffDef, Measure *measure, System *system)
 {
     assert(dc);
     assert(staff);
@@ -1307,35 +1305,50 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetPen(m_currentColor, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColor, AxSOLID);
 
-    for (j = 0; j < staff->m_drawingLines; ++j) {
-        // Skewed lines - with Facs (neumes) only for now
-        if (y1 != y2) {
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
-            // For drawing rectangles instead of lines
-            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        }
-        else {
-            const bool isFrenchOrItalianTablature = (staff->IsTabLuteFrench() || staff->IsTabLuteItalian());
-            SegmentedLine line(x1, x2);
-            // We do not need to do this during layout calculation - and only with tablature but not for French or
-            // Italian tablature
-            if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrItalianTablature) {
-                Object fullLine;
-                fullLine.SetParent(system);
-                fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
-                fullLine.UpdateContentBBoxX(x1, x2);
-                int margin = m_doc->GetDrawingUnit(100) / 2;
-                ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
-                for (Object *note : notes) {
-                    if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
-                        line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+    // If German lute tablature the default is @lines.visible="false", but setting @lines.visible="true"
+    // will draw the staff lines.
+    // For anything other than German lute tablature the default is @lines.visible="true"
+    if (staff->IsTabLuteGerman() && staffDef->GetLinesVisible() != BOOLEAN_true) {
+        // German tablature has no staff, just a single base line
+        // But internally we maintain the fiction of an invisible staff as a coordinate system
+        SegmentedLine line(x1, x2);
+        // Issue #3589 move base line slightly further down and reduce thickness
+        y1 -= (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * staff->m_drawingLines) * 11 / 10;
+        this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth / 2);
+    }
+    else if (staffDef->GetLinesVisible() != BOOLEAN_false) {
+        // draw staff lines
+        for (j = 0; j < staff->m_drawingLines; ++j) {
+            // Skewed lines - with Facs (neumes) only for now
+            if (y1 != y2) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+                // For drawing rectangles instead of lines
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            }
+            else {
+                const bool isFrenchOrGermanOrItalianTablature
+                    = (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian());
+                SegmentedLine line(x1, x2);
+                // We do not need to do this during layout calculation - and only with guitar tablature but not for
+                // French, German or Italian lute tablature
+                if (!dc->Is(BBOX_DEVICE_CONTEXT) && staff->IsTablature() && !isFrenchOrGermanOrItalianTablature) {
+                    Object fullLine;
+                    fullLine.SetParent(system);
+                    fullLine.UpdateContentBBoxY(y1 + (lineWidth / 2), y1 - (lineWidth / 2));
+                    fullLine.UpdateContentBBoxX(x1, x2);
+                    int margin = m_doc->GetDrawingUnit(100) / 2;
+                    ListOfObjects notes = staff->FindAllDescendantsByType(NOTE, false);
+                    for (Object *note : notes) {
+                        if (note->VerticalContentOverlap(&fullLine, margin / 2)) {
+                            line.AddGap(note->GetContentLeft() - margin, note->GetContentRight() + margin);
+                        }
                     }
                 }
+                this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
+                y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y2 = y1;
             }
-            this->DrawHorizontalSegmentedLine(dc, y1, line, lineWidth);
-            y1 -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            y2 = y1;
         }
     }
 
