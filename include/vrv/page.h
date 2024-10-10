@@ -166,9 +166,9 @@ private:
     void AdjustSylSpacingByVerse(const IntTree &verseTree, Doc *doc);
 
     /**
-     * Check whether vertical justification is required for the current page
+     * Reduces the justifiable height based on the --justification-max-vertical option
      */
-    bool IsJustificationRequired(const Doc *doc);
+    void ReduceJustifiableHeight(const Doc *doc);
 
     //
 public:

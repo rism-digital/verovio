@@ -626,8 +626,7 @@ void Page::JustifyVertically()
         return;
     }
 
-    // Ignore vertical justification if it's not required
-    if (!this->IsJustificationRequired(doc)) return;
+    this->ReduceJustifiableHeight(doc);
 
     // Justify Y position
     JustifyYFunctor justifyY(doc);
@@ -643,42 +642,25 @@ void Page::JustifyVertically()
     }
 }
 
-bool Page::IsJustificationRequired(const Doc *doc)
+void Page::ReduceJustifiableHeight(const Doc *doc)
 {
     const Pages *pages = doc->GetPages();
     assert(pages);
 
-    const int childSystems = this->GetChildCount(SYSTEM);
-    // Last page and justification of last page is not enabled
+    double maxRatio = doc->GetOptions()->m_justificationMaxVertical.GetValue();
+    // Special handling for justification of last page
     if (pages->GetLast() == this) {
-        const int idx = this->GetIdx();
-        if (idx > 0) {
-            const Page *previousPage = dynamic_cast<const Page *>(pages->GetPrevious(this));
-            assert(previousPage);
-            const int previousJustifiableHeight = previousPage->m_drawingJustifiableHeight;
-            const int previousJustificationSum = previousPage->m_justificationSum;
-
-            if (previousJustifiableHeight < m_drawingJustifiableHeight) {
-                m_drawingJustifiableHeight = previousJustifiableHeight;
-            }
-
-            const int maxSystemsPerPage = doc->GetOptions()->m_systemMaxPerPage.GetValue();
-            if ((childSystems <= 2) || (childSystems < maxSystemsPerPage)) {
-                m_justificationSum = previousJustificationSum;
+        const Page *previousPage = vrv_cast<const Page *>(pages->GetPrevious(this, PAGE));
+        if (previousPage) {
+            const int systemCount = this->GetChildCount(SYSTEM);
+            const int previousSystemCount = previousPage->GetChildCount(SYSTEM);
+            if (systemCount < previousSystemCount) {
+                maxRatio *= (double)systemCount / (double)previousSystemCount;
             }
         }
-        else {
-            const int stavesPerSystem = m_drawingScoreDef.GetDescendantCount(STAFFDEF);
-            if (childSystems * stavesPerSystem < 8) return false;
-        }
-    }
-    const double ratio = (double)m_drawingJustifiableHeight / (double)doc->m_drawingPageHeight;
-    if (ratio > doc->GetOptions()->m_justificationMaxVertical.GetValue()) {
-        m_drawingJustifiableHeight
-            = doc->m_drawingPageHeight * doc->GetOptions()->m_justificationMaxVertical.GetValue();
     }
 
-    return true;
+    m_drawingJustifiableHeight = std::min<int>(doc->m_drawingPageHeight * maxRatio, m_drawingJustifiableHeight);
 }
 
 void Page::LayOutPitchPos()
