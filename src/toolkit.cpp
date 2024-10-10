@@ -1799,6 +1799,7 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
     bool includeMeasures = false;
     bool includeRests = false;
+    bool useFractions = false;
 
     jsonxx::Object json;
 
@@ -1811,13 +1812,14 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
             if (json.has<jsonxx::Boolean>("includeMeasures"))
                 includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
             if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+            if (json.has<jsonxx::Boolean>("useFractions")) useFractions = json.get<jsonxx::Boolean>("useFractions");
         }
     }
 
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output, includeRests, includeMeasures);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures, useFractions);
     return output;
 }
 

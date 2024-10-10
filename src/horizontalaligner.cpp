@@ -38,6 +38,12 @@ namespace vrv {
 // Fraction
 //----------------------------------------------------------------------------
 
+Fraction::Fraction()
+{
+    m_numerator = 0;
+    m_denominator = 1;
+}
+
 Fraction::Fraction(int num, int denom) : m_numerator(num), m_denominator(denom)
 {
     if (denom == 0) {
