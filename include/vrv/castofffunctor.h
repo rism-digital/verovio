@@ -136,7 +136,11 @@ public:
 protected:
     //
 private:
-    //
+    /*
+     * Returns the available height for system drawing on the current page
+     */
+    int GetAvailableDrawingHeight() const;
+
 public:
     //
 private:
@@ -144,6 +148,8 @@ private:
     Page *m_contentPage;
     // The current page
     Page *m_currentPage;
+    // Indicates whether the current page is the first
+    bool m_firstCastOffPage;
     // The cumulated shift (m_drawingYRel of the first system of the current page)
     int m_shift;
     // The page heights

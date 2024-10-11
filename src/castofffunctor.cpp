@@ -278,7 +278,8 @@ CastOffPagesFunctor::CastOffPagesFunctor(Page *contentPage, Doc *doc, Page *curr
 {
     m_contentPage = contentPage;
     m_currentPage = currentPage;
-    m_shift = 0;
+    m_firstCastOffPage = true;
+    m_shift = VRV_UNSET;
     m_pageHeight = 0;
     m_pgHeadHeight = 0;
     m_pgFootHeight = 0;
@@ -341,19 +342,16 @@ FunctorCode CastOffPagesFunctor::VisitScore(Score *score)
 
 FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
 {
-    int currentShift = m_shift;
-    // We use m_pageHeadHeight to check if we have passed the first page already
-    if (m_pgHeadHeight != VRV_UNSET) {
-        currentShift += m_pgHeadHeight + m_pgFootHeight;
-    }
-    else {
-        currentShift += m_pgHead2Height + m_pgFoot2Height;
+    // Check if this is the first system
+    if (m_shift == VRV_UNSET) {
+        m_shift = system->GetDrawingYRel();
     }
 
     const int systemMaxPerPage = m_doc->GetOptions()->m_systemMaxPerPage.GetValue();
     const int systemChildCount = m_currentPage->GetChildCount(SYSTEM);
     if ((systemMaxPerPage && (systemMaxPerPage == systemChildCount))
-        || ((systemChildCount > 0) && (system->GetDrawingYRel() - system->GetHeight() - currentShift < 0))) {
+        || ((systemChildCount > 0)
+            && (m_shift - system->GetDrawingYRel() + system->GetHeight() > this->GetAvailableDrawingHeight()))) {
         // If this is the last system in the list, it doesn't fit the page and it's a leftover system (has just one
         // measure) => add the system content to the previous system
         Object *nextSystem = m_contentPage->GetNext(system, SYSTEM);
@@ -367,11 +365,10 @@ FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
         }
 
         m_currentPage = new Page();
-        // Use VRV_UNSET value as a flag
-        m_pgHeadHeight = VRV_UNSET;
         assert(m_doc->GetPages());
         m_doc->GetPages()->AddChild(m_currentPage);
-        m_shift = system->GetDrawingYRel() - m_pageHeight;
+        m_shift = system->GetDrawingYRel();
+        m_firstCastOffPage = false;
     }
 
     // First add all pending objects
@@ -389,6 +386,13 @@ FunctorCode CastOffPagesFunctor::VisitSystem(System *system)
     m_currentPage->AddChild(system);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int CastOffPagesFunctor::GetAvailableDrawingHeight() const
+{
+    const int pageHeadAndFootHeight
+        = m_firstCastOffPage ? (m_pgHeadHeight + m_pgFootHeight) : (m_pgHead2Height + m_pgFoot2Height);
+    return m_pageHeight - pageHeadAndFootHeight;
 }
 
 //----------------------------------------------------------------------------
