@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        faction.h
+// Name:        fraction.h
 // Author:      Laurent Pugin
 // Created:     2024
 // Copyright (c) Authors and others. All rights reserved.
