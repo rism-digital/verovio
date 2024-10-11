@@ -32,6 +32,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "elementpart.h"
+#include "fraction.h"
 #include "ftrem.h"
 #include "functor.h"
 #include "horizontalaligner.h"

@@ -14,7 +14,7 @@
 
 #include "atts_shared.h"
 #include "facsimileinterface.h"
-#include "horizontalaligner.h"
+#include "fraction.h"
 #include "linkinginterface.h"
 #include "object.h"
 
