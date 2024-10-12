@@ -143,13 +143,14 @@ ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDur
 
 void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
 {
-    for (ArrayOfElementDurPairs subseq : listOfSequences) {
-        ProcessBoundedSequences(subseq);
+    for (ArrayOfElementDurPairs sequence : listOfSequences) {
+        ProcessBoundedSequences(sequence);
     }
 }
 
 void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
 {
+    // Get the notes in the middle of the boundaries of the sequence
     ArrayOfElementDurPairs middleSeq = GetBoundedNotes(sequence);
 
     // Check if there are dots in the middleSeq and how many. The dots in the middleSeq are the only ones that have the

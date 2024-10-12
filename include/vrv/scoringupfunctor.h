@@ -50,8 +50,8 @@ public:
      */
     ///@{
     void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
-    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
     void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
+    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
     void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
     ///@}
 
@@ -59,8 +59,8 @@ public:
      * @name: Find the duration value of the note in minims
      */
     ///@{
-    double GetValueInMinims(const ArrayOfElementDurPairs &middleSeq);
     double GetValueInUnit(double valueInMinims, data_DURATION unit);
+    double GetValueInMinims(const ArrayOfElementDurPairs &middleSeq);
     double GetDurNumberValue(
         const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement);
     ///@}
