@@ -171,7 +171,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
         FindDurQuals(sequence, sum);
     }
     // 1. Single dot in middle sequence sequence
-    if (numberOfDots == 1) {
+    else if (numberOfDots == 1) {
         // If there is one dot,
         int dotInd = indecesOfDots.at(0);
         ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
@@ -183,8 +183,8 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
             // This other condition is to evaluate if it is a dot of division
             if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
                 // This is a dot of division
-                ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd };
-                ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 1, sequence.end() };
+                ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
+                ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
                 FindDurQuals(seq1, sum1);
                 FindDurQuals(seq2, sum2);
             }
