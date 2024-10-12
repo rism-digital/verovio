@@ -303,7 +303,7 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
 }
 
 double ScoringUpFunctor::GetDurNumberValue(
-    std::pair<LayerElement *, data_DURATION> elementDurPair, bool followedByDot, LayerElement *nextElement)
+    const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement)
 {
     data_DURQUALITY_mensural durquality;
     data_DURATION dur = elementDurPair.second;

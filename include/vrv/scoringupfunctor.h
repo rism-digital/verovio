@@ -56,8 +56,8 @@ public:
      * @name: Find the duration value of the note in minims
      */
     ///@{
-    double GetDurNumberValue(
-        std::pair<LayerElement *, data_DURATION> elementDurPair, bool followedByDot, LayerElement *nextElement);
+    double GetDurNumberValue(const
+        std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement);
     ///@}
 
     /**
