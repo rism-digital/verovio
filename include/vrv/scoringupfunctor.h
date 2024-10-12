@@ -41,7 +41,8 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
-    std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(const ArrayOfElementDurPairs &dursInVoiceSameMensur);
+    std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(
+        const ArrayOfElementDurPairs &dursInVoiceSameMensur);
     ///@}
 
     /**
@@ -56,8 +57,8 @@ public:
      * @name: Find the duration value of the note in minims
      */
     ///@{
-    double GetDurNumberValue(const
-        std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement);
+    double GetDurNumberValue(
+        const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement);
     ///@}
 
     /**

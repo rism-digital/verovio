@@ -104,7 +104,8 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
-std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequences(const ArrayOfElementDurPairs &dursInVoiceSameMensur)
+std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequences(
+    const ArrayOfElementDurPairs &dursInVoiceSameMensur)
 {
     std::vector<ArrayOfElementDurPairs> listOfBoundedSequences = {};
     ArrayOfElementDurPairs boundedSequence = {};
