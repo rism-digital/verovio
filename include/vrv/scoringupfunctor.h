@@ -50,6 +50,7 @@ public:
      */
     ///@{
     void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
+    ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
     void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
     void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
     ///@}

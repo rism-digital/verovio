@@ -124,17 +124,8 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
     return listOfBoundedSequences;
 }
 
-void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
-{
-    for (ArrayOfElementDurPairs subseq : listOfSequences) {
-        ProcessBoundedSequences(subseq);
-    }
-}
-
-void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
-{
+ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence) {
     ArrayOfElementDurPairs middleSeq = {};
-    
     if (sequence.size() >= 2) {
         data_DURATION firstNoteDur = sequence.at(0).second;
         if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
@@ -146,6 +137,19 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
             middleSeq = { sequence.begin() + 1, sequence.end() - 1 };
         }
     }
+    return middleSeq;
+}
+
+void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
+{
+    for (ArrayOfElementDurPairs subseq : listOfSequences) {
+        ProcessBoundedSequences(subseq);
+    }
+}
+
+void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
+{
+    ArrayOfElementDurPairs middleSeq = GetBoundedNotes(sequence);
 
     // Check if there are dots in the middleSeq and how many. The dots in the middleSeq are the only ones that have the
     // possibility of being a dot of imperfection (or alteration) or a dot of augmentation---the dots of perfection are
