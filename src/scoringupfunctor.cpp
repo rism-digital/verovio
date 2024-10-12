@@ -124,7 +124,8 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
     return listOfBoundedSequences;
 }
 
-ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence) {
+ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDurPairs &sequence)
+{
     ArrayOfElementDurPairs middleSeq = {};
     if (sequence.size() >= 2) {
         data_DURATION firstNoteDur = sequence.at(0).second;
@@ -181,11 +182,12 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
             // This other condition is to evaluate if it is a dot of division
             if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
                 // This is a dot of division
-                ArrayOfElementDurPairs seq1 ={sequence.begin(), sequence.begin() + dotInd };
+                ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd };
                 ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 1, sequence.end() };
                 FindDurQuals(seq1, sum1);
                 FindDurQuals(seq2, sum2);
-            } else {
+            }
+            else {
                 // This is a dot of augmentation
                 sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
                 FindDurQuals(sequence, sum);
@@ -208,8 +210,9 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     }
 }
 
-void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit) {
-    double sum = valueInSmallerUnit; //JUST IN THIS CASE
+void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit)
+{
+    double sum = valueInSmallerUnit; // JUST IN THIS CASE
     int remainder = (int)sum % 3;
 
     // CHECK SUM --> IS IT INTEGER when dot of division???
@@ -326,7 +329,8 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, doub
         }
     }
 }
-double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSeq){
+double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSeq)
+{
     // Value in minims:
     double sum = 0;
     bool followedByDot = false;
@@ -346,24 +350,28 @@ double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSe
     return sum;
 }
 
-double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit){
+double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit)
+{
     double valueInUnit = 0.0;
-    if (unit == DURATION_semibrevis){
+    if (unit == DURATION_semibrevis) {
         valueInUnit = valueInMinims / 2;
-        //imperfect mensur
-        //MISSING perfect mensur
-    } else if (unit == DURATION_brevis){
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    else if (unit == DURATION_brevis) {
         valueInUnit = valueInMinims / 4;
-        //imperfect mensur
-        //MISSING perfect mensur
-    } else if (unit == DURATION_longa){
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    else if (unit == DURATION_longa) {
         valueInUnit = valueInMinims / 8;
-        //imperfect mensur
-        //MISSING perfect mensur
-    } else if (unit == DURATION_maxima){
+        // imperfect mensur
+        // MISSING perfect mensur
+    }
+    else if (unit == DURATION_maxima) {
         valueInUnit = valueInMinims / 16;
-        //imperfect mensur
-        //MISSING perfect mensur
+        // imperfect mensur
+        // MISSING perfect mensur
     }
     return valueInUnit;
 }
