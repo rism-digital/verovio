@@ -41,7 +41,7 @@ public:
      * @name: Divide the notes of a voice into sequences to be processed individualy
      */
     ///@{
-    std::vector<ArrayOfElementDurPairs> SubdivideSeq(const ArrayOfElementDurPairs &dursInVoiceSameMensur);
+    std::vector<ArrayOfElementDurPairs> SubdivideIntoBoundedSequences(const ArrayOfElementDurPairs &dursInVoiceSameMensur);
     ///@}
 
     /**

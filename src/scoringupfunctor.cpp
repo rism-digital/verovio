@@ -47,7 +47,7 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     data_PROLATIO prolatio = m_currentMensur->GetProlatio();*/
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
-        m_listOfSequences = SubdivideSeq(m_dursInVoiceSameMensur);
+        m_listOfSequences = SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur);
         FindDurQuals(m_listOfSequences);
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
@@ -104,23 +104,23 @@ FunctorCode ScoringUpFunctor::VisitLayerElement(LayerElement *layerElement)
     return FUNCTOR_CONTINUE;
 }
 
-std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideSeq(const ArrayOfElementDurPairs &dursInVoiceSameMensur)
+std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequences(const ArrayOfElementDurPairs &dursInVoiceSameMensur)
 {
-    std::vector<ArrayOfElementDurPairs> listOfSequences = {};
-    ArrayOfElementDurPairs sequence = {};
+    std::vector<ArrayOfElementDurPairs> listOfBoundedSequences = {};
+    ArrayOfElementDurPairs boundedSequence = {};
     for (std::pair<LayerElement *, data_DURATION> elementDurPair : dursInVoiceSameMensur) {
         data_DURATION dur = elementDurPair.second;
         if (dur == DURATION_brevis || dur == DURATION_longa || dur == DURATION_maxima) {
-            sequence.insert(sequence.end(), elementDurPair);
-            listOfSequences.insert(listOfSequences.end(), sequence);
-            sequence = { elementDurPair };
+            boundedSequence.insert(boundedSequence.end(), elementDurPair);
+            listOfBoundedSequences.insert(listOfBoundedSequences.end(), boundedSequence);
+            boundedSequence = { elementDurPair };
         }
         else {
-            sequence.insert(sequence.end(), elementDurPair);
+            boundedSequence.insert(boundedSequence.end(), elementDurPair);
         }
         LogDebug("dur is:", dur);
     }
-    return listOfSequences;
+    return listOfBoundedSequences;
 }
 
 void ScoringUpFunctor::FindDurQuals(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
