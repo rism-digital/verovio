@@ -48,7 +48,7 @@ FunctorCode ScoringUpFunctor::VisitLayer(Layer *layer)
     // Doesn't get it from the staffDef, right?//
     if (!m_dursInVoiceSameMensur.empty()) {
         m_listOfSequences = SubdivideIntoBoundedSequences(m_dursInVoiceSameMensur);
-        FindDurQuals(m_listOfSequences);
+        ProcessBoundedSequences(m_listOfSequences);
         m_dursInVoiceSameMensur = {}; // restart for next voice (layer)
     }
     return FUNCTOR_CONTINUE;
@@ -124,16 +124,17 @@ std::vector<ArrayOfElementDurPairs> ScoringUpFunctor::SubdivideIntoBoundedSequen
     return listOfBoundedSequences;
 }
 
-void ScoringUpFunctor::FindDurQuals(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
+void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
 {
     for (ArrayOfElementDurPairs subseq : listOfSequences) {
-        FindDurQuals(subseq);
+        ProcessBoundedSequences(subseq);
     }
 }
 
-void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
+void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence)
 {
     ArrayOfElementDurPairs middleSeq = {};
+    
     if (sequence.size() >= 2) {
         data_DURATION firstNoteDur = sequence.at(0).second;
         if (firstNoteDur == DURATION_semibrevis || firstNoteDur == DURATION_minima
@@ -157,7 +158,42 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
         }
     }
     int numberOfDots = (int)indecesOfDots.size();
-    if (numberOfDots >= 1) {
+    // 0. No dots
+    double sum;
+    if (numberOfDots == 0) {
+        sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
+        FindDurQuals(sequence, sum);
+    }
+    // 1. Single dot in middle sequence sequence
+    if (numberOfDots == 1) {
+        // If there is one dot,
+        int dotInd = indecesOfDots.at(0);
+        ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
+        ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
+        double sum1 = GetValueInUnit(GetValueInMinims(middleSeq1), DURATION_semibrevis);
+        double sum2 = GetValueInUnit(GetValueInMinims(middleSeq2), DURATION_semibrevis);
+        // This condition is to discard it being a dot of perfection
+        if (middleSeq1.size() != 0) {
+            // This other condition is to evaluate if it is a dot of division
+            if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
+                // This is a dot of division
+                ArrayOfElementDurPairs seq1 ={sequence.begin(), sequence.begin() + dotInd };
+                ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 1, sequence.end() };
+                FindDurQuals(seq1, sum1);
+                FindDurQuals(seq2, sum2);
+            } else {
+                // This is a dot of augmentation
+                sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
+                FindDurQuals(sequence, sum);
+            }
+        }
+        else {
+            sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
+            FindDurQuals(sequence, sum);
+        }
+    }
+    // 3. More than one dot in middle sequence
+    else if (numberOfDots > 1) {
         // Take first dot and evaluate if it is a dot of imperfection (check if it is "integer number of semibreves"
         // away from the beginning of the sequence, and if the rest of the sequence still sums an integer number)
 
@@ -165,27 +201,11 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
         // from the end of the sequence, and if the rest of the sequence still sums an integer number)
 
         // If neither, all dots are dots of augmentation
-        if (numberOfDots == 1) {
-        }
     }
+}
 
-    // Value in minims:
-    double sum = 0;
-    bool followedByDot = false;
-    LayerElement *nextElement = NULL;
-    for (int i = 0; i < middleSeq.size(); i++) {
-        std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
-        // Check if there is a dot after the element being evaluated
-        if (i + 1 < middleSeq.size()) {
-            nextElement = middleSeq.at(i + 1).first;
-            followedByDot = nextElement->Is(DOT);
-        }
-        else {
-            followedByDot = false;
-        }
-        sum += GetDurNumberValue(elementDurPair, followedByDot, nextElement);
-    }
-    sum = sum / 2;
+void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence, double valueInSmallerUnit) {
+    double sum = valueInSmallerUnit; //JUST IN THIS CASE
     int remainder = (int)sum % 3;
 
     // CHECK SUM --> IS IT INTEGER when dot of division???
@@ -301,6 +321,47 @@ void ScoringUpFunctor::FindDurQuals(const ArrayOfElementDurPairs &sequence)
                 break;
         }
     }
+}
+double ScoringUpFunctor::GetValueInMinims(const ArrayOfElementDurPairs &middleSeq){
+    // Value in minims:
+    double sum = 0;
+    bool followedByDot = false;
+    LayerElement *nextElement = NULL;
+    for (int i = 0; i < middleSeq.size(); i++) {
+        std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
+        // Check if there is a dot after the element being evaluated
+        if (i + 1 < middleSeq.size()) {
+            nextElement = middleSeq.at(i + 1).first;
+            followedByDot = nextElement->Is(DOT);
+        }
+        else {
+            followedByDot = false;
+        }
+        sum += GetDurNumberValue(elementDurPair, followedByDot, nextElement);
+    }
+    return sum;
+}
+
+double ScoringUpFunctor::GetValueInUnit(double valueInMinims, data_DURATION unit){
+    double valueInUnit = 0.0;
+    if (unit == DURATION_semibrevis){
+        valueInUnit = valueInMinims / 2;
+        //imperfect mensur
+        //MISSING perfect mensur
+    } else if (unit == DURATION_brevis){
+        valueInUnit = valueInMinims / 4;
+        //imperfect mensur
+        //MISSING perfect mensur
+    } else if (unit == DURATION_longa){
+        valueInUnit = valueInMinims / 8;
+        //imperfect mensur
+        //MISSING perfect mensur
+    } else if (unit == DURATION_maxima){
+        valueInUnit = valueInMinims / 16;
+        //imperfect mensur
+        //MISSING perfect mensur
+    }
+    return valueInUnit;
 }
 
 double ScoringUpFunctor::GetDurNumberValue(

@@ -49,14 +49,17 @@ public:
      * @name: Find @dur.quality of notes (perfecta / imperfecta / altera)
      */
     ///@{
-    void FindDurQuals(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
-    void FindDurQuals(const ArrayOfElementDurPairs &sequence);
+    void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
+    void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
+    void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
     ///@}
 
     /**
      * @name: Find the duration value of the note in minims
      */
     ///@{
+    double GetValueInMinims(const ArrayOfElementDurPairs &middleSeq);
+    double GetValueInUnit(double valueInMinims, data_DURATION unit);
     double GetDurNumberValue(
         const std::pair<LayerElement *, data_DURATION> &elementDurPair, bool followedByDot, LayerElement *nextElement);
     ///@}
