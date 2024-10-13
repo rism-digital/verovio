@@ -158,7 +158,7 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     // not in the middleSeq.
     std::vector<int> indecesOfDots;
     for (int i = 0; i < middleSeq.size(); i++) {
-        std::pair<LayerElement *, data_DURATION> elementDurPair = middleSeq.at(i);
+        std::pair<LayerElement*, data_DURATION> elementDurPair = middleSeq.at(i);
         if (elementDurPair.first->Is(DOT)) {
             indecesOfDots.insert(indecesOfDots.end(), i);
         }
@@ -182,9 +182,14 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
         if (middleSeq1.size() != 0) {
             // This other condition is to evaluate if it is a dot of division
             if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
-                // This is a dot of division
+                // This is a "dot of division" that divides the sequence into the following two:
                 ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
                 ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
+                // Encode the dot of division:
+                LayerElement* dotElement = sequence.at(dotInd + 1).first;
+                Dot *dot = vrv_cast<Dot *>(dotElement);
+                dot->SetForm(dotLog_FORM_div);
+                // Encode its effect on the notes preceding and following:
                 FindDurQuals(seq1, sum1);
                 FindDurQuals(seq2, sum2);
             }
