@@ -216,11 +216,20 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     else if (numberOfDots > 1) {
         // Take first dot and evaluate if it is a dot of imperfection (check if it is "integer number of semibreves"
         // away from the beginning of the sequence, and if the rest of the sequence still sums an integer number)
+        int startDotInd = indecesOfDots.at(0);
+        bool isStartDotOfDiv = EvalDotOfDiv(middleSeq, sequence, startDotInd);
 
         // Take last dot and evaluate if it is a dot of division (check if it is "integer number of semibreves" away
         // from the end of the sequence, and if the rest of the sequence still sums an integer number)
+        int endDotInd = indecesOfDots.at(indecesOfDots.size() - 1);
+        bool isEndDotOfDiv = EvalDotOfDiv(middleSeq, sequence, endDotInd);
 
         // If neither, all dots are dots of augmentation
+        if (not isStartDotOfDiv and not isEndDotOfDiv) {
+            // This is a dot of augmentation
+            sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
+            FindDurQuals(sequence, sum);
+        }
     }
 }
 
