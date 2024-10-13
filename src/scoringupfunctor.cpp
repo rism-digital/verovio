@@ -141,6 +141,37 @@ ArrayOfElementDurPairs ScoringUpFunctor::GetBoundedNotes(const ArrayOfElementDur
     return middleSeq;
 }
 
+bool ScoringUpFunctor::EvalDotOfDiv(
+    const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd)
+{
+    // Initial assumption: the sequence doesn't have a dot of division
+    bool flagDotOfDiv = false;
+    // Evaluate if the dot passed to the method (by the dotInd) is behaving as a dot of division
+    ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
+    ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
+    double sum1 = GetValueInUnit(GetValueInMinims(middleSeq1), DURATION_semibrevis);
+    double sum2 = GetValueInUnit(GetValueInMinims(middleSeq2), DURATION_semibrevis);
+    // This condition is to discard it being a dot of perfection
+    if (middleSeq1.size() != 0) {
+        // This other condition is to evaluate if it is a dot of division
+        if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
+            // This is a "dot of division"
+            flagDotOfDiv = true;
+            // Then it divides the sequence into the following two:
+            ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
+            ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
+            // Encode the dot of division:
+            LayerElement *dotElement = sequence.at(dotInd + 1).first;
+            Dot *dot = vrv_cast<Dot *>(dotElement);
+            dot->SetForm(dotLog_FORM_div);
+            // Encode its effect on the notes preceding and following:
+            FindDurQuals(seq1, sum1);
+            FindDurQuals(seq2, sum2);
+        }
+    }
+    return flagDotOfDiv;
+}
+
 void ScoringUpFunctor::ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences)
 {
     for (ArrayOfElementDurPairs sequence : listOfSequences) {
@@ -174,32 +205,9 @@ void ScoringUpFunctor::ProcessBoundedSequences(const ArrayOfElementDurPairs &seq
     else if (numberOfDots == 1) {
         // If there is one dot,
         int dotInd = indecesOfDots.at(0);
-        ArrayOfElementDurPairs middleSeq1 = { middleSeq.begin(), middleSeq.begin() + dotInd };
-        ArrayOfElementDurPairs middleSeq2 = { middleSeq.begin() + dotInd + 1, middleSeq.end() };
-        double sum1 = GetValueInUnit(GetValueInMinims(middleSeq1), DURATION_semibrevis);
-        double sum2 = GetValueInUnit(GetValueInMinims(middleSeq2), DURATION_semibrevis);
-        // This condition is to discard it being a dot of perfection
-        if (middleSeq1.size() != 0) {
-            // This other condition is to evaluate if it is a dot of division
-            if ((sum1 == (int)sum1) and (sum2 == (int)sum2)) {
-                // This is a "dot of division" that divides the sequence into the following two:
-                ArrayOfElementDurPairs seq1 = { sequence.begin(), sequence.begin() + dotInd + 1 };
-                ArrayOfElementDurPairs seq2 = { sequence.begin() + dotInd + 2, sequence.end() };
-                // Encode the dot of division:
-                LayerElement *dotElement = sequence.at(dotInd + 1).first;
-                Dot *dot = vrv_cast<Dot *>(dotElement);
-                dot->SetForm(dotLog_FORM_div);
-                // Encode its effect on the notes preceding and following:
-                FindDurQuals(seq1, sum1);
-                FindDurQuals(seq2, sum2);
-            }
-            else {
-                // This is a dot of augmentation
-                sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
-                FindDurQuals(sequence, sum);
-            }
-        }
-        else {
+        bool isDotOfDiv = EvalDotOfDiv(middleSeq, sequence, dotInd);
+        if (not isDotOfDiv) {
+            // This is a dot of augmentation
             sum = GetValueInUnit(GetValueInMinims(middleSeq), DURATION_semibrevis);
             FindDurQuals(sequence, sum);
         }

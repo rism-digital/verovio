@@ -52,6 +52,7 @@ public:
     void ProcessBoundedSequences(const std::vector<ArrayOfElementDurPairs> &listOfSequences);
     void ProcessBoundedSequences(const ArrayOfElementDurPairs &sequence);
     ArrayOfElementDurPairs GetBoundedNotes(const ArrayOfElementDurPairs &sequence);
+    bool EvalDotOfDiv(const ArrayOfElementDurPairs &middleSeq, const ArrayOfElementDurPairs &sequence, int dotInd);
     void FindDurQuals(const ArrayOfElementDurPairs &middleSeq, double valueInUnit);
     ///@}
 
