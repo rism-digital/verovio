@@ -106,10 +106,11 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     bool drawingCueSize = false;
     int overline = 0;
     int strike = 0;
+    int underline = 0;
 
     if (staff->m_drawingNotationType == NOTATIONTYPE_tab_guitar) {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike, underline);
 
         FontInfo fretTxt;
         if (!dc->UseGlobalStyling()) {
@@ -135,7 +136,7 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     else {
 
-        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike);
+        std::u32string fret = note->GetTabFretString(staff->m_drawingNotationType, overline, strike, underline);
         // Center for italian tablature
         if (staff->IsTabLuteItalian()) {
             y -= (m_doc->GetGlyphHeight(SMUFL_EBE0_luteItalianFret0, glyphSize, drawingCueSize) / 2);
@@ -153,8 +154,8 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
         dc->SetFont(m_doc->GetDrawingSmuflFont(glyphSize, false));
         this->DrawSmuflString(dc, x, y, fret, HORIZONTALALIGNMENT_center, glyphSize);
 
-        // Add overlines or strikethoughs if required
-        if ((overline > 0 || strike > 0) && !fret.empty()) {
+        // Add overlines, strikethoughs and underlines if required
+        if ((overline > 0 || strike > 0 || underline > 0) && !fret.empty()) {
             const int lineThickness
                 = m_options->m_lyricLineThickness.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             const int widthFront = m_doc->GetGlyphWidth(fret.front(), glyphSize, drawingCueSize);
@@ -162,8 +163,11 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             TextExtend extend;
             dc->GetSmuflTextExtent(fret, &extend);
 
-            const int x1 = x - widthFront / 2;
-            const int x2 = x + extend.m_width - widthBack * 3 / 10; // trim right hand overhang on last character
+            // TODO These fiddle factors seem necessary to get the lines balanced on either side
+            // of the fret string.  Can we do better?
+            const int x1
+                = x - (fret.size() == 1 ? widthFront * 7 / 10 : widthFront * 12 / 10); // extend on the left hand side
+            const int x2 = x + extend.m_width - widthBack * 1 / 10; // trim right hand overhang on last character
 
             dc->SetPen(m_currentColor, lineThickness, AxSOLID);
             dc->SetBrush(m_currentColor, AxSOLID);
@@ -182,6 +186,14 @@ void View::DrawTabNote(DeviceContext *dc, LayerElement *element, Layer *layer, S
             for (int i = 0; i < strike; ++i) {
                 dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
                 y1 += 2 * lineThickness;
+            }
+
+            // underlines
+            y1 = y - extend.m_descent - lineThickness;
+
+            for (int i = 0; i < underline; ++i) {
+                dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+                y1 -= 2 * lineThickness;
             }
 
             dc->ResetPen();
@@ -212,6 +224,12 @@ void View::DrawTabDurSym(DeviceContext *dc, LayerElement *element, Layer *layer,
     if (tabDurSym->HasLoc()) {
         const int yRel = ((staff->m_drawingLines - 1) * 2 - tabDurSym->GetLoc())
             * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        tabDurSym->SetDrawingYRel(-yRel);
+    }
+    else if (staff->IsTabLuteItalian()) {
+        // make space for 7th course
+        const int yRel
+            = ((staff->m_drawingLines - 1) * 2 - 7 * 2 + 1) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         tabDurSym->SetDrawingYRel(-yRel);
     }
 

@@ -224,6 +224,17 @@ bool Note::HasLedgerLines(int &linesAbove, int &linesBelow, const Staff *staff) 
         staff = this->GetAncestorStaff();
     }
 
+    if (staff->IsTabLuteFrench() || staff->IsTabLuteGerman() || staff->IsTabLuteItalian()) {
+        // French and German tablature do not use ledger lines.
+        // Italian tablature does use a single ledger line for 7th course, and compressed
+        // ledger lines for fretted 8th and above, but not for open 8th and above. So
+        // rather than use the CMN ledger line handling we draw our own.
+        // Guitar tablature has been left as originally implemented.
+        linesAbove = 0;
+        linesBelow = 0;
+        return false;
+    }
+
     linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
     linesBelow = -(this->GetDrawingLoc()) / 2;
 
@@ -271,10 +282,11 @@ const TabGrp *Note::IsTabGrpNote() const
     return vrv_cast<const TabGrp *>(this->GetFirstAncestor(TABGRP, MAX_TABGRP_DEPTH));
 }
 
-std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike) const
+std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overline, int &strike, int &underline) const
 {
     overline = 0;
     strike = 0;
+    underline = 0;
 
     // @glyph.num, @glyph.name or @altsym
     const Resources *resources = this->GetDocResources();
@@ -321,21 +333,27 @@ std::u32string Note::GetTabFretString(data_NOTATIONTYPE notationType, int &overl
 
     if (notationType == NOTATIONTYPE_tab_lute_italian) {
         std::u32string fretStr;
-        int fret = this->GetTabFret();
-        // Maximum allowed would be 19 (always bindly adding 1 as first figure)
-        if (fret > 9) fretStr.push_back(SMUFL_EBE1_luteItalianFret1);
-        switch (fret % 10) {
-            case 0: fretStr.push_back(SMUFL_EBE0_luteItalianFret0); break;
-            case 1: fretStr.push_back(SMUFL_EBE1_luteItalianFret1); break;
-            case 2: fretStr.push_back(SMUFL_EBE2_luteItalianFret2); break;
-            case 3: fretStr.push_back(SMUFL_EBE3_luteItalianFret3); break;
-            case 4: fretStr.push_back(SMUFL_EBE4_luteItalianFret4); break;
-            case 5: fretStr.push_back(SMUFL_EBE5_luteItalianFret5); break;
-            case 6: fretStr.push_back(SMUFL_EBE6_luteItalianFret6); break;
-            case 7: fretStr.push_back(SMUFL_EBE7_luteItalianFret7); break;
-            case 8: fretStr.push_back(SMUFL_EBE8_luteItalianFret8); break;
-            case 9: fretStr.push_back(SMUFL_EBE9_luteItalianFret9); break;
-            default: break;
+        const int fret = this->GetTabFret();
+        const int course = this->GetTabCourse();
+
+        // Italian tablature glyphs are contiguous
+        static_assert(SMUFL_EBE1_luteItalianFret1 == SMUFL_EBE0_luteItalianFret0 + 1);
+        static_assert(SMUFL_EBE2_luteItalianFret2 == SMUFL_EBE0_luteItalianFret0 + 2);
+        // ...
+        static_assert(SMUFL_EBE9_luteItalianFret9 == SMUFL_EBE0_luteItalianFret0 + 9);
+
+        if (course <= 7 || fret != 0) {
+            const auto decimal = std::div(fret, 10);
+            if (decimal.quot > 0) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.quot);
+            if (decimal.rem <= 9) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.rem);
+            if (course >= 7) strike = 1; // course 7 and fretted courses >= 8 use a ledger line
+            underline = std::max(0, course - 7); // compressed ledger lines for fretted courses >= 8
+        }
+        else {
+            // open courses >= 8 just use the number of the course on stave line 7
+            const auto decimal = std::div(course, 10);
+            if (decimal.quot > 0) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.quot);
+            if (decimal.rem <= 9) fretStr.push_back(SMUFL_EBE0_luteItalianFret0 + decimal.rem);
         }
         return fretStr;
     }
