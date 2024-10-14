@@ -367,7 +367,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     /// Loading a UTF-16 file with basic conversion ot UTF-8
     /// This is called after checking if the file has a UTF-16 BOM
 
-    LogWarning("The file seems to be UTF-16 - trying to convert to UTF-8");
+    LogInfo("The file seems to be UTF-16 - trying to convert to UTF-8");
 
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -385,7 +385,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
     // order of the bytes has to be flipped
     if (u16data.at(0) == u'\uFFFE') {
-        LogWarning("The file seems to have been loaded as little endian - trying to convert to big endian");
+        LogInfo("The file seems to have been loaded as little endian - trying to convert to big endian");
         // convert to big endian (swap bytes)
         std::transform(std::begin(u16data), std::end(u16data), std::begin(u16data), [](char16_t c) {
             auto p = reinterpret_cast<char *>(&c);
@@ -1303,11 +1303,11 @@ void Toolkit::PrintOptionUsageOutput(const vrv::Option *option, std::ostream &ou
 void Toolkit::PrintOptionUsage(const std::string &category, std::ostream &output) const
 {
     // map of all categories and expected string arguments for them
-    const std::map<vrv::OptionsCategory, std::string> categories
-        = { { vrv::OptionsCategory::Base, "base" }, { vrv::OptionsCategory::General, "general" },
-              { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
-              { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
-              { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
+    const std::map<vrv::OptionsCategory, std::string> categories = { { vrv::OptionsCategory::Base, "base" },
+        { vrv::OptionsCategory::General, "general" }, { vrv::OptionsCategory::Json, "json" },
+        { vrv::OptionsCategory::Layout, "layout" }, { vrv::OptionsCategory::Margins, "margins" },
+        { vrv::OptionsCategory::Mensural, "mensural" }, { vrv::OptionsCategory::Midi, "midi" },
+        { vrv::OptionsCategory::Selectors, "selectors" }, { vrv::OptionsCategory::Full, "full" } };
 
     output.precision(2);
     // display_version();
@@ -1799,6 +1799,7 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
 {
     bool includeMeasures = false;
     bool includeRests = false;
+    bool useFractions = false;
 
     jsonxx::Object json;
 
@@ -1811,13 +1812,14 @@ std::string Toolkit::RenderToTimemap(const std::string &jsonOptions)
             if (json.has<jsonxx::Boolean>("includeMeasures"))
                 includeMeasures = json.get<jsonxx::Boolean>("includeMeasures");
             if (json.has<jsonxx::Boolean>("includeRests")) includeRests = json.get<jsonxx::Boolean>("includeRests");
+            if (json.has<jsonxx::Boolean>("useFractions")) useFractions = json.get<jsonxx::Boolean>("useFractions");
         }
     }
 
     this->ResetLogBuffer();
 
     std::string output;
-    m_doc.ExportTimemap(output, includeRests, includeMeasures);
+    m_doc.ExportTimemap(output, includeRests, includeMeasures, useFractions);
     return output;
 }
 

@@ -1353,7 +1353,7 @@ Options::Options()
 
     m_justificationMaxVertical.SetInfo("Maximum ratio of justifiable height for page",
         "Maximum ratio of justifiable height to page height that can be used for the vertical justification");
-    m_justificationMaxVertical.Init(0.3, 0.0, 1.0);
+    m_justificationMaxVertical.Init(0.2, 0.0, 1.0);
     this->Register(&m_justificationMaxVertical, "justificationMaxVertical", &m_generalLayout);
 
     m_ledgerLineThickness.SetInfo("Ledger line thickness", "The thickness of the ledger lines");
@@ -1798,7 +1798,7 @@ Options::Options()
     m_topMarginPgFooter.Init(2.0, 0.0, 24.0);
     this->Register(&m_topMarginPgFooter, "topMarginPgFooter", &m_elementMargins);
 
-    /********* midi *********/
+    /********* MIDI *********/
 
     m_midi.SetLabel("Midi options", "5-midi");
     m_midi.SetCategory(OptionsCategory::Midi);
@@ -1812,7 +1812,7 @@ Options::Options()
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
 
-    /********* General *********/
+    /********* Mensural *********/
 
     m_mensural.SetLabel("Mensural notation options", "6-mensural");
     m_mensural.SetCategory(OptionsCategory::Mensural);
@@ -1825,6 +1825,16 @@ Options::Options()
     m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
     m_mensuralToMeasure.Init(false);
     this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_mensural);
+
+    /********* Method JSON options to the command-line *********/
+
+    m_jsonCmdLineOptions.SetLabel("Method JSON options for the command-line", "7-methodJson");
+    m_jsonCmdLineOptions.SetCategory(OptionsCategory::Json);
+    m_grps.push_back(&m_jsonCmdLineOptions);
+
+    m_timemapOptions.SetInfo("Timemap options", "The JSON options to be passed when producing the timemap");
+    m_timemapOptions.Init("{}");
+    this->Register(&m_timemapOptions, "timemapOptions", &m_jsonCmdLineOptions);
 
     /********* Deprecated options *********/
 

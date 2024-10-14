@@ -1269,8 +1269,8 @@ void View::DrawSylConnector(
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
-        // If we do not want to show hyphens at the start of a system and the end is at time 0.0
-        if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0.0)) {
+        // If we do not want to show hyphens at the start of a system and the end is at time 0
+        if (m_options->m_lyricNoStartHyphen.GetValue() && (syl->GetEnd()->GetAlignment()->GetTime() == 0)) {
             // Return but only if the end is in the first measure of the system...
             Measure *measure = vrv_cast<Measure *>(syl->GetEnd()->GetFirstAncestor(MEASURE));
             assert(measure);

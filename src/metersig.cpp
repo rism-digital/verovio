@@ -70,7 +70,7 @@ int MeterSig::GetTotalCount() const
     // If @count is empty, look at the sym to return a resonable value
     if (counts.empty()) {
         if (this->HasSym()) {
-            return (this->GetSym() == METERSIGN_common) ? 4 : 2;
+            return (this->GetSym() == METERSIGN_cut) ? 2 : 4;
         }
         else {
             return 0;
@@ -106,6 +106,29 @@ int MeterSig::GetTotalCount() const
     }
 
     return counts.front();
+}
+
+int MeterSig::GetSymImplicitUnit() const
+{
+    if (this->HasSym()) {
+        return (this->GetSym() == METERSIGN_cut) ? 2 : 4;
+    }
+    else {
+        return 0;
+    }
+}
+
+data_DURATION MeterSig::GetUnitAsDur() const
+{
+    switch (this->GetUnit()) {
+        case 1: return DURATION_1;
+        case 2: return DURATION_2;
+        case 4: return DURATION_4;
+        case 8: return DURATION_8;
+        case 16: return DURATION_16;
+        case 32: return DURATION_32;
+        default: return DURATION_4;
+    }
 }
 
 char32_t MeterSig::GetSymbolGlyph() const

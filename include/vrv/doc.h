@@ -276,7 +276,7 @@ public:
      * Extract a timemap from the document to a JSON string.
      * Run trough all the layers and fill the timemap file content.
      */
-    bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures);
+    bool ExportTimemap(std::string &output, bool includeRests, bool includeMeasures, bool useFractions);
 
     /**
      *  Extract expansionMap from the document to JSON string.

@@ -521,23 +521,24 @@ void PAEOutput::WriteTuplet(Tuplet *tuplet)
 
     Staff *staff = tuplet->GetAncestorStaff();
 
-    double content = tuplet->GetContentAlignmentDuration(true, staff->m_drawingNotationType);
-    // content = DUR_MAX / 2^(dur - 2)
-    int tupletDur = (content != 0.0) ? log2(DUR_MAX / content) + 2 : 4;
+    auto [tupletDur, remainder] = tuplet->GetContentAlignmentDuration(true, staff->m_drawingNotationType).ToDur();
     // We should be looking for dotted values
+    if (remainder != 0) {
+        LogWarning("The tuplet content is not a single non-dotted duration");
+    }
 
     std::string dur;
     switch (tupletDur) {
-        case (DUR_LG): dur = "0"; break;
-        case (DUR_BR): dur = "9"; break;
-        case (DUR_1): dur = "1"; break;
-        case (DUR_2): dur = "2"; break;
-        case (DUR_4): dur = "4"; break;
-        case (DUR_8): dur = "8"; break;
-        case (DUR_16): dur = "6"; break;
-        case (DUR_32): dur = "3"; break;
-        case (DUR_64): dur = "5"; break;
-        case (DUR_128): dur = "7"; break;
+        case (DURATION_long): dur = "0"; break;
+        case (DURATION_breve): dur = "9"; break;
+        case (DURATION_1): dur = "1"; break;
+        case (DURATION_2): dur = "2"; break;
+        case (DURATION_4): dur = "4"; break;
+        case (DURATION_8): dur = "8"; break;
+        case (DURATION_16): dur = "6"; break;
+        case (DURATION_32): dur = "3"; break;
+        case (DURATION_64): dur = "5"; break;
+        case (DURATION_128): dur = "7"; break;
         default: LogWarning("Unsupported tuplet duration"); dur = "4";
     }
 

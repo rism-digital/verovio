@@ -406,8 +406,8 @@ std::pair<int, int> AdjustXPosFunctor::CalculateXPosOffset(LayerElement *layerEl
             if (layerElement->Is({ NOTE, CHORD }) && !layerElement->GetFirstAncestor(TUPLET) && bboxElement->Is(REST)
                 && bboxElement->GetFirstAncestor(TUPLET)) {
                 Rest *rest = vrv_cast<Rest *>(bboxElement);
-                if (rest->GetDur() > DUR_8) {
-                    overlap = 1.5 * (rest->GetDur() - DUR_8) * drawingUnit;
+                if (rest->GetDur() > DURATION_8) {
+                    overlap = 1.5 * (rest->GetDur() - DURATION_8) * drawingUnit;
                 }
             }
         }

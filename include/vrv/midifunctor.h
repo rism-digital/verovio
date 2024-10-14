@@ -65,7 +65,7 @@ public:
     //
 private:
     // The current score time in the measure (incremented by each element)
-    double m_currentScoreTime;
+    Fraction m_currentScoreTime;
     // The current real time in seconds in the measure (incremented by each element)
     double m_currentRealTimeSeconds;
     // The current time alignment parameters
@@ -127,7 +127,7 @@ public:
     //
 private:
     // The current score time
-    double m_currentScoreTime;
+    Fraction m_currentScoreTime;
     // The current time in seconds
     double m_currentRealTimeSeconds;
     // The current tempo
@@ -423,7 +423,7 @@ public:
     //
 private:
     // The score time from the start of the piece to the previous barline in quarter notes
-    double m_scoreTimeOffset;
+    Fraction m_scoreTimeOffset;
     // Real time from the start of the piece to the previous barline in ms
     double m_realTimeOffsetMilliseconds;
     // The current tempo

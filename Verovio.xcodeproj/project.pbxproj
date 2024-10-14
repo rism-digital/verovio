@@ -182,6 +182,12 @@
 		4D16945A1E3A44F300569BF4 /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
 		4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
 		4D1694741E3A455200569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
+		4D1788C22CB8FD0100FE9043 /* fraction.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1788C12CB8FD0100FE9043 /* fraction.h */; };
+		4D1788C32CB8FD0100FE9043 /* fraction.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1788C12CB8FD0100FE9043 /* fraction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D1788C52CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
+		4D1788C62CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
+		4D1788C72CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
+		4D1788C82CB8FD7300FE9043 /* fraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1788C42CB8FD7300FE9043 /* fraction.cpp */; };
 		4D1AC9772B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
 		4D1AC9782B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
 		4D1AC9792B6A9BB200434023 /* filereader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1AC9762B6A9BB200434023 /* filereader.cpp */; };
@@ -1810,6 +1816,8 @@
 		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
 		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D1788C12CB8FD0100FE9043 /* fraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fraction.h; path = include/vrv/fraction.h; sourceTree = "<group>"; };
+		4D1788C42CB8FD7300FE9043 /* fraction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = fraction.cpp; path = src/fraction.cpp; sourceTree = "<group>"; };
 		4D1AC9762B6A9BB200434023 /* filereader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = filereader.cpp; path = src/filereader.cpp; sourceTree = "<group>"; };
 		4D1AC97B2B6A9BD000434023 /* filereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filereader.h; path = include/vrv/filereader.h; sourceTree = "<group>"; };
 		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
@@ -2843,6 +2851,8 @@
 				4D1AC97B2B6A9BD000434023 /* filereader.h */,
 				4DF28A041A754DF000BA9F7D /* floatingobject.cpp */,
 				4D95D4F41D7185DE00B2B856 /* floatingobject.h */,
+				4D1788C12CB8FD0100FE9043 /* fraction.h */,
+				4D1788C42CB8FD7300FE9043 /* fraction.cpp */,
 				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
 				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				4DACC93F2990ED2600B55913 /* libmei.h */,
@@ -3484,6 +3494,7 @@
 				4DEBE6E12B36E78900B67DFB /* facsimilefunctor.h in Headers */,
 				4D94E0E22995411100F49F89 /* meibasic.h in Headers */,
 				BD2E4D9B2875882200B04350 /* stem.h in Headers */,
+				4D1788C22CB8FD0100FE9043 /* fraction.h in Headers */,
 				4DACC9EA2990F29A00B55913 /* attmodule.h in Headers */,
 				4DACC98E2990F29A00B55913 /* atts_externalsymbols.h in Headers */,
 				4D6413762035F57800BB630E /* pages.h in Headers */,
@@ -3761,6 +3772,7 @@
 				4DC3B9EB239E2B23007F185E /* transposition.h in Headers */,
 				BB4C4BC122A932FC001F6AF0 /* MidiMessage.h in Headers */,
 				BB4C4B9222A932DF001F6AF0 /* textelement.h in Headers */,
+				4D1788C32CB8FD0100FE9043 /* fraction.h in Headers */,
 				BB4C4B5C22A932D7001F6AF0 /* mensur.h in Headers */,
 				4D79641E26C152400026288B /* pageelement.h in Headers */,
 				BB4C4AEC22A932BC001F6AF0 /* editorial.h in Headers */,
@@ -3886,7 +3898,8 @@
 		8F086EA0188534680037FD8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1420;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					BB4C4A5122A930A3001F6AF0 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -4014,6 +4027,7 @@
 				E7F1C36929F03461007E12C1 /* savefunctor.cpp in Sources */,
 				4DF092A62497711800239195 /* phrase.cpp in Sources */,
 				4DB3D8D91F83D13C00B5FC2B /* turn.cpp in Sources */,
+				4D1788C62CB8FD7300FE9043 /* fraction.cpp in Sources */,
 				4DA0EAC422BB779400A7EBEB /* surface.cpp in Sources */,
 				4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */,
 				4DEC4DAF21C81F0600D1D273 /* sic.cpp in Sources */,
@@ -4495,6 +4509,7 @@
 				4DACC9F82990F29A00B55913 /* atts_figtable.cpp in Sources */,
 				400FEDD3206FA743000D3233 /* gracegrp.cpp in Sources */,
 				4D4FCD0C1F5455FF0009C455 /* staffgrp.cpp in Sources */,
+				4D1788C82CB8FD7300FE9043 /* fraction.cpp in Sources */,
 				4DEC4DBE21C828AC00D1D273 /* corr.cpp in Sources */,
 				4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D1EB6A12A2A40B400AF2F98 /* textlayoutelement.cpp in Sources */,
@@ -4594,6 +4609,7 @@
 				E7F1C36729F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				4DEC4D8021C804C500D1D273 /* add.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
+				4D1788C72CB8FD7300FE9043 /* fraction.cpp in Sources */,
 				4DF092A72497711800239195 /* phrase.cpp in Sources */,
 				4D20741422A708C600E0765F /* view_tab.cpp in Sources */,
 				4D1BE7861C6A40A80086DC0E /* pugixml.cpp in Sources */,
@@ -4885,6 +4901,7 @@
 				E7F1C36829F0345D007E12C1 /* savefunctor.cpp in Sources */,
 				BB4C4AC122A932B6001F6AF0 /* layer.cpp in Sources */,
 				BB4C4B0522A932C3001F6AF0 /* pgfoot.cpp in Sources */,
+				4D1788C52CB8FD7300FE9043 /* fraction.cpp in Sources */,
 				4DF092A82497711800239195 /* phrase.cpp in Sources */,
 				BB4C4ABF22A932B6001F6AF0 /* labelabbr.cpp in Sources */,
 				4DA0EAC622BB779400A7EBEB /* surface.cpp in Sources */,
@@ -5129,7 +5146,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5140,7 +5157,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5175,6 +5192,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -5234,6 +5252,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -5266,7 +5285,7 @@
 					"$(inherited)",
 					NO_HUMDRUM_SUPPORT,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5278,7 +5297,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -5292,7 +5311,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "";
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -5306,7 +5325,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "";
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -5333,6 +5352,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -5353,7 +5373,8 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 c++20";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rism.VerovioFramework;
@@ -5388,6 +5409,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -5406,7 +5428,8 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 c++20";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rism.VerovioFramework;

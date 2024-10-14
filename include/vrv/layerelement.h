@@ -14,12 +14,12 @@
 
 #include "atts_shared.h"
 #include "facsimileinterface.h"
+#include "fraction.h"
 #include "linkinginterface.h"
 #include "object.h"
 
 namespace vrv {
 
-class Alignment;
 class Beam;
 class BeamElementCoord;
 class FTrem;
@@ -262,26 +262,26 @@ public:
     /**
      * Return the duration if the element has a DurationInterface.
      */
-    double GetAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+    Fraction GetAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
      * Return the duration if the element has a DurationInterface.
      * Shortcut assigning default values for AlignParameter.
      */
-    double GetAlignmentDuration(bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
+    Fraction GetAlignmentDuration(bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**
      * Return the duration if the content of the layer element with a @sameas attribute.
      * Used only on beam, tuplet or ftrem have.
      */
-    double GetSameAsContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+    Fraction GetSameAsContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
-    double GetContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
+    Fraction GetContentAlignmentDuration(const AlignMeterParams &params, bool notGraceOnly = true,
         data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
-    double GetContentAlignmentDuration(
+    Fraction GetContentAlignmentDuration(
         bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn) const;
 
     /**

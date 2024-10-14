@@ -75,7 +75,7 @@ private:
     // The measureAligner
     MeasureAligner *m_measureAligner;
     // The time
-    double m_time;
+    Fraction m_time;
     // The current MeterSig, Mensur and Proport
     AlignMeterParams m_currentParams;
     // The current notation type
