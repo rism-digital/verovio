@@ -24,7 +24,7 @@ jobs:
       # Build the wheels for Linux, Windows and macOS
       matrix:
         os: [macos-13, macos-14, windows-latest, ubuntu-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         architecture: [x86, x64, arm64]
         include:
           - os: macos-13
