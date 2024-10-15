@@ -91,7 +91,7 @@ else:
 
 verovio_module = Extension('verovio._verovio',
                            sources=
-                                glob('./src/*.cpp') + 
+                                glob('./src/*.cpp') +
                                 glob('./src/hum/*.cpp') +
                                 glob('./libmei/dist/*.cpp') +
                                 glob('./libmei/addons/*.cpp') +
@@ -105,8 +105,8 @@ verovio_module = Extension('verovio._verovio',
                                './src/midi/MidiFile.cpp',
                                './src/midi/MidiMessage.cpp',
                                './bindings/python/verovio.i'],
-                           swig_opts=['-c++', '-outdir',
-                                      './bindings/python', '-doxygen'],
+                           swig_opts=['-c++', '-fastproxy', '-olddefs',
+                                      '-outdir', './bindings/python', '-doxygen'],
                            include_dirs=['./include/vrv',
                                          './include/crc',
                                          './include/json',
@@ -156,7 +156,7 @@ setup(name='verovio',
           'verovio.data.Petaluma': os.listdir('./data/Petaluma'),
           'verovio.data.text': os.listdir('./data/text'),
       },
-      python_requires='>=3.7',
+      python_requires='>=3.9',
       project_urls={
           'Bug Reports': 'https://github.com/rism-digital/verovio/issues',
           'Source': 'https://github.com/rism-digital/verovio',
