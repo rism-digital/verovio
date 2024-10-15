@@ -217,6 +217,8 @@ elseif (BUILD_AS_PYTHON)
 
     if(${SWIG_VERSION} VERSION_GREATER_EQUAL "4.1.0")
         list(APPEND CMAKE_SWIG_FLAGS "-doxygen")
+        list(APPEND CMAKE_SWIG_FLAGS "-fastproxy")
+        list(APPEND CMAKE_SWIG_FLAGS "-olddefs")
     else()
         list(APPEND CMAKE_SWIG_FLAGS "-py3;-DPY3")
     endif()
