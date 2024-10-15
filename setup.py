@@ -148,6 +148,7 @@ setup(name='verovio',
       package_dir={'verovio': './bindings/python',
                    'verovio.data': './data'},
       package_data={
+          'verovio': ['py.typed'],
           'verovio.data': [f for f in os.listdir('./data') if (f.endswith('.xml') or f.endswith(".css") or f.endswith(".svg"))],
           'verovio.data.Bravura': os.listdir('./data/Bravura'),
           'verovio.data.Gootville': os.listdir('./data/Gootville'),
