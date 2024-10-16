@@ -286,7 +286,7 @@ public:
      *
      * @remark nojs
      *
-     * @param outputTo the output to value as string
+     * @param outputTo the value to output as string
      * @return True if the option was successfully set
      */
     bool SetOutputTo(std::string const &outputTo);
