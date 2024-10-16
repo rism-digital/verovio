@@ -8,6 +8,10 @@
 #ifndef __VRV_FUNCTOR_H__
 #define __VRV_FUNCTOR_H__
 
+#include <optional>
+
+//----------------------------------------------------------------------------
+
 #include "comparison.h"
 #include "functorinterface.h"
 #include "vrvdef.h"
@@ -15,6 +19,9 @@
 namespace vrv {
 
 class Doc;
+
+// Helper enum classes
+enum class ProcessingStrategy { Sequential, MeasureParallel, SystemParallel };
 
 //----------------------------------------------------------------------------
 // FunctorBase
@@ -76,6 +83,20 @@ public:
      */
     virtual bool ImplementsEndInterface() const = 0;
 
+    /**
+     * Override to enable parallel functor processing
+     */
+    ///@{
+    virtual ProcessingStrategy GetProcessingStrategy() const { return ProcessingStrategy::Sequential; }
+    virtual int GetMaxNumberOfThreads() const { return 1; }
+    ///@}
+
+    /**
+     * Returns the object class on which parallelization is applied
+     * Additionally checks if we have more than one thread
+     */
+    std::optional<ClassId> GetConcurrentClass() const;
+
 private:
     //
 public:
@@ -108,6 +129,18 @@ public:
     virtual ~Functor() = default;
     ///@}
 
+    /**
+     * Copy child classes
+     * Must be overridden in order to use it (e.g. during parallelization)
+     */
+    virtual Functor *CloneFunctor() const;
+
+    /**
+     * Merge child classes, i.e. combine the state of the functor passed in with the current one
+     * The default implementation only considers the functor code
+     */
+    virtual void MergeFunctor(const Functor *functor);
+
 private:
     //
 public:
@@ -132,6 +165,18 @@ public:
     ConstFunctor() {}
     virtual ~ConstFunctor() = default;
     ///@}
+
+    /**
+     * Copy child classes
+     * Must be overridden in order to use it (e.g. during parallelization)
+     */
+    virtual ConstFunctor *CloneFunctor() const;
+
+    /**
+     * Merge child classes, i.e. combine the state of the functor passed in with the current one
+     * The default implementation only considers the functor code
+     */
+    virtual void MergeFunctor(const ConstFunctor *functor);
 
 private:
     //
@@ -162,6 +207,11 @@ public:
      * Getter for the document
      */
     Doc *GetDoc() { return m_doc; }
+
+    /*
+     * Get the maximal number of threads
+     */
+    int GetMaxNumberOfThreads() const final;
 
 private:
     //
@@ -196,6 +246,11 @@ public:
      * Getter for the document
      */
     const Doc *GetDoc() const { return m_doc; }
+
+    /*
+     * Get the maximal number of threads
+     */
+    int GetMaxNumberOfThreads() const final;
 
 private:
     //
